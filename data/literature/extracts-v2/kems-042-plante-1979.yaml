@@ -89684,8 +89684,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1460213088298514459023508072'
+        - - SiO2
+          - '0.8539786911701485540976491926'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -89752,6 +89759,61 @@ observations:
         published_page: 277
         table: '2'
         note: Series 1123, row 30; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1460213088298514459023508072'
+          - - SiO2
+            - '0.8539786911701485540976491926'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 277
+        table: '2'
+        note: Series 1123, row 30; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '21.14'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1123, row 30; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1123, row 30; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '78.86'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1123, row 30; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1123, row 30; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -89900,8 +89962,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1460213088298514459023508072'
+        - - SiO2
+          - '0.8539786911701485540976491926'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -89968,6 +90037,61 @@ observations:
         published_page: 277
         table: '2'
         note: Series 1123, row 31; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1460213088298514459023508072'
+          - - SiO2
+            - '0.8539786911701485540976491926'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 277
+        table: '2'
+        note: Series 1123, row 31; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '21.14'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1123, row 31; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1123, row 31; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '78.86'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1123, row 31; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1123, row 31; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -90116,8 +90240,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1459465117773979309261063226'
+        - - SiO2
+          - '0.8540534882226020690738936777'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -90184,6 +90315,61 @@ observations:
         published_page: 277
         table: '2'
         note: Series 1126, row 1; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1459465117773979309261063226'
+          - - SiO2
+            - '0.8540534882226020690738936777'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 277
+        table: '2'
+        note: Series 1126, row 1; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '21.13'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1126, row 1; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1126, row 1; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '78.87'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1126, row 1; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1126, row 1; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -95282,8 +95468,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1135230374874063380135758229'
+        - - SiO2
+          - '0.8864769625125936619864241772'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -95350,6 +95543,61 @@ observations:
         published_page: 277
         table: '2'
         note: Series 1126, row 17; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1135230374874063380135758229'
+          - - SiO2
+            - '0.8864769625125936619864241772'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 277
+        table: '2'
+        note: Series 1126, row 17; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '16.72'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1126, row 17; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1126, row 17; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '83.28'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1126, row 17; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1126, row 17; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -95498,8 +95746,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1131617434687503891622715043'
+        - - SiO2
+          - '0.8868382565312496108377284958'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -95566,6 +95821,61 @@ observations:
         published_page: 277
         table: '2'
         note: Series 1126, row 18; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1131617434687503891622715043'
+          - - SiO2
+            - '0.8868382565312496108377284958'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 277
+        table: '2'
+        note: Series 1126, row 18; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '16.67'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1126, row 18; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1126, row 18; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '83.33'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1126, row 18; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1126, row 18; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -95714,8 +96024,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1129450338887230432551127818'
+        - - SiO2
+          - '0.887054966111276956744887218'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -95782,6 +96099,61 @@ observations:
         published_page: 277
         table: '2'
         note: Series 1126, row 19; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1129450338887230432551127818'
+          - - SiO2
+            - '0.887054966111276956744887218'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 277
+        table: '2'
+        note: Series 1126, row 19; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '16.64'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1126, row 19; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1126, row 19; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '83.36'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1126, row 19; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1126, row 19; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -95930,8 +96302,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1128005886709604515951970834'
+        - - SiO2
+          - '0.8871994113290395484048029168'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -95998,6 +96377,61 @@ observations:
         published_page: 277
         table: '2'
         note: Series 1126, row 20; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1128005886709604515951970834'
+          - - SiO2
+            - '0.8871994113290395484048029168'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 277
+        table: '2'
+        note: Series 1126, row 20; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '16.62'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1126, row 20; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1126, row 20; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '83.38'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1126, row 20; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1126, row 20; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -96146,8 +96580,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1128005886709604515951970834'
+        - - SiO2
+          - '0.8871994113290395484048029168'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -96214,6 +96655,61 @@ observations:
         published_page: 277
         table: '2'
         note: Series 1126, row 21; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1128005886709604515951970834'
+          - - SiO2
+            - '0.8871994113290395484048029168'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 277
+        table: '2'
+        note: Series 1126, row 21; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '16.62'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1126, row 21; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1126, row 21; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '83.38'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1126, row 21; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1126, row 21; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -96362,8 +96858,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1128005886709604515951970834'
+        - - SiO2
+          - '0.8871994113290395484048029168'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -96430,6 +96933,61 @@ observations:
         published_page: 277
         table: '2'
         note: Series 1126, row 22; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1128005886709604515951970834'
+          - - SiO2
+            - '0.8871994113290395484048029168'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 277
+        table: '2'
+        note: Series 1126, row 22; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '16.62'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1126, row 22; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1126, row 22; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '83.38'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1126, row 22; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1126, row 22; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -96578,8 +97136,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1128005886709604515951970834'
+        - - SiO2
+          - '0.8871994113290395484048029168'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -96646,6 +97211,61 @@ observations:
         published_page: 277
         table: '2'
         note: Series 1126, row 23; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1128005886709604515951970834'
+          - - SiO2
+            - '0.8871994113290395484048029168'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 277
+        table: '2'
+        note: Series 1126, row 23; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '16.62'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1126, row 23; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1126, row 23; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '83.38'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1126, row 23; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1126, row 23; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -96794,8 +97414,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1126561657156628551468664956'
+        - - SiO2
+          - '0.8873438342843371448531335044'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -96862,6 +97489,61 @@ observations:
         published_page: 277
         table: '2'
         note: Series 1129, row 1; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1126561657156628551468664956'
+          - - SiO2
+            - '0.8873438342843371448531335044'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 277
+        table: '2'
+        note: Series 1129, row 1; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '16.6'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 1; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 1; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '83.4'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 1; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 1; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -97010,8 +97692,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1126561657156628551468664956'
+        - - SiO2
+          - '0.8873438342843371448531335044'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -97078,6 +97767,61 @@ observations:
         published_page: 277
         table: '2'
         note: Series 1129, row 2; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1126561657156628551468664956'
+          - - SiO2
+            - '0.8873438342843371448531335044'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 277
+        table: '2'
+        note: Series 1129, row 2; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '16.6'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 2; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 2; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '83.4'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 2; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 2; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -97226,8 +97970,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1125839625848301271031170396'
+        - - SiO2
+          - '0.8874160374151698728968829602'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -97294,6 +98045,61 @@ observations:
         published_page: 277
         table: '2'
         note: Series 1129, row 3; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1125839625848301271031170396'
+          - - SiO2
+            - '0.8874160374151698728968829602'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 277
+        table: '2'
+        note: Series 1129, row 3; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '16.59'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 3; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 3; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '83.41'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 3; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 3; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -97442,8 +98248,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1125839625848301271031170396'
+        - - SiO2
+          - '0.8874160374151698728968829602'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -97510,6 +98323,61 @@ observations:
         published_page: 277
         table: '2'
         note: Series 1129, row 4; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1125839625848301271031170396'
+          - - SiO2
+            - '0.8874160374151698728968829602'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 277
+        table: '2'
+        note: Series 1129, row 4; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '16.59'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 4; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 4; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '83.41'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 4; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 4; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -97658,8 +98526,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1125839625848301271031170396'
+        - - SiO2
+          - '0.8874160374151698728968829602'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -97726,6 +98601,61 @@ observations:
         published_page: 277
         table: '2'
         note: Series 1129, row 5; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1125839625848301271031170396'
+          - - SiO2
+            - '0.8874160374151698728968829602'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 277
+        table: '2'
+        note: Series 1129, row 5; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '16.59'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 5; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 5; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '83.41'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 5; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 5; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -97874,8 +98804,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1125839625848301271031170396'
+        - - SiO2
+          - '0.8874160374151698728968829602'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -97942,6 +98879,61 @@ observations:
         published_page: 277
         table: '2'
         note: Series 1129, row 6; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1125839625848301271031170396'
+          - - SiO2
+            - '0.8874160374151698728968829602'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 277
+        table: '2'
+        note: Series 1129, row 6; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '16.59'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 6; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 6; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '83.41'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 6; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 6; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -98090,8 +99082,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1125117650176838825206585572'
+        - - SiO2
+          - '0.8874882349823161174793414425'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -98158,6 +99157,61 @@ observations:
         published_page: 277
         table: '2'
         note: Series 1129, row 7; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1125117650176838825206585572'
+          - - SiO2
+            - '0.8874882349823161174793414425'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 277
+        table: '2'
+        note: Series 1129, row 7; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '16.58'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 7; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 7; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '83.42'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 7; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 7; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -98306,8 +99360,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1125117650176838825206585572'
+        - - SiO2
+          - '0.8874882349823161174793414425'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -98374,6 +99435,61 @@ observations:
         published_page: 277
         table: '2'
         note: Series 1129, row 8; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1125117650176838825206585572'
+          - - SiO2
+            - '0.8874882349823161174793414425'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 277
+        table: '2'
+        note: Series 1129, row 8; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '16.58'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 8; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 8; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '83.42'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 8; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 8; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -98522,8 +99638,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1123673865718787484406462518'
+        - - SiO2
+          - '0.8876326134281212515593537483'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -98590,6 +99713,61 @@ observations:
         published_page: 277
         table: '2'
         note: Series 1129, row 9; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1123673865718787484406462518'
+          - - SiO2
+            - '0.8876326134281212515593537483'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 277
+        table: '2'
+        note: Series 1129, row 9; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '16.56'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 9; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 9; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '83.44'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 9; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 9; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -98738,8 +99916,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1120786964162187817174368194'
+        - - SiO2
+          - '0.8879213035837812182825631808'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -98806,6 +99991,61 @@ observations:
         published_page: 277
         table: '2'
         note: Series 1129, row 10; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1120786964162187817174368194'
+          - - SiO2
+            - '0.8879213035837812182825631808'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 277
+        table: '2'
+        note: Series 1129, row 10; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '16.52'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 10; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 10; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '83.48'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 10; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 10; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -101594,8 +102834,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.08071729122047080010194167191'
+        - - SiO2
+          - '0.919282708779529199898058328'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -101662,6 +102909,61 @@ observations:
         published_page: 277
         table: '2'
         note: Series 1129, row 19; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.08071729122047080010194167191'
+          - - SiO2
+            - '0.919282708779529199898058328'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 277
+        table: '2'
+        note: Series 1129, row 19; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '12.1'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 19; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 19; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '87.9'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 19; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 19; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -101810,8 +103112,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.07946236568550390689659133619'
+        - - SiO2
+          - '0.9205376343144960931034086641'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -101878,6 +103187,61 @@ observations:
         published_page: 277
         table: '2'
         note: Series 1129, row 20; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.07946236568550390689659133619'
+          - - SiO2
+            - '0.9205376343144960931034086641'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 277
+        table: '2'
+        note: Series 1129, row 20; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '11.92'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 20; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 20; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '88.08'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 20; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1129, row 20; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -102026,8 +103390,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.07904443706377487703039399238'
+        - - SiO2
+          - '0.9209555629362251229696060078'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -102094,6 +103465,61 @@ observations:
         published_page: 277
         table: '2'
         note: Series 1214, row 1; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.07904443706377487703039399238'
+          - - SiO2
+            - '0.9209555629362251229696060078'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 277
+        table: '2'
+        note: Series 1214, row 1; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '11.86'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 1; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 1; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '88.14'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 1; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 1; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -102242,8 +103668,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.07904443706377487703039399238'
+        - - SiO2
+          - '0.9209555629362251229696060078'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -102310,6 +103743,61 @@ observations:
         published_page: 277
         table: '2'
         note: Series 1214, row 2; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.07904443706377487703039399238'
+          - - SiO2
+            - '0.9209555629362251229696060078'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 277
+        table: '2'
+        note: Series 1214, row 2; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '11.86'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 2; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 2; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '88.14'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 2; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 2; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -102458,8 +103946,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.07897480074288919006319337977'
+        - - SiO2
+          - '0.9210251992571108099368066203'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -102526,6 +104021,61 @@ observations:
         published_page: 277
         table: '2'
         note: Series 1214, row 3; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.07897480074288919006319337977'
+          - - SiO2
+            - '0.9210251992571108099368066203'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 277
+        table: '2'
+        note: Series 1214, row 3; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '11.85'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 3; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 3; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '88.15'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 3; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 3; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -102674,8 +104224,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.07890516969166576618973404617'
+        - - SiO2
+          - '0.9210948303083342338102659538'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -102742,6 +104299,61 @@ observations:
         published_page: 277
         table: '2'
         note: Series 1214, row 4; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.07890516969166576618973404617'
+          - - SiO2
+            - '0.9210948303083342338102659538'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 277
+        table: '2'
+        note: Series 1214, row 4; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '11.84'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 4; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 4; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '88.16'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 4; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 4; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -102890,8 +104502,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.07890516969166576618973404617'
+        - - SiO2
+          - '0.9210948303083342338102659538'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -102958,6 +104577,61 @@ observations:
         published_page: 277
         table: '2'
         note: Series 1214, row 5; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.07890516969166576618973404617'
+          - - SiO2
+            - '0.9210948303083342338102659538'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 277
+        table: '2'
+        note: Series 1214, row 5; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '11.84'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 5; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 5; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '88.16'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 5; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 5; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -103106,8 +104780,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.07876592339581322873423604679'
+        - - SiO2
+          - '0.9212340766041867712657639535'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -103174,6 +104855,61 @@ observations:
         published_page: 277
         table: '2'
         note: Series 1214, row 6; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.07876592339581322873423604679'
+          - - SiO2
+            - '0.9212340766041867712657639535'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 277
+        table: '2'
+        note: Series 1214, row 6; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '11.82'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 6; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 6; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '88.18'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 6; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 6; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -103322,8 +105058,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.07841789983341260944744826387'
+        - - SiO2
+          - '0.9215821001665873905525517364'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -103390,6 +105133,61 @@ observations:
         published_page: 277
         table: '2'
         note: Series 1214, row 7; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.07841789983341260944744826387'
+          - - SiO2
+            - '0.9215821001665873905525517364'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 277
+        table: '2'
+        note: Series 1214, row 7; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '11.77'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 7; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 7; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '88.23'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 7; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 7; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -103538,8 +105336,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.07779178905835143197805601546'
+        - - SiO2
+          - '0.9222082109416485680219439844'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -103606,6 +105411,61 @@ observations:
         published_page: 277
         table: '2'
         note: Series 1214, row 8; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.07779178905835143197805601546'
+          - - SiO2
+            - '0.9222082109416485680219439844'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 277
+        table: '2'
+        note: Series 1214, row 8; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '11.68'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 8; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 8; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '88.32'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 8; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 8; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -103754,8 +105614,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.07667975485910036373489894101'
+        - - SiO2
+          - '0.9233202451408996362651010588'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -103822,6 +105689,61 @@ observations:
         published_page: 277
         table: '2'
         note: Series 1214, row 9; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.07667975485910036373489894101'
+          - - SiO2
+            - '0.9233202451408996362651010588'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 277
+        table: '2'
+        note: Series 1214, row 9; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '11.52'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 9; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 9; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '88.48'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 9; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 9; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -103970,8 +105892,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.07452901103799852955405208919'
+        - - SiO2
+          - '0.9254709889620014704459479106'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -104038,6 +105967,61 @@ observations:
         published_page: 277
         table: '2'
         note: Series 1214, row 10; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.07452901103799852955405208919'
+          - - SiO2
+            - '0.9254709889620014704459479106'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 277
+        table: '2'
+        note: Series 1214, row 10; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '11.21'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 10; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 10; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '88.79'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 10; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 10; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -104186,8 +106170,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.07224503367247887759106332195'
+        - - SiO2
+          - '0.9277549663275211224089366782'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -104254,6 +106245,61 @@ observations:
         published_page: 277
         table: '2'
         note: Series 1214, row 11; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.07224503367247887759106332195'
+          - - SiO2
+            - '0.9277549663275211224089366782'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 277
+        table: '2'
+        note: Series 1214, row 11; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '10.88'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 11; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 11; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '89.12'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 11; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 11; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -104402,8 +106448,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.07058752548887558835952354483'
+        - - SiO2
+          - '0.929412474511124411640476455'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -104470,6 +106523,61 @@ observations:
         published_page: 277
         table: '2'
         note: Series 1214, row 12; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.07058752548887558835952354483'
+          - - SiO2
+            - '0.929412474511124411640476455'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 277
+        table: '2'
+        note: Series 1214, row 12; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '10.64'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 12; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 12; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '89.36'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 12; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 12; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -104618,8 +106726,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.06893301132076217690566069173'
+        - - SiO2
+          - '0.9310669886792378230943393083'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -104686,6 +106801,61 @@ observations:
         published_page: 277
         table: '2'
         note: Series 1214, row 13; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.06893301132076217690566069173'
+          - - SiO2
+            - '0.9310669886792378230943393083'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 277
+        table: '2'
+        note: Series 1214, row 13; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '10.4'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 13; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 13; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '89.6'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 13; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 277
+              table: '2'
+              note: Series 1214, row 13; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -104834,8 +107004,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.06728148306316513225766739782'
+        - - SiO2
+          - '0.9327185169368348677423326024'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -104902,6 +107079,61 @@ observations:
         published_page: 278
         table: '2'
         note: Series 1214, row 14; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.06728148306316513225766739782'
+          - - SiO2
+            - '0.9327185169368348677423326024'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 278
+        table: '2'
+        note: Series 1214, row 14; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '10.16'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 14; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 14; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '89.84'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 14; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 14; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -105050,8 +107282,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.06590748459190697476737750299'
+        - - SiO2
+          - '0.9340925154080930252326224967'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -105118,6 +107357,61 @@ observations:
         published_page: 278
         table: '2'
         note: Series 1214, row 15; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.06590748459190697476737750299'
+          - - SiO2
+            - '0.9340925154080930252326224967'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 278
+        table: '2'
+        note: Series 1214, row 15; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '9.96'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 15; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 15; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '90.04'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 15; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 15; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -105266,8 +107560,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.06412437049162336088821149537'
+        - - SiO2
+          - '0.9358756295083766391117885043'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -105334,6 +107635,61 @@ observations:
         published_page: 278
         table: '2'
         note: Series 1214, row 16; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.06412437049162336088821149537'
+          - - SiO2
+            - '0.9358756295083766391117885043'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 278
+        table: '2'
+        note: Series 1214, row 16; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '9.7'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 16; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 16; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '90.3'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 16; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 16; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -105482,8 +107838,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.06248150511867837876507454918'
+        - - SiO2
+          - '0.9375184948813216212349254508'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -105550,6 +107913,61 @@ observations:
         published_page: 278
         table: '2'
         note: Series 1214, row 17; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.06248150511867837876507454918'
+          - - SiO2
+            - '0.9375184948813216212349254508'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 278
+        table: '2'
+        note: Series 1214, row 17; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '9.46'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 17; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 17; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '90.54'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 17; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 17; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -105698,8 +108116,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.06207125071919120751538276891'
+        - - SiO2
+          - '0.9379287492808087924846172309'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -105766,6 +108191,61 @@ observations:
         published_page: 278
         table: '2'
         note: Series 1214, row 18; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.06207125071919120751538276891'
+          - - SiO2
+            - '0.9379287492808087924846172309'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 278
+        table: '2'
+        note: Series 1214, row 18; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '9.4'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 18; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 18; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '90.6'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 18; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 18; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -105914,8 +108394,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.06200289292954462034666079242'
+        - - SiO2
+          - '0.9379971070704553796533392073'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -105982,6 +108469,61 @@ observations:
         published_page: 278
         table: '2'
         note: Series 1214, row 19; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.06200289292954462034666079242'
+          - - SiO2
+            - '0.9379971070704553796533392073'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 278
+        table: '2'
+        note: Series 1214, row 19; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '9.39'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 19; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 19; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '90.61'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 19; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 19; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -106130,8 +108672,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.06193454026510372010846862677'
+        - - SiO2
+          - '0.9380654597348962798915313734'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -106198,6 +108747,61 @@ observations:
         published_page: 278
         table: '2'
         note: Series 1214, row 20; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.06193454026510372010846862677'
+          - - SiO2
+            - '0.9380654597348962798915313734'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 278
+        table: '2'
+        note: Series 1214, row 20; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '9.38'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 20; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 20; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '90.62'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 20; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 20; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -106346,8 +108950,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.06179785030953354332608005384'
+        - - SiO2
+          - '0.9382021496904664566739199461'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -106414,6 +109025,61 @@ observations:
         published_page: 278
         table: '2'
         note: Series 1214, row 21; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.06179785030953354332608005384'
+          - - SiO2
+            - '0.9382021496904664566739199461'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 278
+        table: '2'
+        note: Series 1214, row 21; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '9.36'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 21; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 21; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '90.64'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 21; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 21; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -106562,8 +109228,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.0615245318755064636457786846'
+        - - SiO2
+          - '0.9384754681244935363542213155'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -106630,6 +109303,61 @@ observations:
         published_page: 278
         table: '2'
         note: Series 1214, row 22; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.0615245318755064636457786846'
+          - - SiO2
+            - '0.9384754681244935363542213155'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 278
+        table: '2'
+        note: Series 1214, row 22; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '9.32'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 22; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 22; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '90.68'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 22; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 22; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -106778,8 +109506,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.06138790338783368686729006527'
+        - - SiO2
+          - '0.9386120966121663131327099346'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -106846,6 +109581,61 @@ observations:
         published_page: 278
         table: '2'
         note: Series 1214, row 23; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.06138790338783368686729006527'
+          - - SiO2
+            - '0.9386120966121663131327099346'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 278
+        table: '2'
+        note: Series 1214, row 23; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '9.3'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 23; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 23; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '90.7'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 23; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 23; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -106994,8 +109784,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.06002274415652715507902421836'
+        - - SiO2
+          - '0.9399772558434728449209757816'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -107062,6 +109859,61 @@ observations:
         published_page: 278
         table: '2'
         note: Series 1214, row 24; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.06002274415652715507902421836'
+          - - SiO2
+            - '0.9399772558434728449209757816'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 278
+        table: '2'
+        note: Series 1214, row 24; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '9.1'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 24; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 24; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '90.9'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 24; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 24; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -107210,8 +110062,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.05852342896564698790865245904'
+        - - SiO2
+          - '0.9414765710343530120913475407'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -107278,6 +110137,61 @@ observations:
         published_page: 278
         table: '2'
         note: Series 1214, row 25; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.05852342896564698790865245904'
+          - - SiO2
+            - '0.9414765710343530120913475407'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 278
+        table: '2'
+        note: Series 1214, row 25; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '8.88'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 25; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 25; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '91.12'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 25; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 25; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -107426,8 +110340,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.05777469666086732487902627541'
+        - - SiO2
+          - '0.9422253033391326751209737243'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -107494,6 +110415,61 @@ observations:
         published_page: 278
         table: '2'
         note: Series 1214, row 26; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.05777469666086732487902627541'
+          - - SiO2
+            - '0.9422253033391326751209737243'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 278
+        table: '2'
+        note: Series 1214, row 26; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '8.77'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 26; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 26; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '91.23'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 26; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 26; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -107642,8 +110618,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.0517393546630462152084434997'
+        - - SiO2
+          - '0.9482606453369537847915565005'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -107710,6 +110693,61 @@ observations:
         published_page: 278
         table: '2'
         note: Series 1214, row 27; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.0517393546630462152084434997'
+          - - SiO2
+            - '0.9482606453369537847915565005'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 278
+        table: '2'
+        note: Series 1214, row 27; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '7.88'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 27; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 27; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '92.12'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 27; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 27; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -107858,8 +110896,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.04823158655735836451793340555'
+        - - SiO2
+          - '0.9517684134426416354820665946'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -107926,6 +110971,61 @@ observations:
         published_page: 278
         table: '2'
         note: Series 1214, row 28; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.04823158655735836451793340555'
+          - - SiO2
+            - '0.9517684134426416354820665946'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 278
+        table: '2'
+        note: Series 1214, row 28; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '7.36'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 28; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 28; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '92.64'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 28; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 28; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -108074,8 +111174,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.04634840451722313129088753545'
+        - - SiO2
+          - '0.9536515954827768687091124645'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -108142,6 +111249,61 @@ observations:
         published_page: 278
         table: '2'
         note: Series 1214, row 29; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.04634840451722313129088753545'
+          - - SiO2
+            - '0.9536515954827768687091124645'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 278
+        table: '2'
+        note: Series 1214, row 29; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '7.08'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 29; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 29; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '92.92'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 29; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 29; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -108290,8 +111452,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.0455425258518357973615199777'
+        - - SiO2
+          - '0.954457474148164202638480022'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -108358,6 +111527,61 @@ observations:
         published_page: 278
         table: '2'
         note: Series 1214, row 30; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.0455425258518357973615199777'
+          - - SiO2
+            - '0.954457474148164202638480022'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 278
+        table: '2'
+        note: Series 1214, row 30; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '6.96'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 30; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 30; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '93.04'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 30; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 30; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -108506,8 +111730,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.0450056724794790327786572555'
+        - - SiO2
+          - '0.9549943275205209672213427445'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -108574,6 +111805,61 @@ observations:
         published_page: 278
         table: '2'
         note: Series 1214, row 31; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.0450056724794790327786572555'
+          - - SiO2
+            - '0.9549943275205209672213427445'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 278
+        table: '2'
+        note: Series 1214, row 31; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '6.88'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 31; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 31; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '93.12'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 31; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 31; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -108722,8 +112008,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.04467030109394217531749835369'
+        - - SiO2
+          - '0.9553296989060578246825016463'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -108790,6 +112083,61 @@ observations:
         published_page: 278
         table: '2'
         note: Series 1214, row 32; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.04467030109394217531749835369'
+          - - SiO2
+            - '0.9553296989060578246825016463'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 278
+        table: '2'
+        note: Series 1214, row 32; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '6.83'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 32; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 32; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '93.17'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 32; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 32; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -108938,8 +112286,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.04446913803220689004039525335'
+        - - SiO2
+          - '0.9555308619677931099596047469'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -109006,6 +112361,61 @@ observations:
         published_page: 278
         table: '2'
         note: Series 1214, row 33; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.04446913803220689004039525335'
+          - - SiO2
+            - '0.9555308619677931099596047469'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 278
+        table: '2'
+        note: Series 1214, row 33; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '6.8'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 33; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 33; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '93.2'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 33; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 33; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -109154,8 +112564,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.04433505421913196628578802862'
+        - - SiO2
+          - '0.9556649457808680337142119714'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -109222,6 +112639,61 @@ observations:
         published_page: 278
         table: '2'
         note: Series 1214, row 34; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.04433505421913196628578802862'
+          - - SiO2
+            - '0.9556649457808680337142119714'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 278
+        table: '2'
+        note: Series 1214, row 34; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '6.78'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 34; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 34; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '93.22'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 34; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 34; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -109370,8 +112842,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.04426801977935549974602937277'
+        - - SiO2
+          - '0.9557319802206445002539706271'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -109438,6 +112917,61 @@ observations:
         published_page: 278
         table: '2'
         note: Series 1214, row 35; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.04426801977935549974602937277'
+          - - SiO2
+            - '0.9557319802206445002539706271'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 278
+        table: '2'
+        note: Series 1214, row 35; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '6.77'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 35; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 35; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '93.23'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 35; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 35; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -109586,8 +113120,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.04426801977935549974602937277'
+        - - SiO2
+          - '0.9557319802206445002539706271'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -109654,6 +113195,61 @@ observations:
         published_page: 278
         table: '2'
         note: Series 1214, row 36; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.04426801977935549974602937277'
+          - - SiO2
+            - '0.9557319802206445002539706271'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 278
+        table: '2'
+        note: Series 1214, row 36; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '6.77'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 36; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 36; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '93.23'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 36; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 36; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
@@ -109802,8 +113398,15 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.04420099031668051797116203944'
+        - - SiO2
+          - '0.9557990096833194820288379604'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -109870,6 +113473,61 @@ observations:
         published_page: 278
         table: '2'
         note: Series 1214, row 37; columns T,K | Wt % K2O | P_K(atm).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.04420099031668051797116203944'
+          - - SiO2
+            - '0.9557990096833194820288379604'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 278
+        table: '2'
+        note: Series 1214, row 37; columns T,K | Wt % K2O | P_K(atm).
+      inference:
+        relation: SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - values.composition_derivation
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '6.76'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 37; columns T,K | Wt % K2O | P_K(atm).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 37; columns T,K | Wt % K2O | P_K(atm).
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '93.24'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 37; columns T,K | Wt % K2O | P_K(atm).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 278
+              table: '2'
+              note: Series 1214, row 37; columns T,K | Wt % K2O | P_K(atm).
+        output_unit: mole_fraction
     fO2_Pa:
       state:
         tag: value
