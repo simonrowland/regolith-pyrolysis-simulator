@@ -83,6 +83,14 @@ CU020_PAGE_READ_SAMPLE = (
     "1600\t99.914\t264.163\t194.298\t111.785\t123.836  52.197 1.704\n"
     "1700\t99.914\t270.220\t198.587\t121.776\t-122.259\t-47.768\t1.468\n"
 )
+O007_PAGE_READ_SAMPLE = (
+    "Lead Oxide (PbO)\tO1Pb1(l)\n"
+    "T(K)\tCp\tS\t-[G-H(Tr)]/T\tH-H(Tr)\tdelta-f H\tdelta-f G\tlog Kf\n"
+    "1100\t65.000\t158.232\t110.850\t52.120\t-191.419\t-108.193\t5.138\n"
+    "1159.000\t65.000\t161.628\t113.349\t55.955\tII <--> LIQUID\n"
+    "1200\t65.000\t163.887\t115.037\t58.620\t189.588  100.708 4.384\n"
+    "1300\t65.000\t169.090\t118.998\t65.120\t-187.750\t-93.376\t3.752\n"
+)
 
 
 def test_harvester_parses_live_t_k_header() -> None:
@@ -245,6 +253,36 @@ def test_page_read_sign_provenance_has_no_machine_local_paths() -> None:
         for field, value in entry.items():
             if isinstance(value, str):
                 assert not any(path in value for path in forbidden), field
+
+
+def test_o007_1200k_enthalpy_uses_the_page_read_sign() -> None:
+    parsed = parse_janaf_txt(
+        O007_PAGE_READ_SAMPLE,
+        table_id="O-007",
+        url="https://janaf.nist.gov/tables/O-007.html",
+        download_url="https://janaf.nist.gov/tables/O-007.txt",
+    )
+    row = next(row for row in parsed.values if row["temperature"]["value"] == 1200)
+    enthalpy = row["formation_enthalpy"]
+
+    assert enthalpy["value"] == -189.588
+    assert enthalpy["as_published"] == "-189.588"
+    assert enthalpy["locator"]["page_read_sign"] == "-189.588"
+    assert enthalpy["locator"]["page_locator"] == (
+        "https://janaf.nist.gov/pdf/JANAF-FourthEd-1998-Oxygen.pdf#page=7; "
+        "SHA-256 6c786ff5ec1c66c7c9bed29e0c358843ca677bccd8e09a7a19e5db3584ae5d3c; "
+        "printed p. 1723"
+    )
+    assert enthalpy["locator"]["crop_note"] == (
+        "https://janaf.nist.gov/pdf/JANAF-FourthEd-1998-Oxygen.pdf#page=7; "
+        "SHA-256 6c786ff5ec1c66c7c9bed29e0c358843ca677bccd8e09a7a19e5db3584ae5d3c; "
+        "printed p. 1723 / PDF p. 7, Table O-007, rows 1100, 1159 transition, "
+        "1200, 1300 K; crop shows PbO(l) header, ΔfH° column, and those rows"
+    )
+    transition = next(
+        item for item in parsed.parse_ambiguities if item.get("line_number") == 4
+    )
+    assert transition["raw_line"].endswith("II <--> LIQUID")
 
 
 def test_page_read_sign_refuses_a_mismatched_text_layer_magnitude(

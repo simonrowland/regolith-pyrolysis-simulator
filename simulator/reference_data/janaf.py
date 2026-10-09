@@ -112,6 +112,23 @@ PAGE_READ_SIGNS = (
             "crop shows the ΔfH° header and row signs."
         ),
     },
+    {
+        "table_id": "O-007",
+        "temperature_as_published": "1200",
+        "column": "delta-f H",
+        "printed_token": "-189.588",
+        "page_locator": (
+            "https://janaf.nist.gov/pdf/JANAF-FourthEd-1998-Oxygen.pdf#page=7; "
+            "SHA-256 6c786ff5ec1c66c7c9bed29e0c358843ca677bccd8e09a7a19e5db3584ae5d3c; "
+            "printed p. 1723"
+        ),
+        "crop_note": (
+            "https://janaf.nist.gov/pdf/JANAF-FourthEd-1998-Oxygen.pdf#page=7; "
+            "SHA-256 6c786ff5ec1c66c7c9bed29e0c358843ca677bccd8e09a7a19e5db3584ae5d3c; "
+            "printed p. 1723 / PDF p. 7, Table O-007, rows 1100, 1159 transition, "
+            "1200, 1300 K; crop shows PbO(l) header, ΔfH° column, and those rows"
+        ),
+    },
 )
 PAGE_READ_SIGN_MAGNITUDE_MISMATCH_KIND = "page_read_sign_magnitude_mismatch"
 PAGE_READ_SIGN_MAGNITUDE_MISMATCH_REASON = (
