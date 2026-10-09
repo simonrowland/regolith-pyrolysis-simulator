@@ -3012,12 +3012,14 @@ def _oxide_map_from_mapping(obj: object) -> dict[str, Decimal] | None:
     comps: dict[str, Decimal] = {}
     for key, value in obj.items():
         name = str(key)
-        if name not in _OXIDE_COMPONENT_KEYS:
+        oxide = name.removesuffix("_wt_pct")
+        if oxide not in _OXIDE_COMPONENT_KEYS:
             continue
         amount = _as_dec_or_none(value)
         if amount is None:
             continue
-        comps[name] = amount
+        if name in _OXIDE_COMPONENT_KEYS or oxide not in comps:
+            comps[oxide] = amount
     if len(comps) < 2:
         return None
     return comps

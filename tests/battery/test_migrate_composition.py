@@ -602,6 +602,35 @@ def test_markova_table2_migrates_both_quantities_and_printed_charge(tmp_path: Pa
             "CaO": Decimal("12.93"),
         },
     }
+    extract = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts/kems-026-markova-1984.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    source_values = {
+        observation["values"]["composition_id"]: observation["values"]
+        for observation in extract["species"]["SiO2"]["observations"]
+        if observation["values"].get("quantity") == "residue_composition_vs_time"
+    }
+    for panel, charge in charges.items():
+        series = source_values[panel]["series"]
+        panel_rows = [
+            row
+            for row in mass_loss_rows.values()
+            if row["experiment_id"].endswith(f"::{panel}")
+        ]
+        assert len(panel_rows) == len(series)
+        for row, source_point in zip(panel_rows, series):
+            expected = (
+                charge
+                if source_point.get("T_C_is_initial_composition")
+                else {
+                    oxide: as_decimal(source_point[f"{oxide}_wt_pct"])
+                    for oxide in charge
+                }
+            )
+            assert _printed_wt_map(row) == expected
+
     for panel, charge in charges.items():
         row = next(
             value for value in residue.values()
