@@ -722,7 +722,13 @@ class SulfSatGate:
                 'treating capacity as 0.0 ppm for degenerate no modeled '
                 'sulfide/sulfate saturation',
             )
-        return max(0.0, number), None
+        if number < 0.0:
+            return (
+                0.0,
+                f'{model} returned out-of-range {field}={number!r}; '
+                'clamping capacity to 0.0 ppm',
+            )
+        return number, None
 
     @staticmethod
     def _finite_fraction(
@@ -745,7 +751,14 @@ class SulfSatGate:
                 f'{model} returned non-finite {field}={number!r}; '
                 'treating fraction as 0.0 for degenerate sulfur speciation',
             )
-        return min(1.0, max(0.0, number)), None
+        if number < 0.0 or number > 1.0:
+            replacement = min(1.0, max(0.0, number))
+            return (
+                replacement,
+                f'{model} returned out-of-range {field}={number!r}; '
+                f'clamping fraction to {replacement!r}',
+            )
+        return number, None
 
     @staticmethod
     def _partition_input_S(

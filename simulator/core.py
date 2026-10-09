@@ -4425,6 +4425,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if source in (
             'none:invalid_liquidus_curve',
             'none:invalid_liquidus_bounds',
+            'none:nonfinite_liquid_fraction',
         ):
             diagnostic['repair_notice'] = {
                 'kind': 'kress_liquidus_floor_repair',
@@ -9194,9 +9195,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             and not diagnostic_silicate_equilibrium
             and self._equilibrium_result_has_phase_species(result)
         ):
+            producer = (
+                getattr(self.backend, 'backend_name', None)
+                or getattr(self.backend, 'name', None)
+                or type(self.backend).__name__
+            )
             self._last_backend_error = (
-                'backend returned post-equilibrium phase material without an '
-                'AtomLedger transition'
+                f'{producer} returned post-equilibrium phase material without '
+                'an AtomLedger transition; using internal-analytical fallback'
             )
             self._disable_backend_after_failure()
             if not self._backend_allows_internal_analytical_fallback():

@@ -98,6 +98,42 @@ def test_sr22_caught_interpolation_failure_has_no_repair_notice() -> None:
     assert "repair_notice" not in record
 
 
+def test_sr21_backend_fallback_message_names_both_producers() -> None:
+    result = SimpleNamespace(
+        ledger_transition=None,
+        phase_species_mol={"melt": {"SiO2": 1.0}},
+    )
+    fallback = SimpleNamespace(status="ok")
+    backend = SimpleNamespace(
+        name="producer-engine",
+        is_available=lambda: True,
+        equilibrate=lambda **_kwargs: result,
+    )
+    sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    sim.backend = backend
+    sim._backend_failed = False
+    sim.melt = SimpleNamespace(
+        oxygen_reservoir=SimpleNamespace(melt_intrinsic_fO2_log=-10.0),
+        temperature_C=1400.0,
+        p_total_mbar=1.0,
+    )
+    sim._chem_registry = SimpleNamespace(authoritative_for=lambda _intent: None)
+    sim.species_formula_registry = {}
+    sim._backend_composition_mol_by_account = lambda: {}
+    sim._backend_composition_mol = lambda: {}
+    sim._validate_backend_account_scope_support = lambda _composition: None
+    sim._sync_oxygen_reservoir_mirror = lambda: None
+    sim._backend_accepts_kwarg = lambda _name: False
+    sim._backend_allows_internal_analytical_fallback = lambda: True
+    sim._disable_backend_after_failure = lambda: None
+    sim._internal_analytical_equilibrium = lambda: fallback
+    sim._record_equilibrium_status = lambda value: value
+
+    assert sim._get_equilibrium() is fallback
+    assert "producer-engine" in sim._last_backend_error
+    assert "internal-analytical" in sim._last_backend_error
+
+
 def test_sr22_missing_curve_has_no_floor_repair_notice() -> None:
     sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
     sim.melt = SimpleNamespace(
