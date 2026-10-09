@@ -314,9 +314,76 @@ class CachedRealBackend(RealBackendAuthority):
         self.config = config
         self._live_backend = live_backend
         self.real_backend_family = config.authorized_backend_family
+        self._admitted_bindings: dict[str, str] = {}
+        self._binding_admission_errors: dict[str, Exception] = {}
+        if live_backend is None:
+            self._validate_replay_admission()
+        else:
+            self._validate_live_admission()
 
     def initialize(self, _config: Mapping[str, Any] | None = None) -> bool:
+        self._admitted_bindings.clear()
+        self._binding_admission_errors.clear()
+        if self._live_backend is None:
+            self._validate_replay_admission()
+            error = next(iter(self._binding_admission_errors.values()), None)
+            if error is not None:
+                raise error
+            return True
+        initializer = getattr(self._live_backend, "initialize", None)
+        if not callable(initializer):
+            return False
+        if not initializer(dict(_config or {})):
+            return False
+        if not bool(self._live_backend.is_available()):
+            return False
+        self._publish_successful_live_init()
         return True
+
+    def _binding_admission(self, *, publish: bool) -> None:
+        from simulator.engine_binding_admission import (
+            EngineBindingAdmissionError,
+            admission_fingerprint,
+            authorize_binding,
+            binding_identity_for_backend,
+            binding_identity_for_cached_real,
+            cached_real_provenance,
+        )
+
+        identity = binding_identity_for_cached_real(self.config)
+        key = identity.producer_transport
+        try:
+            if publish and self._live_backend is not None:
+                live_identity = binding_identity_for_backend(self._live_backend)
+                if live_identity != identity:
+                    raise EngineBindingAdmissionError(
+                        identity,
+                        "live backend identity mismatch: "
+                        f"got {live_identity!r}",
+                    )
+            provenance = cached_real_provenance(
+                self.config,
+                self._live_backend,
+            )
+            authorize_binding(identity, provenance)
+        except Exception as exc:  # noqa: BLE001 - cache eligibility fails closed
+            self._binding_admission_errors[key] = exc
+            return
+        self._binding_admission_errors.pop(key, None)
+        if publish:
+            self._admitted_bindings[key] = admission_fingerprint(
+                identity,
+                provenance,
+            )
+
+    def _validate_replay_admission(self) -> None:
+        self._binding_admission(publish=True)
+
+    def _validate_live_admission(self) -> None:
+        self._binding_admission(publish=False)
+
+    def _publish_successful_live_init(self) -> None:
+        self._binding_admission(publish=True)
 
     def is_available(self) -> bool:
         if self.config.miss_policy == "fail-loud":
@@ -1460,6 +1527,11 @@ def _try_backend(
     except (ImportError, EngineWorkerUnavailable):
         return None
     if available and backend.is_available():
+        from simulator.engine_binding_admission import (
+            publish_live_backend_admission,
+        )
+
+        publish_live_backend_admission(backend)
         return backend
     return None
 
@@ -1527,10 +1599,15 @@ def _cached_real_backend(
                 f"{expected_identity[1]}, got {live_identity[0]} version "
                 f"{live_identity[1]}"
             )
-    return CachedRealBackend(config=config, live_backend=live_backend)
+    backend = CachedRealBackend(config=config, live_backend=live_backend)
+    if live_backend is not None:
+        # _try_backend has completed initialize() and is_available() before
+        # this facade can publish its immutable admission tuple.
+        backend._publish_successful_live_init()
+    return backend
 
 
-def _live_backend_identity(backend: Any) -> tuple[str, str]:
+def _live_backend_identity(backend: Any) -> tuple[str, str | None]:
     raw_name = getattr(backend, "name", None)
     if bool(getattr(backend, '_legacy_alphamelts_cache_identity', False)):
         raw_name = 'alphamelts'
@@ -1540,19 +1617,22 @@ def _live_backend_identity(backend: Any) -> tuple[str, str]:
         raw_name = "alphamelts"
     name = str(raw_name or type(backend).__name__).strip()
     getter = getattr(backend, "get_engine_version", None)
-    version = ""
+    version: str | None = None
     if callable(getter):
         try:
-            version = str(getter()).strip()
-        except Exception:  # noqa: BLE001 - fail-loud config validation below
-            version = "unavailable"
-    if not version:
-        version = "unavailable"
+            value = str(getter()).strip()
+            version = (
+                value
+                if value and value.lower() != "unavailable"
+                else None
+            )
+        except Exception:  # noqa: BLE001 - version is provenance only
+            version = None
     return name, version
 
 
 def _backend_identity_matches(
-    live_identity: tuple[str, str],
+    live_identity: tuple[str, str | None],
     expected_identity: tuple[str, str],
     *,
     unavailable_error_cls: type[_E] = BackendUnavailableError,
@@ -1566,7 +1646,12 @@ def _backend_identity_matches(
         _is_thermoengine_authorized_name(live_name)
         and _is_thermoengine_authorized_name(expected_name)
     ) or live_name.strip().lower() == expected_name.strip().lower()
-    return names_match and live_version.strip() == expected_version.strip()
+    version_matches = (
+        live_version is None
+        or not str(expected_version or "").strip()
+        or live_version == str(expected_version).strip()
+    )
+    return names_match and version_matches
 
 
 def _is_alphamelts_authorized_name(value: Any) -> bool:

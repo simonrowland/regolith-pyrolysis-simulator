@@ -44,6 +44,12 @@ field selection. The probe fields accepted by the command are `feedstock_id`,
 from the identity; other probes default to `internal-analytical` unless an
 `active_backend` is recorded.
 
+Equilibrium probes for OpenIMCC must set `high_t_melt_activity` to `openimcc`
+and use an input temperature above the VapoRock cap. SulfSat probes need a
+sulfur-bearing feedstock and an available PySulfSat result. The assessment
+refuses a producer pin when those input selections do not activate that
+producer, or when the selected OpenIMCC/SulfSat call returns fallback output.
+
 The assessment writes the host-local receipt to
 `engines/engines.local.binding-admission.json`. It records a comparison for
 every pin and fingerprints the local engine configuration, resolved paths,

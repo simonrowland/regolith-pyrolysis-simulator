@@ -1442,6 +1442,7 @@ class PyrolysisRun:
             }
         )
         _attach_engine_commissioning_notice(run_metadata, sim)
+        _attach_engine_binding_admission_notice(run_metadata, sim)
         _attach_diagnostic_gate_authority_notice(run_metadata, sim)
         _attach_sulfur_saturation_notice(run_metadata, sim)
         _attach_rump_expectation_notice(run_metadata, sim)
@@ -3428,6 +3429,17 @@ def _attach_engine_commissioning_notice(
         run_metadata["engine_commissioning_notice"] = _json_safe(notice)
 
 
+def _attach_engine_binding_admission_notice(
+    run_metadata: dict[str, Any],
+    sim: Any,
+) -> None:
+    from simulator.engine_binding_admission import binding_admission_run_notice
+
+    notice = binding_admission_run_notice(sim)
+    if notice:
+        run_metadata["engine_binding_admission_notice"] = _json_safe(notice)
+
+
 def _diagnostic_gate_authority_notice(sim: Any) -> dict[str, Any] | None:
     reader = getattr(sim, "diagnostic_gate_authority_run_notice", None)
     if not callable(reader):
@@ -5211,6 +5223,7 @@ def _runner_failure_result(
             )
     sim = getattr(execution, "simulator", None) if execution is not None else None
     _attach_engine_commissioning_notice(run_metadata, sim)
+    _attach_engine_binding_admission_notice(run_metadata, sim)
     _attach_diagnostic_gate_authority_notice(run_metadata, sim)
     _attach_sulfur_saturation_notice(run_metadata, sim)
     _attach_rump_expectation_notice(run_metadata, sim)
