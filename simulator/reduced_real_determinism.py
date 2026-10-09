@@ -67,6 +67,10 @@ SCHEMA_VERSION = "pt0-reduced-real-determinism-v1"
 PHYSICS_BUCKET_SCHEMA_VERSION = "pt1-reduced-real-physics-bucket-v2"
 PT1_LEGACY_STORE_SCHEMA_VERSION = "pt1-reduced-real-equilibrium-store-v2"
 PT1_STORE_SCHEMA_VERSION = "pt1-reduced-real-equilibrium-store-v3"
+PT1_SUPPORTED_STORE_SCHEMA_VERSIONS = (
+    PT1_LEGACY_STORE_SCHEMA_VERSION,
+    PT1_STORE_SCHEMA_VERSION,
+)
 PT1_EQUILIBRIUM_TABLE = "reduced_real_equilibrium_payloads"
 PT1_METADATA_TABLE = "reduced_real_metadata"
 PT1_READ_ONLY_BASE_ALIAS = "pt1_read_only_base"
@@ -1772,10 +1776,10 @@ class PT1PersistentEquilibriumStore:
             f"SELECT value FROM {PT1_METADATA_TABLE} WHERE key = ?",
             ("store_schema_version",),
         ).fetchone()
-        if metadata is not None and metadata["value"] not in {
-            PT1_LEGACY_STORE_SCHEMA_VERSION,
-            PT1_STORE_SCHEMA_VERSION,
-        }:
+        if (
+            metadata is not None
+            and metadata["value"] not in PT1_SUPPORTED_STORE_SCHEMA_VERSIONS
+        ):
             raise PT1PersistentStoreCorrupt(
                 "PT-1 persistent store schema version drift: "
                 f"{metadata['value']} != {PT1_STORE_SCHEMA_VERSION}"
@@ -1943,10 +1947,7 @@ class PT1PersistentEquilibriumStore:
     ) -> dict[str, Any]:
         row_key_bytes = _sqlite_bytes(row["key_bytes"])
         row_payload_bytes = _sqlite_bytes(row["payload_bytes"])
-        if row["store_schema_version"] not in {
-            PT1_LEGACY_STORE_SCHEMA_VERSION,
-            PT1_STORE_SCHEMA_VERSION,
-        }:
+        if row["store_schema_version"] not in PT1_SUPPORTED_STORE_SCHEMA_VERSIONS:
             raise PT1PersistentStoreCorrupt(
                 "PT-1 row store schema version drift: "
                 f"{row['store_schema_version']} != {PT1_STORE_SCHEMA_VERSION}"

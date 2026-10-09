@@ -21,6 +21,7 @@ from simulator.reduced_real_determinism import (  # noqa: E402
     PT1_EQUILIBRIUM_TABLE,
     PT1_METADATA_TABLE,
     PT1_STORE_SCHEMA_VERSION,
+    PT1_SUPPORTED_STORE_SCHEMA_VERSIONS,
     PT1PersistentEquilibriumStore,
     canonical_json_bytes,
     monotonic_repair_notices_json,
@@ -74,7 +75,7 @@ def _format_schema_mismatch(source: Path, field: str, found: Any) -> str:
     return (
         "PT-1 cache source schema mismatch: "
         f"source={source} field={field} "
-        f"found={found!r} expected={PT1_STORE_SCHEMA_VERSION!r}"
+        f"found={found!r} expected_one_of={PT1_SUPPORTED_STORE_SCHEMA_VERSIONS!r}"
     )
 
 
@@ -103,7 +104,7 @@ def validate_source_schema(source: Path) -> None:
             ).fetchone()
             if row is not None:
                 found_schema = str(row[0])
-        if found_schema != PT1_STORE_SCHEMA_VERSION:
+        if found_schema not in PT1_SUPPORTED_STORE_SCHEMA_VERSIONS:
             raise CacheSourceSchemaMismatch(
                 _format_schema_mismatch(
                     source,
@@ -125,7 +126,9 @@ def validate_source_schema(source: Path) -> None:
             )
         ]
         mismatched = sorted(
-            version for version in versions if version != PT1_STORE_SCHEMA_VERSION
+            version
+            for version in versions
+            if version not in PT1_SUPPORTED_STORE_SCHEMA_VERSIONS
         )
         if mismatched:
             raise CacheSourceSchemaMismatch(
@@ -301,6 +304,7 @@ def validate_cache_source_rows(source: Path) -> list[dict[str, Any]]:
             payload=payload,
             context=f"PT-1 cache source {source}:{artifact}:{key_hash}",
         )
+        row["store_schema_version"] = PT1_STORE_SCHEMA_VERSION
         row["validated_key"] = key
         row["validated_payload"] = payload
     return rows

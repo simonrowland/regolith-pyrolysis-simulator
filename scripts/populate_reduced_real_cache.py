@@ -47,6 +47,7 @@ from simulator.reduced_real_determinism import (
     PT0NonFinitePayload,
     PT1_EQUILIBRIUM_TABLE,
     PT1_STORE_SCHEMA_VERSION,
+    PT1_SUPPORTED_STORE_SCHEMA_VERSIONS,
     PT1PersistentEquilibriumStore,
     _physics_ladder_values_from_replay_key,
     _replay_scope_hash,
@@ -774,7 +775,7 @@ def _validated_cache_payload_row(row: Mapping[str, Any]) -> dict[str, Any]:
         raise RuntimeError(
             f"PT-1 cache shard row has non-canonical payload bytes: {row['key_hash']}"
         )
-    if str(row["store_schema_version"]) != PT1_STORE_SCHEMA_VERSION:
+    if str(row["store_schema_version"]) not in PT1_SUPPORTED_STORE_SCHEMA_VERSIONS:
         raise RuntimeError(
             "PT-1 cache shard row store schema version drift: "
             f"{row['store_schema_version']}"
