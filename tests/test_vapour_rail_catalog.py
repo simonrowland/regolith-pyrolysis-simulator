@@ -4,6 +4,7 @@ from copy import deepcopy
 import csv
 import hashlib
 import importlib.util
+import json
 import math
 from pathlib import Path
 import subprocess
@@ -1507,13 +1508,95 @@ def test_compiler_rejects_ambiguous_or_invalid_schema(mutation: str) -> None:
         compile_vapour_rail_catalog(payload)
 
 
+def _assert_trace_supply_limited_corner(
+    catalog, depletion_host, species_id, temperature_K, pO2_bar,
+    fraction, activity, edge, pressure_pa, ceiling,
+) -> None:
+    from dataclasses import replace
+    from unittest.mock import patch
+
+    from engines.builtin.evaporation_flux import _series_resistance_evaporation_flux_kg_m2_s
+    from simulator.accounting.formulas import parse_formula
+    from simulator.evaporation import _evaporation_species_data, split_frozen_inventory
+    from simulator.vapour_rail.activity import CondensedPhaseActivityProvider
+    from simulator.vapour_rail.batch import FluxActivationContext, FLUX_ACTIVATION_EPOCH_RG_MANIFEST
+    from simulator.vapour_rail.instrumentation import EffectivePressureSource, flux_pressures_from_batch
+    from simulator.vapour_rail.request import VapourResolveState
+
+    species = catalog.species[species_id]
+    data = _evaporation_species_data(depletion_host.vapor_pressures, species_id)
+    parent = data["parent_oxide"]
+    # Select an uncertainty endpoint through the existing activity-provider
+    # seam. Delegate to the production ladder; do not replace pressure math,
+    # alter the declaration or bypass its assemblage/reported-value guard.
+    provider = CondensedPhaseActivityProvider()
+    resolve_activity = provider.resolve_source_reaction_activity
+
+    def envelope_activity(declaration, **kwargs):
+        resolved = resolve_activity(declaration, **kwargs)
+        if declaration.component_id == species.source_reaction_activity.component_id:
+            value = resolved.value
+            if edge != "selected":
+                offset = resolved.ln_band[0 if edge == "lower" else 1]
+                value *= math.exp(offset)
+            assert value == activity
+            return replace(resolved, value=value, ln_value=math.log(value), ln_band=None)
+        return resolved
+
+    ledger = {"process.cleaned_melt": {parent: fraction, "SiO2": 1 - fraction}}
+    with patch.object(provider, "resolve_source_reaction_activity", side_effect=envelope_activity):
+        batch = catalog.resolve_batch(
+            ledger,
+            VapourResolveState(
+                temperature_K=temperature_K, process_phase="hot_train",
+                fO2_bar=pO2_bar, source_reaction_fO2_bar=pO2_bar,
+            ),
+            activity_provider=provider,
+            flux_activation_context=FluxActivationContext(epoch=FLUX_ACTIVATION_EPOCH_RG_MANIFEST),
+        )
+    answer = batch.channel(species_id)
+    assert answer.is_flux_active and not answer.is_refused
+    assert answer.pressure.pa == pressure_pa  # No pressure clamp.
+    assert answer.extra["supply_limited_pressure"] == {
+        "reason": "activity_weighted_pressure_exceeds_physical_guard",
+        "pressure_pa": pressure_pa, "guard_pa": ceiling,
+        "inventory_policy": "split_frozen_inventory",
+    }
+    pressures, _ = flux_pressures_from_batch(
+        batch, effective_pressure_source=EffectivePressureSource("catalog", {}),
+    )
+    assert pressures[species_id] == pressure_pa
+    molar_mass = parse_formula(species.formula).molar_mass_kg_per_mol()
+    raw = _series_resistance_evaporation_flux_kg_m2_s(
+        species=species_id, P_eq_pa=pressures[species_id], P_bulk_pa=0.0,
+        T_surface_K=temperature_K, molar_mass_kg_mol=molar_mass,
+        alpha_i=1.0, overhead_pressure_pa=0.0,
+        gas_resistance_enabled=False,
+    ).flux_kg_s_m2 * 3600.0  # One m² surface, one-hour inventory step.
+    assert math.isfinite(raw) and raw > 0
+    stock_kg = fraction * parse_formula(parent).molar_mass_kg_per_mol()
+    with patch("simulator.evaporation.split_frozen_inventory", wraps=split_frozen_inventory) as split:
+        limited = depletion_host._analytic_evaporation_depletion_rates(
+            {species_id: raw}, dt_hr=1.0, phase_scalar=1.0,
+            cleaned_melt_kg={parent: stock_kg}, available_o2_kg=0.0,
+        )
+    split.assert_called_once()
+    assert split.call_args.args[0] == stock_kg
+    stoich = depletion_host._evaporation_stoich(species_id, data)
+    rate = limited[species_id]
+    assert 0 < rate < raw
+    assert rate * stoich["oxide_per_product_kg"] <= stock_kg
+    assert answer.extra["supply_limited_pressure"]["pressure_pa"] == pressure_pa
+
+
 def test_catalog_operating_envelope_no_nonphysical_pressure() -> None:
-    """b-148 regression: no hot-train in-domain row yields P > 1e9 Pa.
+    """b-148: reference pressure ceiling and trace supply-limited corners.
 
     Sweep reference-activity hot-train evaluators over the existing process
     envelope (T band × melt pO2 band × activity). Inventory-resolved trace
     channels use trace fractions times the production ladder's activity
-    coefficient envelope or bound, retaining the same pressure ceiling.
+    coefficient envelope or bound. Above the same ceiling they must carry
+    the production supply-limited flag and obey frozen parent inventory.
     Stage-0-only carriers
     (P-ladder, …) are excluded: they are gated off the hot train and
     their large negative pO2 powers at unit activity are a separate
@@ -1526,10 +1609,10 @@ def test_catalog_operating_envelope_no_nonphysical_pressure() -> None:
         MELT_DISSOCIATION_PO2_MAX_BAR,
     )
     from simulator.vapour_rail.activity import CondensedPhaseActivityProvider
+    from tests.test_t1139_b1_reactant_vector import _host
 
-    catalog = compile_vapour_rail_catalog(
-        _yaml("vapor_pressures.yaml"), emit_u0_request_rules=False
-    )
+    catalog = compile_vapour_rail_catalog(_yaml("vapor_pressures.yaml"))
+    depletion_host = _host(catalog.legacy_view())
     temperatures_K = (1400.0, 1600.0, 1800.0, 2000.0, 2200.0, 2473.15)
     # Process-representative melt pO2 band (inside the physical envelope).
     pO2_bars = (1.0e-12, 1.0e-9, 1.0e-6, 1.0e-3, 1.0, 10.0)
@@ -1539,6 +1622,7 @@ def test_catalog_operating_envelope_no_nonphysical_pressure() -> None:
     swept_trace_species: set[str] = set()
     ceiling = CATALOG_PHYSICAL_PRESSURE_CEILING_PA
     offenders: list[str] = []
+    supply_limited_corners: list[dict] = []
     assert MELT_DISSOCIATION_PO2_MAX_BAR >= 10.0
 
     for species_id, species in catalog.species.items():
@@ -1555,9 +1639,9 @@ def test_catalog_operating_envelope_no_nonphysical_pressure() -> None:
             assert species.source_reaction_activity is not None
             assert species.code_metadata.source_account == "process.cleaned_melt"
         for temperature_K in temperatures_K:
-            row_activities = activities
+            row_activities = [(value, None, None) for value in activities]
             if trace_inventory:
-                resolved_activities: list[float] = []
+                resolved_activities: list[tuple] = []
                 for fraction in trace_fractions:
                     answer = activity_provider.resolve_source_reaction_activity(
                         species.source_reaction_activity,
@@ -1567,14 +1651,14 @@ def test_catalog_operating_envelope_no_nonphysical_pressure() -> None:
                     )
                     assert answer.value is not None, (species_id, temperature_K, answer)
                     assert math.isfinite(answer.value) and answer.value > 0
-                    resolved_activities.append(answer.value)
+                    resolved_activities.append((answer.value, fraction, "selected"))
                     if answer.ln_band is not None:
-                        for offset in answer.ln_band:
+                        for edge, offset in zip(("lower", "upper"), answer.ln_band, strict=True):
                             assert offset is not None and math.isfinite(offset)
-                            resolved_activities.append(answer.value * math.exp(offset))
+                            resolved_activities.append((answer.value * math.exp(offset), fraction, edge))
                 row_activities = tuple(resolved_activities)
             for pO2_bar in pO2_bars:
-                for activity in row_activities:
+                for activity, fraction, edge in row_activities:
                     kwargs: dict[str, float] = {}
                     if evaluator.activity_exponent:
                         kwargs["source_activity"] = activity
@@ -1587,12 +1671,41 @@ def test_catalog_operating_envelope_no_nonphysical_pressure() -> None:
                             raise
                         continue
                     # Ordinary reference rows retain their in-band sweep.
-                    # Trace activities include extrapolated ladder endpoints
-                    # at the furnace cap and must still satisfy the ceiling.
+                    # Trace activities include extrapolated ladder endpoints;
+                    # deep-reducing over-guard states must be supply-limited.
                     if evaluation.out_of_range and not trace_inventory:
                         continue
                     if trace_inventory:
                         swept_trace_species.add(species_id)
+                        assert math.isfinite(evaluation.pressure_pa)
+                        if evaluation.pressure_pa > ceiling:
+                            term = evaluator.o2_channel_term
+                            # P°=1 bar=1e5 Pa; at a=1 and pO2=P° the
+                            # compiled reference is P° K**(1/nu_vapor).
+                            # Worst corner: 2 GeO2(l) -> Ge2(g) + 2 O2(g).
+                            # p = P° K a² / (pO2/P°)²; P°=1e5 Pa,
+                            # K=8.221903231456591e-8 at 2473.15 K,
+                            # a=(1e-3)*(7.39945954312724)=0.00739945954312724,
+                            # pO2/P°=1e-12, so p=4.5016565831132154e17 Pa.
+                            # This is finite equilibrium thermodynamics;
+                            # production flux must consume at most its stock.
+                            equilibrium_constant = 10 ** (
+                                (evaluator.reference_model.log10_pressure(temperature_K) - 5)
+                                * term.target_nu
+                            )
+                            supply_limited_corners.append({
+                                "carrier": species_id, "T_K": temperature_K,
+                                "pO2_bar": pO2_bar, "x": fraction,
+                                "activity_edge": edge, "gamma": activity / fraction,
+                                "nu_O2": term.signed_nu, "K": equilibrium_constant,
+                                "pressure_Pa": evaluation.pressure_pa,
+                            })
+                            _assert_trace_supply_limited_corner(
+                                catalog, depletion_host, species_id, temperature_K,
+                                pO2_bar, fraction, activity, edge,
+                                evaluation.pressure_pa, ceiling,
+                            )
+                        continue
                     if not math.isfinite(evaluation.pressure_pa) or evaluation.pressure_pa > ceiling:
                         offenders.append(
                             f"{species_id}: T={temperature_K:g} K "
@@ -1605,6 +1718,10 @@ def test_catalog_operating_envelope_no_nonphysical_pressure() -> None:
         species_id for species_id, species in catalog.species.items()
         if species.code_metadata.request_rule == "trace_source_inventory"
     }
+    expected_corners = json.loads(
+        (DATA_DIR.parent / "tests/fixtures/t1139_supply_limited_corners.json").read_text()
+    )
+    assert supply_limited_corners == expected_corners
     assert not offenders, (
         "catalog operating-envelope physical ceiling exceeded "
         f"(>{ceiling:g} Pa in-domain):\n" + "\n".join(offenders[:40])
