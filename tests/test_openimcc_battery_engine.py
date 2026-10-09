@@ -463,8 +463,8 @@ def test_openimcc_producer_emits_activity_and_vapour_rails() -> None:
     assert cell.status == "ok", cell.engine_reason
     assert cell.melt_activities["K2O"] > 0.0
     assert cell.gas_partial_pressures_Pa["K"] > 0.0
-    assert "openimcc" in cell.vapor_pressures_source["K"]
-    assert "gas-shomate.csv" in cell.vapor_pressures_source["K"]
+    gas_digest = handle.identity["engine_binding_identity"]["gas_table_digest"]
+    assert cell.vapor_pressures_source["K"] == f"openimcc-gas-table:sha256:{gas_digest}"
     assert cell.model_id == "IMCC-SF04"
 
 
@@ -1116,6 +1116,17 @@ engine_rows = [
     if candidate.engine is not None and candidate.engine.name is Engine.OPENIMCC
 ]
 assert len(engine_rows) == 162
+binary_pot_residual, binary_pot_candidate = next(
+    (residual, candidate)
+    for residual, candidate in engine_rows
+    if candidate.observation_id
+    == "engine:openimcc:kems-042-plante-1979::plante1979_table2_s1104_r001_quoted"
+)
+assert binary_pot_residual.key == (
+    "kems-042-plante-1979::plante1979_table2_s1104_r001_quoted:"
+    "T=1302::p_partial::vapour::openimcc"
+)
+assert binary_pot_residual.candidate == binary_pot_candidate.observation_id
 assert {
     (candidate.engine.lineage_complete, residual.source_relation.value)
     for residual, candidate in engine_rows
@@ -1355,9 +1366,15 @@ def test_openimcc_plante_candidates_match_mole_basis_package() -> None:
                 str(source).startswith("openimcc-pack-digest:")
                 for source in candidate.engine.coefficient_sources
             )
-            assert any(
-                str(source).startswith("openimcc-gas-table:")
-                for source in candidate.engine.coefficient_sources
+            binding = handle.identity["engine_binding_identity"]
+            expected_binding_sources = {
+                f"openimcc-engine-binding:sha256:{binding['engine_binding_digest']}",
+                f"openimcc-melt-binding:sha256:{binding['melt_binding_digest']}",
+                f"openimcc-condensate-table:sha256:{binding['condensate_table_digest']}",
+                f"openimcc-gas-table:sha256:{binding['gas_table_digest']}",
+            }
+            assert expected_binding_sources <= set(
+                candidate.engine.coefficient_sources
             )
         package_melt = evaluate(
             composition_mol,
@@ -1502,7 +1519,14 @@ def test_openimcc_gas_table_mutation_to_vaporock_changes_prediction(monkeypatch)
         composition_mol=composition_mol,
         fO2_log=math.log10(0.226 * float(row["measured_P_K_Pa"]) / 1.0e5),
     )
-    assert "VapoRock" in mutated._identity["gas_table_source"]
+    assert (
+        mutated._identity["engine_binding_identity"]["gas_table_digest"]
+        != packaged._identity["engine_binding_identity"]["gas_table_digest"]
+    )
+    assert (
+        mutated._identity["engine_binding_identity"]["engine_binding_digest"]
+        != packaged._identity["engine_binding_identity"]["engine_binding_digest"]
+    )
     assert len(gas_results) == 2
     _packaged_gas_result, mutated_gas_result = gas_results
     packaged_melt = openimcc.evaluate(

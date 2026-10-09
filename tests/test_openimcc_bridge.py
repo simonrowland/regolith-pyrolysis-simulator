@@ -523,6 +523,97 @@ def test_pack_digest_refuses_missing_binding_digest(pack) -> None:
     assert "install the recorded pin" in str(exc_info.value)
 
 
+def test_engine_binding_identity_changes_with_condensate_coefficient(
+    tmp_path: Path,
+) -> None:
+    _openimcc_or_skip()
+    import csv
+    import shutil
+
+    import openimcc
+    from simulator.melt_backend import openimcc_bridge
+
+    melt_pack = _load_pack("v1.0.2")
+    packaged_gas = openimcc.load_gas_datapack()
+    baseline = openimcc_bridge.engine_binding_identity(melt_pack, packaged_gas)
+
+    condensate_copy = tmp_path / "condensate.csv"
+    shutil.copyfile(packaged_gas.oxide_path, condensate_copy)
+    with condensate_copy.open(newline="", encoding="utf-8") as handle:
+        reader = csv.DictReader(handle)
+        columns = reader.fieldnames
+        rows = list(reader)
+    assert columns is not None and rows
+    rows[0]["dG_A"] = str(float(rows[0]["dG_A"]) + 0.125)
+    with condensate_copy.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=columns)
+        writer.writeheader()
+        writer.writerows(rows)
+
+    changed_gas = openimcc.load_gas_datapack(
+        gas_path=packaged_gas.gas_path,
+        oxide_path=condensate_copy,
+    )
+    changed = openimcc_bridge.engine_binding_identity(melt_pack, changed_gas)
+
+    assert changed["condensate_table_digest"] != baseline["condensate_table_digest"]
+    assert changed["engine_binding_digest"] != baseline["engine_binding_digest"]
+    assert changed["melt_binding_digest"] == baseline["melt_binding_digest"]
+    assert changed["gas_table_digest"] == baseline["gas_table_digest"]
+
+
+def test_engine_binding_identity_ignores_table_paths(tmp_path: Path) -> None:
+    _openimcc_or_skip()
+    import shutil
+
+    import openimcc
+    from simulator.melt_backend import openimcc_bridge
+
+    melt_pack = _load_pack("v1.0.2")
+    packaged_gas = openimcc.load_gas_datapack()
+    relocated_gas_path = tmp_path / "gas-shomate.csv"
+    relocated_condensate_path = tmp_path / "condensate.csv"
+    shutil.copyfile(packaged_gas.gas_path, relocated_gas_path)
+    shutil.copyfile(packaged_gas.oxide_path, relocated_condensate_path)
+    relocated_gas = openimcc.load_gas_datapack(
+        gas_path=relocated_gas_path,
+        oxide_path=relocated_condensate_path,
+    )
+
+    assert str(relocated_gas.gas_path) != str(packaged_gas.gas_path)
+    assert str(relocated_gas.oxide_path) != str(packaged_gas.oxide_path)
+    assert openimcc_bridge.engine_binding_identity(
+        melt_pack, relocated_gas
+    ) == openimcc_bridge.engine_binding_identity(melt_pack, packaged_gas)
+
+
+@pytest.mark.parametrize("owner_mode", ("missing", "raising"))
+def test_engine_binding_identity_refuses_without_path_fallback(
+    owner_mode: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.melt_backend import openimcc_bridge
+
+    package = SimpleNamespace()
+    if owner_mode == "raising":
+        def raise_identity_error(*_args):
+            raise RuntimeError("package identity failed")
+
+        package.engine_binding_identity = raise_identity_error
+    monkeypatch.setattr(openimcc_bridge, "_openimcc", package)
+
+    with pytest.raises(OpenImccBindingDigestUnavailableError) as exc_info:
+        openimcc_bridge.engine_binding_identity(
+            SimpleNamespace(),
+            SimpleNamespace(
+                gas_path="/host/a/gas-shomate.csv",
+                oxide_path="/host/a/condensate.csv",
+            ),
+        )
+
+    assert exc_info.value.reason_code == "openimcc_binding_digest_unavailable"
+
+
 def test_bridge_envelope_matches_green_edge_decisions() -> None:
     _openimcc_or_skip()
     from openimcc import ImccCompositionOutsideValidatedEnvelopeError

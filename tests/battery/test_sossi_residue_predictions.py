@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import hashlib
 import math
 from pathlib import Path
 from types import SimpleNamespace
@@ -72,11 +71,12 @@ def test_sossi_geometry_is_declared_from_bead_mass_without_residue_inputs() -> N
     ]
 
 
-def test_sossi_prediction_provenance_pins_pack_byte_digests(monkeypatch) -> None:
+def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -> None:
     pytest.importorskip("openimcc")
-    from openimcc import load_gas_datapack
+    import openimcc
 
     import simulator.battery.residue as residue
+    from simulator.melt_backend import openimcc_bridge
 
     def no_evaporation(inventory, *_args, **_kwargs):
         return SimpleNamespace(
@@ -103,13 +103,19 @@ def test_sossi_prediction_provenance_pins_pack_byte_digests(monkeypatch) -> None
         engine="openimcc",
     )[0]
 
-    gas_pack = load_gas_datapack()
-    assert prediction.provenance["gas_pack_digest"] == hashlib.sha256(
-        Path(gas_pack.gas_path).read_bytes()
-    ).hexdigest()
-    assert prediction.provenance["liquid_pack_digest"] == hashlib.sha256(
-        Path(gas_pack.oxide_path).read_bytes()
-    ).hexdigest()
+    gas_pack = openimcc.load_gas_datapack()
+    package_identity = openimcc.engine_binding_identity(
+        openimcc_bridge._load_pack("v1.0.2"), gas_pack
+    )
+    expected_identity = {
+        "engine_binding_digest": package_identity.digest,
+        "melt_binding_digest": package_identity.melt_binding_digest,
+        "condensate_table_digest": package_identity.condensate_table_digest,
+        "gas_table_digest": package_identity.gas_table_digest,
+    }
+    assert prediction.provenance["engine_binding_identity"] == expected_identity
+    assert "gas_pack_digest" not in prediction.provenance
+    assert "liquid_pack_digest" not in prediction.provenance
 
 
 def test_sossi_scorer_projects_mn_and_types_unsupported_elements(monkeypatch) -> None:
@@ -242,11 +248,30 @@ def test_mixed_hashimoto_and_sossi_score_keep_separate_engine_cohorts(
     monkeypatch.setattr(residue, "_predict_hashimoto_residue_cohort", hashimoto_cohort)
     monkeypatch.setattr(residue, "_predict_sossi_residue_cohort", sossi_cohort)
 
-    residuals, _ = score_store(
+    residuals, candidates = score_store(
         context,
         engines=(Engine.OPENIMCC,),
         rail=Rail.RESIDUE_COMPOSITION,
     )
+    pinned_score = next(
+        row
+        for row in residuals
+        if row.reference
+        == "kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1573.15:h=0eaa2bb3c525"
+    )
+    assert pinned_score.key == (
+        "kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::"
+        "T=1573.15:h=0eaa2bb3c525:T=1573.15::residue_component_composition::"
+        "residue_composition::openimcc"
+    )
+    assert pinned_score.candidate == (
+        "engine:openimcc:kems-012-sossi-2019::"
+        "sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::"
+        "T=1573.15:h=0eaa2bb3c525"
+    )
+    assert candidates[pinned_score.candidate].observation_id == pinned_score.candidate
+    assert pinned_score.numeric is not None
+    assert float(pinned_score.numeric.value).hex() == "0x1.88fea8359f38fp-4"
     hashimoto_ids = {
         row.observation_id
         for row in context.observations.values()
