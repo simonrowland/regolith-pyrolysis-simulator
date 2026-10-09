@@ -4228,6 +4228,7 @@ def build_sio_yield_report(
         "industrial_benchmark_pct": list(SIO_INDUSTRIAL_BENCHMARK_PCT),
         "verdict": _industrial_sio_verdict(sio_yield_pct),
     }
+    _attach_melt_fO2_seed_notice(report, sim)
 
     if include_diagnostics:
         operating_history = list(
@@ -4347,6 +4348,7 @@ def build_sio_yield_report(
             diagnostics["lab_plume_product_partition"] = (
                 queries.lab_plume_product_partition()
             )
+        _attach_melt_fO2_seed_notice(diagnostics, sim)
         return report, diagnostics
     return report
 

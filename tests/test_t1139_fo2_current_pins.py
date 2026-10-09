@@ -152,6 +152,42 @@ def test_reservoir_tracks_iw_until_the_first_liquid_tick() -> None:
     assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log != pytest.approx(fixed)
 
 
+def test_seed_notice_is_on_the_ranked_surfaces_and_the_sio_report() -> None:
+    from simulator.optimize.evaluate import _cache_trace_payload
+    from simulator.optimize.objective import product_summary
+    from simulator.optimize.profiles import load_profile
+    from simulator.runner import build_sio_yield_report
+
+    sim = _sim()
+    sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
+    notice = sim.melt_fO2_seed_run_notice()
+    assert notice is not None
+
+    class _Execution:
+        simulator = sim
+        trace = None
+        per_hour = ()
+        session = None
+        reduced_real_cache = None
+        refusal_diagnostic = None
+        reason = ""
+
+    summary = product_summary(_Execution(), load_profile("lunar_mare_low_ti"))
+    payload = _cache_trace_payload(_Execution(), {})
+    assert summary["melt_fO2_seed_notice"]["code"] == notice["code"]
+    assert summary["melt_fO2_seed_notice"]["authority"] == notice["authority"]
+    assert payload["melt_fO2_seed_notice"]["code"] == notice["code"]
+
+    report, diagnostics = build_sio_yield_report(
+        feedstock_id="lunar_mare_low_ti",
+        hours=1,
+        include_diagnostics=True,
+        allow_unmeasured_alpha_fallback=True,
+    )
+    assert report["melt_fO2_seed_notice"]["code"] == notice["code"]
+    assert diagnostics["melt_fO2_seed_notice"]["code"] == notice["code"]
+
+
 def test_zero_o2_argon_schedule_is_a_closed_sweep() -> None:
     schedule = deepcopy(_n2_lab_schedule())
     schedule["gas_boundary"]["background_gas"]["species"] = "Ar"

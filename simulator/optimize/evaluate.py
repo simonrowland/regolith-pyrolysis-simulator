@@ -133,7 +133,15 @@ from simulator.mre_ladder import max_voltage_for_target, parse_ladder_from_setpo
 from simulator.run_executor import RunExecutor
 from simulator.recipe_errors import MalformedRecipeError
 from simulator.scalar_boundary import is_declared_real_scalar
-from simulator.runner import PyrolysisRun, RunnerError
+from simulator.runner import (
+    PyrolysisRun,
+    RunnerError,
+    _attach_diagnostic_gate_authority_notice,
+    _attach_engine_commissioning_notice,
+    _attach_melt_fO2_seed_notice,
+    _attach_rump_expectation_notice,
+    _attach_sulfur_saturation_notice,
+)
 from simulator.transport_regime import TransportRegimeRefusal
 from simulator.optimize.backend_status import (
     crash_point_from_carrier,
@@ -5921,41 +5929,11 @@ def _cache_trace_payload(
         payload["refusal_diagnostic"] = _compact_jsonable(dict(refusal_diagnostic))
 
     simulator = getattr(run_execution, "simulator", None)
-    notice_reader = getattr(simulator, "engine_commissioning_run_notice", None)
-    if callable(notice_reader):
-        commissioning_notice = notice_reader()
-        if isinstance(commissioning_notice, MappingABC) and commissioning_notice:
-            payload["engine_commissioning_notice"] = _compact_jsonable(
-                dict(commissioning_notice)
-            )
-    diagnostic_gate_reader = getattr(
-        simulator,
-        "diagnostic_gate_authority_run_notice",
-        None,
-    )
-    if callable(diagnostic_gate_reader):
-        diagnostic_gate_notice = diagnostic_gate_reader()
-        if (
-            isinstance(diagnostic_gate_notice, MappingABC)
-            and diagnostic_gate_notice
-        ):
-            payload["diagnostic_gate_authority_notice"] = _compact_jsonable(
-                dict(diagnostic_gate_notice)
-            )
-    sulfsat_reader = getattr(simulator, "sulfur_saturation_run_notice", None)
-    if callable(sulfsat_reader):
-        sulfsat_notice = sulfsat_reader()
-        if isinstance(sulfsat_notice, MappingABC) and sulfsat_notice:
-            payload["sulfur_saturation_notice"] = _compact_jsonable(
-                dict(sulfsat_notice)
-            )
-    rump_reader = getattr(simulator, "rump_expectation_run_notice", None)
-    if callable(rump_reader):
-        rump_notice = rump_reader()
-        if isinstance(rump_notice, MappingABC) and rump_notice:
-            payload["rump_expectation_notice"] = _compact_jsonable(
-                dict(rump_notice)
-            )
+    _attach_melt_fO2_seed_notice(payload, simulator)
+    _attach_engine_commissioning_notice(payload, simulator)
+    _attach_diagnostic_gate_authority_notice(payload, simulator)
+    _attach_sulfur_saturation_notice(payload, simulator)
+    _attach_rump_expectation_notice(payload, simulator)
     alpha_authority_status_by_species = getattr(
         simulator,
         "_alpha_authority_status_by_species_engaged",

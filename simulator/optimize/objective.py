@@ -30,6 +30,13 @@ from simulator.optimize.physics import (
 )
 from simulator.optimize.product_pools import COMPOSITION_PRODUCT_POOLS, STREAM_PRODUCT_POOLS
 from simulator.cost_energy import is_unavailable_quantity, unavailable_reason_of
+from simulator.runner import (
+    _attach_diagnostic_gate_authority_notice,
+    _attach_engine_commissioning_notice,
+    _attach_melt_fO2_seed_notice,
+    _attach_rump_expectation_notice,
+    _attach_sulfur_saturation_notice,
+)
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.three_product_report import classify_products
 from simulator.diagnostics import (
@@ -3602,18 +3609,11 @@ def product_summary(
         ),
         "target_species_yield_report": target_species_yield_report(sim),
     }
-    notice = _engine_commissioning_notice(sim)
-    if notice:
-        summary["engine_commissioning_notice"] = notice
-    diagnostic_gate_notice = _diagnostic_gate_authority_notice(sim)
-    if diagnostic_gate_notice:
-        summary["diagnostic_gate_authority_notice"] = diagnostic_gate_notice
-    sulfsat = _sulfur_saturation_notice(sim)
-    if sulfsat:
-        summary["sulfur_saturation_notice"] = sulfsat
-    rump = _rump_expectation_notice(sim)
-    if rump:
-        summary["rump_expectation_notice"] = rump
+    _attach_melt_fO2_seed_notice(summary, sim)
+    _attach_engine_commissioning_notice(summary, sim)
+    _attach_diagnostic_gate_authority_notice(summary, sim)
+    _attach_sulfur_saturation_notice(summary, sim)
+    _attach_rump_expectation_notice(summary, sim)
     summary.update(_coating_product_summary(run_execution))
     lifetime, has_positive_fouling = _selection_coating_lifetime(
         coating_margin,
@@ -3632,46 +3632,6 @@ def product_summary(
             )
         )
     return MappingProxyType(summary)
-
-
-def _engine_commissioning_notice(sim: Any) -> Mapping[str, Any] | None:
-    reader = getattr(sim, "engine_commissioning_run_notice", None)
-    if not callable(reader):
-        return None
-    notice = reader()
-    if not isinstance(notice, Mapping) or not notice:
-        return None
-    return dict(notice)
-
-
-def _diagnostic_gate_authority_notice(sim: Any) -> Mapping[str, Any] | None:
-    reader = getattr(sim, "diagnostic_gate_authority_run_notice", None)
-    if not callable(reader):
-        return None
-    notice = reader()
-    if not isinstance(notice, Mapping) or not notice:
-        return None
-    return dict(notice)
-
-
-def _sulfur_saturation_notice(sim: Any) -> Mapping[str, Any] | None:
-    reader = getattr(sim, "sulfur_saturation_run_notice", None)
-    if not callable(reader):
-        return None
-    notice = reader()
-    if not isinstance(notice, Mapping) or not notice:
-        return None
-    return dict(notice)
-
-
-def _rump_expectation_notice(sim: Any) -> Mapping[str, Any] | None:
-    reader = getattr(sim, "rump_expectation_run_notice", None)
-    if not callable(reader):
-        return None
-    notice = reader()
-    if not isinstance(notice, Mapping) or not notice:
-        return None
-    return dict(notice)
 
 
 def _selection_coating_lifetime(
