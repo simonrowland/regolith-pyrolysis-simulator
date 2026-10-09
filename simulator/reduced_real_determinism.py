@@ -1825,10 +1825,24 @@ class PT1PersistentEquilibriumStore:
         }
         for name, column_type in columns.items():
             if name not in existing:
-                conn.execute(
-                    f"ALTER TABLE {PT1_EQUILIBRIUM_TABLE} "
-                    f"ADD COLUMN {name} {column_type}"
-                )
+                try:
+                    conn.execute(
+                        f"ALTER TABLE {PT1_EQUILIBRIUM_TABLE} "
+                        f"ADD COLUMN {name} {column_type}"
+                    )
+                except sqlite3.OperationalError as exc:
+                    if f"duplicate column name: {name}" not in str(exc).casefold():
+                        raise
+                    existing = {
+                        str(row["name"])
+                        for row in conn.execute(
+                            f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})"
+                        )
+                    }
+                    if name not in existing:
+                        raise
+                else:
+                    existing.add(name)
 
     def _update_physics_bucket_columns(
         self,
