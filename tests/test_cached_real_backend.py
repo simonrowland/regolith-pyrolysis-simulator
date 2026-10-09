@@ -22,6 +22,10 @@ from simulator.backends import (
     normalize_cached_real_config,
     resolve_backend,
 )
+from simulator.engine_binding_admission import (
+    EngineBindingAdmissionError,
+    binding_admission_run_notice,
+)
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.config import load_config_bundle
 from engines.alphamelts import AlphaMELTSProvider
@@ -1155,8 +1159,8 @@ def test_cached_real_live_fill_populates_then_fail_loud_hits(tmp_path: Path) -> 
 
     live_result = live_sim._get_equilibrium()
 
-    assert _FakeLiveRealBackend.last_instance is not None
-    assert _FakeLiveRealBackend.last_instance.calls == 1
+    assert backend._live_backend is not None
+    assert backend._live_backend.calls == 1
     assert live_result.status == "ok"
     assert live_sim._last_reduced_real_cache_state == "live_fill"
 
@@ -1187,6 +1191,73 @@ def test_cached_real_live_fill_populates_then_fail_loud_hits(tmp_path: Path) -> 
         "cached_interpolated",
         "live_fill",
     )
+
+
+def test_receiptless_live_fill_computes_without_cache_lookup_or_capture(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator import engine_local_config
+
+    monkeypatch.setattr(
+        engine_local_config,
+        "config_path",
+        lambda: tmp_path / "engines.local.toml",
+    )
+    config = _cache_config(tmp_path / "receiptless-live.db", "live-fill")
+    backend = resolve_backend(
+        "cached-real",
+        BackendSelectionPolicy.RUNNER_STRICT,
+        cached_real_config=config,
+        cached_real_live_backend_cls=_FakeLiveRealBackend,
+    )
+    sim = _build_cached_real_sim(backend=backend, cache_config=config)
+    live_backend = backend._live_backend
+    baseline_backend = _FakeLiveRealBackend()
+    baseline_backend.initialize({})
+    baseline = _build_direct_real_sim(baseline_backend)._get_equilibrium()
+
+    result = sim._get_equilibrium()
+
+    assert result == baseline
+    assert live_backend is not None
+    assert live_backend.calls == 1
+    store = sim._pt0_store()
+    assert store.hits == 0
+    assert store.misses == []
+    assert store.capture_sequence == []
+    assert store.last_cache_state is None
+    notice = binding_admission_run_notice(sim)
+    assert notice is not None
+    assert len(notice["notices"]) == 1
+    assert notice["notices"][0]["kind"] == "engine_binding_not_admitted"
+
+
+def test_receiptless_replay_only_refuses_before_cache_lookup(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator import engine_local_config
+
+    monkeypatch.setattr(
+        engine_local_config,
+        "config_path",
+        lambda: tmp_path / "engines.local.toml",
+    )
+    config = _cache_config(tmp_path / "receiptless-replay.db", "fail-loud")
+    backend = resolve_backend(
+        "cached-real",
+        BackendSelectionPolicy.RUNNER_STRICT,
+        cached_real_config=config,
+    )
+    sim = _build_cached_real_sim(backend=backend, cache_config=config)
+
+    with pytest.raises(EngineBindingAdmissionError, match="receipt missing"):
+        sim._get_equilibrium()
+
+    store = sim._pt0_store()
+    assert store.hits == 0
+    assert store.misses == []
 
 
 def test_cached_real_row_corpus_metadata_is_key_neutral(tmp_path: Path) -> None:
