@@ -7396,13 +7396,12 @@ def test_f4_antoine_and_points_and_range_restore_corroborated_quantity(
     assert state.is_value and state.value is Quantity.P_SAT
 
     costa = _extract_observation(
-        "kems-007-costa-2015.yaml", "costa_2015_sio_olivine_kems_alpha_multicell"
+        "costa-jacobson-2015.yaml", "costa_jacobson_2015_sio_olivine_kems"
     )
     state, _reason = map_quantity(
         costa.get("type"), costa.get("values"), units=costa.get("units"), row=costa
     )
-    assert state.is_unknown
-    assert "curation label" in state.reason
+    assert state.is_value and state.value is Quantity.EVAPORATION_COEFFICIENT_ALPHA
 
     sf04 = _extract_observation(
         "sf04-magma-companion-workbook.yaml", "sf04_workbook_tho_fe_pressure_series"
@@ -7418,7 +7417,7 @@ def test_f4_antoine_and_points_and_range_restore_corroborated_quantity(
         "habermann-daane-1964.yaml",
         "nist-webbook.yaml",
         "berkowitz-chupka-inghram-1957.yaml",
-        "kems-007-costa-2015.yaml",
+        "costa-jacobson-2015.yaml",
         "sf04-magma-companion-workbook.yaml",
     ):
         _copy_extract(root, fname)
@@ -7470,10 +7469,12 @@ def test_f4_antoine_and_points_and_range_restore_corroborated_quantity(
     )
 
     costa_obs = result.observations[
-        "kems-007-costa-2015::costa_2015_sio_olivine_kems_alpha_multicell"
+        "costa-jacobson-2015::costa_jacobson_2015_sio_olivine_kems"
     ]
-    assert costa_obs.identity.quantity.is_unknown
-    assert costa_obs.value.kind is ValueKind.UNAVAILABLE
+    assert quantity_token(costa_obs.identity) is Quantity.EVAPORATION_COEFFICIENT_ALPHA
+    assert costa_obs.value.kind is ValueKind.INTERVAL
+    assert costa_obs.value.interval_low == as_decimal("0.003")
+    assert costa_obs.value.interval_high == as_decimal("0.036")
 
     sf04_rows = [
         o
