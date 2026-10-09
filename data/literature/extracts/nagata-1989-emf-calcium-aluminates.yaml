@@ -169,10 +169,11 @@ species:
           section: 4.4
       regime: emf_liquidus
       units: dimensionless activity
-      derived_from: [unknown:nagata-1989-emf-calcium-aluminates]
+      derived_from: [tables:nagata-1989-emf-calcium-aluminates]
       derivation:
-        relation: 'The paper computes the liquidus CaO activities from measured Cell IV EMF using a_CaO = exp(−2E4F/RT); values are printed in the synopsis and §4.4.'
-        inputs: [unknown:nagata-1989-emf-calcium-aluminates]
+        relation: 'a_CaO = exp(−2 E4 F / RT)'
+        inputs: [tables:nagata-1989-emf-calcium-aluminates]
+        note: Table 1, Cell IV liquidus fit, published p. 2026; activity values printed in the synopsis and §4.4, published pp. 2023 and 2029.
       values:
         quantity: activity
         method_class: measured_reduced
