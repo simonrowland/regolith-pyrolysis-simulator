@@ -1786,6 +1786,17 @@ class EvaporationMixin:
                 ] = [str(item) for item in components]
         if 'floor_T_C' in notice:
             stored_notice['floor_T_C'] = float(notice['floor_T_C'])
+        if (
+            notice.get('bounds_source')
+            == _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
+        ):
+            stored_notice['repair_notice'] = {
+                'kind': 'kress_fixed_liquidus_bound_repair',
+                'repaired': 'missing or unusable projected liquidus bound',
+                'reason': 'no usable composition-projected liquidus bound',
+                'replacement': 'fixed Kress91 liquidus floor',
+                'floor_T_C': float(notice['floor_T_C']),
+            }
         for key in (
             'temperature_band_case',
             'temperature_band_status',
