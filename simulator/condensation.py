@@ -6228,19 +6228,17 @@ def _trace_vapour_carrier_sources() -> dict[str, str | None]:
     that only need membership use ``_trace_vapour_carrier_formulas``.
     """
 
-    from simulator.vapour_rail.channel_generator import generate_first_batch
-    from simulator.vapour_rail.source_rail import load_source_rail
     from simulator.vapour_rail.stoich import strip_phase
 
-    try:
-        batch = generate_first_batch(rail=load_source_rail())
-    except (OSError, ValueError, RuntimeError) as exc:
-        raise _SourceRailUnavailable(str(exc)) from exc
+    payload = _CONFIG_BUNDLE.vapor_pressures.catalog_payload
     sources: dict[str, str | None] = {}
-    for channel in batch.channels:
-        formula = strip_phase(channel.carrier)
-        gas_key = f"{formula}(g)"
-        sources.setdefault(formula, channel.selected_sources.get(gas_key))
+    for family in payload["families"].values():
+        for row in family["physical_properties"]["species"].values():
+            if row.get("chemical_family") != "t1139_generated_carrier":
+                continue
+            formula = strip_phase(row["formula"])
+            gas_key = f"{formula}(g)"
+            sources.setdefault(formula, row["selected_sources"].get(gas_key))
     return sources
 
 
