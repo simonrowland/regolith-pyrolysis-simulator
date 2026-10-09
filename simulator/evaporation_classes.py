@@ -461,7 +461,7 @@ _MARKED_IDEAL_FENCES: tuple[EvidenceRow, ...] = (
 #   vs Fedkin 1973–2273 K). This comment block does not isolate Motzfeldt
 #   geometry as the cause of that spread: Costa's extract records a
 #   Whitman–Motzfeld multi-cell path with missing numeric orifices; Fedkin
-#   is free-evaporation (not Knudsen). Residual 0.62 dex is coverage of the
+#   is free-evaporation (not Knudsen). Residual 0.63 dex is coverage of the
 #   stored poles, not a Motzfeldt-corrected split. A unique-cause
 #   decomposition of the Fe spread is unestablished here.
 #

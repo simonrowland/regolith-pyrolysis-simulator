@@ -2206,6 +2206,13 @@ def test_every_extract_has_fidelity_sample():
             assert doc.get("fidelity_samples"), f"{path.name} missing fidelity_samples"
 
 
+def test_costa_jacobson_retained_sio_has_fidelity_sample(monkeypatch):
+    """Run the landed-pilot sample-presence guard against this extract alone."""
+    path = EXTRACTS / "costa-jacobson-2015.yaml"
+    monkeypatch.setattr(vle, "discover_extracts", lambda: [path])
+    test_every_extract_has_fidelity_sample()
+
+
 # ---------------------------------------------------------------------------
 # t-510 fidelity gate: policy + parameterized match + mutation red
 # ---------------------------------------------------------------------------
