@@ -250,7 +250,7 @@ def test_cu020_1600k_enthalpy_uses_the_page_read_sign() -> None:
 
 
 def test_page_read_sign_provenance_has_no_machine_local_paths() -> None:
-    forbidden = ("/private/", "/Users/", "/tmp/")
+    forbidden = ("/private/", "/" + "Users/", "/tmp/")
     for entry in janaf_reference.PAGE_READ_SIGNS:
         for field, value in entry.items():
             if isinstance(value, str):

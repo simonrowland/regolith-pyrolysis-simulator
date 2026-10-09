@@ -1,6 +1,6 @@
 # Experiment sample composition inheritance sweep
 
-Worktree: `/workspace/repos/wt/slot-z6` at `8089eadbfc856179668287e9c4e503e0e92c2682`.
+Worktree: `.` at `8089eadbfc856179668287e9c4e503e0e92c2682`.
 `engines/engines.local.toml` exists: **False**.
 Migrated 266 extracts with `Migrator(root=Path.cwd(), index={}, aliases={})._migrate_extract(path)` and one `finalize()`.
 
@@ -644,5 +644,5 @@ Smallest reader rule: retain a sample-level fallback only for an explicit experi
 
 ## Artifacts
 
-- `/workspace/b718-sweep/class-b-rows.csv` — Class B inherited rows in the requested column order.
-- `/workspace/b718-sweep/sweep.py` — instrumentation script used for this sweep.
+- `b718-sweep/class-b-rows.csv` — Class B inherited rows in the requested column order.
+- `docs/battery/b718-sweep.py` — instrumentation script used for this sweep.
