@@ -384,17 +384,6 @@ FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION = "reference_converted_via_fusion
 FLAGGED_STRATUM_FIGURE_ONLY = "figure_only"
 FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED = "reactive-cell-not-modelled"
 FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED = "liquidus-position-contested"
-_FLAGGED_STRATUM_NOTICE_KINDS: frozenset[NoticeKind] = frozenset(
-    {
-        NoticeKind.UNVERIFIED_APPARATUS,
-        NoticeKind.CELL_MATERIAL_INFERRED,
-        NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG,
-        NoticeKind.IMCC_COMPLEX_SATURATION,
-        NoticeKind.FIGURE_ONLY,
-        NoticeKind.REACTIVE_CELL_NOT_MODELLED,
-        NoticeKind.LIQUIDUS_POSITION_CONTESTED,
-    }
-)
 
 
 @dataclass(frozen=True)
@@ -1147,38 +1136,46 @@ def _cell_apparatus_inference_notices(
 
 
 def flagged_strata(notices: Sequence[Notice]) -> tuple[str, ...]:
-    strata: list[str] = []
-    kinds = {notice.kind for notice in notices}
-    unverified_apparatus = tuple(
-        notice
-        for notice in notices
-        if notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+    return _classify_flagged_notice_facts(
+        tuple((notice.kind.value, notice.reason) for notice in notices)
     )
-    if any(_is_calibration_not_grounded_reason(n.reason) for n in unverified_apparatus):
+
+
+def _classify_flagged_notice_facts(
+    notices: Sequence[tuple[str, object]],
+) -> tuple[str, ...]:
+    strata: list[str] = []
+    kinds = {kind for kind, _reason in notices}
+    unverified_apparatus = tuple(
+        reason
+        for kind, reason in notices
+        if kind == NoticeKind.UNVERIFIED_APPARATUS.value
+    )
+    if any(_is_calibration_not_grounded_reason(reason) for reason in unverified_apparatus):
         strata.append(FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED)
     if any(
-        not _is_calibration_not_grounded_reason(notice.reason)
-        for notice in unverified_apparatus
+        not _is_calibration_not_grounded_reason(reason)
+        for reason in unverified_apparatus
     ):
         strata.append(FLAGGED_STRATUM_UNVERIFIED_APPARATUS)
-    if NoticeKind.CELL_MATERIAL_INFERRED in kinds:
+    if NoticeKind.CELL_MATERIAL_INFERRED.value in kinds:
         strata.append(FLAGGED_STRATUM_CELL_MATERIAL_INFERRED)
-    if NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG in kinds:
+    if NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG.value in kinds:
         strata.append(FLAGGED_STRATUM_CATALOGUE_COMPOSITION)
     if any(
-        _is_source_internally_inconsistent(notice.kind, notice.reason)
-        for notice in notices
+        _is_source_internally_inconsistent(kind, reason)
+        for kind, reason in notices
     ):
         strata.append(FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT)
-    if NoticeKind.IMCC_COMPLEX_SATURATION in kinds:
+    if NoticeKind.IMCC_COMPLEX_SATURATION.value in kinds:
         strata.append(FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION)
-    if any(_is_fusion_conversion_notice(notice) for notice in notices):
+    if any(_is_fusion_conversion_reason(reason) for _kind, reason in notices):
         strata.append(FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION)
-    if NoticeKind.FIGURE_ONLY in kinds:
+    if NoticeKind.FIGURE_ONLY.value in kinds:
         strata.append(FLAGGED_STRATUM_FIGURE_ONLY)
-    if NoticeKind.REACTIVE_CELL_NOT_MODELLED in kinds:
+    if NoticeKind.REACTIVE_CELL_NOT_MODELLED.value in kinds:
         strata.append(FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED)
-    if NoticeKind.LIQUIDUS_POSITION_CONTESTED in kinds:
+    if NoticeKind.LIQUIDUS_POSITION_CONTESTED.value in kinds:
         strata.append(FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED)
     return tuple(strata)
 
@@ -1198,11 +1195,7 @@ def _is_fusion_conversion_reason(reason: object) -> bool:
 
 
 def _is_flagged_stratum_notice(notice: Notice) -> bool:
-    return (
-        notice.kind in _FLAGGED_STRATUM_NOTICE_KINDS
-        or _is_source_internally_inconsistent(notice.kind, notice.reason)
-        or _is_fusion_conversion_notice(notice)
-    )
+    return bool(flagged_strata((notice,)))
 
 
 @lru_cache(maxsize=1)
@@ -7660,49 +7653,11 @@ def _headline_payload_admits(row: Mapping[str, object], *, tier: str) -> bool:
 
 def _flagged_payload_strata(row: Mapping[str, object]) -> tuple[str, ...]:
     notices = tuple(
-        notice
-        for notice in row.get("notices") or ()
+        (str(notice.get("kind") or ""), notice.get("reason"))
+        for notice in (row.get("notices") or ())
         if isinstance(notice, Mapping)
     )
-    kinds = {str(notice.get("kind")) for notice in notices if notice.get("kind")}
-    out: list[str] = []
-    unverified_apparatus = tuple(
-        notice
-        for notice in notices
-        if notice.get("kind") == NoticeKind.UNVERIFIED_APPARATUS.value
-    )
-    if any(
-        _is_calibration_not_grounded_reason(notice.get("reason"))
-        for notice in unverified_apparatus
-    ):
-        out.append(FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED)
-    if any(
-        not _is_calibration_not_grounded_reason(notice.get("reason"))
-        for notice in unverified_apparatus
-    ):
-        out.append(FLAGGED_STRATUM_UNVERIFIED_APPARATUS)
-    if NoticeKind.CELL_MATERIAL_INFERRED.value in kinds:
-        out.append(FLAGGED_STRATUM_CELL_MATERIAL_INFERRED)
-    if NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG.value in kinds:
-        out.append(FLAGGED_STRATUM_CATALOGUE_COMPOSITION)
-    if any(
-        _is_source_internally_inconsistent(
-            str(notice.get("kind") or ""), notice.get("reason")
-        )
-        for notice in notices
-    ):
-        out.append(FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT)
-    if NoticeKind.IMCC_COMPLEX_SATURATION.value in kinds:
-        out.append(FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION)
-    if any(_is_fusion_conversion_reason(notice.get("reason")) for notice in notices):
-        out.append(FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION)
-    if NoticeKind.FIGURE_ONLY.value in kinds:
-        out.append(FLAGGED_STRATUM_FIGURE_ONLY)
-    if NoticeKind.REACTIVE_CELL_NOT_MODELLED.value in kinds:
-        out.append(FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED)
-    if NoticeKind.LIQUIDUS_POSITION_CONTESTED.value in kinds:
-        out.append(FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED)
-    return tuple(out)
+    return _classify_flagged_notice_facts(notices)
 
 
 def _has_flagged_decision_notice(residual: Residual) -> bool:
