@@ -19,7 +19,7 @@ from simulator.battery.waypoints import normalized_composition
 
 
 ROOT = Path.cwd()
-OUT = Path("/workspace/b718-sweep")
+OUT = Path("b718-sweep")
 CSV_PATH = OUT / "class-b-rows.csv"
 REPORT_PATH = OUT / "report.md"
 SKIP = migrate._WALK_SKIP_KEYS
@@ -618,7 +618,7 @@ def main():
     lines = [
         "# Experiment sample composition inheritance sweep",
         "",
-        f"Worktree: `{ROOT}` at `{__import__('subprocess').check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()}`.",
+        f"Worktree: `.` at `{__import__('subprocess').check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()}`.",
         f"`engines/engines.local.toml` exists: **{(ROOT / 'engines/engines.local.toml').exists()}**.",
         f"Migrated {len(paths)} extracts with `Migrator(root=Path.cwd(), index={{}}, aliases={{}})._migrate_extract(path)` and one `finalize()`.",
         "",
@@ -689,7 +689,7 @@ def main():
         "## Artifacts",
         "",
         f"- `{CSV_PATH}` — Class B inherited rows in the requested column order.",
-        f"- `{Path(__file__)}` — instrumentation script used for this sweep.",
+        f"- `docs/battery/b718-sweep.py` — instrumentation script used for this sweep.",
     ])
     REPORT_PATH.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(json.dumps({
@@ -701,7 +701,7 @@ def main():
         "class_b_sources": len(b_source_counts),
         "comparison_candidates": b_candidate_count,
         "events": len(events),
-        "artifacts": [str(REPORT_PATH), str(CSV_PATH), str(Path(__file__))],
+        "artifacts": [str(REPORT_PATH), str(CSV_PATH), "docs/battery/b718-sweep.py"],
     }, indent=2))
 
 
