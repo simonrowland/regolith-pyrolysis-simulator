@@ -3078,8 +3078,8 @@ def test_residue_composition_has_its_own_rail_and_typed_engine_refusal() -> None
     for engine in ENGINE_CHANNELS:
         prediction = predict_with_engine(engine, observation)
         assert prediction.execution.state is ExecutionState.UNSUPPORTED
-        assert prediction.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
-        assert prediction.refusal_detail["reason"] == "channel_missing"
+        assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+        assert prediction.refusal_detail["reason"] == "quantity_not_predicted"
         assert prediction.refusal_detail["quantity"] == "residue_component_composition"
 
 
@@ -7927,7 +7927,7 @@ def test_score_store_records_each_in_scope_observation_in_small_fixture() -> Non
     assert all(records_by_reference[obs.observation_id] >= 1 for obs in (activity, figure))
 
 
-def test_transition_temperature_pins_generic_engine_quantity_fallthrough(
+def test_transition_temperature_refuses_before_generic_engine_pot(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     from simulator.diagnostic_helpers import binary_pot_battery as battery
@@ -7992,11 +7992,27 @@ def test_transition_temperature_pins_generic_engine_quantity_fallthrough(
 
     monkeypatch.setattr(battery, "open_battery_engine", open_probe_engine)
     monkeypatch.setattr(battery, "equilibrate_cell", equilibrate_probe)
+    from simulator.battery import score as score_module
+
+    parsed_formulas: list[str] = []
+    parse_formula = score_module.parse_species_formula
+
+    def track_formula_parse(formula: str):
+        parsed_formulas.append(formula)
+        return parse_formula(formula)
+
+    monkeypatch.setattr(score_module, "parse_species_formula", track_formula_parse)
 
     prediction = predict_with_engine(Engine.OPENIMCC, reference)
 
-    assert opened == [Engine.OPENIMCC.value]
-    assert len(pots) == 1
-    assert prediction.value == Decimal("0.25")
-    assert prediction.unit == QUANTITY_UNITS[Quantity.TRANSITION_TEMPERATURE]
-    assert prediction.refusal_reason is None
+    assert opened == []
+    assert pots == []
+    assert parsed_formulas == []
+    assert prediction.value is None
+    assert prediction.unit is None
+    assert prediction.execution.state is ExecutionState.UNSUPPORTED
+    assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+    assert prediction.refusal_detail == {
+        "reason": "quantity_not_predicted",
+        "quantity": Quantity.TRANSITION_TEMPERATURE.value,
+    }
