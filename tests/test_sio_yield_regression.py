@@ -407,9 +407,13 @@ BASELINE_STAGE4_SIO2_KG = {
 # and b42d14ed carried per-carrier authority into the wall-routing model.
 # 2026-09-26 b-573 freeze-gate regen (studio-3): lunar 2.73730312429e-06 ->
 # 2.73730270602e-06, mars 2.7578902906e-06 -> 2.75788843064e-06.
+# b03045041. Studio engine config at aedfc902a. Lunar is
+# sio_stage3_silica_kg in the studio pin report. Mars is
+# sio_to_silica_fume_kg.stage_3_sio_zone_product in the studio
+# mars_basalt_c2a fixture.
 BASELINE_STAGE3_SIO2_KG = {
-    "lunar_mare_low_ti": 2.73730270602e-06,
-    "mars_basalt": 2.75788843064e-06,
+    "lunar_mare_low_ti": 1.10557326444e-05,
+    "mars_basalt": 9.78986701671e-06,
 }
 
 
