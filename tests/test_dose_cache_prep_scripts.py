@@ -197,6 +197,37 @@ def test_seed_cache_accepts_new_schema_equilibrium_authority(tmp_path: Path) -> 
     assert payload_count(target) == 1
 
 
+@pytest.mark.parametrize("transport", ["seed", "merge"])
+@pytest.mark.parametrize(
+    "repair_notices_json",
+    ['[{"kind":"seed_repair"}]', "[]", None],
+)
+def test_seed_and_merge_preserve_repair_notice_values(
+    tmp_path: Path,
+    transport: str,
+    repair_notices_json: str | None,
+) -> None:
+    source = tmp_path / f"{transport}-notice-source.db"
+    target = tmp_path / f"{transport}-notice-target.db"
+    _put_cache_row(source, tag=f"notice-{transport}")
+    with sqlite3.connect(source) as conn:
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} SET repair_notices_json = ?",
+            (repair_notices_json,),
+        )
+
+    if transport == "seed":
+        seed_cache(target, [source])
+    else:
+        assert merge_grind_cache.main([str(target), str(source)]) == 0
+
+    with sqlite3.connect(target) as conn:
+        (stored,) = conn.execute(
+            f"SELECT repair_notices_json FROM {PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+    assert stored == repair_notices_json
+
+
 def test_seed_cache_refuses_cross_schema_source(tmp_path: Path) -> None:
     source = tmp_path / "source.db"
     target = tmp_path / "target.db"

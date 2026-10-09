@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import hashlib
+import sqlite3
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -393,6 +394,114 @@ def test_lookup_optional_returns_cached_interpolated(tmp_path: Path) -> None:
     assert payload["equilibrium_result"]["liquid_fraction"] == pytest.approx(0.705)
     assert payload["equilibrium_result"]["vapor_pressures_Pa"]["SiO"] == pytest.approx(7.025)
     assert "cached_interpolated_linear_estimate" in payload["equilibrium_result"]["warnings"]
+
+
+def test_interpolation_reemits_union_from_every_used_neighbor(tmp_path: Path) -> None:
+    query = _interpolation_key("query", feo_fraction=0.20, temperature_K=1500.0)
+    low = _interpolation_key("low", feo_fraction=0.20, temperature_K=1490.0)
+    high = _interpolation_key("high", feo_fraction=0.20, temperature_K=1510.0)
+    db_path = tmp_path / "interpolation-repair-notices.sqlite"
+    notices_by_hash = {
+        hashlib.sha256(canonical_json_bytes(low)).hexdigest(): {
+            "kind": "low_neighbor_repair"
+        },
+        hashlib.sha256(canonical_json_bytes(high)).hexdigest(): {
+            "kind": "high_neighbor_repair"
+        },
+    }
+    _put_interpolation_row(db_path, low, liquid_fraction=0.7, sio_pa=7.0)
+    _put_interpolation_row(db_path, high, liquid_fraction=0.71, sio_pa=7.05)
+    with sqlite3.connect(db_path) as conn:
+        for key_hash, notice in notices_by_hash.items():
+            conn.execute(
+                f"""
+                UPDATE {rrd.PT1_EQUILIBRIUM_TABLE}
+                SET repair_notices_json = ?
+                WHERE key_hash = ?
+                """,
+                (canonical_json_bytes([notice]).decode("utf-8"), key_hash),
+            )
+
+    store = PT0DeterminismStore("capture", db_path=db_path)
+    candidates = store.persistent_store.list_interpolation_candidates(
+        artifact="equilibrium_post_record",
+        replay_scope_sha256=rci.replay_scope_for_interpolation(query),
+    )
+    attempt = rci.attempt_cached_interpolation(query, candidates)
+    assert attempt is not None
+    expected_union = [
+        notices_by_hash[str(neighbor["key_hash"])]
+        for neighbor in attempt["neighbors"]
+    ]
+    replay_sim = SimpleNamespace()
+    assert store._lookup_optional(
+        "equilibrium_post_record",
+        query,
+        physics_bucket_key=canonical_physics_bucket_key_from_replay_key(query),
+        sim=replay_sim,
+    ) is not None
+
+    assert replay_sim._reduced_real_repair_notices == [
+        *expected_union,
+        {
+            "kind": "reduced_real_cache_approximation",
+            "cache_state": "cached_interpolated",
+        },
+    ]
+
+
+def test_interpolation_unions_known_notice_with_legacy_attached_base(
+    tmp_path: Path,
+) -> None:
+    query = _interpolation_key("query", feo_fraction=0.20, temperature_K=1500.0)
+    low = _interpolation_key("low", feo_fraction=0.20, temperature_K=1490.0)
+    high = _interpolation_key("high", feo_fraction=0.20, temperature_K=1510.0)
+    target_db = tmp_path / "local.sqlite"
+    base_db = tmp_path / "legacy-base.sqlite"
+    notice = {"kind": "local_known_repair"}
+    _put_interpolation_row(target_db, low, liquid_fraction=0.7, sio_pa=7.0)
+    _put_interpolation_row(base_db, high, liquid_fraction=0.71, sio_pa=7.05)
+    with sqlite3.connect(target_db) as conn:
+        conn.execute(
+            f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} SET repair_notices_json = ?",
+            (canonical_json_bytes([notice]).decode("utf-8"),),
+        )
+    with sqlite3.connect(base_db) as conn:
+        conn.execute(
+            f"ALTER TABLE {rrd.PT1_EQUILIBRIUM_TABLE} "
+            "DROP COLUMN repair_notices_json"
+        )
+        conn.execute(
+            f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} "
+            "SET store_schema_version = 'pt1-reduced-real-equilibrium-store-v2'"
+        )
+        conn.execute(
+            f"UPDATE {rrd.PT1_METADATA_TABLE} "
+            "SET value = 'pt1-reduced-real-equilibrium-store-v2' "
+            "WHERE key = 'store_schema_version'"
+        )
+
+    store = PT0DeterminismStore(
+        "capture",
+        db_path=target_db,
+        read_only_base_db_path=base_db,
+    )
+    replay_sim = SimpleNamespace()
+    assert store._lookup_optional(
+        "equilibrium_post_record",
+        query,
+        physics_bucket_key=canonical_physics_bucket_key_from_replay_key(query),
+        sim=replay_sim,
+    ) is not None
+
+    assert replay_sim._reduced_real_repair_notices == [
+        notice,
+        {"kind": "repair_notices_unavailable_for_legacy_row"},
+        {
+            "kind": "reduced_real_cache_approximation",
+            "cache_state": "cached_interpolated",
+        },
+    ]
 
 
 def test_cached_interpolated_eval_trace_emits_feasibility_verdict(tmp_path: Path) -> None:

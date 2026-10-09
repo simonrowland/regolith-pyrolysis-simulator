@@ -1265,6 +1265,47 @@ def _lookup_c3a_payload(db_path: Path, key: dict) -> tuple[dict, PT0DeterminismS
     return payload, store
 
 
+def test_pt1_physics_ladder_reemits_source_notices_and_approximation_notice(
+    tmp_path: Path,
+) -> None:
+    query_key = _c3a_ladder_key(
+        "query",
+        feo_fraction=0.123456,
+        temperature_K=1234.5678,
+    )
+    source_key = _c3a_ladder_key(
+        "source",
+        feo_fraction=0.123444,
+        temperature_K=1234.44,
+    )
+    db_path = tmp_path / "ladder-repair-notices.sqlite"
+    _put_c3a_payload(db_path, source_key, "ladder-source")
+    notice = {"kind": "ladder_repair", "field": "SiO2"}
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} SET repair_notices_json = ?",
+            (canonical_json_bytes([notice]).decode("utf-8"),),
+        )
+
+    replay_sim = SimpleNamespace()
+    store = PT0DeterminismStore("capture", db_path=db_path)
+    payload = store._lookup_optional(
+        "equilibrium_post_record",
+        query_key,
+        physics_bucket_key=canonical_physics_bucket_key_from_replay_key(query_key),
+        sim=replay_sim,
+    )
+
+    assert payload is not None
+    assert replay_sim._reduced_real_repair_notices == [
+        notice,
+        {
+            "kind": "reduced_real_cache_approximation",
+            "cache_state": "cached_physics_bucket",
+        },
+    ]
+
+
 def _real_magemin_available() -> bool:
     backend = MAGEMinBackend()
     backend.initialize({"python_bridge": "subprocess"})
@@ -2238,6 +2279,156 @@ def test_pt1_persistent_store_round_trips_exact_payload(tmp_path: Path) -> None:
     assert replay.summary()["hits"] == 1
     assert replay.summary()["misses"] == 0
     assert replay.replay_sequence[-1]["cache_state"] == "cached_exact"
+
+
+def test_pt1_repair_notices_are_outside_payload_and_reemit_on_exact_replay(
+    tmp_path: Path,
+) -> None:
+    curve = {
+        "source": "unit-test:repair-notice",
+        "solidus_T_C": 1100.0,
+        "liquidus_T_C": 1600.0,
+        "path": ((1100.0, 0.0), (1600.0, 1.0)),
+    }
+    notice = {"kind": "test_repair", "field": "SiO2"}
+    rows = []
+    db_paths = (tmp_path / "without-notice.db", tmp_path / "with-notice.db")
+    for db_path, notices in zip(db_paths, ([], [notice]), strict=True):
+        capture = PT0DeterminismStore("capture", db_path=db_path)
+        sim = _build_pt0_sim(capture)
+        sim.start_campaign(CampaignPhase.C2A_STAGED)
+        capture.capture_gate_curve(
+            sim,
+            fO2_log=sim._compute_intrinsic_melt_fO2(),
+            curve=curve,
+            repair_notices=notices,
+        )
+        with sqlite3.connect(db_path) as conn:
+            rows.append(
+                conn.execute(
+                    f"""
+                    SELECT payload_sha256, payload_bytes, repair_notices_json
+                    FROM {PT1_EQUILIBRIUM_TABLE}
+                    """
+                ).fetchone()
+            )
+
+    assert rows[0][:2] == rows[1][:2]
+    assert rows[0][2] == "[]"
+    assert rows[1][2] == canonical_json_bytes([notice]).decode("utf-8")
+
+    replay = PT0DeterminismStore("replay", db_path=db_paths[1])
+    replay_sim = _build_pt0_sim(replay)
+    replay_sim.start_campaign(CampaignPhase.C2A_STAGED)
+    assert replay.replay_gate_curve(
+        replay_sim,
+        fO2_log=replay_sim._compute_intrinsic_melt_fO2(),
+    ) == curve
+    assert replay_sim._reduced_real_repair_notices == [notice]
+
+
+def test_pt1_legacy_null_repair_notices_emit_typed_unavailable_notice(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "legacy-repair-notices.db"
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    sim = _build_pt0_sim(capture)
+    sim.start_campaign(CampaignPhase.C2A_STAGED)
+    fO2_log = sim._compute_intrinsic_melt_fO2()
+    curve = {
+        "source": "unit-test:legacy-repair-notice",
+        "solidus_T_C": 1100.0,
+        "liquidus_T_C": 1600.0,
+        "path": ((1100.0, 0.0), (1600.0, 1.0)),
+    }
+    capture.capture_gate_curve(sim, fO2_log=fO2_log, curve=curve, repair_notices=[])
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} SET repair_notices_json = NULL"
+        )
+
+    replay = PT0DeterminismStore("replay", db_path=db_path)
+    replay_sim = _build_pt0_sim(replay)
+    replay_sim.start_campaign(CampaignPhase.C2A_STAGED)
+    replay.replay_gate_curve(
+        replay_sim,
+        fO2_log=replay_sim._compute_intrinsic_melt_fO2(),
+    )
+
+    assert replay_sim._reduced_real_repair_notices == [
+        {"kind": "repair_notices_unavailable_for_legacy_row"}
+    ]
+
+
+def test_pt1_attached_legacy_table_without_notice_column_reads_as_null(
+    tmp_path: Path,
+) -> None:
+    base_db = tmp_path / "attached-legacy.db"
+    local_db = tmp_path / "local-replay.db"
+    capture = PT0DeterminismStore("capture", db_path=base_db)
+    capture_sim = _build_pt0_sim(capture)
+    capture_sim.start_campaign(CampaignPhase.C2A_STAGED)
+    fO2_log = capture_sim._compute_intrinsic_melt_fO2()
+    curve = {
+        "source": "unit-test:attached-legacy",
+        "solidus_T_C": 1100.0,
+        "liquidus_T_C": 1600.0,
+        "path": ((1100.0, 0.0), (1600.0, 1.0)),
+    }
+    capture.capture_gate_curve(
+        capture_sim,
+        fO2_log=fO2_log,
+        curve=curve,
+        repair_notices=[],
+    )
+    with sqlite3.connect(base_db) as conn:
+        conn.execute(
+            f"ALTER TABLE {PT1_EQUILIBRIUM_TABLE} "
+            "DROP COLUMN repair_notices_json"
+        )
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+            "SET store_schema_version = 'pt1-reduced-real-equilibrium-store-v2'"
+        )
+        conn.execute(
+            f"UPDATE {rrd.PT1_METADATA_TABLE} "
+            "SET value = 'pt1-reduced-real-equilibrium-store-v2' "
+            "WHERE key = 'store_schema_version'"
+        )
+
+    replay = PT0DeterminismStore(
+        "replay",
+        db_path=local_db,
+        read_only_base_db_path=base_db,
+    )
+    replay_sim = _build_pt0_sim(replay)
+    replay_sim.start_campaign(CampaignPhase.C2A_STAGED)
+    assert replay.replay_gate_curve(
+        replay_sim,
+        fO2_log=replay_sim._compute_intrinsic_melt_fO2(),
+    ) == curve
+    assert replay_sim._reduced_real_repair_notices == [
+        {"kind": "repair_notices_unavailable_for_legacy_row"}
+    ]
+
+
+@pytest.mark.parametrize(
+    ("existing", "incoming", "expected"),
+    [
+        (None, "[]", "[]"),
+        ('[{"kind":"a"}]', '[{"kind":"a"},{"kind":"b"}]', '[{"kind":"a"},{"kind":"b"}]'),
+        ('[{"kind":"a"},{"kind":"b"}]', '[{"kind":"a"}]', '[{"kind":"a"},{"kind":"b"}]'),
+        ('[{"kind":"a"}]', '[{"kind":"a"}]', '[{"kind":"a"}]'),
+        ('[{"kind":"a"}]', '[{"kind":"b"}]', '[{"kind":"a"}]'),
+        ('[{"kind":"a"}]', None, '[{"kind":"a"}]'),
+    ],
+)
+def test_pt1_repair_notice_recapture_replaces_only_with_strict_superset(
+    existing: str | None,
+    incoming: str | None,
+    expected: str | None,
+) -> None:
+    assert rrd.monotonic_repair_notices_json(existing, incoming) == expected
 
 
 def test_pt1_projected_gate_notice_replays_into_run_metadata(tmp_path: Path) -> None:

@@ -337,6 +337,42 @@ def test_merge_cache_shard_recomputes_identity_contract(tmp_path):
     )
 
 
+@pytest.mark.parametrize(
+    "repair_notices_json",
+    ['[{"kind":"populate_repair"}]', "[]", None],
+)
+def test_populate_merge_preserves_repair_notice_values(
+    tmp_path: Path,
+    repair_notices_json: str | None,
+) -> None:
+    driver = _load_driver()
+    shard_db = tmp_path / "notice-shard.db"
+    target_db = tmp_path / "notice-target.db"
+    key_hash = _write_pt1_row(shard_db, _pt1_key(f"notice-{repair_notices_json}"))
+    with sqlite3.connect(shard_db) as conn:
+        conn.execute(
+            f"""
+            UPDATE {driver.PT1_EQUILIBRIUM_TABLE}
+            SET repair_notices_json = ?
+            WHERE key_hash = ?
+            """,
+            (repair_notices_json, key_hash),
+        )
+
+    source_row = driver._cache_payload_rows(shard_db)[0]
+    validated = driver._validated_cache_payload_row(source_row)
+    assert validated["repair_notices_json"] == repair_notices_json
+    driver._merge_cache_shard(shard_db, target_db)
+
+    with sqlite3.connect(target_db) as conn:
+        (stored,) = conn.execute(
+            f"SELECT repair_notices_json FROM {driver.PT1_EQUILIBRIUM_TABLE} "
+            "WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()
+    assert stored == repair_notices_json
+
+
 def test_merge_cache_shard_rejects_stored_payload_hash_drift(tmp_path):
     driver = _load_driver()
     shard_db = tmp_path / "shard.db"
