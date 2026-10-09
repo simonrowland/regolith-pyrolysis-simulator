@@ -712,7 +712,8 @@ species:
       units: dimensionless activity
       values:
         quantity: activity
-        method_class: quoted_unattributed
+        method_class: model_derived
+        evidence_class: model_derived
         admission_status: typed_refusal
         reason: Gibbons states the printed activity is in error; retained as typed refusal.
         activity: 1.0
@@ -723,6 +724,10 @@ species:
           Al2O3: 41.3
           SiO2: 6.7
       quote: "The thesis reports approximately unity and states this calculated value is in error."
+      derived_from: [tables:gibbons-1963-thesis-cas-slags-cas]
+      derivation:
+        relation: Calculated from the printed eutectic phase relation and compound free-energy data; context row gibbons_1963_eutectic_and_peritectic_activities, PDF pp. 98–99.
+        inputs: [tables:gibbons-1963-thesis-cas-slags-cas]
     - observation_id: gibbons_1963_second_eutectic_lime_activity
       type: activity_coefficient
       locator: {published_page: 63, pdf_page_index: 98, section: Thermodynamic Discussion}
@@ -736,7 +741,8 @@ species:
       units: dimensionless activity
       values:
         quantity: activity
-        method_class: quoted_unattributed
+        method_class: model_derived
+        evidence_class: model_derived
         admission_status: admitted
         activity: 0.32
         activity_as_printed: '0.32'
@@ -746,6 +752,10 @@ species:
           Al2O3: 43.7
           SiO2: 6.7
       quote: "Gibbons prints a_CaO = 0.32 for the second eutectic."
+      derived_from: [tables:gibbons-1963-thesis-cas-slags-cas]
+      derivation:
+        relation: Calculated from the printed eutectic phase relation and compound free-energy data; context row gibbons_1963_eutectic_and_peritectic_activities, PDF pp. 98–99.
+        inputs: [tables:gibbons-1963-thesis-cas-slags-cas]
   SiO2:
     observations:
     - observation_id: gibbons_1963_first_eutectic_silica_activity
@@ -761,7 +771,8 @@ species:
       units: dimensionless activity
       values:
         quantity: activity
-        method_class: quoted_unattributed
+        method_class: model_derived
+        evidence_class: model_derived
         admission_status: admitted
         activity: 0.00004
         activity_as_printed: '4 x 10^-5'
@@ -771,6 +782,10 @@ species:
           Al2O3: 41.3
           SiO2: 6.7
       quote: "Gibbons prints a_SiO2 = 4 x 10^-5 for the first eutectic."
+      derived_from: [tables:gibbons-1963-thesis-cas-slags-cas]
+      derivation:
+        relation: Calculated from the printed eutectic phase relation and compound free-energy data; context row gibbons_1963_eutectic_and_peritectic_activities, PDF pp. 98–99.
+        inputs: [tables:gibbons-1963-thesis-cas-slags-cas]
     - observation_id: gibbons_1963_second_eutectic_silica_activity
       type: activity_coefficient
       locator: {published_page: 63, pdf_page_index: 98, section: Thermodynamic Discussion}
@@ -784,7 +799,8 @@ species:
       units: dimensionless activity
       values:
         quantity: activity
-        method_class: quoted_unattributed
+        method_class: model_derived
+        evidence_class: model_derived
         admission_status: admitted
         activity: 0.000416
         activity_as_printed: '4.16 x 10^-4'
@@ -794,3 +810,7 @@ species:
           Al2O3: 43.7
           SiO2: 6.7
       quote: "Gibbons prints a_SiO2 = 4.16 x 10^-4 for the second eutectic."
+      derived_from: [tables:gibbons-1963-thesis-cas-slags-cas]
+      derivation:
+        relation: Calculated from the printed eutectic phase relation and compound free-energy data; context row gibbons_1963_eutectic_and_peritectic_activities, PDF pp. 98–99.
+        inputs: [tables:gibbons-1963-thesis-cas-slags-cas]

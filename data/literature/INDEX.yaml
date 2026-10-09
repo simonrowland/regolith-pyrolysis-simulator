@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 271
-  extracts: 269
+  sources: 272
+  extracts: 270
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 60
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 269
+  extracts_without_pdf: 270
   alias_groups_needing_resolution: 41
 gaps:
   pdfs_without_extract: []
@@ -59,6 +59,7 @@ gaps:
   - fray-schmitt-2009-nh3
   - giauque-powell-1939-cl2
   - giauque-ruehrwein-1939-hcn-psat
+  - gibbons-1963-thesis-cas-slags-cas
   - guo-2021-mgo-activity-cmas-slag
   - habermann-daane-1964
   - hashimoto-nakano-2021-bubbles-to-chondrites-ii
@@ -3008,6 +3009,63 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: gibbons-1963-thesis-cas-slags-cas
+  aliases: []
+  citation: T. B. Gibbons, A study of the thermodynamics of lime/alumina/silica slags containing calcium sulphide, PhD thesis, University of Glasgow, January 1963.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/gibbons-1963-thesis-cas-slags-cas.yaml
+    review_status: draft
+    rows: 6
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/gibbons-1963-thesis-cas-slags-cas/gibbons-1963-thesis-cas-slags-cas.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/gibbons-1963-thesis-cas-slags-cas/sidecar.yaml
+      present: false
+    text:
+      path: text/gibbons-1963-thesis-cas-slags-cas
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/gibbons-1963-thesis-cas-slags-cas
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/gibbons-1963-thesis-cas-slags-cas.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/gibbons-1963-thesis-cas-slags-cas.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: guo-2021-mgo-activity-cmas-slag
   aliases: []
