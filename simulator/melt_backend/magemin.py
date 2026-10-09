@@ -313,6 +313,9 @@ def _dropped_account_species(
 # VapoRock's `input_composition_projected` reason token.
 COMPOSITION_PROJECTED = 'composition_projected'
 MAGEMIN_MODE_VECTOR_MASS_DEFICIT = 'magemin_mode_vector_mass_deficit'
+# The solidus low side was a buffer_inactive fraction-0 sample. That
+# sample is not an fO2-buffered solid, so the bracket is not ok.
+INACTIVE_BUFFER_DECIDES_BOUNDARY = 'inactive_buffer_decides_boundary'
 
 
 class _MAGEMinModeVectorMassDeficit(RuntimeError):
@@ -1687,9 +1690,10 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         The scan window opens at 400 C. There qfm is listed with mode 0
         even after the oxygen reservoir is added, the assemblage is fully
         solid, and equilibrate correctly refuses solved-fO2 authority.
-        That refusal must not discard the fraction: it is 0, and the
-        bracket needs the cold end. A sample that still has liquid keeps
-        the refusal and stops the scan.
+        Returning 0 lets the scan continue. It does not authorize a
+        boundary: ``_without_inactive_buffer_boundary`` drops the bracket
+        when this temperature is the solidus endpoint. A sample that
+        still has liquid keeps the refusal and stops the scan.
         """
         if result.status == 'ok':
             return None
@@ -1706,6 +1710,44 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         if not math.isfinite(value) or value != 0.0:
             return None
         return 0.0
+
+    @staticmethod
+    def _without_inactive_buffer_boundary(
+        result: LiquidusSolidusResult,
+        inactive_solid_temperatures_C: set[float],
+    ) -> LiquidusSolidusResult:
+        """Refuse a bracket whose solid endpoint is an unbuffered solid.
+
+        An inactive fraction-0 sample proves zero melt for the unbuffered
+        solve only. It may sit in the scan when a buffer-active solid
+        exists at higher temperature, because that higher solid is then
+        the solidus endpoint. If the endpoint itself is inactive, the
+        bracket has no authoritative solid side.
+        """
+        solidus_T_C = result.solidus_T_C
+        if (
+            result.status != 'ok'
+            or solidus_T_C is None
+            or float(solidus_T_C) not in inactive_solid_temperatures_C
+        ):
+            return result
+        return LiquidusSolidusResult(
+            status='out_of_domain',
+            warnings=tuple([
+                *result.warnings,
+                (
+                    'MAGEMin solidus bracket rests on an unbuffered solid '
+                    'sample; an inactive buffer does not decide the solidus'
+                ),
+            ]),
+            samples=result.samples,
+            iterations=result.iterations,
+            diagnostics={
+                'reason': INACTIVE_BUFFER_DECIDES_BOUNDARY,
+                'backend_status': 'out_of_domain',
+                'backend_status_reason': INACTIVE_BUFFER_DECIDES_BOUNDARY,
+            },
+        )
 
     def find_liquidus_solidus(
         self,
@@ -1735,6 +1777,10 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         sample_warnings: list[str] = []
         excluded_database_kg: Optional[Dict[str, float]] = None
         captured_projection: Optional[Dict[str, Any]] = None
+        # Temperatures whose fraction 0 came from buffer_inactive, not
+        # from a buffer-active solid. The solidus endpoint must not be one
+        # of these: an unbuffered solid does not decide the boundary.
+        inactive_solid_temperatures_C: set[float] = set()
 
         # Mandatory aggregate budget: generic finder default is unbounded so
         # AlphaMELTS is not silently capped; MAGEMin always applies a finite
@@ -1813,8 +1859,11 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 )
                 if solid_fraction is not None:
                     # equilibrate already cleared solved-fO2 authority.
-                    # Keep only the fraction so the cold end of the window
-                    # does not throw the bracket away.
+                    # Keep the fraction so a colder inactive point does not
+                    # abort the scan before a higher buffer-active solid
+                    # is seen. The post-check refuses if this temperature
+                    # is the one that would close the solidus.
+                    inactive_solid_temperatures_C.add(float(temperature_C))
                     note = (
                         'MAGEMin qfm mode is 0 on a fully solid sample; '
                         'melt fraction 0 is kept and solved fO2 is not claimed'
@@ -1857,6 +1906,10 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             scan_step_C=scan_step_C,
             tolerance_C=tolerance_C,
             budget_s=budget_s,
+        )
+        result = self._without_inactive_buffer_boundary(
+            result,
+            inactive_solid_temperatures_C,
         )
         warnings_out = [*result.warnings, *sample_warnings[:6]]
         diagnostics = dict(result.diagnostics or {})

@@ -34,6 +34,7 @@ from simulator.melt_backend.base import LiquidFractionInvalidError, MeltComposit
 from simulator.feedstock_composition import FEOT_FROM_FE2O3
 from simulator.melt_backend.magemin import (
     COMPOSITION_PROJECTED,
+    INACTIVE_BUFFER_DECIDES_BOUNDARY,
     MAGEMIN_MODE_VECTOR_MASS_DEFICIT,
     MAGEMIN_WARM_CALL_TIMEOUT_S,
     MAGEMIN_WARM_LIQUIDUS_BUDGET_S,
@@ -2131,18 +2132,48 @@ def test_magemin_live_buffer_reservoir_is_independent_for_lunar_mare(monkeypatch
     assert bare.diagnostics["authoritative_for_solved_conditions"] is False
 
 
+def _inactive_buffer_solid(temperature_C):
+    from simulator.melt_backend.base import EquilibriumResult
+
+    return EquilibriumResult(
+        temperature_C=float(temperature_C),
+        status="out_of_domain",
+        liquid_fraction=0.0,
+        diagnostics={
+            "backend_status_reason": "buffer_inactive",
+            "fO2_buffer_active": False,
+            "operating_point": "unbuffered",
+            "solved_fO2_log": None,
+            "authoritative_for_requested_conditions": False,
+            "authoritative_for_solved_conditions": False,
+        },
+    )
+
+
+def _buffered_melt(temperature_C, fraction):
+    from simulator.melt_backend.base import EquilibriumResult
+
+    return EquilibriumResult(
+        temperature_C=float(temperature_C),
+        status="ok",
+        liquid_fraction=float(fraction),
+        diagnostics={
+            "fO2_buffer_active": True,
+            "solved_fO2_log": -9.0,
+        },
+    )
+
+
 def test_magemin_liquidus_keeps_solid_samples_when_qfm_mode_is_zero(
     monkeypatch,
 ):
-    """The 400 C window floor lists qfm at mode 0 on a fully solid rock.
+    """Inactive qfm at 400 C and 450 C, buffered solid from 500 C.
 
-    equilibrate still refuses solved fO2. The bracket needs that melt
-    fraction of 0, and a later sample that is buffered and molten must
-    still be able to close the solidus and liquidus. A buffer_inactive
-    sample that still has liquid stops the scan.
+    equilibrate still refuses solved fO2 on the cold points. Those
+    points sit below a buffer-active solid, so the solidus and liquidus
+    close on the buffered samples. A buffer_inactive sample that still
+    has liquid stops the scan.
     """
-    from simulator.melt_backend.base import EquilibriumResult
-
     backend = MAGEMinBackend()
     backend._available = True
     backend._bridge = "subprocess"
@@ -2151,34 +2182,14 @@ def test_magemin_liquidus_keeps_solid_samples_when_qfm_mode_is_zero(
     def equilibrate(temperature_C, **_kwargs):
         temperature = float(temperature_C)
         if temperature < 500.0:
-            return EquilibriumResult(
-                temperature_C=temperature,
-                status="out_of_domain",
-                liquid_fraction=0.0,
-                diagnostics={
-                    "backend_status_reason": "buffer_inactive",
-                    "fO2_buffer_active": False,
-                    "operating_point": "unbuffered",
-                    "solved_fO2_log": None,
-                    "authoritative_for_requested_conditions": False,
-                    "authoritative_for_solved_conditions": False,
-                },
-            )
+            return _inactive_buffer_solid(temperature)
         if temperature < 1100.0:
             fraction = 0.0
         elif temperature < 1400.0:
             fraction = (temperature - 1100.0) / 300.0
         else:
             fraction = 1.0
-        return EquilibriumResult(
-            temperature_C=temperature,
-            status="ok",
-            liquid_fraction=fraction,
-            diagnostics={
-                "fO2_buffer_active": True,
-                "solved_fO2_log": -9.0,
-            },
-        )
+        return _buffered_melt(temperature, fraction)
 
     monkeypatch.setattr(backend, "equilibrate", equilibrate)
     found = backend.find_liquidus_solidus(
@@ -2187,7 +2198,7 @@ def test_magemin_liquidus_keeps_solid_samples_when_qfm_mode_is_zero(
         pressure_bar=1.0,
         min_T_C=400.0,
         max_T_C=1600.0,
-        scan_step_C=100.0,
+        scan_step_C=50.0,
         tolerance_C=5.0,
     )
     assert found.status == "ok", found.warnings
@@ -2196,6 +2207,8 @@ def test_magemin_liquidus_keeps_solid_samples_when_qfm_mode_is_zero(
     assert any("qfm mode is 0" in warning for warning in found.warnings)
 
     def equilibrate_with_liquid(temperature_C, **_kwargs):
+        from simulator.melt_backend.base import EquilibriumResult
+
         return EquilibriumResult(
             temperature_C=float(temperature_C),
             status="out_of_domain",
@@ -2215,6 +2228,49 @@ def test_magemin_liquidus_keeps_solid_samples_when_qfm_mode_is_zero(
     )
     assert refused.status == "out_of_domain"
     assert refused.solidus_T_C is None
+
+
+def test_magemin_liquidus_refuses_when_inactive_solid_decides_the_solidus(
+    monkeypatch,
+):
+    """Inactive zeros up to the first buffered sample, which is molten.
+
+    No buffer-active solid exists, so the solidus endpoint would be an
+    unbuffered solid. That bracket is not ok.
+    """
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = "subprocess"
+    backend._config["liquidus_finder_budget_s"] = 30.0
+
+    def equilibrate(temperature_C, **_kwargs):
+        temperature = float(temperature_C)
+        if temperature < 1100.0:
+            return _inactive_buffer_solid(temperature)
+        if temperature < 1400.0:
+            fraction = 0.05 + 0.95 * (temperature - 1100.0) / 300.0
+        else:
+            fraction = 1.0
+        return _buffered_melt(temperature, fraction)
+
+    monkeypatch.setattr(backend, "equilibrate", equilibrate)
+    refused = backend.find_liquidus_solidus(
+        composition_kg={"SiO2": 50.0, "FeO": 16.0, "MgO": 10.0},
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        min_T_C=400.0,
+        max_T_C=1600.0,
+        scan_step_C=50.0,
+        tolerance_C=5.0,
+    )
+    assert refused.status == "out_of_domain"
+    assert refused.solidus_T_C is None
+    assert refused.liquidus_T_C is None
+    assert refused.diagnostics["reason"] == INACTIVE_BUFFER_DECIDES_BOUNDARY
+    assert (
+        refused.diagnostics["backend_status_reason"]
+        == INACTIVE_BUFFER_DECIDES_BOUNDARY
+    )
 
 
 def test_magemin_empty_melt_composition_marks_status_out_of_domain(monkeypatch):
