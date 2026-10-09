@@ -88,19 +88,19 @@ PRESSURE_PINS: dict[str, tuple[str, str, str]] = {
         "0x1.2fcc5729c1ddbp-32",
     ),
     "Ga": (
-        "0x1.07426c80fc451p-17",
-        "0x1.68039e654f2bbp-5",
-        "0x1.1830660790db6p+5",
+        "0x1.0c08e4f20ee31p-15",
+        "0x1.ac8563f4bf219p-4",
+        "0x1.b74e9469182f5p+5",
     ),
     "In": (
-        "0x1.f2cacbd6c4442p-5",
-        "0x1.872eddd43482ep+6",
-        "0x1.d0904e53a7b7bp+14",
+        "0x1.3b964f70e8f93p-2",
+        "0x1.19afbe4688678p+8",
+        "0x1.af8bd0ae7d362p+15",
     ),
     "GeO": (
-        "0x1.963ab95b029bep+15",
-        "0x1.7810715d9072ep+23",
-        "0x1.9d233d629d883p+29",
+        "0x1.15ad8f8c5f563p+10",
+        "0x1.778c7b191922ep+17",
+        "0x1.3707e44aa6394p+23",
     ),
     "SnO": (
         "0x1.c1c7a638a469ep+6",
@@ -108,24 +108,24 @@ PRESSURE_PINS: dict[str, tuple[str, str, str]] = {
         "0x1.956e5f60cccc1p+13",
     ),
     "PbO": (
-        "0x1.0e796c868d665p+8",
-        "0x1.aa71e4c127283p+11",
-        "0x1.6dc3b4787aee7p+14",
+        "0x1.bfd2b86bbc76dp+7",
+        "0x1.698dc1ca6c5a1p+11",
+        "0x1.3bcb1d0702c42p+14",
     ),
     "Pb": (
-        "0x1.4351e85ef3138p+9",
-        "0x1.0e9200970b963p+12",
-        "0x1.c4da8439a6911p+14",
+        "0x1.4fb4040ac1e5bp+12",
+        "0x1.0802ba37b9a95p+18",
+        "0x1.4db0667914242p+22",
     ),
     "Cu": (
-        "0x1.4e68166b1b5bbp+6",
-        "0x1.b085dbd63a6eep+13",
-        "0x1.677adbc24dd7fp+19",
+        "0x1.ef3dd942cd1fap-1",
+        "0x1.bfee7c1436ed4p+5",
+        "0x1.3e10b4343613dp+10",
     ),
     "Li": (
-        "0x1.cb73b576a21e5p-5",
-        "0x1.3a89271fcc7a3p+2",
-        "0x1.3e0b144246dcfp+7",
+        "0x1.12a1931c41911p-4",
+        "0x1.75d34864ff21dp+2",
+        "0x1.6c8ce65de9558p+7",
     ),
     "Ge": (
         "0x1.ab604ca40b3dfp-18",
@@ -133,44 +133,44 @@ PRESSURE_PINS: dict[str, tuple[str, str, str]] = {
         "0x1.46d169944326cp+7",
     ),
     "Sn": (
-        "0x1.0079f817aa552p-11",
-        "0x1.48a73fdc82b16p+2",
-        "0x1.a0b9812a5d35dp+12",
+        "0x1.30801258c051ap-7",
+        "0x1.966e49eff91cfp+1",
+        "0x1.21ef1e6044233p+8",
     ),
     "GaO": (
-        "0x1.5a7ebbed3613bp-23",
-        "0x1.e3888a8db04b9p-13",
-        "0x1.05d1faa438b6cp-4",
+        "0x1.60c7b78a96944p-21",
+        "0x1.1fc5b8c26a1e7p-11",
+        "0x1.9a81ae4ef8a83p-4",
     ),
     "Ga2O": (
-        "0x1.d9759baf90a0bp-14",
-        "0x1.8d615d7c57326p+1",
-        "0x1.0026b1881a3cbp+13",
+        "0x1.eaca9882289b7p-10",
+        "0x1.198087fe2ba7bp+4",
+        "0x1.3ad8efb3e2e1ep+14",
     ),
     "InO": (
-        "0x1.fc43814e4cc27p-13",
-        "0x1.1e7cc8f383c4ep-3",
-        "0x1.314abb7bf33c7p+4",
+        "0x1.41946e1d2b5d3p-10",
+        "0x1.9c97bc758ffe6p-2",
+        "0x1.1b981b73c43aap+5",
     ),
     "In2O": (
-        "0x1.85c3283be61adp+10",
-        "0x1.6bbc931575425p+14",
-        "0x1.744c7590b6686p+17",
+        "0x1.08b02ad9f6fdbp+4",
+        "0x1.70777ec53c8cep+15",
+        "0x1.4664e30ce283ap+24",
     ),
     "CuO": (
-        "0x1.04624008e2e2fp-9",
-        "0x1.e0ff99ca665fcp-3",
-        "0x1.33a8ff24120b8p+3",
+        "0x1.887f1627bb2bcp-16",
+        "0x1.f97c9047f1e76p-11",
+        "0x1.13161b44b2c77p-6",
     ),
     "Cu2": (
-        "0x1.38a4672b4f21ap+3",
-        "0x1.0584a01208ae0p+15",
-        "0x1.1ec4c11f45267p+24",
+        "0x1.62cbedea90fdep-10",
+        "0x1.2019d5665cddbp-1",
+        "0x1.c804f7c81aeacp+5",
     ),
     "Li2O": (
-        "0x1.35b275ab052fbp-4",
-        "0x1.96b28e852506cp+1",
-        "0x1.cf7413acefc61p+5",
+        "0x1.06a2fe2b6c0e6p-4",
+        "0x1.5369c5db17680p+1",
+        "0x1.67612983c3a22p+5",
     ),
     "Rb2O": (
         "0x1.9d78f023491e3p+12",
@@ -183,14 +183,14 @@ PRESSURE_PINS: dict[str, tuple[str, str, str]] = {
         "0x1.077e7d0600078p+20",
     ),
     "B2O3": (
-        "0x1.b18cf81097757p-3",
-        "0x1.a00f976999c83p+3",
-        "0x1.321a5f77a2b05p+8",
+        "0x1.ed0e09c634c14p-3",
+        "0x1.d6b1193419d05p+3",
+        "0x1.5826c1a851f0cp+8",
     ),
     "VO": (
-        "0x1.6ea6f86ea586ep-24",
-        "0x1.045e40f1df784p-15",
-        "0x1.7890c4fca33bfp-9",
+        "0x1.bb75597dedb61p-28",
+        "0x1.be2d47cf49e8fp-18",
+        "0x1.6cb0ef04ed106p-10",
     ),
 }
 
@@ -279,7 +279,7 @@ def _legacy_row(catalog, species_id: str) -> dict:
 
 
 def test_production_catalog_species_count_pinned(production_catalog) -> None:
-    assert len(production_catalog.species) == 231
+    assert len(production_catalog.species) == 247
 
 
 @pytest.mark.parametrize("species_id", sorted(PRESSURE_PINS))

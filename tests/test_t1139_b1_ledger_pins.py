@@ -123,7 +123,7 @@ _LEDGER_KEYS = (
 
 # sha256 of the Build A live pin tables. Re-evaluated below against the catalog.
 _LIVE_CHANNEL_PIN_DIGEST = (
-    "46c991fb21610b0a504a62c18f04bbee48ab4ffbc51894915fe54d783edaf153"
+    "4aed3badd9aec666e8a56b2ff6e26a3f754fedd686db91131532d05b9352d564"
 )
 
 
@@ -176,7 +176,7 @@ def production_catalog():
 
 
 def test_live_catalog_species_count_stays_pinned(production_catalog) -> None:
-    assert len(production_catalog.species) == 231
+    assert len(production_catalog.species) == 247
 
 
 @pytest.mark.parametrize("species_id", sorted(PRESSURE_PINS))
