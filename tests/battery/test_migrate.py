@@ -929,6 +929,24 @@ def test_missing_admission_status_defaults_with_notice_even_when_class_unknown(
     assert obs.identity.species.phase.value is Phase.G
 
 
+def test_to_plain_state_serialization_omits_absent_keys() -> None:
+    from simulator.battery.records import State
+
+    unknown_bytes = json.dumps(
+        to_plain(State.unknown("not recorded")),
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode()
+    value_bytes = json.dumps(
+        to_plain(State.of("fixture")),
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode()
+
+    assert unknown_bytes == b'{"reason":"not recorded","tag":"unknown"}'
+    assert value_bytes == b'{"tag":"value","value":"fixture"}'
+
+
 def test_missing_admission_status_keeps_unmeasured_row_pending(tmp_path: Path) -> None:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     values = extract["species"]["Na"]["observations"][0]["values"]

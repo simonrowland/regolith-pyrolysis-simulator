@@ -427,6 +427,41 @@ def test_pt2_db_path_none_keeps_write_through_inert() -> None:
     assert store.summary()["persistent_store"] is None
 
 
+def test_malformed_receipt_identity_keeps_pt0_live_fill_cache_ineligible(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator import engine_binding_admission as admission
+    from simulator.engine_binding_admission import (
+        BindingIdentity,
+        binding_admission_run_notice,
+    )
+
+    identity = BindingIdentity(
+        engine_id="synthetic-fake",
+        model_id="fixture-model-v1",
+        binding_revision="synthetic-r1",
+        transport="subprocess",
+    )
+    receipt_path = admission.binding_receipt_path()
+    receipt = json.loads(receipt_path.read_text())
+    receipt["entries"][0]["identity"] = None
+    receipt_path.write_text(json.dumps(receipt))
+    monkeypatch.setattr(
+        admission,
+        "binding_identity_for_backend",
+        lambda _backend: identity,
+    )
+
+    store = PT0DeterminismStore("capture", db_path=tmp_path / "malformed.db")
+    sim = _build_pt0_sim(store)
+
+    assert store.cached_equilibrium(sim) is None
+    notice = binding_admission_run_notice(sim)
+    assert notice is not None
+    assert notice["notices"][0]["reason"] == "receipt invalid"
+
+
 def _run_capped_c2a(
     store: PT0DeterminismStore,
     *,
