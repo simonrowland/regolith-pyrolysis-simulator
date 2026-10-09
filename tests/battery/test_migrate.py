@@ -3461,6 +3461,19 @@ def test_equal_temperature_range_is_a_point_but_true_range_is_not() -> None:
     assert "temperature domain" in (interval.reason or "")
 
 
+def test_bencze_2016_reference_temperature_current_output_pin(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(tmp_path, "bencze-yazhenskikh-2016.yaml")
+    observations = list(result.observations.values())
+    assert len(observations) == 70
+    assert all(
+        observation.identity.temperature_K is None
+        or observation.identity.temperature_K.is_unknown
+        for observation in observations
+    )
+
+
 @pytest.mark.parametrize(
     "extra, expected",
     [
