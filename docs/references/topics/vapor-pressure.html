@@ -31,11 +31,15 @@ ul { padding-left: 1.4rem; }</style>
 <ul>
 <li><code>data/foulant_thermo.yaml:105</code> - NaCl.thermo.source: source: &quot;REF-002 NIST WebBook SRD 69 Stull 1947; chloride-coefficients-salvage.md&quot;</li>
 <li><code>data/foulant_thermo.yaml:124</code> - KCl.thermo.source: source: &quot;REF-002 NIST WebBook SRD 69 Stull 1947; chloride-coefficients-salvage.md&quot;</li>
-<li><code>data/vapor_pressures.yaml:2411</code> - families.metals_cr_family.physical_properties.species.Cr.source: source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 chromium (C7440473); pure_component_antoine</li>
-<li><code>data/vapor_pressures.yaml:2415</code> - families.metals_cr_family.physical_properties.species.Cr.pure_component_antoine.source: source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 chromium (C7440473); log10(P/bar)=6.02371-16064.989/(T-83.86),</li>
-<li><code>data/vapor_pressures.yaml:5012</code> - families.foulant_vapor_nacl_family.physical_properties.species.NaCl.pure_component_antoine.source: source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 NaCl (C7647145); CRC normal bp 1465</li>
-<li><code>data/vapor_pressures.yaml:5114</code> - families.foulant_vapor_kcl_family.physical_properties.species.KCl.pure_component_antoine.source: source: REF-002 NIST WebBook SRD 69 Stull 1947 KCl (C7447407); CRC bp 1420 C; Clausius-Clapeyron</li>
-<li><code>data/vapor_pressures.yaml:5145</code> - families.foulant_vapor_kcl_family.physical_properties.species.KCl.fit_target.coefficients.source: source: REF-002 NIST Stull 1947 mid-range faithful runtime row; bp overshoots - tests use</li>
+<li><code>data/vapor_pressures.yaml:1845</code> - families.metals_al_family.physical_properties.species.Al.source: source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 aluminum (C7429905); pure_component_antoine</li>
+<li><code>data/vapor_pressures.yaml:1849</code> - families.metals_al_family.physical_properties.species.Al.pure_component_antoine.source: source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 aluminum (C7429905); log10(P/bar)=5.73623-13204.109/(T-24.306),</li>
+<li><code>data/vapor_pressures.yaml:2000</code> - families.metals_si_family.physical_properties.species.Si.source: source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 silicon (C7440213); pure_component_antoine</li>
+<li><code>data/vapor_pressures.yaml:2003</code> - families.metals_si_family.physical_properties.species.Si.pure_component_antoine.source: source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 silicon (C7440213); log10(P/bar)=9.56436-23308.848/(T-123.133),</li>
+<li><code>data/vapor_pressures.yaml:2373</code> - families.metals_cr_family.physical_properties.species.Cr.source: source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 chromium (C7440473); pure_component_antoine</li>
+<li><code>data/vapor_pressures.yaml:2377</code> - families.metals_cr_family.physical_properties.species.Cr.pure_component_antoine.source: source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 chromium (C7440473); log10(P/bar)=6.02371-16064.989/(T-83.86),</li>
+<li><code>data/vapor_pressures.yaml:4974</code> - families.foulant_vapor_nacl_family.physical_properties.species.NaCl.pure_component_antoine.source: source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 NaCl (C7647145); CRC normal bp 1465</li>
+<li><code>data/vapor_pressures.yaml:5076</code> - families.foulant_vapor_kcl_family.physical_properties.species.KCl.pure_component_antoine.source: source: REF-002 NIST WebBook SRD 69 Stull 1947 KCl (C7447407); CRC bp 1420 C; Clausius-Clapeyron</li>
+<li><code>data/vapor_pressures.yaml:5107</code> - families.foulant_vapor_kcl_family.physical_properties.species.KCl.fit_target.coefficients.source: source: REF-002 NIST Stull 1947 mid-range faithful runtime row; bp overshoots - tests use</li>
 </ul>
 </section>
 <section class="entry" id="REF-003">
@@ -54,11 +58,12 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/literature/vacuum_pyrolysis_sticking.yaml:79</code> - species.SiO.value.prior_scalar.source: source: &quot;REF-018 REF-016 Schaefer &amp; Fegley 2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa &amp; Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check.&quot;</li>
-<li><code>data/literature/vacuum_pyrolysis_sticking.yaml:110</code> - species.Mg.source: source: &quot;REF-015 REF-018 Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; Schaefer &amp; Fegley 2004 Table 10 Mg2SiO4(liq)/Hashimoto alpha_s=0.20-0.21.&quot;</li>
+<li><code>data/literature/extracts/ref-016-sio-kems-1700-2000k.yaml:7</code> - source.citation: \ B. (2004) Icarus 169:216–241,\n    DOI 10.1016/j.icarus.2003.08.023 (REF-018), Table 9 SiO partials\</li>
+<li><code>data/literature/vacuum_pyrolysis_sticking.yaml:69</code> - species.SiO.value.prior_scalar.source: source: &quot;REF-018 REF-016 Schaefer &amp; Fegley 2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa &amp; Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check.&quot;</li>
+<li><code>data/literature/vacuum_pyrolysis_sticking.yaml:100</code> - species.Mg.source: source: &quot;REF-015 REF-018 Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; Schaefer &amp; Fegley 2004 Table 10 Mg2SiO4(liq)/Hashimoto alpha_s=0.20-0.21.&quot;</li>
 <li><code>data/vapor_pressures.yaml:1450</code> - families.metals_mg_family.vaporisation_coefficients.evaporation_alpha.source: source: REF-015 REF-018 Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; SF2004 Table</li>
-<li><code>data/vapor_pressures.yaml:1961</code> - families.metals_al_family.vaporisation_coefficients.evaporation_alpha.source: source: &#x27;OWNER-RATIFY proxy_not_intrinsic: REF-018 Schaefer &amp; Fegley 2004 Icarus 169:216-241 Table</li>
-<li><code>data/vapor_pressures.yaml:4799</code> - families.oxide_vapors_sio_family.vaporisation_coefficients.evaporation_alpha.value.prior_scalar.source: source: REF-018 REF-016 SF2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa</li>
+<li><code>data/vapor_pressures.yaml:1957</code> - families.metals_al_family.vaporisation_coefficients.evaporation_alpha.source: source: &#x27;OWNER-RATIFY proxy_not_intrinsic: REF-018 Schaefer &amp; Fegley 2004 Icarus 169:216-241 Table</li>
+<li><code>data/vapor_pressures.yaml:4761</code> - families.oxide_vapors_sio_family.vaporisation_coefficients.evaporation_alpha.value.prior_scalar.source: source: REF-018 REF-016 SF2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa</li>
 </ul>
 </section>
 <section class="entry" id="REF-032">
@@ -69,153 +74,10 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/battery/migration-queue.yaml:52849</code> - work_id.observation_id.locator.note: K&quot;, Canadian Metallurgical Quarterly 23(3):309–313, DOI 10.1179/cmq.1984.23.3.309 (project REF-032). Fe solid/liquid</li>
-<li><code>data/battery/migration-queue.yaml:52851</code> - work_id.observation_id.locator.record: record: REF-032#Fe_liquid_equation</li>
-<li><code>data/battery/migration-queue.yaml:52861</code> - work_id.observation_id.locator.note: K&quot;, Canadian Metallurgical Quarterly 23(3):309–313, DOI 10.1179/cmq.1984.23.3.309 (project REF-032). Fe solid/liquid</li>
-<li><code>data/battery/migration-queue.yaml:52863</code> - work_id.observation_id.locator.record: record: REF-032#Fe_liquid_equation</li>
-<li><code>data/battery/migration-queue.yaml:52873</code> - work_id.observation_id.locator.note: K&quot;, Canadian Metallurgical Quarterly 23(3):309–313, DOI 10.1179/cmq.1984.23.3.309 (project REF-032). Fe solid/liquid</li>
-<li><code>data/battery/migration-queue.yaml:52875</code> - work_id.observation_id.locator.record: record: REF-032#Fe_liquid_equation</li>
-<li><code>data/battery/migration-queue.yaml:52885</code> - work_id.observation_id.locator.note: K&quot;, Canadian Metallurgical Quarterly 23(3):309–313, DOI 10.1179/cmq.1984.23.3.309 (project REF-032). Fe solid/liquid</li>
-<li><code>data/battery/migration-queue.yaml:52887</code> - work_id.observation_id.locator.record: record: REF-032#Fe_liquid_equation</li>
-<li><code>data/battery/migration-queue.yaml:130828</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g) Chase 1998 (REF-020)</li>
-<li><code>data/battery/migration-queue.yaml:130830</code> - work_id.observation_id.locator.record: record: REF-032#Mg</li>
-<li><code>data/battery/migration-queue.yaml:130839</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g) Chase 1998 (REF-020)</li>
-<li><code>data/battery/migration-queue.yaml:130841</code> - work_id.observation_id.locator.record: record: REF-032#Mg</li>
-<li><code>data/battery/migration-queue.yaml:130850</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g) Chase 1998 (REF-020)</li>
-<li><code>data/battery/migration-queue.yaml:130852</code> - work_id.observation_id.locator.record: record: REF-032#Mg</li>
-<li><code>data/battery/migration-queue.yaml:130861</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g) Chase 1998 (REF-020)</li>
-<li><code>data/battery/migration-queue.yaml:130863</code> - work_id.observation_id.locator.record: record: REF-032#Mg</li>
-<li><code>data/battery/migration-queue.yaml:130872</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g) Chase 1998 (REF-020)</li>
-<li><code>data/battery/migration-queue.yaml:130874</code> - work_id.observation_id.locator.record: record: REF-032#Mg</li>
-<li><code>data/battery/migration-queue.yaml:144033</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g) Chase 1998 (REF-020).</li>
-<li><code>data/battery/migration-queue.yaml:144034</code> - work_id.observation_id.locator.record: record: REF-032#Al</li>
-<li><code>data/battery/migration-queue.yaml:144043</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g) Chase 1998 (REF-020).</li>
-<li><code>data/battery/migration-queue.yaml:144044</code> - work_id.observation_id.locator.record: record: REF-032#Al</li>
-<li><code>data/battery/migration-queue.yaml:144053</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g) Chase 1998 (REF-020).</li>
-<li><code>data/battery/migration-queue.yaml:144054</code> - work_id.observation_id.locator.record: record: REF-032#Al</li>
-<li><code>data/battery/migration-queue.yaml:144063</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g) Chase 1998 (REF-020).</li>
-<li><code>data/battery/migration-queue.yaml:144064</code> - work_id.observation_id.locator.record: record: REF-032#Al</li>
-<li><code>data/battery/migration-queue.yaml:144073</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g) Chase 1998 (REF-020).</li>
-<li><code>data/battery/migration-queue.yaml:144074</code> - work_id.observation_id.locator.record: record: REF-032#Al</li>
-<li><code>data/battery/migration-queue.yaml:144143</code> - work_id.observation_id.locator.note: note: Alcock et al. (1984) REF-032 Bi; JANAF Bi(g)</li>
-<li><code>data/battery/migration-queue.yaml:144144</code> - work_id.observation_id.locator.record: record: REF-032#Bi</li>
-<li><code>data/battery/migration-queue.yaml:144153</code> - work_id.observation_id.locator.note: note: Alcock et al. (1984) REF-032 Bi; JANAF Bi(g)</li>
-<li><code>data/battery/migration-queue.yaml:144154</code> - work_id.observation_id.locator.record: record: REF-032#Bi</li>
-<li><code>data/battery/migration-queue.yaml:144163</code> - work_id.observation_id.locator.note: note: Alcock et al. (1984) REF-032 Bi; JANAF Bi(g)</li>
-<li><code>data/battery/migration-queue.yaml:144164</code> - work_id.observation_id.locator.record: record: REF-032#Bi</li>
-<li><code>data/battery/migration-queue.yaml:144173</code> - work_id.observation_id.locator.note: note: Alcock et al. (1984) REF-032 Bi; JANAF Bi(g)</li>
-<li><code>data/battery/migration-queue.yaml:144174</code> - work_id.observation_id.locator.record: record: REF-032#Bi</li>
-<li><code>data/battery/migration-queue.yaml:144183</code> - work_id.observation_id.locator.note: note: Alcock et al. (1984) REF-032 Bi; JANAF Bi(g)</li>
-<li><code>data/battery/migration-queue.yaml:144184</code> - work_id.observation_id.locator.record: record: REF-032#Bi</li>
-<li><code>data/battery/migration-queue.yaml:182717</code> - work_id.observation_id.locator.note: note: &#x27;Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Zr equations; JANAF Zr(g) Chase 1998. Oxide:</li>
-<li><code>data/battery/migration-queue.yaml:182719</code> - work_id.observation_id.locator.record: record: REF-032#Zr</li>
-<li><code>data/battery/migration-queue.yaml:182728</code> - work_id.observation_id.locator.note: note: &#x27;Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Zr equations; JANAF Zr(g) Chase 1998. Oxide:</li>
-<li><code>data/battery/migration-queue.yaml:182730</code> - work_id.observation_id.locator.record: record: REF-032#Zr</li>
-<li><code>data/battery/migration-queue.yaml:182739</code> - work_id.observation_id.locator.note: note: &#x27;Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Zr equations; JANAF Zr(g) Chase 1998. Oxide:</li>
-<li><code>data/battery/migration-queue.yaml:182741</code> - work_id.observation_id.locator.record: record: REF-032#Zr</li>
-<li><code>data/battery/migration-queue.yaml:182750</code> - work_id.observation_id.locator.note: note: &#x27;Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Zr equations; JANAF Zr(g) Chase 1998. Oxide:</li>
-<li><code>data/battery/migration-queue.yaml:182752</code> - work_id.observation_id.locator.record: record: REF-032#Zr</li>
-<li><code>data/battery/migration-queue.yaml:207673</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) potassium equations — independent of Fiock &amp;</li>
-<li><code>data/battery/migration-queue.yaml:207675</code> - work_id.observation_id.locator.record: record: REF-032#K</li>
-<li><code>data/battery/migration-queue.yaml:207684</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) potassium equations — independent of Fiock &amp;</li>
-<li><code>data/battery/migration-queue.yaml:207686</code> - work_id.observation_id.locator.record: record: REF-032#K</li>
-<li><code>data/battery/migration-queue.yaml:207695</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) potassium equations — independent of Fiock &amp;</li>
-<li><code>data/battery/migration-queue.yaml:207697</code> - work_id.observation_id.locator.record: record: REF-032#K</li>
-<li><code>data/battery/migration-queue.yaml:207706</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) potassium equations — independent of Fiock &amp;</li>
-<li><code>data/battery/migration-queue.yaml:207708</code> - work_id.observation_id.locator.record: record: REF-032#K</li>
-<li><code>data/battery/migration-queue.yaml:207972</code> - work_id.observation_id.locator.note: note: Alcock et al. (1984) REF-032 Pb equations; JANAF Pb(g) Chase 1998; classic Hultgren selected values for Pb.</li>
-<li><code>data/battery/migration-queue.yaml:207973</code> - work_id.observation_id.locator.record: record: REF-032#Pb</li>
-<li><code>data/battery/migration-queue.yaml:207982</code> - work_id.observation_id.locator.note: note: Alcock et al. (1984) REF-032 Pb equations; JANAF Pb(g) Chase 1998; classic Hultgren selected values for Pb.</li>
-<li><code>data/battery/migration-queue.yaml:207983</code> - work_id.observation_id.locator.record: record: REF-032#Pb</li>
-<li><code>data/battery/migration-queue.yaml:207992</code> - work_id.observation_id.locator.note: note: Alcock et al. (1984) REF-032 Pb equations; JANAF Pb(g) Chase 1998; classic Hultgren selected values for Pb.</li>
-<li><code>data/battery/migration-queue.yaml:207993</code> - work_id.observation_id.locator.record: record: REF-032#Pb</li>
-<li><code>data/battery/migration-queue.yaml:208002</code> - work_id.observation_id.locator.note: note: Alcock et al. (1984) REF-032 Pb equations; JANAF Pb(g) Chase 1998; classic Hultgren selected values for Pb.</li>
-<li><code>data/battery/migration-queue.yaml:208003</code> - work_id.observation_id.locator.record: record: REF-032#Pb</li>
-<li><code>data/battery/migration-queue.yaml:208012</code> - work_id.observation_id.locator.note: note: Alcock et al. (1984) REF-032 Pb equations; JANAF Pb(g) Chase 1998; classic Hultgren selected values for Pb.</li>
-<li><code>data/battery/migration-queue.yaml:208013</code> - work_id.observation_id.locator.record: record: REF-032#Pb</li>
-<li><code>data/battery/migration-queue.yaml:265323</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) sodium vapor-pressure equations (298–2500 K evaluated</li>
-<li><code>data/battery/migration-queue.yaml:265325</code> - work_id.observation_id.locator.record: record: REF-032#Na</li>
-<li><code>data/battery/migration-queue.yaml:265334</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) sodium vapor-pressure equations (298–2500 K evaluated</li>
-<li><code>data/battery/migration-queue.yaml:265336</code> - work_id.observation_id.locator.record: record: REF-032#Na</li>
-<li><code>data/battery/migration-queue.yaml:265345</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) sodium vapor-pressure equations (298–2500 K evaluated</li>
-<li><code>data/battery/migration-queue.yaml:265347</code> - work_id.observation_id.locator.record: record: REF-032#Na</li>
-<li><code>data/battery/migration-queue.yaml:265356</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) sodium vapor-pressure equations (298–2500 K evaluated</li>
-<li><code>data/battery/migration-queue.yaml:265358</code> - work_id.observation_id.locator.record: record: REF-032#Na</li>
-<li><code>data/battery/migration-queue.yaml:342418</code> - work_id.observation_id.locator.note: Can. Metall. Q. 23:309 (REF-032) Th equation if present; JANAF Th(g) Chase 1998.</li>
-<li><code>data/battery/migration-queue.yaml:342419</code> - work_id.observation_id.locator.record: record: REF-032#Th</li>
-<li><code>data/battery/migration-queue.yaml:342429</code> - work_id.observation_id.locator.note: Can. Metall. Q. 23:309 (REF-032) Th equation if present; JANAF Th(g) Chase 1998.</li>
-<li><code>data/battery/migration-queue.yaml:342430</code> - work_id.observation_id.locator.record: record: REF-032#Th</li>
-<li><code>data/battery/migration-queue.yaml:342440</code> - work_id.observation_id.locator.note: Can. Metall. Q. 23:309 (REF-032) Th equation if present; JANAF Th(g) Chase 1998.</li>
-<li><code>data/battery/migration-queue.yaml:342441</code> - work_id.observation_id.locator.record: record: REF-032#Th</li>
-<li><code>data/battery/migration-queue.yaml:342451</code> - work_id.observation_id.locator.note: Can. Metall. Q. 23:309 (REF-032) Th equation if present; JANAF Th(g) Chase 1998.</li>
-<li><code>data/battery/migration-queue.yaml:342452</code> - work_id.observation_id.locator.record: record: REF-032#Th</li>
-<li><code>data/battery/migration-queue.yaml:344640</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Si equations; JANAF Si(g) Chase 1998.</li>
-<li><code>data/battery/migration-queue.yaml:344641</code> - work_id.observation_id.locator.record: record: REF-032#Si</li>
-<li><code>data/battery/migration-queue.yaml:344650</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Si equations; JANAF Si(g) Chase 1998.</li>
-<li><code>data/battery/migration-queue.yaml:344651</code> - work_id.observation_id.locator.record: record: REF-032#Si</li>
-<li><code>data/battery/migration-queue.yaml:344660</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Si equations; JANAF Si(g) Chase 1998.</li>
-<li><code>data/battery/migration-queue.yaml:344661</code> - work_id.observation_id.locator.record: record: REF-032#Si</li>
-<li><code>data/battery/migration-queue.yaml:344670</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Si equations; JANAF Si(g) Chase 1998.</li>
-<li><code>data/battery/migration-queue.yaml:344671</code> - work_id.observation_id.locator.record: record: REF-032#Si</li>
-<li><code>data/battery/migration-queue.yaml:344680</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Si equations; JANAF Si(g) Chase 1998.</li>
-<li><code>data/battery/migration-queue.yaml:344681</code> - work_id.observation_id.locator.record: record: REF-032#Si</li>
-<li><code>data/battery/migration-queue.yaml:362975</code> - work_id.observation_id.locator.note: note: If JANAF evaluation is part of the fit, pure independent measurement is Alcock et al. (1984) REF-032 Mn equations</li>
-<li><code>data/battery/migration-queue.yaml:362978</code> - work_id.observation_id.locator.record: record: REF-032#Mn_if_not_in_fit</li>
-<li><code>data/battery/migration-queue.yaml:362987</code> - work_id.observation_id.locator.note: note: If JANAF evaluation is part of the fit, pure independent measurement is Alcock et al. (1984) REF-032 Mn equations</li>
-<li><code>data/battery/migration-queue.yaml:362990</code> - work_id.observation_id.locator.record: record: REF-032#Mn_if_not_in_fit</li>
-<li><code>data/battery/migration-queue.yaml:362999</code> - work_id.observation_id.locator.note: note: If JANAF evaluation is part of the fit, pure independent measurement is Alcock et al. (1984) REF-032 Mn equations</li>
-<li><code>data/battery/migration-queue.yaml:363002</code> - work_id.observation_id.locator.record: record: REF-032#Mn_if_not_in_fit</li>
-<li><code>data/battery/migration-queue.yaml:363011</code> - work_id.observation_id.locator.note: note: If JANAF evaluation is part of the fit, pure independent measurement is Alcock et al. (1984) REF-032 Mn equations</li>
-<li><code>data/battery/migration-queue.yaml:363014</code> - work_id.observation_id.locator.record: record: REF-032#Mn_if_not_in_fit</li>
-<li><code>data/battery/migration-queue.yaml:363023</code> - work_id.observation_id.locator.note: note: If JANAF evaluation is part of the fit, pure independent measurement is Alcock et al. (1984) REF-032 Mn equations</li>
-<li><code>data/battery/migration-queue.yaml:363026</code> - work_id.observation_id.locator.record: record: REF-032#Mn_if_not_in_fit</li>
-<li><code>data/battery/migration-queue.yaml:389966</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Ca equations; JANAF Ca(g) Chase 1998.</li>
-<li><code>data/battery/migration-queue.yaml:389967</code> - work_id.observation_id.locator.record: record: REF-032#Ca</li>
-<li><code>data/battery/migration-queue.yaml:389976</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Ca equations; JANAF Ca(g) Chase 1998.</li>
-<li><code>data/battery/migration-queue.yaml:389977</code> - work_id.observation_id.locator.record: record: REF-032#Ca</li>
-<li><code>data/battery/migration-queue.yaml:389986</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Ca equations; JANAF Ca(g) Chase 1998.</li>
-<li><code>data/battery/migration-queue.yaml:389987</code> - work_id.observation_id.locator.record: record: REF-032#Ca</li>
-<li><code>data/battery/migration-queue.yaml:389996</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Ca equations; JANAF Ca(g) Chase 1998.</li>
-<li><code>data/battery/migration-queue.yaml:389997</code> - work_id.observation_id.locator.record: record: REF-032#Ca</li>
-<li><code>data/battery/migration-queue.yaml:390006</code> - work_id.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Ca equations; JANAF Ca(g) Chase 1998.</li>
-<li><code>data/battery/migration-queue.yaml:390007</code> - work_id.observation_id.locator.record: record: REF-032#Ca</li>
-<li><code>data/literature/INDEX.yaml:12229</code> - source_id.citation: citation: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g)</li>
-<li><code>data/literature/INDEX.yaml:12287</code> - source_id.citation: citation: Alcock et al. (1984) REF-032 Bi; JANAF Bi(g)</li>
-<li><code>data/literature/INDEX.yaml:12344</code> - source_id.citation: citation: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Ca equations; JANAF Ca(g)</li>
-<li><code>data/literature/INDEX.yaml:12404</code> - source_id.citation.Elements: (project REF-032). Fe solid/liquid equations (log10 P form as tabulated).&#x27;</li>
-<li><code>data/literature/INDEX.yaml:12461</code> - source_id.citation: citation: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) potassium equations — independent</li>
-<li><code>data/literature/INDEX.yaml:12519</code> - source_id.citation: citation: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g)</li>
-<li><code>data/literature/INDEX.yaml:12578</code> - source_id.citation: REF-032 Mn equations (use Alcock alone as anchor) or Nesmeyanov-class experimental Mn vapor-pressure</li>
-<li><code>data/literature/INDEX.yaml:12636</code> - source_id.citation: citation: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) sodium vapor-pressure equations</li>
-<li><code>data/literature/INDEX.yaml:12694</code> - source_id.citation: citation: Alcock et al. (1984) REF-032 Pb equations; JANAF Pb(g) Chase 1998; classic Hultgren selected</li>
-<li><code>data/literature/INDEX.yaml:12752</code> - source_id.citation: citation: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Si equations; JANAF Si(g)</li>
-<li><code>data/literature/INDEX.yaml:12811</code> - source_id.citation: Alcock et al. (1984) Can. Metall. Q. 23:309 (REF-032) Th equation if present; JANAF Th(g) Chase 1998.</li>
-<li><code>data/literature/INDEX.yaml:12868</code> - source_id.citation: citation: &#x27;Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Zr equations; JANAF Zr(g)</li>
-<li><code>data/literature/extracts-v2/ref-032-al.yaml:83</code> - observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g) Chase 1998 (REF-020).</li>
-<li><code>data/literature/extracts-v2/ref-032-al.yaml:84</code> - observation_id.locator.record: record: REF-032#Al</li>
-<li><code>data/literature/extracts-v2/ref-032-bi.yaml:83</code> - observation_id.locator.note: note: Alcock et al. (1984) REF-032 Bi; JANAF Bi(g)</li>
-<li><code>data/literature/extracts-v2/ref-032-bi.yaml:84</code> - observation_id.locator.record: record: REF-032#Bi</li>
-<li><code>data/literature/extracts-v2/ref-032-ca.yaml:83</code> - observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Ca equations; JANAF Ca(g) Chase 1998.</li>
-<li><code>data/literature/extracts-v2/ref-032-ca.yaml:84</code> - observation_id.locator.record: record: REF-032#Ca</li>
-<li><code>data/literature/extracts-v2/ref-032-fe-liquid-equation.yaml:84</code> - observation_id.locator.note: K&quot;, Canadian Metallurgical Quarterly 23(3):309–313, DOI 10.1179/cmq.1984.23.3.309 (project REF-032). Fe solid/liquid</li>
-<li><code>data/literature/extracts-v2/ref-032-fe-liquid-equation.yaml:86</code> - observation_id.locator.record: record: REF-032#Fe_liquid_equation</li>
-<li><code>data/literature/extracts-v2/ref-032-k.yaml:83</code> - observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) potassium equations — independent of Fiock &amp; Rodebush</li>
-<li><code>data/literature/extracts-v2/ref-032-k.yaml:85</code> - observation_id.locator.record: record: REF-032#K</li>
-<li><code>data/literature/extracts-v2/ref-032-mg.yaml:83</code> - observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g) Chase 1998 (REF-020)</li>
-<li><code>data/literature/extracts-v2/ref-032-mg.yaml:85</code> - observation_id.locator.record: record: REF-032#Mg</li>
-<li><code>data/literature/extracts-v2/ref-032-mn-if-not-in-fit.yaml:83</code> - observation_id.locator.note: note: If JANAF evaluation is part of the fit, pure independent measurement is Alcock et al. (1984) REF-032 Mn equations</li>
-<li><code>data/literature/extracts-v2/ref-032-mn-if-not-in-fit.yaml:86</code> - observation_id.locator.record: record: REF-032#Mn_if_not_in_fit</li>
-<li><code>data/literature/extracts-v2/ref-032-na.yaml:83</code> - observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) sodium vapor-pressure equations (298–2500 K evaluated</li>
-<li><code>data/literature/extracts-v2/ref-032-na.yaml:85</code> - observation_id.locator.record: record: REF-032#Na</li>
-<li><code>data/literature/extracts-v2/ref-032-pb.yaml:83</code> - observation_id.locator.note: note: Alcock et al. (1984) REF-032 Pb equations; JANAF Pb(g) Chase 1998; classic Hultgren selected values for Pb.</li>
-<li><code>data/literature/extracts-v2/ref-032-pb.yaml:84</code> - observation_id.locator.record: record: REF-032#Pb</li>
-<li><code>data/literature/extracts-v2/ref-032-si.yaml:83</code> - observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Si equations; JANAF Si(g) Chase 1998.</li>
-<li><code>data/literature/extracts-v2/ref-032-si.yaml:84</code> - observation_id.locator.record: record: REF-032#Si</li>
-<li><code>data/literature/extracts-v2/ref-032-th.yaml:84</code> - observation_id.locator.note: Can. Metall. Q. 23:309 (REF-032) Th equation if present; JANAF Th(g) Chase 1998.</li>
-<li><code>data/literature/extracts-v2/ref-032-th.yaml:85</code> - observation_id.locator.record: record: REF-032#Th</li>
-<li><code>data/literature/extracts-v2/ref-032-zr.yaml:83</code> - observation_id.locator.note: note: &#x27;Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Zr equations; JANAF Zr(g) Chase 1998. Oxide: JANAF</li>
-<li><code>data/literature/extracts-v2/ref-032-zr.yaml:85</code> - observation_id.locator.record: record: REF-032#Zr</li>
 <li><code>data/literature/extracts/janaf-4th.yaml:665</code> - species.Ti.observation_id.values.independence_note: independence_note: REF-032 is the fit source — cannot self-validate</li>
+<li><code>data/literature/extracts/pound-1972-mccabe-cr.yaml:6</code> - source.citation: α_Cr in docs/lab-validation-whitepaper.md; Alcock et al. (1984) REF-032 Cr equations as second pure-Psat</li>
+<li><code>data/literature/extracts/pound-1972-mccabe-cr.yaml:22</code> - species.Cr.observation_id.locator.note: used for α_Cr in docs/lab-validation-whitepaper.md; Alcock et al. (1984) REF-032 Cr equations</li>
+<li><code>data/literature/extracts/pound-1972-mccabe-cr.yaml:48</code> - path.locator.note: α_Cr in docs/lab-validation-whitepaper.md; Alcock et al. (1984) REF-032 Cr equations as second pure-Psat</li>
 <li><code>data/literature/extracts/ref-032-al.yaml:4</code> - source.citation: citation: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g)</li>
 <li><code>data/literature/extracts/ref-032-al.yaml:18</code> - species.Al.observation_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g)</li>
 <li><code>data/literature/extracts/ref-032-al.yaml:20</code> - species.Al.observation_id.locator.record: record: REF-032#Al</li>
@@ -280,46 +142,10 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/literature/extracts/ref-032-zr.yaml:20</code> - species.Zr.observation_id.locator.record: record: REF-032#Zr</li>
 <li><code>data/literature/extracts/ref-032-zr.yaml:42</code> - path.locator.note: note: &#x27;Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Zr equations; JANAF Zr(g)</li>
 <li><code>data/literature/extracts/ref-032-zr.yaml:44</code> - path.locator.record: record: REF-032#Zr</li>
-<li><code>data/literature/works/10.1179_cmq.1984.23.3.309.yaml:5</code> - work.citation: K&quot;, Canadian Metallurgical Quarterly 23(3):309–313, DOI 10.1179/cmq.1984.23.3.309 (project REF-032). Fe solid/liquid equations</li>
-<li><code>data/literature/works/10.1179_cmq.1984.23.3.309.yaml:71</code> - experiment_id.locator.note: K&quot;, Canadian Metallurgical Quarterly 23(3):309–313, DOI 10.1179/cmq.1984.23.3.309 (project REF-032). Fe solid/liquid</li>
-<li><code>data/literature/works/10.1179_cmq.1984.23.3.309.yaml:73</code> - experiment_id.locator.record: record: REF-032#Fe_liquid_equation</li>
-<li><code>data/literature/works/1bb95d2ec4c2ee923788ed803d29dd08a52a2a3d5fc54721f5b94eeb7e58fc29.yaml:4</code> - work.citation: citation: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g) Chase 1998 (REF-020)</li>
-<li><code>data/literature/works/1bb95d2ec4c2ee923788ed803d29dd08a52a2a3d5fc54721f5b94eeb7e58fc29.yaml:68</code> - experiment_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g) Chase 1998 (REF-020)</li>
-<li><code>data/literature/works/1bb95d2ec4c2ee923788ed803d29dd08a52a2a3d5fc54721f5b94eeb7e58fc29.yaml:70</code> - experiment_id.locator.record: record: REF-032#Mg</li>
-<li><code>data/literature/works/2ad3a91187d3057fd19dd66d3f8b8d399bb679f3f805d5fea90f27ba2911ef60.yaml:4</code> - work.citation: citation: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g) Chase 1998 (REF-020).</li>
-<li><code>data/literature/works/2ad3a91187d3057fd19dd66d3f8b8d399bb679f3f805d5fea90f27ba2911ef60.yaml:67</code> - experiment_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Al equations; JANAF Al(g) Chase 1998 (REF-020).</li>
-<li><code>data/literature/works/2ad3a91187d3057fd19dd66d3f8b8d399bb679f3f805d5fea90f27ba2911ef60.yaml:68</code> - experiment_id.locator.record: record: REF-032#Al</li>
-<li><code>data/literature/works/3224004c00710f4e9556f068f06a136a627cc47a1cc0bf7946067defffc76739.yaml:4</code> - work.citation: citation: Alcock et al. (1984) REF-032 Bi; JANAF Bi(g)</li>
-<li><code>data/literature/works/3224004c00710f4e9556f068f06a136a627cc47a1cc0bf7946067defffc76739.yaml:67</code> - experiment_id.locator.note: note: Alcock et al. (1984) REF-032 Bi; JANAF Bi(g)</li>
-<li><code>data/literature/works/3224004c00710f4e9556f068f06a136a627cc47a1cc0bf7946067defffc76739.yaml:68</code> - experiment_id.locator.record: record: REF-032#Bi</li>
-<li><code>data/literature/works/3ecca71f0e96e7331b39d075cfbc32786e45a22a89a157dd3f391b2a31a896fa.yaml:4</code> - work.citation: citation: &#x27;Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Zr equations; JANAF Zr(g) Chase 1998. Oxide:</li>
-<li><code>data/literature/works/3ecca71f0e96e7331b39d075cfbc32786e45a22a89a157dd3f391b2a31a896fa.yaml:68</code> - experiment_id.locator.note: note: &#x27;Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Zr equations; JANAF Zr(g) Chase 1998. Oxide: JANAF</li>
-<li><code>data/literature/works/3ecca71f0e96e7331b39d075cfbc32786e45a22a89a157dd3f391b2a31a896fa.yaml:70</code> - experiment_id.locator.record: record: REF-032#Zr</li>
-<li><code>data/literature/works/612561692eeb36f6c89c01deb223cbf517499b6ad19992894b287e6111c614d5.yaml:4</code> - work.citation: citation: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) potassium equations — independent of Fiock &amp;</li>
-<li><code>data/literature/works/612561692eeb36f6c89c01deb223cbf517499b6ad19992894b287e6111c614d5.yaml:68</code> - experiment_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) potassium equations — independent of Fiock &amp; Rodebush</li>
-<li><code>data/literature/works/612561692eeb36f6c89c01deb223cbf517499b6ad19992894b287e6111c614d5.yaml:70</code> - experiment_id.locator.record: record: REF-032#K</li>
-<li><code>data/literature/works/650568f93c1d8e3ebf5cc8c7ffb49bcb6bf3234dbb5ad9975000aed26c904b02.yaml:4</code> - work.citation: citation: Alcock et al. (1984) REF-032 Pb equations; JANAF Pb(g) Chase 1998; classic Hultgren selected values for Pb.</li>
-<li><code>data/literature/works/650568f93c1d8e3ebf5cc8c7ffb49bcb6bf3234dbb5ad9975000aed26c904b02.yaml:67</code> - experiment_id.locator.note: note: Alcock et al. (1984) REF-032 Pb equations; JANAF Pb(g) Chase 1998; classic Hultgren selected values for Pb.</li>
-<li><code>data/literature/works/650568f93c1d8e3ebf5cc8c7ffb49bcb6bf3234dbb5ad9975000aed26c904b02.yaml:68</code> - experiment_id.locator.record: record: REF-032#Pb</li>
-<li><code>data/literature/works/9785621a61921aac9568eeff4ad3e0c9a66360750d6c1ae376962c9f9927ec30.yaml:4</code> - work.citation: citation: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) sodium vapor-pressure equations (298–2500 K evaluated</li>
-<li><code>data/literature/works/9785621a61921aac9568eeff4ad3e0c9a66360750d6c1ae376962c9f9927ec30.yaml:68</code> - experiment_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) sodium vapor-pressure equations (298–2500 K evaluated</li>
-<li><code>data/literature/works/9785621a61921aac9568eeff4ad3e0c9a66360750d6c1ae376962c9f9927ec30.yaml:70</code> - experiment_id.locator.record: record: REF-032#Na</li>
-<li><code>data/literature/works/d782e5ffc741a6a623f4217305c522cc5759e3f3b7f29792fc27f1957752b265.yaml:5</code> - work.citation: Can. Metall. Q. 23:309 (REF-032) Th equation if present; JANAF Th(g) Chase 1998.</li>
-<li><code>data/literature/works/d782e5ffc741a6a623f4217305c522cc5759e3f3b7f29792fc27f1957752b265.yaml:69</code> - experiment_id.locator.note: Can. Metall. Q. 23:309 (REF-032) Th equation if present; JANAF Th(g) Chase 1998.</li>
-<li><code>data/literature/works/d782e5ffc741a6a623f4217305c522cc5759e3f3b7f29792fc27f1957752b265.yaml:70</code> - experiment_id.locator.record: record: REF-032#Th</li>
-<li><code>data/literature/works/e120eefb04423637700bccb393af85d793acf6a8cf9bdc36a0e4b5b6b442e282.yaml:4</code> - work.citation: citation: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Si equations; JANAF Si(g) Chase 1998.</li>
-<li><code>data/literature/works/e120eefb04423637700bccb393af85d793acf6a8cf9bdc36a0e4b5b6b442e282.yaml:67</code> - experiment_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Si equations; JANAF Si(g) Chase 1998.</li>
-<li><code>data/literature/works/e120eefb04423637700bccb393af85d793acf6a8cf9bdc36a0e4b5b6b442e282.yaml:68</code> - experiment_id.locator.record: record: REF-032#Si</li>
-<li><code>data/literature/works/e8448366ffc1340e9b41f10919c80e1c3ae8f0e9fbf190d553fcb7dc4ef5ec78.yaml:4</code> - work.citation: citation: If JANAF evaluation is part of the fit, pure independent measurement is Alcock et al. (1984) REF-032 Mn equations</li>
-<li><code>data/literature/works/e8448366ffc1340e9b41f10919c80e1c3ae8f0e9fbf190d553fcb7dc4ef5ec78.yaml:69</code> - experiment_id.locator.note: note: If JANAF evaluation is part of the fit, pure independent measurement is Alcock et al. (1984) REF-032 Mn equations</li>
-<li><code>data/literature/works/e8448366ffc1340e9b41f10919c80e1c3ae8f0e9fbf190d553fcb7dc4ef5ec78.yaml:72</code> - experiment_id.locator.record: record: REF-032#Mn_if_not_in_fit</li>
-<li><code>data/literature/works/f3056a1f1870b1398f67983e33a255b48e3437aa22210cc2ef6d314efca7245a.yaml:4</code> - work.citation: citation: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Ca equations; JANAF Ca(g) Chase 1998.</li>
-<li><code>data/literature/works/f3056a1f1870b1398f67983e33a255b48e3437aa22210cc2ef6d314efca7245a.yaml:67</code> - experiment_id.locator.note: note: Alcock, Itkin &amp; Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Ca equations; JANAF Ca(g) Chase 1998.</li>
-<li><code>data/literature/works/f3056a1f1870b1398f67983e33a255b48e3437aa22210cc2ef6d314efca7245a.yaml:68</code> - experiment_id.locator.record: record: REF-032#Ca</li>
-<li><code>data/vapor_pressures.yaml:2202</code> - families.metals_ti_family.physical_properties.species.Ti.source: source: REF-032 CRC Handbook 84th ed. / Alcock-Itkin-Horrigan 1984 vapor-pressure equation for</li>
-<li><code>data/vapor_pressures.yaml:2206</code> - families.metals_ti_family.physical_properties.species.Ti.pure_component_antoine.source: source: REF-032 Alcock-Itkin-Horrigan 1984 titanium liquid equation, CRC/CR2 Pa-converted</li>
-<li><code>data/vapor_pressures.yaml:2559</code> - families.metals_mn_family.physical_properties.species.Mn.source: source: REF-020 NIST-JANAF/Chase 1998 solid/liquid Mn-&gt;Mn(g) evaluation; REF-032 Alcock solid,</li>
-<li><code>data/vapor_pressures.yaml:2564</code> - families.metals_mn_family.physical_properties.species.Mn.pure_component_antoine.source: source: REF-020 NIST-JANAF/Chase 1998 Mn(s/l)-&gt;Mn(g) thermodynamic evaluation fit; REF-032</li>
+<li><code>data/vapor_pressures.yaml:2164</code> - families.metals_ti_family.physical_properties.species.Ti.source: source: REF-032 CRC Handbook 84th ed. / Alcock-Itkin-Horrigan 1984 vapor-pressure equation for</li>
+<li><code>data/vapor_pressures.yaml:2168</code> - families.metals_ti_family.physical_properties.species.Ti.pure_component_antoine.source: source: REF-032 Alcock-Itkin-Horrigan 1984 titanium liquid equation, CRC/CR2 Pa-converted</li>
+<li><code>data/vapor_pressures.yaml:2521</code> - families.metals_mn_family.physical_properties.species.Mn.source: source: REF-020 NIST-JANAF/Chase 1998 solid/liquid Mn-&gt;Mn(g) evaluation; REF-032 Alcock solid,</li>
+<li><code>data/vapor_pressures.yaml:2526</code> - families.metals_mn_family.physical_properties.species.Mn.pure_component_antoine.source: source: REF-020 NIST-JANAF/Chase 1998 Mn(s/l)-&gt;Mn(g) thermodynamic evaluation fit; REF-032</li>
 </ul>
 </section>
 <section class="entry" id="REF-033">
@@ -334,8 +160,8 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/vapor_pressures.yaml:1192</code> - families.metals_mg_family.physical_properties.species.Mg.pure_component_antoine.source: source: REF-033 CRC.b/Stull magnesium pressure-level table fit (1-100000 Pa); cross-checked</li>
 <li><code>data/vapor_pressures.yaml:1232</code> - families.metals_mg_family.physical_properties.species.Mg.reconstructed_vapor_pressure_segment.temperature_K.source: source: REF-033 CRC.b/Stull magnesium pressure-level table final certified point</li>
 <li><code>data/vapor_pressures.yaml:1252</code> - families.metals_mg_family.physical_properties.species.Mg.reconstructed_vapor_pressure_segment.provenance: from REF-033 CRC.b/Stull&#x27;&#x27;s certified 1361 K, 100000 Pa endpoint to the stored</li>
-<li><code>data/vapor_pressures.yaml:2560</code> - families.metals_mn_family.physical_properties.species.Mn.source: REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as comparators; pure_component_antoine</li>
-<li><code>data/vapor_pressures.yaml:2565</code> - families.metals_mn_family.physical_properties.species.Mn.pure_component_antoine.source: Alcock solid, REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as documented comparators</li>
+<li><code>data/vapor_pressures.yaml:2522</code> - families.metals_mn_family.physical_properties.species.Mn.source: REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as comparators; pure_component_antoine</li>
+<li><code>data/vapor_pressures.yaml:2527</code> - families.metals_mn_family.physical_properties.species.Mn.pure_component_antoine.source: Alcock solid, REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as documented comparators</li>
 </ul>
 </section>
 <section class="entry" id="REF-034">
@@ -347,8 +173,8 @@ ul { padding-left: 1.4rem; }</style>
 <p><strong>Cited by:</strong></p>
 <ul>
 <li><code>data/vapor_pressures.yaml:1193</code> - families.metals_mg_family.physical_properties.species.Mg.pure_component_antoine.source: against REF-034 Kaye-Laby/NPL Ambrose pressure-level table; not an Alcock liquid equation</li>
-<li><code>data/vapor_pressures.yaml:2560</code> - families.metals_mn_family.physical_properties.species.Mn.source: REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as comparators; pure_component_antoine</li>
-<li><code>data/vapor_pressures.yaml:2565</code> - families.metals_mn_family.physical_properties.species.Mn.pure_component_antoine.source: Alcock solid, REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as documented comparators</li>
+<li><code>data/vapor_pressures.yaml:2522</code> - families.metals_mn_family.physical_properties.species.Mn.source: REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as comparators; pure_component_antoine</li>
+<li><code>data/vapor_pressures.yaml:2527</code> - families.metals_mn_family.physical_properties.species.Mn.pure_component_antoine.source: Alcock solid, REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as documented comparators</li>
 </ul>
 </section>
 <section class="entry" id="REF-041">
