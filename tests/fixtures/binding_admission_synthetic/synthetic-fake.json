@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "identity": {
+    "engine_id": "synthetic-fake",
+    "model_id": "fixture-model-v1",
+    "binding_revision": "synthetic-r1",
+    "transport": "fixture"
+  },
+  "artifact": "freeze_gate_curve",
+  "projection": {
+    "curve": {
+      "liquidus_T_C": 1300.0,
+      "path": [
+        [1000.0, 0.0],
+        [1300.0, 1.0]
+      ],
+      "solidus_T_C": 1000.0,
+      "source": "gate_liquid_fraction:authoritative:synthetic-fake"
+    }
+  },
+  "review": {
+    "status": "test-only",
+    "source": "synthetic fixture; never authorizes a real producer"
+  }
+}
