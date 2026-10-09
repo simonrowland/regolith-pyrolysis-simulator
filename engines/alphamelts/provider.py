@@ -74,6 +74,7 @@ from simulator.alphamelts_reference_pressure import (
     alphamelts_reference_pressure_diagnostics,
     annotate_alphamelts_reference_pressure,
 )
+from simulator.accounting.oxide_assignment import assign_phase_oxides
 from simulator.melt_backend.base import LiquidFractionInvalidError
 from simulator.melt_backend.liquidus import (
     EquilibriumCrystallizationPathResult,
@@ -81,6 +82,13 @@ from simulator.melt_backend.liquidus import (
     LiquidusSolidusResult,
     build_equilibrium_crystallization_path,
     liquidus_sample_error_from_exception,
+)
+
+
+# A failed current-temperature sample is recorded under this reason.
+# It does not change the F(T) path status.
+_ISOTHERMAL_INVENTORY_SAMPLE_FAILED = (
+    'isothermal_phase_inventory_sample_failed'
 )
 
 
@@ -880,6 +888,30 @@ class AlphaMELTSProvider(ChemistryProvider):
             solidus_T_C=bounds.solidus_T_C,
             liquidus_T_C=bounds.liquidus_T_C,
         )
+        inventories: tuple = ()
+        inventory_diagnostics: dict[str, Any] = {}
+        if (
+            request.intent == ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION
+            and path.status == 'ok'
+        ):
+            # The F(T) curve stays the solidus-to-liquidus grid. This
+            # sample is only the request temperature. Its failure is
+            # recorded on the inventory and does not change path status,
+            # liquid fraction, or warnings.
+            inventories, inventory_diagnostics = (
+                _sample_isothermal_inventories(
+                    equilibrate_transport,
+                    self._backend,
+                    temperature_C=float(request.temperature_C),
+                    pressure_bar=evaluation_pressure_bar,
+                    fO2_log=(
+                        request.fO2_log
+                        if request.fO2_log is not None else -9.0
+                    ),
+                    composition_mol_by_account=composition_mol_by_account,
+                    species_formula_registry=species_registry,
+                )
+            )
         return mode, completed(EquilibriumCrystallizationPathResult(
             liquidus_T_C=path.liquidus_T_C,
             liquidus_T_K=path.liquidus_T_K,
@@ -894,7 +926,11 @@ class AlphaMELTSProvider(ChemistryProvider):
             liquid_fraction_path=path.liquid_fraction_path,
             samples=path.samples,
             iterations=bounds.iterations + path.iterations,
-            diagnostics=path.diagnostics,
+            diagnostics={
+                **dict(path.diagnostics or {}),
+                **inventory_diagnostics,
+            },
+            isothermal_phase_inventories=inventories,
         ))
 
     def _engine_version(self) -> str:
@@ -907,6 +943,99 @@ class AlphaMELTSProvider(ChemistryProvider):
             except Exception:
                 return 'unavailable'
         return 'unavailable'
+
+
+def _sample_isothermal_inventories(
+    equilibrate_transport,
+    backend,
+    *,
+    temperature_C: float,
+    pressure_bar: float,
+    fO2_log: float,
+    composition_mol_by_account,
+    species_formula_registry,
+) -> tuple[tuple, dict[str, Any]]:
+    try:
+        sampled = equilibrate_transport(
+            backend,
+            temperature_C=temperature_C,
+            pressure_bar=pressure_bar,
+            fO2_log=fO2_log,
+            composition_mol_by_account=composition_mol_by_account,
+            species_formula_registry=species_formula_registry,
+        )
+    except Exception as exc:  # noqa: BLE001 - optional engine boundary
+        return (), {
+            'isothermal_phase_inventory_failure': {
+                'reason': _ISOTHERMAL_INVENTORY_SAMPLE_FAILED,
+                'detail': str(exc),
+            },
+        }
+    status = getattr(sampled, 'status', None) or 'unavailable'
+    if status != 'ok':
+        diagnostics = dict(getattr(sampled, 'diagnostics', {}) or {})
+        reason = (
+            diagnostics.get('backend_status_reason')
+            or diagnostics.get('backend_failure_reason_code')
+            or status
+        )
+        return (), {
+            'isothermal_phase_inventory_failure': {
+                'reason': _ISOTHERMAL_INVENTORY_SAMPLE_FAILED,
+                'status': str(status),
+                'backend_status_reason': str(reason),
+            },
+        }
+    return _inventories_from_equilibrium(sampled)
+
+
+def _inventories_from_equilibrium(result) -> tuple[tuple, dict[str, Any]]:
+    """Phase, engine mass, and oxide moles for one equilibrated sample."""
+    masses = dict(getattr(result, 'phase_masses_kg', {}) or {})
+    compositions = dict(getattr(result, 'phase_compositions', {}) or {})
+    instances = []
+    contributed: dict[str, float] = {}
+    for phase, raw_mass in masses.items():
+        name = str(phase).strip()
+        composition = compositions.get(phase)
+        if composition is None:
+            composition = compositions.get(name) or {}
+        instances.append({
+            'phase': name,
+            'mass_kg': raw_mass,
+            'composition_wt_pct': dict(composition or {}),
+        })
+        try:
+            mass = float(raw_mass)
+        except (TypeError, ValueError):
+            continue
+        if (
+            mass > 0.0
+            and mass == mass
+            and mass not in (float('inf'), float('-inf'))
+        ):
+            contributed[name] = contributed.get(name, 0.0) + mass
+    assignment = assign_phase_oxides(instances)
+    rows = tuple(
+        {
+            'phase': phase,
+            'mass_kg': contributed[phase],
+            'oxide_mol': dict(oxides),
+        }
+        for phase, oxides in sorted(assignment.species_mol.items())
+        if phase in contributed
+    )
+    extra: dict[str, Any] = {}
+    if assignment.refusals:
+        extra['isothermal_phase_inventory_refusals'] = [
+            {
+                'phase': refusal.phase,
+                'reason': refusal.reason,
+                'token': refusal.token,
+            }
+            for refusal in assignment.refusals
+        ]
+    return rows, extra
 
 
 def _is_finite(value: Any) -> bool:

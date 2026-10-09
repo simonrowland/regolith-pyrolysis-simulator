@@ -240,6 +240,9 @@ class EquilibriumCrystallizationPathResult:
     samples: Tuple[MeltFractionSample, ...] = ()
     iterations: int = 0
     diagnostics: Mapping[str, Any] = field(default_factory=dict)
+    # Current-temperature phase rows. The F(T) builder leaves this empty;
+    # the EC provider fills it from one sample at the request temperature.
+    isothermal_phase_inventories: Tuple[Mapping[str, Any], ...] = ()
 
     def __post_init__(self) -> None:
         if self.liquidus_T_C is not None:
@@ -274,6 +277,14 @@ class EquilibriumCrystallizationPathResult:
             raise TypeError('iterations must be numeric')
         object.__setattr__(self, 'iterations', int(self.iterations))
         object.__setattr__(self, 'diagnostics', dict(self.diagnostics or {}))
+        object.__setattr__(
+            self,
+            'isothermal_phase_inventories',
+            tuple(
+                _coerce_phase_inventory(row)
+                for row in self.isothermal_phase_inventories
+            ),
+        )
         _validate_temperature_pair(
             self.liquidus_T_C,
             self.liquidus_T_K,
@@ -816,6 +827,25 @@ def _temperature_grid(
         float(solidus_T_C) + span * index / intervals
         for index in range(intervals + 1)
     )
+
+
+def _coerce_phase_inventory(row: object) -> dict[str, Any]:
+    if not isinstance(row, Mapping):
+        raise TypeError('isothermal phase inventory must be a mapping')
+    phase = str(row.get('phase') or '').strip()
+    if not phase:
+        raise TypeError('isothermal phase inventory requires a phase')
+    oxides = row.get('oxide_mol') or {}
+    if not isinstance(oxides, Mapping):
+        raise TypeError('isothermal phase inventory oxide_mol must be a mapping')
+    return {
+        'phase': phase,
+        'mass_kg': _declared_float(row.get('mass_kg'), 'mass_kg'),
+        'oxide_mol': {
+            str(name): _declared_float(amount, str(name))
+            for name, amount in oxides.items()
+        },
+    }
 
 
 def _coerce_path_point(point: object) -> LiquidFractionPathPoint:

@@ -25,6 +25,8 @@ from engines.alphamelts.parser import (
     project_equilibrium_to_diagnostics,
 )
 from engines.alphamelts.provider import AlphaMELTSProvider
+from simulator.accounting.formulas import parse_formula
+from simulator.accounting.oxide_assignment import REASON_UNPARSED_TOKEN
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
@@ -373,9 +375,13 @@ def test_diagnostic_dto_carries_phase_species_mol():
     ] == pytest.approx(0.01)
 
 
-def test_equilibrium_crystallization_path_has_no_phase_inventory_field():
-    assert "isothermal_phase_inventories" not in (
+def test_equilibrium_crystallization_path_inventory_defaults_empty():
+    assert "isothermal_phase_inventories" in (
         EquilibriumCrystallizationPathResult.__dataclass_fields__
+    )
+    assert (
+        EquilibriumCrystallizationPathResult().isothermal_phase_inventories
+        == ()
     )
 
 
@@ -402,13 +408,26 @@ class _PinECBackend:
         temperature_C = float(kwargs["temperature_C"])
         self.temperatures.append(temperature_C)
         frac = max(0.0, min(1.0, (temperature_C - 1100.0) / 200.0))
+        olivine = 1.0 - frac
+        masses = {}
+        compositions = {}
+        present = []
+        if frac > 0.0:
+            masses["liquid"] = frac
+            compositions["liquid"] = {"SiO2": 50.0, "MgO": 50.0}
+            present.append("liquid")
+        if olivine > 0.0:
+            masses["olivine"] = olivine
+            compositions["olivine"] = {"SiO2": 40.0, "MgO": 60.0}
+            present.append("olivine")
         return EquilibriumResult(
             temperature_C=temperature_C,
             pressure_bar=float(kwargs["pressure_bar"]),
             liquid_fraction=frac,
             liquid_composition_wt_pct={"SiO2": 50.0, "MgO": 50.0},
-            phases_present=["liquid"] if frac > 0.0 else ["olivine"],
-            phase_masses_kg={"liquid": frac, "olivine": 1.0 - frac},
+            phases_present=present,
+            phase_masses_kg=masses,
+            phase_compositions=compositions,
             fO2_log=float(kwargs["fO2_log"]),
             status="ok",
         )
@@ -441,9 +460,109 @@ def test_equilibrium_crystallization_returns_liquid_path_and_no_transition():
         path[-1]["liquid_fraction"]
     )
     assert diagnostic["phase_species_mol"] == {}
-    assert "isothermal_phase_inventories" not in diagnostic
-    # The path samples the solidus-liquidus grid only. Request temperature
-    # is not an extra isothermal inventory call.
-    assert backend.temperatures == [
+    rows = {
+        row["phase"]: row
+        for row in diagnostic["isothermal_phase_inventories"]
+    }
+    # Request temperature is 1200 C, halfway from 1100 to 1300, so each
+    # phase is 0.5 kg. Oxide moles are that mass times the weight percent.
+    sio2 = parse_formula("SiO2").molar_mass_kg_per_mol()
+    mgo = parse_formula("MgO").molar_mass_kg_per_mol()
+    assert rows["liquid"]["mass_kg"] == pytest.approx(0.5)
+    assert rows["olivine"]["mass_kg"] == pytest.approx(0.5)
+    assert rows["liquid"]["oxide_mol"]["SiO2"] == pytest.approx(0.25 / sio2)
+    assert rows["liquid"]["oxide_mol"]["MgO"] == pytest.approx(0.25 / mgo)
+    assert rows["olivine"]["oxide_mol"]["SiO2"] == pytest.approx(0.20 / sio2)
+    assert rows["olivine"]["oxide_mol"]["MgO"] == pytest.approx(0.30 / mgo)
+    # The path samples the solidus-liquidus grid. The request temperature
+    # is one more isothermal inventory call after that grid.
+    assert backend.temperatures[:-1] == [
         point["temperature_C"] for point in path
     ]
+    assert backend.temperatures[-1] == pytest.approx(1200.0)
+
+
+class _RefuseOlivineECBackend(_PinECBackend):
+    def equilibrate(self, **kwargs):
+        result = super().equilibrate(**kwargs)
+        if "olivine" in result.phase_compositions:
+            result.phase_compositions["olivine"] = {"fo": 100.0}
+        return result
+
+
+def test_equilibrium_crystallization_refuses_one_phase_without_changing_path():
+    backend = _RefuseOlivineECBackend()
+    provider = AlphaMELTSProvider(backend=backend)
+    result = provider.dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
+            account_view=ProviderAccountView(
+                accounts={"process.cleaned_melt": {"SiO2": 1.0, "MgO": 1.0}},
+                species_formula_registry={},
+            ),
+            temperature_C=1200.0,
+            pressure_bar=1.0,
+            fO2_log=-9.0,
+            control_inputs={},
+        )
+    )
+
+    assert result.status == "ok"
+    assert result.transition is None
+    diagnostic = dict(result.diagnostic or {})
+    path = tuple(diagnostic["liquid_fraction_path"])
+    assert diagnostic["liquid_fraction"] == pytest.approx(
+        path[-1]["liquid_fraction"]
+    )
+    phases = {
+        row["phase"] for row in diagnostic["isothermal_phase_inventories"]
+    }
+    assert phases == {"liquid"}
+    refusals = diagnostic["backend_diagnostics"][
+        "isothermal_phase_inventory_refusals"
+    ]
+    assert refusals[0]["phase"] == "olivine"
+    assert refusals[0]["reason"] == REASON_UNPARSED_TOKEN
+    assert refusals[0]["token"] == "fo"
+
+
+class _FailInventoryECBackend(_PinECBackend):
+    def equilibrate(self, **kwargs):
+        # 1100 to 1300 at the default 50 C step is five path samples.
+        # The next call is the request-temperature inventory.
+        if len(self.temperatures) >= 5:
+            self.temperatures.append(float(kwargs["temperature_C"]))
+            raise RuntimeError("isothermal boom")
+        return super().equilibrate(**kwargs)
+
+
+def test_equilibrium_crystallization_inventory_failure_keeps_the_path():
+    backend = _FailInventoryECBackend()
+    provider = AlphaMELTSProvider(backend=backend)
+    result = provider.dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
+            account_view=ProviderAccountView(
+                accounts={"process.cleaned_melt": {"SiO2": 1.0, "MgO": 1.0}},
+                species_formula_registry={},
+            ),
+            temperature_C=1200.0,
+            pressure_bar=1.0,
+            fO2_log=-9.0,
+            control_inputs={},
+        )
+    )
+
+    assert result.status == "ok"
+    assert result.transition is None
+    diagnostic = dict(result.diagnostic or {})
+    path = tuple(diagnostic["liquid_fraction_path"])
+    assert diagnostic["liquid_fraction"] == pytest.approx(
+        path[-1]["liquid_fraction"]
+    )
+    assert "isothermal_phase_inventories" not in diagnostic
+    failure = diagnostic["backend_diagnostics"][
+        "isothermal_phase_inventory_failure"
+    ]
+    assert failure["reason"] == "isothermal_phase_inventory_sample_failed"
+    assert backend.temperatures[-1] == pytest.approx(1200.0)

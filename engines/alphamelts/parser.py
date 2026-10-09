@@ -193,6 +193,16 @@ def project_equilibrium_to_diagnostics(
         phase_species_mol=dict(
             getattr(equilibrium_result, 'phase_species_mol', {}) or {}
         ),
+        isothermal_phase_inventories=tuple(
+            dict(row)
+            for row in (
+                getattr(
+                    equilibrium_result,
+                    'isothermal_phase_inventories',
+                    (),
+                ) or ()
+            )
+        ),
     )
 
 

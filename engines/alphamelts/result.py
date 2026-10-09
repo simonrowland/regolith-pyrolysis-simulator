@@ -45,6 +45,9 @@ caller wants for trace + UI:
   when available.
 * ``backend_warnings``     -- non-fatal warnings the adapter surfaced.
 * ``phase_species_mol``    -- oxide moles per engine phase token.
+* ``isothermal_phase_inventories`` -- current-temperature phase, mass,
+  and oxide moles. Absent from the plain dict when empty, so other
+  intents keep today's diagnostic keys.
 
 The dataclass is frozen; the provider builds one per dispatch and
 attaches a plain dict projection to ``IntentResult.diagnostic`` so the
@@ -118,6 +121,7 @@ class LiquidusDiagnostics:
     phase_species_mol: Mapping[str, Mapping[str, float]] = field(
         default_factory=dict
     )
+    isothermal_phase_inventories: Tuple[Mapping[str, Any], ...] = ()
 
     def __post_init__(self) -> None:
         # Coerce mappings to plain dict so the asdict() projection drops
@@ -282,10 +286,33 @@ class LiquidusDiagnostics:
                 ).items()
             },
         )
+        object.__setattr__(
+            self,
+            'isothermal_phase_inventories',
+            tuple(
+                {
+                    'phase': str(row.get('phase') or ''),
+                    'mass_kg': float(row.get('mass_kg')),
+                    'oxide_mol': {
+                        str(name): float(amount)
+                        for name, amount in dict(
+                            row.get('oxide_mol') or {}
+                        ).items()
+                    },
+                }
+                for row in tuple(self.isothermal_phase_inventories or ())
+                if isinstance(row, Mapping)
+            ),
+        )
 
     def as_diagnostic(self) -> Dict[str, Any]:
         """Plain-dict projection for the kernel's ``IntentResult.diagnostic``."""
-        return asdict(self)
+        payload = asdict(self)
+        # An empty inventory is not a sample. Omitting it leaves every
+        # non-EC diagnostic key set unchanged.
+        if not payload.get('isothermal_phase_inventories'):
+            payload.pop('isothermal_phase_inventories', None)
+        return payload
 
 
 def _coerce_liquid_fraction_path(path: Tuple[Mapping[str, Any], ...]) -> Tuple[Dict[str, Any], ...]:
