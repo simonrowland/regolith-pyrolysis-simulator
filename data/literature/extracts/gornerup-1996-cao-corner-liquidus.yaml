@@ -1,0 +1,1508 @@
+schema_version: literature_extract.v1
+source_id: gornerup-1996-cao-corner-liquidus
+source:
+  citation: 'M. Görnerup and O. Wijk, "Liquidus Relationships in the CaO-corner of the Ternary System CaO-Al2O3-SiO2", ISIJ International, 36(12) (1996), 1465-1470.'
+  url: https://www.jstage.jst.go.jp/article/isijinternational1989/36/12/36_12_1465/_pdf/-char/en
+  year: 1996
+extraction:
+  method: manual transcription from the controller-fetched PDF; all six pages rendered at 180 dpi and read; Table 1 checked cell by cell against its page image
+  date: '2026-10-04'
+  worker: extract-gornerup1996
+  provenance_path: tables/gornerup-1996-cao-corner-liquidus/
+review_status: draft
+fidelity_samples:
+  - species: CaO
+    observation_id: gornerup_1996_t1_exp_3_4
+    field: composition_mass_percent
+    value:
+      Al2O3: 35.3
+      CaO: 59.8
+      SiO2: 4.9
+    locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 3.4'}
+  - species: CaO
+    observation_id: gornerup_1996_t1_exp_18_10
+    field: composition_mass_percent
+    value:
+      Al2O3: 0
+      CaO: 58.7
+      SiO2: 41.3
+    locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 18.10'}
+  - species: CaO
+    observation_id: gornerup_1996_t1_exp_13_9
+    field: composition_mass_percent
+    value:
+      Al2O3: 22.6
+      CaO: 53.7
+      SiO2: 23.7
+    locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 13.9'}
+  - species: CaO
+    observation_id: gornerup_1996_t1_exp_18_11
+    field: composition_mass_percent
+    value:
+      Al2O3: 0
+      CaO: 60.4
+      SiO2: 39.6
+    locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 18.11'}
+benches:
+- id: gornerup-graphite-resistance-furnace
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: 'Graphite resistance furnace with fused-alumina muffle tube'}
+    locator: {page: 3, published_page: 1467, section: '3.2'}
+  method:
+    state: {tag: value, value: 'Solid-phase dissolution in liquid slag followed by quench equilibration'}
+    locator: {page: 2, published_page: 1466, section: '3.1'}
+  heating_method:
+    state: {tag: value, value: 'Graphite resistance furnace'}
+    locator: {page: 3, published_page: 1467, section: '3.2'}
+  cell_material_and_liner:
+    state: {tag: value, value: 'Two-chamber molybdenum-sheet crucible; fused-alumina tube with water-cooled metal end sections and O-rings; graphite lid; alumina insulation bricks and radiation shields; porous magnesia protection crucible. The molybdenum crucible held the liquid slag and a separate solid saturation phase.'}
+    locator: {page: 2, published_page: 1466, section: '3.1', figure: '2'}
+  temperature_measurement:
+    sensor:
+      state: {tag: value, value: 'Three type B Pt-30%Rh/Pt-6%Rh thermocouples'}
+      locator: {page: 3, published_page: 1467, section: '3.2', figure: '2'}
+    measuring_positions:
+      state: {tag: value, value: 'Two thermocouples inside the muffle tube: one on top of the sample and one underneath it in contact with the magnesia protection crucible; a third was outside the muffle tube.'}
+      locator: {page: 3, published_page: 1467, section: '3.2', figure: '2'}
+    controller:
+      state: {tag: value, value: 'External thermocouple connected to a PID regulator controlled furnace temperature.'}
+      locator: {page: 3, published_page: 1467, section: '3.2'}
+  temperature_calibration:
+    procedure:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 3, published_page: 1467, section: '3.2', note: 'No thermocouple calibration procedure is stated.'}
+  other_facts:
+    - name: fused_alumina_tube_outer_diameter_mm
+      unit: 'mm'
+      value: {state: {tag: value, value: {kind: point, point: '68'}}, locator: {page: 3, published_page: 1467, section: '3.2', note: 'Printed outer diameter 68 mm.'}}
+    - name: fused_alumina_tube_total_length_mm
+      unit: 'mm'
+      value: {state: {tag: value, value: {kind: point, point: '530'}}, locator: {page: 3, published_page: 1467, section: '3.2', note: 'Printed total length 530 mm.'}}
+    - name: molybdenum_crucible_diameter_mm
+      unit: 'mm'
+      value: {state: {tag: value, value: {kind: point, point: '16', approximate: true}}, locator: {page: 3, published_page: 1467, section: '3.1', note: 'Printed approximately 16 mm.'}}
+    - name: molybdenum_crucible_height_mm
+      unit: 'mm'
+      value: {state: {tag: value, value: {kind: point, point: '30', approximate: true}}, locator: {page: 3, published_page: 1467, section: '3.1', note: 'Printed approximately 30 mm.'}}
+    - name: two_chamber_crucible_bottom_gap_mm
+      unit: 'mm'
+      value: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 1467, section: '3.1', note: 'Printed gap of three millimetres.'}}
+    - name: external_PID_reading_error_magnitude_C
+      unit: '°C'
+      value: {state: {tag: value, value: {kind: bound, bound_operator: '<', bound_value: '0.5'}}, locator: {page: 3, published_page: 1467, section: '3.2', note: 'Printed error less than ±0.5 °C; bound applies to the magnitude.'}}
+    - name: experimental_temperature_accuracy_magnitude_C
+      unit: '°C'
+      value: {state: {tag: value, value: {kind: point, point: '4'}}, locator: {page: 3, published_page: 1467, section: '3.2', note: 'Printed experimental temperature accuracy ±4 °C; value is the stated magnitude.'}}
+    - name: constant_temperature_zone_half_width_C
+      unit: '°C'
+      value: {state: {tag: value, value: {kind: point, point: '0.5'}}, locator: {page: 3, published_page: 1467, section: '3.2', note: 'Printed temperature zone ±0.5 °C; value is the stated magnitude.'}}
+    - name: constant_temperature_zone_length_mm
+      unit: 'mm'
+      value: {state: {tag: value, value: {kind: point, point: '30'}}, locator: {page: 3, published_page: 1467, section: '3.2', note: 'Printed constant-temperature zone length 30 mm.'}}
+    - name: maximum_slag_depth_mm
+      unit: 'mm'
+      value: {state: {tag: value, value: {kind: bound, bound_operator: '<=', bound_value: '10'}}, locator: {page: 3, published_page: 1467, section: '3.2', note: 'Printed slag depth no more than 10 mm.'}}
+    - name: argon_purity_percent
+      unit: '%'
+      value: {state: {tag: value, value: {kind: bound, bound_operator: '>', bound_value: '99.996'}}, locator: {page: 3, published_page: 1467, section: '3.3', note: 'Printed argon purity >99.996%.'}}
+    - name: nitrogen_purity_percent
+      unit: '%'
+      value: {state: {tag: value, value: {kind: bound, bound_operator: '>', bound_value: '99.996'}}, locator: {page: 3, published_page: 1467, section: '3.3', note: 'Printed nitrogen purity >99.996%.'}}
+    - name: magnesium_chip_purity_percent
+      unit: '%'
+      value: {state: {tag: value, value: {kind: bound, bound_operator: '>', bound_value: '99'}}, locator: {page: 3, published_page: 1467, section: '3.3', note: 'Printed Mg-chip purity >99%.'}}
+    - name: argon_purifier_tube_temperature_C
+      unit: '°C'
+      value: {state: {tag: value, value: {kind: point, point: '500'}}, locator: {page: 3, published_page: 1467, section: '3.3', note: 'Printed argon purification tube-furnace temperature 500 °C.'}}
+experiments:
+  - experiment_id: equilibration-1600c
+    bench_id: gornerup-graphite-resistance-furnace
+    method: quench_equilibration
+    locator: {page: 2, published_page: 1466, section: '3.1'}
+    sample:
+      mass_kg:
+        state: {tag: value, value: {kind: point, point: '0.004'}}
+        locator: {page: 2, published_page: 1466, section: '3.1', note: 'Printed 4 g slag mixture; converted 4 g / 1000 g per kg = 0.004 kg. This is before adding the 2 g saturation solid.'}
+      printed_composition:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, published_page: 1466, section: '3.1', note: 'Starting mixtures were prepared to be close to saturation, but the exact recipes are not stated; Table 1 reports the final saturated liquid composition.'}
+      form:
+        state: {tag: value, value: 'Pressed cylinder'}
+        locator: {page: 3, published_page: 1467, section: '3.4'}
+      container:
+        state: {tag: value, value: 'Molybdenum two-chamber crucible'}
+        locator: {page: 2, published_page: 1466, section: '3.1'}
+      characterization:
+        state: {tag: value, value: 'A 4 g slag mixture was melted; 2 g of the selected solid saturation phase was placed in one crucible chamber.'}
+        locator: {page: 2, published_page: 1466, section: '3.1'}
+      pretreatment:
+        state: {tag: value, value: 'Each component was calcined at 1100 °C for at least 12 h; weighed mixtures were blended for 2 h in an agate ball mixer and pressed to cylinders.'}
+        locator: {page: 3, published_page: 1467, section: '3.4'}
+    conditions:
+      temperature_K: {state: {tag: value, value: 1873.15}, locator: {page: 4, published_page: 1468, table: '1', note: 'Printed 1600 °C; converted T_K = T_C + 273.15.'}}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 3, published_page: 1467, section: '3.2', note: 'Argon atmosphere is stated; total pressure is not.'}
+      sweep_gas:
+        state: {tag: value, value: {species: Ar, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
+        locator: {page: 3, published_page: 1467, section: '3.2', note: 'Argon atmosphere; flow and partial pressure are not stated.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    fO2_control:
+      channel: {tag: value, value: intrinsic}
+      oxygen_partial_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, published_page: 1466, section: '3.1', note: 'Purified argon and a graphite lid excluded oxygen; no oxygen partial pressure or imposed buffer value is stated.'}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: 'Cold-charged furnace was evacuated and filled twice with purified argon, then heated to the experimental temperature at 5 °C/min; samples were held at temperature for a minimum of 12 h.'}
+        locator: {page: 2, published_page: 1466, section: '3.1'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 3, published_page: 1467, section: '3.1', note: 'Minimum is stated for the isothermal hold, but total run duration including heat-up is not reported.'}
+      ramps:
+        - rate_K_s:
+            state: {tag: value, value: {kind: point, point: '0.083333333333333333'}}
+            locator: {page: 3, published_page: 1467, section: '3.1', note: 'Printed 5 °C/min; converted 5 / 60 = 0.083333333333333333 K/s.'}
+      setpoints_and_holds:
+        - temperature_K:
+            state: {tag: value, value: {kind: point, point: '1873.15'}}
+            locator: {page: 4, published_page: 1468, table: '1', note: 'Printed 1600 °C; converted T_K = T_C + 273.15.'}
+          hold_duration_s:
+            state: {tag: value, value: {kind: bound, bound_operator: '>=', bound_value: '43200'}}
+            locator: {page: 3, published_page: 1467, section: '3.1', note: 'Printed minimum hold 12 h; converted 12 × 3600 = 43200 s.'}
+      cooling_or_quench:
+        state: {tag: value, value: 'Samples removed from furnace and quenched in helium gas; time to below the liquidus was estimated at less than 4 s.'}
+        locator: {page: 3, published_page: 1467, section: '3.1'}
+  - experiment_id: equilibration-1650c
+    bench_id: gornerup-graphite-resistance-furnace
+    method: quench_equilibration
+    locator: {page: 2, published_page: 1466, section: '3.1'}
+    sample:
+      mass_kg:
+        state: {tag: value, value: {kind: point, point: '0.004'}}
+        locator: {page: 2, published_page: 1466, section: '3.1', note: 'Printed 4 g slag mixture; converted 4 g / 1000 g per kg = 0.004 kg. This is before adding the 2 g saturation solid.'}
+      printed_composition:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, published_page: 1466, section: '3.1', note: 'Starting mixtures were prepared to be close to saturation, but the exact recipes are not stated; Table 1 reports the final saturated liquid composition.'}
+      form:
+        state: {tag: value, value: 'Pressed cylinder'}
+        locator: {page: 3, published_page: 1467, section: '3.4'}
+      container:
+        state: {tag: value, value: 'Molybdenum two-chamber crucible'}
+        locator: {page: 2, published_page: 1466, section: '3.1'}
+      characterization:
+        state: {tag: value, value: 'A 4 g slag mixture was melted; 2 g of the selected solid saturation phase was placed in one crucible chamber.'}
+        locator: {page: 2, published_page: 1466, section: '3.1'}
+      pretreatment:
+        state: {tag: value, value: 'Each component was calcined at 1100 °C for at least 12 h; weighed mixtures were blended for 2 h in an agate ball mixer and pressed to cylinders.'}
+        locator: {page: 3, published_page: 1467, section: '3.4'}
+    conditions:
+      temperature_K: {state: {tag: value, value: 1923.15}, locator: {page: 4, published_page: 1468, table: '1', note: 'Printed 1650 °C; converted T_K = T_C + 273.15.'}}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 3, published_page: 1467, section: '3.2', note: 'Argon atmosphere is stated; total pressure is not.'}
+      sweep_gas:
+        state: {tag: value, value: {species: Ar, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
+        locator: {page: 3, published_page: 1467, section: '3.2', note: 'Argon atmosphere; flow and partial pressure are not stated.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    fO2_control:
+      channel: {tag: value, value: intrinsic}
+      oxygen_partial_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, published_page: 1466, section: '3.1', note: 'Purified argon and a graphite lid excluded oxygen; no oxygen partial pressure or imposed buffer value is stated.'}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: 'Cold-charged furnace was evacuated and filled twice with purified argon, then heated to the experimental temperature at 5 °C/min; samples were held at temperature for a minimum of 12 h.'}
+        locator: {page: 2, published_page: 1466, section: '3.1'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 3, published_page: 1467, section: '3.1', note: 'Minimum is stated for the isothermal hold, but total run duration including heat-up is not reported.'}
+      ramps:
+        - rate_K_s:
+            state: {tag: value, value: {kind: point, point: '0.083333333333333333'}}
+            locator: {page: 3, published_page: 1467, section: '3.1', note: 'Printed 5 °C/min; converted 5 / 60 = 0.083333333333333333 K/s.'}
+      setpoints_and_holds:
+        - temperature_K:
+            state: {tag: value, value: {kind: point, point: '1923.15'}}
+            locator: {page: 4, published_page: 1468, table: '1', note: 'Printed 1650 °C; converted T_K = T_C + 273.15.'}
+          hold_duration_s:
+            state: {tag: value, value: {kind: bound, bound_operator: '>=', bound_value: '43200'}}
+            locator: {page: 3, published_page: 1467, section: '3.1', note: 'Printed minimum hold 12 h; converted 12 × 3600 = 43200 s.'}
+      cooling_or_quench:
+        state: {tag: value, value: 'Samples removed from furnace and quenched in helium gas; time to below the liquidus was estimated at less than 4 s.'}
+        locator: {page: 3, published_page: 1467, section: '3.1'}
+  - experiment_id: equilibration-1700c
+    bench_id: gornerup-graphite-resistance-furnace
+    method: quench_equilibration
+    locator: {page: 2, published_page: 1466, section: '3.1'}
+    sample:
+      mass_kg:
+        state: {tag: value, value: {kind: point, point: '0.004'}}
+        locator: {page: 2, published_page: 1466, section: '3.1', note: 'Printed 4 g slag mixture; converted 4 g / 1000 g per kg = 0.004 kg. This is before adding the 2 g saturation solid.'}
+      printed_composition:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, published_page: 1466, section: '3.1', note: 'Starting mixtures were prepared to be close to saturation, but the exact recipes are not stated; Table 1 reports the final saturated liquid composition.'}
+      form:
+        state: {tag: value, value: 'Pressed cylinder'}
+        locator: {page: 3, published_page: 1467, section: '3.4'}
+      container:
+        state: {tag: value, value: 'Molybdenum two-chamber crucible'}
+        locator: {page: 2, published_page: 1466, section: '3.1'}
+      characterization:
+        state: {tag: value, value: 'A 4 g slag mixture was melted; 2 g of the selected solid saturation phase was placed in one crucible chamber.'}
+        locator: {page: 2, published_page: 1466, section: '3.1'}
+      pretreatment:
+        state: {tag: value, value: 'Each component was calcined at 1100 °C for at least 12 h; weighed mixtures were blended for 2 h in an agate ball mixer and pressed to cylinders.'}
+        locator: {page: 3, published_page: 1467, section: '3.4'}
+    conditions:
+      temperature_K: {state: {tag: value, value: 1973.15}, locator: {page: 4, published_page: 1468, table: '1', note: 'Printed 1700 °C; converted T_K = T_C + 273.15.'}}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 3, published_page: 1467, section: '3.2', note: 'Argon atmosphere is stated; total pressure is not.'}
+      sweep_gas:
+        state: {tag: value, value: {species: Ar, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
+        locator: {page: 3, published_page: 1467, section: '3.2', note: 'Argon atmosphere; flow and partial pressure are not stated.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    fO2_control:
+      channel: {tag: value, value: intrinsic}
+      oxygen_partial_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, published_page: 1466, section: '3.1', note: 'Purified argon and a graphite lid excluded oxygen; no oxygen partial pressure or imposed buffer value is stated.'}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: 'Cold-charged furnace was evacuated and filled twice with purified argon, then heated to the experimental temperature at 5 °C/min; samples were held at temperature for a minimum of 12 h.'}
+        locator: {page: 2, published_page: 1466, section: '3.1'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 3, published_page: 1467, section: '3.1', note: 'Minimum is stated for the isothermal hold, but total run duration including heat-up is not reported.'}
+      ramps:
+        - rate_K_s:
+            state: {tag: value, value: {kind: point, point: '0.083333333333333333'}}
+            locator: {page: 3, published_page: 1467, section: '3.1', note: 'Printed 5 °C/min; converted 5 / 60 = 0.083333333333333333 K/s.'}
+      setpoints_and_holds:
+        - temperature_K:
+            state: {tag: value, value: {kind: point, point: '1973.15'}}
+            locator: {page: 4, published_page: 1468, table: '1', note: 'Printed 1700 °C; converted T_K = T_C + 273.15.'}
+          hold_duration_s:
+            state: {tag: value, value: {kind: bound, bound_operator: '>=', bound_value: '43200'}}
+            locator: {page: 3, published_page: 1467, section: '3.1', note: 'Printed minimum hold 12 h; converted 12 × 3600 = 43200 s.'}
+      cooling_or_quench:
+        state: {tag: value, value: 'Samples removed from furnace and quenched in helium gas; time to below the liquidus was estimated at less than 4 s.'}
+        locator: {page: 3, published_page: 1467, section: '3.1'}
+  - experiment_id: equilibration-1750c
+    bench_id: gornerup-graphite-resistance-furnace
+    method: quench_equilibration
+    locator: {page: 2, published_page: 1466, section: '3.1'}
+    sample:
+      mass_kg:
+        state: {tag: value, value: {kind: point, point: '0.004'}}
+        locator: {page: 2, published_page: 1466, section: '3.1', note: 'Printed 4 g slag mixture; converted 4 g / 1000 g per kg = 0.004 kg. This is before adding the 2 g saturation solid.'}
+      printed_composition:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, published_page: 1466, section: '3.1', note: 'Starting mixtures were prepared to be close to saturation, but the exact recipes are not stated; Table 1 reports the final saturated liquid composition.'}
+      form:
+        state: {tag: value, value: 'Pressed cylinder'}
+        locator: {page: 3, published_page: 1467, section: '3.4'}
+      container:
+        state: {tag: value, value: 'Molybdenum two-chamber crucible'}
+        locator: {page: 2, published_page: 1466, section: '3.1'}
+      characterization:
+        state: {tag: value, value: 'A 4 g slag mixture was melted; 2 g of the selected solid saturation phase was placed in one crucible chamber.'}
+        locator: {page: 2, published_page: 1466, section: '3.1'}
+      pretreatment:
+        state: {tag: value, value: 'Each component was calcined at 1100 °C for at least 12 h; weighed mixtures were blended for 2 h in an agate ball mixer and pressed to cylinders.'}
+        locator: {page: 3, published_page: 1467, section: '3.4'}
+    conditions:
+      temperature_K: {state: {tag: value, value: 2023.15}, locator: {page: 4, published_page: 1468, table: '1', note: 'Printed 1750 °C; converted T_K = T_C + 273.15.'}}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 3, published_page: 1467, section: '3.2', note: 'Argon atmosphere is stated; total pressure is not.'}
+      sweep_gas:
+        state: {tag: value, value: {species: Ar, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
+        locator: {page: 3, published_page: 1467, section: '3.2', note: 'Argon atmosphere; flow and partial pressure are not stated.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    fO2_control:
+      channel: {tag: value, value: intrinsic}
+      oxygen_partial_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, published_page: 1466, section: '3.1', note: 'Purified argon and a graphite lid excluded oxygen; no oxygen partial pressure or imposed buffer value is stated.'}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: 'Cold-charged furnace was evacuated and filled twice with purified argon, then heated to the experimental temperature at 5 °C/min; samples were held at temperature for a minimum of 12 h.'}
+        locator: {page: 2, published_page: 1466, section: '3.1'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 3, published_page: 1467, section: '3.1', note: 'Minimum is stated for the isothermal hold, but total run duration including heat-up is not reported.'}
+      ramps:
+        - rate_K_s:
+            state: {tag: value, value: {kind: point, point: '0.083333333333333333'}}
+            locator: {page: 3, published_page: 1467, section: '3.1', note: 'Printed 5 °C/min; converted 5 / 60 = 0.083333333333333333 K/s.'}
+      setpoints_and_holds:
+        - temperature_K:
+            state: {tag: value, value: {kind: point, point: '2023.15'}}
+            locator: {page: 4, published_page: 1468, table: '1', note: 'Printed 1750 °C; converted T_K = T_C + 273.15.'}
+          hold_duration_s:
+            state: {tag: value, value: {kind: bound, bound_operator: '>=', bound_value: '43200'}}
+            locator: {page: 3, published_page: 1467, section: '3.1', note: 'Printed minimum hold 12 h; converted 12 × 3600 = 43200 s.'}
+      cooling_or_quench:
+        state: {tag: value, value: 'Samples removed from furnace and quenched in helium gas; time to below the liquidus was estimated at less than 4 s.'}
+        locator: {page: 3, published_page: 1467, section: '3.1'}
+species:
+  CaO:
+    observations:
+      - observation_id: gornerup_1996_t1_exp_3_4
+        type: transition_point
+        phase: l
+        experiment: equilibration-1600c
+        locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 3.4'}
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          liquid_phase: l
+          composition_mass_percent:
+            Al2O3: 35.3
+            CaO: 59.8
+            SiO2: 4.9
+          points:
+            - T_C: 1600
+              point_conditions:
+                saturation_phase_as_printed:
+                  state: {tag: value, value: {printed_phase: 'CaO'}}
+                  locator: {page: 4, published_page: 1468, table: '1'}
+
+      - observation_id: gornerup_1996_t1_exp_5_16
+        type: transition_point
+        phase: l
+        experiment: equilibration-1600c
+        locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 5.16'}
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          liquid_phase: l
+          composition_mass_percent:
+            Al2O3: 29.3
+            CaO: 61.6
+            SiO2: 9.1
+          points:
+            - T_C: 1600
+              point_conditions:
+                saturation_phase_as_printed:
+                  state: {tag: value, value: {printed_phase: 'CaO'}}
+                  locator: {page: 4, published_page: 1468, table: '1'}
+
+      - observation_id: gornerup_1996_t1_exp_6_8
+        type: transition_point
+        phase: l
+        experiment: equilibration-1600c
+        locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 6.8'}
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          liquid_phase: l
+          composition_mass_percent:
+            Al2O3: 26.4
+            CaO: 62.5
+            SiO2: 11.1
+          points:
+            - T_C: 1600
+              point_conditions:
+                saturation_phase_as_printed:
+                  state: {tag: value, value: {printed_phase: 'CaO'}}
+                  locator: {page: 4, published_page: 1468, table: '1'}
+
+      - observation_id: gornerup_1996_t1_exp_10_14
+        type: transition_point
+        phase: l
+        experiment: equilibration-1600c
+        locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 10.14'}
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          liquid_phase: l
+          composition_mass_percent:
+            Al2O3: 25.2
+            CaO: 62.6
+            SiO2: 12.3
+          points:
+            - T_C: 1600
+              point_conditions:
+                saturation_phase_as_printed:
+                  state: {tag: value, value: {printed_phase: '3CaO·SiO2'}}
+                  locator: {page: 4, published_page: 1468, table: '1'}
+
+      - observation_id: gornerup_1996_t1_exp_11_7
+        type: transition_point
+        phase: l
+        experiment: equilibration-1600c
+        locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 11.7'}
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          liquid_phase: l
+          composition_mass_percent:
+            Al2O3: 26.7
+            CaO: 61.2
+            SiO2: 12.1
+          points:
+            - T_C: 1600
+              point_conditions:
+                saturation_phase_as_printed:
+                  state: {tag: value, value: {printed_phase: '3CaO·SiO2'}}
+                  locator: {page: 4, published_page: 1468, table: '1'}
+
+      - observation_id: gornerup_1996_t1_exp_12_11
+        type: transition_point
+        phase: l
+        experiment: equilibration-1600c
+        locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 12.11'}
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          liquid_phase: l
+          composition_mass_percent:
+            Al2O3: 29.6
+            CaO: 55.2
+            SiO2: 15.2
+          points:
+            - T_C: 1600
+              point_conditions:
+                saturation_phase_as_printed:
+                  state: {tag: value, value: {printed_phase: '3CaO·SiO2'}}
+                  locator: {page: 4, published_page: 1468, table: '1'}
+
+      - observation_id: gornerup_1996_t1_exp_13_10
+        type: transition_point
+        phase: l
+        experiment: equilibration-1600c
+        locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 13.10'}
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          liquid_phase: l
+          composition_mass_percent:
+            Al2O3: 28.3
+            CaO: 53.0
+            SiO2: 18.7
+          points:
+            - T_C: 1600
+              point_conditions:
+                saturation_phase_as_printed:
+                  state: {tag: value, value: {printed_phase: '3CaO·SiO2'}}
+                  locator: {page: 4, published_page: 1468, table: '1'}
+
+      - observation_id: gornerup_1996_t1_exp_14_6
+        type: transition_point
+        phase: l
+        experiment: equilibration-1600c
+        locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 14.6'}
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          liquid_phase: l
+          composition_mass_percent:
+            Al2O3: 22.3
+            CaO: 51.9
+            SiO2: 25.8
+          points:
+            - T_C: 1600
+              point_conditions:
+                saturation_phase_as_printed:
+                  state: {tag: value, value: {printed_phase: '2CaO·SiO2'}}
+                  locator: {page: 4, published_page: 1468, table: '1'}
+
+      - observation_id: gornerup_1996_t1_exp_15_5
+        type: transition_point
+        phase: l
+        experiment: equilibration-1600c
+        locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 15.5'}
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          liquid_phase: l
+          composition_mass_percent:
+            Al2O3: 16.2
+            CaO: 51.8
+            SiO2: 32.0
+          points:
+            - T_C: 1600
+              point_conditions:
+                saturation_phase_as_printed:
+                  state: {tag: value, value: {printed_phase: '2CaO·SiO2'}}
+                  locator: {page: 4, published_page: 1468, table: '1'}
+
+      - observation_id: gornerup_1996_t1_exp_16_17
+        type: transition_point
+        phase: l
+        experiment: equilibration-1600c
+        locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 16.17'}
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          liquid_phase: l
+          composition_mass_percent:
+            Al2O3: 9.6
+            CaO: 53.4
+            SiO2: 37.1
+          points:
+            - T_C: 1600
+              point_conditions:
+                saturation_phase_as_printed:
+                  state: {tag: value, value: {printed_phase: '2CaO·SiO2'}}
+                  locator: {page: 4, published_page: 1468, table: '1'}
+
+      - observation_id: gornerup_1996_t1_exp_17_6
+        type: transition_point
+        phase: l
+        experiment: equilibration-1600c
+        locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 17.6'}
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          liquid_phase: l
+          composition_mass_percent:
+            Al2O3: 5.6
+            CaO: 54.3
+            SiO2: 40.1
+          points:
+            - T_C: 1600
+              point_conditions:
+                saturation_phase_as_printed:
+                  state: {tag: value, value: {printed_phase: '2CaO·SiO2'}}
+                  locator: {page: 4, published_page: 1468, table: '1'}
+
+      - observation_id: gornerup_1996_t1_exp_18_6
+        type: transition_point
+        phase: l
+        experiment: equilibration-1600c
+        locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 18.6'}
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          liquid_phase: l
+          composition_mass_percent:
+            Al2O3: 0
+            CaO: 56.9
+            SiO2: 43.1
+          points:
+            - T_C: 1600
+              point_conditions:
+                saturation_phase_as_printed:
+                  state: {tag: value, value: {printed_phase: '2CaO·SiO2'}}
+                  locator: {page: 4, published_page: 1468, table: '1'}
+
+      - observation_id: gornerup_1996_t1_exp_19_6
+        type: transition_point
+        phase: l
+        experiment: equilibration-1600c
+        locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 19.6'}
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          liquid_phase: l
+          composition_mass_percent:
+            Al2O3: 41.5
+            CaO: 58.5
+            SiO2: 0
+          points:
+            - T_C: 1600
+              point_conditions:
+                saturation_phase_as_printed:
+                  state: {tag: value, value: {printed_phase: 'CaO'}}
+                  locator: {page: 4, published_page: 1468, table: '1'}
+
+      - observation_id: gornerup_1996_t1_exp_23_3
+        type: transition_point
+        phase: l
+        experiment: equilibration-1600c
+        locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 23.3'}
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          liquid_phase: l
+          composition_mass_percent:
+            Al2O3: 26.2
+            CaO: 52.0
+            SiO2: 21.9
+          points:
+            - T_C: 1600
+              point_conditions:
+                saturation_phase_as_printed:
+                  state: {tag: value, value: {printed_phase: '3CaO·SiO2'}}
+                  locator: {page: 4, published_page: 1468, table: '1'}
+
+      - observation_id: gornerup_1996_t1_exp_23_4
+        type: transition_point
+        phase: l
+        experiment: equilibration-1600c
+        locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 23.4'}
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          liquid_phase: l
+          composition_mass_percent:
+            Al2O3: 24.7
+            CaO: 51.7
+            SiO2: 23.6
+          points:
+            - T_C: 1600
+              point_conditions:
+                saturation_phase_as_printed:
+                  state: {tag: value, value: {printed_phase: '2CaO·SiO2'}}
+                  locator: {page: 4, published_page: 1468, table: '1'}
+
+      - observation_id: gornerup_1996_t1_exp_18_10
+        type: transition_point
+        phase: l
+        experiment: equilibration-1650c
+        locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 18.10'}
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          liquid_phase: l
+          composition_mass_percent:
+            Al2O3: 0
+            CaO: 58.7
+            SiO2: 41.3
+          points:
+            - T_C: 1650
+              point_conditions:
+                saturation_phase_as_printed:
+                  state: {tag: value, value: {printed_phase: '2CaO·SiO2'}}
+                  locator: {page: 4, published_page: 1468, table: '1'}
+
+      - observation_id: gornerup_1996_t1_exp_3_3
+        type: transition_point
+        phase: l
+        experiment: equilibration-1700c
+        locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 3.3'}
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          liquid_phase: l
+          composition_mass_percent:
+            Al2O3: 36.0
+            CaO: 60.4
+            SiO2: 3.6
+          points:
+            - T_C: 1700
+              point_conditions:
+                saturation_phase_as_printed:
+                  state: {tag: value, value: {printed_phase: 'CaO'}}
+                  locator: {page: 4, published_page: 1468, table: '1'}
+
+      - observation_id: gornerup_1996_t1_exp_4_3
+        type: transition_point
+        phase: l
+        experiment: equilibration-1700c
+        locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 4.3'}
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          liquid_phase: l
+          composition_mass_percent:
+            Al2O3: 32.4
+            CaO: 61.1
+            SiO2: 6.4
+          points:
+            - T_C: 1700
+              point_conditions:
+                saturation_phase_as_printed:
+                  state: {tag: value, value: {printed_phase: 'CaO'}}
+                  locator: {page: 4, published_page: 1468, table: '1'}
+
+      - observation_id: gornerup_1996_t1_exp_5_18
+        type: transition_point
+        phase: l
+        experiment: equilibration-1700c
+        locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 5.18'}
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          liquid_phase: l
+          composition_mass_percent:
+            Al2O3: 27.7
+            CaO: 62.2
+            SiO2: 10.2
+          points:
+            - T_C: 1700
+              point_conditions:
+                saturation_phase_as_printed:
+                  state: {tag: value, value: {printed_phase: 'CaO'}}
+                  locator: {page: 4, published_page: 1468, table: '1'}
+
+      - observation_id: gornerup_1996_t1_exp_6_11
+        type: transition_point
+        phase: l
+        experiment: equilibration-1700c
+        locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 6.11'}
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          liquid_phase: l
+          composition_mass_percent:
+            Al2O3: 25.0
+            CaO: 63.0
+            SiO2: 12.0
+          points:
+            - T_C: 1700
+              point_conditions:
+                saturation_phase_as_printed:
+                  state: {tag: value, value: {printed_phase: 'CaO'}}
+                  locator: {page: 4, published_page: 1468, table: '1'}
+
+      - observation_id: gornerup_1996_t1_exp_7_5
+        type: transition_point
+        phase: l
+        experiment: equilibration-1700c
+        locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 7.5'}
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          liquid_phase: l
+          composition_mass_percent:
+            Al2O3: 20.7
+            CaO: 63.2
+            SiO2: 16.2
+          points:
+            - T_C: 1700
+              point_conditions:
+                saturation_phase_as_printed:
+                  state: {tag: value, value: {printed_phase: 'CaO'}}
+                  locator: {page: 4, published_page: 1468, table: '1'}
+
+      - observation_id: gornerup_1996_t1_exp_10_13
+        type: transition_point
+        phase: l
+        experiment: equilibration-1700c
+        locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 10.13'}
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          liquid_phase: l
+          composition_mass_percent:
+            Al2O3: 21.2
+            CaO: 62.8
+            SiO2: 16.0
+          points:
+            - T_C: 1700
+              point_conditions:
+                saturation_phase_as_printed:
+                  state: {tag: value, value: {printed_phase: '3CaO·SiO2'}}
+                  locator: {page: 4, published_page: 1468, table: '1'}
+
+      - observation_id: gornerup_1996_t1_exp_11_6
+        type: transition_point
+        phase: l
+        experiment: equilibration-1700c
+        locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 11.6'}
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          liquid_phase: l
+          composition_mass_percent:
+            Al2O3: 21.6
+            CaO: 61.7
+            SiO2: 16.7
+          points:
+            - T_C: 1700
+              point_conditions:
+                saturation_phase_as_printed:
+                  state: {tag: value, value: {printed_phase: '3CaO·SiO2'}}
+                  locator: {page: 4, published_page: 1468, table: '1'}
+
+      - observation_id: gornerup_1996_t1_exp_12_10
+        type: transition_point
+        phase: l
+        experiment: equilibration-1700c
+        locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 12.10'}
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          liquid_phase: l
+          composition_mass_percent:
+            Al2O3: 24.4
+            CaO: 57.6
+            SiO2: 17.9
+          points:
+            - T_C: 1700
+              point_conditions:
+                saturation_phase_as_printed:
+                  state: {tag: value, value: {printed_phase: '3CaO·SiO2'}}
+                  locator: {page: 4, published_page: 1468, table: '1'}
+
+      - observation_id: gornerup_1996_t1_exp_13_8
+        type: transition_point
+        phase: l
+        experiment: equilibration-1700c
+        locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 13.8'}
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          liquid_phase: l
+          composition_mass_percent:
+            Al2O3: 25.0
+            CaO: 56.2
+            SiO2: 18.7
+          points:
+            - T_C: 1700
+              point_conditions:
+                saturation_phase_as_printed:
+                  state: {tag: value, value: {printed_phase: '3CaO·SiO2'}}
+                  locator: {page: 4, published_page: 1468, table: '1'}
+
+      - observation_id: gornerup_1996_t1_exp_13_9
+        type: transition_point
+        phase: l
+        experiment: equilibration-1700c
+        locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 13.9'}
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          liquid_phase: l
+          composition_mass_percent:
+            Al2O3: 22.6
+            CaO: 53.7
+            SiO2: 23.7
+          points:
+            - T_C: 1700
+              point_conditions:
+                saturation_phase_as_printed:
+                  state: {tag: value, value: {printed_phase: '2CaO·SiO2'}}
+                  locator: {page: 4, published_page: 1468, table: '1'}
+
+      - observation_id: gornerup_1996_t1_exp_14_8
+        type: transition_point
+        phase: l
+        experiment: equilibration-1700c
+        locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 14.8'}
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          liquid_phase: l
+          composition_mass_percent:
+            Al2O3: 22.1
+            CaO: 54.2
+            SiO2: 23.7
+          points:
+            - T_C: 1700
+              point_conditions:
+                saturation_phase_as_printed:
+                  state: {tag: value, value: {printed_phase: '3CaO·SiO2'}}
+                  locator: {page: 4, published_page: 1468, table: '1'}
+
+      - observation_id: gornerup_1996_t1_exp_14_9
+        type: transition_point
+        phase: l
+        experiment: equilibration-1700c
+        locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 14.9'}
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          liquid_phase: l
+          composition_mass_percent:
+            Al2O3: 16.8
+            CaO: 54.6
+            SiO2: 28.5
+          points:
+            - T_C: 1700
+              point_conditions:
+                saturation_phase_as_printed:
+                  state: {tag: value, value: {printed_phase: '2CaO·SiO2'}}
+                  locator: {page: 4, published_page: 1468, table: '1'}
+
+      - observation_id: gornerup_1996_t1_exp_15_8
+        type: transition_point
+        phase: l
+        experiment: equilibration-1700c
+        locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 15.8'}
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          liquid_phase: l
+          composition_mass_percent:
+            Al2O3: 14.3
+            CaO: 54.0
+            SiO2: 31.7
+          points:
+            - T_C: 1700
+              point_conditions:
+                saturation_phase_as_printed:
+                  state: {tag: value, value: {printed_phase: '2CaO·SiO2'}}
+                  locator: {page: 4, published_page: 1468, table: '1'}
+
+      - observation_id: gornerup_1996_t1_exp_16_18
+        type: transition_point
+        phase: l
+        experiment: equilibration-1700c
+        locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 16.18'}
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          liquid_phase: l
+          composition_mass_percent:
+            Al2O3: 9.0
+            CaO: 54.6
+            SiO2: 36.3
+          points:
+            - T_C: 1700
+              point_conditions:
+                saturation_phase_as_printed:
+                  state: {tag: value, value: {printed_phase: '2CaO·SiO2'}}
+                  locator: {page: 4, published_page: 1468, table: '1'}
+
+      - observation_id: gornerup_1996_t1_exp_16_19
+        type: transition_point
+        phase: l
+        experiment: equilibration-1700c
+        locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 16.19'}
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          liquid_phase: l
+          composition_mass_percent:
+            Al2O3: 9.4
+            CaO: 55.7
+            SiO2: 35.0
+          points:
+            - T_C: 1700
+              point_conditions:
+                saturation_phase_as_printed:
+                  state: {tag: value, value: {printed_phase: '2CaO·SiO2'}}
+                  locator: {page: 4, published_page: 1468, table: '1'}
+
+      - observation_id: gornerup_1996_t1_exp_17_7
+        type: transition_point
+        phase: l
+        experiment: equilibration-1700c
+        locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 17.7'}
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          liquid_phase: l
+          composition_mass_percent:
+            Al2O3: 5.5
+            CaO: 56.3
+            SiO2: 38.3
+          points:
+            - T_C: 1700
+              point_conditions:
+                saturation_phase_as_printed:
+                  state: {tag: value, value: {printed_phase: '2CaO·SiO2'}}
+                  locator: {page: 4, published_page: 1468, table: '1'}
+
+      - observation_id: gornerup_1996_t1_exp_18_9
+        type: transition_point
+        phase: l
+        experiment: equilibration-1700c
+        locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 18.9'}
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          liquid_phase: l
+          composition_mass_percent:
+            Al2O3: 0
+            CaO: 59.2
+            SiO2: 40.8
+          points:
+            - T_C: 1700
+              point_conditions:
+                saturation_phase_as_printed:
+                  state: {tag: value, value: {printed_phase: '2CaO·SiO2'}}
+                  locator: {page: 4, published_page: 1468, table: '1'}
+
+      - observation_id: gornerup_1996_t1_exp_19_3
+        type: transition_point
+        phase: l
+        experiment: equilibration-1700c
+        locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 19.3'}
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          liquid_phase: l
+          composition_mass_percent:
+            Al2O3: 39.1
+            CaO: 60.9
+            SiO2: 0
+          points:
+            - T_C: 1700
+              point_conditions:
+                saturation_phase_as_printed:
+                  state: {tag: value, value: {printed_phase: 'CaO'}}
+                  locator: {page: 4, published_page: 1468, table: '1'}
+
+      - observation_id: gornerup_1996_t1_exp_19_4
+        type: transition_point
+        phase: l
+        experiment: equilibration-1700c
+        locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 19.4'}
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          liquid_phase: l
+          composition_mass_percent:
+            Al2O3: 39.5
+            CaO: 60.5
+            SiO2: 0
+          points:
+            - T_C: 1700
+              point_conditions:
+                saturation_phase_as_printed:
+                  state: {tag: value, value: {printed_phase: 'CaO'}}
+                  locator: {page: 4, published_page: 1468, table: '1'}
+
+      - observation_id: gornerup_1996_t1_exp_23_1
+        type: transition_point
+        phase: l
+        experiment: equilibration-1700c
+        locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 23.1'}
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          liquid_phase: l
+          composition_mass_percent:
+            Al2O3: 20.9
+            CaO: 53.6
+            SiO2: 25.5
+          points:
+            - T_C: 1700
+              point_conditions:
+                saturation_phase_as_printed:
+                  state: {tag: value, value: {printed_phase: '2CaO·SiO2'}}
+                  locator: {page: 4, published_page: 1468, table: '1'}
+
+      - observation_id: gornerup_1996_t1_exp_23_2
+        type: transition_point
+        phase: l
+        experiment: equilibration-1700c
+        locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 23.2'}
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          liquid_phase: l
+          composition_mass_percent:
+            Al2O3: 23.8
+            CaO: 54.8
+            SiO2: 21.4
+          points:
+            - T_C: 1700
+              point_conditions:
+                saturation_phase_as_printed:
+                  state: {tag: value, value: {printed_phase: '3CaO·SiO2'}}
+                  locator: {page: 4, published_page: 1468, table: '1'}
+
+      - observation_id: gornerup_1996_t1_exp_18_11
+        type: transition_point
+        phase: l
+        experiment: equilibration-1750c
+        locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 18.11'}
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          liquid_phase: l
+          composition_mass_percent:
+            Al2O3: 0
+            CaO: 60.4
+            SiO2: 39.6
+          points:
+            - T_C: 1750
+              point_conditions:
+                saturation_phase_as_printed:
+                  state: {tag: value, value: {printed_phase: '2CaO·SiO2'}}
+                  locator: {page: 4, published_page: 1468, table: '1'}
+
+      - observation_id: gornerup_1996_t1_exp_19_9
+        type: transition_point
+        phase: l
+        experiment: equilibration-1750c
+        locator: {page: 4, published_page: 1468, table: '1', note: 'Experiment no. 19.9'}
+        units: '°C; composition wt% as printed'
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          liquid_phase: l
+          composition_mass_percent:
+            Al2O3: 37.0
+            CaO: 63.0
+            SiO2: 0
+          points:
+            - T_C: 1750
+              point_conditions:
+                saturation_phase_as_printed:
+                  state: {tag: value, value: {printed_phase: 'CaO'}}
+                  locator: {page: 4, published_page: 1468, table: '1'}
+    context:
+      - observation_id: gornerup_1996_table1_basis
+        type: literature_context
+        locator: {page: 4, published_page: 1468, table: '1'}
+        units: wt%
+        values:
+          quantity: liquidus_composition
+          phase_saturated_liquid_quote: 'Listed compositions are liquid phase saturated with given phase at given temperature.'
+          normalization_quote: 'The composition is normalized with respect to the three components after analysis and presented with one decimal.'
+          analyzed_components: [CaO, Al2O3, SiO2, MgO, MoO3]
+          normalized_table_components: [CaO, Al2O3, SiO2]
+          omitted_components: [MgO, MoO3]
+          polymorph_notes: 'Table names saturating solids by stoichiometric formula; no crystal polymorph is specified.'
+      - observation_id: gornerup_1996_starting_materials
+        type: characterization
+        locator: {page: 3, published_page: 1467, section: '3.4'}
+        units: wt%
+        values:
+          reagent_grade_as_printed: 'High-purity Pro analysi chemicals were used.'
+          lime_CaO_purity_lower_bound_wt_percent: 99.5
+          lime_purity_bound_operator: '≥'
+          lime_purity_qualifier: approximately
+          lime_supplier: 'Fischer Scientific, USA'
+          alumina_Al2O3_purity_lower_bound_wt_percent: 99.5
+          alumina_purity_bound_operator: '≥'
+          alumina_supplier: 'BDH AnalaR, Germany'
+          silica_SiO2_purity_lower_bound_wt_percent: 99.0
+          silica_purity_bound_operator: '≥'
+          silica_supplier: 'C. Roth, Germany'
+          starting_material_note: 'Printed purity limits; no separate batch assay is given.'
+      - observation_id: gornerup_1996_charge_preparation
+        type: method
+        locator: {page: 3, published_page: 1467, section: '3.4'}
+        units: as printed
+        values:
+          components_calcined_temperature_C: 1100
+          components_calcined_minimum_duration_h: 12
+          mixture_blended_duration_h: 2
+          mixing_equipment: agate ball mixer
+          pressed_form: cylinder
+          pressing_pressure_MPa: 100
+          pressing_pressure_approximate: true
+          preparation_note: 'Four grams of each slag mixture was pressed to a cylinder at approximately 100 MPa before crucible loading.'
+      - observation_id: gornerup_1996_saturation_solid_preparation
+        type: method
+        locator: {page: 4, published_page: 1468, section: '3.4'}
+        units: as printed
+        values:
+          saturation_solid_mass_g: 2
+          pressing_pressure_MPa: 100
+          pressing_pressure_approximate: true
+          sintering_temperature_C: 1600
+          sintering_minimum_duration_h: 72
+          synthesis_crucible_material: platinium
+          synthesis_reagents: 'CaO and SiO2 mixtures formed 2CaO·SiO2 and 3CaO·SiO2, respectively.'
+          phase_identification_method: 'X-ray diffraction verified phases of the sintered powders before use.'
+          CaO_preparation: 'CaO was calcined and pressed to discs before use; comparative single-crystal experiments showed no discrepancy.'
+          Ca2SiO4_preparation_note: '2CaO·SiO2 discs disintegrated after sintering from a 10% volume change on cooling; a second grinding preceded pressing final cylinders.'
+          Ca3SiO5_preparation_note: 'Sintered 3CaO·SiO2 discs were used directly, apart from forming suitable-size pieces.'
+      - observation_id: gornerup_1996_equilibrium_evidence
+        type: equilibrium_evidence
+        locator: {page: 2, published_page: 1466, section: '3.1'}
+        units: h
+        quote: 'The time required to reach equilibrium was experimentally determined to be approximately six hours.'
+        values:
+          equilibrium_time_approximate_h: 6
+          isothermal_hold_minimum_h: 12
+          saturation_solid_consumption_quote: 'In each experiment, it was monitored that the saturation phase did not get entirely consumed.'
+          replication_count: 3
+          replication_result: 'Some experiments were repeated three times, showing no significant discrepancy.'
+          time_series_data: {state: {tag: unknown, reason: not_published}}
+          equilibrium_demonstration_note: 'Reported evidence: approximately 6 h to equilibrium, minimum 12 h hold, solid remained, and repeatability; no time series is printed.'
+      - observation_id: gornerup_1996_atmosphere
+        type: laboratory_conditions
+        locator: {page: 3, published_page: 1467, section: '3.2', figure: '2'}
+        units: as printed
+        values:
+          experimental_volume_atmosphere: argon
+          furnace_heating_element_protection: nitrogen
+          argon_purification: 'Silica gel, ascarite (NaOH), dehydrite (Mg(ClO4)2), then a 500 °C Mg-chip tube furnace.'
+          nitrogen_purification: 'Same purification train as argon but without the Mg-chip furnace.'
+          oxygen_exclusion: 'A graphite lid kept oxygen from reaching molybdenum; visual inspection was used to verify this.'
+          fO2_note: 'No numerical oxygen partial pressure or imposed oxygen buffer is reported.'
+      - observation_id: gornerup_1996_crucible_role
+        type: apparatus
+        locator: {page: 2, published_page: 1466, section: '3.1', figure: '2'}
+        units: as printed
+        values:
+          crucible_material: molybdenum sheet
+          crucible_chamber_count: 2
+          separating_wall_material: molybdenum
+          chamber_connecting_gap_mm: 3
+          crucible_is_saturating_phase: false
+          crucible_role: 'Separate saturation solids were loaded with the slag in a two-chamber crucible; the layout was intended to prevent solid-phase contamination of the slag.'
+          porous_protection_crucible_material: magnesia
+          graphite_lid: true
+      - observation_id: gornerup_1996_saturated_liquid_analysis
+        type: method
+        locator: {page: 4, published_page: 1468, section: '3.5'}
+        units: as printed
+        values:
+          analysis_method: sequential X-ray spectrometry
+          instrument: 'Siemens SRS 303 Sequential X-ray Spectrometer'
+          flux_prep_lithium_tetraborate_wt_percent: 66
+          flux_prep_lithium_metaborate_wt_percent: 34
+          additional_fusion_reagent: ammonium nitrate
+          fusion_crucible_material: platinum
+          stated_relative_accuracy_wt_percent: 2
+          stated_relative_accuracy_operator: '≤'
+          minimum_sample_mass_for_accuracy_g: 0.5
+          analyzed_components: [CaO, Al2O3, SiO2, MgO, MoO3]
+          accuracy_qualification: 'Relative accuracy ≤2 wt% is stated provided a 0.5 g slag sample is supplied.'
+          electron_probe_or_microscopy: {state: {tag: unknown, reason: not_published}}
+      - observation_id: gornerup_1996_typical_saturated_slag_mass
+        type: method
+        locator: {page: 3, published_page: 1467, section: '3.1'}
+        units: g
+        quote: 'Typically 0.5–1.5 g of saturated slag were obtained and analysed in an X-ray spectrometer.'
+        values:
+          typical_saturated_slag_mass_low_g: 0.5
+          typical_saturated_slag_mass_high_g: 1.5
+      - observation_id: gornerup_1996_phase_identification_limits
+        type: characterization
+        locator: {page: 4, published_page: 1468, section: '3.4'}
+        units: as printed
+        values:
+          prepared_saturation_solids_verified_by: X-ray diffraction
+          in_run_phase_check: 'The authors monitored that the saturation phase did not get entirely consumed.'
+          post_run_phase_identification: {state: {tag: unknown, reason: not_published}}
+          post_run_epma_or_sem: {state: {tag: unknown, reason: not_published}}
+          post_run_phase_note: 'No EPMA, SEM, microscopy, or post-run XRD identification of the surviving saturation phase is reported.'
+      - observation_id: gornerup_1996_quoted_rankin_wright_1915
+        type: literature_context
+        locator: {page: 1, published_page: 1465, section: '2.1'}
+        units: °C
+        quote: 'Rankin and Wright (1915, reference 6) report optical-pyrometer temperature-measurement accuracy estimated at ±20 °C; almost the entire ternary system was examined at composition intervals of five wt%, with a maximum operating temperature of 1600 °C imposed by the experimental equipment.'
+        values:
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          attribution: 'G. A. Rankin and F. E. Wright, Am. J. Sci., XXXIX (1915), 4th ser., no. 229, p. 1 (reference 6).'
+          optical_pyrometer_accuracy_magnitude_C: 20
+          stated_sign: ±
+          composition_interval_wt_percent: 5
+          equipment_maximum_operating_temperature_C: 1600
+      - observation_id: gornerup_1996_quoted_welch_gutt_1959
+        type: literature_context
+        locator: {page: 1, published_page: 1465, section: '2.1'}
+        units: wt% CaO
+        quote: 'Welch and Gutt (1959, reference 7) place primary-phase 3CaO·SiO2 between 69.5 and 71.5 wt% CaO.'
+        values:
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          attribution: 'J. H. Welch and W. Gutt, J. Am. Ceram. Soc., 42 (1959), no. 1, p. 11 (reference 7).'
+          primary_phase_range_lower_wt_percent: 69.5
+          primary_phase_range_upper_wt_percent: 71.5
+          phase_as_printed: 3CaO·SiO2
+      - observation_id: gornerup_1996_quoted_obst_fix_1970
+        type: literature_context
+        locator: {page: 1, published_page: 1465, section: '2.1'}
+        units: wt% SiO2
+        quote: 'Obst and Fix (1970, reference 8) studied CaO-SiO2 slags from approximately 42 to 70 wt% SiO2 using quenching and SEM analysis; one verification experiment was carried out at 1600 °C using a 2CaO·SiO2 crucible.'
+        values:
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          attribution: 'K.-H. Obst and W. Fix, Arch. Eisenhüttenwes., 41 (1970), p. 703 (reference 8).'
+          SiO2_range_lower_wt_percent: 42
+          SiO2_range_upper_wt_percent: 70
+          both_endpoints_approximate: true
+          phase_identification_method: quenching and SEM analysis
+          verification_experiment_temperature_C: 1600
+          verification_experiment_crucible_phase: 2CaO·SiO2
+      - observation_id: gornerup_1996_quoted_prince_1951
+        type: literature_context
+        locator: {page: 2, published_page: 1466, section: '2.3'}
+        units: mg
+        quote: 'Prince (1951, reference 13) melted 20 mg of powdered glass in a platinum envelope and identified phases after quenching.'
+        values:
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          attribution: 'A. T. Prince, J. Am. Ceram. Soc., 34 (1951), p. 44 (reference 13).'
+          powdered_glass_mass_mg: 20
+          envelope_material: platinum
+          three_liquidus_temperatures_of_interest: {state: {tag: unknown, reason: not_published}}
+          numeric_liquidus_points_source_note: 'The authors mention three temperatures from Prince but provide no tabulated numeric values in prose.'
+      - observation_id: gornerup_1996_quaternary_mgo_range
+        type: literature_context
+        locator: {page: 2, published_page: 1466, section: '2.3'}
+        units: wt% MgO
+        quote: 'Some of these experiments have dealt with MgO-contents of 3–10 wt%.'
+        values:
+          MgO_range_lower_wt_percent: 3
+          MgO_range_upper_wt_percent: 10
+      - observation_id: gornerup_1996_slag_atlas_cao_comparator
+        type: literature_context
+        locator: {page: 5, published_page: 1469, section: '5. Discussion', equation: 'reference 14'}
+        units: wt% CaO
+        quote: 'The ternary diagram cited as reference 14 indicates more than 61 wt% CaO at 1600 °C on the CaO-Al2O3 axis.'
+        values:
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          attribution: 'Slag Atlas, 2nd ed., Verein Deutscher Eisenhüttenleute, Verlag Stahleisen GmbH, Germany (1995), reference 14.'
+          ternary_diagram_cao_solubility_lower_bound_wt_percent: 61
+          bound_operator: '>'
+          comparison_temperature_C: 1600
+      - observation_id: gornerup_1996_binary_sio2_comparison
+        type: literature_context
+        locator: {page: 5, published_page: 1469, section: '5. Discussion', note: 'reference 14'}
+        units: wt%
+        quote: 'The authors conclude binary 2CaO·SiO2 solubility is 2.5–3 wt% higher than in the generally accepted system.'
+        values:
+          method_class: author_estimate
+          evidence_class: author_estimate
+          solubility_difference_lower_wt_percent: 2.5
+          solubility_difference_upper_wt_percent: 3
+          phase: 2CaO·SiO2
+          system_compared: 'Slag Atlas, 2nd ed., Verein Deutscher Eisenhüttenleute, Verlag Stahleisen GmbH, Germany (1995), reference 14.'
+      - observation_id: gornerup_1996_binary_al2o3_comparison
+        type: literature_context
+        locator: {page: 5, published_page: 1469, section: '5. Discussion', note: 'reference 14'}
+        units: wt% CaO
+        quote: 'At 1600 °C the authors state approximately 59 wt% CaO in binary CaO-Al2O3, versus more than 61 wt% on the ternary diagram.'
+        values:
+          method_class: author_estimate
+          evidence_class: author_estimate
+          binary_cao_solubility_approx_wt_percent: 59
+          ternary_diagram_cao_solubility_lower_bound_wt_percent: 61
+          ternary_diagram_bound_operator: '>'
+          comparison_temperature_C: 1600
+          ternary_diagram_attribution: 'Slag Atlas, 2nd ed., Verein Deutscher Eisenhüttenleute, Verlag Stahleisen GmbH, Germany (1995), reference 14.'
+      - observation_id: gornerup_1996_figures_context
+        type: literature_context
+        locator: {page: 5, published_page: 1469, figure: '3-5'}
+        units: figure-only context
+        values:
+          method_class: figure_only
+          evidence_class: figure_only
+          figures: ['3', '4', '5']
+          figure_3_sources: 'Day, Shepherd and Wright (1906, ref. 5); Rankin and Wright (1915, ref. 6); Obst and Fix (1970, ref. 8); literature diagram ref. 14.'
+          figure_4_source: 'Literature diagram ref. 14.'
+          figure_5_source: 'Literature diagram ref. 14; dotted lines are literature boundaries and solid lines are authors'' estimates.'
+          digitization_status: 'No un-tabulated curve points were digitized.'
+          paper_has_figure_6: false
+      - observation_id: gornerup_1996_discussion_qualifications
+        type: literature_context
+        locator: {page: 5, published_page: 1469, section: '5. Discussion'}
+        units: text
+        values:
+          1600_ternary_comparison: 'Fairly good agreement with literature except for enlarged 3CaO·SiO2 stability area.'
+          1700_ternary_comparison: 'A slight solubility increase in the 2CaO·SiO2 and 3CaO·SiO2 regions was observed.'
+          cao_saturation_qualification: 'The authors say the ternary CaO-saturation line disagrees with the binary CaO-Al2O3 system; their results agree with the binary system.'
+          table_scope_note: 'Although Results prose says saturation experiments at 1600 and 1700 °C, Table 1 also prints rows at 1650 and 1750 °C.'

@@ -58,6 +58,7 @@ from simulator.battery.migrate import (
     convert_mass_to_kg,
     convert_pressure_to_pa,
     convert_temperature_to_k,
+    wt_pct_to_mole_fraction,
     dump_yaml,
     iter_observation_store_paths,
     lineage_parents_from_source,
@@ -5586,6 +5587,58 @@ def test_l02_value_k_lifts_transition_temperature(tmp_path: Path) -> None:
     assert nbp.identity.subtype.value == "normal_boiling_point"
     assert nbp.identity.total_pressure_Pa.is_value
     assert nbp.identity.total_pressure_Pa.value == as_decimal("101325")
+
+
+def test_gornerup_liquidus_rows_preserve_printed_temperature_and_composition(
+    tmp_path: Path,
+) -> None:
+    filename = "gornerup-1996-cao-corner-liquidus.yaml"
+    source = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts" / filename).read_text(
+            encoding="utf-8"
+        )
+    )
+    printed_row = source["species"]["CaO"]["observations"][0]
+    printed_values = printed_row["values"]
+    printed_composition = {
+        key: as_decimal(value)
+        for key, value in printed_values["composition_mass_percent"].items()
+    }
+    assert printed_values["property_kind"] == "liquidus"
+    assert printed_values["points"][0]["T_C"] == 1600
+    assert printed_composition == {
+        "Al2O3": as_decimal("35.3"),
+        "CaO": as_decimal("59.8"),
+        "SiO2": as_decimal("4.9"),
+    }
+
+    result = _migrate_real_extract(
+        tmp_path, filename, use_repository_index_row=True
+    )
+    liquidus_rows = [
+        observation
+        for observation in result.observations.values()
+        if quantity_token(observation.identity) is Quantity.TRANSITION_TEMPERATURE
+        and observation.identity.subtype.is_value
+        and observation.identity.subtype.value == "liquidus"
+    ]
+    assert len(liquidus_rows) == 39
+    assert result.validation is not None
+    assert not result.validation.hard_issues
+
+    observation = next(
+        observation
+        for observation in liquidus_rows
+        if observation.observation_id.split("::")[-2]
+        == "gornerup_1996_t1_exp_3_4"
+    )
+    assert observation.value.kind is ValueKind.POINT
+    assert observation.value.point == as_decimal("1873.15")
+    assert observation.identity.composition is not None
+    assert observation.identity.composition.is_value
+    assert observation.identity.composition.value == wt_pct_to_mole_fraction(
+        printed_composition
+    )
 
 
 def test_l05g0_rows_list_alone_does_not_name_delta_fg() -> None:
