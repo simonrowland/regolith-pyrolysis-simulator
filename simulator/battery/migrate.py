@@ -2956,10 +2956,7 @@ def _kume_mole_amounts_from_mapping(
         return {}, ()
     amounts: dict[str, Decimal] = {}
     omitted: list[str] = []
-    for name, amount in raw.items():
-        token = str(name).strip()
-        if token in _COMPOSITION_MOL_META_KEYS:
-            continue
+    for token, amount in _composition_mol_items(raw):
         printed = str(amount).strip().casefold() if isinstance(amount, str) else ""
         if printed in {"tr.", "tr"} or printed.startswith(("<", ">", "≤", "≥")):
             omitted.append(token)
@@ -3132,6 +3129,15 @@ _COMPOSITION_MOL_META_KEYS = frozenset(
 _DEFAULT_COMPOSITION_MOL_BASIS = "printed_mole_fraction"
 
 
+def _composition_mol_items(raw: object) -> Iterator[tuple[str, object]]:
+    if not isinstance(raw, Mapping):
+        return
+    for name, amount in raw.items():
+        token = str(name).strip()
+        if token not in _COMPOSITION_MOL_META_KEYS:
+            yield token, amount
+
+
 def _declared_composition_mol_basis(values: Mapping[str, object], raw: object) -> str | None:
     """Return an extract-declared Composition.basis for a composition_mol map.
 
@@ -3148,6 +3154,20 @@ def _declared_composition_mol_basis(values: Mapping[str, object], raw: object) -
     if isinstance(sibling, str) and sibling.strip():
         return sibling.strip()
     return None
+
+
+def _mole_fraction_composition_error(
+    exc: ValueError, values: Mapping[str, object]
+) -> tuple[str, str]:
+    detail = str(exc)
+    if not detail.startswith("malformed declared amount"):
+        raise exc
+    composition_key = (
+        "composition_mol"
+        if isinstance(values.get("composition_mol"), Mapping)
+        else "composition_mole_fraction"
+    )
+    return detail, composition_key
 
 
 def _mole_fraction_composition_from_values(
@@ -3184,10 +3204,7 @@ def _mole_fraction_composition_from_values(
                 return None, tuple(omitted)
             components = [(name, amount / total) for name, amount in mapped.items()]
         else:
-            for name, amount in raw.items():
-                token = str(name).strip()
-                if token in _COMPOSITION_MOL_META_KEYS:
-                    continue
+            for token, amount in _composition_mol_items(raw):
                 # Declared amounts have one owner; malformed → ValueError (hard issue).
                 parsed = parse_declared_amount(amount)
                 if parse_species_formula(token) is None:
@@ -11564,16 +11581,9 @@ class Migrator:
                 _mole_fraction_composition_from_values(values)
             )
         except ValueError as exc:
-            detail = str(exc)
-            if not detail.startswith("malformed declared amount"):
-                raise
+            detail, composition_key = _mole_fraction_composition_error(exc, values)
             initial_composition, omitted_components = None, ()
             malformed_composition_amount = detail
-            composition_key = (
-                "composition_mol"
-                if isinstance(values.get("composition_mol"), Mapping)
-                else "composition_mole_fraction"
-            )
             self.result.registry_issues.append(
                 ValidationIssue(
                     path=f"observations.{obs_id}.values.{composition_key}",
@@ -12761,16 +12771,11 @@ class Migrator:
                     _mole_fraction_composition_from_values(raw_item)
                 )
             except ValueError as exc:
-                detail = str(exc)
-                if not detail.startswith("malformed declared amount"):
-                    raise
+                detail, composition_key = _mole_fraction_composition_error(
+                    exc, raw_item
+                )
                 point_composition = None
                 malformed_composition_amount = detail
-                composition_key = (
-                    "composition_mol"
-                    if isinstance(raw_item.get("composition_mol"), Mapping)
-                    else "composition_mole_fraction"
-                )
             point_composition_located = (
                 None
                 if point_composition is None
