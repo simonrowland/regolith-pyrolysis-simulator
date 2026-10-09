@@ -8,6 +8,7 @@ from simulator.core import PyrolysisSimulator
 from simulator.evaporation import _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
 from simulator.fe_redox import KRESS91_LIQUID_CALIBRATION_MIN_T_C
 from simulator.melt_backend.magemin import MAGEMinBackend
+from simulator.melt_backend.alphamelts import AlphaMELTSBackend
 from simulator.reduced_real_determinism import _curve_payload
 from simulator.runner import _attach_composition_projected_liquidus_notice
 
@@ -99,38 +100,43 @@ def test_sr22_caught_interpolation_failure_has_no_repair_notice() -> None:
     assert "repair_notice" not in record
 
 
-def test_sr21_backend_fallback_message_names_both_producers() -> None:
+def test_sr21_rejected_backend_message_names_producer_without_claiming_fallback() -> None:
     result = SimpleNamespace(
+        backend_name="unknown",
         ledger_transition=None,
         phase_species_mol={"melt": {"SiO2": 1.0}},
     )
-    fallback = SimpleNamespace(status="ok")
-    backend = MAGEMinBackend()
-    backend.is_available = lambda: True
-    backend.equilibrate = lambda **_kwargs: result
-    sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
-    sim.backend = backend
-    sim._backend_failed = False
-    sim.melt = SimpleNamespace(
-        oxygen_reservoir=SimpleNamespace(melt_intrinsic_fO2_log=-10.0),
-        temperature_C=1400.0,
-        p_total_mbar=1.0,
-    )
-    sim._chem_registry = SimpleNamespace(authoritative_for=lambda _intent: None)
-    sim.species_formula_registry = {}
-    sim._backend_composition_mol_by_account = lambda: {}
-    sim._backend_composition_mol = lambda: {}
-    sim._validate_backend_account_scope_support = lambda _composition: None
-    sim._sync_oxygen_reservoir_mirror = lambda: None
-    sim._backend_accepts_kwarg = lambda _name: False
-    sim._backend_allows_internal_analytical_fallback = lambda: True
-    sim._disable_backend_after_failure = lambda: None
-    sim._internal_analytical_equilibrium = lambda: fallback
-    sim._record_equilibrium_status = lambda value: value
+    for backend, producer in (
+        (MAGEMinBackend(), "magemin"),
+        (AlphaMELTSBackend(), "alphamelts"),
+    ):
+        backend.is_available = lambda: True
+        backend.equilibrate = lambda **_kwargs: result
+        sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+        sim.backend = backend
+        sim._backend_failed = False
+        sim.melt = SimpleNamespace(
+            oxygen_reservoir=SimpleNamespace(melt_intrinsic_fO2_log=-10.0),
+            temperature_C=1400.0,
+            p_total_mbar=1.0,
+        )
+        sim._chem_registry = SimpleNamespace(authoritative_for=lambda _intent: None)
+        sim.species_formula_registry = {}
+        sim._backend_composition_mol_by_account = lambda: {}
+        sim._backend_composition_mol = lambda: {}
+        sim._validate_backend_account_scope_support = lambda _composition: None
+        sim._sync_oxygen_reservoir_mirror = lambda: None
+        sim._backend_accepts_kwarg = lambda _name: False
+        sim._disable_backend_after_failure = lambda: None
 
-    assert sim._get_equilibrium() is fallback
-    assert "magemin" in sim._last_backend_error
-    assert "internal-analytical" in sim._last_backend_error
+        try:
+            sim._get_equilibrium()
+        except RuntimeError as exc:
+            message = str(exc)
+        else:
+            raise AssertionError("real backend reject must raise RuntimeError")
+        assert producer in message
+        assert "using internal-analytical fallback" not in message
 
 
 def test_sr22_missing_curve_has_no_floor_repair_notice() -> None:

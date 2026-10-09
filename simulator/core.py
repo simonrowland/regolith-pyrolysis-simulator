@@ -9205,10 +9205,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
             self._last_backend_error = (
                 f'{producer} returned post-equilibrium phase material without '
-                'an AtomLedger transition; using internal-analytical fallback'
+                'an AtomLedger transition'
             )
+            allows_fallback = self._backend_allows_internal_analytical_fallback()
+            if allows_fallback:
+                self._last_backend_error += '; using internal-analytical fallback'
             self._disable_backend_after_failure()
-            if not self._backend_allows_internal_analytical_fallback():
+            if not allows_fallback:
                 raise RuntimeError(self._last_backend_error)
             return self._record_equilibrium_status(self._internal_analytical_equilibrium())
         if transition is not None:
