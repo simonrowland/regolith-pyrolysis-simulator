@@ -227,6 +227,83 @@ def test_failed_version_getter_records_typed_unknown_not_unavailable() -> None:
     assert state["value"] != "unavailable"
 
 
+def test_version_state_has_one_owner_and_receipt_bytes_are_unchanged(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.enums import StateTag as BatteryStateTag
+    from simulator.battery.records import State as BatteryState
+
+    assert BatteryState.__module__ == "simulator.state_types"
+    assert BatteryStateTag.__module__ == "simulator.state_types"
+    assert type(admission._version_getter_state(lambda: "fixture-runtime")) is BatteryState
+
+    def fail() -> None:
+        raise RuntimeError("fixture getter failure")
+
+    receipt = {
+        "schema_version": 1,
+        "assessed_at": "2026-10-09T00:00:00+00:00",
+        "entries": [{
+            "identity": SYNTHETIC_IDENTITY.as_dict(),
+            "status": "admitted",
+            "reason": None,
+            "artifact": "freeze_gate_curve",
+            "comparison": {
+                "status": "matched",
+                "pin": "synthetic.json",
+                "projection_sha256": "0123456789abcdef",
+            },
+            "provenance": {
+                "binding_provenance_verifiable": True,
+                "runtime_version": version_getter_provenance(
+                    lambda: "fixture-runtime"
+                ),
+                "calibration_version": version_getter_provenance(fail),
+            },
+        }],
+    }
+    receipt_path = tmp_path / "receipt.json"
+    admission._write_receipt(receipt_path, receipt)
+
+    assert receipt_path.read_bytes() == (
+        b'{\n'
+        b'  "assessed_at": "2026-10-09T00:00:00+00:00",\n'
+        b'  "entries": [\n'
+        b'    {\n'
+        b'      "artifact": "freeze_gate_curve",\n'
+        b'      "comparison": {\n'
+        b'        "pin": "synthetic.json",\n'
+        b'        "projection_sha256": "0123456789abcdef",\n'
+        b'        "status": "matched"\n'
+        b'      },\n'
+        b'      "identity": {\n'
+        b'        "binding_revision": "synthetic-r1",\n'
+        b'        "engine_id": "synthetic-fake",\n'
+        b'        "model_id": "fixture-model-v1",\n'
+        b'        "transport": "subprocess"\n'
+        b'      },\n'
+        b'      "provenance": {\n'
+        b'        "binding_provenance_verifiable": true,\n'
+        b'        "calibration_version": {\n'
+        b'          "reason": "version getter failed: RuntimeError",\n'
+        b'          "tag": "unknown",\n'
+        b'          "value": null\n'
+        b'        },\n'
+        b'        "runtime_version": {\n'
+        b'          "reason": null,\n'
+        b'          "tag": "value",\n'
+        b'          "value": "fixture-runtime"\n'
+        b'        }\n'
+        b'      },\n'
+        b'      "reason": null,\n'
+        b'      "status": "admitted"\n'
+        b'    }\n'
+        b'  ],\n'
+        b'  "schema_version": 1\n'
+        b'}\n'
+    )
+
+
 def test_install_provenance_binds_alpha_subprocess_environment(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -660,6 +737,71 @@ def test_live_cache_gate_refuses_failed_stale_and_wrong_transport_receipts(
     }[failure]
     assert notice["notices"][0]["reason"] == expected_reason
     assert expected_reason in notice["notices"][0]["message"]
+
+
+@pytest.mark.parametrize(
+    "malformed_identity",
+    [None, [], "identity", {**SYNTHETIC_IDENTITY.as_dict(), "engine_id": []}],
+)
+def test_live_cache_gate_refuses_malformed_receipt_identity(
+    tmp_path: Path,
+    malformed_identity: object,
+) -> None:
+    candidate = _candidate()
+    receipt_path = _assess(tmp_path, candidate)
+    receipt = json.loads(receipt_path.read_text())
+    receipt["entries"][0]["identity"] = malformed_identity
+    receipt_path.write_text(json.dumps(receipt))
+
+    sim = SimpleNamespace()
+    assert not live_cache_eligibility(
+        sim,
+        SYNTHETIC_IDENTITY,
+        candidate.provenance,
+        receipt_path=receipt_path,
+    )
+    notice = binding_admission_run_notice(sim)
+    assert notice is not None
+    assert len(notice["notices"]) == 1
+    assert notice["notices"][0]["reason"] == "receipt invalid"
+
+
+def test_live_cache_gate_refuses_non_mapping_receipt_entry(
+    tmp_path: Path,
+) -> None:
+    candidate = _candidate()
+    receipt_path = _assess(tmp_path, candidate)
+    receipt = json.loads(receipt_path.read_text())
+    receipt["entries"][0] = None
+    receipt_path.write_text(json.dumps(receipt))
+
+    sim = SimpleNamespace()
+    assert not live_cache_eligibility(
+        sim,
+        SYNTHETIC_IDENTITY,
+        candidate.provenance,
+        receipt_path=receipt_path,
+    )
+    notice = binding_admission_run_notice(sim)
+    assert notice is not None
+    assert notice["notices"][0]["reason"] == "receipt invalid"
+
+
+def test_replay_authorizer_refuses_malformed_receipt_identity(
+    tmp_path: Path,
+) -> None:
+    candidate = _candidate()
+    receipt_path = _assess(tmp_path, candidate)
+    receipt = json.loads(receipt_path.read_text())
+    receipt["entries"][0]["identity"] = None
+    receipt_path.write_text(json.dumps(receipt))
+
+    with pytest.raises(EngineBindingAdmissionError, match="receipt invalid"):
+        authorize_binding(
+            SYNTHETIC_IDENTITY,
+            candidate.provenance,
+            receipt_path=receipt_path,
+        )
 
 
 def test_real_assessment_targets_fail_closed_without_reviewed_pins(
