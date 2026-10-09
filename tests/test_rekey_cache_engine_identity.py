@@ -4,13 +4,18 @@ from pathlib import Path
 
 import pytest
 
+from simulator import corpus_version
 from scripts import rekey_cache_engine_identity as rekey
 
 
 @pytest.fixture
 def target_corpus_version(monkeypatch) -> str:
     target = "target"
-    monkeypatch.setattr(rekey, "interoperable_corpus_versions", lambda: (target,))
+    monkeypatch.setattr(
+        corpus_version,
+        "interoperable_corpus_versions",
+        lambda: (target,),
+    )
     return target
 
 
