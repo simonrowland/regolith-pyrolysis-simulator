@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import hashlib
+import json
 import math
 import os
 import sqlite3
@@ -872,6 +873,40 @@ def test_magemin_database_identity_splits_intensive_gate_keys() -> None:
     assert ig["model"]["magemin_database"] == "ig"
     assert igad["model"]["magemin_database"] == "igad"
     assert _key_hash(ig) != _key_hash(igad)
+
+
+def test_current_magemin_and_internal_analytical_replay_key_bytes() -> None:
+    # Captured from green 0a99e3afe9f059e5b80960c84561ca01beff479e.
+    store = PT0DeterminismStore("capture")
+    sim = _build_pt0_sim(store)
+    sim.start_campaign(CampaignPhase.C2A_STAGED)
+    sim._register_freeze_gate_liquid_fraction_providers()
+    provider = sim._chem_registry.fallback_for(
+        ChemistryIntent.GATE_LIQUID_FRACTION
+    )
+    provider._backend = SimpleNamespace(_database="ig")
+    magemin_key = canonical_replay_key(
+        sim,
+        artifact="freeze_gate_curve",
+        intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+        fO2_log=sim._compute_intrinsic_melt_fO2(),
+        fe_redox_policy="intrinsic",
+    )
+    magemin_bytes = canonical_json_bytes(magemin_key)
+    assert len(magemin_bytes) == 1648
+    assert hashlib.sha256(magemin_bytes).hexdigest() == (
+        "13ada0c3401a52f88761e3a2b0abcd64caefc16765e943e9812398bf3fcb7d90"
+    )
+
+    generic_store = PT0DeterminismStore("capture")
+    generic_sim = _build_pt0_sim(generic_store)
+    generic_key = generic_store._equilibrium_key(generic_sim)
+    generic_bytes = canonical_json_bytes(generic_key)
+    assert generic_key["namespace_id"] == "internal-analytical:equilibrium-composite"
+    assert len(generic_bytes) == 1687
+    assert hashlib.sha256(generic_bytes).hexdigest() == (
+        "f23032fcd2ddba188fccad867d238b352c63e4ca53b77c3dc643baae0af422f9"
+    )
 
 
 def test_magemin_shadow_fallback_under_alphamelts_config_excludes_engine_version(
@@ -2122,7 +2157,7 @@ def test_pt1_persistent_store_round_trips_exact_payload(tmp_path: Path) -> None:
     sim.start_campaign(CampaignPhase.C2A_STAGED)
     fO2_log = sim._compute_intrinsic_melt_fO2()
     curve = {
-        "source": "unit-test",
+        "source": "gate_liquid_fraction:fallback:magemin-shadow",
         "solidus_T_C": 1210.0,
         "liquidus_T_C": 1320.0,
         "path": ((1210.0, 0.0), (1320.0, 1.0)),
@@ -2146,7 +2181,7 @@ def test_pt1_persistent_store_round_trips_exact_payload(tmp_path: Path) -> None:
         }
         row = conn.execute(
             f"""
-            SELECT artifact, key_hash, payload_sha256
+            SELECT artifact, key_hash, payload_sha256, payload_bytes
             FROM {PT1_EQUILIBRIUM_TABLE}
             """
         ).fetchone()
@@ -2168,6 +2203,23 @@ def test_pt1_persistent_store_round_trips_exact_payload(tmp_path: Path) -> None:
     assert row[0] == "freeze_gate_curve"
     assert row[1]
     assert row[2]
+    # PT-1 payload bytes captured from green
+    # 0a99e3afe9f059e5b80960c84561ca01beff479e.
+    assert len(row[3]) == 213
+    assert hashlib.sha256(row[3]).hexdigest() == (
+        "dbc926be76bb3e3214d18f26a89dd20d5bea2974b9a084bcab918ee22bea53fa"
+    )
+    payload = json.loads(row[3])
+    assert set(payload) == {"curve"}
+    assert set(payload["curve"]) == {
+        "liquidus_T_C",
+        "path",
+        "solidus_T_C",
+        "source",
+    }
+    assert payload["curve"]["source"] == (
+        "gate_liquid_fraction:fallback:magemin-shadow"
+    )
 
     replay = PT0DeterminismStore("replay", db_path=db_path)
     replay_sim = _build_pt0_sim(replay)
