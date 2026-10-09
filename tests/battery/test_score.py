@@ -8016,3 +8016,22 @@ def test_transition_temperature_refuses_before_generic_engine_pot(
         "reason": "quantity_not_predicted",
         "quantity": Quantity.TRANSITION_TEMPERATURE.value,
     }
+
+    monkeypatch.setattr(
+        score_module,
+        "_ENGINE_CELL_PREDICTED_QUANTITIES",
+        score_module._ENGINE_CELL_PREDICTED_QUANTITIES
+        | {Quantity.TRANSITION_TEMPERATURE},
+    )
+    prediction = predict_with_engine(Engine.OPENIMCC, reference)
+
+    assert len(opened) == 1
+    assert len(pots) == 1
+    assert "CaO" in parsed_formulas
+    assert prediction.value is None
+    assert prediction.unit is None
+    assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+    assert prediction.refusal_detail == {
+        "reason": "quantity_not_predicted",
+        "quantity": Quantity.TRANSITION_TEMPERATURE.value,
+    }

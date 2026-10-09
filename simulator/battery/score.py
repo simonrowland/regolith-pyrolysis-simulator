@@ -404,6 +404,10 @@ class EnginePrediction:
     version: str | None = None
 
 
+def _quantity_not_predicted_detail(quantity: Quantity) -> dict[str, str]:
+    return {"reason": "quantity_not_predicted", "quantity": quantity.value}
+
+
 @dataclass(frozen=True)
 class ScoreContext:
     works: Mapping[str, Work]
@@ -3023,10 +3027,7 @@ def predict_with_engine(
                 coefficient_sources=sources,
                 lineage_complete=False,
                 refusal_reason=RefusalReason.UNSUPPORTED,
-                refusal_detail={
-                    "reason": "quantity_not_predicted",
-                    "quantity": quantity.value,
-                },
+                refusal_detail=_quantity_not_predicted_detail(quantity),
                 identity=identity,
             )
     formula = identity.species.formula
@@ -3581,7 +3582,6 @@ def predict_with_engine(
     activities = dict(getattr(cell, "melt_activities", None) or {})
     pressures = dict(getattr(cell, "gas_partial_pressures_Pa", None) or {})
     reported: Mapping[str, float]
-    unit = QUANTITY_UNITS[quantity]
     coefficient_basis: str | None = None
     if quantity in MELT_ACTIVITY_QUANTITIES:
         coefficients = dict(getattr(cell, "melt_activity_coefficients", None) or {})
@@ -3675,7 +3675,23 @@ def predict_with_engine(
         reported = pressures
         unit = "Pa"
     else:
-        reported = {**activities, **pressures}
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(
+                state=ExecutionState.PRODUCED, call_evidence=call_evidence
+            ),
+            authority=Authority.REFUSED,
+            notices=notices,
+            coefficient_sources=sources,
+            lineage_complete=False,
+            certified_band=certified_band,
+            refusal_reason=RefusalReason.UNSUPPORTED,
+            refusal_detail=_quantity_not_predicted_detail(quantity),
+            identity=identity,
+            requested_composition=requested,
+            version=engine_version,
+        )
 
     magnitude: float | None = None
     converter_reason = ""
