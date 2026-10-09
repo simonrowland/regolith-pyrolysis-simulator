@@ -154,6 +154,7 @@ POLYMORPH_ALIASES: dict[str, Polymorph] = {
     "quartz": Polymorph.QUARTZ,
     "alpha_quartz": Polymorph.ALPHA_QUARTZ,
     "alpha-quartz": Polymorph.ALPHA_QUARTZ,
+    "tridymite": Polymorph.TRIDYMITE,
     "cristobalite_high": Polymorph.CRISTOBALITE_HIGH,
     "cristobalite, high": Polymorph.CRISTOBALITE_HIGH,
     "cristobalite_low": Polymorph.CRISTOBALITE_LOW,

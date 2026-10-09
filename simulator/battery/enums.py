@@ -238,6 +238,7 @@ class Polymorph(StrEnum):
     BETA_RHOMBOHEDRAL = "beta_rhombohedral"
     QUARTZ = "quartz"
     ALPHA_QUARTZ = "alpha_quartz"
+    TRIDYMITE = "tridymite"
     CRISTOBALITE_HIGH = "cristobalite_high"
     CRISTOBALITE_LOW = "cristobalite_low"
     CORUNDUM = "corundum"

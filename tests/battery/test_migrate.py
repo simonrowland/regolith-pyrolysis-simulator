@@ -5075,10 +5075,38 @@ def test_ts1985_and_yam1983_tridymite_reference_state_baseline() -> None:
     )
     assert ts_state is not None and ts_state.is_value
     assert ts_state.value.endmember.polymorph is not None
-    assert ts_state.value.endmember.polymorph.is_unknown
-    assert ts_state.value.endmember.polymorph.reason == (
-        "source does not state polymorph"
+    assert ts_state.value.endmember.polymorph.is_value
+    assert ts_state.value.endmember.polymorph.value is Polymorph.TRIDYMITE
+
+    ambiguous = reference_state_from_extract(
+        "Pure solid tridymite or quartz; endmember=SiO2",
+        species_formula="SiO2",
+        values={},
     )
+    assert ambiguous is not None and ambiguous.is_value
+    ambiguous_polymorph = ambiguous.value.endmember.polymorph
+    assert ambiguous_polymorph is not None and ambiguous_polymorph.is_unknown
+    assert ambiguous_polymorph.reason == "source names more than one polymorph"
+
+    coefficient = reference_state_from_extract(
+        "Raoultian pure solid SiO2; gamma_SiO2 relative to solid SiO2",
+        species_formula="SiO2",
+        values={},
+    )
+    assert coefficient is not None and coefficient.is_value
+    coefficient_polymorph = coefficient.value.endmember.polymorph
+    assert coefficient_polymorph is not None and coefficient_polymorph.is_unknown
+    assert coefficient_polymorph.reason == "source does not state polymorph"
+
+    table_number = reference_state_from_extract(
+        "solid CaO standard state; Table II footnote",
+        species_formula="CaO",
+        values={},
+    )
+    assert table_number is not None and table_number.is_value
+    table_polymorph = table_number.value.endmember.polymorph
+    assert table_polymorph is not None and table_polymorph.is_unknown
+    assert table_polymorph.reason == "source does not state polymorph"
 
     yam1983 = next(
         row

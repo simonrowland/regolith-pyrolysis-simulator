@@ -52,6 +52,10 @@ from typing import Any, Iterable, Iterator, Mapping, Sequence, Union, get_args, 
 
 import yaml
 
+from simulator.battery.polymorph_dictionary import (
+    POLYMORPH_ALIASES,
+    resolve_printed_name_polymorph,
+)
 from simulator.battery.enums import (
     AdmissionStatus,
     AmountBasis,
@@ -6005,7 +6009,60 @@ def reference_state_from_extract(
             "source standard_state does not name one reference endmember"
         )
     phase = _reference_phase_for_formula(text, lowered, formula, convention)
-    endmember = make_species(formula, phase)
+    polymorph = None
+    if phase is Phase.CR:
+        printed_names = sorted(
+            POLYMORPH_ALIASES,
+            key=len,
+            reverse=True,
+        )
+        name_pattern = re.compile(
+            r"(?<![A-Za-z0-9_])(?:"
+            + "|".join(re.escape(name) for name in printed_names)
+            + r")(?![A-Za-z0-9_])",
+            re.IGNORECASE,
+        )
+        generic_names = {
+            Polymorph.ALPHA,
+            Polymorph.BETA,
+            Polymorph.GAMMA,
+            Polymorph.DELTA,
+            Polymorph.KAPPA,
+            Polymorph.I,
+            Polymorph.II,
+            Polymorph.III,
+            Polymorph.IV,
+            Polymorph.V,
+        }
+        named_polymorphs = set()
+        for match in name_pattern.finditer(text):
+            token = resolve_printed_name_polymorph(match.group())
+            if token is None or token is Polymorph.REFERENCE:
+                continue
+            if token in generic_names:
+                # These aliases also occur as coefficients or table numerals;
+                # require a named phase context for them.
+                before = text[max(0, match.start() - 48) : match.start()]
+                after = text[match.end() : match.end() + 48]
+                formula_before = re.search(
+                    rf"\b{re.escape(formula)}\s*[- ]\s*$", before, re.I
+                )
+                formula_after = re.match(
+                    rf"\s*[- ]\s*\b{re.escape(formula)}\b", after, re.I
+                )
+                is_named_form = bool(
+                    re.search(r"\b(?:phase|polymorph)\b", before + after, re.I)
+                    or formula_before
+                    or formula_after
+                )
+                if not is_named_form:
+                    continue
+            named_polymorphs.add(token)
+        if len(named_polymorphs) > 1:
+            polymorph = State.unknown("source names more than one polymorph")
+        elif named_polymorphs:
+            polymorph = State.of(next(iter(named_polymorphs)))
+    endmember = make_species(formula, phase, polymorph)
     return State.of(
         StandardState(
             convention=convention,

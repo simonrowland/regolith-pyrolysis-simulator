@@ -5471,6 +5471,54 @@ def test_unknown_polymorph_with_multiple_eligible_solid_tables_still_refuses() -
     )
 
 
+def test_tridymite_does_not_use_cristobalite_high_fusion_conversion() -> None:
+    from simulator.battery.enums import Polymorph
+    from simulator.battery.score import _fusion_comparison_reference
+
+    experiment = F.kems_experiment()
+    base_identity = F.activity_identity(
+        formula="SiO2",
+        T_K=Decimal("2001"),
+        endmember_phase=Phase.CR,
+        component_basis="SiO2",
+    )
+    before = F.observation(
+        "silica-unknown-polymorph-before-tridymite-lift",
+        experiment.experiment_id,
+        _with_activity_reference_polymorph(base_identity, None),
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-tridymite-reference",
+    )
+    after = F.observation(
+        "silica-tridymite-reference-after-lift",
+        experiment.experiment_id,
+        _with_activity_reference_polymorph(base_identity, Polymorph.TRIDYMITE),
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-tridymite-reference",
+    )
+
+    before_comparison = _fusion_comparison_reference(
+        before, engine=Engine.OPENIMCC
+    )
+    after_comparison = _fusion_comparison_reference(after, engine=Engine.OPENIMCC)
+
+    assert (
+        before_comparison.identity.reference_state.value.endmember.phase.value
+        is Phase.L
+    )
+    assert (
+        after_comparison.identity.reference_state.value.endmember.phase.value
+        is Phase.CR
+    )
+    assert after_comparison.value.point == after.value.point
+    assert any(
+        "measured reference polymorph is tridymite" in notice.reason
+        for notice in after_comparison.notices
+    )
+
+
 @pytest.mark.parametrize("polymorph", (None, "quartz"))
 def test_solid_activity_with_unmatched_polymorph_refuses_conversion(
     polymorph: str | None,
