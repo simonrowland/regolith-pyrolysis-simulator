@@ -448,18 +448,41 @@ def composition_projected_liquidus_notice(
         if projection is None:
             continue
         block = _as_mapping(projection.get(COMPOSITION_PROJECTED))
-        if block is None:
+        fraction_rows = _as_mapping(
+            projection.get('dropped_component_mass_fractions')
+        )
+        if block is None and not fraction_rows:
             continue
-        components = [str(name) for name in (block.get('dropped_components') or ())]
-        fractions = dict(block.get('dropped_component_mass_fractions') or {})
-        if not components:
-            continue
-        if any(name not in fractions for name in components):
-            missing = next(name for name in components if name not in fractions)
-            raise MeltCompositionError(
-                'composition_projected_missing_mass_fraction: '
-                f'{missing}'
+        if block is not None:
+            components = [
+                str(name) for name in (block.get('dropped_components') or ())
+            ]
+            fractions = dict(
+                block.get('dropped_component_mass_fractions') or {}
             )
+            if not components:
+                continue
+            if any(name not in fractions for name in components):
+                missing = next(
+                    name for name in components if name not in fractions
+                )
+                raise MeltCompositionError(
+                    'composition_projected_missing_mass_fraction: '
+                    f'{missing}'
+                )
+        else:
+            components = []
+            fractions = {}
+            for name, value in fraction_rows.items():
+                component = str(name)
+                if not component:
+                    raise MeltCompositionError(
+                        'composition_projected_missing_component'
+                    )
+                components.append(component)
+                fractions[component] = value
+            if not components:
+                continue
         return {
             'kind': COMPOSITION_PROJECTED,
             'reason': COMPOSITION_PROJECTED,
@@ -519,11 +542,12 @@ def _magemin_bulk_projection_details(
         ),
     }
     if bulk_dropped:
-        # Out-of-database oxides are excluded from the bulk and their mass
-        # is recorded on the result for later D partitioning. That is not
-        # the composition_projected refusal: do not set that block or
-        # dropped_bulk_components, which diagnostics_name_composition_projected
-        # treats as a whole-solve refusal.
+        # Out-of-database oxides stay off the bulk. Names and mass
+        # fractions are what composition_projected_liquidus_notice reads
+        # for the freeze gate. Do not set the composition_projected block
+        # or dropped_bulk_components: those mark a whole-solve refusal,
+        # and equilibrate still calls the binary. Excluded kilograms are
+        # recorded on the result for later D partitioning.
         dropped_mass_fraction = _magemin_dropped_mass_fraction(bulk_projection)
         details['dropped_mass_fraction'] = dropped_mass_fraction
         details['dropped_component_mass_fractions'] = dict(dropped_fractions)
@@ -1647,6 +1671,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
 
         sample_warnings: list[str] = []
         excluded_database_kg: Optional[Dict[str, float]] = None
+        captured_projection: Optional[Dict[str, Any]] = None
 
         # Mandatory aggregate budget: generic finder default is unbounded so
         # AlphaMELTS is not silently capped; MAGEMin always applies a finite
@@ -1690,7 +1715,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             temperature_C: float,
             remaining_budget_s: Optional[float] = None,
         ) -> float:
-            nonlocal excluded_database_kg
+            nonlocal excluded_database_kg, captured_projection
             result = self.equilibrate(
                 float(temperature_C),
                 composition_kg=composition_kg,
@@ -1710,6 +1735,15 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     str(name): float(mass)
                     for name, mass in captured_excluded.items()
                 }
+            projection = (result.diagnostics or {}).get(
+                'input_composition_projection'
+            )
+            if (
+                captured_projection is None
+                and isinstance(projection, Mapping)
+                and projection.get('dropped_component_mass_fractions')
+            ):
+                captured_projection = dict(projection)
             if result.status != 'ok':
                 warning = '; '.join(result.warnings) or result.status
                 # Raise the TYPED sample error so the finder preserves which
@@ -1754,9 +1788,16 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             diagnostics['magemin_excluded_database_components_kg'] = (
                 excluded_database_kg
             )
-        # A composition_projected notice still attaches the projected-bulk
-        # search once. An ig-order drop no longer produces that notice:
-        # equilibrate solves the in-database slice and records the excluded kg.
+        if (
+            captured_projection is not None
+            and 'input_composition_projection' not in diagnostics
+        ):
+            # The gate reads dropped-component fractions off this payload.
+            # Copying it does not skip the binary and does not change status.
+            diagnostics['input_composition_projection'] = captured_projection
+        # The notice is rebuilt from those fractions. The projected retry
+        # still runs only for an out_of_domain sample. An ok solve keeps
+        # its status and its bracket; the notice is not a binary skip.
         notice = (
             None
             if projected_retry

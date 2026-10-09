@@ -371,6 +371,24 @@ def _diagnostic_names_composition_projected(
     return diagnostics_name_composition_projected(diagnostic)
 
 
+def _composition_projected_notice_owns_curve(
+    diagnostic: Mapping[str, Any] | None,
+) -> bool:
+    """True when the projected notice, not solve status, chooses the curve.
+
+    The in-database bracket is not the projected-bulk bracket. A present
+    notice keeps the gate on the projected-bounds curve even when the
+    in-database solve returned status ok.
+    """
+    from simulator.melt_backend.magemin import (
+        composition_projected_liquidus_notice,
+    )
+
+    if _diagnostic_names_composition_projected(diagnostic):
+        return True
+    return composition_projected_liquidus_notice(diagnostic) is not None
+
+
 def _composition_projected_notice_key(notice: Mapping[str, Any]) -> tuple:
     rows = []
     for row in notice.get('dropped_components') or ():
@@ -1805,10 +1823,10 @@ class EvaporationMixin:
         self._composition_projected_liquidus_notices = stored
 
     def composition_projected_liquidus_run_notice(self) -> dict[str, Any] | None:
-        """Run-level flag for liquidus solved on a projected bulk.
+        """Run-level flag for a liquidus solved on a projected bulk.
 
-        MAGEMin's equilibrate result stays ``out_of_domain``. This notice is
-        the category-3 flag: each dropped component and its mass fraction.
+        The in-database solve still runs. This notice names each dropped
+        component and its mass fraction; it is not a skip of the binary.
         """
         stored = getattr(self, '_composition_projected_liquidus_notices', None)
         if not stored:
@@ -1839,10 +1857,10 @@ class EvaporationMixin:
             composition_projected_liquidus_notice,
         )
 
-        if not _diagnostic_names_composition_projected(diagnostic):
-            return None
         notice = composition_projected_liquidus_notice(diagnostic)
         if notice is None:
+            if not _diagnostic_names_composition_projected(diagnostic):
+                return None
             reasons.append(
                 f'{source} composition_projected refusal has no '
                 'per-component mass fraction'
@@ -1879,6 +1897,41 @@ class EvaporationMixin:
         curve = dict(curve)
         curve['composition_projected_notice'] = notice
         return curve
+
+    def _projected_curve_or_in_database_blocked(
+        self,
+        diagnostic: Mapping[str, Any],
+        *,
+        source: str,
+        reasons: list[str],
+        status: str,
+        path: tuple = (),
+    ) -> tuple[dict[str, Any] | None, bool]:
+        """Select the projected-bounds curve when a notice is present.
+
+        The in-database bracket is not the projected-bulk bracket. Returns
+        ``(curve, True)`` when the notice owns the selection, including
+        when the projected bounds are unusable and ``curve`` is None.
+        ``(None, False)`` leaves the caller on the in-database curve.
+        Status ok is not the selector.
+        """
+        projected = self._composition_projected_freeze_gate_curve(
+            diagnostic,
+            source=source,
+            reasons=reasons,
+            path=path,
+        )
+        if projected is not None:
+            return projected, True
+        if _composition_projected_notice_owns_curve(diagnostic):
+            if not any(
+                'composition_projected' in reason for reason in reasons
+            ):
+                reasons.append(
+                    f'{source} composition_projected status={status}'
+                )
+            return None, True
+        return None, False
 
     def _stash_invalid_projected_liquidus_notice(
         self,
@@ -2350,22 +2403,16 @@ class EvaporationMixin:
         fallback_provider = diagnostic.get('kernel_fallback_used')
         if fallback_provider:
             source = f'gate_liquid_fraction:fallback:{fallback_provider}'
+        projected, blocked = self._projected_curve_or_in_database_blocked(
+            diagnostic,
+            source=source,
+            reasons=reasons,
+            status=status,
+            path=path if status == 'ok' else (),
+        )
+        if blocked:
+            return projected
         if status != 'ok':
-            projected = self._composition_projected_freeze_gate_curve(
-                diagnostic,
-                source=source,
-                reasons=reasons,
-            )
-            if projected is not None:
-                return projected
-            if _diagnostic_names_composition_projected(diagnostic):
-                if not any(
-                    'composition_projected' in reason for reason in reasons
-                ):
-                    reasons.append(
-                        f'{source} composition_projected status={status}'
-                    )
-                return None
             reasons.append(
                 'gate liquid fraction unavailable: '
                 f'status={status}'
@@ -2553,22 +2600,15 @@ class EvaporationMixin:
                 'liquidus_T_C',
                 getattr(result, 'liquidus_T_C', None),
             )
-            projected = self._composition_projected_freeze_gate_curve(
+            projected, blocked = self._projected_curve_or_in_database_blocked(
                 projected_diagnostic,
                 source=source,
                 reasons=reasons,
+                status=status,
                 path=tuple(sample_points),
             )
-            if projected is not None:
+            if blocked:
                 return projected
-            if _diagnostic_names_composition_projected(projected_diagnostic):
-                if not any(
-                    'composition_projected' in reason for reason in reasons
-                ):
-                    reasons.append(
-                        f'{source} composition_projected status={status}'
-                    )
-                return None
             warnings = '; '.join(tuple(getattr(result, 'warnings', ()) or ()))
             reasons.append(
                 f'{source} unavailable: status={status}'
@@ -2584,6 +2624,22 @@ class EvaporationMixin:
                 'temperature_C': getattr(sample, 'temperature_C', None),
                 'liquid_fraction': getattr(sample, 'frac_M', None),
             })
+        ok_diagnostic = dict(
+            getattr(result, 'diagnostics', None) or {}
+        )
+        if solidus_T_C is not None:
+            ok_diagnostic.setdefault('solidus_T_C', solidus_T_C)
+        if liquidus_T_C is not None:
+            ok_diagnostic.setdefault('liquidus_T_C', liquidus_T_C)
+        projected, blocked = self._projected_curve_or_in_database_blocked(
+            ok_diagnostic,
+            source=source,
+            reasons=reasons,
+            status=status,
+            path=tuple(samples),
+        )
+        if blocked:
+            return projected
         if samples:
             curve = self._freeze_gate_curve_from_path(
                 samples,
