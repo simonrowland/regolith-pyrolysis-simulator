@@ -1355,8 +1355,6 @@ def binding_admission_run_notice(sim: Any) -> dict[str, Any] | None:
 
 
 def version_getter_provenance(getter: Any) -> dict[str, Any]:
-    from simulator.battery.records import State
-
     try:
         value = getter()
         if (
@@ -1365,14 +1363,17 @@ def version_getter_provenance(getter: Any) -> dict[str, Any]:
             or str(value).strip().lower() == "unavailable"
         ):
             raise ValueError("empty version")
-        state = State.of(str(value).strip())
+        return {
+            "tag": "value",
+            "value": str(value).strip(),
+            "reason": None,
+        }
     except Exception as exc:  # noqa: BLE001 - version is provenance only
-        state = State.unknown(f"version getter failed: {type(exc).__name__}")
-    return {
-        "tag": state.tag.value,
-        "value": state.value,
-        "reason": state.reason,
-    }
+        return {
+            "tag": "unknown",
+            "value": None,
+            "reason": f"version getter failed: {type(exc).__name__}",
+        }
 
 
 def install_provenance(
