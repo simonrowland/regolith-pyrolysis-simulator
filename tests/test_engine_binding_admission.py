@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -11,6 +12,8 @@ from simulator.engine_binding_admission import (
     EngineBindingAdmissionError,
     assess_bindings,
     authorize_binding,
+    binding_admission_run_notice,
+    live_cache_eligibility,
     version_getter_provenance,
 )
 
@@ -21,7 +24,7 @@ SYNTHETIC_IDENTITY = BindingIdentity(
     engine_id="synthetic-fake",
     model_id="fixture-model-v1",
     binding_revision="synthetic-r1",
-    transport="fixture",
+    transport="subprocess",
 )
 SYNTHETIC_CURVE = {
     "source": "gate_liquid_fraction:authoritative:synthetic-fake",
@@ -48,34 +51,41 @@ def _candidate(
 
 def _assess(tmp_path: Path, candidate: BindingAssessmentCandidate):
     receipt_path = tmp_path / "engines.local.binding-admission.json"
-    results = assess_bindings(
+    assess_bindings(
         [candidate],
         pin_directory=SYNTHETIC_PINS,
         receipt_path=receipt_path,
     )
-    return receipt_path, results
+    return receipt_path
 
 
 def test_synthetic_reviewed_pin_admits_matching_projection(tmp_path: Path) -> None:
     candidate = _candidate()
-    receipt_path, results = _assess(tmp_path, candidate)
+    receipt_path = _assess(tmp_path, candidate)
+    results = assess_bindings(
+        [candidate], pin_directory=SYNTHETIC_PINS, receipt_path=receipt_path
+    )
 
     assert results[0].status == "admitted"
-    assert authorize_binding(
+    admitted = authorize_binding(
         SYNTHETIC_IDENTITY,
         candidate.provenance,
         receipt_path=receipt_path,
-    ).identity == SYNTHETIC_IDENTITY
+    )
+    assert BindingIdentity.from_mapping(admitted["identity"]) == SYNTHETIC_IDENTITY
     receipt = json.loads(receipt_path.read_text())
     assert receipt["entries"][0]["comparison"]["status"] == "matched"
 
 
 def test_projection_mismatch_is_recorded_but_not_admitted(tmp_path: Path) -> None:
     candidate = _candidate(curve={**SYNTHETIC_CURVE, "liquidus_T_C": 1301.0})
-    receipt_path, results = _assess(tmp_path, candidate)
+    receipt_path = _assess(tmp_path, candidate)
+    results = assess_bindings(
+        [candidate], pin_directory=SYNTHETIC_PINS, receipt_path=receipt_path
+    )
 
     assert results[0].status == "failed"
-    with pytest.raises(EngineBindingAdmissionError, match="comparison failed"):
+    with pytest.raises(EngineBindingAdmissionError, match="differs"):
         authorize_binding(
             SYNTHETIC_IDENTITY,
             candidate.provenance,
@@ -98,7 +108,10 @@ def test_failed_stale_and_transport_mismatched_receipts_refuse(
     failure: str,
 ) -> None:
     candidate = _candidate()
-    receipt_path, results = _assess(tmp_path, candidate)
+    receipt_path = _assess(tmp_path, candidate)
+    results = assess_bindings(
+        [candidate], pin_directory=SYNTHETIC_PINS, receipt_path=receipt_path
+    )
     receipt = json.loads(receipt_path.read_text())
     entry = receipt["entries"][0]
     if failure == "failed":
@@ -119,23 +132,19 @@ def test_failed_stale_and_transport_mismatched_receipts_refuse(
 
 
 def test_alpha_subprocess_receipt_does_not_admit_python_api(tmp_path: Path) -> None:
-    candidate = _candidate(
-        BindingIdentity(
-            engine_id="alphamelts",
-            model_id="MELTSv1.0.2",
-            binding_revision="alphamelts-r1",
-            transport="subprocess",
-        )
+    candidate = _candidate()
+    receipt_path = _assess(tmp_path, candidate)
+    results = assess_bindings(
+        [candidate], pin_directory=SYNTHETIC_PINS, receipt_path=receipt_path
     )
-    receipt_path, results = _assess(tmp_path, candidate)
 
     assert results[0].status == "admitted"
     with pytest.raises(EngineBindingAdmissionError, match="transport mismatch"):
         authorize_binding(
             BindingIdentity(
-                engine_id="alphamelts",
-                model_id="MELTSv1.0.2",
-                binding_revision="alphamelts-r1",
+                engine_id="synthetic-fake",
+                model_id="fixture-model-v1",
+                binding_revision="synthetic-r1",
                 transport="python_api",
             ),
             candidate.provenance,
@@ -154,10 +163,11 @@ def test_missing_real_pin_reports_no_reviewed_pins_and_admits_nothing(
             transport="native",
         )
     )
-    receipt_path, results = assess_bindings(
+    receipt_path = tmp_path / "receipt.json"
+    results = assess_bindings(
         [candidate],
         pin_directory=tmp_path / "no-pins",
-        receipt_path=tmp_path / "receipt.json",
+        receipt_path=receipt_path,
     )
 
     assert results[0].status == "failed"
@@ -182,3 +192,47 @@ def test_failed_version_getter_records_typed_unknown_not_unavailable() -> None:
     }
     assert state["value"] != "unavailable"
 
+
+def test_live_cache_gate_fails_open_and_deduplicates_typed_notice(
+    tmp_path: Path,
+) -> None:
+    sim = SimpleNamespace()
+    missing_receipt = tmp_path / "missing.json"
+
+    assert not live_cache_eligibility(
+        sim,
+        SYNTHETIC_IDENTITY,
+        {"runtime_artifact": "test-only"},
+        receipt_path=missing_receipt,
+    )
+    assert not live_cache_eligibility(
+        sim,
+        SYNTHETIC_IDENTITY,
+        {"runtime_artifact": "test-only"},
+        receipt_path=missing_receipt,
+    )
+
+    notice = binding_admission_run_notice(sim)
+    assert notice is not None
+    assert len(notice["notices"]) == 1
+    assert notice["notices"][0]["type"] == "typed_notice"
+    assert notice["notices"][0]["message"] == (
+        "binding not admitted on this host (receipt missing); replay and "
+        "capture disabled; run scripts/assess_engine_bindings.py"
+    )
+
+    other_transport = BindingIdentity(
+        engine_id=SYNTHETIC_IDENTITY.engine_id,
+        model_id=SYNTHETIC_IDENTITY.model_id,
+        binding_revision=SYNTHETIC_IDENTITY.binding_revision,
+        transport="python_api",
+    )
+    assert not live_cache_eligibility(
+        sim,
+        other_transport,
+        {"runtime_artifact": "test-only"},
+        receipt_path=missing_receipt,
+    )
+    notice = binding_admission_run_notice(sim)
+    assert notice is not None
+    assert len(notice["notices"]) == 2
