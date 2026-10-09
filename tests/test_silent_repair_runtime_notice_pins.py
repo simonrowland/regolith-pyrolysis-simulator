@@ -7,6 +7,7 @@ from types import SimpleNamespace
 from simulator.core import PyrolysisSimulator
 from simulator.evaporation import _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
 from simulator.fe_redox import KRESS91_LIQUID_CALIBRATION_MIN_T_C
+from simulator.melt_backend.magemin import MAGEMinBackend
 from simulator.reduced_real_determinism import _curve_payload
 from simulator.runner import _attach_composition_projected_liquidus_notice
 
@@ -104,11 +105,9 @@ def test_sr21_backend_fallback_message_names_both_producers() -> None:
         phase_species_mol={"melt": {"SiO2": 1.0}},
     )
     fallback = SimpleNamespace(status="ok")
-    backend = SimpleNamespace(
-        name="producer-engine",
-        is_available=lambda: True,
-        equilibrate=lambda **_kwargs: result,
-    )
+    backend = MAGEMinBackend()
+    backend.is_available = lambda: True
+    backend.equilibrate = lambda **_kwargs: result
     sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
     sim.backend = backend
     sim._backend_failed = False
@@ -130,7 +129,7 @@ def test_sr21_backend_fallback_message_names_both_producers() -> None:
     sim._record_equilibrium_status = lambda value: value
 
     assert sim._get_equilibrium() is fallback
-    assert "producer-engine" in sim._last_backend_error
+    assert "magemin" in sim._last_backend_error
     assert "internal-analytical" in sim._last_backend_error
 
 

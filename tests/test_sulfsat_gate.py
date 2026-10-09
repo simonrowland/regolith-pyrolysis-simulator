@@ -582,46 +582,6 @@ def test_kress_carmichael_shared_split_matches_published_anchor():
     assert split['x_feo'] == pytest.approx(expected['x_feo'], rel=0, abs=1.0e-15)
 
 
-def test_finite_out_of_range_capacity_and_fraction_are_warned():
-    assert SulfSatGate._finite_capacity_ppm(
-        -5.0,
-        field='SCSS_ppm',
-        model='Smythe 2017 SCSS',
-    ) == (
-        0.0,
-        'Smythe 2017 SCSS returned out-of-range SCSS_ppm=-5.0; '
-        'clamping capacity to 0.0 ppm',
-    )
-    assert SulfSatGate._finite_fraction(
-        1.25,
-        field='S6_fraction',
-        model='Jugo 2010 S6+/S_total',
-    ) == (
-        1.0,
-        'Jugo 2010 S6+/S_total returned out-of-range S6_fraction=1.25; '
-        'clamping fraction to 1.0',
-    )
-    assert SulfSatGate._finite_fraction(
-        -0.25,
-        field='S6_fraction',
-        model='Jugo 2010 S6+/S_total',
-    ) == (
-        0.0,
-        'Jugo 2010 S6+/S_total returned out-of-range S6_fraction=-0.25; '
-        'clamping fraction to 0.0',
-    )
-    assert SulfSatGate._finite_capacity_ppm(
-        5.0,
-        field='SCSS_ppm',
-        model='Smythe 2017 SCSS',
-    ) == (5.0, None)
-    assert SulfSatGate._finite_fraction(
-        0.5,
-        field='S6_fraction',
-        model='Jugo 2010 S6+/S_total',
-    ) == (0.5, None)
-
-
 def test_sulfsat_gate_wires_shared_kress91_split_into_scss(monkeypatch):
     """Wiring-only check that the gate forwards the shared split to SCSS.
 

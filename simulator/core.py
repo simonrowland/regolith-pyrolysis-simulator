@@ -9195,9 +9195,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             and not diagnostic_silicate_equilibrium
             and self._equilibrium_result_has_phase_species(result)
         ):
+            backend_name = getattr(self.backend, 'backend_name', None)
             producer = (
-                getattr(self.backend, 'backend_name', None)
-                or getattr(self.backend, 'name', None)
+                backend_name
+                if backend_name and backend_name != 'unknown'
+                else getattr(self.backend, 'name', None)
+                or backend_name
                 or type(self.backend).__name__
             )
             self._last_backend_error = (
