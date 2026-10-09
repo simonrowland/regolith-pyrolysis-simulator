@@ -21,6 +21,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.accounting.formulas import resolve_species_formula
 from simulator.core import PyrolysisSimulator
 from simulator.fe_redox import feo_iw_log10_fO2_bar, intrinsic_melt_fO2
 from simulator.feedstock_composition import resolve_feedstock_composition
@@ -79,15 +80,24 @@ def _sim() -> PyrolysisSimulator:
     )
 
 
-@pytest.mark.parametrize("feedstock_id", tuple(_LOAD_PIN))
-def test_load_iron_and_seed_before_the_prior(feedstock_id: str) -> None:
-    pin = _LOAD_PIN[feedstock_id]
+def _iron_atoms(melt: dict) -> float:
+    molar_feo = resolve_species_formula("FeO").molar_mass_g_per_mol()
+    molar_fe2o3 = resolve_species_formula("Fe2O3").molar_mass_g_per_mol()
+    return (
+        float(melt.get("FeO", 0.0)) / molar_feo
+        + 2.0 * float(melt.get("Fe2O3", 0.0)) / molar_fe2o3
+    )
+
+
+def test_mars_load_iron_and_seed_stay_on_the_pre_prior_pin() -> None:
+    pin = _LOAD_PIN["mars_basalt"]
     feedstocks = _feedstocks()
-    carbon_kg = _required_stage0_carbon_kg(feedstocks[feedstock_id], 1000.0)
+    carbon_kg = _required_stage0_carbon_kg(feedstocks["mars_basalt"], 1000.0)
     assert carbon_kg == pytest.approx(pin["carbon_kg"])
-    additives = {"C": carbon_kg} if carbon_kg > 0.0 else {}
     sim = _sim()
-    sim.load_batch(feedstock_id, mass_kg=1000.0, additives_kg=additives)
+    sim.load_batch(
+        "mars_basalt", mass_kg=1000.0, additives_kg={"C": carbon_kg}
+    )
     melt = sim.inventory.melt_oxide_kg
     composition = sim._melt_oxide_wt_pct()
     seeded = intrinsic_melt_fO2(composition, 1673.15)
@@ -98,33 +108,72 @@ def test_load_iron_and_seed_before_the_prior(feedstock_id: str) -> None:
     assert seeded - feo_iw_log10_fO2_bar(1673.15) == pytest.approx(
         pin["alkali_dex"]
     )
+    notice = sim.melt_fO2_seed_run_notice()
+    assert notice is not None
+    assert notice["authority"] == "lower_bound"
+    assert notice["source_id"] is None
+    assert "lower bound" in notice["message"].lower()
+
+
+def test_lunar_prior_keeps_iron_atoms_and_seeds_below_the_old_iw() -> None:
+    pin = _LOAD_PIN["lunar_mare_low_ti"]
+    molar_feo = resolve_species_formula("FeO").molar_mass_g_per_mol()
+    sim = _sim()
+    sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
+    melt = sim.inventory.melt_oxide_kg
+    prior = sim._load_fe_redox.prior
+    composition = sim._melt_oxide_wt_pct()
+
+    assert _iron_atoms(melt) == pytest.approx(pin["feo_kg"] / molar_feo)
+    assert float(melt.get("Fe2O3", 0.0)) > 0.0
+    assert sim.inventory.stage0_external_inputs_kg[
+        "feot_omitted_ferric_oxygen"
+    ] > 0.0
+    seeded = intrinsic_melt_fO2(
+        composition, 1673.15, fe_redox_prior=prior
+    )
+    assert seeded == pytest.approx(feo_iw_log10_fO2_bar(1673.15) + prior.value)
+    assert seeded < pin["seed_1673_15"]
     assert sim.melt.fO2_log == pytest.approx(
-        intrinsic_melt_fO2(composition, 25.0 + 273.15)
+        feo_iw_log10_fO2_bar(25.0 + 273.15) + prior.value
+    )
+    notice = sim.melt_fO2_seed_run_notice()
+    assert notice["authority"] == "prior"
+    assert notice["source_id"] == prior.source_id
+    assert notice["locator"] == prior.locator
+
+
+def test_ci_prior_keeps_iron_atoms_and_inverts_the_measured_fraction() -> None:
+    pin = _LOAD_PIN["ci_carbonaceous_chondrite"]
+    molar_feo = resolve_species_formula("FeO").molar_mass_g_per_mol()
+    sim = _sim()
+    sim.load_batch("ci_carbonaceous_chondrite", mass_kg=1000.0)
+    melt = sim.inventory.melt_oxide_kg
+    prior = sim._load_fe_redox.prior
+
+    assert _iron_atoms(melt) == pytest.approx(pin["feo_kg"] / molar_feo)
+    assert float(melt.get("Fe2O3", 0.0)) > 0.0
+    assert prior.kind == "measured_fe3_fraction"
+    notice = sim.melt_fO2_seed_run_notice()
+    assert notice["authority"] == "measured"
+    assert notice["fe3_fraction"] == pytest.approx(prior.value)
+    assert sim.melt.fO2_log == pytest.approx(
+        intrinsic_melt_fO2(
+            sim._melt_oxide_wt_pct(),
+            25.0 + 273.15,
+            fe_redox_prior=prior,
+        )
     )
 
 
-def test_lunar_resolver_does_not_call_absent_fe2o3_a_measured_zero() -> None:
-    # The pre-prior pin recorded measured_fe2o3 == 0 and split_known True.
-    # That reading treated a total-Fe analysis as a measurement of no Fe3+.
-    # Absent Fe2O3 is now an unresolved split until a prior is seated.
+def test_lunar_resolver_does_not_invent_a_measured_ferric_zero() -> None:
     resolved = resolve_feedstock_composition(
         _feedstocks()["lunar_mare_low_ti"]
     )
     assert resolved.fe_redox_split_unknown is False
-    assert resolved.split_known is False
     assert resolved.measured_feo is None
     assert resolved.measured_fe2o3 is None
+    assert resolved.split_known is True
+    assert resolved.fe_redox_prior is not None
+    assert resolved.fe_redox_prior.kind == "delta_iw"
     assert resolved.total_fe == pytest.approx(16.5)
-    assert resolved.fe_redox_prior is None
-
-
-def test_seed_notice_says_the_unresolved_split_is_a_lower_bound() -> None:
-    sim = _sim()
-    sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
-    notice = sim.melt_fO2_seed_run_notice()
-    assert notice is not None
-    assert notice["code"] == "fe_redox_split"
-    assert notice["authority"] == "lower_bound"
-    assert notice["source_id"] is None
-    assert notice["value"] is None
-    assert "lower bound" in notice["message"].lower()

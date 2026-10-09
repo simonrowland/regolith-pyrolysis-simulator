@@ -254,6 +254,11 @@ def test_iron_free_melt_has_no_resolution_notice() -> None:
 def test_measured_load_keeps_iron_atoms_and_credits_oxygen() -> None:
     fraction = 0.2
     feedstocks = _feedstocks()
+    # The catalog seats a lunar prior. This test's baseline is the unsplit
+    # FeOT ledger, so that prior is removed before the plain load.
+    unsplit = dict(feedstocks["lunar_mare_low_ti"])
+    unsplit.pop("fe_redox_prior", None)
+    feedstocks["lunar_mare_low_ti"] = unsplit
     plain = _sim(feedstocks)
     plain.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
     feot_kg = float(plain.inventory.melt_oxide_kg["FeO"])
@@ -306,6 +311,9 @@ def test_measured_load_keeps_iron_atoms_and_credits_oxygen() -> None:
 def test_delta_iw_load_splits_at_the_kress_reference_and_seeds_iw_plus_offset() -> None:
     delta = -1.01
     feedstocks = _feedstocks()
+    unsplit = dict(feedstocks["lunar_mare_low_ti"])
+    unsplit.pop("fe_redox_prior", None)
+    feedstocks["lunar_mare_low_ti"] = unsplit
     plain = _sim(feedstocks)
     plain.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
     pre_split_wt = plain._melt_oxide_wt_pct()

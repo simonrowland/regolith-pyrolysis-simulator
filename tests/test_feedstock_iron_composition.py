@@ -68,21 +68,27 @@ def _oxygen_mass_fraction(species: str) -> float:
     return oxygen_g_per_mol / formula.molar_mass_g_per_mol()
 
 
-def test_unknown_split_metadata_covers_every_non_lunar_unmeasured_iron_entry() -> None:
+def test_unknown_split_metadata_covers_every_total_basis_entry_without_a_prior() -> None:
+    # CI, CM, and MGS-1 leave this set once a cited prior is seated.
+    # The six terrestrial lunar simulants are total-basis and join it.
+    # NU-LHT entries stay out: they are blocked and were not named.
     expected = {
         "s_type_asteroid_silicate",
         "m_type_silicate_phase",
         "v_type_vesta_hed",
         "e_type_enstatite_aubrite",
-        "ci_carbonaceous_chondrite",
-        "cm_carbonaceous_chondrite",
         "ceres_regolith",
         "comet_nucleus",
-        "mars_global_mgs1",
         "mars_basalt",
         "mars_sulfate_rich",
         "mars_phyllosilicate_clay",
         "mars_perchlorate_rich",
+        "lunar_highlands_lhs1",
+        "lunar_highlands_lhs1_yu_2025_reference",
+        "lunar_mare_lms1",
+        "lunar_mare_oprl2n",
+        "lunar_eac_1a",
+        "lunar_mls_1a",
     }
     feedstocks = _load_yaml("feedstocks.yaml")
     flagged = {
@@ -216,6 +222,9 @@ def test_engine_result_attaches_unknown_split_notice(monkeypatch) -> None:
     backend.initialize({})
     feedstocks = _load_yaml("feedstocks.yaml")
     feedstock = feedstocks["lunar_mare_low_ti"]
+    # The catalog prior and the unknown-split flag refuse together. This
+    # test is the lower-bound notice, so the seated prior is dropped first.
+    feedstock.pop("fe_redox_prior", None)
     feedstock["fe_redox_split_unknown"] = True
     feedstock["composition_basis"] = {
         "fe_reporting_convention": "total Fe as FeO",

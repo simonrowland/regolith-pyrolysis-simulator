@@ -154,17 +154,21 @@ def test_reservoir_tracks_iw_until_the_first_liquid_tick() -> None:
     sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
     composition = sim._melt_oxide_wt_pct()
     notice = sim.melt_fO2_seed_run_notice()
+    prior = sim._load_fe_redox.prior
     assert notice is not None
     assert notice["code"] == "fe_redox_split"
-    assert notice["authority"] == "lower_bound"
-    assert "lower bound" in notice["message"].lower()
+    assert notice["authority"] == "prior"
+    assert notice["kind"] == "delta_iw"
+    assert notice["value"] == pytest.approx(prior.value)
 
     # The Kress floor is the liquidus. 1100 C is below it. 1215 C is the
     # first temperature this test puts above it, so that tick adopts.
     floor = _pinned_liquidus(KRESS91_LIQUID_CALIBRATION_MIN_T_C)
     sim.melt.temperature_C = 1100.0
     sim._re_reference_melt_fO2_to_temperature(gate_authority=floor)
-    subliquid = intrinsic_melt_fO2(composition, 1100.0 + 273.15)
+    subliquid = intrinsic_melt_fO2(
+        composition, 1100.0 + 273.15, fe_redox_prior=prior
+    )
     assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(
         subliquid
     )
@@ -172,13 +176,17 @@ def test_reservoir_tracks_iw_until_the_first_liquid_tick() -> None:
 
     sim.melt.temperature_C = 1215.0
     sim._re_reference_melt_fO2_to_temperature(gate_authority=floor)
-    fixed = intrinsic_melt_fO2(composition, 1215.0 + 273.15)
+    fixed = intrinsic_melt_fO2(
+        composition, 1215.0 + 273.15, fe_redox_prior=prior
+    )
     assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(fixed)
     assert sim.melt.oxygen_reservoir.reference_T_K == pytest.approx(1215.0 + 273.15)
 
     sim.melt.temperature_C = 1230.0
     sim._re_reference_melt_fO2_to_temperature(gate_authority=floor)
-    fresh = intrinsic_melt_fO2(composition, 1230.0 + 273.15)
+    fresh = intrinsic_melt_fO2(
+        composition, 1230.0 + 273.15, fe_redox_prior=prior
+    )
     assert sim.melt.oxygen_reservoir.reference_T_K == pytest.approx(1230.0 + 273.15)
     assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log != pytest.approx(fresh)
     assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log != pytest.approx(fixed)
@@ -196,12 +204,17 @@ def test_reservoir_tracks_iw_until_the_first_liquid_tick() -> None:
     tracking = _sim()
     tracking.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
     tracking_composition = tracking._melt_oxide_wt_pct()
+    tracking_prior = tracking._load_fe_redox.prior
     for temperature_C in temperatures:
         tracking.melt.temperature_C = temperature_C
         tracking._re_reference_melt_fO2_to_temperature(gate_authority=projected)
         assert tracking.melt.oxygen_reservoir.reference_T_K is None
         assert tracking.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(
-            intrinsic_melt_fO2(tracking_composition, temperature_C + 273.15)
+            intrinsic_melt_fO2(
+                tracking_composition,
+                temperature_C + 273.15,
+                fe_redox_prior=tracking_prior,
+            )
         )
 
 

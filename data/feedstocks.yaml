@@ -15,6 +15,15 @@ lunar_mare_low_ti:
   label: "Lunar Mare Basalt (Low-Ti)"
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Apollo 12/15 low-Ti basaltic soils"
   confidence: "High"
+  # Sato 1976 Table 1 natural rows vs production Holzheid IW. Grand mean
+  # dIW -1.01785 (n=30, 1000-1200 C); catalog value -1.02. Table accuracy +/- 0.1.
+  fe_redox_prior:
+    delta_iw:
+      value: -1.02
+      range: [-1.42, -0.60]
+      uncertainty: 0.1
+      source_id: sato-1976-lunar-fo2-apollo-17
+      locator: "Table 1, natural bulk-rock rows (iron-capsule parentheses excluded), six mare basalts, 1000-1200 C"
   note: >
     Low-Ti mare basalt variant (TiO2 ~1.5 wt%). Source data gives single
     ranges for all oxides with TiO2 1.5-8.0; this entry uses the low end
@@ -234,6 +243,15 @@ lunar_mare_high_ti:
   label: "Lunar Mare Basalt (High-Ti)"
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Apollo 11/17 high-Ti basaltic soils"
   confidence: "High"
+  # Sato 1976 Table 1 natural rows vs production Holzheid IW. Grand mean
+  # dIW -1.01785 (n=30, 1000-1200 C); catalog value -1.02. Table accuracy +/- 0.1.
+  fe_redox_prior:
+    delta_iw:
+      value: -1.02
+      range: [-1.42, -0.60]
+      uncertainty: 0.1
+      source_id: sato-1976-lunar-fo2-apollo-17
+      locator: "Table 1, natural bulk-rock rows (iron-capsule parentheses excluded), six mare basalts, 1000-1200 C"
   note: >
     High-Ti mare basalt variant (TiO2 ~8 wt%). Using upper TiO2 range
     with other oxide midpoints overshoots 100% (sum ~103.7 wt%) because
@@ -445,6 +463,16 @@ lunar_highland:
   label: "Lunar Highland Anorthosite"
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Apollo 16 anorthositic soils"
   confidence: "High"
+  # Same Sato 1976 mare-basalt mean (grand mean dIW -1.01785, n=30).
+  # Sato did not measure highlands. Zhang 2024 treats the Apollo suite as
+  # one mantle average, dIW -1.0 +/- 0.9, so this entry uses the mare mean.
+  fe_redox_prior:
+    delta_iw:
+      value: -1.02
+      range: [-1.42, -0.60]
+      uncertainty: 0.1
+      source_id: sato-1976-lunar-fo2-apollo-17
+      locator: "Table 1, natural bulk-rock rows (iron-capsule parentheses excluded), six mare basalts, 1000-1200 C"
   note: >
     Source data omits Cr2O3, MnO, P2O5; typical highland values added
     from literature (Heiken et al. 1991). Sum ~99.3 wt%.
@@ -652,6 +680,16 @@ lunar_pkt_kreep_average:
   label: "Procellarum KREEP Terrane (PKT) Average"
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Fra Mauro / Imbrium ejecta average (Apollo 14 soils + 15386 analogs)"
   confidence: "High"
+  # Same Sato 1976 mare-basalt mean (grand mean dIW -1.01785, n=30).
+  # Sato did not measure KREEP. Zhang 2024 treats the Apollo suite as
+  # one mantle average, dIW -1.0 +/- 0.9, so this entry uses the mare mean.
+  fe_redox_prior:
+    delta_iw:
+      value: -1.02
+      range: [-1.42, -0.60]
+      uncertainty: 0.1
+      source_id: sato-1976-lunar-fo2-apollo-17
+      locator: "Table 1, natural bulk-rock rows (iron-capsule parentheses excluded), six mare basalts, 1000-1200 C"
   note: >
     Source data omits Cr2O3, MnO; typical KREEP basalt values added.
     MC-1 trace/minor rows are additive; the legacy major-oxide sum_check
@@ -841,6 +879,16 @@ lunar_spa_kreep_influenced:
   label: "South Pole-Aitken KREEP-Influenced"
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: CE-6 impact glasses + noritic SPA floor (diluted deep excavation)"
   confidence: "Medium"
+  # Same Sato 1976 mare-basalt mean (grand mean dIW -1.01785, n=30).
+  # Sato did not measure the SPA floor. Zhang 2024 treats the Apollo suite
+  # as one mantle average, dIW -1.0 +/- 0.9, so this entry uses the mare mean.
+  fe_redox_prior:
+    delta_iw:
+      value: -1.02
+      range: [-1.42, -0.60]
+      uncertainty: 0.1
+      source_id: sato-1976-lunar-fo2-apollo-17
+      locator: "Table 1, natural bulk-rock rows (iron-capsule parentheses excluded), six mare basalts, 1000-1200 C"
   note: >
     Very wide oxide ranges reflect heterogeneous SPA floor lithology.
     Midpoint sum ~102.6 wt%  --  the broad ranges cause overshoot.
@@ -1030,6 +1078,16 @@ targeted_super_kreep_ore:
   label: "Targeted Super-KREEP Ore (Modeled Enriched Blend)"
   source: "MODELED ENRICHED BLEND (synthetic targeted-ore scenario; not a measured table); component basis: major oxides from Apollo 15386-type KREEP basalt analog, K/P/REE/Zr enrichment from VHK clasts + urKREEP immiscible fractions, Cr/Mn trace estimates"
   confidence: "Medium-High"
+  # Same Sato 1976 mare-basalt mean (grand mean dIW -1.01785, n=30).
+  # Sato did not measure this blend. Zhang 2024 treats the Apollo suite as
+  # one mantle average, dIW -1.0 +/- 0.9, so this entry uses the mare mean.
+  fe_redox_prior:
+    delta_iw:
+      value: -1.02
+      range: [-1.42, -0.60]
+      uncertainty: 0.1
+      source_id: sato-1976-lunar-fo2-apollo-17
+      locator: "Table 1, natural bulk-rock rows (iron-capsule parentheses excluded), six mare basalts, 1000-1200 C"
   note: >
     Synthetic enriched-blend scenario for Copernicus rays, Aristarchus,
     Lalande ejecta, and Imbrium enriched strata. Includes per-element La-Lu oxides and ZrO2
@@ -1245,6 +1303,9 @@ lunar_highlands_lhs1:
     retained separately. Simulant, not real regolith: no agglutinates or
     nanophase Fe0; batch-specific XRF should be requested for experiment
     reproduction.
+  fe_redox_split_unknown: true
+  composition_basis:
+    fe_reporting_convention: "total Fe as FeO"
   composition_wt_pct:
     SiO2:  49.12
     TiO2:   0.63
@@ -1297,6 +1358,9 @@ lunar_highlands_lhs1_yu_2025_reference:
     any oxide. Runtime load_batch normalizes the reported rows to the requested
     batch mass as an execution assumption; those normalized runtime fractions
     are not published composition values.
+  fe_redox_split_unknown: true
+  composition_basis:
+    fe_reporting_convention: "total Fe as FeO"
   composition_wt_pct:
     SiO2:  51.2
     FeO:    2.7
@@ -1360,6 +1424,9 @@ lunar_mare_lms1:
     factsheet cross-values where the research note flagged minor-source
     differences. FeO is total iron as FeO. Simulant, not real mare soil:
     agglutinates and nanophase Fe0 are absent.
+  fe_redox_split_unknown: true
+  composition_basis:
+    fe_reporting_convention: "total Fe as FeO"
   composition_wt_pct:
     SiO2:  48.22
     TiO2:   3.62
@@ -1416,6 +1483,9 @@ lunar_mare_oprl2n:
     current-lot oxide table is captured. Simulant, not real regolith; custom
     agglutinates or ilmenite may be added by OPR and must be represented by
     lot-specific metadata.
+  fe_redox_split_unknown: true
+  composition_basis:
+    fe_reporting_convention: "total Fe as FeO"
   composition_wt_pct:
     SiO2:  46.2
     TiO2:   5.5
@@ -1517,6 +1587,17 @@ lunar_mare_jsc_1a_legacy:
   blocked_reason: "Catalog captured legacy/discontinued status only; no source-cited oxide table captured for this chunk."
   source: "NASA/ORBITEC JSC-1A legacy simulant; Merriam Crater basalt ash"
   confidence: "Legacy status high; composition blocked"
+  # JSC-1A MSDS Section 3 midpoints Fe2O3 3.5 and FeO 7.25 wt%.
+  # f = n_Fe3 / (n_Fe2 + n_Fe3) = 0.302840. Uncertainty 0.037455 is half
+  # the span of the four range corners, not a reported sigma. The entry
+  # stays blocked: this prior does not fill the empty composition.
+  # Sibille 2006 Table 9 JSC-1 3.44/7.35 (f = 0.296) is the cross-check.
+  fe_redox_prior:
+    measured_fe3_fraction:
+      value: 0.302840
+      uncertainty: 0.037455
+      source_id: jsc1a-msds-orbitec
+      locator: "Section 3, Fe2O3 3-4 wt% and FeO 7-7.5 wt%; midpoint pair 3.5/7.25; uncertainty is half the span of the four range corners"
   note: >
     JSC-1A is retained as a legacy-status feedstock note because it appears in
     older literature and is no longer generally purchasable. Do not substitute
@@ -1563,6 +1644,8 @@ lunar_eac_1a:
     Use the Engelschiøn et al. 2020 primary XRF table for loadable oxide
     composition. The later Robinot Fig. 5 elemental row is retained below only
     as an extraction-suspect cross-check; do not derive oxides from it.
+    Total Fe reported as FeO in the primary XRF major-oxide table.
+  fe_redox_split_unknown: true
   paper_aliases:
     - EAC-1
   composition_wt_pct:
@@ -1581,7 +1664,7 @@ lunar_eac_1a:
   composition_basis:
     source: "REF-031 Engelschiøn et al. 2020 XRF major oxides, wt% on post-LOI/ignited basis"
     method: "XRF after drying, LOI at 1050 C, and Li2B4O7 fusion glass bead preparation"
-    fe_reporting_convention: "Total Fe reported as FeO in the primary XRF major-oxide table."
+    fe_reporting_convention: "total Fe as FeO"
     secondary_batch_xrf_spread: "Zemeny et al. 2024/Luna Analog Facility stock XRF gives SiO2 42.1-42.3, TiO2 2.1, MgO 13.1-13.8, Na2O 2.8-2.9, Al2O3 11.2, CaO 10.4; use primary Engelschiøn values where batches differ."
     findings_ref: "docs-private/research/2026-06-12-vpr-sources/eac1a-composition-findings.md"
   non_oxide_components:
@@ -1639,7 +1722,8 @@ lunar_mls_1a:
   class: lunar_simulant
   source: "Hill et al. 2007 JGR Planets Table 1, DOI 10.1029/2006JE002767"
   confidence: "High for published major-oxide table; exact Pomeroy/Cardiff batch variation not reported"
-  note: "Load the published MLS-1 major oxides without renormalization; the 2.06 wt% unreported balance is an accounting surrogate only."
+  note: "Load the published MLS-1 major oxides without renormalization; the 2.06 wt% unreported balance is an accounting surrogate only. Total Fe reported as FeO in the source table. Sibille 2006 Table 9 Fe2O3 2.6 / FeO 13.4 is MLS-1, not MLS-1A, and is not used as a prior."
+  fe_redox_split_unknown: true
   composition_wt_pct:
     SiO2: 42.8
     TiO2: 6.77
@@ -1656,7 +1740,7 @@ lunar_mls_1a:
   composition_basis:
     source: "Hill E. et al. 2007, JGR Planets 112:E02006, Table 1, MLS-1A column, DOI 10.1029/2006JE002767"
     method: "Published bulk major-oxide wt%; values retained as stated without renormalization."
-    fe_reporting_convention: "Total Fe reported as FeO in the source table."
+    fe_reporting_convention: "total Fe as FeO"
     pomeroy_batch_note: "Pomeroy/Cardiff identifies MLS-1A but does not publish a run-specific batch analysis."
   non_oxide_components:
     unreported_loi_residual_wt_pct: 2.06
@@ -1935,7 +2019,15 @@ ci_carbonaceous_chondrite:
   label: "CI Carbonaceous Chondrite"
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: CI meteorites; Hayabusa2 Ryugu return; OSIRIS-REx Bennu return"
   confidence: "High"
-  fe_redox_split_unknown: true
+  # Garenne 2019 Table 1 CI rows. Fe3+/(Fe0+Fe2++Fe3+): Orgueil 0.608,
+  # Ivuna 0.411241. Unweighted mean 0.509621. Uncertainty is the sample
+  # standard deviation of those two rows, 0.139130. Not the ~0.6 approximation.
+  fe_redox_prior:
+    measured_fe3_fraction:
+      value: 0.509621
+      uncertainty: 0.139130
+      source_id: garenne-2019-chondrite-fe-xanes-speciation
+      locator: "Table 1, CI rows Orgueil and Ivuna; unweighted mean of Fe3+/(Fe0+Fe2++Fe3+); uncertainty is the sample standard deviation"
   composition_basis:
     fe_reporting_convention: "total Fe as FeO"
   note: >
@@ -2055,7 +2147,15 @@ cm_carbonaceous_chondrite:
     silicate is slightly higher SiO2, lower FeO than CI. Full oxide
     breakdown not provided in source; anhydrous silicate estimated as
     CI-like with noted adjustments.
-  fe_redox_split_unknown: true
+  # Garenne 2019 Table 1, eight unheated CM falls. Unweighted mean of
+  # Fe3+/(Fe0+Fe2++Fe3+) is 0.377256. Uncertainty is the sample standard
+  # deviation, 0.086746. Mighei alone is 0.245; that is not the group value.
+  fe_redox_prior:
+    measured_fe3_fraction:
+      value: 0.377256
+      uncertainty: 0.086746
+      source_id: garenne-2019-chondrite-fe-xanes-speciation
+      locator: "Table 1, unheated CM falls Murchison, Murray, Boriskino, Mighei, Banten, Nogoya, Essebi, Cold Bokkeveld; unweighted mean of Fe3+/(Fe0+Fe2++Fe3+); uncertainty is the sample standard deviation"
   composition_basis:
     fe_reporting_convention: total Fe as FeO
   composition_wt_pct:
@@ -2454,7 +2554,17 @@ mars_global_mgs1:
     excluded_classes: [sulfur, halides, perchlorates, salts, sulfides]
     citation: "Long-Fox J.M. et al. 2023, Frontiers in Space Technologies, Table 2 XRF for MGS-1."
     fe_reporting_convention: "total Fe as FeO"
-  fe_redox_split_unknown: true
+  # December 2022 spec sheet, per 100 g. XRF FeO 11.2 is the Fe-atom total.
+  # Ferrihydrite 3.5 as Fe2O3·0.5H2O (the sheet names the phase and not the
+  # formula), magnetite 1.9 as Fe3O4 (2/3 of its Fe is ferric), hematite 0.5
+  # as Fe2O3. f = 0.411627. No uncertainty is printed on the sheet. The
+  # fraction is applied to the catalog FeO 11.83; 11.2 is not substituted.
+  # Cannon 2019 Table 1 is an older recipe and is not this value.
+  fe_redox_prior:
+    measured_fe3_fraction:
+      value: 0.411627
+      source_id: mgs1-spec-sheet-2022
+      locator: "December 2022 fact sheet, mineralogy ferrihydrite 3.5, magnetite 1.9, hematite 0.5 wt% against XRF FeO 11.2; ferrihydrite taken as Fe2O3·0.5H2O"
   glass_fraction:
     value: "not_reported"
     note: "MGS-1 captured sources do not report glass fraction."

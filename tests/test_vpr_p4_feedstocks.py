@@ -197,7 +197,8 @@ def test_lunar_eac1a_entry_uses_primary_xrf_and_preserves_suspect_robinot_elemen
     assert entry["composition_wt_pct"] == SOURCE_SPOTS["lunar_eac_1a"]
     assert entry["sum_check"] == pytest.approx(98.4)
     assert entry["composition_status"] == "primary_xrf_loadable"
-    assert entry["composition_basis"]["fe_reporting_convention"].startswith("Total Fe reported as FeO")
+    assert entry["composition_basis"]["fe_reporting_convention"] == "total Fe as FeO"
+    assert "Total Fe reported as FeO in the primary XRF major-oxide table." in entry["note"]
     assert "MgO 13.1-13.8" in entry["composition_basis"]["secondary_batch_xrf_spread"]
     assert entry["elemental_composition_wt_pct"] == ROBINOT_EAC1_ELEMENTAL_WT_PCT
     assert entry["elemental_sum_check"] == pytest.approx(96.0)
