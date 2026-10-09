@@ -17,21 +17,21 @@ experimental_regime: kems_effusion
 authority: diagnostic_only
 certifies: false
 records:
-  - record_id: costa_jacobson_2015_fe_olivine_kems
+  - record_id: kems-007-costa-2015::costa_2015_fe_vaporization_coefficient_alpha_digitized
     species: Fe
     regime: kems_effusion
     material: Fo93Fa7_olivine
     temperature_range_K: [1700.0, 1800.0]
-    alpha_value: 0.02
-    alpha_range: [0.011, 0.020]
+    alpha_value: 0.01978
+    alpha_range: [0.011505, 0.01978]
     citation: >-
-      Costa & Jacobson (2015) NASA NTRS 20150002321; KEMS Fo93Fa7 olivine
-      Fe+ vaporization-coefficient range 0.011-0.020 at 1700-1800 K
+      Costa & Jacobson (2015) NASA NTRS 20150002321; five digitized KEMS Fo93Fa7
+      olivine Fe+ vaporization-coefficient points at 1700-1800 K
     doi_or_url: https://ntrs.nasa.gov/citations/20150002321
     extraction_note: >-
-      KEMS campaign Fe+ coefficient; runtime adopts the measured high-side
-      bound as the conservative literature pin (still diagnostic for rail
-      certification).
+      Direct marker-center reading at 1753.84 K from the Fe+ panel on PDF p. 11;
+      the envelope is the min/max of the five digitized owner-series points.
+      Still diagnostic for rail certification.
     certifies: false
 
   - record_id: halwax_2024_cao_kems_series

@@ -213,25 +213,14 @@ _SIO_EVIDENCE: tuple[EvidenceRow, ...] = (
 _REDOX_EVIDENCE: tuple[EvidenceRow, ...] = (
     EvidenceRow(
         source_id="kems-007-costa-2015",
-        observation_id="costa_2015_fe_olivine_kems_alpha_multicell",
+        observation_id="costa_2015_fe_vaporization_coefficient_alpha_digitized",
         species="Fe",
         system_class="solid_solution_silicate",
         transformation_class="redox_reduction_required",
-        alpha_note="0.02 KEMS; geometry ABSENT (b-116 open)",
+        alpha_note="0.01978, Fe+ figure point at 1753.84 K; geometry ABSENT",
         comparable=True,
         role="grounding",
-        alpha=0.02,
-    ),
-    EvidenceRow(
-        source_id="costa-jacobson-2015",
-        observation_id="costa_jacobson_2015_fe_olivine_kems",
-        species="Fe",
-        system_class="solid_solution_silicate",
-        transformation_class="redox_reduction_required",
-        alpha_note="0.02",
-        comparable=True,
-        role="grounding",
-        alpha=0.02,
+        alpha=0.01978,
     ),
     EvidenceRow(
         source_id="kems-005-fedkin-2006",
@@ -450,29 +439,29 @@ _MARKED_IDEAL_FENCES: tuple[EvidenceRow, ...] = (
 # silicate_melt_cation_redox — recompute from comparable grounding alphas.
 # Pilot/kems mirrors of the same measurement are collapsed to one pole:
 #
-#   Costa Fe olivine KEMS (costa_2015_fe… / costa_jacobson…):     0.02
+#   Costa Fe olivine KEMS (1753.84 K figure point):                 0.01978
 #   Fedkin Fe Hashimoto Langmuir (fedkin_2006_fe… / table3_fe…):  0.24
 #   Fedkin Mg Hashimoto (kems 0.24 + table3 0.27) → √(0.24·0.27): 0.254558
 #   Richter Mg CAI γ (richter_2002_mg…):                          0.04
 #
 # gmean = exp(mean(ln α_i))
-#       = exp( (ln 0.02 + ln 0.24 + ln √(0.24·0.27) + ln 0.04) / 4 )
-#       = 0.083612…  → class central 0.084 (3 s.f.)
+#       = exp( (ln 0.01978 + ln 0.24 + ln √(0.24·0.27) + ln 0.04) / 4 )
+#       = 0.083382…  → class central 0.083 (3 s.f.)
 #
-# Cross-check: Fe-pole-only gmean √(0.02·0.24) = 0.0693, which alone already
+# Cross-check: Fe-pole-only gmean √(0.01978·0.24) = 0.0689, which alone already
 # refutes the prior 0.10 central. Full-class gmean is used (not Fe-only).
 #
-# Band: every grounded α ∈ {0.02, 0.24, 0.27, 0.04} must lie in
+# Band: every grounded α ∈ {0.01978, 0.24, 0.27, 0.04} must lie in
 #   [α_c · 10^{-σ}, α_c · 10^{+σ}].
-#   max_i |log10(α_i / 0.084)| = |log10(0.02/0.084)| = 0.623 → residual 0.63 dex.
-#   Programme 0.5-dex pin is a floor, not a ceiling. Fe poles 0.02 and 0.24
-#   differ by log10(0.24/0.02) = 1.079 dex, but those two rows also differ in
+#   max_i |log10(α_i / 0.083)| = |log10(0.01978/0.083)| = 0.624 → residual 0.62 dex.
+#   Programme 0.5-dex pin is a floor, not a ceiling. Fe poles 0.01978 and 0.24
+#   differ by log10(0.24/0.01978) = 1.084 dex, but those two rows also differ in
 #   condensed phase (solid_solution_olivine / kems_effusion vs silicate_melt /
 #   langmuir_free_evaporation), material, and T window (Costa ~1700–1800 K
 #   vs Fedkin 1973–2273 K). This comment block does not isolate Motzfeldt
 #   geometry as the cause of that spread: Costa's extract records a
 #   Whitman–Motzfeld multi-cell path with missing numeric orifices; Fedkin
-#   is free-evaporation (not Knudsen). Residual 0.63 dex is coverage of the
+#   is free-evaporation (not Knudsen). Residual 0.62 dex is coverage of the
 #   stored poles, not a Motzfeldt-corrected split. A unique-cause
 #   decomposition of the Fe spread is unestablished here.
 #
@@ -480,8 +469,8 @@ _MARKED_IDEAL_FENCES: tuple[EvidenceRow, ...] = (
 # Limiting cases: σ→0 collapses to a point estimate (false precision here);
 # σ ≥ half-span of log poles is the minimum honest band.
 
-_REDOX_CENTRAL_ALPHA: Final[float] = 0.084
-_REDOX_RESIDUAL_DEX: Final[float] = 0.63
+_REDOX_CENTRAL_ALPHA: Final[float] = 0.083
+_REDOX_RESIDUAL_DEX: Final[float] = 0.62
 
 # SiO-class: keep rail prior_scalar 0.04 as central; residual widens so every
 # stored comparable numeric pin (Costa log-mid ~0.0104, Fedkin 0.17) is covered.

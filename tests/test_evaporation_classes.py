@@ -9,6 +9,7 @@ import pytest
 from simulator.evaporation_classes import (
     e_down_from_s,
     flux_band_factors,
+    grounding_evidence,
     interface_resistance_share,
     interface_share_s,
     report_species_class_diagnostics,
@@ -142,4 +143,15 @@ def test_report_species_class_diagnostics_class_alpha_fallback_unchanged():
     assert diag.alpha_runtime is None
     assert diag.alpha_runtime_note.endswith("+class_alpha_fallback_for_s")
     assert diag.series is not None
-    assert diag.series.alpha_intrinsic == pytest.approx(0.084)
+    assert diag.series.alpha_intrinsic == pytest.approx(0.083)
+
+
+def test_costa_redox_grounding_uses_owner_figure_series_once():
+    costa = [
+        row for row in grounding_evidence("silicate_melt_cation_redox")
+        if "costa" in row.source_id
+    ]
+    assert len(costa) == 1
+    assert costa[0].source_id == "kems-007-costa-2015"
+    assert costa[0].observation_id == "costa_2015_fe_vaporization_coefficient_alpha_digitized"
+    assert costa[0].alpha == pytest.approx(0.01978)
