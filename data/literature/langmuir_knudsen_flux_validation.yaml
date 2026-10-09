@@ -13,6 +13,8 @@ measurements:
     measured_langmuir_to_effusion_flux_ratio:
       value: 0.90
       uncertainty_absolute: 0.10
+    derived_from:
+      - kems-003-pound-1972::pound_1972_cr_solid_alpha_mccabe
     source:
       citation_id: REF-040
       citation: "Pound, G. M. (1972), J. Phys. Chem. Ref. Data 1, 135-146, Table 1"
@@ -28,6 +30,8 @@ measurements:
     measured_langmuir_to_effusion_flux_ratio:
       value: 0.13
       uncertainty_absolute: 0.02
+    derived_from:
+      - kems-005-fedkin-2006::fedkin_2006_k_yu_langmuir
     source:
       citation_id: REF-014
       citation: "Fedkin et al. (2006), Geochim. Cosmochim. Acta 70, 206-223; value tabulated with uncertainty by Richter et al. (2011), Meteorit. Planet. Sci. 46"
@@ -41,6 +45,12 @@ measurements:
     temperature_range_k: [1700, 1800]
     measured_langmuir_to_effusion_flux_ratio:
       range: [0.011, 0.020]
+    derived_from:
+      - kems-007-costa-2015::T=1700.75:h=682762865c33
+      - kems-007-costa-2015::T=1722.97:h=62173258382a
+      - kems-007-costa-2015::T=1753.84:h=987cbef2f63c
+      - kems-007-costa-2015::T=1794.26:h=733623c7db8d
+      - kems-007-costa-2015::T=1799.68:h=aaacb48a2180
     source:
       citation_id: REF-016
       citation: "Costa & Jacobson (2015), Vaporization Studies of Olivine via Knudsen Effusion Mass Spectrometry, NASA NTRS 20150002321"
