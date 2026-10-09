@@ -159,6 +159,10 @@ def _repair_notice_test_record() -> tuple[dict[str, str], dict[str, object]]:
             "artifact": "freeze_gate_curve",
             "schema_version": "test",
             "tag": "notice-recapture",
+            "namespace_id": "test:notice-recapture",
+            "vapor_pressure_provider_selection": "test-vapor-provider",
+            "sulfur_side": {},
+            "model": {},
         },
         {"curve": {"status": "in_range", "tag": "notice-recapture"}},
     )
@@ -527,7 +531,9 @@ def _run_capped_c2a_with_equilibrium_counter(
         "liquidus_T_C": 1320.0,
         "path": ((1210.0, 0.0), (1320.0, 1.0)),
     }
-    sim._freeze_gate_curve_from_gate_dispatch = lambda reasons, *, fO2_log: dict(freeze_curve)
+    sim._freeze_gate_curve_from_gate_dispatch = (
+        lambda reasons, *, fO2_log, repair_notices=None: dict(freeze_curve)
+    )
     original_equilibrate = sim.backend.equilibrate
     calls = 0
 

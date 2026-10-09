@@ -33,6 +33,7 @@ from simulator.fe_redox import (
 from simulator.melt_backend.base import EquilibriumResult, MeltCompositionError
 from simulator.reduced_real_determinism import (
     PT0DeterminismStore,
+    _gate_provider_role_for_key,
     canonical_json_bytes,
     record_dependency_vector,
 )
@@ -441,9 +442,17 @@ def _install_freeze_gate_curve(
     }
     if path is not None:
         curve['path'] = path
+    dependency_vector = record_dependency_vector(
+        sim,
+        ChemistryIntent.GATE_LIQUID_FRACTION,
+        artifact='freeze_gate_curve',
+        provider_role=_gate_provider_role_for_key(sim),
+    )
     sim._freeze_gate_liquid_fraction_cache = {
         'key': _freeze_gate_key_for_current_state(sim),
         'curve': curve,
+        'dependency_vector': dependency_vector,
+        'repair_notices': [],
     }
 
 
@@ -1071,7 +1080,7 @@ def test_redox_liquid_gate_builds_outer_curve_when_cache_missing_default_off(
     memo_curve = sim._melt_redox_liquidus_gate_curve()
 
     assert memo_curve['source'] == 'gate_liquid_fraction'
-    assert gate_calls == 1
+    assert gate_calls == 2
 
 
 def test_redox_liquid_gate_rebuilds_stale_cache_on_key_mismatch(
@@ -1928,7 +1937,7 @@ def test_projected_notice_survives_shared_cache_reuse_in_run_metadata(
     for index, sim in enumerate(sims):
         sim._freeze_gate_shared_curve_cache = shared_cache
         sim._freeze_gate_curve_from_gate_dispatch = (
-            lambda reasons, *, fO2_log, index=index: (
+            lambda reasons, *, fO2_log, repair_notices=None, index=index: (
                 calls.append(index) or dict(curve)
             )
         )
@@ -2644,7 +2653,7 @@ def test_shared_freeze_gate_curve_cache_uses_melt_input_only(
         )
         sim._freeze_gate_shared_curve_cache = shared_cache
         sim._freeze_gate_curve_from_gate_dispatch = (
-            lambda reasons, *, fO2_log, index=index: (
+            lambda reasons, *, fO2_log, repair_notices=None, index=index: (
                 calls.append(index) or curves[index]
             )
         )
@@ -2849,7 +2858,7 @@ def test_shared_freeze_gate_curve_cache_splits_validation_map_dose_states(
         )
         sim._freeze_gate_shared_curve_cache = shared_cache
         sim._freeze_gate_curve_from_gate_dispatch = (
-            lambda reasons, *, fO2_log, index=index: (
+            lambda reasons, *, fO2_log, repair_notices=None, index=index: (
                 calls.append(index) or curves[index]
             )
         )
