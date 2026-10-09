@@ -600,6 +600,11 @@ species:
           B: 16650.0
           original_source: Hastie et al. (1980)
           note: equation corresponds to [K2O] ~14; Illinois no. 6 / UTSI
+          composition_role:
+            value: initial_charge_only
+            locator: {page: 24, published_page: 24, pdf_page_index: 30, table: '2', note: 'body row 13; Comments column, with footnote a'}
+            quote: 'Equation corresponds to [K2O] ~ 14.'
+            note: 'Footnote a: the System column prints initial compositions. The fit is for K2O ~14 wt%, below the printed 19.5.'
         - system: synthetic Western channel slag
           composition_wt_pct:
             K2O: 22.7
@@ -614,6 +619,11 @@ species:
           B: 18472.0
           original_source: Plante and Cook (1978)
           K2O_during_run_wt_pct_as_published: 18.9-17.6
+          composition_role:
+            value: initial_charge_only
+            locator: {page: 24, published_page: 24, pdf_page_index: 30, table: '2', note: 'body row 14; Comments column, with footnote a'}
+            quote: '[K2O] 18.9-17.6.'
+            note: 'Footnote a: the System column prints initial compositions. Run K2O 18.9-17.6 wt%, below the printed 22.7.'
         - system: synthetic Eastern channel slag
           composition_wt_pct:
             K2O: 23.6
@@ -628,6 +638,11 @@ species:
           B: 19056.0
           original_source: Plante and Cook (1978)
           K2O_during_run_wt_pct_as_published: 23.3-22.1
+          composition_role:
+            value: initial_charge_only
+            locator: {page: 24, published_page: 24, pdf_page_index: 30, table: '2', note: 'body row 15; Comments column, with footnote a'}
+            quote: '23.3-22.1 [K2O].'
+            note: 'Footnote a: the System column prints initial compositions. Run K2O 23.3-22.1 wt%, below the printed 23.6.'
         - system: illite
           composition_wt_pct:
             K2O: 7.4
@@ -654,6 +669,11 @@ species:
           B: 17863.0
           original_source: Hastie et al. (1980)
           note: 6[K2O]; initial P_O2 >= P_K, later fell to the level of K2O
+          composition_role:
+            value: initial_charge_only
+            locator: {page: 25, published_page: 25, pdf_page_index: 31, table: '2', note: 'body row 17; Comments column, with footnote a'}
+            quote: '6[K2O].'
+            note: 'Footnote a: the System column prints initial compositions. The fit is for K2O ~6 wt%, below the printed 8.7.'
         note: >-
           T columns are ranges. A,B,C,D,E stored as printed; P(T) not evaluated.
           Do not average with the 1975/1978/1979/1980 originals if those later

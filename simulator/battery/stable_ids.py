@@ -89,12 +89,16 @@ def series_row_extra(raw_item: Any, *, include_locator: bool = True) -> str | No
             label = loc.get("paragraph") or loc.get("row")
     if label is not None and str(label).strip():
         parts.append(f"row={_name_slug(str(label))}")
+    # ``composition_role`` (b-716) annotates what the row's printed oxide map
+    # stands for; it is not part of the printed row, so declaring it on a row
+    # must not rename that row's point id.
     skip = {
         "T_K",
         "T_C",
         "temperature_K",
         "temperature_quote",
         "quote",
+        "composition_role",
     }
     if not include_locator:
         skip.add("locator")

@@ -79,6 +79,8 @@ from simulator.battery.migrate import (
     to_plain,
 )
 from simulator.battery.records import (
+    INITIAL_CHARGE_ONLY_PROXY_FLAG,
+    SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX,
     Bench,
     CandidateRequest,
     Composition,
@@ -815,6 +817,42 @@ def _catalogue_composition_notice(reference: Observation) -> Notice | None:
     )
 
 
+def _initial_charge_composition_notice(reference: Observation) -> Notice | None:
+    """Predict with an initial-charge composition, then flag the residual.
+
+    ``proxy_flag == initial_charge_only`` marks a printed starting charge
+    standing in for a later (depleted) state. The residual joins the existing
+    source-internally-inconsistent diagnostic stratum (b-716).
+    """
+
+    identity = reference.identity
+    if not isinstance(identity, Identity):
+        return None
+    quantity = quantity_token(identity)
+    if quantity is None:
+        return None
+    point = (reference.point_conditions or {}).get("composition")
+    states = (identity.composition, point.state if isinstance(point, Located) else None)
+    if not any(
+        state is not None
+        and state.is_value
+        and isinstance(state.value, Composition)
+        and state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+        for state in states
+    ):
+        return None
+    return Notice(
+        kind=NoticeKind.SOURCE_DISAGREEMENT,
+        affected_quantities=(quantity,),
+        reason=(
+            f"{SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX} "
+            f"composition_role={INITIAL_CHARGE_ONLY_PROXY_FLAG}: the printed "
+            "composition is the starting charge, not the state of this datum"
+        ),
+        origin=reference.observation_id,
+    )
+
+
 def _missing_apparatus_fact(
     check: object,
     *,
@@ -1017,6 +1055,11 @@ def _flagged_stratum_notices(
         _unverified_apparatus_notices(reference, experiment, gates),
         _cell_apparatus_inference_notices(reference, experiment, bench),
         (() if (notice := _catalogue_composition_notice(reference)) is None else (notice,)),
+        (
+            ()
+            if (notice := _initial_charge_composition_notice(reference)) is None
+            else (notice,)
+        ),
     )
 
 

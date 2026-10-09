@@ -98,6 +98,7 @@ from simulator.battery.stable_ids import (
     temperature_token,
 )
 from simulator.battery.records import (
+    INITIAL_CHARGE_ONLY_PROXY_FLAG,
     Admission,
     AdmissionDecision,
     Annotations,
@@ -3271,6 +3272,33 @@ def _located_printed_and_initial(
         inference=wt_pct_to_mole_fraction_derivation(wt, locator),
     )
     return printed, initial
+
+
+_COMPOSITION_ROLE_TOKENS = frozenset({INITIAL_CHARGE_ONLY_PROXY_FLAG})
+
+
+def _declared_composition_role(*roots: object) -> tuple[str | None, str | None]:
+    """Return (role, refusal) from the first ``composition_role`` declared.
+
+    The row is read before its parent values block. A role is either the bare
+    token or a mapping whose ``value`` is the token (with its page locator and
+    quote kept beside it in the extract). A token outside the closed set is a
+    refusal, never a guess.
+    """
+
+    for root in roots:
+        if not isinstance(root, Mapping) or "composition_role" not in root:
+            continue
+        raw = root.get("composition_role")
+        token = raw.get("value") if isinstance(raw, Mapping) else raw
+        token = str(token).strip() if token is not None else ""
+        if token in _COMPOSITION_ROLE_TOKENS:
+            return token, None
+        return None, (
+            f"composition_role {token!r} is not one of "
+            f"{sorted(_COMPOSITION_ROLE_TOKENS)}; composition left unstamped"
+        )
+    return None, None
 
 
 def conversion_derivation(
@@ -13226,6 +13254,21 @@ class Migrator:
             printed, residual = _located_printed_and_initial(
                 point_oxide_map, point_locator
             )
+            role, role_refusal = _declared_composition_role(raw_item, parent_values)
+            if role_refusal is not None:
+                self.result.add_queue(
+                    work.work_id,
+                    point_locator,
+                    ["composition"],
+                    role_refusal,
+                    source=source_key,
+                    observation_id=point_id,
+                )
+            if residual is not None and role is not None:
+                residual = replace(
+                    residual,
+                    state=State.of(replace(residual.state.value, proxy_flag=role)),
+                )
             extra_pc: dict[str, Located[Any]] = {}
             if printed is not None:
                 extra_pc["printed_composition"] = printed
