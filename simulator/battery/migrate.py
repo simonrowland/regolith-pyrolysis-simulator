@@ -5819,6 +5819,11 @@ def _yield_point_admission(
 ) -> Admission:
     if parent_admission.status is AdmissionStatus.SUPERSEDED:
         return parent_admission
+    if item.get("T_C_is_initial_composition") is True:
+        return Admission(
+            status=AdmissionStatus.PENDING,
+            reason="initial composition is not a run-temperature mass-loss measurement",
+        )
     test_id = str(item.get("test") or "")
     if test_id in {"2b", "3"}:
         disagreement = _cardiff_matchett_disagreement_reason(parent_values)
@@ -13450,6 +13455,11 @@ class Migrator:
                 if q_for_species is Quantity.RESIDUE_COMPONENT_COMPOSITION
                 else _oxide_map_from_mapping(raw_item)
             )
+            if (
+                q_for_species is Quantity.MASS_LOSS_FRACTION
+                and point_oxide_map is None
+            ):
+                point_oxide_map = _initial_oxide_map_from_values(parent_values)
             if q_for_species in _BULK_PROPERTY_QUANTITIES:
                 species_formula = bulk_property_species_formula(
                     quantity=q_for_species,

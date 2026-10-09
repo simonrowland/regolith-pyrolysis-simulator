@@ -364,7 +364,15 @@ species:
             table: '2'
             published_page: 510
             pdf_page_index: 2
+        T_C_0_note: T=0 / M=0 is the initial five-oxide recast, not a run temperature
         series:
+        - mass_loss_pct: 0
+          T_C_is_initial_composition: true
+          locator:
+            published_page: 510
+            table: '2'
+            pdf_page_index: 2
+            note: Table 2 left panel (composition VI), printed T=0 / M%=0 initial charge
         - T_C: 1475
           mass_loss_pct: 1.46
           SiO2_wt_pct: 44.4
@@ -540,7 +548,15 @@ species:
             table: '2'
             published_page: 510
             pdf_page_index: 2
+        T_C_0_note: T=0 / M=0 is the initial five-oxide recast, not a run temperature
         series:
+        - mass_loss_pct: 0
+          T_C_is_initial_composition: true
+          locator:
+            published_page: 510
+            table: '2'
+            pdf_page_index: 2
+            note: Table 2 right panel (composition V), printed T=0 / M%=0 initial charge
         - T_C: 1476
           mass_loss_pct: 1.17
           SiO2_wt_pct: 52.4
