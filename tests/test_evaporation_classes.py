@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 import math
+from pathlib import Path
+
+import yaml
 
 import pytest
 
@@ -153,12 +156,23 @@ def test_consolidated_duplicate_evidence_alpha_values_stay_pinned():
         *evaporation_classes._MODIFIER_EVIDENCE,
         *evaporation_classes._MARKED_IDEAL_FENCES,
     )
+    owner_extract = yaml.safe_load(
+        (Path(__file__).parents[1] / "data/literature/extracts/kems-005-fedkin-2006.yaml")
+        .read_text(encoding="utf-8")
+    )
+    mg_owner = next(
+        row
+        for row in owner_extract["species"]["Mg"]["observations"]
+        if row["observation_id"] == "fedkin_2006_mg_hashimoto_langmuir_table3"
+    )
     targets = {
         ("costa-jacobson-2015", "costa_jacobson_2015_fe_olivine_kems"): 0.02,
         ("kems-007-costa-2015", "costa_2015_fe_olivine_kems_alpha_multicell"): 0.02,
         ("kems-005-fedkin-2006", "fedkin_2006_sio_hashimoto_langmuir_table3"): 0.17,
         ("kems-005-fedkin-2006", "fedkin_2006_fe_hashimoto_langmuir_table3"): 0.24,
-        ("kems-005-fedkin-2006", "fedkin_2006_mg_hashimoto_langmuir_table3"): 0.27,
+        ("kems-005-fedkin-2006", "fedkin_2006_mg_hashimoto_langmuir_table3"): mg_owner[
+            "values"
+        ]["alpha"],
         ("kems-005-fedkin-2006", "fedkin_2006_na_yu_langmuir"): 0.26,
         ("kems-005-fedkin-2006", "fedkin_2006_k_yu_langmuir"): 0.13,
         ("kems-012-sossi-2019", "sossi_2019_na_alpha_e_authors_adopted_unity"): 1.0,
