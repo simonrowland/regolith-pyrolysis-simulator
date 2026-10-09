@@ -557,6 +557,43 @@ def test_migrate_plante_shaped_charge_survives_residual_evolution(tmp_path: Path
     assert start_x != later_x
 
 
+def test_registry_charge_repeated_by_row_keeps_derived_initial_composition(
+    tmp_path: Path,
+) -> None:
+    raw = _plante_evolving_extract()
+    charge = dict(_PLANTE_CHARGE_WT)
+    raw["experiments"] = [
+        {
+            "experiment_id": "k2o-sio2-effusion-series",
+            "method": "knudsen_effusion",
+            "sample": {
+                "printed_composition": {
+                    "state": {"tag": "value", "value": charge},
+                    "locator": {"table": "2", "published_page": 276},
+                }
+            },
+        }
+    ]
+    for observation in raw["species"]["K2O"]["observations"]:
+        observation["experiment"] = "k2o-sio2-effusion-series"
+
+    result = migrate(_write_min_tree(tmp_path, raw), write=False)
+
+    experiment_id = result.observations[
+        "fixture-source::plante_s1104_start"
+    ].experiment_id
+    experiment = result.experiments[experiment_id]
+    initial = experiment.sample.initial_composition
+    assert initial is not None and initial.state.is_value
+    assert initial.state.value.amount_basis is AmountBasis.MOLE_FRACTION
+    assert initial.inference is not None
+    assert initial.inference.relation == "wt_pct_to_mole_fraction"
+    expected = wt_pct_to_mole_fraction(
+        {key: as_decimal(value) for key, value in _PLANTE_CHARGE_WT.items()}
+    )
+    assert dict(initial.state.value.components) == dict(expected.components)
+
+
 def test_plante_1979_one_k2si2o5_charge_not_eight_series_experiments() -> None:
     """Table 2 is one K2Si2O5 charge; series are analysis groups, not reloads.
 

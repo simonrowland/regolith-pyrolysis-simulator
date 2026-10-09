@@ -30,6 +30,15 @@ benches:
     locator:
       section: 3.1 Starting materials and experimental procedure
 experiments:
+- experiment_id: type-b-cai-like-lab-melt
+  method: vacuum_evaporation
+  locator: {note: "Type B CAI-like laboratory melt shared by geometry, non-loss, and gamma-fit rows"}
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: {MgO: '11.48', SiO2: '46', Al2O3: '19.39', CaO: '23.12'}
+      locator: {note: Starting Type B CAI-like composition for vacuum evaporation experiments (Richter et al. 2007)}
 - experiment_id: cai-r3-12
   bench_id: hashimoto-vacuum-furnace
   method: free_evaporation
@@ -5199,6 +5208,7 @@ species:
   Mg:
     observations:
     - observation_id: richter_2007_mg_cai_langmuir_alpha_arrhenius
+      experiment: type-b-cai-like-lab-melt
       type: alpha
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
@@ -5269,6 +5279,7 @@ species:
             paragraph: iridium loop; Hashimoto high-temperature vacuum furnace
             line_range: 105-107
     - observation_id: richter_2007_mg_rate_series_geometry
+      experiment: type-b-cai-like-lab-melt
       type: rate_series
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
@@ -5688,6 +5699,7 @@ species:
             paragraph: iridium loops
       experiment: cai-r-16
     - observation_id: richter_2007_mg_quoted_fits
+      experiment: type-b-cai-like-lab-melt
       type: alpha
       class_tag: model
       locator:
@@ -55430,6 +55442,7 @@ species:
   SiO:
     observations:
     - observation_id: richter_2007_sio_cai_langmuir_alpha_arrhenius
+      experiment: type-b-cai-like-lab-melt
       type: alpha
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
@@ -55489,6 +55502,7 @@ species:
             paragraph: iridium loop
             line_range: '107'
     - observation_id: richter_2007_sio_quoted_fits
+      experiment: type-b-cai-like-lab-melt
       type: alpha
       class_tag: model
       locator:
@@ -57108,6 +57122,7 @@ species:
   Ca:
     observations:
     - observation_id: richter_2007_ca_non_loss_until_mg_exhausted
+      experiment: type-b-cai-like-lab-melt
       type: rate_series
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
@@ -57152,6 +57167,7 @@ species:
             paragraph: pressure at run conditions was always less than 10^-6 Torr
             line_range: '105'
     - observation_id: richter_2007_ca_quoted_non_loss_bound
+      experiment: type-b-cai-like-lab-melt
       type: rate_series
       class_tag: measured
       locator:
@@ -57175,6 +57191,7 @@ species:
   Al:
     observations:
     - observation_id: richter_2007_al_non_loss_until_mg_exhausted
+      experiment: type-b-cai-like-lab-melt
       type: rate_series
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
@@ -57219,6 +57236,7 @@ species:
             paragraph: pressure at run conditions was always less than 10^-6 Torr
             line_range: '105'
     - observation_id: richter_2007_al_quoted_non_loss_bound
+      experiment: type-b-cai-like-lab-melt
       type: rate_series
       class_tag: measured
       locator:
