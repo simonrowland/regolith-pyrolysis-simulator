@@ -520,3 +520,129 @@ def catalog_payload_from_channels(
         family_id = f"t1139_{channel.element}_{channel.carrier}_family"
         families[family_id] = channel.family
     return {"schema_version": 2, "families": families}
+
+
+def _manifest_coverage(catalog, catalog_payload, *, manifest=None):
+    """Classify every demand pair against the inserted production rows."""
+    from simulator.vapour_rail.u0_manifest import canonicalize_gas_id
+
+    payload = manifest if manifest is not None else load_demand_manifest()
+    by_formula = {}
+    for species in catalog.species.values():
+        by_formula.setdefault(canonicalize_gas_id(species.formula), []).append(species)
+    report = []
+    for pair in payload["pairs"]:
+        formula = canonicalize_gas_id(pair["formula"])
+        candidates = by_formula.get(formula, ())
+        live = [s for s in candidates if s.evaluator is not None
+                and s.code_metadata.request_rule != "dormant_pending_validation"
+                and s.code_metadata.hot_train_applicability not in {"not_applicable", "inapplicable"}]
+        item = {"element": pair["element"], "carrier": pair["carrier"],
+                "formula": pair["formula"]}
+        if live:
+            item.update(path="evaluated_channel", species_ids=[s.species_id for s in live],
+                        validation_status=[s.validation_status.value for s in live])
+        else:
+            reasons = []
+            for species in candidates:
+                family = catalog_payload["families"][species.family_id]
+                raw = family["physical_properties"]["species"][species.species_id]
+                reasons.append(raw.get("dormancy_reason") or {
+                    "kind": "catalog_channel_not_live",
+                    "detail": species.code_metadata.request_rule,
+                    "species_id": species.species_id,
+                })
+            item.update(path="typed_gap", reasons=reasons or [{
+                "kind": "no_production_catalog_channel",
+                "detail": "No compiled carrier with this formula; no source/reaction binding was invented.",
+            }])
+        report.append(item)
+    _assert_manifest_coverage(report, payload)
+    return report
+
+
+def _assert_manifest_coverage(report, manifest):
+    expected = {(p["element"], p["carrier"]) for p in manifest["pairs"]}
+    actual = [(p["element"], p["carrier"]) for p in report]
+    if len(actual) != len(set(actual)) or set(actual) != expected:
+        raise ValueError("silent demand-manifest omission or duplicate coverage")
+    for item in report:
+        if item["path"] == "evaluated_channel" and item.get("species_ids"):
+            continue
+        if item["path"] == "typed_gap" and item.get("reasons"):
+            if all(reason.get("kind") and (reason.get("detail") or reason.get("participants"))
+                   for reason in item["reasons"]):
+                continue
+        raise ValueError("untyped demand-manifest coverage")
+
+
+def _all_feedstock_coverage(catalog, catalog_payload, feedstocks, *, temperature_K):
+    """Inventory and activity paths for every declared feedstock element."""
+    from simulator.accounting.formulas import load_species_formulas, resolve_species_formula
+    from simulator.feedstock_composition import (
+        fe_metal, normalized_feedstock_component_masses_kg, trace_element_disposition,
+    )
+    from simulator.vapour_rail.activity import trace_parent_gamma_report
+    from simulator.reference_data.janaf import _feedstock_element_symbols_from_payload
+
+    registry = load_species_formulas(ROOT / "data" / "species_catalog.yaml")
+    pairs = _manifest_coverage(catalog, catalog_payload)
+    gamma = trace_parent_gamma_report(temperature_K)
+    report = {}
+    for feedstock_id, feedstock in feedstocks.items():
+        components = normalized_feedstock_component_masses_kg(feedstock, 1000.0)
+        elements = {}
+        unresolved = []
+        for component, mass in components.items():
+            if mass <= 0:
+                continue
+            try:
+                atoms = resolve_species_formula(component, registry).elements
+            except ValueError:
+                unresolved.append({"component": component, "mass_kg": mass,
+                    "kind": "unresolved_component_formula"})
+                continue
+            for element in atoms:
+                elements.setdefault(element, {"components": [], "paths": []})["components"].append(component)
+        for component, declaration in (feedstock.get("stage0_formula_inventory") or {}).items():
+            atoms = declaration.get("atoms")
+            if atoms is None:
+                formula = declaration.get("template_formula") or declaration.get("formula") or component
+                atoms = resolve_species_formula(formula, registry).elements
+            for element in atoms:
+                entry = elements.setdefault(element, {"components": [], "paths": []})
+                entry["components"].append("stage0:" + component)
+                entry["paths"].append({"path": "typed_gap", "kind": "stage0_inventory_scope",
+                    "detail": "Declared Stage-0 inventory follows pretreatment, outside melt trace evaporation."})
+        for element, entry in elements.items():
+            if trace_element_disposition(element) == "siderophile_in_metal_scope_gap" and (fe_metal(feedstock) or 0) > 0:
+                entry["paths"].append({"path": "typed_gap", "kind": "siderophile_in_metal_scope_gap",
+                    "detail": "Metal-host evaporation is outside the oxide-parent channel scope."})
+                continue
+            paths = [p for p in pairs if p["element"] == element]
+            grouped = {}
+            for path in paths:
+                key = (path["path"], repr(path.get("reasons")))
+                group = grouped.setdefault(key, {"path": path["path"], "carriers": []})
+                group["carriers"].append(path["carrier"])
+                if path["path"] == "typed_gap":
+                    group["reasons"] = path["reasons"]
+                else:
+                    group.setdefault("species_ids", set()).update(path["species_ids"])
+            for group in grouped.values():
+                if "species_ids" in group:
+                    group["species_ids"] = sorted(group["species_ids"])
+                entry["paths"].append(group)
+            if element in LIQUID_PARENT_OXIDE:
+                entry["activity"] = gamma[LIQUID_PARENT_OXIDE[element]]
+            if not entry["paths"]:
+                entry["paths"].append({"path": "typed_gap", "kind": "no_element_owner_demand",
+                    "detail": "The carrier-demand manifest does not classify this element's process routes; retention is not inferred."})
+        for element in _feedstock_element_symbols_from_payload({feedstock_id: feedstock}):
+            if element not in elements:
+                elements[element] = {"components": ["declaration_only"], "paths": [{
+                    "path": "typed_gap", "kind": "declared_inventory_outside_melt",
+                    "detail": "Declared element is outside the resolved positive melt inventory; no ceramic or evaporation disposition assumed.",
+                }]}
+        report[feedstock_id] = {"elements": elements, "unresolved_components": unresolved}
+    return report

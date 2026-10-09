@@ -1125,6 +1125,11 @@ def feedstock_element_symbols(feedstocks_path: Path | None = None) -> list[str]:
     payload = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
     if not isinstance(payload, Mapping):
         raise JanafParseError(f"{path}: expected mapping")
+    return _feedstock_element_symbols_from_payload(payload)
+
+
+def _feedstock_element_symbols_from_payload(payload: Mapping[str, Any]) -> list[str]:
+    """The same declaration census for file and already-loaded callers."""
     found: set[str] = set()
 
     def add_formula(token: str) -> None:
