@@ -446,7 +446,10 @@ from simulator.state import (
     STOICH_RATIOS,
 )
 from simulator.vapour_rail.batch import FluxActivationContext
-from simulator.equilibrium import EquilibriumMixin
+from simulator.equilibrium import (
+    EquilibriumMixin,
+    oxygen_potential_mode_for_atmosphere,
+)
 from simulator.evaporation import EvaporationMixin
 from simulator.extraction import ExtractionMixin
 from simulator.melt_backend.base import (
@@ -2174,6 +2177,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         melt_activity_engine_inputs: Mapping[str, Any] | None = None,
         provider_candidates_by_species: dict | None = None,
         flux_activation_context: FluxActivationContext | None = None,
+        oxygen_potential_mode: str | None = None,
     ):
         """Exact-key vapour batch via VR-6 request builder + refusal closure.
 
@@ -2240,6 +2244,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 melt_activity_engine_inputs or {}
             ),
         }
+        if oxygen_potential_mode is not None:
+            state["oxygen_potential_mode"] = oxygen_potential_mode
         return self.vapour_rail_catalog.resolve_batch(
             ledger_snapshot,
             state,
@@ -9555,6 +9561,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'control_inputs': {
                 'pO2_bar': pO2_bar,
                 'intrinsic_fO2_log': intrinsic_fO2_log,
+                'oxygen_potential_mode': oxygen_potential_mode_for_atmosphere(
+                    getattr(self.melt, 'atmosphere', None)
+                ),
                 'vacuum_floor_bar': vacuum_floor,
                 'body': getattr(self.melt, 'body', ''),
                 'process_phase': process_phase,

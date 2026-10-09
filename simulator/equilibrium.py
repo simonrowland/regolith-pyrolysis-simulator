@@ -40,6 +40,25 @@ _O2_CONTROLLED_ATMOSPHERES = frozenset({
     Atmosphere.CONTROLLED_O2_FLOW,
     Atmosphere.O2_BACKPRESSURE,
 })
+
+
+def oxygen_potential_mode_for_atmosphere(atmosphere: object) -> str:
+    """Closed unless this atmosphere holds a commanded oxygen setpoint.
+
+    The commanded set is ``_O2_CONTROLLED_ATMOSPHERES``. Hard vacuum and
+    sweep gases are closed: mass action uses the melt oxygen potential.
+    """
+
+    from simulator.vapour_rail.stoich import (
+        OXYGEN_POTENTIAL_CLOSED,
+        OXYGEN_POTENTIAL_IMPOSED,
+    )
+
+    if atmosphere in _O2_CONTROLLED_ATMOSPHERES:
+        return OXYGEN_POTENTIAL_IMPOSED
+    return OXYGEN_POTENTIAL_CLOSED
+
+
 _ELLINGHAM_STANDARD_PRESSURE_PA = 100000.0
 
 

@@ -12,9 +12,11 @@ The provider:
   payload passed at construction time,
 - combines Ellingham oxide-decomposition equilibrium with phase-correct
   reference terms to compute per-species effective equilibrium pressures at the
-  request's ``temperature_C``. Non-FeO metal release reads the independently
-  supplied intrinsic-melt fO2; overhead ``pO2_bar`` remains the gas-side
-  transport/backpressure channel (and the explicit SiO lever). Only
+  request's ``temperature_C``. Oxide-coupled carriers and SiO read one surface
+  oxygen potential (ruling d-099): closed mode uses the intrinsic melt fO2 and
+  imposed mode uses the commanded headspace pO2. FeO keeps the transport
+  denominator because its Kress91 activity already carries melt redox.
+  Overhead ``pO2_bar`` remains the diagnostic transport channel. Only
   ``pure_component_antoine`` sidecars are used for pure-component reference
   pressures when present; legacy ``antoine`` rows are used only when no
   sidecar exists. ``pseudo_psat_backsolved_from_vaporock`` rows are backsolved
@@ -168,8 +170,36 @@ def physical_melt_dissociation_pO2_bar(fO2_log: float) -> tuple[float, bool]:
     return raw, False
 
 
+def _representable_melt_pO2_bar(fO2_log: float) -> float:
+    """Unclamped ``10**log`` when that bar is finite and positive.
+
+    ``physical_melt_dissociation_pO2_bar`` has already refused NaN. A log
+    whose power underflows or overflows is not a bar the fold receipt can
+    name, so this returns a sentinel strictly outside the envelope. The
+    true log stays on ``source_reaction_fO2_log10``.
+    """
+
+    log = float(fO2_log)
+    if not math.isfinite(log):
+        if log < 0.0:
+            return MELT_DISSOCIATION_PO2_MIN_BAR / 10.0
+        return MELT_DISSOCIATION_PO2_MAX_BAR * 10.0
+    try:
+        raw = 10.0 ** log
+    except OverflowError:
+        raw = math.inf
+    if not math.isfinite(raw) or raw <= 0.0:
+        if log < 0.0:
+            return MELT_DISSOCIATION_PO2_MIN_BAR / 10.0
+        return MELT_DISSOCIATION_PO2_MAX_BAR * 10.0
+    return raw
+
+
 MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON = (
     "melt_dissociation_pO2_floor_inverted_through_mass_action"
+)
+MELT_DISSOCIATION_PO2_CEILING_FOLD_REASON = (
+    "surface_pO2_folded_to_physical_envelope_ceiling"
 )
 # Catalog operating-envelope lower bound from
 # test_catalog_operating_envelope_no_nonphysical_pressure (1e-12 bar).
@@ -1794,7 +1824,12 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             REACTION_PLANE_MELT_INTERFACE,
             REACTION_PLANE_TRANSPORT_HEADSPACE,
             channel_linear_mass_action_factor,
+            clamp_physical_pO2_bar,
             o2_potential_from_pO2_bar,
+        )
+        from simulator.vapour_rail.stoich import (
+            SurfaceOxygenUnavailable,
+            surface_oxygen_potential_bar,
         )
 
         wrong_intent = reject_wrong_intent(request, ChemistryIntent.VAPOR_PRESSURE)
@@ -1840,6 +1875,32 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             melt_dissociation_pO2_bar, melt_dissociation_pO2_clamped = (
                 physical_melt_dissociation_pO2_bar(float(intrinsic_fO2_log))
             )
+        # Ellingham metals keep the clamped melt bar above. Oxide carriers
+        # and SiO share one unclamped surface so a fold receipt can name the
+        # raw value. Mode absent with both reservoirs is closed.
+        surface_intrinsic = (
+            _representable_melt_pO2_bar(float(intrinsic_fO2_log))
+            if intrinsic_fO2_log is not None
+            else None
+        )
+        oxygen_mode = controls.get("oxygen_potential_mode")
+        try:
+            surface_pO2_bar = surface_oxygen_potential_bar(
+                mode=oxygen_mode,
+                intrinsic_melt_fO2_bar=surface_intrinsic,
+                imposed_pO2_bar=transport_pO2_bar,
+            )
+        except SurfaceOxygenUnavailable as exc:
+            raise VaporPressureComputationError(str(exc)) from exc
+        surface_pO2_bar_used = clamp_physical_pO2_bar(surface_pO2_bar)
+        surface_fold_notice = dict(
+            o2_potential_from_pO2_bar(
+                pO2_bar=surface_pO2_bar,
+                temperature_K=T_K,
+                reaction_plane=REACTION_PLANE_TRANSPORT_HEADSPACE,
+                pO2_reference_bar=1.0,
+            ).observation_or_setpoint_receipt
+        ).get("extrapolation_notice")
         comp_wt = composition_wt_pct_from_account_view(
             request.account_view, self.DECLARED_ACCOUNT
         )
@@ -1928,6 +1989,17 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 f"pO2_bar={melt_dissociation_pO2_bar:g} "
                 f"envelope_bar=[{MELT_DISSOCIATION_PO2_MIN_BAR:g}, "
                 f"{MELT_DISSOCIATION_PO2_MAX_BAR:g}]"
+            )
+        if (
+            isinstance(surface_fold_notice, Mapping)
+            and surface_fold_notice.get("reason")
+            == MELT_DISSOCIATION_PO2_CEILING_FOLD_REASON
+        ):
+            warnings.append(
+                f"{MELT_DISSOCIATION_PO2_CEILING_FOLD_REASON}: "
+                "pO2_bar_input="
+                f"{float(surface_fold_notice['pO2_bar_input']):.6g} "
+                f"pO2_bar_used={float(surface_fold_notice['pO2_bar_used']):g}"
             )
 
         metals_data = self._vapor_pressure_data.get('metals', {}) or {}
@@ -2939,16 +3011,13 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     continue
                 # Explicit unit/reference inputs here are the declared standard
                 # reaction reference, not evaluator defaults. The live point
-                # below uses the physical activity and the evaluator's named
-                # oxygen channel.
+                # uses the physical activity and the one surface potential.
                 reference_evaluation = compiled_evaluator.evaluate(
                     T_K,
                     source_activity=1.0,
                     pO2_bar=compiled_evaluator.pO2_reference_bar,
                 )
-                evaluator_pO2_bar = transport_pO2_bar
-                if compiled_evaluator.oxygen_fugacity_channel == "intrinsic_melt":
-                    evaluator_pO2_bar = melt_dissociation_pO2_bar
+                evaluator_pO2_bar = surface_pO2_bar
                 evaluation = compiled_evaluator.evaluate(
                     T_K,
                     source_activity=(
@@ -3012,7 +3081,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 # bounds out-of-envelope transport fallbacks (b-148 physics).
                 o2_term, o2_potential = _o2_channel_term_and_potential(
                     pO2_exponent=pO2_exponent,
-                    pO2_bar=transport_pO2_bar,
+                    pO2_bar=surface_pO2_bar,
                     pO2_reference_bar=pO2_reference_bar,
                     temperature_K=T_K,
                     reaction_plane=REACTION_PLANE_TRANSPORT_HEADSPACE,
@@ -3034,10 +3103,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             # above). Unit check: bar/bar is dimensionless. Sanity: at
             # pO2=p_ref the factor is 1; at the legal lunar floor 1.3e-12 bar
             # the factor is sqrt(1e-9/1.3e-12)≈27.735 — a silent clip to
-            # unity below p_ref was an under-extraction bug. Transport pO2
-            # is already fail-loud gated at the body/request vacuum floor
-            # (resolve_transport_pO2_bar); no additional silent pO2 floor
-            # belongs here. Body floors must not retune the SiO fit itself.
+            # unity below p_ref was an under-extraction bug. The surface
+            # potential is already one number; no second pO2 floor belongs
+            # here. Body floors must not retune the SiO fit itself.
             if name == 'SiO' and not pO2_exponent:
                 sio_reference_bar = max(
                     1e-30,
@@ -3049,12 +3117,11 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 # t-571: the sqrt mass action consumes the owner-gated O2
                 # channel potential (transport_headspace plane).  The exact
                 # legacy expression sqrt(p_ref / p) is preserved — only the
-                # scalar source changes (typed, clamped, receipted).  The
-                # envelope clamp is the identity for fail-loud floored
-                # transport pO2 (>= 1e-9 bar); an out-of-envelope explicit
-                # control (>100 bar) now receives the b-148 envelope.
+                # scalar source changes (the one surface potential).  The
+                # envelope clamp is the identity inside 1e-30..100 bar; a
+                # value outside that envelope folds and leaves a receipt.
                 sio_o2_potential = o2_potential_from_pO2_bar(
-                    pO2_bar=transport_pO2_bar,
+                    pO2_bar=surface_pO2_bar,
                     temperature_K=T_K,
                     reaction_plane=REACTION_PLANE_TRANSPORT_HEADSPACE,
                     pO2_reference_bar=sio_reference_bar,
@@ -3112,11 +3179,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     "P_reference_Antoine_Pa": P_reference_Pa,
                     "P_eq_Pa": P_eq_Pa,
                     "pO2_bar": (
-                        evaluator_pO2_bar
-                        if (
-                            compiled_evaluator is not None
-                            and parent_oxide == "P2O5"
-                        )
+                        surface_pO2_bar_used
+                        if pO2_scaled
                         else transport_pO2_bar
                     ),
                     "activity_factor": activity_factor,
@@ -3126,6 +3190,16 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     vapor_pressure_provenance[name]["extrapolation_notice"] = dict(
                         oxide_vapor_extrapolations[name]
                     )
+                if (
+                    pO2_scaled
+                    and isinstance(surface_fold_notice, Mapping)
+                    and surface_fold_notice.get("pO2_bar_input") is not None
+                    and "extrapolation_notice"
+                    not in vapor_pressure_provenance[name]
+                ):
+                    vapor_pressure_provenance[name][
+                        "extrapolation_notice"
+                    ] = dict(surface_fold_notice)
                 if compiled_evaluator is not None:
                     vapor_pressure_provenance[name][
                         "P_reference_model_Pa"

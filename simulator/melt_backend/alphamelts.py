@@ -4913,6 +4913,7 @@ class _MELTSBackendSupport(MeltBackend):
         from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
         from simulator.chemistry.kernel.capabilities import ChemistryIntent
         from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
+        from simulator.vapour_rail.stoich import OXYGEN_POTENTIAL_CLOSED
 
         provider = self._subprocess_vapor_pressure_provider
         if provider is None:
@@ -4944,13 +4945,14 @@ class _MELTSBackendSupport(MeltBackend):
             pressure_bar=eq.pressure_bar,
             fO2_log=eq.fO2_log,
             control_inputs={
-                # The alphaMELTS fO2 is the melt-redox constraint. This
-                # diagnostic has no live headspace ledger, so overhead-
-                # transport pO2 comes from its independent environment
-                # setpoint: the unknown-body model floor until CF-1b supplies
-                # body-aware floors. It must not be derived from melt fO2.
+                # Closed: mass action uses the melt fO2 (ruling d-099).
+                # This diagnostic has no live headspace ledger, so the
+                # transport field stays the independent environment floor.
+                # It is not derived from melt fO2 and it is not the
+                # mass-action input.
                 'pO2_bar': self._vapor_transport_pO2_bar,
                 'intrinsic_fO2_log': eq.fO2_log,
+                'oxygen_potential_mode': OXYGEN_POTENTIAL_CLOSED,
             },
         )
         result = provider.dispatch(request)

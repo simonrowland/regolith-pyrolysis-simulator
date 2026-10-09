@@ -45,6 +45,10 @@ from simulator.chemistry.melt_activity import (
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.physical_constants import CATALOG_PHYSICAL_PRESSURE_CEILING_PA
 from simulator.trace_oxide_parents import ledger_component_key
+from simulator.vapour_rail.stoich import (
+    SurfaceOxygenUnavailable,
+    surface_oxygen_potential_bar,
+)
 from simulator.vapour_rail.activity import (
     ActivityInputDeclaration,
     ActivityVerdictKind,
@@ -1507,33 +1511,27 @@ def refusal_closure(
                 #   effective-pressure class (~4.6e-9, 7.3e-3, 0.469,
                 #   1.4e-8 Pa for Ca/Mg/K/Al), never the former pure/reference
                 #   class (~8.35e5, 6.87e5, 4.51e6, 110 Pa).
-                oxygen_fugacity_channel = getattr(
-                    compiled.evaluator, "oxygen_fugacity_channel", None
-                )
+                # One surface oxygen potential (ruling d-099). The stored
+                # oxygen_fugacity_channel is the coproduct class, not this
+                # input. Oxygen-free evaluators keep the headspace value,
+                # including None, and are not refused for a missing reservoir.
                 evaluator_fO2_bar = state.fO2_bar
-                if oxygen_fugacity_channel == "intrinsic_melt":
-                    if state.source_reaction_fO2_bar is None:
-                        return _make_refusal(
-                            rule,
-                            REFUSAL_MISSING_OUTCOME_STATE,
-                            "intrinsic_melt oxygen fugacity is unavailable; "
-                            "transport/headspace fO2 substitution is forbidden",
-                            source_reaction_activity=source_reaction_activity,
-                        )
+                if abs(float(compiled.evaluator.pO2_exponent or 0.0)) > 0.0:
                     try:
-                        evaluator_fO2_bar = float(state.source_reaction_fO2_bar)
-                    except (TypeError, ValueError):
-                        return _make_refusal(
-                            rule,
-                            REFUSAL_MISSING_OUTCOME_STATE,
-                            "intrinsic_melt oxygen fugacity is malformed",
-                            source_reaction_activity=source_reaction_activity,
+                        evaluator_fO2_bar = surface_oxygen_potential_bar(
+                            mode=(state.extras or {}).get(
+                                "oxygen_potential_mode"
+                            ),
+                            intrinsic_melt_fO2_bar=(
+                                state.source_reaction_fO2_bar
+                            ),
+                            imposed_pO2_bar=state.fO2_bar,
                         )
-                    if not math.isfinite(evaluator_fO2_bar) or evaluator_fO2_bar <= 0.0:
+                    except SurfaceOxygenUnavailable as exc:
                         return _make_refusal(
                             rule,
                             REFUSAL_MISSING_OUTCOME_STATE,
-                            "intrinsic_melt oxygen fugacity must be finite and positive",
+                            str(exc),
                             source_reaction_activity=source_reaction_activity,
                         )
                 evaluation = compiled.evaluator.evaluate(

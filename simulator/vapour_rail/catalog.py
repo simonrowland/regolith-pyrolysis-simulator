@@ -1176,23 +1176,39 @@ class CompiledPressureEvaluator:
             ),
         )
         # Non-field attribute so t-622 dataclass canonicalization is unchanged.
-        object.__setattr__(
-            evaluation,
-            "extrapolation_notice",
-            _pO2_floor_inversion_notice(
-                species_id=self.species_id,
-                pressure_pa=pressure_pa,
-                pO2_exponent=self.pO2_exponent,
-                pO2_bar_used=_evaluation_pO2_bar_used(
-                    o2_potential=o2_potential,
-                    pO2_bar=pO2_bar_raw,
-                ),
-                was_clamped=_evaluation_pO2_was_clamped(
-                    o2_potential=o2_potential,
-                    pO2_bar=pO2_bar_raw,
-                ),
+        # The species floor notice stays preferred. A ceiling fold is copied
+        # from the potential receipt only when that notice is absent; the
+        # floor receipt has no pO2_bar_input, so a positive-exponent species
+        # at the floor keeps extrapolation_notice is None.
+        floor_notice = _pO2_floor_inversion_notice(
+            species_id=self.species_id,
+            pressure_pa=pressure_pa,
+            pO2_exponent=self.pO2_exponent,
+            pO2_bar_used=_evaluation_pO2_bar_used(
+                o2_potential=o2_potential,
+                pO2_bar=pO2_bar_raw,
+            ),
+            was_clamped=_evaluation_pO2_was_clamped(
+                o2_potential=o2_potential,
+                pO2_bar=pO2_bar_raw,
             ),
         )
+        notice: Mapping[str, Any] | None = floor_notice
+        if notice is None and o2_potential is not None:
+            receipt = getattr(
+                o2_potential, "observation_or_setpoint_receipt", None
+            ) or {}
+            receipt_notice = (
+                receipt.get("extrapolation_notice")
+                if isinstance(receipt, Mapping)
+                else None
+            )
+            if (
+                isinstance(receipt_notice, Mapping)
+                and receipt_notice.get("pO2_bar_input") is not None
+            ):
+                notice = dict(receipt_notice)
+        object.__setattr__(evaluation, "extrapolation_notice", notice)
         return evaluation
 
     def evaluate_typed_shadow(

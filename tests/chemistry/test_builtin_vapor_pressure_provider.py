@@ -2830,60 +2830,96 @@ def test_active_si_composite_supersedes_legacy_pure_component_sidecar(
     assert set(kernel_vp) - set(legacy_vp) == {"Si2", "Si3", "SiO2_gas"}
 
 
-def test_transport_po2_and_intrinsic_melt_fo2_are_independent(
+def test_closed_surface_sio_follows_melt_and_imposed_follows_transport(
     vapor_pressure_data,
 ):
+    """Ruling d-099: default SiO follows the melt; imposed follows transport.
+
+    Diagnostic ``pO2_bar`` stays the transport reservoir. Expected SiO
+    pressures are a single-reservoir dispatch of this provider, not a
+    pasted square-root.
+    """
+
     provider = BuiltinVaporPressureProvider(vapor_pressure_data)
-    reduced_redox = _si_only_transport_redox_request(
+
+    def pressures_of(request: IntentRequest):
+        result = provider.dispatch(request)
+        diagnostic = dict(result.diagnostic or {})
+        return diagnostic, dict(diagnostic.get("vapor_pressures_Pa") or {})
+
+    def only_transport(pO2_bar: float):
+        controls = {"pO2_bar": pO2_bar}
+        if pO2_bar < 1.0e-9:
+            controls["vacuum_floor_bar"] = pO2_bar
+        return pressures_of(
+            IntentRequest(
+                intent=ChemistryIntent.VAPOR_PRESSURE,
+                account_view=ProviderAccountView(
+                    accounts={"process.cleaned_melt": {"SiO2": 1.0}},
+                    species_formula_registry={},
+                ),
+                temperature_C=_SiOnlyMelt.temperature_C,
+                pressure_bar=1e-6,
+                control_inputs=controls,
+            )
+        )
+
+    reduced = _si_only_transport_redox_request(
         transport_pO2_bar=1e-6,
         intrinsic_fO2_log=-12.0,
     )
-    oxidized_redox = _si_only_transport_redox_request(
+    oxidized = _si_only_transport_redox_request(
         transport_pO2_bar=1e-6,
         intrinsic_fO2_log=-4.0,
     )
-
-    assert provider._resolve_transport_pO2_bar(reduced_redox) == pytest.approx(
-        1e-6
+    assert provider._resolve_transport_pO2_bar(reduced) == pytest.approx(1e-6)
+    assert provider._resolve_transport_pO2_bar(oxidized) == pytest.approx(1e-6)
+    assert provider._resolve_intrinsic_melt_fO2_log(reduced) == pytest.approx(
+        -12.0
     )
-    assert provider._resolve_transport_pO2_bar(oxidized_redox) == pytest.approx(
-        1e-6
+    assert provider._resolve_intrinsic_melt_fO2_log(oxidized) == pytest.approx(
+        -4.0
     )
-    assert provider._resolve_intrinsic_melt_fO2_log(
-        reduced_redox
-    ) == pytest.approx(-12.0)
-    assert provider._resolve_intrinsic_melt_fO2_log(
-        oxidized_redox
-    ) == pytest.approx(-4.0)
 
-    reduced_result = provider.dispatch(reduced_redox)
-    oxidized_result = provider.dispatch(oxidized_redox)
-    reduced_diag = dict(reduced_result.diagnostic or {})
-    oxidized_diag = dict(oxidized_result.diagnostic or {})
-    reduced_vp = dict(reduced_diag.get("vapor_pressures_Pa") or {})
-    oxidized_vp = dict(oxidized_diag.get("vapor_pressures_Pa") or {})
-
+    reduced_diag, reduced_vp = pressures_of(reduced)
+    oxidized_diag, oxidized_vp = pressures_of(oxidized)
+    _, melt_reduced_vp = only_transport(1.0e-12)
+    _, melt_oxidized_vp = only_transport(1.0e-4)
     assert reduced_diag["pO2_bar"] == pytest.approx(1e-6)
     assert oxidized_diag["pO2_bar"] == pytest.approx(1e-6)
-    assert reduced_vp["SiO"] == pytest.approx(oxidized_vp["SiO"])
+    assert reduced_vp["SiO"] == pytest.approx(melt_reduced_vp["SiO"])
+    assert oxidized_vp["SiO"] == pytest.approx(melt_oxidized_vp["SiO"])
+    assert reduced_vp["SiO"] != pytest.approx(oxidized_vp["SiO"])
+    assert reduced_diag["vapor_pressure_numerator_provenance"]["SiO"][
+        "pO2_bar"
+    ] == pytest.approx(1.0e-12)
 
     lower_transport = _si_only_transport_redox_request(
         transport_pO2_bar=1e-9,
         intrinsic_fO2_log=-12.0,
     )
-    assert provider._resolve_intrinsic_melt_fO2_log(
-        lower_transport
-    ) == pytest.approx(
-        provider._resolve_intrinsic_melt_fO2_log(reduced_redox)
-    )
-    lower_transport_result = provider.dispatch(lower_transport)
-    lower_transport_diag = dict(lower_transport_result.diagnostic or {})
-    lower_transport_vp = dict(
-        lower_transport_diag.get("vapor_pressures_Pa") or {}
-    )
+    lower_diag, lower_vp = pressures_of(lower_transport)
+    assert lower_diag["pO2_bar"] == pytest.approx(1e-9)
+    assert lower_vp["SiO"] == pytest.approx(reduced_vp["SiO"])
 
-    assert lower_transport_diag["pO2_bar"] == pytest.approx(1e-9)
-    assert lower_transport_vp["SiO"] > reduced_vp["SiO"]
+    def imposed(transport_pO2_bar: float, intrinsic_fO2_log: float):
+        base = _si_only_transport_redox_request(
+            transport_pO2_bar=transport_pO2_bar,
+            intrinsic_fO2_log=intrinsic_fO2_log,
+        )
+        controls = dict(base.control_inputs)
+        controls["oxygen_potential_mode"] = "imposed"
+        return pressures_of(replace(base, control_inputs=controls))
+
+    imposed_reduced_diag, imposed_reduced_vp = imposed(1e-6, -12.0)
+    _, imposed_oxidized_vp = imposed(1e-6, -4.0)
+    _, transport_only_vp = only_transport(1e-6)
+    assert imposed_reduced_vp["SiO"] == pytest.approx(imposed_oxidized_vp["SiO"])
+    assert imposed_reduced_vp["SiO"] == pytest.approx(transport_only_vp["SiO"])
+    assert imposed_reduced_diag["pO2_bar"] == pytest.approx(1e-6)
+    assert imposed_reduced_diag["vapor_pressure_numerator_provenance"]["SiO"][
+        "pO2_bar"
+    ] == pytest.approx(1e-6)
 
 
 def test_fe_activity_uses_kress91_only_with_explicit_intrinsic_channel(
@@ -3083,7 +3119,7 @@ def test_provider_matches_legacy_internal_analytical_for_known_lunar_composition
         "exercising the path it claims to cover"
     )
     for species, legacy_value in legacy_result.vapor_pressures_Pa.items():
-        if species in _REVIEWED_ADDITIVE_CARRIERS:
+        if species in _REVIEWED_ADDITIVE_CARRIERS | _LEGACY_HEADSPACE_SIO:
             continue
         kernel_value = kernel_vp.get(species, 0.0)
         tol = max(
@@ -3194,7 +3230,7 @@ def test_shadow_parity_across_short_simulation_run(
         kernel_only = set(kernel_vp) - set(legacy_vp)
         assert kernel_only <= _REVIEWED_ADDITIVE_CARRIERS
         parity_species = (set(legacy_vp) | set(kernel_vp)) - (
-            _REVIEWED_ADDITIVE_CARRIERS
+            _REVIEWED_ADDITIVE_CARRIERS | _LEGACY_HEADSPACE_SIO
         )
         for species in parity_species:
             legacy_value = float(legacy_vp.get(species, 0.0))
@@ -3432,6 +3468,11 @@ def test_vapor_pressure_provider_raises_on_unregistered_species_in_view(
 
     with pytest.raises(AccountingError):
         provider.dispatch(request)
+# Kernel SiO reads the closed melt surface (ruling d-099).
+# ``_internal_analytical_equilibrium`` still mass-actions SiO on headspace
+# pO2 with the old piecewise clip. That fallback is not the production kernel.
+_LEGACY_HEADSPACE_SIO = frozenset({"SiO"})
+
 _REVIEWED_ADDITIVE_CARRIERS = {
     "Al2",
     "Al2O2",

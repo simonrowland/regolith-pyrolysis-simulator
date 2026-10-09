@@ -3053,6 +3053,8 @@ class EvaporationMixin:
                     for species_id in effective_pressure_species_ids
                     if species_id in {'PO', 'PO2', 'P2', 'P4', 'P4O6', 'P4O10'}
                 )
+            from simulator.equilibrium import oxygen_potential_mode_for_atmosphere
+
             batch = builder(
                 temperature_K=float(temperature_K),
                 process_phase='hot_train',
@@ -3062,6 +3064,9 @@ class EvaporationMixin:
                     float(transport_pO2_bar)
                     if transport_pO2_bar is not None
                     else None
+                ),
+                oxygen_potential_mode=oxygen_potential_mode_for_atmosphere(
+                    getattr(self.melt, 'atmosphere', None)
                 ),
                 source_reaction_fO2_bar=source_reaction_fO2_bar,
                 source_reaction_fO2_log10=(

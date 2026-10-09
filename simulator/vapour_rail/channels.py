@@ -8,12 +8,13 @@ and makes ``gas.O2.ideal_1bar.v1`` the first runtime citizen: the existing
 ``source_activity`` + ``pO2_bar`` evaluator path becomes the O2 channel
 under this interface with bit-identical pressure evaluation.
 
-Composition in this module matches on ``channel_id`` only.
+Composition matches ``channel_id`` and the reaction plane.
 :func:`channel_log10_contribution` compares ``potential.channel_id`` to
-``term.input_id``; it does not compare ``term.required_plane`` to
-``potential.reaction_plane``.  :class:`ReactionThermoInputs` ``__post_init__``
-freezes the activity and channel mappings; it does not compare the
-container ``state_fingerprint`` to each potential's fingerprint.
+``term.input_id`` and ``term.required_plane`` to
+``potential.reaction_plane``.  A plane mismatch is a
+:class:`ChannelEvaluationError`.  :class:`ReactionThermoInputs`
+``__post_init__`` freezes the activity and channel mappings; it does not
+compare the container ``state_fingerprint`` to each potential's fingerprint.
 
 Non-O2 channels (H2, F2, Cl2, Br2, I2, S2, N2) have no runtime owners yet.
 Resolving them yields typed refusals that name both the missing channel and
@@ -931,6 +932,25 @@ def o2_potential_from_pO2_bar(
             "pO2_bar_used": oxygen,
             "was_clamped": True,
         }
+    elif (
+        oxygen == MELT_DISSOCIATION_PO2_MAX_BAR
+        and float(pO2_bar) > MELT_DISSOCIATION_PO2_MAX_BAR
+    ):
+        from engines.builtin.vapor_pressure import (
+            MELT_DISSOCIATION_PO2_CEILING_FOLD_REASON,
+        )
+
+        receipt["extrapolation_notice"] = {
+            "reason": MELT_DISSOCIATION_PO2_CEILING_FOLD_REASON,
+            "authority_level": "extrapolated",
+            "pO2_bar_input": float(pO2_bar),
+            "pO2_bar_used": oxygen,
+            "was_clamped": True,
+            "envelope_bar": (
+                MELT_DISSOCIATION_PO2_MIN_BAR,
+                MELT_DISSOCIATION_PO2_MAX_BAR,
+            ),
+        }
     return GasChannelPotential(
         channel_id=CHANNEL_O2,
         gas_formula="O2",
@@ -963,11 +983,10 @@ def channel_log10_contribution(
     ``e · log10(p / p_ref)``.  All other finite-center potentials use the
     general natural-log form ``e · reduced_potential_ln / ln(10)``.
 
-    Identity check in this function: ``potential.channel_id == term.input_id``.
-    This function does not compare ``term.required_plane`` with
-    ``potential.reaction_plane`` and does not read ``state_fingerprint``.
-    A finite-center potential for the matching ``channel_id`` produces a
-    numeric contribution even when those other identity fields disagree.
+    Identity checks: ``potential.channel_id == term.input_id`` and
+    ``potential.reaction_plane == term.required_plane``.  A plane mismatch
+    raises :class:`ChannelEvaluationError`.  This function does not read
+    ``state_fingerprint``.
     """
 
     if term.role is not ReactionTermRole.EXCHANGE_CHANNEL:
@@ -990,6 +1009,11 @@ def channel_log10_contribution(
         raise ChannelEvaluationError(
             f"potential channel {potential.channel_id} does not match term "
             f"{term.input_id}"
+        )
+    if potential.reaction_plane != term.required_plane:
+        raise ChannelEvaluationError(
+            f"potential plane {potential.reaction_plane} does not match "
+            f"term plane {term.required_plane}"
         )
 
     # Bit-identity path for O2 (design §7.2).
@@ -1057,6 +1081,11 @@ def channel_linear_mass_action_factor(
         raise ChannelEvaluationError(
             f"potential channel {potential.channel_id} does not match term "
             f"{term.input_id}"
+        )
+    if potential.reaction_plane != term.required_plane:
+        raise ChannelEvaluationError(
+            f"potential plane {potential.reaction_plane} does not match "
+            f"term plane {term.required_plane}"
         )
     if potential.verdict is not ChannelVerdictKind.POINT:
         raise ChannelEvaluationError(

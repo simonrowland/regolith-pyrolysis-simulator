@@ -1053,9 +1053,12 @@ def _provider_and_request(
         "MnO": 0.2,
         "FeO": 10.0,
     }
-    payload = yaml.safe_load(
-        (DATA / "vapor_pressures.yaml").read_text(encoding="utf-8")
-    )
+    payload = getattr(_provider_and_request, "_payload", None)
+    if payload is None:
+        payload = yaml.safe_load(
+            (DATA / "vapor_pressures.yaml").read_text(encoding="utf-8")
+        )
+        _provider_and_request._payload = payload
     provider = BuiltinVaporPressureProvider(payload)
     request = IntentRequest(
         intent=ChemistryIntent.VAPOR_PRESSURE,
@@ -1255,11 +1258,18 @@ def test_builtin_linear_rail_o2_bit_identity_differential():
                         row.get("pO2_reference_bar", 1.0e-9) or 1.0e-9
                     ),
                 )
-                sio_sqrt_factors.add(math.sqrt(sio_ref / transport_pO2))
+                # Closed default: both reservoirs are set and no mode is
+                # passed, so SiO's surface is the melt fO2, folded onto
+                # the physical envelope. Transport is the distractor.
+                surface = min(
+                    max(float(melt_pO2), MELT_DISSOCIATION_PO2_MIN_BAR),
+                    MELT_DISSOCIATION_PO2_MAX_BAR,
+                )
+                sio_sqrt_factors.add(math.sqrt(sio_ref / surface))
                 legacy = (
                     float(prov["P_reference_Antoine_Pa"])
                     * float(prov["activity_factor"])
-                    * math.sqrt(sio_ref / transport_pO2)
+                    * math.sqrt(sio_ref / surface)
                 )
                 record("SiO", legacy, "sio_sqrt")
 
@@ -1274,15 +1284,18 @@ def test_builtin_linear_rail_o2_bit_identity_differential():
     # values stay inside the b-148 envelope, so the recomputed
     # pre-migration expressions remain the exact legacy forms.
     #
-    # SiO: the sqrt mass action depends ONLY on transport pO2; the main
-    # grid samples it at just 2 distinct factors.  Sweep 8 in-envelope
-    # transport values -> 8 distinct sqrt factors over ~7.5 orders of
-    # magnitude (the request vacuum floor fail-loud rejects transport pO2
-    # below 1e-9 bar, so the sweep starts at the floor).
-    for transport_pO2 in (
+    # SiO: closed mode reads the melt surface, not transport. The main
+    # grid samples that surface at 5 logs. Sweep 8 in-envelope melt
+    # potentials at a fixed distractor transport of 1e-9 bar.
+    for surface_bar in (
         1.0e-9, 1.0e-7, 1.0e-5, 1.0e-3, 1.0e-1, 1.0, 10.0, 50.0,
     ):
-        probe_point(1600.0, -9.0, transport_pO2, rails=frozenset({"sio"}))
+        probe_point(
+            1600.0,
+            math.log10(surface_bar),
+            1.0e-9,
+            rails=frozenset({"sio"}),
+        )
     #
     # Ca/Mg: the Ellingham division depends ONLY on (T, melt pO2); sweep
     # 12 fO2 values covering the clamped-below edge, the exact envelope

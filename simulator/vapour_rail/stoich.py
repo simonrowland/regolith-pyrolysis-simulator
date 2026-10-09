@@ -135,13 +135,95 @@ def oxygen_coproduct_account(
     return "process.overhead_gas"
 
 
-def oxygen_fugacity_plane(*, vapor_oxygen_atoms: float) -> str:
-    """fO2 plane for one binding, from the metal-versus-oxide coproduct rule.
+OXYGEN_POTENTIAL_CLOSED = "closed"
+OXYGEN_POTENTIAL_IMPOSED = "imposed"
 
-    Metal vapour credits ``reservoir.fo2_buffer`` and is evaluated on
-    ``intrinsic_melt``. Oxide vapour credits ``process.overhead_gas`` and is
-    evaluated on ``transport_headspace``. A declared oxygen destination is an
-    accounting override and does not retarget the plane.
+
+class SurfaceOxygenUnavailable(ValueError):
+    """The evaporating surface has no single usable oxygen potential."""
+
+
+def _oxygen_reservoir_bar(value: Any, *, label: str) -> float | None:
+    """Absent is None. Bool, non-numeric, non-finite, and non-positive raise."""
+
+    if value is None:
+        return None
+    if isinstance(value, bool):
+        raise SurfaceOxygenUnavailable(
+            f"{label} oxygen fugacity must be finite and positive"
+        )
+    try:
+        parsed = float(value)
+    except (TypeError, ValueError) as exc:
+        raise SurfaceOxygenUnavailable(
+            f"{label} oxygen fugacity is malformed"
+        ) from exc
+    if not math.isfinite(parsed) or parsed <= 0.0:
+        raise SurfaceOxygenUnavailable(
+            f"{label} oxygen fugacity must be finite and positive"
+        )
+    return parsed
+
+
+def surface_oxygen_potential_bar(
+    *,
+    mode: str | None,
+    intrinsic_melt_fO2_bar: Any,
+    imposed_pO2_bar: Any,
+) -> float:
+    """One surface oxygen potential for every gas of a binding (ruling d-099).
+
+    Closed mode returns the intrinsic melt fO2. Imposed mode returns the
+    imposed potential. A missing mode with a usable melt reservoir is closed,
+    including when both reservoirs are present. A missing mode with only the
+    imposed reservoir returns that reservoir, so a caller that never carried
+    a melt fO2 keeps its single input. A malformed reservoir raises before
+    the mode is applied, so a bad melt fO2 is never dropped in favour of the
+    imposed number. The metal/oxide class is an accounting destination
+    (:func:`oxygen_coproduct_account`) and does not select this number.
+    """
+
+    intrinsic = _oxygen_reservoir_bar(
+        intrinsic_melt_fO2_bar, label="intrinsic_melt"
+    )
+    imposed = _oxygen_reservoir_bar(imposed_pO2_bar, label="imposed")
+    if mode is not None and mode not in (
+        OXYGEN_POTENTIAL_CLOSED,
+        OXYGEN_POTENTIAL_IMPOSED,
+    ):
+        raise SurfaceOxygenUnavailable(
+            f"oxygen potential mode {mode!r} is not closed or imposed"
+        )
+    if mode == OXYGEN_POTENTIAL_CLOSED or (
+        mode is None and intrinsic is not None
+    ):
+        if intrinsic is None:
+            raise SurfaceOxygenUnavailable(
+                "intrinsic_melt oxygen fugacity is unavailable; "
+                "transport/headspace fO2 substitution is forbidden"
+            )
+        return intrinsic
+    if mode == OXYGEN_POTENTIAL_IMPOSED or (
+        mode is None and imposed is not None
+    ):
+        if imposed is None:
+            raise SurfaceOxygenUnavailable(
+                "imposed oxygen potential is unavailable; "
+                "melt fO2 substitution is forbidden"
+            )
+        return imposed
+    raise SurfaceOxygenUnavailable("surface oxygen potential is unavailable")
+
+
+def oxygen_fugacity_plane(*, vapor_oxygen_atoms: float) -> str:
+    """Stored coproduct class for one binding, not the mass-action input.
+
+    Metal vapour (no oxygen in the gas) is ``intrinsic_melt`` and credits
+    ``reservoir.fo2_buffer``. Oxide vapour is ``transport_headspace`` and
+    credits ``process.overhead_gas``. Every gas of the binding is evaluated
+    at :func:`surface_oxygen_potential_bar`. This label does not select that
+    number. A declared oxygen destination is an accounting override and does
+    not retarget the class.
     """
 
     account = oxygen_coproduct_account(

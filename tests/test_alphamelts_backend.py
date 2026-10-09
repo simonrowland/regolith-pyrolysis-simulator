@@ -901,6 +901,7 @@ def test_builtin_subprocess_vapor_projection_separates_melt_fo2_from_transport_p
     assert request.fO2_log == pytest.approx(-11.0)
     assert request.control_inputs['intrinsic_fO2_log'] == pytest.approx(-11.0)
     assert request.control_inputs['pO2_bar'] == pytest.approx(2.0e-9)
+    assert request.control_inputs['oxygen_potential_mode'] == 'closed'
 
 
 @pytest.mark.parametrize(

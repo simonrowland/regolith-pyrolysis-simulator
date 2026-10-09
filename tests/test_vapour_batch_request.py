@@ -3881,7 +3881,7 @@ def test_intrinsic_fo2_affects_pressure_and_state_fingerprint() -> None:
     assert "source_fO2=" in a1.state_fingerprint
 
 
-@pytest.mark.parametrize("intrinsic_fO2", [None, "bogus", -1.0, math.nan])
+@pytest.mark.parametrize("intrinsic_fO2", ["bogus", -1.0, math.nan])
 def test_intrinsic_fo2_missing_or_malformed_is_typed_refusal(
     intrinsic_fO2: Any,
 ) -> None:
@@ -3903,6 +3903,57 @@ def test_intrinsic_fo2_missing_or_malformed_is_typed_refusal(
     assert answer.is_refused
     assert answer.refusal_code == REFUSAL_MISSING_OUTCOME_STATE
     assert "intrinsic_melt oxygen fugacity" in (answer.extra.get("detail") or "")
+
+
+def test_closed_mode_refuses_when_intrinsic_melt_fo2_is_absent() -> None:
+    payload = _minimal_family("K")
+    catalog = compile_vapour_rail_catalog(payload, u0_manifest=_u0_stub("K"))
+    ledger = {"process.cleaned_melt": {"K2O": 1.0, "KO0.5": 1.0}}
+    batch = catalog.resolve_batch(
+        ledger,
+        _state_with_k_activity(
+            temperature_K=1500.0,
+            fO2_bar=1.0e-8,
+            source_reaction_fO2_bar=None,
+            extras={"oxygen_potential_mode": "closed"},
+        ),
+        flux_activation_context=_rg_activation_context(),
+    )
+    answer = batch.channel("K")
+    assert answer.is_refused
+    assert answer.refusal_code == REFUSAL_MISSING_OUTCOME_STATE
+    detail = answer.extra.get("detail") or ""
+    assert "intrinsic_melt oxygen fugacity" in detail
+    assert "substitution is forbidden" in detail
+
+
+def test_absent_mode_uses_the_only_supplied_oxygen_reservoir() -> None:
+    """No melt fO2 and no mode: the imposed number is the surface.
+
+    K's exponent is -0.25, so the two imposed values differ by 1e8 and
+    the pressure ratio is 100. A missing melt reservoir must not refuse.
+    """
+
+    payload = _minimal_family("K")
+    catalog = compile_vapour_rail_catalog(payload, u0_manifest=_u0_stub("K"))
+    ledger = {"process.cleaned_melt": {"K2O": 1.0, "KO0.5": 1.0}}
+
+    def pressure(fO2_bar: float) -> float:
+        batch = catalog.resolve_batch(
+            ledger,
+            _state_with_k_activity(
+                temperature_K=1500.0,
+                fO2_bar=fO2_bar,
+                source_reaction_fO2_bar=None,
+            ),
+            flux_activation_context=_rg_activation_context(),
+        )
+        answer = batch.channel("K")
+        assert not answer.is_refused
+        assert isinstance(answer.pressure, PressureValue)
+        return answer.pressure.pa
+
+    assert pressure(1.0e-8) / pressure(1.0) == pytest.approx(100.0, rel=1e-9)
 
 
 def test_validation_anchors_propagate_to_rule_and_answer() -> None:
