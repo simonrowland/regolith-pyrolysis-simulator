@@ -8,7 +8,7 @@ absent.
 from __future__ import annotations
 
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import lru_cache
 from importlib import resources
 import math
@@ -170,6 +170,7 @@ class OpenImccBridgeResult:
     labels: Any
     coverage: Mapping[str, str]
     activity_coefficients: Mapping[str, Mapping[str, Any]] | None = None
+    parent_oxide_x_star_ratios: Mapping[str, float] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -178,6 +179,11 @@ class OpenImccBridgeResult:
             MappingProxyType(dict(self.parent_oxide_activities)),
         )
         object.__setattr__(self, "coverage", MappingProxyType(dict(self.coverage)))
+        object.__setattr__(
+            self,
+            "parent_oxide_x_star_ratios",
+            MappingProxyType(dict(self.parent_oxide_x_star_ratios)),
+        )
         object.__setattr__(
             self,
             "activity_coefficients",
@@ -213,27 +219,38 @@ class OpenImccCleanedMeltResult:
         )
 
 
-def imcc_complex_saturation_notice(
-    flags: tuple[str, ...] | list[str], acid_sink_ratio: float | None
-) -> dict[str, Any] | None:
-    """Map openimcc's acidic-sink exhaustion label to a typed notice."""
+def imcc_complex_saturation_notices(
+    flags: tuple[str, ...] | list[str],
+    acid_sink_ratio: float | None,
+    parent_oxide_x_star_ratios: Mapping[str, float],
+) -> tuple[dict[str, Any], ...]:
+    """Map each openimcc acidic-sink exhaustion label to a typed notice."""
 
-    flag = next(
-        (
-            str(item)
-            for item in flags
-            if str(item).startswith("species-coverage-edge")
-        ),
-        None,
-    )
-    if flag is None:
-        return None
-    return {
-        "kind": "imcc_complex_saturation",
-        "flag": flag,
-        "reason": flag,
-        "acid_sink_ratio": acid_sink_ratio,
-    }
+    notices: list[dict[str, Any]] = []
+    for item in flags:
+        flag = str(item)
+        if not flag.startswith("species-coverage-edge"):
+            continue
+        sink_name = flag.partition("x*(")[2].partition(")")[0]
+        if sink_name == "SiO2":
+            # Keep the established silica notice shape byte-for-byte.
+            notice = {
+                "kind": "imcc_complex_saturation",
+                "flag": flag,
+                "reason": flag,
+                "acid_sink_ratio": acid_sink_ratio,
+            }
+        else:
+            notice = {
+                "kind": "imcc_complex_saturation",
+                "flag": flag,
+                "reason": flag,
+                "sink_name": sink_name,
+            }
+            if sink_name in parent_oxide_x_star_ratios:
+                notice["sink_ratio"] = parent_oxide_x_star_ratios[sink_name]
+        notices.append(notice)
+    return tuple(notices)
 
 
 def _require_openimcc() -> Any:
@@ -683,6 +700,17 @@ def evaluate(
         allow_out_of_envelope=allow_out_of_envelope,
     )
     parent_oxides = tuple(str(name) for name in result.parent_oxides)
+    parent_oxide_x_star_ratios: dict[str, float] = {}
+    parent_x = getattr(result, "parent_x", None)
+    parent_x_star = getattr(result, "parent_x_star", None)
+    if parent_x is not None and parent_x_star is not None:
+        for name, nominal, free in zip(
+            parent_oxides, parent_x, parent_x_star, strict=True
+        ):
+            nominal = float(nominal)
+            free = float(free)
+            if nominal > 0.0 and math.isfinite(nominal) and math.isfinite(free):
+                parent_oxide_x_star_ratios[name] = free / nominal
     activities = {
         name: float(value)
         for name, value in zip(parent_oxides, result.parent_activity, strict=True)
@@ -745,6 +773,7 @@ def evaluate(
         labels=labels,
         coverage={str(name): str(value) for name, value in labels.coverage.items()},
         activity_coefficients=activity_coefficients,
+        parent_oxide_x_star_ratios=parent_oxide_x_star_ratios,
     )
 
 

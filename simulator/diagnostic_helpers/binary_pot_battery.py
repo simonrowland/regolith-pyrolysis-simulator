@@ -1835,14 +1835,16 @@ class _OpenImccBatteryBackend:
             if outside_domain:
                 authority = AUTHORITY_EXTRAPOLATED
         from simulator.melt_backend.openimcc_bridge import (
-            imcc_complex_saturation_notice,
+            imcc_complex_saturation_notices,
         )
 
-        saturation_notice = imcc_complex_saturation_notice(
-            result.flags, result.acid_sink_ratio
+        notices.extend(
+            imcc_complex_saturation_notices(
+                result.flags,
+                result.acid_sink_ratio,
+                result.parent_oxide_x_star_ratios,
+            )
         )
-        if saturation_notice is not None:
-            notices.append(saturation_notice)
         if result.extrapolated:
             notices.append(
                 {
