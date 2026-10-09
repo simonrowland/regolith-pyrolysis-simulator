@@ -3,12 +3,12 @@
 rows in: 47835
 records out (observations): 121821
 works: 269
-experiments: 3562
+experiments: 3564
 queue size: 77514
 identical-payload dedupe aliases: 342
 metadata files: 43
 index sources: 272
-hard issues: 3637
+hard issues: 3609
 
 ## Spec vs measured
 
@@ -24,7 +24,7 @@ hard issues: 3637
 | gibbs_reference_100000 | 1023 | 1029 (mismatch) |
 | gibbs_reference_101325 | 594 | 594 |
 | formulas | 1625 | 2044 (mismatch) |
-| equipment_payloads | 670 | 973 (mismatch) |
+| equipment_payloads | 670 | 972 (mismatch) |
 | absent_admissions | 3511 | 5036 (mismatch) |
 | absent_classes | 2174 | 2203 (mismatch) |
 | range_only_T | 3125 | 2666 (mismatch) |
@@ -18245,7 +18245,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 
 ## Hard issue census
 
-hard issues: 3637
+hard issues: 3609
 
 MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointers are not fabricated. Unstated derived_from / derivation is a hard conditional_field queued for page-grounding.
 
@@ -18253,13 +18253,9 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 |---|---:|
 | `conditional_field:derived_from` | 1990 |
 | `conditional_field:derivation` | 1619 |
-| `conditional_field:attribution` | 28 |
 
 ## Hard issues (first 50)
 
-- `observation[2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019::zahnle_2010_ordinary_chondrite_volatile_composition].evidence.attribution` conditional_field: quoted_attributed requires attribution
-- `observation[2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019::zahnle_2010_ci_volatile_composition].evidence.attribution` conditional_field: quoted_attributed requires attribution
-- `observation[2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019::zahnle_2010_impact_degas_velocity_threshold].evidence.attribution` conditional_field: quoted_attributed requires attribution
 - `observation[2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019::zahnle_2010_ordinary_chondrite_equilibrium_gas].derived_from` conditional_field: derived observation requires derived_from
 - `observation[2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019::zahnle_2010_ordinary_chondrite_equilibrium_gas].derivation` conditional_field: derived observation requires derivation
 - `observation[2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019::zahnle_2010_co_ch4_equal_ratio_pressure_shift::rows:h=480b1202919d].derived_from` conditional_field: derived observation requires derived_from
@@ -18284,7 +18280,6 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 - `observation[ammin-75-781-hemingway-1990::hemingway_1990_qfm_and_mh_fitted_relations].derivation` conditional_field: derived observation requires derivation
 - `observation[ammin-76-904::ammin_76_904_author_regression_liquid_heat_capacity].derived_from` conditional_field: derived observation requires derived_from
 - `observation[ammin-76-904::ammin_76_904_author_regression_liquid_heat_capacity].derivation` conditional_field: derived observation requires derivation
-- `observation[ammin-76-904::ammin_76_904_quoted_comparator_enthalpy_values].evidence.attribution` conditional_field: quoted_attributed requires attribution
 - `observation[arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_1_model].derived_from` conditional_field: derived observation requires derived_from
 - `observation[arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_1_model].derivation` conditional_field: derived observation requires derivation
 - `observation[arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_4_model].derived_from` conditional_field: derived observation requires derived_from
@@ -18307,6 +18302,10 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 - `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_particle_density].derivation` conditional_field: derived observation requires derivation
 - `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_condensation_growth_model].derived_from` conditional_field: derived observation requires derived_from
 - `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_condensation_growth_model].derivation` conditional_field: derived observation requires derivation
+- `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_reaction_mechanism].derived_from` conditional_field: derived observation requires derived_from
+- `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_reaction_mechanism].derivation` conditional_field: derived observation requires derivation
+- `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_nonreactive_validation_setup].derived_from` conditional_field: derived observation requires derived_from
+- `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_nonreactive_validation_setup].derivation` conditional_field: derived observation requires derivation
 
 ## Advisory issue census
 

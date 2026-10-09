@@ -66,7 +66,7 @@ experiments:
   locator:
     pdf_page_index: 8
     section: Format
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+    source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
   bench_id: 425cde4c797b6bb0228af3d1c12c27515a49095ea600db7a6e753076c9436cc0::bench::handbook-no-vaporization-run
 benches:
 - id: 425cde4c797b6bb0228af3d1c12c27515a49095ea600db7a6e753076c9436cc0::bench::handbook-no-vaporization-run
@@ -81,7 +81,7 @@ benches:
       pdf_page_index: 8
       section: Format
       note: 'heated_cell_or_furnace: not_reported'
-      source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+      source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
   cell_material_and_liner:
     state:
       tag: unknown
@@ -90,7 +90,7 @@ benches:
       pdf_page_index: 8
       section: Format
       note: 'vaporization_run: not_reported; no heated cell or crucible printed'
-      source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+      source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
   temperature_measurement:
     sensor:
       state:
@@ -100,5 +100,5 @@ benches:
         pdf_page_index: 8
         section: Format
         note: 'run_temperature_and_calibration: not_reported'
-        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
   other_facts: []

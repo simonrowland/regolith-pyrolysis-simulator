@@ -52,7 +52,7 @@ experiments:
         pdf_page_index: 1
         section: Introduction and Petrography
         note: Printed 171 g characterization mass (not a thermal-run charge); unit conversion only.
-        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
+        source_path: corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
       inference:
         relation: g_to_kg
         inputs:
@@ -67,7 +67,7 @@ experiments:
               pdf_page_index: 1
               section: Introduction and Petrography
               note: Printed 171 g characterization mass (not a thermal-run charge); unit conversion only.
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
+              source_path: corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
         - - factor
           - state:
               tag: value
@@ -76,7 +76,7 @@ experiments:
               pdf_page_index: 1
               section: Introduction and Petrography
               note: Printed 171 g characterization mass (not a thermal-run charge); unit conversion only.
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
+              source_path: corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
         output_unit: kg
   conditions:
     temperature_K:
@@ -103,7 +103,7 @@ experiments:
   locator:
     pdf_page_index: 1
     section: Introduction and Petrography
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
+    source_path: corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
   bench_id: 3cd13f4643f5203d2814509b33698274c14c1cbbc3fc24d4120b308862417814::bench::handbook-entry-no-thermal-run
 benches:
 - id: 3cd13f4643f5203d2814509b33698274c14c1cbbc3fc24d4120b308862417814::bench::handbook-entry-no-thermal-run
@@ -118,7 +118,7 @@ benches:
       pdf_page_index: 1
       section: Introduction and Petrography
       note: 'furnace_or_heated_cell: not stated'
-      source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
+      source_path: corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
   cell_material_and_liner:
     state:
       tag: unknown
@@ -127,7 +127,7 @@ benches:
       pdf_page_index: 1
       section: Introduction and Petrography
       note: 'crucible_or_container_for_thermal_experiment: not stated'
-      source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
+      source_path: corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
   temperature_measurement:
     sensor:
       state:
@@ -137,5 +137,5 @@ benches:
         pdf_page_index: 1
         section: Introduction and Petrography
         note: 'temperature_measurement_or_calibration: not stated'
-        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
+        source_path: corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
   other_facts: []
