@@ -453,7 +453,7 @@ _MARKED_IDEAL_FENCES: tuple[EvidenceRow, ...] = (
 #
 # Band: every grounded α ∈ {0.01978, 0.24, 0.27, 0.04} must lie in
 #   [α_c · 10^{-σ}, α_c · 10^{+σ}].
-#   max_i |log10(α_i / 0.083)| = |log10(0.01978/0.083)| = 0.624 → residual 0.62 dex.
+#   max_i |log10(α_i / 0.083)| = |log10(0.01978/0.083)| ≈ 0.623 → residual 0.63 dex.
 #   Programme 0.5-dex pin is a floor, not a ceiling. Fe poles 0.01978 and 0.24
 #   differ by log10(0.24/0.01978) = 1.084 dex, but those two rows also differ in
 #   condensed phase (solid_solution_olivine / kems_effusion vs silicate_melt /
@@ -470,7 +470,7 @@ _MARKED_IDEAL_FENCES: tuple[EvidenceRow, ...] = (
 # σ ≥ half-span of log poles is the minimum honest band.
 
 _REDOX_CENTRAL_ALPHA: Final[float] = 0.083
-_REDOX_RESIDUAL_DEX: Final[float] = 0.62
+_REDOX_RESIDUAL_DEX: Final[float] = 0.63
 
 # SiO-class: keep rail prior_scalar 0.04 as central; residual widens so every
 # stored comparable numeric pin (Costa log-mid ~0.0104, Fedkin 0.17) is covered.
