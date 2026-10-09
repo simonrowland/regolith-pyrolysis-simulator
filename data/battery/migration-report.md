@@ -1,11 +1,11 @@
 # Battery v2.1 migration report
 
 rows in: 47835
-records out (observations): 121821
+records out (observations): 121777
 works: 269
-experiments: 3564
+experiments: 3568
 queue size: 77514
-identical-payload dedupe aliases: 342
+identical-payload dedupe aliases: 339
 metadata files: 43
 index sources: 272
 hard issues: 3609
@@ -18309,8 +18309,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 218198
+advisory issues: 218218
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 218198 |
+| `identity_incomplete` | 218218 |
