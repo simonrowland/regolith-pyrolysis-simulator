@@ -7,6 +7,8 @@ import sqlite3
 import sys
 from pathlib import Path
 
+import pytest
+
 import simulator.reduced_real_determinism as rrd
 from simulator.corpus_version import current_corpus_version
 
@@ -128,6 +130,42 @@ def test_backfill_accepts_new_schema_equilibrium_authority(tmp_path):
 
     assert stats.invalid_rows == 0
     assert stats.rows_updated == 1
+
+
+@pytest.mark.parametrize(
+    "repair_notices_json",
+    ['[{"kind":"backfill_repair"}]', "[]", None],
+)
+def test_backfill_preserves_repair_notice_values(
+    tmp_path: Path,
+    repair_notices_json: str | None,
+) -> None:
+    db_path = tmp_path / "backfill-notices.db"
+    _create_legacy_db(db_path)
+    key = _replay_key("notice-preserved", setpoints_digest="notice-setpoints")
+    _insert_legacy_row(db_path, key)
+    key_hash = hashlib.sha256(rrd.canonical_json_bytes(key)).hexdigest()
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"ALTER TABLE {rrd.PT1_EQUILIBRIUM_TABLE} "
+            "ADD COLUMN repair_notices_json TEXT"
+        )
+        conn.execute(
+            f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} "
+            "SET repair_notices_json = ? WHERE key_hash = ?",
+            (repair_notices_json, key_hash),
+        )
+
+    stats = backfill.run_backfill(db_path, dry_run=False)
+
+    assert stats.rows_updated == 1
+    with sqlite3.connect(db_path) as conn:
+        (stored,) = conn.execute(
+            f"SELECT repair_notices_json FROM {rrd.PT1_EQUILIBRIUM_TABLE} "
+            "WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()
+    assert stored == repair_notices_json
 
 
 def _bucket_sha_by_code_version(db_path: Path) -> dict:

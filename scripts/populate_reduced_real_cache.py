@@ -47,12 +47,15 @@ from simulator.reduced_real_determinism import (
     PT0NonFinitePayload,
     PT1_EQUILIBRIUM_TABLE,
     PT1_STORE_SCHEMA_VERSION,
+    PT1_SUPPORTED_STORE_SCHEMA_VERSIONS,
     PT1PersistentEquilibriumStore,
     _physics_ladder_values_from_replay_key,
     _replay_scope_hash,
     canonical_json_bytes,
     canonical_physics_bucket_key_from_replay_key,
+    monotonic_repair_notices_json,
     validate_reduced_real_equilibrium_record_key,
+    validate_repair_notices_json,
 )
 from simulator.grind_preflight import (
     GrindSourceGateError,
@@ -682,6 +685,11 @@ def _cache_payload_rows(db_path: Path) -> list[dict[str, Any]]:
             if "corpus_version" in columns
             else "NULL AS corpus_version"
         )
+        repair_notices_column = (
+            "repair_notices_json"
+            if "repair_notices_json" in columns
+            else "NULL AS repair_notices_json"
+        )
         identity_columns = (
             "physics_bucket_schema_version",
             "physics_bucket_sha256",
@@ -717,6 +725,7 @@ def _cache_payload_rows(db_path: Path) -> list[dict[str, Any]]:
                     {corpus_column},
                     engine_version,
                     data_digests_json,
+                    {repair_notices_column},
                     {identity_selects},
                     created_at,
                     git_dirty
@@ -766,11 +775,19 @@ def _validated_cache_payload_row(row: Mapping[str, Any]) -> dict[str, Any]:
         raise RuntimeError(
             f"PT-1 cache shard row has non-canonical payload bytes: {row['key_hash']}"
         )
-    if str(row["store_schema_version"]) != PT1_STORE_SCHEMA_VERSION:
+    if str(row["store_schema_version"]) not in PT1_SUPPORTED_STORE_SCHEMA_VERSIONS:
         raise RuntimeError(
             "PT-1 cache shard row store schema version drift: "
             f"{row['store_schema_version']}"
         )
+    repair_notices_json = row.get("repair_notices_json")
+    if repair_notices_json is not None and not isinstance(
+        repair_notices_json, str
+    ):
+        raise RuntimeError(
+            f"PT-1 repair_notices_json storage type mismatch: {row['key_hash']}"
+        )
+    validate_repair_notices_json(repair_notices_json)
     validate_reduced_real_equilibrium_record_key(artifact, key, payload)
     assert_strict_vapor_pt1_row(
         artifact=artifact,
@@ -795,6 +812,7 @@ def _validated_cache_payload_row(row: Mapping[str, Any]) -> dict[str, Any]:
         "physics_bucket_hash": physics_bucket_hash,
         "ladder_values": _physics_ladder_values_from_replay_key(key),
         "data_digests_json": str(row["data_digests_json"]),
+        "repair_notices_json": repair_notices_json,
     }
 
 
@@ -876,6 +894,16 @@ def _merge_cache_shard(shard_path: Path, target_path: Path) -> dict[str, Any]:
                     canonical_json_bytes(entry["payload"]) != payload_bytes
                 ):
                     raise RuntimeError(f"PT-1 cache collision while merging {key_hash}")
+                merged_notices = monotonic_repair_notices_json(
+                    entry.get("repair_notices_json"),
+                    validated["repair_notices_json"],
+                )
+                if merged_notices != entry.get("repair_notices_json"):
+                    conn.execute(
+                        f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+                        "SET repair_notices_json = ? WHERE key_hash = ?",
+                        (merged_notices, key_hash),
+                    )
                 target_store._update_physics_bucket_columns(
                     conn,
                     key_hash=key_hash,
@@ -900,6 +928,7 @@ def _merge_cache_shard(shard_path: Path, target_path: Path) -> dict[str, Any]:
                     corpus_version,
                     engine_version,
                     data_digests_json,
+                    repair_notices_json,
                     physics_bucket_schema_version,
                     physics_bucket_sha256,
                     replay_scope_sha256,
@@ -914,7 +943,7 @@ def _merge_cache_shard(shard_path: Path, target_path: Path) -> dict[str, Any]:
                     physics_bucket_h30c_distance,
                     created_at,
                     git_dirty
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     key_hash,
@@ -929,6 +958,7 @@ def _merge_cache_shard(shard_path: Path, target_path: Path) -> dict[str, Any]:
                     row.get("corpus_version"),
                     row.get("engine_version"),
                     validated["data_digests_json"],
+                    validated["repair_notices_json"],
                     PHYSICS_BUCKET_SCHEMA_VERSION,
                     physics_bucket_hash,
                     _replay_scope_hash(physics_bucket_key),

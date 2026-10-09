@@ -4,6 +4,7 @@ import hashlib
 import json
 import logging
 import signal
+import shutil
 import sqlite3
 import sys
 import threading
@@ -1389,6 +1390,89 @@ def test_merge_epoch_shards_preserves_seed_source_labels_in_base_cache(tmp_path:
         con.close()
     assert merge_summary["seed_source_rows"] == 1
     assert rows == [(point_id, "ladder_polish", "job-a")]
+
+
+@pytest.mark.parametrize(
+    "repair_notices_json",
+    ['[{"kind":"epoch_repair"}]', "[]", None],
+)
+def test_epoch_seed_copy_preserves_repair_notice_values(
+    tmp_path: Path,
+    repair_notices_json: str | None,
+) -> None:
+    base = tmp_path / "notice-base.sqlite"
+    shard = tmp_path / "notice-epoch" / "shards" / "job-a.sqlite"
+    point_id = _put_pt1_cache_row(base, "notice-seed")
+    with sqlite3.connect(base) as conn:
+        conn.execute(
+            f"""
+            UPDATE {epoch_grind.PT1_EQUILIBRIUM_TABLE}
+            SET repair_notices_json = ?
+            WHERE key_hash = ?
+            """,
+            (repair_notices_json, point_id),
+        )
+
+    summary = epoch_grind.seed_job_cache(
+        shard,
+        base,
+        point_sources=[{"point_id": point_id, "source": "ladder_polish"}],
+        job_id="job-a",
+    )
+
+    assert summary["seed_rows"] == 1
+    with sqlite3.connect(shard) as conn:
+        (stored,) = conn.execute(
+            f"SELECT repair_notices_json "
+            f"FROM {epoch_grind.PT1_EQUILIBRIUM_TABLE} "
+            "WHERE key_hash = ?",
+            (point_id,),
+        ).fetchone()
+    assert stored == repair_notices_json
+
+
+def test_epoch_merge_merges_duplicate_row_notice_superset(tmp_path: Path) -> None:
+    base = tmp_path / "duplicate-epoch-base.sqlite"
+    shard = tmp_path / "duplicate-epoch-shard.sqlite"
+    point_id = _put_pt1_cache_row(base, "duplicate-epoch-row")
+    notice_a = {"kind": "epoch_repair_a"}
+    notice_b = {"kind": "epoch_repair_b"}
+    with sqlite3.connect(base) as conn:
+        conn.execute(
+            f"UPDATE {epoch_grind.PT1_EQUILIBRIUM_TABLE} "
+            "SET repair_notices_json = ? WHERE key_hash = ?",
+            (canonical_json_bytes([notice_a]).decode("utf-8"), point_id),
+        )
+    shard.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(base, shard)
+    with sqlite3.connect(shard) as conn:
+        conn.execute(
+            f"UPDATE {epoch_grind.PT1_EQUILIBRIUM_TABLE} "
+            "SET repair_notices_json = ? WHERE key_hash = ?",
+            (
+                canonical_json_bytes([notice_a, notice_b]).decode("utf-8"),
+                point_id,
+            ),
+        )
+
+    summary = epoch_grind.merge_epoch_shards(base, [shard])
+
+    with sqlite3.connect(base) as conn:
+        (merged_notices,) = conn.execute(
+            f"SELECT repair_notices_json "
+            f"FROM {epoch_grind.PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
+            (point_id,),
+        ).fetchone()
+    with sqlite3.connect(shard) as conn:
+        (source_notices,) = conn.execute(
+            f"SELECT repair_notices_json "
+            f"FROM {epoch_grind.PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
+            (point_id,),
+        ).fetchone()
+
+    assert summary["inserted_rows"] == 0
+    assert json.loads(merged_notices) == [notice_a, notice_b]
+    assert json.loads(source_notices) == [notice_a, notice_b]
 
 
 def test_seed_job_cache_rejects_stale_epoch_seed_without_counting_coverage(

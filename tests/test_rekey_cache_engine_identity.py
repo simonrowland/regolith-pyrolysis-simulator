@@ -4,13 +4,18 @@ from pathlib import Path
 
 import pytest
 
+from simulator import corpus_version
 from scripts import rekey_cache_engine_identity as rekey
 
 
 @pytest.fixture
 def target_corpus_version(monkeypatch) -> str:
     target = "target"
-    monkeypatch.setattr(rekey, "interoperable_corpus_versions", lambda: (target,))
+    monkeypatch.setattr(
+        corpus_version,
+        "interoperable_corpus_versions",
+        lambda: (target,),
+    )
     return target
 
 
@@ -140,3 +145,38 @@ def test_rekey_locks_identity_decision_before_backup(
             f"SELECT key_bytes FROM {rekey.PT1_EQUILIBRIUM_TABLE}"
         ).fetchone()
     assert rekey._json_loads(bytes(backup_key_bytes))["engine_version"] == "one"
+
+
+@pytest.mark.parametrize(
+    "repair_notices_json",
+    ['[{"kind":"rekey_repair"}]', "[]", None],
+)
+def test_rekey_preserves_repair_notice_values(
+    tmp_path: Path,
+    target_corpus_version: str,
+    repair_notices_json: str | None,
+) -> None:
+    db_path = tmp_path / "notice-cache.db"
+    _write_rekeyable_rows(db_path, ("one",))
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"ALTER TABLE {rekey.PT1_EQUILIBRIUM_TABLE} "
+            "ADD COLUMN repair_notices_json TEXT"
+        )
+        conn.execute(
+            f"UPDATE {rekey.PT1_EQUILIBRIUM_TABLE} "
+            "SET repair_notices_json = ? WHERE engine_version = 'one'",
+            (repair_notices_json,),
+        )
+
+    result = rekey.rekey_cache(
+        db_path,
+        target_corpus_version=target_corpus_version,
+    )
+
+    assert result.rows_updated == 1
+    with sqlite3.connect(db_path) as conn:
+        (stored,) = conn.execute(
+            f"SELECT repair_notices_json FROM {rekey.PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+    assert stored == repair_notices_json
