@@ -3371,16 +3371,23 @@ def bulk_property_species_formula(
 
 
 def _located_printed_and_initial(
-    wt: Mapping[str, Decimal] | None,
+    wt: Mapping[str, Any] | None,
     locator: Locator | None,
 ) -> tuple[Located[Mapping[str, Any]] | None, Located[Composition] | None]:
-    if not wt or len(wt) < 2:
+    if not isinstance(wt, Mapping):
         return None, None
-    printed = located_value(_printed_map_payload(wt), locator)
+    oxide_map = {
+        str(key): as_decimal(value)
+        for key, value in wt.items()
+        if str(key) in _OXIDE_COMPONENT_KEYS and _as_dec_or_none(value) is not None
+    }
+    if len(oxide_map) < 2:
+        return None, None
+    printed = located_value(_printed_map_payload(oxide_map), locator)
     initial = Located(
-        State.of(wt_pct_to_mole_fraction(wt)),
+        State.of(wt_pct_to_mole_fraction(oxide_map)),
         locator=locator,
-        inference=wt_pct_to_mole_fraction_derivation(wt, locator),
+        inference=wt_pct_to_mole_fraction_derivation(oxide_map, locator),
     )
     return printed, initial
 
@@ -9808,13 +9815,9 @@ def sample_from_equipment(
     if initial is None and printed is not None and printed.state.is_value:
         raw = printed.state.value
         if isinstance(raw, Mapping):
-            wt = {
-                str(k): as_decimal(v)
-                for k, v in raw.items()
-                if str(k) in _OXIDE_COMPONENT_KEYS and _as_dec_or_none(v) is not None
-            }
-            if len(wt) >= 2:
-                _, initial = _located_printed_and_initial(wt, printed.locator or locator)
+            _, initial = _located_printed_and_initial(
+                raw, printed.locator or locator
+            )
     if (
         mass_located is None
         and volume_located is None
@@ -11807,13 +11810,7 @@ class Migrator:
             initial = None
             raw = located.state.value
             if isinstance(raw, Mapping):
-                wt = {
-                    str(k): as_decimal(v)
-                    for k, v in raw.items()
-                    if str(k) in _OXIDE_COMPONENT_KEYS and _as_dec_or_none(v) is not None
-                }
-                if len(wt) >= 2:
-                    _, initial = _located_printed_and_initial(wt, located.locator)
+                _, initial = _located_printed_and_initial(raw, located.locator)
             sample = replace(
                 experiment.sample,
                 printed_composition=printed,
