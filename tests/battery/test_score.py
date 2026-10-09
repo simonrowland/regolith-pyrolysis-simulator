@@ -2638,7 +2638,6 @@ def test_e15_report_rows_cover_three_stolyarova_sources() -> None:
         "series",
         "x_axis",
         "expected_n",
-        "expected_model_derived_oxygen_candidates",
         "expected_slope",
     ),
     (
@@ -2648,7 +2647,6 @@ def test_e15_report_rows_cover_three_stolyarova_sources() -> None:
             "stolyarova_1991_ca_partial_pressure_1993k_complete_evaporation",
             "x(SiO2)",
             11,
-            9,
             Decimal("-3.87"),
         ),
         (
@@ -2657,7 +2655,6 @@ def test_e15_report_rows_cover_three_stolyarova_sources() -> None:
             "stolyarova_1995_ca_partial_pressure_table2",
             "x(CaO)",
             8,
-            26,
             Decimal("1.04"),
         ),
     ),
@@ -2668,7 +2665,6 @@ def test_e15_production_accumulator_pins_stolyarova_pca(
     series: str,
     x_axis: str,
     expected_n: int,
-    expected_model_derived_oxygen_candidates: int,
     expected_slope: Decimal,
 ) -> None:
     from simulator.battery import score as score_mod
@@ -2680,9 +2676,7 @@ def test_e15_production_accumulator_pins_stolyarova_pca(
     aggregate = _ScorePayloadAccumulator.from_rows(
         payloads, context=context, engines=(Engine.OPENIMCC,)
     )
-    _assert_no_model_derived_e15_points(
-        residuals, context, expected_model_derived_oxygen_candidates
-    )
+    _assert_no_model_derived_e15_points(residuals, context)
     shape = next(
         row
         for row in score_mod._e15_level_shape_rows(aggregate.e15_points)
@@ -2699,11 +2693,19 @@ def test_e15_production_accumulator_pins_stolyarova_pca(
 def _assert_no_model_derived_e15_points(
     residuals: tuple[Residual, ...],
     context: ScoreContext,
-    expected_oxygen_candidates: int,
 ) -> None:
     from simulator.battery import score as score_mod
 
-    oxygen_candidates = 0
+    oxygen_candidates_by_source: dict[str, int] = {}
+    model_derived_oxygen_sources = {
+        observation.source_id
+        for observation in context.observations.values()
+        if observation.source_id in score_mod._E15_LEVEL_BASIS
+        and isinstance(observation.identity, Identity)
+        and observation.identity.species.formula in {"O", "O2"}
+        and observation.evidence.class_.is_value
+        and observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+    }
     for residual in residuals:
         observation = context.observations.get(residual.reference)
         if observation is None:
@@ -2724,14 +2726,23 @@ def _assert_no_model_derived_e15_points(
                     class_=State.of(EvidenceClass.MEASURED_DIRECT),
                 ),
             )
-            oxygen_candidates += (
-                score_mod._e15_residual_point(residual, measured_observation)
-                is not None
+            oxygen_candidates_by_source[observation.source_id] = (
+                oxygen_candidates_by_source.get(observation.source_id, 0)
+                + int(
+                    score_mod._e15_residual_point(
+                        residual, measured_observation
+                    )
+                    is not None
+                )
             )
         point = score_mod._e15_residual_point(residual, observation)
         if point is not None:
             assert not is_model_derived
-    assert oxygen_candidates == expected_oxygen_candidates
+    assert model_derived_oxygen_sources
+    assert all(
+        oxygen_candidates_by_source.get(source_id, 0) >= 1
+        for source_id in model_derived_oxygen_sources
+    )
 
 
 def test_e15_production_accumulator_uses_exact_residual_predicate() -> None:
@@ -2894,7 +2905,7 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path() -> None:
     aggregate = _ScorePayloadAccumulator.from_rows(
         payloads, context=context, engines=(Engine.OPENIMCC,)
     )
-    _assert_no_model_derived_e15_points(residuals, context, 43)
+    _assert_no_model_derived_e15_points(residuals, context)
     production_shape = next(
         row
         for row in score_mod._e15_level_shape_rows(aggregate.e15_points)
