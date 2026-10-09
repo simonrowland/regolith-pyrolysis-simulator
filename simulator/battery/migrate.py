@@ -6177,10 +6177,26 @@ def reference_state_from_extract(
                 formula_after = re.match(
                     rf"\s*[- ]\s*\b{re.escape(formula)}\b", after, re.I
                 )
+                context = text[
+                    max(0, match.start() - 48) : match.end() + 48
+                ]
+                qualifier_formula_link = re.search(
+                    rf"\b{re.escape(printed_name)}\b"
+                    rf"(?:\s+(?:phase|polymorph))?(?:\s+of)?\s+"
+                    rf"\b{re.escape(formula)}\b",
+                    context,
+                    re.I,
+                ) or re.search(
+                    rf"\b{re.escape(formula)}\b"
+                    rf"\s+(?:phase|polymorph)\s+"
+                    rf"\b{re.escape(printed_name)}\b",
+                    context,
+                    re.I,
+                )
                 is_named_form = bool(
-                    re.search(r"\b(?:phase|polymorph)\b", before + after, re.I)
-                    or formula_before
+                    formula_before
                     or formula_after
+                    or qualifier_formula_link
                 )
                 if not is_named_form:
                     continue
