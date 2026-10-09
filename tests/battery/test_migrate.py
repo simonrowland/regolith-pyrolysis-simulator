@@ -1461,6 +1461,34 @@ def test_g02_iron_olivine_kems_is_knudsen_not_langmuir(tmp_path: Path) -> None:
     assert obs.evidence.class_.value is not EvidenceClass.MEASURED_DIRECT
 
 
+def test_g02_langmuir_ledger_keeps_qualified_derived_from(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    parent = "10.1016/j.gca.2005.08.014::kems-005-fedkin-2006::fedkin_2006_k_yu_langmuir"
+    (root / "data" / "literature" / "langmuir_knudsen_flux_validation.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "measurements": {
+                    "potassium_silicate_vacuum": {
+                        "species": "K",
+                        "temperature_range_k": [1723.15, 1723.15],
+                        "measured_langmuir_to_effusion_flux_ratio": {"value": 0.13},
+                        "derived_from": [parent],
+                        "source": {
+                            "citation_id": "REF-014",
+                            "citation": "Fedkin et al. (2006), DOI 10.1016/j.gca.2005.08.014",
+                            "doi": "10.1016/j.gca.2005.08.014",
+                        },
+                    }
+                }
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    observation = migrate(root, write=False).observations["potassium_silicate_vacuum"]
+    assert observation.derived_from == (parent,)
+
+
 def test_g02_kems_row_without_method_is_unknown(tmp_path: Path) -> None:
     root = _write_min_tree(tmp_path)
     (root / "data" / "literature" / "kems_measurements.yaml").write_text(
@@ -9512,3 +9540,120 @@ def test_residue_series_emits_numeric_component_cells_with_component_identity(
     assert pressure["value"] == "0.00015"
     assert pressure["units"] == "Torr"
     assert pressure["kind"] == "about_nominal_by_temperature"
+
+
+def _same_work_observation_duplicate_pairs(observations: list[dict]) -> list[tuple[str, str, str]]:
+    """Return equal admitted values for one work that came from separate extracts."""
+    grouped: dict[tuple[object, ...], list[dict]] = {}
+
+    def canonical(value: object) -> object:
+        if isinstance(value, dict):
+            if value.get("tag") == "value":
+                return canonical(value.get("value"))
+            return tuple(sorted((key, canonical(item)) for key, item in value.items()))
+        if isinstance(value, list):
+            return tuple(canonical(item) for item in value)
+        if value is None:
+            return None
+        try:
+            return Decimal(str(value))
+        except Exception:
+            return value
+
+    for obs in observations:
+        if (obs.get("admission") or {}).get("status") not in {"admitted", "pending"}:
+            continue
+        identity = obs.get("identity") or {}
+        quantity = canonical(identity.get("quantity"))
+        species = (identity.get("species") or {}).get("formula")
+        temperature_state = identity.get("temperature_K") or {}
+        if isinstance(temperature_state, dict) and temperature_state.get("tag") != "value":
+            continue
+        temperature = canonical(temperature_state)
+        value = obs.get("value") or {}
+        value_payload = {key: item for key, item in value.items() if key not in {"kind", "approximate"}}
+        experiment_id = str(obs.get("experiment_id") or "")
+        work_id = experiment_id.split("::", 1)[0]
+        source_id = str(obs.get("source_id") or "")
+        if not all((quantity, species, temperature is not None, value_payload, work_id, source_id)):
+            continue
+        grouped.setdefault(
+            (work_id, quantity, species, temperature, canonical(value_payload)), []
+        ).append(obs)
+
+    pairs: list[tuple[str, str, str]] = []
+    for (work_id, *_), members in grouped.items():
+        for index, left in enumerate(members):
+            for right in members[index + 1 :]:
+                if left.get("source_id") == right.get("source_id"):
+                    continue
+                left_id = str(left.get("observation_id") or "")
+                right_id = str(right.get("observation_id") or "")
+                left_parents = left.get("derived_from") or []
+                right_parents = right.get("derived_from") or []
+                if isinstance(left_parents, str):
+                    left_parents = [left_parents]
+                if isinstance(right_parents, str):
+                    right_parents = [right_parents]
+                if left_id in right_parents or right_id in left_parents:
+                    continue
+                pairs.append((work_id, left_id, right_id))
+    return sorted(pairs)
+
+
+def test_literature_store_has_no_duplicate_values_across_extracts() -> None:
+    roots = (
+        REPO_ROOT / "data" / "literature" / "extracts-v2",
+        REPO_ROOT / "data" / "literature" / "observations-v2",
+    )
+    observations: list[dict] = []
+    summary = load_observation_store_summary(REPO_ROOT)
+    for root in roots:
+        for path in iter_observation_store_paths(root):
+            if compilation_family_from_store_path(path) is not None:
+                _account_compilation_shard(path, summary)
+                continue
+            stored = yaml.load(path.read_text(encoding="utf-8"), Loader=yaml.CSafeLoader)
+            if isinstance(stored, dict):
+                observations.extend(stored.get("observations") or [])
+    duplicates = _same_work_observation_duplicate_pairs(observations)
+    assert duplicates == [], duplicates
+
+
+def test_duplicate_guard_catches_measured_copy_but_not_ulp_or_different_value() -> None:
+    owner = {
+        "observation_id": "owner::row",
+        "experiment_id": "10.1234/example::owner",
+        "source_id": "owner",
+        "identity": {
+            "quantity": {"tag": "value", "value": "evaporation_coefficient_alpha"},
+            "species": {"formula": "Fe"},
+            "temperature_K": {"tag": "value", "value": "2073"},
+        },
+        "value": {"kind": "point", "point": "0.25", "approximate": False},
+        "admission": {"status": "admitted"},
+    }
+    duplicate = {
+        **owner,
+        "observation_id": "secondary::row",
+        "experiment_id": "10.1234/example::secondary",
+        "source_id": "secondary",
+        "evidence": {"class": {"tag": "value", "value": "measured_direct"}},
+    }
+    assert _same_work_observation_duplicate_pairs([owner, duplicate]) == [
+        ("10.1234/example", "owner::row", "secondary::row")
+    ]
+
+    duplicate["derived_from"] = ["owner::row"]
+    assert _same_work_observation_duplicate_pairs([owner, duplicate]) == []
+    duplicate.pop("derived_from")
+
+    duplicate["value"] = {
+        "kind": "point",
+        "point": "0.2500000000000000000000000001",
+        "approximate": False,
+    }
+    assert _same_work_observation_duplicate_pairs([owner, duplicate]) == []
+
+    duplicate["value"] = {"kind": "point", "point": "0.3", "approximate": False}
+    assert _same_work_observation_duplicate_pairs([owner, duplicate]) == []

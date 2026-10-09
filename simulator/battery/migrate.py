@@ -13516,6 +13516,7 @@ class Migrator:
         method: State[MethodToken] | None = None,
         equipment: object = None,
         source_row_index: int | None = None,
+        derived_from: tuple[str, ...] | None = None,
         derivation: Derivation | None = None,
         per: PerBasis | State[PerBasis] | None = None,
         reaction: Reaction | State[Reaction] | None = None,
@@ -13620,6 +13621,7 @@ class Migrator:
             locator=locator,
             read_from=read_from,
             point_conditions=point_conditions,
+            derived_from=derived_from,
             derivation=derivation,
         )
         self._add_observation(
@@ -13963,6 +13965,20 @@ class Migrator:
                     source=rel,
                     observation_id=str(meas_id),
                 )
+            raw_derived_from = meas.get("derived_from")
+            if isinstance(raw_derived_from, str) and raw_derived_from.strip():
+                derived_from = (raw_derived_from.strip(),)
+            elif isinstance(raw_derived_from, (list, tuple)) and all(
+                isinstance(parent, str) and parent.strip()
+                for parent in raw_derived_from
+            ):
+                derived_from = tuple(parent.strip() for parent in raw_derived_from)
+            elif raw_derived_from is None:
+                derived_from = None
+            else:
+                raise ValueError(
+                    f"malformed derived_from for Langmuir ledger row {meas_id!r}"
+                )
             self._generic_obs(
                 work=work,
                 source_id=str((src or {}).get("citation_id") or meas_id),
@@ -13976,6 +13992,7 @@ class Migrator:
                 temperature_K=t,
                 uncertainty=unc,
                 method=map_method(meas.get("regime") or meas.get("method")),
+                derived_from=derived_from,
             )
 
     def _migrate_refractory(self, path: Path) -> None:
