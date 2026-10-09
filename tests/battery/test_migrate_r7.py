@@ -478,7 +478,7 @@ def test_g2_plante_source_points_and_comparison_fence(tmp_path):
 
 
 def test_plante_1979_quoted_row_composition_binding_pin(tmp_path):
-    """Pin the current row identity, initial charge, and two-phase guard."""
+    """Pin the bound row identity, initial charge, and two-phase guard."""
 
     root = _write_min_tree(tmp_path)
     _copy_extract(root, "kems-042-plante-1979.yaml")
