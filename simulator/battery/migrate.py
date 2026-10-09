@@ -2981,6 +2981,21 @@ def wt_pct_to_mole_fraction(wt: Mapping[str, Decimal]) -> Composition:
     )
 
 
+def _total_iron_reported_as_feo_notice(
+    wt: Mapping[str, Decimal] | None,
+    quantity: Quantity | None,
+    origin: str,
+) -> Notice | None:
+    if wt is None or "FeOT" not in wt or quantity is None:
+        return None
+    return Notice(
+        kind=NoticeKind.TOTAL_IRON_REPORTED_AS_FEO,
+        affected_quantities=(quantity,),
+        reason="FeOT (total iron) treated as FeO for conversion; printed key FeOT",
+        origin=origin,
+    )
+
+
 def _kume_formula_unit_oxide(name: str) -> tuple[str, Decimal] | None:
     component = _COMPOSITION_COMPONENTS.get(name)
     if component is not None:
@@ -11684,6 +11699,9 @@ class Migrator:
         initial_oxide_map = _initial_oxide_map_from_values(
             values, refusal_reason=composition_refusal
         )
+        total_iron_notice = _total_iron_reported_as_feo_notice(
+            initial_oxide_map, q_token, obs_id
+        )
         composition_located = _composition_located_from_values(values, locator)
         catalogue_composition = _catalogue_composition_located_from_values(values, locator)
         initial_composition, omitted_components = _mole_fraction_composition_from_values(
@@ -12368,7 +12386,9 @@ class Migrator:
                     t_is_point=t_sel.available,
                     parent_admission=admission,
                 )
-                point_notices: tuple[Notice, ...] = ()
+                point_notices: tuple[Notice, ...] = (
+                    () if total_iron_notice is None else (total_iron_notice,)
+                )
                 disagreement = _cardiff_matchett_disagreement_reason(values)
                 test_id = str(item.get("test") or "")
                 if disagreement and test_id in {"2b", "3"}:
@@ -12382,6 +12402,7 @@ class Migrator:
                         )
                     )
                     point_notices = (
+                        *point_notices,
                         Notice(
                             kind=NoticeKind.SOURCE_DISAGREEMENT,
                             affected_quantities=(q_token,),
@@ -12484,6 +12505,9 @@ class Migrator:
                         source_derivation=source_derivation,
                         phase_provenance=phase_provenance,
                         identity_provenance=identity_provenance,
+                        notices=(
+                            () if total_iron_notice is None else (total_iron_notice,)
+                        ),
                         equipment=obs.get("equipment"),
                         parent_reason=hold_reason,
                         parent_values=values,
@@ -12532,6 +12556,9 @@ class Migrator:
                     source_derivation=source_derivation,
                     phase_provenance=phase_provenance,
                     identity_provenance=identity_provenance,
+                    notices=(
+                        () if total_iron_notice is None else (total_iron_notice,)
+                    ),
                     equipment=obs.get("equipment"),
                     parent_reason=hold_reason,
                     parent_values=values,
@@ -12576,6 +12603,9 @@ class Migrator:
                         read_from=read_from,
                         derived_from=derived_from,
                         source_derivation=source_derivation,
+                        notices=(
+                            () if total_iron_notice is None else (total_iron_notice,)
+                        ),
                         equipment=obs.get("equipment"),
                         parent_reason=hold_reason,
                         parent_values=values,
@@ -12605,6 +12635,8 @@ class Migrator:
                 verbatim["source_uncertainty"] = obs.get("uncertainty")
             uncertainty = Uncertainty(kind=UncertaintyKind.PRINTED, verbatim=verbatim)
         observation_notices: list[Notice] = []
+        if total_iron_notice is not None:
+            observation_notices.append(total_iron_notice)
         from simulator.battery.validity import comparison_method_cell_constant_cancels
 
         if (
