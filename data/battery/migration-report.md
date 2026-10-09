@@ -1,21 +1,21 @@
 # Battery v2.1 migration report
 
-rows in: 47822
-records out (observations): 121808
-works: 268
-experiments: 3557
-queue size: 77488
+rows in: 47835
+records out (observations): 121821
+works: 269
+experiments: 3562
+queue size: 77514
 identical-payload dedupe aliases: 342
 metadata files: 43
-index sources: 271
+index sources: 272
 hard issues: 3637
 
 ## Spec vs measured
 
 | count | spec | measured |
 |---|---:|---:|
-| citations | 147 | 270 (mismatch) |
-| doi_works | 56 | 128 (mismatch) |
+| citations | 147 | 271 (mismatch) |
+| doi_works | 56 | 129 (mismatch) |
 | no_doi_works | 91 | 140 (mismatch) |
 | admission_statuses | 374 | 1180 (mismatch) |
 | supersedes | 422 | 650 (mismatch) |
@@ -25,10 +25,10 @@ hard issues: 3637
 | gibbs_reference_101325 | 594 | 594 |
 | formulas | 1625 | 2044 (mismatch) |
 | equipment_payloads | 670 | 973 (mismatch) |
-| absent_admissions | 3511 | 5023 (mismatch) |
+| absent_admissions | 3511 | 5036 (mismatch) |
 | absent_classes | 2174 | 2203 (mismatch) |
 | range_only_T | 3125 | 2666 (mismatch) |
-| system_like_phases | 1065 | 2685 (mismatch) |
+| system_like_phases | 1065 | 2698 (mismatch) |
 | missing_phases | 237 | 588 (mismatch) |
 | tabulated_lists | — | 6 |
 
@@ -18217,6 +18217,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/ta-shirai-2000-lpsc.yaml` | 19 | 46 | 92 |
 | `data/literature/extracts/ta-yamanaka-1997-metsoc.yaml` | 5 | 5 | 22 |
 | `data/literature/extracts/tachibana-tsuchiyama-1998-forsterite-dust-lpsc.yaml` | 6 | 6 | 24 |
+| `data/literature/extracts/takeda-1990-sn-slag-matertrans.yaml` | 13 | 13 | 26 |
 | `data/literature/extracts/thomas-2022-chlorine-bonding-silicate-melts.yaml` | 4 | 88 | 99 |
 | `data/literature/extracts/thomas-wood-2021-chlorine-silicate-melts.yaml` | 11 | 111 | 134 |
 | `data/literature/extracts/ts1985.yaml` | 16 | 19 | 37 |
@@ -18309,8 +18310,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 218171
+advisory issues: 218198
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 218171 |
+| `identity_incomplete` | 218198 |
