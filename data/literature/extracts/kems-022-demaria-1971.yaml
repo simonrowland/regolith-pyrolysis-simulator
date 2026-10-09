@@ -504,7 +504,10 @@ species:
           tag: value
           value:
             convention: raoultian_pure_endmember
-            endmember: {formula: Fe, phase: {tag: value, value: cr}}
+            endmember:
+              formula: Fe
+              phase: {tag: value, value: cr}
+              polymorph: {tag: unknown, reason: source does not state polymorph}
             component_basis: Fe
         inferred: false
         note: Pure Fe metal reference vapor-pressure line from Hultgren (1967), Fig. 3.
@@ -560,7 +563,10 @@ species:
           tag: value
           value:
             convention: raoultian_pure_endmember
-            endmember: {formula: Fe, phase: {tag: value, value: cr}}
+            endmember:
+              formula: Fe
+              phase: {tag: value, value: cr}
+              polymorph: {tag: unknown, reason: source does not state polymorph}
             component_basis: Fe
         inferred: false
         note: Pure Fe chips in Fe crucible are the multi-rotating-cell reference.

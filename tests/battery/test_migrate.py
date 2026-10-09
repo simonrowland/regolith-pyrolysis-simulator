@@ -5316,6 +5316,8 @@ def test_reference_prose_rejects_ambiguous_or_negated_raoult_conventions() -> No
 
 def test_demaria_fe_rows_use_the_pure_iron_reference_state(tmp_path: Path) -> None:
     result = _migrate_real_extract(tmp_path, "kems-022-demaria-1971.yaml")
+    assert result.validation is not None
+    assert result.validation.hard_issues == ()
     expected = {
         "demaria_1971_fe_lunar_basalt_kems_main_cell",
         "demaria_1971_fe_activity_multi_rotating_cell",
@@ -5333,6 +5335,9 @@ def test_demaria_fe_rows_use_the_pure_iron_reference_state(tmp_path: Path) -> No
         assert reference.value.endmember.formula == "Fe"
         assert reference.value.endmember.phase.value is Phase.CR
         assert reference.value.component_basis == "Fe"
+        polymorph = reference.value.endmember.polymorph
+        assert polymorph is not None and polymorph.is_unknown
+        assert polymorph.reason == "source does not state polymorph"
 
 
 def test_tsaplin_gibbs_duhem_sio2_is_not_measured_direct(tmp_path: Path) -> None:
