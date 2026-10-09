@@ -1244,11 +1244,25 @@ def authorize_binding(
     same_binding: list[Mapping[str, Any]] = []
     for entry in receipt["entries"]:
         if not isinstance(entry, Mapping):
-            continue
+            raise EngineBindingAdmissionError(identity, "receipt invalid")
+        entry_identity_mapping = entry.get("identity")
+        if not isinstance(entry_identity_mapping, Mapping) or any(
+            not isinstance(entry_identity_mapping.get(field), str)
+            for field in (
+                "engine_id",
+                "model_id",
+                "binding_revision",
+                "transport",
+            )
+        ):
+            raise EngineBindingAdmissionError(identity, "receipt invalid")
         try:
-            entry_identity = BindingIdentity.from_mapping(entry.get("identity", {}))
-        except (TypeError, ValueError):
-            continue
+            entry_identity = BindingIdentity.from_mapping(entry_identity_mapping)
+        except (TypeError, ValueError) as exc:
+            raise EngineBindingAdmissionError(
+                identity,
+                "receipt invalid",
+            ) from exc
         if entry_identity == identity:
             exact.append(entry)
         elif (
