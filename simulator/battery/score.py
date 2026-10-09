@@ -1173,6 +1173,90 @@ def _janaf_pure_solid_table_temperature_range(
     return min(temperatures), max(temperatures)
 
 
+@lru_cache(maxsize=1)
+def _b1259_tridymite_cristobalite_offset_rows() -> tuple[
+    tuple[Decimal, Decimal, Decimal], ...
+]:
+    """Load common B1259 H/S rows as (T K, dH J/mol, dS J/mol/K)."""
+
+    from simulator.reference_data.robie_waldbaum_1968_usgs_b1259_loader import (
+        load_records,
+    )
+
+    wanted = {"b1259-ht-0113-cristobalite", "b1259-ht-0114-tridymite"}
+    tables: dict[str, dict[Decimal, tuple[Decimal, Decimal]]] = {}
+    for record in load_records(include_ocr_suspect=True):
+        if record.get("record_id") not in wanted:
+            continue
+        rows: dict[Decimal, tuple[Decimal, Decimal]] = {}
+        for row in record.get("rows", ()):
+            if row.get("kind") != "data":
+                continue
+            temperature = row.get("temperature", {}).get("value")
+            enthalpy = row.get("delta_f_H", {}).get("value")
+            entropy = row.get("entropy", {}).get("value")
+            if temperature is None or enthalpy is None or entropy is None:
+                continue
+            key = Decimal(str(temperature))
+            # A duplicated T is a printed phase boundary, not a unique H/S
+            # point for this polymorph comparison.
+            if key in rows:
+                rows.pop(key)
+                continue
+            # B1259 H is kcal/mol and S is cal/(mol K). Convert both to SI.
+            rows[key] = (
+                Decimal(str(enthalpy)) * Decimal("4184"),
+                Decimal(str(entropy)) * Decimal("4.184"),
+            )
+        tables[str(record["record_id"])] = rows
+    cristobalite = tables["b1259-ht-0113-cristobalite"]
+    tridymite = tables["b1259-ht-0114-tridymite"]
+    return tuple(
+        (
+            temperature,
+            cristobalite[temperature][0] - tridymite[temperature][0],
+            cristobalite[temperature][1] - tridymite[temperature][1],
+        )
+        for temperature in sorted(cristobalite.keys() & tridymite.keys())
+    )
+
+
+def _b1259_tridymite_cristobalite_delta_g(
+    temperature_K: Decimal,
+) -> tuple[Decimal, Decimal, Decimal, bool]:
+    """Return ΔG(cristobalite−tridymite), certified bounds and extrapolation."""
+
+    rows = _b1259_tridymite_cristobalite_offset_rows()
+    lower, upper = rows[0][0], rows[-1][0]
+    if temperature_K <= lower:
+        edge = rows[0]
+        extrapolated = temperature_K < lower
+        delta_h, delta_s = edge[1], edge[2]
+    elif temperature_K >= upper:
+        edge = rows[-1]
+        extrapolated = temperature_K > upper
+        delta_h, delta_s = edge[1], edge[2]
+    else:
+        extrapolated = False
+        for left, right in zip(rows, rows[1:]):
+            if left[0] <= temperature_K <= right[0]:
+                fraction = (temperature_K - left[0]) / (right[0] - left[0])
+                delta_h = left[1] + fraction * (right[1] - left[1])
+                delta_s = left[2] + fraction * (right[2] - left[2])
+                break
+        else:
+            raise ValueError("B1259 common tridymite/cristobalite grid has a gap")
+
+    # Premise: B1259's two SiO2 tables print formation H (kcal/mol) and S
+    # (cal/(mol K)); the element reference cancels in their difference.
+    # Thus ΔG_tr=G_cr−G_tr=ΔH_tr−TΔS_tr, interpolating H and S on their
+    # common printed grid; beyond it use the edge ΔH/ΔS (dCp=0). At 2000 K,
+    # dH=0.105 kcal/mol and dS=0.060 cal/(mol K), so dG=−15 cal/mol, matching
+    # the printed ΔfG difference (−131.621−(−131.606) kcal/mol) to precision.
+    # Units: kcal/mol×4184 J/kcal − K×cal/(mol K)×4.184 J/cal = J/mol.
+    return delta_h - temperature_K * delta_s, lower, upper, extrapolated
+
+
 def _fusion_comparison_reference(
     reference: Observation, *, engine: Engine | None = None
 ) -> Observation:
@@ -1284,6 +1368,11 @@ def _fusion_comparison_reference(
         "O-035": Polymorph.CRISTOBALITE_HIGH,
     }.get(fusion.crystal_table)
     observed_polymorph = polymorph_token(standard_state.endmember)
+    tridymite_to_cristobalite = (
+        formula == "SiO2"
+        and fusion.crystal_table == "O-035"
+        and observed_polymorph is Polymorph.TRIDYMITE
+    )
     source_polymorph = standard_state.endmember.polymorph
     source_polymorph_is_unknown = (
         source_polymorph is not None
@@ -1311,6 +1400,7 @@ def _fusion_comparison_reference(
     if (
         expected_polymorph is not None
         and observed_polymorph is not expected_polymorph
+        and not tridymite_to_cristobalite
         and not unique_unknown_polymorph_table
     ):
         observed = "unknown" if observed_polymorph is None else observed_polymorph.value
@@ -1330,6 +1420,40 @@ def _fusion_comparison_reference(
             ),
         )
         return replace(reference, notices=union_notices(reference.notices, (notice,)))
+
+    tridymite_notice: Notice | None = None
+    tridymite_offset_dex = Decimal(0)
+    if tridymite_to_cristobalite:
+        delta_g_tr_J_per_mol, band_lo, band_hi, extrapolated = (
+            _b1259_tridymite_cristobalite_delta_g(temperature_K)
+        )
+        # At equal chemical potential, G_cr + RT ln(a_cr) =
+        # G_tr + RT ln(a_tr), so ln(a_cr/a_tr) = -ΔG_tr/(RT).
+        tridymite_offset_dex = -delta_g_tr_J_per_mol / (
+            JANAF_R_J_PER_MOL_K * temperature_K * Decimal(10).ln()
+        )
+        authority = Authority.EXTRAPOLATED if extrapolated else Authority.CERTIFIED
+        band = f"B1259 common printed H/S band [{band_lo}, {band_hi}] K"
+        original_reason = (
+            "fusion conversion missing input: JANAF solid table O-035 represents "
+            "polymorph cristobalite_high, but measured reference polymorph is tridymite"
+        )
+        tridymite_notice = Notice(
+            kind=NoticeKind.DERIVATION_USES_COMPILATION,
+            affected_quantities=(Quantity.ACTIVITY,),
+            reason=(
+                f"{original_reason}; B1259 tridymite→cristobalite offset applied; "
+                f"DeltaG_cristobalite_minus_tridymite={delta_g_tr_J_per_mol} J/mol; "
+                f"offset_dex={tridymite_offset_dex}; authority={authority.value}; "
+                f"certified_band=[{band_lo}, {band_hi}] K"
+            ),
+            origin=reference.observation_id,
+            band=band,
+            authority=authority,
+            certification=(
+                "Robie & Waldbaum 1968, USGS Bulletin 1259 common printed H/S grid"
+            ),
+        )
 
     delta_g_fus_J_per_mol = fusion.delta_g_fus_kJ_per_mol * Decimal(1000)
     offset_dex = delta_g_fus_J_per_mol / (
@@ -1392,6 +1516,8 @@ def _fusion_comparison_reference(
             ),
         )
         notices = (notice,) if melts_notice is None else (notice, melts_notice)
+        if tridymite_notice is not None:
+            notices += (tridymite_notice,)
         return replace(
             reference,
             identity=comparison_identity,
@@ -1407,6 +1533,7 @@ def _fusion_comparison_reference(
     # 32.966 kJ/mol at those temperatures.
     converted_activity = reference.value.point * (
         -delta_g_fus_J_per_mol / (JANAF_R_J_PER_MOL_K * temperature_K)
+        + tridymite_offset_dex * Decimal(10).ln()
     ).exp()
     mismatch_K = fusion.melting_temperature_K - fusion.accepted_melting_temperature_K
     extrapolation_K = fusion.melting_temperature_K - temperature_K
@@ -1432,6 +1559,9 @@ def _fusion_comparison_reference(
         ),
         origin=reference.observation_id,
     )
+    notices = (notice,) if melts_notice is None else (notice, melts_notice)
+    if tridymite_notice is not None:
+        notices += (tridymite_notice,)
     return replace(
         reference,
         identity=comparison_identity,
@@ -1442,10 +1572,7 @@ def _fusion_comparison_reference(
                 "activity converted from a solid to liquid reference with JANAF fusion Gibbs energy"
             ),
         ),
-        notices=union_notices(
-            reference.notices,
-            (notice,) if melts_notice is None else (notice, melts_notice),
-        ),
+        notices=union_notices(reference.notices, notices),
     )
 
 
