@@ -16,22 +16,6 @@ extraction:
   provenance_path: ferry-inbox/cao-al2o3-sources/nagata-1989-emf-calcium-aluminates/
 review_status: draft
 fidelity_samples:
-- path: species.CaO.observations[nagata_1989_table2_delta_Gf].values.rows[0].A_J
-  value: -16380
-  note: Table 2 CaO.6Al2O3 A coefficient
-  locator:
-    published_page: 2026
-    pdf_page_index: 4
-    table: '2'
-    row: CaO.6Al2O3
-- path: species.CaO.observations[nagata_1989_table1_emf].values.rows[0].emf_equation_mV
-  value: 84.88 + 0.1947T (±8.63)
-  note: Table 1 Cell I EMF equation
-  locator:
-    published_page: 2026
-    pdf_page_index: 4
-    table: '1'
-    row: Cell I
 - path: species.CaO.observations[nagata_1989_liquidus_a_CaO].values.points[0].a_CaO
   value: 0.248
   note: a(CaO) liquid in eq. with solid CA at 1773 K (synopsis + sec. 4.4 / conclusion)
@@ -55,12 +39,13 @@ species:
         experimental_method: galvanic cells with 4CaO.P2O5 solid electrolyte; solid CaO reference electrode; sample electrode
           = two-phase solid mixtures of adjacent calcium aluminates (Cells I–IV)
         electrolyte_as_printed: 4CaO.P2O5
-        temperature_range_K_as_printed: 1373 to 1873
+        temperature_range_K_as_printed: 1473 to 1873
         standard_state_CaO_as_printed: pure solid
         how_equilibrium_shown_as_printed: EMF stable after 20–36 ks at setpoint; after temperature cycle returns to within ±1 mV
           (Fig. 2); polarization ±110 mV for 60 s recovers to equilibrium EMF ~360 s later (reversible); heating/cooling symbols
           agree on Fig. 3; post-run XRD shows only the intended two compounds; SEM/XRD of electrolyte surface shows no phases
           other than 4CaO.P2O5
+        preparation_and_measurement_conditions_as_printed: Electrolyte powders were dried at 473 K for over one week, calcined in air at 1373 K for 43.2 ks, pelletized, and sintered in air at 1473 K for 36.0 ks; an alumina crucible was used and the pellet was buried in same-composition powder. The furnace atmosphere was air dried over P2O5 powder. A PID controller held temperature to ±1 K; the thermocouple position is shown in Fig. 1.
         cell_IV_liquidus_note_as_printed: above 1635 K Cell IV splits into (a) liquid + 3CaO.Al2O3 and (b) liquid + CaO.Al2O3
           at eutectic 1633±5 K, 50.65 wt% Al2O3
         a_CaO_from_emf_formula_as_printed: 'aCaO = exp(-2 E4 F / RT) for liquidus EMF of Cell IV (sec. 4.4)'
@@ -82,105 +67,80 @@ species:
         - 'Fig. 4 oxygen-pressure / electrode-location checks'
         - 'Figs. 5–8 ΔG° of formation reactions vs T (comparisons)'
         note: scatter not digitised; numeric ΔG°f equations taken from Table 2 / synopsis
-    observations:
-    - observation_id: nagata_1989_table1_emf
-      type: gibbs_table
+    - observation_id: nagata_1989_table1_emf_context
+      type: thermodynamic_example
       locator:
         published_page: 2026
         pdf_page_index: 4
         table: '1'
-      T_range_K:
-      - 1373.0
-      - 1873.0
-      phase: solid calcium aluminate equilibria; Cell IV above 1635 K includes liquid slag
-      standard_state: pure solid CaO reference
       units: mV; K
       values:
         quantity: emf_of_galvanic_cells
-        method_class: measured
-        admission_status: admitted
+        method_class: quoted
         table_title_as_printed: 'Table 1. EMF of Galvanic cells.'
         rows:
         - cell: I
           virtual_cell_reaction_as_printed: CaO + 6Al2O3 = CaO.6Al2O3
           emf_equation_mV: 84.88 + 0.1947T (±8.63)
-          emf_as_printed: '84.88 + 0.1947T (±8.63)'
           T_range_K_as_printed: 1373-1873
         - cell: II
           virtual_cell_reaction_as_printed: 2CaO + CaO.6Al2O3 = 3(CaO.2Al2O3)
           emf_equation_mV: 79.24 + 0.1033T (±5.49)
-          emf_as_printed: '79.24 + 0.1033T (±5.49)'
           T_range_K_as_printed: 1373-1873
         - cell: III
           virtual_cell_reaction_as_printed: CaO + CaO.2Al2O3 = 2(CaO.Al2O3)
           emf_equation_mV: 104.5 + 0.0463T (±6.80)
-          emf_as_printed: '104.5 + 0.0463T (±6.80)'
           T_range_K_as_printed: 1373-1843
         - cell: IV
           virtual_cell_reaction_as_printed: 2CaO + CaO.Al2O3 = 3CaO.Al2O3
           emf_equation_mV: -15.85 + 0.0282T (±2.29)
-          emf_as_printed: '-15.85 + 0.0282T (±2.29)'
           T_range_K_as_printed: 1373-1635
         - cell: IV
           virtual_cell_reaction_as_printed: CaO + CaO.Al2O3 = Slag(l)
           emf_equation_mV: -875.3 + 0.5538T (±5.90)
-          emf_as_printed: '-875.3 + 0.5538T (±5.90)'
           T_range_K_as_printed: 1635-1773
         - cell: IV
           virtual_cell_reaction_as_printed: CaO + Slag(l) = 3CaO.Al2O3
           emf_equation_mV: -35.70 + 0.0408T (±1.78)
-          emf_as_printed: '-35.70 + 0.0408T (±1.78)'
           T_range_K_as_printed: 1635-1773
-      quote: 'Table 1. EMF of Galvanic cells. Cell I: 84.88 + 0.1947T (±8.63) mV, 1373-1873 K.'
-    - observation_id: nagata_1989_table2_delta_Gf
-      type: gibbs_table
+    - observation_id: nagata_1989_table2_delta_Gf_context
+      type: thermodynamic_example
       locator:
         published_page: 2026
         pdf_page_index: 4
         table: '2'
-      T_range_K:
-      - 1373.0
-      - 1873.0
-      phase: solid intermediate compounds from CaO and Al2O3
-      standard_state: formation from pure solid CaO and Al2O3
       units: J/mol
       values:
         quantity: standard_free_energy_of_formation
-        method_class: derived
-        admission_status: admitted
+        method_class: quoted
         measurement_status: calculated_from_cell_EMF
-        table_title_as_printed: 'Table 2. Standard free energies of formation of CaO-Al2O3 intermediate compounds formed of
-          CaO and Al2O3.'
+        table_title_as_printed: 'Table 2. Standard free energies of formation of CaO-Al2O3 intermediate compounds formed of CaO and Al2O3.'
         rows:
-        - compound_as_printed: CaO.6Al2O3
+        - sample: CaO.6Al2O3
           delta_Gf_equation_J_per_mol: -16380 - 37.58T (±1730)
           A_J: -16380
           B_J_per_K: -37.58
           uncertainty_J: 1730
           T_range_K_as_printed: 1373-1873
-          as_printed: '-16380 - 37.58T (±1730)'
-        - compound_as_printed: CaO.2Al2O3
+        - sample: CaO.2Al2O3
           delta_Gf_equation_J_per_mol: -15650 - 25.82T (±900)
           A_J: -15650
           B_J_per_K: -25.82
           uncertainty_J: 900
           T_range_K_as_printed: 1373-1873
-          as_printed: '-15650 - 25.82T (±900)'
-        - compound_as_printed: CaO.Al2O3
+        - sample: CaO.Al2O3
           delta_Gf_equation_J_per_mol: -17910 - 17.38T (±790)
           A_J: -17910
           B_J_per_K: -17.38
           uncertainty_J: 790
           T_range_K_as_printed: 1373-1843
-          as_printed: '-17910 - 17.38T (±790)'
-        - compound_as_printed: 3CaO.Al2O3
+        - sample: 3CaO.Al2O3
           delta_Gf_equation_J_per_mol: -11790 - 28.27T (±1190)
           A_J: -11790
           B_J_per_K: -28.27
           uncertainty_J: 1190
           T_range_K_as_printed: 1373-1635
-          as_printed: '-11790 - 28.27T (±1190)'
-      quote: 'Synopsis / Table 2: CaO.6Al2O3 ΔG°f = -16380 - 37.58T (±1730) J/mol (1373-1873 K); unit J/mol.'
+    observations:
     - observation_id: nagata_1989_liquidus_a_CaO
       type: activity_coefficient
       locator:
@@ -190,49 +150,69 @@ species:
       T_range_K:
       - 1773.0
       - 1823.0
-      phase: liquid CaO-Al2O3 slag in equilibrium with solid CA or C3A
-      standard_state: pure solid CaO
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: CaO
+              phase: {tag: value, value: cr}
+              polymorph: {tag: unknown, reason: 'Source states pure solid CaO but does not name its polymorph.'}
+            component_basis: CaO
+        inferred: false
+        note: Standard state printed as pure solid CaO.
+        locator:
+          published_page: 2029
+          pdf_page_index: 7
+          section: 4.4
       regime: emf_liquidus
       units: dimensionless activity
+      derived_from: [unknown:nagata-1989-emf-calcium-aluminates]
+      derivation:
+        relation: 'The paper computes the liquidus CaO activities from measured Cell IV EMF using a_CaO = exp(−2E4F/RT); values are printed in the synopsis and §4.4.'
+        inputs: [unknown:nagata-1989-emf-calcium-aluminates]
       values:
         quantity: activity
-        method_class: derived
+        method_class: measured_reduced
         admission_status: admitted
         measurement_status: derived_from_Cell_IV_liquidus_EMF
         experimental_method: galvanic_cell_emf
         formula_as_printed: aCaO = exp(-2 E4 F / RT)
         points:
         - T_K: 1773
-          coexisting_solid_as_printed: CaO.Al2O3
           a_CaO: 0.248
           a_CaO_as_printed: '0.248'
           activity: 0.248
           activity_as_published: '0.248'
-          locator_note: synopsis p. 2023 and conclusion p. 2029
+          locator_note: synopsis p. 2023 and conclusion p. 2029; liquid in equilibrium with solid CaO.Al2O3
         - T_K: 1823
-          coexisting_solid_as_printed: CaO.Al2O3
           a_CaO: 0.181
           a_CaO_as_printed: '0.181'
           activity: 0.181
           activity_as_published: '0.181'
-          locator_note: sec. 4.4 p. 2029 (page-image verified)
+          locator_note: sec. 4.4 p. 2029 (page-image verified); liquid in equilibrium with solid CaO.Al2O3
         - T_K: 1773
-          coexisting_solid_as_printed: 3CaO.Al2O3
+          a_CaO: 0.134
+          a_CaO_as_printed: '0.134'
+          activity: 0.134
+          activity_as_published: '0.134'
+          locator_note: sec. 4.4 p. 2029 (page-image verified); liquid in equilibrium with solid CaO.Al2O3; printed at 1773 K despite the Cell IV fit giving about 0.134 at 1873 K
+        - T_K: 1773
           a_CaO: 0.619
           a_CaO_as_printed: '0.619'
           activity: 0.619
           activity_as_published: '0.619'
-          locator_note: synopsis p. 2023 and conclusion p. 2029
+          locator_note: synopsis p. 2023 and conclusion p. 2029; liquid in equilibrium with solid 3CaO.Al2O3
         formula: CaO
         quantity_as_published: activity_of_CaO
         comparisons_as_printed:
         - 'Sharma & Richardson 1773 K: 0.21'
         - 'Cameron et al. 1823 K: 0.04'
         - 'Fujisawa et al. 1873 K: 0.09'
-        note: Liquid compositions on the liquidus are not tabulated as x(CaO) in this paper; activities pin CA and C3A liquidus
-          sides. No invented liquidus mole fractions.
+        note: The article prints 0.134 at 1773 K for the CA liquidus, although the Cell IV fit gives about 0.134 at 1873 K and about 0.248 at 1773 K; the synopsis and conclusion give only 0.248 and 0.619. Preserve the §4.4 value and temperature as printed. Liquid compositions on the liquidus are not tabulated as x(CaO); no mole fractions are inferred.
       uncertainty:
         reported_status: not_separately_printed_on_a_CaO
         note: a(CaO) uncertainties not separately tabulated; EMF std. max ±8.6 mV (Table 1 text)
-      quote: 'The activity of CaO in liquid slag in equilibrium with solid CaO.Al2O3 was 0.248 at 1773 K and that in equilibrium
-        with solid 3CaO.Al2O3 was 0.619. The standard state of CaO is pure solid.'
+      quote: 'Section 4.4 prints CaO activity in the liquid in equilibrium with CaO.Al2O3 as 0.248 at 1773 K, 0.181 at 1823 K, and 0.134 at 1773 K; it prints 0.619 at 1773 K for liquid in equilibrium with 3CaO.Al2O3. The standard state of CaO is pure solid.'
