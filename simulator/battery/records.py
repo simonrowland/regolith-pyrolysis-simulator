@@ -345,6 +345,14 @@ class Reaction:
             raise ValueError("Reaction requires at least one term")
 
 
+# Composition.proxy_flag tokens. Absent (None) means a printed analysis of the
+# point. ``composition_from_sample_catalog``: a catalogue proxy.
+# ``initial_charge_only``: the source prints the starting charge while the
+# datum describes a later (depleted) state; consumers may predict with it but
+# the residual is flagged (b-716).
+INITIAL_CHARGE_ONLY_PROXY_FLAG = "initial_charge_only"
+
+
 @dataclass(frozen=True)
 class Composition:
     basis: str
@@ -444,7 +452,10 @@ class Notice:
 
     def __post_init__(self) -> None:
         if not self.affected_quantities:
-            raise ValueError("Notice.affected_quantities is required")
+            # FIGURE_ONLY may label a row whose quantity is still unknown
+            # (typed quantity_unknown refusal); empty is allowed only there.
+            if self.kind is not NoticeKind.FIGURE_ONLY:
+                raise ValueError("Notice.affected_quantities is required")
         if not self.reason:
             raise ValueError("Notice.reason is required")
         if not self.origin:
