@@ -975,6 +975,22 @@ def test_magemin_shadow_fallback_under_alphamelts_config_excludes_engine_version
     )
 
 
+def test_failed_version_getter_is_typed_pt1_provenance() -> None:
+    class BrokenVersionBackend:
+        def get_engine_version(self) -> str:
+            raise RuntimeError("version unavailable")
+
+    provenance = json.loads(
+        rrd._backend_version_for_key(BrokenVersionBackend())
+    )
+
+    assert provenance == {
+        "tag": "unknown",
+        "value": None,
+        "reason": "version getter failed: RuntimeError",
+    }
+
+
 def _c3a_ladder_key(
     label: str,
     *,
