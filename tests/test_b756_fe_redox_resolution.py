@@ -28,6 +28,7 @@ from simulator.fe_redox import (
     KRESS91_LIQUID_CALIBRATION_MIN_T_C,
     MEASURED_FRACTION_SEED_DISSOCIATION_ENVELOPE,
     MEASURED_FRACTION_SEED_KRESS91,
+    delta_iw_ledger_seed_gap,
     fe3_fraction_for_prior,
     feo_fe2o3_kg_from_feot,
     feo_iw_log10_fO2_bar,
@@ -468,6 +469,7 @@ def test_measured_load_keeps_iron_atoms_and_credits_oxygen() -> None:
     assert notice["locator"] == "Table 1"
     assert notice["value"] == pytest.approx(fraction)
     assert notice["fe3_fraction"] == pytest.approx(fraction)
+    assert "fe3_fraction_gap_at_calibration_floor" not in notice
     assert sim.melt.fO2_log == pytest.approx(
         kress91_fO2_log_for_fe3_fraction(
             fe3_fraction=fraction,
@@ -517,6 +519,32 @@ def test_delta_iw_load_splits_at_the_kress_reference_and_seeds_iw_plus_offset() 
     assert notice["kind"] == "delta_iw"
     assert notice["value"] == pytest.approx(delta)
     assert "lower bound" not in notice["message"].lower()
+    floor_T_K = KRESS91_LIQUID_CALIBRATION_MIN_T_C + 273.15
+    implied_floor = kress91_fe3_over_sigma_fe(
+        fO2_log=feo_iw_log10_fO2_bar(floor_T_K) + delta,
+        mol_fractions=melt_mol_fractions_for_kress91(sim._melt_oxide_wt_pct()),
+        T_K=floor_T_K,
+        pressure_bar=LOAD_FE_SPLIT_PRESSURE_BAR,
+    )
+    gap = delta_iw_ledger_seed_gap(
+        sim._melt_oxide_wt_pct(),
+        delta_iw=delta,
+        ledger_fe3_fraction=float(resolution.fe3_fraction),
+    )
+    assert gap is not None
+    assert notice["split_temperature_K"] == KRESS91_FO2_KEY_REFERENCE_T_K
+    assert notice["fe3_fraction_gap_at_calibration_floor"] == pytest.approx(
+        implied_floor - resolution.fe3_fraction
+    )
+    assert notice["implied_fe3_fraction_at_calibration_floor"] == pytest.approx(
+        gap["implied_fe3_fraction_at_calibration_floor"]
+    )
+    assert notice["fe3_fraction_gap_at_split_T"] == pytest.approx(
+        gap["fe3_fraction_gap_at_split_T"]
+    )
+    # The ledger fraction stays the reference-temperature split. The notice
+    # records the floor gap instead of rewriting FeO and Fe2O3.
+    assert resolution.fe3_fraction == pytest.approx(expected_fraction)
 
 
 def test_prior_oxygen_bound_is_a_point_on_the_same_coefficient() -> None:

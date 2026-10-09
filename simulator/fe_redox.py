@@ -935,13 +935,32 @@ def fe3_fraction_for_prior(
 ) -> float:
     """Ferric fraction used for the one load-time mass split.
 
-    A measured fraction is the cited value. A delta_iw prior is the
-    Kress91 split at production IW(T) + delta_iw. T is
-    ``KRESS91_FO2_KEY_REFERENCE_T_K`` (1673.15 K), inside the liquid
-    calibration band and independent of the campaign clock. The seed
-    itself still tracks IW(T) + delta_iw at the adopting temperature.
-    Pressure is ``LOAD_FE_SPLIT_PRESSURE_BAR``. Alkali is not added:
-    delta_iw is already the offset from production IW.
+    A measured fraction is the cited value. It already matches the seed
+    at every temperature, because the seed inverts Kress91 for that
+    fraction. A delta_iw prior is the Kress91 split at production IW(T)
+    + delta_iw. T is ``KRESS91_FO2_KEY_REFERENCE_T_K`` (1673.15 K),
+    inside the 1200-1630 C liquid band. Pressure is
+    ``LOAD_FE_SPLIT_PRESSURE_BAR``. Alkali is not added: delta_iw is
+    already the offset from production IW.
+
+    The seed stays IW(T) + delta_iw at the adopting temperature, as the
+    b-747 potential does. Ledger and seed therefore agree only when the
+    adopting temperature is 1673.15 K. The split is not redone on the
+    first liquid tick. The atom ledger and the omitted-oxygen credit
+    close at load, before any liquid hour, so a later rewrite of FeO
+    and Fe2O3 would move mass after that close. A campaign that never
+    adopts would also stay all-ferrous for the whole run. 1673.15 K is
+    known before that close. ``delta_iw_ledger_seed_gap`` records how
+    far the seed-implied fraction at the 1200 C floor sits from this
+    frozen fraction.
+
+    Algebra: f = Kress91(fO2 = IW(T_ref) + delta_iw, T_ref, 1 bar) on
+    the pre-split wt%. Units: T_ref kelvin, delta_iw dex, f
+    dimensionless Fe3+/sum-Fe.
+
+    Sanity: on one composition, f at T_ref equals the forward Kress91
+    fraction at IW(T_ref) + delta_iw. The same composition at 1200 C
+    differs by the temperature term only.
     """
 
     if prior.kind == "measured_fe3_fraction":
@@ -964,6 +983,63 @@ def fe3_fraction_for_prior(
             pressure_bar=LOAD_FE_SPLIT_PRESSURE_BAR,
         )
     )
+
+
+def delta_iw_ledger_seed_gap(
+    composition_wt_pct: Mapping[str, float],
+    *,
+    delta_iw: float,
+    ledger_fe3_fraction: float,
+) -> dict[str, float] | None:
+    """Size of the frozen ledger fraction against the seed at another T.
+
+    Premise: ``fe3_fraction_for_prior`` freezes a delta_iw split at
+    1673.15 K. The seed at temperature T is IW(T) + delta_iw, whose
+    Kress91 fraction is not that frozen value. This reports both
+    fractions. It does not write a second split.
+
+    Algebra: f_implied(T) = Kress91(fO2 = IW(T) + delta_iw, T, 1 bar)
+    on ``composition_wt_pct``. The notice passes the post-split melt,
+    so the gap at 1673.15 K is only the composition change from adding
+    ferric oxygen. The gap at the 1200 C floor is
+    f_implied(1473.15 K) - f_ledger.
+
+    Units: temperatures in K, delta_iw in dex, fractions dimensionless.
+
+    Sanity: SiO2 45, FeO 16.5, Al2O3 10, MgO 10, CaO 10 wt% at
+    delta_iw -1.01. The frozen fraction is 0.017789. On that same map
+    the split-temperature gap is 0, and the 1200 C gap is 0.001412
+    (implied fraction 0.019202). A None return means the composition
+    has no FeOt mole fraction to split.
+    """
+
+    mol_fractions = melt_mol_fractions_for_kress91(composition_wt_pct)
+    if not mol_fractions or float(mol_fractions.get("FeOt", 0.0)) <= 0.0:
+        return None
+    offset = float(delta_iw)
+    ledger = float(ledger_fe3_fraction)
+    floor_T_K = KRESS91_LIQUID_CALIBRATION_MIN_T_C + 273.15
+
+    def _implied(temperature_K: float) -> float:
+        return float(
+            kress91_fe3_over_sigma_fe(
+                fO2_log=feo_iw_log10_fO2_bar(temperature_K) + offset,
+                mol_fractions=mol_fractions,
+                T_K=temperature_K,
+                pressure_bar=LOAD_FE_SPLIT_PRESSURE_BAR,
+            )
+        )
+
+    at_split = _implied(KRESS91_FO2_KEY_REFERENCE_T_K)
+    at_floor = _implied(floor_T_K)
+    return {
+        "split_temperature_K": KRESS91_FO2_KEY_REFERENCE_T_K,
+        "implied_fe3_fraction_at_split_T": at_split,
+        "fe3_fraction_gap_at_split_T": at_split - ledger,
+        "calibration_floor_temperature_K": floor_T_K,
+        "implied_fe3_fraction_at_calibration_floor": at_floor,
+        "fe3_fraction_gap_at_calibration_floor": at_floor - ledger,
+    }
 
 
 def omitted_ferric_oxygen_kg(feot_kg: float, fe3_fraction: float) -> float:

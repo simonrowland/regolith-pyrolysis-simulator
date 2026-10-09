@@ -391,6 +391,7 @@ from simulator.fe_redox import (
     floor_vacuum_pressure_bar,
     intrinsic_melt_fO2,
     BULK_ROCK_ON_LIQUID_RELATION_REASON,
+    delta_iw_ledger_seed_gap,
     KRESS91_LIQUID_CALIBRATION_MAX_T_C,
     KRESS91_LIQUID_CALIBRATION_MIN_T_C,
     kress91_ln_fO2_temperature_delta,
@@ -9035,6 +9036,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         notice["kress91_temperature_band"] = band
         notice["extrapolated"] = bool(reasons)
         notice["extrapolation_reasons"] = reasons
+        if (
+            resolution.authority == "prior"
+            and prior is not None
+            and prior.kind == "delta_iw"
+            and resolution.fe3_fraction is not None
+        ):
+            gap = delta_iw_ledger_seed_gap(
+                self._melt_oxide_wt_pct(),
+                delta_iw=float(prior.value),
+                ledger_fe3_fraction=float(resolution.fe3_fraction),
+            )
+            if gap is not None:
+                notice.update(gap)
         return notice
 
     def sulfur_saturation_run_notice(self) -> Dict[str, Any] | None:
