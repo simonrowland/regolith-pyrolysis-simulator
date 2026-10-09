@@ -37,7 +37,23 @@ from simulator.melt_backend.magemin import (
     MAGEMIN_WARM_CALL_TIMEOUT_S,
     MAGEMIN_WARM_LIQUIDUS_BUDGET_S,
     MAGEMinBackend,
+    diagnostics_name_composition_projected,
 )
+
+# Verb=0 success now reads output/_matlab_output.txt. Stdout-only mocks
+# that return a unit mode must plant this one-phase table.
+_LIQ_ONLY_MATLAB = (
+    "Oxide compositions [wt fr]:\n"
+    " SiO2\n"
+    " liq 1.0\n"
+    "\n"
+)
+
+
+def _plant_liq_matlab(cwd) -> None:
+    dest = Path(cwd) / "output" / "_matlab_output.txt"
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    dest.write_text(_LIQ_ONLY_MATLAB, encoding="utf-8")
 
 # Thread-rendezvous guards throughout this module: these bound a HANG, they do
 # not assert a latency. Any test that means to claim "within N seconds" should
@@ -91,43 +107,28 @@ def _make_absent_magemin(monkeypatch):
     )
 
 
-def _assert_magemin_bulk_drop_projected(
+def _assert_magemin_database_exclusion(
     result,
-    expected_components,
+    expected_kg,
     *,
-    min_dropped_wt_pct,
-    exact_components=False,
-    min_dropped_mass_fraction=None,
+    calls,
 ):
-    assert result.status == "out_of_domain"
-    assert result.diagnostics["backend_status_reason"] == COMPOSITION_PROJECTED
-    assert result.diagnostics["backend_status"] == "out_of_domain"
-    assert not result.phases_present
+    """Out-of-database oxides are excluded and the majors still solve."""
+    assert calls
+    assert result.status == "ok"
+    assert result.phases_present
+    assert result.diagnostics.get("backend_status_reason") != COMPOSITION_PROJECTED
     projection = result.diagnostics["input_composition_projection"]
-    dropped = set(projection["dropped_bulk_components"])
-    expected = set(expected_components)
-    notice = projection[COMPOSITION_PROJECTED]
-
-    assert projection["status"] == "projected"
-    assert projection["reason"] == "input_composition_projected"
-    assert projection["magemin_database"] == "ig"
-    if exact_components:
-        assert dropped == expected
-    else:
-        assert expected <= dropped
-    assert projection["bulk_dropped_wt_pct"] >= min_dropped_wt_pct
-    assert notice["dropped_components"] == projection["dropped_bulk_components"]
-    assert notice["dropped_mass_fraction"] == projection["dropped_mass_fraction"]
-    assert notice["dropped_mass_fraction"] > 0.0
-    if min_dropped_mass_fraction is not None:
-        assert notice["dropped_mass_fraction"] >= min_dropped_mass_fraction
-    assert "dropped_species" not in projection
-
+    assert COMPOSITION_PROJECTED not in projection
+    assert "dropped_bulk_components" not in projection
+    assert diagnostics_name_composition_projected(result.diagnostics) is False
+    excluded = result.diagnostics["magemin_excluded_database_components_kg"]
+    assert set(excluded) == set(expected_kg)
+    for name, mass_kg in expected_kg.items():
+        assert excluded[name] == pytest.approx(mass_kg)
     warning_text = " ".join(result.warnings)
     assert "dropped components outside documented bulk order" in warning_text
-    assert "refused projected composition" in warning_text
-    for component in expected_components:
-        assert component in warning_text
+    assert "refused projected composition" not in warning_text
 
 
 
@@ -1146,13 +1147,15 @@ def test_magemin_bulk_projection_drop_is_composition_projected_refusal(
         pressure_bar=5000.0,
     )
 
-    assert calls == []
-    _assert_magemin_bulk_drop_projected(
+    assert calls
+    assert "MnO" not in calls[0]["composition"]
+    _assert_magemin_database_exclusion(
         result,
-        ("MnO",),
-        min_dropped_wt_pct=0.9,
-        exact_components=True,
+        {"MnO": 1.0},
+        calls=calls,
     )
+    assert result.phase_masses_kg["liq"] == pytest.approx(1.0)
+    assert result.liquid_fraction == pytest.approx(1.0)
 
 
 def test_magemin_p2o5_bulk_is_composition_projected_refusal(monkeypatch):
@@ -1177,28 +1180,18 @@ def test_magemin_p2o5_bulk_is_composition_projected_refusal(monkeypatch):
         pressure_bar=5000.0,
     )
 
-    assert calls == []
-    _assert_magemin_bulk_drop_projected(
+    assert calls
+    assert "P2O5" not in calls[0]["composition"]
+    _assert_magemin_database_exclusion(
         result,
-        ("P2O5",),
-        min_dropped_wt_pct=9.9,
-        min_dropped_mass_fraction=0.099,
-        exact_components=True,
+        {"P2O5": 10.0},
+        calls=calls,
     )
-    notice = result.diagnostics["input_composition_projection"][
-        COMPOSITION_PROJECTED
-    ]
-    assert notice["dropped_components"] == ["P2O5"]
-    assert notice["dropped_mass_fraction"] == pytest.approx(0.10)
-    assert notice["dropped_component_mass_fractions"]["P2O5"] == pytest.approx(
-        0.10
-    )
+    assert result.liquid_fraction == pytest.approx(1.0)
 
 
-def test_magemin_liquidus_of_projected_bulk_stays_composition_projected():
-    """The ig-order drop stays a refusal. The projected bulk's liquidus is
-    attached for the freeze gate; it is not reported as status=ok.
-    """
+def test_magemin_liquidus_of_excluded_bulk_solves_the_majors():
+    """An ig-order drop excludes that mass and still solves the majors."""
     backend = MAGEMinBackend()
     backend._available = True
     backend._bridge = "subprocess"
@@ -1233,31 +1226,30 @@ def test_magemin_liquidus_of_projected_bulk_stays_composition_projected():
     )
 
     assert calls
-    assert result.status == "out_of_domain"
-    assert result.status != "ok"
+    assert result.status == "ok"
     assert result.solidus_T_C == pytest.approx(1000.0, abs=2.0)
     assert result.liquidus_T_C == pytest.approx(1200.0, abs=2.0)
     assert result.solidus_T_C < result.liquidus_T_C
-    notice = result.diagnostics["composition_projected_notice"]
-    fractions = {
-        row["component"]: row["mass_fraction"]
-        for row in notice["dropped_components"]
-    }
-    assert fractions["P2O5"] == pytest.approx(0.10)
-    assert fractions["MnO"] == pytest.approx(0.01)
-    assert notice["authority"] == "extrapolated"
-    assert notice["reason"] == "composition_projected"
+    assert "composition_projected_notice" not in result.diagnostics
+    excluded = result.diagnostics["magemin_excluded_database_components_kg"]
+    assert excluded["P2O5"] == pytest.approx(10.0)
+    assert excluded["MnO"] == pytest.approx(1.0)
+    assert diagnostics_name_composition_projected(result.diagnostics) is False
 
     calls_before = len(calls)
-    refused = backend.equilibrate(
+    solved = backend.equilibrate(
         1400.0,
         composition_kg=bulk,
         fO2_log=-9.0,
         pressure_bar=1.0,
     )
-    assert refused.status == "out_of_domain"
-    assert refused.diagnostics["backend_status_reason"] == COMPOSITION_PROJECTED
-    assert len(calls) == calls_before
+    assert solved.status == "ok"
+    solved_excluded = solved.diagnostics[
+        "magemin_excluded_database_components_kg"
+    ]
+    assert solved_excluded["P2O5"] == pytest.approx(10.0)
+    assert solved_excluded["MnO"] == pytest.approx(1.0)
+    assert len(calls) == calls_before + 1
 
 
 def test_magemin_pressure_conversion_helpers_are_exact():
@@ -1625,7 +1617,7 @@ def test_magemin_live_smoke_runs_real_binary():
     )
 
     # No library-boundary error. Oxides with no ig endmember (P2O5/MnO/NiO/CoO)
-    # are a composition_projected refusal, tested separately; this live smoke
+    # are excluded and their mass recorded, tested separately; this live smoke
     # stays inside the documented ig bulk order.
     assert result.status == "ok", result.warnings
     assert not any("failed" in w for w in result.warnings), result.warnings
@@ -1969,6 +1961,7 @@ def test_magemin_subprocess_runs_in_fresh_temp_cwd(monkeypatch, tmp_path):
     def fake_subprocess_run(args, **kwargs):
         captured["args"] = list(args)
         captured["cwd"] = kwargs.get("cwd")
+        _plant_liq_matlab(kwargs["cwd"])
         return FakeCompleted()
 
     fake_binary = tmp_path / "MAGEMin"
@@ -2046,6 +2039,7 @@ def test_magemin_subprocess_launches_are_serialized_across_callers(
         stdout = 'Phase : liq\nMode  : 1.000\n'
 
     def fake_subprocess_run(_args, **_kwargs):
+        _plant_liq_matlab(_kwargs["cwd"])
         with state_lock:
             state['active'] += 1
             state['calls'] += 1
@@ -2204,6 +2198,7 @@ def test_magemin_subprocess_fo2_log_substitution_recorded(monkeypatch):
 
     def fake_subprocess_run(args, **kwargs):
         captured["args"] = list(args)
+        _plant_liq_matlab(kwargs["cwd"])
         return FakeCompleted()
 
     # Force the subprocess bridge directly: stub the binary discovery so
@@ -2286,6 +2281,7 @@ def test_magemin_subprocess_unknown_buffer_falls_back_with_warning(monkeypatch):
 
     def fake_subprocess_run(args, **kwargs):
         captured["args"] = list(args)
+        _plant_liq_matlab(kwargs["cwd"])
         return FakeCompleted()
 
     monkeypatch.setattr(
@@ -2335,6 +2331,7 @@ def test_magemin_configured_named_buffer_marks_requested_fo2_out_of_domain(
 
     def fake_subprocess_run(args, **kwargs):
         captured["args"] = list(args)
+        _plant_liq_matlab(kwargs["cwd"])
         return FakeCompleted()
 
     monkeypatch.setattr(

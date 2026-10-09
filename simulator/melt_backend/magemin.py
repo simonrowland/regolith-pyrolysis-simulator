@@ -118,6 +118,7 @@ from simulator.melt_backend.base import (
     RealBackendAuthority,
     RealBackendFamily,
     liquid_fraction_from_phase_masses,
+    positive_melt_mass_by_species,
     projection_diagnostics_for_melt_input,
     project_melt_to_oxide_projection,
     split_cleaned_melt_account,
@@ -286,6 +287,7 @@ def _handle_magemin_subprocess_request(backend, request, _errlog):
         pressure_kbar=request['pressure_kbar'],
         fO2_log=request['fO2_log'],
         call_timeout_s=request.get('call_timeout_s'),
+        batch_kg=float(request.get('batch_kg', 1.0)),
     )
 
 
@@ -517,18 +519,17 @@ def _magemin_bulk_projection_details(
         ),
     }
     if bulk_dropped:
+        # Out-of-database oxides are excluded from the bulk and their mass
+        # is recorded on the result for later D partitioning. That is not
+        # the composition_projected refusal: do not set that block or
+        # dropped_bulk_components, which diagnostics_name_composition_projected
+        # treats as a whole-solve refusal.
         dropped_mass_fraction = _magemin_dropped_mass_fraction(bulk_projection)
-        details['dropped_bulk_components'] = list(bulk_dropped)
         details['dropped_mass_fraction'] = dropped_mass_fraction
         details['dropped_component_mass_fractions'] = dict(dropped_fractions)
         details['magemin_projected_composition_wt_pct'] = {
             str(name): float(value)
             for name, value in bulk_projection.composition_wt_pct.items()
-        }
-        details[COMPOSITION_PROJECTED] = {
-            'dropped_components': list(bulk_dropped),
-            'dropped_mass_fraction': dropped_mass_fraction,
-            'dropped_component_mass_fractions': dict(dropped_fractions),
         }
     if bulk_merged:
         details['merged_bulk_components'] = list(bulk_merged)
@@ -861,17 +862,17 @@ def _lambda_stencil_warning(endmember: str, temperature_K: float) -> Optional[st
     return None
 
 
-def _parse_magemin_sys_oxide_row(
+def _first_magemin_oxide_composition_block(
     matlab_text: str,
-) -> Optional[Dict[str, float]]:
-    """The SYS row of the matlab 'Oxide compositions [wt fr]' block.
+) -> Optional[Tuple[List[str], List[List[str]]]]:
+    """Header and data rows of the first ``Oxide compositions`` block.
 
-    Unparsable or non-finite values make the row unparseable (None) so the
-    bulk-echo guard refuses typed instead of comparing against a NaN (a NaN
-    comparison is False and would pass the guard silently).
+    The block ends at the first blank line after the header, matching the
+    SYS-row reader this replaced. Verb=0 writes one block.
     """
     in_block = False
     header: List[str] = []
+    rows: List[List[str]] = []
     for line in matlab_text.splitlines():
         if line.startswith('Oxide compositions'):
             in_block = True
@@ -886,17 +887,80 @@ def _parse_magemin_sys_oxide_row(
         if not header:
             header = tokens
             continue
-        if tokens[0] == 'SYS':
-            try:
-                values = [float(t) for t in tokens[1:]]
-            except ValueError:
-                return None
-            if len(values) != len(header):
-                return None
-            if not all(math.isfinite(v) for v in values):
-                return None
-            return dict(zip(header, values))
+        rows.append(tokens)
+    if not header:
+        return None
+    return header, rows
+
+
+def _parse_magemin_sys_oxide_row(
+    matlab_text: str,
+) -> Optional[Dict[str, float]]:
+    """The SYS row of the matlab 'Oxide compositions [wt fr]' block.
+
+    Unparsable or non-finite values make the row unparseable (None) so the
+    bulk-echo guard refuses typed instead of comparing against a NaN (a NaN
+    comparison is False and would pass the guard silently).
+    """
+    parsed = _first_magemin_oxide_composition_block(matlab_text)
+    if parsed is None:
+        return None
+    header, rows = parsed
+    for tokens in rows:
+        if tokens[0] != 'SYS':
+            continue
+        try:
+            values = [float(token) for token in tokens[1:]]
+        except ValueError:
+            return None
+        if len(values) != len(header):
+            return None
+        if not all(math.isfinite(value) for value in values):
+            return None
+        return dict(zip(header, values))
     return None
+
+
+def _magemin_phase_oxide_wt_pct(
+    matlab_text: str,
+) -> Dict[str, Dict[str, float]]:
+    """Per-phase oxide wt% from the matlab weight-fraction table.
+
+    Values are weight fractions of the phase (they sum to 1). Multiply by
+    100 to match ``EquilibriumResult.phase_compositions``. FeO and O stay
+    as printed; O is not folded into Fe2O3. SYS and buffer pseudo-phases
+    are not material rows. A repeated phase name keeps the last row, the
+    same overwrite the Mode parser uses.
+    """
+    parsed = _first_magemin_oxide_composition_block(matlab_text)
+    if parsed is None:
+        raise RuntimeError(
+            'MAGEMin matlab dump lacks an Oxide compositions [wt fr] block'
+        )
+    header, rows = parsed
+    phases: Dict[str, Dict[str, float]] = {}
+    for tokens in rows:
+        name = tokens[0]
+        if name == 'SYS' or name.lower() in MAGEMinBackend._BUFFER_CHOICES:
+            continue
+        try:
+            values = [float(token) for token in tokens[1:]]
+        except ValueError as exc:
+            raise RuntimeError(
+                f'MAGEMin oxide row for {name!r} is not numeric: {tokens!r}'
+            ) from exc
+        if len(values) != len(header) or not all(
+            math.isfinite(value) for value in values
+        ):
+            raise RuntimeError(
+                f'MAGEMin oxide row for {name!r} does not match the header'
+            )
+        phases[name] = {
+            oxide: value * 100.0
+            for oxide, value in zip(header, values)
+            if value > 0.0
+        }
+    return phases
 
 
 def _assert_magemin_bulk_echo(
@@ -1179,9 +1243,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         if projected_oxide_wt_pct is not None:
             # Explicit solve of an already-folded ig bulk. These wt% values
             # are the post-drop vector and are not rescaled to 100: that is
-            # the bulk the pre-refusal liquidus search sent to the binary.
-            # equilibrate() without this argument still refuses the original
-            # bulk and does not call MAGEMin.
+            # the bulk a projected liquidus retry sends to the binary.
             comp_wt = {
                 str(name): float(value)
                 for name, value in projected_oxide_wt_pct.items()
@@ -1295,25 +1357,22 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 bulk_projection
             ),
         )
-        if bulk_projection.dropped_components:
-            # A result for a different (projected) bulk is not a result for
-            # this one. Do not call MAGEMin on the truncated vector.
-            diagnostics = dict(result_diagnostics)
-            diagnostics['backend_status'] = 'out_of_domain'
-            diagnostics['backend_status_reason'] = COMPOSITION_PROJECTED
-            dropped = ', '.join(bulk_projection.dropped_components)
-            return EquilibriumResult(
-                temperature_C=temperature_C,
-                pressure_bar=pressure_bar,
-                fO2_log=fO2_log,
-                status='out_of_domain',
-                warnings=[
-                    *prior_warnings,
-                    *bulk_projection.warnings,
-                    'MAGEMin refused projected composition; dropped '
-                    f'components have no documented ig endmember: {dropped}',
-                ],
-                diagnostics=diagnostics,
+        solved_batch_kg, excluded_kg = self._solved_batch_and_excluded_kg(
+            composition_kg=(
+                comp_wt if projected_oxide_wt_pct is not None else composition_kg
+            ),
+            composition_mol=(
+                None if projected_oxide_wt_pct is not None else composition_mol
+            ),
+            species_formula_registry=species_formula_registry,
+            bulk_projection=bulk_projection,
+        )
+        if excluded_kg:
+            # Mass kept off the MAGEMin bulk. Not renormalised into the
+            # majors, and not a composition_projected refusal.
+            result_diagnostics = dict(result_diagnostics)
+            result_diagnostics['magemin_excluded_database_components_kg'] = (
+                excluded_kg
             )
 
         try:
@@ -1323,6 +1382,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
                 call_timeout_s=call_timeout_s,
+                batch_kg=solved_batch_kg,
             )
         except EngineWorkerTimeout:
             # A hang is a control-plane event, not an equilibrium refusal.
@@ -1489,6 +1549,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             )
 
         sample_warnings: list[str] = []
+        excluded_database_kg: Optional[Dict[str, float]] = None
 
         # Mandatory aggregate budget: generic finder default is unbounded so
         # AlphaMELTS is not silently capped; MAGEMin always applies a finite
@@ -1532,6 +1593,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             temperature_C: float,
             remaining_budget_s: Optional[float] = None,
         ) -> float:
+            nonlocal excluded_database_kg
             result = self.equilibrate(
                 float(temperature_C),
                 composition_kg=composition_kg,
@@ -1543,6 +1605,14 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 call_timeout_s=remaining_budget_s,
                 projected_oxide_wt_pct=projected_oxide_wt_pct,
             )
+            captured_excluded = (result.diagnostics or {}).get(
+                'magemin_excluded_database_components_kg'
+            )
+            if isinstance(captured_excluded, Mapping) and captured_excluded:
+                excluded_database_kg = {
+                    str(name): float(mass)
+                    for name, mass in captured_excluded.items()
+                }
             if result.status != 'ok':
                 warning = '; '.join(result.warnings) or result.status
                 # Raise the TYPED sample error so the finder preserves which
@@ -1583,11 +1653,13 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         )
         warnings_out = [*result.warnings, *sample_warnings[:6]]
         diagnostics = dict(result.diagnostics or {})
-        # An ig-order drop is a refusal of the requested bulk (status stays
-        # out_of_domain — not ok). The freeze gate is allowed to predict on
-        # the projected bulk, so the search for that different bulk is
-        # attached here, once, with the drop notice. A second drop does not
-        # recurse.
+        if excluded_database_kg:
+            diagnostics['magemin_excluded_database_components_kg'] = (
+                excluded_database_kg
+            )
+        # A composition_projected notice still attaches the projected-bulk
+        # search once. An ig-order drop no longer produces that notice:
+        # equilibrate solves the in-database slice and records the excluded kg.
         notice = (
             None
             if projected_retry
@@ -1923,6 +1995,51 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         """Convert pressure from GPa to kilobar.  1 GPa = 10 kbar."""
         return float(pressure_GPa) * 10.0
 
+    def _solved_batch_and_excluded_kg(
+        self,
+        *,
+        composition_kg: Optional[Mapping[str, float]],
+        composition_mol: Optional[Mapping[str, float]],
+        species_formula_registry: Optional[Mapping[str, Any]],
+        bulk_projection: _MAGEMinBulkProjection,
+    ) -> Tuple[float, Dict[str, float]]:
+        """In-database batch mass and the kg kept off that bulk.
+
+        ``basis_mass_kg`` is the mass of components in MAGEMin's input
+        basis. The binary's Mode row is a fraction of the unit-mass system
+        it actually solved, which is only the in-database slice:
+
+            batch_kg = basis_mass_kg * (projected_sum_wt_pct / source_sum_wt_pct)
+            excluded_kg_i = basis_mass_kg * dropped_fraction_i
+
+        Unit check: kg * (wt% / wt%) = kg, and a dropped fraction is
+        already kg/kg of the post-merge source. Sanity: a bulk with nothing
+        outside the database order has projected_sum == source_sum, so
+        batch_kg is the whole basis mass and excluded_kg is empty.
+        """
+        masses = positive_melt_mass_by_species(
+            composition_kg=composition_kg,
+            composition_mol=composition_mol,
+            species_formula_registry=species_formula_registry,
+        )
+        basis = set(self._MAGEMIN_INPUT_BASIS)
+        basis_mass_kg = sum(
+            mass
+            for species, mass in masses.items()
+            if species in basis and mass > 0.0
+        )
+        source_sum = float(bulk_projection.source_sum_wt_pct)
+        if basis_mass_kg <= 0.0 or source_sum <= 0.0:
+            return 0.0, {}
+        solved_batch_kg = basis_mass_kg * (
+            float(bulk_projection.projected_sum_wt_pct) / source_sum
+        )
+        excluded_kg = {
+            str(name): basis_mass_kg * float(fraction)
+            for name, fraction in bulk_projection.dropped_component_mass_fractions
+        }
+        return solved_batch_kg, excluded_kg
+
     def _call_magemin(
         self,
         bulk_projection: _MAGEMinBulkProjection,
@@ -1930,6 +2047,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         pressure_bar: float,
         fO2_log: float,
         call_timeout_s: Optional[float] = None,
+        batch_kg: float = 1.0,
     ) -> Any:
         """
         Invoke MAGEMin via whichever bridge ``initialize`` selected.
@@ -1984,6 +2102,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                             fO2_log=fO2_log,
                             bridge='pymagemin',
                             exc=exc,
+                            batch_kg=batch_kg,
                             call_timeout_s=self._residual_call_timeout_s(
                                 call_timeout_s,
                                 call_started,
@@ -1998,6 +2117,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     fO2_log=fO2_log,
                     bridge='pymagemin',
                     exc=RuntimeError('pymagemin exposes no minimize/run/equilibrium entry point'),
+                    batch_kg=batch_kg,
                     call_timeout_s=self._residual_call_timeout_s(
                         call_timeout_s,
                         call_started,
@@ -2026,6 +2146,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         fO2_log=fO2_log,
                         bridge='julia',
                         exc=exc,
+                        batch_kg=batch_kg,
                         call_timeout_s=self._residual_call_timeout_s(
                             call_timeout_s,
                             call_started,
@@ -2070,6 +2191,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         # subprocess timeout is only a secondary containment
                         # wall for platforms without process-group cleanup.
                         'call_timeout_s': timeout_s + 0.5,
+                        'batch_kg': float(batch_kg),
                     }, timeout_s=timeout_s)
                     return future.result()
                 except EngineWorkerTimeout:
@@ -2085,6 +2207,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 pressure_kbar=pressure_kbar,
                 fO2_log=fO2_log,
                 call_timeout_s=call_timeout_s,
+                batch_kg=batch_kg,
             )
 
         raise RuntimeError(
@@ -2118,6 +2241,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         bridge: str,
         exc: Exception,
         call_timeout_s: Optional[float] = None,
+        batch_kg: float = 1.0,
     ) -> Dict[str, Any]:
         message = f'MAGEMin {bridge} bridge failed; retried subprocess: {exc}'
         self._last_error = message
@@ -2128,6 +2252,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 pressure_kbar=pressure_kbar,
                 fO2_log=fO2_log,
                 call_timeout_s=call_timeout_s,
+                batch_kg=batch_kg,
             )
         except Exception as subprocess_exc:
             raise RuntimeError(
@@ -2144,6 +2269,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         pressure_kbar: float,
         fO2_log: float,
         call_timeout_s: Optional[float] = None,
+        batch_kg: float = 1.0,
     ) -> Dict[str, Any]:
         """
         Drive the compiled MAGEMin binary for one single-point call.
@@ -2216,6 +2342,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             '--Bulk=' + ','.join(f'{value:.6f}' for value in bulk),
             f'--buffer={buffer_name}',
             f'--buffer_n={buffer_n:.6f}',
+            '--out_matlab=1',
         ]
 
         configured_timeout_s = float(self._config.get('timeout_s', 60.0))
@@ -2248,6 +2375,12 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         text=True,
                         timeout=remaining_timeout_s,
                         check=False,
+                    )
+                    matlab_path = Path(tmpdir) / 'output' / '_matlab_output.txt'
+                    matlab_text = (
+                        matlab_path.read_text(encoding='utf-8')
+                        if matlab_path.is_file()
+                        else ''
                     )
         except subprocess.TimeoutExpired as exc:
             raise RuntimeError(
@@ -2287,6 +2420,25 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             raise RuntimeError(
                 'MAGEMin binary produced no parseable Phase/Mode block'
             )
+        if not math.isfinite(batch_kg) or batch_kg < 0.0:
+            raise RuntimeError(
+                f'MAGEMin batch_kg must be finite and non-negative: {batch_kg!r}'
+            )
+        compositions = _magemin_phase_oxide_wt_pct(matlab_text)
+        for name, row in phases.items():
+            composition = compositions.get(name)
+            if composition is None:
+                raise RuntimeError(
+                    'MAGEMin oxide table lacks material phase '
+                    f'{name!r}'
+                )
+            row['composition_wt_pct'] = composition
+            # Mode is a mass fraction of MAGEMin's unit-mass system.
+            # Physical mass: m_kg = mode * batch_kg, with batch_kg the
+            # in-database mass sent to the binary.
+            # Unit check: (kg/kg) * kg = kg.
+            # Sanity: mode 1 on a 50 kg in-database batch is 50 kg.
+            row['mass_kg'] = float(row['mass_kg']) * float(batch_kg)
         return {
             'phases': phases,
             'buffer_warnings': buffer_warnings,
