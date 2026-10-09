@@ -1143,10 +1143,10 @@ def migrate_alpha_kinetics() -> list[Path]:
             source_id = "costa-jacobson-2015"
             year = 2015
         elif rid.startswith("fedkin") or "fedkin" in rid:
-            source_id = "fedkin-grossman-ghiorso-2006"
+            source_id = "kems-005-fedkin-2006"
             year = 2006
         elif rid.startswith("sossi_2019") or "sossi_2019" in rid:
-            source_id = "sossi-et-al-2019"
+            source_id = "kems-012-sossi-2019"
             year = 2019
         elif "richter" in rid:
             # DRAFT record_id is richter_2007_*; year 2007 GCA 71:5544 (P2-V2).
@@ -1257,7 +1257,7 @@ def migrate_alpha_kinetics() -> list[Path]:
             )
 
         # Hashimoto free-evaporation rate points when present on Fedkin Fe table
-        if rec.get("per_temperature") and source_id == "fedkin-grossman-ghiorso-2006":
+        if rec.get("per_temperature") and source_id == "kems-005-fedkin-2006":
             _add_obs(
                 doc,
                 species,
