@@ -2915,6 +2915,9 @@ _COMPOSITION_LOOKED_FOR = (
     "SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5"
 )
 _WT_PCT_TO_MOLE_FRACTION_ARITHMETIC = "x_i = (w_i / M_i) / Σ_j (w_j / M_j)"
+_FEOT_COMPOSITION_DERIVATION_NOTE = (
+    "FeOT (total iron) treated as FeO; printed key FeOT"
+)
 
 
 def oxide_molar_mass(oxide: str) -> Decimal:
@@ -3352,9 +3355,12 @@ def wt_pct_to_mole_fraction_derivation(
                 Located(State.of(oxide_molar_mass(oxide)), locator=locator),
             )
         )
+    inputs = [_WT_PCT_TO_MOLE_FRACTION_ARITHMETIC, "original_unit=wt_pct"]
+    if any(str(oxide).strip() == "FeOT" for oxide in wt):
+        inputs.append(_FEOT_COMPOSITION_DERIVATION_NOTE)
     return Derivation(
         relation="wt_pct_to_mole_fraction",
-        inputs=(_WT_PCT_TO_MOLE_FRACTION_ARITHMETIC, "original_unit=wt_pct"),
+        inputs=tuple(inputs),
         parameters=tuple(params),
         output_unit="mole_fraction",
     )
@@ -3364,16 +3370,22 @@ def _composition_located_from_values(
     values: object,
     locator: Locator | None,
 ) -> Located[Composition] | None:
-    """Keep a source-declared oxide complement beside the identity value."""
+    """Retain provenance for declared complements and FeOT basis conversions."""
 
     source_note = values.get("composition_derivation") if isinstance(values, Mapping) else None
-    if not isinstance(source_note, str) or not source_note.strip():
-        return None
     wt = _initial_oxide_map_from_values(values)
     if not wt:
         return None
+    has_feot = any(str(oxide).strip() == "FeOT" for oxide in wt)
+    if not has_feot and (not isinstance(source_note, str) or not source_note.strip()):
+        return None
     derivation = wt_pct_to_mole_fraction_derivation(wt, locator)
-    if "SiO2" in source_note and "K2O" in source_note and "100" in source_note:
+    if (
+        isinstance(source_note, str)
+        and "SiO2" in source_note
+        and "K2O" in source_note
+        and "100" in source_note
+    ):
         # Plante prints K2O and declares SiO2 as 100-K2O; retain that source
         # rule in the typed lineage instead of presenting the complement as a
         # second measured oxide.
