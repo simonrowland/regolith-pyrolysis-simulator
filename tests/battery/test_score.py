@@ -237,6 +237,25 @@ def _predict(value: Decimal, identity, **kwargs) -> EnginePrediction:
     )
 
 
+def test_prediction_refusal_reports_unknown_composition_component() -> None:
+    reason = "printed oxide wt% map has unsupported numeric component(s): XxO"
+    identity = replace(
+        F.activity_identity(), composition=State.unknown(reason)
+    )
+    observation = F.observation(
+        "activity-unknown-composition",
+        "fixture-experiment",
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+
+    prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, observation)
+
+    assert prediction.refusal_detail["reason"] == "composition_incomplete"
+    assert prediction.refusal_detail["detail"] == reason
+
+
 def _compile(reference, experiment, predict, review=None, extra_obs=()):
     ctx = _context(F.work(), experiment, reference, *extra_obs, review=review)
     return compile_residual(

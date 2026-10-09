@@ -1665,9 +1665,9 @@ def _sample_from_plain(payload: object) -> Sample:
     )
     if printed_located is None and initial is not None:
         printed_located = _mass_percent_printed_from_plain(initial)
-    if initial_located is None and printed is not None:
-        if _mass_percent_pairs(printed) is not None:
-            initial_located = _composition_located_from_plain(printed)
+    owner_initial = _owner_initial_from_printed(printed_located)
+    if owner_initial is not None:
+        initial_located = owner_initial
     return Sample(
         mass_kg=None
         if mass is None
@@ -2850,33 +2850,53 @@ _CONVERSION_META: dict[str, tuple[Decimal, str, str, str]] = {
 }
 
 
-# Component key -> (molar-mass formula, admitted by the melt-engine oxide input).
+# Component key -> (molar-mass formula, canonical output key, engine input).
 # Migration and waypoints share this owner; engine support stays narrower than
 # the set of species whose printed compositions can be converted.
-_COMPOSITION_COMPONENTS: dict[str, tuple[str, bool]] = {
-    name: (name, True)
-    for name in (
-        "SiO2",
-        "TiO2",
-        "Al2O3",
-        "FeO",
-        "Fe2O3",
-        "MgO",
-        "CaO",
-        "Na2O",
-        "K2O",
-        "Cr2O3",
-        "MnO",
-        "P2O5",
-        "NiO",
-        "CoO",
-    )
+_COMPOSITION_COMPONENTS: dict[str, tuple[str, str, bool]] = {
+    **{
+        name: (name, name, True)
+        for name in (
+            "SiO2",
+            "TiO2",
+            "Al2O3",
+            "FeO",
+            "Fe2O3",
+            "MgO",
+            "CaO",
+            "Na2O",
+            "K2O",
+            "Cr2O3",
+            "MnO",
+            "P2O5",
+            "NiO",
+            "CoO",
+        )
+    },
+    "Rb2O": ("Rb2O", "Rb2O", False),
+    "SO3": ("SO3", "SO3", False),
+    "S": ("S", "S", False),
+    "B2O3": ("B2O3", "B2O3", False),
+    # Total iron printed as FeO is converted with the FeO mass and key.
+    "FeOT": ("FeO", "FeO", False),
 }
+_FORMULA_COMPONENT_KEY_RE = re.compile(
+    r"^(?:[A-Z][a-z]?(?:\d+(?:\.\d+)?)?)+$"
+)
 
 
 def _is_engine_oxide_component(name: str) -> bool:
     component = _COMPOSITION_COMPONENTS.get(name)
-    return component is not None and component[1]
+    return component is not None and component[2]
+
+
+def _is_formula_component_key(name: str) -> bool:
+    return name in _COMPOSITION_COMPONENTS or (
+        not is_sample_code_formula(name)
+        and bool(_FORMULA_COMPONENT_KEY_RE.fullmatch(name))
+    )
+
+
 _PRINTED_COMPOSITION_MAP_KEYS = (
     "oxides_wt_pct",
     "major_oxide_wt_pct",
@@ -2924,7 +2944,7 @@ _WT_PCT_TO_MOLE_FRACTION_ARITHMETIC = "x_i = (w_i / M_i) / Σ_j (w_j / M_j)"
 def oxide_molar_mass(oxide: str) -> Decimal:
     """Composition-component molar mass (g/mol) from CIAAW/NIST weights."""
 
-    mass_formula = _COMPOSITION_COMPONENTS.get(oxide, (oxide, False))[0]
+    mass_formula = _COMPOSITION_COMPONENTS.get(oxide, (oxide, oxide, False))[0]
 
     from simulator.state import MOLAR_MASS
 
@@ -2940,6 +2960,11 @@ def oxide_molar_mass(oxide: str) -> Decimal:
 def wt_pct_to_mole_fraction(wt: Mapping[str, Decimal]) -> Composition:
     """Convert a printed oxide wt% map to mole fraction. Does not renormalize wt%."""
 
+    names = {str(oxide).strip() for oxide in wt}
+    if "FeOT" in names and names.intersection({"FeO", "Fe2O3"}):
+        overlap = ", ".join(sorted(names.intersection({"FeO", "Fe2O3"})))
+        raise ValueError(f"ambiguous total iron components: FeOT with {overlap}")
+
     unsupported = []
     for oxide, weight in wt.items():
         name = str(oxide).strip()
@@ -2948,7 +2973,7 @@ def wt_pct_to_mole_fraction(wt: Mapping[str, Decimal]) -> Composition:
             or name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
         ):
             continue
-        if _as_dec_or_none(weight) is not None:
+        if _is_formula_component_key(name) and _as_dec_or_none(weight) is not None:
             unsupported.append(name)
     if unsupported:
         raise ValueError(
@@ -2956,32 +2981,35 @@ def wt_pct_to_mole_fraction(wt: Mapping[str, Decimal]) -> Composition:
             + ", ".join(sorted(unsupported))
         )
 
-    moles: list[tuple[str, Decimal]] = []
+    moles: dict[str, Decimal] = {}
     total = Decimal("0")
     for oxide, weight in wt.items():
         name = str(oxide).strip()
         if name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS:
             continue
-        if name not in _COMPOSITION_COMPONENTS:
+        component = _COMPOSITION_COMPONENTS.get(name)
+        if component is None:
             continue
         amount = as_decimal(weight)
         if amount < 0:
             raise ValueError(f"oxide {name!r} wt% is negative")
         n = amount / oxide_molar_mass(name)
-        moles.append((name, n))
+        canonical_name = component[1]
+        moles[canonical_name] = moles.get(canonical_name, Decimal("0")) + n
         total += n
     if total <= 0:
         raise ValueError("printed oxide wt% map has no positive mass")
     return Composition(
         basis="printed_oxides",
-        components=tuple((oxide, n / total) for oxide, n in moles),
+        components=tuple((oxide, n / total) for oxide, n in moles.items()),
         amount_basis=AmountBasis.MOLE_FRACTION,
     )
 
 
 def _kume_formula_unit_oxide(name: str) -> tuple[str, Decimal] | None:
-    if _is_engine_oxide_component(name):
-        return name, Decimal("1")
+    component = _COMPOSITION_COMPONENTS.get(name)
+    if component is not None:
+        return component[1], Decimal("1")
     if name != "AlO1.5":
         return None
 
@@ -3027,7 +3055,11 @@ def is_sample_code_formula(text: str) -> bool:
     return bool(_SAMPLE_CODE_FORMULA_RE.match(str(text).strip()))
 
 
-def _oxide_map_from_mapping(obj: object) -> dict[str, Decimal] | None:
+def _oxide_map_from_mapping(
+    obj: object,
+    *,
+    refusal_reason: list[str] | None = None,
+) -> dict[str, Decimal] | None:
     if not isinstance(obj, Mapping):
         return None
     for key in _PRINTED_COMPOSITION_MAP_KEYS:
@@ -3037,6 +3069,11 @@ def _oxide_map_from_mapping(obj: object) -> dict[str, Decimal] | None:
                 comps: dict[str, Decimal] = {}
                 for name, value in nested.items():
                     token = str(name).strip()
+                    if (
+                        token in _COMPOSITION_CONDITION_KEYS
+                        or not _is_formula_component_key(token)
+                    ):
+                        continue
                     amount = _as_dec_or_none(value)
                     if amount is None:
                         return None
@@ -3049,20 +3086,29 @@ def _oxide_map_from_mapping(obj: object) -> dict[str, Decimal] | None:
                 if len(comps) >= 2:
                     try:
                         wt_pct_to_mole_fraction(comps)
-                    except ValueError:
+                    except ValueError as exc:
+                        if refusal_reason is not None:
+                            refusal_reason.append(str(exc))
                         return None
                     return comps
                 continue
-            got = _oxide_map_from_mapping(nested)
+            got = _oxide_map_from_mapping(nested, refusal_reason=refusal_reason)
             if got:
                 for name, value in nested.items():
                     token = str(name).strip()
+                    if (
+                        token in _COMPOSITION_CONDITION_KEYS
+                        or not _is_formula_component_key(token)
+                    ):
+                        continue
                     amount = _as_dec_or_none(value)
                     if amount is not None and token not in got:
                         got[token] = amount
                 try:
                     wt_pct_to_mole_fraction(got)
-                except ValueError:
+                except ValueError as exc:
+                    if refusal_reason is not None:
+                        refusal_reason.append(str(exc))
                     return None
                 return got
     comps: dict[str, Decimal] = {}
@@ -3072,20 +3118,16 @@ def _oxide_map_from_mapping(obj: object) -> dict[str, Decimal] | None:
         if amount is None:
             continue
         # Point records share the flat map with these condition fields.
-        if name in {
-            "T_C",
-            "T_K",
-            "mass_loss_pct",
-            "t_min",
-            "Nr",
-        }:
+        if name in _COMPOSITION_CONDITION_KEYS or not _is_formula_component_key(name):
             continue
         comps[name] = amount
     if len(comps) < 2:
         return None
     try:
         wt_pct_to_mole_fraction(comps)
-    except ValueError:
+    except ValueError as exc:
+        if refusal_reason is not None:
+            refusal_reason.append(str(exc))
         return None
     return comps
 
@@ -3101,7 +3143,11 @@ def _point_rows(values: object) -> list[Mapping[str, Any]]:
     return [item for item in points if isinstance(item, Mapping)]
 
 
-def _printed_initial_charge_row_map(values: object) -> dict[str, Decimal] | None:
+def _printed_initial_charge_row_map(
+    values: object,
+    *,
+    refusal_reason: list[str] | None = None,
+) -> dict[str, Decimal] | None:
     """Oxide map of the row the source prints as the series' starting charge.
 
     Either flagged ``T_C_is_initial_composition: true`` or printed at
@@ -3113,7 +3159,7 @@ def _printed_initial_charge_row_map(values: object) -> dict[str, Decimal] | None
     ranked = _point_rows(values)
     for item in ranked:
         if item.get("T_C_is_initial_composition") is True:
-            got = _oxide_map_from_mapping(item)
+            got = _oxide_map_from_mapping(item, refusal_reason=refusal_reason)
             if got:
                 return got
     for item in ranked:
@@ -3125,7 +3171,7 @@ def _printed_initial_charge_row_map(values: object) -> dict[str, Decimal] | None
         )
         loss = _as_dec_or_none(loss_raw)
         if t_c == 0 and loss == 0:
-            got = _oxide_map_from_mapping(item)
+            got = _oxide_map_from_mapping(item, refusal_reason=refusal_reason)
             if got:
                 return got
     return None
@@ -3133,15 +3179,17 @@ def _printed_initial_charge_row_map(values: object) -> dict[str, Decimal] | None
 
 def _initial_oxide_map_from_values(
     values: object,
+    *,
+    refusal_reason: list[str] | None = None,
 ) -> dict[str, Decimal] | None:
     if not isinstance(values, Mapping):
         return None
     ranked = _point_rows(values)
     if ranked:
-        got = _printed_initial_charge_row_map(values)
+        got = _printed_initial_charge_row_map(values, refusal_reason=refusal_reason)
         if got:
             return got
-    got = _oxide_map_from_mapping(values)
+    got = _oxide_map_from_mapping(values, refusal_reason=refusal_reason)
     if got:
         return got
     raw_moles = values.get("composition_mole_fraction")
@@ -3395,7 +3443,9 @@ def _composition_located_from_values(
     )
 
 
-def composition_unknown_reason() -> str:
+def composition_unknown_reason(refusal_reasons: Sequence[str] = ()) -> str:
+    if refusal_reasons:
+        return refusal_reasons[0]
     return f"no composition field under keys {_COMPOSITION_LOOKED_FOR} in this extract"
 
 
@@ -3483,6 +3533,51 @@ def _declared_composition_role(*roots: object) -> tuple[str | None, str | None]:
             f"{sorted(_COMPOSITION_ROLE_TOKENS)}; composition left unstamped"
         )
     return None, None
+
+
+def _owner_initial_from_printed(
+    printed: Located[Any] | None,
+) -> Located[Composition] | None:
+    """Derive the sample initial from its printed wt% through the owner."""
+
+    if printed is None or not printed.state.is_value:
+        return None
+    raw = printed.state.value
+    refusal_reason: list[str] = []
+    pairs = _mass_percent_pairs(raw)
+    if pairs is not None:
+        names = [name.strip() for name, _amount in pairs]
+        seen_names: set[str] = set()
+        duplicates: set[str] = set()
+        for name in names:
+            if name in seen_names:
+                duplicates.add(name)
+            seen_names.add(name)
+        if duplicates:
+            refusal_reason.append(
+                "duplicate component key(s): " + ", ".join(sorted(duplicates))
+            )
+            wt = None
+        else:
+            wt = dict(pairs)
+            try:
+                wt_pct_to_mole_fraction(wt)
+            except (ArithmeticError, ValueError) as exc:
+                refusal_reason.append(str(exc))
+                wt = None
+    else:
+        wt = _initial_oxide_map_from_values(raw, refusal_reason=refusal_reason)
+    if wt:
+        _printed, initial = _located_printed_and_initial(wt, printed.locator)
+        return initial
+    if refusal_reason:
+        return Located(
+            State.unknown(
+                f"mass-percent composition is not usable: {refusal_reason[0]}"
+            ),
+            locator=printed.locator,
+        )
+    return None
 
 
 def conversion_derivation(
@@ -9770,7 +9865,15 @@ def _merge_experiment_lab_params(
 ) -> Experiment:
     existing_initial = existing.sample.initial_composition
     incoming_initial = sample.initial_composition
-    if (
+    printed_composition = _prefer_located(
+        existing.sample.printed_composition,
+        sample.printed_composition,
+        numeric_mapping=True,
+    )
+    owner_initial = _owner_initial_from_printed(printed_composition)
+    if owner_initial is not None:
+        initial_composition = owner_initial
+    elif (
         prefer_existing_initial
         and existing_initial is not None
         and incoming_initial is not None
@@ -9784,11 +9887,7 @@ def _merge_experiment_lab_params(
         mass_kg=_prefer_located(existing.sample.mass_kg, sample.mass_kg),
         volume_m3=_prefer_located(existing.sample.volume_m3, sample.volume_m3),
         initial_composition=initial_composition,
-        printed_composition=_prefer_located(
-            existing.sample.printed_composition,
-            sample.printed_composition,
-            numeric_mapping=True,
-        ),
+        printed_composition=printed_composition,
         form=_prefer_located(existing.sample.form, sample.form),
         container=_prefer_located(existing.sample.container, sample.container),
         composition_class=_prefer_located(
@@ -12297,7 +12396,10 @@ class Migrator:
                 species = make_species(
                     suffix_formula, phase, polymorph=polymorph_from_extract(obs)
                 )
-        initial_oxide_map = _initial_oxide_map_from_values(values)
+        composition_refusal: list[str] = []
+        initial_oxide_map = _initial_oxide_map_from_values(
+            values, refusal_reason=composition_refusal
+        )
         composition_located = _composition_located_from_values(values, locator)
         catalogue_composition = _catalogue_composition_located_from_values(values, locator)
         malformed_composition_amount: str | None = None
@@ -12605,8 +12707,10 @@ class Migrator:
             ident_kwargs["composition"] = State.of(
                 wt_pct_to_mole_fraction(initial_oxide_map)
             )
-        elif q_token in _BULK_PROPERTY_QUANTITIES:
-            ident_kwargs["composition"] = State.unknown(composition_unknown_reason())
+        elif composition_refusal or q_token in _BULK_PROPERTY_QUANTITIES:
+            ident_kwargs["composition"] = State.unknown(
+                composition_unknown_reason(composition_refusal)
+            )
         derived_oxygen = collect_author_ratio_oxygen((values,), locator)
         if raw_adm == AdmissionStatus.ADMITTED.value:
             oxygen = derived_oxygen
@@ -13707,14 +13811,17 @@ class Migrator:
                 wt_pct_to_mole_fraction(point_oxide_map)
             )
         elif ident_kwargs.get("composition") is None:
-            initial_map = _initial_oxide_map_from_values(parent_values)
+            composition_refusal: list[str] = []
+            initial_map = _initial_oxide_map_from_values(
+                parent_values, refusal_reason=composition_refusal
+            )
             if initial_map:
                 ident_kwargs["composition"] = State.of(
                     wt_pct_to_mole_fraction(initial_map)
                 )
-            elif q_token_point in _BULK_PROPERTY_QUANTITIES:
+            elif composition_refusal or q_token_point in _BULK_PROPERTY_QUANTITIES:
                 ident_kwargs["composition"] = State.unknown(
-                    composition_unknown_reason()
+                    composition_unknown_reason(composition_refusal)
                 )
         printed_phase_text = (
             _printed_point_phase_text(raw_item)
