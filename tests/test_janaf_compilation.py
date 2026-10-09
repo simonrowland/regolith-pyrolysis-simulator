@@ -243,8 +243,10 @@ def test_cu020_1600k_enthalpy_uses_the_page_read_sign() -> None:
     parsed_row = next(
         row for row in parsed.values if row["temperature"]["value"] == 1600
     )
-    assert parsed_row["formation_enthalpy"]["value"] == -123.836
-    assert parsed_row["formation_enthalpy"]["as_published"] == "-123.836"
+    parsed_enthalpy = parsed_row["formation_enthalpy"]
+    assert parsed_enthalpy["value"] == -123.836
+    assert parsed_enthalpy["as_published"] == "-123.836"
+    assert parsed_enthalpy["locator"]["crop_note"] == enthalpy["locator"]["crop_note"]
 
 
 def test_page_read_sign_provenance_has_no_machine_local_paths() -> None:
@@ -256,6 +258,10 @@ def test_page_read_sign_provenance_has_no_machine_local_paths() -> None:
 
 
 def test_o007_1200k_enthalpy_uses_the_page_read_sign() -> None:
+    table = load_table_document(TABLES_DIR / "O-007.yaml")["table"]
+    committed_row = next(
+        item for item in table["values"] if item["temperature"]["value"] == 1200
+    )
     parsed = parse_janaf_txt(
         O007_PAGE_READ_SAMPLE,
         table_id="O-007",
@@ -264,6 +270,15 @@ def test_o007_1200k_enthalpy_uses_the_page_read_sign() -> None:
     )
     row = next(row for row in parsed.values if row["temperature"]["value"] == 1200)
     enthalpy = row["formation_enthalpy"]
+    parsed_locator = {
+        key: value for key, value in enthalpy["locator"].items() if key != "line_number"
+    }
+    committed_locator = {
+        key: value
+        for key, value in committed_row["formation_enthalpy"]["locator"].items()
+        if key != "line_number"
+    }
+    assert parsed_locator == committed_locator
 
     assert enthalpy["value"] == -189.588
     assert enthalpy["as_published"] == "-189.588"
