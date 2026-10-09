@@ -1075,7 +1075,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self.setpoints.get("lab_geometry"),
             allow_temperature_profiles=allow_lab_geometry_temperature_profiles,
         )
-        self._base_species_formula_registry = self._load_species_formula_registry()
+        self._base_species_formula_registry = self._load_species_formula_registry(
+            self.vapor_pressure_catalog_data
+        )
         self.species_formula_registry = dict(self._base_species_formula_registry)
         self.atom_ledger = self._new_atom_ledger()
         self.cost_ledger = CostLedger(
@@ -1637,7 +1639,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._c7_ca_shuttle_applied = False
 
     @staticmethod
-    def _load_species_formula_registry() -> dict:
+    def _load_species_formula_registry(
+        vapor_catalog: Mapping[str, Any] | None = None,
+    ) -> dict:
         catalog = Path(__file__).resolve().parents[1] / 'data' / 'species_catalog.yaml'
         from simulator.yaml_cache import load_cached_safe_yaml
 
@@ -1645,16 +1649,82 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # VR-3 collision-only gas IDs close the catalog namespace but remain
         # dormant until manifest request rules land. Do not let those metadata
         # rows perturb the live formula-registry identity or physical outputs.
-        payload['species'] = [
-            row
-            for row in payload.get('species', [])
-            if not (
+        raw_species = payload.get('species', [])
+        stripped_ids = {
+            str(row.get('id', ''))
+            for row in raw_species
+            if (
                 isinstance(row, Mapping)
                 and str(row.get('id', '')).endswith('_gas')
                 and row.get('direct_vapour_flux') is False
             )
+        }
+        payload['species'] = [
+            row
+            for row in raw_species
+            if not (
+                isinstance(row, Mapping)
+                and str(row.get('id', '')) in stripped_ids
+            )
         ]
-        return load_species_formulas(payload)
+        registry = load_species_formulas(payload)
+        if vapor_catalog is not None:
+            PyrolysisSimulator._install_compiled_vapour_formulas(
+                registry, vapor_catalog, stripped_ids
+            )
+        return registry
+
+    @staticmethod
+    def _install_compiled_vapour_formulas(
+        registry: dict,
+        vapor_catalog: Mapping[str, Any],
+        stripped_ids: set[str],
+    ) -> None:
+        """Admit compiled vapour formulas the species catalog does not name.
+
+        SpeciesFormula is the molar-mass owner. A declared mass the owner
+        rejects stays unresolved; no second mass table is invented. Existing
+        ids are left as the species catalog declared them. VR-3 collision
+        ids already stripped from that catalog stay stripped.
+        """
+
+        from simulator.accounting.exceptions import UnknownSpeciesError
+
+        families = vapor_catalog.get('families') or {}
+        if not isinstance(families, Mapping):
+            return
+        for family in families.values():
+            if not isinstance(family, Mapping):
+                continue
+            species_rows = (
+                (family.get('physical_properties') or {}).get('species') or {}
+            )
+            if not isinstance(species_rows, Mapping):
+                continue
+            for species_id, row in species_rows.items():
+                species_key = str(species_id)
+                if (
+                    species_key in registry
+                    or species_key in stripped_ids
+                    or not isinstance(row, Mapping)
+                ):
+                    continue
+                formula = row.get('formula')
+                if not isinstance(formula, str) or not formula.strip():
+                    continue
+                declaration: dict[str, Any] = {
+                    'formula': formula,
+                    'source': 'compiled_vapour_catalog',
+                }
+                declared_mass = row.get('molar_mass_g_mol')
+                if declared_mass is not None:
+                    declaration['molar_mass_g_mol'] = declared_mass
+                try:
+                    registry[species_key] = coerce_species_formula(
+                        species_key, declaration
+                    )
+                except (AccountingError, UnknownSpeciesError):
+                    continue
 
     def _registry_for_feedstock(self, feedstock: Mapping[str, Any]) -> dict:
         registry = dict(self._base_species_formula_registry)
