@@ -1,34 +1,34 @@
 # Battery v2.1 migration report
 
-rows in: 47835
-records out (observations): 121821
-works: 269
-experiments: 3562
-queue size: 77514
+rows in: 47821
+records out (observations): 121798
+works: 268
+experiments: 3556
+queue size: 77469
 identical-payload dedupe aliases: 342
 metadata files: 43
-index sources: 272
-hard issues: 3637
+index sources: 266
+hard issues: 3642
 
 ## Spec vs measured
 
 | count | spec | measured |
 |---|---:|---:|
-| citations | 147 | 271 (mismatch) |
+| citations | 147 | 265 (mismatch) |
 | doi_works | 56 | 129 (mismatch) |
-| no_doi_works | 91 | 140 (mismatch) |
+| no_doi_works | 91 | 139 (mismatch) |
 | admission_statuses | 374 | 1180 (mismatch) |
 | supersedes | 422 | 650 (mismatch) |
-| series | 60 | 597 (mismatch) |
+| series | 60 | 594 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1635 (mismatch) |
 | gibbs_reference_100000 | 1023 | 1029 (mismatch) |
 | gibbs_reference_101325 | 594 | 594 |
 | formulas | 1625 | 2044 (mismatch) |
 | equipment_payloads | 670 | 973 (mismatch) |
-| absent_admissions | 3511 | 5036 (mismatch) |
-| absent_classes | 2174 | 2203 (mismatch) |
-| range_only_T | 3125 | 2666 (mismatch) |
-| system_like_phases | 1065 | 2698 (mismatch) |
+| absent_admissions | 3511 | 5022 (mismatch) |
+| absent_classes | 2174 | 2189 (mismatch) |
+| range_only_T | 3125 | 2654 (mismatch) |
+| system_like_phases | 1065 | 2684 (mismatch) |
 | missing_phases | 237 | 588 (mismatch) |
 | tabulated_lists | — | 6 |
 
@@ -36,7 +36,7 @@ hard issues: 3637
 
 | source method_class | count |
 |---|---:|
-| `absent` | 544 |
+| `absent` | 530 |
 | `method_only` | 39 |
 | `derived_from_kems_equilibrium_constants` | 8 |
 | `third_law_kems` | 8 |
@@ -17988,14 +17988,13 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/cardiff-2007-vacuum-pyrolysis-gsfc.yaml` | 7 | 15 | 33 |
 | `data/literature/extracts/charnoz-2023-hydrogen-magma-ocean.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/cooper-2007-sintering-lunar-simulant.yaml` | 8 | 8 | 33 |
-| `data/literature/extracts/costa-jacobson-2015.yaml` | 2 | 2 | 6 |
+| `data/literature/extracts/costa-jacobson-2015.yaml` | 1 | 1 | 3 |
 | `data/literature/extracts/datz-1961-na2cl2.yaml` | 1 | 1 | 6 |
 | `data/literature/extracts/datz-and-smith-1961.yaml` | 3 | 3 | 12 |
 | `data/literature/extracts/datz-smith-taylor-1961-nacl-vapor.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/deguzman-2026-simulant-physicochemical.yaml` | 10 | 30 | 60 |
 | `data/literature/extracts/engelschion-2020-eac1a-simulant.yaml` | 2 | 2 | 7 |
 | `data/literature/extracts/fdm879.yaml` | 6 | 8 | 26 |
-| `data/literature/extracts/fedkin-grossman-ghiorso-2006.yaml` | 8 | 17 | 22 |
 | `data/literature/extracts/fegley-2016-rock-steam-solubility.yaml` | 5 | 75 | 179 |
 | `data/literature/extracts/fegley-2023-chemical-equilibrium-calculations-bu.yaml` | 28 | 109 | 164 |
 | `data/literature/extracts/filiberto-lpsc2011-2064-volatiles.yaml` | 3 | 6 | 15 |
@@ -18163,10 +18162,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/pending-pages-wo3-polymer-vp.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/pending-re2o7-second-series.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/pending-teo2-vp.yaml` | 1 | 1 | 4 |
-| `data/literature/extracts/pound-1972-cr-langmuir-knudsen.yaml` | 1 | 1 | 3 |
-| `data/literature/extracts/pound-1972-mccabe-cr.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/rau-1974-se-vp.yaml` | 1 | 1 | 7 |
-| `data/literature/extracts/ref-016-sio-kems-1700-2000k.yaml` | 1 | 1 | 6 |
 | `data/literature/extracts/ref-032-al.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/ref-032-bi.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/ref-032-ca.yaml` | 1 | 1 | 5 |
@@ -18186,7 +18182,6 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/robie-hemingway-wilson-1980-usgs-of-80-908.yaml` | 7 | 7 | 28 |
 | `data/literature/extracts/robinot-2025-promes-review.yaml` | 29 | 39 | 136 |
 | `data/literature/extracts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.yaml` | 12 | 14 | 52 |
-| `data/literature/extracts/safarian-engh-2013-si-pure-langmuir.yaml` | 1 | 1 | 3 |
 | `data/literature/extracts/schaefer-and-fegley-2007-icarus-outgassing-of-oc.yaml` | 15 | 15 | 82 |
 | `data/literature/extracts/schaefer-fegley-2011-vaporization-earth.yaml` | 21 | 321 | 577 |
 | `data/literature/extracts/senior-1991-solar-heating-jbis.yaml` | 0 | 0 | 1 |
@@ -18200,7 +18195,6 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/slag-003-hino-kitagawa-banya-1993.yaml` | 18 | 18 | 80 |
 | `data/literature/extracts/smales-1971-lpsc-12022.yaml` | 2 | 2 | 12 |
 | `data/literature/extracts/sossi-2020-cu-zn-isotope-evap-formalism.yaml` | 75 | 101 | 242 |
-| `data/literature/extracts/sossi-et-al-2019.yaml` | 1 | 1 | 3 |
 | `data/literature/extracts/span-wagner-1996-co2-psat.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/stebbins-carmichael-weill-1983.yaml` | 24 | 24 | 179 |
 | `data/literature/extracts/steurer-1985-vapor-phase-pyrolysis.yaml` | 8 | 43 | 151 |
@@ -18245,7 +18239,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 
 ## Hard issue census
 
-hard issues: 3637
+hard issues: 3642
 
 MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointers are not fabricated. Unstated derived_from / derivation is a hard conditional_field queued for page-grounding.
 
@@ -18254,6 +18248,7 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 | `conditional_field:derived_from` | 1990 |
 | `conditional_field:derivation` | 1619 |
 | `conditional_field:attribution` | 28 |
+| `referential_integrity:derived_from` | 5 |
 
 ## Hard issues (first 50)
 
@@ -18310,8 +18305,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 218198
+advisory issues: 218021
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 218198 |
+| `identity_incomplete` | 218021 |
