@@ -471,6 +471,30 @@ def test_g2_plante_source_points_and_comparison_fence(tmp_path):
             assert obs.identity.fO2_Pa.is_value
 
 
+def test_plante_1979_quoted_row_composition_binding_pin(tmp_path):
+    """Pin the current row identity, initial charge, and two-phase guard."""
+
+    root = _write_min_tree(tmp_path)
+    _copy_extract(root, "kems-042-plante-1979.yaml")
+    result = migrate(root, write=False)
+    observation_id = "plante1979_table2_s1123_r030_quoted"
+    source = _extract_observation("kems-042-plante-1979.yaml", observation_id)
+    observation = result.observations[
+        f"kems-042-plante-1979::{observation_id}"
+    ]
+
+    assert source["values"]["composition_K2O_wt_percent_as_published"] == 21.14
+    assert observation.identity.composition is None or not observation.identity.composition.is_value
+    assert source["values"]["two_phase_marker"] == "a"
+    assert any(
+        notice.band == "two_phase_bulk_composition_not_liquid_composition"
+        for notice in observation.notices
+    )
+    sample_composition = result.experiments[observation.experiment_id].sample.printed_composition
+    assert sample_composition is not None and sample_composition.state.is_value
+    assert sample_composition.state.value == {"K2O": 43.94, "SiO2": 56.06}
+
+
 def test_g2_plante_partial_pressure_identity_axes_are_source_grounded(tmp_path):
     root = _write_min_tree(tmp_path)
     _copy_extract(root, "kems-042-plante-1979.yaml")
