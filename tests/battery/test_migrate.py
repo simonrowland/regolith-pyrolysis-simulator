@@ -5356,6 +5356,26 @@ def test_kume_activity_compositions_map_to_parent_oxide_basis(tmp_path: Path) ->
     assert unknown_observation.identity.composition.is_unknown
 
 
+def test_kume_tables_3_and_4_composition_gap_baseline_pin(tmp_path: Path) -> None:
+    result = _migrate_real_extract(
+        tmp_path / "real", "kume-2000-cao-activities.yaml"
+    )
+    observations = {
+        obs.observation_id.rsplit("::", 1)[-1]: obs
+        for obs in result.observations.values()
+    }
+
+    # Printed table compositions are currently attached to the CaO rows only.
+    sio2 = observations["kume_2000_table3_sample_207_sio2_activity"]
+    assert sio2.identity.composition is not None
+    assert sio2.identity.composition.is_unknown
+    assert sio2.identity.composition.reason == "no composition mapped from source"
+
+    # The extract currently omits the Table 3/4 MgO and AlO1.5 activity rows.
+    assert not any("_mgo_activity" in observation_id for observation_id in observations)
+    assert not any("_alo1_5_activity" in observation_id for observation_id in observations)
+
+
 @pytest.mark.parametrize(
     ("composition_key", "observation_id"),
     [
