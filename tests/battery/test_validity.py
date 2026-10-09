@@ -129,6 +129,68 @@ def test_kems_gate_treats_missing_point_conditions_as_empty() -> None:
     assert missing_outcome.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
 
 
+def test_kems_apparatus_gates_apply_to_measured_rows() -> None:
+    experiment = F.kems_experiment(
+        experiment_id="kems-missing-apparatus",
+        orifice_area=None,
+        clausing=None,
+        kn=None,
+        calibrated=False,
+    )
+    observation = F.observation(
+        "measured-row",
+        experiment.experiment_id,
+        F.psat_identity("Na"),
+        "1",
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+
+    outcome = run_validity_gates(experiment, observation)
+
+    assert outcome.passed is False
+    assert outcome.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert any(
+        check.name == "in_cell_partial_pressure_sum" and not check.passed
+        for check in outcome.checks
+    )
+    assert any(
+        check.name == "kems_calibration" and not check.passed
+        for check in outcome.checks
+    )
+
+
+def test_kems_apparatus_gates_do_not_apply_to_model_derived_rows() -> None:
+    experiment = F.kems_experiment(
+        experiment_id="kems-missing-apparatus",
+        orifice_area=None,
+        clausing=None,
+        kn=None,
+        calibrated=False,
+    )
+    observation = F.observation(
+        "model-derived-row",
+        experiment.experiment_id,
+        F.psat_identity("Na"),
+        "1",
+        evidence=EvidenceClass.MODEL_DERIVED,
+    )
+
+    outcome = run_validity_gates(experiment, observation)
+
+    assert outcome.passed is True
+    assert any(
+        check.name == "apparatus_applicability"
+        and check.passed
+        and check.detail["reason"]
+        == "apparatus gate not applicable: non-measured evidence"
+        for check in outcome.checks
+    )
+    assert not any(
+        check.name in {"in_cell_partial_pressure_sum", "kems_calibration"}
+        for check in outcome.checks
+    )
+
+
 def test_validity_observation_buckets_partition_store() -> None:
     root = Path(__file__).resolve().parents[2]
     paths = _validity_observation_paths(root)

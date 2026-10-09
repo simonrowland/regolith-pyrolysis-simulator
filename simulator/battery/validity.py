@@ -40,6 +40,7 @@ from typing import Any, Iterable, Mapping, Sequence
 
 from simulator.battery.enums import (
     AdmissionStatus,
+    EvidenceClass,
     MEASURED_EVIDENCE,
     MethodToken,
     Quantity,
@@ -1197,19 +1198,37 @@ def run_validity_gates(
             )
         )
     if quantity is not None:
-        absorb(
-            effusion_regime_unverified(
-                experiment,
-                quantity,
-                observation=observation,
-                point_observations=(
-                    (observation,)
-                    if point_observations is None
-                    else point_observations
-                ),
+        evidence_class = observation.evidence.class_
+        if (
+            evidence_class.is_value
+            and evidence_class.value not in MEASURED_EVIDENCE
+            and evidence_class.value is not EvidenceClass.FIGURE_ONLY
+        ):
+            checks.append(
+                GateCheck(
+                    "apparatus_applicability",
+                    True,
+                    {"reason": "apparatus gate not applicable: non-measured evidence"},
+                )
             )
-        )
-        absorb(underdetermined_apparatus(experiment, quantity, observation=observation))
+        else:
+            absorb(
+                effusion_regime_unverified(
+                    experiment,
+                    quantity,
+                    observation=observation,
+                    point_observations=(
+                        (observation,)
+                        if point_observations is None
+                        else point_observations
+                    ),
+                )
+            )
+            absorb(
+                underdetermined_apparatus(
+                    experiment, quantity, observation=observation
+                )
+            )
         absorb(background_pressure_high(experiment, quantity))
     if primary is not None:
         return GateOutcome(
