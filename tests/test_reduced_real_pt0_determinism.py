@@ -2755,6 +2755,7 @@ def test_pt1_repair_notices_are_outside_payload_and_reemit_on_exact_replay(
         fO2_log=replay_sim._compute_intrinsic_melt_fO2(),
     ) == curve
     assert replay_sim._reduced_real_repair_notices == notices
+    assert replay_sim._last_reduced_real_replay_notices == notices
 
 
 def test_pt1_legacy_null_repair_notices_emit_typed_unavailable_notice(
