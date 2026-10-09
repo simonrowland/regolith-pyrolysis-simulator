@@ -6263,15 +6263,14 @@ def test_g5_compilation_column_mapping_mutation_proof() -> None:
 
 def test_l05c1_costa_control_is_not_condensation() -> None:
     row = _extract_observation(
-        "kems-007-costa-2015.yaml", "costa_2015_fe_olivine_kems_alpha_multicell"
+        "costa-jacobson-2015.yaml", "costa_jacobson_2015_fe_olivine_kems"
     )
     values = row.get("values") if isinstance(row.get("values"), dict) else {}
     state, reason = map_quantity(
         row.get("type"), values, units=row.get("units"), row=row
     )
-    assert state.is_unknown
-    assert "curation label" in state.reason
-    assert reason == state.reason
+    assert state.is_value and state.value is Quantity.EVAPORATION_COEFFICIENT_ALPHA
+    assert reason is None
 
 
 def test_l03_per_mol_o2_ledger_lifts_delta_fg(tmp_path: Path) -> None:

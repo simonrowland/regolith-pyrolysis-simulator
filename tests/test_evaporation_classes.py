@@ -154,6 +154,7 @@ def test_consolidated_duplicate_evidence_alpha_values_stay_pinned():
         *evaporation_classes._MARKED_IDEAL_FENCES,
     )
     targets = {
+        ("costa-jacobson-2015", "costa_jacobson_2015_fe_olivine_kems"): 0.02,
         ("kems-007-costa-2015", "costa_2015_fe_olivine_kems_alpha_multicell"): 0.02,
         ("kems-005-fedkin-2006", "fedkin_2006_sio_hashimoto_langmuir_table3"): 0.17,
         ("kems-005-fedkin-2006", "fedkin_2006_fe_hashimoto_langmuir_table3"): 0.24,
