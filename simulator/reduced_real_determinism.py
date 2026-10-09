@@ -513,9 +513,6 @@ class PT0DeterminismStore:
         if not self._cached_real_binding_eligible(sim):
             self._mark_uncacheable_capture(sim)
             return
-        if not _selected_binding_capture_is_cacheable(sim, result):
-            self._mark_uncacheable_capture(sim)
-            return
         if not _is_cacheable_equilibrium_result(result):
             self._mark_uncacheable_capture(sim)
             return
@@ -2410,37 +2407,6 @@ def record_binding_producer_ids(
     if sulfur_input > 0.0 and getattr(sim, "_sulfsat_gate", None) is not None:
         selected.append("sulfsat")
     return tuple(selected)
-
-
-def _selected_binding_capture_is_cacheable(
-    sim: Any,
-    result: EquilibriumResult,
-) -> bool:
-    producer_ids = record_binding_producer_ids(
-        sim,
-        artifact="equilibrium_post_record",
-    )
-    if "openimcc" in producer_ids:
-        diagnostic = getattr(sim, "_last_vapor_pressure_diagnostic", {})
-        authority = (
-            diagnostic.get("high_t_melt_activity", {})
-            if isinstance(diagnostic, Mapping)
-            else {}
-        )
-        if not (
-            isinstance(authority, Mapping)
-            and authority.get("fallback") is not True
-            and authority.get("provider") == "openimcc"
-        ):
-            return False
-    if "sulfsat" in producer_ids:
-        sulfur_result = getattr(result, "sulfur_saturation", None)
-        if (
-            sulfur_result is None
-            or sulfur_result.calibration_status == "unavailable"
-        ):
-            return False
-    return True
 
 
 def replay_scope_dependency_vector(key: Mapping[str, Any]) -> dict[str, Any]:
