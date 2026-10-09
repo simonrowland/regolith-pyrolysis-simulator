@@ -129,6 +129,46 @@ def test_kems_gate_treats_missing_point_conditions_as_empty() -> None:
     assert missing_outcome.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
 
 
+@pytest.mark.parametrize(
+    ("evidence", "expected_reason"),
+    (
+        (EvidenceClass.MODEL_DERIVED, RefusalReason.EFFUSION_REGIME_UNVERIFIED),
+        (EvidenceClass.MEASURED_DIRECT, RefusalReason.EFFUSION_REGIME_UNVERIFIED),
+    ),
+)
+def test_kems_apparatus_gates_apply_to_model_and_measured_rows_today(
+    evidence: EvidenceClass,
+    expected_reason: RefusalReason,
+) -> None:
+    experiment = F.kems_experiment(
+        experiment_id="kems-missing-apparatus",
+        orifice_area=None,
+        clausing=None,
+        kn=None,
+        calibrated=False,
+    )
+    observation = F.observation(
+        f"{evidence.value}-row",
+        experiment.experiment_id,
+        F.psat_identity("Na"),
+        "1",
+        evidence=evidence,
+    )
+
+    outcome = run_validity_gates(experiment, observation)
+
+    assert outcome.passed is False
+    assert outcome.reason is expected_reason
+    assert any(
+        check.name == "in_cell_partial_pressure_sum" and not check.passed
+        for check in outcome.checks
+    )
+    assert any(
+        check.name == "kems_calibration" and not check.passed
+        for check in outcome.checks
+    )
+
+
 def test_validity_observation_buckets_partition_store() -> None:
     root = Path(__file__).resolve().parents[2]
     paths = _validity_observation_paths(root)
