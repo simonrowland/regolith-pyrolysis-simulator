@@ -66,9 +66,13 @@ CODE_INPUTS = (
 #   9bb0a22ce, 1d254d51e, b8be6d576: kems-041 misprint notes and compilation
 #     status wording (t-1145, t-1146); regen at their merge produced no store
 #     diff on the pregate host and on the landing gate.
+#   d47e84bec: openimcc provenance moves from table paths and file hashes to the
+#     engine binding identity (b-690); emitted provenance only, and a regen on
+#     top of it produced no store diff on the landing gate.
 STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "1b78b5697", "574800443", "149df2858",
     "9bb0a22ce", "1d254d51e", "b8be6d576",
+    "d47e84bec",
 })
 
 

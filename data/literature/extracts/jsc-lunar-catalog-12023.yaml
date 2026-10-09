@@ -65,7 +65,7 @@ species:
       values:
         quantity: sample_characterisation
         method_class: quoted_attributed
-        quoted_from: Morris (1978) for maturity; Graf (1993), data by McKay et al., for grain-size distribution
+        attribution: Morris (1978) for maturity; Graf (1993), data by McKay et al., for grain-size distribution
         maturity_index_Is_per_FeO: 60
         maturity_class: mature
         average_grain_size_um: 48
@@ -83,7 +83,7 @@ species:
       values:
         quantity: chemical_composition
         method_class: compilation_assessed
-        quoted_from: Warren et al. (1978)
+        attribution: Warren et al. (1978)
         oxide_wt_pct:
           TiO2: 2.45
           Al2O3: 10.77
@@ -139,6 +139,7 @@ species:
       values:
         quantity: carbon_and_nitrogen_abundance
         method_class: quoted_attributed
+        attribution: 'Moore et al. (1971); Kaplan and Petrowski (1971); Kerridge et al. (1978); Norris et al. (1983)'
         rows:
         - {source: Moore et al. (1971), sample: 12023, C_ppm: 150, N_ppm: 120}
         - {source: Moore et al. (1971), sample: 12024, C_ppm: 115}
@@ -157,7 +158,7 @@ species:
       values:
         quantity: radiogenic_age
         method_class: quoted_attributed
-        quoted_from: Levine et al. (2005, 2007) and Barra et al. (2006)
+        attribution: Levine et al. (2005, 2007) and Barra et al. (2006)
         number_of_glass_beads: 'numerous (81?)'
         majority_age_upper_bound_years: '<500 m.y.'
         technique: 40Ar/39Ar plateau
@@ -208,7 +209,7 @@ species:
       values:
         quantity: sample_characterisation
         method_class: quoted_attributed
-        quoted_from: Morris (1978)
+        attribution: Morris (1978)
         maturity_index_Is_per_FeO: 30
         maturity_class: submature
       uncertainty:
@@ -239,7 +240,7 @@ species:
       values:
         quantity: particle_inventory
         method_class: quoted_attributed
-        quoted_from: Marvin (1978)
+        attribution: Marvin (1978)
         particle_12024_15_mass_g: 14.1
         particle_12024_15_description: large dark rock / olivine vitrophyre
         figure_scale_cm: 1

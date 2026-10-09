@@ -154,8 +154,11 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_unattributed
+      value: quoted_attributed
     original_method_class: quoted_measurement
+    attribution: Kay and Taylor 1960 (ref 3) 1600 C; Eriksson et al. 1994 (ref 4) 1600 C; Morita et al. 2000 (ref 5) 1600
+      C and 1550 C; Rein and Chipman 1965/1963 (ref 6) 1550 C; Carter and Macfarlane 1957 (ref 7) 1500 C; Sharma and Richardson
+      1962 (ref 8) 1500 C
   admission:
     status: pending
     reason: source admission_status=figure_only is not a closed v2.1 token
@@ -201,8 +204,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_unattributed
+      value: quoted_attributed
     original_method_class: quoted_measurement
+    attribution: Morita et al. 2000 (ref 5); Rein and Chipman 1965/1963 (ref 6)
   admission:
     status: pending
     reason: source admission_status=figure_only is not a closed v2.1 token
@@ -258,8 +262,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_unattributed
+      value: quoted_attributed
     original_method_class: quoted_measurement
+    attribution: Morita et al. 2000 (ref 5); Rein and Chipman 1965/1963 (ref 6); Kay and Taylor 1963 (ref 9)
   admission:
     status: pending
     reason: source admission_status=figure_only is not a closed v2.1 token
@@ -315,8 +320,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_unattributed
+      value: quoted_attributed
     original_method_class: quoted_measurement
+    attribution: Morita, Kume and Sano (ref 5; figure-caption attribution); Rein and Chipman (ref 6)
   admission:
     status: pending
     reason: source admission_status=figure_only is not a closed v2.1 token
@@ -374,8 +380,10 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_unattributed
+      value: quoted_attributed
     original_method_class: quoted_measurement
+    attribution: Elliott, Gleiser and Ramakrishna 1963 (ref 10) 1600 C Gibbs-Duhem from FeO activities; Timucin and Morris
+      1970 (ref 11) 1550 C Gibbs-Duhem from FeO activities; Ban-ya and Hino 1991 (ref 12) binary FeO-SiO2 compilation
   admission:
     status: pending
     reason: source admission_status=figure_only is not a closed v2.1 token
@@ -423,6 +431,7 @@ observations:
       tag: value
       value: model_derived
     original_method_class: model_derived
+    attribution: Fujisawa and Sakao 1977 (ref 13); computed from previous thermodynamic data plus a simple solution model
     model: model_derived
   admission:
     status: pending
@@ -537,6 +546,7 @@ observations:
       tag: value
       value: model_derived
     original_method_class: model_derived
+    attribution: Fujisawa and Sakao 1977 (ref 13)
     model: model_derived
   admission:
     status: rejected
@@ -603,6 +613,7 @@ observations:
       tag: value
       value: model_derived
     original_method_class: model_derived
+    attribution: Fujisawa and Sakao 1977 (ref 13)
     model: model_derived
   admission:
     status: rejected
@@ -669,6 +680,7 @@ observations:
       tag: value
       value: model_derived
     original_method_class: model_derived
+    attribution: Fujisawa and Sakao 1977 (ref 13)
     model: model_derived
   admission:
     status: rejected
@@ -1049,6 +1061,7 @@ observations:
       tag: value
       value: model_derived
     original_method_class: model_derived
+    attribution: 'E. T. Turkdogan: ISIJ Int., 40 (2000), 964 (ref 2; the author''s recent publication)'
     model: model_derived
   admission:
     status: pending

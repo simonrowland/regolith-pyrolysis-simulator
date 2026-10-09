@@ -633,17 +633,204 @@ def test_cached_real_subprocess_unverified_model_refuses_before_identity(
         )
 
 
-@pytest.mark.parametrize("model", [None, ""])
+@pytest.mark.parametrize(
+    ("backend_name", "family", "mode", "model", "expected", "refuses"),
+    [
+        ("alphamelts", RealBackendFamily.ALPHAMELTS, "subprocess", None, None, True),
+        ("alphamelts", RealBackendFamily.ALPHAMELTS, "subprocess", "", "MELTSv1.0.2", False),
+        ("alphamelts", RealBackendFamily.ALPHAMELTS, "subprocess", " MELTSv1.0.2 ", "MELTSv1.0.2", False),
+        ("alphamelts", RealBackendFamily.ALPHAMELTS, "subprocess", "not-a-model", None, True),
+        ("alphamelts", RealBackendFamily.ALPHAMELTS, "subprocess", "MELTSv1.0.2", "MELTSv1.0.2", False),
+        ("thermoengine", RealBackendFamily.THERMOENGINE, "thermoengine", None, "None", False),
+        ("thermoengine", RealBackendFamily.THERMOENGINE, "thermoengine", "", "MELTSv1.0.2", False),
+        ("thermoengine", RealBackendFamily.THERMOENGINE, "thermoengine", " pMELTS ", "pMELTS", False),
+        ("thermoengine", RealBackendFamily.THERMOENGINE, "thermoengine", "not-a-model", "not-a-model", False),
+        ("thermoengine", RealBackendFamily.THERMOENGINE, "thermoengine", "MELTSv1.0.2", "MELTSv1.0.2", False),
+    ],
+)
+def test_cached_real_non_python_api_model_normalization_is_unchanged(
+    tmp_path: Path,
+    backend_name,
+    family,
+    mode,
+    model,
+    expected,
+    refuses,
+) -> None:
+    config = _cache_config(
+        tmp_path / "cached-real.db",
+        "fail-loud",
+        name=backend_name,
+        family=family,
+        mode=mode,
+        model=model,
+    )
+    config["authorized_model"] = model
+
+    if refuses:
+        with pytest.raises(BackendUnavailableError):
+            normalize_cached_real_config(config)
+        return
+
+    assert normalize_cached_real_config(config).authorized_model == expected
+
+
+@pytest.mark.parametrize(
+    "model",
+    [
+        " pMELTS ",
+        " \t ",
+        "not-a-model",
+        Path("pMELTS"),
+        pytest.param(
+            type("StringifiableModel", (), {"__str__": lambda self: "pMELTS"})(),
+            id="stringifiable",
+        ),
+    ],
+)
+def test_cached_real_python_api_model_refuses_before_backend_or_store_access(
+    tmp_path: Path,
+    monkeypatch,
+    model,
+) -> None:
+    constructed = []
+    events = []
+    original_init = CachedRealBackend.__init__
+
+    def track_init(self, **kwargs):
+        constructed.append(True)
+        original_init(self, **kwargs)
+
+    monkeypatch.setattr(CachedRealBackend, "__init__", track_init)
+    monkeypatch.setattr(
+        PT0DeterminismStore,
+        "_lookup",
+        lambda self, *args, **kwargs: (
+            events.append("lookup") or (_ for _ in ()).throw(PT0CacheMiss())
+        ),
+    )
+    monkeypatch.setattr(
+        PT0DeterminismStore,
+        "_store",
+        lambda self, *args, **kwargs: events.append("store"),
+    )
+    config = _cache_config(
+        tmp_path / "cached-real.db",
+        "fail-loud",
+        name="alphamelts",
+        family=RealBackendFamily.ALPHAMELTS,
+        mode="python_api",
+        model=model,
+    )
+
+    try:
+        backend = resolve_backend(
+            "cached-real",
+            BackendSelectionPolicy.RUNNER_STRICT,
+            cached_real_config=config,
+        )
+    except BackendUnavailableError as exc:
+        assert exc.reason_code == "invalid_run_input"
+    else:
+        # This is the reviewer's cached-real probe shape: use the real facade,
+        # public normalization, and public replay/capture entry points.
+        sim = _build_cached_real_sim(backend=backend, cache_config=config)
+        store = sim._pt0_store()
+        with pytest.raises(PT0CacheMiss):
+            store.replay_equilibrium(sim)
+        store.capture_equilibrium(
+            sim,
+            EquilibriumResult(
+                status="ok",
+                temperature_C=1400.0,
+                pressure_bar=1.0,
+                fO2_log=-9.0,
+                liquid_fraction=0.25,
+            ),
+        )
+
+    assert constructed == []
+    assert events == []
+
+
+@pytest.mark.parametrize(
+    "model",
+    [None, "", "MELTSv1.0.2", "pMELTS", "MELTSv1.1.0", "MELTSv1.2.0"],
+)
+def test_cached_real_python_api_model_normalization_round_trip_is_idempotent(
+    tmp_path: Path,
+    model: str | None,
+) -> None:
+    raw_config = _cache_config(
+        tmp_path / "cached-real.db",
+        "fail-loud",
+        name="alphamelts",
+        mode="python_api",
+        model=model,
+    )
+    raw_config["authorized_model"] = model
+
+    normalized = normalize_cached_real_config(raw_config)
+    normalized_again = normalize_cached_real_config(normalized)
+    backend = resolve_backend(
+        "cached-real",
+        BackendSelectionPolicy.RUNNER_STRICT,
+        cached_real_config=normalized_again,
+    )
+
+    assert normalized_again == normalized
+    assert backend.config.authorized_model == normalized.authorized_model
+
+
+def test_cached_real_python_api_literal_none_model_is_refused(tmp_path: Path) -> None:
+    config = _cache_config(
+        tmp_path / "cached-real.db",
+        "fail-loud",
+        name="alphamelts",
+        mode="python_api",
+        model="None",
+    )
+    config["authorized_model"] = "None"
+
+    with pytest.raises(BackendUnavailableError) as exc_info:
+        resolve_backend(
+            "cached-real",
+            BackendSelectionPolicy.RUNNER_STRICT,
+            cached_real_config=config,
+        )
+
+    assert exc_info.value.reason_code == "invalid_run_input"
+
+
+@pytest.mark.parametrize(
+    ("model", "expected_identity", "expected_key_model"),
+    [
+        (
+            None,
+            None,
+            "None",
+        ),
+        (
+            "",
+            "",
+            "MELTSv1.0.2",
+        ),
+    ],
+)
 def test_cached_real_blank_model_normalization_keeps_replay_identity(
     tmp_path: Path,
     model: str | None,
+    expected_identity: str | None,
+    expected_key_model: str,
 ) -> None:
     replay_config = _cache_config(
         tmp_path / "cached-real.db",
         "fail-loud",
         name="alphamelts",
         model=model,
+        mode="python_api",
     )
+    replay_config["authorized_model"] = model
     normalized = normalize_cached_real_config(replay_config)
     replay_backend = resolve_backend(
         "cached-real",
@@ -662,13 +849,9 @@ def test_cached_real_blank_model_normalization_keeps_replay_identity(
         fe_redox_policy="intrinsic",
     )
 
-    assert normalized.authorized_model == "MELTSv1.0.2"
-    assert replay_backend.config.authorized_model == "MELTSv1.0.2"
-    assert replay_key["model"]["model"] == "MELTSv1.0.2"
-    assert _key_hash(replay_key) == _DEFAULT_MELTS_REPLAY_KEY_HASH
-    assert _key_hash(
-        canonical_physics_bucket_key_from_replay_key(replay_key)
-    ) == _DEFAULT_MELTS_PROVIDER_KEY_HASH
+    assert normalized.authorized_model == expected_identity
+    assert replay_backend.config.authorized_model == expected_identity
+    assert replay_key["model"]["model"] == expected_key_model
 
 
 @pytest.mark.parametrize(
@@ -722,7 +905,12 @@ def test_cached_real_model_identity_pins_current_family_and_transport_behavior(
         BackendSelectionPolicy.RUNNER_STRICT,
         cached_real_config=config,
     )
-    assert backend.config.authorized_model == expected_model
+    config_model = (
+        model
+        if backend_name == "alphamelts" and mode == "python_api"
+        else expected_model
+    )
+    assert backend.config.authorized_model == config_model
     sim = _build_cached_real_sim(backend=backend, cache_config=config)
 
     key = canonical_replay_key(

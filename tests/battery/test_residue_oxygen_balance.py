@@ -375,9 +375,10 @@ def test_hashimoto_vacuum_oxygen_balance_is_engine_specific_and_alpha_weighted()
     # probe; at 30c51c8 the alpha=1 and 0.25 results are 0.8286161505495706 Pa
     # and 0.3003449996328013 Pa, respectively.
     # The two engines still use their own melt channel pressures for both arms.
-    assert solved["openimcc"][1.0].pO2_bar * PA_PER_BAR == pytest.approx(
-        0.8286161505495706, rel=2.0e-5
-    )
+    assert solved["openimcc"][1.0].pO2_bar.hex() == "0x1.160995d98f6e4p-17"
+    assert (
+        solved["openimcc"][1.0].pO2_bar * PA_PER_BAR
+    ).hex() == "0x1.a8406047187bap-1"
     assert solved["openimcc"][0.25].pO2_bar * PA_PER_BAR == pytest.approx(
         0.3003449996328013, rel=2.0e-5
     )

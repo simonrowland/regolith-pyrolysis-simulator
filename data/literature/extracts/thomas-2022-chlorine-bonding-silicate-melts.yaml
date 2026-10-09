@@ -9,7 +9,7 @@ extraction:
   method: pdftotext -layout with visual verification of Tables 1-2 and methods; printed units, bounds, dashes, and parenthetical 2-sigma uncertainties retained
   date: '2026-09-20'
   worker: i3-thomas-2022-chlorine-bonding-silicate-melts
-  provenance_path: /Users/simonrowland/Repos/regolith-corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/
+  provenance_path: corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/
 review_status: draft
 corrections:
 - note: The abstract and conclusion state 44 experimentally produced glasses, while Tables 1 and 2 enumerate 43 experiment IDs; both statements are retained without reconciliation.
@@ -146,7 +146,7 @@ experiments:
 fidelity_samples:
 - path: species.Cl.observations[thomas_2022_table2_experimental_conditions_and_xaf].values.series[0].CCl
   value: 0.32
-  locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf, published_page: 121273, pdf_page_index: 5, table: '2', record: Ab/Fo-1}
+  locator: {source_path: corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf, published_page: 121273, pdf_page_index: 5, table: '2', record: Ab/Fo-1}
 species:
   Cl:
     observations:
@@ -154,7 +154,7 @@ species:
       experiment: quench-glass-series
       type: composition_series
       locator:
-        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf
+        source_path: corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf
         published_page: 121271
         pdf_page_index: 3
         table: '1'
@@ -192,7 +192,7 @@ species:
     - observation_id: thomas_2022_table1_chlorine_concentrations_all_rows
       experiment: quench-glass-series
       type: composition_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf, published_page: 121271, pdf_page_index: 3, table: '1', note: continued on published page 121272}
+      locator: {source_path: corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf, published_page: 121271, pdf_page_index: 3, table: '1', note: continued on published page 121272}
       phase: experimentally_quenched_silicate_glass
       regime: quench_equilibration
       units: Cl wt%; parenthetical uncertainties are 2 standard deviations of n analyses
@@ -246,7 +246,7 @@ species:
         - {experiment: CMAS+Brucite-1, Cl_wt_pct: 2.52, uncertainty_wt_pct: 0.04}
     - observation_id: thomas_2022_author_chloride_capacity_model
       type: model_comparison
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf, published_page: 121270, pdf_page_index: 2, section: 1.1 Chlorine incorporation in silicate melts and glasses, equation: '3'}
+      locator: {source_path: corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf, published_page: 121270, pdf_page_index: 2, section: 1.1 Chlorine incorporation in silicate melts and glasses, equation: '3'}
       phase: silicate_melt
       regime: author_regression
       units: log CCl dimensionless; T K; P GPa; X terms oxide mole fractions on single-cation basis
@@ -261,7 +261,7 @@ species:
       experiment: quench-glass-series
       type: gibbs_table
       locator:
-        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf
+        source_path: corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf
         published_page: 121273
         pdf_page_index: 5
         table: '2'
@@ -323,7 +323,7 @@ species:
     - observation_id: thomas_2022_apparatus_and_analytical_conditions
       experiment: quench-glass-series
       type: apparatus
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf, published_page: 121270, pdf_page_index: 2, section: 2.1 Starting compositions and experimental conditions}
+      locator: {source_path: corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf, published_page: 121270, pdf_page_index: 2, section: 2.1 Starting compositions and experimental conditions}
       phase: silicate_melt_quenched_to_glass
       regime: quench_equilibration
       units: as printed
@@ -346,7 +346,7 @@ species:
         absent_not_printed: [sample mass, exposed area, vacuum level, pumping rate, run pressure medium, run duration beyond Table 2, thermocouple/calibration details]
     - observation_id: thomas_2022_salt_standard_xaf_measurements
       type: calibration
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf, published_page: 121275, pdf_page_index: 7, section: 3.1 Salt standard spectra, table: '2'}
+      locator: {source_path: corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf, published_page: 121275, pdf_page_index: 7, section: 3.1 Salt standard spectra, table: '2'}
       phase: compressed_crystalline_chloride_salt
       regime: XAFS_fluorescence
       units: E0 and Emax eV; R Angstrom; Shannon R values Angstrom
@@ -365,7 +365,7 @@ species:
         - {standard: AgCl, E0_eV: 2823.40, Emax_eV: 2823.99, Shannon_R_A: 2.48}
     - observation_id: thomas_2022_qualitative_xafs_conclusions
       type: characterization
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf, published_page: 121279, pdf_page_index: 11, section: 4 Conclusions}
+      locator: {source_path: corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf, published_page: 121279, pdf_page_index: 11, section: 4 Conclusions}
       phase: silicate_glass
       regime: XAFS_fluorescence
       units: qualitative; figure-only trends are not digitized

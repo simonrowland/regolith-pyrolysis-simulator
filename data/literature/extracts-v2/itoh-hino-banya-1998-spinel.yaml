@@ -46,7 +46,7 @@ observations:
     published_page: 87
     equation: '7'
     note: The paper explicitly states that e_Ca^Mg is taken as zero as in prior work.
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+    source_path: corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
   read_from: pdf:itoh-hino-banya-1998-spinel
   point_conditions:
     temperature_K:
@@ -57,7 +57,7 @@ observations:
         published_page: 87
         equation: '7'
         note: The paper explicitly states that e_Ca^Mg is taken as zero as in prior work.
-        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+        source_path: corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
 - observation_id: itoh-hino-banya-1998-spinel::itoh_1998_dolomite_MgO_CaO_phase_observations
   experiment_id: 10.2355/tetsutohagane1955.84.2_85::experiment::spinel-deoxidation-series
   identity:
@@ -101,7 +101,7 @@ observations:
     published_page: 86
     section: 4.2 Experimental conditions and deoxidation-product composition; 4.3
     note: Phase-presence statements are in sections 4.2-4.3 prose; Figure 1 is the separate dissolved Mg/O plot
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+    source_path: corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
   read_from: pdf:itoh-hino-banya-1998-spinel
   point_conditions:
     temperature_K:
@@ -112,7 +112,7 @@ observations:
         published_page: 86
         section: 4.2 Experimental conditions and deoxidation-product composition; 4.3
         note: Phase-presence statements are in sections 4.2-4.3 prose; Figure 1 is the separate dissolved Mg/O plot
-        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+        source_path: corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
 - observation_id: itoh-hino-banya-1998-spinel::itoh_1998_equilibrium_time
   experiment_id: 10.2355/tetsutohagane1955.84.2_85::experiment::spinel-deoxidation-series
   identity:
@@ -157,7 +157,7 @@ observations:
     published_page: 86
     figure: '2'
     section: 4.1 Equilibrium attainment time
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+    source_path: corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
   read_from: pdf:itoh-hino-banya-1998-spinel
   point_conditions:
     temperature_K:
@@ -168,7 +168,7 @@ observations:
         published_page: 86
         figure: '2'
         section: 4.1 Equilibrium attainment time
-        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+        source_path: corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
 - observation_id: itoh-hino-banya-1998-spinel::itoh_1998_fig1_fig2_measured_concentration_plots
   experiment_id: 10.2355/tetsutohagane1955.84.2_85::itoh-hino-banya-1998-spinel
   identity:
@@ -210,7 +210,7 @@ observations:
     figure: '1'
     note: 'Four printed series: filled circles Present work [Mg], filled squares Present work [O], open circles Degawa [Mg],
       open squares Degawa [O]; x-axis dolomite MgO/CaO; points not digitised'
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+    source_path: corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
   read_from: pdf:itoh-hino-banya-1998-spinel
 - observation_id: itoh-hino-banya-1998-spinel::itoh_1998_fig2_measured_concentration_time_plots
   experiment_id: 10.2355/tetsutohagane1955.84.2_85::experiment::spinel-deoxidation-series
@@ -253,7 +253,7 @@ observations:
     figure: '2'
     note: 'Four printed series versus time: [Al] circles, [Mg] squares, [O] triangles, [Ca] diamonds; [Al]init = 0.5 mass%;
       crucible (%MgO)0.4(%CaO)0.6; points not digitised'
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+    source_path: corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
   read_from: pdf:itoh-hino-banya-1998-spinel
 - observation_id: itoh-hino-banya-1998-spinel::itoh_1998_quoted_prior_interaction_parameters
   experiment_id: 10.2355/tetsutohagane1955.84.2_85::itoh-hino-banya-1998-spinel
@@ -289,6 +289,7 @@ observations:
       tag: value
       value: quoted_attributed
     original_method_class: quoted_attributed
+    attribution: Mizin et al. (1983, ref 10) for e_Mg_Al_1873K; Sponseller and Flinn (1964, ref 11) for e_Ca_Al_1873K
   admission:
     status: pending
     reason: no observation admission_status mapped from source
@@ -298,7 +299,7 @@ observations:
     published_page: 87
     equation: '7'
     note: Values are attributed in the paper to Mizin et al. and Sponseller and Flinn, not measured in this paper.
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+    source_path: corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
   read_from: pdf:itoh-hino-banya-1998-spinel
   point_conditions:
     temperature_K:
@@ -309,7 +310,7 @@ observations:
         published_page: 87
         equation: '7'
         note: Values are attributed in the paper to Mizin et al. and Sponseller and Flinn, not measured in this paper.
-        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+        source_path: corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
 - observation_id: itoh-hino-banya-1998-spinel::itoh_1998_solid_solution_activity_assumptions
   experiment_id: 10.2355/tetsutohagane1955.84.2_85::itoh-hino-banya-1998-spinel
   identity:
@@ -354,7 +355,7 @@ observations:
     published_page: 88
     figure: '5'
     note: equations=21-24
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+    source_path: corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
   read_from: pdf:itoh-hino-banya-1998-spinel
 - observation_id: itoh-hino-banya-1998-spinel::itoh_1998_spinel_equilibrium_constants
   experiment_id: 10.2355/tetsutohagane1955.84.2_85::itoh-hino-banya-1998-spinel
@@ -400,7 +401,7 @@ observations:
     published_page: 88
     note: Printed equations and evaluated 1873 K values; do not treat these author calculations as direct measurements.; equations=12-18,
       21-24
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+    source_path: corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
   read_from: pdf:itoh-hino-banya-1998-spinel
   derived_from:
   - itoh-hino-banya-1998-spinel::itoh_1998_dolomite_MgO_CaO_phase_observations
@@ -449,7 +450,7 @@ observations:
     figure: '4'
     note: Values printed as determined at 1873 K from present experimental data and prior deoxidation equilibria; Figure 4
       and Eq. 19 print r_O^(Mg,Al) = -150, not gamma.; equations=7-20
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+    source_path: corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
   read_from: pdf:itoh-hino-banya-1998-spinel
   point_conditions:
     temperature_K:
@@ -461,7 +462,7 @@ observations:
         figure: '4'
         note: Values printed as determined at 1873 K from present experimental data and prior deoxidation equilibria; Figure
           4 and Eq. 19 print r_O^(Mg,Al) = -150, not gamma.; equations=7-20
-        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+        source_path: corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
   derived_from:
   - itoh-hino-banya-1998-spinel::itoh_1998_dolomite_MgO_CaO_phase_observations
 - observation_id: itoh-hino-banya-1998-spinel::itoh_1998_spinel_thresholds
@@ -512,7 +513,7 @@ observations:
     section: 4.3 Relationship between dolomite composition and deoxidation-product phases
     note: Thresholds printed in text from author-constructed pseudo-binary sections of a cited CaO–Al2O3–MgO ternary diagram
       (ref. 9); phase diagrams were not digitised.
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+    source_path: corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
   read_from: pdf:itoh-hino-banya-1998-spinel
   point_conditions:
     temperature_K:
@@ -525,4 +526,4 @@ observations:
         section: 4.3 Relationship between dolomite composition and deoxidation-product phases
         note: Thresholds printed in text from author-constructed pseudo-binary sections of a cited CaO–Al2O3–MgO ternary diagram
           (ref. 9); phase diagrams were not digitised.
-        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+        source_path: corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf

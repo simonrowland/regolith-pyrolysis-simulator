@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from importlib.resources import files
 from typing import Any
 
 import pytest
@@ -158,13 +157,6 @@ _GOLDEN = {
     },
 }
 
-_GAS_SOURCE_CLASSES = {
-    "Ca": "janaf_fitted", "CaO": "janaf_fitted", "O": "janaf_fitted",
-    "O2": "janaf_fitted", "Si": "janaf_fitted", "Si2": "janaf_fitted",
-    "Si3": "janaf_fitted", "SiO": "janaf_fitted", "SiO2": "janaf_fitted",
-    "Fe": "janaf_transcribed", "FeO": "janaf_transcribed",
-    "Mg": "janaf_fitted", "MgO": "janaf_fitted",
-}
 _PROVENANCE_CLASSES = {
     "Al": "janaf_fitted", "Al2": "janaf_fitted", "Al2O": "janaf_fitted",
     "Al2O2": "janaf_fitted", "AlO": "janaf_fitted", "AlO2": "janaf_fitted",
@@ -249,23 +241,26 @@ def _gas_result(backend: Any, pot: Any, temperature_K: float, cell: str | None) 
     )
 
 
-def test_binary_pot_gas_paths_match_recorded_revision_hex_pins() -> None:
+def test_binary_pot_gas_records_engine_binding_identity_and_hex_pins() -> None:
     openimcc = pytest.importorskip("openimcc", reason="openimcc is not importable")
     if not hasattr(openimcc, "oxygen_balance_from_pressure_model"):
         pytest.skip("installed openimcc lacks oxygen_balance_from_pressure_model")
 
-    gas_data = files("openimcc") / "data" / "gas"
-    gas_table = str((gas_data / "gas-shomate.csv").resolve())
+    backend = _OpenImccBatteryBackend("openimcc")
+    package_identity = openimcc.engine_binding_identity(backend._pack, backend._gas)
     gas_provenance = {
-        "gas_condensate_source": str((gas_data / "condensate.csv").resolve()),
-        "gas_table_source": gas_table,
+        "engine_binding_identity": {
+            "engine_binding_digest": package_identity.digest,
+            "melt_binding_digest": package_identity.melt_binding_digest,
+            "condensate_table_digest": package_identity.condensate_table_digest,
+            "gas_table_digest": package_identity.gas_table_digest,
+        },
         "pack": "1.0.2",
         "pack_digest": "f2b479cd54e3c82704a5863fcc06836f72045375d9a8c7f8d2fad19e98f75d05",
         "package_version": "0.1.0.dev0",
     }
 
     pots = {pot.pot_id: pot for pot in load_binary_pots(DEFAULT_POTS_PATH)[0]}
-    backend = _OpenImccBatteryBackend("openimcc")
 
     for (pot_id, temperature_K, cell), expected in _GOLDEN.items():
         result = _gas_result(backend, pots[pot_id], temperature_K, cell)
@@ -315,7 +310,10 @@ def test_binary_pot_gas_paths_match_recorded_revision_hex_pins() -> None:
         assert (None if buffer is None else float(buffer).hex()) == expected["buffer"]
         assert set(result.vapor_pressures_source) == set(expected["pressures"])
         expected_sources = {
-            species: f"openimcc:{gas_table}:{_GAS_SOURCE_CLASSES[species]}"
+            species: (
+                "openimcc-gas-table:sha256:"
+                f"{package_identity.gas_table_digest}"
+            )
             for species in expected["pressures"]
             if species not in _CELL_SOURCE_LABELS
         }

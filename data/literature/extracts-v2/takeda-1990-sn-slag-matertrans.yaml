@@ -1,0 +1,1473 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/takeda-1990-sn-slag-matertrans.yaml
+observations:
+- observation_id: takeda-1990-sn-slag-matertrans::takeda_1990_table1_gamma_01
+  experiment_id: 10.2320/matertrans1989.31.793::experiment::takeda_1990_table1_gamma_summary
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: SnO
+      phase:
+        tag: unknown
+        reason: phase string 'liquid slag' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1423'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SnO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SnO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: interval
+    interval_low: '1'
+    interval_high: '1.3'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Chizhikov
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: takeda-1990-sn-slag-matertrans::takeda_1990_table1_gamma_01
+  source_id: takeda-1990-sn-slag-matertrans
+  locator:
+    published_page: 794
+    pdf_page_index: 1
+    table: '1'
+    note: Reported comparison for Chizhikov
+  read_from: pdf:takeda-1990-sn-slag-matertrans
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1423'
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        table: '1'
+        note: Reported comparison for Chizhikov
+- observation_id: takeda-1990-sn-slag-matertrans::takeda_1990_table1_gamma_02
+  experiment_id: 10.2320/matertrans1989.31.793::experiment::takeda_1990_table1_gamma_summary
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: SnO
+      phase:
+        tag: unknown
+        reason: phase string 'liquid slag' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1373'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SnO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SnO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: interval
+    interval_low: '1'
+    interval_high: '1.4'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Kozuka
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: takeda-1990-sn-slag-matertrans::takeda_1990_table1_gamma_02
+  source_id: takeda-1990-sn-slag-matertrans
+  locator:
+    published_page: 794
+    pdf_page_index: 1
+    table: '1'
+    note: Reported comparison for Kozuka
+  read_from: pdf:takeda-1990-sn-slag-matertrans
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373'
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        table: '1'
+        note: Reported comparison for Kozuka
+- observation_id: takeda-1990-sn-slag-matertrans::takeda_1990_table1_gamma_03
+  experiment_id: 10.2320/matertrans1989.31.793::experiment::takeda_1990_table1_gamma_summary
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: SnO
+      phase:
+        tag: unknown
+        reason: phase string 'liquid slag' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1433'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SnO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SnO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: interval
+    interval_low: '1'
+    interval_high: '1.6'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carbo
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: takeda-1990-sn-slag-matertrans::takeda_1990_table1_gamma_03
+  source_id: takeda-1990-sn-slag-matertrans
+  locator:
+    published_page: 794
+    pdf_page_index: 1
+    table: '1'
+    note: Reported comparison for Carbo
+  read_from: pdf:takeda-1990-sn-slag-matertrans
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1433'
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        table: '1'
+        note: Reported comparison for Carbo
+- observation_id: takeda-1990-sn-slag-matertrans::takeda_1990_table1_gamma_04
+  experiment_id: 10.2320/matertrans1989.31.793::experiment::takeda_1990_table1_gamma_summary
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: SnO
+      phase:
+        tag: unknown
+        reason: phase string 'liquid slag' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1373'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SnO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SnO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: interval
+    interval_low: '1'
+    interval_high: '1.6'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Grau
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: takeda-1990-sn-slag-matertrans::takeda_1990_table1_gamma_04
+  source_id: takeda-1990-sn-slag-matertrans
+  locator:
+    published_page: 794
+    pdf_page_index: 1
+    table: '1'
+    note: Reported comparison for Grau
+  read_from: pdf:takeda-1990-sn-slag-matertrans
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373'
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        table: '1'
+        note: Reported comparison for Grau
+- observation_id: takeda-1990-sn-slag-matertrans::takeda_1990_table1_gamma_05
+  experiment_id: 10.2320/matertrans1989.31.793::experiment::takeda_1990_table1_gamma_summary
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: SnO
+      phase:
+        tag: unknown
+        reason: phase string 'liquid slag' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1423'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SnO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SnO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: interval
+    interval_low: '1.4'
+    interval_high: '0.9'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Koike
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: takeda-1990-sn-slag-matertrans::takeda_1990_table1_gamma_05
+  source_id: takeda-1990-sn-slag-matertrans
+  locator:
+    published_page: 794
+    pdf_page_index: 1
+    table: '1'
+    note: Reported comparison for Koike
+  read_from: pdf:takeda-1990-sn-slag-matertrans
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1423'
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        table: '1'
+        note: Reported comparison for Koike
+- observation_id: takeda-1990-sn-slag-matertrans::takeda_1990_table1_gamma_06
+  experiment_id: 10.2320/matertrans1989.31.793::experiment::takeda_1990_table1_gamma_summary
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: SnO
+      phase:
+        tag: unknown
+        reason: phase string 'liquid slag' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1373'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SnO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SnO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: interval
+    interval_low: '1.6'
+    interval_high: '1.7'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Watanabe
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: takeda-1990-sn-slag-matertrans::takeda_1990_table1_gamma_06
+  source_id: takeda-1990-sn-slag-matertrans
+  locator:
+    published_page: 794
+    pdf_page_index: 1
+    table: '1'
+    note: Reported comparison for Watanabe
+  read_from: pdf:takeda-1990-sn-slag-matertrans
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373'
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        table: '1'
+        note: Reported comparison for Watanabe
+- observation_id: takeda-1990-sn-slag-matertrans::takeda_1990_table1_gamma_07
+  experiment_id: 10.2320/matertrans1989.31.793::experiment::takeda_1990_table1_gamma_summary
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: SnO
+      phase:
+        tag: unknown
+        reason: phase string 'liquid slag' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1423'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SnO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SnO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: interval
+    interval_low: '1.1'
+    interval_high: '1.8'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Koike
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: takeda-1990-sn-slag-matertrans::takeda_1990_table1_gamma_07
+  source_id: takeda-1990-sn-slag-matertrans
+  locator:
+    published_page: 794
+    pdf_page_index: 1
+    table: '1'
+    note: Reported comparison for Koike
+  read_from: pdf:takeda-1990-sn-slag-matertrans
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1423'
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        table: '1'
+        note: Reported comparison for Koike
+- observation_id: takeda-1990-sn-slag-matertrans::takeda_1990_table1_gamma_08
+  experiment_id: 10.2320/matertrans1989.31.793::experiment::takeda_1990_table1_gamma_summary
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: SnO
+      phase:
+        tag: unknown
+        reason: phase string 'liquid slag' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1373'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SnO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SnO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: interval
+    interval_low: '1.2'
+    interval_high: '1.4'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Watanabe
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: takeda-1990-sn-slag-matertrans::takeda_1990_table1_gamma_08
+  source_id: takeda-1990-sn-slag-matertrans
+  locator:
+    published_page: 794
+    pdf_page_index: 1
+    table: '1'
+    note: Reported comparison for Watanabe
+  read_from: pdf:takeda-1990-sn-slag-matertrans
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373'
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        table: '1'
+        note: Reported comparison for Watanabe
+- observation_id: takeda-1990-sn-slag-matertrans::takeda_1990_table1_gamma_09
+  experiment_id: 10.2320/matertrans1989.31.793::experiment::takeda_1990_table1_gamma_summary
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: SnO
+      phase:
+        tag: unknown
+        reason: phase string 'liquid slag' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1423'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SnO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SnO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: interval
+    interval_low: '0.9'
+    interval_high: '1.6'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Koike
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: takeda-1990-sn-slag-matertrans::takeda_1990_table1_gamma_09
+  source_id: takeda-1990-sn-slag-matertrans
+  locator:
+    published_page: 794
+    pdf_page_index: 1
+    table: '1'
+    note: Reported comparison for Koike
+  read_from: pdf:takeda-1990-sn-slag-matertrans
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1423'
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        table: '1'
+        note: Reported comparison for Koike
+- observation_id: takeda-1990-sn-slag-matertrans::takeda_1990_table1_gamma_10
+  experiment_id: 10.2320/matertrans1989.31.793::experiment::takeda_1990_table1_gamma_summary
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: SnO
+      phase:
+        tag: unknown
+        reason: phase string 'liquid slag' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1433'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SnO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SnO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '1.8'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carbo
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: takeda-1990-sn-slag-matertrans::takeda_1990_table1_gamma_10
+  source_id: takeda-1990-sn-slag-matertrans
+  locator:
+    published_page: 794
+    pdf_page_index: 1
+    table: '1'
+    note: Reported comparison for Carbo
+  read_from: pdf:takeda-1990-sn-slag-matertrans
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1433'
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        table: '1'
+        note: Reported comparison for Carbo
+- observation_id: takeda-1990-sn-slag-matertrans::takeda_1990_table1_gamma_12
+  experiment_id: 10.2320/matertrans1989.31.793::experiment::takeda_1990_table1_gamma_summary
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: SnO
+      phase:
+        tag: unknown
+        reason: phase string 'liquid slag' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1473, 1573]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SnO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SnO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: interval
+    interval_low: '0.8'
+    interval_high: '2.4'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Nagamori
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: takeda-1990-sn-slag-matertrans::takeda_1990_table1_gamma_12
+  source_id: takeda-1990-sn-slag-matertrans
+  locator:
+    published_page: 794
+    pdf_page_index: 1
+    table: '1'
+    note: Reported comparison for Nagamori
+  read_from: pdf:takeda-1990-sn-slag-matertrans
+- observation_id: takeda-1990-sn-slag-matertrans::takeda_1990_table1_gamma_13
+  experiment_id: 10.2320/matertrans1989.31.793::experiment::takeda_1990_table1_gamma_summary
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: SnO
+      phase:
+        tag: unknown
+        reason: phase string 'liquid slag' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1523'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SnO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SnO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '1.7'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Takeda
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: takeda-1990-sn-slag-matertrans::takeda_1990_table1_gamma_13
+  source_id: takeda-1990-sn-slag-matertrans
+  locator:
+    published_page: 794
+    pdf_page_index: 1
+    table: '1'
+    note: Reported comparison for Takeda
+  read_from: pdf:takeda-1990-sn-slag-matertrans
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523'
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        table: '1'
+        note: Reported comparison for Takeda
+- observation_id: takeda-1990-sn-slag-matertrans::takeda_1990_table1_gamma_14
+  experiment_id: 10.2320/matertrans1989.31.793::experiment::takeda_1990_table1_gamma_summary
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: SnO
+      phase:
+        tag: unknown
+        reason: phase string 'liquid slag' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1523'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SnO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SnO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.9'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Takeda
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: takeda-1990-sn-slag-matertrans::takeda_1990_table1_gamma_14
+  source_id: takeda-1990-sn-slag-matertrans
+  locator:
+    published_page: 794
+    pdf_page_index: 1
+    table: '1'
+    note: Reported comparison for Takeda
+  read_from: pdf:takeda-1990-sn-slag-matertrans
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523'
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        table: '1'
+        note: Reported comparison for Takeda

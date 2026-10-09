@@ -144,8 +144,9 @@ class OpenImccBindingDigestUnavailableError(RuntimeError):
 
     def __init__(self) -> None:
         self.backend_status_reason = (
-            f"{self.code}: installed openimcc does not expose a non-empty "
-            "datapack binding_digest; remedy: install the recorded pin "
+            f"{self.code}: installed openimcc cannot provide a usable "
+            "datapack binding_digest or engine binding identity; remedy: "
+            "install the recorded pin "
             f"{OPENIMCC_RECORDED_PIN}"
         )
         super().__init__(self.backend_status_reason)
@@ -611,6 +612,28 @@ def _pack_digest(pack: Any) -> str:
     if not isinstance(value, str) or not value:
         raise OpenImccBindingDigestUnavailableError()
     return value
+
+
+def engine_binding_identity(melt_pack: Any, gas_pack: Any) -> dict[str, str]:
+    """Return OpenIMCC's parsed-content identity for the packs used together."""
+
+    package = _require_openimcc()
+    owner = getattr(package, "engine_binding_identity", None)
+    if not callable(owner):
+        raise OpenImccBindingDigestUnavailableError()
+    try:
+        identity = owner(melt_pack, gas_pack)
+        result = {
+            "engine_binding_digest": identity.digest,
+            "melt_binding_digest": identity.melt_binding_digest,
+            "condensate_table_digest": identity.condensate_table_digest,
+            "gas_table_digest": identity.gas_table_digest,
+        }
+    except Exception as exc:
+        raise OpenImccBindingDigestUnavailableError() from exc
+    if any(not isinstance(value, str) or not value for value in result.values()):
+        raise OpenImccBindingDigestUnavailableError()
+    return result
 
 
 def evaluate(

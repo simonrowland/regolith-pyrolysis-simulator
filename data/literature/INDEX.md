@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 271
-- Extracts (`literature_extract.v1`): 269
+- Sources: 272
+- Extracts (`literature_extract.v1`): 270
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 269
+- Extracts with no PDF: 270
 - Alias groups needing owner/controller resolution: 41
 - Extracts with private/non-public row locators: 60
 
@@ -281,6 +281,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `ta-shirai-2000-lpsc` | Shirai, T., Tachibana, S. & Tsuchiyama, A. (2000), "Evaporation rates of Na from Na2O-SiO2 melt at 1 atm", Lunar and Planetary Science XXXI, abstract 1610. |  | ABSENT, `` | `raw/ta-shirai-2000-lpsc/ta-shirai-2000-lpsc.pdf` (present, c156af42); `text/ta-shirai-2000-lpsc/` (19 files, exists); `tables/ta-shirai-2000-lpsc/` (0 files, ABSENT) | `data/literature/extracts/ta-shirai-2000-lpsc.yaml` (19 rows, draft) | `ledger/ta-shirai-2000-lpsc.yaml`: decoded (2026-09-06) |
 | `ta-yamanaka-1997-metsoc` | Yamanaka, A. & Tsuchiyama, A. (1997), "Evaporation experiments of Na from a Na2O-SiO2 melt by thermogravimetry: Measurement of evaporation coefficients", 60th Annual Meteoritical Society Meeting, abstract 5122. |  | ABSENT, `` | `raw/ta-yamanaka-1997-metsoc/ta-yamanaka-1997-metsoc.pdf` (present, b0ea5696); `text/ta-yamanaka-1997-metsoc/` (17 files, exists); `tables/ta-yamanaka-1997-metsoc/` (0 files, ABSENT) | `data/literature/extracts/ta-yamanaka-1997-metsoc.yaml` (5 rows, draft) | `ledger/ta-yamanaka-1997-metsoc.yaml`: decoded (2026-09-06) |
 | `tachibana-tsuchiyama-1998-forsterite-dust-lpsc` | Tachibana, S. & Tsuchiyama, A. (1998), "Evaporation Behavior of Forsterite Dust in the Primordial Solar Nebula", Lunar and Planetary Science XXIX, abstract 1538. |  | ABSENT, `` | `raw/tachibana-tsuchiyama-1998-forsterite-dust-lpsc/tachibana-tsuchiyama-1998-forsterite-dust-lpsc.pdf` (present, dc6516ac); `text/tachibana-tsuchiyama-1998-forsterite-dust-lpsc/` (11 files, exists); `tables/tachibana-tsuchiyama-1998-forsterite-dust-lpsc/` (0 files, ABSENT) | `data/literature/extracts/tachibana-tsuchiyama-1998-forsterite-dust-lpsc.yaml` (6 rows, draft) | `ledger/tachibana-tsuchiyama-1998-forsterite-dust-lpsc.yaml`: decoded (2026-09-06) |
+| `takeda-1990-sn-slag-matertrans` | Takeda, Y., Yazawa, A., Chit, P. P. and Ujiie, H. (1990), “Equilibria between liquid tin and FeOx-CaO-SiO2 slag”, Materials Transactions JIM 31(9), 793–801. | 10.2320/matertrans1989.31.793 | ABSENT, `` | `raw/takeda-1990-sn-slag-matertrans/takeda-1990-sn-slag-matertrans.pdf` (ABSENT, ); `text/takeda-1990-sn-slag-matertrans/` (0 files, ABSENT); `tables/takeda-1990-sn-slag-matertrans/` (0 files, ABSENT) | `data/literature/extracts/takeda-1990-sn-slag-matertrans.yaml` (13 rows, draft) | `ledger/takeda-1990-sn-slag-matertrans.yaml`: — (—) |
 | `thomas-2022-chlorine-bonding-silicate-melts` | Thomas, R. W., Wade, J. & Wood, B. J. (2023), "The bonding environment of chlorine in silicate melts", Chemical Geology 617:121269, DOI 10.1016/j.chemgeo.2022.121269 | 10.1016/j.chemgeo.2022.121269 | ABSENT, `` | `raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf` (present, 50e804ac); `text/thomas-2022-chlorine-bonding-silicate-melts/` (27 files, exists); `tables/thomas-2022-chlorine-bonding-silicate-melts/` (0 files, ABSENT) | `data/literature/extracts/thomas-2022-chlorine-bonding-silicate-melts.yaml` (4 rows, draft, private_path) | `ledger/thomas-2022-chlorine-bonding-silicate-melts.yaml`: decoded (2026-09-06) |
 | `thomas-wood-2021-chlorine-silicate-melts` | Thomas, Richard W. & Wood, Bernard J. (2021), "The chemical behaviour of chlorine in silicate melts", Geochimica et Cosmochimica Acta. | 10.1016/j.gca.2020.11.018 | ABSENT, `` | `raw/thomas-wood-2021-chlorine-silicate-melts/thomas-wood-2021-chlorine-silicate-melts.pdf` (present, f190a321); `text/thomas-wood-2021-chlorine-silicate-melts/` (54 files, exists); `tables/thomas-wood-2021-chlorine-silicate-melts/` (0 files, ABSENT) | `data/literature/extracts/thomas-wood-2021-chlorine-silicate-melts.yaml` (11 rows, draft) | `ledger/thomas-wood-2021-chlorine-silicate-melts.yaml`: decoded (2026-09-06) |
 | `ts1985` | Tsukihashi, F. & Sano, N. (1985), "Measurement of the Activity of Na2O in Na2O-SiO2 Melts by Chemical Equilibration Method" / 「化学平衡法による Na2O-SiO2 系融体中の Na2O の活量の測定」, Tetsu-to-Hagane (鉄と鋼) 71(7), 815-822. | 10.2355/tetsutohagane1955.71.7_815 | ABSENT, `` | `raw/ts1985/ts1985.pdf` (present, 8345faa4); `text/ts1985/` (51 files, exists); `tables/ts1985/` (0 files, ABSENT) | `data/literature/extracts/ts1985.yaml` (16 rows, draft) | `ledger/ts1985.yaml`: decoded (2026-09-06) |
@@ -558,6 +559,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `ta-shirai-2000-lpsc`
 - `ta-yamanaka-1997-metsoc`
 - `tachibana-tsuchiyama-1998-forsterite-dust-lpsc`
+- `takeda-1990-sn-slag-matertrans`
 - `thomas-2022-chlorine-bonding-silicate-melts`
 - `thomas-wood-2021-chlorine-silicate-melts`
 - `ts1985`

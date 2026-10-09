@@ -11,7 +11,7 @@ extraction:
   method: pdftotext_layout_manual_transcription
   date: '2026-09-20'
   worker: codex-extract-ingest
-  provenance_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+  provenance_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 review_status: draft
 species:
   CaMgSi2O6:
@@ -19,7 +19,7 @@ species:
       - observation_id: ammin_76_904_table2_step_scan_heat_capacity_enthalpy
         type: heat_capacity_and_heat_content_series
         locator:
-          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+          source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
           published_page: 908
           pdf_page: 5
           table: '2'
@@ -86,7 +86,7 @@ species:
       - observation_id: ammin_76_904_fusion_and_melting_transition
         type: phase_transition
         locator:
-          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+          source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
           published_page: 904
           pdf_page: 1
           section: Abstract
@@ -110,7 +110,7 @@ species:
       - observation_id: ammin_76_904_crystallization_repeated_runs
         type: phase_transition
         locator:
-          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+          source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
           published_page: 910
           pdf_page: 7
           figure: '6'
@@ -134,7 +134,7 @@ species:
       - observation_id: ammin_76_904_author_regression_liquid_heat_capacity
         type: heat_capacity_and_heat_content_series
         locator:
-          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+          source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
           published_page: 909
           pdf_page: 6
           equation: '6'
@@ -155,7 +155,7 @@ species:
       - observation_id: ammin_76_904_quoted_comparator_enthalpy_values
         type: quoted_comparator
         locator:
-          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+          source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
           published_page: 909
           pdf_page: 6
           section: Final capacity of crystal and liquid, enthalpy of fusion, and analysis of error
@@ -164,6 +164,7 @@ species:
         units: as_published
         values:
           method_class: quoted_attributed
+          attribution: 'Stebbins et al. (1983); Richet and Bottinga (1984); Ferrier (1968); Stebbins et al. (1984); Adamkovicova et al. (1980)'
           cited_values:
             - {source: Stebbins et al. (1983), quantity: enthalpy_of_fusion, value_kJ_per_mol: 138.1}
             - {source: Richet and Bottinga (1984), quantity: enthalpy_of_fusion, value_kJ_per_mol: 137.7}
@@ -176,7 +177,7 @@ species:
       - observation_id: ammin_76_904_table1_diopside_composition
         type: composition
         locator:
-          source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ammin-76-904/ammin-76-904.pdf
+          source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
           published_page: 905
           pdf_page: 2
           table: '1'

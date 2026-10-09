@@ -33,6 +33,38 @@ def resolve_alphamelts_subprocess_model(
     return model, "MELTS"
 
 
+def resolve_alphamelts_python_api_model(
+    model_name: str | None,
+) -> tuple[str, int]:
+    """Resolve exact PetThermoTools model names to their payload codes."""
+    # The subprocess resolver accepts only the default, so stripping there
+    # cannot change the computation. This transport accepts several models;
+    # stripping here would turn a name that previously fell through to code 1
+    # into code 2/3/4 under the unchanged replay identity.
+    if model_name is not None and not isinstance(model_name, str):
+        raise ValueError(
+            f"AlphaMELTS Python API model {model_name!r} is not verified"
+        )
+    model = (
+        DEFAULT_ALPHAMELTS_MODEL
+        if model_name is None or model_name == ""
+        else model_name
+    )
+    model_codes = {
+        DEFAULT_ALPHAMELTS_MODEL: 1,
+        "pMELTS": 2,
+        "MELTSv1.1.0": 3,
+        "MELTSv1.2.0": 4,
+    }
+    try:
+        model_code = model_codes[model]
+    except (KeyError, TypeError) as exc:
+        raise ValueError(
+            f"AlphaMELTS Python API model {model!r} is not verified"
+        ) from exc
+    return model, model_code
+
+
 def resolve_grid_engine_model(model_name: str | None, backend_name: str) -> str:
     """Resolve the model identity used by the grid producer and writer."""
     if backend_name == "subprocess":

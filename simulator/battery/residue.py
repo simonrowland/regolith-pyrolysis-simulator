@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import math
-import hashlib
 import time
 from collections import defaultdict
 from collections.abc import Callable, Mapping, Sequence
@@ -898,16 +897,6 @@ def _hashimoto_integrate_geometry(
     )
 
 
-def _gas_pack_byte_digests(gas_pack) -> tuple[str, str]:
-    """Return raw-byte digests of both pack files; b-690 replaces this with the
-    bridge's parsed-content binding digest.
-    """
-    return (
-        hashlib.sha256(Path(gas_pack.gas_path).read_bytes()).hexdigest(),
-        hashlib.sha256(Path(gas_pack.oxide_path).read_bytes()).hexdigest(),
-    )
-
-
 def _predict_hashimoto_residue_cohort(
     experiments: Sequence[Mapping[str, Any]],
     runtime_catalog: Mapping[str, Any],
@@ -993,7 +982,13 @@ def _predict_hashimoto_residue_cohort(
         for species, reaction in gas_channels
     }
 
-    gas_digest, liquid_digest = _gas_pack_byte_digests(gas_pack)
+    engine_binding_identity = (
+        openimcc_bridge.engine_binding_identity(
+            openimcc_bridge._load_pack("v1.0.2"), gas_pack
+        )
+        if engine == "openimcc"
+        else None
+    )
     melt_pack_identity: dict[str, str] = {}
     primary_alpha_arm, primary_geometry = _hashimoto_primary_policy()
     prediction_rows: list[_HashimotoResiduePrediction] = []
@@ -1464,9 +1459,12 @@ def _predict_hashimoto_residue_cohort(
                 "openimcc_model_id": melt_pack_identity.get("model_id", "IMCC-SF04"),
                 "pack_digest": {
                     "melt_datapack": melt_pack_identity.get("pack_digest", ""),
-                    "gas_table_sha256": gas_digest,
-                    "condensate_table_sha256": liquid_digest,
                 },
+                **(
+                    {"engine_binding_identity": engine_binding_identity}
+                    if engine_binding_identity is not None
+                    else {}
+                ),
                 "openimcc_pin": openimcc_bridge.OPENIMCC_RECORDED_PIN,
                 "code_revision": code_revision,
                 "integration": {
@@ -1651,6 +1649,7 @@ def _predict_sossi_residue_cohort(
         if isinstance(row, Mapping) and row.get("formula")
     ]
     alpha_specs = _load_evaporation_alpha_by_species(legacy_catalog)
+    engine_binding_identity: dict[str, str] | None = None
     if engine == "openimcc":
         try:
             import openimcc
@@ -1660,6 +1659,9 @@ def _predict_sossi_residue_cohort(
         except ImportError as exc:
             raise ResidueInventoryRefusal("openimcc_not_importable", str(exc)) from exc
         gas_pack = load_gas_datapack()
+        engine_binding_identity = openimcc_bridge.engine_binding_identity(
+            openimcc_bridge._load_pack("v1.0.2"), gas_pack
+        )
         raw_gas_channels, omissions = _openimcc_gas_channels_and_omission_notices(
             tuple(_SOSSI_TRACE_PARENTS.values()), gas_pack
         )
@@ -1668,12 +1670,10 @@ def _predict_sossi_residue_cohort(
             for species, reaction in raw_gas_channels
             if str(reaction[0]) in set(_SOSSI_TRACE_PARENTS.values())
         ]
-        gas_pack_digest, liquid_pack_digest = _gas_pack_byte_digests(gas_pack)
     else:
         gas_pack = None
         omissions = ()
         gas_channels = []
-        gas_pack_digest = liquid_pack_digest = "not_consumed"
 
     prediction_rows: list[_SossiResiduePrediction] = []
     for experiment in experiments:
@@ -2011,8 +2011,11 @@ def _predict_sossi_residue_cohort(
                     "integration": geometry_refinement,
                     "gas_channel_omissions": omissions,
                     "channel_missing_elements": tuple(missing_elements),
-                    "gas_pack_digest": gas_pack_digest,
-                    "liquid_pack_digest": liquid_pack_digest,
+                    **(
+                        {"engine_binding_identity": engine_binding_identity}
+                        if engine_binding_identity is not None
+                        else {}
+                    ),
                     "liquid_rows_used": liquid_rows_used,
                     "melt_pack_identity": dict(melt_pack_identity),
                     "assumption_flags": {

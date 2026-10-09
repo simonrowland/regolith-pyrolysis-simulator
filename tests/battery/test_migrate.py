@@ -2687,6 +2687,32 @@ def test_h01_sample_volume_cm3_is_stored_as_m3(tmp_path: Path) -> None:
     assert volume.locator is not None and volume.locator.table == "2"
 
 
+def test_takeda_single_printed_gamma_values_migrate_as_points(tmp_path: Path) -> None:
+    result = _migrate_real_extract(
+        tmp_path, "takeda-1990-sn-slag-matertrans.yaml"
+    )
+    expected = {
+        "takeda_1990_table1_gamma_10": Decimal("1.8"),
+        "takeda_1990_table1_gamma_13": Decimal("1.7"),
+        "takeda_1990_table1_gamma_14": Decimal("0.9"),
+    }
+
+    assert result.validation is not None
+    assert result.validation.hard_issues == ()
+    for observation_id, gamma in expected.items():
+        matches = [
+            observation
+            for key, observation in result.observations.items()
+            if key.endswith(f"::{observation_id}")
+        ]
+        assert len(matches) == 1, observation_id
+        observation = matches[0]
+        assert observation.admission.status is AdmissionStatus.ADMITTED
+        assert observation.identity.quantity.value is Quantity.ACTIVITY_COEFFICIENT
+        assert observation.value.kind is ValueKind.POINT
+        assert observation.value.point == gamma
+
+
 def test_h02_activity_coefficient_uses_gamma_not_pressure(tmp_path: Path) -> None:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     extract["species"]["Na"]["observations"] = [

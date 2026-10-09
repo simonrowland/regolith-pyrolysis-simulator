@@ -3627,6 +3627,10 @@ def test_openimcc_candidate_alias_has_complete_lineage_mapping() -> None:
         *ENGINE_COEFFICIENT_SOURCES[Engine.OPENIMCC],
         "openimcc-pack-version:1.0.2",
         "openimcc-pack-digest:sha256:test",
+        "openimcc-engine-binding:sha256:test",
+        "openimcc-melt-binding:sha256:test",
+        "openimcc-condensate-table:sha256:test",
+        "openimcc-gas-table:sha256:test",
     )
     expanded = expand_coefficient_sources(candidate_sources)
     assert "openimcc-v1.0.2" in candidate_sources
@@ -3642,14 +3646,17 @@ def test_openimcc_candidate_alias_has_complete_lineage_mapping() -> None:
             id="metadata-only",
         ),
         pytest.param(
-            ("openimcc-gas-table:sf04-magma-companion-workbook",),
+            ("openimcc-condensate-table:sf04-magma-companion-workbook",),
             id="prefix-concealed",
         ),
         pytest.param(
             (
                 "openimcc-pack-version:1.0.2",
                 "openimcc-pack-digest:sha256:test",
-                "openimcc-gas-table:gas.csv",
+                "openimcc-engine-binding:sha256:test",
+                "openimcc-melt-binding:sha256:test",
+                "openimcc-condensate-table:sha256:test",
+                "openimcc-gas-table:sha256:test",
             ),
             id="empty-after-strip",
         ),
@@ -3770,7 +3777,10 @@ def test_openimcc_lineage_metadata_passes_residual_validation() -> None:
             "sf04-magma-companion-workbook",
             "openimcc-pack-version:1.0.2",
             "openimcc-pack-digest:sha256:test",
-            "openimcc-gas-table:test.csv",
+            "openimcc-engine-binding:sha256:test",
+            "openimcc-melt-binding:sha256:test",
+            "openimcc-condensate-table:sha256:test",
+            "openimcc-gas-table:sha256:test",
         )
     )
     assert validate_residual(
@@ -3786,7 +3796,10 @@ def test_openimcc_metadata_only_lineage_fails_residual_validation() -> None:
         (
             "openimcc-pack-version:1.0.2",
             "openimcc-pack-digest:sha256:test",
-            "openimcc-gas-table:test.csv",
+            "openimcc-engine-binding:sha256:test",
+            "openimcc-melt-binding:sha256:test",
+            "openimcc-condensate-table:sha256:test",
+            "openimcc-gas-table:sha256:test",
         )
     )
     issues = validate_residual(residual, observations, experiments, works)

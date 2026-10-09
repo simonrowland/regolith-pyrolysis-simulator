@@ -111,7 +111,10 @@ from simulator.battery.oxygen_balance import (
     OXYGEN_BALANCE_NOTICE_PREFIX,
     has_own_engine_solved_oxygen_balance,
 )
-from simulator.battery.source_lineage import coefficient_lineage_sources
+from simulator.battery.source_lineage import (
+    coefficient_lineage_sources,
+    openimcc_engine_identity_sources,
+)
 from simulator.battery.validate import (
     _observation_lineage,
     _pressure_blocking_notices,
@@ -3442,12 +3445,14 @@ def predict_with_engine(
             provenance = (
                 ("openimcc-pack-version", identity_block.get("pack_version")),
                 ("openimcc-pack-digest", identity_block.get("pack_digest")),
-                ("openimcc-gas-table", identity_block.get("gas_table_source")),
             )
             sources = tuple(
                 dict.fromkeys(
                     [
                         *sources,
+                        *openimcc_engine_identity_sources(
+                            identity_block.get("engine_binding_identity")
+                        ),
                         *(
                             f"{label}:{value}"
                             for label, value in provenance
@@ -4018,6 +4023,12 @@ def _hashimoto_residue_prediction(
         if primary is None or production is None:
             raise ValueError("hashimoto_prediction_row_missing")
         primary_provenance = dict(primary.provenance)
+        sources = (
+            *sources,
+            *openimcc_engine_identity_sources(
+                primary_provenance.get("engine_binding_identity")
+            ),
+        )
         consumed_provenance = {
             "observation_id": reference.observation_id,
             "source_id": reference.source_id,
@@ -4250,6 +4261,12 @@ def _sossi_residue_prediction(
                 "residue_metric_domain", f"no positive Sossi {formula} prediction"
             )
         provenance = dict(prediction.provenance)
+        sources = (
+            *sources,
+            *openimcc_engine_identity_sources(
+                provenance.get("engine_binding_identity")
+            ),
+        )
         provenance["consumed_row"] = {
             "observation_id": reference.observation_id,
             "source_id": reference.source_id,

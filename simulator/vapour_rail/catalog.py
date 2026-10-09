@@ -3296,6 +3296,18 @@ def _compile_thermo_reference_model(
                     domain_high=domain_high,
                 )
 
+            # Melt-source SiO2(l) -> Si(g) + O2(g) combines the catalog's
+            # SiO2 -> SiO + 0.5 O2 reference with the CEA gas-exchange
+            # deltaG for SiO -> Si + 0.5 O2. K(T)=exp(-deltaG_standard/RT);
+            # K=(p_Si/P_standard)*(p_O2/P_standard)/a_SiO2, so
+            # p_Si=P_standard*K*a_SiO2/(p_O2/P_standard). AlO1.5(l) ->
+            # Al(g) + 0.75 O2 follows the same law with exponent -0.75.
+            # K, oxide activity and pressure ratios are dimensionless;
+            # multiplying by P_standard returns Pa. Pure-element sidecars
+            # describe saturation at a wall deposit, never this source term.
+            # Sanity: lunar low-Ti at 1800 K and pO2=1e-9 bar gives about
+            # 1e-9 Pa Si, versus 0.140 Pa from the old sidecar path (8 dex).
+            # evaluate() predicts and flags outside the band's limits.
             def _log10_from_composite(temperature_K: float) -> float:
                 # Physical composite in pure log space (b-145 regrind).
                 #

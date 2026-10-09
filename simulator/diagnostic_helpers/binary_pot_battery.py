@@ -88,7 +88,7 @@ def _openimcc_gas_channels_and_omission_notices(
             "kind": NoticeKind.INPUT_OMITTED.value,
             "authority": None,
             "reason": (
-                f"gas channel {name} omitted: {reason}; table: {table_path}"
+                f"gas channel {name} omitted: {reason}; table_path_diagnostic: {table_path}"
             ),
         }
         for name, reason in omitted_channels.items()
@@ -1809,15 +1809,13 @@ class _OpenImccBatteryBackend:
         self._pack = openimcc_bridge._load_pack(self._pack_name)
         self._gas: Any = None
         self._gas_error: str | None = None
-        self._identity: dict[str, str] = {
+        self._identity: dict[str, Any] = {
             "name": self.model_id,
             "model_id": self.model_id,
             "version": str(getattr(self._package, "__version__", "0+unknown")),
             "pack": self._pack_name,
             "pack_version": str(getattr(self._pack, "version", self._pack_name)),
             "pack_digest": str(openimcc_bridge._pack_digest(self._pack)),
-            "gas_table_source": "",
-            "gas_condensate_source": "",
         }
         self._load_gas()
 
@@ -1826,13 +1824,14 @@ class _OpenImccBatteryBackend:
             from openimcc import load_gas_datapack
 
             self._gas = load_gas_datapack()
-            self._identity["gas_table_source"] = str(self._gas.gas_path)
-            self._identity["gas_condensate_source"] = str(self._gas.oxide_path)
-            self._gas_error = None
         except Exception as exc:  # noqa: BLE001 - melt rail remains usable
             self._gas = None
             self._gas_error = f"{type(exc).__name__}: {exc}"
-            self._identity["gas_table_source"] = f"unavailable:{self._gas_error}"
+            return
+        self._identity["engine_binding_identity"] = (
+            self._bridge.engine_binding_identity(self._pack, self._gas)
+        )
+        self._gas_error = None
 
     def equilibrate(
         self,
@@ -1919,6 +1918,11 @@ class _OpenImccBatteryBackend:
         pressures: dict[str, float] = {}
         vapor_sources: dict[str, str] = {}
         gas_diagnostics: dict[str, Any] = {}
+        engine_binding_identity = self._identity.get("engine_binding_identity") or {}
+        gas_table_lineage = (
+            "openimcc-gas-table:sha256:"
+            f"{engine_binding_identity.get('gas_table_digest', '')}"
+        )
         if (
             po2_request is not None
             and po2_request.mode == PO2_OXYGEN_BALANCE_EFFUSION
@@ -2061,10 +2065,7 @@ class _OpenImccBatteryBackend:
                         f"{source['source_sha256']}"
                     )
                 else:
-                    vapor_sources[str(name)] = (
-                        f"openimcc:{self._gas.gas_path}:"
-                        f"{getattr(gas_result, 'provenance_class', {}).get(name, 'unknown')}"
-                    )
+                    vapor_sources[str(name)] = gas_table_lineage
             for name, flag in getattr(gas_result, "domain_flags", {}).items():
                 if flag:
                     notices.append(
@@ -2112,10 +2113,7 @@ class _OpenImccBatteryBackend:
                     if number is None or number <= 0.0:
                         continue
                     pressures[str(name)] = number * PA_PER_BAR
-                    vapor_sources[str(name)] = (
-                        f"openimcc:{self._gas.gas_path}:"
-                        f"{gas_result.provenance_class.get(name, 'unknown')}"
-                    )
+                    vapor_sources[str(name)] = gas_table_lineage
                 for name, flag in gas_result.domain_flags.items():
                     if flag:
                         notices.append(
@@ -2132,11 +2130,11 @@ class _OpenImccBatteryBackend:
             "package_version": result.openimcc_version,
             "pack": result.pack_version,
             "pack_digest": result.pack_digest,
-            "gas_table_source": self._identity.get("gas_table_source", ""),
-            "gas_condensate_source": self._identity.get(
-                "gas_condensate_source", ""
-            ),
         }
+        if "engine_binding_identity" in self._identity:
+            provenance["engine_binding_identity"] = self._identity[
+                "engine_binding_identity"
+            ]
         diagnostics = {
             "imcc_model_id": result.pack_model_id,
             "imcc_datapack_version": result.pack_version,

@@ -46,7 +46,16 @@ def _sio_wall_product_deposit_kg(liner_temperature_c: float) -> float:
     return float(wall.get("Si", 0.0)) + float(wall.get("SiO2", 0.0))
 
 
-def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
+def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux(monkeypatch):
+    # b-732: this wall-deposition pin explicitly exercises the unavailable
+    # MAGEMin path. Host auto-detection otherwise changes redox capacity via
+    # projected liquidus bounds (918.75--1370.3125 C with the lunar config)
+    # versus the Kress-floor fallback, shifting the wall product by 1.34e-5
+    # relative. Neither path calls the alphaMELTS vapour fallback (b-729).
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    monkeypatch.setattr(MAGEMinBackend, "initialize", lambda self, config: False)
+    _report_at_wall_T.cache_clear()
     # Post 2026-05-20 Antoine refit: builtin SiO P_sat dropped ~4700x to the
     # VapoRock-consistent value, so the 1050 C cold-liner deposit fell from
     # 1.05348872049e-2 kg to 2.24808480214e-06 kg.
@@ -225,16 +234,21 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
     # capped by available supply.  Re-grounding that executable chain moves
     # the 1050 C product deposit, without changing the 1400/1500 C threshold
     # zeros; this is a physics-derived pin, not a tuning adjustment.
-    # The new 1050 C value is 8.191905995448e-06 kg.
-    assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
-        8.191905995448e-06, rel=1e-9
-    )
-    assert _sio_wall_product_deposit_kg(1400.0) == pytest.approx(
-        0.0, rel=1e-9
-    )
-    assert _sio_wall_product_deposit_kg(1500.0) == pytest.approx(
-        0.0, rel=1e-9
-    )
+    # b-732: fixed unavailable-MAGEMin scenario. The default report with real
+    # MAGEMin yields 8.191905995448e-06 kg through its liquid-fraction/redox
+    # inputs; this wall-step pin now passes with either engine config.
+    try:
+        assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
+            8.191796266986e-06, rel=1e-9
+        )
+        assert _sio_wall_product_deposit_kg(1400.0) == pytest.approx(
+            0.0, rel=1e-9
+        )
+        assert _sio_wall_product_deposit_kg(1500.0) == pytest.approx(
+            0.0, rel=1e-9
+        )
+    finally:
+        _report_at_wall_T.cache_clear()
 
 
 def test_hot_wall_sio_reactive_deposit_uses_product_psat_floor():
