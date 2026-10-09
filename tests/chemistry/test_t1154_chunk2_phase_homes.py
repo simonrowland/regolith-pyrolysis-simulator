@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from types import SimpleNamespace
 
+import pandas as pd
 import pytest
 
 from engines.alphamelts.provider import AlphaMELTSProvider
@@ -42,9 +43,20 @@ from simulator.chemistry.kernel import (
     ProviderRegistry,
     ProviderUnavailableError,
 )
-from simulator.melt_backend.base import EquilibriumResult, LiquidFractionInvalidError
+from simulator.core import PyrolysisSimulator
+from simulator.melt_backend.base import (
+    EquilibriumResult,
+    InternalAnalyticalBackend,
+    LiquidFractionInvalidError,
+)
 from simulator.melt_backend.liquidus import LiquidusSampleError, LiquidusSolidusResult
 from simulator.state import CampaignPhase
+from tests.test_t1154_chunk0_payload_pin import (
+    _RECORDED_PTT_LOG_FO2,
+    _RECORDED_PTT_MASS_G,
+    _RECORDED_PTT_WT_PCT,
+    _ptt_composition_frame,
+)
 from tests.chemistry.test_evaporation_freeze_gate import _build_freeze_gate_sim
 from tests.chemistry.test_partial_melt_offgassing_diagnostic import (
     _install_eligible_vapour_batch,
@@ -1285,3 +1297,201 @@ def test_an_empty_liquid_probe_refuses_when_the_engine_is_down():
         "assemblage_held_from_previous_hour"
     )
     assert ledger.mol_by_account(_OLIVINE_0)["SiO2"] == pytest.approx(silica)
+
+
+# liquid1_prop activities from the recorded rhyolite-MELTS 1.0.2 capture.
+# The capture spells the suffix in lower case (activity_sio2). This
+# parser keeps an element-case label (activity_SiO2). MnSi0.5O2 is
+# omitted: its decimal is not an activity label. NaN columns are omitted.
+_RECORDED_LIQUID_ACTIVITIES = {
+    "activity_SiO2": 0.48534265272317045,
+    "activity_TiO2": 0.061177531903705645,
+    "activity_Al2O3": 0.007396065651075722,
+    "activity_Fe2O3": 0.0017747354020072172,
+    "activity_MgCr2O4": 0.001487120926204379,
+    "activity_Fe2SiO4": 0.12435516533829832,
+    "activity_Mg2SiO4": 0.04517350343176396,
+    "activity_CaSiO3": 0.11049725369968659,
+    "activity_Na2SiO3": 0.00015152081444028514,
+    "activity_KAlSiO4": 0.005350645597971357,
+    "activity_Ca3(PO4)2": 0.15826716724273618,
+    "activity_H2O": 0.000127419489524917,
+}
+_SILICATE_PTT_PHASES = (
+    "liquid1",
+    "olivine1",
+    "clinopyroxene1",
+    "plagioclase1",
+    "spinel1",
+)
+
+
+def _recorded_ptt_result(phases: tuple[str, ...]):
+    """Parse one recorded frame with the production PetThermoTools parser."""
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+
+    mass_g = sum(_RECORDED_PTT_MASS_G[phase] for phase in phases)
+    payload = {
+        "Conditions": pd.DataFrame([{
+            "temperature": 1150.0,
+            "pressure": 1.0,
+            "mass": mass_g,
+            "logfO2": _RECORDED_PTT_LOG_FO2,
+        }]),
+    }
+    for phase in phases:
+        payload[phase] = _ptt_composition_frame(_RECORDED_PTT_WT_PCT[phase])
+        row = {"mass": _RECORDED_PTT_MASS_G[phase]}
+        if phase == "liquid1":
+            row.update(_RECORDED_LIQUID_ACTIVITIES)
+        payload[f"{phase}_prop"] = pd.DataFrame([row])
+    backend = AlphaMELTSBackend()
+    return backend._parse_petthermotools_result(
+        (payload, {}),
+        temperature_C=1150.0,
+        pressure_bar=1.0,
+        fO2_log=_RECORDED_PTT_LOG_FO2,
+        comp_wt={"SiO2": 48.5},
+        total_input_kg=mass_g / 1000.0,
+    )
+
+
+def _silicate_oxide_kg() -> dict[str, float]:
+    """Kilograms of each oxide across the silicate rows, H2O excluded.
+
+    H2O is only on liquid1. Crystal rows have none, and water1 is not
+    part of this bulk. The batch is these kilograms, so the liquid can
+    fund every crystal debit.
+    """
+    totals: dict[str, float] = {}
+    for phase in _SILICATE_PTT_PHASES:
+        mass_kg = _RECORDED_PTT_MASS_G[phase] / 1000.0
+        for oxide, wt_pct in _RECORDED_PTT_WT_PCT[phase].items():
+            if oxide == "H2O":
+                continue
+            totals[oxide] = totals.get(oxide, 0.0) + mass_kg * float(wt_pct) / 100.0
+    return totals
+
+
+class _RecordedPayloadBackend:
+    """Python-API stand-in. equilibrate returns one parsed recorded frame."""
+
+    def __init__(self, result) -> None:
+        self._mode = "python_api"
+        self._result = result
+
+    def is_available(self) -> bool:
+        return True
+
+    def get_engine_version(self) -> str:
+        return "recorded-rhyolite-MELTS-1.0.2"
+
+    def find_liquidus_solidus(self, **_kwargs):
+        return LiquidusSolidusResult(
+            liquidus_T_C=1300.0,
+            solidus_T_C=1000.0,
+            liquid_fraction=1.0,
+            status="ok",
+        )
+
+    def equilibrate(self, **_kwargs):
+        return self._result
+
+
+def _homes_hour(backend):
+    """One sub-liquidus hour's phase-home commit, then its snapshot.
+
+    1150 C sits under the stub liquidus at 1300 C. The commit is
+    ``_commit_phase_homes``, the call ``step`` makes before redox.
+    """
+    oxide_kg = _silicate_oxide_kg()
+    total_kg = sum(oxide_kg.values())
+    composition = {
+        name: kilograms / total_kg * 100.0
+        for name, kilograms in oxide_kg.items()
+    }
+    analytical = InternalAnalyticalBackend()
+    analytical.initialize({})
+    sim = PyrolysisSimulator(
+        analytical,
+        {"campaigns": {}},
+        {"sample": {
+            "composition_wt_pct": composition,
+            "composition_basis": {
+                "FeO": {"method": "recorded MELTS split", "source": "t1154"},
+                "Fe2O3": {"method": "recorded MELTS split", "source": "t1154"},
+            },
+        }},
+        {"metals": {}, "oxide_vapors": {}},
+    )
+    sim.load_batch("sample", mass_kg=total_kg)
+    sim.melt.temperature_C = 1150.0
+    provider = AlphaMELTSProvider(backend=backend)
+    sim._chem_registry.register(
+        provider,
+        [ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION],
+    )
+    sim._commit_phase_homes()
+    return sim, provider
+
+
+def test_recorded_water_row_refuses_the_homes_hour():
+    """water1 is the non-silicate row. It refuses the commit.
+
+    The frame is the recorded payload, including water1. A reported
+    water phase is not booked as a crystal.
+    """
+    parsed = _recorded_ptt_result((*_SILICATE_PTT_PHASES, "water1"))
+    assert parsed.status == "ok"
+    assert "water1" in parsed.phase_masses_kg
+    assert parsed.activity_coefficients["SiO2"] == pytest.approx(
+        _RECORDED_LIQUID_ACTIVITIES["activity_SiO2"]
+    )
+    assert parsed.fO2_log == pytest.approx(_RECORDED_PTT_LOG_FO2)
+    sim, _provider = _homes_hour(_RecordedPayloadBackend(parsed))
+    diagnostic = sim._phase_home_diagnostic["backend_diagnostics"]
+    assert diagnostic["phase_home_refusal"]["reason"] == REASON_NON_SILICATE
+    assert "water1" in diagnostic["phase_home_refusal"]["detail"]
+    assert holds_positive_crystal_moles(sim.atom_ledger.mol_by_account()) is False
+    assert crystal_accounts_for_binding(
+        sim.atom_ledger.mol_by_account(),
+        MELTS_BINDING,
+    ) == ()
+    snapshot = sim._make_snapshot()
+    assert abs(snapshot.mass_balance_error_pct) < 5e-12
+
+
+def test_recorded_silicate_hour_commits_and_closes():
+    """Silicate rows of the same capture commit and the snapshot closes.
+
+    water1 is not in this frame. It is covered by the refusal test.
+    """
+    parsed = _recorded_ptt_result(_SILICATE_PTT_PHASES)
+    assert parsed.status == "ok"
+    assert set(parsed.phase_masses_kg) == set(_SILICATE_PTT_PHASES)
+    assert "water1" not in parsed.phase_masses_kg
+    assert parsed.activity_coefficients["SiO2"] == pytest.approx(
+        _RECORDED_LIQUID_ACTIVITIES["activity_SiO2"]
+    )
+    assert parsed.fO2_log == pytest.approx(_RECORDED_PTT_LOG_FO2)
+    sim, _provider = _homes_hour(_RecordedPayloadBackend(parsed))
+    diagnostic = sim._phase_home_diagnostic["backend_diagnostics"]
+    assert "phase_home_refusal" not in diagnostic
+    accounts = crystal_accounts_for_binding(
+        sim.atom_ledger.mol_by_account(),
+        MELTS_BINDING,
+    )
+    assert accounts == (
+        "process.crystal.melts.clinopyroxene1.0",
+        "process.crystal.melts.olivine1.0",
+        "process.crystal.melts.plagioclase1.0",
+        "process.crystal.melts.spinel1.0",
+    )
+    assert holds_positive_crystal_moles(sim.atom_ledger.mol_by_account()) is True
+    state = diagnostic["assemblage_thermodynamic_state"]
+    assert state["liquid_activities"]["SiO2"] == pytest.approx(
+        _RECORDED_LIQUID_ACTIVITIES["activity_SiO2"]
+    )
+    assert state["oxygen_root"] == pytest.approx(_RECORDED_PTT_LOG_FO2)
+    snapshot = sim._make_snapshot()
+    assert abs(snapshot.mass_balance_error_pct) < 5e-12
