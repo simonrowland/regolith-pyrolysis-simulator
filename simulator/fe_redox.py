@@ -1052,7 +1052,7 @@ def omitted_ferric_oxygen_kg(feot_kg: float, fe3_fraction: float) -> float:
     Algebra: n_Fe = m_FeOT / M_FeO
              delta_m = f * n_Fe * 0.5 * M_O
                      = f * m_FeOT * 0.5 * OXYGEN_IN_FEO
-    OXYGEN_IN_FEO is 15.999/71.844, so 0.5 * OXYGEN_IN_FEO is 0.111339 kg
+    OXYGEN_IN_FEO is 15.999/71.844, so 0.5 * OXYGEN_IN_FEO is 0.111345415 kg
     oxygen per kg FeOT at f = 1.
 
     The dispatch text's 8.0e-3 * f * FeOT wt% * batch_kg is 0.800 kg oxygen
@@ -1061,8 +1061,8 @@ def omitted_ferric_oxygen_kg(feot_kg: float, fe3_fraction: float) -> float:
     Units: m_FeOT and the result share a mass unit (kg on the ledger, wt%
     when the caller passes a wt% FeOT). f is dimensionless Fe3+/sum-Fe.
 
-    Sanity: f = 1 and m_FeOT = 100 kg. n_Fe = 100 / 0.071844 = 1391.90 mol.
-    delta_m = 1391.90 * 0.5 * 0.015999 = 11.134 kg.
+    Sanity: f = 1 and m_FeOT = 100 kg. delta_m = 100 * 0.111345415 =
+    11.1345415 kg.
     """
 
     fraction = float(fe3_fraction)
