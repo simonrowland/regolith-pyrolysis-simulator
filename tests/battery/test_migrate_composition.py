@@ -10,7 +10,7 @@ import yaml
 import pytest
 
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
-from simulator.battery.enums import AmountBasis
+from simulator.battery.enums import AmountBasis, NoticeKind
 from simulator.battery.migrate import (
     Migrator,
     REPO_ROOT,
@@ -365,6 +365,71 @@ def test_nonbulk_observation_identity_keeps_unknown_component_reason(
     assert observation.identity.composition is not None
     assert observation.identity.composition.is_unknown
     assert "XxO" in observation.identity.composition.reason
+
+
+def test_feot_conversion_notice_is_pinned_to_observation_locator(tmp_path: Path) -> None:
+    root = _write_min_tree(
+        tmp_path,
+        {
+            "schema_version": "literature_extract.v1",
+            "source_id": "fixture-source",
+            "source": {
+                "citation": "Fixture, A. (2026), Test Journal 1:1, DOI 10.1234/FIXTURE",
+                "doi": "10.1234/FIXTURE",
+            },
+            "extraction": {
+                "method": "unit_test",
+                "date": "2026-09-19",
+                "worker": "pytest",
+            },
+            "review_status": "draft",
+            "fidelity_samples": [],
+            "species": {
+                "SiO2": {
+                    "observations": [
+                        {
+                            "observation_id": "feot-notice",
+                            "type": "measurement",
+                            "locator": {"table": "3", "page": 9},
+                            "phase": "silicate_melt",
+                            "units": "%",
+                            "values": {
+                                "quantity": "mass_loss_fraction",
+                                "method_class": "measured_direct",
+                                "mass_loss_fraction": 0.2,
+                                "T_K": 1400,
+                                "composition_wt_pct": {
+                                    "SiO2": 50,
+                                    "MgO": 40,
+                                    "FeOT": 10,
+                                },
+                            },
+                        }
+                    ]
+                }
+            },
+        },
+    )
+    observation = migrate(root, write=False).observations[
+        "fixture-source::feot-notice"
+    ]
+
+    assert observation.identity.composition is not None
+    assert observation.identity.composition.is_value
+    assert "FeO" in dict(observation.identity.composition.value.components)
+    notice, = (
+        notice
+        for notice in observation.notices
+        if notice.kind is NoticeKind.TOTAL_IRON_REPORTED_AS_FEO
+    )
+    assert notice.reason == (
+        "FeOT (total iron) treated as FeO for conversion; printed key FeOT"
+    )
+    assert notice.affected_quantities == (observation.identity.quantity.value,)
+    assert notice.origin == observation.observation_id
+    assert observation.locator is not None
+    assert observation.locator.table == "3"
+    assert observation.locator.page == 9
 
 
 def test_flat_point_composition_ignores_temperature_and_loss_fields() -> None:
