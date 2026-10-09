@@ -793,27 +793,12 @@ class PT0DeterminismStore:
                     f"{key_hash}"
                 )
             self._verify_entry(artifact, key, key_bytes, key_hash, existing)
-            existing["repair_notices_json"] = monotonic_repair_notices_json(
+            effective_notices_json = monotonic_repair_notices_json(
                 existing.get("repair_notices_json"),
                 repair_notices_json,
             )
-            if self.persistent_store is not None:
-                self.persistent_store.put(
-                    artifact=artifact,
-                    key=key,
-                    key_bytes=key_bytes,
-                    key_hash=key_hash,
-                    payload=payload,
-                    payload_bytes=payload_bytes,
-                    payload_hash=payload_hash,
-                    repair_notices_json=repair_notices_json,
-                    engine_version_provenance=engine_version_provenance,
-                    physics_bucket_key=physics_bucket_key,
-                    physics_bucket_bytes=physics_bucket_bytes,
-                    physics_bucket_hash=physics_bucket_hash,
-                )
-            self.physics_bucket_entries.setdefault(physics_bucket_hash, key_hash)
-            return
+        else:
+            effective_notices_json = repair_notices_json
         if self.persistent_store is not None:
             self.persistent_store.put(
                 artifact=artifact,
@@ -829,6 +814,21 @@ class PT0DeterminismStore:
                 physics_bucket_bytes=physics_bucket_bytes,
                 physics_bucket_hash=physics_bucket_hash,
             )
+            persisted = self.persistent_store.get(
+                artifact=artifact,
+                key=key,
+                key_bytes=key_bytes,
+                key_hash=key_hash,
+            )
+            if persisted is None:
+                raise PT1PersistentStoreCorrupt(
+                    f"PT-1 capture disappeared after write: {key_hash}"
+                )
+            effective_notices_json = persisted["repair_notices_json"]
+        if existing is not None:
+            existing["repair_notices_json"] = effective_notices_json
+            self.physics_bucket_entries.setdefault(physics_bucket_hash, key_hash)
+            return
         self.entries[key_hash] = {
             "artifact": artifact,
             "key": copy.deepcopy(dict(key)),
@@ -836,7 +836,7 @@ class PT0DeterminismStore:
             "key_bytes": key_bytes.decode("utf-8"),
             "payload": copy.deepcopy(dict(payload)),
             "payload_hash": payload_hash,
-            "repair_notices_json": repair_notices_json,
+            "repair_notices_json": effective_notices_json,
             "physics_bucket_key": copy.deepcopy(dict(physics_bucket_key)),
             "physics_bucket_hash": physics_bucket_hash,
             "cache_state": "live_fill",
