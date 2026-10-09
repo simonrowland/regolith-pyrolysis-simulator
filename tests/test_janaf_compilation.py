@@ -196,6 +196,19 @@ def test_transition_following_enthalpy_bracket_is_named_refusal(
     assert row["log10_formation_equilibrium_constant"]["value"] is not None
 
 
+def test_cu020_1600k_enthalpy_is_refused_before_page_read_review() -> None:
+    table = load_table_document(TABLES_DIR / "Cu-020.yaml")["table"]
+    row = next(row for row in table["values"] if row["temperature"]["value"] == 1600)
+    enthalpy = row["formation_enthalpy"]
+
+    assert enthalpy["value"] is None
+    assert enthalpy["as_published"] == "123.836"
+    assert enthalpy["locator"]["parse_repair"] == "nist_tail_dfh_sign_undetermined"
+    assert enthalpy["locator"]["parse_repair_reason"] == (
+        "formation enthalpy neighbors span a transition marker"
+    )
+
+
 def test_refused_janaf_row_keeps_unsigned_source_line() -> None:
     table = load_table_document(TABLES_DIR / "O-038.yaml")["table"]
     raw_line = (
