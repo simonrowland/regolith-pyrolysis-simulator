@@ -22,7 +22,7 @@ evidence_policy:
   scope_note: In-scope magma-ocean/melt thermodynamics and atmospheric volatile-partition model; not an experimental vaporization study.
 model_tables:
 - table: '1'
-  locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lebrun-2013-magma-ocean-atmosphere/lebrun-2013-magma-ocean-atmosphere.pdf, published_page: 1159, table: '1'}
+  locator: {source_path: corpus/raw/lebrun-2013-magma-ocean-atmosphere/lebrun-2013-magma-ocean-atmosphere.pdf, published_page: 1159, table: '1'}
   classification: compilation_assessed
   values:
     method_class: compilation_assessed
@@ -46,7 +46,7 @@ model_tables:
     - {symbol: alpha_n, value: '26', meaning: Coefficient in melt fraction-dependent viscosity}
     - {symbol: t0, value: '4.55 Gyr', meaning: Age of the Earth}
 - table: '2'
-  locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lebrun-2013-magma-ocean-atmosphere/lebrun-2013-magma-ocean-atmosphere.pdf, published_page: 1160, table: '2'}
+  locator: {source_path: corpus/raw/lebrun-2013-magma-ocean-atmosphere/lebrun-2013-magma-ocean-atmosphere.pdf, published_page: 1160, table: '2'}
   classification: compilation_assessed
   values:
     method_class: compilation_assessed
@@ -63,7 +63,7 @@ model_tables:
     - {isotope_or_element: K, half_time: null, heat_production_per_unit_mass: null, natural_abundance: null, current_concentration: '270 ppm [Javoy, 1999]'}
     - {isotope_or_element: 26Al, half_time: '7.17 x 10^5 year', heat_production_per_unit_mass: '3.54 x 10^-1 W/kg', natural_abundance: '0.005%', current_concentration: '8650 ppm [Lodders and Fegley, 1998]'}
 - table: '3'
-  locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lebrun-2013-magma-ocean-atmosphere/lebrun-2013-magma-ocean-atmosphere.pdf, published_page: 1160, table: '3'}
+  locator: {source_path: corpus/raw/lebrun-2013-magma-ocean-atmosphere/lebrun-2013-magma-ocean-atmosphere.pdf, published_page: 1160, table: '3'}
   classification: compilation_assessed
   values:
     method_class: compilation_assessed
@@ -76,7 +76,7 @@ model_tables:
     - {symbol: k_H2O_lherzolite, value: '1.1 x 10^-2'}
     - {symbol: k_CO2_lherzolite, value: '2.1 x 10^-3'}
 - table: '4'
-  locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lebrun-2013-magma-ocean-atmosphere/lebrun-2013-magma-ocean-atmosphere.pdf, published_page: 1162, table: '4'}
+  locator: {source_path: corpus/raw/lebrun-2013-magma-ocean-atmosphere/lebrun-2013-magma-ocean-atmosphere.pdf, published_page: 1162, table: '4'}
   classification: model_derived
   values:
     method_class: model_derived
@@ -109,7 +109,7 @@ model_tables:
     - {figures: '17', X0_H2O: '4.3', X0_CO2: '1.4', distance_from_sun_au: '1.55-0.63', g_m_s2: '3.5-10.5', planetary_radius_km: '3000-7000', initial_depth_km: '2885'}
     - {figures: '18', X0_H2O: '4.3', X0_CO2: '1.4', distance_from_sun_au: '0-1.8', g_m_s2: '3.7; 9.8; 8.8', planetary_radius_km: '3390; 6378; 6052', initial_depth_km: '1800; 2885; 3000'}
 - table: printed_text_parameters
-  locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lebrun-2013-magma-ocean-atmosphere/lebrun-2013-magma-ocean-atmosphere.pdf, published_page: 1156, section: '2.1 Initial State'}
+  locator: {source_path: corpus/raw/lebrun-2013-magma-ocean-atmosphere/lebrun-2013-magma-ocean-atmosphere.pdf, published_page: 1156, section: '2.1 Initial State'}
   classification: model_derived
   values:
     method_class: model_derived
@@ -142,7 +142,7 @@ model_tables:
     - {parameter: 98_percent_solid_stage_surface_liquid_thickness, value: 'about 35 km'}
     - {parameter: long_period_radiogenic_heating_magma_ocean_duration_range, value: '1 to 8 Myr'}
 - table: figure_only_trends
-  locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lebrun-2013-magma-ocean-atmosphere/lebrun-2013-magma-ocean-atmosphere.pdf, published_page: 1162, section: '3 Results'}
+  locator: {source_path: corpus/raw/lebrun-2013-magma-ocean-atmosphere/lebrun-2013-magma-ocean-atmosphere.pdf, published_page: 1162, section: '3 Results'}
   classification: figure_only
   values:
     method_class: figure_only

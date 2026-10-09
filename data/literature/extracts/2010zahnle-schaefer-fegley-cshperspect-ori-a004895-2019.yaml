@@ -17,7 +17,7 @@ fidelity_samples:
     quantity: volatile_bulk_composition
     method_class: quoted_attributed
     evidence_class: quoted_attributed
-    source_attribution: Schaefer and Fegley (2007)
+    attribution: Schaefer and Fegley (2007)
     components:
     - component: C
       value_as_printed: about 0.1%
@@ -45,7 +45,7 @@ species:
         quantity: volatile_bulk_composition
         method_class: quoted_attributed
         evidence_class: quoted_attributed
-        source_attribution: Schaefer and Fegley (2007)
+        attribution: Schaefer and Fegley (2007)
         components:
         - component: C
           value_as_printed: about 0.1%
@@ -69,7 +69,7 @@ species:
         quantity: volatile_bulk_composition
         method_class: quoted_attributed
         evidence_class: quoted_attributed
-        source_attribution: Hashimoto et al. (2007)
+        attribution: Hashimoto et al. (2007)
         components:
         - component: reduced carbon
           value_as_printed: 3.5%
@@ -91,9 +91,7 @@ species:
         quantity: impact_velocity_for_water_degas
         method_class: quoted_attributed
         evidence_class: quoted_attributed
-        source_attribution:
-        - Lange et al. (1985)
-        - Tyburczy et al. (1986)
+        attribution: 'Lange et al. (1985); Tyburczy et al. (1986)'
         threshold_as_printed: exceeds 5 km/s
       uncertainty:
         note: Threshold is a bound, not a point estimate.

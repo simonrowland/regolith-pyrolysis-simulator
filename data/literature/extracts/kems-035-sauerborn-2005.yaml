@@ -374,6 +374,21 @@ experiments:
       state: {tag: unknown, reason: not_published}
       locator: {page: 68, table: '5.1', note: 'Reference runs have distinct Tmax'}
 
+- experiment_id: jsc1-melts-model
+  method:
+    tag: unknown
+    reason: >-
+      MELTS liquidus / full-melt calculations are not solar-furnace
+      measurements (b-717; REVIEW-b714-r2). Bench-free apparatus-free
+      registry scope.
+  locator:
+    page: 17
+    paragraph: MELTS simulation liquidus
+    note: >-
+      Model-only registry for MELTS outputs; physical DLR solar vacuum
+      bench stays on jsc1-solar-series / MS run experiments.
+
+
 species:
   SiO2:
     observations:
@@ -3586,7 +3601,7 @@ species:
         T_K = T_C + 273.15 and pressure_Pa = pressure_mbar * 100. T_range_K endpoints refer to the quoted run-temperature
         cells, not independent measurements.
     - observation_id: sauerborn_2005_melts_liquidus_model_deep2
-      experiment: jsc1-solar-series
+      experiment: jsc1-melts-model
       type: rate_series
       locator:
         page: 17
@@ -3632,7 +3647,7 @@ species:
           \                           17"
         method: pdftotext -layout; whitespace retained; superscripts follow PDF text order
     - observation_id: sauerborn_2005_melts_full_melt_model_1261_deep2
-      experiment: jsc1-solar-series
+      experiment: jsc1-melts-model
       type: rate_series
       locator:
         page: 107

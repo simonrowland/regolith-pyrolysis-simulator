@@ -259,6 +259,11 @@ source_metadata:
       pdf_page_index: 59
     diameter_mm: 0.34
     quote: KMS data with Pt-cell orifice diameter of 0.34 mm.
+    note: >-
+      Own-evidence orifice for K2 slag KMS runs (also on
+      hastie_1981_k2_slag_orifice_0p34mm → hastie-1981-pt-kms). Removed from
+      remaining_figures_ledger values.figures['20'] so it does not promote
+      onto the shared default experiment (b-717).
   figure15_reference:
     class_tag: metadata
     locator:
@@ -798,7 +803,7 @@ species:
           '17': {role: H2O_dissociation_Kp, status: figure_only, note: gas-equilibrium check vs JANAF}
           '18': {role: K_and_O2_vs_H2O_at_1655K_K2_slag, status: figure_only}
           '19': {role: K_vs_H2O_isothermal_1610K, status: figure_only}
-          '20': {role: KOH_vs_H2O_at_1794K, status: figure_only, orifice_mm: 0.34}
+          '20': {role: KOH_vs_H2O_at_1794K, status: figure_only}
           '21': {role: SOLGASMIX_alkali_speciation_vs_T, status: model_proxy, table3_covers: true}
         semantics: bound_not_point_ordering
       uncertainty:

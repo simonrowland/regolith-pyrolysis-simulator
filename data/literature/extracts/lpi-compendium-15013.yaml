@@ -7,7 +7,7 @@ extraction:
   method: 'pdftotext -layout transcription checked against rendered PDF pages; plotted curves and image-only particle dimensions not digitized'
   date: '2026-09-20'
   worker: i2-lpi-compendium-15013
-  source_pdf: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
+  source_pdf: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
   source_pdf_pages: 6
   provenance_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
   scope: 'secondary lunar sample compendium entry; sample provenance and characterization are retained as measurements, cited analyses as attributed/compiled values'
@@ -18,23 +18,23 @@ fidelity_samples:
   locator: {pdf_page_index: 1, section: Introduction, figure: '1'}
 source_locators:
   page_1: &page_1
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
+    source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
     pdf_page_index: 1
   page_2: &page_2
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
+    source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
     pdf_page_index: 2
   page_3: &page_3
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
+    source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
     pdf_page_index: 3
   table_1: &table_1
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
+    source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
     pdf_page_index: 4
     table: '1'
   page_5: &page_5
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
+    source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
     pdf_page_index: 5
   page_6: &page_6
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
+    source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
     pdf_page_index: 6
 coverage:
   evidence_classes:
@@ -56,7 +56,7 @@ sample_characterization:
     observations: &sample_15013_observations
     - observation_id: lpi_15013_sample_mass_and_collection
       type: sample_characterization
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 1, section: Introduction, figure: '1'}
+      locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 1, section: Introduction, figure: '1'}
       units: as_published
       values:
         method_class: measured_tabulated
@@ -70,10 +70,11 @@ sample_characterization:
       quote: 'Soil (vacuum container) 296.2 grams; the introduction states that the sample was collected from the surface under the Lunar Module and that the SESC had not sealed.'
     - observation_id: lpi_15013_maturity_and_grain_size
       type: sample_characterization
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 1, section: Petrography}
+      locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 1, section: Petrography}
       units: as_published
       values:
         method_class: quoted_attributed
+        attribution: 'Morris 1978 (for Is/FeO = 77)'
         evidence_class: quoted_attributed
         sample_id: '15013'
         maturity_index_Is_FeO: 77
@@ -83,10 +84,11 @@ sample_characterization:
       disagreement: 'Narrative and Figure 5 caption differ: 52 versus 53 microns. Both are retained; neither is reconciled.'
     - observation_id: lpi_15013_carbon_and_nitrogen
       type: sample_characterization
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 1, section: Chemistry, figure: '2'}
+      locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 1, section: Chemistry, figure: '2'}
       units: as_published
       values:
         method_class: quoted_attributed
+        attribution: 'Moore et al. 1973; Des Marais et al. 1973; Kothari and Goel 1972; Muller 1973'
         evidence_class: quoted_attributed
         sample_id: '15013'
         carbon_ppm:
@@ -100,35 +102,35 @@ sample_characterization:
     observations: &sample_15013_figure_observations
     - observation_id: lpi_15013_grain_size_distribution_figure_only
       type: sample_characterization
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 2, figure: '5'}
+      locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 2, figure: '5'}
       units: as_published
       values:
         method_class: figure_only
         evidence_class: figure_only
         quantity: grain_size_distribution
         sample_id: '15013'
-        source_attribution: 'Graf 1993'
+        attribution: 'Graf 1993'
         plotted_values: not_digitized
     - observation_id: lpi_15013_maturity_carbon_figure_only
       type: sample_characterization
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 1, figure: '2'}
+      locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 1, figure: '2'}
       units: as_published
       values:
         method_class: figure_only
         evidence_class: figure_only
         quantity: maturity_index_vs_carbon_content
         plotted_values: not_digitized
-        source_attribution: 'Moore et al. 1973; Morris 1978'
+        attribution: 'Moore et al. 1973; Morris 1978'
     - observation_id: lpi_15013_ree_normalized_pattern_figure_only
       type: composition_pattern
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 2, figure: '4'}
+      locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 2, figure: '4'}
       units: normalized_to_chondrite_as_plotted
       values:
         method_class: figure_only
         evidence_class: figure_only
         quantity: rare_earth_element_pattern
         sample_id: '15013'
-        source_attribution: 'Korotev 1987'
+        attribution: 'Korotev 1987'
         plotted_values: not_digitized
 chemical_composition:
   sample_15013_and_reference_materials:
@@ -197,25 +199,25 @@ chemical_composition:
     observations: &sample_15013_volatile_observations
     - observation_id: lpi_15013_lm_exhaust_release_context
       type: volatile_release_context
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 3, figure: '6'}
+      locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 3, figure: '6'}
       units: as_published
       values:
         method_class: quoted_attributed
         evidence_class: quoted_attributed
         quantity: low_temperature_vacuum_release_of_lm_exhaust_breakdown_products
         species_reported: [NO2, H2O, CO2]
-        source_attribution: 'Simoneit et al. 1973'
+        attribution: 'Simoneit et al. 1973'
         note: 'The page text says these products could be released at relatively low temperatures in a vacuum; it gives no numeric release temperature in prose.'
     - observation_id: lpi_15013_volatile_release_curve_figure_only
       type: volatile_release_context
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 3, figure: '7'}
+      locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 3, figure: '7'}
       units: as_plotted
       values:
         method_class: figure_only
         evidence_class: figure_only
         quantity: volatile_release_curve
         comparison_sample: '15020'
-        source_attribution: 'Gibson and Moore 1972'
+        attribution: 'Gibson and Moore 1972'
         plotted_values: not_digitized
 species:
   sample_15013: {observations: *sample_15013_observations}
