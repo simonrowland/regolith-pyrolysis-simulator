@@ -4992,6 +4992,28 @@ def test_guo_structured_standard_state_lifts_periclase_reference(tmp_path: Path)
         assert reference_state.value.endmember.polymorph.value is Polymorph.PERICLASE
 
 
+def test_ohta_feto_standard_state_lifts_liquid_reference(tmp_path: Path) -> None:
+    result = _migrate_real_extract(
+        tmp_path,
+        "ohta-1996-cao-mgo-al2o3-activities.yaml",
+        use_repository_index_row=True,
+    )
+    observation = next(
+        obs
+        for obs in result.observations.values()
+        if "ohta_1996_feto_activity_coefficient_spinel_line" in obs.observation_id
+    )
+    reference_state = observation.identity.reference_state
+    assert reference_state is not None and reference_state.is_value
+    assert (
+        reference_state.value.convention
+        is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+    )
+    assert reference_state.value.component_basis == "Fe_tO"
+    assert reference_state.value.endmember.formula == "Fe_tO"
+    assert reference_state.value.endmember.phase.value is Phase.L
+
+
 def test_stolyarova_table3_137_row_ids_and_reference_states_unchanged(
     tmp_path: Path,
 ) -> None:
