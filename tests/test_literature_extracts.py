@@ -28,6 +28,14 @@ TOOLS = REPO_ROOT / "tools"
 EXTRACTS = REPO_ROOT / "data" / "literature" / "extracts"
 FIDELITY_POLICY = EXTRACTS / "_fidelity_pre_policy_allowlist.yaml"
 FIDELITY_GRADUATION_LEDGER = EXTRACTS / "_fidelity_graduation_ledger.yaml"
+RETIRED_DUPLICATE_SOURCE_IDS = {
+    "fedkin-grossman-ghiorso-2006",
+    "sossi-et-al-2019",
+    "pound-1972-cr-langmuir-knudsen",
+    "pound-1972-mccabe-cr",
+    "ref-016-sio-kems-1700-2000k",
+    "safarian-engh-2013-si-pure-langmuir",
+}
 
 if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
@@ -2060,7 +2068,8 @@ def test_pilot_extract_count_exact_and_merge_smoke():
     closed = set(policy["closed_set_source_ids"])
     present = _corpus_stems_including_aliases()
     assert len(closed) == 68  # frozen pilot census
-    assert closed <= present  # pilot files still present (or recorded as aliases)
+    assert closed - RETIRED_DUPLICATE_SOURCE_IDS <= present
+    assert RETIRED_DUPLICATE_SOURCE_IDS.isdisjoint({path.stem for path in files})
     assert len(files) >= 68  # live corpus may include t-509 OCR extracts
     extracts = em.load_extracts(require_valid=True)
     assert len(extracts) == len(files)
@@ -2420,7 +2429,8 @@ def test_fidelity_allowlist_covers_pilot_census():
     stems = {p.stem for p in vle.discover_extracts()}
     present = _corpus_stems_including_aliases()
     # Frozen pilot set still present in the live corpus (file stem or extract alias).
-    assert closed <= present, f"missing pilot extracts: {sorted(closed - present)}"
+    assert closed - RETIRED_DUPLICATE_SOURCE_IDS <= present
+    assert RETIRED_DUPLICATE_SOURCE_IDS.isdisjoint(stems)
     assert active <= closed
     # New (post-policy) stems are allowed and must not be on the active allowlist.
     new_stems = stems - closed
@@ -2977,20 +2987,16 @@ def test_fidelity_sample_mutation_reds():
                 f"sample[{i}] still shares identity with body — re-dump without aliases"
             )
 
-    # Mutate the Fe alpha pin in the extract body (samples left untouched).
-    fe_obs = doc["species"]["Fe"]["observations"]
+    # Mutate the surviving SiO interval pin in the extract body (sample stays fixed).
+    sio_obs = doc["species"]["SiO"]["observations"]
     target = None
-    for obs in fe_obs:
-        if obs.get("observation_id") == "costa_jacobson_2015_fe_olivine_kems":
+    for obs in sio_obs:
+        if obs.get("observation_id") == "costa_jacobson_2015_sio_olivine_kems":
             target = obs
             break
-    assert target is not None, "expected costa Fe KEMS observation"
+    assert target is not None, "expected unique Costa SiO KEMS interval"
     original = copy.deepcopy(target["values"])
-    # Flip a numeric field the sample pins (whole values dict on the pilot sample).
-    if isinstance(target["values"], dict) and "alpha" in target["values"]:
-        target["values"]["alpha"] = float(target["values"]["alpha"]) + 0.5
-    else:
-        target["values"] = {"__mutated__": True}
+    target["values"]["alpha_range"][0] = 0.5
 
     errs = vle.check_all_fidelity_samples_match(doc, label="costa-mutated")
     assert errs, (
