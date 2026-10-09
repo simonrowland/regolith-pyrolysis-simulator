@@ -55,12 +55,12 @@ _VAPOR_PA = {'Na': 2.0, 'K': 0.5}
 _FLUX_STUB_KG_HR = {'Na': 8.0, 'K': 3.0}
 
 
-def _batch_enrichment(partition_coefficient: float, melt_fraction: float) -> float:
-    """C_liquid / C_bulk from C_bulk = F*C_liquid + (1-F)*D*C_liquid."""
-    return 1.0 / (
-        partition_coefficient
-        + melt_fraction * (1.0 - partition_coefficient)
-    )
+# Diagnostic enrichment at the pinned melt fraction 0.2.
+# C_liquid / C_bulk = 1 / (D + F*(1-D)).
+# Na D=0.10: 0.10 + 0.2*0.90 = 0.28.
+# K  D=0.05: 0.05 + 0.2*0.95 = 0.24.
+# Design §3.5's 3.64× is the homes/scalar-F rate ratio at F=0.5, not this pin.
+_ENRICHMENT_AT_PINNED_F = {"Na": 1.0 / 0.28, "K": 1.0 / 0.24}
 
 
 def _install_curve(sim) -> None:
@@ -252,10 +252,7 @@ def test_nak_diagnostic_keeps_the_batch_enrichment_while_flux_follows_the_gate(
         assert partition['partition_coefficient'] == pytest.approx(
             0.10 if species == 'Na' else 0.05
         )
-        enrichment = _batch_enrichment(
-            float(partition['partition_coefficient']),
-            _MELT_FRACTION_F,
-        )
+        enrichment = _ENRICHMENT_AT_PINNED_F[species]
         detail = diagnostic['component_details'][component]
         assert detail['liquid_composition_source'] == (
             'analytical_batch_partition_fallback'

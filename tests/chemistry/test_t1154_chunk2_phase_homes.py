@@ -1,8 +1,8 @@
 """Chunk 2: phase-home cohorts and the scalar-F switch.
 
 The 50 kg hour is a worked example, not a runner golden. Expected
-masses come from the signed contract written in this file, and oxide
-moles come from kilograms divided by ``parse_formula``.
+masses are the literals in each test. Oxide moles come from kilograms
+divided by ``parse_formula``.
 """
 
 from __future__ import annotations
@@ -62,13 +62,6 @@ from tests.chemistry.test_t1154_chunk1_freeze_gate_pin import (
 _OLIVINE_0 = "process.crystal.melts.olivine.0"
 _OLIVINE_1 = "process.crystal.melts.olivine.1"
 _LIQUID = "process.cleaned_melt"
-
-
-def _signed(m_locked_kg: float, m_growth_kg: float, m_eq_kg: float) -> tuple[float, float]:
-    """Independent contract: dissolution and growth are never both positive."""
-    dissolve = max(0.0, m_locked_kg - m_eq_kg)
-    m_new = max(0.0, min(m_growth_kg, m_eq_kg - m_locked_kg))
-    return dissolve, m_new
 
 
 def _kg_per_mol(species: str) -> float:
@@ -261,6 +254,9 @@ def _dispatch(kernel: ChemistryKernel, temperature_C: float):
 
 
 def test_signed_masses_match_the_contract_and_are_never_both_positive():
+    # Rows are (locked kg, growth kg, equilibrium kg, dissolve kg, new kg).
+    # A shortfall against the lock dissolves. A surplus grows, and only
+    # up to the growth offer. The two moves cannot both be positive.
     cases = (
         (50.0, 15.0, 60.0, 0.0, 10.0),
         (50.0, 0.0, 40.0, 10.0, 0.0),
@@ -268,15 +264,15 @@ def test_signed_masses_match_the_contract_and_are_never_both_positive():
         (50.0, 0.0, 50.0, 0.0, 0.0),
     )
     for m_locked, m_growth, m_eq, dissolve, m_new in cases:
-        spec = _signed(m_locked, m_growth, m_eq)
-        assert spec == pytest.approx((dissolve, m_new))
-        assert signed_locked_masses(m_locked, m_growth, m_eq) == pytest.approx(spec)
-        assert not (spec[0] > 0.0 and spec[1] > 0.0)
+        got = signed_locked_masses(m_locked, m_growth, m_eq)
+        assert got == pytest.approx((dissolve, m_new))
+        assert not (got[0] > 0.0 and got[1] > 0.0)
 
 
 def test_partial_growth_opens_one_new_cohort_at_the_accessible_composition():
-    m_locked, m_growth, m_eq = 50.0, 15.0, 60.0
-    dissolve, m_new = _signed(m_locked, m_growth, m_eq)
+    # Locked 50 kg, the engine offers 15 kg, equilibrium is 60 kg.
+    # Nothing dissolves. The new shell is min(15, 60-50) = 10 kg,
+    # which is 10/15 of the offer: 5 kg of each oxide from 7.5 kg.
     sio2 = _moles(7.5, "SiO2")
     mgo = _moles(7.5, "MgO")
     feo = _moles(60.0, "FeO")
@@ -291,22 +287,21 @@ def test_partial_growth_opens_one_new_cohort_at_the_accessible_composition():
     update = locked_cohort_update(
         binding=MELTS_BINDING,
         liquid_oxide_mol=before[_LIQUID],
-        accessible_phases=(_phase("olivine", m_growth, {"SiO2": sio2, "MgO": mgo}),),
-        probe_phases=(_phase("olivine", m_eq, {"FeO": feo}),),
+        accessible_phases=(_phase("olivine", 15.0, {"SiO2": sio2, "MgO": mgo}),),
+        probe_phases=(_phase("olivine", 60.0, {"FeO": feo}),),
         locked=cohorts,
     )
 
     assert update.refusal_reason is None
     assert update.proposal is not None
     note = {row["phase"]: row for row in update.phases}
-    assert note["olivine"]["dissolve_kg"] == pytest.approx(dissolve)
-    assert note["olivine"]["m_new_kg"] == pytest.approx(m_new)
+    assert note["olivine"]["dissolve_kg"] == pytest.approx(0.0)
+    assert note["olivine"]["m_new_kg"] == pytest.approx(10.0)
     assert _OLIVINE_0 not in update.proposal.debits
     assert _OLIVINE_0 not in update.proposal.credits
-    fraction = m_new / m_growth
     credit = update.proposal.credits[_OLIVINE_1]
-    assert credit["SiO2"] == pytest.approx(sio2 * fraction)
-    assert credit["MgO"] == pytest.approx(mgo * fraction)
+    assert credit["SiO2"] == pytest.approx(_moles(5.0, "SiO2"))
+    assert credit["MgO"] == pytest.approx(_moles(5.0, "MgO"))
     assert "FeO" not in credit
     assert _elements(_apply_proposal(before, update.proposal)) == pytest.approx(
         _elements(before)
@@ -334,11 +329,12 @@ def test_partial_dissolution_empties_the_youngest_cohort_first():
         locked=cohorts,
     )
 
-    dissolve, m_new = _signed(50.0, 0.0, 40.0)
+    # Locked 40 kg SiO2 plus 10 kg MgO. Equilibrium is 40 kg and no
+    # growth is offered, so 10 kg dissolves and the youngest shell empties.
     assert update.proposal is not None
     note = {row["phase"]: row for row in update.phases}
-    assert note["olivine"]["dissolve_kg"] == pytest.approx(dissolve)
-    assert note["olivine"]["m_new_kg"] == pytest.approx(m_new)
+    assert note["olivine"]["dissolve_kg"] == pytest.approx(10.0)
+    assert note["olivine"]["m_new_kg"] == pytest.approx(0.0)
     assert set(update.proposal.debits) == {_OLIVINE_1}
     assert update.proposal.debits[_OLIVINE_1]["MgO"] == pytest.approx(
         _moles(10.0, "MgO")
@@ -529,7 +525,9 @@ def test_fifty_kilogram_remelt_uses_one_probe_and_the_hold_case_does_not():
         row["phase"]: row
         for row in result.diagnostic["backend_diagnostics"]["phase_home"]["phases"]
     }
-    assert phases["olivine"]["dissolve_kg"] == pytest.approx(_signed(50.0, 0.0, 0.0)[0])
+    # The 50 kg MgO shell is locked, the accessible offer is empty, and
+    # the probe equilibrium is 0 kg, so the whole shell dissolves.
+    assert phases["olivine"]["dissolve_kg"] == pytest.approx(50.0)
     assert phases["olivine"]["m_new_kg"] == pytest.approx(0.0)
     assert result.transition is not None
     kernel.commit_batch(
