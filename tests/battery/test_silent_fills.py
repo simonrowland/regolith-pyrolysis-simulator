@@ -575,7 +575,7 @@ def test_unknown_vapour_composition_is_not_a_pure_pot(monkeypatch) -> None:
     assert prediction.refusal_detail["also_unfilled"]["total_pressure_Pa"] == "missing"
 
 
-def test_formation_row_without_a_pure_reservoir_is_not_a_pure_pot(monkeypatch) -> None:
+def test_unallowlisted_formation_quantity_refuses_before_engine(monkeypatch) -> None:
     opened = _no_engine(monkeypatch)
     ident = replace(
         F.psat_identity("Na"),
@@ -586,7 +586,11 @@ def test_formation_row_without_a_pure_reservoir_is_not_a_pure_pot(monkeypatch) -
     obs = F.observation("na-gf", "exp", ident, Decimal("-100"))
     prediction = predict_with_engine(Engine.VAPOROCK, obs, isolated=False)
     assert opened == []
-    assert prediction.refusal_detail["reason"] == "engine-thermo-does-not-emit"
+    assert prediction.value is None
+    assert prediction.refusal_detail == {
+        "reason": "quantity_not_predicted",
+        "quantity": Quantity.DELTA_FG.value,
+    }
 
 
 def test_stated_pure_reservoir_is_the_pot_and_oxygen_is_omitted(monkeypatch) -> None:

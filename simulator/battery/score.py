@@ -151,6 +151,12 @@ MELTS_ENGINES: frozenset[Engine] = frozenset(
 SINGLE_LIQUID_ENGINES: frozenset[Engine] = frozenset(
     {Engine.VAPOROCK, *IMCC_ENGINES, Engine.INTERNAL_ANALYTICAL}
 )
+# Generic engine cells report melt activities and vapour pressures. Thermo
+# quantities come from the engine-specific compilation tier.
+_ENGINE_CELL_PREDICTED_QUANTITIES = frozenset(
+    _VAPOUR_EQUILIBRIUM
+    | {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+)
 TWO_PHASE_BULK_COMPOSITION_STATUS = "two_phase_bulk_composition_not_liquid_composition"
 TWO_PHASE_BULK_COMPOSITION_PHASE_MARKER = "bulk_composition_in_two_phase_region"
 # Engines that consume the SF04 magma companion workbook. Never score them
@@ -406,6 +412,10 @@ class EnginePrediction:
     refusal_detail: Mapping[str, object] = field(default_factory=dict)
     identity: Identity | None = None
     version: str | None = None
+
+
+def _quantity_not_predicted_detail(quantity: Quantity) -> dict[str, str]:
+    return {"reason": "quantity_not_predicted", "quantity": quantity.value}
 
 
 @dataclass(frozen=True)
@@ -3450,52 +3460,20 @@ def predict_with_engine(
             refusal_reason=RefusalReason.IDENTITY_UNKNOWN,
             refusal_detail={"reason": "quantity_unknown"},
         )
-    if quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION:
-        if (
-            observation.source_id == "kems-012-sossi-2019"
-            and identity.species.formula not in {"Mn", "Ti"}
-        ):
+    if quantity not in _ENGINE_CELL_PREDICTED_QUANTITIES:
+        from simulator.battery.compilation_tier import _engine_thermo_quantities
+
+        if quantity not in _engine_thermo_quantities(engine):
             return EnginePrediction(
                 engine=engine,
                 channel=channel,
                 execution=Execution(state=ExecutionState.UNSUPPORTED),
                 coefficient_sources=sources,
                 lineage_complete=False,
-                refusal_reason=RefusalReason.OUTSIDE_SUPPORTED_SPECIES,
-                refusal_detail={
-                    "reason": "channel_missing",
-                    "element": identity.species.formula,
-                    "quantity": quantity.value,
-                },
+                refusal_reason=RefusalReason.UNSUPPORTED,
+                refusal_detail=_quantity_not_predicted_detail(quantity),
                 identity=identity,
             )
-        if engine in OXYGEN_BALANCE_EFFUSION_ENGINES:
-            return EnginePrediction(
-                engine=engine,
-                channel=channel,
-                execution=Execution(state=ExecutionState.NOT_PROBED),
-                coefficient_sources=sources,
-                lineage_complete=False,
-                refusal_reason=RefusalReason.IDENTITY_INCOMPLETE,
-                refusal_detail={
-                    "reason": "melt_surface_area_evolution_missing",
-                    "quantity": quantity.value,
-                },
-                identity=identity,
-            )
-        return EnginePrediction(
-            engine=engine,
-            channel=channel,
-            execution=Execution(state=ExecutionState.UNSUPPORTED),
-            coefficient_sources=sources,
-            lineage_complete=False,
-            refusal_reason=RefusalReason.UNSUPPORTED,
-            refusal_detail={
-                "reason": "quantity_not_predicted",
-                "quantity": quantity.value,
-            },
-            identity=identity,
-        )
     formula = identity.species.formula
     if parse_species_formula(formula) is None:
         return EnginePrediction(
@@ -3519,21 +3497,6 @@ def predict_with_engine(
             refusal_detail={
                 "reason": "imcc_built_on_sf04_workbook",
                 "source_id": observation.source_id,
-            },
-            identity=identity,
-        )
-
-    if quantity in EQUILIBRIUM_FIT_QUANTITIES:
-        return EnginePrediction(
-            engine=engine,
-            channel=channel,
-            execution=Execution(state=ExecutionState.UNSUPPORTED),
-            coefficient_sources=sources,
-            lineage_complete=False,
-            refusal_reason=RefusalReason.UNSUPPORTED,
-            refusal_detail={
-                "reason": "unsupported_observable:logKstar_not_activity_coefficient",
-                "quantity": quantity.value,
             },
             identity=identity,
         )
@@ -4078,7 +4041,6 @@ def predict_with_engine(
     activities = dict(getattr(cell, "melt_activities", None) or {})
     pressures = dict(getattr(cell, "gas_partial_pressures_Pa", None) or {})
     reported: Mapping[str, float]
-    unit = QUANTITY_UNITS[quantity]
     coefficient_basis: str | None = None
     if quantity in MELT_ACTIVITY_QUANTITIES:
         coefficients = dict(getattr(cell, "melt_activity_coefficients", None) or {})
@@ -4172,7 +4134,23 @@ def predict_with_engine(
         reported = pressures
         unit = "Pa"
     else:
-        reported = {**activities, **pressures}
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(
+                state=ExecutionState.PRODUCED, call_evidence=call_evidence
+            ),
+            authority=Authority.REFUSED,
+            notices=notices,
+            coefficient_sources=sources,
+            lineage_complete=False,
+            certified_band=certified_band,
+            refusal_reason=RefusalReason.UNSUPPORTED,
+            refusal_detail=_quantity_not_predicted_detail(quantity),
+            identity=identity,
+            requested_composition=requested,
+            version=engine_version,
+        )
 
     magnitude: float | None = None
     converter_reason = ""

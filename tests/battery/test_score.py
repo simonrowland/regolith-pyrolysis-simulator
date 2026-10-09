@@ -96,6 +96,7 @@ from simulator.battery.score import (
     load_score_context,
     parse_species_formula,
     pooled_log_pressure_sd,
+    predict_with_engine,
     resolve_source_relation,
     residual_to_plain,
     score_eligible_from_conjuncts,
@@ -3077,8 +3078,8 @@ def test_residue_composition_has_its_own_rail_and_typed_engine_refusal() -> None
     for engine in ENGINE_CHANNELS:
         prediction = predict_with_engine(engine, observation)
         assert prediction.execution.state is ExecutionState.UNSUPPORTED
-        assert prediction.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
-        assert prediction.refusal_detail["reason"] == "channel_missing"
+        assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+        assert prediction.refusal_detail["reason"] == "quantity_not_predicted"
         assert prediction.refusal_detail["quantity"] == "residue_component_composition"
 
 
@@ -8170,3 +8171,127 @@ def test_score_store_records_each_in_scope_observation_in_small_fixture() -> Non
     records_by_reference = Counter(row.reference for row in residuals)
     assert records_by_reference.keys() == {activity.observation_id, figure.observation_id}
     assert all(records_by_reference[obs.observation_id] >= 1 for obs in (activity, figure))
+
+
+def test_transition_temperature_refuses_before_generic_engine_pot(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        EngineHandle,
+        EquilibrateCell,
+    )
+
+    identity = replace(
+        F.activity_identity(
+            formula="CaO",
+            component_basis="CaO",
+            composition=Composition(
+                basis="ordered_complete_mole_inventory",
+                components=(("SiO2", Decimal("0.5")), ("CaO", Decimal("0.5"))),
+                amount_basis=AmountBasis.MOLE_FRACTION,
+            ),
+        ),
+        quantity=Quantity.TRANSITION_TEMPERATURE,
+        subtype=State.of("liquidus"),
+    )
+    reference = F.observation(
+        "transition-temperature-generic-fallthrough",
+        F.tabulation_experiment().experiment_id,
+        identity,
+        Decimal("1673.15"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="work-1",
+    )
+    opened: list[str] = []
+    pots = []
+
+    def open_probe_engine(name: str) -> EngineHandle:
+        opened.append(name)
+        return EngineHandle(
+            name=name,
+            backend=object(),
+            available=True,
+            unavailable_reason=None,
+            takes_fo2=False,
+            supports_intrinsic_fo2=True,
+        )
+
+    def equilibrate_probe(handle, pot, **kwargs):
+        pots.append(pot)
+        return EquilibrateCell(
+            pot_id="transition-probe",
+            engine=handle.name,
+            temperature_K=kwargs["temperature_K"],
+            po2=kwargs["po2"],
+            status="ok",
+            refusal_reason=None,
+            engine_status="ok",
+            engine_reason=None,
+            melt_activities={"CaO": 0.25},
+            gas_partial_pressures_Pa={},
+            liquid_fraction=1.0,
+            wall_s=0.0,
+            cpu_s=0.0,
+            hostname="test",
+        )
+
+    monkeypatch.setattr(battery, "open_battery_engine", open_probe_engine)
+    monkeypatch.setattr(battery, "equilibrate_cell", equilibrate_probe)
+    from simulator.battery import score as score_module
+
+    parsed_formulas: list[str] = []
+    parse_formula = score_module.parse_species_formula
+
+    def track_formula_parse(formula: str):
+        parsed_formulas.append(formula)
+        return parse_formula(formula)
+
+    monkeypatch.setattr(score_module, "parse_species_formula", track_formula_parse)
+
+    predictions = {
+        engine: predict_with_engine(engine, reference)
+        for engine in score_module.SCORE_ENGINE_SET
+    }
+
+    assert opened == []
+    assert pots == []
+    assert parsed_formulas == []
+    prediction = predictions[Engine.OPENIMCC]
+    assert prediction.value is None
+    assert prediction.unit is None
+    assert prediction.execution.state is ExecutionState.UNSUPPORTED
+    assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+    assert prediction.refusal_detail == {
+        "reason": "quantity_not_predicted",
+        "quantity": Quantity.TRANSITION_TEMPERATURE.value,
+    }
+
+    for prediction in predictions.values():
+        assert prediction.value is None
+        assert prediction.unit is None
+        assert prediction.execution.state is ExecutionState.UNSUPPORTED
+        assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+        assert prediction.refusal_detail == {
+            "reason": "quantity_not_predicted",
+            "quantity": Quantity.TRANSITION_TEMPERATURE.value,
+        }
+
+    monkeypatch.setattr(
+        score_module,
+        "_ENGINE_CELL_PREDICTED_QUANTITIES",
+        score_module._ENGINE_CELL_PREDICTED_QUANTITIES
+        | {Quantity.TRANSITION_TEMPERATURE},
+    )
+    prediction = predict_with_engine(Engine.OPENIMCC, reference)
+
+    assert len(opened) == 1
+    assert len(pots) == 1
+    assert "CaO" in parsed_formulas
+    assert prediction.value is None
+    assert prediction.unit is None
+    assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+    assert prediction.refusal_detail == {
+        "reason": "quantity_not_predicted",
+        "quantity": Quantity.TRANSITION_TEMPERATURE.value,
+    }
