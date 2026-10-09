@@ -28,17 +28,20 @@ from simulator.yaml_cache import load_cached_safe_yaml  # noqa: E402
 
 REPORT_PATH = ROOT / "studio-pin-report.json"
 
-# Laptop-config (committed) baselines for honesty-gate comparison in the report.
-# Values are the pre-regen pins at tip 0de9c6d / train11 expected side.
+# Studio engine pins at aedfc902a (studio-pin-report pins block).
+# sio_evolved_kg, sio_stage3_silica_kg, sio_wall_deposit_1050_kg: b03045041.
+# staged_silica_kg and staged_product_sio_kg: a98989941 drops the closed
+# hot pulse; b03045041 sets this surviving value.
+# capacity_* are the studio report; they are not in the 7.2 table.
 LAPTOP_BASELINES: dict[str, float] = {
-    "capacity_total_kg_hr": 2.6213753068336443,
-    "capacity_transport_saturation_pct": 1161978.521915791,
-    "capacity_melt_mass_kg": 997.3707383784229,
-    "sio_evolved_kg": 1.03187282595e-05,
-    "sio_stage3_silica_kg": 6.73119341581e-06,
-    "sio_wall_deposit_1050_kg": 4.439481519259e-06,
-    "staged_silica_kg": 0.10262754045817979,
-    "staged_product_sio_kg": 0.011456288948428558,
+    "capacity_total_kg_hr": 3.0804084716614697,
+    "capacity_transport_saturation_pct": 1275753.3787005893,
+    "capacity_melt_mass_kg": 995.6856143330566,
+    "sio_evolved_kg": 4.1406638526e-05,
+    "sio_stage3_silica_kg": 1.10557326444e-05,
+    "sio_wall_deposit_1050_kg": 2.893926197234e-05,
+    "staged_silica_kg": 0.0083664669711566,
+    "staged_product_sio_kg": 0.0009319538440054429,
 }
 
 

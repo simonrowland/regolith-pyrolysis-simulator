@@ -294,9 +294,10 @@ def test_sio_wall_sweep_refuses_negative_pO2_before_floor() -> None:
 # studio-3 regen, VapoRock 0001+0002; lunar -1.6e-7 rel, mars +2.35e-5 rel:
 # lunar 1.04099243606e-05 -> 1.0409922677e-05,
 # mars 1.05357832376e-05 -> 1.05360311732e-05.
+# b03045041. Studio engine-live C2A (section 7.4).
 BASELINE_SIO_EVOLVED_KG = {
-    "lunar_mare_low_ti": 1.0409922677e-05,
-    "mars_basalt": 1.05360311732e-05,
+    "lunar_mare_low_ti": 4.1406638526e-05,
+    "mars_basalt": 3.67446217974e-05,
 }
 
 
@@ -572,9 +573,11 @@ def test_sio_yield_restored_capture_keeps_provenance_and_closure(feedstock):
     # therefore re-grounds the two cancellation residuals, not a free tuning
     # parameter; canonical atom-ledger closure remains independently bounded
     # at 5e-12 percent.
+    # b03045041 re-grounds the cancellation. Engines-live on this seat;
+    # the studio sio_yield fixtures do not store closure_error_pct.
     expected_closure_error_pct = {
-        "lunar_mare_low_ti": 5.717403344648834e-7,
-        "mars_basalt": 6.656418718358862e-7,
+        "lunar_mare_low_ti": 1.4034099078263498e-07,
+        "mars_basalt": 5.054742681489493e-08,
     }
     assert diagnostics["closure_error_pct"] == pytest.approx(
         expected_closure_error_pct[feedstock], rel=1.0e-9, abs=1.0e-15

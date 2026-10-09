@@ -133,11 +133,13 @@ def test_native_fe_saturation_split_routes_fe_to_drain_tap() -> None:
 
     assert direct["native_fe_saturation"] is True
     assert direct["native_fe_frac"] > 0.0
-    # 2026-08-05 MC-1 trace wiring d1b4f5d: feedstock-native Co/Ni are already
-    # in the drain tap before the Fe split; the migration contract is no Fe yet.
+    # 6ecc4ad4b bridges trace element keys onto parent-oxide ledger keys.
+    # Co and Ni stay element keys and rescale by 0.9999218639709601.
+    # Feedstock-native Co/Ni are already in the drain tap before the Fe
+    # split; the migration contract is no Fe yet.
     assert before_tap == pytest.approx({
-        "Co": 0.035950609023654635,
-        "Ni": 0.20543205156374078,
+        "Co": 0.03594779998582396,
+        "Ni": 0.20541599991899406,
     })
     assert "Fe" not in before_tap
 

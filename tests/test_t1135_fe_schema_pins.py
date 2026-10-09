@@ -208,6 +208,7 @@ def test_base_intrinsic_fO2_is_pinned_for_every_fe_oxide_entry() -> None:
     }
 
     assert len(outputs) == 26
+    # b03045041 evaluates the melt fO2 seed at the current temperature.
     assert _digest(outputs) == (
-        "291e9d828da424db6ef5e87d293e641a30d5ba0e4a6442331fe952725977476f"
+        "7a4a995e9f35b031b4331f14f0005c26602f323bd609e9d4969c360dbe58a8d5"
     )

@@ -100,10 +100,12 @@ SIO_ANCHOR_HOUR = 6
 #   0.6621306185414277 × 0.979154 ≈ 0.648328 (vs observed 0.648391; residual
 #   ~9.8e−5 relative — a_SiO2 / melt-path detail, not a missed lever).
 #   decade |log10(finite/IW)| 0.2103247134402787 → 0.21947209153015898 (UP).
+# b03045041. Engines-live on this seat: |log10(0.3427 / 0.8958)| = 0.4172761500204381.
 # Same alkali-coupled class as t-383; SiO Antoine row bit-identical; not a
 # mass-balance artifact (AtomLedger closes). Pin = executed probe value;
 # never hand-pasted. See docs-private/research/2026-08-09-b151-disposition/.
-EXPECTED_SIO_DECADE_DRIFT = 0.21947209153015898
+# b03045041. Engines-live value on this seat; the studio fixtures do not carry it.
+EXPECTED_SIO_DECADE_DRIFT = 0.4172761500204381
 
 
 def test_vaporock_sio_iw_vs_vacuum_floor_hot_c2a_anchor():
