@@ -28,7 +28,11 @@ from simulator.accounting.oxide_assignment import (
     PHASE_OXIDE_MASS_ABS_TOLERANCE_KG,
 )
 from simulator.chemistry.kernel.dto import LedgerTransitionProposal
-from simulator.melt_backend.base import engine_phase_role
+from simulator.melt_backend.base import (
+    ENGINE_MAGEMIN_IG,
+    ENGINE_PETTHERMOTOOLS,
+    engine_phase_role,
+)
 
 
 # Post-commit kilogram band of AtomLedger. Not imported: the ledger
@@ -43,6 +47,14 @@ _LEDGER_BALANCE_TOLERANCE_KG = 1e-12
 _ELEMENT_CLOSURE_TOLERANCE_MOL = 1e-8
 
 MELTS_BINDING = "melts"
+MAGEMIN_BINDING = "magemin"
+
+# The crystallization commit runs on the PetThermoTools path. A MAGEMin
+# binding uses the ig table. An unlisted binding matches no phase.
+_BINDING_ENGINE = {
+    MELTS_BINDING: ENGINE_PETTHERMOTOOLS,
+    MAGEMIN_BINDING: ENGINE_MAGEMIN_IG,
+}
 CRYSTAL_ACCOUNT_PREFIX = "process.crystal."
 LIQUID_ACCOUNT = "process.cleaned_melt"
 
@@ -253,6 +265,7 @@ def locked_cohort_update(
     probe_phases: Sequence[Mapping[str, object]] | None,
     locked: Sequence[LockedCohort],
     liquid_account: str = LIQUID_ACCOUNT,
+    engine: str | None = None,
 ) -> PhaseHomeUpdate:
     """Build the one proposal, or refuse the whole commit.
 
@@ -261,9 +274,13 @@ def locked_cohort_update(
     growth. An empty probe sequence means the probe ran and reported
     no solid: equilibrium mass is zero.
     """
+    role_engine = _role_engine(binding, engine)
     try:
-        accessible = _phase_table(accessible_phases)
-        probe = None if probe_phases is None else _phase_table(probe_phases)
+        accessible = _phase_table(accessible_phases, role_engine)
+        probe = (
+            None if probe_phases is None
+            else _phase_table(probe_phases, role_engine)
+        )
     except _PhaseRowError as exc:
         return _refused(exc.reason, exc.detail)
     liquid = _positive_oxides(liquid_oxide_mol)
@@ -393,8 +410,15 @@ class _PhaseRowError(Exception):
         super().__init__(detail)
 
 
+def _role_engine(binding: str, engine: str | None) -> str:
+    if engine is not None and str(engine).strip():
+        return str(engine).strip()
+    return _BINDING_ENGINE.get(str(binding).strip(), "")
+
+
 def _phase_table(
     rows: Sequence[Mapping[str, object]],
+    engine: str,
 ) -> dict[str, tuple[float, dict[str, float]]]:
     table: dict[str, tuple[float, dict[str, float]]] = {}
     liquid_names: set[str] = set()
@@ -416,7 +440,7 @@ def _phase_table(
             )
         if mass_kg <= PHASE_OXIDE_MASS_ABS_TOLERANCE_KG:
             continue
-        role = engine_phase_role(phase_name)
+        role = engine_phase_role(phase_name, engine)
         if role == "silicate_liquid":
             liquid_names.add(phase_name)
             continue

@@ -27,6 +27,10 @@ from pathlib import Path
 from typing import Any, Callable, Mapping, Optional
 
 from simulator.accounting.formulas import resolve_species_formula
+from simulator.melt_backend.base import (
+    ENGINE_ALPHAMELTS,
+    is_engine_liquid_phase,
+)
 from simulator.engine_local_config import (
     cache_version_for,
     setup_thermoengine_dylib_path,
@@ -2224,10 +2228,10 @@ print('ok')
 
     def _select_liquid_phase(self, phases: tuple[str, ...]) -> Optional[str]:
         for phase in phases:
-            if phase.lower() == 'liquid':
+            if str(phase).strip().casefold() == 'liquid':
                 return phase
         for phase in phases:
-            if phase.lower().startswith('liquid'):
+            if is_engine_liquid_phase(phase, ENGINE_ALPHAMELTS):
                 return phase
         return None
 

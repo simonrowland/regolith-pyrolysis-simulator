@@ -20,16 +20,6 @@ from simulator.accounting.ledger import (
     AtomLedger,
 )
 from simulator.accounting.oxide_assignment import PHASE_OXIDE_MASS_ABS_TOLERANCE_KG
-from simulator.accounting.phase_homes import (
-    MELTS_BINDING,
-    REASON_LIQUID_INSUFFICIENT,
-    REASON_NON_SILICATE,
-    crystal_accounts_for_binding,
-    holds_positive_crystal_moles,
-    locked_cohort_update,
-    locked_cohorts,
-    signed_locked_masses,
-)
 from simulator.chemistry.kernel import (
     AccountFilterViolation,
     CapabilityProfile,
@@ -44,10 +34,29 @@ from simulator.chemistry.kernel import (
     ProviderUnavailableError,
 )
 from simulator.core import PyrolysisSimulator
+from simulator.accounting.phase_homes import (
+    MAGEMIN_BINDING,
+    MELTS_BINDING,
+    REASON_LIQUID_INSUFFICIENT,
+    REASON_NON_SILICATE,
+    crystal_account,
+    crystal_accounts_for_binding,
+    holds_positive_crystal_moles,
+    locked_cohort_update,
+    locked_cohorts,
+    signed_locked_masses,
+)
 from simulator.melt_backend.base import (
+    ENGINE_ALPHAMELTS,
+    ENGINE_MAGEMIN_IG,
+    ENGINE_PETTHERMOTOOLS,
     EquilibriumResult,
     InternalAnalyticalBackend,
     LiquidFractionInvalidError,
+    engine_phase_role,
+    is_engine_liquid_phase,
+    silicate_liquid_token,
+    silicate_solid_phases,
 )
 from simulator.melt_backend.liquidus import LiquidusSampleError, LiquidusSolidusResult
 from simulator.state import CampaignPhase
@@ -398,6 +407,113 @@ def test_a_second_liquid_or_an_alloy_refuses_the_whole_commit():
         assert update.proposal is None
         assert update.refusal_reason == REASON_NON_SILICATE
         assert update.touched_crystal_accounts == ()
+
+
+_REFUSED_PHASE_NAMES = (
+    "alloy-solid",
+    "alloy-liquid",
+    "Solid Alloy",
+    "sulfide-liquid",
+    "liquid alloy",
+    "Liquid Alloy",
+    "not-a-phase",
+)
+
+_ENGINE_BINDINGS = (
+    (ENGINE_MAGEMIN_IG, MAGEMIN_BINDING),
+    (ENGINE_ALPHAMELTS, MELTS_BINDING),
+    (ENGINE_PETTHERMOTOOLS, MELTS_BINDING),
+)
+
+
+@pytest.mark.parametrize("phase_name", _REFUSED_PHASE_NAMES)
+@pytest.mark.parametrize(
+    ("engine", "binding"),
+    _ENGINE_BINDINGS,
+    ids=("magemin-ig", "alphamelts", "petthermotools"),
+)
+def test_unlisted_phase_refuses_before_any_cohort_is_booked(engine, binding, phase_name):
+    """Alloy, sulfide, water-like, and unknown names are not crystal homes."""
+    solid = sorted(silicate_solid_phases(engine))[0]
+    rows = (
+        _phase(silicate_liquid_token(engine), 0.5, {"SiO2": _moles(0.5, "SiO2")}),
+        _phase(solid, 0.01, {"SiO2": _moles(0.01, "SiO2")}),
+        _phase(phase_name, 0.02, {"SiO2": _moles(0.02, "SiO2")}),
+    )
+    update = locked_cohort_update(
+        binding=binding,
+        engine=engine,
+        liquid_oxide_mol={"SiO2": _moles(1.0, "SiO2")},
+        accessible_phases=rows,
+        probe_phases=None,
+        locked=(),
+    )
+    assert update.proposal is None
+    assert update.refusal_reason == REASON_NON_SILICATE
+    assert phase_name in update.refusal_detail
+    assert update.touched_crystal_accounts == ()
+
+
+@pytest.mark.parametrize(
+    ("engine", "binding"),
+    _ENGINE_BINDINGS,
+    ids=("magemin-ig", "alphamelts", "petthermotools"),
+)
+def test_every_listed_silicate_solid_commits(engine, binding):
+    solids = silicate_solid_phases(engine)
+    assert solids
+    assert silicate_liquid_token(engine)
+    for phase_name in sorted(solids):
+        update = locked_cohort_update(
+            binding=binding,
+            engine=engine,
+            liquid_oxide_mol={"SiO2": _moles(1.0, "SiO2")},
+            accessible_phases=(
+                _phase(phase_name, 0.01, {"SiO2": _moles(0.01, "SiO2")}),
+            ),
+            probe_phases=None,
+            locked=(),
+        )
+        assert update.refusal_reason is None, phase_name
+        assert update.proposal is not None, phase_name
+        assert crystal_account(binding, phase_name, 0) in (
+            update.touched_crystal_accounts
+        ), phase_name
+
+
+def test_phase_role_is_positive_membership_of_the_engine_table():
+    # Stems the engines actually emit. ``liquid alloy`` shares a prefix
+    # with the MELTS liquid token and is still not that token.
+    assert engine_phase_role("ol", ENGINE_MAGEMIN_IG) == "silicate_solid"
+    assert engine_phase_role("liq", ENGINE_MAGEMIN_IG) == "silicate_liquid"
+    assert engine_phase_role("fl", ENGINE_MAGEMIN_IG) == "non_silicate"
+    assert engine_phase_role("qfm", ENGINE_MAGEMIN_IG) == "non_silicate"
+    assert engine_phase_role("H2O", ENGINE_MAGEMIN_IG) == "non_silicate"
+    assert engine_phase_role("olivine1", ENGINE_PETTHERMOTOOLS) == "silicate_solid"
+    assert engine_phase_role("Olivine", ENGINE_ALPHAMELTS) == "silicate_solid"
+    assert engine_phase_role("liquid1", ENGINE_PETTHERMOTOOLS) == "silicate_liquid"
+    assert engine_phase_role("liquid_0", ENGINE_ALPHAMELTS) == "silicate_liquid"
+    assert is_engine_liquid_phase("liquid_0", ENGINE_ALPHAMELTS) is True
+    assert engine_phase_role("Liquid", ENGINE_ALPHAMELTS) == "silicate_liquid"
+    assert engine_phase_role("liquid2", ENGINE_PETTHERMOTOOLS) == "silicate_liquid"
+    assert engine_phase_role("liquid alloy", ENGINE_PETTHERMOTOOLS) == "non_silicate"
+    assert engine_phase_role("Liquid Alloy", ENGINE_ALPHAMELTS) == "non_silicate"
+    assert engine_phase_role("alloy-solid", ENGINE_ALPHAMELTS) == "non_silicate"
+    assert engine_phase_role("water1", ENGINE_PETTHERMOTOOLS) == "non_silicate"
+    assert engine_phase_role("not-a-phase", ENGINE_MAGEMIN_IG) == "non_silicate"
+    assert is_engine_liquid_phase("liquid1") is True
+    assert is_engine_liquid_phase("liq") is True
+    assert is_engine_liquid_phase("liquid alloy") is False
+    assert is_engine_liquid_phase("Liquid Alloy") is False
+    assert "clinopyroxene" in silicate_solid_phases(ENGINE_PETTHERMOTOOLS)
+    assert "ol" in silicate_solid_phases(ENGINE_MAGEMIN_IG)
+    assert "alloy-solid" not in silicate_solid_phases(ENGINE_ALPHAMELTS)
+    folded = {
+        name.casefold()
+        for name in silicate_solid_phases(ENGINE_PETTHERMOTOOLS)
+    }
+    assert "water" not in folded
+    assert "solid alloy" not in folded
 
 
 def test_dust_under_the_phase_floor_is_not_a_cohort_and_does_not_hold_f_off():

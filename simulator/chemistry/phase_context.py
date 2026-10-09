@@ -15,6 +15,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
+from ..melt_backend.base import ENGINE_ALPHAMELTS, is_engine_liquid_phase
 from ..melt_regime import MeltRegime, melt_regime
 from ..scalar_boundary import is_declared_real_scalar
 
@@ -560,7 +561,7 @@ def _cache_species_context(
     liquid_mass = sum(
         float(mass)
         for phase_name, mass in phase_masses.items()
-        if str(phase_name).strip().lower().startswith("liquid")
+        if is_engine_liquid_phase(str(phase_name), ENGINE_ALPHAMELTS)
     )
     total_phase_mass = sum(phase_masses.values())
     # All-liquid shortcut applies ONLY when the assemblage is genuinely
@@ -573,7 +574,7 @@ def _cache_species_context(
     non_liquid_mass = sum(
         float(mass)
         for phase_name, mass in phase_masses.items()
-        if not str(phase_name).strip().lower().startswith("liquid")
+        if not is_engine_liquid_phase(str(phase_name), ENGINE_ALPHAMELTS)
     )
     if (
         total_phase_mass > 0.0

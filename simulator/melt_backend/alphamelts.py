@@ -75,6 +75,8 @@ from simulator.melt_backend.base import (
     MeltBackendError,
     RealBackendAuthority,
     RealBackendFamily,
+    ENGINE_PETTHERMOTOOLS,
+    is_engine_liquid_phase,
     liquid_fraction_from_phase_masses,
 )
 from simulator.engine_pool import (
@@ -4397,7 +4399,9 @@ class _MELTSBackendSupport(MeltBackend):
     def _select_liquid_phase_key(self, results: Mapping[str, object]) -> Optional[str]:
         for key in results:
             name = str(key)
-            if name.lower().startswith('liquid') and not name.endswith('_prop'):
+            if name.endswith('_prop') or name.endswith('_keys'):
+                continue
+            if is_engine_liquid_phase(name, ENGINE_PETTHERMOTOOLS):
                 return name
         return None
 
@@ -4623,8 +4627,7 @@ class _MELTSBackendSupport(MeltBackend):
         return None
 
     def _is_liquid_activity_phase(self, phase: object) -> bool:
-        name = str(phase).strip().lower()
-        return name == 'liq' or name.startswith('liquid')
+        return is_engine_liquid_phase(str(phase))
 
     def _extract_activities_from_chemical_potentials(
         self,

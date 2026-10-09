@@ -117,6 +117,7 @@ from simulator.melt_backend.base import (
     MeltOxideProjection,
     RealBackendAuthority,
     RealBackendFamily,
+    is_engine_liquid_phase,
     liquid_fraction_from_phase_masses,
     positive_melt_mass_by_species,
     projection_diagnostics_for_melt_input,
@@ -3118,7 +3119,6 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         if liquid_fraction is None:
             raise MeltCompositionError('zero_total_phase_mass')
 
-        liquid_phase_names = ('liq', 'liquid', 'LIQUID', 'melt', 'Melt')
         phases_present: List[str] = []
         phase_masses_kg: Dict[str, float] = {}
         phase_compositions: Dict[str, Dict[str, float]] = {}
@@ -3132,7 +3132,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             phase_masses_kg[name] = mass
             if composition_wt_pct:
                 phase_compositions[name] = composition_wt_pct
-            if name in liquid_phase_names or name.lower().startswith('liq'):
+            if is_engine_liquid_phase(name):
                 if composition_wt_pct:
                     liquid_composition = composition_wt_pct
 

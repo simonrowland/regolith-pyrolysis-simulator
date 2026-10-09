@@ -1137,12 +1137,15 @@ class AlphaMELTSProvider(ChemistryProvider):
         liquid = dict(
             request.account_view.accounts.get(LIQUID_ACCOUNT, {}) or {}
         )
+        from simulator.melt_backend.base import ENGINE_PETTHERMOTOOLS
+
         update = locked_cohort_update(
             binding=MELTS_BINDING,
             liquid_oxide_mol=liquid,
             accessible_phases=rows,
             probe_phases=probe_rows,
             locked=cohorts,
+            engine=ENGINE_PETTHERMOTOOLS,
         )
         if update.refusal_reason:
             return None, _hold_notices(

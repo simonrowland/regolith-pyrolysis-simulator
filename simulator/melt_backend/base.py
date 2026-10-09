@@ -57,56 +57,133 @@ class MeltCompositionError(MeltBackendError):
     """Raised when backend phase/composition output is physically unusable."""
 
 
-_LIQUID_PHASE_NAMES = frozenset({
-    'liq', 'liquid', 'LIQUID', 'melt', 'Melt',
+# One silicate-liquid token and the silicate/oxide solids each engine
+# reports. Membership is the whole stem: a trailing instance digit is
+# stripped (``liquid1``, ``olivine1``), and the comparison is casefold.
+# Anything else, including alloy, metal, sulfide, fluid, and water, is
+# not a crystal home.
+#
+# MAGEMin ig solution and pure phases are the ``igneous_db`` arrays in
+# MAGEMin ``src/TC_database/TC_init_database.c`` (n_ss_ig 16, n_pp_ig 27).
+# Dropped from the solid list: ``liq`` (the liquid token), ``fl``,
+# ``O2``, ``H2O``, the oxygen-buffer rows ``qfm`` ``mw`` ``qif`` ``nno``
+# ``hm`` ``iw`` ``cco``, and the activity sensors ``aH2O`` ``aO2``
+# ``aMgO`` ``aFeO`` ``aAl2O3`` ``aTiO2``.
+#
+# alphaMELTS / MELTS and PetThermoTools share one spelling list. The
+# subprocess labels are ``CACHE_V2_SUBPROCESS_PHASE_DICTIONARY`` in
+# ``scripts/grid_pregrind_writer.py``, cited there to alphaMELTS 2.3.1
+# ``Phase_main_tbl.txt``. The MELTSv1.0.2 labels are
+# ``CACHE_V2_THERMOENGINE_PHASE_LABELS`` in the same file, cited there
+# to ``MELTSmodel.get_phase_names()``. Excluded: ``liquid`` / ``Liquid``,
+# ``metal``, ``alloy-solid``, ``alloy-liquid``, ``Liquid Alloy``,
+# ``Solid Alloy``, ``sulfide-liquid``, ``fluid``, ``Water``.
+ENGINE_MAGEMIN_IG = 'magemin-ig'
+ENGINE_ALPHAMELTS = 'alphamelts'
+ENGINE_PETTHERMOTOOLS = 'petthermotools'
+
+_MAGEMIN_IG_LIQUID = 'liq'
+_MAGEMIN_IG_SOLIDS = frozenset({
+    'spl', 'bi', 'cd', 'cpx', 'ep', 'g', 'amp', 'ilm', 'ol', 'opx',
+    'fsp', 'mu', 'fper', 'chl',
+    'ne', 'q', 'crst', 'trd', 'coe', 'stv', 'ky', 'sill', 'and', 'ru',
+    'sph', 'cor',
 })
 
-
-def is_engine_liquid_phase(phase_name: str) -> bool:
-    """True for a silicate-liquid phase name.
-
-    The same names ``liquid_fraction_from_phase_masses`` counts as liquid.
-    A crystal home is a solid, so a liquid row must not become one.
-    """
-    name = str(phase_name)
-    return (
-        name in _LIQUID_PHASE_NAMES
-        or name.lower().startswith('liq')
-        or name.endswith('_Liq')
-    )
-
-
-# MELTS reports these as their own phases. The stem drops a trailing
-# instance digit, so ``water1`` and ``alloy1`` match. They are not
-# silicate solids and must not be booked as crystal homes.
-_NON_SILICATE_PHASE_STEMS = frozenset({
-    'alloy',
-    'metal',
-    'fluid',
-    'water',
+_MELTS_LIQUID = 'liquid'
+_MELTS_SILICATE_SOLIDS = frozenset({
+    'olivine', 'orthopyroxene', 'clinopyroxene', 'spinel', 'plagioclase',
+    'feldspar', 'ortho-oxide', 'alkali-feldspar', 'quartz', 'tridymite',
+    'cristobalite', 'rhm-oxide', 'ilmenite', 'magnetite', 'hematite',
+    'garnet', 'melilite', 'nepheline', 'leucite', 'kalsilite',
+    'perovskite', 'whitlockite', 'apatite', 'corundum',
+    'actinolite', 'aegirine', 'aenigmatite', 'akermanite', 'andalusite',
+    'anthophyllite', 'augite', 'biotite', 'chromite', 'coesite',
+    'cummingtonite', 'fayalite', 'forsterite', 'gehlenite', 'hornblende',
+    'ilmenite ss', 'kalsilite ss', 'kyanite', 'lime', 'muscovite',
+    'nepheline ss', 'orthooxide', 'panunzite', 'periclase', 'phlogopite',
+    'pigeonite', 'rutile', 'sanidine', 'sillimanite', 'sphene',
+    'titanaugite',
 })
+
+_ENGINE_PHASE_TABLES = {
+    ENGINE_MAGEMIN_IG: (_MAGEMIN_IG_LIQUID, _MAGEMIN_IG_SOLIDS),
+    ENGINE_ALPHAMELTS: (_MELTS_LIQUID, _MELTS_SILICATE_SOLIDS),
+    ENGINE_PETTHERMOTOOLS: (_MELTS_LIQUID, _MELTS_SILICATE_SOLIDS),
+}
+_ENGINE_LIQUID_FOLDED = {
+    engine: token.casefold()
+    for engine, (token, _solids) in _ENGINE_PHASE_TABLES.items()
+}
+_ENGINE_SOLID_FOLDED = {
+    engine: frozenset(name.casefold() for name in solids)
+    for engine, (_token, solids) in _ENGINE_PHASE_TABLES.items()
+}
+
+
+def silicate_liquid_token(engine: str) -> str:
+    """The one silicate-liquid token that engine reports."""
+    try:
+        token, _solids = _ENGINE_PHASE_TABLES[engine]
+    except KeyError:
+        raise ValueError(f'unknown phase-role engine {engine!r}') from None
+    return token
+
+
+def silicate_solid_phases(engine: str) -> frozenset[str]:
+    """Silicate and oxide crystal phases that engine reports."""
+    try:
+        _token, solids = _ENGINE_PHASE_TABLES[engine]
+    except KeyError:
+        raise ValueError(f'unknown phase-role engine {engine!r}') from None
+    return solids
 
 
 def _engine_phase_stem(phase_name: str) -> str:
-    name = str(phase_name).strip().lower()
+    """Phase name without a trailing instance index.
+
+    ``olivine1`` and ``liquid_0`` are the same phase as ``olivine`` and
+    ``liquid``. The underscore is removed only when digits follow it, so
+    ``liquid alloy`` stays a different name.
+    """
+    name = str(phase_name).strip()
     end = len(name)
     while end > 0 and name[end - 1].isdigit():
+        end -= 1
+    if end < len(name) and end > 0 and name[end - 1] == '_':
         end -= 1
     return name[:end]
 
 
-def engine_phase_role(phase_name: str) -> str:
+def engine_phase_role(phase_name: str, engine: str) -> str:
     """``silicate_liquid``, ``silicate_solid``, or ``non_silicate``.
 
-    Silicate liquid is :func:`is_engine_liquid_phase`. Alloy, metal,
-    fluid, and water are the engine's non-silicate phases. Every other
-    name is a silicate solid.
+    Positive membership of that engine's table. A name the table does
+    not list is ``non_silicate``, which refuses the whole commit.
     """
-    if is_engine_liquid_phase(phase_name):
-        return 'silicate_liquid'
-    if _engine_phase_stem(phase_name) in _NON_SILICATE_PHASE_STEMS:
+    folded = _engine_phase_stem(phase_name).casefold()
+    if not folded or engine not in _ENGINE_PHASE_TABLES:
         return 'non_silicate'
-    return 'silicate_solid'
+    if folded == _ENGINE_LIQUID_FOLDED[engine]:
+        return 'silicate_liquid'
+    if folded in _ENGINE_SOLID_FOLDED[engine]:
+        return 'silicate_solid'
+    return 'non_silicate'
+
+
+def is_engine_liquid_phase(phase_name: str, engine: str | None = None) -> bool:
+    """True when the stem is that engine's silicate-liquid token.
+
+    With no engine, the row matches if it is any listed engine's liquid
+    token. ``liquid_fraction_from_phase_masses`` uses that form. A
+    prefix is not enough: ``liquid alloy`` is not ``liquid``.
+    """
+    folded = _engine_phase_stem(phase_name).casefold()
+    if not folded:
+        return False
+    if engine is None:
+        return folded in _ENGINE_LIQUID_FOLDED.values()
+    return engine_phase_role(phase_name, engine) == 'silicate_liquid'
 
 
 def liquid_fraction_from_phase_masses(
