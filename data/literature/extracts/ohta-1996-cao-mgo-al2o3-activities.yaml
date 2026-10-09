@@ -35,6 +35,20 @@ fidelity_samples:
   value: 0.14
   note: p. 985 activity at MgO-spinel saturation
   locator: {published_page: 985, pdf_page_index: 3, section: '3.1'}
+- species: Fe_tO
+  observation_id: ohta_1996_feto_activity_coefficient_spinel_line
+  observable: activity_coefficient
+  field: gamma
+  value: 0.51
+  note: p. 986 Fig. 4 activity coefficient
+  locator: {published_page: 986, pdf_page_index: 4, figure: '4', section: '3.1'}
+- species: CaO
+  observation_id: ohta_1996_bearing_steel_example_conditions
+  observable: method
+  field: composition_mass_pct
+  value: {C: 1.0, Cr: 1.4, Mn: 0.4, Si: 0.3, Al: 0.02}
+  note: p. 989 bearing-steel example carbon content
+  locator: {published_page: 989, pdf_page_index: 7, section: '4'}
 species:
   CaO:
     observations: []
@@ -357,11 +371,23 @@ species:
       locator: {published_page: 986, pdf_page_index: 4, section: '3.1'}
       T_range_K: [1823.0, 1873.0]
       phase: liquid slag
-      standard_state: liquid Fe_tO
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase: {tag: value, value: l}
+              polymorph: {tag: not_applicable, reason: not_applicable}
+            component_basis: Fe_tO
+        inferred: false
+        note: Eq. (3) uses Fe_tO(l) and identifies the coefficient as referred to the liquid standard state.
+        locator: {published_page: 986, pdf_page_index: 4, equation: '3', section: '3.1'}
       units: dimensionless activity coefficient
       derived_from: [tables:ohta-1996-cao-mgo-al2o3-activities]
       derivation:
-        relation: 'The temperature-independent γ(Fe_tO)=0.51 ± 0.23 was estimated from measured O contents, interaction coefficients for f_Al, and ΔG° = −116100 + 48.79T J/mol for Fe(l)+O=Fe_tO(l), as printed.'
+        relation: 'Fig. 4 gives the temperature-independent γ(Fe_tO)=0.51 ± 0.23, obtained from a(Al2O3), Fe_tO content, and the interaction coefficients for f_Al. A separate estimate from O contents, the interaction coefficients for f_O, and ΔG° = −116100 + 48.79T J/mol for Fe(l)+O=Fe_tO(l) was reported to agree with Fig. 4.'
         inputs: [tables:ohta-1996-cao-mgo-al2o3-activities]
         output_unit: dimensionless activity coefficient
       uncertainty: {absolute: 0.23, note: 'Printed as 0.51 ± 0.23.'}
@@ -381,7 +407,7 @@ species:
       units: dimensionless activity coefficient
       derived_from: [tables:ohta-1996-cao-mgo-al2o3-activities]
       derivation:
-        relation: 'The temperature-independent γ(MnO)=0.82 ± 0.30 was estimated from measured Mn and O contents, interaction coefficients for f_Al and f_Mn, and ΔG° = −288100 + 128.3T J/mol for Mn+O=MnO(s), as printed.'
+        relation: 'Fig. 5 gives the temperature-independent γ(MnO)=0.82 ± 0.30, determined from a(Al2O3), MnO content, and the interaction coefficients for f_Al and f_Mn. A separate calculation from Mn and O contents, the respective interaction coefficients, and ΔG° = −288100 + 128.3T J/mol for Mn+O=MnO(s) was reported to agree with Fig. 5.'
         inputs: [tables:ohta-1996-cao-mgo-al2o3-activities]
         output_unit: dimensionless activity coefficient
       uncertainty: {absolute: 0.30, note: 'Printed as 0.82 ± 0.30.'}
