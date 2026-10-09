@@ -283,6 +283,11 @@ def test_cached_real_admission_lifecycle_clears_and_publishes_after_init(
     )
     monkeypatch.setattr(
         admission,
+        "binding_identity_for_backend",
+        lambda _backend: SYNTHETIC_IDENTITY,
+    )
+    monkeypatch.setattr(
+        admission,
         "cached_real_provenance",
         lambda _config, _backend: provenance,
     )
@@ -321,6 +326,171 @@ def test_cached_real_admission_lifecycle_clears_and_publishes_after_init(
     assert facade._binding_admission_errors[
         SYNTHETIC_IDENTITY.producer_transport
     ].reason == "receipt stale"
+
+
+def test_direct_live_constructor_does_not_admit_mismatched_backend(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    mismatch = BindingIdentity(
+        engine_id="synthetic-fake",
+        model_id="fixture-model-v1",
+        binding_revision="synthetic-r1",
+        transport="python_api",
+    )
+    provenance = {"binding_provenance_verifiable": True}
+
+    class LiveBackend:
+        def initialize(self, _config=None):
+            return True
+
+        def is_available(self):
+            return True
+
+        def get_engine_version(self):
+            return "synthetic-fake test"
+
+    monkeypatch.setattr(
+        admission,
+        "binding_identity_for_cached_real",
+        lambda _config: SYNTHETIC_IDENTITY,
+    )
+    monkeypatch.setattr(
+        admission,
+        "binding_identity_for_backend",
+        lambda _backend: mismatch,
+    )
+    monkeypatch.setattr(
+        admission,
+        "cached_real_provenance",
+        lambda _config, _backend: provenance,
+    )
+    monkeypatch.setattr(
+        admission,
+        "authorize_binding",
+        lambda identity, _provenance: {
+            "status": "admitted",
+            "identity": identity.as_dict(),
+        },
+    )
+
+    facade = CachedRealBackend(
+        config=SimpleNamespace(
+            miss_policy="live-fill",
+            authorized_backend_family=SimpleNamespace(name="ALPHAMELTS"),
+        ),
+        live_backend=LiveBackend(),
+    )
+
+    assert facade.initialize()
+    assert facade._admitted_bindings == {}
+    error = facade._binding_admission_errors[SYNTHETIC_IDENTITY.producer_transport]
+    assert isinstance(error, EngineBindingAdmissionError)
+    assert "live backend identity mismatch" in error.reason
+
+
+def _run_fake_alpha_python_api_probe(
+    monkeypatch: pytest.MonkeyPatch,
+    identity: BindingIdentity,
+    *,
+    actual_mode: str,
+) -> dict[str, object]:
+    from simulator import backends, config
+
+    requested: dict[str, object] = {}
+    actual_model = identity.model_id
+    if actual_mode != identity.transport:
+        from simulator.config import resolve_alphamelts_subprocess_model
+
+        actual_model, _ = resolve_alphamelts_subprocess_model(None)
+
+    actual_backend = SimpleNamespace(
+        name="AlphaMELTS",
+        real_backend_family=SimpleNamespace(name="ALPHAMELTS"),
+        _model=actual_model,
+        _mode=actual_mode,
+    )
+
+    def resolve_backend(name, _policy, *, backend_config):
+        requested["name"] = name
+        requested["backend_config"] = backend_config
+        return actual_backend
+
+    class FakeSimulator:
+        melt = SimpleNamespace(temperature_C=1000.0, p_total_mbar=1000.0)
+
+        def load_batch(self, *_args, **_kwargs):
+            return None
+
+        def start_campaign(self, *_args, **_kwargs):
+            return None
+
+        def _get_equilibrium(self):
+            return object()
+
+    monkeypatch.setattr(backends, "resolve_backend", resolve_backend)
+    monkeypatch.setattr(backends, "build_simulator", lambda _config: FakeSimulator())
+    monkeypatch.setattr(
+        config,
+        "load_config_bundle",
+        lambda: SimpleNamespace(
+            setpoints={},
+            feedstocks={},
+            vapor_pressures={},
+        ),
+    )
+    monkeypatch.setattr(
+        admission,
+        "selected_binding_provenance",
+        lambda *_args: {"binding_provenance_verifiable": True},
+    )
+    admission._run_binding_probe(
+        identity,
+        "equilibrium_post_record",
+        {"active_backend": "internal-analytical"},
+    )
+    return requested
+
+
+def test_alpha_python_api_probe_forces_candidate_mode_and_model(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    identity = next(
+        identity
+        for identity, artifact in admission.known_binding_assessment_targets()
+        if identity.engine_id == "alphamelts"
+        and identity.transport == "python_api"
+        and artifact == "equilibrium_post_record"
+    )
+
+    requested = _run_fake_alpha_python_api_probe(
+        monkeypatch,
+        identity,
+        actual_mode="python_api",
+    )
+
+    assert requested == {
+        "name": "alphamelts",
+        "backend_config": {"mode": "python_api", "model": identity.model_id},
+    }
+
+
+def test_alpha_python_api_probe_refuses_resolved_transport_mismatch(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    identity = next(
+        identity
+        for identity, artifact in admission.known_binding_assessment_targets()
+        if identity.engine_id == "alphamelts"
+        and identity.transport == "python_api"
+        and artifact == "equilibrium_post_record"
+    )
+
+    with pytest.raises(ValueError, match="resolved backend identity mismatch"):
+        _run_fake_alpha_python_api_probe(
+            monkeypatch,
+            identity,
+            actual_mode="subprocess",
+        )
 
 
 def test_direct_replay_only_constructor_uses_receipt_authorizer(
