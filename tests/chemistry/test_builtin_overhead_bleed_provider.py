@@ -449,6 +449,76 @@ def test_live_headspace_bleed_conductance_uses_headspace_species_m_avg(
     assert sim._headspace_bleed_conductance_kg_s() == pytest.approx(expected)
 
 
+def test_hard_vacuum_bleed_follows_actual_headspace_pressure(
+    vapor_pressure_data, feedstocks_data, setpoints_data, monkeypatch
+):
+    """Poiseuille capacity is P_up^2 at the headspace total, not the 1 Pa floor.
+
+    C0 commands p_total_mbar = 0. A conductance evaluated there cannot remove
+    the native-iron oxygen release. The committed bleed uses the equilibrium
+    total pressure. The expected mass is the production pipe at that pressure.
+    """
+
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    sim.melt.atmosphere = Atmosphere.HARD_VACUUM
+    sim.melt.p_total_mbar = 0.0
+    sim.melt.pO2_mbar = 0.0
+    sim.melt.temperature_C = 2200.0
+    sim._overhead_headspace_config["volume_m3"] = 0.085
+    loaded_kg = 10.0
+    sim.atom_ledger.load_external(
+        "process.overhead_gas",
+        {"O2": loaded_kg},
+        source="test overhead oxygen",
+        material_origin="feedstock",
+    )
+    monkeypatch.setattr(
+        sim,
+        "_cold_train_capacity_policy",
+        lambda: (NoColdTrain(), None),
+    )
+    diagnostic = sim._overhead_gas_equilibrium_diagnostic()
+    p_total_bar = float(diagnostic["p_total_bar"])
+    assert p_total_bar > 100.0
+    species_kg = sim._overhead_holdup_species_kg()
+    pipe_at_headspace_kg = (
+        sim.overhead_model._pipe_conductance(
+            p_total_bar * 1.0e5,
+            sim.melt.temperature_C,
+            p_downstream_Pa=0.0,
+            species_kg_for_M_avg=species_kg,
+        )
+        * 3600.0
+    )
+    pipe_at_one_pa_kg = (
+        sim.overhead_model._pipe_conductance(
+            1.0,
+            sim.melt.temperature_C,
+            p_downstream_Pa=0.0,
+            species_kg_for_M_avg=species_kg,
+        )
+        * 3600.0
+    )
+    assert pipe_at_headspace_kg > loaded_kg
+    assert pipe_at_one_pa_kg < 1.0e-3
+
+    result = sim._dispatch_overhead_bleed()
+    remaining = sim.atom_ledger.kg_by_account("process.overhead_gas").get(
+        "O2", 0.0
+    )
+    bled = float((result.diagnostic or {}).get("bled_o2_kg") or 0.0)
+
+    assert result.status == "ok"
+    assert bled == pytest.approx(loaded_kg, rel=1.0e-9)
+    assert bled > pipe_at_one_pa_kg * 1.0e3
+    assert remaining == pytest.approx(0.0, abs=1.0e-9)
+
+
 @pytest.mark.parametrize(
     "downstream_pressure_bar",
     [
