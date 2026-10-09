@@ -47,7 +47,6 @@ from itertools import product
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional
 
-from engines.antoine import _antoine_log10_pressure
 from engines.alphamelts.domain import (
     canonical_melt_oxide_activity_name,
     canonical_oxide_activity_map,
@@ -5210,12 +5209,23 @@ class _MELTSBackendSupport(MeltBackend):
             self._antoine_vapor_pressure_source_by_species(base_source, pressures),
         )
 
+    @staticmethod
+    def _antoine_uses_reaction_pressure(spec: Mapping[str, object]) -> bool:
+        """Select the reaction owner for both pressure and provenance."""
+        return bool(
+            spec.get("reference_pressure_model")
+            or spec.get("liquid_oxide_standard_reaction")
+            or spec.get("pure_component_antoine")
+            or spec.get("fit_target") == "standard_reaction_term"
+        )
+
     def _antoine_vapor_pressure_source_by_species(
         self,
         base_source: str,
         pressures: Mapping[str, float],
     ) -> Dict[str, str]:
         from engines.builtin.vapor_pressure import (
+            FIT_TARGET_STANDARD_REACTION,
             MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON,
             vapor_pressure_source_label,
         )
@@ -5225,9 +5235,12 @@ class _MELTSBackendSupport(MeltBackend):
         token = MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON
         labels: Dict[str, str] = {}
         for species in pressures:
+            spec = table.get(str(species), {})
+            reaction_source = self._antoine_uses_reaction_pressure(spec)
             label = vapor_pressure_source_label(
                 base_source,
-                table.get(str(species), {}),
+                dict(spec, fit_target=FIT_TARGET_STANDARD_REACTION) if reaction_source else spec,
+                coefficient_block="compiled_reference_pressure_model" if reaction_source else None,
             )
             if str(species) in notices and token not in str(label).split(":"):
                 label = f"{label}:{token}"
@@ -5334,138 +5347,86 @@ class _MELTSBackendSupport(MeltBackend):
                                     _comp_wt: dict,
                                     *,
                                     pO2_bar: float | None = None) -> Dict[str, float]:
-        """
-        Project vapor pressure from a loaded Antoine-row P_reference(T) and an
-        activity. Fallback when VapoRock is not available.
+        """Project melt-source reactions when VapoRock is unavailable.
 
-        Premise: each loaded row stores log10(P_reference / Pa) =
-        A - B / (T_K + C). Algebra: P_reference_i(T) =
-        10 ** (A - B / (T_K + C)). Unit check: A, B, C are the stored
-        Antoine coefficients for P in Pa; T_K is kelvin; the exponent is
-        dimensionless; P_reference_i is Pa.
-
-        For fit_target != standard_reaction_term:
-            P_i = a_i * P_reference_i(T)
-        that is activity-linear scaling of the stored reference pressure.
-
-        For fit_target == standard_reaction_term:
-            P_i = a_i ** n_a * P_reference_i(T)
-                  * (pO2 / pO2_reference) ** n_p
-        where n_a is oxide_activity_exponent (the code treats a missing or
-        zero-like value as 1.0) and n_p is pO2_exponent (default 0). pO2 and
-        pO2_reference are in bar. If n_p is nonzero and pO2_bar is omitted,
-        this helper raises RuntimeError rather than dropping the pO2 term.
-
-        Sanity (Na row, T=1500 C, a_Na2O=0.5): n_p = -0.25, so dropping pO2
-        from 1 bar to 1e-4 bar multiplies P_Na by 10; a pO2-free
-        a_i * P_ref formula predicts no change.
-
-        fit_target=pure_component_psat identifies the fit target, not a
-        first-principles evidence class. vapor_pressure_source_label reserves
-        pure_component_first_principles for a derivation from physical
-        constants; loaded pure-component rows include source-published
-        empirical equations. Rows with
-        fit_target=pseudo_psat_backsolved_from_vaporock are backsolved
-        VapoRock fallbacks (curve-fits), with residual_dex/confidence_tier
-        metadata.
-
-        This helper does not require activities to have come from
-        ``activity_from_chem_potential``. Callers pass whatever mapping they
-        extracted (direct tables, gamma*x, phase fields, or mu/mu0). If that
-        mapping is empty, no pressure is emitted.
-        Missing activity for a melt-present precursor is a hard refusal of the
-        whole projection (via ``_activities_times_antoine_or_fail``); this
-        helper records partial omissions so the outer gate can refuse rather
-        than emit a map with silently dropped volatiles.
+        Activities may come from direct tables, gamma*x, or mu/mu0. Missing
+        precursor activities are refused by _activities_times_antoine_or_fail.
+        Pressure math belongs to the catalog/Ellingham owner, never to a
+        pure-component wall-saturation sidecar in this adapter.
         """
         if not activities:
             return {}
         table = self._load_vapor_pressure_table()
         if not table:
             return {}
-        T_K = float(T_C) + 273.15
-        pressures: Dict[str, float] = {}
-        self._antoine_floor_inversion_notices = {}
+        from simulator.chemistry.ellingham_graph import (
+            ELLINGHAM_THERMO,
+            _antoine_reference_pressure_Pa,
+            effective_equilibrium_pressure_Pa,
+        )
         from engines.builtin.vapor_pressure import (
-            COEFF_BLOCK_ANTOINE,
-            FIT_TARGET_STANDARD_REACTION,
+            _standard_reaction_pressure_Pa,
             melt_dissociation_pO2_floor_inversion_notice,
-            vapor_pressure_antoine_coefficients,
             warn_pseudo_vapor_pressure_fallback,
         )
         from simulator.physical_constants import MELT_DISSOCIATION_PO2_MIN_BAR
 
+        T_K = float(T_C) + 273.15
+        pressures: Dict[str, float] = {}
+        self._antoine_floor_inversion_notices = {}
         for species, spec in table.items():
+            if species not in ELLINGHAM_THERMO and not spec.get('antoine'):
+                # Retain this bridge's original oxide-gas request surface.
+                continue
             raw_activity = self._activity_for_vapor_species(species, activities)
-            if raw_activity is None:
-                # Omission is handled by or_fail when melt has precursor.
+            if raw_activity is None or not self._is_number(raw_activity):
                 continue
-            if not self._is_number(raw_activity):
-                continue
-            coeffs, coefficient_block = vapor_pressure_antoine_coefficients(
-                spec,
-                temperature_K=T_K,
-            )
-            if not all(key in coeffs for key in ('A', 'B', 'C')):
-                continue
-            activity_i = float(raw_activity)
-            p_reference_i = 10.0 ** _antoine_log10_pressure(
-                float(coeffs['A']),
-                float(coeffs['B']),
-                float(coeffs['C']),
-                T_K,
-            )
-            p_i = activity_i * p_reference_i
-            if str(spec.get('fit_target', '') or '') == FIT_TARGET_STANDARD_REACTION:
-                activity_exponent = float(
-                    spec.get('oxide_activity_exponent', 1.0) or 1.0
+            reaction = spec.get('liquid_oxide_standard_reaction') or spec
+            pO2_exponent = float(reaction.get('pO2_exponent', 0.0) or 0.0)
+            uses_sidecar = bool(spec.get('pure_component_antoine'))
+            uses_catalog = bool(spec.get('reference_pressure_model') or spec.get('liquid_oxide_standard_reaction'))
+            if pO2_bar is None and (pO2_exponent or uses_sidecar or uses_catalog):
+                raise RuntimeError(
+                    'AlphaMELTS Antoine fallback cannot evaluate '
+                    f'{species} melt-source reaction without pO2_bar; '
+                    'refusing activity-only vapor pressure'
                 )
-                p_i = (max(activity_i, 0.0) ** activity_exponent) * p_reference_i
-                pO2_exponent = float(spec.get('pO2_exponent', 0.0) or 0.0)
-                if pO2_exponent:
-                    if pO2_bar is None:
-                        raise RuntimeError(
-                            'AlphaMELTS Antoine fallback cannot evaluate '
-                            f'{species} standard_reaction_term without pO2_bar; '
-                            'refusing activity-only vapor pressure'
-                        )
-                    pO2_reference_bar = max(
-                        1e-30,
-                        float(spec.get('pO2_reference_bar', 1.0) or 1.0),
-                    )
-                    pO2_raw = float(pO2_bar)
-                    pO2_value = max(pO2_raw, 1e-30)
-                    p_i *= (pO2_value / pO2_reference_bar) ** pO2_exponent
-                    if p_i > 0.0 and math.isfinite(p_i):
-                        try:
-                            fO2_log = math.log10(pO2_value)
-                        except ValueError:
-                            fO2_log = None
-                        notice = melt_dissociation_pO2_floor_inversion_notice(
-                            species=str(species),
-                            pressure_Pa=p_i,
-                            pO2_bar_used=pO2_value,
-                            pO2_exponent=pO2_exponent,
-                            pressure_rail="liquid_oxide_standard_reaction",
-                            fO2_log=fO2_log,
-                            was_clamped=(
-                                math.isfinite(pO2_raw)
-                                and pO2_raw < MELT_DISSOCIATION_PO2_MIN_BAR
-                            ),
-                        )
-                        if notice is not None:
-                            self._antoine_floor_inversion_notices[
-                                str(species)
-                            ] = notice
-            if p_i > 0.0 and math.isfinite(p_i):
-                pressures[str(species)] = p_i
-                if coefficient_block == COEFF_BLOCK_ANTOINE:
-                    warn_pseudo_vapor_pressure_fallback(
-                        str(species),
-                        spec,
-                        self._pseudo_vapor_pressure_warning_seen,
-                        stacklevel=3,
-                    )
+            pO2_value = float(pO2_bar) if pO2_bar is not None else 1.0
+            if self._antoine_uses_reaction_pressure(spec):
+                group = 'metals' if species in ELLINGHAM_THERMO else 'oxide_vapors'
+                p_i = effective_equilibrium_pressure_Pa(
+                    species, T_K, pO2_value, a_oxide=float(raw_activity),
+                    vapor_pressure_data=(
+                        getattr(self, '_vapor_pressure_catalog_payload', {group: {species: spec}})
+                        if uses_catalog else {group: {species: spec}}
+                    ),
+                )
+            else:
+                # Legacy fitted reaction references are not elemental
+                # sidecars. Preserve their projection through the owner.
+                reference = _antoine_reference_pressure_Pa(spec.get('antoine') or {}, T_K)
+                if reference is None:
+                    continue
+                p_i, _, _ = _standard_reaction_pressure_Pa(
+                    P_reference_Pa=reference, oxide_activity_value=float(raw_activity),
+                    activity_exponent=1.0, o2_term=None, o2_potential=None,
+                )
+            if p_i <= 0.0 or not math.isfinite(p_i):
+                continue
+            pressures[str(species)] = p_i
+            notice = melt_dissociation_pO2_floor_inversion_notice(
+                species=str(species), pressure_Pa=p_i,
+                pO2_bar_used=pO2_value, pO2_exponent=pO2_exponent,
+                pressure_rail="liquid_oxide_standard_reaction",
+                fO2_log=math.log10(max(pO2_value, 1e-30)),
+                was_clamped=pO2_value < MELT_DISSOCIATION_PO2_MIN_BAR,
+            )
+            if notice is not None:
+                self._antoine_floor_inversion_notices[str(species)] = notice
+            warn_pseudo_vapor_pressure_fallback(
+                str(species), spec, self._pseudo_vapor_pressure_warning_seen,
+                stacklevel=3,
+            )
         return pressures
 
     def _melt_has_antoine_vapor_precursor(
@@ -5587,6 +5548,7 @@ class _MELTSBackendSupport(MeltBackend):
         )
         with open(path) as f:
             data = load_cached_safe_yaml(f.read()) or {}
+        self._vapor_pressure_catalog_payload = data
         from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
 
         data = vapor_pressure_legacy_view(data)

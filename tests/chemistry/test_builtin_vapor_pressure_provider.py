@@ -2824,7 +2824,7 @@ def test_active_si_composite_supersedes_legacy_pure_component_sidecar(
 
     assert "SiO" in kernel_vp
     assert kernel_vp["Si"] > 0.0
-    assert legacy_vp["Si"] > kernel_vp["Si"] * 1.0e6
+    assert legacy_vp["Si"] == kernel_vp["Si"]
     assert kernel_vp["Si"] == pytest.approx(2.9468548936088294e-07)
     assert set(legacy_vp) <= set(kernel_vp)
     assert set(kernel_vp) - set(legacy_vp) == {"Si2", "Si3", "SiO2_gas"}

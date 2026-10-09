@@ -7720,7 +7720,20 @@ def test_activities_times_antoine_maps_thermoengine_liquid_activity_keys():
     assert all(pressures[species] > 0.0 for species in required)
     assert pressures['Na'].hex() == '0x1.27fb918b2b0aep+8'
     assert pressures['K'].hex() == '0x1.19c380c94a644p+14'
-    assert pressures['Mg'].hex() == '0x1.0e7fbeab5e7f0p+18'
+    from simulator.chemistry.ellingham_graph import effective_equilibrium_pressure_Pa
+
+    assert pressures['Mg'] == effective_equilibrium_pressure_Pa(
+        'Mg', 1600.0 + 273.15, 1e-9,
+        a_oxide=backend._activity_for_vapor_species('Mg', activities),
+        vapor_pressure_data=backend._vapor_pressure_catalog_payload,
+    )
+    # Independent JANAF Mg-010 pin (Chase 1998, rows 1400-2000 K):
+    # 2 Mg(g) + O2 -> 2 MgO(s), dG = -1463.2445 + 0.411822143*T
+    # kJ/mol O2. At 1873.15 K, K = exp(dG*1000/(R*T)); with
+    # a_MgO = 2*0.0676 and pO2/P° = 1e-9, mass action gives
+    # p_Mg = 100000*sqrt(K*a_MgO**2/1e-9) = 0.0965708 Pa for
+    # R = 8.314462618 J/(mol K). Allow the owner's rounded R = 8.31446.
+    assert pressures['Mg'] == pytest.approx(0.0965708, rel=1e-5)
     assert pressures['SiO'].hex() == '0x1.3edd07a85de8dp+0'
     assert backend._activity_for_vapor_species('Na', activities) == pytest.approx(
         9.57e-5
@@ -8930,11 +8943,11 @@ def test_vapor_bridge_helper_unavailable_uses_explicit_antoine_fallback_nonempty
     # refuse — silent Na/K drop is the A2 fail-closed class).
     pressures, source = backend._vapor_pressures_via_vaporock_or_antoine(
         T_C=1600.0,
-        solved_melt_wt_pct={'SiO2': 45.0, 'Na2O': 4.0, 'K2O': 1.0},
+        solved_melt_wt_pct={'SiO2': 45.0, 'Na2O': 4.0, 'K2O': 1.0, 'MgO': 10.0},
         liquid_fraction=1.0,
         fO2_log=-8.0,
         pressure_bar=1e-6,
-        activities={'Na2O': 0.2, 'SiO2': 0.4, 'K2O': 0.05},
+        activities={'Na2O': 0.2, 'SiO2': 0.4, 'K2O': 0.05, 'MgO': 0.1352},
     )
 
     # t-383: Na high-T rail is L&H liquid-NaO0.5 standard_reaction_term
@@ -8946,6 +8959,11 @@ def test_vapor_bridge_helper_unavailable_uses_explicit_antoine_fallback_nonempty
     # standard_reaction_term (melt-activity + pO2 context), and the
     # provenance token reports it.
     assert source["SiO"] == (
+        "antoine_fallback_from_vaporock:standard_reaction_term"
+    )
+    # Mg's pure-component sidecar routes pressure through Ellingham's
+    # gas-reaction rail here; provenance must follow that selected rail.
+    assert source["Mg"] == (
         "antoine_fallback_from_vaporock:standard_reaction_term"
     )
     # FAIL-LOUD: the fallback is a real Antoine dict, NOT a silent {} that
