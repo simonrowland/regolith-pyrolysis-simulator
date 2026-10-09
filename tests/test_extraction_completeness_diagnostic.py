@@ -78,6 +78,28 @@ def test_extraction_hard_floor_invalid_liquid_fraction_preserves_false_gate() ->
     assert divergence["liquid_fraction_invalid"] == "non_finite"
 
 
+def test_extraction_hard_floor_ignores_freeze_gate_f_when_crystals_hold_mass() -> None:
+    sim = _diagnostic_sim()
+    sim._freeze_gate_enabled = lambda: True
+
+    def forbidden():
+        raise AssertionError(
+            "hard floor read freeze-gate F while crystals hold mass"
+        )
+
+    sim._freeze_gate_liquid_fraction_factor = forbidden
+    sim.atom_ledger.load_external_mol(
+        "process.crystal.melts.olivine.0",
+        {"MgO": 1.0},
+        material_origin="feedstock",
+    )
+    sim._update_extraction_completeness_diagnostic()
+    diag = sim._last_extraction_completeness_diagnostic
+    assert diag["liquid_fraction"] is None
+    assert diag["would_be_hard_floor_advance"] is None
+    assert diag["hard_floor_status"] == "crystal homes hold mass"
+
+
 def test_completeness_diagnostic_does_not_change_campaign_advancement() -> None:
     with_diagnostic = _diagnostic_sim()
     without_diagnostic = _diagnostic_sim()

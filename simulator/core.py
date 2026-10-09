@@ -12984,7 +12984,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         liquid_fraction = None
         hard_would_advance = None
         hard_reason = "freeze gate disabled"
-        if self._freeze_gate_enabled():
+        ledger = getattr(self, "atom_ledger", None)
+        crystals_hold_mass = (
+            ledger is not None
+            and holds_positive_crystal_moles(ledger.mol_by_account())
+        )
+        if crystals_hold_mass:
+            # Same predicate as the flux sites. F is not an area and
+            # the crystal mass is already out of the liquid account.
+            hard_reason = "crystal homes hold mass"
+        elif self._freeze_gate_enabled():
             try:
                 raw_liquid_fraction = self._freeze_gate_liquid_fraction_factor()
             except Exception as exc:
