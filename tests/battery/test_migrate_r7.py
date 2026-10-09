@@ -956,6 +956,7 @@ def absence_audit(paths=STORE_PATHS):
                             contradiction = found
                     elif match := re.search(r"source does not state (?:a numeric )?(\w+)", reason):
                         found = [p for p, value in leaves if value not in (None, "") and
+                                 not p.endswith((".tag", ".reason")) and
                                  re.search(r"(?:^|\.)" + re.escape(match[1]) + r"(?:\.|\[|$)", p)]
                         if found:
                             contradiction = found[:3]
@@ -1001,6 +1002,73 @@ def test_g1_whole_store_absence_claims_match_sources(path):
         if _source_observation_rows(path) != 0:
             assert judged, "no source families judged"
     assert not bad, f"{len(bad)} false absence claims; first witnesses: {bad[:12]}"
+
+
+@pytest.mark.parametrize(
+    "source_polymorph,expected_bad",
+    [
+        ({"tag": "unknown", "reason": "source does not state polymorph"}, False),
+        ({"tag": "value", "value": "corundum"}, True),
+    ],
+    ids=("typed-absence", "printed-polymorph"),
+)
+def test_g1_nested_unknown_is_not_a_printed_field_witness(
+    tmp_path, monkeypatch, source_polymorph, expected_bad
+):
+    root = tmp_path / "repo"
+    store_dir = root / "data/literature/extracts-v2"
+    source_dir = root / "data/literature/extracts"
+    store_dir.mkdir(parents=True)
+    source_dir.mkdir(parents=True)
+    monkeypatch.setitem(absence_audit.__globals__, "REPO_ROOT", root)
+
+    observation_id = "fixture::polymorph-row"
+    store = {
+        "observations": [
+            {
+                "observation_id": observation_id,
+                "source_id": "fixture",
+                "identity": {
+                    "reference_state": {
+                        "tag": "value",
+                        "value": {
+                            "endmember": {
+                                "polymorph": {
+                                    "tag": "unknown",
+                                    "reason": "source does not state polymorph",
+                                }
+                            }
+                        },
+                    }
+                },
+            }
+        ]
+    }
+    source = {
+        "species": {
+            "Fe": {
+                "observations": [
+                    {
+                        "observation_id": "polymorph-row",
+                        "standard_state": {
+                            "state": {
+                                "tag": "value",
+                                "value": {
+                                    "endmember": {"polymorph": source_polymorph}
+                                },
+                            }
+                        },
+                    }
+                ]
+            }
+        }
+    }
+    store_path = store_dir / "fixture.yaml"
+    store_path.write_text(yaml.safe_dump(store))
+    (source_dir / "fixture.yaml").write_text(yaml.safe_dump(source))
+
+    _judged, bad = absence_audit([store_path])
+    assert bool(bad) is expected_bad
 
 
 _COUNT_LEAF_KEYS = ("value", "as_published", "raw")

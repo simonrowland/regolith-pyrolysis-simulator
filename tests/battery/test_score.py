@@ -36,6 +36,7 @@ from simulator.battery.enums import (
     NoticeKind,
     PerBasis,
     Phase,
+    Polymorph,
     Quantity,
     QUANTITY_UNITS,
     Rail,
@@ -7096,10 +7097,19 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
             for row in allibert_cao_rows
         )
         assert len(allibert_alumina_rows) == 8
+        # Allibert's extracted reference text explicitly names pure alpha-Al2O3,
+        # so regenerated rows have a corundum reference and receive the fusion
+        # conversion. The prior missing-input notice came from the stale store.
+        assert all(
+            observations[row.reference]
+            .identity.reference_state.value.endmember.polymorph.value
+            is Polymorph.CORUNDUM
+            for row in allibert_alumina_rows
+        )
         assert all(
             any(
-                "fusion conversion missing input" in notice.reason
-                and "measured reference polymorph is unknown" in notice.reason
+                notice.kind is NoticeKind.DERIVATION_USES_COMPILATION
+                and notice.reason.startswith("reference_converted_via_fusion;")
                 for notice in row.notices
             )
             for row in allibert_alumina_rows

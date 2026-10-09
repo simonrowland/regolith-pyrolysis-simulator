@@ -5217,6 +5217,16 @@ def test_ts1985_and_yam1983_tridymite_reference_state_baseline() -> None:
     assert allibert_polymorph is not None and allibert_polymorph.is_value
     assert allibert_polymorph.value is Polymorph.CORUNDUM
 
+    without_printed_form = reference_state_from_extract(
+        allibert["standard_state"].replace("alpha-Al2O3", "Al2O3"),
+        species_formula="Al2O3",
+        values=allibert["values"],
+    )
+    assert without_printed_form is not None and without_printed_form.is_value
+    missing_polymorph = without_printed_form.value.endmember.polymorph
+    assert missing_polymorph is not None and missing_polymorph.is_unknown
+    assert missing_polymorph.reason == "source does not state polymorph"
+
     ca2sio4_alpha = next(
         row
         for row in _extract_observations(
