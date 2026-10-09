@@ -518,9 +518,8 @@ EVAPORATION_CLASSES: Final[dict[str, EvaporationClass]] = {
         species=("Fe", "Mg", "Mg2", "MgO_gas"),
         evidence=_REDOX_EVIDENCE,
         notes=(
-            "Central 0.084 = gmean of comparable grounding poles (Costa Fe 0.02, "
-            "Fedkin Fe 0.24, Fedkin Mg √(0.24·0.27), Richter Mg 0.04); residual "
-            "0.63 dex covers every grounded α including rail Fe 0.02 (b-153). "
+            "Central class fallback α=0.083. Costa Fe high-side figure reading "
+            "0.01978 (PDF p. 11); 0.63 dex covers every grounded α (b-153). "
             "Not a Motzfeldt resolution (b-116 still open)."
         ),
     ),
