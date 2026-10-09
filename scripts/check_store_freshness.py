@@ -47,12 +47,14 @@ INPUT_EXACT = {
 
 # Migration-code closure outside data/literature and simulator/battery: the
 # molar-mass table (atomic weights), the shared physical constants
-# (STANDARD_ATMOSPHERE_PA), and the JANAF formula parser validate.py uses.
+# (STANDARD_ATMOSPHERE_PA), the JANAF formula parser validate.py uses, and the
+# State/StateTag owner that battery records and enums re-export.
 CODE_INPUTS = (
     "simulator/accounting/exceptions.py",
     "simulator/accounting/formulas.py",
     "simulator/physical_constants.py",
     "simulator/reference_data/janaf.py",
+    "simulator/state_types.py",
 )
 
 
