@@ -19,6 +19,7 @@ import pytest
 import yaml
 
 from simulator.yaml_cache import load_cached_safe_yaml
+import simulator.reference_data.janaf as janaf_reference
 
 from simulator.reference_data.janaf import (
     COMPILATION_ROOT,
@@ -72,6 +73,23 @@ LIVE_TXT_SAMPLE = (
     "0\t0.\t0.\tINFINITE\t-4.539\t0.\t0.\t0.\n"
     "298.15\t20.786\t154.846\t154.846\t0.\t905.814\t888.384\t-155.656\n"
     "933.450\t20.786\t177.123\t160.111\t13.211\tCRYSTAL <--> LIQUID\n"
+)
+CU020_PAGE_READ_SAMPLE = (
+    "Copper Oxide (Cu2O)\tCu2O1(l)\n"
+    "T(K)\tCp\tS\t-[G-H(Tr)]/T\tH-H(Tr)\tdelta-f H\tdelta-f G\tlog Kf\n"
+    "1400\t99.914\t250.822\t185.249\t91.802\t-127.026\t-61.360\t2.289\n"
+    "1500\t99.914\t257.715\t189.853\t101.794\t-125.424\t-56.725\t1.975\n"
+    "1516.700\t99.914\t258.821\t190.606\t103.462\tCRYSTAL <--> LIQUID\n"
+    "1600\t99.914\t264.163\t194.298\t111.785\t123.836  52.197 1.704\n"
+    "1700\t99.914\t270.220\t198.587\t121.776\t-122.259\t-47.768\t1.468\n"
+)
+O007_PAGE_READ_SAMPLE = (
+    "Lead Oxide (PbO)\tO1Pb1(l)\n"
+    "T(K)\tCp\tS\t-[G-H(Tr)]/T\tH-H(Tr)\tdelta-f H\tdelta-f G\tlog Kf\n"
+    "1100\t65.000\t158.232\t110.850\t52.120\t-191.419\t-108.193\t5.138\n"
+    "1159.000\t65.000\t161.628\t113.349\t55.955\tII <--> LIQUID\n"
+    "1200\t65.000\t163.887\t115.037\t58.620\t189.588  100.708 4.384\n"
+    "1300\t65.000\t169.090\t118.998\t65.120\t-187.750\t-93.376\t3.752\n"
 )
 
 
@@ -194,6 +212,120 @@ def test_transition_following_enthalpy_bracket_is_named_refusal(
     ]["parse_repair_reason"]
     assert row["formation_gibbs_energy"]["value"] is not None
     assert row["log10_formation_equilibrium_constant"]["value"] is not None
+
+
+def test_cu020_1600k_enthalpy_uses_the_page_read_sign() -> None:
+    table = load_table_document(TABLES_DIR / "Cu-020.yaml")["table"]
+    row = next(row for row in table["values"] if row["temperature"]["value"] == 1600)
+    enthalpy = row["formation_enthalpy"]
+
+    assert enthalpy["value"] == -123.836
+    assert enthalpy["as_published"] == "-123.836"
+    assert enthalpy["locator"]["page_read_sign"] == "-123.836"
+    assert enthalpy["locator"]["page_locator"] == (
+        "https://janaf.nist.gov/pdf/JANAF-FourthEd-1998-Copper.pdf#page=20; "
+        "SHA-256 d161dc6535ffa6c579357f7489573f402610fbbf94018d703b6aa350c59d3773; "
+        "printed p. 1024"
+    )
+    assert enthalpy["locator"]["crop_note"] == (
+        "https://janaf.nist.gov/pdf/JANAF-FourthEd-1998-Copper.pdf#page=20; "
+        "SHA-256 d161dc6535ffa6c579357f7489573f402610fbbf94018d703b6aa350c59d3773; "
+        "printed p. 1024 / PDF p. 20, Table Cu-020, rows 1500, 1600, and 1700 K; "
+        "crop shows the ΔfH° header and row signs."
+    )
+
+    parsed = parse_janaf_txt(
+        CU020_PAGE_READ_SAMPLE,
+        table_id="Cu-020",
+        url="https://janaf.nist.gov/tables/Cu-020.html",
+        download_url="https://janaf.nist.gov/tables/Cu-020.txt",
+    )
+    parsed_row = next(
+        row for row in parsed.values if row["temperature"]["value"] == 1600
+    )
+    parsed_enthalpy = parsed_row["formation_enthalpy"]
+    assert parsed_enthalpy["value"] == -123.836
+    assert parsed_enthalpy["as_published"] == "-123.836"
+    assert parsed_enthalpy["locator"]["crop_note"] == enthalpy["locator"]["crop_note"]
+
+
+def test_page_read_sign_provenance_has_no_machine_local_paths() -> None:
+    forbidden = ("/private/", "/Users/", "/tmp/")
+    for entry in janaf_reference.PAGE_READ_SIGNS:
+        for field, value in entry.items():
+            if isinstance(value, str):
+                assert not any(path in value for path in forbidden), field
+
+
+def test_o007_1200k_enthalpy_uses_the_page_read_sign() -> None:
+    table = load_table_document(TABLES_DIR / "O-007.yaml")["table"]
+    committed_row = next(
+        item for item in table["values"] if item["temperature"]["value"] == 1200
+    )
+    parsed = parse_janaf_txt(
+        O007_PAGE_READ_SAMPLE,
+        table_id="O-007",
+        url="https://janaf.nist.gov/tables/O-007.html",
+        download_url="https://janaf.nist.gov/tables/O-007.txt",
+    )
+    row = next(row for row in parsed.values if row["temperature"]["value"] == 1200)
+    enthalpy = row["formation_enthalpy"]
+    parsed_locator = {
+        key: value for key, value in enthalpy["locator"].items() if key != "line_number"
+    }
+    committed_locator = {
+        key: value
+        for key, value in committed_row["formation_enthalpy"]["locator"].items()
+        if key != "line_number"
+    }
+    assert parsed_locator == committed_locator
+
+    assert enthalpy["value"] == -189.588
+    assert enthalpy["as_published"] == "-189.588"
+    assert enthalpy["locator"]["page_read_sign"] == "-189.588"
+    assert enthalpy["locator"]["page_locator"] == (
+        "https://janaf.nist.gov/pdf/JANAF-FourthEd-1998-Oxygen.pdf#page=7; "
+        "SHA-256 6c786ff5ec1c66c7c9bed29e0c358843ca677bccd8e09a7a19e5db3584ae5d3c; "
+        "printed p. 1723"
+    )
+    assert enthalpy["locator"]["crop_note"] == (
+        "https://janaf.nist.gov/pdf/JANAF-FourthEd-1998-Oxygen.pdf#page=7; "
+        "SHA-256 6c786ff5ec1c66c7c9bed29e0c358843ca677bccd8e09a7a19e5db3584ae5d3c; "
+        "printed p. 1723 / PDF p. 7, Table O-007, rows 1100, 1159 transition, "
+        "1200, 1300 K; crop shows PbO(l) header, ΔfH° column, and those rows"
+    )
+    transition = next(
+        item for item in parsed.parse_ambiguities if item.get("line_number") == 4
+    )
+    assert transition["raw_line"].endswith("II <--> LIQUID")
+
+
+def test_page_read_sign_refuses_a_mismatched_text_layer_magnitude(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        janaf_reference,
+        "PAGE_READ_SIGNS",
+        tuple(
+            {**entry, "printed_token": "-123.837"}
+            for entry in janaf_reference.PAGE_READ_SIGNS
+        ),
+    )
+    parsed = parse_janaf_txt(
+        CU020_PAGE_READ_SAMPLE,
+        table_id="Cu-020",
+        url="https://janaf.nist.gov/tables/Cu-020.html",
+        download_url="https://janaf.nist.gov/tables/Cu-020.txt",
+    )
+
+    assert not any(row["temperature"]["value"] == 1600 for row in parsed.values)
+    refusal = next(
+        ambiguity
+        for ambiguity in parsed.parse_ambiguities
+        if ambiguity.get("kind")
+        == janaf_reference.PAGE_READ_SIGN_MAGNITUDE_MISMATCH_KIND
+    )
+    assert refusal["reason"] == janaf_reference.PAGE_READ_SIGN_MAGNITUDE_MISMATCH_REASON
 
 
 def test_refused_janaf_row_keeps_unsigned_source_line() -> None:

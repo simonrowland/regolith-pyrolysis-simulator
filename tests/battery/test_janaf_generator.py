@@ -63,7 +63,7 @@ STRUCTURED_NUMERIC_COUNTS = {
     "entropy": 75818,
     "negative_gibbs_enthalpy_function": 74572,
     "enthalpy_increment": 75818,
-    "formation_enthalpy": 74914,
+    "formation_enthalpy": 74916,
     "formation_gibbs_energy": 75180,
     "log10_formation_equilibrium_constant": 74200,
 }
@@ -83,6 +83,15 @@ _CRYSTAL_POLYMORPH_LABELS = {"ALPHA", "BETA", "GAMMA", "DELTA", "I", "II", "III"
 
 def _generation(table_id: str) -> generator.TableGeneration:
     return generator.generate_table(load_table_document(TABLES_DIR / f"{table_id}.yaml"))
+
+
+def test_o007_1200k_page_read_enters_generated_formation_enthalpy() -> None:
+    payload = _require_raw_table("O-007").read_bytes()
+    generated = generator.generate_table(_parse_raw_document("O-007", payload))
+
+    assert (Decimal("1200"), Decimal("-189.588")) in _series(
+        generated, Quantity.DELTA_FH
+    )
 
 
 def _phase_values(generated: generator.TableGeneration) -> list[str]:
@@ -1897,7 +1906,7 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
     assert points[Quantity.CP.value] == 77542
     assert points[Quantity.S.value] == 77540
     assert points[Quantity.H_MINUS_H298.value] == 77539
-    assert points[Quantity.DELTA_FH.value] == 74914
+    assert points[Quantity.DELTA_FH.value] == 74916
     assert points[Quantity.DELTA_FG.value] == 75180
     assert points[Quantity.LOG10_KF.value] == 74200
     assert points[Quantity.TRANSITION_TEMPERATURE.value] == 979
@@ -1910,7 +1919,7 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
     assert cells["heat_capacity"]["stored_points"] == 77542
     assert cells["entropy"]["stored_points"] == 77540
     assert cells["enthalpy_increment"]["stored_points"] == 77539
-    assert cells["formation_enthalpy"]["stored_points"] == 74914
+    assert cells["formation_enthalpy"]["stored_points"] == 74916
     assert cells["formation_gibbs_energy"]["stored_points"] == 75180
     assert cells["log10_formation_equilibrium_constant"]["stored_points"] == 74200
     assert cells["formation_enthalpy"]["excluded_numeric_total"] == 12
@@ -1988,8 +1997,8 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
     assert refused_merged_pair_checks == 12
     assert stored_cell_errata == 1
     assert raw_numeric_accounting == {
-        "numeric_source_tokens": 533246,
-        "accounted_numeric_cells": 533246,
+        "numeric_source_tokens": 533248,
+        "accounted_numeric_cells": 533248,
         "refused_concatenated_numeric_tokens": 0,
         "refused_layout_numeric_tokens": 0,
         "unexplained_numeric_tokens": 0,
