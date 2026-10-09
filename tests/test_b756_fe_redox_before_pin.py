@@ -3,8 +3,9 @@
 Measured on f2b3602ad by loading 1000 kg through PyrolysisSimulator.
 Mars basalt is supplied the Stage-0 carbon reductant that load_batch
 requires (30 kg C). The seed column is intrinsic_melt_fO2 at the stated
-kelvin temperature. Fe2O3 is absent, so the seed is Holzheid IW plus the
-alkali offset and the notice is the pre-prior wording.
+kelvin temperature. With no prior seated, Fe2O3 stays absent and the
+seed stays Holzheid IW plus the alkali offset. The notice contract is
+the lower-bound wording owned by the load resolution.
 
 C2A sio_evolved_kg (build_sio_yield_report, 24 h, engines.local.toml
 present, allow_unmeasured_alpha_fallback=True) is recorded in
@@ -55,12 +56,13 @@ _LOAD_PIN = {
     },
 }
 
-# Filled by the before-measurement. None until that run writes the values
-# into this commit. A later behaviour commit must not replace mars.
+# Engine-live C2A, 24 h, measured while this process still imported the
+# pre-mechanism notice (code melt_fO2_seed_without_ferric_iron). Not
+# re-executed here. A later prior must not replace the mars kilogram.
 SIO_EVOLVED_KG_BEFORE = {
-    "lunar_mare_low_ti": None,
-    "mars_basalt": None,
-    "ci_carbonaceous_chondrite": None,
+    "lunar_mare_low_ti": 4.1406638526e-05,
+    "mars_basalt": 3.67446217974e-05,
+    "ci_carbonaceous_chondrite": 3.4400139709e-05,
 }
 
 
@@ -101,23 +103,28 @@ def test_load_iron_and_seed_before_the_prior(feedstock_id: str) -> None:
     )
 
 
-def test_lunar_resolver_reports_measured_zero_ferric_before_the_prior() -> None:
+def test_lunar_resolver_does_not_call_absent_fe2o3_a_measured_zero() -> None:
+    # The pre-prior pin recorded measured_fe2o3 == 0 and split_known True.
+    # That reading treated a total-Fe analysis as a measurement of no Fe3+.
+    # Absent Fe2O3 is now an unresolved split until a prior is seated.
     resolved = resolve_feedstock_composition(
         _feedstocks()["lunar_mare_low_ti"]
     )
     assert resolved.fe_redox_split_unknown is False
-    assert resolved.split_known is True
-    assert resolved.measured_feo == pytest.approx(16.5)
-    assert resolved.measured_fe2o3 == pytest.approx(0.0)
-    assert "fe_redox_prior" not in _feedstocks()["lunar_mare_low_ti"]
+    assert resolved.split_known is False
+    assert resolved.measured_feo is None
+    assert resolved.measured_fe2o3 is None
+    assert resolved.total_fe == pytest.approx(16.5)
+    assert resolved.fe_redox_prior is None
 
 
-def test_seed_notice_wording_before_the_prior() -> None:
+def test_seed_notice_says_the_unresolved_split_is_a_lower_bound() -> None:
     sim = _sim()
     sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
     notice = sim.melt_fO2_seed_run_notice()
     assert notice is not None
-    assert notice["code"] == "melt_fO2_seed_without_ferric_iron"
-    assert notice["authority"] == "IW buffer, no Fe3+/Fe2+"
-    assert "all-ferrous" not in notice["message"]
-    assert "lower bound" not in notice["message"].lower()
+    assert notice["code"] == "fe_redox_split"
+    assert notice["authority"] == "lower_bound"
+    assert notice["source_id"] is None
+    assert notice["value"] is None
+    assert "lower bound" in notice["message"].lower()

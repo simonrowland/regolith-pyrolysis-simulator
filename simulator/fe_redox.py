@@ -2,9 +2,13 @@ from __future__ import annotations
 
 import math
 from collections.abc import Mapping
+from dataclasses import dataclass
 
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
 from simulator.feedstock_composition import (
+    FEOT_FROM_FE2O3,
+    OXYGEN_IN_FEO,
+    FeRedoxPrior,
     feot_equivalent_wt_pct,
     iron_oxide_values,
 )
@@ -26,46 +30,73 @@ def melt_fO2_seed_without_ferric_iron(
 def intrinsic_melt_fO2(
     composition_wt_pct: Mapping[str, float],
     temperature_K: float,
+    *,
+    fe_redox_prior: FeRedoxPrior | None = None,
 ) -> float:
     """Melt oxygen potential adopted from the iron-wüstite buffer.
 
     Premise: before a liquid redox step has a reference temperature, the
     melt potential is the pure-FeO IW buffer at the temperature where it
     is adopted, plus the alkali offset already used by this seed. The
-    ferric term applies only when both FeO and Fe2O3 are present. Fe2O3
-    absent does not invent an IW-1 offset; the caller carries
-    ``melt_fO2_seed_without_ferric_iron``.
+    ferric term applies only when both FeO and Fe2O3 are present and no
+    prior is seated. Fe2O3 absent does not invent an IW-1 offset; the
+    caller carries ``melt_fO2_seed_without_ferric_iron``.
 
-    Algebra: log10(fO2/bar) = feo_iw_log10_fO2_bar(T) + redox_offset.
+    A delta_iw prior replaces that sum. Sato's offset is already the
+    measured log10(fO2) minus production IW, so alkali is not added again.
+    A measured Fe3+/sum-Fe prior inverts Kress91 at this temperature
+    (``kress91_fO2_log_for_fe3_fraction``); Kress91 already carries the
+    Na2O and K2O terms, so alkali is not added on top.
+
+    Algebra, no prior: log10(fO2/bar) = feo_iw_log10_fO2_bar(T) + redox_offset.
     feo_iw_log10_fO2_bar is Holzheid, Palme & Chakraborty 1997 liquid FeO
     at a_FeO = 1 (ΔG = -244118 + 115.559 T - 8.474 T ln T J/mol;
     ln(fO2) = 2 ΔG / (R T); log10 = ln / ln(10)). Alkali offset is
     min(0.15, (Na2O + K2O) wt% * 0.01) dex. Ferric offset, when both
-    oxides are positive, is 0.25 * log10(Fe2O3/FeO).
+    oxides are positive and no prior is seated, is 0.25 * log10(Fe2O3/FeO).
+    delta_iw: log10(fO2/bar) = feo_iw_log10_fO2_bar(T) + prior.value.
 
-    Units: T in K, ΔG in J/mol, R in J/(mol·K), result dimensionless
-    log10(fO2/bar).
+    Units: T in K, ΔG in J/mol, R in J/(mol·K), prior.value in dex for
+    delta_iw and dimensionless Fe3+/sum-Fe for a measured fraction.
+    Result is dimensionless log10(fO2/bar).
 
     Sanity: Holzheid IW is -13.3608 at 1338 K (4.36e-14 bar) and -10.0490
-    at 1638 K (8.93e-11 bar). At 1800 K it is -8.731 (1.86e-9 bar). The
-    headspace vacuum floor is not applied here. Vapour mass action still
+    at 1638 K (8.93e-11 bar). At 1800 K it is -8.731 (1.86e-9 bar). A
+    delta_iw of -1.01 at 1673.15 K is -9.740754 - 1.01 = -10.750754.
+    The headspace vacuum floor is not applied here. Vapour mass action still
     uses the 1e-30..100 bar melt-dissociation envelope
     (MELT_DISSOCIATION_PO2_MIN_BAR / MAX_BAR).
 
     The 0.25 ferric coefficient is not a Kress91 inversion. Kress91's
     a = 0.196 would be ~5.1 per log10 molar ratio, and it takes a molar
-    ratio rather than this weight ratio. On a ledger Fe2O3 that never
-    equilibrated, inverting Kress91 is a category error.
+    ratio rather than this weight ratio. It remains only on the no-prior
+    path. A seated prior uses the forward Kress91 relation, inverted once
+    in ``kress91_fO2_log_for_fe3_fraction``.
     """
 
     temperature = float(temperature_K)
+    if fe_redox_prior is not None and fe_redox_prior.kind == "delta_iw":
+        return feo_iw_log10_fO2_bar(temperature, a_feo=1.0) + float(
+            fe_redox_prior.value
+        )
+    if (
+        fe_redox_prior is not None
+        and fe_redox_prior.kind == "measured_fe3_fraction"
+        and 0.0 < float(fe_redox_prior.value) < 1.0
+    ):
+        return kress91_fO2_log_for_fe3_fraction(
+            fe3_fraction=float(fe_redox_prior.value),
+            composition_wt_pct=composition_wt_pct,
+            T_K=temperature,
+            pressure_bar=LOAD_FE_SPLIT_PRESSURE_BAR,
+        )
     feo, fe2o3 = iron_oxide_values(composition_wt_pct)
     alkali = max(0.0, float(composition_wt_pct.get("Na2O", 0.0))) + max(
         0.0, float(composition_wt_pct.get("K2O", 0.0))
     )
     log_iw = feo_iw_log10_fO2_bar(temperature, a_feo=1.0)
     redox_offset = 0.0
-    if feo > 0.0 and fe2o3 > 0.0:
+    if fe_redox_prior is None and feo > 0.0 and fe2o3 > 0.0:
         redox_offset += 0.25 * math.log10(max(fe2o3 / feo, 1.0e-12))
     redox_offset += min(0.15, alkali * 0.01)
     return log_iw + redox_offset
@@ -98,6 +129,12 @@ KRESS91_AITHALA_EXPERIMENTAL_CONFIRMATION_MAX_T_C = 2100.0
 KRESS91_HIGH_UNCERTAINTY_MAX_T_C = 2500.0
 # 1400 C cache-label convention for isochemical redox keys, not new physics.
 KRESS91_FO2_KEY_REFERENCE_T_K = 1673.15
+# Load-time mass split pressure. Kress91 pressure terms are GPa corrections.
+# At 1e5 Pa and 1673 K, KRESS91_PRESSURE_INV_T_COEFFICIENT * 1e5 / 1673 is
+# about -4e-5 in ln(Fe2O3/FeO). 1.0 bar keeps the split defined
+# (_validate_kress91_controls refuses a non-positive pressure) without
+# pretending the batch has a GPa load.
+LOAD_FE_SPLIT_PRESSURE_BAR = 1.0
 
 
 def kress91_temperature_band_case(temperature_C: float) -> dict[str, object]:
@@ -751,6 +788,253 @@ def kress91_fe3_over_sigma_fe(
         pressure_bar=pressure_bar,
     )
     return 2.0 * ratio / (2.0 * ratio + 1.0)
+
+
+def kress91_fO2_log_for_fe3_fraction(
+    *,
+    fe3_fraction: float,
+    composition_wt_pct: Mapping[str, float],
+    T_K: float,
+    pressure_bar: float,
+) -> float:
+    """Invert the existing Kress91 forward ratio for log10(fO2/bar).
+
+    Premise: this module had no inversion. The fO2 term inside
+    ``_kress91_fe2o3_over_feo_molar`` is linear, ``a * fO2_log * ln(10)``
+    with ``a = KRESS91_LN_FO2_COEFFICIENT``, and no other term depends on
+    fO2. One call of that forward function at fO2_log = 0 supplies B =
+    ln(ratio_0). The composition terms are not copied here.
+
+    Algebra: fe3 = 2r / (2r + 1) with r = Fe2O3/FeO molar, so
+    r = f / (2 (1 - f)). ln(r) = B + a * fO2_log * ln(10), hence
+    fO2_log = (ln(r) - B) / (a * ln(10)).
+
+    f of 0 or 1 makes r zero or infinite, so this relation has no finite
+    fO2 there. The load path passes ``LOAD_FE_SPLIT_PRESSURE_BAR``.
+
+    Units: f is Fe3+/sum-Fe, T_K kelvin, pressure_bar bar, result
+    log10(fO2/bar).
+
+    Sanity: ``kress91_fe3_over_sigma_fe`` at the returned log reproduces f.
+    """
+
+    fraction = float(fe3_fraction)
+    if not math.isfinite(fraction) or fraction <= 0.0 or fraction >= 1.0:
+        raise Kress91InvalidControls(
+            "Kress91 inversion needs a ferric fraction strictly between 0 and 1"
+        )
+    mol_fractions = melt_mol_fractions_for_kress91(composition_wt_pct)
+    if not mol_fractions or float(mol_fractions.get("FeOt", 0.0)) <= 0.0:
+        raise Kress91InvalidControls(
+            "Kress91 inversion needs a positive FeOt mole fraction"
+        )
+    ratio_at_zero = _kress91_fe2o3_over_feo_molar(
+        fO2_log=0.0,
+        mol_fractions=mol_fractions,
+        T_K=T_K,
+        pressure_bar=pressure_bar,
+    )
+    if ratio_at_zero <= 0.0 or not math.isfinite(ratio_at_zero):
+        raise Kress91InvalidControls(
+            "Kress91 forward ratio at log10(fO2) = 0 is not positive"
+        )
+    target_ratio = fraction / (2.0 * (1.0 - fraction))
+    return (math.log(target_ratio) - math.log(ratio_at_zero)) / (
+        KRESS91_LN_FO2_COEFFICIENT * math.log(10.0)
+    )
+
+
+def fe3_fraction_for_prior(
+    composition_wt_pct: Mapping[str, float],
+    prior: FeRedoxPrior,
+) -> float:
+    """Ferric fraction used for the one load-time mass split.
+
+    A measured fraction is the cited value. A delta_iw prior is the
+    Kress91 split at production IW(T) + delta_iw. T is
+    ``KRESS91_FO2_KEY_REFERENCE_T_K`` (1673.15 K), inside the liquid
+    calibration band and independent of the campaign clock. The seed
+    itself still tracks IW(T) + delta_iw at the adopting temperature.
+    Pressure is ``LOAD_FE_SPLIT_PRESSURE_BAR``. Alkali is not added:
+    delta_iw is already the offset from production IW.
+    """
+
+    if prior.kind == "measured_fe3_fraction":
+        return float(prior.value)
+    if prior.kind != "delta_iw":
+        raise Kress91InvalidControls(
+            f"unknown fe redox prior kind {prior.kind!r}"
+        )
+    mol_fractions = melt_mol_fractions_for_kress91(composition_wt_pct)
+    if not mol_fractions or float(mol_fractions.get("FeOt", 0.0)) <= 0.0:
+        return 0.0
+    fO2_log = feo_iw_log10_fO2_bar(KRESS91_FO2_KEY_REFERENCE_T_K) + float(
+        prior.value
+    )
+    return float(
+        kress91_fe3_over_sigma_fe(
+            fO2_log=fO2_log,
+            mol_fractions=mol_fractions,
+            T_K=KRESS91_FO2_KEY_REFERENCE_T_K,
+            pressure_bar=LOAD_FE_SPLIT_PRESSURE_BAR,
+        )
+    )
+
+
+def omitted_ferric_oxygen_kg(feot_kg: float, fe3_fraction: float) -> float:
+    """Oxygen mass a total-Fe-as-FeO analysis omits when fraction f is Fe3+.
+
+    Premise: FeOT counts every Fe atom as FeO. Moving fraction f of those
+    atoms into Fe2O3 adds half an oxygen atom per ferric Fe
+    (2 FeO + O -> Fe2O3) and does not change the Fe-atom count.
+
+    Algebra: n_Fe = m_FeOT / M_FeO
+             delta_m = f * n_Fe * 0.5 * M_O
+                     = f * m_FeOT * 0.5 * OXYGEN_IN_FEO
+    OXYGEN_IN_FEO is 15.999/71.844, so 0.5 * OXYGEN_IN_FEO is 0.111339 kg
+    oxygen per kg FeOT at f = 1.
+
+    The dispatch text's 8.0e-3 * f * FeOT wt% * batch_kg is 0.800 kg oxygen
+    per kg FeOT at f = 1, about 7.2 times this molar result, and is not used.
+
+    Units: m_FeOT and the result share a mass unit (kg on the ledger, wt%
+    when the caller passes a wt% FeOT). f is dimensionless Fe3+/sum-Fe.
+
+    Sanity: f = 1 and m_FeOT = 100 kg. n_Fe = 100 / 0.071844 = 1391.90 mol.
+    delta_m = 1391.90 * 0.5 * 0.015999 = 11.134 kg.
+    """
+
+    fraction = float(fe3_fraction)
+    mass = float(feot_kg)
+    if not math.isfinite(fraction) or not math.isfinite(mass):
+        raise Kress91InvalidControls("ferric oxygen inputs must be finite")
+    if fraction < 0.0 or fraction > 1.0:
+        raise Kress91InvalidControls("ferric fraction must be between 0 and 1")
+    if mass <= 0.0 or fraction == 0.0:
+        return 0.0
+    return fraction * mass * 0.5 * OXYGEN_IN_FEO
+
+
+def feo_fe2o3_kg_from_feot(
+    feot_kg: float, fe3_fraction: float
+) -> tuple[float, float, float]:
+    """Return FeO mass, Fe2O3 mass, and the omitted oxygen. Fe atoms stay put.
+
+    n_Fe2 = (1 - f) * n_Fe and n_Fe3 = f * n_Fe.
+    m_FeO = n_Fe2 * M_FeO = (1 - f) * m_FeOT.
+    m_Fe2O3 = n_Fe3 * M_Fe2O3 / 2 = f * m_FeOT / FEOT_FROM_FE2O3,
+    because FEOT_FROM_FE2O3 = 2 M_FeO / M_Fe2O3.
+    M_Fe2O3 = 2 M_FeO + M_O, so m_FeO + m_Fe2O3 = m_FeOT + omitted oxygen.
+    """
+
+    oxygen_kg = omitted_ferric_oxygen_kg(feot_kg, fe3_fraction)
+    fraction = float(fe3_fraction)
+    ferrous_kg = (1.0 - fraction) * float(feot_kg)
+    if fraction <= 0.0 or float(feot_kg) <= 0.0:
+        return float(feot_kg), 0.0, 0.0
+    ferric_kg = fraction * float(feot_kg) / FEOT_FROM_FE2O3
+    return ferrous_kg, ferric_kg, oxygen_kg
+
+
+def apply_feot_split_to_oxide_kg(
+    oxide_kg: dict[str, float], fe3_fraction: float
+) -> float:
+    """Rewrite FeO and Fe2O3 in ``oxide_kg``. Return the added oxygen mass."""
+
+    feo_kg = float(oxide_kg.get("FeO", 0.0) or 0.0)
+    fe2o3_kg = float(oxide_kg.get("Fe2O3", 0.0) or 0.0)
+    feot_kg = feo_kg + fe2o3_kg * FEOT_FROM_FE2O3
+    ferrous_kg, ferric_kg, oxygen_kg = feo_fe2o3_kg_from_feot(
+        feot_kg, fe3_fraction
+    )
+    if feot_kg <= 0.0 or float(fe3_fraction) <= 0.0:
+        return 0.0
+    if ferrous_kg > 1.0e-15:
+        oxide_kg["FeO"] = ferrous_kg
+    else:
+        oxide_kg.pop("FeO", None)
+    if ferric_kg > 1.0e-15:
+        oxide_kg["Fe2O3"] = ferric_kg
+    else:
+        oxide_kg.pop("Fe2O3", None)
+    return oxygen_kg
+
+
+def omitted_ferric_oxygen_wt_pct(
+    composition_wt_pct: Mapping[str, float],
+    prior: FeRedoxPrior,
+) -> float:
+    """Wt% oxygen the declared FeOT omits at this prior.
+
+    ``omitted_ferric_oxygen_kg`` is linear in the FeOT mass, so a wt%
+    FeOT returns a wt% of oxygen.
+    """
+
+    feot_wt_pct = feot_equivalent_wt_pct(composition_wt_pct)
+    fraction = fe3_fraction_for_prior(composition_wt_pct, prior)
+    return omitted_ferric_oxygen_kg(feot_wt_pct, fraction)
+
+
+@dataclass(frozen=True)
+class LoadFeRedox:
+    """The one load-time iron resolution every consumer reads.
+
+    ``authority`` is ``measured``, ``prior``, ``lower_bound``, or None when
+    the melt has no oxide iron and no prior. ``fe3_fraction`` is the fraction
+    written into the ledger, or None when the ledger stays all-ferrous.
+    """
+
+    authority: str | None
+    prior: FeRedoxPrior | None
+    fe3_fraction: float | None
+    added_oxygen_kg: float
+
+
+def _oxide_wt_pct_from_kg(oxide_kg: Mapping[str, float]) -> dict[str, float]:
+    total_kg = sum(float(kg) for kg in oxide_kg.values() if float(kg) > 0.0)
+    if total_kg <= 0.0:
+        return {}
+    return {
+        species: float(kg) / total_kg * 100.0
+        for species, kg in oxide_kg.items()
+        if float(kg) > 0.0
+    }
+
+
+def resolve_load_fe_redox(
+    oxide_kg: dict[str, float],
+    prior: FeRedoxPrior | None,
+) -> LoadFeRedox:
+    """Split ``oxide_kg`` once from ``prior``. No prior leaves the ledger ferrous.
+
+    The ferric fraction for a delta_iw prior is evaluated on the pre-split
+    wt% of this same map, at ``KRESS91_FO2_KEY_REFERENCE_T_K`` and
+    ``LOAD_FE_SPLIT_PRESSURE_BAR``. Added oxygen stays in Fe2O3; the caller
+    credits that mass on the stage-0 external-input ledger so the batch
+    balance still closes. A map that already carries Fe2O3 and has no prior
+    is a declared pair: it is left unchanged and is not labelled a lower bound.
+    """
+
+    feo_kg = float(oxide_kg.get("FeO", 0.0) or 0.0)
+    fe2o3_kg = float(oxide_kg.get("Fe2O3", 0.0) or 0.0)
+    feot_kg = feo_kg + fe2o3_kg * FEOT_FROM_FE2O3
+    if prior is None:
+        if feot_kg <= 0.0:
+            return LoadFeRedox(None, None, None, 0.0)
+        # A declared Fe2O3 mass is already a split. It is not the unresolved
+        # total-Fe lower bound, and it is not rewritten.
+        if fe2o3_kg > 0.0:
+            return LoadFeRedox(None, None, None, 0.0)
+        return LoadFeRedox("lower_bound", None, None, 0.0)
+    authority = (
+        "measured" if prior.kind == "measured_fe3_fraction" else "prior"
+    )
+    if feot_kg <= 0.0:
+        return LoadFeRedox(authority, prior, None, 0.0)
+    composition_wt_pct = _oxide_wt_pct_from_kg(oxide_kg)
+    fraction = fe3_fraction_for_prior(composition_wt_pct, prior)
+    added_oxygen_kg = apply_feot_split_to_oxide_kg(oxide_kg, fraction)
+    return LoadFeRedox(authority, prior, fraction, added_oxygen_kg)
 
 
 def _kress91_ferrous_feo_activity_raw(

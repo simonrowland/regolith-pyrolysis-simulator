@@ -395,6 +395,7 @@ from simulator.fe_redox import (
     kress91_split,
     melt_fO2_seed_without_ferric_iron,
     melt_mol_fractions_for_kress91,
+    resolve_load_fe_redox,
 )
 from simulator.melt_regime import MeltRegime, melt_regime
 from simulator.config_flags import bool_feature_flag
@@ -1023,6 +1024,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_backend_status = 'ok'
         self._backend_status_history: list[str] = []
         self._feedstock_fe_redox_split_unknown = False
+        self._load_fe_redox = None
         self._last_backend_diagnostics: Dict[str, Any] = {}
         self._last_out_of_domain_diagnostics: Dict[str, Any] = {}
         self._engine_commissioning_steps: list[dict[str, Any]] = []
@@ -6993,12 +6995,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if not math.isfinite(T_K) or T_K <= 0.0:
             raise ValueError('temperature_K must be finite and greater than zero')
         comp = self._melt_oxide_wt_pct()
-        # The seed is intrinsic_melt_fO2 at T_K: Holzheid IW plus the alkali
-        # offset (and the ferric term only when both iron oxides are present).
+        # The seed is intrinsic_melt_fO2 at T_K. With no prior that is Holzheid
+        # IW plus the alkali offset (and the 0.25 ferric term only when both
+        # iron oxides are present and no prior is seated). A delta_iw prior is
+        # IW(T) + delta_iw. A measured Fe3+ fraction inverts Kress91 at T_K.
         # The headspace vacuum floor is not a melt property and is not applied.
         # Callers before the first liquid tick pass the current temperature;
         # load_batch's 25 C value does not remain the adopted potential.
-        return intrinsic_melt_fO2(comp, T_K)
+        resolution = getattr(self, "_load_fe_redox", None)
+        prior = None if resolution is None else resolution.prior
+        return intrinsic_melt_fO2(comp, T_K, fe_redox_prior=prior)
 
     def _compute_fe_redox_split_diagnostic(
         self,
@@ -8934,21 +8940,47 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         steps.append(step)
 
     def melt_fO2_seed_run_notice(self) -> Dict[str, Any] | None:
-        """Predict-and-flag when the seed has no Fe3+/Fe2+ term.
+        """Predict-and-flag the iron split that seeded this run.
 
-        Authority is the IW buffer. Fe2O3 absent does not move the seed
-        to IW-1; the Holzheid value plus the alkali offset stands.
+        Authority is measured, prior, or lower_bound. No oxide iron and no
+        prior produces no notice. A lower bound keeps today's all-ferrous
+        ledger and IW-plus-alkali seed, and says so as a bound on Fe3+.
         """
 
-        if not getattr(self, '_melt_fO2_seed_without_ferric_iron', False):
+        resolution = getattr(self, "_load_fe_redox", None)
+        if resolution is None or resolution.authority is None:
             return None
+        prior = resolution.prior
+        if resolution.authority == "lower_bound":
+            message = (
+                "Ferric iron is unresolved. The ledger keeps the reported "
+                "FeO mass and the seed is the Holzheid iron-wustite buffer "
+                "plus the alkali offset. This ferric inventory is a lower "
+                "bound on Fe3+."
+            )
+        elif resolution.authority == "prior":
+            message = (
+                "Melt fO2 seed is the production iron-wustite buffer plus "
+                "the cited delta_iw. The ledger ferric fraction is the "
+                "Kress91 split at that offset, with the omitted ferric "
+                "oxygen added to the batch."
+            )
+        else:
+            message = (
+                "Ledger FeO and Fe2O3 keep the feedstock Fe atoms and add "
+                "the ferric oxygen the total-Fe analysis omitted. The seed "
+                "is the Kress91 fO2 consistent with the measured "
+                "Fe3+/sum-Fe fraction."
+            )
         return {
-            'code': 'melt_fO2_seed_without_ferric_iron',
-            'authority': 'IW buffer, no Fe3+/Fe2+',
-            'message': (
-                'Melt fO2 seed is the Holzheid iron-wustite buffer plus the '
-                'alkali offset. Fe2O3 is absent, so there is no Fe3+/Fe2+ term.'
-            ),
+            "code": "fe_redox_split",
+            "authority": resolution.authority,
+            "source_id": None if prior is None else prior.source_id,
+            "locator": None if prior is None else prior.locator,
+            "value": None if prior is None else prior.value,
+            "kind": None if prior is None else prior.kind,
+            "fe3_fraction": resolution.fe3_fraction,
+            "message": message,
         }
 
     def sulfur_saturation_run_notice(self) -> Dict[str, Any] | None:
@@ -9334,15 +9366,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _record_equilibrium_status(self, result):
         """Record the per-call backend outcome and run the post-equilibrium
         SULFUR_SATURATION_GATE; returns ``result`` unchanged."""
-        if self._feedstock_fe_redox_split_unknown:
+        iron_notice = self.melt_fO2_seed_run_notice()
+        if iron_notice is not None:
             diagnostics = dict(getattr(result, 'diagnostics', {}) or {})
-            diagnostics['feedstock_iron_notice'] = {
-                'code': 'fe_redox_split_unknown',
-                'message': (
-                    'Iron was treated as all-ferrous using the existing FeO '
-                    'value because fe_redox_split_unknown is true.'
-                ),
-            }
+            diagnostics['feedstock_iron_notice'] = dict(iron_notice)
             result.diagnostics = diagnostics
         self._last_backend_status = getattr(result, 'status', 'ok')
         self._backend_status_history.append(str(self._last_backend_status))
@@ -10259,6 +10286,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         feedstock_key: str | None = None,
     ) -> ProcessInventory:
         """Build raw, Stage 0, and cleaned melt inventories for a batch."""
+        self._load_fe_redox = None
         raw = normalized_feedstock_component_masses_kg(feedstock, mass_kg)
         declared_stage0_buckets = self._declared_stage0_product_buckets(
             feedstock, mass_kg)
@@ -10331,6 +10359,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 buckets = self._classify_stage0_components(non_oxide)
                 processed_components = self._processable_stage0_components(raw)
 
+        # One owner for the ledger split. No prior leaves FeO as reported
+        # and records a lower bound. The oxygen credit is applied once the
+        # stage-0 external-input map exists, before the balance check.
+        resolved_feed = resolve_feedstock_composition(feedstock)
+        self._load_fe_redox = resolve_load_fe_redox(
+            melt, resolved_feed.fe_redox_prior
+        )
+
         processed_components.update(inert_melt)
 
         formula_species = set(raw)
@@ -10341,6 +10377,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             buckets)
         stage0_external_inputs = self._apply_stage0_offgas_chemistry(
             feedstock, buckets)
+        added_oxygen_kg = float(
+            getattr(self._load_fe_redox, "added_oxygen_kg", 0.0) or 0.0
+        )
+        if added_oxygen_kg > 0.0:
+            # Not a species formula. The kilogram is the oxygen inside the
+            # rewritten Fe2O3; summing this map is what closes the batch.
+            stage0_external_inputs["feot_omitted_ferric_oxygen"] = (
+                float(
+                    stage0_external_inputs.get(
+                        "feot_omitted_ferric_oxygen", 0.0
+                    )
+                )
+                + added_oxygen_kg
+            )
         carbonate_specs: list[dict] = []
         self._decompose_stage0_carbonates(
             feedstock, buckets, melt, carbonate_specs, stage0_temp_range)

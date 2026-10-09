@@ -155,8 +155,9 @@ def test_reservoir_tracks_iw_until_the_first_liquid_tick() -> None:
     composition = sim._melt_oxide_wt_pct()
     notice = sim.melt_fO2_seed_run_notice()
     assert notice is not None
-    assert notice["code"] == "melt_fO2_seed_without_ferric_iron"
-    assert notice["authority"] == "IW buffer, no Fe3+/Fe2+"
+    assert notice["code"] == "fe_redox_split"
+    assert notice["authority"] == "lower_bound"
+    assert "lower bound" in notice["message"].lower()
 
     # The Kress floor is the liquidus. 1100 C is below it. 1215 C is the
     # first temperature this test puts above it, so that tick adopts.

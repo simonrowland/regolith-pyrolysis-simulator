@@ -31,12 +31,32 @@ UNKNOWN_FERRIC_UPPER_BOUND_REASON = (
 
 
 @dataclass(frozen=True)
+class FeRedoxPrior:
+    """One cited ferric prior. Exactly one kind is set by the parser.
+
+    ``measured_fe3_fraction`` is Fe3+/sum-Fe on a mole basis.
+    ``delta_iw`` is log10(fO2) relative to the production IW buffer.
+    """
+
+    kind: str
+    value: float
+    source_id: str
+    locator: str
+    uncertainty: float | None = None
+    range_low: float | None = None
+    range_high: float | None = None
+
+
+@dataclass(frozen=True)
 class ResolvedFeedstockComposition:
     """Canonical oxide map and iron semantics for one feedstock entry.
 
     ``total_fe`` is expressed as FeO-equivalent wt% on the entry's declared
     composition basis. ``fe_metal`` is elemental Fe wt% from the separate
-    elemental composition field.
+    elemental composition field. ``measured_feo`` / ``measured_fe2o3`` are
+    set only when the entry declares both oxides. Absent Fe2O3 is not a
+    measured zero. A ``fe_redox_prior`` resolves the split without claiming
+    that laboratory pair.
     """
 
     canonical_wt_pct: Mapping[str, Any]
@@ -48,6 +68,7 @@ class ResolvedFeedstockComposition:
     measured_fe2o3: float | None
     fe_metal: float | None
     split_known: bool
+    fe_redox_prior: FeRedoxPrior | None = None
 
 
 @dataclass(frozen=True)
@@ -60,6 +81,91 @@ class OxygenBound:
 class TotalOxygenBounds:
     lower: OxygenBound
     upper: OxygenBound
+
+
+def _finite_prior_number(value: Any, field: str) -> float:
+    if not is_declared_real_scalar(value) or isinstance(value, bool):
+        raise ValueError(f"{field} must be a finite number")
+    number = float(value)
+    if not math.isfinite(number):
+        raise ValueError(f"{field} must be a finite number")
+    return number
+
+
+def _parse_fe_redox_prior(feedstock: Mapping[str, Any]) -> FeRedoxPrior | None:
+    """Validate the optional fe_redox_prior block.
+
+    A value without both source_id and locator is invalid input. The block
+    carries exactly one of measured_fe3_fraction or delta_iw.
+    """
+
+    if "fe_redox_prior" not in feedstock or feedstock.get("fe_redox_prior") is None:
+        return None
+    raw = feedstock.get("fe_redox_prior")
+    if not isinstance(raw, Mapping):
+        raise ValueError("fe_redox_prior must be a mapping")
+    kinds = ("measured_fe3_fraction", "delta_iw")
+    present = [kind for kind in kinds if kind in raw]
+    if len(present) != 1 or set(raw) - set(kinds):
+        raise ValueError(
+            "fe_redox_prior requires exactly one of "
+            "measured_fe3_fraction or delta_iw"
+        )
+    kind = present[0]
+    block = raw[kind]
+    if not isinstance(block, Mapping):
+        raise ValueError(f"fe_redox_prior.{kind} must be a mapping")
+    allowed = {"value", "uncertainty", "source_id", "locator"}
+    if kind == "delta_iw":
+        allowed = allowed | {"range"}
+    if set(block) - allowed:
+        raise ValueError(
+            f"fe_redox_prior.{kind} contains an unsupported field"
+        )
+    value = _finite_prior_number(block.get("value"), f"fe_redox_prior.{kind}.value")
+    source_id = block.get("source_id")
+    locator = block.get("locator")
+    if not isinstance(source_id, str) or not source_id.strip():
+        raise ValueError(f"fe_redox_prior.{kind} requires source_id and locator")
+    if not isinstance(locator, str) or not locator.strip():
+        raise ValueError(f"fe_redox_prior.{kind} requires source_id and locator")
+    uncertainty = None
+    if "uncertainty" in block and block.get("uncertainty") is not None:
+        uncertainty = _finite_prior_number(
+            block.get("uncertainty"),
+            f"fe_redox_prior.{kind}.uncertainty",
+        )
+        if uncertainty < 0.0:
+            raise ValueError(
+                f"fe_redox_prior.{kind}.uncertainty must be >= 0"
+            )
+    range_low = None
+    range_high = None
+    if kind == "measured_fe3_fraction":
+        if not 0.0 <= value <= 1.0:
+            raise ValueError(
+                "fe_redox_prior.measured_fe3_fraction.value "
+                "must be between 0 and 1"
+            )
+    else:
+        span = block.get("range")
+        if not isinstance(span, (list, tuple)) or len(span) != 2:
+            raise ValueError("fe_redox_prior.delta_iw.range must be [low, high]")
+        range_low = _finite_prior_number(span[0], "fe_redox_prior.delta_iw.range")
+        range_high = _finite_prior_number(span[1], "fe_redox_prior.delta_iw.range")
+        if range_low > value or value > range_high:
+            raise ValueError(
+                "fe_redox_prior.delta_iw.value must lie inside range"
+            )
+    return FeRedoxPrior(
+        kind=kind,
+        value=value,
+        source_id=source_id.strip(),
+        locator=locator.strip(),
+        uncertainty=uncertainty,
+        range_low=range_low,
+        range_high=range_high,
+    )
 
 
 def resolve_feedstock_composition(
@@ -76,6 +182,11 @@ def resolve_feedstock_composition(
     flag = feedstock.get("fe_redox_split_unknown", False)
     if not isinstance(flag, bool):
         raise ValueError("fe_redox_split_unknown must be a boolean")
+    prior = _parse_fe_redox_prior(feedstock)
+    if flag and prior is not None:
+        raise ValueError(
+            "fe_redox_split_unknown cannot be combined with fe_redox_prior"
+        )
 
     if "FeO_total" in composition:
         raise ValueError(
@@ -105,6 +216,10 @@ def resolve_feedstock_composition(
                 "fe_reporting_convention: total Fe as FeO"
             )
     elif has_fe2o3:
+        if prior is not None:
+            raise ValueError(
+                "fe_redox_prior cannot be combined with declared Fe2O3"
+            )
         if not has_feo:
             raise ValueError("measured split requires both FeO and Fe2O3")
         for oxide in ("FeO", "Fe2O3"):
@@ -135,12 +250,17 @@ def resolve_feedstock_composition(
         )
     )
     feot = feot_equivalent_wt_pct(composition)
-    if flag:
+    # A declared FeO/Fe2O3 pair is the only laboratory split. FeO with no
+    # Fe2O3 used to be reported as measured Fe2O3 = 0. That reading is the
+    # SC-308 failure: a total-Fe analysis is not a measurement that Fe3+ is
+    # zero. A prior resolves the split and still does not invent that pair.
+    oxides_declared = has_feo and has_fe2o3 and not flag
+    if oxides_declared:
+        measured_feo_value = feo
+        measured_fe2o3_value = fe2o3
+    else:
         measured_feo_value = None
         measured_fe2o3_value = None
-    else:
-        measured_feo_value = feo
-        measured_fe2o3_value = fe2o3 if fe2o3 is not None else (0.0 if feo is not None else None)
 
     return ResolvedFeedstockComposition(
         canonical_wt_pct=dict(composition),
@@ -151,7 +271,8 @@ def resolve_feedstock_composition(
         measured_feo=measured_feo_value,
         measured_fe2o3=measured_fe2o3_value,
         fe_metal=metal,
-        split_known=not flag,
+        split_known=bool(oxides_declared or prior is not None),
+        fe_redox_prior=prior,
     )
 
 
@@ -231,6 +352,17 @@ def total_oxygen_bounds(
             continue
         oxygen_mass = oxygen_atoms * ATOMIC_WEIGHTS_G_PER_MOL["O"]
         oxygen_wt_pct += amount * oxygen_mass / formula.molar_mass_g_per_mol()
+
+    if resolved.fe_redox_prior is not None and resolved.total_fe > 0.0:
+        # Lazy import: fe_redox imports this module at load. The omitted-oxygen
+        # coefficient and the Kress91 fraction live there so this bound cannot
+        # drift from the ledger split.
+        from simulator.fe_redox import omitted_ferric_oxygen_wt_pct
+
+        oxygen_wt_pct += omitted_ferric_oxygen_wt_pct(
+            resolved.canonical_wt_pct,
+            resolved.fe_redox_prior,
+        )
 
     if resolved.fe_redox_split_unknown:
         return TotalOxygenBounds(

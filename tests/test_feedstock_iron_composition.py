@@ -248,10 +248,12 @@ def test_engine_result_attaches_unknown_split_notice(monkeypatch) -> None:
     returned = PyrolysisSimulator._record_equilibrium_status(sim, result)
 
     assert returned is result
-    assert result.diagnostics["feedstock_iron_notice"]["code"] == (
-        "fe_redox_split_unknown"
+    assert result.diagnostics["feedstock_iron_notice"]["code"] == "fe_redox_split"
+    assert result.diagnostics["feedstock_iron_notice"]["authority"] == "lower_bound"
+    assert "lower bound" in result.diagnostics["feedstock_iron_notice"]["message"].lower()
+    assert result.diagnostics["feedstock_iron_notice"]["message"] == (
+        sim.melt_fO2_seed_run_notice()["message"]
     )
-    assert "all-ferrous" in result.diagnostics["feedstock_iron_notice"]["message"]
 
 
 @pytest.mark.parametrize(
