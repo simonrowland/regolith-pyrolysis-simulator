@@ -1510,8 +1510,11 @@ def test_compiler_rejects_ambiguous_or_invalid_schema(mutation: str) -> None:
 def test_catalog_operating_envelope_no_nonphysical_pressure() -> None:
     """b-148 regression: no hot-train in-domain row yields P > 1e9 Pa.
 
-    Sweep every *hot-train* compiled evaluator over a physical process
-    envelope (T band × melt pO2 band × activity). Stage-0-only carriers
+    Sweep reference-activity hot-train evaluators over the existing process
+    envelope (T band × melt pO2 band × activity). Inventory-resolved trace
+    channels require the actual ledger gamma/X and oxygen planes; their
+    pressure ceiling is checked in the six B4 full-run acceptance cases.
+    Stage-0-only carriers
     (P-ladder, …) are excluded: they are gated off the hot train and
     their large negative pO2 powers at unit activity are a separate
     Stage-0 envelope question. A failure here means a stoichiometry /
@@ -1542,6 +1545,10 @@ def test_catalog_operating_envelope_no_nonphysical_pressure() -> None:
             getattr(species.code_metadata, "hot_train_applicability", "") or ""
         )
         if hot in {"stage0_only", "not_applicable"}:
+            continue
+        if species.code_metadata.request_rule == "trace_source_inventory":
+            assert species.source_reaction_activity is not None
+            assert species.code_metadata.source_account == "process.cleaned_melt"
             continue
         for temperature_K in temperatures_K:
             for pO2_bar in pO2_bars:

@@ -5,6 +5,7 @@ import math
 import pytest
 
 from simulator.accounting.ledger import DEFAULT_BALANCE_ABSOLUTE_FLOOR_KG
+from simulator.physical_constants import CATALOG_PHYSICAL_PRESSURE_CEILING_PA
 from tests.test_t1139_b4_live_pins import SCENARIOS_B4, capture_run
 
 
@@ -15,6 +16,13 @@ def test_live_full_run_closes_each_element_and_reports_condensables(scenario, mo
     assert len(sim.record.snapshots) == scenario["hours"]
     assert math.fsum(s.duration_h for s in sim.record.snapshots) == scenario["hours"]
     assert all(abs(s.mass_balance_error_pct) < 5e-12 for s in sim.record.snapshots)
+    channels = sim._last_vapour_batch_report["channels_by_species"]
+    trace_values = [row["pressure"]["pa"] for row in channels.values()
+                    if row["extra"].get("request_rule") == "trace_source_inventory"
+                    and row["pressure"]["kind"] == "value"]
+    assert trace_values
+    assert all(math.isfinite(value) and 0 <= value <= CATALOG_PHYSICAL_PRESSURE_CEILING_PA
+               for value in trace_values)
 
     drift = sim.atom_ledger.element_atom_drift_report()
     assert drift["unit"] == "mol-atoms"

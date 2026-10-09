@@ -146,6 +146,9 @@ def test_declared_non_sio_extension_invalid_area_aborts_hour(monkeypatch):
     run = PyrolysisRun(
         feedstock_id="lunar_mare_low_ti", campaign="C0", hours=24,
         additives_kg={}, allow_fallback_vapor=True, allow_unmeasured_alpha_fallback=True,
+        setpoints_patch={"condensation_train": {
+            "condensation_temperatures_C": {"Na": 25.0},
+        }},
     )
     execution = RunExecutor().execute(run._session_config())
     assert execution.status == "failed"
@@ -312,23 +315,20 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(hours):
         assert wall["authoritative_for_coating"] is False
         assert wall["wall_saturation_pressure_extrapolations_by_species"]["Mg"]
         refused = wall["wall_saturation_pressure_refusals_by_species"]
-        assert {"Na", "Al2"} <= refused.keys()
+        assert "Na" in refused
         assert any(
             "no extrapolation available" in record["reason"]
             for record in refused["Na"].values()
         )
-        # Al2 has no reactive-product backstop, so reactivity metadata is not
-        # applicable.  Its real reversible wall route instead refuses because
-        # the available reaction-term source is not a wall saturation curve.
-        assert any(
-            "no extrapolation available" in record["reason"]
-            and record.get("refusal_type") == "WallSaturationPressureRefusal"
-            for record in refused["Al2"].values()
-        ), [
-            (record["reason"], record.get("refusal_type"))
-            for record in refused["Al2"].values()
-        ]
+        al2 = row["condensation_refusals_by_species"]["Al2"]
+        assert al2["reason"] == "upstream_vapour_carrier_non_authoritative"
+        assert al2["status"] == "status_bearing"
+        assert al2["input_mass_kg_hr"] >= 0
+        assert al2["remaining_mass_kg_hr"] == al2["input_mass_kg_hr"]
+        assert al2["condensed_mass_kg_hr"] == 0
+        assert al2["mass_closure_error_kg_hr"] == 0
     assert document["per_hour_summary"][0]["T_C"] == 2200.0
+    assert document["per_hour_summary"][0]["condensation_refusals_by_species"]["Al2"]["input_mass_kg_hr"] > 0
     if hours == 24:
         assert not any(record.get("refusal_type") == "DepositionInputRefusal"
                        for records in refused.values() for record in records.values())
@@ -340,7 +340,12 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(hours):
     pareto = document["run_metadata"]["pressure_coating_pareto_diagnostic"]["by_species"]
     assert pareto["Mg"]["authority_level"] == "extrapolated"
     assert pareto["Na"]["status"] == "unavailable"
-    assert pareto["Al2"]["status"] == "unavailable"
+    if hours == 24:
+        assert pareto["Al2"]["status"] == "unavailable"
+        assert pareto["Al2"]["reason"] == "evaporation_transport_unavailable"
+        assert pareto["Al2"]["evaporation_transport_notices"] == transport["Al2"]
+    else:
+        assert "Al2" not in pareto
     assert pareto["SiO"]["vapour_pressure_extrapolation_notice"]["authority_level"] == "extrapolated"
     if hours == 24:
         assert pareto["SiO"]["evaporation_transport_notices"] == transport["SiO"]
