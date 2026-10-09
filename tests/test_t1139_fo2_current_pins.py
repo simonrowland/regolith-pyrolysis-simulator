@@ -21,6 +21,7 @@ from engines.builtin.overhead_gas_equilibrium import (
 from simulator.campaigns import CampaignManager
 from simulator.core import PyrolysisSimulator
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
+from simulator.equilibrium import oxygen_potential_mode_for_atmosphere
 from simulator.fe_redox import (
     feo_iw_log10_fO2_bar,
     intrinsic_melt_fO2,
@@ -233,6 +234,33 @@ def test_pressure_controlled_o2_partial_does_not_exceed_mole_fraction_times_tota
         ledger,
         rel=1e-12,
     )
+
+
+def test_imposed_o2_cover_survives_a_fe_only_pressure_controlled_holdup() -> None:
+    sim = _sim()
+    sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
+    sim.campaign_mgr.overrides["C2A"] = {
+        "lab_schedule": _c2a_pressure_schedule("flow_through_with_pump"),
+        "lab_schedule_pO2_setpoint_mbar": 1.0,
+    }
+    sim.melt.campaign = CampaignPhase.C2A
+    sim.campaign_mgr.configure_campaign(sim.melt, CampaignPhase.C2A)
+    _load_overhead(sim, {"Fe": _RH03_FE_MOL})
+
+    holdup = sim.atom_ledger.mol_by_account("process.overhead_gas")
+    n_total = sum(float(mol) for mol in holdup.values())
+    p_controlled = sim.campaign_mgr.pressure_controlled_total_bar(sim.melt)
+    assert p_controlled == pytest.approx(0.013)
+    assert float(holdup.get("O2", 0.0)) == pytest.approx(0.0)
+    assert n_total > 0.0
+    assert sim.melt.atmosphere is Atmosphere.CONTROLLED_O2
+    assert oxygen_potential_mode_for_atmosphere(sim.melt.atmosphere) == "imposed"
+    assert sim._commanded_pO2_bar() == pytest.approx(0.001)
+
+    transport = sim._headspace_transport_pO2_bar_from_ledger(0.0, head_o2_mol=0.0)
+    assert transport == pytest.approx(0.001)
+    sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
+    assert sim._headspace_transport_pO2_bar() == pytest.approx(0.001)
 
 
 def test_pressure_controlled_bound_does_not_lift_an_underpressured_partial() -> None:

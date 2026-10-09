@@ -4223,14 +4223,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         BuiltinOverheadGasEquilibriumProvider.compute_partial_pressures_bar,
         p_i = n_i R T / (V * 1e5), with R = GAS_CONSTANT.
         Algebra: cap = (n_O2 / n_total) * P_controlled when n_total > 0;
-        result = min(partial, cap). Units: mol/mol * bar = bar.
+        ledger term = min(partial, cap). The imposed cover is gas the
+        controller supplies, so the ledger mole fraction does not dilute
+        it: p_read = max(p_cover, ledger term). p_cover is
+        _headspace_control_floor_pO2_bar (melt.pO2_mbar / 1000 on an
+        O2-controlled atmosphere, else 0). Units: mol/mol * bar = bar.
         Sanity: RH03 hour 0 holds 823.214 mol O2 and 581.862 mol Fe at
         0.013 bar, so the O2 cap is about 0.00762 bar against an ideal-gas
-        partial of 2284.62 bar.
+        partial of 2284.62 bar. The same 13 mbar pump with a 1 mbar O2
+        command and Fe-only holdup has cap 0; p_read stays 0.001 bar.
         The vapour provider refuses an explicit pO2 below the headspace
-        vacuum floor. When the cap is below that floor the returned value
-        is the floor; the excess over the cap is at most the floor, not
-        the ideal-gas holdup. Bleed keeps the uncapped diagnostic.
+        vacuum floor. When the ledger term is below that floor it becomes
+        the floor, and the cover is applied after that. The excess of the
+        ledger term over the cap is at most the floor, not the ideal-gas
+        holdup. Bleed keeps the uncapped diagnostic.
         """
 
         manager = getattr(self, "campaign_mgr", None)
@@ -4249,8 +4255,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         bounded = min(float(partial_bar), cap_bar)
         floor_bar = self._vacuum_floor_bar()
         if bounded < floor_bar:
-            return floor_bar
-        return bounded
+            bounded = floor_bar
+        return max(self._headspace_control_floor_pO2_bar(), bounded)
 
     def _refresh_oxygen_reservoir_transport_pO2_for_vapor(
         self,
