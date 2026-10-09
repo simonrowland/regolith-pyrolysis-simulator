@@ -15,6 +15,7 @@ from simulator.evaporation_classes import (
     interface_share_s,
     report_species_class_diagnostics,
 )
+import simulator.evaporation_classes as evaporation_classes
 
 
 NAN = float("nan")
@@ -166,3 +167,34 @@ def test_redox_class_band_covers_every_grounded_alpha():
     ]
     assert grounded
     assert all(cls.band_low() <= alpha <= cls.band_high() for alpha in grounded)
+
+
+def test_legacy_duplicate_evidence_alpha_values_are_pinned_before_repoint():
+    rows = (
+        *evaporation_classes._SIO_EVIDENCE,
+        *evaporation_classes._REDOX_EVIDENCE,
+        *evaporation_classes._MODIFIER_EVIDENCE,
+        *evaporation_classes._MARKED_IDEAL_FENCES,
+    )
+    duplicate_ids = {
+        "costa_jacobson_2015_fe_olivine_kems": 0.02,
+        "fedkin_2006_table3_sio_hashimoto_langmuir": 0.17,
+        "fedkin_2006_table3_fe_hashimoto_langmuir": 0.24,
+        "fedkin_2006_table3_mg_hashimoto_langmuir": 0.27,
+        "fedkin_2006_yu_na_vacuum_langmuir": 0.26,
+        "fedkin_2006_yu_k_vacuum_langmuir": 0.13,
+        "sossi_2019_na_open_furnace_apparent": 1.0,
+        "safarian_engh_2013_si_pure_langmuir": 1.0,
+    }
+    actual = {row.observation_id: row.alpha for row in rows if row.observation_id in duplicate_ids}
+    assert actual == duplicate_ids
+
+
+def test_fedkin_owner_mg_alpha_is_pinned_before_consolidation():
+    row = next(
+        row
+        for row in evaporation_classes._REDOX_EVIDENCE
+        if row.source_id == "kems-005-fedkin-2006"
+        and row.observation_id == "fedkin_2006_mg_hashimoto_langmuir_table3"
+    )
+    assert row.alpha == 0.24
