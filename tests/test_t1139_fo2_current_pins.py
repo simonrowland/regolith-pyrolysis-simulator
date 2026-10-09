@@ -23,6 +23,7 @@ from simulator.core import PyrolysisSimulator
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
 from simulator.equilibrium import oxygen_potential_mode_for_atmosphere
 from simulator.fe_redox import (
+    KRESS91_LIQUID_CALIBRATION_MIN_T_C,
     feo_iw_log10_fO2_bar,
     intrinsic_melt_fO2,
     melt_fO2_seed_without_ferric_iron,
@@ -121,6 +122,33 @@ def test_melt_seed_is_holzheid_iw_plus_alkali_without_a_vacuum_floor() -> None:
     ) is False
 
 
+def _pinned_liquidus(liquidus_T_C: float) -> dict[str, float | str]:
+    """Freeze-gate curve owned by the test, not by engines.local.toml."""
+
+    return {
+        "liquidus_T_C": float(liquidus_T_C),
+        "source": "test_pinned_liquidus",
+    }
+
+
+def _c2a_campaign_temperatures(sim: PyrolysisSimulator) -> list[float]:
+    """Hourly C2A temperatures from the production ramp, through max hold."""
+
+    from simulator.runner import _prepare_sio_campaign_start
+
+    sim.melt.campaign = CampaignPhase.C2A
+    sim.campaign_mgr.configure_campaign(sim.melt, CampaignPhase.C2A)
+    _prepare_sio_campaign_start(sim)
+    hours = int(sim.campaign_mgr._max_hold_hr(CampaignPhase.C2A))
+    temperatures: list[float] = []
+    for hour in range(hours):
+        sim.melt.campaign_hour = hour
+        sim.melt.hour = hour
+        sim._update_temperature()
+        temperatures.append(float(sim.melt.temperature_C))
+    return temperatures
+
+
 def test_reservoir_tracks_iw_until_the_first_liquid_tick() -> None:
     sim = _sim()
     sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
@@ -130,8 +158,11 @@ def test_reservoir_tracks_iw_until_the_first_liquid_tick() -> None:
     assert notice["code"] == "melt_fO2_seed_without_ferric_iron"
     assert notice["authority"] == "IW buffer, no Fe3+/Fe2+"
 
+    # The Kress floor is the liquidus. 1100 C is below it. 1215 C is the
+    # first temperature this test puts above it, so that tick adopts.
+    floor = _pinned_liquidus(KRESS91_LIQUID_CALIBRATION_MIN_T_C)
     sim.melt.temperature_C = 1100.0
-    sim._re_reference_melt_fO2_to_temperature()
+    sim._re_reference_melt_fO2_to_temperature(gate_authority=floor)
     subliquid = intrinsic_melt_fO2(composition, 1100.0 + 273.15)
     assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(
         subliquid
@@ -139,17 +170,38 @@ def test_reservoir_tracks_iw_until_the_first_liquid_tick() -> None:
     assert sim.melt.oxygen_reservoir.reference_T_K is None
 
     sim.melt.temperature_C = 1215.0
-    sim._re_reference_melt_fO2_to_temperature()
+    sim._re_reference_melt_fO2_to_temperature(gate_authority=floor)
     fixed = intrinsic_melt_fO2(composition, 1215.0 + 273.15)
     assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(fixed)
     assert sim.melt.oxygen_reservoir.reference_T_K == pytest.approx(1215.0 + 273.15)
 
     sim.melt.temperature_C = 1230.0
-    sim._re_reference_melt_fO2_to_temperature()
+    sim._re_reference_melt_fO2_to_temperature(gate_authority=floor)
     fresh = intrinsic_melt_fO2(composition, 1230.0 + 273.15)
     assert sim.melt.oxygen_reservoir.reference_T_K == pytest.approx(1230.0 + 273.15)
     assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log != pytest.approx(fresh)
     assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log != pytest.approx(fixed)
+
+    # A projected liquidus above the C2A campaign peak never adopts.
+    # Every hour keeps tracking IW(T), and reference_T_K stays unset.
+    schedule = _sim()
+    schedule.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
+    temperatures = _c2a_campaign_temperatures(schedule)
+    peak_T_C = max(temperatures)
+    assert peak_T_C > KRESS91_LIQUID_CALIBRATION_MIN_T_C
+    projected = _pinned_liquidus(peak_T_C + 1.0)
+    assert float(projected["liquidus_T_C"]) > peak_T_C
+
+    tracking = _sim()
+    tracking.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
+    tracking_composition = tracking._melt_oxide_wt_pct()
+    for temperature_C in temperatures:
+        tracking.melt.temperature_C = temperature_C
+        tracking._re_reference_melt_fO2_to_temperature(gate_authority=projected)
+        assert tracking.melt.oxygen_reservoir.reference_T_K is None
+        assert tracking.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(
+            intrinsic_melt_fO2(tracking_composition, temperature_C + 273.15)
+        )
 
 
 def test_seed_notice_is_on_the_ranked_surfaces_and_the_sio_report() -> None:
