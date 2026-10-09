@@ -3902,6 +3902,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self,
         *,
         species_kg_for_M_avg: Optional[Mapping[str, float]] = None,
+        p_upstream_Pa: Optional[float] = None,
     ) -> Any:
         configured = self._overhead_headspace_config.get('conductance_kg_s')
         if configured is None:
@@ -3919,14 +3920,23 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return value
         if species_kg_for_M_avg is None:
             species_kg_for_M_avg = self._overhead_holdup_species_kg()
-        p_mean_Pa = max(float(self.melt.p_total_mbar) * 100.0, 1.0)
-        # This is the upstream-to-vacuum carrying limit C0. Controlled-pO2
-        # runtime passes it through the provider-owned flow-capacity result;
-        # pressure-bound modes retain the provider's finite-P2 derate.
+        # Compressible Poiseuille capacity is proportional to P_up^2.
+        # Callers that know the headspace total pressure pass it. A missing
+        # pressure keeps the commanded melt total, floored at 1 Pa, which is
+        # the M_avg probe and not the committed hard-vacuum bleed.
+        if p_upstream_Pa is None:
+            upstream_Pa = max(float(self.melt.p_total_mbar) * 100.0, 1.0)
+        else:
+            try:
+                upstream_Pa = float(p_upstream_Pa)
+            except (TypeError, ValueError):
+                upstream_Pa = max(float(self.melt.p_total_mbar) * 100.0, 1.0)
+            if not math.isfinite(upstream_Pa) or upstream_Pa < 0.0:
+                upstream_Pa = max(float(self.melt.p_total_mbar) * 100.0, 1.0)
         return max(
             0.0,
             float(self.overhead_model._pipe_conductance(
-                p_mean_Pa,
+                upstream_Pa,
                 self.melt.temperature_C,
                 p_downstream_Pa=0.0,
                 species_kg_for_M_avg=species_kg_for_M_avg,
@@ -4151,6 +4161,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 bleed_kg = (
                     self._headspace_bleed_conductance_kg_s(
                         species_kg_for_M_avg=holdup_kg,
+                        p_upstream_Pa=p_total_bar * 1.0e5,
                     )
                     * pressure_capacity_fraction
                     * 3600.0
@@ -6520,6 +6531,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         configured_downstream_pressure_bar = self._overhead_headspace_config.get(
             'downstream_pressure_bar'
         )
+        # Hard vacuum commands p_total = 0. The pipe's mass capacity is the
+        # Poiseuille value at the actual headspace pressure, not at the 1 Pa
+        # floor of that command. Controlled-pO2 keeps its own flow result.
+        upstream_Pa = None
+        if effective_transport_capacity is None:
+            raw_total = diagnostic.get('p_total_bar')
+            try:
+                parsed_total = float(raw_total)
+            except (TypeError, ValueError):
+                parsed_total = None
+            if (
+                parsed_total is not None
+                and math.isfinite(parsed_total)
+                and parsed_total >= 0.0
+            ):
+                upstream_Pa = parsed_total * 1.0e5
         controls: Dict[str, Any] = {
             'headspace_volume_m3': self._headspace_volume_m3(),
             'headspace_temperature_K': self._headspace_temperature_K(),
@@ -6528,6 +6555,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 if effective_transport_capacity is not None
                 else self._headspace_bleed_conductance_kg_s(
                     species_kg_for_M_avg=species_kg_for_M_avg,
+                    p_upstream_Pa=upstream_Pa,
                 )
             ),
             'p_total_bar': diagnostic.get('p_total_bar'),
