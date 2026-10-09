@@ -1,0 +1,456 @@
+schema_version: literature_extract.v1
+source_id: ohta-1996-cao-mgo-al2o3-activities
+source:
+  citation: 'H. Ohta and H. Suito, "Activities in CaO-MgO-Al2O3 Slags and Deoxidation Equilibria of Al, Mg, and Ca", ISIJ International 36(8) (1996) 983–990.'
+  doi: 10.2355/isijinternational.36.983
+  url: https://doi.org/10.2355/isijinternational.36.983
+  year: 1996
+  corpus_source_id: ohta-1996-cao-mgo-al2o3-activities
+extraction:
+  method: Manual transcription from 200–300 dpi pdftoppm renders of the ISIJ PDF plus pdftotext -layout/-raw
+    cross-check. Table 1 fully transcribed from page images. Iso-activity figures recorded figure_only (not digitised).
+    No invented binary a(CaO) values — authors state CaO iso-activities in the ternary were assessed from reported
+    sulfide capacities coupled with γ(CaS) estimated from CaO-Al2O3 slags (i.e. binary edge partly derived, not an
+    independent binary measurement).
+  date: '2026-10-04'
+  worker: empirical-cao-al2o3-slot-04
+  provenance_path: ferry-inbox/cao-al2o3-sources/ohta-1996-cao-mgo-al2o3-activities/
+review_status: draft
+fidelity_samples:
+- path: species.Al2O3.observations[ohta_1996_table1_spinel_sat_compositions].values.rows[6].T_K
+  value: 1823
+  note: first Table 1 row at 1823 K
+  locator: {published_page: 984, pdf_page_index: 2, table: '1', row: '1823-1'}
+- path: species.Al2O3.observations[ohta_1996_table1_spinel_sat_compositions].values.rows[0].slag_mass_pct_Al2O3
+  value: 57.5
+  note: Table 1 first 1873 K slag Al2O3 mass%
+  locator: {published_page: 984, pdf_page_index: 2, table: '1'}
+- species: Al2O3
+  observation_id: ohta_1996_table1_spinel_sat_compositions
+  field: row_count
+  value: 10
+  note: full Table 1 row count (6 at 1873 K + 4 at 1823 K)
+  locator: {published_page: 984, pdf_page_index: 2, table: '1'}
+- path: species.Al2O3.observations[ohta_1996_al2o3_activity_mgo_spinel_saturation_1873].values.activity
+  value: 0.14
+  note: p. 985 activity at MgO-spinel saturation
+  locator: {published_page: 985, pdf_page_index: 3, section: '3.1'}
+- species: Fe_tO
+  observation_id: ohta_1996_feto_activity_coefficient_spinel_line
+  observable: activity_coefficient
+  field: gamma
+  value: 0.51
+  note: p. 986 Fig. 4 activity coefficient
+  locator: {published_page: 986, pdf_page_index: 4, figure: '4', section: '3.1'}
+- species: CaO
+  observation_id: ohta_1996_bearing_steel_example_conditions
+  observable: method
+  field: composition_mass_pct
+  value: {C: 1.0, Cr: 1.4, Mn: 0.4, Si: 0.3, Al: 0.02}
+  note: p. 989 bearing-steel example carbon content
+  locator: {published_page: 989, pdf_page_index: 7, section: '4'}
+species:
+  CaO:
+    observations: []
+    context:
+    - observation_id: ohta_1996_method_scope
+      type: method
+      locator:
+        published_page: 983
+        pdf_page_index: 1
+        section: Synopsis / Introduction
+      units: K; mass%
+      values:
+        quantity: slag_metal_equilibration_method_and_activity_assessment_scope
+        method_class: method_only
+        experimental_method: >-
+          Master slag was premelted from reagent CaCO3, MgO, and Al2O3 in a Pt
+          crucible under air. Each experiment used 30 g electrolytic iron
+          initially containing about 500 to 1000 mass ppm O and 7 g
+          CaO-Al2O3-MgO slag with an appropriate amount of FeS. Fe-1 to 20
+          mass% Al or Fe-1 to 10 mass% Mn alloy was added by dropping. The
+          slag-metal charge was held in an Al2O3 or MgO crucible at 1823 or
+          1873 K under deoxidized Ar; it was stirred for 2 h in MgO crucibles
+          and 3 h in Al2O3 crucibles, with an Al2O3 rod used for 90 s every
+          30 min. Equilibrium was reached in about 2 h; the melt was unstirred
+          for at least 1 h before quenching, then quenched rapidly in a He gas
+          stream and in water. Chemical analysis methods for metal and slag
+          phases are described in the cited prior articles.
+        temperatures_K: [1823, 1873]
+        a_CaO_assessment_as_printed: activities of CaO in entire liquid region first determined at 1823 and 1873 K from reported
+          sulfide capacities coupled with activity coefficients of CaS estimated from those in CaO-Al2O3 slags
+        a_Al2O3_MgO_as_printed: on basis of CaO iso-activity lines, activities of Al2O3 and MgO calculated by Schuhmann method
+          using spinel-saturation a(Al2O3) and a(MgO) as starting points
+        binary_edge_note: for the CaO-Al2O3 binary join this paper is partly derived from prior Cs / γ(CaS) data (refs cited),
+          not an independent gas-slag binary activity table; iso-activity figures (Fig. 6) are figure_only here
+        standard_states_as_printed: >-
+          Solute activities in liquid iron use a dilute solution of one mass
+          percent standard state. Al2O3, CaO, MgO, and MnO activities use
+          solid standard states. Fe_tO activity coefficient is referred to
+          the liquid standard state. γ(Fe_tO) is on the liquid standard
+          state; γ(MnO) is relative to solid MnO.
+        how_equilibrium_shown_as_printed: time trials found equilibrium in ~2 h; unstirred >=1 h before quench; metal/slag
+          analyses as in prior articles
+    - observation_id: ohta_1996_bearing_steel_example_conditions
+      type: method
+      locator:
+        published_page: 989
+        pdf_page_index: 7
+        section: '4. Deoxidation Equilibria of Al, Mg, and Ca'
+      units: mass%; K; mass ppm
+      values:
+        quantity: bearing_steel_example_composition_and_oxygen_range
+        method_class: quoted
+        temperature_K: 1823
+        composition_mass_pct: {C: 1.0, Cr: 1.4, Mn: 0.4, Si: 0.3, Al: 0.02}
+        oxygen_range_mass_ppm: [8, 10]
+        note: Fig. 12 iso-composition lines remain figure_only and are not digitised.
+    - observation_id: ohta_1996_fig6_iso_activity_cao_figure_only
+      type: method
+      locator:
+        published_page: 987
+        pdf_page_index: 5
+        figure: '6'
+      units: none
+      values:
+        quantity: iso_activity_lines_of_CaO
+        method_class: method_only
+        admission_status: figure_only
+        note: Fig. 6 iso-activity lines of CaO at 1873 and 1823 K in CaO-MgO-Al2O3; points not digitised; binary-edge values
+          not re-invented from the figure
+    - observation_id: ohta_1996_cao_iso_activity_one_saturation_line
+      type: method
+      locator: {published_page: 987, pdf_page_index: 5, section: '3.2 Iso-activity Line for CaO'}
+      units: dimensionless activity
+      values:
+        quantity: iso_activity_relation
+        relation_as_printed: 'The dash-dotted lines in Figs. 6(a) and 6(b) correspond to iso-CaO activity lines for a_CaO = 1.'
+        activity: 1
+        method_class: method_only
+        note: Line relation is prose; figure curves remain undigitised.
+    - observation_id: ohta_1996_cas_solubility_limits_prior_study
+      type: method
+      locator: {published_page: 986, pdf_page_index: 4, section: '3.2 Iso-activity Line for CaO'}
+      units: mass%
+      values:
+        quantity: CaS_solubility_limit_in_CaO_Al2O3_slag
+        method_class: quoted
+        attribution: reference 9 (Inoue and Suito)
+        Al2O3_crucible: 1.79
+        CaO_crucible: 4.52
+        note: CaS solubility limits in CaO-Al2O3 slag at 1873 K, quoted from reference 9.
+    - observation_id: ohta_1996_mgo_solubility_in_cao_prior_study
+      type: method
+      locator: {published_page: 987, pdf_page_index: 5, section: '3.2 Iso-activity Line for CaO'}
+      units: mass%
+      values:
+        quantity: MgO_solubility_in_CaO_phase
+        method_class: quoted
+        attribution: reference 34 (Doman et al.)
+        at_1873_K: 2.3
+        at_1823_K: 1.9
+    - observation_id: ohta_1996_cao_solubility_in_mgo_prior_study
+      type: method
+      locator: {published_page: 988, pdf_page_index: 6, section: '3.4 Iso-activity Line for MgO'}
+      units: mass%
+      values:
+        quantity: CaO_solubility_in_MgO_phase
+        method_class: quoted
+        attribution: reference 34 (Doman et al.)
+        at_1823_K: 0.6
+        at_1873_K: 0.8
+    - observation_id: ohta_1996_cao_assessment_equation6
+      type: method
+      locator: {published_page: 987, pdf_page_index: 5, equation: '6'}
+      units: equation as printed
+      values:
+        quantity: CaO_activity_assessment_relation
+        method_class: quoted
+        relation_as_printed: 'log a_CaO = log(CS · γCaS) + log{(α · KO)/(K5 · KS)}'
+        note: Numeric context for the paper's CaO activity assessment; no values digitised from Fig. 6.
+    - observation_id: ohta_1996_manganese_distribution_ratio_spinel_line
+      type: method
+      locator: {published_page: 986, pdf_page_index: 4, section: '3.1'}
+      units: dimensionless ratio
+      values:
+        quantity: manganese_distribution_ratio
+        method_class: quoted
+        relation_as_printed: 'L_Mn = (mass% Mn)/[mass% Mn]'
+        range_as_printed: [1.3, 6.7]
+        note: Along the spinel-saturation line; not represented by an existing battery quantity.
+    - observation_id: ohta_1996_mgo_equilibrium_constant_1873
+      type: method
+      locator:
+        published_page: 988
+        pdf_page_index: 6
+        section: '3.4 Iso-activity Line for MgO'
+      units: log10 K_Mg
+      values:
+        quantity: Mg_equilibrium_constant_activity_ratio
+        method_class: quoted
+        reaction_as_printed: 'MgO(s) = Mg + O'
+        relation_as_printed: 'K_Mg = (a_Mg · a_O)/a_MgO'
+        temperature_K: 1873
+        value: -7.8
+        uncertainty: 0.2
+        apparent_product_as_printed: "K'_Mg = [mass% Mg] · [mass% O]"
+        note: Author estimate from the activity-ratio intercept; the separate apparent-product symbol is K'_Mg.
+    - observation_id: ohta_1996_mg_equilibrium_comparators
+      type: method
+      locator:
+        published_page: 988
+        pdf_page_index: 6
+        section: '3.4 Iso-activity Line for MgO'
+      units: as printed
+      values:
+        quantity: cited_Mg_equilibrium_comparators
+        method_class: quoted
+        reaction_as_printed: 'MgO(s) = Mg + O (Eq. 8)'
+        DeltaG8_as_printed: 'ΔG°8 = 728600 − 238.4 T J/mol'
+        log_K_Mg_from_DeltaG8: -7.86
+        log_K_Mg_Inoue_and_Suito: '-7.8 ± 0.2'
+        e_O_Mg_Inoue_and_Suito: '-190 ± 60'
+        e_O_Mg_Kulikov: -160
+        attributions:
+          log_K_Mg_from_DeltaG8: 'ΔG°8, refs. 19, 22, 23'
+          log_K_Mg_Inoue_and_Suito: 'ref. 7'
+          e_O_Mg_Inoue_and_Suito: 'ref. 7'
+          e_O_Mg_Kulikov: 'ref. 37'
+  Al2O3:
+    observations:
+    - observation_id: ohta_1996_al2o3_activity_mgo_spinel_saturation_1873
+      type: activity_coefficient
+      locator: {published_page: 985, pdf_page_index: 3, section: '3.1', mark: A}
+      T_range_K: [1873.0, 1873.0]
+      phase: solid Al2O3 endmember in MgO-spinel double-saturated slag
+      standard_state:
+        state: {tag: value, value: {convention: raoultian_pure_endmember, endmember: {formula: Al2O3, phase: {tag: value, value: cr}, polymorph: {tag: unknown, reason: polymorph_not_published}}, component_basis: Al2O3}}
+        inferred: false
+        note: Solid Al2O3 standard state as printed.
+        locator: {published_page: 985, pdf_page_index: 3, section: '3.1'}
+      units: dimensionless activity
+      derived_from: [tables:ohta-1996-cao-mgo-al2o3-activities]
+      derivation:
+        relation: 'a(Al2O3)=0.14 at mark A from ΔG°spinel = −18800 − 6.3T J/mol for MgO(s)+Al2O3(s)=MgO·Al2O3(s), as printed.'
+        inputs: [tables:ohta-1996-cao-mgo-al2o3-activities]
+        output_unit: dimensionless activity
+      values:
+        quantity: activity
+        method_class: model_derived
+        admission_status: admitted
+        activity: 0.14
+    - observation_id: ohta_1996_al2o3_activity_mgo_spinel_saturation_1823
+      type: activity_coefficient
+      locator: {published_page: 985, pdf_page_index: 3, section: '3.1', mark: A'}
+      T_range_K: [1823.0, 1823.0]
+      phase: solid Al2O3 endmember in MgO-spinel double-saturated slag
+      standard_state:
+        state: {tag: value, value: {convention: raoultian_pure_endmember, endmember: {formula: Al2O3, phase: {tag: value, value: cr}, polymorph: {tag: unknown, reason: polymorph_not_published}}, component_basis: Al2O3}}
+        inferred: false
+        note: Solid Al2O3 standard state as printed.
+        locator: {published_page: 985, pdf_page_index: 3, section: '3.1'}
+      units: dimensionless activity
+      derived_from: [tables:ohta-1996-cao-mgo-al2o3-activities]
+      derivation:
+        relation: 'a(Al2O3)=0.13 at mark A'' from ΔG°spinel = −18800 − 6.3T J/mol for MgO(s)+Al2O3(s)=MgO·Al2O3(s), as printed.'
+        inputs: [tables:ohta-1996-cao-mgo-al2o3-activities]
+        output_unit: dimensionless activity
+      values:
+        quantity: activity
+        method_class: model_derived
+        admission_status: admitted
+        activity: 0.13
+    - observation_id: ohta_1996_al2o3_activity_ca2_spinel_saturation_1873
+      type: activity_coefficient
+      locator: {published_page: 985, pdf_page_index: 3, section: '3.1', mark: B}
+      T_range_K: [1873.0, 1873.0]
+      phase: solid Al2O3 endmember in CaO·2Al2O3-spinel double-saturated slag
+      standard_state:
+        state: {tag: value, value: {convention: raoultian_pure_endmember, endmember: {formula: Al2O3, phase: {tag: value, value: cr}, polymorph: {tag: unknown, reason: polymorph_not_published}}, component_basis: Al2O3}}
+        inferred: false
+        note: Solid Al2O3 standard state as printed.
+        locator: {published_page: 985, pdf_page_index: 3, section: '3.1'}
+      units: dimensionless activity
+      derived_from: [tables:ohta-1996-cao-mgo-al2o3-activities]
+      derivation:
+        relation: 'a(Al2O3)=0.83 at mark B from ΔG°CA2 = −16700 − 25.5T J/mol for CaO(s)+2Al2O3(s)=CaO·2Al2O3(s), using a(CaO) assessed in this study.'
+        inputs: [tables:ohta-1996-cao-mgo-al2o3-activities]
+        output_unit: dimensionless activity
+      values:
+        quantity: activity
+        method_class: model_derived
+        admission_status: admitted
+        activity: 0.83
+    - observation_id: ohta_1996_al2o3_activity_ca2_spinel_saturation_1823
+      type: activity_coefficient
+      locator: {published_page: 985, pdf_page_index: 3, section: '3.1', mark: B'}
+      T_range_K: [1823.0, 1823.0]
+      phase: solid Al2O3 endmember in CaO·2Al2O3-spinel double-saturated slag
+      standard_state:
+        state: {tag: value, value: {convention: raoultian_pure_endmember, endmember: {formula: Al2O3, phase: {tag: value, value: cr}, polymorph: {tag: unknown, reason: polymorph_not_published}}, component_basis: Al2O3}}
+        inferred: false
+        note: Solid Al2O3 standard state as printed.
+        locator: {published_page: 985, pdf_page_index: 3, section: '3.1'}
+      units: dimensionless activity
+      derived_from: [tables:ohta-1996-cao-mgo-al2o3-activities]
+      derivation:
+        relation: 'a(Al2O3)=0.83 at mark B'' from ΔG°CA2 = −16700 − 25.5T J/mol for CaO(s)+2Al2O3(s)=CaO·2Al2O3(s), using a(CaO) assessed in this study.'
+        inputs: [tables:ohta-1996-cao-mgo-al2o3-activities]
+        output_unit: dimensionless activity
+      values:
+        quantity: activity
+        method_class: model_derived
+        admission_status: admitted
+        activity: 0.83
+    - observation_id: ohta_1996_al2o3_activity_ca_al2o3_ac_1873_rein_chipman
+      type: activity_coefficient
+      locator: {published_page: 987, pdf_page_index: 5, section: '3.3 Iso-activity Line for Al2O3'}
+      T_range_K: [1873.0, 1873.0]
+      phase: solid Al2O3 endmember in CaO-Al2O3 slag at AC composition
+      standard_state:
+        state: {tag: value, value: {convention: raoultian_pure_endmember, endmember: {formula: Al2O3, phase: {tag: value, value: cr}, polymorph: {tag: unknown, reason: polymorph_not_published}}, component_basis: Al2O3}}
+        inferred: false
+        note: Solid Al2O3 standard state as printed.
+        locator: {published_page: 987, pdf_page_index: 5, section: '3.3'}
+      units: dimensionless activity
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        admission_status: admitted
+        activity: 0.33
+        attribution: 'Rein and Chipman, reference 29'
+      quote: 'At the AC composition in CaO-Al2O3, a(Al2O3) = 0.33 at 1873 K, used as a starting point for Gibbs-Duhem integration; cited to Rein and Chipman (ref. 29).'
+    - observation_id: ohta_1996_al2o3_activity_ca_al2o3_ac_1823_rein_chipman
+      type: activity_coefficient
+      locator: {published_page: 987, pdf_page_index: 5, section: '3.3 Iso-activity Line for Al2O3'}
+      T_range_K: [1823.0, 1823.0]
+      phase: solid Al2O3 endmember in CaO-Al2O3 slag at AC composition
+      standard_state:
+        state: {tag: value, value: {convention: raoultian_pure_endmember, endmember: {formula: Al2O3, phase: {tag: value, value: cr}, polymorph: {tag: unknown, reason: polymorph_not_published}}, component_basis: Al2O3}}
+        inferred: false
+        note: Solid Al2O3 standard state as printed.
+        locator: {published_page: 987, pdf_page_index: 5, section: '3.3'}
+      units: dimensionless activity
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        admission_status: admitted
+        activity: 0.26
+        attribution: 'Rein and Chipman, reference 29'
+      quote: 'At the AC composition in CaO-Al2O3, a(Al2O3) = 0.26 at 1823 K, used as a starting point for Gibbs-Duhem integration; cited to Rein and Chipman (ref. 29).'
+    - observation_id: ohta_1996_table1_spinel_sat_compositions
+      type: composition_series
+      locator: {published_page: 984, pdf_page_index: 2, table: '1'}
+      T_range_K: [1823.0, 1873.0]
+      phase: liquid CaO-MgO-Al2O3 slag along spinel saturation (plus metal)
+      units: mass ppm (metal); mass% (slag oxides); mass ppm (S in slag)
+      values:
+        quantity: chemical_compositions_metal_and_slag
+        method_class: measured
+        admission_status: admitted
+        table_title_as_printed: Table 1. Chemical compositions of metal and slag phases.
+        columns_as_printed: 'Metal mass ppm: [Al] Sol., [Al] Insol., [Mg], [Ca], [Mn], [O], [S]; Slag: (S) mass ppm; (CaO)(MgO)(Al2O3)(MnO)(FetO) mass pct'
+        row_count: 10
+        note: 'Full Table 1 transcription: six rows at 1873 K and four at 1823 K; metal [Ca] printed as <0.01 retained as text. Slag compositions are spinel-saturated ternary, not binary CaO-Al2O3 measurements.'
+        rows:
+        - {T_K: 1873, metal_Al_sol_ppm: 43.5, metal_Al_insol_ppm: 0.0, metal_Mg_ppm: 0.3, metal_Ca_ppm: '<0.01', metal_Mn_ppm: 982, metal_O_ppm: 13.3, metal_S_ppm: 538, slag_S_ppm: 2420, slag_mass_pct_CaO: 27.4, slag_mass_pct_MgO: 12.3, slag_mass_pct_Al2O3: 57.5, slag_mass_pct_MnO: 0.274, slag_mass_pct_FetO: 0.959}
+        - {T_K: 1873, metal_Al_sol_ppm: 21.6, metal_Al_insol_ppm: 0.1, metal_Mg_ppm: 0.29, metal_Ca_ppm: '<0.01', metal_Mn_ppm: 1070, metal_O_ppm: 10.2, metal_S_ppm: 618, slag_S_ppm: 3210, slag_mass_pct_CaO: 30.1, slag_mass_pct_MgO: 15.4, slag_mass_pct_Al2O3: 52.3, slag_mass_pct_MnO: 0.208, slag_mass_pct_FetO: 2.13}
+        - {T_K: 1873, metal_Al_sol_ppm: 15.0, metal_Al_insol_ppm: 2.5, metal_Mg_ppm: 0.31, metal_Ca_ppm: 0.8, metal_Mn_ppm: 274, metal_O_ppm: 15.3, metal_S_ppm: 802, slag_S_ppm: 1370, slag_mass_pct_CaO: 26.5, slag_mass_pct_MgO: 8.8, slag_mass_pct_Al2O3: 62.0, slag_mass_pct_MnO: 0.099, slag_mass_pct_FetO: 0.855}
+        - {T_K: 1873, metal_Al_sol_ppm: 31.3, metal_Al_insol_ppm: 0.0, metal_Mg_ppm: 0.31, metal_Ca_ppm: '<0.01', metal_Mn_ppm: 1890, metal_O_ppm: 21.1, metal_S_ppm: 868, slag_S_ppm: 2690, slag_mass_pct_CaO: 26.8, slag_mass_pct_MgO: 9.0, slag_mass_pct_Al2O3: 61.4, slag_mass_pct_MnO: 0.478, slag_mass_pct_FetO: 0.683}
+        - {T_K: 1873, metal_Al_sol_ppm: 93.1, metal_Al_insol_ppm: 1.6, metal_Mg_ppm: 1.02, metal_Ca_ppm: 0.61, metal_Mn_ppm: 2990, metal_O_ppm: 14.9, metal_S_ppm: 845, slag_S_ppm: 955, slag_mass_pct_CaO: 27.7, slag_mass_pct_MgO: 4.1, slag_mass_pct_Al2O3: 67.3, slag_mass_pct_MnO: 0.485, slag_mass_pct_FetO: 0.512}
+        - {T_K: 1873, metal_Al_sol_ppm: 24.1, metal_Al_insol_ppm: 2.2, metal_Mg_ppm: 0.32, metal_Ca_ppm: 0.12, metal_Mn_ppm: 908, metal_O_ppm: 14.8, metal_S_ppm: 435, slag_S_ppm: 674, slag_mass_pct_CaO: 27.5, slag_mass_pct_MgO: 6.6, slag_mass_pct_Al2O3: 63.7, slag_mass_pct_MnO: 0.781, slag_mass_pct_FetO: 1.54}
+        - {T_K: 1823, metal_Al_sol_ppm: 29.6, metal_Al_insol_ppm: 0.0, metal_Mg_ppm: 0.37, metal_Ca_ppm: 0.52, metal_Mn_ppm: 212, metal_O_ppm: 15.0, metal_S_ppm: 556, slag_S_ppm: 1570, slag_mass_pct_CaO: 31.9, slag_mass_pct_MgO: 9.0, slag_mass_pct_Al2O3: 56.5, slag_mass_pct_MnO: 0.06, slag_mass_pct_FetO: 0.726}
+        - {T_K: 1823, metal_Al_sol_ppm: 27.7, metal_Al_insol_ppm: 0.3, metal_Mg_ppm: 1.01, metal_Ca_ppm: '<0.01', metal_Mn_ppm: 817, metal_O_ppm: 10.4, metal_S_ppm: 649, slag_S_ppm: 1960, slag_mass_pct_CaO: 31.6, slag_mass_pct_MgO: 10.5, slag_mass_pct_Al2O3: 55.6, slag_mass_pct_MnO: 0.385, slag_mass_pct_FetO: 1.72}
+        - {T_K: 1823, metal_Al_sol_ppm: 27.7, metal_Al_insol_ppm: 0.2, metal_Mg_ppm: 0.12, metal_Ca_ppm: '<0.01', metal_Mn_ppm: 3710, metal_O_ppm: 3.5, metal_S_ppm: 483, slag_S_ppm: 1330, slag_mass_pct_CaO: 30.6, slag_mass_pct_MgO: 7.0, slag_mass_pct_Al2O3: 60.0, slag_mass_pct_MnO: 0.853, slag_mass_pct_FetO: 0.774}
+        - {T_K: 1823, metal_Al_sol_ppm: 8.0, metal_Al_insol_ppm: 0.2, metal_Mg_ppm: 0.29, metal_Ca_ppm: 0.54, metal_Mn_ppm: 181, metal_O_ppm: 34.1, metal_S_ppm: 1110, slag_S_ppm: 1180, slag_mass_pct_CaO: 32.3, slag_mass_pct_MgO: 8.4, slag_mass_pct_Al2O3: 56.9, slag_mass_pct_MnO: 0.086, slag_mass_pct_FetO: 1.86}
+      quote: 'Table 1 (full): six rows at 1873 K and four at 1823 K.'
+  Fe_tO:
+    observations:
+    - observation_id: ohta_1996_feto_activity_coefficient_spinel_line
+      type: activity_coefficient
+      locator: {published_page: 986, pdf_page_index: 4, section: '3.1'}
+      T_range_K: [1823.0, 1873.0]
+      phase: liquid slag
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase: {tag: value, value: l}
+              polymorph: {tag: not_applicable, reason: not_applicable}
+            component_basis: Fe_tO
+        inferred: false
+        note: Eq. (3) uses Fe_tO(l) and identifies the coefficient as referred to the liquid standard state.
+        locator: {published_page: 986, pdf_page_index: 4, equation: '3', section: '3.1'}
+      units: dimensionless activity coefficient
+      derived_from: [tables:ohta-1996-cao-mgo-al2o3-activities]
+      derivation:
+        relation: 'Fig. 4 gives the temperature-independent γ(Fe_tO)=0.51 ± 0.23, obtained from a(Al2O3), Fe_tO content, and the interaction coefficients for f_Al. A separate estimate from O contents, the interaction coefficients for f_O, and ΔG° = −116100 + 48.79T J/mol for Fe(l)+O=Fe_tO(l) was reported to agree with Fig. 4.'
+        inputs: [tables:ohta-1996-cao-mgo-al2o3-activities]
+        output_unit: dimensionless activity coefficient
+      uncertainty: {absolute: 0.23, note: 'Printed as 0.51 ± 0.23.'}
+      values:
+        quantity: activity_coefficient
+        method_class: calculated
+        admission_status: admitted
+        gamma: 0.51
+  MnO:
+    observations:
+    - observation_id: ohta_1996_mno_activity_coefficient_spinel_line
+      type: activity_coefficient
+      locator: {published_page: 986, pdf_page_index: 4, section: '3.1'}
+      T_range_K: [1823.0, 1873.0]
+      phase: liquid slag
+      standard_state: solid MnO
+      units: dimensionless activity coefficient
+      derived_from: [tables:ohta-1996-cao-mgo-al2o3-activities]
+      derivation:
+        relation: 'Fig. 5 gives the temperature-independent γ(MnO)=0.82 ± 0.30, determined from a(Al2O3), MnO content, and the interaction coefficients for f_Al and f_Mn. A separate calculation from Mn and O contents, the respective interaction coefficients, and ΔG° = −288100 + 128.3T J/mol for Mn+O=MnO(s) was reported to agree with Fig. 5.'
+        inputs: [tables:ohta-1996-cao-mgo-al2o3-activities]
+        output_unit: dimensionless activity coefficient
+      uncertainty: {absolute: 0.30, note: 'Printed as 0.82 ± 0.30.'}
+      values:
+        quantity: activity_coefficient
+        method_class: calculated
+        admission_status: admitted
+        gamma: 0.82
+  O:
+    observations:
+    - observation_id: ohta_1996_o_interaction_parameter_in_mg
+      type: interaction_parameter
+      locator: {published_page: 988, pdf_page_index: 6, section: '3.4 Iso-activity Line for MgO', equation: '9'}
+      T_range_K: [1873.0, 1873.0]
+      phase: liquid iron
+      units: Wagner interaction parameter
+      derived_from: [tables:ohta-1996-cao-mgo-al2o3-activities]
+      derivation:
+        relation: 'Eq. (9): log K''Mg − log aMgO + Σe_j^O[mass% j] + Σe_k^Mg[mass% k] = −e_O^Mg([mass% Mg] + M_Mg/M_O·[mass% O]) + log K_Mg. The 1873 K slope gives e_O^Mg = −300 ± 100, as printed.'
+        inputs: [tables:ohta-1996-cao-mgo-al2o3-activities]
+        output_unit: Wagner interaction parameter
+      uncertainty: {absolute: 100, note: 'Printed as −300 ± 100.'}
+      values:
+        quantity: wagner_interaction_parameter
+        method_class: model_derived
+        admission_status: admitted
+        epsilon: -300
+  Mg:
+    observations:
+    - observation_id: ohta_1996_mg_interaction_parameter_in_o
+      type: interaction_parameter
+      locator: {published_page: 988, pdf_page_index: 6, section: '3.4 Iso-activity Line for MgO', equation: '9'}
+      T_range_K: [1873.0, 1873.0]
+      phase: liquid iron
+      units: Wagner interaction parameter
+      derived_from: [tables:ohta-1996-cao-mgo-al2o3-activities]
+      derivation:
+        relation: 'Eq. (9): log K''Mg − log aMgO + Σe_j^O[mass% j] + Σe_k^Mg[mass% k] = −e_O^Mg([mass% Mg] + M_Mg/M_O·[mass% O]) + log K_Mg. The reported coupled parameter is e_Mg^O = −460 ± 150, as printed.'
+        inputs: [tables:ohta-1996-cao-mgo-al2o3-activities]
+        output_unit: Wagner interaction parameter
+      uncertainty: {absolute: 150, note: 'Printed as −460 ± 150.'}
+      values:
+        quantity: wagner_interaction_parameter
+        method_class: model_derived
+        admission_status: admitted
+        epsilon: -460
