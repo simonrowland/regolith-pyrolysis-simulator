@@ -8003,16 +8003,20 @@ def test_transition_temperature_refuses_before_generic_engine_pot(
 
     monkeypatch.setattr(score_module, "parse_species_formula", track_formula_parse)
 
-    prediction = predict_with_engine(Engine.OPENIMCC, reference)
+    predictions = [
+        predict_with_engine(engine, reference)
+        for engine in score_module.SCORE_ENGINE_SET
+    ]
 
     assert opened == []
     assert pots == []
     assert parsed_formulas == []
-    assert prediction.value is None
-    assert prediction.unit is None
-    assert prediction.execution.state is ExecutionState.UNSUPPORTED
-    assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
-    assert prediction.refusal_detail == {
-        "reason": "quantity_not_predicted",
-        "quantity": Quantity.TRANSITION_TEMPERATURE.value,
-    }
+    for prediction in predictions:
+        assert prediction.value is None
+        assert prediction.unit is None
+        assert prediction.execution.state is ExecutionState.UNSUPPORTED
+        assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+        assert prediction.refusal_detail == {
+            "reason": "quantity_not_predicted",
+            "quantity": Quantity.TRANSITION_TEMPERATURE.value,
+        }
