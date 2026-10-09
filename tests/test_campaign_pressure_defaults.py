@@ -725,6 +725,79 @@ def test_zero_o2_argon_lab_schedule_does_not_synthesize_n2():
     assert gas.composition.get("N2", 0.0) == pytest.approx(0.0)
 
 
+@pytest.mark.parametrize("headspace_kind", ["finite", "no_headspace"])
+@pytest.mark.parametrize(
+    ("mole_fraction", "expected_ar_mbar"),
+    [
+        (0.0, 0.0),
+        ("unstamped", 10.0),
+    ],
+)
+def test_declared_zero_background_fraction_is_not_the_sweep_balance(
+    headspace_kind: str,
+    mole_fraction: float | str,
+    expected_ar_mbar: float,
+) -> None:
+    """Explicit y_Ar = 0 stays 0 mbar. An omitted fraction is the full balance.
+
+    Both overhead writers. The omitted key is the schedule reader's default
+    of 1, which is the unstamped boundary. A dataclass melt with no carrier
+    still takes the nominal N2 sweep.
+    """
+
+    from simulator.overhead import OverheadGasModel
+    from simulator.state import CondensationTrain, EvaporationFlux
+
+    schedule = deepcopy(_n2_lab_schedule())
+    schedule["gas_boundary"]["background_gas"]["species"] = "Ar"
+    if mole_fraction == "unstamped":
+        schedule["gas_boundary"]["background_gas"].pop("mole_fraction", None)
+    else:
+        schedule["gas_boundary"]["background_gas"]["mole_fraction"] = mole_fraction
+    manager = CampaignManager(_setpoints())
+    manager.overrides["C2A"] = {"lab_schedule": schedule}
+    melt = MeltState()
+    manager.configure_campaign(melt, CampaignPhase.C2A)
+
+    assert melt.atmosphere is Atmosphere.PN2_SWEEP
+    assert melt.p_total_mbar == pytest.approx(10.0)
+    assert melt.pO2_mbar == pytest.approx(0.0)
+    assert melt.background_gas_species == "Ar"
+    if mole_fraction == "unstamped":
+        assert melt.background_gas_mole_fraction == pytest.approx(1.0)
+    else:
+        assert melt.background_gas_mole_fraction == pytest.approx(0.0)
+
+    headspace = (
+        {"enabled": True, "volume_m3": 1.0}
+        if headspace_kind == "finite"
+        else {"enabled": False}
+    )
+    gas = OverheadGasModel(headspace).update(
+        EvaporationFlux(),
+        melt,
+        CondensationTrain.create_default(),
+    )
+
+    assert gas.composition.get("Ar", 0.0) == pytest.approx(expected_ar_mbar)
+    assert gas.composition.get("N2", 0.0) == pytest.approx(0.0)
+
+    unstamped = MeltState(
+        atmosphere=Atmosphere.PN2_SWEEP,
+        p_total_mbar=10.0,
+        pO2_mbar=0.0,
+    )
+    assert unstamped.background_gas_species == ""
+    assert unstamped.background_gas_mole_fraction == pytest.approx(0.0)
+    nominal = OverheadGasModel(headspace).update(
+        EvaporationFlux(),
+        unstamped,
+        CondensationTrain.create_default(),
+    )
+    assert nominal.composition.get("N2", 0.0) == pytest.approx(10.0)
+    assert nominal.composition.get("Ar", 0.0) == pytest.approx(0.0)
+
+
 def test_declared_pure_co2_keeps_its_mole_fraction():
     from simulator.overhead import OverheadGasModel
     from simulator.state import CondensationTrain, EvaporationFlux

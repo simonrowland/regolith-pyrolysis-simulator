@@ -160,29 +160,30 @@ class OverheadConfigurationError(ValueError):
 
 
 def declared_background_partial_mbar(melt: MeltState) -> tuple[str, float] | None:
-    """Carrier partial from a stamped background mole fraction.
+    """Carrier partial from a stamped background species and mole fraction.
 
-    Premise: a lab schedule's background mole fraction is that carrier's
-    composition. The nominal sweep (the full balance p_total - pO2 on the
-    carrier) and the C0 CO2 cover (0.96 * p_total) apply only when no
-    positive fraction is stamped. The field defaults to 0, which is that
-    unset state.
-    Algebra: p_i = max(0, p_total - pO2) * min(1, y_i).
+    Premise: a stamped carrier owns its mole fraction, and an explicit
+    zero is that composition. The nominal sweep (the full balance
+    p_total - pO2) and the C0 CO2 cover (0.96 * p_total) apply only when
+    no carrier is stamped. The dataclass default fraction is 0 and arrives
+    with an empty species, which is that unstamped boundary.
+    Algebra: p_i = max(0, p_total - pO2) * min(1, max(0, y)).
     Units: mbar * dimensionless = mbar.
-    Sanity: Ar at y = 0.8, 10 mbar, pO2 = 0 is 8 mbar Ar. Declared pure
-    CO2 at y = 1 is 10 mbar, not the 9.6 mbar nominal cover.
+    Sanity: Ar at y = 0.8, 10 mbar, pO2 = 0 is 8 mbar Ar. Ar at y = 0 and
+    10 mbar is 0 mbar, not the 10 mbar balance. Declared pure CO2 at
+    y = 1 is 10 mbar, not the 9.6 mbar nominal cover.
     """
 
     species = str(getattr(melt, "background_gas_species", "") or "").strip()
-    try:
-        fraction = float(getattr(melt, "background_gas_mole_fraction", 0.0) or 0.0)
-    except (TypeError, ValueError):
+    if not species:
         return None
-    if not species or fraction <= 0.0:
+    raw_fraction = getattr(melt, "background_gas_mole_fraction", None)
+    if not is_declared_real_scalar(raw_fraction):
         return None
+    fraction = min(1.0, max(0.0, float(raw_fraction)))
     partial = (
         max(0.0, float(melt.p_total_mbar) - float(melt.pO2_mbar))
-        * min(1.0, fraction)
+        * fraction
     )
     return species, partial
 
@@ -190,14 +191,16 @@ def declared_background_partial_mbar(melt: MeltState) -> tuple[str, float] | Non
 def write_declared_background_partial(gas: OverheadGas, melt: MeltState) -> bool:
     """Stamp a declared carrier partial, or leave the nominal cover in place.
 
-    Premise: a positive background mole fraction is that carrier's
-    composition. The nominal sweep and the C0 0.96 CO2 cover run only
-    when this returns False. The fraction field defaults to 0, which is
-    the unset state.
+    Premise: a stamped carrier, including an explicit zero fraction, is
+    that carrier's composition. The nominal sweep and the C0 0.96 CO2
+    cover run only when this returns False. An empty species is the
+    unstamped boundary and returns False.
     Algebra: p_i from declared_background_partial_mbar,
-    p_i = max(0, p_total - pO2) * min(1, y_i).
+    p_i = max(0, p_total - pO2) * min(1, max(0, y)), then
+    p_reported = max(p_existing, p_i).
     Units: mbar * dimensionless = mbar.
-    Sanity: Ar at y = 0.8, 10 mbar, pO2 = 0 writes 8 mbar Ar.
+    Sanity: Ar at y = 0 and 10 mbar writes 0 mbar Ar and does not fall
+    through to the 10 mbar balance. Ar at y = 0.8 writes 8 mbar.
     """
 
     declared = declared_background_partial_mbar(melt)
