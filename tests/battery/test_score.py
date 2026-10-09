@@ -7084,18 +7084,29 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
                 .identity.reference_state.value.endmember.polymorph
             )
             assert polymorph is not None
-            assert polymorph.is_value or polymorph.is_unknown
-            conversion_notice = next(
-                notice
-                for notice in row.notices
-                if notice.kind is NoticeKind.DERIVATION_USES_COMPILATION
-                and notice.reason.startswith("reference_converted_via_fusion;")
-            )
             if polymorph.is_value:
                 assert polymorph.value is Polymorph.CORUNDUM
+                conversion_notice = next(
+                    notice
+                    for notice in row.notices
+                    if notice.kind is NoticeKind.DERIVATION_USES_COMPILATION
+                    and notice.reason.startswith("reference_converted_via_fusion;")
+                )
                 assert "source polymorph is unknown" not in conversion_notice.reason
             else:
-                assert "source polymorph is unknown" in conversion_notice.reason
+                assert polymorph.is_unknown
+                missing_input_notice = next(
+                    notice
+                    for notice in row.notices
+                    if notice.kind is NoticeKind.OUT_OF_GAMMA_DOMAIN
+                    and notice.reason.startswith("fusion conversion missing input:")
+                )
+                assert "JANAF solid table Al-096 represents polymorph corundum" in (
+                    missing_input_notice.reason
+                )
+                assert "measured reference polymorph is unknown" in (
+                    missing_input_notice.reason
+                )
         assert not any(row.reference in allibert_rejected for row in residuals)
 
         stolyarova_rows = engine_rows(

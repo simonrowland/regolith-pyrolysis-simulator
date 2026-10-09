@@ -27,7 +27,7 @@ benches:
     sensor: {state: {tag: value, value: optical pyrometer on crucible surface; Pt/Pt-13%Rh and W/W-26%Re thermocouples for monitoring}, locator: {published_page: 113, section: Experimental device}}
 experiments:
 - experiment_id: fcmas-free-evap-series
-  method: free_evaporation
+  method: langmuir_free_evaporation
   locator: {table: '1', published_page: 113, note: FCMAS solar-abundance starting composition shared by free-evap geometry and derived rows}
   sample:
     printed_composition:

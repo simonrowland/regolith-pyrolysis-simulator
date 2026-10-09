@@ -5435,6 +5435,26 @@ def test_reference_prose_binds_polymorphs_to_their_own_endmember() -> None:
     assert corundum_state.value.endmember.polymorph.value is Polymorph.CORUNDUM
 
 
+@pytest.mark.parametrize(
+    ("filename", "experiment_id"),
+    (
+        ("kems-010-richter-2007.yaml", "type-b-cai-like-lab-melt"),
+        ("kems-015-hashimoto-1983.yaml", "fcmas-free-evap-series"),
+    ),
+)
+def test_richter_hashimoto_declared_experiments_resolve_langmuir_method(
+    tmp_path: Path, filename: str, experiment_id: str
+) -> None:
+    result = _migrate_real_extract(tmp_path / filename, filename)
+    experiment = next(
+        experiment
+        for experiment in result.experiments.values()
+        if experiment.experiment_id.endswith(f"::experiment::{experiment_id}")
+    )
+    assert experiment.method.is_value
+    assert experiment.method.value is MethodToken.LANGMUIR_FREE_EVAPORATION
+
+
 def test_allibert_alumina_polymorph_binds_in_isolated_migration(
     tmp_path: Path,
 ) -> None:

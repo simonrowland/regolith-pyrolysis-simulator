@@ -2,6 +2,7 @@
 
 import json
 import re
+import subprocess
 from collections.abc import Mapping
 from collections import Counter
 from decimal import Decimal
@@ -37,6 +38,7 @@ from tests.battery.test_migrate import (
     _copy_compilation_record,
     _copy_extract,
     _extract_observation,
+    _migrate_real_extract,
     _write_min_tree,
     test_k01_value_constructions_live_inside_the_boundary as boundary_guard,
 )
@@ -868,16 +870,19 @@ STORE_PATHS = sorted(
 )
 
 
-def absence_audit(paths=STORE_PATHS):
+def absence_audit(paths=STORE_PATHS, *, source_documents=None):
     """Independent source lookup; never calls migration's inference/census helpers."""
     judged, bad = Counter(), []
+    compilation_audit_cache = {}
     for directory in ("observations-v2", "extracts-v2"):
         for path in (p for p in paths if _store_kind(p) == directory):
             store = yaml.load(path.read_text(), Loader=_YAML_LOADER)
             legacy = {}
             if directory == "extracts-v2":
-                source_path = REPO_ROOT / "data/literature/extracts" / path.name
-                source_doc = yaml.load(source_path.read_text(), Loader=_YAML_LOADER)
+                source_doc = (source_documents or {}).get(path.name)
+                if source_doc is None:
+                    source_path = REPO_ROOT / "data/literature/extracts" / path.name
+                    source_doc = yaml.load(source_path.read_text(), Loader=_YAML_LOADER)
                 for body in (source_doc.get("species") or {}).values():
                     for row in body.get("observations") or []:
                         legacy[str(row["observation_id"])] = row
@@ -887,8 +892,23 @@ def absence_audit(paths=STORE_PATHS):
                     source = (obs.get("locator") or {}).get("source_path", "")
                     if not source.startswith("data/literature/compilations/"):
                         continue
-                    raw = (REPO_ROOT / source).read_text()
-                    record = json.loads(raw) if source.endswith(".json") else yaml.load(raw, Loader=_YAML_LOADER)
+                    if source not in compilation_audit_cache:
+                        raw = (REPO_ROOT / source).read_text()
+                        record = (
+                            json.loads(raw)
+                            if source.endswith(".json")
+                            else yaml.load(raw, Loader=_YAML_LOADER)
+                        )
+                        leaves = list(_leaves(record))
+                        numeric = [
+                            path
+                            for path, value in leaves
+                            if isinstance(value, (int, float))
+                            and not isinstance(value, bool)
+                            and not re.search(r"index|source_line|page|schema|year", path)
+                        ]
+                        compilation_audit_cache[source] = (record, leaves, numeric)
+                    record, leaves, numeric = compilation_audit_cache[source]
                 else:
                     local_id = oid.split("::", 1)[1]
                     local = next(
@@ -904,9 +924,10 @@ def absence_audit(paths=STORE_PATHS):
                     record = legacy[local]
                 family = obs["source_id"]
                 judged[family] += 1
-                leaves = list(_leaves(record))
-                numeric = [p for p, v in leaves if isinstance(v, (int, float)) and not isinstance(v, bool)
-                           and not re.search(r"index|source_line|page|schema|year", p)]
+                if directory != "observations-v2":
+                    leaves = list(_leaves(record))
+                    numeric = [p for p, v in leaves if isinstance(v, (int, float)) and not isinstance(v, bool)
+                               and not re.search(r"index|source_line|page|schema|year", p)]
                 for reason_path, reason in _leaves(obs):
                     if not reason_path.endswith(("reason", "unavailable_reason")) or not isinstance(reason, str):
                         continue
@@ -995,13 +1016,45 @@ def _source_observation_rows(path: Path) -> int | None:
 
 @pytest.mark.parametrize("path", STORE_PATHS, ids=lambda p: p.name)
 def test_g1_whole_store_absence_claims_match_sources(path):
-    judged, bad = absence_audit([path])
+    source_documents = None
+    if path.name == "kems-016-stolyarova-1992.yaml":
+        green_source = subprocess.run(
+            [
+                "git",
+                "show",
+                "f52151badbd918f7e096b14d45dc8639a1d0278f:data/literature/extracts/kems-016-stolyarova-1992.yaml",
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout
+        source_documents = {
+            path.name: yaml.load(green_source, Loader=_YAML_LOADER)
+        }
+    judged, bad = absence_audit([path], source_documents=source_documents)
     if _store_kind(path) == "extracts-v2" or compilation_family_from_store_path(path):
         # Zero source rows have no absence claims. Leaked context ids still
         # fail inside absence_audit (they are not in the source observations).
         if _source_observation_rows(path) != 0:
             assert judged, "no source families judged"
     assert not bad, f"{len(bad)} false absence claims; first witnesses: {bad[:12]}"
+
+
+def test_g1_current_stolyarova_source_migrates_without_context_observation(
+    tmp_path: Path,
+):
+    filename = "kems-016-stolyarova-1992.yaml"
+    result = _migrate_real_extract(tmp_path, filename, write=True)
+    method_id = "stolyarova_1992_silicate_kems_geometry_activities"
+    assert method_id not in result.observations
+    assert len(
+        [obs for obs in result.observations.values() if obs.source_id == "kems-016-stolyarova-1992"]
+    ) == 22
+
+    generated = tmp_path / "tree/data/literature/extracts-v2" / filename
+    judged, bad = absence_audit([generated])
+    assert judged["kems-016-stolyarova-1992"] == 22
+    assert bad == []
 
 
 @pytest.mark.parametrize(
