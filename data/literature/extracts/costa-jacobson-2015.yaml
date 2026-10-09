@@ -49,3 +49,15 @@ species:
         alpha_range:
         - 0.003
         - 0.036
+fidelity_samples:
+- path: species.SiO.observations[costa_jacobson_2015_sio_olivine_kems].values
+  value:
+    alpha: null
+    alpha_range:
+    - 0.003
+    - 0.036
+    gas_species: SiO(g)
+    material: Fo93Fa7_olivine
+  note: fidelity sample retained on Costa's unique SiO interval after Fe summary removal
+  locator:
+    record: costa_jacobson_2015_sio_olivine_kems
