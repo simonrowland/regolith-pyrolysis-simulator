@@ -2208,12 +2208,21 @@ def test_pt2_persistent_physics_bucket_hit_is_not_cached_exact(tmp_path: Path) -
     assert counts["cached_exact"] == 0
 
 
-def test_pt0_exact_route_refuses_dependency_vector_mismatch() -> None:
+def test_pt0_exact_route_refuses_dependency_vector_mismatch(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     capture = PT0DeterminismStore("capture")
     sim, result = _pt0_equilibrium_capture_context(capture)
     capture.capture_equilibrium(sim, result)
-    query_key = copy.deepcopy(capture.capture_sequence[-1]["key"])
+    source_key = capture.capture_sequence[-1]["key"]
+    source_entry = capture.entries[_key_hash(source_key)]
+    query_key = copy.deepcopy(source_key)
     query_key["model"]["model"] = "different-admitted-model"
+    monkeypatch.setattr(
+        capture,
+        "_entry_for_key",
+        lambda *_args, **_kwargs: source_entry,
+    )
 
     with pytest.raises(PT0CacheMiss):
         capture._lookup("equilibrium_post_record", query_key)
