@@ -36,6 +36,10 @@ RETIRED_DUPLICATE_SOURCE_IDS = {
     "ref-016-sio-kems-1700-2000k",
     "safarian-engh-2013-si-pure-langmuir",
 }
+RETIRED_DUPLICATE_RESIDUAL_KEY_ALIASES = {
+    "fedkin_2006_table3_mg_hashimoto_langmuir:T=1973":
+        "fedkin_2006_mg_hashimoto_langmuir_table3:T=1973",
+}
 
 if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
