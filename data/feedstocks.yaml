@@ -15,12 +15,14 @@ lunar_mare_low_ti:
   label: "Lunar Mare Basalt (Low-Ti)"
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Apollo 12/15 low-Ti basaltic soils"
   confidence: "High"
-  # Sato 1976 Table 1 natural rows vs production Holzheid IW. Grand mean
-  # dIW -1.01785 (n=30, 1000-1200 C); catalog value -1.02. Table accuracy +/- 0.1.
+  # Sato 1976 Table 1 prints -log10(fO2/atm). Production IW is log10(fO2/bar),
+  # so each point is -printed + log10(1.01325) - IW(T). log10(1.01325) is
+  # +0.005717. Grand mean dIW -1.012129 (n=30, 1000-1200 C); catalog value
+  # -1.01. Range [-1.41, -0.59] holds every converted point. Table accuracy +/- 0.1.
   fe_redox_prior:
     delta_iw:
-      value: -1.02
-      range: [-1.42, -0.60]
+      value: -1.01
+      range: [-1.41, -0.59]
       uncertainty: 0.1
       source_id: sato-1976-lunar-fo2-apollo-17
       locator: "Table 1, natural bulk-rock rows (iron-capsule parentheses excluded), six mare basalts, 1000-1200 C"
@@ -243,12 +245,14 @@ lunar_mare_high_ti:
   label: "Lunar Mare Basalt (High-Ti)"
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Apollo 11/17 high-Ti basaltic soils"
   confidence: "High"
-  # Sato 1976 Table 1 natural rows vs production Holzheid IW. Grand mean
-  # dIW -1.01785 (n=30, 1000-1200 C); catalog value -1.02. Table accuracy +/- 0.1.
+  # Sato 1976 Table 1 prints -log10(fO2/atm). Production IW is log10(fO2/bar),
+  # so each point is -printed + log10(1.01325) - IW(T). log10(1.01325) is
+  # +0.005717. Grand mean dIW -1.012129 (n=30, 1000-1200 C); catalog value
+  # -1.01. Range [-1.41, -0.59] holds every converted point. Table accuracy +/- 0.1.
   fe_redox_prior:
     delta_iw:
-      value: -1.02
-      range: [-1.42, -0.60]
+      value: -1.01
+      range: [-1.41, -0.59]
       uncertainty: 0.1
       source_id: sato-1976-lunar-fo2-apollo-17
       locator: "Table 1, natural bulk-rock rows (iron-capsule parentheses excluded), six mare basalts, 1000-1200 C"
@@ -463,13 +467,14 @@ lunar_highland:
   label: "Lunar Highland Anorthosite"
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Apollo 16 anorthositic soils"
   confidence: "High"
-  # Same Sato 1976 mare-basalt mean (grand mean dIW -1.01785, n=30).
+  # Same Sato 1976 mare-basalt mean (grand mean dIW -1.012129, n=30,
+  # Table 1 atm converted to bar by +log10(1.01325)).
   # Sato did not measure highlands. Zhang 2024 treats the Apollo suite as
   # one mantle average, dIW -1.0 +/- 0.9, so this entry uses the mare mean.
   fe_redox_prior:
     delta_iw:
-      value: -1.02
-      range: [-1.42, -0.60]
+      value: -1.01
+      range: [-1.41, -0.59]
       uncertainty: 0.1
       source_id: sato-1976-lunar-fo2-apollo-17
       locator: "Table 1, natural bulk-rock rows (iron-capsule parentheses excluded), six mare basalts, 1000-1200 C"
@@ -680,13 +685,14 @@ lunar_pkt_kreep_average:
   label: "Procellarum KREEP Terrane (PKT) Average"
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Fra Mauro / Imbrium ejecta average (Apollo 14 soils + 15386 analogs)"
   confidence: "High"
-  # Same Sato 1976 mare-basalt mean (grand mean dIW -1.01785, n=30).
+  # Same Sato 1976 mare-basalt mean (grand mean dIW -1.012129, n=30,
+  # Table 1 atm converted to bar by +log10(1.01325)).
   # Sato did not measure KREEP. Zhang 2024 treats the Apollo suite as
   # one mantle average, dIW -1.0 +/- 0.9, so this entry uses the mare mean.
   fe_redox_prior:
     delta_iw:
-      value: -1.02
-      range: [-1.42, -0.60]
+      value: -1.01
+      range: [-1.41, -0.59]
       uncertainty: 0.1
       source_id: sato-1976-lunar-fo2-apollo-17
       locator: "Table 1, natural bulk-rock rows (iron-capsule parentheses excluded), six mare basalts, 1000-1200 C"
@@ -879,13 +885,14 @@ lunar_spa_kreep_influenced:
   label: "South Pole-Aitken KREEP-Influenced"
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: CE-6 impact glasses + noritic SPA floor (diluted deep excavation)"
   confidence: "Medium"
-  # Same Sato 1976 mare-basalt mean (grand mean dIW -1.01785, n=30).
+  # Same Sato 1976 mare-basalt mean (grand mean dIW -1.012129, n=30,
+  # Table 1 atm converted to bar by +log10(1.01325)).
   # Sato did not measure the SPA floor. Zhang 2024 treats the Apollo suite
   # as one mantle average, dIW -1.0 +/- 0.9, so this entry uses the mare mean.
   fe_redox_prior:
     delta_iw:
-      value: -1.02
-      range: [-1.42, -0.60]
+      value: -1.01
+      range: [-1.41, -0.59]
       uncertainty: 0.1
       source_id: sato-1976-lunar-fo2-apollo-17
       locator: "Table 1, natural bulk-rock rows (iron-capsule parentheses excluded), six mare basalts, 1000-1200 C"
@@ -1078,13 +1085,14 @@ targeted_super_kreep_ore:
   label: "Targeted Super-KREEP Ore (Modeled Enriched Blend)"
   source: "MODELED ENRICHED BLEND (synthetic targeted-ore scenario; not a measured table); component basis: major oxides from Apollo 15386-type KREEP basalt analog, K/P/REE/Zr enrichment from VHK clasts + urKREEP immiscible fractions, Cr/Mn trace estimates"
   confidence: "Medium-High"
-  # Same Sato 1976 mare-basalt mean (grand mean dIW -1.01785, n=30).
+  # Same Sato 1976 mare-basalt mean (grand mean dIW -1.012129, n=30,
+  # Table 1 atm converted to bar by +log10(1.01325)).
   # Sato did not measure this blend. Zhang 2024 treats the Apollo suite as
   # one mantle average, dIW -1.0 +/- 0.9, so this entry uses the mare mean.
   fe_redox_prior:
     delta_iw:
-      value: -1.02
-      range: [-1.42, -0.60]
+      value: -1.01
+      range: [-1.41, -0.59]
       uncertainty: 0.1
       source_id: sato-1976-lunar-fo2-apollo-17
       locator: "Table 1, natural bulk-rock rows (iron-capsule parentheses excluded), six mare basalts, 1000-1200 C"
