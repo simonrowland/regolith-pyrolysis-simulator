@@ -7792,6 +7792,71 @@ def test_thermoengine_endmember_oxide_projection_is_stoichiometric():
     assert oxide_component_stoichiometry('fo') == ()
 
 
+def test_melts_decomposition_activity_code_golden():
+    """Activity proxies after the decomposition moved into accounting.
+
+    Coefficients are the oxide stoichiometry of each endmember. The
+    proxy is that coefficient times the reported endmember activity.
+    An oxide that is itself the carrier keeps its reported activity.
+    """
+    activities = {
+        'Al2O3': 0.0218,
+        'Ca3(PO4)2': 0.001,
+        'CaSiO3': 0.124,
+        'CoSi0.5O2': 0.001,
+        'Fe2O3': 0.01,
+        'Fe2SiO4': 0.139,
+        'H2O': 0.001,
+        'KAlSiO4': 0.00229,
+        'Mg2SiO4': 0.0676,
+        'MgCr2O4': 0.00584,
+        'MnSi0.5O2': 0.00371,
+        'Na2SiO3': 9.57e-5,
+        'NiSi0.5O2': 0.001,
+        'SiO2': 0.443,
+        'TiO2': 0.0253,
+    }
+    expected = {
+        'Al2O3': {'Al2O3': 1.0},
+        'Ca3(PO4)2': {'CaO': 3.0, 'P2O5': 1.0},
+        'CaSiO3': {'CaO': 1.0, 'SiO2': 1.0},
+        'CoSi0.5O2': {'CoO': 1.0, 'SiO2': 0.5},
+        'Fe2O3': {'Fe2O3': 1.0},
+        'Fe2SiO4': {'FeO': 2.0, 'SiO2': 1.0},
+        'H2O': {},
+        'KAlSiO4': {'Al2O3': 0.5, 'K2O': 0.5, 'SiO2': 1.0},
+        'Mg2SiO4': {'MgO': 2.0, 'SiO2': 1.0},
+        'MgCr2O4': {'Cr2O3': 1.0, 'MgO': 1.0},
+        'MnSi0.5O2': {'MnO': 1.0, 'SiO2': 0.5},
+        'Na2SiO3': {'Na2O': 1.0, 'SiO2': 1.0},
+        'NiSi0.5O2': {'NiO': 1.0, 'SiO2': 0.5},
+        'SiO2': {'SiO2': 1.0},
+        'TiO2': {'TiO2': 1.0},
+    }
+    for endmember, oxides in expected.items():
+        assert dict(oxide_component_stoichiometry(endmember)) == oxides
+
+    backend = AlphaMELTSBackend()
+    # Preferred carrier, then the coefficient above.
+    proxies = {
+        'Na': activities['Na2SiO3'],
+        'K': 0.5 * activities['KAlSiO4'],
+        'Mg': 2.0 * activities['Mg2SiO4'],
+        'Fe': 2.0 * activities['Fe2SiO4'],
+        'Ca': activities['CaSiO3'],
+        'Al': activities['Al2O3'],
+        'Si': activities['SiO2'],
+        'SiO': activities['SiO2'],
+        'Ti': activities['TiO2'],
+        'Cr': activities['MgCr2O4'],
+        'Mn': activities['MnSi0.5O2'],
+    }
+    for species, proxy in proxies.items():
+        assert backend._activity_for_vapor_species(
+            species, activities,
+        ) == pytest.approx(proxy)
+
+
 def test_endmember_projection_never_sums_multiple_activity_carriers():
     backend = AlphaMELTSBackend()
     assert backend._activity_for_vapor_species(
