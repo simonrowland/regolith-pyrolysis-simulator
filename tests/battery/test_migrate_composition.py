@@ -569,6 +569,7 @@ def test_swept_source_maps_refused_to_converted_and_populate_identity() -> None:
         )
         converted = 0
         refused = 0
+        feot_derivations = 0
         for body in (doc.get("species") or {}).values():
             for raw_observation in (body.get("observations") or []):
                 values = raw_observation.get("values") or {}
@@ -597,8 +598,26 @@ def test_swept_source_maps_refused_to_converted_and_populate_identity() -> None:
                     composition = observation.identity.composition
                     assert composition is not None and composition.is_value
                     assert composition.value == expected, observation.observation_id
+                    if "FeOT" in raw_composition:
+                        assert observation.identity.quantity.is_unknown
+                        assert not any(
+                            notice.kind is NoticeKind.TOTAL_IRON_REPORTED_AS_FEO
+                            for notice in observation.notices
+                        )
+                        printed_composition = (observation.point_conditions or {}).get(
+                            "composition"
+                        )
+                        assert printed_composition is not None
+                        assert printed_composition.inference is not None
+                        assert (
+                            "FeOT (total iron) treated as FeO; printed key FeOT"
+                            in printed_composition.inference.inputs
+                        )
+                        feot_derivations += 1
                 converted += 1
         assert (refused, converted) == (0, expected_count), label
+        if label == "Britt":
+            assert feot_derivations == expected_count
 
 
 def test_typed_printed_composition_is_readable_and_gets_canonical_sibling() -> None:
