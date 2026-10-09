@@ -409,7 +409,7 @@ def test_projected_field_repair_warning_reaches_shadow_caller():
     )
 
     assert result.status == 'ok'
-    assert len(result.warnings) == 4
+    assert len(result.warnings) == 2
     assert result.warnings == result.diagnostic['backend_warnings']
     assert any(
         'nonfinite' in warning and "'Na2O'" in warning
@@ -419,6 +419,8 @@ def test_projected_field_repair_warning_reaches_shadow_caller():
     assert result.diagnostic['liquid_composition_wt_pct'] == {
         'SiO2': 50.0,
         'MgO': 50.0,
+        'FeO': 0.0,
+        'CaO': -1.0,
     }
 
 

@@ -554,20 +554,36 @@ def test_projected_invalid_fields_warn_without_changing_replay_record():
 
     assert diagnostic.phase_masses_kg == {'liquid': 1.0}
     assert diagnostic.phase_modes_wt_pct == {'liquid': 100.0}
-    assert diagnostic.liquid_composition_wt_pct == {'SiO2': 50.0, 'MgO': 50.0}
-    assert len(diagnostic.backend_warnings) == 3
+    assert diagnostic.liquid_composition_wt_pct == {
+        'SiO2': 50.0, 'MgO': 50.0, 'FeO': 0.0, 'CaO': -1.0,
+    }
+    assert len(diagnostic.backend_warnings) == 1
     assert any(
         "phase 'olivine'" in warning and 'nonpositive' in warning
-        for warning in diagnostic.backend_warnings
-    )
-    assert any(
-        "'FeO'" in warning and 'nonpositive' in warning
-        for warning in diagnostic.backend_warnings
-    )
-    assert any(
-        "'CaO'" in warning and 'nonpositive' in warning
         for warning in diagnostic.backend_warnings
     )
     cached_after = canonical_json_bytes(equilibrium_payload(sim, equilibrium))
     assert cached_after == cached_before
     assert equilibrium.warnings == []
+
+
+def test_projected_nonfinite_liquid_scalars_are_reported():
+    from types import SimpleNamespace
+
+    diagnostic = MAGEMinShadowProvider._project_equilibrium(
+        SimpleNamespace(
+            liquid_fraction=float('nan'),
+            liquidus_T_K=float('nan'),
+            liquidus_T_C=float('inf'),
+            solidus_T_C=float('-inf'),
+        ),
+        mode='shadow',
+        engine_version='test',
+    )
+
+    assert diagnostic.liquid_fraction is None
+    assert diagnostic.liquidus_T_K is None
+    assert diagnostic.liquidus_T_C is None
+    assert diagnostic.solidus_T_C is None
+    assert len(diagnostic.backend_warnings) == 4
+    assert all('nonfinite' in warning for warning in diagnostic.backend_warnings)

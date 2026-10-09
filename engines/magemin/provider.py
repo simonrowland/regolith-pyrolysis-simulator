@@ -617,16 +617,20 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         ).items():
             finite = _is_finite(value)
             numeric = float(value) if finite else None
-            if numeric is None or numeric <= 0.0:
-                reason = 'nonfinite' if numeric is None else 'nonpositive'
+            if numeric is None:
                 projection_warnings.append(
-                    'MAGEMin provider omitted '
-                    f'{reason} liquid_composition_wt_pct field '
+                    'MAGEMin provider omitted nonfinite '
+                    'liquid_composition_wt_pct field '
                     f'{str(field)!r} for phase liquid: {value!r}'
                 )
                 continue
             liquid_comp[str(field)] = numeric
         liquid_fraction_raw = getattr(equilibrium, 'liquid_fraction', None)
+        if liquid_fraction_raw is not None and not _is_finite(liquid_fraction_raw):
+            projection_warnings.append(
+                'MAGEMin provider omitted nonfinite liquid_fraction field '
+                f'for phase liquid: {liquid_fraction_raw!r}'
+            )
         liquid_fraction = (
             float(liquid_fraction_raw)
             if liquid_fraction_raw is not None and _is_finite(liquid_fraction_raw)
@@ -650,6 +654,13 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         # liquidus (``liquid_fraction == 1.0`` from a known single-phase
         # MAGEMin run). Otherwise leave it None and let the parity
         # comparator hit its conservative "cannot evaluate" branch.
+        for field in ('liquidus_T_K', 'liquidus_T_C', 'solidus_T_C'):
+            value = getattr(equilibrium, field, None)
+            if value is not None and not _is_finite(value):
+                projection_warnings.append(
+                    f'MAGEMin provider omitted nonfinite {field} field '
+                    f'for phase liquid: {value!r}'
+                )
         liquidus_T_K = _safe_attr_float(equilibrium, 'liquidus_T_K')
         liquidus_T_C: Optional[float] = None
         if liquidus_T_K is not None:
