@@ -5363,15 +5363,17 @@ def test_kume_malformed_declared_composition_amount_makes_whole_composition_unkn
     assert observation.identity.composition is not None
     assert observation.identity.composition.is_unknown
     hard = result.validation.hard_issues if result.validation is not None else ()
+    key_matches = [
+        issue
+        for issue in hard
+        if issue.reason is RefusalReason.INVALID_SOURCE
+        and composition_key in (issue.path or "")
+        and "malformed declared amount" in (issue.detail or "")
+    ]
     if composition_key == "composition_mole_fraction":
-        matches = [
-            issue
-            for issue in hard
-            if issue.reason is RefusalReason.INVALID_SOURCE
-            and "composition_mole_fraction" in (issue.path or "")
-            and "malformed declared amount" in (issue.detail or "")
-        ]
-        assert len(matches) == 1
+        assert len(key_matches) == 1
+    else:
+        assert key_matches == []
 
 
 @pytest.mark.parametrize("printed_marker", ["<0.01", "tr."])
