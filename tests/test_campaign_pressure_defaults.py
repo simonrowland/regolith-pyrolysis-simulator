@@ -713,10 +713,34 @@ def test_zero_o2_argon_lab_schedule_does_not_synthesize_n2():
         "volume_m3": 1.0,
     }).update(EvaporationFlux(), melt, CondensationTrain.create_default())
 
-    # The sweep writes the full balance p_total - pO2 onto the stamped
-    # carrier. It does not scale that balance by background mole fraction.
-    assert gas.composition.get("Ar", 0.0) == pytest.approx(10.0)
+    # Declared y_Ar = 0.8 at 10 mbar. The closed-sweep binding keeps that
+    # composition: 8 mbar Ar, and does not synthesize N2.
+    assert gas.composition.get("Ar", 0.0) == pytest.approx(8.0)
     assert gas.composition.get("N2", 0.0) == pytest.approx(0.0)
+
+
+def test_declared_pure_co2_keeps_its_mole_fraction():
+    from simulator.overhead import OverheadGasModel
+    from simulator.state import CondensationTrain, EvaporationFlux
+
+    schedule = deepcopy(_n2_lab_schedule())
+    schedule["gas_boundary"]["background_gas"]["species"] = "CO2"
+    schedule["gas_boundary"]["background_gas"]["mole_fraction"] = 1.0
+    manager = CampaignManager(_setpoints())
+    manager.overrides["C2A"] = {"lab_schedule": schedule}
+    melt = MeltState()
+    manager.configure_campaign(melt, CampaignPhase.C2A)
+
+    assert melt.atmosphere is Atmosphere.CO2_BACKPRESSURE
+    assert melt.p_total_mbar == pytest.approx(10.0)
+    assert melt.background_gas_mole_fraction == pytest.approx(1.0)
+
+    gas = OverheadGasModel({
+        "enabled": True,
+        "volume_m3": 1.0,
+    }).update(EvaporationFlux(), melt, CondensationTrain.create_default())
+
+    assert gas.composition.get("CO2", 0.0) == pytest.approx(10.0)
 
 
 @pytest.mark.parametrize(

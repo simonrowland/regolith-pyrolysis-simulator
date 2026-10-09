@@ -159,6 +159,59 @@ class OverheadConfigurationError(ValueError):
     """Invalid overhead configuration input."""
 
 
+def declared_background_partial_mbar(melt: MeltState) -> tuple[str, float] | None:
+    """Carrier partial from a stamped background mole fraction.
+
+    Premise: a lab schedule's background mole fraction is that carrier's
+    composition. The nominal sweep (the full balance p_total - pO2 on the
+    carrier) and the C0 CO2 cover (0.96 * p_total) apply only when no
+    positive fraction is stamped. The field defaults to 0, which is that
+    unset state.
+    Algebra: p_i = max(0, p_total - pO2) * min(1, y_i).
+    Units: mbar * dimensionless = mbar.
+    Sanity: Ar at y = 0.8, 10 mbar, pO2 = 0 is 8 mbar Ar. Declared pure
+    CO2 at y = 1 is 10 mbar, not the 9.6 mbar nominal cover.
+    """
+
+    species = str(getattr(melt, "background_gas_species", "") or "").strip()
+    try:
+        fraction = float(getattr(melt, "background_gas_mole_fraction", 0.0) or 0.0)
+    except (TypeError, ValueError):
+        return None
+    if not species or fraction <= 0.0:
+        return None
+    partial = (
+        max(0.0, float(melt.p_total_mbar) - float(melt.pO2_mbar))
+        * min(1.0, fraction)
+    )
+    return species, partial
+
+
+def write_declared_background_partial(gas: OverheadGas, melt: MeltState) -> bool:
+    """Stamp a declared carrier partial, or leave the nominal cover in place.
+
+    Premise: a positive background mole fraction is that carrier's
+    composition. The nominal sweep and the C0 0.96 CO2 cover run only
+    when this returns False. The fraction field defaults to 0, which is
+    the unset state.
+    Algebra: p_i from declared_background_partial_mbar,
+    p_i = max(0, p_total - pO2) * min(1, y_i).
+    Units: mbar * dimensionless = mbar.
+    Sanity: Ar at y = 0.8, 10 mbar, pO2 = 0 writes 8 mbar Ar.
+    """
+
+    declared = declared_background_partial_mbar(melt)
+    if declared is None or float(melt.p_total_mbar) <= 0.0:
+        return False
+    species, partial = declared
+    gas.pressure_mbar = max(gas.pressure_mbar, melt.p_total_mbar)
+    gas.composition[species] = max(
+        gas.composition.get(species, 0.0),
+        partial,
+    )
+    return True
+
+
 def canonical_stage_area_key(stage: Any) -> str:
     """Canonical stage-area ratio key."""
 
@@ -1158,7 +1211,9 @@ class OverheadGasModel:
             gas.composition['O2'] = max(  # mbar — controlled O2 partial pressure floor
                 gas.composition.get('O2', 0.0), melt.pO2_mbar)  # mbar — controlled O2 partial pressure floor
 
-        if atmosphere_name == 'CO2_BACKPRESSURE' and melt.p_total_mbar > 0:
+        if write_declared_background_partial(gas, melt):
+            pass
+        elif atmosphere_name == 'CO2_BACKPRESSURE' and melt.p_total_mbar > 0:
             gas.composition['CO2'] = max(  # mbar — CO2 partial pressure
                 gas.composition.get('CO2', 0.0), melt.p_total_mbar * 0.96)  # mbar — CO2 partial pressure; 0.96 mole fraction
         elif atmosphere_name in {'PN2_SWEEP', 'ARGON_FLOW'} and melt.p_total_mbar > 0:
@@ -1269,7 +1324,9 @@ class OverheadGasModel:
         })
 
         atmosphere_name = getattr(melt.atmosphere, 'name', '')
-        if atmosphere_name == 'CO2_BACKPRESSURE' and melt.p_total_mbar > 0:
+        if write_declared_background_partial(gas, melt):
+            pass
+        elif atmosphere_name == 'CO2_BACKPRESSURE' and melt.p_total_mbar > 0:
             gas.pressure_mbar = max(gas.pressure_mbar, melt.p_total_mbar)  # mbar — CO2 total pressure floor
             gas.composition['CO2'] = max(  # mbar — CO2 partial pressure
                 gas.composition.get('CO2', 0.0), melt.p_total_mbar * 0.96)  # mbar — CO2 partial pressure; 0.96 mole fraction
