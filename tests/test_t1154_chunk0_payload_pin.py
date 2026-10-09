@@ -652,12 +652,81 @@ def test_equilibrium_crystallization_inventory_failure_keeps_the_path():
 
 
 # dispComposition columns from PetThermoTools MELTS.py. H2O and CO2 are
-# on that table and outside MELTS_OXIDE_BASIS. This is the recorded
-# column set, not a live engine call.
+# on that table and outside MELTS_OXIDE_BASIS.
 _PTT_DISPOSITION_OXIDES = (
     "SiO2", "TiO2", "Al2O3", "Fe2O3", "Cr2O3", "FeO", "MnO",
     "MgO", "CaO", "Na2O", "K2O", "P2O5", "H2O", "CO2",
 )
+
+# Recorded rhyolite-MELTS 1.0.2 payload from PetThermoTools
+# equilibrate_MELTS, 1150 C, 1 bar, FMQ, offset 0. Bulk before the
+# engine's own renormalisation to 100 wt%: SiO2 48.5, TiO2 1.5,
+# Al2O3 14, Fe3+/FeT 0.15, FeOt 11, Cr2O3 0.05, MnO 0.18, MgO 9,
+# CaO 11, Na2O 2.4, K2O 0.2, P2O5 0.12, H2O 0.2, CO2 0.
+# The seat has no meltsdynamic install. The capture loaded the
+# example libalphamelts.dylib shipped with PetThermoTools
+# CrystallisationTests, retargeted at the machine's GSL 2.8 because
+# that dylib asks for GSL 2.7. Zeros are omitted; the frame fills them.
+_RECORDED_PTT_CONDITIONS_MASS_G = 99.97515958192925
+_RECORDED_PTT_LOG_FO2 = -8.884507255032851
+_RECORDED_PTT_MASS_G = {
+    "liquid1": 54.10600955382909,
+    "olivine1": 7.894108519484482,
+    "clinopyroxene1": 15.09693089071845,
+    "plagioclase1": 22.57850280989757,
+    "spinel1": 0.13227074729596594,
+    "water1": 0.16733706070372292,
+}
+_RECORDED_PTT_WT_PCT = {
+    "liquid1": {
+        "SiO2": 49.67946491038592,
+        "TiO2": 2.63790161546477,
+        "Al2O3": 12.331406422631424,
+        "Fe2O3": 2.46917828361544,
+        "Cr2O3": 0.042186441036470616,
+        "FeO": 12.660168155062683,
+        "MnO": 0.25164853118073366,
+        "MgO": 6.5490974449363515,
+        "CaO": 9.90797474775172,
+        "Na2O": 2.8263355706638076,
+        "K2O": 0.35245392902769596,
+        "P2O5": 0.22554759051141224,
+        "H2O": 0.06663635773158368,
+    },
+    "olivine1": {
+        "SiO2": 38.48933781621879,
+        "FeO": 21.60942651804958,
+        "MnO": 0.5940534370333811,
+        "MgO": 38.84483441024793,
+        "CaO": 0.462347818450318,
+    },
+    "clinopyroxene1": {
+        "SiO2": 51.18759882145755,
+        "TiO2": 0.5852105515748945,
+        "Al2O3": 3.8028301765547954,
+        "Fe2O3": 1.638346608307302,
+        "FeO": 7.561930691070501,
+        "MgO": 16.76041529611999,
+        "CaO": 18.27278526596781,
+        "Na2O": 0.19088258894716956,
+    },
+    "plagioclase1": {
+        "SiO2": 51.715900910111785,
+        "Al2O3": 30.896146177742875,
+        "CaO": 13.422438472151688,
+        "Na2O": 3.909299117044225,
+        "K2O": 0.056215322949423045,
+    },
+    "spinel1": {
+        "TiO2": 7.426342152079585,
+        "Al2O3": 11.615282688001841,
+        "Fe2O3": 24.51899886732191,
+        "Cr2O3": 21.185662326197995,
+        "FeO": 25.884235462429416,
+        "MgO": 9.36947850396925,
+    },
+    "water1": {"H2O": 100.0},
+}
 
 
 def _ptt_composition_frame(weight_percent: dict[str, float]) -> pd.DataFrame:
@@ -697,64 +766,55 @@ def test_petthermotools_schema_compositions_are_not_missing():
     assert result.ledger_transition is None
 
 
-def test_petthermotools_dispcomposition_inventory_closes():
+def test_recorded_petthermotools_payload_inventory_closes():
     backend = AlphaMELTSBackend()
-    liquid_wt = {
-        "SiO2": 45.0,
-        "TiO2": 2.0,
-        "Al2O3": 14.0,
-        "Fe2O3": 2.0,
-        "Cr2O3": 0.1,
-        "FeO": 12.0,
-        "MnO": 0.2,
-        "MgO": 8.0,
-        "CaO": 10.0,
-        "Na2O": 3.0,
-        "K2O": 0.5,
-        "P2O5": 0.2,
-        "H2O": 2.0,
-        "CO2": 1.0,
+    conditions_g = _RECORDED_PTT_CONDITIONS_MASS_G
+    payload = {
+        "Conditions": pd.DataFrame([{
+            "temperature": 1150.0,
+            "pressure": 1.0,
+            "mass": conditions_g,
+            "logfO2": _RECORDED_PTT_LOG_FO2,
+        }]),
     }
-    olivine_wt = {"SiO2": 40.0, "FeO": 10.0, "MgO": 50.0}
+    for phase, weight_percent in _RECORDED_PTT_WT_PCT.items():
+        payload[phase] = _ptt_composition_frame(weight_percent)
+        payload[f"{phase}_prop"] = pd.DataFrame([{
+            "mass": _RECORDED_PTT_MASS_G[phase],
+        }])
     result = backend._parse_petthermotools_result(
-        ({
-            "Conditions": pd.DataFrame([{"mass": 100.0}]),
-            "liquid1": _ptt_composition_frame(liquid_wt),
-            "liquid1_prop": pd.DataFrame([{"mass": 70.0}]),
-            "olivine1": _ptt_composition_frame(olivine_wt),
-            "olivine1_prop": pd.DataFrame([{"mass": 30.0}]),
-        }, {}),
-        temperature_C=1200.0,
+        (payload, {}),
+        temperature_C=1150.0,
         pressure_bar=1.0,
-        fO2_log=-9.0,
-        comp_wt={"SiO2": 45.0},
-        total_input_kg=10.0,
+        fO2_log=_RECORDED_PTT_LOG_FO2,
+        comp_wt={"SiO2": 48.5},
+        total_input_kg=conditions_g / 1000.0,
     )
 
-    assert result.liquid_fraction == pytest.approx(0.7)
-    assert result.phase_masses_kg["liquid1"] == pytest.approx(7.0)
-    assert result.phase_masses_kg["olivine1"] == pytest.approx(3.0)
-    assert result.phase_compositions["liquid1"]["H2O"] == pytest.approx(2.0)
-    assert result.phase_compositions["liquid1"]["CO2"] == pytest.approx(1.0)
-    assert "H2O" not in result.liquid_composition_wt_pct
-    assert "CO2" not in result.liquid_composition_wt_pct
+    assert result.status == "ok"
     assert result.ledger_transition is None
+    assert set(result.phase_masses_kg) == set(_RECORDED_PTT_MASS_G)
+    assert result.liquid_fraction == pytest.approx(
+        _RECORDED_PTT_MASS_G["liquid1"] / conditions_g
+    )
+    assert "H2O" not in result.liquid_composition_wt_pct
+    for phase, mass_g in _RECORDED_PTT_MASS_G.items():
+        assert result.phase_masses_kg[phase] == pytest.approx(mass_g / 1000.0)
+        for oxide, wt_pct in _RECORDED_PTT_WT_PCT[phase].items():
+            assert result.phase_compositions[phase][oxide] == pytest.approx(
+                wt_pct
+            )
 
     rows, extra = _inventories_from_equilibrium(result)
     assert extra == {}
     by_phase = {row["phase"]: row for row in rows}
-    assert set(by_phase) == {"liquid1", "olivine1"}
-    for phase, mass_kg, weight_percent in (
-        ("liquid1", 7.0, liquid_wt),
-        ("olivine1", 3.0, olivine_wt),
-    ):
+    assert set(by_phase) == set(_RECORDED_PTT_MASS_G)
+    for phase, weight_percent in _RECORDED_PTT_WT_PCT.items():
+        mass_kg = _RECORDED_PTT_MASS_G[phase] / 1000.0
         oxides = by_phase[phase]["oxide_mol"]
         assert by_phase[phase]["mass_kg"] == pytest.approx(mass_kg)
         rebuilt_kg = 0.0
         for oxide, wt_pct in weight_percent.items():
-            if wt_pct <= 0.0:
-                assert oxide not in oxides
-                continue
             molar = parse_formula(oxide).molar_mass_kg_per_mol()
             component_kg = mass_kg * wt_pct / 100.0
             assert oxides[oxide] == pytest.approx(component_kg / molar)
