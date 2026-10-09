@@ -21,7 +21,7 @@ def _projected_notice() -> dict[str, object]:
     }
 
 
-def test_sr22_kress_floor_fallback_output_pin_has_no_repair_notice() -> None:
+def test_sr22_nonfinite_interpolation_fallback_emits_repair_notice() -> None:
     sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
     sim.melt = SimpleNamespace(
         hour=2,
@@ -30,24 +30,31 @@ def test_sr22_kress_floor_fallback_output_pin_has_no_repair_notice() -> None:
     )
 
     fallback = sim._melt_redox_liquidus_floor_fallback(
-        source="none:liquidus_invalid",
-        reason="invalid liquidus bounds",
+        source="none:nonfinite_liquid_fraction",
+        reason="non-finite liquid_fraction=nan",
         liquidus_status="invalid",
     )
 
-    assert fallback.source == "none:liquidus_invalid"
-    assert fallback.reason == "invalid liquidus bounds"
+    assert fallback.source == "none:nonfinite_liquid_fraction"
+    assert fallback.reason == "non-finite liquid_fraction=nan"
     assert fallback.liquidus_status == "invalid"
     record = sim._melt_redox_liquidus_gate_fallback_summary()["recent"][0]
     assert record == {
         "status": "liquidus_unavailable_floor_fallback",
-        "source": "none:liquidus_invalid",
-        "reason": "invalid liquidus bounds",
+        "source": "none:nonfinite_liquid_fraction",
+        "reason": "non-finite liquid_fraction=nan",
         "liquidus_status": "invalid",
         "floor_T_C": 1200.0,
         "hour": 2,
         "campaign_hour": 3,
         "campaign": "C2A",
+        "repair_notice": {
+            "kind": "kress_liquidus_floor_repair",
+            "repaired": "unusable liquidus bounds or interpolation",
+            "reason": "non-finite liquid_fraction=nan",
+            "replacement": "deterministic Kress91 liquidus floor",
+            "floor_T_C": 1200.0,
+        },
     }
 
 
@@ -58,14 +65,6 @@ def test_sr22_invalid_bounds_fallback_emits_runtime_notice() -> None:
         campaign_hour=3,
         campaign=SimpleNamespace(name="C2A"),
     )
-    curve_record = {
-        "source": "liquidus_solidus:kernel",
-        "solidus_T_C": 900.0,
-        "liquidus_T_C": 1200.0,
-        "path": ((900.0, 0.0), (1200.0, 1.0)),
-    }
-    cached_curve_bytes = _curve_payload(curve_record)
-
     sim._melt_redox_liquidus_floor_fallback(
         source="none:invalid_liquidus_bounds",
         reason="invalid liquidus bounds",
@@ -79,7 +78,24 @@ def test_sr22_invalid_bounds_fallback_emits_runtime_notice() -> None:
         "replacement": "deterministic Kress91 liquidus floor",
         "floor_T_C": 1200.0,
     }
-    assert _curve_payload(curve_record) == cached_curve_bytes
+
+
+def test_sr22_caught_interpolation_failure_has_no_repair_notice() -> None:
+    sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    sim.melt = SimpleNamespace(
+        hour=2,
+        campaign_hour=3,
+        campaign=SimpleNamespace(name="C2A"),
+    )
+
+    sim._melt_redox_liquidus_floor_fallback(
+        source="none:invalid_liquid_fraction_curve",
+        reason="cannot interpolate curve",
+        liquidus_status="invalid",
+    )
+
+    record = sim._melt_redox_liquidus_gate_fallback_summary()["recent"][0]
+    assert "repair_notice" not in record
 
 
 def test_sr22_missing_curve_has_no_floor_repair_notice() -> None:
