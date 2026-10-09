@@ -96,6 +96,7 @@ from simulator.battery.score import (
     load_score_context,
     parse_species_formula,
     pooled_log_pressure_sd,
+    predict_with_engine,
     resolve_source_relation,
     residual_to_plain,
     score_eligible_from_conjuncts,
@@ -233,6 +234,25 @@ def _predict(value: Decimal, identity, **kwargs) -> EnginePrediction:
         refusal_reason=kwargs.get("refusal_reason"),
         refusal_detail=kwargs.get("refusal_detail", {}),
     )
+
+
+def test_prediction_refusal_reports_unknown_composition_component() -> None:
+    reason = "printed oxide wt% map has unsupported numeric component(s): XxO"
+    identity = replace(
+        F.activity_identity(), composition=State.unknown(reason)
+    )
+    observation = F.observation(
+        "activity-unknown-composition",
+        "fixture-experiment",
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+
+    prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, observation)
+
+    assert prediction.refusal_detail["reason"] == "composition_incomplete"
+    assert prediction.refusal_detail["detail"] == reason
 
 
 def _compile(reference, experiment, predict, review=None, extra_obs=()):
