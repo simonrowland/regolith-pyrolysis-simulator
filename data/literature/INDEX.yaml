@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 272
-  extracts: 270
+  sources: 273
+  extracts: 271
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 60
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 270
+  extracts_without_pdf: 271
   alias_groups_needing_resolution: 41
 gaps:
   pdfs_without_extract: []
@@ -1706,7 +1706,7 @@ sources:
     extract:
       path: extracts/britt-2019-asteroid-simulants.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/britt-2019-asteroid-simulants.yaml
       present: true
@@ -2646,7 +2646,7 @@ sources:
     extract:
       path: extracts/fegley-2023-chemical-equilibrium-calculations-bu.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/fegley-2023-chemical-equilibrium-calculations-bu.yaml
       present: true
@@ -3472,7 +3472,7 @@ sources:
     extract:
       path: extracts/itoh-hino-banya-1998-spinel.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/itoh-hino-banya-1998-spinel.yaml
       present: true
@@ -4933,7 +4933,7 @@ sources:
   extracts:
   - path: data/literature/extracts/kems-020-hastie-1981-nbsir.yaml
     review_status: draft
-    rows: 38
+    rows: 41
     locator_status: private_path
   battery_datasets: []
   hunt_ids: []
@@ -5045,7 +5045,7 @@ sources:
   extracts:
   - path: data/literature/extracts/kems-022-demaria-1971.yaml
     review_status: draft
-    rows: 31
+    rows: 32
     locator_status: private_path
   battery_datasets: []
   hunt_ids: []
@@ -5190,7 +5190,7 @@ sources:
     extract:
       path: extracts/kems-024-gibson-hubbard-1972.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-024-gibson-hubbard-1972.yaml
       present: true
@@ -5685,7 +5685,7 @@ sources:
   extracts:
   - path: data/literature/extracts/kems-035-sauerborn-2005.yaml
     review_status: draft
-    rows: 60
+    rows: 62
     locator_status: private_path
   battery_datasets: []
   hunt_ids: []
@@ -5712,7 +5712,7 @@ sources:
     extract:
       path: extracts/kems-035-sauerborn-2005.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-035-sauerborn-2005.yaml
       present: true
@@ -5949,7 +5949,7 @@ sources:
     extract:
       path: extracts/kems-039-wolf-2023-vaporock.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-039-wolf-2023-vaporock.yaml
       present: true
@@ -6063,7 +6063,7 @@ sources:
     extract:
       path: extracts/kems-041-sossi-fegley-2018.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-041-sossi-fegley-2018.yaml
       present: true
@@ -6301,7 +6301,7 @@ sources:
     extract:
       path: extracts/kems-046-van-limpt-2007.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-046-van-limpt-2007.yaml
       present: true
@@ -6625,7 +6625,7 @@ sources:
   extracts:
   - path: data/literature/extracts/kems-053-stolyarova-1991.yaml
     review_status: draft
-    rows: 17
+    rows: 18
   battery_datasets: []
   hunt_ids: []
   copies: []
@@ -7797,7 +7797,7 @@ sources:
     extract:
       path: extracts/kems-127-qi-1989.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-127-qi-1989.yaml
       present: true
@@ -8398,7 +8398,7 @@ sources:
     extract:
       path: extracts/kems-190-wu-1993.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-190-wu-1993.yaml
       present: true
@@ -8456,7 +8456,7 @@ sources:
     extract:
       path: extracts/kems-198-ichise-ueshima-1989.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-198-ichise-ueshima-1989.yaml
       present: true
@@ -8514,7 +8514,7 @@ sources:
     extract:
       path: extracts/kems-200-ueshima-1983.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-200-ueshima-1983.yaml
       present: true
@@ -9627,7 +9627,7 @@ sources:
     extract:
       path: extracts/lpi-compendium-65701.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/lpi-compendium-65701.yaml
       present: true
@@ -9686,7 +9686,7 @@ sources:
     extract:
       path: extracts/lpi-lunar-soils.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/lpi-lunar-soils.yaml
       present: true
@@ -10634,7 +10634,7 @@ sources:
     extract:
       path: extracts/nagahara-ozawa-1999-forsterite-surface-microstructures.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/nagahara-ozawa-1999-forsterite-surface-microstructures.yaml
       present: true
@@ -11215,7 +11215,7 @@ sources:
     extract:
       path: extracts/ntrs-19650014783.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/ntrs-19650014783.yaml
       present: true
@@ -14391,7 +14391,7 @@ sources:
     extract:
       path: extracts/slag-003-hino-kitagawa-banya-1993.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/slag-003-hino-kitagawa-banya-1993.yaml
       present: true
@@ -14736,7 +14736,7 @@ sources:
     extract:
       path: extracts/steurer-1985-vapor-phase-pyrolysis.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/steurer-1985-vapor-phase-pyrolysis.yaml
       present: true
@@ -14970,7 +14970,7 @@ sources:
     extract:
       path: extracts/street-2010-thermal-properties-simulants.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/street-2010-thermal-properties-simulants.yaml
       present: true
@@ -15029,7 +15029,7 @@ sources:
     extract:
       path: extracts/sublimation-kinetics-2023-minerals.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/sublimation-kinetics-2023-minerals.yaml
       present: true
@@ -16025,7 +16025,7 @@ sources:
     extract:
       path: extracts/van-kooten-2020-lunar-outgassing.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/van-kooten-2020-lunar-outgassing.yaml
       present: true
@@ -16380,7 +16380,7 @@ sources:
     extract:
       path: extracts/wilkerson-2023-jsc1a-outgassing.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/wilkerson-2023-jsc1a-outgassing.yaml
       present: true
@@ -16548,7 +16548,7 @@ sources:
     extract:
       path: extracts/yam1983.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/yam1983.yaml
       present: true
