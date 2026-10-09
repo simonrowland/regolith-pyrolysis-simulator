@@ -4959,6 +4959,10 @@ def test_petthermotools_result_parser_uses_verified_schema():
         'liquid1': pytest.approx(8.0),
         'olivine1': pytest.approx(2.0),
     }
+    assert result.phase_compositions == {
+        'liquid1': {'SiO2': 50.0, 'Al2O3': 15.0, 'FeO': 10.0},
+        'olivine1': {'SiO2': 40.0, 'MgO': 50.0},
+    }
     assert result.liquid_fraction == pytest.approx(0.8)
     assert result.liquid_composition_wt_pct['SiO2'] == pytest.approx(50.0)
     assert result.activity_coefficients == {'Na': pytest.approx(2.0)}

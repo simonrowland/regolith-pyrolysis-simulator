@@ -4321,20 +4321,26 @@ class _MELTSBackendSupport(MeltBackend):
 
         phases_present: List[str] = []
         phase_masses_g: Dict[str, float] = {}
+        phase_compositions: Dict[str, Dict[str, float]] = {}
         for key, value in run_result.items():
             if not self._is_petthermotools_phase_key(key, value):
                 continue
             phase = str(key)
             prop = self._first_row_mapping(run_result.get(f'{phase}_prop', {}))
             mass_g = self._first_number(prop, ('mass', 'Mass'))
+            row = self._first_row_mapping(value)
             if mass_g is None:
-                row = self._first_row_mapping(value)
                 mass_g = self._first_number(row, ('mass', 'Mass'))
             if mass_g is not None and mass_g > 0.0:
                 phase_name = phase[:-1] if phase.endswith('_Liq') else phase
                 if phase_name not in phases_present:
                     phases_present.append(phase_name)
                 phase_masses_g[phase_name] = mass_g
+                # The composition table is the phase row. ``*_prop`` is mass
+                # and activity, not oxide weight percent.
+                phase_compositions[phase_name] = (
+                    self._extract_phase_oxide_wt_pct(row)
+                )
 
         physical_input_kg = float(total_input_kg)
         solver_basis_g = total_mass or sum(phase_masses_g.values())
@@ -4401,6 +4407,7 @@ class _MELTSBackendSupport(MeltBackend):
             fO2_log=result_fO2_log,
             phases_present=phases_present,
             phase_masses_kg=phase_masses_kg,
+            phase_compositions=phase_compositions,
             liquid_fraction=liquid_fraction,
             liquid_composition_wt_pct=liquid_composition_wt_pct,
             activity_coefficients=activity_coefficients,
@@ -4496,6 +4503,24 @@ class _MELTSBackendSupport(MeltBackend):
                 oxide = 'FeO'
             if oxide in MELTS_OXIDE_BASIS:
                 composition[oxide] = float(value)
+        return composition
+
+    def _extract_phase_oxide_wt_pct(self, row: Mapping[str, object]) -> dict:
+        """Oxide wt% from one PetThermoTools phase composition row.
+
+        The liquid vector stays on ``MELTS_OXIDE_BASIS``. This row also
+        keeps H2O and CO2, which ``dispComposition`` prints and which are
+        outside that basis. Dropping them would refuse a closed phase.
+        """
+        composition = dict(self._extract_liquid_composition(row))
+        for key, value in row.items():
+            if not self._is_number(value):
+                continue
+            name = str(key).strip()
+            if name.endswith('_Liq'):
+                name = name[:-4]
+            if name in {'H2O', 'CO2'} and name not in composition:
+                composition[name] = float(value)
         return composition
 
     def _extract_activity_mapping(

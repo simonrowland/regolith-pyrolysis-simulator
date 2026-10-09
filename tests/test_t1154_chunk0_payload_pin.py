@@ -24,9 +24,18 @@ from engines.alphamelts.parser import (
     diagnostics_to_equilibrium,
     project_equilibrium_to_diagnostics,
 )
-from engines.alphamelts.provider import AlphaMELTSProvider
+import pandas as pd
+
+from engines.alphamelts.provider import (
+    AlphaMELTSProvider,
+    _inventories_from_equilibrium,
+)
 from simulator.accounting.formulas import parse_formula
-from simulator.accounting.oxide_assignment import REASON_UNPARSED_TOKEN
+from simulator.accounting.oxide_assignment import (
+    REASON_MASS_UNCLOSED,
+    REASON_MISSING_COMPOSITION,
+    REASON_UNPARSED_TOKEN,
+)
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
@@ -640,3 +649,114 @@ def test_equilibrium_crystallization_inventory_failure_keeps_the_path():
     ]
     assert failure["reason"] == "isothermal_phase_inventory_sample_failed"
     assert backend.temperatures[-1] == pytest.approx(1200.0)
+
+
+# dispComposition columns from PetThermoTools MELTS.py. H2O and CO2 are
+# on that table and outside MELTS_OXIDE_BASIS. This is the recorded
+# column set, not a live engine call.
+_PTT_DISPOSITION_OXIDES = (
+    "SiO2", "TiO2", "Al2O3", "Fe2O3", "Cr2O3", "FeO", "MnO",
+    "MgO", "CaO", "Na2O", "K2O", "P2O5", "H2O", "CO2",
+)
+
+
+def _ptt_composition_frame(weight_percent: dict[str, float]) -> pd.DataFrame:
+    row = {oxide: 0.0 for oxide in _PTT_DISPOSITION_OXIDES}
+    row.update(weight_percent)
+    assert sum(row.values()) == pytest.approx(100.0)
+    return pd.DataFrame([row], columns=list(_PTT_DISPOSITION_OXIDES))
+
+
+def test_petthermotools_schema_compositions_are_not_missing():
+    """The verified schema dict is partial, so mass does not close.
+
+    Carrying the rows must refuse ``oxide_assignment_mass_unclosed``,
+    not ``oxide_assignment_missing_composition``.
+    """
+    backend = AlphaMELTSBackend()
+    result = backend._parse_petthermotools_result(
+        ({
+            "Conditions": {"mass": 100.0},
+            "liquid1": {"SiO2": 50.0, "Al2O3": 15.0, "FeO": 10.0},
+            "liquid1_prop": {"mass": 80.0},
+            "olivine1": {"SiO2": 40.0, "MgO": 50.0},
+            "olivine1_prop": {"mass": 20.0},
+        }, {}),
+        temperature_C=1200.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        comp_wt={"SiO2": 50.0, "Al2O3": 15.0, "FeO": 10.0},
+        total_input_kg=10.0,
+    )
+
+    _rows, extra = _inventories_from_equilibrium(result)
+    refusals = extra["isothermal_phase_inventory_refusals"]
+    assert {item["phase"] for item in refusals} == {"liquid1", "olivine1"}
+    assert {item["reason"] for item in refusals} == {REASON_MASS_UNCLOSED}
+    assert REASON_MISSING_COMPOSITION not in {item["reason"] for item in refusals}
+    assert result.ledger_transition is None
+
+
+def test_petthermotools_dispcomposition_inventory_closes():
+    backend = AlphaMELTSBackend()
+    liquid_wt = {
+        "SiO2": 45.0,
+        "TiO2": 2.0,
+        "Al2O3": 14.0,
+        "Fe2O3": 2.0,
+        "Cr2O3": 0.1,
+        "FeO": 12.0,
+        "MnO": 0.2,
+        "MgO": 8.0,
+        "CaO": 10.0,
+        "Na2O": 3.0,
+        "K2O": 0.5,
+        "P2O5": 0.2,
+        "H2O": 2.0,
+        "CO2": 1.0,
+    }
+    olivine_wt = {"SiO2": 40.0, "FeO": 10.0, "MgO": 50.0}
+    result = backend._parse_petthermotools_result(
+        ({
+            "Conditions": pd.DataFrame([{"mass": 100.0}]),
+            "liquid1": _ptt_composition_frame(liquid_wt),
+            "liquid1_prop": pd.DataFrame([{"mass": 70.0}]),
+            "olivine1": _ptt_composition_frame(olivine_wt),
+            "olivine1_prop": pd.DataFrame([{"mass": 30.0}]),
+        }, {}),
+        temperature_C=1200.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        comp_wt={"SiO2": 45.0},
+        total_input_kg=10.0,
+    )
+
+    assert result.liquid_fraction == pytest.approx(0.7)
+    assert result.phase_masses_kg["liquid1"] == pytest.approx(7.0)
+    assert result.phase_masses_kg["olivine1"] == pytest.approx(3.0)
+    assert result.phase_compositions["liquid1"]["H2O"] == pytest.approx(2.0)
+    assert result.phase_compositions["liquid1"]["CO2"] == pytest.approx(1.0)
+    assert "H2O" not in result.liquid_composition_wt_pct
+    assert "CO2" not in result.liquid_composition_wt_pct
+    assert result.ledger_transition is None
+
+    rows, extra = _inventories_from_equilibrium(result)
+    assert extra == {}
+    by_phase = {row["phase"]: row for row in rows}
+    assert set(by_phase) == {"liquid1", "olivine1"}
+    for phase, mass_kg, weight_percent in (
+        ("liquid1", 7.0, liquid_wt),
+        ("olivine1", 3.0, olivine_wt),
+    ):
+        oxides = by_phase[phase]["oxide_mol"]
+        assert by_phase[phase]["mass_kg"] == pytest.approx(mass_kg)
+        rebuilt_kg = 0.0
+        for oxide, wt_pct in weight_percent.items():
+            if wt_pct <= 0.0:
+                assert oxide not in oxides
+                continue
+            molar = parse_formula(oxide).molar_mass_kg_per_mol()
+            component_kg = mass_kg * wt_pct / 100.0
+            assert oxides[oxide] == pytest.approx(component_kg / molar)
+            rebuilt_kg += component_kg
+        assert rebuilt_kg == pytest.approx(mass_kg)
