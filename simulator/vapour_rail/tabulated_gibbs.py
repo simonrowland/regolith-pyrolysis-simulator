@@ -68,6 +68,7 @@ def interpolate_tabulated(
     temperature_K: Any,
     *,
     missing_nodes: Sequence[Any] = (),
+    extrapolate: bool = False,
 ) -> Any:
     """Linear interpolation of y(T) on a strictly increasing T grid.
 
@@ -80,6 +81,14 @@ def interpolate_tabulated(
         if missing is not None:
             raise TabulatedMissingNodeError(missing, temperature_K)
     if temperature_K < points[0][0] or temperature_K > points[-1][0]:
+        if extrapolate:
+            edge = points[:2] if temperature_K < points[0][0] else points[-2:]
+            missing = next((node for node in missing_nodes
+                            if edge[0][0] < node < edge[1][0]), None)
+            if missing is not None:
+                raise TabulatedMissingNodeError(missing, temperature_K)
+            (t0, y0), (t1, y1) = edge
+            return y0 + (y1 - y0) * (temperature_K - t0) / (t1 - t0)
         raise TabulatedDomainError(
             f"{temperature_K} K is outside tabulated range "
             f"[{points[0][0]}, {points[-1][0]}] K",
@@ -116,6 +125,8 @@ class TabulatedThermo:
     # Temperatures with a row but no printed y. Empty for series that do not
     # record blanks (Pankratz has no blank-node index).
     missing_nodes: tuple[float, ...] = ()
+    formation_enthalpy_J_per_mol: tuple[tuple[float, float], ...] = ()
+    missing_enthalpy_nodes: tuple[float, ...] = ()
 
     def __post_init__(self) -> None:
         if self.standard_state not in (
@@ -128,11 +139,20 @@ class TabulatedThermo:
                 f"{self.name}: missing or unsupported standard_state "
                 f"{self.standard_state!r}"
             )
-        points = self.formation_gibbs_J_per_mol
-        if len(points) < 2:
+        if len(self.formation_gibbs_J_per_mol) < 2:
             raise TabulatedGibbsConventionError(
                 f"{self.name}: tabulated ΔfG requires at least two points"
             )
+        for label, points in (("ΔfG", self.formation_gibbs_J_per_mol),
+                              ("ΔfH", self.formation_enthalpy_J_per_mol)):
+            self._validate_points(label, points)
+        pstd = float(self.reference_pressure_Pa)
+        if not math.isfinite(pstd) or pstd <= 0.0:
+            raise TabulatedGibbsConventionError(
+                f"{self.name}: reference_pressure_Pa must be finite and > 0"
+            )
+
+    def _validate_points(self, label: str, points: Sequence[tuple[float, float]]) -> None:
         previous_t = 0.0
         for index, (t_k, g_j) in enumerate(points):
             t_f = float(t_k)
@@ -143,18 +163,13 @@ class TabulatedThermo:
                 )
             if not math.isfinite(g_f):
                 raise TabulatedGibbsConventionError(
-                    f"{self.name}: point[{index}] ΔfG must be finite"
+                    f"{self.name}: point[{index}] {label} must be finite"
                 )
             if index and t_f <= previous_t:
                 raise TabulatedGibbsConventionError(
                     f"{self.name}: tabulated T must be strictly increasing"
                 )
             previous_t = t_f
-        pstd = float(self.reference_pressure_Pa)
-        if not math.isfinite(pstd) or pstd <= 0.0:
-            raise TabulatedGibbsConventionError(
-                f"{self.name}: reference_pressure_Pa must be finite and > 0"
-            )
 
     @property
     def T_min_K(self) -> float:
@@ -164,25 +179,40 @@ class TabulatedThermo:
     def T_max_K(self) -> float:
         return float(self.formation_gibbs_J_per_mol[-1][0])
 
-    def evaluate(self, T_K: float) -> ThermoState:
+    def evaluate(
+        self, T_K: float, *, extrapolate: bool = False,
+        include_enthalpy: bool = True,
+    ) -> ThermoState:
         T = float(T_K)
         if not math.isfinite(T) or T <= 0.0:
             raise TabulatedDomainError(
                 f"{self.name}: T must be finite and > 0 K; got {T_K!r}"
             )
-        if T < self.T_min_K or T > self.T_max_K:
+        if not extrapolate and (T < self.T_min_K or T > self.T_max_K):
             raise TabulatedDomainError(
                 f"{self.name}: T={T} K outside domain "
                 f"[{self.T_min_K}, {self.T_max_K}] K"
             )
         g_j = interpolate_tabulated(
-            self.formation_gibbs_J_per_mol, T, missing_nodes=self.missing_nodes
+            self.formation_gibbs_J_per_mol, T, missing_nodes=self.missing_nodes,
+            extrapolate=extrapolate,
         )
+        h_j = (interpolate_tabulated(
+            self.formation_enthalpy_J_per_mol, T,
+            missing_nodes=self.missing_enthalpy_nodes, extrapolate=extrapolate,
+        ) if include_enthalpy and self.formation_enthalpy_J_per_mol else math.nan)
         g_over_RT = g_j / (R_J_PER_MOL_K * T)
         return ThermoState(
             T_K=T,
             cp_over_R=math.nan,
-            h_over_RT=math.nan,
+            h_over_RT=h_j / (R_J_PER_MOL_K * T),
             s_over_R=math.nan,
             g_over_RT=g_over_RT,
         )
+
+
+def evaluate_gibbs_state(thermo: Any, temperature_K: float) -> ThermoState:
+    """Pressure/Gibbs consumers do not require an optional enthalpy cell."""
+    if isinstance(thermo, TabulatedThermo):
+        return thermo.evaluate(temperature_K, include_enthalpy=False)
+    return thermo.evaluate(temperature_K)

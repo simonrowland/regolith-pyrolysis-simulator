@@ -40,7 +40,7 @@ from simulator.vapour_rail.nasa_cea import (
     NasaCeaPolynomial,
     ThermoState,
 )
-from simulator.vapour_rail.tabulated_gibbs import TabulatedThermo
+from simulator.vapour_rail.tabulated_gibbs import TabulatedThermo, evaluate_gibbs_state
 
 STANDARD_PRESSURE_PA = 100_000.0
 ATM_PRESSURE_PA = 101_325.0
@@ -280,7 +280,7 @@ def _element_reference_species_g(
             "reference",
             f"no {element} reference record covers {temperature_K} K",
         )
-    return float(chosen.thermo.evaluate(temperature_K).g_J_per_mol), atoms
+    return float(evaluate_gibbs_state(chosen.thermo, temperature_K).g_J_per_mol), atoms
 
 
 @dataclass
@@ -522,6 +522,7 @@ def _janaf_points(
     document: Mapping[str, Any],
     *,
     defined_zero: bool = False,
+    field: str = "formation_gibbs_energy",
 ) -> tuple[tuple[tuple[float, float], ...], tuple[float, ...]]:
     table = document.get("table") or {}
     rows = table.get("values") or []
@@ -531,7 +532,7 @@ def _janaf_points(
         if not isinstance(row, Mapping):
             continue
         temperature = row.get("temperature") or {}
-        gibbs = row.get("formation_gibbs_energy") or {}
+        gibbs = row.get(field) or {}
         t_k = _published_value(temperature)
         if t_k is None or t_k <= 0.0:
             continue
@@ -585,6 +586,9 @@ def _janaf_record_from_path(path: Path) -> SourceRailRecord | None:
     if not formula or standard_state is None:
         return None
     points, missing_nodes = _janaf_points(document, defined_zero=defined_zero)
+    enthalpy_points, missing_enthalpy_nodes = _janaf_points(
+        document, field="formation_enthalpy",
+    )
     if len(points) < 2:
         return None
     table_id = str(table.get("table_id") or path.stem)
@@ -600,6 +604,8 @@ def _janaf_record_from_path(path: Path) -> SourceRailRecord | None:
         native_phase=native_phase,
         native_reference_pressure_Pa=STANDARD_PRESSURE_PA,
         missing_nodes=missing_nodes,
+        formation_enthalpy_J_per_mol=enthalpy_points,
+        missing_enthalpy_nodes=missing_enthalpy_nodes,
     )
     species_thermo = {
         "evaluator_family": "tabulated_janaf",
@@ -608,6 +614,10 @@ def _janaf_record_from_path(path: Path) -> SourceRailRecord | None:
         "formation_gibbs_points": [
             {"T_K": t_k, "delta_f_G_J_per_mol": g_j} for t_k, g_j in points
         ],
+        "formation_enthalpy_points": [
+            {"T_K": t_k, "delta_f_H_J_per_mol": h_j}
+            for t_k, h_j in enthalpy_points
+        ],
         "source_id": "nist-janaf-4th",
         "record_id": table_id,
         "native_phase": native_phase,
@@ -615,6 +625,8 @@ def _janaf_record_from_path(path: Path) -> SourceRailRecord | None:
     }
     if missing_nodes:
         species_thermo["missing_nodes"] = [float(node) for node in missing_nodes]
+    if missing_enthalpy_nodes:
+        species_thermo["missing_enthalpy_nodes"] = list(missing_enthalpy_nodes)
     if defined_zero:
         species_thermo["gibbs_defined_zero"] = True
     return SourceRailRecord(
@@ -1193,8 +1205,8 @@ def compare_g_over_overlap(
     for temperature_K in temperatures_K:
         if temperature_K < low or temperature_K > high:
             continue
-        g_left = float(left.thermo.evaluate(temperature_K).g_J_per_mol)
-        g_right = float(right.thermo.evaluate(temperature_K).g_J_per_mol)
+        g_left = float(evaluate_gibbs_state(left.thermo, temperature_K).g_J_per_mol)
+        g_right = float(evaluate_gibbs_state(right.thermo, temperature_K).g_J_per_mol)
         rows.append(
             {
                 "T_K": temperature_K,

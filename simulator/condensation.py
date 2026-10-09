@@ -6689,16 +6689,17 @@ def _assemblage_saturation_pa(
 ) -> tuple[float, tuple[Any, ...]] | None:
     from simulator.vapour_rail.nasa_cea import reaction_equilibrium_constant
     from simulator.vapour_rail.source_rail import STANDARD_PRESSURE_PA
+    from simulator.vapour_rail.tabulated_gibbs import evaluate_gibbs_state
 
     terms: list[tuple[float, Any]] = [
-        (1.0, gas_record.thermo.evaluate(temperature_K))
+        (1.0, evaluate_gibbs_state(gas_record.thermo, temperature_K))
     ]
     phases: list[Any] = []
     for formula, nu in reaction:
         phase = _stable_receiving_phase(present[formula], temperature_K)
         if phase is None:
             return None
-        terms.append((-float(nu), phase.thermo.evaluate(temperature_K)))
+        terms.append((-float(nu), evaluate_gibbs_state(phase.thermo, temperature_K)))
         phases.append(phase)
     k_eq = reaction_equilibrium_constant(tuple(terms), T_K=temperature_K)
     if not math.isfinite(k_eq) or k_eq <= 0.0:
@@ -6773,12 +6774,14 @@ def _stable_receiving_phase(condensed: Sequence[Any], temperature_K: float) -> A
     not settled by file order.
     """
 
+    from simulator.vapour_rail.tabulated_gibbs import evaluate_gibbs_state
+
     best = None
     best_g: float | None = None
     for record in condensed:
         if not record.T_min_K <= temperature_K <= record.T_max_K:
             continue
-        g_over_rt = float(record.thermo.evaluate(temperature_K).g_over_RT)
+        g_over_rt = float(evaluate_gibbs_state(record.thermo, temperature_K).g_over_RT)
         if best is None or best_g is None or g_over_rt < best_g:
             best = record
             best_g = g_over_rt

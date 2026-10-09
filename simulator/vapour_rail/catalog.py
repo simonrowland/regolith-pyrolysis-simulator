@@ -81,6 +81,7 @@ from simulator.vapour_rail.stoich import (
     derive_stoich_oxide_per_vapor,
 )
 from simulator.vapour_rail.tabulated_gibbs import (
+    evaluate_gibbs_state,
     TabulatedDomainError,
     TabulatedThermo,
 )
@@ -3304,7 +3305,7 @@ def _compile_thermo_reference_model(
                 # raising CatalogCompileError.
                 delta_g_over_RT = 0.0
                 for nu, poly, _formula in exchange_terms:
-                    state = poly.evaluate(temperature_K)
+                    state = evaluate_gibbs_state(poly, temperature_K)
                     delta_g_over_RT += float(nu) * float(state.g_over_RT)
                 log10_K = -delta_g_over_RT / math.log(10.0)
                 # Base Antoine is the van't Hoff 1/(T+C) continuation of the
@@ -3436,7 +3437,7 @@ def _compile_thermo_reference_model(
             # Derivation (premise → algebra → units → sanity): see
             # reaction_equilibrium_constant in nasa_cea.py.
             states = [
-                (nu, poly.evaluate(temperature_K))
+                (nu, evaluate_gibbs_state(poly, temperature_K))
                 for nu, poly, _formula in terms_builders
             ]
             K = reaction_equilibrium_constant(states, T_K=temperature_K)
@@ -3533,8 +3534,8 @@ def _compile_thermo_reference_model(
     )
 
     def _log10_from_psat(temperature_K: float) -> float:
-        g_gas = gas_poly.evaluate(temperature_K).g_over_RT
-        g_cond = cond_poly.evaluate(temperature_K).g_over_RT
+        g_gas = evaluate_gibbs_state(gas_poly, temperature_K).g_over_RT
+        g_cond = evaluate_gibbs_state(cond_poly, temperature_K).g_over_RT
         # P_sat / P° = exp(−(G_gas − G_cond)/(R T))
         ratio = math.exp(-(g_gas - g_cond))
         pressure_pa = ratio * Pstd
@@ -3771,6 +3772,15 @@ def _polynomial_from_thermo_record(
             _finite_positive(node, f"{name}.missing_nodes[{index}]")
             for index, node in enumerate(missing_raw)
         )
+        enthalpy_points = tuple(
+            (_finite_positive(item["T_K"], f"{name}.formation_enthalpy_points.T_K"),
+             float(item["delta_f_H_J_per_mol"]))
+            for item in record.get("formation_enthalpy_points", ())
+        )
+        missing_enthalpy_nodes = tuple(
+            _finite_positive(node, f"{name}.missing_enthalpy_nodes")
+            for node in record.get("missing_enthalpy_nodes", ())
+        )
         try:
             return TabulatedThermo(
                 name=name,
@@ -3791,6 +3801,8 @@ def _polynomial_from_thermo_record(
                     else None
                 ),
                 missing_nodes=missing_nodes,
+                formation_enthalpy_J_per_mol=enthalpy_points,
+                missing_enthalpy_nodes=missing_enthalpy_nodes,
             )
         except Exception as exc:
             raise CatalogCompileError(
