@@ -3714,6 +3714,46 @@ def test_b718_partial_pressure_point_composition_stays_on_own_point(
     assert rows[1].identity.composition.value == wt_pct_to_mole_fraction(
         {name: Decimal(str(value)) for name, value in point_composition.items()}
     )
+
+
+def test_b718_zero_mass_loss_row_is_initial_without_optional_flag(
+    tmp_path: Path,
+) -> None:
+    initial_wt_pct = {"SiO2": 60, "MgO": 40}
+    extract = _scalar_extract(
+        quantity="mass_loss_fraction",
+        units="wt_pct",
+        values={
+            "quantity": "mass_loss_fraction",
+            "method_class": "measured_direct",
+            "points": [
+                {
+                    "T_C": 0,
+                    "mass_loss_pct": 0,
+                    "composition_wt_pct": initial_wt_pct,
+                },
+                {"T_C": 1300, "mass_loss_pct": 10},
+            ],
+        },
+        obs_type="mass_loss_series",
+    )
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+    sample = result.experiments[observation.experiment_id].sample
+
+    assert sample.printed_composition is not None
+    assert sample.printed_composition.state.is_value
+    assert sample.initial_composition is not None
+    assert sample.initial_composition.state.is_value
+    expected = wt_pct_to_mole_fraction(
+        {name: Decimal(str(value)) for name, value in initial_wt_pct.items()}
+    )
+    assert dict(sample.initial_composition.state.value.components) == dict(
+        expected.components
+    )
+
+
 def test_k01_scalar_psat_does_not_take_alpha(tmp_path: Path) -> None:
     extract = _scalar_extract(
         quantity="pure_Psat",
