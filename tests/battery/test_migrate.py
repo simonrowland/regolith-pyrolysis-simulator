@@ -463,6 +463,28 @@ def _extract_observations(name: str) -> list[dict]:
     return found
 
 
+def test_hastie_fig5_initial_glass_composition_binds_to_points(tmp_path: Path) -> None:
+    from simulator.battery.migrate import wt_pct_to_mole_fraction
+
+    result = _migrate_real_extract(tmp_path, "kems-020-hastie-1981-nbsir.yaml")
+    rows = [
+        observation
+        for observation in result.observations.values()
+        if "hastie_1981_fig5_glass_Na_this_work_digitized" in observation.observation_id
+        and observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.P_PARTIAL
+    ]
+    assert len(rows) == 6
+    expected = wt_pct_to_mole_fraction(
+        {"Na2O": Decimal("17"), "CaO": Decimal("12"), "SiO2": Decimal("71")}
+    )
+    for observation in rows:
+        composition = observation.identity.composition
+        assert composition is not None and composition.is_value
+        assert composition.value.as_map() == expected.as_map()
+        assert composition.value.proxy_flag == "initial_charge_only"
+
+
 def _run_migrate_cli(args: list[str]) -> subprocess.CompletedProcess[str]:
     env = os.environ.copy()
     env["PYTHONPATH"] = str(REPO_ROOT)
