@@ -255,6 +255,33 @@ def test_prediction_refusal_reports_unknown_composition_component() -> None:
     assert prediction.refusal_detail["detail"] == reason
 
 
+def test_feot_conversion_notice_reaches_scorer_residual() -> None:
+    experiment = F.tabulation_experiment()
+    identity = F.activity_identity()
+    notice = Notice(
+        kind=NoticeKind.TOTAL_IRON_REPORTED_AS_FEO,
+        affected_quantities=(Quantity.ACTIVITY,),
+        reason="FeOT (total iron) treated as FeO for conversion; printed key FeOT",
+        origin="feot-observation",
+    )
+    reference = F.observation(
+        "feot-observation",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        notices=(notice,),
+    )
+
+    residual, _candidate = _compile(
+        reference,
+        experiment,
+        _predict(Decimal("0.2"), identity),
+    )
+
+    assert notice in residual.notices
+
+
 def _compile(reference, experiment, predict, review=None, extra_obs=()):
     ctx = _context(F.work(), experiment, reference, *extra_obs, review=review)
     return compile_residual(
