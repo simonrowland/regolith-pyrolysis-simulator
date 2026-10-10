@@ -12398,7 +12398,17 @@ class Migrator:
                 continue
             try:
                 extractor_derivation = _derivation_from_plain(payload["inference"])
-            except (TypeError, ValueError):
+            except ValueError as exc:
+                if str(exc) != "Derivation.inputs is required":
+                    raise
+                field_path = "values.inference" if payload is values else "inference"
+                self.result.registry_issues.append(
+                    ValidationIssue(
+                        path=f"observations.{obs_id}.{field_path}",
+                        reason=RefusalReason.INVALID_SOURCE,
+                        detail=str(exc),
+                    )
+                )
                 continue
             if source_derivation is None:
                 source_derivation = _merge_source_conversion_derivation(

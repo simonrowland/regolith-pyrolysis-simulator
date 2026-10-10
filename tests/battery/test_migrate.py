@@ -1830,6 +1830,27 @@ def test_j02_source_stated_derived_from_is_stored(tmp_path: Path) -> None:
     assert child_obs.derived_from == ("fixture-source::raw_parent",)
 
 
+def test_invalid_extractor_inference_is_a_typed_hard_issue(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    row["values"]["inference"] = {
+        "relation": "author_calculation",
+        "inputs": [],
+        "output_unit": "Pa",
+    }
+    root = _write_min_tree(tmp_path, extract)
+
+    result = migrate(root, write=False)
+
+    issue = next(
+        issue
+        for issue in result.validation.hard_issues
+        if issue.path == "observations.fixture-source::na_psat.values.inference"
+    )
+    assert issue.reason is RefusalReason.INVALID_SOURCE
+    assert issue.detail == "Derivation.inputs is required"
+
+
 def test_calculated_composition_requires_measured_lineage(tmp_path: Path) -> None:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     base = extract["species"]["Na"]["observations"][0]
