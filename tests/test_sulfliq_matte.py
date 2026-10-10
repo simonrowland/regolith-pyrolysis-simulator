@@ -317,6 +317,27 @@ def test_invalid_composition_refuses_without_raise() -> None:
     assert math.isnan(result.ln_a_FeS)
 
 
+def test_invalid_temperature_refuses_with_unavailable_nan(monkeypatch) -> None:
+    provider = _mock_provider(monkeypatch)
+    result = provider.a_FeS(-10.0, {'S': 0.5, 'Fe': 0.5})
+    assert result.calibration_status == 'unavailable'
+    assert math.isnan(result.a_FeS)
+    assert math.isnan(result.ln_a_FeS)
+    assert any('invalid T_K' in warning for warning in result.warnings)
+
+
+def test_sulfliq_import_initialization_error_is_unavailable(monkeypatch) -> None:
+    monkeypatch.setattr(
+        sulfliq_matte_module.importlib,
+        'import_module',
+        lambda _name: (_ for _ in ()).throw(RuntimeError('broken extension init')),
+    )
+    provider = SulfLiqMatteProvider()
+    assert provider.initialize() is False
+    assert provider.is_available() is False
+    assert 'broken extension init' in provider._init_error
+
+
 class _FakeSulfLiq:
     def setTK(self, _value): pass
     def setPa(self, _value): pass

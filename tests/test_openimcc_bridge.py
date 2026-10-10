@@ -346,7 +346,7 @@ import sys
 class _BlockOpenImcc(importlib.abc.MetaPathFinder):
     def find_spec(self, fullname, path=None, target=None):
         if fullname == 'openimcc' or fullname.startswith('openimcc.'):
-            raise ImportError('test-only blocked openimcc import')
+            raise RuntimeError('test-only openimcc initialization failure')
         return None
 
 

@@ -43,7 +43,7 @@ from simulator.melt_backend.base import (
 
 try:  # Optional dependency: C1 must remain importable without openimcc.
     import openimcc as _openimcc
-except ImportError as exc:  # pragma: no cover - exercised without PYTHONPATH
+except (ImportError, OSError, RuntimeError) as exc:  # pragma: no cover
     _openimcc = None
     _OPENIMCC_IMPORT_ERROR: BaseException | None = exc
 else:

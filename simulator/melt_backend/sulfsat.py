@@ -246,7 +246,7 @@ class SulfSatGate:
         """
         try:
             self._module = importlib.import_module('PySulfSat')
-        except ImportError as exc:
+        except (ImportError, OSError, RuntimeError) as exc:
             self._available = False
             self._module = None
             self._init_error = f'PySulfSat import failed: {exc!r}'
@@ -307,11 +307,14 @@ class SulfSatGate:
           ``[0, 1]``.
         * Otherwise the ratio is derived from ``fO2_log`` + ``T_K`` +
           ``P_bar`` + composition via ``simulator.fe_redox.kress91_split``.
-        * If the derivation raises or produces a non-finite ratio (e.g.
-          zero-iron melt or out-of-calibration extrapolation), the
-          result is tagged ``calibration_status='out_of_range'`` with an
-          explicit warning. Fe3Fet_Liq=0 is passed to SCSS so the call
-          completes, but the caller is expected to honour the status.
+        * Errors from the shared Kress-Carmichael helper propagate,
+          including ``Kress91InvalidControls`` for invalid controls such
+          as a non-finite ``fO2_log``.
+        * A returned non-finite derived ratio (e.g. zero-iron melt or an
+          out-of-calibration result) is tagged
+          ``calibration_status='out_of_range'`` with an explicit warning.
+          Fe3Fet_Liq=0 is passed to SCSS so the call completes, but the
+          caller is expected to honour the status.
 
         There is no silent default — every redox decision is either
         operator-explicit or attributed to the Kress-Carmichael fit, and

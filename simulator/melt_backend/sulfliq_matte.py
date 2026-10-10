@@ -180,7 +180,7 @@ class SulfLiqMatteProvider:
         del config  # unused; API symmetry with SulfSatGate
         try:
             self._module = importlib.import_module('SulfLiq')
-        except ImportError as exc:
+        except (ImportError, OSError, RuntimeError) as exc:
             self._available = False
             self._module = None
             self._init_error = f'SulfLiq import failed: {exc!r}'

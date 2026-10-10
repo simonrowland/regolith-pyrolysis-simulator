@@ -249,6 +249,18 @@ def test_import_helper_key_error_propagates(monkeypatch):
         SulfSatGate().initialize()
 
 
+def test_pysulfsat_import_initialization_error_is_unavailable(monkeypatch):
+    monkeypatch.setattr(
+        sulfsat_module.importlib,
+        'import_module',
+        lambda _name: (_ for _ in ()).throw(RuntimeError('broken package init')),
+    )
+    gate = SulfSatGate()
+    assert gate.initialize() is False
+    assert gate.is_available() is False
+    assert 'broken package init' in gate._init_error
+
+
 # ---------------------------------------------------------------------------
 # 2. Mocked-present path
 # ---------------------------------------------------------------------------
@@ -680,6 +692,20 @@ def test_kress_carmichael_helper_key_error_propagates(monkeypatch):
         gate.compute_sulfur_saturation(
             liquid_comp_wt=_MORB_COMP_WT,
             T_K=1400.0, P_bar=1.0, fO2_log=-9.0, S_input_ppm=1000.0,
+        )
+
+
+def test_kress91_invalid_controls_propagate_as_typed_error(monkeypatch):
+    from simulator.fe_redox import Kress91InvalidControls
+
+    monkeypatch.setitem(sys.modules, 'PySulfSat', _make_fake_pysulfsat())
+    gate = SulfSatGate()
+    assert gate.initialize()
+    with pytest.raises(Kress91InvalidControls):
+        gate.compute_sulfur_saturation(
+            liquid_comp_wt=_MORB_COMP_WT,
+            T_K=1400.0, P_bar=1.0, fO2_log=float('nan'),
+            S_input_ppm=1000.0,
         )
 
 
