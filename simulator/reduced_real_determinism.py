@@ -508,6 +508,11 @@ class PT0DeterminismStore:
         *,
         repair_notices: Sequence[Mapping[str, Any]] | None = None,
     ) -> None:
+        if uncacheable_replay_disposition(sim) or _openimcc_fallback_is_uncacheable(
+            sim
+        ):
+            self._mark_uncacheable_capture(sim)
+            return
         if not self._cached_real_binding_eligible(sim):
             self._mark_uncacheable_capture(sim)
             return
@@ -516,6 +521,14 @@ class PT0DeterminismStore:
             return
         intent = _equilibrium_payload_intent(sim)
         key = self._equilibrium_key(sim)
+        expected_dependency_vector = record_dependency_vector(
+            sim,
+            intent,
+            artifact="equilibrium_post_record",
+        )
+        if dependency_vector_from_replay_key(key) != expected_dependency_vector:
+            self._mark_uncacheable_capture(sim)
+            return
         payload = canonical_replay_output_projection(
             "equilibrium_post_record", sim, result
         )
@@ -644,6 +657,9 @@ class PT0DeterminismStore:
         curve: Mapping[str, Any],
         repair_notices: Sequence[Mapping[str, Any]] | None = None,
     ) -> None:
+        if uncacheable_replay_disposition(sim):
+            self._mark_uncacheable_capture(sim)
+            return
         if not _is_cacheable_gate_curve(curve):
             self._mark_uncacheable_capture(sim)
             return
@@ -660,6 +676,14 @@ class PT0DeterminismStore:
             provider_role=provider_role,
             control_quantization=self._control_quantization,
         )
+        if dependency_vector_from_replay_key(key) != record_dependency_vector(
+            sim,
+            ChemistryIntent.GATE_LIQUID_FRACTION,
+            artifact="freeze_gate_curve",
+            provider_role=provider_role,
+        ):
+            self._mark_uncacheable_capture(sim)
+            return
         self._store(
             "freeze_gate_curve",
             key,
@@ -957,7 +981,10 @@ class PT0DeterminismStore:
             key_hash = _sha256(key_bytes)
             checked.append((key, key_bytes, key_hash))
             entry = self._entry_for_key(artifact, key, key_bytes, key_hash)
-            if entry is None:
+            if entry is None or not replay_dependency_vectors_match(
+                key,
+                entry.get("key", {}),
+            ):
                 continue
             self.replay_sequence.append(
                 {
@@ -980,7 +1007,12 @@ class PT0DeterminismStore:
             self.hits += 1
             self.last_cache_state = "cached_exact"
             self._record_cache_event(artifact, "cached_exact")
-            _emit_repair_notices(sim, (entry.get("repair_notices_json"),))
+            replay_notices = _emit_repair_notices(
+                sim,
+                (entry.get("repair_notices_json"),),
+            )
+            if artifact == "freeze_gate_curve" and sim is not None:
+                sim._last_reduced_real_replay_notices = replay_notices
             return copy.deepcopy(entry["payload"])
 
         key, _key_bytes, key_hash = checked[0]
@@ -1072,6 +1104,11 @@ class PT0DeterminismStore:
                             )
                             physics_bucket_rung = rung_tag
                             break
+            if entry is not None and not replay_dependency_vectors_match(
+                candidate_key,
+                entry.get("key", {}),
+            ):
+                entry = None
             if entry is not None:
                 break
             if tier_ceiling == "cached_interpolated":
@@ -1641,9 +1678,7 @@ class PT1PersistentEquilibriumStore:
                         canonical_physics_bucket_key_from_replay_key(entry["key"])
                     )
                     if row_replay_scope != replay_scope_sha256:
-                        raise PT1PersistentStoreCorrupt(
-                            f"PT-1 row exact key replay scope mismatch: {row_hash}"
-                        )
+                        continue
                     candidates.append(
                         {
                             "artifact": artifact,
@@ -2412,27 +2447,81 @@ def record_binding_producer_ids(
 
 
 def replay_scope_dependency_vector(key: Mapping[str, Any]) -> dict[str, Any]:
-    sulfur_side = key.get("sulfur_side", {})
-    if not isinstance(sulfur_side, Mapping):
-        sulfur_side = {}
-    vector: dict[str, Any] = {
-        "namespace_id": key.get("namespace_id"),
-        "vapor_pressure_provider_selection": key.get(
-            "vapor_pressure_provider_selection"
-        ),
-        "model": _json_ready(key.get("model", {})),
-    }
-    sulfur_input_ppm = _sulfur_input_ppm_from_replay_key(key)
-    if sulfur_input_ppm and sulfur_input_ppm > 0.0:
-        vector["sulfsat"] = {
-            name: sulfur_side.get(name)
-            for name in (
-                "sulfsat_available",
-                "sulfsat_provider_selection",
-            )
-            if sulfur_side.get(name) is not None
-        }
-    return vector
+    vector = dependency_vector_from_replay_key(key)
+    return {} if vector is None else vector
+
+
+def dependency_vector_from_replay_key(
+    key: Mapping[str, Any],
+) -> dict[str, Any] | None:
+    """Read the complete dependency selection already carried by a replay key."""
+
+    fields = (
+        "namespace_id",
+        "vapor_pressure_provider_selection",
+        "sulfur_side",
+        "model",
+    )
+    if any(field not in key for field in fields):
+        return None
+    if not isinstance(key.get("sulfur_side"), Mapping):
+        return None
+    if not isinstance(key.get("model"), Mapping):
+        return None
+    return _json_ready({field: key[field] for field in fields})
+
+
+def replay_dependency_vectors_match(
+    query_key: Mapping[str, Any],
+    candidate_key: Mapping[str, Any],
+) -> bool:
+    query_vector = dependency_vector_from_replay_key(query_key)
+    return (
+        query_vector is not None
+        and dependency_vector_from_replay_key(candidate_key) == query_vector
+    )
+
+
+def gate_curve_memo_dependency_vector(
+    sim: Any,
+    curve: Mapping[str, Any],
+) -> dict[str, Any]:
+    provider_role = _gate_curve_provider_role(curve)
+    if provider_role is None:
+        provider_role = _gate_provider_role_for_key(sim)
+    return record_dependency_vector(
+        sim,
+        ChemistryIntent.GATE_LIQUID_FRACTION,
+        artifact="freeze_gate_curve",
+        provider_role=provider_role,
+    )
+
+
+def uncacheable_replay_disposition(sim: Any) -> bool:
+    reasons = getattr(sim, "_reduced_real_uncacheable_reasons", None)
+    return bool(reasons)
+
+
+def mark_uncacheable_replay_disposition(sim: Any, reason: str) -> None:
+    reasons = getattr(sim, "_reduced_real_uncacheable_reasons", None)
+    if not isinstance(reasons, list):
+        reasons = []
+        sim._reduced_real_uncacheable_reasons = reasons
+    text = str(reason)
+    if text and text not in reasons:
+        reasons.append(text)
+
+
+def _openimcc_fallback_is_uncacheable(sim: Any) -> bool:
+    diagnostic = getattr(sim, "_last_vapor_pressure_diagnostic", None)
+    if not isinstance(diagnostic, Mapping):
+        return False
+    high_t = diagnostic.get("high_t_melt_activity")
+    if not isinstance(high_t, Mapping):
+        return False
+    return bool(high_t.get("fallback")) or str(high_t.get("provider")) == (
+        "constant_gamma"
+    )
 
 
 def canonical_replay_key(
@@ -3285,9 +3374,9 @@ def _emit_repair_notices(
     groups: Sequence[str | None],
     *,
     approximation_cache_state: str | None = None,
-) -> None:
+) -> list[dict[str, Any]]:
     if sim is None:
-        return
+        return []
     collected: list[dict[str, Any]] = []
     seen: set[bytes] = set()
     legacy_history_unavailable = False
@@ -3312,6 +3401,7 @@ def _emit_repair_notices(
         )
     for notice in collected:
         record_repair_notice(sim, notice)
+    return copy.deepcopy(collected)
 
 
 def _curve_payload(curve: Mapping[str, Any]) -> dict[str, Any]:

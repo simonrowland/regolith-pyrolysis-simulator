@@ -1151,10 +1151,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         self._freeze_gate_config = self._resolve_freeze_gate_config()
         self._freeze_gate_liquid_fraction_cache: Optional[Dict[str, Any]] = None
-        self._freeze_gate_liquid_fraction_curve_memo: Dict[
-            tuple,
-            Dict[str, Any],
-        ] = {}
         self._freeze_gate_curve_in_progress: bool = False
         self._last_freeze_gate_diagnostic: Dict[str, Any] = {}
         self._melt_redox_liquidus_gate_fallback_diagnostics: deque[
@@ -3375,15 +3371,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         *,
         freeze_gate_config: Optional[Mapping[str, Any]] = None,
     ) -> None:
-        previous_config = getattr(self, '_freeze_gate_config', None)
         self._freeze_gate_config = dict(
             freeze_gate_config
             if freeze_gate_config is not None
             else self._resolve_freeze_gate_config(campaign)
         )
         self._freeze_gate_liquid_fraction_cache = None
-        if previous_config != self._freeze_gate_config:
-            self._freeze_gate_liquid_fraction_curve_memo = {}
         self._freeze_gate_curve_in_progress = False
         self._last_freeze_gate_diagnostic = {}
 
@@ -4689,6 +4682,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _melt_redox_liquidus_gate_curve(
         self,
     ) -> Mapping[str, Any] | _MeltRedoxLiquidusFloorFallback | None:
+        from simulator.engine_binding_admission import gate_curve_memo_eligibility
+        from simulator.reduced_real_determinism import (
+            gate_curve_memo_dependency_vector,
+            record_repair_notice,
+            uncacheable_replay_disposition,
+        )
+
+        self._reduced_real_uncacheable_reasons = []
         pressure_bar = float(self.melt.p_total_mbar) / 1000.0
         fO2_log = float(self._current_melt_redox_fO2_log())
         redox_key_fO2_log = self._freeze_gate_redox_key_fO2_log(
@@ -4700,17 +4701,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         cache = getattr(self, '_freeze_gate_liquid_fraction_cache', None)
         curve = cache.get('curve') if isinstance(cache, dict) else None
-        if not (
+        cache_notices = cache.get('repair_notices') if isinstance(cache, dict) else None
+        cache_vector = cache.get('dependency_vector') if isinstance(cache, dict) else None
+        cache_vector_matches = (
+            isinstance(curve, Mapping)
+            and cache_vector == gate_curve_memo_dependency_vector(self, curve)
+        )
+        cache_hit = bool(
             isinstance(cache, dict)
             and cache.get('key') == key
             and isinstance(curve, Mapping)
-        ):
+            and cache_vector_matches
+            and isinstance(cache_notices, list)
+            and gate_curve_memo_eligibility(self, curve)
+        )
+        if not cache_hit:
             curve = None
-        memo = getattr(self, '_freeze_gate_liquid_fraction_curve_memo', None)
-        if curve is None and isinstance(memo, dict):
-            memoized_curve = memo.get(key)
-            if isinstance(memoized_curve, Mapping):
-                curve = dict(memoized_curve)
 
         gate_curve_in_progress = (
             bool(getattr(self, '_freeze_gate_curve_in_progress', False))
@@ -4735,8 +4741,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 ProviderUnavailableError,
                 LiquidusSampleError,
             ) + _liquidus_engine_exceptions()
+            if (
+                isinstance(cache, dict)
+                and cache.get('status') != 'computing'
+                and not cache_vector_matches
+            ):
+                self._freeze_gate_liquid_fraction_cache = None
+                cache = None
             try:
                 curve = self._freeze_gate_curve()
+                replay_notices = getattr(
+                    self,
+                    '_last_reduced_real_replay_notices',
+                    None,
+                )
+                if isinstance(replay_notices, list):
+                    cache_notices = replay_notices
             except EvaporationFluxRefusal:
                 raise
             except liquidus_provider_failures as exc:
@@ -4765,8 +4785,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 and self._freeze_gate_liquid_fraction_cache.get('key') == key
             ):
                 self._freeze_gate_liquid_fraction_cache = None
-            if isinstance(memo, dict):
-                memo.pop(key, None)
             return self._melt_redox_liquidus_floor_fallback(
                 source='none:invalid_liquidus_curve',
                 reason=str(exc),
@@ -4782,8 +4800,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 and self._freeze_gate_liquid_fraction_cache.get('key') == key
             ):
                 self._freeze_gate_liquid_fraction_cache = None
-            if isinstance(memo, dict):
-                memo.pop(key, None)
             return self._melt_redox_liquidus_floor_fallback(
                 source='none:invalid_liquidus_bounds',
                 reason=(
@@ -4794,22 +4810,41 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 liquidus_status='invalid',
             )
 
+        reusable_curve = not uncacheable_replay_disposition(self)
         normalized_curve = dict(curve)
         normalized_curve['solidus_T_C'] = solidus_T_C
         normalized_curve['liquidus_T_C'] = liquidus_T_C
         validated_cache = self._freeze_gate_liquid_fraction_cache
-        if not (
+        if cache_hit:
+            for notice in cache_notices or ():
+                record_repair_notice(self, notice)
+        cache_eligible = reusable_curve and gate_curve_memo_eligibility(
+            self,
+            normalized_curve,
+        )
+        validated_curve = (
+            validated_cache.get('curve')
+            if isinstance(validated_cache, dict)
+            else None
+        )
+        if cache_eligible and not (
             isinstance(validated_cache, dict)
             and validated_cache.get('key') == key
-            and isinstance(validated_cache.get('curve'), Mapping)
-            and dict(validated_cache['curve']) == normalized_curve
+            and isinstance(validated_curve, Mapping)
+            and dict(validated_curve) == normalized_curve
+            and validated_cache.get('dependency_vector')
+            == gate_curve_memo_dependency_vector(self, normalized_curve)
+            and isinstance(validated_cache.get('repair_notices'), list)
         ):
             self._freeze_gate_liquid_fraction_cache = {
                 'key': key,
                 'curve': dict(normalized_curve),
+                'dependency_vector': gate_curve_memo_dependency_vector(
+                    self,
+                    normalized_curve,
+                ),
+                'repair_notices': list(cache_notices or ()),
             }
-        if isinstance(memo, dict):
-            memo[key] = dict(normalized_curve)
         self._record_composition_projected_liquidus_notice_from_curve(
             normalized_curve
         )
