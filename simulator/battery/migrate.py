@@ -3228,8 +3228,20 @@ def _initial_oxide_map_from_values(
 ) -> dict[str, Decimal] | None:
     if not isinstance(values, Mapping):
         return None
+    quantity = str(values.get("quantity") or "").casefold()
+    if not quantity and not declared_map:
+        declared_map = any(
+            isinstance(row, Mapping)
+            and any(
+                isinstance(row.get(key), Mapping)
+                for key in _PRINTED_COMPOSITION_MAP_KEYS
+            )
+            for row in _point_rows(values)
+        )
+    if quantity and "composition" not in quantity and not declared_map:
+        return None
     ranked = _point_rows(values)
-    if ranked:
+    if ranked and declared_map:
         got = _printed_initial_charge_row_map(
             values,
             refusal_reason=refusal_reason,
@@ -3267,17 +3279,17 @@ def _initial_oxide_map_from_values(
 def _declared_wt_composition_point_map(values: object, units: object) -> bool:
     if not isinstance(values, Mapping):
         return False
+    if any(
+        isinstance(values.get(key), Mapping)
+        for key in _PRINTED_COMPOSITION_MAP_KEYS
+    ):
+        return True
     quantity = str(values.get("quantity") or "").casefold()
     unit_text = str(units or "").casefold()
     if "composition" not in quantity or not any(
         unit in unit_text for unit in ("wt percent", "wt.%", "wt %")
     ):
         return False
-    if any(
-        isinstance(values.get(key), Mapping)
-        for key in _PRINTED_COMPOSITION_MAP_KEYS
-    ):
-        return True
     if sum(key in _COMPOSITION_COMPONENTS for key in values) >= 2:
         return True
     for key in ("points", "rows", "tests"):
@@ -3471,6 +3483,8 @@ def wt_pct_to_mole_fraction_derivation(
 ) -> Derivation:
     params: list[tuple[str, Located[Decimal]]] = []
     for oxide, weight in wt.items():
+        if str(oxide).strip().casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS:
+            continue
         params.append(
             (
                 f"original_{oxide}_wt_pct",
@@ -9723,6 +9737,8 @@ def _printed_composition_from_roots(
 def _is_printed_initial_charge(
     printed: Located[Mapping[str, Any]] | None,
     values: object,
+    *,
+    declared_map: bool = False,
 ) -> bool:
     """``printed`` is the series' printed starting-charge row (see above).
 
@@ -9732,7 +9748,7 @@ def _is_printed_initial_charge(
 
     if printed is None or not printed.state.is_value:
         return False
-    charge = _printed_initial_charge_row_map(values)
+    charge = _printed_initial_charge_row_map(values, declared_map=declared_map)
     return charge is not None and _printed_fingerprint(
         _printed_map_payload(charge)
     ) == _printed_fingerprint(printed.state.value)
@@ -11377,7 +11393,11 @@ class Migrator:
             ):
                 sample = replace(sample, initial_composition=None)
         elif row_printed is not None and not _is_printed_initial_charge(
-            row_printed, values
+            row_printed,
+            values,
+            declared_map=_declared_wt_composition_point_map(
+                values, composition_units
+            ),
         ):
             sample = replace(
                 sample,
