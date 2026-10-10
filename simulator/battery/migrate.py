@@ -412,6 +412,7 @@ QUANTITY_ALIASES = {
     "delta_fH": Quantity.DELTA_FH,
     "deltafH": Quantity.DELTA_FH,
     "delta_f_H": Quantity.DELTA_FH,
+    "negative_enthalpy_change_on_cooling": Quantity.H_MINUS_H298,
     "log10_Kf": Quantity.LOG10_KF,
     "log10_kf": Quantity.LOG10_KF,
     "log10_K_star_equilibrium_fit": Quantity.LOG10_K_STAR,
@@ -2846,6 +2847,12 @@ _CONVERSION_META: dict[str, tuple[Decimal, str, str, str]] = {
         "x = pct / 100",
         "dimensionless",
         "percent",
+    ),
+    "negative_cooling_enthalpy_to_H_minus_H298": (
+        Decimal("1"),
+        "H(T) - H(298 K) = -DeltaH_cool",
+        "kJ/mol",
+        "kJ/mol",
     ),
 }
 
@@ -7212,6 +7219,7 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
     Quantity.H_MINUS_H298: (
         "enthalpy_increment",
         "H_minus_H298",
+        "minus_delta_H_cool_kJ_mol-1",
         "value",
     ),
     Quantity.DELTA_FH: (
@@ -8300,6 +8308,30 @@ def select_declared_source(
         )
 
     q_token = _quantity_token(declared)
+    if (
+        q_token is Quantity.H_MINUS_H298
+        and "minus_delta_H_cool_kJ_mol-1" in payload
+    ):
+        amount = _as_dec_or_none(payload.get("minus_delta_H_cool_kJ_mol-1"))
+        if amount is None:
+            return _unavailable_selection(
+                "minus_delta_H_cool_kJ_mol-1 is not numeric",
+                condition_ranges=condition_ranges,
+                field_name="minus_delta_H_cool_kJ_mol-1",
+                unit_trail="negative_cooling_enthalpy_to_H_minus_H298",
+            )
+        # Premise: the source says these values are -DeltaH_cool while cooling
+        # from T to 298 K, so DeltaH_cool = H(298 K)-H(T). Algebra gives
+        # H(T)-H(298 K) = -DeltaH_cool; the printed value already has that sign.
+        # Unit check: both sides are kJ/mol. Worked source point: Zigo's 1519 K
+        # value 335.9 kJ/mol is H(1519 K)-H(298 K), so it remains +335.9.
+        return _point_selection(
+            amount,
+            "minus_delta_H_cool_kJ_mol-1",
+            "negative_cooling_enthalpy_to_H_minus_H298",
+            payload,
+            condition_ranges,
+        )
     if q_token is Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT:
         a_printed = payload.get("A_printed")
         b_printed = payload.get("B_printed")
@@ -12499,7 +12531,11 @@ class Migrator:
         value_derivation = source_derivation
         value_conversion: Derivation | None = None
         if (
-            q_token in {Quantity.MASS_LOSS_AREAL_DENSITY, Quantity.FUGACITY}
+            q_token in {
+                Quantity.MASS_LOSS_AREAL_DENSITY,
+                Quantity.FUGACITY,
+                Quantity.H_MINUS_H298,
+            }
             and value_sel.available
             and value_sel.field_name
         ):
