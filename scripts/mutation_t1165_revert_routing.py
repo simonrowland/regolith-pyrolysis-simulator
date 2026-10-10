@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Prove the t1165 point-routing regression fails with the old guard restored."""
+"""Prove the t1165 routing and printed-species regressions detect reverts."""
 
 from __future__ import annotations
 
@@ -22,19 +22,26 @@ CURRENT = (
     b'        ):\n'
 )
 REVERTED = b"elif row_point_containers and not _parent_bound_categorical(value_sel):\n"
+SPECIES_CURRENT = b"if use_printed_point_species and printed_species_formula is not None:\n"
+SPECIES_REVERTED = b"if False and printed_species_formula is not None:\n"
 
 
-def main() -> int:
-    original = SOURCE.read_bytes()
-    if original.count(CURRENT) != 1:
-        raise SystemExit("could not identify the t1165 routing branch exactly once")
-
-    SOURCE.write_bytes(original.replace(CURRENT, REVERTED, 1))
+def _run_mutation(original: bytes, mutated: bytes, label: str) -> None:
+    SOURCE.write_bytes(mutated)
     os.utime(SOURCE, None)
     try:
         result = subprocess.run(
-            [sys.executable, "-m", "pytest", "-n", "0", TEST],
+            [
+                sys.executable,
+                "-m",
+                "pytest",
+                "-n",
+                "0",
+                "--timeout=300",
+                TEST,
+            ],
             cwd=ROOT,
+            env={**os.environ, "PYTHONPATH": str(ROOT)},
             text=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
@@ -43,11 +50,28 @@ def main() -> int:
     finally:
         SOURCE.write_bytes(original)
         os.utime(SOURCE, None)
-
     print(result.stdout, end="")
     if result.returncode == 0:
-        raise SystemExit("mutation survived: regression test unexpectedly passed")
-    print("expected red: reverting point routing fails the regression test")
+        raise SystemExit(f"{label} mutation survived: regression test unexpectedly passed")
+    print(f"expected red: {label} mutation fails the regression test")
+
+
+def main() -> int:
+    original = SOURCE.read_bytes()
+    if original.count(CURRENT) != 1:
+        raise SystemExit("could not identify the t1165 routing branch exactly once")
+    if original.count(SPECIES_CURRENT) != 1:
+        raise SystemExit("could not identify the t1165 species override exactly once")
+    _run_mutation(
+        original,
+        original.replace(CURRENT, REVERTED, 1),
+        "point-routing revert",
+    )
+    _run_mutation(
+        original,
+        original.replace(SPECIES_CURRENT, SPECIES_REVERTED, 1),
+        "printed-species override removal",
+    )
     return 0
 
 

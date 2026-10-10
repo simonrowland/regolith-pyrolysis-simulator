@@ -13311,6 +13311,7 @@ class Migrator:
                             point_parent_conditions if non_yield_points else point_conditions
                         ),
                         content_stable_id=True,
+                        use_printed_point_species=non_yield_points,
                     )
             if self._count(source_key).observations_out > before:
                 return
@@ -13501,6 +13502,7 @@ class Migrator:
         provenance: Mapping[str, Any] | None = None,
         parent_point_conditions: Mapping[str, Located[Any]] | None = None,
         content_stable_id: bool = False,
+        use_printed_point_species: bool = False,
     ) -> None:
         raw_item = item.get("item")
         index = item.get("index", 0)
@@ -13586,6 +13588,21 @@ class Migrator:
                         polymorph=species.polymorph,
                         charge=species.charge,
                     )
+            printed_species = raw_item.get("species_as_printed")
+            printed_species_formula = (
+                _reference_formula_token(
+                    re.sub(r"\s*\(g\)\s*$", "", printed_species)
+                )
+                if isinstance(printed_species, str)
+                else None
+            )
+            if use_printed_point_species and printed_species_formula is not None:
+                species = make_species(
+                    printed_species_formula,
+                    species.phase,
+                    polymorph=species.polymorph,
+                    charge=species.charge,
+                )
             if raw_item.get("locator"):
                 point_locator = (
                     locator_from_mapping(

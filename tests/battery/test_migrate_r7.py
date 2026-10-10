@@ -32,6 +32,7 @@ from simulator.battery.migrate import (
     wt_pct_to_mole_fraction,
 )
 from simulator.battery.records import State
+from simulator.battery.score import rail_for_quantity
 from simulator.battery.validity import underdetermined_apparatus
 from tests.battery.test_migrate import (
     _copy_compilation_record,
@@ -657,12 +658,33 @@ def test_g1_jacobson_keeps_category_and_quantity_reason(tmp_path):
     root = _write_min_tree(tmp_path)
     _copy_extract(root, "kems-139-jacobson-2024.yaml")
     result = migrate(root, write=False)
-    oid = "kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat"
-    obs = result.observations[oid]
-    assert obs.identity.quantity.is_unknown
-    assert "predicted_partial_pressure" in obs.identity.quantity.reason
-    assert obs.value.kind is ValueKind.CATEGORICAL
-    assert obs.value.categorical == "bound_not_point_ordering"
+    parent_id = "kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat"
+    points = [
+        obs for oid, obs in result.observations.items()
+        if oid.startswith(parent_id + "::")
+    ]
+    assert len(points) == 21
+    assert {obs.identity.species.formula for obs in points} >= {"PO2", "SiO"}
+    assert all(
+        obs.identity.quantity.is_unknown
+        and "predicted_partial_pressure" in obs.identity.quantity.reason
+        and obs.value.kind is ValueKind.UNAVAILABLE
+        and obs.evidence.class_.is_value
+        and obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+        and obs.evidence.model
+        and (obs.point_conditions or {}).get("temperature_K") is not None
+        and obs.point_conditions["temperature_K"].state.value == Decimal("2500.0")
+        and rail_for_quantity(
+            quantity_token(obs.identity),
+            species_formula=obs.identity.species.formula,
+        ) is None
+        for obs in points
+    )
+    assert any(
+        entry.observation_id in {obs.observation_id for obs in points}
+        and "unsupported quantity 'predicted_partial_pressure'" in entry.why
+        for entry in result.queue
+    )
 
 
 def test_g1_compilation_columns_grid_and_multi_phase(tmp_path):

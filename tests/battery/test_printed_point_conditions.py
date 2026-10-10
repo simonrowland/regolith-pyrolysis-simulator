@@ -16,10 +16,12 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import ValueKind
+from simulator.battery.enums import EvidenceClass, ValueKind
+from simulator.battery.identity import quantity_token
 from simulator.yaml_cache import load_cached_safe_yaml
 
 from simulator.battery.migrate import REPO_ROOT, migrate
+from simulator.battery.score import rail_for_quantity
 from tests.battery.test_migrate import _write_min_tree
 
 _EXTRACTS = REPO_ROOT / "data" / "literature" / "extracts"
@@ -104,10 +106,23 @@ def test_jacobson_table1_points_keep_printed_temperature_and_typed_reason(
         obs for oid, obs in result.observations.items()
         if oid.startswith(parent_id + "::")
     ]
-    assert len(points) == 21
+    printed_species = [
+        "PO2", "SiO", "Fe", "Na", "PO", "K", "FeO", "O", "O2", "Mg",
+        "SiO2", "TiO2", "P", "KO", "TiO", "Ca", "CaO", "Al", "Si", "K2", "Ti",
+    ]
+    assert len(points) == len(printed_species) == 21
+    assert [obs.identity.species.formula for obs in points] == printed_species
     for obs in points:
         assert obs.identity.quantity.is_unknown
+        assert "predicted_partial_pressure" in obs.identity.quantity.reason
         assert obs.value.kind is ValueKind.UNAVAILABLE
+        assert obs.evidence.class_.is_value
+        assert obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+        assert obs.evidence.model == "model_derived"
+        assert rail_for_quantity(
+            quantity_token(obs.identity),
+            species_formula=obs.identity.species.formula,
+        ) is None
         temperature = (obs.point_conditions or {}).get("temperature_K")
         assert temperature is not None and temperature.state.is_value
         assert temperature.state.value == Decimal("2500.0")
