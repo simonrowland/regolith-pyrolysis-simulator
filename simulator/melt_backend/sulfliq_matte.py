@@ -97,6 +97,20 @@ FES_MU0_1300K_J_PER_MOL = -257599.6112
 SULFLIQ_CALIBRATION_VERSION = 'kress-sulfliq-1.0.4-a_FeS-v2'
 
 
+class _SulfLiqCallError(RuntimeError):
+    """An exception raised by one SulfLiq binding operation."""
+
+
+def _call_sulfliq(target: Any, operation: str, *args: Any) -> Any:
+    """Catch failures from one binding lookup/call, never result handling."""
+    try:
+        return getattr(target, operation)(*args)
+    except Exception as exc:  # SulfLiq is a third-party native binding.
+        raise _SulfLiqCallError(
+            f'SulfLiq.{operation} failed ({type(exc).__name__}: {exc})'
+        ) from exc
+
+
 @dataclass
 class ActivityResult:
     """
@@ -166,15 +180,15 @@ class SulfLiqMatteProvider:
         del config  # unused; API symmetry with SulfSatGate
         try:
             self._module = importlib.import_module('SulfLiq')
-        except Exception as exc:  # noqa: BLE001 — lazy probe path
+        except ImportError as exc:
             self._available = False
             self._module = None
             self._init_error = f'SulfLiq import failed: {exc!r}'
             return False
         # Touch the constructor so a broken .so (wrong ABI) fails here.
         try:
-            _ = self._module.pySulfLiq()
-        except Exception as exc:  # noqa: BLE001
+            _call_sulfliq(self._module, 'pySulfLiq')
+        except _SulfLiqCallError as exc:
             self._available = False
             self._module = None
             self._init_error = f'SulfLiq.pySulfLiq() failed: {exc!r}'
@@ -306,13 +320,14 @@ class SulfLiqMatteProvider:
                 f'P_bar={P_bar_f:.3g} exceeds SulfLiq highP (~6e4 bar)'
             )
 
+        component_values = list(comps)
         try:
-            sl = self._module.pySulfLiq()
-            sl.setTK(T_K_f)
-            sl.setPa(P_bar_f * 1.0e5)
-            sl.setComps(list(comps))
-            sl.setSpeciateTolerance(1.0e-16)
-        except Exception as exc:  # noqa: BLE001
+            sl = _call_sulfliq(self._module, 'pySulfLiq')
+            _call_sulfliq(sl, 'setTK', T_K_f)
+            _call_sulfliq(sl, 'setPa', P_bar_f * 1.0e5)
+            _call_sulfliq(sl, 'setComps', component_values)
+            _call_sulfliq(sl, 'setSpeciateTolerance', 1.0e-16)
+        except _SulfLiqCallError as exc:
             return ActivityResult(
                 T_K=T_K_f,
                 P_bar=P_bar_f,
@@ -321,10 +336,9 @@ class SulfLiqMatteProvider:
             )
 
         try:
-            mu0 = float(sl.getMu0(_FES_SPECIES_INDEX))
-            mu = float(sl.getSpecMu(_FES_SPECIES_INDEX))
-            a_fes = math.exp((mu - mu0) / (_R_J_PER_MOL_K * T_K_f))
-        except Exception as exc:  # noqa: BLE001
+            raw_mu0 = _call_sulfliq(sl, 'getMu0', _FES_SPECIES_INDEX)
+            raw_mu = _call_sulfliq(sl, 'getSpecMu', _FES_SPECIES_INDEX)
+        except _SulfLiqCallError as exc:
             return ActivityResult(
                 T_K=T_K_f,
                 P_bar=P_bar_f,
@@ -332,33 +346,60 @@ class SulfLiqMatteProvider:
                 + [f'SulfLiq a_FeS evaluation failed: {exc!r}'],
                 calibration_status='unavailable',
             )
+        mu0 = float(raw_mu0)
+        mu = float(raw_mu)
+        a_fes = math.exp((mu - mu0) / (_R_J_PER_MOL_K * T_K_f))
 
         log_fo2: Optional[float] = None
         log_fs2: Optional[float] = None
         is_stable: Optional[bool] = None
         species_frac: Dict[str, float] = {}
         try:
-            is_stable = bool(sl.isStable())
-        except Exception as exc:  # noqa: BLE001
+            raw_is_stable = _call_sulfliq(sl, 'isStable')
+        except _SulfLiqCallError as exc:
             warnings_list.append(f'isStable failed: {exc!r}')
+        else:
+            is_stable = bool(raw_is_stable)
+        # Pure FeS (zero O) makes getlogfo2 throw; leave None then. Returned
+        # values are log10 (SulfLiq API / petrologic convention).
+        log_read_failed = False
+        if comps[0] > 0.0:
+            try:
+                raw_log_fo2 = _call_sulfliq(sl, 'getlogfo2')
+            except _SulfLiqCallError as exc:
+                warnings_list.append(f'logfO2/logfS2 unavailable: {exc!r}')
+                log_read_failed = True
+            else:
+                log_fo2 = float(raw_log_fo2)
+        if not log_read_failed:
+            try:
+                raw_log_fs2 = _call_sulfliq(sl, 'getlogfs2')
+            except _SulfLiqCallError as exc:
+                warnings_list.append(f'logfO2/logfS2 unavailable: {exc!r}')
+            else:
+                log_fs2 = float(raw_log_fs2)
         try:
-            # Pure FeS (zero O) makes getlogfo2 throw; leave None then.
-            # Returned values are log10 (SulfLiq API / petrologic convention).
-            if comps[0] > 0.0:
-                log_fo2 = float(sl.getlogfo2())
-            log_fs2 = float(sl.getlogfs2())
-        except Exception as exc:  # noqa: BLE001
-            warnings_list.append(f'logfO2/logfS2 unavailable: {exc!r}')
-        try:
-            specs = list(sl.getSpecs())
+            raw_specs = _call_sulfliq(sl, 'getSpecs')
+        except _SulfLiqCallError as exc:
+            warnings_list.append(f'species readout failed: {exc!r}')
+        else:
+            specs = list(raw_specs)
             total = sum(specs)
             if total > 0.0:
-                nspec = int(sl.getNspec())
-                for i in range(nspec):
-                    name = str(sl.getSpecFormula(i))
-                    species_frac[name] = float(specs[i] / total)
-        except Exception as exc:  # noqa: BLE001
-            warnings_list.append(f'species readout failed: {exc!r}')
+                try:
+                    raw_nspec = _call_sulfliq(sl, 'getNspec')
+                except _SulfLiqCallError as exc:
+                    warnings_list.append(f'species readout failed: {exc!r}')
+                else:
+                    nspec = int(raw_nspec)
+                    for i in range(nspec):
+                        try:
+                            raw_name = _call_sulfliq(sl, 'getSpecFormula', i)
+                        except _SulfLiqCallError as exc:
+                            warnings_list.append(f'species readout failed: {exc!r}')
+                            break
+                        name = str(raw_name)
+                        species_frac[name] = float(specs[i] / total)
 
         status = 'in_range'
         if warnings_list and any(
