@@ -652,14 +652,15 @@ def _build_high_t_melt_activity_authority(
     if isinstance(relaxed_projection, Mapping):
         policy_notices.append(dict(relaxed_projection))
     from simulator.melt_backend.openimcc_bridge import (
-        imcc_complex_saturation_notice,
+        imcc_complex_saturation_notices,
     )
 
-    saturation_notice = imcc_complex_saturation_notice(
-        bridge.flags, bridge.acid_sink_ratio
-    )
-    typed_openimcc_notices = (
-        [] if saturation_notice is None else [saturation_notice]
+    typed_openimcc_notices = list(
+        imcc_complex_saturation_notices(
+            bridge.flags,
+            bridge.acid_sink_ratio,
+            bridge.parent_oxide_x_star_ratios,
+        )
     )
     base["notices"].extend(typed_openimcc_notices)
     base.update(
