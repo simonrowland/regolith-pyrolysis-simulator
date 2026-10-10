@@ -1097,6 +1097,16 @@ def migrate_alpha_kinetics() -> list[Path]:
     draft = yaml.safe_load(fences[0])
     root = draft.get("vp_alpha_kinetics_DRAFT") or draft
     records = root.get("records") or []
+    retired_record_ids = {
+        "fedkin_2006_table3_fe_hashimoto_langmuir",
+        "fedkin_2006_yu_na_vacuum_langmuir",
+        "sossi_2019_na_open_furnace_apparent",
+        "fedkin_2006_yu_k_vacuum_langmuir",
+        "fedkin_2006_table3_mg_hashimoto_langmuir",
+        "fedkin_2006_table3_sio_hashimoto_langmuir",
+        "pound_1972_cr_langmuir_knudsen",
+        "safarian_engh_2013_si_pure_langmuir",
+    }
 
     by_source: dict[str, dict[str, Any]] = {}
 
@@ -1125,11 +1135,9 @@ def migrate_alpha_kinetics() -> list[Path]:
         if not isinstance(rec, Mapping):
             continue
         rid = str(rec.get("record_id") or "alpha_rec")
-        # d-084 retired these duplicate extracts; their curated kems-* owners
-        # must never be rebuilt from the obsolete acquisition draft.
-        if rid.startswith("fedkin") or "fedkin" in rid:
-            continue
-        if rid.startswith("sossi_2019") or "sossi_2019" in rid:
+        # d-084 retired these duplicate extracts; never rebuild them from the
+        # obsolete acquisition draft.
+        if rid in retired_record_ids:
             continue
         citation = str(rec.get("citation") or "UNKNOWN")
         doi_or_url = str(rec.get("doi_or_url") or "")
@@ -1148,12 +1156,6 @@ def migrate_alpha_kinetics() -> list[Path]:
         if rid.startswith("costa"):
             source_id = "costa-jacobson-2015"
             year = 2015
-        elif rid.startswith("fedkin") or "fedkin" in rid:
-            source_id = "kems-005-fedkin-2006"
-            year = 2006
-        elif rid.startswith("sossi_2019") or "sossi_2019" in rid:
-            source_id = "kems-012-sossi-2019"
-            year = 2019
         elif "richter" in rid:
             # DRAFT record_id is richter_2007_*; year 2007 GCA 71:5544 (P2-V2).
             source_id = "richter-et-al-2007"
@@ -1260,29 +1262,6 @@ def migrate_alpha_kinetics() -> list[Path]:
                 value=rec.get("alpha_form"),
                 note="alpha_form retained verbatim from alpha-kinetics DRAFT (P1-F1 fix)",
                 locator={"record": rid},
-            )
-
-        # Hashimoto free-evaporation rate points when present on Fedkin Fe table
-        if rec.get("per_temperature") and source_id == "kems-005-fedkin-2006":
-            _add_obs(
-                doc,
-                species,
-                {
-                    "observation_id": rid + "_per_T_alpha_series",
-                    "type": "rate_series",
-                    "locator": {
-                        "table": "3",
-                        "note": "Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)",
-                        "record": rid,
-                    },
-                    "T_range_K": list(tr)
-                    if isinstance(tr, (list, tuple)) and len(tr) == 2
-                    else None,
-                    "phase": rec.get("phase"),
-                    "regime": rec.get("regime"),
-                    "units": "dimensionless alpha vs T_K",
-                    "values": {"series": rec.get("per_temperature")},
-                },
             )
 
     outs = []

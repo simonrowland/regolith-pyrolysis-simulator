@@ -19,40 +19,30 @@ def _load_writer():
     return module
 
 
-def test_alpha_writer_preserves_retained_fedkin_and_sossi_owner_extracts(
-    tmp_path, monkeypatch
-):
-    writer = _load_writer()
-    extracts = tmp_path / "extracts"
-    extracts.mkdir()
-    original_owners = {}
-    for source_id in ("kems-005-fedkin-2006", "kems-012-sossi-2019"):
-        path = extracts / f"{source_id}.yaml"
-        payload = {
-            "source_id": source_id,
-            "species": {
-                "Mg": {
-                    "observations": [
-                        {"observation_id": f"{source_id}-curated-row"}
-                    ]
-                }
-            },
-        }
-        path.write_text(yaml.safe_dump(payload), encoding="utf-8")
-        original_owners[path] = path.read_bytes()
+RETIRED_RECORDS = (
+    "fedkin_2006_table3_fe_hashimoto_langmuir",
+    "fedkin_2006_yu_na_vacuum_langmuir",
+    "sossi_2019_na_open_furnace_apparent",
+    "fedkin_2006_yu_k_vacuum_langmuir",
+    "fedkin_2006_table3_mg_hashimoto_langmuir",
+    "fedkin_2006_table3_sio_hashimoto_langmuir",
+    "pound_1972_cr_langmuir_knudsen",
+    "safarian_engh_2013_si_pure_langmuir",
+)
+RETIRED_DESTINATIONS = {
+    "fedkin-grossman-ghiorso-2006.yaml",
+    "sossi-et-al-2019.yaml",
+    "pound-1972-cr-langmuir-knudsen.yaml",
+    "safarian-engh-2013-si-pure-langmuir.yaml",
+    "kems-005-fedkin-2006.yaml",
+    "kems-012-sossi-2019.yaml",
+    "kems-003-pound-1972.yaml",
+    "kems-009-safarian-2013.yaml",
+}
 
-    draft = tmp_path / "alpha-kinetics.md"
-    records = [
-        {"record_id": "fedkin_2006_mg", "species": "Mg", "alpha_value": 0.27},
-        {"record_id": "sossi_2019_na", "species": "Na", "alpha_value": 1.0},
-        {"record_id": "costa_2015_si", "species": "Si", "alpha_value": 0.02},
-    ]
-    draft.write_text(
-        "```yaml\n"
-        + yaml.safe_dump({"records": records}, sort_keys=False)
-        + "```\n",
-        encoding="utf-8",
-    )
+
+def _run_writer(draft, extracts, monkeypatch):
+    writer = _load_writer()
     monkeypatch.setattr(writer, "EXTRACTS", extracts)
     monkeypatch.setattr(writer, "_find_research", lambda *args: draft)
     monkeypatch.setattr(writer, "ensure_fidelity_samples", lambda doc: None)
@@ -61,10 +51,51 @@ def test_alpha_writer_preserves_retained_fedkin_and_sossi_owner_extracts(
 
     written = writer.migrate_alpha_kinetics()
 
-    assert written == [extracts / "costa-jacobson-2015.yaml"]
-    assert writes == written
-    assert not {path.name for path in writes} & {
-        "kems-005-fedkin-2006.yaml",
-        "kems-012-sossi-2019.yaml",
+    return {path.name for path in writes}, written
+
+
+def _draft_with_records(path, records):
+    path.write_text(
+        "```yaml\n" + yaml.safe_dump({"records": records}, sort_keys=False) + "```\n",
+        encoding="utf-8",
+    )
+    return path
+
+
+def test_alpha_writer_preserves_retired_sources(tmp_path, monkeypatch):
+    extracts = tmp_path / "extracts"
+    extracts.mkdir()
+    records = [
+        {"record_id": rid, "species": "Cr", "alpha_value": 0.9}
+        for rid in RETIRED_RECORDS
+    ]
+    records.append(
+        {"record_id": "costa_2015_si", "species": "Si", "alpha_value": 0.02}
+    )
+    draft = _draft_with_records(tmp_path / "alpha-kinetics.md", records)
+
+    destinations, written = _run_writer(draft, extracts, monkeypatch)
+
+    assert destinations == {"costa-jacobson-2015.yaml"}
+    assert {path.name for path in written} == destinations
+    assert not destinations & RETIRED_DESTINATIONS
+
+
+def test_real_alpha_draft_emits_only_nonretired_destinations(tmp_path, monkeypatch):
+    extracts = tmp_path / "extracts"
+    extracts.mkdir()
+    draft = (
+        REPO_ROOT.parents[1]
+        / "docs-private/research/2026-08-01-vp-acquire-6/alpha-kinetics.md"
+    )
+    assert draft.is_file(), f"real acquisition draft is unavailable: {draft}"
+
+    destinations, written = _run_writer(draft, extracts, monkeypatch)
+
+    assert destinations == {
+        "costa-jacobson-2015.yaml",
+        "richter-et-al-2007.yaml",
+        "wetzel-gail-2013-sio-arrhenius.yaml",
     }
-    assert {path: path.read_bytes() for path in original_owners} == original_owners
+    assert {path.name for path in written} == destinations
+    assert not destinations & RETIRED_DESTINATIONS
