@@ -2627,6 +2627,146 @@ def test_g04_unexpanded_shell_without_key_follows_exploded_series(
     _assert_superseded_targets_are_live(migrator.result)
 
 
+@pytest.mark.parametrize("temperature_kind", ["absent", "unknown"])
+def test_g04_numeric_row_without_temperature_stays_live(
+    tmp_path: Path, temperature_kind: str
+) -> None:
+    from types import SimpleNamespace
+
+    from simulator.battery.score import comparison_candidates
+
+    migrator = _stage_keyed_children(
+        tmp_path,
+        [("A", "a", None), ("B-a", "a", "1000"), ("B-b", "b", "2000")],
+    )
+    staged_id = "fixture-source::A::T=None:row=a"
+    old = migrator.result.observations.pop(staged_id)
+    temperature = (
+        None if temperature_kind == "absent" else State.unknown("not printed")
+    )
+    old = replace(
+        old,
+        observation_id="fixture-source::A",
+        identity=replace(old.identity, temperature_K=temperature),
+        value=Value(ValueKind.POINT, point=Decimal("0.7")),
+    )
+    migrator.result.observations[old.observation_id] = old
+    children = sorted(
+        oid for oid in migrator.result.observations if oid != old.observation_id
+    )
+    for child_id in children:
+        migrator.result.observations[child_id] = replace(
+            migrator.result.observations[child_id],
+            value=Value(ValueKind.POINT, point=Decimal("0.8")),
+        )
+    migrator._exploded_children = {"fixture-source::B": children}
+    migrator._pending_supersedes = [
+        (
+            old.observation_id,
+            "fixture-source::B",
+            old.experiment_id,
+            old.locator,
+            "fixture-source.yaml",
+        )
+    ]
+    before = comparison_candidates(
+        SimpleNamespace(observations=migrator.result.observations)
+    )
+
+    migrator._apply_supersedes()
+
+    kept = migrator.result.observations[old.observation_id]
+    after = comparison_candidates(
+        SimpleNamespace(observations=migrator.result.observations)
+    )
+    diagnostics = [
+        entry
+        for entry in migrator.result.queue
+        if entry.why
+        and "no unique matching row" in entry.why
+        and "row left live" in entry.why
+    ]
+    assert kept.admission.status is AdmissionStatus.ADMITTED
+    assert kept.admission.superseded_by is None
+    assert [row.observation_id for row in after] == [
+        row.observation_id for row in before
+    ]
+    assert len(diagnostics) == 1
+    assert old.observation_id in (diagnostics[0].why or "")
+    _assert_superseded_targets_are_live(migrator.result)
+
+
+def test_g04_correspondence_diagnostic_follows_the_final_successor_set(
+    tmp_path: Path,
+) -> None:
+    migrator = _stage_keyed_children(
+        tmp_path,
+        [
+            ("A-a", "a", "1000"),
+            ("A-b", "b", "2000"),
+            ("A-c", "c", "1800"),
+            ("E-b", "b", "2000"),
+            ("B-a", "a", "1000"),
+            ("C-x", "x", "1500"),
+            ("D-a", "a", "1000"),
+        ],
+    )
+    ids = {
+        "A-a": "fixture-source::A-a::T=1000:row=a",
+        "A-b": "fixture-source::A-b::T=2000:row=b",
+        "A-c": "fixture-source::A-c::T=1800:row=c",
+        "E-b": "fixture-source::E-b::T=2000:row=b",
+        "B-a": "fixture-source::B-a::T=1000:row=a",
+        "C-x": "fixture-source::C-x::T=1500:row=x",
+        "D-a": "fixture-source::D-a::T=1000:row=a",
+    }
+    migrator._exploded_children = {
+        "fixture-source::A": [ids["A-a"], ids["A-b"], ids["A-c"]],
+        "fixture-source::E": [ids["E-b"]],
+        "fixture-source::B": [ids["B-a"]],
+        "fixture-source::C": [ids["C-x"]],
+        "fixture-source::D": [ids["D-a"]],
+    }
+    sample = migrator.result.observations[ids["A-a"]]
+    migrator._pending_supersedes = [
+        (
+            "fixture-source::A",
+            successor,
+            sample.experiment_id,
+            sample.locator,
+            "fixture-source.yaml",
+        )
+        for successor in (
+            "fixture-source::E",
+            "fixture-source::B",
+            "fixture-source::C",
+            "fixture-source::D",
+        )
+    ]
+
+    migrator._apply_supersedes()
+
+    matched_later = migrator.result.observations[ids["A-a"]]
+    matched_earlier = migrator.result.observations[ids["A-b"]]
+    unmatched = migrator.result.observations[ids["A-c"]]
+    assert matched_later.admission.status is AdmissionStatus.SUPERSEDED
+    assert matched_later.admission.superseded_by == ids["D-a"]
+    assert matched_earlier.admission.status is AdmissionStatus.SUPERSEDED
+    assert matched_earlier.admission.superseded_by == ids["E-b"]
+    assert unmatched.admission.status is AdmissionStatus.ADMITTED
+    assert unmatched.admission.superseded_by is None
+    live_notes = [
+        entry
+        for entry in migrator.result.queue
+        if entry.why and "row left live" in entry.why
+    ]
+    assert len(live_notes) == 1
+    assert ids["A-c"] in (live_notes[0].why or "")
+    assert ids["A-a"] not in (live_notes[0].why or "")
+    assert ids["A-b"] not in (live_notes[0].why or "")
+    _assert_superseded_targets_are_live(migrator.result)
+
+
 def test_g04_rejected_superseder_does_not_supersede_measured_row(
     tmp_path: Path,
 ) -> None:
@@ -10073,6 +10213,26 @@ def test_residue_component_quantity_aliases_keep_printed_values_and_missing_cell
         missing = select_declared_source(quantity.value, units, {field: None})
         assert not missing.available
         assert "null" in (missing.reason or "")
+
+
+def test_hashimoto_row_left_live_diagnostics_are_final(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-015-hashimoto-1983.yaml")
+    left_live = [
+        entry
+        for entry in result.queue
+        if entry.why and "row left live" in entry.why
+    ]
+    contradicted = [
+        entry
+        for entry in left_live
+        if entry.observation_id in result.observations
+        and result.observations[entry.observation_id].admission.status
+        is AdmissionStatus.SUPERSEDED
+    ]
+    assert contradicted == []
+    assert len(left_live) == 0
 
 
 def test_residue_store_write_files_cells_under_their_extract_sources(

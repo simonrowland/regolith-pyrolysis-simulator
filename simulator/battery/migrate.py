@@ -15865,6 +15865,9 @@ class Migrator:
     def _apply_supersedes(self) -> None:
         observations = self.result.observations
         chosen_edges: dict[str, str] = {}
+        # Rows that miss one successor may match a later one. The diagnostic
+        # is decided after every declared successor has been tried.
+        unmatched_rows: dict[str, tuple[str, Locator | None, str, list[str]]] = {}
 
         def measurement_key(observation_id: str) -> tuple[object, ...] | None:
             observation = observations[observation_id]
@@ -15919,8 +15922,10 @@ class Migrator:
                 continue
 
             # An exploded parent is retargeted per measurement key, including
-            # a one-row explosion. Direct unexpanded A->B is not. A shell with
-            # no key is the series object an exploded successor replaces.
+            # a one-row explosion. Direct unexpanded A->B keeps its single
+            # target. An unexpanded row with no measurement value and no
+            # temperature key is the series shell an exploded successor
+            # replaces. A numeric row with no matching key stays live.
             old_exploded = old_id not in observations
             new_exploded = new_id not in observations
             for old_row in old_rows:
@@ -15936,16 +15941,21 @@ class Migrator:
                         len(target_rows) != 1
                         and not old_exploded
                         and old_key is None
+                        and observations[old_row].value.kind is ValueKind.UNAVAILABLE
                         and new_exploded
                     ):
                         target_rows = [min(new_rows)]
                 if len(target_rows) != 1:
-                    self.result.add_queue(
-                        work_id, observations[old_row].locator or locator,
-                        ["admission.superseded_by"],
-                        f"supersedes row {old_row!r} has no unique matching row in {new_id!r}; row left live",
-                        source=source_key, observation_id=old_row,
-                    )
+                    if old_row not in unmatched_rows:
+                        unmatched_rows[old_row] = (
+                            work_id,
+                            observations[old_row].locator or locator,
+                            source_key,
+                            [],
+                        )
+                    missed_ids = unmatched_rows[old_row][3]
+                    if new_id not in missed_ids:
+                        missed_ids.append(new_id)
                     continue
                 chosen_edges[old_row] = target_rows[0]
 
@@ -16024,6 +16034,20 @@ class Migrator:
                     superseded_by=terminal_id,
                     decided_by=decided,
                 ),
+            )
+
+        for old_row, (work_id, row_locator, source_key, new_ids) in unmatched_rows.items():
+            if old_row in chosen_edges:
+                continue
+            observation = observations[old_row]
+            if observation.admission.status is AdmissionStatus.SUPERSEDED:
+                continue
+            described: object = new_ids[0] if len(new_ids) == 1 else new_ids
+            self.result.add_queue(
+                work_id, row_locator,
+                ["admission.superseded_by"],
+                f"supersedes row {old_row!r} has no unique matching row in {described!r}; row left live",
+                source=source_key, observation_id=old_row,
             )
 
     def _resolve_queue_ids(self) -> None:
