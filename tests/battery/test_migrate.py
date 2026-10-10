@@ -33,6 +33,7 @@ from simulator.battery.enums import (
     Polymorph,
     Quantity,
     Rail,
+    ResidualStatus,
     ReferenceStateConvention,
     RefusalReason,
     StateTag,
@@ -5596,7 +5597,11 @@ def test_demaria_fe_rows_use_the_pure_iron_reference_state(tmp_path: Path) -> No
 
 
 def test_tsaplin_gibbs_duhem_sio2_is_not_measured_direct(tmp_path: Path) -> None:
-    from simulator.battery.score import ScoreContext, comparison_candidates
+    from simulator.battery.score import (
+        ScoreContext,
+        comparison_candidates,
+        score_store,
+    )
 
     result = _migrate_real_extract(tmp_path, "kems-ms2000-044.yaml")
     r2 = [
@@ -5616,6 +5621,9 @@ def test_tsaplin_gibbs_duhem_sio2_is_not_measured_direct(tmp_path: Path) -> None
         assert reference.value.endmember.formula == "SiO2"
         assert reference.value.endmember.phase.value is Phase.L
         assert reference.value.reference_pressure_bar is None
+        species_phase = obs.identity.species.phase
+        assert species_phase is not None and species_phase.is_value
+        assert species_phase.value is Phase.L
     superseded = [
         obs
         for obs in result.observations.values()
@@ -5636,6 +5644,21 @@ def test_tsaplin_gibbs_duhem_sio2_is_not_measured_direct(tmp_path: Path) -> None
     candidate_ids = {obs.observation_id for obs in candidates}
     assert r2_ids.isdisjoint(candidate_ids)
     assert {obs.observation_id for obs in superseded}.isdisjoint(candidate_ids)
+    residuals, _ = score_store(
+        ScoreContext(
+            works=result.works,
+            experiments=result.experiments,
+            observations=result.observations,
+            benches=result.benches,
+        ),
+        engines=(Engine.OPENIMCC,),
+        rail=Rail.MELT_ACTIVITY,
+    )
+    silica_residuals = [row for row in residuals if row.reference in r2_ids]
+    assert len(silica_residuals) == 24
+    assert all(row.status is ResidualStatus.NO_BAND for row in silica_residuals)
+    assert all(row.numeric is not None for row in silica_residuals)
+    assert all(row.numeric.value.is_finite() for row in silica_residuals if row.numeric)
 
 
 def test_unprinted_temperature_envelopes_are_not_loaded(tmp_path: Path) -> None:
