@@ -91,19 +91,17 @@ def test_finder_propagates_internal_monotone_error(monkeypatch):
         )
 
 
-def test_finder_external_failure_carries_exception_class():
-    def fail_engine(_temperature_C):
+def test_finder_propagates_untyped_sampler_failure():
+    def fail_sampler(_temperature_C):
         raise RuntimeError('engine sample failed')
 
-    result = find_liquidus_solidus_by_fraction(
-        fail_engine,
-        min_T_C=800.0,
-        max_T_C=1000.0,
-        scan_step_C=100.0,
-    )
-    assert result.status == 'not_converged'
-    assert result.diagnostics['exception_class'] == 'RuntimeError'
-    assert result.diagnostics['exception_message'] == 'engine sample failed'
+    with pytest.raises(RuntimeError, match='engine sample failed'):
+        find_liquidus_solidus_by_fraction(
+            fail_sampler,
+            min_T_C=800.0,
+            max_T_C=1000.0,
+            scan_step_C=100.0,
+        )
 
 
 def test_ec_path_propagates_internal_composition_error(monkeypatch):
@@ -120,12 +118,34 @@ def test_ec_path_propagates_internal_composition_error(monkeypatch):
         )
 
 
-def test_ec_path_external_failure_carries_exception_class():
-    def fail_engine(_temperature_C):
-        raise RuntimeError('engine state failed')
+def test_ec_path_propagates_local_sample_callback_error():
+    def fail_local(_temperature_C):
+        raise KeyError('local sample callback defect')
+
+    with pytest.raises(KeyError, match='local sample callback defect'):
+        build_equilibrium_crystallization_path(
+            fail_local,
+            solidus_T_C=1000.0,
+            liquidus_T_C=1100.0,
+            grid_step_C=100.0,
+        )
+
+
+def test_ec_path_preserves_typed_backend_sample_failure():
+    error = LiquidusSampleError(
+        'not_converged',
+        ('RuntimeError: engine state failed',),
+        {
+            'exception_class': 'RuntimeError',
+            'exception_message': 'engine state failed',
+        },
+    )
+
+    def fail_backend(_temperature_C):
+        raise error
 
     result = build_equilibrium_crystallization_path(
-        fail_engine,
+        fail_backend,
         solidus_T_C=1000.0,
         liquidus_T_C=1100.0,
         grid_step_C=100.0,
@@ -492,7 +512,16 @@ def test_liquidus_finder_engine_residual_timeout_emits_budget_diagnostics(
         remaining_seen.append(remaining)
         # Burn residual wall as a real residual-clamped subprocess would.
         clock['t'] += remaining
-        raise RuntimeError(f'MAGEMin binary timed out after {remaining:g}s')
+        raise LiquidusSampleError(
+            'not_converged',
+            (f'MAGEMin binary timed out after {remaining:g}s',),
+            {
+                'exception_class': 'RuntimeError',
+                'exception_message': (
+                    f'MAGEMin binary timed out after {remaining:g}s'
+                ),
+            },
+        )
 
     monkeypatch.setattr(liquidus_module.time, 'monotonic', fake_monotonic)
 
