@@ -82,6 +82,20 @@ from simulator.feedstock_composition import (
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
+class _PySulfSatCallError(RuntimeError):
+    """An exception raised while invoking a PySulfSat operation."""
+
+
+def _call_pysulfsat(module: Any, operation: str, **kwargs: Any) -> Any:
+    """Wrap only package lookup and invocation, leaving result parsing loud."""
+    try:
+        return getattr(module, operation)(**kwargs)
+    except Exception as exc:  # The call is an optional third-party boundary.
+        raise _PySulfSatCallError(
+            f'PySulfSat.{operation} failed ({type(exc).__name__}: {exc})'
+        ) from exc
+
+
 # Cleaned-melt oxide -> PySulfSat ``*_Liq`` column name mapping. Every
 # SCSS / SCAS function in PySulfSat consumes a pandas DataFrame keyed by
 # these column names; missing columns are filled with zero by the
@@ -232,7 +246,7 @@ class SulfSatGate:
         """
         try:
             self._module = importlib.import_module('PySulfSat')
-        except Exception as exc:  # noqa: BLE001 — lazy probe path
+        except ImportError as exc:
             self._available = False
             self._module = None
             self._init_error = f'PySulfSat import failed: {exc!r}'
@@ -405,7 +419,7 @@ class SulfSatGate:
                 fO2_log=fO2_log_f,
                 operator_fe3fet=operator_fe3fet,
             )
-        except Exception as exc:  # noqa: BLE001 — upstream library boundary
+        except _PySulfSatCallError as exc:
             return SulfurSaturationResult(
                 warnings=warnings_list
                 + [f'PySulfSat call failed: {exc!r}'],
@@ -506,11 +520,10 @@ class SulfSatGate:
         * otherwise -> simulator.fe_redox's shared Kress-Carmichael 1991
           split on ``fO2_log``.
 
-        If the derivation raises or returns a non-finite value the
-        result is tagged ``out_of_range`` with an explicit warning and
-        Fe3Fet_Liq=0 is passed to SCSS purely to keep the call alive —
-        the caller honours the status and falls back to the builtin
-        path.
+        A non-finite derived ratio is tagged ``out_of_range`` with an
+        explicit warning. Errors from the simulator's shared redox
+        helper propagate; only PySulfSat operations are translated to
+        unavailable results.
         """
         df = self._build_dataframe(liquid_comp_wt)
         P_kbar = max(P_bar, 1e-9) / 1000.0
@@ -534,7 +547,9 @@ class SulfSatGate:
             # MORB-like sulfide default used in PySulfSat's tutorial.
             # Fe3Fet_Liq is either operator-set or Kress-Carmichael-
             # derived (see _resolve_fe3fet) — never a silent default.
-            scss_df = ss.calculate_S2017_SCSS(
+            scss_df = _call_pysulfsat(
+                ss,
+                'calculate_S2017_SCSS',
                 df=df,
                 T_K=T_K,
                 P_kbar=P_kbar,
@@ -543,12 +558,12 @@ class SulfSatGate:
             )
             scss_ppm = float(scss_df['SCSS2_ppm_ideal_Smythe2017'].iloc[0])
 
-            scas_df = ss.calculate_CD2019_SCAS(df=df, T_K=T_K)
+            scas_df = _call_pysulfsat(ss, 'calculate_CD2019_SCAS', df=df, T_K=T_K)
             scas_ppm = float(scas_df['SCAS6_ppm'].iloc[0])
 
-            s6_fraction = float(
-                ss.calculate_S6St_Jugo2010_eq10(deltaQFM=delta_qfm)
-            )
+            s6_fraction = float(_call_pysulfsat(
+                ss, 'calculate_S6St_Jugo2010_eq10', deltaQFM=delta_qfm
+            ))
 
         numerical_warnings: List[str] = []
         scss_ppm, note = self._finite_capacity_ppm(
@@ -618,25 +633,14 @@ class SulfSatGate:
             # there is genuinely nothing to derive a ratio FROM.
             return 0.0, [], True
 
-        try:
-            mol_fractions = melt_mol_fractions_for_kress91(liquid_comp_wt)
-            split = kress91_split(
-                fO2_log=float(fO2_log),
-                mol_fractions=mol_fractions,
-                T_K=float(T_K),
-                pressure_bar=max(float(P_kbar) * 1000.0, 1.0e-9),
-            )
-            ratio = float(split['fe3'])
-        except Exception as exc:  # noqa: BLE001 — upstream library boundary
-            return (
-                0.0,
-                [
-                    'Kress-Carmichael 1991 Fe3+/SumFe fit failed '
-                    f'(T_K={T_K}, fO2_log={fO2_log}): {exc!r}; '
-                    'no operator Fe3Fet_Liq supplied -> calibration tagged out_of_range'
-                ],
-                False,
-            )
+        mol_fractions = melt_mol_fractions_for_kress91(liquid_comp_wt)
+        split = kress91_split(
+            fO2_log=float(fO2_log),
+            mol_fractions=mol_fractions,
+            T_K=float(T_K),
+            pressure_bar=max(float(P_kbar) * 1000.0, 1.0e-9),
+        )
+        ratio = float(split['fe3'])
 
         if not (ratio == ratio) or ratio < 0.0 or ratio > 1.0:
             # NaN / out-of-range -> the fit produced no usable answer.
