@@ -646,7 +646,9 @@ def test_bridge_envelope_matches_green_edge_decisions() -> None:
 
 def test_species_coverage_edge_flag_contract_and_typed_notice() -> None:
     _openimcc_or_skip()
-    from simulator.melt_backend.openimcc_bridge import imcc_complex_saturation_notice
+    from simulator.melt_backend.openimcc_bridge import (
+        imcc_complex_saturation_notices,
+    )
 
     for alkali in ("Na2O", "K2O"):
         for fraction in (0.50, 0.55):
@@ -655,13 +657,23 @@ def test_species_coverage_edge_flag_contract_and_typed_notice() -> None:
                 temperature_K=1800.0,
                 allow_out_of_envelope=True,
             )
-            notice = imcc_complex_saturation_notice(
-                result.flags, result.acid_sink_ratio
+            notices = imcc_complex_saturation_notices(
+                result.flags,
+                result.acid_sink_ratio,
+                result.parent_oxide_x_star_ratios,
             )
-            assert notice is not None
-            assert notice["kind"] == "imcc_complex_saturation"
-            assert notice["flag"].startswith("species-coverage-edge")
-            assert notice["acid_sink_ratio"] == result.acid_sink_ratio
+            assert len(notices) == 1
+            notice = notices[0]
+            edge_flag = next(
+                flag for flag in result.flags
+                if flag.startswith("species-coverage-edge")
+            )
+            assert notice == {
+                "kind": "imcc_complex_saturation",
+                "flag": edge_flag,
+                "reason": edge_flag,
+                "acid_sink_ratio": result.acid_sink_ratio,
+            }
 
     pinned = bridge_evaluate(
         composition_mol={"K2O": 0.55, "SiO2": 0.45},
@@ -686,9 +698,83 @@ def test_species_coverage_edge_flag_contract_and_typed_notice() -> None:
             temperature_K=temperature_K,
             allow_extrapolation=True,
         )
-        assert imcc_complex_saturation_notice(
-            result.flags, result.acid_sink_ratio
-        ) is None
+        assert imcc_complex_saturation_notices(
+            result.flags,
+            result.acid_sink_ratio,
+            result.parent_oxide_x_star_ratios,
+        ) == ()
+
+
+def test_non_silica_notice_omits_ratio_when_result_has_no_parent_arrays() -> None:
+    from simulator.melt_backend.openimcc_bridge import (
+        imcc_complex_saturation_notices,
+    )
+
+    flag = (
+        "species-coverage-edge: free x*(Al2O3) is below 0.1 of nominal "
+        "x(Al2O3); the Ca–Al complex ladder has exhausted its acidic sink"
+    )
+    assert imcc_complex_saturation_notices((flag,), None, {}) == (
+        {
+            "kind": "imcc_complex_saturation",
+            "flag": flag,
+            "reason": flag,
+            "sink_name": "Al2O3",
+        },
+    )
+
+
+@pytest.mark.parametrize(
+    "composition_mol, expected_sinks",
+    [
+        ({"CaO": 0.9, "Al2O3": 0.1}, ("Al2O3",)),
+        (
+            {"Na2O": 0.2, "CaO": 0.4, "Al2O3": 0.2, "TiO2": 0.2},
+            ("Al2O3", "TiO2"),
+        ),
+    ],
+)
+def test_each_exhausted_non_silica_sink_gets_its_own_notice(
+    composition_mol, expected_sinks
+) -> None:
+    _openimcc_or_skip()
+    from simulator.melt_backend.openimcc_bridge import (
+        imcc_complex_saturation_notices,
+    )
+
+    result = bridge_evaluate(
+        composition_mol=composition_mol,
+        temperature_K=1800.0,
+        allow_extrapolation=True,
+        allow_out_of_envelope=True,
+    )
+    edge_flags = tuple(
+        flag for flag in result.flags
+        if flag.startswith("species-coverage-edge")
+    )
+    actual_sinks = tuple(
+        sink for sink in expected_sinks
+        if any(f"x*({sink})" in flag for flag in edge_flags)
+    )
+    if actual_sinks != expected_sinks:
+        pytest.skip(
+            "installed openimcc does not emit the requested multi-sink coverage-edge flags"
+        )
+
+    notices = imcc_complex_saturation_notices(
+        result.flags,
+        result.acid_sink_ratio,
+        result.parent_oxide_x_star_ratios,
+    )
+    assert len(notices) == len(expected_sinks)
+    assert tuple(
+        next(sink for sink in expected_sinks if f"x*({sink})" in row["flag"])
+        for row in notices
+    ) == expected_sinks
+    for sink, notice in zip(expected_sinks, notices, strict=True):
+        assert notice["sink_name"] == sink
+        assert notice["sink_ratio"] == result.parent_oxide_x_star_ratios[sink]
+        assert "acid_sink_ratio" not in notice
 
 
 def test_bridge_extrapolation_and_envelope_flags_are_explicit() -> None:
