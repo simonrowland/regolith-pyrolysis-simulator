@@ -1784,49 +1784,139 @@ def test_unknown_method_on_vapour_is_typed_method_unknown() -> None:
     assert residual.refusal.reason is not RefusalReason.UNDERDETERMINED_APPARATUS
 
 
-def test_static_equilibrium_pressure_requires_a_stated_vapour_species(monkeypatch) -> None:
-    class ReachedEngineOpen(Exception):
-        pass
-
-    from simulator.diagnostic_helpers import binary_pot_battery
-
-    monkeypatch.setattr(
-        binary_pot_battery,
-        "open_battery_engine",
-        lambda _engine: (_ for _ in ()).throw(ReachedEngineOpen()),
-    )
+@pytest.mark.parametrize(
+    ("temperature", "expected_pressure", "extrapolated"),
+    [
+        (Decimal("1056"), Decimal("33991.26"), False),
+        (Decimal("1200"), Decimal("117402.2"), True),
+    ],
+)
+def test_static_equilibrium_pressure_uses_pure_sodium_total_surface(
+    temperature: Decimal, expected_pressure: Decimal, extrapolated: bool
+) -> None:
     experiment = F.tabulation_experiment(
-        method=MethodToken.STATIC_EQUILIBRIUM, T_K=Decimal("1200")
+        method=MethodToken.STATIC_EQUILIBRIUM, T_K=temperature
     )
-    unspecified_identity = replace(
-        F.psat_identity("Na", T_K=Decimal("1200")),
-        species=Species("Na", State.unknown("source does not state vapour species")),
+    identity = replace(
+        F.psat_identity("Na", T_K=temperature),
+        species=Species("Na", Phase.L),
     )
-    unspecified = F.observation(
-        "static-unspecified-vapour",
+    reference = F.observation(
+        "static-pure-sodium",
         experiment.experiment_id,
-        unspecified_identity,
-        Decimal("10"),
+        identity,
+        expected_pressure,
+        source_id="static-source",
+    )
+
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL, reference, experiment=experiment
+    )
+
+    assert prediction.value is not None
+    assert abs(float(prediction.value) - float(expected_pressure)) <= (
+        float(expected_pressure) * 1e-6
+    )
+    assert prediction.unit == "Pa"
+    assert prediction.identity is identity
+    assert prediction.identity.species.phase.value is Phase.L
+    assert prediction.authority is (
+        Authority.EXTRAPOLATED if extrapolated else Authority.CERTIFIED
+    )
+    assert any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        for notice in prediction.notices
+    ) is extrapolated
+
+
+def test_static_equilibrium_pressure_refuses_missing_reservoir_or_engine_total(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+
+    experiment = F.tabulation_experiment(
+        method=MethodToken.STATIC_EQUILIBRIUM, T_K=Decimal("1056")
+    )
+    missing_reservoir = F.observation(
+        "static-missing-reservoir",
+        experiment.experiment_id,
+        replace(
+            F.psat_identity("Na", T_K=Decimal("1056")),
+            species=Species("Na", State.unknown("source does not state phase")),
+            reservoir=State.unknown("source does not state condensed reservoir"),
+        ),
+        Decimal("33991.26"),
         source_id="static-source",
     )
     refusal = predict_with_engine(
-        Engine.THERMOENGINE, unspecified, experiment=experiment
+        Engine.THERMOENGINE, missing_reservoir, experiment=experiment
     )
     assert refusal.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
-    assert refusal.refusal_detail["reason"] == "static_equilibrium_pressure_species_not_stated"
-
-    explicitly_speciated = F.observation(
-        "static-specified-vapour",
-        experiment.experiment_id,
-        F.psat_identity("Na", T_K=Decimal("1200")),
-        Decimal("10"),
-        source_id="static-source",
+    assert (
+        refusal.refusal_detail["reason"]
+        == "static_equilibrium_pure_reservoir_not_stated"
     )
 
-    with pytest.raises(ReachedEngineOpen):
-        predict_with_engine(
-            Engine.THERMOENGINE, explicitly_speciated, experiment=experiment
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        EngineHandle,
+        EquilibrateCell,
+    )
+
+    reference = F.observation(
+        "static-engine-without-total",
+        experiment.experiment_id,
+        replace(
+            F.psat_identity("Na", T_K=Decimal("1056")),
+            species=Species("Na", Phase.L),
+        ),
+        Decimal("33991.26"),
+        source_id="static-source",
+    )
+    reported_pressures: dict[str, float] = {}
+    handle = EngineHandle(
+        name=Engine.THERMOENGINE.value,
+        backend=object(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=False,
+        supports_intrinsic_fo2=True,
+    )
+    monkeypatch.setattr(battery, "open_battery_engine", lambda _name: handle)
+
+    def fake_gas_pressures(_handle, pot, *, temperature_K, po2, **_kwargs):
+        return EquilibrateCell(
+            pot_id=pot.pot_id,
+            engine=Engine.THERMOENGINE.value,
+            temperature_K=temperature_K,
+            po2=po2,
+            status="ok",
+            refusal_reason=None,
+            engine_status="ok",
+            engine_reason=None,
+            melt_activities={},
+            gas_partial_pressures_Pa=dict(reported_pressures),
+            liquid_fraction=1.0,
+            wall_s=0.0,
+            cpu_s=0.0,
+            hostname="test",
         )
+
+    monkeypatch.setattr(battery, "equilibrate_cell", fake_gas_pressures)
+    no_total = predict_with_engine(
+        Engine.THERMOENGINE, reference, experiment=experiment
+    )
+    assert no_total.refusal_reason is RefusalReason.UNSUPPORTED
+    assert (
+        no_total.refusal_detail["reason"]
+        == "static_equilibrium_total_pressure_not_reported"
+    )
+
+    reported_pressures.update({"Na": 20000.0, "Na2": 13991.26166001457})
+    total = predict_with_engine(
+        Engine.THERMOENGINE, reference, experiment=experiment
+    )
+    assert total.value is not None
+    assert abs(float(total.value) - 33991.26) <= 33991.26e-6
 
 
 def test_static_equilibrium_method_is_scoped_to_the_vapour_rail() -> None:

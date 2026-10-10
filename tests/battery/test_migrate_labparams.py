@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import MethodToken
+from simulator.battery.enums import Engine, MethodToken, NoticeKind, Phase
 from simulator.battery.migrate import (
     REPO_ROOT,
     Migrator,
@@ -24,6 +24,7 @@ from simulator.battery.migrate import (
     wt_pct_to_mole_fraction,
 )
 from simulator.battery.records import Located, State, Value, ValueKind, as_decimal
+from simulator.battery.score import ScoreContext, compile_residual, predict_with_engine
 from tests.battery.test_migrate import FIXTURE_EXTRACT, _write_min_tree
 
 
@@ -87,7 +88,53 @@ def test_ntrs_static_capsule_rows_migrate_with_source_validity_flags() -> None:
         is MethodToken.STATIC_EQUILIBRIUM
         for row in rows
     )
-    assert all(not row.identity.species.phase.is_value for row in rows)
+    assert all(row.identity.species.phase.value is Phase.L for row in rows)
+    assert all(
+        row.identity.reservoir.is_value
+        and row.identity.reservoir.value.formula == "Na"
+        and row.identity.reservoir.value.phase.value is Phase.L
+        for row in rows
+    )
+    assert all(
+        any(
+            notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+            and "temperature_uniformity: status=intentional_gradient" in notice.reason
+            for notice in row.notices
+        )
+        for row in rows
+    )
+    assert all(
+        any(
+            "outgassing: status=not_reported" in notice.reason
+            for notice in row.notices
+        )
+        and any(
+            "capsule_reaction: status=not_reported" in notice.reason
+            for notice in row.notices
+        )
+        for row in rows
+    )
+
+    reference = rows[0]
+    experiment = migrator.result.experiments[reference.experiment_id]
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL, reference, experiment=experiment
+    )
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=ScoreContext(
+            works={},
+            experiments={experiment.experiment_id: experiment},
+            observations={reference.observation_id: reference},
+        ),
+        prediction=prediction,
+    )
+    assert any(
+        notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+        and "temperature_uniformity: status=intentional_gradient" in notice.reason
+        for notice in residual.notices
+    )
 
 
 # Printed 「3. 起電力測定」 under 「II. 実験方法」. The heading is on published
