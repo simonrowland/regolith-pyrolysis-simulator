@@ -9,6 +9,7 @@ from __future__ import annotations
 import copy
 import json
 import math
+import subprocess
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
@@ -1356,7 +1357,7 @@ def _resolve_web_autodetect(
     probe_error: Exception | None = None
     try:
         backend = _try_alphamelts(alphamelts_backend_cls, backend_config)
-    except Exception as exc:  # noqa: BLE001 - auto treats probe failure as unavailable
+    except (OSError, subprocess.TimeoutExpired) as exc:
         if not forced_subprocess_probe:
             raise
         backend = None
