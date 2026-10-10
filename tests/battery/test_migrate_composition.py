@@ -17,6 +17,7 @@ from simulator.battery.migrate import (
     Migrator,
     REPO_ROOT,
     _catalogue_composition_located_from_values,
+    _composition_located_from_values,
     _declared_wt_composition_point_map,
     _initial_oxide_map_from_values,
     _oxide_map_from_mapping,
@@ -388,9 +389,168 @@ def test_noncomposition_values_in_britt_plante_and_van_limpt_are_ignored() -> No
             if observation.get("observation_id") == observation_id
         )
         refusal: list[str] = []
+        if observation_id == "plante1979_table2_s1123_r030_quoted":
+            assert _initial_oxide_map_from_values(
+                values,
+                refusal_reason=refusal,
+                declared_map=migrate_module._declared_wt_composition_point_map(
+                    values, None
+                ),
+            ) == {"K2O": Decimal("21.14"), "SiO2": Decimal("78.86")}
+            located = _composition_located_from_values(values, None)
+            assert located is not None and located.state.is_value
+            assert located.inference is not None
+            assert located.inference.relation == (
+                "SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction"
+            )
+        else:
+            assert _initial_oxide_map_from_values(
+                values, refusal_reason=refusal
+            ) is None
+            assert refusal == [], observation_id
 
-        assert _initial_oxide_map_from_values(values, refusal_reason=refusal) is None
-        assert refusal == [], observation_id
+
+@pytest.mark.parametrize("include_parent_map", [False, True])
+def test_markova_point_unsupported_map_refuses_without_parent_fallback(
+    include_parent_map: bool,
+) -> None:
+    from simulator.battery.waypoints import normalized_composition
+    from tests.battery.test_waypoints import _bench
+
+    path = REPO_ROOT / "data/literature/extracts/kems-025-markova-1983.yaml"
+    doc = migrate_module.load_yaml(path)
+    raw = next(
+        observation
+        for body in doc["species"].values()
+        for observation in body.get("observations", [])
+        if any(
+            "composition_wt_pct" in point
+            for point in observation.get("values", {}).get("points", [])
+        )
+    )
+    point = next(
+        point
+        for point in raw["values"]["points"]
+        if "composition_wt_pct" in point
+    )
+    if include_parent_map:
+        raw["values"]["composition_wt_pct"] = dict(
+            point["composition_wt_pct"]
+        )
+    else:
+        raw["values"].pop("composition_wt_pct", None)
+    point["composition_wt_pct"] = dict(
+        point["composition_wt_pct"], XxO=10
+    )
+    prefix = f"{doc['source_id']}::{raw['observation_id']}"
+    target_t = migrate_module.as_decimal(point["T_C"]) + Decimal("273.15")
+    migrator = Migrator(REPO_ROOT)
+    original_load_yaml = migrate_module.load_yaml
+    with pytest.MonkeyPatch.context() as monkeypatch:
+        monkeypatch.setattr(
+            migrate_module,
+            "load_yaml",
+            lambda candidate: doc if candidate == path else original_load_yaml(candidate),
+        )
+        migrator._migrate_extract(path)
+
+    row = next(
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.observation_id.startswith(prefix)
+        and observation.identity.temperature_K.value == target_t
+    )
+    composition = row.identity.composition
+    assert composition is not None and composition.is_unknown
+    assert "XxO" in composition.reason
+    printed = row.point_conditions["printed_composition"]
+    assert printed.state.is_value and printed.state.value["XxO"] == Decimal("10")
+    condition = row.point_conditions["composition"]
+    assert condition.state.is_unknown and "XxO" in condition.state.reason
+    waypoint = normalized_composition(
+        migrator.result.experiments[row.experiment_id], _bench(), row
+    )
+    assert waypoint.selected is None
+    assert waypoint.absence is not None
+
+
+def test_markova_point_refusal_mutation_proof(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Dropping the child refusal restores the parent's accepted composition."""
+    from simulator.battery.waypoints import normalized_composition
+    from tests.battery.test_waypoints import _bench
+
+    path = REPO_ROOT / "data/literature/extracts/kems-025-markova-1983.yaml"
+    doc = migrate_module.load_yaml(path)
+    raw = next(
+        observation
+        for body in doc["species"].values()
+        for observation in body.get("observations", [])
+        if any(
+            "composition_wt_pct" in point
+            for point in observation.get("values", {}).get("points", [])
+        )
+    )
+    point = next(
+        point
+        for point in raw["values"]["points"]
+        if "composition_wt_pct" in point
+    )
+    raw["values"]["composition_wt_pct"] = dict(point["composition_wt_pct"])
+    point["composition_wt_pct"] = dict(point["composition_wt_pct"], XxO=10)
+    original_parse = migrate_module._oxide_map_from_mapping
+
+    def discard_refusal(obj, *, refusal_reason=None, declared_map=False):
+        return original_parse(obj, declared_map=declared_map)
+
+    monkeypatch.setattr(migrate_module, "_oxide_map_from_mapping", discard_refusal)
+    original_load_yaml = migrate_module.load_yaml
+    monkeypatch.setattr(
+        migrate_module,
+        "load_yaml",
+        lambda candidate: doc if candidate == path else original_load_yaml(candidate),
+    )
+    target_t = migrate_module.as_decimal(point["T_C"]) + Decimal("273.15")
+    migrator = Migrator(REPO_ROOT)
+    migrator._migrate_extract(path)
+    prefix = f"{doc['source_id']}::{raw['observation_id']}"
+    row = next(
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.observation_id.startswith(prefix)
+        and observation.identity.temperature_K.value == target_t
+    )
+    assert row.identity.composition.is_value
+    assert row.identity.composition.value == wt_pct_to_mole_fraction(
+        raw["values"]["composition_wt_pct"]
+    )
+    assert normalized_composition(
+        migrator.result.experiments[row.experiment_id], _bench(), row
+    ).selected is not None
+
+
+def test_plante_declared_map_mutation_proof(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Dropping declaration at the composition owner erases Plante lineage."""
+    doc = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts/kems-042-plante-1979.yaml").read_text()
+    )
+    values = next(
+        observation["values"]
+        for species in doc["species"].values()
+        for observation in species["observations"]
+        if observation["observation_id"]
+        == "plante1979_table2_s1123_r030_quoted"
+    )
+    original_reader = migrate_module._initial_oxide_map_from_values
+
+    def drop_declaration(values, *, refusal_reason=None, declared_map=False):
+        return original_reader(
+            values, refusal_reason=refusal_reason, declared_map=False
+        )
+
+    monkeypatch.setattr(
+        migrate_module, "_initial_oxide_map_from_values", drop_declaration
+    )
+    assert _composition_located_from_values(values, None) is None
 
 
 def test_wt_composition_declaration_requires_a_component_map() -> None:

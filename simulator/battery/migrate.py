@@ -3515,7 +3515,10 @@ def _composition_located_from_values(
     """Retain provenance for declared complements and FeOT basis conversions."""
 
     source_note = values.get("composition_derivation") if isinstance(values, Mapping) else None
-    wt = _initial_oxide_map_from_values(values)
+    wt = _initial_oxide_map_from_values(
+        values,
+        declared_map=_declared_wt_composition_point_map(values, None),
+    )
     if not wt:
         return None
     has_feot = any(str(oxide).strip() == "FeOT" for oxide in wt)
@@ -13797,6 +13800,7 @@ class Migrator:
         value_sel: SourceSelection | None = None
         point_oxide_map: dict[str, Decimal] | None = None
         point_map_declared = False
+        point_composition_refusal: list[str] = []
         point_composition_located: Located[Composition] | None = None
         point_catalogue: Located[Composition] | None = None
         malformed_composition_amount: str | None = None
@@ -13811,11 +13815,26 @@ class Migrator:
             point_map_declared = _declared_wt_composition_point_map(
                 parent_values, units
             )
+            point_map_explicit = _declared_wt_composition_point_map(
+                raw_item, units
+            ) or (
+                point_map_declared
+                and sum(
+                    key in _COMPOSITION_COMPONENTS
+                    and _as_dec_or_none(value) is not None
+                    for key, value in raw_item.items()
+                )
+                >= 2
+            )
             point_oxide_map = (
                 None
                 if q_for_species is Quantity.RESIDUE_COMPONENT_COMPOSITION
                 else _oxide_map_from_mapping(
-                    raw_item, declared_map=point_map_declared
+                    raw_item,
+                    refusal_reason=(
+                        point_composition_refusal if point_map_explicit else None
+                    ),
+                    declared_map=point_map_declared,
                 )
             )
             if q_for_species in _BULK_PROPERTY_QUANTITIES:
@@ -14023,7 +14042,11 @@ class Migrator:
                     "melt_reference_pairing",
                 }
             } or None
-        if q_token_point is Quantity.P_PARTIAL and point_oxide_map:
+        if point_composition_refusal:
+            ident_kwargs["composition"] = State.unknown(
+                composition_unknown_reason(point_composition_refusal)
+            )
+        elif q_token_point is Quantity.P_PARTIAL and point_oxide_map:
             ident_kwargs["composition"] = State.of(
                 wt_pct_to_mole_fraction(point_oxide_map)
             )
@@ -14571,6 +14594,40 @@ class Migrator:
             point_conditions = {
                 **parent_point_conditions,
                 **(point_conditions or {}),
+            }
+        if point_composition_refusal:
+            child_printed_map = next(
+                (
+                    raw_item[key]
+                    for key in _PRINTED_COMPOSITION_MAP_KEYS
+                    if isinstance(raw_item, Mapping)
+                    and isinstance(raw_item.get(key), Mapping)
+                ),
+                None,
+            )
+            if isinstance(child_printed_map, Mapping):
+                point_conditions = {
+                    **(point_conditions or {}),
+                    "printed_composition": located_value(
+                        {
+                            str(key): (
+                                as_decimal(amount)
+                                if _as_dec_or_none(amount) is not None
+                                else amount
+                            )
+                            for key, amount in child_printed_map.items()
+                        },
+                        point_locator,
+                    ),
+                }
+            point_conditions = {
+                **(point_conditions or {}),
+                "composition": Located(
+                    State.unknown(
+                        composition_unknown_reason(point_composition_refusal)
+                    ),
+                    locator=point_locator,
+                ),
             }
         if printed_phase_kind is not None and (
             identity.composition is None or not identity.composition.is_value
