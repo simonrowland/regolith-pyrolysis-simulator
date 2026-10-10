@@ -1537,6 +1537,8 @@ def _cell_from_observation(
     decision_band=None,
     derive_eligible: bool = True,
 ) -> _TierCell:
+    from simulator.battery.score import _decision_band_kind
+
     quantity = "unknown"
     rail = "none"
     if isinstance(observation.identity, Identity):
@@ -1562,12 +1564,7 @@ def _cell_from_observation(
         quantity=quantity,
         uncertainty=uncertainty_text(observation.uncertainty),
         band_value=None if decision_band is None else decision_band.value,
-        band_kind=(
-            "no_band" if decision_band is None
-            else "printed" if decision_band.rule == "source-printed per-cell uncertainty"
-            else "derived_2xMAD" if "residual distribution" in decision_band.rule
-            else "legacy_fallback"
-        ),
+        band_kind=_decision_band_kind(decision_band),
         band_derived_n=(
             int(decision_band.rule.rsplit("derived_n=", 1)[1])
             if decision_band is not None and "derived_n=" in decision_band.rule
@@ -1617,6 +1614,8 @@ def _tier_cell_from_payload_fields(
     derive_eligible: bool,
     numeric_value: Decimal | None = None,
 ) -> _TierCell:
+    from simulator.battery.score import _decision_band_kind
+
     request = row.get("candidate_request")
     engine = (
         str(request["engine"])
@@ -1661,12 +1660,7 @@ def _tier_cell_from_payload_fields(
         quantity=quantity,
         uncertainty=uncertainty,
         band_value=band_value,
-        band_kind=(
-            "no_band" if band is None
-            else "printed" if band_rule == "source-printed per-cell uncertainty"
-            else "derived_2xMAD" if "residual distribution" in band_rule
-            else "legacy_fallback"
-        ),
+        band_kind=_decision_band_kind(band),
         band_derived_n=(
             int(band_rule.rsplit("derived_n=", 1)[1])
             if "derived_n=" in band_rule

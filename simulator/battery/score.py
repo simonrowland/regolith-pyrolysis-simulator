@@ -2184,6 +2184,25 @@ def _derive_kems_partial_pressure_band(
     return DecisionBand(width, "dimensionless", rule)
 
 
+def _decision_band_kind(
+    band: DecisionBand | Mapping[str, object] | str | None,
+) -> str:
+    """Translate the band's rule token into the scorer's report kind."""
+    if band is None:
+        return "no_band"
+    if isinstance(band, DecisionBand):
+        rule = band.rule
+    elif isinstance(band, Mapping):
+        rule = str(band.get("rule") or "")
+    else:
+        rule = band or ""
+    if rule == "source-printed per-cell uncertainty":
+        return "printed"
+    if "residual distribution" in rule:
+        return "derived_2xMAD"
+    return "legacy_fallback"
+
+
 def decision_band_for(
     quantity: Quantity | None,
     source_relation: SourceRelation,
@@ -6272,12 +6291,7 @@ def _compilation_decision_strata(
         center = _median(values)
         mad = None if center is None else _median([abs(value - center) for value in values])
         bands = [r.numeric.decision_band for r in bucket if r.numeric is not None and r.numeric.decision_band is not None]
-        kinds = sorted({
-            "printed" if band.rule == "source-printed per-cell uncertainty"
-            else "derived_2xMAD" if "residual distribution" in band.rule
-            else "legacy_fallback"
-            for band in bands
-        }) or ["no_band"]
+        kinds = sorted({_decision_band_kind(band) for band in bands}) or ["no_band"]
         widths = sorted({str(band.value) for band in bands})
         units = sorted({band.unit for band in bands})
         band_n = sorted({
@@ -6290,7 +6304,7 @@ def _compilation_decision_strata(
             r for r in bucket
             if r.numeric is not None
             and r.numeric.decision_band is not None
-            and "residual distribution" in r.numeric.decision_band.rule
+            and _decision_band_kind(r.numeric.decision_band) == "derived_2xMAD"
         ]
         tail_in = sum(1 for r in derived_rows if r.status is ResidualStatus.MATCH) if "derived_2xMAD" in kinds else None
         tail_out = sum(1 for r in derived_rows if r.status is ResidualStatus.MISMATCH) if "derived_2xMAD" in kinds else None
@@ -7689,10 +7703,7 @@ def _family_pool_key(
         numeric is None
         or residual.status is ResidualStatus.REFUSED
         or family_quantity is None
-        or (
-            numeric.decision_band is not None
-            and numeric.decision_band.rule == "source-printed per-cell uncertainty"
-        )
+        or _decision_band_kind(numeric.decision_band) == "printed"
         or _has_flagged_decision_notice(residual)
     ):
         return None
@@ -7716,10 +7727,7 @@ def _family_band_update(
         numeric is None
         or status is ResidualStatus.REFUSED
         or family_quantity is None
-        or (
-            numeric.decision_band is not None
-            and numeric.decision_band.rule == "source-printed per-cell uncertainty"
-        )
+        or _decision_band_kind(numeric.decision_band) == "printed"
         or flagged
     ):
         return False, None, False
@@ -7905,7 +7913,7 @@ class _ResidualJsonlStream:
                             family is not None
                             and quantity is not None
                             and status != ResidualStatus.REFUSED.value
-                            and band_rule != "source-printed per-cell uncertainty"
+                            and _decision_band_kind(band_rule) != "printed"
                             and not flagged
                             and has_numeric
                         )
@@ -8244,16 +8252,13 @@ def headline_payload_records(
                 group["no_band_count"] = int(group["no_band_count"]) + 1
             if band is None:
                 continue
-            if band.rule == "source-printed per-cell uncertainty":
-                group["kinds"].add("printed")  # type: ignore[union-attr]
-            elif "residual distribution" in band.rule:
-                group["kinds"].add("derived_2xMAD")  # type: ignore[union-attr]
+            band_kind = _decision_band_kind(band)
+            group["kinds"].add(band_kind)  # type: ignore[union-attr]
+            if band_kind == "derived_2xMAD":
                 if status == ResidualStatus.MATCH.value:
                     group["tail_in_count"] = int(group["tail_in_count"]) + 1
                 elif status == ResidualStatus.MISMATCH.value:
                     group["tail_out_count"] = int(group["tail_out_count"]) + 1
-            else:
-                group["kinds"].add("legacy_fallback")  # type: ignore[union-attr]
             group["widths"].add(str(band_data["value"]))  # type: ignore[union-attr]
             group["units"].add(band.unit)  # type: ignore[union-attr]
             if "derived_n=" in band.rule:
@@ -8531,17 +8536,14 @@ class _ScorePayloadAccumulator:
             group["no_band_count"] = int(group["no_band_count"]) + 1
         if not isinstance(band_data, Mapping):
             return
-        band_rule = str(band_data["rule"])
-        if band_rule == "source-printed per-cell uncertainty":
-            group["kinds"].add("printed")
-        elif "residual distribution" in band_rule:
-            group["kinds"].add("derived_2xMAD")
+        band_kind = _decision_band_kind(band_data)
+        band_rule = str(band_data.get("rule") or "")
+        group["kinds"].add(band_kind)
+        if band_kind == "derived_2xMAD":
             if status == ResidualStatus.MATCH.value:
                 group["tail_in_count"] = int(group["tail_in_count"]) + 1
             elif status == ResidualStatus.MISMATCH.value:
                 group["tail_out_count"] = int(group["tail_out_count"]) + 1
-        else:
-            group["kinds"].add("legacy_fallback")
         group["widths"].add(str(band_data["value"]))
         group["units"].add(str(band_data["unit"]))
         if "derived_n=" in band_rule:
