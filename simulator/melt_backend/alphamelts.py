@@ -734,13 +734,25 @@ def _bootstrap_petthermotools_worker(model_code: int):
     call.
     """
     try:
-        module = importlib.import_module('petthermotools')
-    except ImportError:
-        module = importlib.import_module('PetThermoTools')
-    loader = getattr(module, 'MELTSdynamic', None)
+        module = _petthermotools_external_call(
+            lambda: importlib.import_module('petthermotools')
+        )
+    except _PetThermoToolsExternalCallFailure as exc:
+        if not isinstance(exc.__cause__, ImportError):
+            raise
+        module = _petthermotools_external_call(
+            lambda: importlib.import_module('PetThermoTools')
+        )
+    loader = _petthermotools_external_call(
+        lambda: getattr(module, 'MELTSdynamic', None)
+    )
     if loader is None:
-        meltsdynamic = importlib.import_module('meltsdynamic')
-        loader = getattr(meltsdynamic, 'MELTSdynamic', None)
+        meltsdynamic = _petthermotools_external_call(
+            lambda: importlib.import_module('meltsdynamic')
+        )
+        loader = _petthermotools_external_call(
+            lambda: getattr(meltsdynamic, 'MELTSdynamic', None)
+        )
     if loader is None:
         raise ImportError('MELTSdynamic loader not found')
     resource = {
@@ -748,7 +760,9 @@ def _bootstrap_petthermotools_worker(model_code: int):
         'loader': loader,
         'model_code': int(model_code),
     }
-    version = getattr(module, '__version__', None)
+    version = _petthermotools_external_call(
+        lambda: getattr(module, '__version__', None)
+    )
     return resource, str(version or 'available')
 
 
@@ -768,11 +782,14 @@ def _handle_petthermotools_request(resource, request, _errlog):
         # operation. This module has no reused-versus-fresh A/B of
         # PetThermoTools output, so reconstruction is the implemented
         # isolation, not a measured counterfactual.
+        loader = resource['loader']
+        model_code = resource['model_code']
         call_kwargs['melts'] = _petthermotools_external_call(
-            lambda: resource['loader'](resource['model_code'])
+            lambda: loader(model_code)
         )
+    module = resource['module']
     function = _petthermotools_external_call(
-        lambda: getattr(resource['module'], operation)
+        lambda: getattr(module, operation)
     )
     args = tuple(request.get('args') or ())
     return _petthermotools_external_call(
@@ -796,6 +813,19 @@ def _petthermotools_external_call(call):
         raise _PetThermoToolsExternalCallFailure(
             type(exc).__name__, str(exc)
         ) from exc
+
+
+def _decode_petthermotools_remote_failure(
+    exception_name: str,
+    detail: str,
+) -> _PetThermoToolsExternalCallFailure | None:
+    if exception_name != _PetThermoToolsExternalCallFailure.__name__:
+        return None
+    exception_class, _, message = detail.partition(': ')
+    return _PetThermoToolsExternalCallFailure(
+        exception_class or 'Exception',
+        message or detail,
+    )
 
 
 PETTHERMOTOOLS_NON_PHASE_KEYS = {
@@ -2711,12 +2741,12 @@ class _MELTSBackendSupport(MeltBackend):
                     f'PetThermoTools {operation} failed: {exc.detail}\n'
                     f'{exc.remote_traceback}'
                 ) from exc
-            if exc.exc_name == _PetThermoToolsExternalCallFailure.__name__:
-                exception_class, _, message = exc.detail.partition(': ')
-                raise _PetThermoToolsExternalCallFailure(
-                    exception_class or 'Exception',
-                    message or exc.detail,
-                ) from exc
+            external_failure = _decode_petthermotools_remote_failure(
+                exc.exc_name,
+                exc.detail,
+            )
+            if external_failure is not None:
+                raise external_failure from exc
             raise
         except RuntimeError as exc:
             raise _alphamelts_backend_failure_error(
@@ -2788,12 +2818,12 @@ class _MELTSBackendSupport(MeltBackend):
                 f'PetThermoTools {operation} failed: {detail}\n'
                 f'{child_traceback}'
             )
-        if exc_name == _PetThermoToolsExternalCallFailure.__name__:
-            exception_class, _, message = detail.partition(': ')
-            raise _PetThermoToolsExternalCallFailure(
-                exception_class or 'Exception',
-                message or detail,
-            )
+        external_failure = _decode_petthermotools_remote_failure(
+            exc_name,
+            detail,
+        )
+        if external_failure is not None:
+            raise external_failure
         raise EngineWorkerRemoteError(
             exc_name,
             detail,
