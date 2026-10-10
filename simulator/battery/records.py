@@ -427,8 +427,15 @@ class Derivation:
     def __post_init__(self) -> None:
         if not self.relation:
             raise ValueError("Derivation.relation is required")
-        if not self.inputs:
-            raise ValueError("Derivation.inputs is required")
+        if not self.inputs and not (
+            self.raw_inputs is not None
+            and self.raw_inputs.state.is_value
+            and self.raw_inputs.state.value is RawInputStatus.NOT_PRINTED
+            and self.raw_inputs.locator is not None
+        ):
+            raise ValueError(
+                "Derivation.inputs is required unless raw_inputs is located not_printed"
+            )
         if not self.output_unit:
             raise ValueError("Derivation.output_unit is required")
         if self.pure_substance_reference is not None and not isinstance(

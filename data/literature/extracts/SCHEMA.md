@@ -192,12 +192,15 @@ derivation may declare that the source does not print the raw inputs:
 locator: {page: 164, section: '3.3'}
 derivation:
   relation: "calculated from measured quantities"
-  inputs: ["pdf:source-id"]
   output_unit: dimensionless
   raw_inputs:
     state: {tag: value, value: not_printed}
     locator: {page: 164, section: '3.3'}
 ```
+
+When the source does not print raw inputs, omit `inputs` entirely. The paper
+is never an input, and no invented observation may stand in for the unprinted
+inputs.
 
 `raw_inputs` is a typed `not_printed` value with its own source locator. It is
 valid only for `measured_reduced`, cannot appear with `derived_from`, and does

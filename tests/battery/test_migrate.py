@@ -81,6 +81,7 @@ from simulator.battery.migrate import (
     expand_queue_entries,
     group_queue_entries,
     migrate,
+    observation_from_plain,
     migration_queue_document,
     reference_state_from_extract,
     _mole_fraction_composition_from_values,
@@ -463,6 +464,76 @@ def _extract_observations(name: str) -> list[dict]:
             if isinstance(row, dict):
                 found.append(row)
     return found
+
+
+def _raw_inputs_extract(method_class: str, *, include_locator: bool = True) -> dict:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    observation = extract["species"]["Na"]["observations"][0]
+    observation["values"]["method_class"] = method_class
+    raw_inputs = {"state": {"tag": "value", "value": "not_printed"}}
+    if include_locator:
+        raw_inputs["locator"] = {"page": 2, "section": "3.3"}
+    observation["values"]["derivation"] = {
+        "relation": "calculated from measured quantities",
+        "output_unit": "Pa",
+        "raw_inputs": raw_inputs,
+    }
+    return extract
+
+
+def test_production_migration_keeps_located_unprinted_raw_input_declaration(
+    tmp_path: Path,
+) -> None:
+    result = migrate(
+        _write_min_tree(tmp_path, _raw_inputs_extract("measured_reduced")),
+        write=False,
+    )
+    observation = next(iter(result.observations.values()))
+
+    assert observation.derivation is not None
+    assert observation.derivation.inputs == ()
+    assert observation.derivation.raw_inputs is not None
+    assert observation.derivation.raw_inputs.state.value.value == "not_printed"
+    assert observation.derivation.raw_inputs.locator is not None
+    assert not any(
+        issue.path.endswith(".derived_from")
+        for issue in result.validation.hard_issues
+    )
+
+    reloaded = observation_from_plain(
+        yaml.safe_load(yaml.safe_dump(to_plain(observation)))
+    )
+    assert reloaded.derivation == observation.derivation
+
+
+def test_production_migration_rejects_unlocated_unprinted_raw_input_declaration(
+    tmp_path: Path,
+) -> None:
+    result = migrate(
+        _write_min_tree(
+            tmp_path, _raw_inputs_extract("measured_reduced", include_locator=False)
+        ),
+        write=False,
+    )
+    assert any(
+        issue.path.endswith(".derived_from")
+        and issue.detail == "derived observation requires derived_from"
+        for issue in result.validation.hard_issues
+    )
+
+
+def test_production_migration_rejects_model_derived_raw_input_declaration(
+    tmp_path: Path,
+) -> None:
+    result = migrate(
+        _write_min_tree(tmp_path, _raw_inputs_extract("model_derived")),
+        write=False,
+    )
+    assert any(
+        issue.path.endswith(".derivation.raw_inputs")
+        and "invalid for model_derived" in issue.detail
+        for issue in result.validation.hard_issues
+    )
 
 
 def test_hastie_initial_charges_bind_to_figure_points_as_proxies(
