@@ -567,6 +567,189 @@ def test_series_cells_are_points_and_intervals_are_not_midpoints() -> None:
     assert comparison_candidates(ctx) == ()
 
 
+def test_compilation_series_score_pins_cell_results_and_partial_refusal(monkeypatch) -> None:
+    from simulator.battery.compilation_tier import ThermoAttempt, compilation_tier_census
+    from simulator.battery.enums import QUANTITY_UNITS, MetricOperation
+    from simulator.battery.records import DecisionBand, Execution
+    from simulator.battery.score import ENGINE_CHANNELS, score_store
+
+    identity = replace(_na2o_liquid(), temperature_K=State.unknown("series"))
+    series = F.observation(
+        "cell-pin-series",
+        "exp-1",
+        identity,
+        Decimal("0"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+    pairs = (
+        *((Decimal(1000 + 100 * index), Decimal(-20 + index)) for index in range(10)),
+        (Decimal("1900"), Decimal("-11")),
+        (Decimal("2000"), Decimal("-10")),
+    )
+    series = replace(series, value=Value(ValueKind.SERIES, series=pairs))
+    origin = "compilations-janaf/janaf-Na.yaml"
+    ctx = _context(series, origins={series.observation_id: origin})
+    offsets = {
+        Decimal(1000 + 100 * index): Decimal(index + 1)
+        for index in range(10)
+    }
+
+    def predict(engine, cell, **kwargs):
+        del kwargs
+        temperature = cell.identity.temperature_K.value
+        if temperature == Decimal("2000"):
+            return EnginePrediction(
+                engine,
+                ENGINE_CHANNELS[engine],
+                Execution(state=ExecutionState.NOT_PROBED),
+                coefficient_sources=("janaf-4th",),
+                lineage_complete=True,
+                refusal_reason=RefusalReason.UNSUPPORTED,
+                refusal_detail={"reason": "synthetic-cell-unavailable"},
+                identity=cell.identity,
+            )
+        offset = offsets[temperature]
+        return EnginePrediction(
+            engine,
+            ENGINE_CHANNELS[engine],
+            Execution(
+                state=ExecutionState.PRODUCED,
+                call_evidence=f"synthetic-cell-{temperature}",
+            ),
+            value=cell.value.point + offset,
+            unit=QUANTITY_UNITS[Quantity.DELTA_FG],
+            coefficient_sources=("janaf-4th",),
+            lineage_complete=True,
+            identity=cell.identity,
+        )
+
+    residuals, _candidates = score_store(
+        ctx,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        predict=predict,
+    )
+    expected_references = [
+        *(f"cell-pin-series#t{1000 + 100 * index}v{-20 + index}" for index in range(10)),
+        "cell-pin-series#t1900v-11n1",
+        "cell-pin-series#t2000v-10",
+    ]
+    assert [row.reference for row in residuals] == expected_references
+    assert [row.status for row in residuals] == [
+        ResidualStatus.MATCH,
+        ResidualStatus.MATCH,
+        ResidualStatus.MATCH,
+        ResidualStatus.MATCH,
+        ResidualStatus.MATCH,
+        ResidualStatus.MATCH,
+        ResidualStatus.MISMATCH,
+        ResidualStatus.MISMATCH,
+        ResidualStatus.MISMATCH,
+        ResidualStatus.MISMATCH,
+        ResidualStatus.MISMATCH,
+        ResidualStatus.REFUSED,
+    ]
+    expected_band = DecisionBand(
+        Decimal("6"),
+        QUANTITY_UNITS[Quantity.DELTA_FG],
+        "compilations-janaf/delta_fG residual distribution: 2x median absolute deviation; derived_n=11",
+    )
+    for index, row in enumerate(residuals[:-1], start=1):
+        assert row.numeric is not None
+        assert (
+            row.numeric.value,
+            row.numeric.unit,
+            row.numeric.operation,
+            row.numeric.metric_uncertainty,
+            row.numeric.verdict,
+            row.numeric.decision_band,
+        ) == (
+            Decimal(index if index <= 10 else 10),
+            QUANTITY_UNITS[Quantity.DELTA_FG],
+            MetricOperation.ABSOLUTE,
+            None,
+            None,
+            expected_band,
+        )
+        assert [
+            (notice.kind, notice.reason, notice.origin)
+            for notice in row.notices
+        ] == [
+            (
+                NoticeKind.DERIVATION_USES_COMPILATION,
+                "Do not validate an engine against a compilation it consumes. "
+                "same-source compilation=nist-janaf-4th uncertainty=none",
+                row.reference,
+            )
+        ]
+    refused = residuals[-1]
+    assert refused.numeric is None
+    assert refused.refusal is not None
+    assert (
+        refused.refusal.reason,
+        dict(refused.refusal.detail),
+        refused.candidate_request.engine,
+    ) == (
+        RefusalReason.UNSUPPORTED,
+        {"reason": "synthetic-cell-unavailable"},
+        Engine.INTERNAL_ANALYTICAL,
+    )
+
+    def attempt(engine, cell, **kwargs):
+        del engine, kwargs
+        temperature = cell.identity.temperature_K.value
+        if temperature == Decimal("2000"):
+            return ThermoAttempt(
+                None,
+                None,
+                Authority.REFUSED,
+                (),
+                RefusalReason.UNSUPPORTED,
+                {"reason": "synthetic-cell-unavailable"},
+                "synthetic-refusal",
+            )
+        offset = offsets[temperature]
+        return ThermoAttempt(
+            cell.value.point + offset,
+            QUANTITY_UNITS[Quantity.DELTA_FG],
+            Authority.BRIDGE,
+            (),
+            None,
+            {},
+            f"synthetic-{temperature}",
+        )
+
+    monkeypatch.setattr(
+        "simulator.battery.compilation_tier.predict_thermo_attempt", attempt
+    )
+    census = compilation_tier_census(
+        ctx,
+        engines=(Engine.MAGEMIN,),
+        invoke_pure_phase=True,
+        audit_compile_residual=False,
+    )
+    assert (
+        census["reachable_points"],
+        census["series_cells_expanded"],
+        census["banded_series_cells_expanded"],
+        census["transition_temperature_series_cells_left"],
+    ) == (12, 12, 12, 0)
+    row = census["rows"][0]
+    assert (
+        row["reachable"],
+        row["engine_values"],
+        row["numeric"],
+        row["median_abs_residual"],
+        row["refused"],
+    ) == (
+        12,
+        11,
+        11,
+        "6",
+        {"unsupported:synthetic-cell-unavailable": 1},
+    )
+
+
 def test_transition_temperature_and_empirical_series_stay_series() -> None:
     identity = _na2o_liquid(Quantity.TRANSITION_TEMPERATURE)
     experiment = F.tabulation_experiment()

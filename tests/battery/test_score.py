@@ -3055,6 +3055,96 @@ def test_headline_records_keep_tiers_separate_and_count_no_band() -> None:
     assert "tail membership, not accuracy" in payload_record["match_rate_label"]
 
 
+def test_compilation_series_does_not_change_empirical_headline() -> None:
+    from simulator.battery.score import ENGINE_CHANNELS, headline_rows
+
+    engine = Engine.INTERNAL_ANALYTICAL
+    experiment = F.tabulation_experiment()
+    identity = F.oxide_identity(
+        "Na2O",
+        Phase.L,
+        T_K=Decimal("2200"),
+        metal_formula="Na",
+    )
+    measured = F.observation(
+        "empirical-na2o",
+        experiment.experiment_id,
+        identity,
+        Decimal("-3.886"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-measured-source",
+    )
+    series = F.observation(
+        "compilation-na2o-series",
+        experiment.experiment_id,
+        replace(identity, temperature_K=State.unknown("series")),
+        Decimal("0"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+    series = replace(
+        series,
+        value=Value(
+            ValueKind.SERIES,
+            series=(
+                (Decimal("2100"), Decimal("-4")),
+                (Decimal("2200"), Decimal("-3.886")),
+            ),
+        ),
+    )
+    measured_context = _context(F.work(), experiment, measured)
+    combined_context = replace(
+        _context(F.work(), experiment, measured, series),
+        origins={series.observation_id: "compilations-janaf/janaf-Na.yaml"},
+    )
+
+    def predict(engine, reference, **kwargs):
+        del kwargs
+        return EnginePrediction(
+            engine,
+            ENGINE_CHANNELS[engine],
+            Execution(state=ExecutionState.PRODUCED, call_evidence="synthetic"),
+            value=reference.value.point,
+            unit=QUANTITY_UNITS[Quantity.DELTA_FG],
+            identity=reference.identity,
+        )
+
+    measured_residuals, _ = score_store(
+        measured_context,
+        engines=(engine,),
+        predict=predict,
+    )
+    combined_residuals, _ = score_store(
+        combined_context,
+        engines=(engine,),
+        predict=predict,
+    )
+    before = headline_rows(
+        measured_residuals,
+        context=measured_context,
+        tier="measured",
+        engines=(engine,),
+    )
+    after = headline_rows(
+        combined_residuals,
+        context=combined_context,
+        tier="measured",
+        engines=(engine,),
+    )
+    assert before == after
+    thermochemistry = next(
+        row
+        for row in after
+        if row["rail"] == Rail.THERMOCHEMISTRY.value
+        and row["engine"] == engine.value
+    )
+    assert (
+        thermochemistry["n_candidates"],
+        thermochemistry["n_scored"],
+        thermochemistry["n_inside_band"],
+    ) == (1, 1, 1)
+
+
 def test_pyrolysis_yield_keeps_residual_without_robinot_floor() -> None:
     """n=2 same-rig O2 scatter is not a sourced agreement band."""
 
