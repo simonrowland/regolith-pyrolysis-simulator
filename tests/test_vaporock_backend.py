@@ -1360,12 +1360,20 @@ def test_vaporock_warm_result_classifies_engine_errors_and_lifecycle_failures():
         "engine_exception_message"
     ]
 
-    worker_died = RuntimeError(
-        "VapoRock warm pool slot 0 worker exited without a result"
+    local_runtime = RuntimeError("local restart helper bug")
+    backend = VapoRockBackend()
+    backend._available = True
+    backend._warm_pool = FailedPool(local_runtime)
+    with pytest.raises(RuntimeError, match="local restart helper bug"):
+        backend.equilibrate(1600.0, composition_mol={"Na2O": 1.0})
+
+    worker_died = vaporock_module.EngineWorkerDied(
+        "call",
+        "VapoRock warm pool slot 0 worker exited without a result",
     )
     failed = run_with_failure(worker_died)
     assert failed.status == "not_converged"
-    assert failed.diagnostics["engine_exception"] == "RuntimeError"
+    assert failed.diagnostics["engine_exception"] == "EngineWorkerDied"
     assert failed.diagnostics["engine_exception_message"] == str(worker_died)
 
     timeout = vaporock_module.EngineWorkerTimeout(
@@ -3648,3 +3656,104 @@ def test_candidate_signature_mismatch_uses_positional_variant(monkeypatch):
     assert result.status == "non_authoritative"
     assert len(calls) == 1
     assert calls[0][1:] == (1600.0, -8.0)
+
+
+def test_uninspectable_positional_candidate_is_not_an_engine_failure(
+    monkeypatch,
+):
+    import numpy as np
+
+    legacy = np.frompyfunc(lambda comp, temp, fo2: {"Na": 0.001}, 3, 1)
+    _install_fake_import(
+        monkeypatch,
+        types.SimpleNamespace(calc_vapor_pressures=legacy),
+    )
+    backend = VapoRockBackend()
+    assert backend.initialize({"warm_worker": False})
+
+    result = backend.equilibrate(1600.0, composition_mol={"Na2O": 1.0})
+
+    assert result.status == "non_authoritative"
+    assert result.diagnostics.get("engine_exception") is None
+    assert getattr(result, "vaporock_full_speciation_Pa", {})["Na"] == (
+        pytest.approx(100.0)
+    )
+
+
+def test_upstream_pressure_accessor_failure_is_typed(monkeypatch):
+    class BrokenWrapper:
+        @property
+        def pressures(self):
+            raise ValueError("upstream pressure field failed")
+
+    _install_fake_import(
+        monkeypatch,
+        types.SimpleNamespace(
+            calc_vapor_pressures=lambda **_kwargs: BrokenWrapper()
+        ),
+    )
+    backend = VapoRockBackend()
+    assert backend.initialize({"warm_worker": False})
+
+    result = backend.equilibrate(1600.0, composition_mol={"Na2O": 1.0})
+
+    assert result.status == "not_converged"
+    assert result.diagnostics["engine_exception"] == "ValueError"
+    assert result.diagnostics["engine_exception_message"] == (
+        "upstream pressure field failed"
+    )
+
+
+def _restart_pool():
+    def factory(_index):
+        return vaporock_module.WarmEngineWorker(
+            name="review restart",
+            bootstrap=eval,
+            bootstrap_args=("({}, 'ready')",),
+            handler=vaporock_module._handle_vaporock_request,
+            startup_timeout_s=15,
+            call_timeout_s=10,
+            diagnostic_log_path=None,
+        )
+
+    return vaporock_module.EngineWorkerPool(factory, size=1)
+
+
+def test_warm_worker_restart_exit_before_ready_is_typed():
+    import os
+
+    pool = _restart_pool()
+    backend = VapoRockBackend()
+    backend._available = True
+    backend._warm_pool = pool
+    try:
+        worker = pool.workers[0]
+        worker.close()
+        worker._bootstrap = os._exit
+        worker._bootstrap_args = (23,)
+        result = backend.equilibrate(1600.0, composition_mol={"Na2O": 1.0})
+    finally:
+        backend.close()
+
+    assert result.status == "not_converged"
+    assert result.diagnostics["engine_exception"] == "EOFError"
+    assert result.diagnostics["engine_exception_message"] == ""
+
+
+def test_warm_pool_local_runtimeerror_propagates():
+    pool = _restart_pool()
+    backend = VapoRockBackend()
+    backend._available = True
+    backend._warm_pool = pool
+    try:
+        worker = pool.workers[0]
+        worker.close()
+
+        def local_restart_defect():
+            raise RuntimeError("local restart helper bug")
+
+        worker.start = local_restart_defect
+        with pytest.raises(RuntimeError, match="local restart helper bug"):
+            backend.equilibrate(1600.0, composition_mol={"Na2O": 1.0})
+    finally:
+        backend.close()

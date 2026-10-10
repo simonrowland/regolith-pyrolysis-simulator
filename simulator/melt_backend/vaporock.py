@@ -122,6 +122,7 @@ from typing import Any, Dict, List, Mapping, Optional, Sequence
 from engines.domain_reason import OutOfDomainReason
 from engines.engine_commissioning import assess_engine_commissioning
 from simulator.engine_pool import (
+    EngineWorkerDied,
     EngineWorkerPool,
     EngineWorkerRemoteError,
     EngineWorkerTimeout,
@@ -1526,10 +1527,15 @@ class VapoRockBackend(MeltBackend):
             self._warnings.append(self._last_error)
             self._warm_pool = None
             return False
-        except EOFError as exc:
+        except EngineWorkerDied as exc:
+            named = (
+                exc.__cause__
+                if isinstance(exc.__cause__, BaseException)
+                else exc
+            )
             self._last_error = (
                 'VapoRock warm pool failed to initialize: '
-                f'{type(exc).__name__}: {exc}'
+                f'{type(named).__name__}: {named}'
             )
             self._warnings.append(self._last_error)
             self._warm_pool = None
@@ -2266,27 +2272,66 @@ class VapoRockBackend(MeltBackend):
                 signature = inspect.signature(fn)
             except (AttributeError, TypeError, ValueError):
                 signature = None
-            if signature is None:
-                call_args = ()
-                call_kwargs = candidate_kwargs
-            else:
+            # A missing signature, or one that names no parameters and
+            # accepts every convention, does not describe the callable.
+            # Probe keyword then positional. A TypeError there is an
+            # API-variant mismatch; any other error ran inside the entry.
+            probe_legacy = signature is None
+            keyword_binds = False
+            positional_binds = False
+            bind_error: Optional[Exception] = None
+            if signature is not None:
+                concrete = any(
+                    parameter.kind in (
+                        inspect.Parameter.POSITIONAL_ONLY,
+                        inspect.Parameter.POSITIONAL_OR_KEYWORD,
+                        inspect.Parameter.KEYWORD_ONLY,
+                    )
+                    for parameter in signature.parameters.values()
+                )
                 try:
                     signature.bind(**candidate_kwargs)
-                except TypeError:
+                    keyword_binds = True
+                except TypeError as exc:
+                    bind_error = exc
+                try:
+                    signature.bind(*legacy_args)
+                    positional_binds = True
+                except TypeError as exc:
+                    bind_error = exc
+                if (
+                    not concrete
+                    and keyword_binds
+                    and positional_binds
+                ):
+                    probe_legacy = True
+            if probe_legacy:
+                try:
+                    raw = fn(**candidate_kwargs)
+                except TypeError as exc:
+                    last_attr_error = exc
                     try:
-                        signature.bind(*legacy_args)
-                    except TypeError as exc:
-                        last_attr_error = exc
+                        raw = fn(*legacy_args)
+                    except TypeError as positional_exc:
+                        last_attr_error = positional_exc
                         continue
-                    call_args = legacy_args
-                    call_kwargs = {}
-                else:
-                    call_args = ()
-                    call_kwargs = candidate_kwargs
-            try:
-                raw = fn(*call_args, **call_kwargs)
-            except Exception as exc:
-                raise VapoRockCallError(exc) from exc
+                    except Exception as exc:
+                        raise VapoRockCallError(exc) from exc
+                except Exception as exc:
+                    raise VapoRockCallError(exc) from exc
+            elif keyword_binds:
+                try:
+                    raw = fn(**candidate_kwargs)
+                except Exception as exc:
+                    raise VapoRockCallError(exc) from exc
+            elif positional_binds:
+                try:
+                    raw = fn(*legacy_args)
+                except Exception as exc:
+                    raise VapoRockCallError(exc) from exc
+            else:
+                last_attr_error = bind_error
+                continue
             vapor_pressures = self._normalize_vapor_pressures(raw)
             self._last_pressure_authority_warning = (
                 'VapoRock candidate vapor function has unverified total '
@@ -2363,10 +2408,13 @@ class VapoRockBackend(MeltBackend):
             ) from exc
         except EngineWorkerTimeout as exc:
             raise VapoRockCallError(exc) from exc
-        except RuntimeError as exc:
-            # EngineWorkerPool reports a dead child through this result
-            # boundary after it has already discarded the worker handle.
-            raise VapoRockCallError(exc) from exc
+        except EngineWorkerDied as exc:
+            named = (
+                exc.__cause__
+                if isinstance(exc.__cause__, BaseException)
+                else exc
+            )
+            raise VapoRockCallError(named) from exc
         if not isinstance(payload, dict):
             raise RuntimeError(
                 f'VapoRock warm worker returned non-dict payload: '
@@ -2443,30 +2491,43 @@ class VapoRockBackend(MeltBackend):
         # Some upstream builds wrap the dict in an object with a
         # ``.pressures`` attribute or expose ``.to_dict()``.
         if not isinstance(raw, dict):
+            accessor_failure: Optional[BaseException] = None
+            extracted: Any = None
             for attr in ('pressures', 'partial_pressures', 'vapor_pressures'):
-                value = getattr(raw, attr, None)
+                try:
+                    value = getattr(raw, attr, None)
+                except Exception as exc:  # upstream result property
+                    accessor_failure = exc
+                    break
                 if isinstance(value, dict):
-                    raw = value
+                    extracted = value
                     break
             else:
-                to_dict = getattr(raw, 'to_dict', None)
-                if callable(to_dict):
-                    try:
-                        raw = to_dict()
-                    except Exception as exc:  # VapoRock result object's method.
-                        self._last_empty_speciation_error = {
-                            'exception': type(exc).__name__,
-                            'message': str(exc),
-                        }
-                        self._latch_empty_speciation(
-                            EmptySpeciationCause.TABLE_UNREADABLE
-                        )
-                        return {}
+                try:
+                    to_dict = getattr(raw, 'to_dict', None)
+                except Exception as exc:  # upstream result accessor
+                    accessor_failure = exc
                 else:
-                    self._latch_empty_speciation(
-                        EmptySpeciationCause.TABLE_UNREADABLE
-                    )
-                    return {}
+                    if callable(to_dict):
+                        try:
+                            extracted = to_dict()
+                        except Exception as exc:  # VapoRock result method.
+                            accessor_failure = exc
+            if accessor_failure is not None:
+                self._last_empty_speciation_error = {
+                    'exception': type(accessor_failure).__name__,
+                    'message': str(accessor_failure),
+                }
+                self._latch_empty_speciation(
+                    EmptySpeciationCause.TABLE_UNREADABLE
+                )
+                return {}
+            if not isinstance(extracted, dict):
+                self._latch_empty_speciation(
+                    EmptySpeciationCause.TABLE_UNREADABLE
+                )
+                return {}
+            raw = extracted
 
         if not isinstance(raw, dict):
             self._latch_empty_speciation(EmptySpeciationCause.TABLE_UNREADABLE)

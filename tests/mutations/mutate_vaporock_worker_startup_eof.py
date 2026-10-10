@@ -15,10 +15,18 @@ TEST = (
     "test_warm_worker_exit_before_ready_is_typed"
 )
 NARROW = (
-    "        except EOFError as exc:\n"
+    "        except EngineWorkerDied as exc:\n"
+    "            named = (\n"
+    "                exc.__cause__\n"
+    "                if isinstance(exc.__cause__, BaseException)\n"
+    "                else exc\n"
+    "            )\n"
     "            self._last_error = (\n"
 )
-MUTANT = NARROW.replace("except EOFError as exc:", "except TypeError as exc:")
+MUTANT = NARROW.replace(
+    "except EngineWorkerDied as exc:",
+    "except TypeError as exc:",
+)
 
 
 def main() -> int:

@@ -16,6 +16,7 @@ from simulator.engine_pool import (
     ENGINE_WORKER_CANCEL_POLL_S,
     ENGINE_WORKER_SPAWN_SLACK_S,
     ENGINE_WORKER_STOP_PAIR_JOIN_S,
+    EngineWorkerDied,
     EngineWorkerRemoteError,
     EngineWorkerPool,
     EngineWorkerTimeout,
@@ -109,6 +110,59 @@ def test_warm_worker_matches_24_cold_workers_byte_for_byte():
         assert warm_worker.start_count == 1
     finally:
         warm_worker.close()
+
+
+def test_pre_ready_worker_death_is_engine_worker_died():
+    dying = WarmEngineWorker(
+        name='pre-ready death',
+        bootstrap=os._exit,
+        bootstrap_args=(23,),
+        handler=_handle_test_request,
+        startup_timeout_s=5.0,
+        call_timeout_s=5.0,
+        diagnostic_log_path=None,
+    )
+    with pytest.raises(EngineWorkerDied) as started:
+        dying.start()
+    assert started.value.phase == 'start'
+    assert isinstance(started.value.__cause__, EOFError)
+    dying.close()
+
+    worker = _test_worker(timeout_s=5.0)
+    worker.start()
+    worker.close()
+    worker._bootstrap = os._exit
+    worker._bootstrap_args = (23,)
+    with pytest.raises(EngineWorkerDied) as restarted:
+        worker.call({
+            'T_C': 1100.0,
+            'P_bar': 0.01,
+            'fO2_log': -12.0,
+            'composition': {'SiO2': 50.0},
+        })
+    assert restarted.value.phase == 'restart'
+    assert isinstance(restarted.value.__cause__, EOFError)
+    worker.close()
+
+
+def test_replaced_start_runtimeerror_is_not_worker_death():
+    worker = _test_worker(timeout_s=5.0)
+    worker.start()
+    worker.close()
+
+    def local_restart_defect():
+        raise RuntimeError('local restart helper bug')
+
+    worker.start = local_restart_defect
+    with pytest.raises(RuntimeError, match='local restart helper bug') as caught:
+        worker.call({
+            'T_C': 1100.0,
+            'P_bar': 0.01,
+            'fO2_log': -12.0,
+            'composition': {'SiO2': 50.0},
+        })
+    assert not isinstance(caught.value, EngineWorkerDied)
+    worker.close()
 
 
 def test_timeout_discards_slot_and_next_call_respawns():

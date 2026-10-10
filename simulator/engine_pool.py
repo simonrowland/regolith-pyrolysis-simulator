@@ -112,6 +112,21 @@ class EngineWorkerUnavailable(RuntimeError):
         super().__init__(f'{self.worker_name} worker is unavailable')
 
 
+class EngineWorkerDied(RuntimeError):
+    """The worker exited or hit EOF before returning a result.
+
+    Raised by the pool itself, only for that event. ``phase`` is
+    ``start`` (pre-ready during construction), ``restart`` (pre-ready
+    inside ``call``), or ``call`` (died while a request was in flight).
+    Other exceptions are not rewritten into this type.
+    """
+
+    def __init__(self, phase: str, detail: str) -> None:
+        self.phase = phase
+        self.detail = str(detail)
+        super().__init__(self.detail)
+
+
 class EngineWorkerTimeout(TimeoutError):
     """Typed hard-wall expiry for an isolated engine worker."""
 
@@ -419,13 +434,20 @@ class WarmEngineWorker:
                 if parent.poll(min(ENGINE_WORKER_CANCEL_POLL_S, remaining)):
                     break
             message = parent.recv()
-        except (EOFError, OSError, TimeoutError):
+        except (EOFError, OSError, TimeoutError) as exc:
             self._discard_current(
                 diagnostic=False,
                 expected_process=process,
                 expected_connection=parent,
             )
-            raise
+            # EngineWorkerTimeout stays itself. EOF and a dead pipe are
+            # the worker exiting before ready.
+            if isinstance(exc, TimeoutError):
+                raise
+            raise EngineWorkerDied(
+                'start',
+                f'{type(exc).__name__}: {exc}',
+            ) from exc
         if message[0] == 'timeout':
             self._discard_current(
                 diagnostic=False,
@@ -491,7 +513,12 @@ class WarmEngineWorker:
             # its own budget — never let the tighter one strangle the
             # other. The call wall below still bounds the job itself.
             t_start = time.monotonic()
-            self.start()
+            try:
+                self.start()
+            except EngineWorkerDied as exc:
+                # Construction and this restart share start(); the phase
+                # records which caller observed the pre-ready death.
+                raise EngineWorkerDied('restart', exc.detail) from exc.__cause__
             _pool_debug(
                 f'{self.name}: cold start ok in '
                 f'{time.monotonic() - t_start:.2f}s pid='
@@ -569,8 +596,9 @@ class WarmEngineWorker:
                 expected_process=process,
                 expected_connection=connection,
             )
-            raise RuntimeError(
-                f'{self.name} worker exited without a result'
+            raise EngineWorkerDied(
+                'call',
+                f'{self.name} worker exited without a result',
             ) from exc
         with self._state_lock:
             current = (
