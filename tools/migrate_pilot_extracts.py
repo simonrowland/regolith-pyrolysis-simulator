@@ -1124,6 +1124,13 @@ def migrate_alpha_kinetics() -> list[Path]:
     for rec in records:
         if not isinstance(rec, Mapping):
             continue
+        rid = str(rec.get("record_id") or "alpha_rec")
+        # d-084 retired these duplicate extracts; their curated kems-* owners
+        # must never be rebuilt from the obsolete acquisition draft.
+        if rid.startswith("fedkin") or "fedkin" in rid:
+            continue
+        if rid.startswith("sossi_2019") or "sossi_2019" in rid:
+            continue
         citation = str(rec.get("citation") or "UNKNOWN")
         doi_or_url = str(rec.get("doi_or_url") or "")
         doi = None
@@ -1137,7 +1144,6 @@ def migrate_alpha_kinetics() -> list[Path]:
         elif doi_or_url:
             url = doi_or_url
 
-        rid = str(rec.get("record_id") or "alpha_rec")
         # Map record_id prefix → source_id
         if rid.startswith("costa"):
             source_id = "costa-jacobson-2015"
