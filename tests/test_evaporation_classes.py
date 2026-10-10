@@ -7,8 +7,10 @@ import math
 import pytest
 
 from simulator.evaporation_classes import (
+    EVAPORATION_CLASSES,
     e_down_from_s,
     flux_band_factors,
+    grounding_evidence,
     interface_resistance_share,
     interface_share_s,
     report_species_class_diagnostics,
@@ -142,4 +144,25 @@ def test_report_species_class_diagnostics_class_alpha_fallback_unchanged():
     assert diag.alpha_runtime is None
     assert diag.alpha_runtime_note.endswith("+class_alpha_fallback_for_s")
     assert diag.series is not None
-    assert diag.series.alpha_intrinsic == pytest.approx(0.084)
+    assert diag.series.alpha_intrinsic == pytest.approx(0.083)
+
+
+def test_costa_redox_grounding_uses_owner_figure_series_once():
+    costa = [
+        row for row in grounding_evidence("silicate_melt_cation_redox")
+        if "costa" in row.source_id
+    ]
+    assert len(costa) == 1
+    assert costa[0].source_id == "kems-007-costa-2015"
+    assert costa[0].observation_id == "costa_2015_fe_vaporization_coefficient_alpha_digitized"
+    assert costa[0].alpha == pytest.approx(0.01978)
+
+
+def test_redox_class_band_covers_every_grounded_alpha():
+    cls = EVAPORATION_CLASSES["silicate_melt_cation_redox"]
+    grounded = [
+        row.alpha for row in grounding_evidence(cls.class_id)
+        if row.alpha is not None
+    ]
+    assert grounded
+    assert all(cls.band_low() <= alpha <= cls.band_high() for alpha in grounded)

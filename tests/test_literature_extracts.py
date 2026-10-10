@@ -28,6 +28,11 @@ TOOLS = REPO_ROOT / "tools"
 EXTRACTS = REPO_ROOT / "data" / "literature" / "extracts"
 FIDELITY_POLICY = EXTRACTS / "_fidelity_pre_policy_allowlist.yaml"
 FIDELITY_GRADUATION_LEDGER = EXTRACTS / "_fidelity_graduation_ledger.yaml"
+RETIRED_DUPLICATE_OBSERVATION_ALIASES = {
+    "costa-jacobson-2015::costa_jacobson_2015_fe_olivine_kems": (
+        "kems-007-costa-2015::costa_2015_fe_vaporization_coefficient_alpha_digitized"
+    ),
+}
 
 if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
@@ -2201,6 +2206,13 @@ def test_every_extract_has_fidelity_sample():
             assert doc.get("fidelity_samples"), f"{path.name} missing fidelity_samples"
 
 
+def test_costa_jacobson_retained_sio_has_fidelity_sample(monkeypatch):
+    """Run the landed-pilot sample-presence guard against this extract alone."""
+    path = EXTRACTS / "costa-jacobson-2015.yaml"
+    monkeypatch.setattr(vle, "discover_extracts", lambda: [path])
+    test_every_extract_has_fidelity_sample()
+
+
 # ---------------------------------------------------------------------------
 # t-510 fidelity gate: policy + parameterized match + mutation red
 # ---------------------------------------------------------------------------
@@ -2965,13 +2977,13 @@ def test_fidelity_sample_mutation_reds():
     Pins must be independent literals (no YAML alias). Mutate the body without
     deepcopying samples — a co-mutated alias would keep the match green.
     """
-    path = EXTRACTS / "costa-jacobson-2015.yaml"
-    assert path.is_file(), "costa-jacobson-2015 extract required for mutation pin"
+    path = EXTRACTS / "kems-007-costa-2015.yaml"
+    assert path.is_file(), "Costa owner extract required for mutation pin"
     doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
     samples = doc.get("fidelity_samples") or []
-    assert samples, "costa extract must carry at least one fidelity sample"
+    assert samples, "Costa owner extract must carry at least one fidelity sample"
     # Baseline green with independent (non-aliased) pins.
-    assert vle.check_all_fidelity_samples_match(doc, label="costa") == []
+    assert vle.check_all_fidelity_samples_match(doc, label="costa-owner") == []
     # Prove samples do not share identity with body values.
     for i, s in enumerate(samples):
         exp = s.get("value") if "value" in s else s.get("draft_value")
@@ -2982,26 +2994,44 @@ def test_fidelity_sample_mutation_reds():
             )
 
     # Mutate the Fe alpha pin in the extract body (samples left untouched).
-    fe_obs = doc["species"]["Fe"]["observations"]
-    target = None
-    for obs in fe_obs:
-        if obs.get("observation_id") == "costa_jacobson_2015_fe_olivine_kems":
-            target = obs
-            break
-    assert target is not None, "expected costa Fe KEMS observation"
+    target = next(
+        obs for obs in doc["species"]["Fe"]["observations"]
+        if obs.get("observation_id")
+        == "costa_2015_fe_vaporization_coefficient_alpha_digitized"
+    )
     original = copy.deepcopy(target["values"])
-    # Flip a numeric field the sample pins (whole values dict on the pilot sample).
-    if isinstance(target["values"], dict) and "alpha" in target["values"]:
-        target["values"]["alpha"] = float(target["values"]["alpha"]) + 0.5
-    else:
-        target["values"] = {"__mutated__": True}
+    target["values"]["points"][2]["alpha"] += 0.5
 
-    errs = vle.check_all_fidelity_samples_match(doc, label="costa-mutated")
+    errs = vle.check_all_fidelity_samples_match(doc, label="costa-owner-mutated")
     assert errs, (
         "mutation of pinned extract value must turn fidelity match RED; "
         f"original={original!r}"
     )
     assert any("mismatch" in e for e in errs), errs
+
+
+def test_costa_fe_summary_key_is_retired_to_owner_series():
+    secondary = load_cached_safe_yaml(
+        (EXTRACTS / "costa-jacobson-2015.yaml").read_text(encoding="utf-8")
+    )
+    owner = load_cached_safe_yaml(
+        (EXTRACTS / "kems-007-costa-2015.yaml").read_text(encoding="utf-8")
+    )
+    retired_key, owner_key = next(iter(RETIRED_DUPLICATE_OBSERVATION_ALIASES.items()))
+    retired_source, retired_observation = retired_key.split("::", 1)
+    owner_source, owner_observation = owner_key.split("::", 1)
+    secondary_rows = secondary["species"].get("Fe", {}).get("observations", [])
+    assert retired_source == secondary["source_id"]
+    assert all(row.get("observation_id") != retired_observation for row in secondary_rows)
+    assert secondary["species"]["SiO"]["observations"]
+    assert owner_source == owner["source_id"]
+    owner_row = next(
+        row for row in owner["species"]["Fe"]["observations"]
+        if row.get("observation_id") == owner_observation
+    )
+    assert [point["alpha"] for point in owner_row["values"]["points"]] == [
+        0.016269, 0.015517, 0.01978, 0.011505, 0.013045
+    ]
 
 
 def test_fidelity_resolve_structured_series_index():

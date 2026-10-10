@@ -188,6 +188,36 @@ def test_anchor_records_cite_external_literature_not_self():
         assert record.temperature_range_K[0] <= record.temperature_range_K[1]
 
 
+def test_costa_kems_anchor_points_to_equal_owner_series_reading():
+    owner = yaml.safe_load(
+        (ROOT / "data/literature/extracts/kems-007-costa-2015.yaml").read_text()
+    )
+    alpha_series = next(
+        row for row in owner["species"]["Fe"]["observations"]
+        if row["observation_id"]
+        == "costa_2015_fe_vaporization_coefficient_alpha_digitized"
+    )
+    peak = alpha_series["values"]["points"][2]["alpha"]
+    anchors = [row for row in load_kems_anchors() if row.species == "Fe"]
+    costa = next(row for row in anchors if row.record_id == "costa_jacobson_2015_fe_olivine_kems")
+    assert "kems-007-costa-2015::" + alpha_series["observation_id"] in costa.extraction_note
+    assert "PDF p. 11" in costa.extraction_note
+    assert costa.alpha_value == peak == pytest.approx(0.01978)
+    values = [point["alpha"] for point in alpha_series["values"]["points"]]
+    assert costa.alpha_range == (min(values), max(values))
+
+
+def test_u0_costa_kems_sidecar_reference_resolves():
+    manifest = yaml.safe_load((ROOT / "data/vapour_rail_u0_manifest.yaml").read_text())
+    costa = next(row for row in manifest["species"] if row.get("id") == "Fe")
+    ref = next(
+        ref for ref in costa["validation_anchor_refs"]
+        if ref.startswith("data/literature/vapour_rail_kems_anchors.yaml#")
+    )
+    record_id = ref.split("#", 1)[1]
+    assert any(row.record_id == record_id for row in load_kems_anchors())
+
+
 def test_fedkin_k_alpha_is_langmuir_not_kems():
     """P0-1: Fedkin/Yu α_K = 0.13 is vacuum free-evaporation, not KEMS."""
 
