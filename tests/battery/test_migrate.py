@@ -6809,9 +6809,10 @@ def test_g5_compilation_column_mapping_mutation_proof() -> None:
 
 
 
-def test_l05c1_costa_control_is_not_condensation() -> None:
+def test_l05c1_costa_owner_fe_control_is_not_condensation() -> None:
     row = _extract_observation(
-        "costa-jacobson-2015.yaml", "costa_jacobson_2015_fe_olivine_kems"
+        "kems-007-costa-2015.yaml",
+        "costa_2015_fe_vaporization_coefficient_alpha_digitized",
     )
     values = row.get("values") if isinstance(row.get("values"), dict) else {}
     state, reason = map_quantity(
@@ -6819,6 +6820,9 @@ def test_l05c1_costa_control_is_not_condensation() -> None:
     )
     assert state.is_value and state.value is Quantity.EVAPORATION_COEFFICIENT_ALPHA
     assert reason is None
+    assert [point["alpha"] for point in values["points"]] == [
+        0.016269, 0.015517, 0.01978, 0.011505, 0.013045
+    ]
 
 
 def test_l03_per_mol_o2_ledger_lifts_delta_fg(tmp_path: Path) -> None:
