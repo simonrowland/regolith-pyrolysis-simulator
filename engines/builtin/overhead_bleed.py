@@ -154,6 +154,199 @@ def controlled_flow_capacity(
     )
 
 
+@dataclass(frozen=True)
+class OverheadBleedRemoval:
+    """Species the bleed debits, after the cold-train partition.
+
+    ``debited_mol`` is what leaves ``process.overhead_gas``. Candidate
+    pipe flow can be larger: a finite cold train holds the rest.
+    """
+
+    debited_mol: dict[str, float]
+    candidate_bled_mol: dict[str, float]
+    candidate_bled_o2_mol: float
+    external_o2_holdup_mol: float
+    external_o2_bled_mol: float
+    o2_stored_mol: float
+    o2_accumulated_mol: float
+    melt_o2_vented_mol: float
+    o2_held_mol: float
+    melt_o2_bled_mol: float
+    cistern_fill_kg: float
+    accumulator_enabled: bool
+    refusal_reason: str | None = None
+
+    @property
+    def bled_o2_mol(self) -> float:
+        return float(self.debited_mol.get(OXYGEN_SPECIES, 0.0))
+
+
+def plan_overhead_bleed(
+    holdup_mol: dict[str, float],
+    *,
+    molar_mass_kg_per_mol: dict[str, float],
+    controls: dict,
+    cistern_o2_mol: float = 0.0,
+) -> OverheadBleedRemoval:
+    """O2 and co-bled species one bleed dispatch removes.
+
+    Premise: pipe conductance, a swallowed effective-transport flow, and
+    the cold-train partition are one removal. A second copy that stops
+    at the pipe reports the oxygen the cold train then holds.
+    Algebra: candidate moles are ``_bled_species_mol`` (conductance or
+    ``EffectiveTransportCapacity.swallowed_flux``, capped by the holdup).
+    With ``FiniteCapacity``, admitted mol is
+    ``min(melt_bled, capacity_kg_hr * dt_hr / M_O2)`` and relief is
+    ``min(remainder, k_relief * max(p_O2 - p_open, 0) * dt / M)``.
+    The debit is external + admitted + accumulated + relieved.
+    Units: holdup and the result are mol; capacity is kg/h; M is kg/mol;
+    pressures in the relief law are Pa. Sanity: 0.001 kg/h, closed
+    relief, no accumulator, and more O2 than that capacity admits
+    ``0.001 / M_O2`` mol. At ``M_O2 = 0.032 kg/mol`` that is 0.03125 mol,
+    not the pipe's 37.97 mol.
+    """
+    from simulator.thermal_train import FiniteCapacity
+
+    empty = OverheadBleedRemoval(
+        debited_mol={},
+        candidate_bled_mol={},
+        candidate_bled_o2_mol=0.0,
+        external_o2_holdup_mol=0.0,
+        external_o2_bled_mol=0.0,
+        o2_stored_mol=0.0,
+        o2_accumulated_mol=0.0,
+        melt_o2_vented_mol=0.0,
+        o2_held_mol=0.0,
+        melt_o2_bled_mol=0.0,
+        cistern_fill_kg=0.0,
+        accumulator_enabled=controls.get("accumulator_enabled") is True,
+    )
+    cleaned = {
+        str(species): amount
+        for species, mol in dict(holdup_mol or {}).items()
+        if (amount := max(0.0, float(mol))) > 0.0
+    }
+    if not cleaned:
+        return empty
+    total_mol = sum(cleaned.values())
+    total_kg = sum(
+        cleaned[species] * float(molar_mass_kg_per_mol[species])
+        for species in cleaned
+    )
+    if total_mol <= 0.0 or total_kg <= 0.0:
+        return empty
+
+    candidate_bled_mol = BuiltinOverheadBleedProvider._bled_species_mol(
+        cleaned,
+        total_mol=total_mol,
+        total_kg=total_kg,
+        controls=controls,
+    )
+    bled_o2_mol = candidate_bled_mol.get(OXYGEN_SPECIES, 0.0)
+    overhead_o2_mol = cleaned.get(OXYGEN_SPECIES, 0.0)
+    external_o2_holdup_mol = BuiltinOverheadBleedProvider._external_o2_holdup_mol(
+        controls,
+        overhead_o2_mol,
+    )
+    external_o2_bled_mol = (
+        min(
+            bled_o2_mol,
+            bled_o2_mol * external_o2_holdup_mol / overhead_o2_mol,
+        )
+        if bled_o2_mol > 0.0 and overhead_o2_mol > 0.0
+        else 0.0
+    )
+    melt_o2_bled_mol = max(0.0, bled_o2_mol - external_o2_bled_mol)
+    capacity = controls.get("cold_train_capacity")
+    o2_held_mol = 0.0
+    o2_accumulated_mol = 0.0
+    cistern_fill_kg = 0.0
+    accumulator_enabled = controls.get("accumulator_enabled") is True
+    molar_o2 = float(molar_mass_kg_per_mol.get(OXYGEN_SPECIES, 0.0) or 0.0)
+    if isinstance(capacity, FiniteCapacity):
+        if overhead_o2_mol > 0.0 and molar_o2 > 0.0:
+            from simulator.capacity_coupling import partition_melt_oxygen
+
+            cistern_fill_kg = max(0.0, float(cistern_o2_mol)) * molar_o2
+            if accumulator_enabled and cistern_fill_kg > float(
+                controls["cavern_capacity_kg"]
+            ):
+                return OverheadBleedRemoval(
+                    debited_mol={},
+                    candidate_bled_mol=dict(candidate_bled_mol),
+                    candidate_bled_o2_mol=bled_o2_mol,
+                    external_o2_holdup_mol=external_o2_holdup_mol,
+                    external_o2_bled_mol=0.0,
+                    o2_stored_mol=0.0,
+                    o2_accumulated_mol=0.0,
+                    melt_o2_vented_mol=0.0,
+                    o2_held_mol=0.0,
+                    melt_o2_bled_mol=0.0,
+                    cistern_fill_kg=cistern_fill_kg,
+                    accumulator_enabled=True,
+                    refusal_reason=(
+                        "cistern_fill_kg must not exceed cavern_capacity_kg"
+                    ),
+                )
+            partition = partition_melt_oxygen(
+                bled_o2_mol=bled_o2_mol,
+                overhead_o2_mol=overhead_o2_mol,
+                external_o2_holdup_mol=external_o2_holdup_mol,
+                capacity=capacity,
+                dt_hr=float(controls.get("dt_hr", 1.0)),
+                p_o2_Pa=float(controls.get("p_ref_Pa", 0.0)),
+                k_relief_kg_hr_Pa=float(
+                    controls.get("k_relief_kg_hr_Pa", 0.0)
+                ),
+                p_open_Pa=float(controls.get("p_open_Pa", 0.0)),
+                molar_mass_kg_mol=molar_o2,
+                accumulator_enabled=accumulator_enabled,
+                cistern_fill_kg=cistern_fill_kg,
+                cavern_capacity_kg=float(
+                    controls.get("cavern_capacity_kg", 0.0)
+                ),
+            )
+            external_o2_bled_mol = partition.external_mol
+            o2_stored_mol = partition.admitted_mol
+            o2_accumulated_mol = partition.accumulated_mol
+            melt_o2_vented_mol = partition.relieved_mol
+            o2_held_mol = partition.held_mol
+            melt_o2_bled_mol = (
+                o2_stored_mol + o2_accumulated_mol + melt_o2_vented_mol
+            )
+        else:
+            o2_stored_mol = 0.0
+            melt_o2_vented_mol = 0.0
+    else:
+        melt_o2_vented_mol = 0.0
+        o2_stored_mol = melt_o2_bled_mol
+    debited_mol = dict(candidate_bled_mol)
+    actual_o2_debit_mol = (
+        external_o2_bled_mol
+        + o2_stored_mol
+        + o2_accumulated_mol
+        + melt_o2_vented_mol
+    )
+    if actual_o2_debit_mol > 0.0:
+        debited_mol[OXYGEN_SPECIES] = actual_o2_debit_mol
+    else:
+        debited_mol.pop(OXYGEN_SPECIES, None)
+    return OverheadBleedRemoval(
+        debited_mol=debited_mol,
+        candidate_bled_mol=dict(candidate_bled_mol),
+        candidate_bled_o2_mol=bled_o2_mol,
+        external_o2_holdup_mol=external_o2_holdup_mol,
+        external_o2_bled_mol=external_o2_bled_mol,
+        o2_stored_mol=o2_stored_mol,
+        o2_accumulated_mol=o2_accumulated_mol,
+        melt_o2_vented_mol=melt_o2_vented_mol,
+        o2_held_mol=o2_held_mol,
+        melt_o2_bled_mol=melt_o2_bled_mol,
+        cistern_fill_kg=cistern_fill_kg,
+        accumulator_enabled=accumulator_enabled,
+    )
+
+
 def compressible_pressure_capacity_fraction(
     p_upstream_bar: float,
     p_downstream_bar: float,
@@ -263,116 +456,40 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
                 diagnostic={"bled_species_mol": {}},
             )
 
-        candidate_bled_mol = self._bled_species_mol(
-            holdup_mol,
-            total_mol=total_mol,
-            total_kg=total_kg,
-            controls=controls,
+        cistern_o2_mol = float(
+            request.account_view.accounts.get(
+                OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT, {}
+            ).get(OXYGEN_SPECIES, 0.0)
+            or 0.0
         )
+        removal = plan_overhead_bleed(
+            holdup_mol,
+            molar_mass_kg_per_mol=molar_mass,
+            controls=controls,
+            cistern_o2_mol=cistern_o2_mol,
+        )
+        if removal.refusal_reason is not None:
+            return IntentResult(
+                intent=ChemistryIntent.OVERHEAD_BLEED,
+                status="unsupported",
+                control_audit=control_audit,
+                diagnostic={"reason": removal.refusal_reason},
+            )
         credits: dict[str, dict[str, float]] = {}
         offgas: dict[str, float] = {}
-
-        bled_o2_mol = candidate_bled_mol.get(OXYGEN_SPECIES, 0.0)
-        bled_o2_kg = bled_o2_mol * molar_mass.get(OXYGEN_SPECIES, 0.0)
-        overhead_o2_mol = holdup_mol.get(OXYGEN_SPECIES, 0.0)
-        external_o2_holdup_mol = self._external_o2_holdup_mol(
-            controls,
-            overhead_o2_mol,
-        )
-        external_o2_bled_mol = (
-            min(
-                bled_o2_mol,
-                bled_o2_mol * external_o2_holdup_mol / overhead_o2_mol,
-            )
-            if bled_o2_mol > 0.0 and overhead_o2_mol > 0.0
-            else 0.0
-        )
-        melt_o2_bled_mol = max(0.0, bled_o2_mol - external_o2_bled_mol)
-        capacity = controls.get("cold_train_capacity")
-        o2_held_mol = 0.0
-        o2_accumulated_mol = 0.0
-        cistern_fill_kg = 0.0
-        accumulator_enabled = controls.get("accumulator_enabled") is True
-        from simulator.thermal_train import FiniteCapacity
-
-        if isinstance(capacity, FiniteCapacity):
-            if (
-                overhead_o2_mol > 0.0
-                and molar_mass.get(OXYGEN_SPECIES, 0.0) > 0.0
-            ):
-                from simulator.capacity_coupling import partition_melt_oxygen
-
-                cistern_fill_mol = float(
-                    request.account_view.accounts.get(
-                        OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT, {}
-                    ).get(OXYGEN_SPECIES, 0.0)
-                    or 0.0
-                )
-                cistern_fill_kg = (
-                    cistern_fill_mol
-                    * molar_mass.get(OXYGEN_SPECIES, 0.0)
-                )
-                if accumulator_enabled and cistern_fill_kg > float(
-                    controls["cavern_capacity_kg"]
-                ):
-                    return IntentResult(
-                        intent=ChemistryIntent.OVERHEAD_BLEED,
-                        status="unsupported",
-                        control_audit=control_audit,
-                        diagnostic={
-                            "reason": (
-                                "cistern_fill_kg must not exceed "
-                                "cavern_capacity_kg"
-                            )
-                        },
-                    )
-
-                partition = partition_melt_oxygen(
-                    bled_o2_mol=bled_o2_mol,
-                    overhead_o2_mol=overhead_o2_mol,
-                    external_o2_holdup_mol=external_o2_holdup_mol,
-                    capacity=capacity,
-                    dt_hr=float(controls.get("dt_hr", 1.0)),
-                    p_o2_Pa=float(controls.get("p_ref_Pa", 0.0)),
-                    k_relief_kg_hr_Pa=float(
-                        controls.get("k_relief_kg_hr_Pa", 0.0)
-                    ),
-                    p_open_Pa=float(controls.get("p_open_Pa", 0.0)),
-                    molar_mass_kg_mol=molar_mass.get(OXYGEN_SPECIES, 0.0),
-                    accumulator_enabled=accumulator_enabled,
-                    cistern_fill_kg=cistern_fill_kg,
-                    cavern_capacity_kg=float(
-                        controls.get("cavern_capacity_kg", 0.0)
-                    ),
-                )
-                external_o2_bled_mol = partition.external_mol
-                o2_stored_mol = partition.admitted_mol
-                o2_accumulated_mol = partition.accumulated_mol
-                melt_o2_vented_mol = partition.relieved_mol
-                o2_held_mol = partition.held_mol
-                melt_o2_bled_mol = (
-                    o2_stored_mol
-                    + o2_accumulated_mol
-                    + melt_o2_vented_mol
-                )
-            else:
-                o2_stored_mol = 0.0
-                melt_o2_vented_mol = 0.0
-        else:
-            melt_o2_vented_mol = 0.0
-            o2_stored_mol = melt_o2_bled_mol
+        candidate_bled_mol = removal.candidate_bled_mol
+        debited_mol = removal.debited_mol
+        bled_o2_mol = removal.candidate_bled_o2_mol
+        external_o2_holdup_mol = removal.external_o2_holdup_mol
+        external_o2_bled_mol = removal.external_o2_bled_mol
+        o2_stored_mol = removal.o2_stored_mol
+        o2_accumulated_mol = removal.o2_accumulated_mol
+        melt_o2_vented_mol = removal.melt_o2_vented_mol
+        o2_held_mol = removal.o2_held_mol
+        melt_o2_bled_mol = removal.melt_o2_bled_mol
+        cistern_fill_kg = removal.cistern_fill_kg
+        accumulator_enabled = removal.accumulator_enabled
         o2_vented_mol = melt_o2_vented_mol + external_o2_bled_mol
-        debited_mol = dict(candidate_bled_mol)
-        actual_o2_debit_mol = (
-            external_o2_bled_mol
-            + o2_stored_mol
-            + o2_accumulated_mol
-            + melt_o2_vented_mol
-        )
-        if actual_o2_debit_mol > 0.0:
-            debited_mol[OXYGEN_SPECIES] = actual_o2_debit_mol
-        else:
-            debited_mol.pop(OXYGEN_SPECIES, None)
         if o2_stored_mol > 0.0:
             credits[OXYGEN_MELT_OFFGAS_ACCOUNT] = {
                 OXYGEN_SPECIES: o2_stored_mol

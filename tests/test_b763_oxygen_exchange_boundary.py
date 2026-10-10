@@ -127,6 +127,60 @@ def test_pumped_vacuum_is_a_fixed_pressure_sink() -> None:
     )
 
 
+def test_removal_forecast_matches_the_bleed_on_the_same_state(monkeypatch) -> None:
+    """A pipe-only forecast of the kinetic credit is not the bleed.
+
+    Premise: sol's Mars hour-24 probe asked the pipe whether it could
+    pass 37.97 mol and got yes, while a 0.001 kg/h cold train with
+    closed relief admits 0.001/M_O2 mol (0.03125 mol at 0.032 kg/mol).
+    Algebra: both the forecast and the dispatch call plan_overhead_bleed
+    on this holdup, so the debit is the admitted mol, not the candidate.
+    Units: capacity kg/h, M kg/mol, removal mol.
+    """
+    from types import SimpleNamespace
+
+    from simulator.core import OXYGEN_MOLAR_MASS_KG_PER_MOL
+    from simulator.thermal_train import FiniteCapacity
+
+    sim = _mars_at_hour24()
+    arriving_mol = _MARS_HOUR24_DN_MOL
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"O2": arriving_mol},
+        source="b763 cold-train probe",
+        material_origin="feedstock",
+    )
+    capacity_kg_hr = 0.001
+    monkeypatch.setattr(
+        sim,
+        "_cold_train_capacity_policy",
+        lambda: (
+            FiniteCapacity(capacity_kg_hr),
+            SimpleNamespace(
+                accumulator_enabled=False,
+                relief={
+                    "k_relief_kg_hr_Pa": 1.0e-6,
+                    "p_open_Pa": 1.0e12,
+                    "vessel_rating_Pa": 1.0e13,
+                },
+            ),
+        ),
+    )
+
+    forecast = sim._headspace_one_hour_o2_removal_mol(0.0)
+    bleed = sim._dispatch_overhead_bleed()
+    diagnostic = dict(bleed.diagnostic or {})
+    admitted_mol = capacity_kg_hr / OXYGEN_MOLAR_MASS_KG_PER_MOL
+
+    assert forecast == diagnostic["bled_o2_mol"]
+    assert forecast == pytest.approx(admitted_mol, rel=1e-12)
+    assert diagnostic["candidate_bled_o2_mol"] == pytest.approx(
+        arriving_mol,
+        rel=1e-6,
+    )
+    assert forecast < 0.1
+
+
 def test_slow_bleed_keeps_the_two_capacitor_exchange() -> None:
     sim = _mars_at_hour24()
     sim._overhead_headspace_config["conductance_kg_s"] = 1.0e-7

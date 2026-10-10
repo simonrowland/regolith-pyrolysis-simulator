@@ -6451,21 +6451,146 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'source_campaign_hour': int(source_context.get('campaign_hour', 0)),
         }
 
-    def _headspace_one_hour_o2_removal_mol(self, arriving_o2_mol: float) -> float:
-        """O2 moles the existing one-hour bleed would remove after a credit.
+    def _overhead_bleed_controls(
+        self,
+        *,
+        holdup_mol: Mapping[str, float],
+        p_total_bar: Any,
+        force_drain_all: bool = False,
+        capacity_result: Any = None,
+        effective_transport_capacity: Any = None,
+    ) -> Tuple[Dict[str, Any], Any]:
+        """Controls for one overhead-bleed sizing.
 
-        Premise: the exchange asks, before it sizes dn, whether the bleed
-        that already runs later this hour can take the arriving O2 back out.
-        Algebra matches ``_bled_species_mol`` with no cold-train override.
-        Conductance is the kg/s capacity against vacuum at the ideal-gas
-        pressure of (current overhead + arriving O2). A finite downstream
-        pressure multiplies by ``compressible_pressure_capacity_fraction``.
-        ``bleed_kg = min(total_kg, conductance_kg_s * fraction * 3600 s)``,
-        then O2 takes its mole-fraction share, capped at the holdup.
-        Units: mol in, mol out. Returns 0 when the headspace is off or the
-        volume, temperature, or conductance cannot move gas. Does not commit.
+        ``_dispatch_overhead_bleed`` and
+        ``_headspace_one_hour_o2_removal_mol`` both pass this dict to
+        ``plan_overhead_bleed``. Conductance is resolved at ``p_total_bar``
+        before a capacity-coupling result replaces that total: the pipe
+        was already evaluated at the diagnostic pressure, and the
+        replacement is only the partial-pressure sum the cold train sees.
+        The second return is the capacity object those controls were
+        built from, so the dispatch can snapshot it without re-reading
+        the policy.
         """
-        if not math.isfinite(arriving_o2_mol) or arriving_o2_mol <= 0.0:
+        species_kg = self._overhead_holdup_species_kg(holdup_mol)
+        configured_downstream_pressure_bar = self._overhead_headspace_config.get(
+            'downstream_pressure_bar'
+        )
+        upstream_Pa = None
+        if effective_transport_capacity is None:
+            try:
+                parsed_total = float(p_total_bar)
+            except (TypeError, ValueError):
+                parsed_total = None
+            if (
+                parsed_total is not None
+                and math.isfinite(parsed_total)
+                and parsed_total >= 0.0
+            ):
+                upstream_Pa = parsed_total * 1.0e5
+        controls: Dict[str, Any] = {
+            'headspace_volume_m3': self._headspace_volume_m3(),
+            'headspace_temperature_K': self._headspace_temperature_K(),
+            'bleed_conductance_kg_s': (
+                effective_transport_capacity.pipe_capacity_kg_hr / 3600.0
+                if effective_transport_capacity is not None
+                else self._headspace_bleed_conductance_kg_s(
+                    species_kg_for_M_avg=species_kg,
+                    p_upstream_Pa=upstream_Pa,
+                )
+            ),
+            'p_total_bar': p_total_bar,
+            'p_downstream_bar': (
+                configured_downstream_pressure_bar
+                if configured_downstream_pressure_bar is not None
+                else self._headspace_downstream_pressure_bar(
+                    effective_transport_capacity
+                )
+            ),
+            'dt_hr': 1.0,
+            'force_drain_all': bool(force_drain_all),
+            'external_o2_in_overhead_mol': getattr(
+                self,
+                '_o2_bubbler_external_o2_in_overhead_mol',
+                0.0,
+            ),
+        }
+        if effective_transport_capacity is not None:
+            controls['effective_transport_capacity'] = (
+                effective_transport_capacity
+            )
+        from simulator.thermal_train import FiniteCapacity
+
+        capacity, cold_train = self._cold_train_capacity_policy()
+        if isinstance(capacity, FiniteCapacity):
+            assert cold_train is not None
+            accumulator_enabled = bool(
+                getattr(cold_train, 'accumulator_enabled', False)
+            )
+            p_ref_Pa = (
+                capacity_result.partial_pressures_Pa.get(OXYGEN_SPECIES, 0.0)
+                if capacity_result is not None
+                else self._headspace_ledger_pO2_bar_from_o2_mol(
+                    float(holdup_mol.get(OXYGEN_SPECIES, 0.0) or 0.0)
+                ) * 100000.0
+            )
+            controls.update({
+                'cold_train_capacity': capacity,
+                'p_ref_Pa': p_ref_Pa,
+                'k_relief_kg_hr_Pa': cold_train.relief[
+                    'k_relief_kg_hr_Pa'
+                ],
+                'p_open_Pa': cold_train.relief['p_open_Pa'],
+                'vessel_rating_Pa': cold_train.relief['vessel_rating_Pa'],
+            })
+            if accumulator_enabled:
+                from simulator.thermal_train import (
+                    thermal_train_parameters_from_mapping,
+                )
+
+                controls.update({
+                    'accumulator_enabled': True,
+                    'cavern_capacity_kg': (
+                        thermal_train_parameters_from_mapping()
+                        .cavern_capacity_kg
+                    ),
+                })
+            if capacity_result is not None:
+                controls['p_total_bar'] = sum(
+                    capacity_result.partial_pressures_Pa.values()
+                ) / 100000.0
+        return controls, capacity
+
+    def _headspace_one_hour_o2_removal_mol(
+        self,
+        arriving_o2_mol: float,
+        *,
+        capacity_result: Any = None,
+        effective_transport_capacity: Any = None,
+    ) -> float:
+        """O2 moles one bleed dispatch removes from this headspace.
+
+        Premise: the hour's removal is the bleed provider's own sizing.
+        A second pipe-only formula reports oxygen the cold train then
+        holds, so this calls ``plan_overhead_bleed`` with the controls
+        ``_dispatch_overhead_bleed`` would commit.
+        Algebra: candidate moles follow conductance or
+        ``EffectiveTransportCapacity.swallowed_flux``, then
+        ``FiniteCapacity`` admits
+        ``min(melt_bled, capacity_kg_hr * dt_hr / M_O2)`` and relieves
+        ``min(remainder, k_relief * max(p_O2 - p_open, 0) * dt / M)``.
+        The returned debit is external + admitted + accumulated + relieved.
+        ``arriving_o2_mol`` of 0 forecasts the ledger as it stands, so
+        the number equals the following dispatch. A positive arrival is
+        the post-credit holdup; its total pressure is the ideal-gas
+        pressure of that holdup because the ledger has not posted it.
+        Units: mol in, mol out; capacity kg/h; M kg/mol. Sanity: 0.001
+        kg/h, closed relief, no accumulator, and 37.97 mol O2 already
+        in the headspace removes ``0.001 / M_O2`` mol (0.03125 mol at
+        0.032 kg/mol), not 37.97. Does not commit. Returns 0 when the
+        headspace is off or the provider would refuse the controls.
+        """
+        if not math.isfinite(arriving_o2_mol) or arriving_o2_mol < 0.0:
             return 0.0
         if not self._overhead_headspace_enabled():
             return 0.0
@@ -6483,47 +6608,61 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             for species, mol in self._overhead_holdup_mol().items()
             if (amount := max(0.0, float(mol))) > 0.0
         }
-        holdup[OXYGEN_SPECIES] = (
-            holdup.get(OXYGEN_SPECIES, 0.0) + float(arriving_o2_mol)
+        if arriving_o2_mol > 0.0:
+            holdup[OXYGEN_SPECIES] = (
+                holdup.get(OXYGEN_SPECIES, 0.0) + float(arriving_o2_mol)
+            )
+            total_mol = sum(holdup.values())
+            p_total_bar = (
+                total_mol * GAS_CONSTANT * temperature_K / (volume_m3 * 1.0e5)
+            )
+            if not math.isfinite(p_total_bar) or p_total_bar <= 0.0:
+                return 0.0
+        else:
+            if not holdup:
+                return 0.0
+            diagnostic = self._overhead_gas_equilibrium_diagnostic()
+            p_total_bar = diagnostic.get('p_total_bar')
+        if not holdup:
+            return 0.0
+        controls, _capacity = self._overhead_bleed_controls(
+            holdup_mol=holdup,
+            p_total_bar=p_total_bar,
+            capacity_result=capacity_result,
+            effective_transport_capacity=effective_transport_capacity,
         )
-        species_kg = self._overhead_holdup_species_kg(holdup)
-        total_mol = sum(holdup.values())
-        total_kg = sum(species_kg.values())
-        if total_mol <= 0.0 or total_kg <= 0.0:
-            return 0.0
-        p_total_bar = (
-            total_mol * GAS_CONSTANT * temperature_K / (volume_m3 * 1.0e5)
-        )
-        if not math.isfinite(p_total_bar) or p_total_bar <= 0.0:
-            return 0.0
-        conductance = self._headspace_bleed_conductance_kg_s(
-            species_kg_for_M_avg=species_kg,
-            p_upstream_Pa=p_total_bar * 1.0e5,
-        )
-        try:
-            conductance_kg_s = float(conductance)
-        except (TypeError, ValueError):
-            return 0.0
-        if not math.isfinite(conductance_kg_s) or conductance_kg_s <= 0.0:
-            return 0.0
-        try:
-            downstream_bar = float(self._headspace_downstream_pressure_bar())
-        except (TypeError, ValueError):
-            return 0.0
         from engines.builtin.overhead_bleed import (
-            compressible_pressure_capacity_fraction,
+            BuiltinOverheadBleedProvider,
+            plan_overhead_bleed,
         )
 
-        fraction = compressible_pressure_capacity_fraction(
-            p_total_bar,
-            downstream_bar,
-        )
-        bleed_kg = min(total_kg, conductance_kg_s * fraction * 3600.0)
-        if bleed_kg <= 0.0 or not math.isfinite(bleed_kg):
+        if (
+            BuiltinOverheadBleedProvider._invalid_destructive_control(controls)
+            is not None
+        ):
             return 0.0
-        bleed_total_mol = min(total_mol, bleed_kg * total_mol / total_kg)
-        o2_mol = holdup[OXYGEN_SPECIES]
-        return min(o2_mol, o2_mol * bleed_total_mol / total_mol)
+        molar_mass = {
+            species: resolve_species_formula(
+                species,
+                self.atom_ledger.registry,
+            ).molar_mass_kg_per_mol()
+            for species in holdup
+        }
+        cistern_o2_mol = float(
+            self.atom_ledger.mol_by_account(
+                OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT
+            ).get(OXYGEN_SPECIES, 0.0)
+            or 0.0
+        )
+        removal = plan_overhead_bleed(
+            holdup,
+            molar_mass_kg_per_mol=molar_mass,
+            controls=controls,
+            cistern_o2_mol=cistern_o2_mol,
+        )
+        if removal.refusal_reason is not None:
+            return 0.0
+        return removal.bled_o2_mol
 
     def _apply_oxygen_reservoir_exchange(
         self,
@@ -6845,101 +6984,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         effective_transport_capacity=None,
     ) -> IntentResult:
         diagnostic = self._overhead_gas_equilibrium_diagnostic()
-        species_kg_for_M_avg = self._overhead_holdup_species_kg()
-        configured_downstream_pressure_bar = self._overhead_headspace_config.get(
-            'downstream_pressure_bar'
-        )
         # Hard vacuum commands p_total = 0. The pipe's mass capacity is the
         # Poiseuille value at the actual headspace pressure, not at the 1 Pa
         # floor of that command. Controlled-pO2 keeps its own flow result.
-        upstream_Pa = None
-        if effective_transport_capacity is None:
-            raw_total = diagnostic.get('p_total_bar')
-            try:
-                parsed_total = float(raw_total)
-            except (TypeError, ValueError):
-                parsed_total = None
-            if (
-                parsed_total is not None
-                and math.isfinite(parsed_total)
-                and parsed_total >= 0.0
-            ):
-                upstream_Pa = parsed_total * 1.0e5
-        controls: Dict[str, Any] = {
-            'headspace_volume_m3': self._headspace_volume_m3(),
-            'headspace_temperature_K': self._headspace_temperature_K(),
-            'bleed_conductance_kg_s': (
-                effective_transport_capacity.pipe_capacity_kg_hr / 3600.0
-                if effective_transport_capacity is not None
-                else self._headspace_bleed_conductance_kg_s(
-                    species_kg_for_M_avg=species_kg_for_M_avg,
-                    p_upstream_Pa=upstream_Pa,
-                )
-            ),
-            'p_total_bar': diagnostic.get('p_total_bar'),
-            'p_downstream_bar': (
-                configured_downstream_pressure_bar
-                if configured_downstream_pressure_bar is not None
-                else self._headspace_downstream_pressure_bar(
-                    effective_transport_capacity
-                )
-            ),
-            'dt_hr': 1.0,
-            'force_drain_all': bool(force_drain_all),
-            'external_o2_in_overhead_mol': getattr(
-                self,
-                '_o2_bubbler_external_o2_in_overhead_mol',
-                0.0,
-            ),
-        }
-        if effective_transport_capacity is not None:
-            controls['effective_transport_capacity'] = (
-                effective_transport_capacity
-            )
-        from simulator.thermal_train import FiniteCapacity
-
-        capacity, cold_train = self._cold_train_capacity_policy()
+        controls, capacity = self._overhead_bleed_controls(
+            holdup_mol=self._overhead_holdup_mol(),
+            p_total_bar=diagnostic.get('p_total_bar'),
+            force_drain_all=force_drain_all,
+            capacity_result=capacity_result,
+            effective_transport_capacity=effective_transport_capacity,
+        )
         # Snapshot for _project_overhead_bleed_partition: the policy re-reads
         # config on every call, so the projection must reuse the exact
         # capacity this dispatch partitioned with, never a fresh read.
         self._last_bleed_cold_train_capacity = capacity
-        if isinstance(capacity, FiniteCapacity):
-            assert cold_train is not None
-            accumulator_enabled = bool(
-                getattr(cold_train, 'accumulator_enabled', False)
-            )
-            p_ref_Pa = (
-                capacity_result.partial_pressures_Pa.get(OXYGEN_SPECIES, 0.0)
-                if capacity_result is not None
-                else self._headspace_ledger_pO2_bar_from_o2_mol(
-                    self._overhead_holdup_mol().get(OXYGEN_SPECIES, 0.0)
-                ) * 100000.0
-            )
-            controls.update({
-                'cold_train_capacity': capacity,
-                'p_ref_Pa': p_ref_Pa,
-                'k_relief_kg_hr_Pa': cold_train.relief[
-                    'k_relief_kg_hr_Pa'
-                ],
-                'p_open_Pa': cold_train.relief['p_open_Pa'],
-                'vessel_rating_Pa': cold_train.relief['vessel_rating_Pa'],
-            })
-            if accumulator_enabled:
-                from simulator.thermal_train import (
-                    thermal_train_parameters_from_mapping,
-                )
-
-                controls.update({
-                    'accumulator_enabled': True,
-                    'cavern_capacity_kg': (
-                        thermal_train_parameters_from_mapping()
-                        .cavern_capacity_kg
-                    ),
-                })
-            if capacity_result is not None:
-                controls['p_total_bar'] = sum(
-                    capacity_result.partial_pressures_Pa.values()
-                ) / 100000.0
         result = self._dispatch_and_commit(
             ChemistryIntent.OVERHEAD_BLEED,
             control_inputs=controls,
