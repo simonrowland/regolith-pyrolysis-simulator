@@ -594,27 +594,48 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
                 getattr(equilibrium, 'phases_present', ()) or ()
             )
         )
-        phase_masses_kg = {
-            str(k): float(v)
-            for k, v in dict(
-                getattr(equilibrium, 'phase_masses_kg', {}) or {}
-            ).items()
-            if _is_finite(v) and float(v) > 0.0
-        }
-        liquid_comp = {
-            str(k): float(v)
-            for k, v in dict(
-                getattr(equilibrium, 'liquid_composition_wt_pct', {}) or {}
-            ).items()
-            if _is_finite(v)
-        }
+        projection_warnings = list(warnings)
+        phase_masses_kg = {}
+        for phase, value in dict(
+            getattr(equilibrium, 'phase_masses_kg', {}) or {}
+        ).items():
+            finite = _is_finite(value)
+            numeric = float(value) if finite else None
+            if numeric is None or numeric <= 0.0:
+                reason = 'nonfinite' if numeric is None else 'nonpositive'
+                projection_warnings.append(
+                    'MAGEMin provider omitted '
+                    f'{reason} phase_masses_kg field for phase {str(phase)!r}: '
+                    f'{value!r}'
+                )
+                continue
+            phase_masses_kg[str(phase)] = numeric
+
+        liquid_comp = {}
+        for field, value in dict(
+            getattr(equilibrium, 'liquid_composition_wt_pct', {}) or {}
+        ).items():
+            finite = _is_finite(value)
+            numeric = float(value) if finite else None
+            if numeric is None:
+                projection_warnings.append(
+                    'MAGEMin provider omitted nonfinite '
+                    'liquid_composition_wt_pct field '
+                    f'{str(field)!r} for phase liquid: {value!r}'
+                )
+                continue
+            liquid_comp[str(field)] = numeric
         liquid_fraction_raw = getattr(equilibrium, 'liquid_fraction', None)
+        if liquid_fraction_raw is not None and not _is_finite(liquid_fraction_raw):
+            projection_warnings.append(
+                'MAGEMin provider omitted nonfinite liquid_fraction field '
+                f'for phase liquid: {liquid_fraction_raw!r}'
+            )
         liquid_fraction = (
             float(liquid_fraction_raw)
             if liquid_fraction_raw is not None and _is_finite(liquid_fraction_raw)
             else None
         )
-
         # Modal abundance: project per-phase mass onto wt% summing to 100.
         # Same projection AlphaMELTS uses; the parity comparator looks up
         # ``phase_modes_wt_pct`` directly.
@@ -633,6 +654,13 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         # liquidus (``liquid_fraction == 1.0`` from a known single-phase
         # MAGEMin run). Otherwise leave it None and let the parity
         # comparator hit its conservative "cannot evaluate" branch.
+        for field in ('liquidus_T_K', 'liquidus_T_C', 'solidus_T_C'):
+            value = getattr(equilibrium, field, None)
+            if value is not None and not _is_finite(value):
+                projection_warnings.append(
+                    f'MAGEMin provider omitted nonfinite {field} field '
+                    f'for phase liquid: {value!r}'
+                )
         liquidus_T_K = _safe_attr_float(equilibrium, 'liquidus_T_K')
         liquidus_T_C: Optional[float] = None
         if liquidus_T_K is not None:
@@ -681,7 +709,7 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
             mode=mode,
             engine_version=engine_version,
             backend_status=backend_status,
-            backend_warnings=warnings,
+            backend_warnings=tuple(projection_warnings),
             backend_diagnostics=backend_diagnostics,
             backend_status_reason=backend_status_reason,
         )

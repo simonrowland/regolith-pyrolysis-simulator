@@ -1,0 +1,300 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2355/isijinternational.36.983
+  citation: H. Ohta and H. Suito, "Activities in CaO-MgO-Al2O3 Slags and Deoxidation Equilibria of Al, Mg, and Ca", ISIJ International
+    36(8) (1996) 983–990.
+  source_ids:
+  - ohta-1996-cao-mgo-al2o3-activities
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+    files:
+    - asset_id: pdf:ohta-1996-cao-mgo-al2o3-activities
+      role: pdf
+      path: raw/ohta-1996-cao-mgo-al2o3-activities/ohta-1996-cao-mgo-al2o3-activities.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:ohta-1996-cao-mgo-al2o3-activities
+      role: pdftotext
+      path: text/ohta-1996-cao-mgo-al2o3-activities
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:ohta-1996-cao-mgo-al2o3-activities
+      role: table_csv
+      path: tables/ohta-1996-cao-mgo-al2o3-activities
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: unknown:ohta-1996-cao-mgo-al2o3-activities
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2355/isijinternational.36.983
+experiments:
+- experiment_id: 10.2355/isijinternational.36.983::ohta-1996-cao-mgo-al2o3-activities
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.36.983
+  locator:
+    published_page: 985
+    pdf_page_index: 3
+    section: '3.1'
+    note: mark=A
+context:
+- observation_id: ohta_1996_bearing_steel_example_conditions
+  type: method
+  locator:
+    published_page: 989
+    pdf_page_index: 7
+    section: 4. Deoxidation Equilibria of Al, Mg, and Ca
+  units: mass%; K; mass ppm
+  values:
+    quantity: bearing_steel_example_composition_and_oxygen_range
+    method_class: quoted
+    temperature_K: 1823
+    composition_mass_pct:
+      C: '1'
+      Cr: '1.4'
+      Mn: '0.4'
+      Si: '0.3'
+      Al: '0.02'
+    oxygen_range_mass_ppm:
+    - 8
+    - 10
+    note: Fig. 12 iso-composition lines remain figure_only and are not digitised.
+  context_id: ohta-1996-cao-mgo-al2o3-activities::context::ohta_1996_bearing_steel_example_conditions
+  work_id: 10.2355/isijinternational.36.983
+  source_id: ohta-1996-cao-mgo-al2o3-activities
+  species: CaO
+- observation_id: ohta_1996_cao_assessment_equation6
+  type: method
+  locator:
+    published_page: 987
+    pdf_page_index: 5
+    equation: '6'
+  units: equation as printed
+  values:
+    quantity: CaO_activity_assessment_relation
+    method_class: quoted
+    relation_as_printed: log a_CaO = log(CS · γCaS) + log{(α · KO)/(K5 · KS)}
+    note: Numeric context for the paper's CaO activity assessment; no values digitised from Fig. 6.
+  context_id: ohta-1996-cao-mgo-al2o3-activities::context::ohta_1996_cao_assessment_equation6
+  work_id: 10.2355/isijinternational.36.983
+  source_id: ohta-1996-cao-mgo-al2o3-activities
+  species: CaO
+- observation_id: ohta_1996_cao_iso_activity_one_saturation_line
+  type: method
+  locator:
+    published_page: 987
+    pdf_page_index: 5
+    section: 3.2 Iso-activity Line for CaO
+  units: dimensionless activity
+  values:
+    quantity: iso_activity_relation
+    relation_as_printed: The dash-dotted lines in Figs. 6(a) and 6(b) correspond to iso-CaO activity lines for a_CaO = 1.
+    activity: 1
+    method_class: method_only
+    note: Line relation is prose; figure curves remain undigitised.
+  context_id: ohta-1996-cao-mgo-al2o3-activities::context::ohta_1996_cao_iso_activity_one_saturation_line
+  work_id: 10.2355/isijinternational.36.983
+  source_id: ohta-1996-cao-mgo-al2o3-activities
+  species: CaO
+- observation_id: ohta_1996_cao_solubility_in_mgo_prior_study
+  type: method
+  locator:
+    published_page: 988
+    pdf_page_index: 6
+    section: 3.4 Iso-activity Line for MgO
+  units: mass%
+  values:
+    quantity: CaO_solubility_in_MgO_phase
+    method_class: quoted
+    attribution: reference 34 (Doman et al.)
+    at_1823_K: '0.6'
+    at_1873_K: '0.8'
+  context_id: ohta-1996-cao-mgo-al2o3-activities::context::ohta_1996_cao_solubility_in_mgo_prior_study
+  work_id: 10.2355/isijinternational.36.983
+  source_id: ohta-1996-cao-mgo-al2o3-activities
+  species: CaO
+- observation_id: ohta_1996_cas_solubility_limits_prior_study
+  type: method
+  locator:
+    published_page: 986
+    pdf_page_index: 4
+    section: 3.2 Iso-activity Line for CaO
+  units: mass%
+  values:
+    quantity: CaS_solubility_limit_in_CaO_Al2O3_slag
+    method_class: quoted
+    attribution: reference 9 (Inoue and Suito)
+    Al2O3_crucible: '1.79'
+    CaO_crucible: '4.52'
+    note: CaS solubility limits in CaO-Al2O3 slag at 1873 K, quoted from reference 9.
+  context_id: ohta-1996-cao-mgo-al2o3-activities::context::ohta_1996_cas_solubility_limits_prior_study
+  work_id: 10.2355/isijinternational.36.983
+  source_id: ohta-1996-cao-mgo-al2o3-activities
+  species: CaO
+- observation_id: ohta_1996_fig6_iso_activity_cao_figure_only
+  type: method
+  locator:
+    published_page: 987
+    pdf_page_index: 5
+    figure: '6'
+  units: none
+  values:
+    quantity: iso_activity_lines_of_CaO
+    method_class: method_only
+    admission_status: figure_only
+    note: Fig. 6 iso-activity lines of CaO at 1873 and 1823 K in CaO-MgO-Al2O3; points not digitised; binary-edge values not
+      re-invented from the figure
+  context_id: ohta-1996-cao-mgo-al2o3-activities::context::ohta_1996_fig6_iso_activity_cao_figure_only
+  work_id: 10.2355/isijinternational.36.983
+  source_id: ohta-1996-cao-mgo-al2o3-activities
+  species: CaO
+- observation_id: ohta_1996_manganese_distribution_ratio_spinel_line
+  type: method
+  locator:
+    published_page: 986
+    pdf_page_index: 4
+    section: '3.1'
+  units: dimensionless ratio
+  values:
+    quantity: manganese_distribution_ratio
+    method_class: quoted
+    relation_as_printed: L_Mn = (mass% Mn)/[mass% Mn]
+    range_as_printed:
+    - '1.3'
+    - '6.7'
+    note: Along the spinel-saturation line; not represented by an existing battery quantity.
+  context_id: ohta-1996-cao-mgo-al2o3-activities::context::ohta_1996_manganese_distribution_ratio_spinel_line
+  work_id: 10.2355/isijinternational.36.983
+  source_id: ohta-1996-cao-mgo-al2o3-activities
+  species: CaO
+- observation_id: ohta_1996_method_scope
+  type: method
+  locator:
+    published_page: 983
+    pdf_page_index: 1
+    section: Synopsis / Introduction
+  units: K; mass%
+  values:
+    quantity: slag_metal_equilibration_method_and_activity_assessment_scope
+    method_class: method_only
+    experimental_method: Master slag was premelted from reagent CaCO3, MgO, and Al2O3 in a Pt crucible under air. Each experiment
+      used 30 g electrolytic iron initially containing about 500 to 1000 mass ppm O and 7 g CaO-Al2O3-MgO slag with an appropriate
+      amount of FeS. Fe-1 to 20 mass% Al or Fe-1 to 10 mass% Mn alloy was added by dropping. The slag-metal charge was held
+      in an Al2O3 or MgO crucible at 1823 or 1873 K under deoxidized Ar; it was stirred for 2 h in MgO crucibles and 3 h in
+      Al2O3 crucibles, with an Al2O3 rod used for 90 s every 30 min. Equilibrium was reached in about 2 h; the melt was unstirred
+      for at least 1 h before quenching, then quenched rapidly in a He gas stream and in water. Chemical analysis methods
+      for metal and slag phases are described in the cited prior articles.
+    temperatures_K:
+    - 1823
+    - 1873
+    a_CaO_assessment_as_printed: activities of CaO in entire liquid region first determined at 1823 and 1873 K from reported
+      sulfide capacities coupled with activity coefficients of CaS estimated from those in CaO-Al2O3 slags
+    a_Al2O3_MgO_as_printed: on basis of CaO iso-activity lines, activities of Al2O3 and MgO calculated by Schuhmann method
+      using spinel-saturation a(Al2O3) and a(MgO) as starting points
+    binary_edge_note: for the CaO-Al2O3 binary join this paper is partly derived from prior Cs / γ(CaS) data (refs cited),
+      not an independent gas-slag binary activity table; iso-activity figures (Fig. 6) are figure_only here
+    standard_states_as_printed: Solute activities in liquid iron use a dilute solution of one mass percent standard state.
+      Al2O3, CaO, MgO, and MnO activities use solid standard states. Fe_tO activity coefficient is referred to the liquid
+      standard state. γ(Fe_tO) is on the liquid standard state; γ(MnO) is relative to solid MnO.
+    how_equilibrium_shown_as_printed: time trials found equilibrium in ~2 h; unstirred >=1 h before quench; metal/slag analyses
+      as in prior articles
+  context_id: ohta-1996-cao-mgo-al2o3-activities::context::ohta_1996_method_scope
+  work_id: 10.2355/isijinternational.36.983
+  source_id: ohta-1996-cao-mgo-al2o3-activities
+  species: CaO
+- observation_id: ohta_1996_mg_equilibrium_comparators
+  type: method
+  locator:
+    published_page: 988
+    pdf_page_index: 6
+    section: 3.4 Iso-activity Line for MgO
+  units: as printed
+  values:
+    quantity: cited_Mg_equilibrium_comparators
+    method_class: quoted
+    reaction_as_printed: MgO(s) = Mg + O (Eq. 8)
+    DeltaG8_as_printed: ΔG°8 = 728600 − 238.4 T J/mol
+    log_K_Mg_from_DeltaG8: '-7.86'
+    log_K_Mg_Inoue_and_Suito: -7.8 ± 0.2
+    e_O_Mg_Inoue_and_Suito: -190 ± 60
+    e_O_Mg_Kulikov: -160
+    attributions:
+      log_K_Mg_from_DeltaG8: ΔG°8, refs. 19, 22, 23
+      log_K_Mg_Inoue_and_Suito: ref. 7
+      e_O_Mg_Inoue_and_Suito: ref. 7
+      e_O_Mg_Kulikov: ref. 37
+  context_id: ohta-1996-cao-mgo-al2o3-activities::context::ohta_1996_mg_equilibrium_comparators
+  work_id: 10.2355/isijinternational.36.983
+  source_id: ohta-1996-cao-mgo-al2o3-activities
+  species: CaO
+- observation_id: ohta_1996_mgo_equilibrium_constant_1873
+  type: method
+  locator:
+    published_page: 988
+    pdf_page_index: 6
+    section: 3.4 Iso-activity Line for MgO
+  units: log10 K_Mg
+  values:
+    quantity: Mg_equilibrium_constant_activity_ratio
+    method_class: quoted
+    reaction_as_printed: MgO(s) = Mg + O
+    relation_as_printed: K_Mg = (a_Mg · a_O)/a_MgO
+    temperature_K: 1873
+    value: '-7.8'
+    uncertainty: '0.2'
+    apparent_product_as_printed: K'_Mg = [mass% Mg] · [mass% O]
+    note: Author estimate from the activity-ratio intercept; the separate apparent-product symbol is K'_Mg.
+  context_id: ohta-1996-cao-mgo-al2o3-activities::context::ohta_1996_mgo_equilibrium_constant_1873
+  work_id: 10.2355/isijinternational.36.983
+  source_id: ohta-1996-cao-mgo-al2o3-activities
+  species: CaO
+- observation_id: ohta_1996_mgo_solubility_in_cao_prior_study
+  type: method
+  locator:
+    published_page: 987
+    pdf_page_index: 5
+    section: 3.2 Iso-activity Line for CaO
+  units: mass%
+  values:
+    quantity: MgO_solubility_in_CaO_phase
+    method_class: quoted
+    attribution: reference 34 (Doman et al.)
+    at_1873_K: '2.3'
+    at_1823_K: '1.9'
+  context_id: ohta-1996-cao-mgo-al2o3-activities::context::ohta_1996_mgo_solubility_in_cao_prior_study
+  work_id: 10.2355/isijinternational.36.983
+  source_id: ohta-1996-cao-mgo-al2o3-activities
+  species: CaO

@@ -197,6 +197,58 @@ def test_openimcc_battery_surfaces_complex_saturation_notice() -> None:
 
 
 @pytest.mark.parametrize(
+    "composition_mol, expected_sinks",
+    [
+        ({"CaO": 0.9, "Al2O3": 0.1}, ("Al2O3",)),
+        (
+            {"Na2O": 0.2, "CaO": 0.4, "Al2O3": 0.2, "TiO2": 0.2},
+            ("Al2O3", "TiO2"),
+        ),
+    ],
+)
+def test_openimcc_battery_emits_one_notice_per_exhausted_sink(
+    composition_mol, expected_sinks
+) -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import _OpenImccBatteryBackend
+
+    molar_mass = {"Na2O": 61.9789, "CaO": 56.077, "Al2O3": 101.961, "TiO2": 79.866}
+    backend = _OpenImccBatteryBackend("openimcc")
+    result = backend.equilibrate(
+        temperature_C=1800.0 - 273.15,
+        composition_kg={
+            oxide: amount * molar_mass[oxide] / 1000.0
+            for oxide, amount in composition_mol.items()
+        },
+        composition_mol=composition_mol,
+    )
+    edge_flags = tuple(
+        str(row.get("reason", row.get("flag", "")))
+        for row in result.imcc_notices
+        if str(row.get("reason", row.get("flag", ""))).startswith(
+            "species-coverage-edge"
+        )
+    )
+    actual_sinks = tuple(
+        sink for sink in expected_sinks
+        if any(f"x*({sink})" in flag for flag in edge_flags)
+    )
+    if actual_sinks != expected_sinks:
+        pytest.skip(
+            "installed openimcc does not emit the requested multi-sink coverage-edge flags"
+        )
+
+    notices = [
+        row for row in result.imcc_notices
+        if row.get("kind") == "imcc_complex_saturation"
+    ]
+    assert len(notices) == len(expected_sinks)
+    for sink, notice in zip(expected_sinks, notices, strict=True):
+        assert notice["sink_name"] == sink
+        assert notice["sink_ratio"] > 0.0
+        assert "acid_sink_ratio" not in notice
+
+
+@pytest.mark.parametrize(
     "composition_mol",
     [
         {"K2O": 0.500002, "SiO2": 0.499998},

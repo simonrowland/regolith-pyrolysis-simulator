@@ -99,8 +99,24 @@ _TE_FORMULA: dict[str, str] = {
 }
 
 _THERMO_QUANTITIES = FORMATION_QUANTITIES | EQUILIBRIUM_FIT_QUANTITIES | PURE_STANDARD_THERMO
+_ENGINE_ELLINGHAM_QUANTITIES = frozenset(
+    {Quantity.DELTA_FG, Quantity.LOG10_KF}
+)
+_ENGINE_PURE_PHASE_QUANTITIES = frozenset(
+    {Quantity.CP, Quantity.S, Quantity.H_MINUS_H298}
+)
+_ENGINE_THERMO_QUANTITIES: dict[Engine, frozenset[Quantity]] = {
+    Engine.INTERNAL_ANALYTICAL: _ENGINE_ELLINGHAM_QUANTITIES,
+    Engine.VAPOROCK: _ENGINE_PURE_PHASE_QUANTITIES,
+    Engine.THERMOENGINE: _ENGINE_PURE_PHASE_QUANTITIES,
+    Engine.MAGEMIN: _ENGINE_PURE_PHASE_QUANTITIES,
+}
 _H298_K = 298.15
 _PA_PER_BAR = Decimal("100000")
+
+
+def _engine_thermo_quantities(engine: Engine) -> frozenset[Quantity]:
+    return _ENGINE_THERMO_QUANTITIES.get(engine, frozenset())
 
 
 @dataclass(frozen=True)
@@ -418,7 +434,7 @@ def _ellingham_attempt(
     K2O at 298.15 K is outside the 1100 K K(g) segment and is refused.
     """
 
-    if quantity not in {Quantity.DELTA_FG, Quantity.LOG10_KF}:
+    if quantity not in _engine_thermo_quantities(Engine.INTERNAL_ANALYTICAL):
         return _refuse(
             RefusalReason.UNSUPPORTED,
             "ellingham-emits-reaction-dg-only",
@@ -830,7 +846,7 @@ def _pure_phase_attempt(
             origin=origin,
             extra={"engine": engine.value},
         )
-    if quantity not in {Quantity.CP, Quantity.S, Quantity.H_MINUS_H298}:
+    if quantity not in _engine_thermo_quantities(engine):
         return _refuse(
             RefusalReason.UNSUPPORTED,
             "engine-thermo-does-not-emit",
@@ -972,7 +988,7 @@ def _vaporock_gas_attempt(
         not isinstance(phase, State)
         or not phase.is_value
         or phase.value is not Phase.G
-        or quantity not in {Quantity.CP, Quantity.S, Quantity.H_MINUS_H298}
+        or quantity not in _engine_thermo_quantities(Engine.VAPOROCK)
     ):
         return _refuse(
             RefusalReason.UNSUPPORTED,

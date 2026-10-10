@@ -91,6 +91,106 @@ experiments:
     published_page: 3710
     section: Experimental
     note: Samples evaporated from tungsten effusion cells.
+phase_field_records:
+  # t-1123a (regolith-main ruling 2026-10-06 + regolith-physics confirmation). Printed facts read by the
+  # general two-test rule in simulator/battery/phase_field.py. Only the outside_side reading is not printed.
+  liquidus:
+  - id: stolyarova-1991-cao-sio2-lime-side-liquidus
+    system: CaO-SiO2
+    component: SiO2
+    amount_basis: mole_fraction
+    position_as_printed: 0.37 ± 0.02
+    position: '0.37'
+    sigma: '0.02'
+    temperature_K_as_captioned: 1933.0
+    superseded_positions: ['0.41']
+    superseded_as_printed: earlier mentioned 0.41 mole fraction of SiO2 (30)
+    outside_side: below
+    outside_side_basis: Reading, not printed. The paper prints no per-row phase. On the CaO-SiO2 diagram the single-liquid
+      field is the SiO2-rich side of this liquidus point; compositions below it (lime side) are outside the single-liquid
+      field. Adopted by regolith-main (t-1123 Q1) and confirmed by regolith-physics, 2026-10-06.
+    text_as_printed: The congruent character of vaporization processes in the range from 0.01 to 0.37 ± 0.02 mole fractions
+      of SiO2 was shown on the basis of analysis of the dependencies of the CaO, Ca, and SiO evaporation isotherms, Fig. 1.
+      Owing to this observation, we concluded that the liquidus point on the phase diagram may be corrected compared with
+      the earlier mentioned 0.41 mole fraction of SiO2 (30).
+    locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, note: 'Right column, last paragraph of Results; its Fig. 1 is captioned 1933 K. Ref. (30) is the earlier phase diagram. The sentence itself prints no temperature.'}
+  plateaus:
+  - id: stolyarova-1991-table-ia-1993k-lime-plateau
+    temperature_K_as_captioned: 1993.0
+    composition_field: SiO2_mole_fraction_as_printed
+    compositions: ['0.33', '0.25']
+    locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: Ia}
+    series:
+    - observation_id: stolyarova_1991_ca_partial_pressure_1993k_complete_evaporation
+      field: P_Ca_times_10^7_atm_as_printed
+      sigma_basis: printed
+    - observation_id: stolyarova_1991_ca_partial_pressure_1993k_ion_comparison
+      field: P_Ca_times_10^7_atm_as_printed
+      sigma_basis: printed
+    - observation_id: stolyarova_1991_cao_partial_pressure_1993k_complete_evaporation
+      field: P_CaO_times_10^8_atm_as_printed
+      sigma_basis: printed
+    - observation_id: stolyarova_1991_cao_partial_pressure_1993k_ion_comparison
+      field: P_CaO_times_10^8_atm_as_printed
+      sigma_basis: printed
+  - id: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
+    temperature_K_as_captioned: 1933.0
+    composition_field: SiO2_mole_fraction_as_printed
+    compositions: ['0.33', '0.25']
+    locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ib, IIa, IIb'}
+    series:
+    - observation_id: stolyarova_1991_sio_partial_pressure_1933k_complete_evaporation
+      field: P_SiO_times_10^6_atm_as_printed
+      sigma_basis: printed
+    - observation_id: stolyarova_1991_sio_partial_pressure_1933k_ion_comparison
+      field: P_SiO_times_10^6_atm_as_printed
+      sigma_basis: printed
+    - observation_id: stolyarova_1991_sio2_gas_partial_pressure_1933k_ion_comparison
+      field: P_SiO2_times_10^9_atm_as_printed
+      sigma_basis: none_printed
+      untestable_reason: Table Ib prints no ± for this column, so the plateau test cannot be applied.
+    - observation_id: stolyarova_1991_o_atomic_partial_pressure_1933k_equilibrium
+      field: P_O_times_10^10_atm_as_printed
+      sigma_basis: none_printed
+      untestable_reason: Table Ib prints no ± for this column, so the plateau test cannot be applied.
+    - observation_id: stolyarova_1991_cao_activity_eq2_1933k
+      field: a_CaO_as_printed
+      sigma_basis: printed
+    - observation_id: stolyarova_1991_sio2_activity_eq3_1933k
+      field: a_SiO2_as_printed
+      sigma_basis: printed
+    - observation_id: stolyarova_1991_cao_activity_eq5_1933k
+      field: a_CaO_as_printed
+      sigma_basis: relative
+      relative_sigma: '0.15'
+      sigma_locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, note: 'The relative uncertainties of the determination of the CaO and SiO2 activities according to Eq. [5]-[8] were not more than 15%.'}
+    - observation_id: stolyarova_1991_cao_activity_eq7_1933k
+      field: a_CaO_as_printed
+      sigma_basis: relative
+      relative_sigma: '0.15'
+      sigma_locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, note: 'The relative uncertainties of the determination of the CaO and SiO2 activities according to Eq. [5]-[8] were not more than 15%.'}
+    - observation_id: stolyarova_1991_sio2_activity_eq6_1933k
+      field: a_SiO2_as_printed
+      sigma_basis: relative
+      relative_sigma: '0.15'
+      sigma_locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, note: 'The relative uncertainties of the determination of the CaO and SiO2 activities according to Eq. [5]-[8] were not more than 15%.'}
+    - observation_id: stolyarova_1991_sio2_activity_eq8_1933k
+      field: a_SiO2_as_printed
+      sigma_basis: relative
+      relative_sigma: '0.15'
+      sigma_locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, note: 'The relative uncertainties of the determination of the CaO and SiO2 activities according to Eq. [5]-[8] were not more than 15%.'}
+    named_failure:
+      observation_id: stolyarova_1991_sio2_activity_eq8_1933k
+      reason: Eq. [8]* is a Belton-Fruehan integral of the measured ion-current ratio and has no printed ±; tested at
+        the paper's 15% bound it gives z = 2.98 on {0.33, 0.25}. It is the one series allowed to fail, and it is named.
+  caption_notes:
+  - table: Ia
+    note: Table Ia is captioned 1993 K as printed, while the abstract states the measurements were at 1933 K, and Table IIa
+      (captioned 1933 K) reproduces the Table Ia P_CaO ratios to 0.01 dex (regolith-empirical t-1123 proposal pre-check,
+      not printed). The caption is left as printed (regolith-main t-1123 Q5).
+      A misprint ruling needs internal evidence (text, another table, or the experimental section stating 1933 K for this
+      series), not a temperature difference by itself.
+    locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: Ia, note: 'Caption: "... CaO-SiO2 system at 1993 K obtained by the complete evaporation method (1) and the ion comparison method (2)." Abstract, p. 3710: "... 0.1-0.5 mole fraction of SiO2 at 1933 K."'}
 species:
   Ca:
     observations:
@@ -193,6 +293,14 @@ species:
           pressure_atm: 4.96e-06
           sigma: 4.0e-07
         - SiO2_mole_fraction_as_printed: '0.33'
+          phase_field_class:
+            class: outside_single_liquid_field
+            basis:
+              criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
+              liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
+              plateau: stolyarova-1991-table-ia-1993k-lime-plateau
+              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: Ia, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              test_values: {x: '0.33', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '0.72', plateau_series_tested: 4, plateau_series_failing: [], plateau_series_untestable: 0}
           P_Ca_times_10^7_atm_as_printed: 50.1 ± 4.0
           point_conditions:
             composition:
@@ -201,6 +309,14 @@ species:
           pressure_atm: 5.01e-06
           sigma: 4.0e-07
         - SiO2_mole_fraction_as_printed: '0.25'
+          phase_field_class:
+            class: outside_single_liquid_field
+            basis:
+              criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
+              liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
+              plateau: stolyarova-1991-table-ia-1993k-lime-plateau
+              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: Ia, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              test_values: {x: '0.25', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '0.72', plateau_series_tested: 4, plateau_series_failing: [], plateau_series_untestable: 0}
           P_Ca_times_10^7_atm_as_printed: 49.9 ± 4.0
           point_conditions:
             composition:
@@ -355,6 +471,14 @@ species:
           pressure_atm: 4.87e-06
           sigma: 5.0e-07
         - SiO2_mole_fraction_as_printed: '0.33'
+          phase_field_class:
+            class: outside_single_liquid_field
+            basis:
+              criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
+              liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
+              plateau: stolyarova-1991-table-ia-1993k-lime-plateau
+              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: Ia, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              test_values: {x: '0.33', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '0.72', plateau_series_tested: 4, plateau_series_failing: [], plateau_series_untestable: 0}
           P_Ca_times_10^7_atm_as_printed: 49.2 ± 5.0
           point_conditions:
             composition:
@@ -363,6 +487,14 @@ species:
           pressure_atm: 4.92e-06
           sigma: 5.0e-07
         - SiO2_mole_fraction_as_printed: '0.25'
+          phase_field_class:
+            class: outside_single_liquid_field
+            basis:
+              criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
+              liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
+              plateau: stolyarova-1991-table-ia-1993k-lime-plateau
+              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: Ia, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              test_values: {x: '0.25', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '0.72', plateau_series_tested: 4, plateau_series_failing: [], plateau_series_untestable: 0}
           P_Ca_times_10^7_atm_as_printed: 50.9 ± 5.0
           point_conditions:
             composition:
@@ -526,6 +658,14 @@ species:
           pressure_atm: 6.170000000000001e-07
           sigma: 4.0e-08
         - SiO2_mole_fraction_as_printed: '0.33'
+          phase_field_class:
+            class: outside_single_liquid_field
+            basis:
+              criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
+              liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
+              plateau: stolyarova-1991-table-ia-1993k-lime-plateau
+              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: Ia, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              test_values: {x: '0.33', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '0.72', plateau_series_tested: 4, plateau_series_failing: [], plateau_series_untestable: 0}
           P_CaO_times_10^8_atm_as_printed: 75.8 ± 5.0
           point_conditions:
             composition:
@@ -534,6 +674,14 @@ species:
           pressure_atm: 7.58e-07
           sigma: 5.0e-08
         - SiO2_mole_fraction_as_printed: '0.25'
+          phase_field_class:
+            class: outside_single_liquid_field
+            basis:
+              criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
+              liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
+              plateau: stolyarova-1991-table-ia-1993k-lime-plateau
+              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: Ia, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              test_values: {x: '0.25', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '0.72', plateau_series_tested: 4, plateau_series_failing: [], plateau_series_untestable: 0}
           P_CaO_times_10^8_atm_as_printed: 78.8 ± 5.0
           point_conditions:
             composition:
@@ -690,6 +838,14 @@ species:
           pressure_atm: 6.05e-07
           sigma: 5.0e-08
         - SiO2_mole_fraction_as_printed: '0.33'
+          phase_field_class:
+            class: outside_single_liquid_field
+            basis:
+              criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
+              liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
+              plateau: stolyarova-1991-table-ia-1993k-lime-plateau
+              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: Ia, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              test_values: {x: '0.33', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '0.72', plateau_series_tested: 4, plateau_series_failing: [], plateau_series_untestable: 0}
           P_CaO_times_10^8_atm_as_printed: 73.4 ± 6.0
           point_conditions:
             composition:
@@ -698,6 +854,14 @@ species:
           pressure_atm: 7.340000000000001e-07
           sigma: 6.000000000000001e-08
         - SiO2_mole_fraction_as_printed: '0.25'
+          phase_field_class:
+            class: outside_single_liquid_field
+            basis:
+              criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
+              liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
+              plateau: stolyarova-1991-table-ia-1993k-lime-plateau
+              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: Ia, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              test_values: {x: '0.25', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '0.72', plateau_series_tested: 4, plateau_series_failing: [], plateau_series_untestable: 0}
           P_CaO_times_10^8_atm_as_printed: 79.5 ± 6.0
           point_conditions:
             composition:
@@ -834,6 +998,14 @@ species:
           pressure_atm: 1.3899999999999999e-05
           sigma: 1.0e-06
         - SiO2_mole_fraction_as_printed: '0.33'
+          phase_field_class:
+            class: outside_single_liquid_field
+            basis:
+              criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
+              liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
+              plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
+              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: Ib, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              test_values: {x: '0.33', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           P_SiO_times_10^6_atm_as_printed: 1.9 ± 1.0
           point_conditions:
             composition:
@@ -842,6 +1014,14 @@ species:
           pressure_atm: 1.8999999999999998e-06
           sigma: 1.0e-06
         - SiO2_mole_fraction_as_printed: '0.25'
+          phase_field_class:
+            class: outside_single_liquid_field
+            basis:
+              criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
+              liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
+              plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
+              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: Ib, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              test_values: {x: '0.25', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           P_SiO_times_10^6_atm_as_printed: 2.7 ± 1.0
           point_conditions:
             composition:
@@ -980,6 +1160,14 @@ species:
           pressure_atm: 1.53e-05
           sigma: 2.0e-06
         - SiO2_mole_fraction_as_printed: '0.33'
+          phase_field_class:
+            class: outside_single_liquid_field
+            basis:
+              criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
+              liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
+              plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
+              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: Ib, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              test_values: {x: '0.33', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           P_SiO_times_10^6_atm_as_printed: 5.0 ± 2.0
           point_conditions:
             composition:
@@ -988,6 +1176,14 @@ species:
           pressure_atm: 4.9999999999999996e-06
           sigma: 2.0e-06
         - SiO2_mole_fraction_as_printed: '0.25'
+          phase_field_class:
+            class: outside_single_liquid_field
+            basis:
+              criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
+              liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
+              plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
+              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: Ib, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              test_values: {x: '0.25', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           P_SiO_times_10^6_atm_as_printed: 0.8 ± 1.0
           point_conditions:
             composition:
@@ -1093,6 +1289,14 @@ species:
               locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.40; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; not printed.'}
           pressure_atm: 7.700000000000001e-09
         - SiO2_mole_fraction_as_printed: '0.33'
+          phase_field_class:
+            class: outside_single_liquid_field
+            basis:
+              criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
+              liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
+              plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
+              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: Ib, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              test_values: {x: '0.33', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           P_SiO2_times_10^9_atm_as_printed: (5.3)
           point_conditions:
             composition:
@@ -1100,6 +1304,14 @@ species:
               locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.33; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; not printed.'}
           pressure_atm: 5.3e-09
         - SiO2_mole_fraction_as_printed: '0.25'
+          phase_field_class:
+            class: outside_single_liquid_field
+            basis:
+              criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
+              liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
+              plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
+              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: Ib, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              test_values: {x: '0.25', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           P_SiO2_times_10^9_atm_as_printed: (2.0)
           point_conditions:
             composition:
@@ -1240,6 +1452,14 @@ species:
               locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.38; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; not printed.'}
           pressure_atm: 7.4e-10
         - SiO2_mole_fraction_as_printed: '0.33'
+          phase_field_class:
+            class: outside_single_liquid_field
+            basis:
+              criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
+              liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
+              plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
+              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: Ib, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              test_values: {x: '0.33', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           P_O_times_10^10_atm_as_printed: '6.7'
           point_conditions:
             composition:
@@ -1247,6 +1467,14 @@ species:
               locator: {page: 3711, published_page: 3711, pdf_page_index: 2, table: 'Ib', note: 'Printed X(SiO2)=0.33; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; not printed.'}
           pressure_atm: 6.700000000000001e-10
         - SiO2_mole_fraction_as_printed: '0.25'
+          phase_field_class:
+            class: outside_single_liquid_field
+            basis:
+              criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
+              liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
+              plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
+              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: Ib, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              test_values: {x: '0.25', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           P_O_times_10^10_atm_as_printed: '6.8'
           point_conditions:
             composition:
@@ -1387,6 +1615,14 @@ species:
           activity: 0.63
           activity_as_published: 0.63 ± 0.04
         - SiO2_mole_fraction_as_printed: '0.33'
+          phase_field_class:
+            class: outside_single_liquid_field
+            basis:
+              criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
+              liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
+              plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
+              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: IIa, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              test_values: {x: '0.33', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           a_CaO_as_printed: 0.96 ± 0.03
           point_conditions:
             composition:
@@ -1395,6 +1631,14 @@ species:
           activity: 0.96
           activity_as_published: 0.96 ± 0.03
         - SiO2_mole_fraction_as_printed: '0.25'
+          phase_field_class:
+            class: outside_single_liquid_field
+            basis:
+              criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
+              liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
+              plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
+              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: IIa, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              test_values: {x: '0.25', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           a_CaO_as_printed: 1.00 ± 0.02
           point_conditions:
             composition:
@@ -1496,6 +1740,14 @@ species:
           activity: 0.67
           activity_as_published: '0.67'
         - SiO2_mole_fraction_as_printed: '0.33'
+          phase_field_class:
+            class: outside_single_liquid_field
+            basis:
+              criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
+              liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
+              plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
+              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: IIa, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              test_values: {x: '0.33', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           a_CaO_as_printed: '0.95'
           point_conditions:
             composition:
@@ -1504,6 +1756,14 @@ species:
           activity: 0.95
           activity_as_published: '0.95'
         - SiO2_mole_fraction_as_printed: '0.25'
+          phase_field_class:
+            class: outside_single_liquid_field
+            basis:
+              criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
+              liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
+              plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
+              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: IIa, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              test_values: {x: '0.25', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           a_CaO_as_printed: '1.00'
           point_conditions:
             composition:
@@ -1608,6 +1868,14 @@ species:
           activity: 0.55
           activity_as_published: '0.55'
         - SiO2_mole_fraction_as_printed: '0.33'
+          phase_field_class:
+            class: outside_single_liquid_field
+            basis:
+              criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
+              liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
+              plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
+              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: IIa, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              test_values: {x: '0.33', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           a_CaO_as_printed: '0.75'
           point_conditions:
             composition:
@@ -1616,6 +1884,14 @@ species:
           activity: 0.75
           activity_as_published: '0.75'
         - SiO2_mole_fraction_as_printed: '0.25'
+          phase_field_class:
+            class: outside_single_liquid_field
+            basis:
+              criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
+              liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
+              plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
+              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: IIa, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              test_values: {x: '0.25', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           a_CaO_as_printed: '1.00'
           point_conditions:
             composition:
@@ -1736,6 +2012,14 @@ species:
           activity: 0.023
           activity_as_published: 0.023 ± 0.005
         - SiO2_mole_fraction_as_printed: '0.33'
+          phase_field_class:
+            class: outside_single_liquid_field
+            basis:
+              criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
+              liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
+              plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
+              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: IIb, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              test_values: {x: '0.33', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           a_SiO2_as_printed: 0.003 ± 0.002
           point_conditions:
             composition:
@@ -1744,6 +2028,14 @@ species:
           activity: 0.003
           activity_as_published: 0.003 ± 0.002
         - SiO2_mole_fraction_as_printed: '0.25'
+          phase_field_class:
+            class: outside_single_liquid_field
+            basis:
+              criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
+              liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
+              plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
+              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: IIb, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              test_values: {x: '0.25', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           a_SiO2_as_printed: 0.004 ± 0.001
           point_conditions:
             composition:
@@ -1847,6 +2139,14 @@ species:
           activity: 0.02
           activity_as_published: '0.02'
         - SiO2_mole_fraction_as_printed: '0.33'
+          phase_field_class:
+            class: outside_single_liquid_field
+            basis:
+              criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
+              liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
+              plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
+              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: IIb, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              test_values: {x: '0.33', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           a_SiO2_as_printed: '0.006'
           point_conditions:
             composition:
@@ -1855,6 +2155,14 @@ species:
           activity: 0.006
           activity_as_published: '0.006'
         - SiO2_mole_fraction_as_printed: '0.25'
+          phase_field_class:
+            class: outside_single_liquid_field
+            basis:
+              criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
+              liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
+              plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
+              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: IIb, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              test_values: {x: '0.25', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           a_SiO2_as_printed: '0.005'
           point_conditions:
             composition:
@@ -1960,6 +2268,14 @@ species:
           activity: 0.015
           activity_as_published: '0.015'
         - SiO2_mole_fraction_as_printed: '0.33'
+          phase_field_class:
+            class: outside_single_liquid_field
+            basis:
+              criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
+              liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
+              plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
+              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: IIb, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              test_values: {x: '0.33', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           a_SiO2_as_printed: '0.008'
           point_conditions:
             composition:
@@ -1968,6 +2284,14 @@ species:
           activity: 0.008
           activity_as_published: '0.008'
         - SiO2_mole_fraction_as_printed: '0.25'
+          phase_field_class:
+            class: outside_single_liquid_field
+            basis:
+              criterion: stated_liquidus_side_and_printed_plateau_within_2_sigma
+              liquidus: stolyarova-1991-cao-sio2-lime-side-liquidus
+              plateau: stolyarova-1991-tables-ib-ii-1933k-lime-plateau
+              locator: {page: 3711, published_page: 3711, pdf_page_index: 2, section: Results, table: IIb, note: 'Liquidus 0.37 ± 0.02 (Results text) and the printed plateau cells at x(SiO2) 0.33 and 0.25.'}
+              test_values: {x: '0.25', liquidus: '0.37', liquidus_sigma: '0.02', plateau_max_z: '1.88', plateau_series_tested: 8, plateau_series_failing: [stolyarova_1991_sio2_activity_eq8_1933k], plateau_series_untestable: 2}
           a_SiO2_as_printed: '0.004'
           point_conditions:
             composition:

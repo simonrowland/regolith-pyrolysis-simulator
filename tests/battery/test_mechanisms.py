@@ -648,10 +648,18 @@ def test_m07_apparatus_rejects_unknown_calibration_and_requires_flux_area() -> N
     assert tga_gate.reason is RefusalReason.UNDERDETERMINED_APPARATUS
     complete = F.kems_experiment()
     assert underdetermined_apparatus(complete, Quantity.P_SAT).passed
-    assert run_validity_gates(
+    combined = run_validity_gates(
         complete,
-        F.observation("kems-ok-geom", complete.experiment_id, F.psat_identity("Na"), Decimal("1")),
-    ).passed
+        F.observation(
+            "kems-ok-geom",
+            complete.experiment_id,
+            F.psat_identity("Na"),
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+        ),
+    )
+    assert combined.passed
+    assert any(check.name == "orifice_knudsen" for check in combined.checks)
 
 
 def test_m07_wall_identity_and_determinants_required_for_deposit() -> None:
@@ -3112,15 +3120,18 @@ def test_mf_f04_f16_scoped_notices_and_explicit_apparatus_gate() -> None:
     stated = F.kems_experiment(total_P=Decimal("1e-6"))
     assert effusion_regime_unverified(stated, Quantity.P_SAT).passed
     assert background_pressure_high(stated, Quantity.P_SAT).passed
-    assert run_validity_gates(
+    combined = run_validity_gates(
         stated,
         F.observation(
             "kems-stated-bg",
             stated.experiment_id,
             F.psat_identity("Na"),
             Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
         ),
-    ).passed
+    )
+    assert combined.passed
+    assert any(check.name == "orifice_knudsen" for check in combined.checks)
 
 
 def test_kems_background_interval_uses_bounds_without_inventing_a_point() -> None:
@@ -3160,9 +3171,16 @@ def test_kems_background_interval_uses_bounds_without_inventing_a_point() -> Non
     partial = _replace(F.psat_identity("K"), quantity=Quantity.P_PARTIAL)
     combined = run_validity_gates(
         calibrated_without_kn,
-        F.observation("interval-kems", calibrated_without_kn.experiment_id, partial, Decimal("1")),
+        F.observation(
+            "interval-kems",
+            calibrated_without_kn.experiment_id,
+            partial,
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+        ),
     )
     assert combined.passed
+    assert any(check.name == "orifice_knudsen" for check in combined.checks)
 
     high = background_pressure_high(
         with_interval("0.02", "0.03"), Quantity.P_PARTIAL
@@ -3225,22 +3243,22 @@ def _kems_without_background(experiment):
 
 
 @pytest.mark.parametrize(
-    ("evidence_class", "expected_pass"),
+    ("evidence_class", "expected_pass", "expect_not_applicable"),
     (
-        (EvidenceClass.MEASURED_DIRECT, True),
-        (EvidenceClass.MEASURED_TABULATED, True),
-        (EvidenceClass.MEASURED_REDUCED, True),
-        (EvidenceClass.QUOTED_ATTRIBUTED, False),
-        (EvidenceClass.QUOTED_UNATTRIBUTED, False),
-        (EvidenceClass.MODEL_DERIVED, False),
-        (EvidenceClass.AUTHOR_ESTIMATE, False),
-        (EvidenceClass.FIGURE_ONLY, False),
-        (EvidenceClass.COMPILATION_ASSESSED, False),
-        (EvidenceClass.ENGINE_PREDICTION, False),
+        (EvidenceClass.MEASURED_DIRECT, True, False),
+        (EvidenceClass.MEASURED_TABULATED, True, False),
+        (EvidenceClass.MEASURED_REDUCED, True, False),
+        (EvidenceClass.QUOTED_ATTRIBUTED, True, True),
+        (EvidenceClass.QUOTED_UNATTRIBUTED, True, True),
+        (EvidenceClass.MODEL_DERIVED, True, True),
+        (EvidenceClass.AUTHOR_ESTIMATE, True, True),
+        (EvidenceClass.FIGURE_ONLY, False, False),
+        (EvidenceClass.COMPILATION_ASSESSED, True, True),
+        (EvidenceClass.ENGINE_PREDICTION, True, True),
     ),
 )
 def test_mf_f04_pressure_sum_evidence_class_golden_pin(
-    evidence_class: EvidenceClass, expected_pass: bool
+    evidence_class: EvidenceClass, expected_pass: bool, expect_not_applicable: bool
 ) -> None:
     composition = Composition(
         basis="printed_mole_fraction",
@@ -3269,7 +3287,10 @@ def test_mf_f04_pressure_sum_evidence_class_golden_pin(
     )
 
     assert result.passed is expected_pass
-    if expected_pass:
+    if expect_not_applicable:
+        check = next(check for check in result.checks if check.name == "apparatus_applicability")
+        assert check.detail["reason"] == "apparatus gate not applicable: non-measured evidence"
+    elif expected_pass:
         pressure_check = next(
             check for check in result.checks if check.name == "in_cell_partial_pressure_sum"
         )
@@ -3476,6 +3497,7 @@ def test_mf_f04_printed_orifice_kn_path_is_unchanged() -> None:
         experiment.experiment_id,
         F.psat_identity("Na"),
         Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
     )
     result = run_validity_gates(experiment, observation)
     assert result.passed
@@ -3546,6 +3568,7 @@ def test_mf_f04_calibrated_background_route_skips_in_cell_fallback(monkeypatch) 
         experiment.experiment_id,
         replace(F.psat_identity("K"), quantity=Quantity.P_PARTIAL),
         Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
     )
 
     def fallback_must_not_run(*_args, **_kwargs):

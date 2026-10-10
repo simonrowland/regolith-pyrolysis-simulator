@@ -20,6 +20,7 @@ from simulator.battery.polymorph_dictionary import (
     CROSS_SOURCE_EQUIVALENCES,
     JANAF_CRYSTAL_DICTIONARY,
     JANAF_CRYSTAL_TABLE_IDS,
+    POLYMORPH_ALIASES,
     canonicalize_janaf_transition,
     classify_printed_qualifier,
     coerce_polymorph_token,
@@ -462,6 +463,12 @@ def test_periclase_is_a_closed_mgo_token() -> None:
     assert coerce_polymorph_token("periclase") is Polymorph.PERICLASE
     assert coerce_polymorph_token("PERICLASE") is Polymorph.PERICLASE
     assert coerce_polymorph_token("Periclase") is Polymorph.PERICLASE
+
+
+def test_tridymite_is_a_closed_polymorph_token() -> None:
+    assert Polymorph.TRIDYMITE.value == "tridymite"
+    assert POLYMORPH_ALIASES["tridymite"] is Polymorph.TRIDYMITE
+    assert coerce_polymorph_token("tridymite") is Polymorph.TRIDYMITE
 
 
 def test_neutral_charge_is_zero_value_not_unknown() -> None:

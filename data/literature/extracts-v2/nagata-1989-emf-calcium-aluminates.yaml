@@ -1,0 +1,508 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/nagata-1989-emf-calcium-aluminates.yaml
+observations:
+- observation_id: nagata-1989-emf-calcium-aluminates::nagata_1989_liquidus_a_CaO::T=1773:h=594b381a406b
+  experiment_id: 10.2355/tetsutohagane1955.75.11_2023::nagata-1989-emf-calcium-aluminates
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CaO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: Source states pure solid CaO but does not name its polymorph.
+          charge:
+            tag: value
+            value: 0
+        component_basis: CaO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.134'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_separately_printed_on_a_CaO
+      note: a(CaO) uncertainties not separately tabulated; EMF std. max ±8.6 mV (Table 1 text)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+    attribution: Section 4.4 prints CaO activity in the liquid in equilibrium with CaO.Al2O3 as 0.248 at 1773 K, 0.181 at
+      1823 K, and 0.134 at 1773 K; it prints 0.619 at 1773 K for liquid in equilibrium with 3CaO.Al2O3. The standard state
+      of CaO is pure solid.
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: empirical-cao-al2o3-slot-03
+      date: '2026-10-04'
+      evidence:
+        published_page: 2029
+        pdf_page_index: 7
+        section: 4.4 / 5. Conclusion
+  notices: []
+  source_id: nagata-1989-emf-calcium-aluminates
+  locator:
+    published_page: 2029
+    pdf_page_index: 7
+    section: 4.4 / 5. Conclusion
+  read_from: pdf:nagata-1989-emf-calcium-aluminates
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 2029
+        pdf_page_index: 7
+        section: 4.4 / 5. Conclusion
+  derived_from:
+  - tables:nagata-1989-emf-calcium-aluminates
+  derivation:
+    relation: a_CaO = exp(−2 E4 F / RT)
+    inputs:
+    - tables:nagata-1989-emf-calcium-aluminates
+    parameters: []
+    output_unit: as_published
+- observation_id: nagata-1989-emf-calcium-aluminates::nagata_1989_liquidus_a_CaO::T=1773:h=bbcaaa004ee4
+  experiment_id: 10.2355/tetsutohagane1955.75.11_2023::nagata-1989-emf-calcium-aluminates
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CaO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: Source states pure solid CaO but does not name its polymorph.
+          charge:
+            tag: value
+            value: 0
+        component_basis: CaO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.619'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_separately_printed_on_a_CaO
+      note: a(CaO) uncertainties not separately tabulated; EMF std. max ±8.6 mV (Table 1 text)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+    attribution: Section 4.4 prints CaO activity in the liquid in equilibrium with CaO.Al2O3 as 0.248 at 1773 K, 0.181 at
+      1823 K, and 0.134 at 1773 K; it prints 0.619 at 1773 K for liquid in equilibrium with 3CaO.Al2O3. The standard state
+      of CaO is pure solid.
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: empirical-cao-al2o3-slot-03
+      date: '2026-10-04'
+      evidence:
+        published_page: 2029
+        pdf_page_index: 7
+        section: 4.4 / 5. Conclusion
+  notices: []
+  source_id: nagata-1989-emf-calcium-aluminates
+  locator:
+    published_page: 2029
+    pdf_page_index: 7
+    section: 4.4 / 5. Conclusion
+  read_from: pdf:nagata-1989-emf-calcium-aluminates
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 2029
+        pdf_page_index: 7
+        section: 4.4 / 5. Conclusion
+  derived_from:
+  - tables:nagata-1989-emf-calcium-aluminates
+  derivation:
+    relation: a_CaO = exp(−2 E4 F / RT)
+    inputs:
+    - tables:nagata-1989-emf-calcium-aluminates
+    parameters: []
+    output_unit: as_published
+- observation_id: nagata-1989-emf-calcium-aluminates::nagata_1989_liquidus_a_CaO::T=1773:h=f45ddd36ede8
+  experiment_id: 10.2355/tetsutohagane1955.75.11_2023::nagata-1989-emf-calcium-aluminates
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CaO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: Source states pure solid CaO but does not name its polymorph.
+          charge:
+            tag: value
+            value: 0
+        component_basis: CaO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.248'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_separately_printed_on_a_CaO
+      note: a(CaO) uncertainties not separately tabulated; EMF std. max ±8.6 mV (Table 1 text)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+    attribution: Section 4.4 prints CaO activity in the liquid in equilibrium with CaO.Al2O3 as 0.248 at 1773 K, 0.181 at
+      1823 K, and 0.134 at 1773 K; it prints 0.619 at 1773 K for liquid in equilibrium with 3CaO.Al2O3. The standard state
+      of CaO is pure solid.
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: empirical-cao-al2o3-slot-03
+      date: '2026-10-04'
+      evidence:
+        published_page: 2029
+        pdf_page_index: 7
+        section: 4.4 / 5. Conclusion
+  notices: []
+  source_id: nagata-1989-emf-calcium-aluminates
+  locator:
+    published_page: 2029
+    pdf_page_index: 7
+    section: 4.4 / 5. Conclusion
+  read_from: pdf:nagata-1989-emf-calcium-aluminates
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 2029
+        pdf_page_index: 7
+        section: 4.4 / 5. Conclusion
+  derived_from:
+  - tables:nagata-1989-emf-calcium-aluminates
+  derivation:
+    relation: a_CaO = exp(−2 E4 F / RT)
+    inputs:
+    - tables:nagata-1989-emf-calcium-aluminates
+    parameters: []
+    output_unit: as_published
+- observation_id: nagata-1989-emf-calcium-aluminates::nagata_1989_liquidus_a_CaO::T=1823:h=6de420e3ac73
+  experiment_id: 10.2355/tetsutohagane1955.75.11_2023::nagata-1989-emf-calcium-aluminates
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1823'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CaO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: Source states pure solid CaO but does not name its polymorph.
+          charge:
+            tag: value
+            value: 0
+        component_basis: CaO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.181'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_separately_printed_on_a_CaO
+      note: a(CaO) uncertainties not separately tabulated; EMF std. max ±8.6 mV (Table 1 text)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+    attribution: Section 4.4 prints CaO activity in the liquid in equilibrium with CaO.Al2O3 as 0.248 at 1773 K, 0.181 at
+      1823 K, and 0.134 at 1773 K; it prints 0.619 at 1773 K for liquid in equilibrium with 3CaO.Al2O3. The standard state
+      of CaO is pure solid.
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: empirical-cao-al2o3-slot-03
+      date: '2026-10-04'
+      evidence:
+        published_page: 2029
+        pdf_page_index: 7
+        section: 4.4 / 5. Conclusion
+  notices: []
+  source_id: nagata-1989-emf-calcium-aluminates
+  locator:
+    published_page: 2029
+    pdf_page_index: 7
+    section: 4.4 / 5. Conclusion
+  read_from: pdf:nagata-1989-emf-calcium-aluminates
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 2029
+        pdf_page_index: 7
+        section: 4.4 / 5. Conclusion
+  derived_from:
+  - tables:nagata-1989-emf-calcium-aluminates
+  derivation:
+    relation: a_CaO = exp(−2 E4 F / RT)
+    inputs:
+    - tables:nagata-1989-emf-calcium-aluminates
+    parameters: []
+    output_unit: as_published

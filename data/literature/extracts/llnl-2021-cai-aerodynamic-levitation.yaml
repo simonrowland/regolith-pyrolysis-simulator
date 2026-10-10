@@ -29,10 +29,21 @@ fidelity_samples:
 - path: species.B_type_CAI.observations[ryerson_2022_CAI_starting_and_evaporated_composition_table1].values.samples[0].MgO_wt_pct
   value: 11.61
   locator: {pdf_page_index: 5, table: '1', row: VP1, column: MgO (wt%)}
+experiments:
+- experiment_id: cai-aerodynamic-levitation-series
+  method: aerodynamic_levitation_laser_heating
+  locator: {table: '1', note: CAI starting composition shared by levitation evaporation series}
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: {MgO: '12', SiO2: '46', Al2O3: '19', CaO: '23'}
+      locator: {table: '1', note: Starting CAI-like composition for aerodynamic levitation runs (Ryerson et al. 2022)}
 species:
   B_type_CAI:
     observations:
     - observation_id: ryerson_2022_CAI_starting_and_evaporated_composition_table1
+      experiment: cai-aerodynamic-levitation-series
       type: rate_series
       class_tag: measured
       locator:
@@ -77,6 +88,7 @@ species:
         experiment_duration_as_printed_in_methods_s: [180, 900]
         duration_disagreement: abstract_and_methods_differ; both ranges retained
     - observation_id: ryerson_2022_isotope_ratios_table1
+      experiment: cai-aerodynamic-levitation-series
       type: rate_series
       class_tag: measured
       locator:
@@ -111,6 +123,7 @@ species:
         isotope_integration_cycles: {Mg: 13, Si: 21}
         integration_time_s_per_cycle: 4
     - observation_id: ryerson_2022_fractionation_factors_table2
+      experiment: cai-aerodynamic-levitation-series
       type: alpha
       class_tag: measured_reduced
       locator:
@@ -130,6 +143,7 @@ species:
         - {isotope_pair: d26Mg, alpha_advective: 0.9906, uncertainty_2SD: 0.0008, comparison_vacuum: 0.9608, comparison_1_atm_diffusive: 0.9841}
         - {isotope_pair: d25Mg, alpha_advective: 0.9950, uncertainty_2SD: 0.0006, comparison_vacuum: 0.9798, comparison_1_atm_diffusive: 0.9918}
     - observation_id: ryerson_2022_modified_HKL_saturation_factor
+      experiment: cai-aerodynamic-levitation-series
       type: rate_series
       class_tag: model_derived
       locator:
@@ -147,6 +161,7 @@ species:
         abstract_summary: 0.75
         note: p_i and p_i,eq were not measured; saturation factors were constrained from isotope data using Eq. 19.
     - observation_id: ryerson_2022_aerodynamic_transport_conditions
+      experiment: cai-aerodynamic-levitation-series
       type: rate_series
       class_tag: measured_direct
       locator:

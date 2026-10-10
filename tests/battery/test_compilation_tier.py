@@ -46,6 +46,7 @@ from simulator.battery.score import (
     comparison_candidates,
     decision_band_for,
     headline_rows,
+    predict_with_engine,
     render_score_report,
 )
 from simulator.chemistry.ellingham_thermo import ELLINGHAM_FIT_SEGMENTS
@@ -596,9 +597,10 @@ def test_transition_temperature_and_empirical_series_stay_series() -> None:
 
 def test_ellingham_na2o_matches_printed_janaf_within_fit_bound() -> None:
     identity = _na2o_liquid()
+    observation = F.observation("na2o", "exp-1", identity, _PRINTED_DFG)
     attempt = predict_thermo_attempt(
         Engine.INTERNAL_ANALYTICAL,
-        F.observation("na2o", "exp-1", identity, _PRINTED_DFG),
+        observation,
     )
     assert attempt.value is not None
     assert attempt.unit == "kJ_per_declared_mol_basis"
@@ -607,6 +609,11 @@ def test_ellingham_na2o_matches_printed_janaf_within_fit_bound() -> None:
     assert abs(residual - Decimal("0.1832")) < Decimal("0.001")
     assert abs(residual) < Decimal("0.221")
     assert attempt.refusal_reason is None
+
+    prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, observation)
+    assert prediction.value is not None
+    assert float(prediction.value).hex() == "-0x1.d9f559b3d0780p+1"
+    assert prediction.unit == attempt.unit
 
 
 def test_ellingham_transforms_formation_values_to_printed_standard_pressure() -> None:

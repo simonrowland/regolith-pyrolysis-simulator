@@ -1,0 +1,1811 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 62152405c9c855d1d088ddd2d436241bf1fde23b541c751988e73df91e9c52fa
+  citation: M. Görnerup and O. Wijk, "Liquidus Relationships in the CaO-corner of the Ternary System CaO-Al2O3-SiO2", ISIJ
+    International, 36(12) (1996), 1465-1470.
+  source_ids:
+  - gornerup-1996-cao-corner-liquidus
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+    files:
+    - asset_id: pdf:gornerup-1996-cao-corner-liquidus
+      role: pdf
+      path: raw/gornerup-1996-cao-corner-liquidus/gornerup-1996-cao-corner-liquidus.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:gornerup-1996-cao-corner-liquidus
+      role: pdftotext
+      path: text/gornerup-1996-cao-corner-liquidus
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:gornerup-1996-cao-corner-liquidus
+      role: table_csv
+      path: tables/gornerup-1996-cao-corner-liquidus
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: unknown:gornerup-1996-cao-corner-liquidus
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 62152405c9c855d1d088ddd2d436241bf1fde23b541c751988e73df91e9c52fa::experiment::equilibration-1600c
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.004'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 1466
+        section: '3.1'
+        note: Printed 4 g slag mixture; converted 4 g / 1000 g per kg = 0.004 kg. This is before adding the 2 g saturation
+          solid.
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 1466
+        section: '3.1'
+        note: Starting mixtures were prepared to be close to saturation, but the exact recipes are not stated; Table 1 reports
+          the final saturated liquid composition.
+    form:
+      state:
+        tag: value
+        value: Pressed cylinder
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.4'
+    container:
+      state:
+        tag: value
+        value: Molybdenum two-chamber crucible
+      locator:
+        page: 2
+        published_page: 1466
+        section: '3.1'
+    characterization:
+      state:
+        tag: value
+        value: A 4 g slag mixture was melted; 2 g of the selected solid saturation phase was placed in one crucible chamber.
+      locator:
+        page: 2
+        published_page: 1466
+        section: '3.1'
+    pretreatment:
+      state:
+        tag: value
+        value: Each component was calcined at 1100 °C for at least 12 h; weighed mixtures were blended for 2 h in an agate
+          ball mixer and pressed to cylinders.
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.4'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Printed 1600 °C; converted T_K = T_C + 273.15.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Printed 1600 °C; converted T_K = T_C + 273.15.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Printed 1600 °C; converted T_K = T_C + 273.15.
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.2'
+        note: Argon atmosphere is stated; total pressure is not.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.2'
+        note: Argon atmosphere; flow and partial pressure are not stated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 62152405c9c855d1d088ddd2d436241bf1fde23b541c751988e73df91e9c52fa
+  locator:
+    page: 2
+    published_page: 1466
+    section: '3.1'
+  fO2_control:
+    channel:
+      tag: value
+      value: intrinsic
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 1466
+        section: '3.1'
+        note: Purified argon and a graphite lid excluded oxygen; no oxygen partial pressure or imposed buffer value is stated.
+  bench_id: 62152405c9c855d1d088ddd2d436241bf1fde23b541c751988e73df91e9c52fa::bench::gornerup-graphite-resistance-furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Cold-charged furnace was evacuated and filled twice with purified argon, then heated to the experimental temperature
+          at 5 °C/min; samples were held at temperature for a minimum of 12 h.
+      locator:
+        page: 2
+        published_page: 1466
+        section: '3.1'
+    ramps:
+    - rate_K_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.083333333333333333'
+            approximate: false
+        locator:
+          page: 3
+          published_page: 1467
+          section: '3.1'
+          note: Printed 5 °C/min; converted 5 / 60 = 0.083333333333333333 K/s.
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1873.15'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 1468
+          table: '1'
+          note: Printed 1600 °C; converted T_K = T_C + 273.15.
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1600'
+              locator:
+                page: 4
+                published_page: 1468
+                table: '1'
+                note: Printed 1600 °C; converted T_K = T_C + 273.15.
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                page: 4
+                published_page: 1468
+                table: '1'
+                note: Printed 1600 °C; converted T_K = T_C + 273.15.
+          output_unit: K
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: bound
+            bound_operator: '>='
+            bound_value: '43200'
+            approximate: false
+        locator:
+          page: 3
+          published_page: 1467
+          section: '3.1'
+          note: Printed minimum hold 12 h; converted 12 × 3600 = 43200 s.
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.1'
+        note: Minimum is stated for the isothermal hold, but total run duration including heat-up is not reported.
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Samples removed from furnace and quenched in helium gas; time to below the liquidus was estimated at less than
+          4 s.
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.1'
+- experiment_id: 62152405c9c855d1d088ddd2d436241bf1fde23b541c751988e73df91e9c52fa::experiment::equilibration-1650c
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.004'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 1466
+        section: '3.1'
+        note: Printed 4 g slag mixture; converted 4 g / 1000 g per kg = 0.004 kg. This is before adding the 2 g saturation
+          solid.
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0'
+          - - CaO
+            - '0.6036216524525470412125312306'
+          - - SiO2
+            - '0.3963783475474529587874687694'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 18.10
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 18.10
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 18.10
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '58.7'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 18.10
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 18.10
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '41.3'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 18.10
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Experiment no. 18.10
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '0'
+          CaO: '58.7'
+          SiO2: '41.3'
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Experiment no. 18.10
+    form:
+      state:
+        tag: value
+        value: Pressed cylinder
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.4'
+    container:
+      state:
+        tag: value
+        value: Molybdenum two-chamber crucible
+      locator:
+        page: 2
+        published_page: 1466
+        section: '3.1'
+    characterization:
+      state:
+        tag: value
+        value: A 4 g slag mixture was melted; 2 g of the selected solid saturation phase was placed in one crucible chamber.
+      locator:
+        page: 2
+        published_page: 1466
+        section: '3.1'
+    pretreatment:
+      state:
+        tag: value
+        value: Each component was calcined at 1100 °C for at least 12 h; weighed mixtures were blended for 2 h in an agate
+          ball mixer and pressed to cylinders.
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.4'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1923.15'
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Printed 1650 °C; converted T_K = T_C + 273.15.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1650'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Printed 1650 °C; converted T_K = T_C + 273.15.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Printed 1650 °C; converted T_K = T_C + 273.15.
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.2'
+        note: Argon atmosphere is stated; total pressure is not.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.2'
+        note: Argon atmosphere; flow and partial pressure are not stated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 62152405c9c855d1d088ddd2d436241bf1fde23b541c751988e73df91e9c52fa
+  locator:
+    page: 2
+    published_page: 1466
+    section: '3.1'
+  fO2_control:
+    channel:
+      tag: value
+      value: intrinsic
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 1466
+        section: '3.1'
+        note: Purified argon and a graphite lid excluded oxygen; no oxygen partial pressure or imposed buffer value is stated.
+  bench_id: 62152405c9c855d1d088ddd2d436241bf1fde23b541c751988e73df91e9c52fa::bench::gornerup-graphite-resistance-furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Cold-charged furnace was evacuated and filled twice with purified argon, then heated to the experimental temperature
+          at 5 °C/min; samples were held at temperature for a minimum of 12 h.
+      locator:
+        page: 2
+        published_page: 1466
+        section: '3.1'
+    ramps:
+    - rate_K_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.083333333333333333'
+            approximate: false
+        locator:
+          page: 3
+          published_page: 1467
+          section: '3.1'
+          note: Printed 5 °C/min; converted 5 / 60 = 0.083333333333333333 K/s.
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1923.15'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 1468
+          table: '1'
+          note: Printed 1650 °C; converted T_K = T_C + 273.15.
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1650'
+              locator:
+                page: 4
+                published_page: 1468
+                table: '1'
+                note: Printed 1650 °C; converted T_K = T_C + 273.15.
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                page: 4
+                published_page: 1468
+                table: '1'
+                note: Printed 1650 °C; converted T_K = T_C + 273.15.
+          output_unit: K
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: bound
+            bound_operator: '>='
+            bound_value: '43200'
+            approximate: false
+        locator:
+          page: 3
+          published_page: 1467
+          section: '3.1'
+          note: Printed minimum hold 12 h; converted 12 × 3600 = 43200 s.
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.1'
+        note: Minimum is stated for the isothermal hold, but total run duration including heat-up is not reported.
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Samples removed from furnace and quenched in helium gas; time to below the liquidus was estimated at less than
+          4 s.
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.1'
+- experiment_id: 62152405c9c855d1d088ddd2d436241bf1fde23b541c751988e73df91e9c52fa::experiment::equilibration-1700c
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.004'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 1466
+        section: '3.1'
+        note: Printed 4 g slag mixture; converted 4 g / 1000 g per kg = 0.004 kg. This is before adding the 2 g saturation
+          solid.
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 1466
+        section: '3.1'
+        note: Starting mixtures were prepared to be close to saturation, but the exact recipes are not stated; Table 1 reports
+          the final saturated liquid composition.
+    form:
+      state:
+        tag: value
+        value: Pressed cylinder
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.4'
+    container:
+      state:
+        tag: value
+        value: Molybdenum two-chamber crucible
+      locator:
+        page: 2
+        published_page: 1466
+        section: '3.1'
+    characterization:
+      state:
+        tag: value
+        value: A 4 g slag mixture was melted; 2 g of the selected solid saturation phase was placed in one crucible chamber.
+      locator:
+        page: 2
+        published_page: 1466
+        section: '3.1'
+    pretreatment:
+      state:
+        tag: value
+        value: Each component was calcined at 1100 °C for at least 12 h; weighed mixtures were blended for 2 h in an agate
+          ball mixer and pressed to cylinders.
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.4'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973.15'
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Printed 1700 °C; converted T_K = T_C + 273.15.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1700'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Printed 1700 °C; converted T_K = T_C + 273.15.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Printed 1700 °C; converted T_K = T_C + 273.15.
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.2'
+        note: Argon atmosphere is stated; total pressure is not.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.2'
+        note: Argon atmosphere; flow and partial pressure are not stated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 62152405c9c855d1d088ddd2d436241bf1fde23b541c751988e73df91e9c52fa
+  locator:
+    page: 2
+    published_page: 1466
+    section: '3.1'
+  fO2_control:
+    channel:
+      tag: value
+      value: intrinsic
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 1466
+        section: '3.1'
+        note: Purified argon and a graphite lid excluded oxygen; no oxygen partial pressure or imposed buffer value is stated.
+  bench_id: 62152405c9c855d1d088ddd2d436241bf1fde23b541c751988e73df91e9c52fa::bench::gornerup-graphite-resistance-furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Cold-charged furnace was evacuated and filled twice with purified argon, then heated to the experimental temperature
+          at 5 °C/min; samples were held at temperature for a minimum of 12 h.
+      locator:
+        page: 2
+        published_page: 1466
+        section: '3.1'
+    ramps:
+    - rate_K_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.083333333333333333'
+            approximate: false
+        locator:
+          page: 3
+          published_page: 1467
+          section: '3.1'
+          note: Printed 5 °C/min; converted 5 / 60 = 0.083333333333333333 K/s.
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1973.15'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 1468
+          table: '1'
+          note: Printed 1700 °C; converted T_K = T_C + 273.15.
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1700'
+              locator:
+                page: 4
+                published_page: 1468
+                table: '1'
+                note: Printed 1700 °C; converted T_K = T_C + 273.15.
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                page: 4
+                published_page: 1468
+                table: '1'
+                note: Printed 1700 °C; converted T_K = T_C + 273.15.
+          output_unit: K
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: bound
+            bound_operator: '>='
+            bound_value: '43200'
+            approximate: false
+        locator:
+          page: 3
+          published_page: 1467
+          section: '3.1'
+          note: Printed minimum hold 12 h; converted 12 × 3600 = 43200 s.
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.1'
+        note: Minimum is stated for the isothermal hold, but total run duration including heat-up is not reported.
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Samples removed from furnace and quenched in helium gas; time to below the liquidus was estimated at less than
+          4 s.
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.1'
+- experiment_id: 62152405c9c855d1d088ddd2d436241bf1fde23b541c751988e73df91e9c52fa::experiment::equilibration-1750c
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.004'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 1466
+        section: '3.1'
+        note: Printed 4 g slag mixture; converted 4 g / 1000 g per kg = 0.004 kg. This is before adding the 2 g saturation
+          solid.
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 1466
+        section: '3.1'
+        note: Starting mixtures were prepared to be close to saturation, but the exact recipes are not stated; Table 1 reports
+          the final saturated liquid composition.
+    form:
+      state:
+        tag: value
+        value: Pressed cylinder
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.4'
+    container:
+      state:
+        tag: value
+        value: Molybdenum two-chamber crucible
+      locator:
+        page: 2
+        published_page: 1466
+        section: '3.1'
+    characterization:
+      state:
+        tag: value
+        value: A 4 g slag mixture was melted; 2 g of the selected solid saturation phase was placed in one crucible chamber.
+      locator:
+        page: 2
+        published_page: 1466
+        section: '3.1'
+    pretreatment:
+      state:
+        tag: value
+        value: Each component was calcined at 1100 °C for at least 12 h; weighed mixtures were blended for 2 h in an agate
+          ball mixer and pressed to cylinders.
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.4'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2023.15'
+      locator:
+        page: 4
+        published_page: 1468
+        table: '1'
+        note: Printed 1750 °C; converted T_K = T_C + 273.15.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1750'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Printed 1750 °C; converted T_K = T_C + 273.15.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 1468
+              table: '1'
+              note: Printed 1750 °C; converted T_K = T_C + 273.15.
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.2'
+        note: Argon atmosphere is stated; total pressure is not.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.2'
+        note: Argon atmosphere; flow and partial pressure are not stated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 62152405c9c855d1d088ddd2d436241bf1fde23b541c751988e73df91e9c52fa
+  locator:
+    page: 2
+    published_page: 1466
+    section: '3.1'
+  fO2_control:
+    channel:
+      tag: value
+      value: intrinsic
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 1466
+        section: '3.1'
+        note: Purified argon and a graphite lid excluded oxygen; no oxygen partial pressure or imposed buffer value is stated.
+  bench_id: 62152405c9c855d1d088ddd2d436241bf1fde23b541c751988e73df91e9c52fa::bench::gornerup-graphite-resistance-furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Cold-charged furnace was evacuated and filled twice with purified argon, then heated to the experimental temperature
+          at 5 °C/min; samples were held at temperature for a minimum of 12 h.
+      locator:
+        page: 2
+        published_page: 1466
+        section: '3.1'
+    ramps:
+    - rate_K_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.083333333333333333'
+            approximate: false
+        locator:
+          page: 3
+          published_page: 1467
+          section: '3.1'
+          note: Printed 5 °C/min; converted 5 / 60 = 0.083333333333333333 K/s.
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '2023.15'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 1468
+          table: '1'
+          note: Printed 1750 °C; converted T_K = T_C + 273.15.
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1750'
+              locator:
+                page: 4
+                published_page: 1468
+                table: '1'
+                note: Printed 1750 °C; converted T_K = T_C + 273.15.
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                page: 4
+                published_page: 1468
+                table: '1'
+                note: Printed 1750 °C; converted T_K = T_C + 273.15.
+          output_unit: K
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: bound
+            bound_operator: '>='
+            bound_value: '43200'
+            approximate: false
+        locator:
+          page: 3
+          published_page: 1467
+          section: '3.1'
+          note: Printed minimum hold 12 h; converted 12 × 3600 = 43200 s.
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.1'
+        note: Minimum is stated for the isothermal hold, but total run duration including heat-up is not reported.
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Samples removed from furnace and quenched in helium gas; time to below the liquidus was estimated at less than
+          4 s.
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.1'
+benches:
+- id: 62152405c9c855d1d088ddd2d436241bf1fde23b541c751988e73df91e9c52fa::bench::gornerup-graphite-resistance-furnace
+  work_id: 62152405c9c855d1d088ddd2d436241bf1fde23b541c751988e73df91e9c52fa
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Graphite resistance furnace with fused-alumina muffle tube
+    locator:
+      page: 3
+      published_page: 1467
+      section: '3.2'
+  method:
+    state:
+      tag: value
+      value: Solid-phase dissolution in liquid slag followed by quench equilibration
+    locator:
+      page: 2
+      published_page: 1466
+      section: '3.1'
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Two-chamber molybdenum-sheet crucible; fused-alumina tube with water-cooled metal end sections and O-rings; graphite
+        lid; alumina insulation bricks and radiation shields; porous magnesia protection crucible. The molybdenum crucible
+        held the liquid slag and a separate solid saturation phase.
+    locator:
+      page: 2
+      published_page: 1466
+      figure: '2'
+      section: '3.1'
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: Three type B Pt-30%Rh/Pt-6%Rh thermocouples
+      locator:
+        page: 3
+        published_page: 1467
+        figure: '2'
+        section: '3.2'
+    measuring_positions:
+      state:
+        tag: value
+        value: 'Two thermocouples inside the muffle tube: one on top of the sample and one underneath it in contact with the
+          magnesia protection crucible; a third was outside the muffle tube.'
+      locator:
+        page: 3
+        published_page: 1467
+        figure: '2'
+        section: '3.2'
+    controller:
+      state:
+        tag: value
+        value: External thermocouple connected to a PID regulator controlled furnace temperature.
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.2'
+  temperature_calibration:
+    procedure:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.2'
+        note: No thermocouple calibration procedure is stated.
+  heating_method:
+    state:
+      tag: value
+      value: Graphite resistance furnace
+    locator:
+      page: 3
+      published_page: 1467
+      section: '3.2'
+  other_facts:
+  - name: fused_alumina_tube_outer_diameter_mm
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '68'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.2'
+        note: Printed outer diameter 68 mm.
+    unit: mm
+  - name: fused_alumina_tube_total_length_mm
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '530'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.2'
+        note: Printed total length 530 mm.
+    unit: mm
+  - name: molybdenum_crucible_diameter_mm
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '16'
+          approximate: true
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.1'
+        note: Printed approximately 16 mm.
+    unit: mm
+  - name: molybdenum_crucible_height_mm
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '30'
+          approximate: true
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.1'
+        note: Printed approximately 30 mm.
+    unit: mm
+  - name: two_chamber_crucible_bottom_gap_mm
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.1'
+        note: Printed gap of three millimetres.
+    unit: mm
+  - name: external_PID_reading_error_magnitude_C
+    value:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.5'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.2'
+        note: Printed error less than ±0.5 °C; bound applies to the magnitude.
+    unit: °C
+  - name: experimental_temperature_accuracy_magnitude_C
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '4'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.2'
+        note: Printed experimental temperature accuracy ±4 °C; value is the stated magnitude.
+    unit: °C
+  - name: constant_temperature_zone_half_width_C
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.5'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.2'
+        note: Printed temperature zone ±0.5 °C; value is the stated magnitude.
+    unit: °C
+  - name: constant_temperature_zone_length_mm
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '30'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.2'
+        note: Printed constant-temperature zone length 30 mm.
+    unit: mm
+  - name: maximum_slag_depth_mm
+    value:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <=
+          bound_value: '10'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.2'
+        note: Printed slag depth no more than 10 mm.
+    unit: mm
+  - name: argon_purity_percent
+    value:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: '>'
+          bound_value: '99.996'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.3'
+        note: Printed argon purity >99.996%.
+    unit: '%'
+  - name: nitrogen_purity_percent
+    value:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: '>'
+          bound_value: '99.996'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.3'
+        note: Printed nitrogen purity >99.996%.
+    unit: '%'
+  - name: magnesium_chip_purity_percent
+    value:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: '>'
+          bound_value: '99'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.3'
+        note: Printed Mg-chip purity >99%.
+    unit: '%'
+  - name: argon_purifier_tube_temperature_C
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '500'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 1467
+        section: '3.3'
+        note: Printed argon purification tube-furnace temperature 500 °C.
+    unit: °C
+context:
+- observation_id: gornerup_1996_atmosphere
+  type: laboratory_conditions
+  locator:
+    page: 3
+    published_page: 1467
+    section: '3.2'
+    figure: '2'
+  units: as printed
+  values:
+    experimental_volume_atmosphere: argon
+    furnace_heating_element_protection: nitrogen
+    argon_purification: Silica gel, ascarite (NaOH), dehydrite (Mg(ClO4)2), then a 500 °C Mg-chip tube furnace.
+    nitrogen_purification: Same purification train as argon but without the Mg-chip furnace.
+    oxygen_exclusion: A graphite lid kept oxygen from reaching molybdenum; visual inspection was used to verify this.
+    fO2_note: No numerical oxygen partial pressure or imposed oxygen buffer is reported.
+  context_id: gornerup-1996-cao-corner-liquidus::context::gornerup_1996_atmosphere
+  work_id: 62152405c9c855d1d088ddd2d436241bf1fde23b541c751988e73df91e9c52fa
+  source_id: gornerup-1996-cao-corner-liquidus
+  species: CaO
+- observation_id: gornerup_1996_binary_al2o3_comparison
+  type: literature_context
+  locator:
+    page: 5
+    published_page: 1469
+    section: 5. Discussion
+    note: reference 14
+  units: wt% CaO
+  quote: At 1600 °C the authors state approximately 59 wt% CaO in binary CaO-Al2O3, versus more than 61 wt% on the ternary
+    diagram.
+  values:
+    method_class: author_estimate
+    evidence_class: author_estimate
+    binary_cao_solubility_approx_wt_percent: 59
+    ternary_diagram_cao_solubility_lower_bound_wt_percent: 61
+    ternary_diagram_bound_operator: '>'
+    comparison_temperature_C: 1600
+    ternary_diagram_attribution: Slag Atlas, 2nd ed., Verein Deutscher Eisenhüttenleute, Verlag Stahleisen GmbH, Germany (1995),
+      reference 14.
+  context_id: gornerup-1996-cao-corner-liquidus::context::gornerup_1996_binary_al2o3_comparison
+  work_id: 62152405c9c855d1d088ddd2d436241bf1fde23b541c751988e73df91e9c52fa
+  source_id: gornerup-1996-cao-corner-liquidus
+  species: CaO
+- observation_id: gornerup_1996_binary_sio2_comparison
+  type: literature_context
+  locator:
+    page: 5
+    published_page: 1469
+    section: 5. Discussion
+    note: reference 14
+  units: wt%
+  quote: The authors conclude binary 2CaO·SiO2 solubility is 2.5–3 wt% higher than in the generally accepted system.
+  values:
+    method_class: author_estimate
+    evidence_class: author_estimate
+    solubility_difference_lower_wt_percent: '2.5'
+    solubility_difference_upper_wt_percent: 3
+    phase: 2CaO·SiO2
+    system_compared: Slag Atlas, 2nd ed., Verein Deutscher Eisenhüttenleute, Verlag Stahleisen GmbH, Germany (1995), reference
+      14.
+  context_id: gornerup-1996-cao-corner-liquidus::context::gornerup_1996_binary_sio2_comparison
+  work_id: 62152405c9c855d1d088ddd2d436241bf1fde23b541c751988e73df91e9c52fa
+  source_id: gornerup-1996-cao-corner-liquidus
+  species: CaO
+- observation_id: gornerup_1996_charge_preparation
+  type: method
+  locator:
+    page: 3
+    published_page: 1467
+    section: '3.4'
+  units: as printed
+  values:
+    components_calcined_temperature_C: 1100
+    components_calcined_minimum_duration_h: 12
+    mixture_blended_duration_h: 2
+    mixing_equipment: agate ball mixer
+    pressed_form: cylinder
+    pressing_pressure_MPa: 100
+    pressing_pressure_approximate: true
+    preparation_note: Four grams of each slag mixture was pressed to a cylinder at approximately 100 MPa before crucible loading.
+  context_id: gornerup-1996-cao-corner-liquidus::context::gornerup_1996_charge_preparation
+  work_id: 62152405c9c855d1d088ddd2d436241bf1fde23b541c751988e73df91e9c52fa
+  source_id: gornerup-1996-cao-corner-liquidus
+  species: CaO
+- observation_id: gornerup_1996_crucible_role
+  type: apparatus
+  locator:
+    page: 2
+    published_page: 1466
+    section: '3.1'
+    figure: '2'
+  units: as printed
+  values:
+    crucible_material: molybdenum sheet
+    crucible_chamber_count: 2
+    separating_wall_material: molybdenum
+    chamber_connecting_gap_mm: 3
+    crucible_is_saturating_phase: false
+    crucible_role: Separate saturation solids were loaded with the slag in a two-chamber crucible; the layout was intended
+      to prevent solid-phase contamination of the slag.
+    porous_protection_crucible_material: magnesia
+    graphite_lid: true
+  context_id: gornerup-1996-cao-corner-liquidus::context::gornerup_1996_crucible_role
+  work_id: 62152405c9c855d1d088ddd2d436241bf1fde23b541c751988e73df91e9c52fa
+  source_id: gornerup-1996-cao-corner-liquidus
+  species: CaO
+- observation_id: gornerup_1996_discussion_qualifications
+  type: literature_context
+  locator:
+    page: 5
+    published_page: 1469
+    section: 5. Discussion
+  units: text
+  values:
+    1600_ternary_comparison: Fairly good agreement with literature except for enlarged 3CaO·SiO2 stability area.
+    1700_ternary_comparison: A slight solubility increase in the 2CaO·SiO2 and 3CaO·SiO2 regions was observed.
+    cao_saturation_qualification: The authors say the ternary CaO-saturation line disagrees with the binary CaO-Al2O3 system;
+      their results agree with the binary system.
+    table_scope_note: Although Results prose says saturation experiments at 1600 and 1700 °C, Table 1 also prints rows at
+      1650 and 1750 °C.
+  context_id: gornerup-1996-cao-corner-liquidus::context::gornerup_1996_discussion_qualifications
+  work_id: 62152405c9c855d1d088ddd2d436241bf1fde23b541c751988e73df91e9c52fa
+  source_id: gornerup-1996-cao-corner-liquidus
+  species: CaO
+- observation_id: gornerup_1996_equilibrium_evidence
+  type: equilibrium_evidence
+  locator:
+    page: 2
+    published_page: 1466
+    section: '3.1'
+  units: h
+  quote: The time required to reach equilibrium was experimentally determined to be approximately six hours.
+  values:
+    equilibrium_time_approximate_h: 6
+    isothermal_hold_minimum_h: 12
+    saturation_solid_consumption_quote: In each experiment, it was monitored that the saturation phase did not get entirely
+      consumed.
+    replication_count: 3
+    replication_result: Some experiments were repeated three times, showing no significant discrepancy.
+    time_series_data:
+      state:
+        tag: unknown
+        reason: not_published
+    equilibrium_demonstration_note: 'Reported evidence: approximately 6 h to equilibrium, minimum 12 h hold, solid remained,
+      and repeatability; no time series is printed.'
+  context_id: gornerup-1996-cao-corner-liquidus::context::gornerup_1996_equilibrium_evidence
+  work_id: 62152405c9c855d1d088ddd2d436241bf1fde23b541c751988e73df91e9c52fa
+  source_id: gornerup-1996-cao-corner-liquidus
+  species: CaO
+- observation_id: gornerup_1996_figures_context
+  type: literature_context
+  locator:
+    page: 5
+    published_page: 1469
+    figure: 3-5
+  units: figure-only context
+  values:
+    method_class: figure_only
+    evidence_class: figure_only
+    figures:
+    - '3'
+    - '4'
+    - '5'
+    figure_3_sources: Day, Shepherd and Wright (1906, ref. 5); Rankin and Wright (1915, ref. 6); Obst and Fix (1970, ref.
+      8); literature diagram ref. 14.
+    figure_4_source: Literature diagram ref. 14.
+    figure_5_source: Literature diagram ref. 14; dotted lines are literature boundaries and solid lines are authors' estimates.
+    digitization_status: No un-tabulated curve points were digitized.
+    paper_has_figure_6: false
+  context_id: gornerup-1996-cao-corner-liquidus::context::gornerup_1996_figures_context
+  work_id: 62152405c9c855d1d088ddd2d436241bf1fde23b541c751988e73df91e9c52fa
+  source_id: gornerup-1996-cao-corner-liquidus
+  species: CaO
+- observation_id: gornerup_1996_phase_identification_limits
+  type: characterization
+  locator:
+    page: 4
+    published_page: 1468
+    section: '3.4'
+  units: as printed
+  values:
+    prepared_saturation_solids_verified_by: X-ray diffraction
+    in_run_phase_check: The authors monitored that the saturation phase did not get entirely consumed.
+    post_run_phase_identification:
+      state:
+        tag: unknown
+        reason: not_published
+    post_run_epma_or_sem:
+      state:
+        tag: unknown
+        reason: not_published
+    post_run_phase_note: No EPMA, SEM, microscopy, or post-run XRD identification of the surviving saturation phase is reported.
+  context_id: gornerup-1996-cao-corner-liquidus::context::gornerup_1996_phase_identification_limits
+  work_id: 62152405c9c855d1d088ddd2d436241bf1fde23b541c751988e73df91e9c52fa
+  source_id: gornerup-1996-cao-corner-liquidus
+  species: CaO
+- observation_id: gornerup_1996_quaternary_mgo_range
+  type: literature_context
+  locator:
+    page: 2
+    published_page: 1466
+    section: '2.3'
+  units: wt% MgO
+  quote: Some of these experiments have dealt with MgO-contents of 3–10 wt%.
+  values:
+    MgO_range_lower_wt_percent: 3
+    MgO_range_upper_wt_percent: 10
+  context_id: gornerup-1996-cao-corner-liquidus::context::gornerup_1996_quaternary_mgo_range
+  work_id: 62152405c9c855d1d088ddd2d436241bf1fde23b541c751988e73df91e9c52fa
+  source_id: gornerup-1996-cao-corner-liquidus
+  species: CaO
+- observation_id: gornerup_1996_quoted_obst_fix_1970
+  type: literature_context
+  locator:
+    page: 1
+    published_page: 1465
+    section: '2.1'
+  units: wt% SiO2
+  quote: Obst and Fix (1970, reference 8) studied CaO-SiO2 slags from approximately 42 to 70 wt% SiO2 using quenching and
+    SEM analysis; one verification experiment was carried out at 1600 °C using a 2CaO·SiO2 crucible.
+  values:
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: K.-H. Obst and W. Fix, Arch. Eisenhüttenwes., 41 (1970), p. 703 (reference 8).
+    SiO2_range_lower_wt_percent: 42
+    SiO2_range_upper_wt_percent: 70
+    both_endpoints_approximate: true
+    phase_identification_method: quenching and SEM analysis
+    verification_experiment_temperature_C: 1600
+    verification_experiment_crucible_phase: 2CaO·SiO2
+  context_id: gornerup-1996-cao-corner-liquidus::context::gornerup_1996_quoted_obst_fix_1970
+  work_id: 62152405c9c855d1d088ddd2d436241bf1fde23b541c751988e73df91e9c52fa
+  source_id: gornerup-1996-cao-corner-liquidus
+  species: CaO
+- observation_id: gornerup_1996_quoted_prince_1951
+  type: literature_context
+  locator:
+    page: 2
+    published_page: 1466
+    section: '2.3'
+  units: mg
+  quote: Prince (1951, reference 13) melted 20 mg of powdered glass in a platinum envelope and identified phases after quenching.
+  values:
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: A. T. Prince, J. Am. Ceram. Soc., 34 (1951), p. 44 (reference 13).
+    powdered_glass_mass_mg: 20
+    envelope_material: platinum
+    three_liquidus_temperatures_of_interest:
+      state:
+        tag: unknown
+        reason: not_published
+    numeric_liquidus_points_source_note: The authors mention three temperatures from Prince but provide no tabulated numeric
+      values in prose.
+  context_id: gornerup-1996-cao-corner-liquidus::context::gornerup_1996_quoted_prince_1951
+  work_id: 62152405c9c855d1d088ddd2d436241bf1fde23b541c751988e73df91e9c52fa
+  source_id: gornerup-1996-cao-corner-liquidus
+  species: CaO
+- observation_id: gornerup_1996_quoted_rankin_wright_1915
+  type: literature_context
+  locator:
+    page: 1
+    published_page: 1465
+    section: '2.1'
+  units: °C
+  quote: The accuracy of temperature measurements, which were carried out with an optical pyrometer, was estimated to be ±20°C.
+  values:
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: G. A. Rankin and F. E. Wright, Am. J. Sci., XXXIX (1915), 4th ser., no. 229, p. 1 (reference 6).
+    optical_pyrometer_accuracy_magnitude_C: 20
+    stated_sign: ±
+  context_id: gornerup-1996-cao-corner-liquidus::context::gornerup_1996_quoted_rankin_wright_1915
+  work_id: 62152405c9c855d1d088ddd2d436241bf1fde23b541c751988e73df91e9c52fa
+  source_id: gornerup-1996-cao-corner-liquidus
+  species: CaO
+- observation_id: gornerup_1996_quoted_rankin_wright_1915_ternary_intervals
+  type: literature_context
+  locator:
+    page: 1
+    published_page: 1465
+    section: '2.3'
+  units: as printed
+  quote: Almost the entire ternary system was examined at composition intervals of five wt%. The only limitation was set by
+    the experimental equipment, which had a maximum operating temperature of 1600°C.
+  values:
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: G. A. Rankin and F. E. Wright, Am. J. Sci., XXXIX (1915), 4th ser., no. 229, p. 1 (reference 6).
+    composition_interval_wt_percent: 5
+    equipment_maximum_operating_temperature_C: 1600
+  context_id: gornerup-1996-cao-corner-liquidus::context::gornerup_1996_quoted_rankin_wright_1915_ternary_intervals
+  work_id: 62152405c9c855d1d088ddd2d436241bf1fde23b541c751988e73df91e9c52fa
+  source_id: gornerup-1996-cao-corner-liquidus
+  species: CaO
+- observation_id: gornerup_1996_quoted_welch_gutt_1959
+  type: literature_context
+  locator:
+    page: 1
+    published_page: 1465
+    section: '2.1'
+  units: wt% CaO
+  quote: Welch and Gutt (1959, reference 7) place primary-phase 3CaO·SiO2 between 69.5 and 71.5 wt% CaO.
+  values:
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: J. H. Welch and W. Gutt, J. Am. Ceram. Soc., 42 (1959), no. 1, p. 11 (reference 7).
+    primary_phase_range_lower_wt_percent: '69.5'
+    primary_phase_range_upper_wt_percent: '71.5'
+    phase_as_printed: 3CaO·SiO2
+  context_id: gornerup-1996-cao-corner-liquidus::context::gornerup_1996_quoted_welch_gutt_1959
+  work_id: 62152405c9c855d1d088ddd2d436241bf1fde23b541c751988e73df91e9c52fa
+  source_id: gornerup-1996-cao-corner-liquidus
+  species: CaO
+- observation_id: gornerup_1996_saturated_liquid_analysis
+  type: method
+  locator:
+    page: 4
+    published_page: 1468
+    section: '3.5'
+  units: as printed
+  values:
+    analysis_method: sequential X-ray spectrometry
+    instrument: Siemens SRS 303 Sequential X-ray Spectrometer
+    flux_prep_lithium_tetraborate_wt_percent: 66
+    flux_prep_lithium_metaborate_wt_percent: 34
+    additional_fusion_reagent: ammonium nitrate
+    fusion_crucible_material: platinum
+    stated_relative_accuracy_wt_percent: 2
+    stated_relative_accuracy_operator: ≤
+    minimum_sample_mass_for_accuracy_g: '0.5'
+    analyzed_components:
+    - CaO
+    - Al2O3
+    - SiO2
+    - MgO
+    - MoO3
+    accuracy_qualification: Relative accuracy ≤2 wt% is stated provided a 0.5 g slag sample is supplied.
+    electron_probe_or_microscopy:
+      state:
+        tag: unknown
+        reason: not_published
+  context_id: gornerup-1996-cao-corner-liquidus::context::gornerup_1996_saturated_liquid_analysis
+  work_id: 62152405c9c855d1d088ddd2d436241bf1fde23b541c751988e73df91e9c52fa
+  source_id: gornerup-1996-cao-corner-liquidus
+  species: CaO
+- observation_id: gornerup_1996_saturation_solid_preparation
+  type: method
+  locator:
+    page: 4
+    published_page: 1468
+    section: '3.4'
+  units: as printed
+  values:
+    saturation_solid_mass_g: 2
+    pressing_pressure_MPa: 100
+    pressing_pressure_approximate: true
+    sintering_temperature_C: 1600
+    sintering_minimum_duration_h: 72
+    synthesis_crucible_material: platinium
+    synthesis_reagents: CaO and SiO2 mixtures formed 2CaO·SiO2 and 3CaO·SiO2, respectively.
+    phase_identification_method: X-ray diffraction verified phases of the sintered powders before use.
+    CaO_preparation: CaO was calcined and pressed to discs before use; comparative single-crystal experiments showed no discrepancy.
+    Ca2SiO4_preparation_note: 2CaO·SiO2 discs disintegrated after sintering from a 10% volume change on cooling; a second
+      grinding preceded pressing final cylinders.
+    Ca3SiO5_preparation_note: Sintered 3CaO·SiO2 discs were used directly, apart from forming suitable-size pieces.
+  context_id: gornerup-1996-cao-corner-liquidus::context::gornerup_1996_saturation_solid_preparation
+  work_id: 62152405c9c855d1d088ddd2d436241bf1fde23b541c751988e73df91e9c52fa
+  source_id: gornerup-1996-cao-corner-liquidus
+  species: CaO
+- observation_id: gornerup_1996_slag_atlas_cao_comparator
+  type: literature_context
+  locator:
+    page: 5
+    published_page: 1469
+    section: 5. Discussion
+    equation: reference 14
+  units: wt% CaO
+  quote: The ternary diagram cited as reference 14 indicates more than 61 wt% CaO at 1600 °C on the CaO-Al2O3 axis.
+  values:
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Slag Atlas, 2nd ed., Verein Deutscher Eisenhüttenleute, Verlag Stahleisen GmbH, Germany (1995), reference
+      14.
+    ternary_diagram_cao_solubility_lower_bound_wt_percent: 61
+    bound_operator: '>'
+    comparison_temperature_C: 1600
+  context_id: gornerup-1996-cao-corner-liquidus::context::gornerup_1996_slag_atlas_cao_comparator
+  work_id: 62152405c9c855d1d088ddd2d436241bf1fde23b541c751988e73df91e9c52fa
+  source_id: gornerup-1996-cao-corner-liquidus
+  species: CaO
+- observation_id: gornerup_1996_starting_materials
+  type: characterization
+  locator:
+    page: 3
+    published_page: 1467
+    section: '3.4'
+  units: wt%
+  values:
+    reagent_grade_as_printed: High-purity Pro analysi chemicals were used.
+    lime_CaO_purity_lower_bound_wt_percent: '99.5'
+    lime_purity_bound_operator: ≥
+    lime_purity_qualifier: approximately
+    lime_supplier: Fischer Scientific, USA
+    alumina_Al2O3_purity_lower_bound_wt_percent: '99.5'
+    alumina_purity_bound_operator: ≥
+    alumina_supplier: BDH AnalaR, Germany
+    silica_SiO2_purity_lower_bound_wt_percent: '99'
+    silica_purity_bound_operator: ≥
+    silica_supplier: C. Roth, Germany
+    starting_material_note: Printed purity limits; no separate batch assay is given.
+  context_id: gornerup-1996-cao-corner-liquidus::context::gornerup_1996_starting_materials
+  work_id: 62152405c9c855d1d088ddd2d436241bf1fde23b541c751988e73df91e9c52fa
+  source_id: gornerup-1996-cao-corner-liquidus
+  species: CaO
+- observation_id: gornerup_1996_table1_basis
+  type: literature_context
+  locator:
+    page: 4
+    published_page: 1468
+    table: '1'
+  units: wt%
+  values:
+    quantity: liquidus_composition
+    phase_saturated_liquid_quote: Listed compositions are liquid phase saturated with given phase at given temperature.
+    normalization_quote: The composition is normalized with respect to the three components after analysis and presented with
+      one decimal.
+    analyzed_components:
+    - CaO
+    - Al2O3
+    - SiO2
+    - MgO
+    - MoO3
+    normalized_table_components:
+    - CaO
+    - Al2O3
+    - SiO2
+    omitted_components:
+    - MgO
+    - MoO3
+    polymorph_notes: Table names saturating solids by stoichiometric formula; no crystal polymorph is specified.
+  context_id: gornerup-1996-cao-corner-liquidus::context::gornerup_1996_table1_basis
+  work_id: 62152405c9c855d1d088ddd2d436241bf1fde23b541c751988e73df91e9c52fa
+  source_id: gornerup-1996-cao-corner-liquidus
+  species: CaO
+- observation_id: gornerup_1996_typical_saturated_slag_mass
+  type: method
+  locator:
+    page: 3
+    published_page: 1467
+    section: '3.1'
+  units: g
+  quote: Typically 0.5–1.5 g of saturated slag were obtained and analysed in an X-ray spectrometer.
+  values:
+    typical_saturated_slag_mass_low_g: '0.5'
+    typical_saturated_slag_mass_high_g: '1.5'
+  context_id: gornerup-1996-cao-corner-liquidus::context::gornerup_1996_typical_saturated_slag_mass
+  work_id: 62152405c9c855d1d088ddd2d436241bf1fde23b541c751988e73df91e9c52fa
+  source_id: gornerup-1996-cao-corner-liquidus
+  species: CaO

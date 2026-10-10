@@ -65,14 +65,85 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22
   locator:
+    page: PDF p. 2 / printed p. 186
+    table: '1'
+    paragraph: Gibbs energies of multicomponent systems by HTMS (1), Kohler (2), Wilson (3)
+    line_range: 27-45
+    note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-016-stolyarova-1992/tables.md
+    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+context:
+- observation_id: stolyarova_1992_silicate_kems_geometry_activities
+  type: method
+  locator:
     section: 2. Experimental procedures
     line_range: 15-19
-    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
-  apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: Mo (ion identification)
+  T_range_K:
+  - '1300'
+  - '1973'
+  phase: multicomponent_silicate_melt
+  standard_state: oxide activities via Belton-Fruehan / comparison method (Ag, Au standards)
+  regime: kems_effusion
+  units: as published (activities; Gibbs energies kcal/mol in tables)
+  values:
+    quantity: multicomponent_silicate_KEMS_activities_geometry
+    hole_to_vaporization_area_ratios:
+    - 100
+    - 400
+    - 500
+    hole_to_vaporization_area_ratios_note: ratio of the areas of the effusion hole and vaporization was equaled to 1:100,400,500
+    cell_materials:
+    - Pt
+    - Mo
+    - W
+    cell_material_caveat: Mo cells used for ion-identification runs; Mo reactive with silicate melts (VapoRock/De Maria caveat)
+      — absolute p from Mo deserve scrutiny; ratios more robust.
+    vapor_species_examples:
+    - CaSiO3+
+    - CaSiO2+
+    - CaSiO+
+    - CaAlO+
+    - CaAl+
+    - AlSiO+
+    ions_similar_to_binary_systems: true
+    missing_for_motzfeldt:
+    - absolute_orifice_diameter
+    - clausing_factor
+    - absolute_sample_surface_area_m2
+    numeric_activity_published: false
+    numeric_activity_note: Conference paper states oxide activities were determined (Belton–Fruehan / comparison method) but
+      does not tabulate component γ or a. Table 1 is integral −ΔG of mixing (kcal/mol); Table 2 is Wilson binary λ parameters;
+      Tables 3–4 are Gibbs / μ(Na2O). Those live on the gibbs_table observations. See §2 and Table 1, lines 15-27.
+  uncertainty:
+    note: short conference paper; geometry ratios only
+  equipment:
+    multi_orifice_series:
+      value:
+        hole_to_vaporization_area_ratios:
+        - 1:100
+        - 1:400
+        - 1:500
+        absolute_orifice_area_m2: null
+        note: ratios only — not Whitman-Motzfeldt multi-cell α with numeric d
       locator:
-        line_range: '19'
-        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+        paragraph: ratio of the areas of the effusion hole and vaporization was equaled to 1:100,400,500
+        line_range: '17'
+    sample_surface_area:
+      value:
+        via_area_ratio: true
+        ratios_to_orifice:
+        - 100
+        - 400
+        - 500
+        numeric_m2: null
+      locator:
+        paragraph: ratio of the areas of the effusion hole and vaporization
+        line_range: '17'
+    cell_material:
+      value: Pt, Mo, and W effusion cells (selection system-dependent)
+      locator:
+        paragraph: Vaporization from platinum, molybdenum and tungsten effusion cells
+        line_range: '17'
+  context_id: kems-016-stolyarova-1992::context::stolyarova_1992_silicate_kems_geometry_activities
+  work_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22
+  source_id: kems-016-stolyarova-1992
+  species: SiO2

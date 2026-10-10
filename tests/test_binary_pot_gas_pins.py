@@ -16,30 +16,30 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
 )
 
 
-# Regenerated at openimcc 30c51c8 after 4fe8eaf refit the liquid continuations.
+# Regenerated at openimcc f037d05; the low-temperature Si2/Si3 gas rows come from upstream 8b99c3e.
 # Float outputs are stored as float.hex strings so these are exact pins.
 _GOLDEN = {
     ("cao_sio2_40_60", 1200.0, None): {
         "pressures": {
             "Ca": "0x1.86a34857d97cfp-49", "CaO": "0x1.509fe9032de8ap-61",
             "O": "0x1.6c79fb9838ad1p-34", "O2": "0x1.e07376c2990acp-34",
-            "Si": "0x1.b81f475f1d5dcp-76", "Si2": "0x1.cc03d75d6a7f9p-142",
-            "Si3": "0x1.bc559b79b2aa5p-198", "SiO": "0x1.b13779512e22ep-32",
+            "Si": "0x1.b81f475f1d5dcp-76", "Si2": "0x1.cbf877428edb0p-142",
+            "Si3": "0x1.bc561b7e18be2p-198", "SiO": "0x1.b13779512e22ep-32",
             "SiO2": "0x1.0d9ffb54aa148p-41",
         },
         "total": "0x1.427d34a0db165p-31", "pO2": "0x1.3ade4ea65c98ep-50",
         "residual": "0x1.0c60aacc06d05p-44", "iterations": 15,
         "O": (("SiO", "0x1.5615e032a1ad1p-51"), ("O2", "0x1.bd4e186b5803dp-52"), ("O", "0x1.ddbdd6fa4a886p-53"), ("SiO2", "0x1.6cbd9a5f7dfe2p-60"), ("CaO", "0x1.d75c5be5cb0e5p-81")),
         "metal": (("SiO", "0x1.5615e032a1ad1p-50"), ("SiO2", "0x1.6cbd9a5f7dfe2p-60"), ("Ca", "0x1.4383392738376p-68"), ("CaO", "0x1.d75c5be5cb0e5p-81"), ("Si", "0x1.b36ae6a7250e3p-94")),
-        "flags": (("SiO", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("SiO2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("CaO", "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028"), ("Ca", "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028"), ("Si2", "T=1200.0 K outside declared G(T) interval for 'Si2(g)' [1500, 3000] K; SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si3", "T=1200.0 K outside declared G(T) interval for 'Si3(g)' [1500, 3000] K; SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038")),
+        "flags": (("SiO", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("SiO2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("CaO", "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028"), ("Ca", "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028"), ("Si2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si3", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038")),
         "flux": None, "buffer": None,
     },
     ("cao_sio2_40_60", 1200.0, "W"): {
         "pressures": {
             "Ca": "0x1.1cd9a66e10688p-45", "CaO": "0x1.509fe9032de8ap-61",
             "O": "0x1.f3d5f229fbfbap-38", "O2": "0x1.c3c9b8f18c976p-41",
-            "Si": "0x1.d40b8caf64559p-69", "Si2": "0x1.041e496f20bc8p-127",
-            "Si3": "0x1.0b3121bc01c03p-176", "SiO": "0x1.3be5fd12f7c75p-28",
+            "Si": "0x1.d40b8caf64559p-69", "Si2": "0x1.0417dac439126p-127",
+            "Si3": "0x1.0b316eb70e793p-176", "SiO": "0x1.3be5fd12f7c75p-28",
             "SiO2": "0x1.0d9ffb54aa148p-41", "W2O6": "0x1.2493b610681eap-29",
             "W3O8": "0x1.38de46e4c4afbp-34", "W3O9": "0x1.cfc6dc1b16f42p-33",
             "W4O12": "0x1.28002d3e0c262p-44", "WO": "0x1.5fae4f42c90f1p-55",
@@ -49,7 +49,7 @@ _GOLDEN = {
         "residual": "0x1.171ed7fd6e3b7p-48", "iterations": 20,
         "O": (("SiO", "0x1.f2e4702b5f64ap-48"), ("W2O6", "0x1.ab6b8dbfa2c60p-48"), ("W3O9", "0x1.9ee56ca719ba6p-51"), ("W3O8", "0x1.f769434b4fa00p-53"), ("WO3", "0x1.2fb9d8486522cp-55")),
         "metal": (("SiO", "0x1.f2e4702b5f64ap-47"), ("SiO2", "0x1.6cbd9a5f7dfe2p-60"), ("Ca", "0x1.d7ce52d9a7dffp-65"), ("CaO", "0x1.d75c5be5cb0e5p-81"), ("Si", "0x1.cf0ac2fe0778cp-87")),
-        "flags": (("SiO", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("SiO2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("CaO", "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028"), ("Ca", "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028"), ("Si2", "T=1200.0 K outside declared G(T) interval for 'Si2(g)' [1500, 3000] K; SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si3", "T=1200.0 K outside declared G(T) interval for 'Si3(g)' [1500, 3000] K; SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038")),
+        "flags": (("SiO", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("SiO2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("CaO", "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028"), ("Ca", "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028"), ("Si2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si3", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038")),
         "flux": "0x1.fe6ee7d423bc6p-2", "buffer": "0x1.0e9617dca9e3ap-54",
     },
     ("cao_sio2_40_60", 1700.0, None): {
@@ -90,15 +90,15 @@ _GOLDEN = {
             "Fe": "0x1.9ab04b48fa33dp-27", "FeO": "0x1.51f31284b1206p-33",
             "Mg": "0x1.2badb1443a838p-35", "MgO": "0x1.9b72b08cf1669p-51",
             "O": "0x1.1afe7d89c263bp-31", "O2": "0x1.21a4ead5094d7p-28",
-            "Si": "0x1.e0178d9b1308ep-81", "Si2": "0x1.11ae4d1b861f5p-151",
-            "Si3": "0x1.205beae23561dp-212", "SiO": "0x1.6ee9fa97739e8p-34",
+            "Si": "0x1.e0178d9b1308ep-81", "Si2": "0x1.11a788952f041p-151",
+            "Si3": "0x1.205c3df676ecfp-212", "SiO": "0x1.6ee9fa97739e8p-34",
             "SiO2": "0x1.629d69bf2766fp-41",
         },
         "total": "0x1.2344c146dd4a2p-26", "pO2": "0x1.7ba47809e0c68p-45",
         "residual": "0x1.13a3f2adafb66p-50", "iterations": 14,
         "O": (("O2", "0x1.0c74c5e9972eep-46"), ("O", "0x1.72f0080b4eb1fp-50"), ("FeO", "0x1.a213c2947944ap-53"), ("SiO", "0x1.21baea9f5e0dbp-53"), ("SiO2", "0x1.dfb669c874fb6p-60")),
         "metal": (("Fe", "0x1.20219e351840ep-46"), ("SiO", "0x1.21baea9f5e0dbp-52"), ("FeO", "0x1.a213c2947944ap-53"), ("Mg", "0x1.3eb25ff51d446p-54"), ("SiO2", "0x1.dfb669c874fb6p-60")),
-        "flags": (("SiO", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Mg", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("MgO", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("SiO2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si2", "T=1200.0 K outside declared G(T) interval for 'Si2(g)' [1500, 3000] K; SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si3", "T=1200.0 K outside declared G(T) interval for 'Si3(g)' [1500, 3000] K; SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038")),
+        "flags": (("SiO", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Mg", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("MgO", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("SiO2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si3", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038")),
         "flux": None, "buffer": None,
     },
     ("feo_mgo_sio2_30_20_50", 1200.0, "W"): {
@@ -106,8 +106,8 @@ _GOLDEN = {
             "Fe": "0x1.e2c1d4341bc6ap-22", "FeO": "0x1.51f31284b1206p-33",
             "Mg": "0x1.604445ac1857ap-30", "MgO": "0x1.9b72b08cf1669p-51",
             "O": "0x1.e17e9a832f578p-37", "O2": "0x1.a33d77b49769cp-39",
-            "Si": "0x1.4baf7d83951b2p-70", "Si2": "0x1.05436a5d6c1bbp-130",
-            "Si3": "0x1.7c5d3d733ada6p-181", "SiO": "0x1.af4d019c0a7b4p-29",
+            "Si": "0x1.4baf7d83951b2p-70", "Si2": "0x1.053cf472e11b3p-130",
+            "Si3": "0x1.7c5dab096efcdp-181", "SiO": "0x1.af4d019c0a7b4p-29",
             "SiO2": "0x1.629d69bf2766fp-41", "W2O6": "0x1.d3941fab43ed5p-24",
             "W3O8": "0x1.cffc362d0cccep-27", "W3O9": "0x1.4b45d2a231c7bp-24",
             "W4O12": "0x1.79fff6eaeb5c4p-33", "WO": "0x1.52c6b3247cf30p-54",
@@ -117,7 +117,7 @@ _GOLDEN = {
         "residual": "0x1.f1ce1dcfe930dp-48", "iterations": 22,
         "O": (("W2O6", "0x1.5589cf27d5d48p-42"), ("W3O9", "0x1.285b8eb17c7f3p-42"), ("W3O8", "0x1.7547d86a091afp-45"), ("SiO", "0x1.5492952a894e0p-48"), ("W4O12", "0x1.86792fd81e23ep-51")),
         "metal": (("Fe", "0x1.52b175aaa4435p-41"), ("SiO", "0x1.5492952a894e0p-47"), ("Mg", "0x1.769f522e7eddap-49"), ("FeO", "0x1.a213c2947944ap-53"), ("SiO2", "0x1.dfb669c874fb6p-60")),
-        "flags": (("SiO", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Mg", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("MgO", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("SiO2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si2", "T=1200.0 K outside declared G(T) interval for 'Si2(g)' [1500, 3000] K; SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si3", "T=1200.0 K outside declared G(T) interval for 'Si3(g)' [1500, 3000] K; SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038")),
+        "flags": (("SiO", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Mg", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("MgO", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("SiO2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si3", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038")),
         "flux": "0x1.fbde39f6ea1ffp-1", "buffer": "0x1.0e9617dca9e3ap-54",
     },
     ("feo_mgo_sio2_30_20_50", 1700.0, None): {
@@ -172,10 +172,11 @@ _PROVENANCE_CLASSES = {
 }
 _COMMON_LOW_FLAGS = "Al2O3(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Al-100"
 _SILICA_LOW_FLAGS = "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"
+_TITANIA_LOW_FLAGS = "TiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-044"
 _DOMAIN_FLAGS = {
     1200.0: {
         "Al": _COMMON_LOW_FLAGS,
-        "Al2": "T=1200.0 K outside declared G(T) interval for 'Al2(g)' [1500, 3000] K; " + _COMMON_LOW_FLAGS,
+        "Al2": _COMMON_LOW_FLAGS,
         "Al2O": _COMMON_LOW_FLAGS, "Al2O2": _COMMON_LOW_FLAGS, "AlO": _COMMON_LOW_FLAGS,
         "AlO2": _COMMON_LOW_FLAGS,
         "Ca": "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028",
@@ -185,12 +186,10 @@ _DOMAIN_FLAGS = {
         "MgO": "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009",
         "Na": None, "Na2": None, "Na2O": None, "NaO": None, "O": None, "O2": None,
         "Si": _SILICA_LOW_FLAGS,
-        "Si2": "T=1200.0 K outside declared G(T) interval for 'Si2(g)' [1500, 3000] K; " + _SILICA_LOW_FLAGS,
-        "Si3": "T=1200.0 K outside declared G(T) interval for 'Si3(g)' [1500, 3000] K; " + _SILICA_LOW_FLAGS,
+        "Si2": _SILICA_LOW_FLAGS,
+        "Si3": _SILICA_LOW_FLAGS,
         "SiO": _SILICA_LOW_FLAGS, "SiO2": _SILICA_LOW_FLAGS,
-        "Ti": "T=1200.0 K outside declared G(T) interval for 'Ti(g)' [1500, 3000] K; TiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-044",
-        "TiO": "T=1200.0 K outside declared G(T) interval for 'TiO(g)' [1500, 3000] K; TiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-044",
-        "TiO2": "T=1200.0 K outside declared G(T) interval for 'TiO2(g)' [1500, 3000] K; TiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-044",
+        "Ti": _TITANIA_LOW_FLAGS, "TiO": _TITANIA_LOW_FLAGS, "TiO2": _TITANIA_LOW_FLAGS,
     },
     1700.0: {
         "Al": _COMMON_LOW_FLAGS, "Al2": _COMMON_LOW_FLAGS, "Al2O": _COMMON_LOW_FLAGS,
@@ -342,14 +341,14 @@ def test_binary_pot_gas_records_engine_binding_identity_and_hex_pins() -> None:
         assert result.vapor_pressures_source == expected_sources
 
 
-def test_binary_pot_gas_pin_inputs_cover_both_paths_and_interval_flag() -> None:
+def test_binary_pot_gas_pin_inputs_cover_both_paths_without_low_t_interval_flags() -> None:
     assert set(pot_id for pot_id, _, _ in _GOLDEN) == {
         "cao_sio2_40_60",
         "feo_mgo_sio2_30_20_50",
     }
     assert {temperature for _, temperature, _ in _GOLDEN} == {1200.0, 1700.0}
     assert {cell for _, _, cell in _GOLDEN} == {None, "W"}
-    assert any(
+    assert not any(
         "outside declared G(T) interval" in reason
         for pin in _GOLDEN.values()
         for _, reason in pin["flags"]

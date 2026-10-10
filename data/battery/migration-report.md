@@ -1,35 +1,35 @@
 # Battery v2.1 migration report
 
-rows in: 47829
-records out (observations): 121821
-works: 269
-experiments: 3564
-queue size: 77476
+rows in: 47898
+records out (observations): 121992
+works: 276
+experiments: 3576
+queue size: 77705
 identical-payload dedupe aliases: 342
 metadata files: 43
-index sources: 272
-hard issues: 3625
+index sources: 279
+hard issues: 3631
 
 ## Spec vs measured
 
 | count | spec | measured |
 |---|---:|---:|
-| citations | 147 | 271 (mismatch) |
-| doi_works | 56 | 129 (mismatch) |
-| no_doi_works | 91 | 140 (mismatch) |
-| admission_statuses | 374 | 1174 (mismatch) |
+| citations | 147 | 278 (mismatch) |
+| doi_works | 56 | 133 (mismatch) |
+| no_doi_works | 91 | 143 (mismatch) |
+| admission_statuses | 374 | 1201 (mismatch) |
 | supersedes | 422 | 650 (mismatch) |
 | series | 60 | 599 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1635 (mismatch) |
 | gibbs_reference_100000 | 1023 | 1029 (mismatch) |
 | gibbs_reference_101325 | 594 | 594 |
-| formulas | 1625 | 2044 (mismatch) |
-| equipment_payloads | 670 | 966 (mismatch) |
-| absent_admissions | 3511 | 5036 (mismatch) |
+| formulas | 1625 | 2047 (mismatch) |
+| equipment_payloads | 670 | 965 (mismatch) |
+| absent_admissions | 3511 | 5078 (mismatch) |
 | absent_classes | 2174 | 2203 (mismatch) |
-| range_only_T | 3125 | 2666 (mismatch) |
-| system_like_phases | 1065 | 2698 (mismatch) |
-| missing_phases | 237 | 582 (mismatch) |
+| range_only_T | 3125 | 2668 (mismatch) |
+| system_like_phases | 1065 | 2710 (mismatch) |
+| missing_phases | 237 | 591 (mismatch) |
 | tabulated_lists | — | 6 |
 
 ## Evidence-class fall-throughs
@@ -18004,11 +18004,13 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/fray-schmitt-2009-nh3.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/giauque-powell-1939-cl2.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/giauque-ruehrwein-1939-hcn-psat.yaml` | 1 | 1 | 4 |
+| `data/literature/extracts/gibbons-1963-thesis-cas-slags-cas.yaml` | 6 | 6 | 18 |
+| `data/literature/extracts/gornerup-1996-cao-corner-liquidus.yaml` | 39 | 39 | 78 |
 | `data/literature/extracts/guo-2021-mgo-activity-cmas-slag.yaml` | 2 | 16 | 18 |
 | `data/literature/extracts/habermann-daane-1964.yaml` | 2 | 2 | 9 |
 | `data/literature/extracts/hashimoto-nakano-2021-bubbles-to-chondrites-ii.yaml` | 7 | 7 | 38 |
 | `data/literature/extracts/hendrix-2024-reactivity-reduced-simulants.yaml` | 8 | 8 | 36 |
-| `data/literature/extracts/holzheid-1997-feo-nio-coo-activity-metal-saturated.yaml` | 37 | 37 | 93 |
+| `data/literature/extracts/holzheid-1997-feo-nio-coo-activity-metal-saturated.yaml` | 37 | 37 | 86 |
 | `data/literature/extracts/iapws-95-psat-liquid.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/itoh-hino-banya-1997-mg-deoxidation.yaml` | 3 | 39 | 52 |
 | `data/literature/extracts/itoh-hino-banya-1998-spinel.yaml` | 10 | 10 | 46 |
@@ -18032,19 +18034,19 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-011-wetzel-gail-2013.yaml` | 17 | 17 | 89 |
 | `data/literature/extracts/kems-012-sossi-2019.yaml` | 192 | 612 | 308 |
 | `data/literature/extracts/kems-014-drowart-2005.yaml` | 8 | 17 | 45 |
-| `data/literature/extracts/kems-015-hashimoto-1983.yaml` | 167 | 681 | 292 |
-| `data/literature/extracts/kems-016-stolyarova-1992.yaml` | 10 | 23 | 69 |
+| `data/literature/extracts/kems-015-hashimoto-1983.yaml` | 167 | 681 | 298 |
+| `data/literature/extracts/kems-016-stolyarova-1992.yaml` | 9 | 22 | 63 |
 | `data/literature/extracts/kems-017-stolyarova-2013.yaml` | 11 | 11 | 50 |
 | `data/literature/extracts/kems-018-stolyarova-2012.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/kems-019-miller-armatys-2013.yaml` | 28 | 28 | 60 |
-| `data/literature/extracts/kems-020-hastie-1981-nbsir.yaml` | 41 | 112 | 293 |
+| `data/literature/extracts/kems-020-hastie-1981-nbsir.yaml` | 41 | 112 | 292 |
 | `data/literature/extracts/kems-021-plante-1992-feo.yaml` | 10 | 25 | 40 |
-| `data/literature/extracts/kems-022-demaria-1971.yaml` | 32 | 117 | 195 |
+| `data/literature/extracts/kems-022-demaria-1971.yaml` | 32 | 117 | 193 |
 | `data/literature/extracts/kems-023-demaria-1973.yaml` | 30 | 75 | 58 |
 | `data/literature/extracts/kems-024-gibson-hubbard-1972.yaml` | 102 | 108 | 292 |
 | `data/literature/extracts/kems-025-markova-1983.yaml` | 22 | 44 | 63 |
 | `data/literature/extracts/kems-026-markova-1984.yaml` | 15 | 37 | 61 |
-| `data/literature/extracts/kems-027-plante-hastie-1983.yaml` | 26 | 48 | 110 |
+| `data/literature/extracts/kems-027-plante-hastie-1983.yaml` | 26 | 48 | 107 |
 | `data/literature/extracts/kems-028-yakovlev-1984.yaml` | 19 | 29 | 55 |
 | `data/literature/extracts/kems-029-yakovlev-shornikov-2011.yaml` | 5 | 15 | 26 |
 | `data/literature/extracts/kems-031-halwax-2024.yaml` | 22 | 24 | 109 |
@@ -18102,6 +18104,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-200-ueshima-1983.yaml` | 63 | 115 | 358 |
 | `data/literature/extracts/kems-201-ichise-1986.yaml` | 11 | 27 | 65 |
 | `data/literature/extracts/kems-ms2000-044.yaml` | 100 | 140 | 383 |
+| `data/literature/extracts/kor-1967-thesis-sulphur-oxides-slags.yaml` | 4 | 56 | 64 |
 | `data/literature/extracts/kume-2000-cao-activities.yaml` | 312 | 312 | 728 |
 | `data/literature/extracts/lamoreaux-hildenbrand-1984.yaml` | 20 | 20 | 92 |
 | `data/literature/extracts/lamoreaux-hildenbrand-hildenbrand-1987.yaml` | 6 | 6 | 27 |
@@ -18136,6 +18139,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/murchison-hydropyrolysis-1990s-gca.yaml` | 10 | 44 | 83 |
 | `data/literature/extracts/nagabayashi-hino-banya-1989-phosphorus.yaml` | 10 | 14 | 48 |
 | `data/literature/extracts/nagahara-ozawa-1999-forsterite-surface-microstructures.yaml` | 5 | 16 | 5 |
+| `data/literature/extracts/nagata-1989-emf-calcium-aluminates.yaml` | 1 | 4 | 2 |
 | `data/literature/extracts/nakamura-2022-science-ryugu-thermal.yaml` | 3 | 18 | 29 |
 | `data/literature/extracts/nakano-hashimoto-2020-bubbles-to-chondrites-i.yaml` | 9 | 16 | 52 |
 | `data/literature/extracts/nasa-cea-thermo.yaml` | 1615 | 1615 | 1692 |
@@ -18147,6 +18151,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/ntrs-19650014783.yaml` | 8 | 52 | 35 |
 | `data/literature/extracts/ntrs-19730008085.yaml` | 2 | 30 | 66 |
 | `data/literature/extracts/ntrs-20250004626.yaml` | 5 | 15 | 36 |
+| `data/literature/extracts/ohta-1996-cao-mgo-al2o3-activities.yaml` | 11 | 20 | 36 |
 | `data/literature/extracts/okazaki-2022-ryugu-gas-treasure-box.yaml` | 13 | 13 | 57 |
 | `data/literature/extracts/oneill-2002-feo-activity-coefficients-cmas.yaml` | 5 | 91 | 91 |
 | `data/literature/extracts/pahlevan-2026-protolunar-volatile-outflows.yaml` | 8 | 51 | 16 |
@@ -18189,6 +18194,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/safarian-engh-2013-si-pure-langmuir.yaml` | 1 | 1 | 3 |
 | `data/literature/extracts/schaefer-and-fegley-2007-icarus-outgassing-of-oc.yaml` | 15 | 15 | 82 |
 | `data/literature/extracts/schaefer-fegley-2011-vaporization-earth.yaml` | 21 | 321 | 577 |
+| `data/literature/extracts/seki-2011-ca-o-solubility-fe-cao-al2o3.yaml` | 1 | 10 | 2 |
 | `data/literature/extracts/senior-1991-solar-heating-jbis.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/senior-1991-vacuum-pyrolysis.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/senior-1992-vacuum-pyrolysis.yaml` | 0 | 0 | 1 |
@@ -18220,6 +18226,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/takeda-1990-sn-slag-matertrans.yaml` | 13 | 13 | 26 |
 | `data/literature/extracts/thomas-2022-chlorine-bonding-silicate-melts.yaml` | 4 | 88 | 99 |
 | `data/literature/extracts/thomas-wood-2021-chlorine-silicate-melts.yaml` | 11 | 111 | 134 |
+| `data/literature/extracts/tomioka-1991-nitride-capacity-cao-al2o3.yaml` | 8 | 37 | 42 |
 | `data/literature/extracts/ts1985.yaml` | 16 | 19 | 37 |
 | `data/literature/extracts/ueshima-1982-fe-mo-thermal.yaml` | 4 | 61 | 5 |
 | `data/literature/extracts/usgs-lunar-sourcebook-tab8-1.yaml` | 23 | 23 | 92 |
@@ -18245,14 +18252,14 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 
 ## Hard issue census
 
-hard issues: 3625
+hard issues: 3631
 
 MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointers are not fabricated. Unstated derived_from / derivation is a hard conditional_field queued for page-grounding.
 
 | kind | count |
 |---|---:|
 | `conditional_field:derived_from` | 2006 |
-| `conditional_field:derivation` | 1619 |
+| `conditional_field:derivation` | 1625 |
 
 ## Hard issues (first 50)
 
@@ -18309,8 +18316,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 218254
+advisory issues: 218223
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 218254 |
+| `identity_incomplete` | 218223 |

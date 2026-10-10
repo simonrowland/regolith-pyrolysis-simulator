@@ -1,0 +1,266 @@
+schema_version: literature_extract.v1
+source_id: seki-2011-ca-o-solubility-fe-cao-al2o3
+source:
+  citation: 'I. Seki, K. Nagata, T. Ashino, and J. Tanabe, Solubility of Calcium and Oxygen in Molten Iron Equilibrated with Slag in CaO, Al2O3 or CaO-stabilized ZrO2 Crucible at 1873 K, ISIJ International 51(9) (2011) 1369–1374.'
+  doi: 10.2355/isijinternational.51.1369
+  url: https://doi.org/10.2355/isijinternational.51.1369
+  year: 2011
+  corpus_source_id: seki-2011-ca-o-solubility-fe-cao-al2o3
+extraction:
+  method: Manual transcription from 300 dpi page renders of the ISIJ PDF. Tables 2 and 3, abstract values, and discussion
+    parameter values were checked against the rendered pages.
+  date: '2026-10-04'
+  worker: empirical-cao-al2o3-slot-07
+  provenance_path: ferry-inbox/cao-al2o3-sources/seki-2011-ca-o-solubility-fe-cao-al2o3/
+review_status: draft
+fidelity_samples:
+- path: species.CaO.observations[seki_2011_table3_calculated_a_CaO].values.rows[7].a_CaO
+  value: 0.81
+  note: Table 3 CaO-crucible run 6 aCaO
+  locator: {published_page: 1373, pdf_page_index: 5, table: '3', row: '6'}
+species:
+  CaO:
+    context:
+    - observation_id: seki_2011_method
+      type: method
+      locator:
+        published_page: 1369
+        pdf_page_index: 1
+        section: Synopsis / Experiments
+      units: K; mass%
+      values:
+        quantity: slag_metal_equilibration_ca_o_solubility
+        method_class: method_only
+        experimental_method: slag-metal equilibration of molten iron with CaO-Al2O3-ZrO2 slag in CaO, Al2O3, or 5.5 mass% CaO-stabilized
+          ZrO2 crucible at 1873 K
+        temperature_K: 1873
+        argon_flow_Nml_s_as_printed: 2
+        argon_pO2_Pa_at_1100_K_as_printed: 8.3e-27
+        holding_time_after_calcium_addition_s_as_printed: 3600
+        equilibration_check_interval_s_as_printed: [1800, 10800]
+        temperature_uncertainty_K_as_printed: 2
+        temperature_couple_as_printed: Pt/Pt-13%Rh
+        calcium_analysis_as_printed: ICP-OES, Ca II 393.368 nm
+        aluminum_analysis_as_printed: ICP-OES, Al I 396.152 nm
+        zirconium_analysis_as_printed: ICP-OES, Zr II 339.198 nm
+        oxygen_analysis_as_printed: LECO TC-436 infrared absorption
+        how_equilibrium_shown_as_printed: held at 1873 K, quenched, and analyzed for Ca and O; Table 2 gives measured concentrations
+        fitted_parameters_as_printed: {log_K: -4.38, e_O^Ca: 31.8, e_Ca^O: 12.7, e_Ca^Zr: 3}
+        abstract_parameter_sentence_as_printed: e_Ca^O = 31.8
+        hino_recommended_parameters_as_printed:
+          log_K: -9.08
+          e_Ca^Ca: -0.002
+          e_Ca^O: -1293
+          e_Ca^Al: -0.072
+          e_O^O: -0.17
+          e_O^Ca: -515
+          e_O^Al: -1.17
+          e_O^Zr: -2.1
+          trial_e_Ca^Zr: 0
+        comparison_activity_values_as_attributed:
+          Nagata_a_CaO_in_equilibrium_with_CaO_2Al2O3: 0.25
+          Tanabe_a_CaO_for_Al2O3_and_CSZ_slags: 0.03
+        note: The 1100 K Ar-sensor pO2 is not the pO2 of the 1873 K iron; the paper does not report that value.
+    - observation_id: seki_2011_table2_solubilities
+      type: table
+      locator: {published_page: 1372, pdf_page_index: 4, table: '2'}
+      units: mass% in molten iron; slag composition mol%
+      values:
+        rows:
+        - run: 1
+          crucible: Al2O3
+          replicates_mass_percent: {O: ['0.0044', '0.0036'], Ca: ['0.0004', '0.0004'], Al: ['0.0017', '0.0015'], Zr: ['0.0032', '0.0032']}
+          average_mass_percent: {O: '0.0040', Ca: '0.0004', Al: '0.0016', Zr: '0.0032'}
+        - run: 2
+          crucible: Al2O3
+          replicates_mass_percent: {O: ['0.0031', '0.0021'], Ca: ['0.0005', '0.0003'], Al: ['0.1140', '0.1130', '0.0834', '0.0683'], Zr: ['0.0070', '0.0057']}
+          average_mass_percent: {O: '0.0026', Ca: '0.0004', Al: '0.0947', Zr: '0.0063'}
+        - run: 3
+          crucible: CaO-stabilized ZrO2
+          replicates_mass_percent: {O: ['0.0015', '0.0013'], Ca: ['<0.0005', '0.0010'], Al: ['0.0044', '0.0043'], Zr: ['<0.0003', '<0.0003']}
+          average_mass_percent: {O: '0.0014', Ca: '0.0008', Al: '0.0044', Zr: '0.0003'}
+        - run: 4
+          crucible: CaO-stabilized ZrO2
+          replicates_mass_percent: {O: ['0.0020', '0.0020'], Ca: ['<0.0005'], Al: ['0.0033'], Zr: ['<0.0003']}
+          average_mass_percent: {O: '0.0020', Ca: '0.0005', Al: '0.0033', Zr: '0.0003'}
+        - run: 5
+          crucible: CaO-stabilized ZrO2
+          replicates_mass_percent: {O: ['0.0031', '0.0027'], Ca: ['0.0003', '0.0003'], Al: ['0.0889', '0.0838', '0.0788', '0.0782'], Zr: ['0.0065', '0.0064']}
+          average_mass_percent: {O: '0.0029', Ca: '0.0003', Al: '0.0824', Zr: '0.0064'}
+        - run: 6
+          crucible: CaO
+          replicates_mass_percent: {O: ['0.0268', '0.0250'], Ca: ['0.0002', '0.0002'], Al: ['0.0003', '0.0002'], Zr: ['0.0032', '0.0031']}
+          average_mass_percent: {O: '0.0259', Ca: '0.0002', Al: '0.0003', Zr: '0.0032'}
+        - run: 7
+          crucible: CaO
+          replicates_mass_percent: {O: ['0.0249', '0.0238'], Ca: ['0.0005', '0.0002'], Al: ['0.0003', '0.0002'], Zr: ['0.0032', '0.0031']}
+          average_mass_percent: {O: '0.0244', Ca: '0.0004', Al: '0.0003', Zr: '0.0032'}
+        equilibrated_slag_compositions_mol_percent:
+          Al2O3_crucible: {CaO: '41.45', Al2O3: '44.97', ZrO2: '13.59'}
+          CaO_stabilized_ZrO2_crucible: {CaO: '45.37', Al2O3: '42.36', ZrO2: '12.28'}
+          CaO_crucible: {CaO: '71.63', Al2O3: '23.95', ZrO2: '4.42'}
+        compounds_as_printed:
+          Al2O3_crucible: 'ZrO2-CaO (Css) and 2CaO·Al2O3'
+          CaO_stabilized_ZrO2_crucible: 'ZrO2-CaO (Css) and CaO·ZrO2'
+          CaO_crucible: 'CaO·ZrO2 and CaO'
+        quote: Table 2.
+    - observation_id: seki_2011_abstract_solubility_averages
+      type: table
+      locator: {published_page: 1369, pdf_page_index: 1, section: Synopsis}
+      units: ppm in molten iron
+      values:
+        averages_as_printed:
+          CaO_crucible: {O: 251, Ca: 3}
+          Al2O3_crucible: {O: 33, Ca: 4}
+          CaO_stabilized_ZrO2_crucible: {O: 21, Ca: 5}
+        quote: The abstract reports average oxygen and calcium concentrations for each crucible.
+    - observation_id: seki_2011_abstract_slag_compositions
+      type: table
+      locator: {published_page: 1369, pdf_page_index: 1, section: Synopsis}
+      units: mass%
+      values:
+        compositions_as_printed:
+          CaO_crucible: {CaO: '57.36', Al2O3: '34.86', ZrO2: '7.78'}
+          Al2O3_crucible: {CaO: '27.08', Al2O3: '53.42', ZrO2: '19.50'}
+          CaO_stabilized_ZrO2_crucible: {CaO: '30.38', Al2O3: '51.56', ZrO2: '18.06'}
+        compounds_as_printed_in_synopsis_and_section_3_1:
+          Al2O3_crucible: CaO·2Al2O3
+        quote: Abstract and section 3.1 slag compositions and phases.
+    observations:
+    - observation_id: seki_2011_table3_calculated_a_CaO
+      type: activity_coefficient
+      locator:
+        published_page: 1373
+        pdf_page_index: 5
+        table: '3'
+      T_range_K: [1873.0, 1873.0]
+      phase: CaO-Al2O3-ZrO2 slag / molten iron
+      standard_state: solid CaO (reaction CaO(s)=Ca+O)
+      units: dimensionless activity
+      values:
+        quantity: activity
+        method_class: model_derived
+        evidence_class: model_derived
+        admission_status: admitted
+        measurement_status: author_reported_calculated_from_Ca_O_and_interaction_parameters
+        derived_from: [tables:seki-2011-ca-o-solubility-fe-cao-al2o3]
+        derivation:
+          relation: K = a_Ca·a_O / a_CaO for CaO(s) = Ca + O
+          inputs: [tables:seki-2011-ca-o-solubility-fe-cao-al2o3]
+          note: The numeric context row seki_2011_table2_solubilities gives the printed Ca/O concentrations and slag compositions (Table 2, p. 1372); context row seki_2011_method gives the §4.2 fitted interaction parameters (p. 1373).
+          parameters:
+          - [log_K, {state: {tag: value, value: '-4.38'}, locator: {published_page: 1373, pdf_page_index: 5, section: 4.2}}]
+          - [e_O^Ca, {state: {tag: value, value: '31.8'}, locator: {published_page: 1373, pdf_page_index: 5, section: 4.2}}]
+          - [e_Ca^O, {state: {tag: value, value: '12.7'}, locator: {published_page: 1373, pdf_page_index: 5, section: 4.2}}]
+          - [e_Ca^Zr, {state: {tag: value, value: '3'}, locator: {published_page: 1373, pdf_page_index: 5, section: 4.2}}]
+          output_unit: dimensionless activity
+        table_title_as_printed: 'Table 3. Calculated activity of calcium and oxygen in molten iron and CaO in slag at 1873 K.'
+        rows:
+        - run: 1
+          crucible: Al2O3
+          a_Ca: 5.36e-4
+          a_O: 3.96e-3
+          activity: 0.037
+          a_CaO: 0.037
+          a_CaO_as_printed: '0.037'
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.4145'], [Al2O3, '0.4497'], [ZrO2, '0.1359']]}}
+              locator: {published_page: 1372, pdf_page_index: 4, table: '2', row: '1–2 average'}
+        - run: 2
+          crucible: Al2O3
+          a_Ca: 4.82e-4
+          a_O: 1.97e-3
+          activity: 0.023
+          a_CaO: 0.023
+          a_CaO_as_printed: '0.023'
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.4145'], [Al2O3, '0.4497'], [ZrO2, '0.1359']]}}
+              locator: {published_page: 1372, pdf_page_index: 4, table: '2', row: '1–2 average'}
+        - run: Av_Al2O3
+          crucible: Al2O3
+          activity: 0.030
+          a_CaO: 0.030
+          a_CaO_as_printed: '0.030'
+          note: table average row
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.4145'], [Al2O3, '0.4497'], [ZrO2, '0.1359']]}}
+              locator: {published_page: 1372, pdf_page_index: 4, table: '2', row: '1–2 average'}
+        - run: 3
+          crucible: CaO-stabilized ZrO2
+          a_Ca: 8.31e-4
+          a_O: 1.41e-3
+          activity: 0.028
+          a_CaO: 0.028
+          a_CaO_as_printed: '0.028'
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.4537'], [Al2O3, '0.4236'], [ZrO2, '0.1228']]}}
+              locator: {published_page: 1372, pdf_page_index: 4, table: '2', row: '3–5 average'}
+        - run: 4
+          crucible: CaO-stabilized ZrO2
+          a_Ca: 5.79e-4
+          a_O: 2.01e-3
+          activity: 0.028
+          a_CaO: 0.028
+          a_CaO_as_printed: '0.028'
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.4537'], [Al2O3, '0.4236'], [ZrO2, '0.1228']]}}
+              locator: {published_page: 1372, pdf_page_index: 4, table: '2', row: '3–5 average'}
+        - run: 5
+          crucible: CaO-stabilized ZrO2
+          a_Ca: 3.70e-4
+          a_O: 2.27e-3
+          activity: 0.020
+          a_CaO: 0.020
+          a_CaO_as_printed: '0.020'
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.4537'], [Al2O3, '0.4236'], [ZrO2, '0.1228']]}}
+              locator: {published_page: 1372, pdf_page_index: 4, table: '2', row: '3–5 average'}
+        - run: Av_CSZ
+          crucible: CaO-stabilized ZrO2
+          activity: 0.025
+          a_CaO: 0.025
+          a_CaO_as_printed: '0.025'
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.4537'], [Al2O3, '0.4236'], [ZrO2, '0.1228']]}}
+              locator: {published_page: 1372, pdf_page_index: 4, table: '2', row: '3–5 average'}
+        - run: 6
+          crucible: CaO
+          a_Ca: 1.33e-3
+          a_O: 2.54e-2
+          activity: 0.81
+          a_CaO: 0.81
+          a_CaO_as_printed: '0.81'
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.7163'], [Al2O3, '0.2395'], [ZrO2, '0.0442']]}}
+              locator: {published_page: 1372, pdf_page_index: 4, table: '2', row: '6–7 average'}
+        - run: 7
+          crucible: CaO
+          a_Ca: 2.08e-3
+          a_O: 2.40e-2
+          activity: 1.20
+          a_CaO: 1.20
+          a_CaO_as_printed: '1.20'
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.7163'], [Al2O3, '0.2395'], [ZrO2, '0.0442']]}}
+              locator: {published_page: 1372, pdf_page_index: 4, table: '2', row: '6–7 average'}
+        - run: Av_CaO
+          crucible: CaO
+          activity: 1.00
+          a_CaO: 1.00
+          a_CaO_as_printed: '1.00'
+          note: table average as printed; discussion states lime-saturated activity is unity
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.7163'], [Al2O3, '0.2395'], [ZrO2, '0.0442']]}}
+              locator: {published_page: 1372, pdf_page_index: 4, table: '2', row: '6–7 average'}
+        formula: CaO
+      quote: 'Table 3: aCaO averages are 0.030 (Al2O3), 0.025 (CaO-stabilized ZrO2), and 1.00 (CaO); the CaO runs are 0.81 and 1.20.'

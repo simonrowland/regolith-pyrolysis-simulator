@@ -11,7 +11,11 @@ def test_hashimoto_runs_carry_table_1_average_starting_composition() -> None:
     experiments = extract["experiments"]
     expected = {"SiO2": 35.43, "Al2O3": 3.16, "FeO": 35.04, "MgO": 23.84, "CaO": 2.53}
 
-    assert len(experiments) == 31
+    # 31 per-run experiments plus the b-718 declared series experiment
+    # fcmas-free-evap-series that holds the same Table 1 starting composition
+    # for the derived (geometry, activation-energy) rows.
+    assert len(experiments) == 32
+    assert sum(1 for item in experiments if item["experiment_id"] == "fcmas-free-evap-series") == 1
     for experiment in experiments:
         composition = experiment["sample"]["printed_composition"]
         assert composition["state"]["value"] == expected
@@ -22,7 +26,13 @@ def test_hashimoto_runs_carry_table_1_average_starting_composition() -> None:
 def test_hashimoto_all_runs_carry_printed_nominal_run_pressure() -> None:
     extract = yaml.safe_load(EXTRACT.read_text())
 
-    for experiment in extract["experiments"]:
+    runs = [
+        item
+        for item in extract["experiments"]
+        if item["experiment_id"] != "fcmas-free-evap-series"
+    ]
+    assert len(runs) == 31
+    for experiment in runs:
         pressure = experiment["pressure_environment"]["total_pressure_Pa"]
         assert pressure["state"] == {
             "tag": "value",

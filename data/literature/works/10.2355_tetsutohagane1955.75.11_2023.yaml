@@ -1,0 +1,206 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2355/tetsutohagane1955.75.11_2023
+  citation: K. Nagata, J. Tanabe, K. S. Goto, "Standard Free Energies of Formation of CaO-Al2O3 Intermediate Compounds by
+    Means of EMF Measurement of Galvanic Cells", Tetsu-to-Hagane 75 (1989) No. 11, 2023–2030.
+  source_ids:
+  - nagata-1989-emf-calcium-aluminates
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+    files:
+    - asset_id: pdf:nagata-1989-emf-calcium-aluminates
+      role: pdf
+      path: raw/nagata-1989-emf-calcium-aluminates/nagata-1989-emf-calcium-aluminates.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:nagata-1989-emf-calcium-aluminates
+      role: pdftotext
+      path: text/nagata-1989-emf-calcium-aluminates
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:nagata-1989-emf-calcium-aluminates
+      role: table_csv
+      path: tables/nagata-1989-emf-calcium-aluminates
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: unknown:nagata-1989-emf-calcium-aluminates
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2355/tetsutohagane1955.75.11_2023
+experiments:
+- experiment_id: 10.2355/tetsutohagane1955.75.11_2023::nagata-1989-emf-calcium-aluminates
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'emf_liquidus' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.75.11_2023
+  locator:
+    published_page: 2029
+    pdf_page_index: 7
+    section: 4.4 / 5. Conclusion
+context:
+- observation_id: nagata_1989_emf_method_and_equilibrium_proof
+  type: method
+  locator:
+    published_page: 2024
+    pdf_page_index: 2
+    section: 2. Experimental method
+  units: K; mV; J/mol
+  values:
+    quantity: galvanic_cell_emf_method
+    method_class: method_only
+    experimental_method: galvanic cells with 4CaO.P2O5 solid electrolyte; solid CaO reference electrode; sample electrode
+      = two-phase solid mixtures of adjacent calcium aluminates (Cells I–IV)
+    electrolyte_as_printed: 4CaO.P2O5
+    temperature_range_K_as_printed: 1473 to 1873
+    standard_state_CaO_as_printed: pure solid
+    how_equilibrium_shown_as_printed: EMF stable after 20–36 ks at setpoint; after temperature cycle returns to within ±1
+      mV (Fig. 2); polarization ±110 mV for 60 s recovers to equilibrium EMF ~360 s later (reversible); heating/cooling symbols
+      agree on Fig. 3; post-run XRD shows only the intended two compounds; SEM/XRD of electrolyte surface shows no phases
+      other than 4CaO.P2O5
+    preparation_and_measurement_conditions_as_printed: Electrolyte powders were dried at 473 K for over one week, calcined
+      in air at 1373 K for 43.2 ks, pelletized, and sintered in air at 1473 K for 36.0 ks; an alumina crucible was used and
+      the pellet was buried in same-composition powder. The furnace atmosphere was air dried over P2O5 powder. A PID controller
+      held temperature to ±1 K; the thermocouple position is shown in Fig. 1.
+    cell_IV_liquidus_note_as_printed: above 1635 K Cell IV splits into (a) liquid + 3CaO.Al2O3 and (b) liquid + CaO.Al2O3
+      at eutectic 1633±5 K, 50.65 wt% Al2O3
+    a_CaO_from_emf_formula_as_printed: aCaO = exp(-2 E4 F / RT) for liquidus EMF of Cell IV (sec. 4.4)
+  context_id: nagata-1989-emf-calcium-aluminates::context::nagata_1989_emf_method_and_equilibrium_proof
+  work_id: 10.2355/tetsutohagane1955.75.11_2023
+  source_id: nagata-1989-emf-calcium-aluminates
+  species: CaO
+- observation_id: nagata_1989_figs_figure_only
+  type: method
+  locator:
+    published_page: 2025
+    pdf_page_index: 3
+    figure: 1-8
+  units: none
+  values:
+    quantity: emf_and_gibbs_figures
+    method_class: method_only
+    admission_status: figure_only
+    figures_as_printed:
+    - Fig. 1 schematic Galvanic cell
+    - Fig. 2 EMF stability on temperature change
+    - Fig. 3 EMF of Cells I–IV vs T
+    - Fig. 4 oxygen-pressure / electrode-location checks
+    - Figs. 5–8 ΔG° of formation reactions vs T (comparisons)
+    note: scatter not digitised; numeric ΔG°f equations taken from Table 2 / synopsis
+  context_id: nagata-1989-emf-calcium-aluminates::context::nagata_1989_figs_figure_only
+  work_id: 10.2355/tetsutohagane1955.75.11_2023
+  source_id: nagata-1989-emf-calcium-aluminates
+  species: CaO
+- observation_id: nagata_1989_table1_emf_context
+  type: thermodynamic_example
+  locator:
+    published_page: 2026
+    pdf_page_index: 4
+    table: '1'
+  units: mV; K
+  values:
+    quantity: emf_of_galvanic_cells
+    method_class: quoted
+    table_title_as_printed: Table 1. EMF of Galvanic cells.
+    rows:
+    - cell: I
+      virtual_cell_reaction_as_printed: CaO + 6Al2O3 = CaO.6Al2O3
+      emf_equation_mV: 84.88 + 0.1947T (±8.63)
+      T_range_K_as_printed: 1373-1873
+    - cell: II
+      virtual_cell_reaction_as_printed: 2CaO + CaO.6Al2O3 = 3(CaO.2Al2O3)
+      emf_equation_mV: 79.24 + 0.1033T (±5.49)
+      T_range_K_as_printed: 1373-1873
+    - cell: III
+      virtual_cell_reaction_as_printed: CaO + CaO.2Al2O3 = 2(CaO.Al2O3)
+      emf_equation_mV: 104.5 + 0.0463T (±6.80)
+      T_range_K_as_printed: 1373-1843
+    - cell: IV
+      virtual_cell_reaction_as_printed: 2CaO + CaO.Al2O3 = 3CaO.Al2O3
+      emf_equation_mV: -15.85 + 0.0282T (±2.29)
+      T_range_K_as_printed: 1373-1635
+    - cell: IV
+      virtual_cell_reaction_as_printed: CaO + CaO.Al2O3 = Slag(l)
+      emf_equation_mV: -875.3 + 0.5538T (±5.90)
+      T_range_K_as_printed: 1635-1773
+    - cell: IV
+      virtual_cell_reaction_as_printed: CaO + Slag(l) = 3CaO.Al2O3
+      emf_equation_mV: -35.70 + 0.0408T (±1.78)
+      T_range_K_as_printed: 1635-1773
+  context_id: nagata-1989-emf-calcium-aluminates::context::nagata_1989_table1_emf_context
+  work_id: 10.2355/tetsutohagane1955.75.11_2023
+  source_id: nagata-1989-emf-calcium-aluminates
+  species: CaO
+- observation_id: nagata_1989_table2_delta_Gf_context
+  type: thermodynamic_example
+  locator:
+    published_page: 2026
+    pdf_page_index: 4
+    table: '2'
+  units: J/mol
+  values:
+    quantity: standard_free_energy_of_formation
+    method_class: quoted
+    measurement_status: calculated_from_cell_EMF
+    table_title_as_printed: Table 2. Standard free energies of formation of CaO-Al2O3 intermediate compounds formed of CaO
+      and Al2O3.
+    rows:
+    - sample: CaO.6Al2O3
+      delta_Gf_equation_J_per_mol: -16380 - 37.58T (±1730)
+      A_J: -16380
+      B_J_per_K: '-37.58'
+      uncertainty_J: 1730
+      T_range_K_as_printed: 1373-1873
+    - sample: CaO.2Al2O3
+      delta_Gf_equation_J_per_mol: -15650 - 25.82T (±900)
+      A_J: -15650
+      B_J_per_K: '-25.82'
+      uncertainty_J: 900
+      T_range_K_as_printed: 1373-1873
+    - sample: CaO.Al2O3
+      delta_Gf_equation_J_per_mol: -17910 - 17.38T (±790)
+      A_J: -17910
+      B_J_per_K: '-17.38'
+      uncertainty_J: 790
+      T_range_K_as_printed: 1373-1843
+    - sample: 3CaO.Al2O3
+      delta_Gf_equation_J_per_mol: -11790 - 28.27T (±1190)
+      A_J: -11790
+      B_J_per_K: '-28.27'
+      uncertainty_J: 1190
+      T_range_K_as_printed: 1373-1635
+  context_id: nagata-1989-emf-calcium-aluminates::context::nagata_1989_table2_delta_Gf_context
+  work_id: 10.2355/tetsutohagane1955.75.11_2023
+  source_id: nagata-1989-emf-calcium-aluminates
+  species: CaO

@@ -5457,7 +5457,12 @@ species:
       - 1673.15
       - 1673.15
       phase: silicate_melt_ferrobasalt_FCMAS
-      standard_state: open 1-bar furnace; K* = α_e · γ_i · K for NaO0.5(l)=Na(g)+1/4 O2 (n=1)
+      standard_state:
+        state:
+          tag: not_applicable
+          reason: "K* = α_e·γ_i·K is a lumped constant, not an activity; the γ_i inside K* refers to pure liquid oxide."
+        inferred: false
+        note: "Original source standard_state: open 1-bar furnace; K* = α_e · γ_i · K for NaO0.5(l)=Na(g)+1/4 O2 (n=1)"
       regime: open_furnace_apparent
       units: log10 dimensionless (bar-based mass-action as published)
       uncertainty:
@@ -5750,6 +5755,11 @@ species:
         alpha: 1.0
         consumer_policy: Report-only inference/adopted model; inference span is not an admissible physical-alpha interval.
     - observation_id: sossi_2019_na_logKstar_table3_quoted_20260906
+      standard_state:
+        state:
+          tag: not_applicable
+          reason: "K* = α_e·γ_i·K is a lumped constant, not an activity; the γ_i inside K* refers to pure liquid oxide."
+        inferred: false
       supersedes: sossi_2019_na_logKstar_table3
       type: activity_coefficient
       class: model
@@ -6055,7 +6065,12 @@ species:
         transition_context:
           liquidus_K: 1573.0
           source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)
+      standard_state:
+        state:
+          tag: not_applicable
+          reason: "K* = α_e·γ_i·K is a lumped constant, not an activity; the γ_i inside K* refers to pure liquid oxide."
+        inferred: false
+        note: "Original source standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)"
       regime: open_furnace_apparent
       units: log10 dimensionless (bar-based mass-action as published)
       uncertainty:
@@ -6319,6 +6334,11 @@ species:
         - 3.4
         consumer_policy: Report-only inference/adopted model; inference span is not an admissible physical-alpha interval.
     - observation_id: sossi_2019_k_logKstar_table3_quoted_20260906
+      standard_state:
+        state:
+          tag: not_applicable
+          reason: "K* = α_e·γ_i·K is a lumped constant, not an activity; the γ_i inside K* refers to pure liquid oxide."
+        inferred: false
       supersedes: sossi_2019_k_logKstar_table3
       type: activity_coefficient
       class: model
@@ -18144,7 +18164,12 @@ species:
         transition_context:
           liquidus_K: 1573.0
           source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)
+      standard_state:
+        state:
+          tag: not_applicable
+          reason: "K* = α_e·γ_i·K is a lumped constant, not an activity; the γ_i inside K* refers to pure liquid oxide."
+        inferred: false
+        note: "Original source standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)"
       regime: open_furnace_apparent
       units: log10 dimensionless (bar-based mass-action as published)
       uncertainty:
@@ -18221,7 +18246,12 @@ species:
         transition_context:
           liquidus_K: 1573.0
           source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)
+      standard_state:
+        state:
+          tag: not_applicable
+          reason: "K* = α_e·γ_i·K is a lumped constant, not an activity; the γ_i inside K* refers to pure liquid oxide."
+        inferred: false
+        note: "Original source standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)"
       regime: open_furnace_apparent
       units: log10 dimensionless (bar-based mass-action as published)
       uncertainty:
@@ -18393,6 +18423,11 @@ species:
           Table 5 Li* n=1. Footnote *: single-T logK*. OCR Table 5 also has an n=−1 Li* row
           (ΔS*=0.130, ΔH*=326.3).
     - observation_id: sossi_2019_li_logKstar_table3_Li_g_quoted_20260906
+      standard_state:
+        state:
+          tag: not_applicable
+          reason: "K* = α_e·γ_i·K is a lumped constant, not an activity; the γ_i inside K* refers to pure liquid oxide."
+        inferred: false
       supersedes: sossi_2019_li_logKstar_table3_Li_g
       type: activity_coefficient
       class: model
@@ -18435,6 +18470,11 @@ species:
             N_points_at_T: 2
         gas_species: Li(g)
     - observation_id: sossi_2019_li_logKstar_table3_LiO_g_quoted_20260906
+      standard_state:
+        state:
+          tag: not_applicable
+          reason: "K* = α_e·γ_i·K is a lumped constant, not an activity; the γ_i inside K* refers to pure liquid oxide."
+        inferred: false
       supersedes: sossi_2019_li_logKstar_table3_LiO_g
       type: activity_coefficient
       class: model
@@ -18580,7 +18620,12 @@ species:
         transition_context:
           liquidus_K: 1573.0
           source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)
+      standard_state:
+        state:
+          tag: not_applicable
+          reason: "K* = α_e·γ_i·K is a lumped constant, not an activity; the γ_i inside K* refers to pure liquid oxide."
+        inferred: false
+        note: "Original source standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)"
       regime: open_furnace_apparent
       units: log10 dimensionless (bar-based mass-action as published)
       uncertainty:
@@ -18774,6 +18819,11 @@ species:
         note: >-
           Table 5 Rb experimental 6 points. Source 2 = L&H 1984.
     - observation_id: sossi_2019_rb_logKstar_table3_quoted_20260906
+      standard_state:
+        state:
+          tag: not_applicable
+          reason: "K* = α_e·γ_i·K is a lumped constant, not an activity; the γ_i inside K* refers to pure liquid oxide."
+        inferred: false
       supersedes: sossi_2019_rb_logKstar_table3
       type: activity_coefficient
       class: model
@@ -18968,7 +19018,12 @@ species:
         transition_context:
           liquidus_K: 1573.0
           source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)
+      standard_state:
+        state:
+          tag: not_applicable
+          reason: "K* = α_e·γ_i·K is a lumped constant, not an activity; the γ_i inside K* refers to pure liquid oxide."
+        inferred: false
+        note: "Original source standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)"
       regime: open_furnace_apparent
       units: log10 dimensionless (bar-based mass-action as published)
       uncertainty:
@@ -19173,6 +19228,11 @@ species:
           OCR Table 5 reaction text writes 1/2 O2 for Cu; Table 3 n=1 is 1/4 O2. Recorded here as
           Table 3 stoichiometry (n=1). Ambiguity noted, not silently averaged.
     - observation_id: sossi_2019_cu_logKstar_table3_quoted_20260906
+      standard_state:
+        state:
+          tag: not_applicable
+          reason: "K* = α_e·γ_i·K is a lumped constant, not an activity; the γ_i inside K* refers to pure liquid oxide."
+        inferred: false
       supersedes: sossi_2019_cu_logKstar_table3
       type: activity_coefficient
       class: model
@@ -19402,7 +19462,12 @@ species:
         transition_context:
           liquidus_K: 1573.0
           source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)
+      standard_state:
+        state:
+          tag: not_applicable
+          reason: "K* = α_e·γ_i·K is a lumped constant, not an activity; the γ_i inside K* refers to pure liquid oxide."
+        inferred: false
+        note: "Original source standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)"
       regime: open_furnace_apparent
       units: log10 dimensionless (bar-based mass-action as published)
       uncertainty:
@@ -19525,6 +19590,11 @@ species:
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
     - observation_id: sossi_2019_ag_logKstar_table3_quoted_20260906
+      standard_state:
+        state:
+          tag: not_applicable
+          reason: "K* = α_e·γ_i·K is a lumped constant, not an activity; the γ_i inside K* refers to pure liquid oxide."
+        inferred: false
       supersedes: sossi_2019_ag_logKstar_table3
       type: activity_coefficient
       class: model
@@ -19621,7 +19691,12 @@ species:
         transition_context:
           liquidus_K: 1573.0
           source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)
+      standard_state:
+        state:
+          tag: not_applicable
+          reason: "K* = α_e·γ_i·K is a lumped constant, not an activity; the γ_i inside K* refers to pure liquid oxide."
+        inferred: false
+        note: "Original source standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)"
       regime: open_furnace_apparent
       units: log10 dimensionless (bar-based mass-action as published)
       uncertainty:
@@ -19819,6 +19894,11 @@ species:
         note: >-
           Table 5 Zn 10 points. Source 3 = Lamoreaux et al. 1987.
     - observation_id: sossi_2019_zn_logKstar_table3_quoted_20260906
+      standard_state:
+        state:
+          tag: not_applicable
+          reason: "K* = α_e·γ_i·K is a lumped constant, not an activity; the γ_i inside K* refers to pure liquid oxide."
+        inferred: false
       supersedes: sossi_2019_zn_logKstar_table3
       type: activity_coefficient
       class: model
@@ -20038,7 +20118,12 @@ species:
         transition_context:
           liquidus_K: 1573.0
           source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)
+      standard_state:
+        state:
+          tag: not_applicable
+          reason: "K* = α_e·γ_i·K is a lumped constant, not an activity; the γ_i inside K* refers to pure liquid oxide."
+        inferred: false
+        note: "Original source standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)"
       regime: open_furnace_apparent
       units: log10 dimensionless (bar-based mass-action as published)
       uncertainty:
@@ -20235,6 +20320,11 @@ species:
         note: >-
           Table 5 Ge 10 points. Source 3 = Lamoreaux et al. 1987.
     - observation_id: sossi_2019_ge_logKstar_table3_quoted_20260906
+      standard_state:
+        state:
+          tag: not_applicable
+          reason: "K* = α_e·γ_i·K is a lumped constant, not an activity; the γ_i inside K* refers to pure liquid oxide."
+        inferred: false
       supersedes: sossi_2019_ge_logKstar_table3
       type: activity_coefficient
       class: model
@@ -20454,7 +20544,12 @@ species:
         transition_context:
           liquidus_K: 1573.0
           source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)
+      standard_state:
+        state:
+          tag: not_applicable
+          reason: "K* = α_e·γ_i·K is a lumped constant, not an activity; the γ_i inside K* refers to pure liquid oxide."
+        inferred: false
+        note: "Original source standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)"
       regime: open_furnace_apparent
       units: log10 dimensionless (bar-based mass-action as published)
       uncertainty:
@@ -20574,6 +20669,11 @@ species:
             paragraph: 1-atm vertical tube gas-mixing furnaces
             line_range: '408'
     - observation_id: sossi_2019_cd_logKstar_table3_quoted_20260906
+      standard_state:
+        state:
+          tag: not_applicable
+          reason: "K* = α_e·γ_i·K is a lumped constant, not an activity; the γ_i inside K* refers to pure liquid oxide."
+        inferred: false
       supersedes: sossi_2019_cd_logKstar_table3
       type: activity_coefficient
       class: model
@@ -20670,7 +20770,12 @@ species:
         transition_context:
           liquidus_K: 1573.0
           source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)
+      standard_state:
+        state:
+          tag: not_applicable
+          reason: "K* = α_e·γ_i·K is a lumped constant, not an activity; the γ_i inside K* refers to pure liquid oxide."
+        inferred: false
+        note: "Original source standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)"
       regime: open_furnace_apparent
       units: log10 dimensionless (bar-based mass-action as published)
       uncertainty:
@@ -20754,7 +20859,12 @@ species:
         transition_context:
           liquidus_K: 1573.0
           source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)
+      standard_state:
+        state:
+          tag: not_applicable
+          reason: "K* = α_e·γ_i·K is a lumped constant, not an activity; the γ_i inside K* refers to pure liquid oxide."
+        inferred: false
+        note: "Original source standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)"
       regime: open_furnace_apparent
       units: log10 dimensionless (bar-based mass-action as published)
       uncertainty:
@@ -20865,6 +20975,11 @@ species:
           duplicated as a second observation to keep the extract one-row-per-reaction; that
           companion is OCR Table 5 Ga n=1.
     - observation_id: sossi_2019_ga_logKstar_table3_Ga_g_quoted_20260906
+      standard_state:
+        state:
+          tag: not_applicable
+          reason: "K* = α_e·γ_i·K is a lumped constant, not an activity; the γ_i inside K* refers to pure liquid oxide."
+        inferred: false
       supersedes: sossi_2019_ga_logKstar_table3_Ga_g
       type: activity_coefficient
       class: model
@@ -20927,6 +21042,11 @@ species:
             N_points_at_T: 1
         gas_species: Ga(g)
     - observation_id: sossi_2019_ga_logKstar_table3_GaO_g_quoted_20260906
+      standard_state:
+        state:
+          tag: not_applicable
+          reason: "K* = α_e·γ_i·K is a lumped constant, not an activity; the γ_i inside K* refers to pure liquid oxide."
+        inferred: false
       supersedes: sossi_2019_ga_logKstar_table3_GaO_g
       type: activity_coefficient
       class: model
@@ -21049,7 +21169,12 @@ species:
         transition_context:
           liquidus_K: 1573.0
           source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)
+      standard_state:
+        state:
+          tag: not_applicable
+          reason: "K* = α_e·γ_i·K is a lumped constant, not an activity; the γ_i inside K* refers to pure liquid oxide."
+        inferred: false
+        note: "Original source standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)"
       regime: open_furnace_apparent
       units: log10 dimensionless (bar-based mass-action as published)
       uncertainty:
@@ -21128,7 +21253,12 @@ species:
         transition_context:
           liquidus_K: 1573.0
           source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)
+      standard_state:
+        state:
+          tag: not_applicable
+          reason: "K* = α_e·γ_i·K is a lumped constant, not an activity; the γ_i inside K* refers to pure liquid oxide."
+        inferred: false
+        note: "Original source standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)"
       regime: open_furnace_apparent
       units: log10 dimensionless (bar-based mass-action as published)
       uncertainty:
@@ -21321,6 +21451,11 @@ species:
         note: >-
           Table 5 Pb n=0, 3 points. Companion n=2 ΔS*=0.227±0.070, ΔH*=490.9±112.1.
     - observation_id: sossi_2019_pb_logKstar_table3_PbO_g_quoted_20260906
+      standard_state:
+        state:
+          tag: not_applicable
+          reason: "K* = α_e·γ_i·K is a lumped constant, not an activity; the γ_i inside K* refers to pure liquid oxide."
+        inferred: false
       supersedes: sossi_2019_pb_logKstar_table3_PbO_g
       type: activity_coefficient
       class: model
@@ -21366,6 +21501,11 @@ species:
             N_points_at_T: 1
         gas_species: PbO(g)
     - observation_id: sossi_2019_pb_logKstar_table3_Pb_g_quoted_20260906
+      standard_state:
+        state:
+          tag: not_applicable
+          reason: "K* = α_e·γ_i·K is a lumped constant, not an activity; the γ_i inside K* refers to pure liquid oxide."
+        inferred: false
       supersedes: sossi_2019_pb_logKstar_table3_Pb_g
       type: activity_coefficient
       class: model
@@ -21551,7 +21691,12 @@ species:
         transition_context:
           liquidus_K: 1573.0
           source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)
+      standard_state:
+        state:
+          tag: not_applicable
+          reason: "K* = α_e·γ_i·K is a lumped constant, not an activity; the γ_i inside K* refers to pure liquid oxide."
+        inferred: false
+        note: "Original source standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)"
       regime: open_furnace_apparent
       units: log10 dimensionless (bar-based mass-action as published)
       uncertainty:
@@ -21639,7 +21784,12 @@ species:
         transition_context:
           liquidus_K: 1573.0
           source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)
+      standard_state:
+        state:
+          tag: not_applicable
+          reason: "K* = α_e·γ_i·K is a lumped constant, not an activity; the γ_i inside K* refers to pure liquid oxide."
+        inferred: false
+        note: "Original source standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)"
       regime: open_furnace_apparent
       units: log10 dimensionless (bar-based mass-action as published)
       uncertainty:
@@ -21753,6 +21903,11 @@ species:
           text vs Table 3 MoO3(g); that OCR conflict is recorded, not silently repaired.
           ΔS*=0.033±0.004, ΔH*=143.2±7.8 on the n=−2 row.
     - observation_id: sossi_2019_mo_logKstar_table3_MoO3_congruent_quoted_20260906
+      standard_state:
+        state:
+          tag: not_applicable
+          reason: "K* = α_e·γ_i·K is a lumped constant, not an activity; the γ_i inside K* refers to pure liquid oxide."
+        inferred: false
       supersedes: sossi_2019_mo_logKstar_table3_MoO3_congruent
       type: activity_coefficient
       class: model
@@ -21818,6 +21973,11 @@ species:
             N_points_at_T: 1
         gas_species: MoO3(g)
     - observation_id: sossi_2019_mo_logKstar_table3_MoO2_ox_quoted_20260906
+      standard_state:
+        state:
+          tag: not_applicable
+          reason: "K* = α_e·γ_i·K is a lumped constant, not an activity; the γ_i inside K* refers to pure liquid oxide."
+        inferred: false
       supersedes: sossi_2019_mo_logKstar_table3_MoO2_ox
       type: activity_coefficient
       class: model
@@ -21943,7 +22103,12 @@ species:
         transition_context:
           liquidus_K: 1573.0
           source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)
+      standard_state:
+        state:
+          tag: not_applicable
+          reason: "K* = α_e·γ_i·K is a lumped constant, not an activity; the γ_i inside K* refers to pure liquid oxide."
+        inferred: false
+        note: "Original source standard_state: open 1-bar furnace; K* = α_e · γ_i · K as fitted by authors (eq. 8)"
       regime: open_furnace_apparent
       units: log10 dimensionless (bar-based mass-action as published)
       uncertainty:
@@ -22050,6 +22215,11 @@ species:
         note: >-
           Table 5 Cr* n=−2, 4 points. Semi-empirical. Impurity, not a dopant.
     - observation_id: sossi_2019_cr_logKstar_table3_CrO_ox_quoted_20260906
+      standard_state:
+        state:
+          tag: not_applicable
+          reason: "K* = α_e·γ_i·K is a lumped constant, not an activity; the γ_i inside K* refers to pure liquid oxide."
+        inferred: false
       supersedes: sossi_2019_cr_logKstar_table3_CrO_ox
       type: activity_coefficient
       class: model

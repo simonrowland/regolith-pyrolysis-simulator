@@ -1,0 +1,1724 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/seki-2011-ca-o-solubility-fe-cao-al2o3.yaml
+observations:
+- observation_id: seki-2011-ca-o-solubility-fe-cao-al2o3::seki_2011_table3_calculated_a_CaO::rows:row=1:h=431629299e0d
+  experiment_id: 10.2355/isijinternational.51.1369::seki-2011-ca-o-solubility-fe-cao-al2o3
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-ZrO2 slag / molten iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CaO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: CaO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.037'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Table 3: aCaO averages are 0.030 (Al2O3), 0.025 (CaO-stabilized ZrO2), and 1.00 (CaO); the CaO runs are
+      0.81 and 1.20.'
+    model: model_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: empirical-cao-al2o3-slot-07
+      date: '2026-10-04'
+      evidence:
+        published_page: 1373
+        pdf_page_index: 5
+        table: '3'
+  notices: []
+  source_id: seki-2011-ca-o-solubility-fe-cao-al2o3
+  locator:
+    published_page: 1373
+    pdf_page_index: 5
+    table: '3'
+  read_from: pdf:seki-2011-ca-o-solubility-fe-cao-al2o3
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 1373
+        pdf_page_index: 5
+        table: '3'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - CaO
+            - '0.4145'
+          - - Al2O3
+            - '0.4497'
+          - - ZrO2
+            - '0.1359'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1372
+        pdf_page_index: 4
+        table: '2'
+  derived_from:
+  - tables:seki-2011-ca-o-solubility-fe-cao-al2o3
+  derivation:
+    relation: K = a_Ca·a_O / a_CaO for CaO(s) = Ca + O
+    inputs:
+    - tables:seki-2011-ca-o-solubility-fe-cao-al2o3
+    parameters:
+    - - log_K
+      - state:
+          tag: value
+          value: '-4.38'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    - - e_O^Ca
+      - state:
+          tag: value
+          value: '31.8'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    - - e_Ca^O
+      - state:
+          tag: value
+          value: '12.7'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    - - e_Ca^Zr
+      - state:
+          tag: value
+          value: '3'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    output_unit: dimensionless activity
+- observation_id: seki-2011-ca-o-solubility-fe-cao-al2o3::seki_2011_table3_calculated_a_CaO::rows:row=2:h=85378569351f
+  experiment_id: 10.2355/isijinternational.51.1369::seki-2011-ca-o-solubility-fe-cao-al2o3
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-ZrO2 slag / molten iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CaO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: CaO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.023'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Table 3: aCaO averages are 0.030 (Al2O3), 0.025 (CaO-stabilized ZrO2), and 1.00 (CaO); the CaO runs are
+      0.81 and 1.20.'
+    model: model_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: empirical-cao-al2o3-slot-07
+      date: '2026-10-04'
+      evidence:
+        published_page: 1373
+        pdf_page_index: 5
+        table: '3'
+  notices: []
+  source_id: seki-2011-ca-o-solubility-fe-cao-al2o3
+  locator:
+    published_page: 1373
+    pdf_page_index: 5
+    table: '3'
+  read_from: pdf:seki-2011-ca-o-solubility-fe-cao-al2o3
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 1373
+        pdf_page_index: 5
+        table: '3'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - CaO
+            - '0.4145'
+          - - Al2O3
+            - '0.4497'
+          - - ZrO2
+            - '0.1359'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1372
+        pdf_page_index: 4
+        table: '2'
+  derived_from:
+  - tables:seki-2011-ca-o-solubility-fe-cao-al2o3
+  derivation:
+    relation: K = a_Ca·a_O / a_CaO for CaO(s) = Ca + O
+    inputs:
+    - tables:seki-2011-ca-o-solubility-fe-cao-al2o3
+    parameters:
+    - - log_K
+      - state:
+          tag: value
+          value: '-4.38'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    - - e_O^Ca
+      - state:
+          tag: value
+          value: '31.8'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    - - e_Ca^O
+      - state:
+          tag: value
+          value: '12.7'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    - - e_Ca^Zr
+      - state:
+          tag: value
+          value: '3'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    output_unit: dimensionless activity
+- observation_id: seki-2011-ca-o-solubility-fe-cao-al2o3::seki_2011_table3_calculated_a_CaO::rows:row=3:h=e4b8cdf425ee
+  experiment_id: 10.2355/isijinternational.51.1369::seki-2011-ca-o-solubility-fe-cao-al2o3
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-ZrO2 slag / molten iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CaO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: CaO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.028'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Table 3: aCaO averages are 0.030 (Al2O3), 0.025 (CaO-stabilized ZrO2), and 1.00 (CaO); the CaO runs are
+      0.81 and 1.20.'
+    model: model_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: empirical-cao-al2o3-slot-07
+      date: '2026-10-04'
+      evidence:
+        published_page: 1373
+        pdf_page_index: 5
+        table: '3'
+  notices: []
+  source_id: seki-2011-ca-o-solubility-fe-cao-al2o3
+  locator:
+    published_page: 1373
+    pdf_page_index: 5
+    table: '3'
+  read_from: pdf:seki-2011-ca-o-solubility-fe-cao-al2o3
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 1373
+        pdf_page_index: 5
+        table: '3'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - CaO
+            - '0.4537'
+          - - Al2O3
+            - '0.4236'
+          - - ZrO2
+            - '0.1228'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1372
+        pdf_page_index: 4
+        table: '2'
+  derived_from:
+  - tables:seki-2011-ca-o-solubility-fe-cao-al2o3
+  derivation:
+    relation: K = a_Ca·a_O / a_CaO for CaO(s) = Ca + O
+    inputs:
+    - tables:seki-2011-ca-o-solubility-fe-cao-al2o3
+    parameters:
+    - - log_K
+      - state:
+          tag: value
+          value: '-4.38'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    - - e_O^Ca
+      - state:
+          tag: value
+          value: '31.8'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    - - e_Ca^O
+      - state:
+          tag: value
+          value: '12.7'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    - - e_Ca^Zr
+      - state:
+          tag: value
+          value: '3'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    output_unit: dimensionless activity
+- observation_id: seki-2011-ca-o-solubility-fe-cao-al2o3::seki_2011_table3_calculated_a_CaO::rows:row=4:h=42027071af75
+  experiment_id: 10.2355/isijinternational.51.1369::seki-2011-ca-o-solubility-fe-cao-al2o3
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-ZrO2 slag / molten iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CaO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: CaO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.028'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Table 3: aCaO averages are 0.030 (Al2O3), 0.025 (CaO-stabilized ZrO2), and 1.00 (CaO); the CaO runs are
+      0.81 and 1.20.'
+    model: model_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: empirical-cao-al2o3-slot-07
+      date: '2026-10-04'
+      evidence:
+        published_page: 1373
+        pdf_page_index: 5
+        table: '3'
+  notices: []
+  source_id: seki-2011-ca-o-solubility-fe-cao-al2o3
+  locator:
+    published_page: 1373
+    pdf_page_index: 5
+    table: '3'
+  read_from: pdf:seki-2011-ca-o-solubility-fe-cao-al2o3
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 1373
+        pdf_page_index: 5
+        table: '3'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - CaO
+            - '0.4537'
+          - - Al2O3
+            - '0.4236'
+          - - ZrO2
+            - '0.1228'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1372
+        pdf_page_index: 4
+        table: '2'
+  derived_from:
+  - tables:seki-2011-ca-o-solubility-fe-cao-al2o3
+  derivation:
+    relation: K = a_Ca·a_O / a_CaO for CaO(s) = Ca + O
+    inputs:
+    - tables:seki-2011-ca-o-solubility-fe-cao-al2o3
+    parameters:
+    - - log_K
+      - state:
+          tag: value
+          value: '-4.38'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    - - e_O^Ca
+      - state:
+          tag: value
+          value: '31.8'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    - - e_Ca^O
+      - state:
+          tag: value
+          value: '12.7'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    - - e_Ca^Zr
+      - state:
+          tag: value
+          value: '3'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    output_unit: dimensionless activity
+- observation_id: seki-2011-ca-o-solubility-fe-cao-al2o3::seki_2011_table3_calculated_a_CaO::rows:row=5:h=65c32e8000da
+  experiment_id: 10.2355/isijinternational.51.1369::seki-2011-ca-o-solubility-fe-cao-al2o3
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-ZrO2 slag / molten iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CaO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: CaO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.02'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Table 3: aCaO averages are 0.030 (Al2O3), 0.025 (CaO-stabilized ZrO2), and 1.00 (CaO); the CaO runs are
+      0.81 and 1.20.'
+    model: model_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: empirical-cao-al2o3-slot-07
+      date: '2026-10-04'
+      evidence:
+        published_page: 1373
+        pdf_page_index: 5
+        table: '3'
+  notices: []
+  source_id: seki-2011-ca-o-solubility-fe-cao-al2o3
+  locator:
+    published_page: 1373
+    pdf_page_index: 5
+    table: '3'
+  read_from: pdf:seki-2011-ca-o-solubility-fe-cao-al2o3
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 1373
+        pdf_page_index: 5
+        table: '3'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - CaO
+            - '0.4537'
+          - - Al2O3
+            - '0.4236'
+          - - ZrO2
+            - '0.1228'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1372
+        pdf_page_index: 4
+        table: '2'
+  derived_from:
+  - tables:seki-2011-ca-o-solubility-fe-cao-al2o3
+  derivation:
+    relation: K = a_Ca·a_O / a_CaO for CaO(s) = Ca + O
+    inputs:
+    - tables:seki-2011-ca-o-solubility-fe-cao-al2o3
+    parameters:
+    - - log_K
+      - state:
+          tag: value
+          value: '-4.38'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    - - e_O^Ca
+      - state:
+          tag: value
+          value: '31.8'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    - - e_Ca^O
+      - state:
+          tag: value
+          value: '12.7'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    - - e_Ca^Zr
+      - state:
+          tag: value
+          value: '3'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    output_unit: dimensionless activity
+- observation_id: seki-2011-ca-o-solubility-fe-cao-al2o3::seki_2011_table3_calculated_a_CaO::rows:row=6:h=4879011175f1
+  experiment_id: 10.2355/isijinternational.51.1369::seki-2011-ca-o-solubility-fe-cao-al2o3
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-ZrO2 slag / molten iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CaO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: CaO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.81'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Table 3: aCaO averages are 0.030 (Al2O3), 0.025 (CaO-stabilized ZrO2), and 1.00 (CaO); the CaO runs are
+      0.81 and 1.20.'
+    model: model_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: empirical-cao-al2o3-slot-07
+      date: '2026-10-04'
+      evidence:
+        published_page: 1373
+        pdf_page_index: 5
+        table: '3'
+  notices: []
+  source_id: seki-2011-ca-o-solubility-fe-cao-al2o3
+  locator:
+    published_page: 1373
+    pdf_page_index: 5
+    table: '3'
+  read_from: pdf:seki-2011-ca-o-solubility-fe-cao-al2o3
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 1373
+        pdf_page_index: 5
+        table: '3'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - CaO
+            - '0.7163'
+          - - Al2O3
+            - '0.2395'
+          - - ZrO2
+            - '0.0442'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1372
+        pdf_page_index: 4
+        table: '2'
+  derived_from:
+  - tables:seki-2011-ca-o-solubility-fe-cao-al2o3
+  derivation:
+    relation: K = a_Ca·a_O / a_CaO for CaO(s) = Ca + O
+    inputs:
+    - tables:seki-2011-ca-o-solubility-fe-cao-al2o3
+    parameters:
+    - - log_K
+      - state:
+          tag: value
+          value: '-4.38'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    - - e_O^Ca
+      - state:
+          tag: value
+          value: '31.8'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    - - e_Ca^O
+      - state:
+          tag: value
+          value: '12.7'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    - - e_Ca^Zr
+      - state:
+          tag: value
+          value: '3'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    output_unit: dimensionless activity
+- observation_id: seki-2011-ca-o-solubility-fe-cao-al2o3::seki_2011_table3_calculated_a_CaO::rows:row=7:h=5503853adc20
+  experiment_id: 10.2355/isijinternational.51.1369::seki-2011-ca-o-solubility-fe-cao-al2o3
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-ZrO2 slag / molten iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CaO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: CaO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '1.2'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Table 3: aCaO averages are 0.030 (Al2O3), 0.025 (CaO-stabilized ZrO2), and 1.00 (CaO); the CaO runs are
+      0.81 and 1.20.'
+    model: model_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: empirical-cao-al2o3-slot-07
+      date: '2026-10-04'
+      evidence:
+        published_page: 1373
+        pdf_page_index: 5
+        table: '3'
+  notices: []
+  source_id: seki-2011-ca-o-solubility-fe-cao-al2o3
+  locator:
+    published_page: 1373
+    pdf_page_index: 5
+    table: '3'
+  read_from: pdf:seki-2011-ca-o-solubility-fe-cao-al2o3
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 1373
+        pdf_page_index: 5
+        table: '3'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - CaO
+            - '0.7163'
+          - - Al2O3
+            - '0.2395'
+          - - ZrO2
+            - '0.0442'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1372
+        pdf_page_index: 4
+        table: '2'
+  derived_from:
+  - tables:seki-2011-ca-o-solubility-fe-cao-al2o3
+  derivation:
+    relation: K = a_Ca·a_O / a_CaO for CaO(s) = Ca + O
+    inputs:
+    - tables:seki-2011-ca-o-solubility-fe-cao-al2o3
+    parameters:
+    - - log_K
+      - state:
+          tag: value
+          value: '-4.38'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    - - e_O^Ca
+      - state:
+          tag: value
+          value: '31.8'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    - - e_Ca^O
+      - state:
+          tag: value
+          value: '12.7'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    - - e_Ca^Zr
+      - state:
+          tag: value
+          value: '3'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    output_unit: dimensionless activity
+- observation_id: seki-2011-ca-o-solubility-fe-cao-al2o3::seki_2011_table3_calculated_a_CaO::rows:row=av_al2o3:h=4c4039096664
+  experiment_id: 10.2355/isijinternational.51.1369::seki-2011-ca-o-solubility-fe-cao-al2o3
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-ZrO2 slag / molten iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CaO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: CaO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.03'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Table 3: aCaO averages are 0.030 (Al2O3), 0.025 (CaO-stabilized ZrO2), and 1.00 (CaO); the CaO runs are
+      0.81 and 1.20.'
+    model: model_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: empirical-cao-al2o3-slot-07
+      date: '2026-10-04'
+      evidence:
+        published_page: 1373
+        pdf_page_index: 5
+        table: '3'
+  notices: []
+  source_id: seki-2011-ca-o-solubility-fe-cao-al2o3
+  locator:
+    published_page: 1373
+    pdf_page_index: 5
+    table: '3'
+  read_from: pdf:seki-2011-ca-o-solubility-fe-cao-al2o3
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 1373
+        pdf_page_index: 5
+        table: '3'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - CaO
+            - '0.4145'
+          - - Al2O3
+            - '0.4497'
+          - - ZrO2
+            - '0.1359'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1372
+        pdf_page_index: 4
+        table: '2'
+  derived_from:
+  - tables:seki-2011-ca-o-solubility-fe-cao-al2o3
+  derivation:
+    relation: K = a_Ca·a_O / a_CaO for CaO(s) = Ca + O
+    inputs:
+    - tables:seki-2011-ca-o-solubility-fe-cao-al2o3
+    parameters:
+    - - log_K
+      - state:
+          tag: value
+          value: '-4.38'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    - - e_O^Ca
+      - state:
+          tag: value
+          value: '31.8'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    - - e_Ca^O
+      - state:
+          tag: value
+          value: '12.7'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    - - e_Ca^Zr
+      - state:
+          tag: value
+          value: '3'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    output_unit: dimensionless activity
+- observation_id: seki-2011-ca-o-solubility-fe-cao-al2o3::seki_2011_table3_calculated_a_CaO::rows:row=av_cao:h=16c103e3fc98
+  experiment_id: 10.2355/isijinternational.51.1369::seki-2011-ca-o-solubility-fe-cao-al2o3
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-ZrO2 slag / molten iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CaO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: CaO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '1'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Table 3: aCaO averages are 0.030 (Al2O3), 0.025 (CaO-stabilized ZrO2), and 1.00 (CaO); the CaO runs are
+      0.81 and 1.20.'
+    model: model_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: empirical-cao-al2o3-slot-07
+      date: '2026-10-04'
+      evidence:
+        published_page: 1373
+        pdf_page_index: 5
+        table: '3'
+  notices: []
+  source_id: seki-2011-ca-o-solubility-fe-cao-al2o3
+  locator:
+    published_page: 1373
+    pdf_page_index: 5
+    table: '3'
+  read_from: pdf:seki-2011-ca-o-solubility-fe-cao-al2o3
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 1373
+        pdf_page_index: 5
+        table: '3'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - CaO
+            - '0.7163'
+          - - Al2O3
+            - '0.2395'
+          - - ZrO2
+            - '0.0442'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1372
+        pdf_page_index: 4
+        table: '2'
+  derived_from:
+  - tables:seki-2011-ca-o-solubility-fe-cao-al2o3
+  derivation:
+    relation: K = a_Ca·a_O / a_CaO for CaO(s) = Ca + O
+    inputs:
+    - tables:seki-2011-ca-o-solubility-fe-cao-al2o3
+    parameters:
+    - - log_K
+      - state:
+          tag: value
+          value: '-4.38'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    - - e_O^Ca
+      - state:
+          tag: value
+          value: '31.8'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    - - e_Ca^O
+      - state:
+          tag: value
+          value: '12.7'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    - - e_Ca^Zr
+      - state:
+          tag: value
+          value: '3'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    output_unit: dimensionless activity
+- observation_id: seki-2011-ca-o-solubility-fe-cao-al2o3::seki_2011_table3_calculated_a_CaO::rows:row=av_csz:h=265f1dd7f9f0
+  experiment_id: 10.2355/isijinternational.51.1369::seki-2011-ca-o-solubility-fe-cao-al2o3
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-ZrO2 slag / molten iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CaO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: CaO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.025'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Table 3: aCaO averages are 0.030 (Al2O3), 0.025 (CaO-stabilized ZrO2), and 1.00 (CaO); the CaO runs are
+      0.81 and 1.20.'
+    model: model_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: empirical-cao-al2o3-slot-07
+      date: '2026-10-04'
+      evidence:
+        published_page: 1373
+        pdf_page_index: 5
+        table: '3'
+  notices: []
+  source_id: seki-2011-ca-o-solubility-fe-cao-al2o3
+  locator:
+    published_page: 1373
+    pdf_page_index: 5
+    table: '3'
+  read_from: pdf:seki-2011-ca-o-solubility-fe-cao-al2o3
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 1373
+        pdf_page_index: 5
+        table: '3'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - CaO
+            - '0.4537'
+          - - Al2O3
+            - '0.4236'
+          - - ZrO2
+            - '0.1228'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1372
+        pdf_page_index: 4
+        table: '2'
+  derived_from:
+  - tables:seki-2011-ca-o-solubility-fe-cao-al2o3
+  derivation:
+    relation: K = a_Ca·a_O / a_CaO for CaO(s) = Ca + O
+    inputs:
+    - tables:seki-2011-ca-o-solubility-fe-cao-al2o3
+    parameters:
+    - - log_K
+      - state:
+          tag: value
+          value: '-4.38'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    - - e_O^Ca
+      - state:
+          tag: value
+          value: '31.8'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    - - e_Ca^O
+      - state:
+          tag: value
+          value: '12.7'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    - - e_Ca^Zr
+      - state:
+          tag: value
+          value: '3'
+        locator:
+          published_page: 1373
+          pdf_page_index: 5
+          section: '4.2'
+    output_unit: dimensionless activity

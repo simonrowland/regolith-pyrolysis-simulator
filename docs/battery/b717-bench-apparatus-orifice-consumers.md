@@ -12,7 +12,7 @@ Sauerborn MELTS on solar-furnace bench).
 |---|---|---|---|
 | `underdetermined_apparatus` | `simulator/battery/validity.py` | `experiment.apparatus.geometry` (`orifice_area_m2`, `orifice_diameter_m`, clausing), `apparatus.calibration`, `apparatus.wall` | Emits `RefusalReason.UNDERDETERMINED_APPARATUS` when quantity scopes by method and required geometry/calibration is missing or non-finite; also used when geometry is present but incomplete |
 | Effusion-regime gate | `simulator/battery/validity.py` (`_printed_orifice_diameter`, orifice Kn / p÷d routes) | `experiment.apparatus.geometry.orifice_diameter_m` (+ cell pressure / calibration) | `EFFUSION_REGIME_UNVERIFIED` when orifice Kn cannot be grounded |
-| Validity absorb | `run_validity_gates` → `absorb(underdetermined_apparatus(...))` | same | Row refused before numeric engine predict |
+| Validity absorb | `run_validity_gates` → apparatus gates for measured evidence; typed non-measured evidence records `apparatus_applicability` as passing | same | Measured rows can be refused before numeric engine predict; typed non-measured rows skip the apparatus gates |
 | Score flagged stratum | `simulator/battery/score.py` (`_unverified_apparatus_notices`, `FLAGGED_STRATUM_UNVERIFIED_APPARATUS`) | validity check payloads (`orifice_knudsen`, geometry determinants) | Marks `unverified-apparatus` stratum; blocks numeric residual |
 | Cell-apparatus inference notices | `score.py` `_cell_apparatus_inference_notices` | `bench.cell_material*`, `experiment.apparatus.cell_material_and_liner` | Inference notices when cell material is used without grounded print |
 | Bench resolve | `score.py` `_bench_for_score` | `experiment.bench_id` → `context.benches` | Solar-furnace / KMS / TMS bench facts join the row |

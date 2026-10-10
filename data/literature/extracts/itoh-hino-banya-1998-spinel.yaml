@@ -169,7 +169,16 @@ species:
           note: 'Values printed as determined at 1873 K from present experimental data and prior deoxidation equilibria; Figure 4 and Eq. 19 print r_O^(Mg,Al) = -150, not gamma.'
         T_range_K: [1873.0, 1873.0]
         phase: dilute_liquid_iron
-        standard_state: dissolved-element concentration in mass% with infinite-dilution activity coefficients
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: hypothetical_1wt_pct
+              endmember: {formula: Mg, phase: {tag: value, value: l}}
+              component_basis: Mg
+          inferred: false
+          note: Dissolved-element concentration basis is mass% with infinite-dilution activity coefficients.
+          locator: {published_page: 88, equations: '7-20'}
         regime: regular_solution_interaction_parameter_expansion
         units: dimensionless interaction coefficients
         values:

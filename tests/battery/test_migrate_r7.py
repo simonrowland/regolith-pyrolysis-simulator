@@ -29,6 +29,7 @@ from simulator.battery.migrate import (
     map_quantity,
     migrate,
     select_declared_source,
+    wt_pct_to_mole_fraction,
 )
 from simulator.battery.records import State
 from simulator.battery.validity import underdetermined_apparatus
@@ -36,6 +37,7 @@ from tests.battery.test_migrate import (
     _copy_compilation_record,
     _copy_extract,
     _extract_observation,
+    _migrate_real_extract,
     _write_min_tree,
     test_k01_value_constructions_live_inside_the_boundary as boundary_guard,
 )
@@ -427,7 +429,12 @@ def test_g2_plante_source_points_and_comparison_fence(tmp_path):
             for notice in obs.notices
         )
         composition = obs.identity.composition
-        assert composition is None or not composition.is_value
+        assert composition is not None and composition.is_value
+        source_row = _extract_observation(
+            "kems-042-plante-1979.yaml", obs.observation_id.split("::", 1)[1]
+        )
+        composition_wt_pct = source_row["values"]["composition_wt_pct"]
+        assert composition.value == wt_pct_to_mole_fraction(composition_wt_pct)
         fo2 = obs.identity.fO2_Pa
         assert fo2 is None or not fo2.is_value
     for obs in buckets["superseded"]:
@@ -469,6 +476,39 @@ def test_g2_plante_source_points_and_comparison_fence(tmp_path):
         else:
             assert obs.admission.status.value == "admitted"
             assert obs.identity.fO2_Pa.is_value
+
+
+def test_plante_1979_quoted_row_composition_binding_pin(tmp_path):
+    """Pin the bound row composition, initial charge, and two-phase guard."""
+
+    root = _write_min_tree(tmp_path)
+    _copy_extract(root, "kems-042-plante-1979.yaml")
+    result = migrate(root, write=False)
+    observation_id = "plante1979_table2_s1123_r030_quoted"
+    source = _extract_observation("kems-042-plante-1979.yaml", observation_id)
+    observation = result.observations[
+        f"kems-042-plante-1979::{observation_id}"
+    ]
+
+    composition_wt_pct = source["values"]["composition_wt_pct"]
+    assert composition_wt_pct["K2O"] == 21.14
+    assert composition_wt_pct["SiO2"] == 78.86
+    composition = observation.identity.composition
+    assert composition is not None and composition.is_value
+    assert composition.value == wt_pct_to_mole_fraction(composition_wt_pct)
+    composition_condition = observation.point_conditions["composition"]
+    assert composition_condition.inference is not None
+    assert composition_condition.inference.relation == (
+        "SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction"
+    )
+    assert source["values"]["two_phase_marker"] == "a"
+    assert any(
+        notice.band == "two_phase_bulk_composition_not_liquid_composition"
+        for notice in observation.notices
+    )
+    sample_composition = result.experiments[observation.experiment_id].sample.printed_composition
+    assert sample_composition is not None and sample_composition.state.is_value
+    assert sample_composition.state.value == {"K2O": 43.94, "SiO2": 56.06}
 
 
 def test_g2_plante_partial_pressure_identity_axes_are_source_grounded(tmp_path):
@@ -813,6 +853,16 @@ def _nonempty_printed_paths(value, prefix=""):
     ]
 
 
+def _numeric_evidence_paths(leaves):
+    return [
+        path
+        for path, value in leaves
+        if isinstance(value, (int, float))
+        and not isinstance(value, bool)
+        and not re.search(r"index|source_line|page|schema|year", path)
+    ]
+
+
 def _store_kind(path: Path) -> str | None:
     parts = path.parts
     if "extracts-v2" in parts:
@@ -832,6 +882,7 @@ STORE_PATHS = sorted(
 def absence_audit(paths=STORE_PATHS):
     """Independent source lookup; never calls migration's inference/census helpers."""
     judged, bad = Counter(), []
+    compilation_audit_cache = {}
     for directory in ("observations-v2", "extracts-v2"):
         for path in (p for p in paths if _store_kind(p) == directory):
             store = yaml.load(path.read_text(), Loader=_YAML_LOADER)
@@ -848,8 +899,17 @@ def absence_audit(paths=STORE_PATHS):
                     source = (obs.get("locator") or {}).get("source_path", "")
                     if not source.startswith("data/literature/compilations/"):
                         continue
-                    raw = (REPO_ROOT / source).read_text()
-                    record = json.loads(raw) if source.endswith(".json") else yaml.load(raw, Loader=_YAML_LOADER)
+                    if source not in compilation_audit_cache:
+                        raw = (REPO_ROOT / source).read_text()
+                        record = (
+                            json.loads(raw)
+                            if source.endswith(".json")
+                            else yaml.load(raw, Loader=_YAML_LOADER)
+                        )
+                        leaves = list(_leaves(record))
+                        numeric = _numeric_evidence_paths(leaves)
+                        compilation_audit_cache[source] = (record, leaves, numeric)
+                    record, leaves, numeric = compilation_audit_cache[source]
                 else:
                     local_id = oid.split("::", 1)[1]
                     local = next(
@@ -865,9 +925,9 @@ def absence_audit(paths=STORE_PATHS):
                     record = legacy[local]
                 family = obs["source_id"]
                 judged[family] += 1
-                leaves = list(_leaves(record))
-                numeric = [p for p, v in leaves if isinstance(v, (int, float)) and not isinstance(v, bool)
-                           and not re.search(r"index|source_line|page|schema|year", p)]
+                if directory != "observations-v2":
+                    leaves = list(_leaves(record))
+                    numeric = _numeric_evidence_paths(leaves)
                 for reason_path, reason in _leaves(obs):
                     if not reason_path.endswith(("reason", "unavailable_reason")) or not isinstance(reason, str):
                         continue
@@ -917,6 +977,7 @@ def absence_audit(paths=STORE_PATHS):
                             contradiction = found
                     elif match := re.search(r"source does not state (?:a numeric )?(\w+)", reason):
                         found = [p for p, value in leaves if value not in (None, "") and
+                                 not p.endswith((".tag", ".reason")) and
                                  re.search(r"(?:^|\.)" + re.escape(match[1]) + r"(?:\.|\[|$)", p)]
                         if found:
                             contradiction = found[:3]
@@ -962,6 +1023,90 @@ def test_g1_whole_store_absence_claims_match_sources(path):
         if _source_observation_rows(path) != 0:
             assert judged, "no source families judged"
     assert not bad, f"{len(bad)} false absence claims; first witnesses: {bad[:12]}"
+
+
+def test_g1_current_stolyarova_source_migrates_without_context_observation(
+    tmp_path: Path,
+):
+    filename = "kems-016-stolyarova-1992.yaml"
+    result = _migrate_real_extract(tmp_path, filename, write=True)
+    method_id = "stolyarova_1992_silicate_kems_geometry_activities"
+    assert method_id not in result.observations
+    assert len(
+        [obs for obs in result.observations.values() if obs.source_id == "kems-016-stolyarova-1992"]
+    ) == 22
+
+    generated = tmp_path / "tree/data/literature/extracts-v2" / filename
+    judged, bad = absence_audit([generated])
+    assert judged["kems-016-stolyarova-1992"] == 22
+    assert bad == []
+
+
+@pytest.mark.parametrize(
+    "source_polymorph,expected_bad",
+    [
+        ({"tag": "unknown", "reason": "source does not state polymorph"}, False),
+        ({"tag": "value", "value": "corundum"}, True),
+    ],
+    ids=("typed-absence", "printed-polymorph"),
+)
+def test_g1_nested_unknown_is_not_a_printed_field_witness(
+    tmp_path, monkeypatch, source_polymorph, expected_bad
+):
+    root = tmp_path / "repo"
+    store_dir = root / "data/literature/extracts-v2"
+    source_dir = root / "data/literature/extracts"
+    store_dir.mkdir(parents=True)
+    source_dir.mkdir(parents=True)
+    monkeypatch.setitem(absence_audit.__globals__, "REPO_ROOT", root)
+
+    observation_id = "fixture::polymorph-row"
+    store = {
+        "observations": [
+            {
+                "observation_id": observation_id,
+                "source_id": "fixture",
+                "identity": {
+                    "reference_state": {
+                        "tag": "value",
+                        "value": {
+                            "endmember": {
+                                "polymorph": {
+                                    "tag": "unknown",
+                                    "reason": "source does not state polymorph",
+                                }
+                            }
+                        },
+                    }
+                },
+            }
+        ]
+    }
+    source = {
+        "species": {
+            "Fe": {
+                "observations": [
+                    {
+                        "observation_id": "polymorph-row",
+                        "standard_state": {
+                            "state": {
+                                "tag": "value",
+                                "value": {
+                                    "endmember": {"polymorph": source_polymorph}
+                                },
+                            }
+                        },
+                    }
+                ]
+            }
+        }
+    }
+    store_path = store_dir / "fixture.yaml"
+    store_path.write_text(yaml.safe_dump(store))
+    (source_dir / "fixture.yaml").write_text(yaml.safe_dump(source))
+
+    _judged, bad = absence_audit([store_path])
+    assert bool(bad) is expected_bad
 
 
 _COUNT_LEAF_KEYS = ("value", "as_published", "raw")

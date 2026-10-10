@@ -187,6 +187,27 @@ def test_melts_endmember_identity_matches_hand_worked_sio2_al2o3() -> None:
     assert al2o3_reason == ""
 
 
+def test_sr03_current_oxide_activity_filter_is_pinned_without_notice() -> None:
+    assert canonical_oxide_activity_map(
+        {
+            "SiO2": 0.42,
+            "Al2O3": float("nan"),
+            "FeO": 0.0,
+            "MgO": float("inf"),
+            "Na": 0.7,
+        }
+    ) == {"SiO2": 0.42}
+
+
+def test_sr04_current_parent_projection_is_pinned_without_notice() -> None:
+    value, reason = melts_endmember_to_parent_oxide_activity(
+        {"SiO2": float("nan"), "SiO2_Liq": 0.0}, "SiO2"
+    )
+
+    assert value is None
+    assert reason == "engine returned no positive activity for SiO2"
+
+
 def test_melts_cao_mgo_are_typed_refusals_not_fabricated_conversions() -> None:
     """CaO/MgO are not MELTS liquid endmembers; do not invent a residual.
 

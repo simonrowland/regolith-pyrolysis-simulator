@@ -94,6 +94,46 @@ GRID_ORDER_REASON = (
 NIST_TAIL_PARSE_REPAIR = "nist_tail_whitespace_signs_restored"
 NIST_TAIL_DFH_ABSENCE_REPAIR = "nist_tail_dfh_sign_undetermined"
 NIST_TAIL_UNRESOLVED_KIND = "nist_tail_whitespace_signs_unresolved"
+PAGE_READ_SIGNS = (
+    {
+        "table_id": "Cu-020",
+        "temperature_as_published": "1600",
+        "column": "delta-f H",
+        "printed_token": "-123.836",
+        "page_locator": (
+            "https://janaf.nist.gov/pdf/JANAF-FourthEd-1998-Copper.pdf#page=20; "
+            "SHA-256 d161dc6535ffa6c579357f7489573f402610fbbf94018d703b6aa350c59d3773; "
+            "printed p. 1024"
+        ),
+        "crop_note": (
+            "https://janaf.nist.gov/pdf/JANAF-FourthEd-1998-Copper.pdf#page=20; "
+            "SHA-256 d161dc6535ffa6c579357f7489573f402610fbbf94018d703b6aa350c59d3773; "
+            "printed p. 1024 / PDF p. 20, Table Cu-020, rows 1500, 1600, and 1700 K; "
+            "crop shows the ΔfH° header and row signs."
+        ),
+    },
+    {
+        "table_id": "O-007",
+        "temperature_as_published": "1200",
+        "column": "delta-f H",
+        "printed_token": "-189.588",
+        "page_locator": (
+            "https://janaf.nist.gov/pdf/JANAF-FourthEd-1998-Oxygen.pdf#page=7; "
+            "SHA-256 6c786ff5ec1c66c7c9bed29e0c358843ca677bccd8e09a7a19e5db3584ae5d3c; "
+            "printed p. 1723"
+        ),
+        "crop_note": (
+            "https://janaf.nist.gov/pdf/JANAF-FourthEd-1998-Oxygen.pdf#page=7; "
+            "SHA-256 6c786ff5ec1c66c7c9bed29e0c358843ca677bccd8e09a7a19e5db3584ae5d3c; "
+            "printed p. 1723 / PDF p. 7, Table O-007, rows 1100, 1159 transition, "
+            "1200, 1300 K; crop shows PbO(l) header, ΔfH° column, and those rows"
+        ),
+    },
+)
+PAGE_READ_SIGN_MAGNITUDE_MISMATCH_KIND = "page_read_sign_magnitude_mismatch"
+PAGE_READ_SIGN_MAGNITUDE_MISMATCH_REASON = (
+    "page-read sign magnitude does not match the text-layer magnitude"
+)
 JANAF_R_J_MOL_K = Decimal("8.31441")
 # Decimal subscripts are retained. Charge is optional.
 FORMULA_TOKEN_RE = re.compile(r"([A-Z][a-z]?)(\d+(?:\.\d+)?)?")
@@ -953,6 +993,7 @@ def parse_janaf_txt(
     )
     repaired_values: dict[int, tuple[float | None, float, float]] = {}
     enthalpy_absence_reasons: dict[int, str] = {}
+    page_read_signs_by_line: dict[int, Mapping[str, str]] = {}
     corroborated_lines = {candidate.line_number for candidate in corroborated}
     for candidate in whitespace_tail_candidates:
         if candidate.line_number not in corroborated_lines:
@@ -965,6 +1006,39 @@ def parse_janaf_txt(
             state=title_state,
             has_zero_reference_interval=has_zero_reference_interval,
         )
+        page_read_sign = next(
+            (
+                entry
+                for entry in PAGE_READ_SIGNS
+                if entry["table_id"] == table_id
+                and entry["temperature_as_published"] == candidate.content[0]
+                and entry["column"] == header_fields[5]
+            ),
+            None,
+        )
+        if page_read_sign is not None:
+            printed_token = page_read_sign["printed_token"]
+            text_layer_token = candidate.whitespace_tail[0]
+            if (
+                not NUMBER_RE.fullmatch(printed_token)
+                or not NUMBER_RE.fullmatch(text_layer_token)
+                or abs(Decimal(printed_token)) != abs(Decimal(text_layer_token))
+            ):
+                ambiguities.append(
+                    _ambiguity_record(
+                        line_number=candidate.line_number,
+                        line=candidate.line,
+                        reason=PAGE_READ_SIGN_MAGNITUDE_MISMATCH_REASON,
+                        table_id=table_id,
+                        url=url,
+                        kind=PAGE_READ_SIGN_MAGNITUDE_MISMATCH_KIND,
+                    )
+                )
+                continue
+            if restored is not None:
+                restored = (float(Decimal(printed_token)), restored[1], restored[2])
+                enthalpy_absence_reason = None
+                page_read_signs_by_line[candidate.line_number] = page_read_sign
         if restored is None:
             ambiguities.append(
                 _ambiguity_record(
@@ -992,6 +1066,13 @@ def parse_janaf_txt(
             zip(VALUE_COLUMNS, fields, strict=True)
         ):
             column = header_fields[index] if index < len(header_fields) else default_column
+            page_read_sign = (
+                page_read_signs_by_line.get(candidate.line_number)
+                if index == 5
+                else None
+            )
+            if page_read_sign is not None:
+                token = page_read_sign["printed_token"]
             locator = {
                 "table_id": table_id,
                 "url": url,
@@ -1022,6 +1103,14 @@ def parse_janaf_txt(
                             "raw_line": candidate.line,
                         }
                     )
+                    if page_read_sign is not None:
+                        locator.update(
+                            {
+                                "page_read_sign": page_read_sign["printed_token"],
+                                "page_locator": page_read_sign["page_locator"],
+                                "crop_note": page_read_sign["crop_note"],
+                            }
+                        )
             row[key] = {
                 "value": value,
                 "as_published": token,

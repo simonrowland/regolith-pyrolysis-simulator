@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import ast
 import inspect
+import math
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -993,6 +994,110 @@ def test_parser_raises_when_liquid_fraction_missing():
             mode='subprocess',
             engine_version='fake-alphamelts subprocess',
         )
+
+
+def test_parser_sr10_current_filtered_values_are_pinned_without_notice():
+    legacy = SimpleNamespace(
+        phases_present=['liquid', 'olivine'],
+        phase_masses_kg={
+            'liquid': 0.8,
+            'olivine': 0.2,
+            'zero_phase': 0.0,
+            'negative_phase': -0.1,
+            'nonfinite_phase': float('nan'),
+        },
+        liquid_fraction=0.8,
+        liquid_composition_wt_pct={
+            'SiO2': 49.0,
+            'bad_liquid': float('nan'),
+        },
+        activity_coefficients={
+            'SiO2': 0.95,
+            'bad_activity': float('inf'),
+        },
+        status='ok',
+        warnings=[],
+    )
+
+    diagnostics = project_equilibrium_to_diagnostics(
+        legacy,
+        mode='subprocess',
+        engine_version='fake-alphamelts subprocess',
+    )
+
+    assert diagnostics.phase_masses_kg == {'liquid': 0.8, 'olivine': 0.2}
+    assert diagnostics.phase_modes_wt_pct == {'liquid': 80.0, 'olivine': 20.0}
+    assert diagnostics.liquid_composition_wt_pct == {'SiO2': 49.0}
+    assert diagnostics.activity_coefficients == {'SiO2': 0.95}
+    assert diagnostics.backend_warnings == ()
+
+
+def test_parser_sr11_current_path_values_are_pinned_without_notice():
+    legacy = SimpleNamespace(
+        phases_present=['liquid'],
+        phase_masses_kg={'liquid': 1.0},
+        liquid_fraction=1.0,
+        liquid_fraction_path=(
+            {
+                'temperature_C': 1000.0,
+                'liquid_fraction': 0.5,
+                'liquid_composition_wt_pct': {
+                    'SiO2': 49.0,
+                    'bad_liquid': float('nan'),
+                },
+            },
+        ),
+        status='ok',
+        warnings=[],
+    )
+
+    diagnostics = project_equilibrium_to_diagnostics(
+        legacy,
+        mode='subprocess',
+        engine_version='fake-alphamelts subprocess',
+    )
+
+    assert diagnostics.liquid_fraction_path == (
+        {
+            'temperature_C': 1000.0,
+            'liquid_fraction': 0.5,
+            'liquid_composition_wt_pct': {'SiO2': 49.0},
+        },
+    )
+    assert diagnostics.backend_warnings == ()
+
+
+def test_parser_sr12_current_default_values_are_pinned_without_notice():
+    diagnostics = LiquidusDiagnostics(
+        phases_present=('liquid',),
+        phase_masses_kg={'liquid': 1.0},
+        liquid_fraction=1.0,
+        backend_status='ok',
+        backend_diagnostics={
+            'executed_temperature_C': float('inf'),
+            'condensed_phase_reference_pressure_bar': float('nan'),
+            'liquid_viscosity_Pa_s': float('nan'),
+        },
+    )
+
+    result = diagnostics_to_equilibrium(
+        diagnostics,
+        {'temperature_C': 1200.0, 'pressure_bar': 1.0, 'fO2_log': -9.0},
+    )
+
+    assert result.temperature_C == 1200.0
+    assert result.pressure_bar == 1.0
+    assert result.liquid_viscosity_Pa_s is None
+    assert result.warnings == []
+    assert result.status == 'ok'
+    assert set(result.diagnostics) == {
+        'executed_temperature_C',
+        'condensed_phase_reference_pressure_bar',
+        'liquid_viscosity_Pa_s',
+    }
+    assert result.diagnostics['executed_temperature_C'] == float('inf')
+    assert math.isnan(result.diagnostics['condensed_phase_reference_pressure_bar'])
+    assert math.isnan(result.diagnostics['liquid_viscosity_Pa_s'])
 
 
 def test_alphamelts_writer_populates_structured_field_and_warning():
