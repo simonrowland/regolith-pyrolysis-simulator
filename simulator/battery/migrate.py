@@ -5562,7 +5562,9 @@ def source_derivation_from_source(
         raw = payload.get("derivation")
         if not isinstance(raw, Mapping):
             continue
-        if not raw.get("relation") or not raw.get("inputs"):
+        if not raw.get("relation") or (
+            not raw.get("inputs") and "raw_inputs" not in raw
+        ):
             continue
         try:
             return _derivation_from_plain(raw)
@@ -12364,7 +12366,7 @@ class Migrator:
             derived_prose = tuple(dict.fromkeys((*derived_prose, *derivation_prose)))
             source_derivation = (
                 replace(source_derivation, inputs=derivation_parents)
-                if derivation_parents
+                if derivation_parents or source_derivation.raw_inputs is not None
                 else None
             )
             if not derived_prose:
