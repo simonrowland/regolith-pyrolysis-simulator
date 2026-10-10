@@ -9687,6 +9687,560 @@ def test_vapor_pressure_diagnostics_marks_not_attempted_on_empty_pressures():
     )
 
 
+def test_imposed_fo2_failed_status_reaches_typed_not_converged(monkeypatch):
+    from engines.alphamelts.thermoengine import ThermoEngineNotConvergedError
+    from simulator.engine_pool import EngineWorkerRemoteError
+    from simulator.melt_backend.thermoengine import ThermoEngineBackend
+    import tests.test_alphamelts_provider as provider_tests
+
+    monkeypatch.setattr(
+        'simulator.fe_redox.kress91_split',
+        lambda **_kwargs: {'fe3': 0.2},
+    )
+
+    class Model:
+        def set_bulk_composition(self, _bulk):
+            return None
+
+        def equilibrate_tp(self, *_args, **_kwargs):
+            return [('failed', 1400.0, 0.1, None)]
+
+    transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
+        activity_converter=lambda *_args: 1.0,
+    )
+    transport._new_melts_model = lambda: Model()
+    transport._track_operation_root = lambda *_args: None
+    bulk = {'SiO2': 50.0, 'FeO': 10.0, 'Fe2O3': 1.0}
+    solve_kwargs = dict(
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+        pressure_mpa=0.1,
+        bulk_wt=bulk,
+        target_fO2_log=-9.0,
+    )
+
+    with pytest.raises(
+        ThermoEngineNotConvergedError,
+        match='equilibrium status: failed',
+    ) as native:
+        transport._solve_imposed_fO2(**solve_kwargs)
+    assert type(native.value) is ThermoEngineNotConvergedError
+
+    class EmptyModel(Model):
+        def equilibrate_tp(self, *_args, **_kwargs):
+            return []
+
+    transport._new_melts_model = lambda: EmptyModel()
+    with pytest.raises(
+        ThermoEngineNotConvergedError,
+        match='no equilibration result',
+    ) as empty:
+        transport._solve_imposed_fO2(**solve_kwargs)
+    assert type(empty.value) is ThermoEngineNotConvergedError
+
+    class RaisingModel(Model):
+        def equilibrate_tp(self, *_args, **_kwargs):
+            raise RuntimeError('native equilibrate failed')
+
+    transport._new_melts_model = lambda: RaisingModel()
+    with pytest.raises(
+        ThermoEngineNotConvergedError,
+        match='RuntimeError: native equilibrate failed',
+    ):
+        transport._solve_imposed_fO2(**solve_kwargs)
+
+    transport._new_melts_model = lambda: Model()
+
+    class Worker:
+        process = object()
+        start_count = 1
+
+        def call(self, kwargs):
+            try:
+                return transport._solve_imposed_fO2(
+                    temperature_C=kwargs['temperature_C'],
+                    pressure_bar=kwargs['pressure_bar'],
+                    pressure_mpa=kwargs['pressure_bar'] / 10.0,
+                    bulk_wt=kwargs['comp_wt'],
+                    target_fO2_log=kwargs['fO2_log'],
+                )
+            except Exception as exc:
+                raise EngineWorkerRemoteError(
+                    type(exc).__name__,
+                    str(exc),
+                    'native status traceback',
+                ) from exc
+
+        def close(self):
+            raise AssertionError(
+                'row-local nonconvergence must keep the handle'
+            )
+
+    transport._worker = Worker()
+    backend = ThermoEngineBackend()
+    backend._mode = 'thermoengine'
+    backend._thermoengine_transport = transport
+    result = backend.find_liquidus_solidus(
+        composition_mol=provider_tests._basalt_species_mol(),
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        min_T_C=1400.0,
+        max_T_C=1500.0,
+        scan_step_C=100.0,
+    )
+    assert result.status == 'not_converged'
+    assert any(
+        'ThermoEngine equilibrium status: failed' in warning
+        for warning in result.warnings
+    )
+    assert backend._thermoengine_transport is transport
+    assert backend.transport_close_count() == 0
+
+
+@pytest.mark.parametrize(
+    'method_name',
+    [
+        'get_oxide_names',
+        'set_bulk_composition',
+        'equilibrate_tp',
+        'get_list_of_phases_in_assemblage',
+        'get_mass_of_phase',
+        'get_composition_of_phase',
+        'get_property_of_phase',
+        'get_dictionary_of_affinities',
+        'get_phase_names',
+    ],
+)
+def test_unconstrained_native_library_failure_is_typed(
+    monkeypatch,
+    method_name,
+):
+    from engines.alphamelts.thermoengine import ThermoEngineNotConvergedError
+
+    class FakeMelts:
+        def _maybe(self, name):
+            if name == method_name:
+                raise RuntimeError(f'library failed in {name}')
+
+        def get_oxide_names(self):
+            self._maybe('get_oxide_names')
+            return ('SiO2', 'Al2O3')
+
+        def set_bulk_composition(self, bulk_wt):
+            self._maybe('set_bulk_composition')
+            self.bulk_wt = dict(bulk_wt)
+
+        def equilibrate_tp(self, temperature_C, pressure_mpa, *, initialize):
+            self._maybe('equilibrate_tp')
+            return [('success', temperature_C, pressure_mpa, self)]
+
+        def get_list_of_phases_in_assemblage(self, root):
+            self._maybe('get_list_of_phases_in_assemblage')
+            return ('Liquid',)
+
+        def get_mass_of_phase(self, root, phase):
+            self._maybe('get_mass_of_phase')
+            return 1000.0
+
+        def get_composition_of_phase(self, root, phase, basis):
+            self._maybe('get_composition_of_phase')
+            if basis == 'oxide_wt':
+                return {'SiO2': 70.0, 'Al2O3': 30.0}
+            return {'SiO2': 0.7, 'Al2O3': 0.3}
+
+        def get_property_of_phase(self, root, phase, property_name):
+            self._maybe('get_property_of_phase')
+            return 1.0
+
+        def get_dictionary_of_affinities(self, root, sort=False):
+            self._maybe('get_dictionary_of_affinities')
+            return {}
+
+        def get_phase_names(self):
+            self._maybe('get_phase_names')
+            return ('Liquid',)
+
+    transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
+        activity_converter=lambda *_args: 1.0,
+    )
+    transport._equilibrate = object()
+    transport._liq_phase = object()
+    transport._operation_parent = 'parent'
+    monkeypatch.setattr(transport, '_new_melts_model', lambda: FakeMelts())
+    monkeypatch.setattr(transport, '_clear_operation_palette', lambda: None)
+    monkeypatch.setattr(transport, '_echo_log_fO2', lambda *_args, **_kwargs: -9.0)
+    monkeypatch.setattr(
+        transport,
+        '_chemical_potentials_for_phase',
+        lambda *_args, **_kwargs: {'SiO2': -1000.0},
+    )
+    monkeypatch.setattr(
+        transport,
+        '_activities_from_chemical_potentials',
+        lambda **_kwargs: {},
+    )
+    monkeypatch.setattr(transport, '_fe_redox_split', lambda _comp: {})
+
+    with pytest.raises(
+        ThermoEngineNotConvergedError,
+        match=f'RuntimeError: library failed in {method_name}',
+    ):
+        transport._equilibrate_in_process(
+            temperature_C=1400.0,
+            pressure_bar=1.0,
+            comp_wt={'SiO2': 70.0, 'Al2O3': 30.0},
+            fO2_log=None,
+        )
+
+
+def test_native_call_preserves_declared_failure():
+    from engines.alphamelts.thermoengine import (
+        ThermoEngineNotConvergedError,
+        _thermoengine_native_call,
+    )
+
+    original = ThermoEngineNotConvergedError('already typed')
+    with pytest.raises(ThermoEngineNotConvergedError) as captured:
+        _thermoengine_native_call(
+            lambda: (_ for _ in ()).throw(original)
+        )
+    assert captured.value is original
+
+
+def test_thermoengine_model_constructor_failure_is_typed():
+    from engines.alphamelts.thermoengine import ThermoEngineNotConvergedError
+
+    transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
+        activity_converter=lambda *_args: 1.0,
+    )
+    transport._operation_parent = 'parent'
+    transport._equilibrate = types.SimpleNamespace(
+        MELTSmodel=lambda **_kwargs: (_ for _ in ()).throw(
+            RuntimeError('model init failed')
+        )
+    )
+    with pytest.raises(
+        ThermoEngineNotConvergedError,
+        match='RuntimeError: model init failed',
+    ):
+        transport._new_melts_model()
+
+
+def test_operation_parent_absence_propagates():
+    class SealedPhase:
+        @property
+        def operationParent(self):
+            return None
+
+        @operationParent.setter
+        def operationParent(self, _value):
+            raise AttributeError('sealed')
+
+    phase_wrapper = types.SimpleNamespace(phaseClassInstance=SealedPhase())
+    native = types.SimpleNamespace(
+        dictionaryOfPhasesInSystem={'Augite': phase_wrapper},
+    )
+    model = types.SimpleNamespace(melts=native)
+    transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
+        activity_converter=lambda *_args: 1.0,
+    )
+    transport._equilibrate = types.SimpleNamespace(
+        MELTSmodel=lambda **_kwargs: model,
+    )
+    transport._operation_parent = 'parent'
+    with pytest.raises(RuntimeError, match='operationParent') as captured:
+        transport._new_melts_model()
+    assert type(captured.value) is RuntimeError
+
+
+def test_retained_solution_failures_are_typed():
+    from engines.alphamelts.thermoengine import ThermoEngineNotConvergedError
+
+    transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
+        activity_converter=lambda *_args: 1.0,
+    )
+
+    def missing_state(_key):
+        raise RuntimeError('state lookup failed')
+
+    with pytest.raises(
+        ThermoEngineNotConvergedError,
+        match='RuntimeError: state lookup failed',
+    ):
+        transport._retained_solution_chemical_potentials(
+            types.SimpleNamespace(
+                melts=types.SimpleNamespace(valueForKey_=missing_state),
+            ),
+            'Spinel',
+            expected_components={'chromite': 0.0},
+        )
+
+    empty_state = types.SimpleNamespace(phasesInSystem={})
+    with pytest.raises(
+        ThermoEngineNotConvergedError,
+        match='lacks solution phase',
+    ):
+        transport._retained_solution_chemical_potentials(
+            types.SimpleNamespace(
+                melts=types.SimpleNamespace(
+                    valueForKey_=lambda _key: empty_state,
+                ),
+            ),
+            'Spinel',
+            expected_components={'chromite': 0.0},
+        )
+
+
+def test_echo_and_activity_library_failures_are_typed():
+    from engines.alphamelts.thermoengine import ThermoEngineNotConvergedError
+
+    transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
+        activity_converter=lambda *_args: 1.0,
+    )
+    transport._database = object()
+    transport._chem = types.SimpleNamespace(OXIDE_ORDER=('SiO2',))
+
+    class EchoMelts:
+        def get_list_of_phases_in_assemblage(self, _root):
+            raise RuntimeError('echo phases failed')
+
+    with pytest.raises(
+        ThermoEngineNotConvergedError,
+        match='RuntimeError: echo phases failed',
+    ):
+        transport._echo_log_fO2(
+            EchoMelts(),
+            object(),
+            temperature_C=1400.0,
+            pressure_bar=1.0,
+        )
+
+    class LiquidPhase:
+        endmember_names = ('SiO2',)
+
+        def chem_potential(self, *_args, **_kwargs):
+            raise RuntimeError('chem potential failed')
+
+    transport._liq_phase = LiquidPhase()
+    with pytest.raises(
+        ThermoEngineNotConvergedError,
+        match='RuntimeError: chem potential failed',
+    ):
+        transport._activities_from_chemical_potentials(
+            temperature_C=1400.0,
+            pressure_bar=1.0,
+            component_mole_fraction={'SiO2': 1.0},
+            comp_wt={'SiO2': 100.0},
+        )
+
+
+def test_cold_worker_missing_loader_is_typed_absence(monkeypatch):
+    import simulator.melt_backend.alphamelts as alphamelts_module
+    from engines.alphamelts.petthermo import _PetThermoToolsUnavailable
+    from simulator.engine_pool import EngineWorkerRemoteError
+
+    monkeypatch.setattr(
+        alphamelts_module.importlib,
+        'import_module',
+        lambda _name: types.SimpleNamespace(),
+    )
+    sent = []
+
+    class Connection:
+        def send(self, message):
+            sent.append(message)
+
+        def close(self):
+            return None
+
+    alphamelts_module._run_petthermotools_worker(
+        Connection(),
+        'equilibrate_MELTS',
+        1,
+        (),
+        {},
+    )
+    assert sent[0][0] == 'error'
+    assert sent[0][1] == '_PetThermoToolsUnavailable'
+    assert 'MELTSdynamic loader not found' in sent[0][2]
+
+    backend = AlphaMELTSBackend()
+    _select_python_api_for_test(backend)
+
+    class Worker:
+        def call(self, _request, **_kwargs):
+            raise EngineWorkerRemoteError(
+                '_PetThermoToolsUnavailable',
+                'MELTSdynamic loader not found',
+                'child traceback',
+            )
+
+    backend._pet_worker = Worker()
+    with pytest.raises(
+        _PetThermoToolsUnavailable,
+        match='loader not found',
+    ):
+        backend._run_petthermotools_isolated('equilibrate_MELTS')
+
+
+def test_chemical_potential_library_failure_and_missing_components_are_typed():
+    from engines.alphamelts.thermoengine import ThermoEngineNotConvergedError
+
+    transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
+        activity_converter=lambda *_args: 1.0,
+    )
+
+    class Melts:
+        def get_thermo_properties_of_phase_components(self, *_args, **_kwargs):
+            raise RuntimeError('mu lookup failed')
+
+    with pytest.raises(
+        ThermoEngineNotConvergedError,
+        match='RuntimeError: mu lookup failed',
+    ):
+        transport._chemical_potentials_for_phase(Melts(), 'root', 'Spinel')
+
+    class Vector:
+        def __init__(self, values):
+            self.values = values
+
+        def pointerToDouble(self):
+            return self.values
+
+    class Component:
+        def __init__(self, name):
+            self.phaseName = name
+
+    class Phase:
+        phaseName = 'Spinel'
+
+        def convertElementsToMoles_(self, _elements):
+            return Vector([1.0])
+
+        def getChemicalPotentialFromMolesOfComponents_andT_andP_(
+            self, _moles, _temperature, _pressure,
+        ):
+            return Vector([-1.0])
+
+        def numberOfSolutionComponents(self):
+            return 1
+
+        def componentAtIndex_(self, _index):
+            return Component('chromite')
+
+    phase = Phase()
+    wrapper = types.SimpleNamespace(
+        phaseClassInstance=phase,
+        bulkCompositionInElements=Vector([1.0]),
+    )
+    state = types.SimpleNamespace(
+        phasesInSystem={'Spinel': wrapper},
+        T=1400.0,
+        P=1.0,
+    )
+    with pytest.raises(
+        ThermoEngineNotConvergedError,
+        match='lack: hercynite',
+    ):
+        transport._retained_solution_chemical_potentials(
+            types.SimpleNamespace(
+                melts=types.SimpleNamespace(
+                    valueForKey_=lambda _key: state,
+                ),
+            ),
+            'Spinel',
+            expected_components={'chromite': 0.0, 'hercynite': 0.0},
+        )
+
+
+def test_redox_state_library_failure_is_typed():
+    from engines.alphamelts.thermoengine import ThermoEngineNotConvergedError
+
+    class Chem:
+        OXIDE_ORDER = ('Fe2O3',)
+
+        def wt_to_mol_oxide(self, values):
+            return values
+
+    class Database:
+        def redox_state(self, *_args, **_kwargs):
+            raise RuntimeError('redox failed')
+
+    class Melts:
+        def get_list_of_phases_in_assemblage(self, _root):
+            return ('Liquid',)
+
+        def get_composition_of_phase(self, _root, _phase, _basis):
+            return {'Fe2O3': 1.0}
+
+    transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
+        activity_converter=lambda *_args: 1.0,
+    )
+    transport._database = Database()
+    transport._chem = Chem()
+    with pytest.raises(
+        ThermoEngineNotConvergedError,
+        match='RuntimeError: redox failed',
+    ):
+        transport._echo_log_fO2(
+            Melts(),
+            object(),
+            temperature_C=1400.0,
+            pressure_bar=1.0,
+        )
+
+
+def test_gibbs_energy_library_failure_is_typed():
+    from engines.alphamelts.thermoengine import ThermoEngineNotConvergedError
+
+    class LiquidPhase:
+        endmember_names = ('SiO2',)
+
+        def chem_potential(self, *_args, **_kwargs):
+            return [[-1000.0]]
+
+        def gibbs_energy(self, *_args, **_kwargs):
+            raise RuntimeError('gibbs failed')
+
+    transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
+        activity_converter=lambda *_args: 1.0,
+    )
+    transport._liq_phase = LiquidPhase()
+    with pytest.raises(
+        ThermoEngineNotConvergedError,
+        match='RuntimeError: gibbs failed',
+    ):
+        transport._activities_from_chemical_potentials(
+            temperature_C=1400.0,
+            pressure_bar=1.0,
+            component_mole_fraction={'SiO2': 1.0},
+            comp_wt={'SiO2': 100.0},
+        )
+
+
+def test_thermoengine_wrong_backend_name_propagates():
+    from engines.alphamelts.thermoengine import equilibrate_via_thermoengine
+
+    with pytest.raises(RuntimeError, match='thermoengine'):
+        equilibrate_via_thermoengine(
+            types.SimpleNamespace(backend_name='alphamelts'),
+            temperature_C=1400.0,
+            pressure_bar=1.0,
+            fO2_log=-9.0,
+            composition_mol_by_account={},
+            species_formula_registry={},
+        )
+
+
 def test_dead_uppercase_vaporock_stub_is_gone_from_source():
     import simulator.melt_backend.alphamelts as mod
 

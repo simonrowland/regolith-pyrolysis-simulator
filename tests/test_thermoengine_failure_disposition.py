@@ -8,6 +8,7 @@ from engines.alphamelts.thermoengine import (
     ThermoEngineFO2UndefinedError,
     ThermoEngineIsolationError,
     ThermoEngineNonFiniteField,
+    ThermoEngineNotConvergedError,
     ThermoEngineOutOfDomainError,
     ThermoEnginePayload,
     ThermoEngineRefusalCause,
@@ -56,6 +57,7 @@ def test_thermoengine_failure_disposition_pins_both_directions() -> None:
         ThermoEngineFO2UndefinedError('finite echo undefined'),
         ThermoEngineNonFiniteField('Liquid GibbsFreeEnergy is nan'),
         ThermoEngineFO2OmittedError('solved fO2 omitted'),
+        ThermoEngineNotConvergedError('ThermoEngine equilibrium status: failed'),
         ThermoEngineTimeoutError(
             ThermoEngineTimeoutCause.WARM_CALL_EQUILIBRIUM_TIMEOUT,
             timeout_s=1.0,
@@ -115,6 +117,9 @@ def test_liquidus_projection_pins_policy_and_execution_failures() -> None:
             ThermoEngineFO2UndefinedError('finite echo undefined'),
             ThermoEngineNonFiniteField('Liquid GibbsFreeEnergy is nan'),
             ThermoEngineFO2OmittedError('solved fO2 omitted'),
+            ThermoEngineNotConvergedError(
+                'ThermoEngine equilibrium status: failed'
+            ),
             _tagged_solver_failure(),
             _attribute_bearing_tagged_solver_failure(),
         )

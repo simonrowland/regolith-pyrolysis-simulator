@@ -51,7 +51,10 @@ from engines.alphamelts.domain import (
     canonical_melt_oxide_activity_name,
     canonical_oxide_activity_map,
 )
-from engines.alphamelts.petthermo import _PetThermoToolsExternalCallFailure
+from engines.alphamelts.petthermo import (
+    _PetThermoToolsExternalCallFailure,
+    _PetThermoToolsUnavailable,
+)
 from engines.domain_reason import OutOfDomainReason, reason_value
 from engines.engine_commissioning import (
     assess_engine_commissioning,
@@ -708,7 +711,9 @@ def _run_petthermotools_worker(
                     lambda: getattr(meltsdynamic, 'MELTSdynamic', None)
                 )
             if loader is None:
-                raise ImportError('MELTSdynamic loader not found')
+                raise _PetThermoToolsUnavailable(
+                    'MELTSdynamic loader not found'
+                )
             call_kwargs['melts'] = _petthermotools_external_call(
                 lambda: loader(model_code)
             )
@@ -2706,12 +2711,14 @@ class _MELTSBackendSupport(MeltBackend):
 
     def _require_petthermotools_runtime(self):
         if not self._pet_payload_preloaded or self._pet_melts is None:
-            raise ImportError(
+            raise _PetThermoToolsUnavailable(
                 'PetThermoTools runtime not preloaded; call initialize() '
                 'so meltsdynamic loads outside the request hot path'
             )
         if self._pet_module is None:
-            raise ImportError('PetThermoTools module not initialized')
+            raise _PetThermoToolsUnavailable(
+                'PetThermoTools module not initialized'
+            )
         return self._pet_module
 
     def _run_petthermotools_isolated(
@@ -2747,8 +2754,8 @@ class _MELTSBackendSupport(MeltBackend):
                 f'{timeout_s:g}s',
             ) from exc
         except EngineWorkerRemoteError as exc:
-            if exc.exc_name == 'ImportError':
-                raise ImportError(
+            if exc.exc_name in {'ImportError', '_PetThermoToolsUnavailable'}:
+                raise _PetThermoToolsUnavailable(
                     f'PetThermoTools {operation} failed: {exc.detail}\n'
                     f'{exc.remote_traceback}'
                 ) from exc
@@ -2824,8 +2831,8 @@ class _MELTSBackendSupport(MeltBackend):
         if message[0] == 'ok':
             return message[1]
         _tag, exc_name, detail, child_traceback = message
-        if exc_name == 'ImportError':
-            raise ImportError(
+        if exc_name in {'ImportError', '_PetThermoToolsUnavailable'}:
+            raise _PetThermoToolsUnavailable(
                 f'PetThermoTools {operation} failed: {detail}\n'
                 f'{child_traceback}'
             )
@@ -2968,6 +2975,10 @@ class _MELTSBackendSupport(MeltBackend):
         pressure_bar: float,
         seed_T_C: float,
     ) -> tuple[Optional[float], tuple[str, ...]]:
+        from engines.alphamelts.thermoengine import (
+            DECLARED_THERMOENGINE_FAILURE_TYPES,
+        )
+
         try:
             ptt = self._require_petthermotools_runtime()
         except ImportError as exc:
@@ -3023,10 +3034,11 @@ class _MELTSBackendSupport(MeltBackend):
                 f'PetThermoTools findLiq unavailable '
                 f'({type(exc).__name__}): {exc}',
             )
-        except _PetThermoToolsExternalCallFailure as exc:
+        except DECLARED_THERMOENGINE_FAILURE_TYPES as exc:
+            origin = getattr(exc, 'exception_class', type(exc).__name__)
+            detail = getattr(exc, 'message', str(exc))
             return None, (
-                f'PetThermoTools findLiq failed '
-                f'({exc.exception_class}): {exc.message}',
+                f'PetThermoTools findLiq failed ({origin}): {detail}',
             )
         return self._extract_temperature_C(raw), ()
 

@@ -621,3 +621,166 @@ def test_liquidus_finder_engine_residual_timeout_emits_budget_diagnostics(
         warning.startswith('liquidus finder failed:')
         for warning in result.warnings
     )
+
+
+def test_finder_projects_tagged_external_failure():
+    from engines.alphamelts.petthermo import _PetThermoToolsExternalCallFailure
+
+    failure = _PetThermoToolsExternalCallFailure(
+        'RuntimeError',
+        'review-real-engine-runtime',
+    )
+    result = find_liquidus_solidus_by_fraction(
+        lambda _temperature_C: (_ for _ in ()).throw(failure),
+        min_T_C=800.0,
+        max_T_C=900.0,
+        scan_step_C=100.0,
+    )
+    assert result.status == 'not_converged'
+    assert result.diagnostics['exception_class'] == (
+        '_PetThermoToolsExternalCallFailure'
+    )
+    assert 'review-real-engine-runtime' in (
+        result.diagnostics['exception_message']
+    )
+
+
+def test_ec_projects_tagged_external_failure_and_typed_absence():
+    from engines.alphamelts.petthermo import (
+        _PetThermoToolsExternalCallFailure,
+        _PetThermoToolsUnavailable,
+    )
+    from engines.alphamelts.thermoengine import ThermoEngineNotConvergedError
+    from simulator.engine_pool import EngineWorkerTimeout
+
+    tagged = _PetThermoToolsExternalCallFailure(
+        'RuntimeError',
+        'review-real-engine-runtime',
+    )
+    tagged_result = build_equilibrium_crystallization_path(
+        lambda _temperature_C: (_ for _ in ()).throw(tagged),
+        solidus_T_C=1000.0,
+        liquidus_T_C=1100.0,
+        grid_step_C=100.0,
+    )
+    assert tagged_result.status == 'not_converged'
+    assert tagged_result.diagnostics['exception_class'] == (
+        '_PetThermoToolsExternalCallFailure'
+    )
+    assert 'review-real-engine-runtime' in tagged_result.warnings[0]
+
+    absent = build_equilibrium_crystallization_path(
+        lambda _temperature_C: (_ for _ in ()).throw(
+            _PetThermoToolsUnavailable('MELTSdynamic loader not found')
+        ),
+        solidus_T_C=1000.0,
+        liquidus_T_C=1100.0,
+        grid_step_C=100.0,
+    )
+    assert absent.status == 'unavailable'
+    assert 'MELTSdynamic loader not found' in absent.warnings[0]
+
+    unsolved = build_equilibrium_crystallization_path(
+        lambda _temperature_C: (_ for _ in ()).throw(
+            ThermoEngineNotConvergedError(
+                'ThermoEngine equilibrium status: failed'
+            )
+        ),
+        solidus_T_C=1000.0,
+        liquidus_T_C=1100.0,
+        grid_step_C=100.0,
+    )
+    assert unsolved.status == 'not_converged'
+    assert 'equilibrium status: failed' in unsolved.warnings[0]
+
+    timed_out = build_equilibrium_crystallization_path(
+        lambda _temperature_C: (_ for _ in ()).throw(
+            EngineWorkerTimeout('worker', 1.0, phase='call')
+        ),
+        solidus_T_C=1000.0,
+        liquidus_T_C=1100.0,
+        grid_step_C=100.0,
+    )
+    assert timed_out.status == 'not_converged'
+
+
+def test_ec_projects_timeout_contract_and_propagates_engine_crash():
+    from simulator.melt_backend.alphamelts import (
+        ALPHAMELTS_REASON_SUBPROCESS_DIED,
+        ALPHAMELTS_REASON_TIMEOUT,
+        AlphaMELTSSubprocessContractError,
+        _alphamelts_backend_failure_error,
+    )
+
+    timeout = _alphamelts_backend_failure_error(
+        ALPHAMELTS_REASON_TIMEOUT,
+        'wall',
+    )
+    result = build_equilibrium_crystallization_path(
+        lambda _temperature_C: (_ for _ in ()).throw(timeout),
+        solidus_T_C=1000.0,
+        liquidus_T_C=1100.0,
+        grid_step_C=100.0,
+    )
+    assert result.status == 'not_converged'
+    assert 'timed out' in result.warnings[0]
+
+    crash = _alphamelts_backend_failure_error(
+        ALPHAMELTS_REASON_SUBPROCESS_DIED,
+        'worker exited',
+    )
+    with pytest.raises(AlphaMELTSSubprocessContractError) as captured:
+        build_equilibrium_crystallization_path(
+            lambda _temperature_C: (_ for _ in ()).throw(crash),
+            solidus_T_C=1000.0,
+            liquidus_T_C=1100.0,
+            grid_step_C=100.0,
+        )
+    assert captured.value.backend_failure_category == 'engine_crash'
+
+
+def test_finder_projects_timeout_contract_and_propagates_engine_crash():
+    from simulator.melt_backend.alphamelts import (
+        ALPHAMELTS_REASON_SUBPROCESS_DIED,
+        ALPHAMELTS_REASON_TIMEOUT,
+        AlphaMELTSSubprocessContractError,
+        _alphamelts_backend_failure_error,
+    )
+
+    timeout = _alphamelts_backend_failure_error(
+        ALPHAMELTS_REASON_TIMEOUT,
+        'wall',
+    )
+    result = find_liquidus_solidus_by_fraction(
+        lambda _temperature_C: (_ for _ in ()).throw(timeout),
+        min_T_C=800.0,
+        max_T_C=900.0,
+        scan_step_C=100.0,
+    )
+    assert result.status == 'not_converged'
+    assert 'timed out' in result.warnings[0]
+
+    crash = _alphamelts_backend_failure_error(
+        ALPHAMELTS_REASON_SUBPROCESS_DIED,
+        'worker exited',
+    )
+    with pytest.raises(AlphaMELTSSubprocessContractError) as captured:
+        find_liquidus_solidus_by_fraction(
+            lambda _temperature_C: (_ for _ in ()).throw(crash),
+            min_T_C=800.0,
+            max_T_C=900.0,
+            scan_step_C=100.0,
+        )
+    assert captured.value.backend_failure_category == 'engine_crash'
+
+
+def test_ec_propagates_untagged_runtime_error():
+    with pytest.raises(RuntimeError, match='review-local-runtime'):
+        build_equilibrium_crystallization_path(
+            lambda _temperature_C: (_ for _ in ()).throw(
+                RuntimeError('review-local-runtime')
+            ),
+            solidus_T_C=1000.0,
+            liquidus_T_C=1100.0,
+            grid_step_C=100.0,
+        )

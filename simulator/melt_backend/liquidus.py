@@ -491,6 +491,12 @@ def find_liquidus_solidus_by_fraction(
                 if projected is None:
                     raise
                 raise projected from exc
+            except MeltBackendError as exc:
+                _raise_budget_if_engine_exhausted(exc)
+                projected = liquidus_sample_error_from_exception(exc)
+                if projected is None:
+                    raise
+                raise projected from exc
             raw_fraction_by_temperature[temperature_C] = raw
         frac = _clamp_fraction(raw)
         point = _monotone_point(
@@ -759,6 +765,16 @@ def build_equilibrium_crystallization_path(
         )
     except DECLARED_THERMOENGINE_FAILURE_TYPES as exc:
         projected = _sample_error_for_declared_engine_failure(exc)
+        if projected is None:
+            raise
+        return _equilibrium_path_from_sample_error(
+            projected,
+            smoothing_warnings=smoothing_warnings,
+            path=path,
+            samples=samples,
+        )
+    except MeltBackendError as exc:
+        projected = liquidus_sample_error_from_exception(exc)
         if projected is None:
             raise
         return _equilibrium_path_from_sample_error(

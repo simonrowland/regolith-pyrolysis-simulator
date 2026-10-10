@@ -37,7 +37,10 @@ from simulator.engine_pool import (
     EngineWorkerTimeout,
     WarmEngineWorker,
 )
-from engines.alphamelts.petthermo import _PetThermoToolsExternalCallFailure
+from engines.alphamelts.petthermo import (
+    _PetThermoToolsExternalCallFailure,
+    _PetThermoToolsUnavailable,
+)
 from simulator.melt_backend.pure_phase import (
     GIBBS_CONVENTION_APPARENT_298,
     PurePhaseAccessError,
@@ -91,6 +94,18 @@ class ThermoEngineFO2OmittedError(ValueError):
 
     backend_failure_category = 'not_converged'
     backend_status_reason = 'thermoengine_fo2_omitted'
+    backend_failure_reason_code = backend_status_reason
+
+
+class ThermoEngineNotConvergedError(RuntimeError):
+    """Native ThermoEngine solve failed, returned nothing, or raised.
+
+    Row-local solver outcome. The parent transport handle stays. This
+    is not a programming error and not adapter absence.
+    """
+
+    backend_failure_category = 'not_converged'
+    backend_status_reason = 'not_converged'
     backend_failure_reason_code = backend_status_reason
 
 class ThermoEngineRefusalCause(str, Enum):
@@ -593,6 +608,8 @@ class ThermoEngineOutOfDomainError(ValueError):
 
 # One membership for typed ThermoEngine / worker failures. The freeze-gate
 # and the liquidus finder import this tuple; they do not restate it.
+# Declared ThermoEngine failures and the PetThermoTools origin tag /
+# absence type. Catch sites import this tuple; they do not restate it.
 DECLARED_THERMOENGINE_FAILURE_TYPES = (
     ThermoEngineOutOfDomainError,
     ThermoEngineIsolationError,
@@ -600,7 +617,10 @@ DECLARED_THERMOENGINE_FAILURE_TYPES = (
     ThermoEngineNonFiniteField,
     ThermoEngineFO2OmittedError,
     ThermoEngineTimeoutError,
+    ThermoEngineNotConvergedError,
     EngineWorkerTimeout,
+    _PetThermoToolsExternalCallFailure,
+    _PetThermoToolsUnavailable,
 )
 
 
@@ -642,6 +662,7 @@ def thermoengine_failure_disposition_from_exception(
             ThermoEngineFO2UndefinedError,
             ThermoEngineNonFiniteField,
             ThermoEngineFO2OmittedError,
+            ThermoEngineNotConvergedError,
         ),
     ):
         return ThermoEngineFailureDisposition(
@@ -678,6 +699,24 @@ def thermoengine_failure_disposition_from_exception(
             exception=exc,
         )
     raise exc
+
+
+def _thermoengine_native_call(call):
+    """Run one bound ThermoEngine/ENKI call.
+
+    Arguments are evaluated by the caller. Only the call itself is
+    typed: a library exception is row-local nonconvergence, and a
+    declared failure keeps its type.
+    """
+
+    try:
+        return call()
+    except DECLARED_THERMOENGINE_FAILURE_TYPES:
+        raise
+    except Exception as exc:
+        raise ThermoEngineNotConvergedError(
+            f'{type(exc).__name__}: {exc}'
+        ) from exc
 
 
 _FO2_ECHO_TOLERANCE = 1.0e-3
@@ -1249,6 +1288,7 @@ print('ok')
             'ThermoEngineNonFiniteField': ThermoEngineNonFiniteField,
             'ThermoEngineFO2UndefinedError': ThermoEngineFO2UndefinedError,
             'ThermoEngineFO2OmittedError': ThermoEngineFO2OmittedError,
+            'ThermoEngineNotConvergedError': ThermoEngineNotConvergedError,
         }.get(exc_name, RuntimeError)
         raise exception_type(
             f'ThermoEngine equilibrium failed: {detail}\n{child_traceback}'
@@ -1375,7 +1415,10 @@ print('ok')
     def _new_melts_model(self) -> Any:
         if self._equilibrate is None or self._operation_parent is None:
             raise ImportError('ThermoEngine operation is not initialized')
-        melts = self._equilibrate.MELTSmodel(version=self._melts_version)
+        version = self._melts_version
+        melts = _thermoengine_native_call(
+            lambda: self._equilibrate.MELTSmodel(version=version)
+        )
         phases = melts.melts.dictionaryOfPhasesInSystem
         isolated = 0
         for phase_wrapper in phases.values():
@@ -1450,7 +1493,11 @@ print('ok')
             raise ImportError('ThermoEngine transport not initialized')
 
         melts = self._new_melts_model()
-        oxide_names = tuple(str(name) for name in melts.get_oxide_names())
+        oxide_names = tuple(
+            str(name) for name in _thermoengine_native_call(
+                lambda: melts.get_oxide_names()
+            )
+        )
         bulk_wt = {
             oxide: float(comp_wt.get(oxide, 0.0) or 0.0)
             for oxide in oxide_names
@@ -1465,11 +1512,15 @@ print('ok')
         solved_fO2_reason: Optional[str] = None
         fO2_solve_count = 1
         if fO2_log is None:
-            melts.set_bulk_composition(bulk_wt)
-            runs = melts.equilibrate_tp(
-                float(temperature_C),
-                pressure_mpa,
-                initialize=True,
+            _thermoengine_native_call(
+                lambda: melts.set_bulk_composition(bulk_wt)
+            )
+            runs = _thermoengine_native_call(
+                lambda: melts.equilibrate_tp(
+                    float(temperature_C),
+                    pressure_mpa,
+                    initialize=True,
+                )
             )
             self._track_operation_root(melts, runs)
         else:
@@ -1496,7 +1547,11 @@ print('ok')
                 ),
             )
 
-        phases = tuple(str(phase) for phase in melts.get_list_of_phases_in_assemblage(root))
+        phases = tuple(
+            str(phase) for phase in _thermoengine_native_call(
+                lambda: melts.get_list_of_phases_in_assemblage(root)
+            )
+        )
         if fO2_log is None and self._select_liquid_phase(phases) is not None:
             try:
                 solved_fO2_log = self._echo_log_fO2(
@@ -1507,11 +1562,13 @@ print('ok')
                 )
             except ThermoEngineFO2UndefinedError:
                 solved_fO2_reason = 'undefined_zero_ferric_liquid'
-        phase_masses_kg = {
-            phase: float(melts.get_mass_of_phase(root, phase)) / 1000.0
-            for phase in phases
-            if float(melts.get_mass_of_phase(root, phase)) > 0.0
-        }
+        phase_masses_kg = {}
+        for phase in phases:
+            mass_g = float(_thermoengine_native_call(
+                lambda phase=phase: melts.get_mass_of_phase(root, phase)
+            ))
+            if mass_g > 0.0:
+                phase_masses_kg[phase] = mass_g / 1000.0
         total_mass_kg = sum(phase_masses_kg.values())
         liquid_phase = self._select_liquid_phase(phases)
         liquid_mass_kg = phase_masses_kg.get(liquid_phase or '', 0.0)
@@ -1521,7 +1578,11 @@ print('ok')
         )
         phase_compositions = {
             phase: self._strict_finite_mapping(
-                melts.get_composition_of_phase(root, phase, 'oxide_wt'),
+                _thermoengine_native_call(
+                    lambda phase=phase: melts.get_composition_of_phase(
+                        root, phase, 'oxide_wt'
+                    )
+                ),
                 context=f'ThermoEngine {phase} phase composition',
             )
             for phase in phases
@@ -1540,7 +1601,13 @@ print('ok')
         for phase in phases:
             values = {
                 name: self._strict_finite_float(
-                    melts.get_property_of_phase(root, phase, property_name),
+                    _thermoengine_native_call(
+                        lambda phase=phase, property_name=property_name: (
+                            melts.get_property_of_phase(
+                                root, phase, property_name
+                            )
+                        )
+                    ),
                     context=f'ThermoEngine {phase} {property_name}',
                 )
                 for name, property_name in property_names.items()
@@ -1566,8 +1633,10 @@ print('ok')
             source_basis = 'chemical_potential_J_mol'
             conversion: dict[str, Any] = {}
             if len(raw_mu) == 1 and phase in raw_mu:
-                formula_payload = melts.get_composition_of_phase(
-                    root, phase, 'component'
+                formula_payload = _thermoengine_native_call(
+                    lambda phase=phase: melts.get_composition_of_phase(
+                        root, phase, 'component'
+                    )
                 )
                 formula = str(dict(formula_payload or {}).get('formula') or '')
                 if not formula:
@@ -1599,7 +1668,9 @@ print('ok')
                 'components': components,
                 **conversion,
             }
-        raw_affinities = melts.get_dictionary_of_affinities(root, sort=False)
+        raw_affinities = _thermoengine_native_call(
+            lambda: melts.get_dictionary_of_affinities(root, sort=False)
+        )
         if not isinstance(raw_affinities, Mapping):
             raise ValueError(
                 'ThermoEngine phase affinities must be a mapping; '
@@ -1673,7 +1744,12 @@ print('ok')
         extra_warnings: tuple[str, ...] = ()
         if liquid_phase:
             liquid_comp = self._finite_mapping(
-                melts.get_composition_of_phase(root, liquid_phase, 'oxide_wt'))
+                _thermoengine_native_call(
+                    lambda: melts.get_composition_of_phase(
+                        root, liquid_phase, 'oxide_wt'
+                    )
+                )
+            )
             if not liquid_comp:
                 liquid_comp = dict(bulk_wt)
                 extra_warnings = (
@@ -1682,7 +1758,12 @@ print('ok')
                     'an empty payload; falling back to bulk composition.',
                 )
             liquid_components = self._finite_mapping(
-                melts.get_composition_of_phase(root, liquid_phase, 'component'))
+                _thermoengine_native_call(
+                    lambda: melts.get_composition_of_phase(
+                        root, liquid_phase, 'component'
+                    )
+                )
+            )
         else:
             # No liquid phase: leave composition + activities + Fe redox
             # empty.  Subsolidus / fully crystallized states surface as
@@ -1729,7 +1810,9 @@ print('ok')
             fe_redox_split=fe_redox_split,
             solved_fO2_log=solved_fO2_log,
             solved_fO2_reason=solved_fO2_reason,
-            phase_universe_size=len(melts.get_phase_names()),
+            phase_universe_size=len(_thermoengine_native_call(
+                lambda: melts.get_phase_names()
+            )),
             fO2_solve_count=fO2_solve_count,
             solver_status=status_text,
             solver_converged=True,
@@ -1757,8 +1840,12 @@ print('ok')
         contains allocator-history-dependent garbage. Keeping the wrappers in
         Python locals closes that lifetime hole without changing the solve.
         """
-        state = melts.melts.valueForKey_('equilibrateState')
-        phase_wrapper = state.phasesInSystem.get(phase_name)
+        state = _thermoengine_native_call(
+            lambda: melts.melts.valueForKey_('equilibrateState')
+        )
+        phase_wrapper = _thermoengine_native_call(
+            lambda: state.phasesInSystem.get(phase_name)
+        )
         if phase_wrapper is None:
             phase_wrapper = next(
                 (
@@ -1768,30 +1855,46 @@ print('ok')
                 None,
             )
         if phase_wrapper is None:
-            raise RuntimeError(
+            raise ThermoEngineNotConvergedError(
                 f'ThermoEngine native state lacks solution phase {phase_name!r}'
             )
         phase = phase_wrapper.phaseClassInstance
         elements_wrapper = phase_wrapper.bulkCompositionInElements
-        moles_wrapper = phase.convertElementsToMoles_(
-            elements_wrapper.pointerToDouble())
-        mu_wrapper = phase.getChemicalPotentialFromMolesOfComponents_andT_andP_(
-            moles_wrapper.pointerToDouble(), state.T, state.P)
-        mu = mu_wrapper.pointerToDouble()
-        components = {
-            str(phase.componentAtIndex_(index).phaseName):
-                self._strict_finite_float(
-                    mu[index],
-                    context=(
-                        f'ThermoEngine {phase_name} retained chemical potential'
-                    ),
-                )
-            for index in range(phase.numberOfSolutionComponents())
-        }
+        elements_pointer = _thermoengine_native_call(
+            lambda: elements_wrapper.pointerToDouble()
+        )
+        moles_wrapper = _thermoengine_native_call(
+            lambda: phase.convertElementsToMoles_(elements_pointer)
+        )
+        moles_pointer = _thermoengine_native_call(
+            lambda: moles_wrapper.pointerToDouble()
+        )
+        temperature = state.T
+        pressure = state.P
+        mu_wrapper = _thermoengine_native_call(
+            lambda: phase.getChemicalPotentialFromMolesOfComponents_andT_andP_(
+                moles_pointer, temperature, pressure,
+            )
+        )
+        mu = _thermoengine_native_call(lambda: mu_wrapper.pointerToDouble())
+        count = _thermoengine_native_call(
+            lambda: phase.numberOfSolutionComponents()
+        )
+        components = {}
+        for index in range(count):
+            component = _thermoengine_native_call(
+                lambda index=index: phase.componentAtIndex_(index)
+            )
+            components[str(component.phaseName)] = self._strict_finite_float(
+                mu[index],
+                context=(
+                    f'ThermoEngine {phase_name} retained chemical potential'
+                ),
+            )
         expected = set(expected_components)
         if not expected.issubset(components):
             missing = ', '.join(sorted(expected - set(components)))
-            raise RuntimeError(
+            raise ThermoEngineNotConvergedError(
                 f'ThermoEngine {phase_name} native chemical potentials lack: '
                 f'{missing}'
             )
@@ -1803,8 +1906,10 @@ print('ok')
         root: Any,
         phase: str,
     ) -> dict[str, float]:
-        raw_mu = melts.get_thermo_properties_of_phase_components(
-            root, phase, mode='mu'
+        raw_mu = _thermoengine_native_call(
+            lambda: melts.get_thermo_properties_of_phase_components(
+                root, phase, mode='mu'
+            )
         )
         if isinstance(raw_mu, Mapping) and raw_mu and phase not in raw_mu:
             raw_mu = self._retained_solution_chemical_potentials(
@@ -1877,19 +1982,27 @@ print('ok')
                 total_fe_moles * (1.0 - ferric_fraction) * _FE_O_MOLAR_MASS
             )
             model = self._new_melts_model()
-            model.set_bulk_composition(candidate)
-            result = model.equilibrate_tp(
-                temperature_C,
-                pressure_mpa,
-                initialize=True,
+            _thermoengine_native_call(
+                lambda: model.set_bulk_composition(candidate)
+            )
+            result = _thermoengine_native_call(
+                lambda: model.equilibrate_tp(
+                    temperature_C,
+                    pressure_mpa,
+                    initialize=True,
+                )
             )
             self._track_operation_root(model, result)
             solve_count += 1
             if not result:
-                raise RuntimeError('ThermoEngine returned no equilibration result')
+                raise ThermoEngineNotConvergedError(
+                    'ThermoEngine returned no equilibration result'
+                )
             status, _T_C, _P_MPa, root = result[0]
             if 'success' not in str(status).lower():
-                raise RuntimeError(f'ThermoEngine equilibrium status: {status}')
+                raise ThermoEngineNotConvergedError(
+                    f'ThermoEngine equilibrium status: {status}'
+                )
             solved = self._echo_log_fO2(
                 model,
                 root,
@@ -2076,7 +2189,9 @@ print('ok')
         if self._database is None or self._chem is None:
             raise ImportError('ThermoEngine redox model not initialized')
         phases = tuple(
-            str(name) for name in melts.get_list_of_phases_in_assemblage(root)
+            str(name) for name in _thermoengine_native_call(
+                lambda: melts.get_list_of_phases_in_assemblage(root)
+            )
         )
         liquid_phase = self._select_liquid_phase(phases)
         if liquid_phase is None:
@@ -2084,7 +2199,11 @@ print('ok')
                 ThermoEngineRefusalCause.FO2_ECHO_REQUIRES_LIQUID,
             )
         liquid = self._finite_mapping(
-            melts.get_composition_of_phase(root, liquid_phase, 'oxide_wt')
+            _thermoengine_native_call(
+                lambda: melts.get_composition_of_phase(
+                    root, liquid_phase, 'oxide_wt'
+                )
+            )
         )
         liquid_fe2o3 = float(liquid.get('Fe2O3', 0.0) or 0.0)
         if liquid_fe2o3 < -_FE2O3_ROUNDOFF_WT_TOLERANCE:
@@ -2112,13 +2231,16 @@ print('ok')
             for oxide in self._chem.OXIDE_ORDER
         ])
         mol = self._chem.wt_to_mol_oxide(wt)
-        solved = float(np.asarray(self._database.redox_state(
-            np.array([temperature_C + 273.15]),
-            np.array([pressure_bar]),
-            oxide_comp={'Liq': mol},
-            phase_of_interest='Liq',
-            method='Kress91',
-        )).reshape(-1)[0])
+        redox = _thermoengine_native_call(
+            lambda: self._database.redox_state(
+                np.array([temperature_C + 273.15]),
+                np.array([pressure_bar]),
+                oxide_comp={'Liq': mol},
+                phase_of_interest='Liq',
+                method='Kress91',
+            )
+        )
+        solved = float(np.asarray(redox).reshape(-1)[0])
         if not math.isfinite(solved):
             raise ThermoEngineOutOfDomainError(
                 ThermoEngineRefusalCause.FO2_ECHO_NONFINITE,
@@ -2154,7 +2276,9 @@ print('ok')
         T_K = float(temperature_C) + 273.15
         P_bar = max(float(pressure_bar), 1.0e-6)
         mu_values = np.asarray(
-            liq_phase.chem_potential(T_K, P_bar, mol=[mol]),
+            _thermoengine_native_call(
+                lambda: liq_phase.chem_potential(T_K, P_bar, mol=[mol])
+            ),
             dtype=float,
         ).reshape(-1)
         activities: dict[str, float] = {}
@@ -2164,7 +2288,11 @@ print('ok')
             pure = [0.0 for _ in endmember_names]
             pure[idx] = 1.0
             mu0_values = np.asarray(
-                liq_phase.gibbs_energy(T_K, P_bar, mol=[pure]),
+                _thermoengine_native_call(
+                    lambda pure=pure: liq_phase.gibbs_energy(
+                        T_K, P_bar, mol=[pure]
+                    )
+                ),
                 dtype=float,
             ).reshape(-1)
             if len(mu0_values) == 0:
@@ -2342,6 +2470,7 @@ __all__ = (
     'ThermoEngineFailureDisposition',
     'ThermoEngineIsolationError',
     'ThermoEngineNonFiniteField',
+    'ThermoEngineNotConvergedError',
     'ThermoEngineOutOfDomainError',
     'ThermoEnginePayload',
     'ThermoEngineRefusalCause',

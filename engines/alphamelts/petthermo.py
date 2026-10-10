@@ -31,6 +31,10 @@ class _PetThermoToolsExternalCallFailure(RuntimeError):
         super().__init__(f'{self.exception_class}: {self.message}')
 
 
+class _PetThermoToolsUnavailable(ImportError):
+    """PetThermoTools runtime or loader is absent."""
+
+
 def equilibrate_via_python_api(
     backend: Any,
     *,
