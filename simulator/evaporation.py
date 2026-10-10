@@ -2172,7 +2172,7 @@ class EvaporationMixin:
                             'detail': detail,
                         },
                     )
-                raise RuntimeError(
+                raise ProviderUnavailableError(
                     'freeze_gate.enabled requires a liquid_fraction(T) source; '
                     'no liquidus engine produced usable solidus/liquidus bounds. '
                     f'{detail}'

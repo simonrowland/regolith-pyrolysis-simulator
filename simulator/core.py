@@ -447,7 +447,10 @@ from simulator.state import (
 )
 from simulator.vapour_rail.batch import FluxActivationContext
 from simulator.equilibrium import EquilibriumMixin
-from simulator.evaporation import EvaporationMixin
+from simulator.evaporation import (
+    EvaporationFluxRefusal,
+    EvaporationMixin,
+)
 from simulator.extraction import ExtractionMixin
 from simulator.melt_backend.base import (
     InternalAnalyticalBackend,
@@ -574,15 +577,17 @@ def _liquidus_status_from_freeze_gate_exception(
 ) -> _MeltRedoxLiquidusStatus:
     """Classify a freeze-gate curve failure without grepping prose.
 
-    Typed ThermoEngine / liquidus-sample exceptions win. Freeze-gate
-    RuntimeError still concatenates ``status=<token>`` from upstream
-    IntentResult statuses; extract those tokens rather than treating
-    anything other than ``not_converged`` as engine-absence.
+    Typed provider and liquidus-sample statuses win. A provider-unavailable
+    signal may also carry the accumulated ``status=<token>`` trace from
+    upstream IntentResult statuses; preserve those tokens rather than
+    treating anything other than ``not_converged`` as engine-absence.
     ``not_converged`` is preserved when present: rewriting it to
     ``out_of_domain`` drops the non-convergence mark.
     """
     if isinstance(exc, ProviderUnavailableError):
-        return 'unavailable'
+        status = getattr(exc, 'status', None)
+        if status in BACKEND_STATUS_PRECEDENCE:
+            return status  # type: ignore[return-value]
 
     from simulator.melt_backend.liquidus import LiquidusSampleError
 
@@ -4715,48 +4720,39 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             }
             return None
         if curve is None:
+            from engines.alphamelts.thermoengine import (
+                ThermoEngineFO2OmittedError,
+                ThermoEngineFO2UndefinedError,
+                ThermoEngineIsolationError,
+                ThermoEngineNonFiniteField,
+                ThermoEngineOutOfDomainError,
+                ThermoEngineTimeoutError,
+            )
+            from simulator.engine_pool import EngineWorkerTimeout
+            from simulator.melt_backend.liquidus import LiquidusSampleError
+
+            liquidus_provider_failures = (
+                ProviderUnavailableError,
+                LiquidusSampleError,
+                ThermoEngineOutOfDomainError,
+                ThermoEngineIsolationError,
+                ThermoEngineFO2UndefinedError,
+                ThermoEngineNonFiniteField,
+                ThermoEngineFO2OmittedError,
+                ThermoEngineTimeoutError,
+                EngineWorkerTimeout,
+            )
             try:
                 curve = self._freeze_gate_curve()
-            except MeltCompositionError:
+            except EvaporationFluxRefusal:
                 raise
-            except IntentResultStatusError:
-                # An engine that answered with a status we do not recognise is
-                # NOT an unavailable engine, and must not be routed to the
-                # floor fallback below.
-                #
-                # The distinction is the whole point. The fallback's own
-                # comment (see _melt_redox_liquid_fraction_factor) argues that
-                # "an unavailable liquidus is a measurement failure, not
-                # evidence of solidification", and therefore declares the melt
-                # fully liquid above the Kress91 calibration floor. That
-                # reasoning holds for a KNOWN absence -- we asked, nobody
-                # answered, and asserting solid without data would be worse.
-                # It does not hold for an UNKNOWN answer: the engine did
-                # respond, we could not interpret what it said, and treating
-                # that as "no measurement" silently upgrades an engine-contract
-                # violation into an authoritative liquid_fraction = 1.0 that
-                # can commit an fe_redox_respeciation transition.
-                #
-                # Fail-closed category: an unrecognised status is a MISSING
-                # INPUT (we do not know what the engine meant), which refuses.
-                # Genuine absence and non-convergence are separate categories
-                # and keep their existing handling below.
-                #
-                # Without this branch the provider-side validation added for
-                # the MAGEMin status fail-open is cosmetic on this path: the
-                # DTO raises exactly as intended and the generic handler two
-                # lines down converts it straight back into a permissive
-                # default.
-                raise
-            except Exception as exc:  # noqa: BLE001 - optional liquidus engines
-                # composition_projected is out-of-domain physics, not a missing
-                # liquidus. Usable projected bounds, a later ladder bound, or
-                # the named Kress floor are chosen inside _freeze_gate_curve.
-                # This branch must not treat the projection's exception as
-                # that floor: doing so arms liquidus_unavailable_floor_fallback
-                # and drops the named source.
-                if 'composition_projected' in str(exc):
-                    raise
+            except liquidus_provider_failures as exc:
+                # These are the declared liquidus-provider failures:
+                # ProviderUnavailableError, LiquidusSampleError, the typed
+                # ThermoEngine failures, and EngineWorkerTimeout. They retain
+                # their classified floor fallback. EvaporationFluxRefusal is
+                # a composition-projected refusal; MeltCompositionError,
+                # IntentResultStatusError, and programming errors propagate.
                 reason = str(exc)
                 liquidus_status = _liquidus_status_from_freeze_gate_exception(
                     exc
