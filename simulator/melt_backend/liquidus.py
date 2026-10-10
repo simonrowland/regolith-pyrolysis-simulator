@@ -91,10 +91,49 @@ class LiquidusSampleError(RuntimeError):
         super().__init__('; '.join(self.warnings) or self.status)
 
 
+def _sample_error_with_exception_context(
+    exc: LiquidusSampleError,
+) -> LiquidusSampleError:
+    diagnostics = dict(exc.diagnostics)
+    diagnostics.setdefault('exception_class', type(exc).__name__)
+    diagnostics.setdefault('exception_message', str(exc))
+    return LiquidusSampleError(exc.status, exc.warnings, diagnostics)
+
+
+class _LiquidusNonMonotoneError(RuntimeError):
+    """Expected invalid engine curve, distinct from a finder implementation bug."""
+
+
+class _LiquidusCompositionInvalidError(RuntimeError):
+    """Expected malformed liquid-composition sample from the engine."""
+
+
+class _LiquidusFinderConfigurationError(RuntimeError):
+    """Invalid temperature grid configuration rejected by the solver."""
+
+
+class _LiquidusBisectionError(RuntimeError):
+    """Bisection reached its declared iteration bound without convergence."""
+
+
+def _sample_error_for_declared_engine_failure(
+    exc: BaseException,
+) -> LiquidusSampleError | None:
+    """Project one declared ThermoEngine failure. Other types return None."""
+
+    from engines.alphamelts.thermoengine import (
+        DECLARED_THERMOENGINE_FAILURE_TYPES,
+    )
+
+    if not isinstance(exc, DECLARED_THERMOENGINE_FAILURE_TYPES):
+        return None
+    return liquidus_sample_error_from_exception(exc)
+
+
 def liquidus_sample_error_from_exception(
     exc: BaseException,
 ) -> LiquidusSampleError | None:
-    """Project a backend failure without trusting exception attributes."""
+    """Project a declared backend failure. Unknown types propagate."""
 
     if isinstance(exc, LiquidusSampleError):
         return exc
@@ -108,6 +147,9 @@ def liquidus_sample_error_from_exception(
             or status
         )
     else:
+        # Deferred: importing the classifier module while this module is
+        # still initialising crashes. The owner is the classifier module,
+        # not the backend adapter that imports this module back.
         from engines.alphamelts.thermoengine import (
             thermoengine_failure_disposition_from_exception,
         )
@@ -120,6 +162,8 @@ def liquidus_sample_error_from_exception(
         'backend_status_reason': str(reason),
         'backend_failure_reason_code': str(reason),
         'backend_failure_category': status,
+        'exception_class': type(exc).__name__,
+        'exception_message': str(exc),
     }
     for field_name in ('requested', 'solved'):
         value = getattr(exc, field_name, None)
@@ -319,6 +363,10 @@ def find_liquidus_solidus_by_fraction(
     callable accepts it, so engine call timeouts can be clamped to the
     residual rather than only checking the budget between calls.
     """
+    from engines.alphamelts.thermoengine import (
+        DECLARED_THERMOENGINE_FAILURE_TYPES,
+    )
+
     try:
         min_T = _declared_float(min_T_C, 'min_T_C')
         max_T = _declared_float(max_T_C, 'max_T_C')
@@ -447,9 +495,21 @@ def find_liquidus_solidus_by_fraction(
                 )
             except _LiquidusFinderBudgetExceeded:
                 raise
-            except Exception as exc:  # noqa: BLE001 - engine-boundary sample guard
+            except LiquidusSampleError as exc:
                 _raise_budget_if_engine_exhausted(exc)
-                raise
+                raise _sample_error_with_exception_context(exc) from exc
+            except DECLARED_THERMOENGINE_FAILURE_TYPES as exc:
+                _raise_budget_if_engine_exhausted(exc)
+                projected = _sample_error_for_declared_engine_failure(exc)
+                if projected is None:
+                    raise
+                raise projected from exc
+            except MeltBackendError as exc:
+                _raise_budget_if_engine_exhausted(exc)
+                projected = liquidus_sample_error_from_exception(exc)
+                if projected is None:
+                    raise
+                raise projected from exc
             raw_fraction_by_temperature[temperature_C] = raw
         frac = _clamp_fraction(raw)
         point = _monotone_point(
@@ -535,29 +595,17 @@ def find_liquidus_solidus_by_fraction(
             iterations=iterations,
             diagnostics=exc.diagnostics,
         )
-    except Exception as exc:  # noqa: BLE001 - library-boundary finder guard
-        typed_failure = liquidus_sample_error_from_exception(exc)
-        if typed_failure is not None:
-            return LiquidusSolidusResult(
-                status=typed_failure.status,
-                warnings=tuple([
-                    *smoothing_warnings,
-                    *typed_failure.warnings,
-                ]),
-                samples=tuple(samples),
-                iterations=iterations,
-                diagnostics=typed_failure.diagnostics,
-            )
+    except (
+        LiquidFractionInvalidError,
+        _LiquidusNonMonotoneError,
+        _LiquidusBisectionError,
+    ) as exc:
         return LiquidusSolidusResult(
             status='not_converged',
-            warnings=tuple([
-                *smoothing_warnings,
-                f'liquidus finder failed: {exc}',
-            ]),
+            warnings=tuple([*smoothing_warnings, str(exc)]),
             samples=tuple(samples),
             iterations=iterations,
         )
-
     if liquidus.temperature_C < solidus.temperature_C:
         return LiquidusSolidusResult(
             status='not_converged',
@@ -579,6 +627,78 @@ def find_liquidus_solidus_by_fraction(
     )
 
 
+def _validated_ec_configuration(
+    *,
+    solidus_T_C: float,
+    liquidus_T_C: float,
+    grid_step_C: float,
+    max_points: int,
+    monotonicity_tolerance: float,
+    monotone_smoothing_max: float,
+) -> tuple[float, float, float, float, float]:
+    """Reject public EC settings before int() or math.ceil can raise."""
+
+    try:
+        solidus_T = _declared_float(solidus_T_C, 'solidus_T_C')
+        liquidus_T = _declared_float(liquidus_T_C, 'liquidus_T_C')
+        step = _declared_float(grid_step_C, 'grid_step_C')
+        tolerance = _declared_float(
+            monotonicity_tolerance,
+            'monotonicity_tolerance',
+        )
+        smoothing = _declared_float(
+            monotone_smoothing_max,
+            'monotone_smoothing_max',
+        )
+    except TypeError as exc:
+        raise _LiquidusFinderConfigurationError(str(exc)) from exc
+    if not is_declared_real_scalar(max_points, allow_numeric_str=True):
+        raise _LiquidusFinderConfigurationError(
+            'max_points must be numeric'
+        )
+    if not math.isfinite(float(max_points)):
+        raise _LiquidusFinderConfigurationError('max_points must be finite')
+    try:
+        int(max_points)
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise _LiquidusFinderConfigurationError(
+            'max_points must be numeric'
+        ) from exc
+    if not math.isfinite(solidus_T) or not math.isfinite(liquidus_T):
+        raise _LiquidusFinderConfigurationError(
+            'invalid EC temperature bound: must be finite'
+        )
+    if not math.isfinite(step):
+        raise _LiquidusFinderConfigurationError(
+            'invalid EC grid_step_C: must be finite'
+        )
+    return solidus_T, liquidus_T, step, tolerance, smoothing
+
+
+def _equilibrium_path_from_sample_error(
+    exc: LiquidusSampleError,
+    *,
+    smoothing_warnings: list[str],
+    path: list[LiquidFractionPathPoint],
+    samples: list[MeltFractionSample],
+) -> EquilibriumCrystallizationPathResult:
+    exc = _sample_error_with_exception_context(exc)
+    return EquilibriumCrystallizationPathResult(
+        status=exc.status,
+        warnings=tuple([
+            *smoothing_warnings,
+            *(
+                f'equilibrium crystallization path failed: {warning}'
+                for warning in exc.warnings
+            ),
+        ]),
+        liquid_fraction_path=tuple(path),
+        samples=tuple(samples),
+        iterations=len(samples),
+        diagnostics=exc.diagnostics,
+    )
+
+
 def build_equilibrium_crystallization_path(
     sample_liquid_state: Callable[[float], tuple[float, Mapping[str, float]]],
     *,
@@ -590,30 +710,47 @@ def build_equilibrium_crystallization_path(
     monotone_smoothing_max: float = 5.0e-1,
 ) -> EquilibriumCrystallizationPathResult:
     """Build a monotone liquid-fraction path over solidus -> liquidus."""
+    from engines.alphamelts.thermoengine import (
+        DECLARED_THERMOENGINE_FAILURE_TYPES,
+    )
+
     samples: list[MeltFractionSample] = []
     path: list[LiquidFractionPathPoint] = []
     smoothing_warnings: list[str] = []
     try:
-        solidus_T = _declared_float(solidus_T_C, 'solidus_T_C')
-        liquidus_T = _declared_float(liquidus_T_C, 'liquidus_T_C')
-        grid_step_C = _declared_float(grid_step_C, 'grid_step_C')
-        monotonicity_tolerance = _declared_float(
-            monotonicity_tolerance,
-            'monotonicity_tolerance',
-        )
-        monotone_smoothing_max = _declared_float(
-            monotone_smoothing_max,
-            'monotone_smoothing_max',
-        )
-        if not is_declared_real_scalar(max_points, allow_numeric_str=True):
-            raise TypeError('max_points must be numeric')
         for name, value in (
-            ('grid_step_C', grid_step_C),
+            ('solidus_T_C', solidus_T_C),
+            ('liquidus_T_C', liquidus_T_C),
+        ):
+            if (
+                is_declared_real_scalar(value, allow_numeric_str=True)
+                and not math.isfinite(float(value))
+            ):
+                raise _LiquidusFinderConfigurationError(
+                    f'{name} must be finite'
+                )
+        (
+            solidus_T,
+            liquidus_T,
+            grid_step_C,
+            monotonicity_tolerance,
+            monotone_smoothing_max,
+        ) = _validated_ec_configuration(
+            solidus_T_C=solidus_T_C,
+            liquidus_T_C=liquidus_T_C,
+            grid_step_C=grid_step_C,
+            max_points=max_points,
+            monotonicity_tolerance=monotonicity_tolerance,
+            monotone_smoothing_max=monotone_smoothing_max,
+        )
+        for name, value in (
             ('monotonicity_tolerance', monotonicity_tolerance),
             ('monotone_smoothing_max', monotone_smoothing_max),
         ):
             if not math.isfinite(value):
-                raise ValueError(f'{name} must be finite')
+                raise _LiquidusFinderConfigurationError(
+                    f'{name} must be finite'
+                )
         if not solidus_T <= liquidus_T:
             return EquilibriumCrystallizationPathResult(
                 status='refused',
@@ -626,7 +763,7 @@ def build_equilibrium_crystallization_path(
             grid_step_C=grid_step_C,
             max_points=max_points,
         )
-    except (TypeError, ValueError, RuntimeError) as exc:
+    except RuntimeError as exc:
         return EquilibriumCrystallizationPathResult(
             status='refused',
             warnings=(f'invalid EC input: {exc}',),
@@ -634,7 +771,9 @@ def build_equilibrium_crystallization_path(
         )
     try:
         for temperature_C in temperatures:
-            raw_fraction, raw_composition = sample_liquid_state(float(temperature_C))
+            raw_fraction, raw_composition = sample_liquid_state(
+                float(temperature_C)
+            )
             fraction_point = _monotone_point(
                 MeltFractionSample(
                     float(temperature_C),
@@ -655,23 +794,38 @@ def build_equilibrium_crystallization_path(
             )
     except LiquidFractionInvalidError:
         raise
-    except Exception as exc:  # noqa: BLE001 - engine sampler boundary
-        typed_failure = liquidus_sample_error_from_exception(exc)
-        if typed_failure is not None:
-            return EquilibriumCrystallizationPathResult(
-                status=typed_failure.status,
-                warnings=tuple([
-                    *smoothing_warnings,
-                    *(
-                        f'equilibrium crystallization path failed: {warning}'
-                        for warning in typed_failure.warnings
-                    ),
-                ]),
-                liquid_fraction_path=tuple(path),
-                samples=tuple(samples),
-                iterations=len(samples),
-                diagnostics=typed_failure.diagnostics,
-            )
+    except LiquidusSampleError as exc:
+        return _equilibrium_path_from_sample_error(
+            exc,
+            smoothing_warnings=smoothing_warnings,
+            path=path,
+            samples=samples,
+        )
+    except DECLARED_THERMOENGINE_FAILURE_TYPES as exc:
+        projected = _sample_error_for_declared_engine_failure(exc)
+        if projected is None:
+            raise
+        return _equilibrium_path_from_sample_error(
+            projected,
+            smoothing_warnings=smoothing_warnings,
+            path=path,
+            samples=samples,
+        )
+    except MeltBackendError as exc:
+        projected = liquidus_sample_error_from_exception(exc)
+        if projected is None:
+            raise
+        return _equilibrium_path_from_sample_error(
+            projected,
+            smoothing_warnings=smoothing_warnings,
+            path=path,
+            samples=samples,
+        )
+    except (
+        _LiquidusNonMonotoneError,
+        _LiquidusCompositionInvalidError,
+        _LiquidusFinderConfigurationError,
+    ) as exc:
         return EquilibriumCrystallizationPathResult(
             status='not_converged',
             warnings=tuple([
@@ -706,7 +860,9 @@ def _bisect_solidus(
     iterations = 0
     while high.temperature_C - low.temperature_C > tolerance_C:
         if iterations >= max_iterations:
-            raise RuntimeError('solidus bisection exceeded iteration bound')
+            raise _LiquidusBisectionError(
+                'solidus bisection exceeded iteration bound'
+            )
         mid = sample((low.temperature_C + high.temperature_C) / 2.0)
         if mid.frac_M <= threshold:
             low = mid
@@ -728,7 +884,9 @@ def _bisect_liquidus(
     iterations = 0
     while high.temperature_C - low.temperature_C > tolerance_C:
         if iterations >= max_iterations:
-            raise RuntimeError('liquidus bisection exceeded iteration bound')
+            raise _LiquidusBisectionError(
+                'liquidus bisection exceeded iteration bound'
+            )
         mid = sample((low.temperature_C + high.temperature_C) / 2.0)
         if mid.frac_M >= threshold:
             high = mid
@@ -752,13 +910,13 @@ def _monotone_point(
         low = max(lower, key=lambda p: p.temperature_C)
         drop = low.frac_M - frac
         if drop > smoothing_max:
-            raise RuntimeError(
+            raise _LiquidusNonMonotoneError(
                 'non-monotone frac_M(T): '
                 f'{point.temperature_C:.3f} C gives {frac:.6g} below '
                 f'{low.temperature_C:.3f} C value {low.frac_M:.6g}'
             )
         if drop > tolerance:
-            raise RuntimeError(
+            raise _LiquidusNonMonotoneError(
                 'non-monotone frac_M(T) would require smoothing: '
                 f'{point.temperature_C:.3f} C gives raw {frac:.6g} below '
                 f'{low.temperature_C:.3f} C value {low.frac_M:.6g}'
@@ -770,13 +928,13 @@ def _monotone_point(
         high = min(upper, key=lambda p: p.temperature_C)
         rise = frac - high.frac_M
         if rise > smoothing_max:
-            raise RuntimeError(
+            raise _LiquidusNonMonotoneError(
                 'non-monotone frac_M(T): '
                 f'{point.temperature_C:.3f} C gives {frac:.6g} above '
                 f'{high.temperature_C:.3f} C value {high.frac_M:.6g}'
             )
         if rise > tolerance:
-            raise RuntimeError(
+            raise _LiquidusNonMonotoneError(
                 'non-monotone frac_M(T) would require smoothing: '
                 f'{point.temperature_C:.3f} C gives raw {frac:.6g} above '
                 f'{high.temperature_C:.3f} C value {high.frac_M:.6g}'
@@ -804,7 +962,7 @@ def _bounded_scan_grid(
     span = float(max_T_C) - float(min_T_C)
     step = float(scan_step_C)
     if float(min_T_C) + step == float(min_T_C):
-        raise RuntimeError(
+        raise _LiquidusFinderConfigurationError(
             'invalid finder scan_step_C: step does not advance temperature'
         )
     interval_ratio = span / step
@@ -815,7 +973,7 @@ def _bounded_scan_grid(
     intervals = math.ceil(interval_ratio)
     point_count = intervals + 1
     if point_count > MAX_LIQUIDUS_SCAN_POINTS:
-        raise RuntimeError(
+        raise _LiquidusFinderConfigurationError(
             'invalid finder scan grid: '
             f'{point_count} points exceeds cap {MAX_LIQUIDUS_SCAN_POINTS}'
         )
@@ -833,20 +991,19 @@ def _temperature_grid(
     max_points: int,
 ) -> Tuple[float, ...]:
     step = _declared_float(grid_step_C, 'grid_step_C')
-    point_limit = _declared_float(max_points, 'max_points')
-    for name, value in (
-        ('solidus_T_C', solidus_T_C),
-        ('liquidus_T_C', liquidus_T_C),
-    ):
-        if not math.isfinite(float(value)):
-            raise ValueError(f'{name} must be finite')
-    if not math.isfinite(point_limit):
-        raise ValueError('max_points must be finite')
-    point_cap = int(point_limit)
+    if not is_declared_real_scalar(max_points, allow_numeric_str=True):
+        raise TypeError('max_points must be numeric')
+    if not math.isfinite(float(max_points)):
+        raise _LiquidusFinderConfigurationError('max_points must be finite')
+    point_cap = int(max_points)
     if not math.isfinite(step) or step <= 0.0:
-        raise RuntimeError('invalid EC grid_step_C: must be finite and positive')
+        raise _LiquidusFinderConfigurationError(
+            'invalid EC grid_step_C: must be finite and positive'
+        )
     if point_cap < 2:
-        raise RuntimeError('invalid EC max_points: must be at least 2')
+        raise _LiquidusFinderConfigurationError(
+            'invalid EC max_points: must be at least 2'
+        )
     span = float(liquidus_T_C) - float(solidus_T_C)
     if span == 0.0:
         return (float(solidus_T_C),)
@@ -910,11 +1067,11 @@ def _coerce_composition(composition: Mapping[str, float]) -> dict[str, float]:
     for species, value in dict(composition or {}).items():
         amount = _declared_float(value, f'liquid_composition_wt_pct.{species}')
         if not math.isfinite(amount):
-            raise RuntimeError(
+            raise _LiquidusCompositionInvalidError(
                 f'invalid liquid_composition_wt_pct value for {species}: {value!r}'
             )
         if amount < 0.0:
-            raise RuntimeError(
+            raise _LiquidusCompositionInvalidError(
                 'invalid liquid_composition_wt_pct negative value for '
                 f'{species}: {value!r}'
             )
@@ -989,35 +1146,27 @@ def _invoke_sample_fraction(
     and clamp their per-call timeout/cancellation to that residual. Simple
     ``lambda T: ...`` unit-test callables keep working unchanged.
     """
-    if remaining_budget_s is None:
-        return _declared_float(sample_fraction(float(temperature_C)), 'frac_M')
-    try:
-        parameters = inspect.signature(sample_fraction).parameters
-    except (TypeError, ValueError):
-        return _declared_float(sample_fraction(float(temperature_C)), 'frac_M')
-    if 'remaining_budget_s' in parameters:
-        return _declared_float(
-            sample_fraction(
-                float(temperature_C),
-                remaining_budget_s=float(remaining_budget_s),
-            ),
-            'frac_M',
-        )
-    positional = [
-        name
-        for name, param in parameters.items()
-        if param.kind
-        in (
-            inspect.Parameter.POSITIONAL_ONLY,
-            inspect.Parameter.POSITIONAL_OR_KEYWORD,
-        )
-    ]
-    if len(positional) >= 2:
-        return _declared_float(
-            sample_fraction(float(temperature_C), float(remaining_budget_s)),
-            'frac_M',
-        )
-    return _declared_float(sample_fraction(float(temperature_C)), 'frac_M')
+    args = (float(temperature_C),)
+    kwargs = {}
+    if remaining_budget_s is not None:
+        try:
+            parameters = inspect.signature(sample_fraction).parameters
+        except (TypeError, ValueError):
+            parameters = {}
+        if 'remaining_budget_s' in parameters:
+            kwargs['remaining_budget_s'] = float(remaining_budget_s)
+        else:
+            positional = [
+                param for param in parameters.values()
+                if param.kind in (
+                    inspect.Parameter.POSITIONAL_ONLY,
+                    inspect.Parameter.POSITIONAL_OR_KEYWORD,
+                )
+            ]
+            if len(positional) >= 2:
+                args = (*args, float(remaining_budget_s))
+    raw = sample_fraction(*args, **kwargs)
+    return _declared_float(raw, 'frac_M')
 
 
 def _declared_float(value: Any, name: str) -> float:

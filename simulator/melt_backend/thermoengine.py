@@ -12,6 +12,7 @@ from engines.alphamelts.thermoengine import (
     ThermoEngineFO2UndefinedError,
     ThermoEngineIsolationError,
     ThermoEngineNonFiniteField,
+    ThermoEngineNotConvergedError,
     ThermoEngineOutOfDomainError,
     ThermoEngineRefusalCause,
     ThermoEngineTimeoutCause,
@@ -551,6 +552,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
             ThermoEngineFO2UndefinedError,
             ThermoEngineFO2OmittedError,
             ThermoEngineOutOfDomainError,
+            ThermoEngineNotConvergedError,
         ):
             # TYPED keep-handle. Complete set:
             #   ThermoEngineTimeoutError      — smoke or warm-call wall
@@ -561,10 +563,12 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
             #                                   reason (failed assemblage
             #                                   or unexplained missing echo)
             #   ThermoEngineOutOfDomainError  — unattainable fO2 / echo
+            #   ThermoEngineNotConvergedError — row-local solve failure
             # NonFinite, FO2Undefined, FO2Omitted, and OutOfDomain are
             # ValueError subclasses: do not add `except ValueError` on
-            # this path. The child may already be dead; the parent
-            # transport handle stays.
+            # this path. NotConverged is a RuntimeError, not a ValueError.
+            # The child may already be dead; the parent transport handle
+            # stays. A bare RuntimeError still closes below.
             raise
         except ImportError as exc:
             # Genuine adapter death. Close is correct.

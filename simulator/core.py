@@ -573,26 +573,17 @@ class _MeltRedoxLiquidusFloorFallback:
 
 
 def _liquidus_engine_exceptions() -> tuple[type[BaseException], ...]:
-    """Return the engine failures eligible for liquidus floor fallback."""
-    from engines.alphamelts.thermoengine import (
-        ThermoEngineFO2OmittedError,
-        ThermoEngineFO2UndefinedError,
-        ThermoEngineIsolationError,
-        ThermoEngineNonFiniteField,
-        ThermoEngineOutOfDomainError,
-        ThermoEngineTimeoutError,
-    )
-    from simulator.engine_pool import EngineWorkerTimeout
+    """Return the engine failures eligible for liquidus floor fallback.
 
-    return (
-        ThermoEngineOutOfDomainError,
-        ThermoEngineIsolationError,
-        ThermoEngineFO2UndefinedError,
-        ThermoEngineNonFiniteField,
-        ThermoEngineFO2OmittedError,
-        ThermoEngineTimeoutError,
-        EngineWorkerTimeout,
+    Membership is the ThermoEngine owner's declared tuple. This helper
+    only exists so the freeze-gate catch can union it with the provider
+    errors; it does not restate the types.
+    """
+    from engines.alphamelts.thermoengine import (
+        DECLARED_THERMOENGINE_FAILURE_TYPES,
     )
+
+    return DECLARED_THERMOENGINE_FAILURE_TYPES
 
 
 def _liquidus_status_from_freeze_gate_exception(
@@ -621,10 +612,11 @@ def _liquidus_status_from_freeze_gate_exception(
         return 'unavailable'
 
     from engines.alphamelts.thermoengine import (
+        DECLARED_THERMOENGINE_FAILURE_TYPES,
         thermoengine_failure_disposition_from_exception,
     )
 
-    if isinstance(exc, _liquidus_engine_exceptions()):
+    if isinstance(exc, DECLARED_THERMOENGINE_FAILURE_TYPES):
         mapped = thermoengine_failure_disposition_from_exception(exc).status
         if mapped == 'out_of_domain':
             return 'out_of_domain'
