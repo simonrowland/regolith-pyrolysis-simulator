@@ -648,6 +648,53 @@ def test_warm_petthermotools_bootstrap_preserves_model_code(
     assert result['melts'] == {'code': expected_code}
 
 
+def test_petthermotools_warm_bootstrap_import_failure_is_typed(monkeypatch):
+    from simulator.engine_pool import EngineWorkerRemoteError
+
+    def fail_library_import(module_name):
+        if module_name in {'petthermotools', 'PetThermoTools'}:
+            raise ModuleNotFoundError('external dependency absent')
+        raise AssertionError(f'unexpected import: {module_name}')
+
+    monkeypatch.setattr(
+        alphamelts_module.importlib,
+        'import_module',
+        fail_library_import,
+    )
+
+    class BootstrapWorker:
+        def call(self, *_args, **_kwargs):
+            try:
+                _bootstrap_petthermotools_worker(1)
+            except Exception as exc:
+                raise EngineWorkerRemoteError(
+                    type(exc).__name__,
+                    str(exc),
+                    'bootstrap traceback',
+                ) from exc
+            raise AssertionError('bootstrap unexpectedly succeeded')
+
+    backend = AlphaMELTSBackend()
+    _select_python_api_for_test(backend)
+    backend._pet_worker = BootstrapWorker()
+    backend._require_petthermotools_runtime = lambda: types.SimpleNamespace(
+        findLiq_MELTS=lambda **_kwargs: None
+    )
+    backend._to_petthermotools_liq_comp = lambda comp: comp
+    backend._composition_for_liquidus_finder = (
+        lambda **_kwargs: {'SiO2': 100.0}
+    )
+
+    result = backend.find_liquidus_solidus(composition_kg={'SiO2': 100.0})
+
+    assert result.status == 'unavailable'
+    assert result.warnings[0] == (
+        'PetThermoTools findLiq failed '
+        '(ModuleNotFoundError): external dependency absent'
+    )
+    assert 'did not return a temperature' in result.warnings[1]
+
+
 @pytest.mark.parametrize(
     ('model_name', 'expected_code'),
     [
@@ -814,6 +861,30 @@ def test_alphamelts_python_liquidus_finder_uses_findliq_gate():
     assert result.liquidus_T_C == pytest.approx(1300.0, abs=1.0)
 
 
+def test_alphamelts_liquidus_propagates_local_result_processing_error():
+    class ParsedResult:
+        status = 'ok'
+        warnings = ()
+        diagnostics = {}
+
+        @property
+        def liquid_fraction(self):
+            raise KeyError('local result-field defect')
+
+    backend = AlphaMELTSBackend()
+    _select_python_api_for_test(backend)
+    backend._composition_for_liquidus_finder = (
+        lambda **_kwargs: {'SiO2': 100.0}
+    )
+    backend._find_petthermotools_liquidus_C = (
+        lambda *_args, **_kwargs: (1000.0, ())
+    )
+    backend.equilibrate = lambda *_args, **_kwargs: ParsedResult()
+
+    with pytest.raises(KeyError, match='local result-field defect'):
+        backend.find_liquidus_solidus(composition_kg={'SiO2': 100.0})
+
+
 def test_alphamelts_python_liquidus_finder_requires_findliq_call():
     """python_api must call findLiq. Skipping the call leaves this test red.
 
@@ -974,7 +1045,7 @@ def test_petthermotools_liquidus_failure_notice_keeps_exception_class(
     )
 
 
-def test_petthermotools_liquidus_propagates_worker_local_error():
+def test_petthermotools_liquidus_propagates_worker_resource_lookup_error():
     from simulator.engine_pool import EngineWorkerRemoteError
 
     backend = AlphaMELTSBackend()
@@ -985,20 +1056,59 @@ def test_petthermotools_liquidus_propagates_worker_local_error():
     backend._to_petthermotools_liq_comp = lambda comp: comp
 
     class FailedWorker:
-        def call(self, *_args, **_kwargs):
-            raise EngineWorkerRemoteError(
-                'KeyError',
-                'local worker request parsing defect',
-                'request[\'operation\'] raised KeyError',
-            )
+        def call(self, request, **_kwargs):
+            resource = {
+                'module': types.SimpleNamespace(
+                    findLiq_MELTS=lambda **_kwargs: None
+                ),
+                'model_code': 1,
+            }
+            try:
+                alphamelts_module._handle_petthermotools_request(
+                    resource,
+                    request,
+                    None,
+                )
+            except Exception as exc:
+                raise EngineWorkerRemoteError(
+                    type(exc).__name__,
+                    str(exc),
+                    'request resource lookup raised KeyError',
+                ) from exc
+            raise AssertionError('request unexpectedly succeeded')
 
     backend._pet_worker = FailedWorker()
     with pytest.raises(
         EngineWorkerRemoteError,
-        match='local worker request parsing defect',
+        match='loader',
     ):
         backend._find_petthermotools_liquidus_C(
             {'SiO2': 100.0}, pressure_bar=1.0, seed_T_C=1200.0
+        )
+
+
+@pytest.mark.parametrize('missing_key', ['loader', 'model_code', 'module'])
+def test_petthermotools_request_propagates_local_resource_lookup_error(
+    missing_key,
+):
+    resource = {
+        'module': types.SimpleNamespace(
+            findLiq_MELTS=lambda **_kwargs: None
+        ),
+        'loader': lambda _model_code: object(),
+        'model_code': 1,
+    }
+    del resource[missing_key]
+
+    with pytest.raises(KeyError, match=missing_key):
+        _handle_petthermotools_request(
+            resource,
+            {
+                'operation': 'findLiq_MELTS',
+                'args': (),
+                'kwargs': {},
+            },
+            None,
         )
 
 
