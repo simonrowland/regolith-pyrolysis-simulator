@@ -71,13 +71,15 @@ CODE_INPUTS = (
 #   d47e84bec: openimcc provenance moves from table paths and file hashes to the
 #     engine binding identity (b-690); emitted provenance only, and a regen on
 #     top of it produced no store diff on the landing gate.
-#   c0b364892: State/StateTag move from simulator/battery to
+#   6c3b40660: State/StateTag move from simulator/battery to
 #     simulator/state_types.py with re-exports (b-672); class bodies unchanged,
-#     and the recorded full regen receipt produced no store diff.
+#     and a full regen on the rebased tip produced no store diff (0 store paths
+#     changed; observations 122164, works 276, experiments 3576, queue 77761,
+#     hard issues 3631).
 STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "1b78b5697", "574800443", "149df2858",
     "9bb0a22ce", "1d254d51e", "b8be6d576",
-    "d47e84bec", "c0b364892",
+    "d47e84bec", "6c3b40660",
 })
 
 
