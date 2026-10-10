@@ -670,8 +670,9 @@ def test_g1_jacobson_keeps_category_and_quantity_reason(tmp_path):
         and "predicted_partial_pressure" in obs.identity.quantity.reason
         and obs.value.kind is ValueKind.UNAVAILABLE
         and obs.evidence.class_.is_value
-        and obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
-        and obs.evidence.model
+        and obs.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+        and obs.evidence.attribution
+        == "Jacobson et al. 2024, Table 1, calculated with FactSage (ref. 115, Bale et al. 2002)"
         and (obs.point_conditions or {}).get("temperature_K") is not None
         and obs.point_conditions["temperature_K"].state.value == Decimal("2500.0")
         and rail_for_quantity(

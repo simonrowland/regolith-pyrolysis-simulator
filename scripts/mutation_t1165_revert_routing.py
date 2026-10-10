@@ -8,6 +8,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from _mutation_pytest import is_expected_test_failure
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "simulator" / "battery" / "migrate.py"
@@ -51,8 +53,10 @@ def _run_mutation(original: bytes, mutated: bytes, label: str) -> None:
         SOURCE.write_bytes(original)
         os.utime(SOURCE, None)
     print(result.stdout, end="")
-    if result.returncode == 0:
-        raise SystemExit(f"{label} mutation survived: regression test unexpectedly passed")
+    if not is_expected_test_failure(result, TEST):
+        raise SystemExit(
+            f"{label} mutation did not produce only the expected target-test failure"
+        )
     print(f"expected red: {label} mutation fails the regression test")
 
 

@@ -120,7 +120,7 @@ def test_jacobson_table1_points_keep_printed_temperature_and_typed_reason(
         assert obs.evidence.class_.is_value
         assert obs.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
         assert obs.evidence.attribution == (
-            "Jacobson et al. 2024, Table 1, FactSage 11.5 SLAG database"
+            "Jacobson et al. 2024, Table 1, calculated with FactSage (ref. 115, Bale et al. 2002)"
         )
         assert rail_for_quantity(
             quantity_token(obs.identity),

@@ -8,6 +8,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from _mutation_pytest import is_expected_test_failure
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "data/literature/extracts/kems-139-jacobson-2024.yaml"
@@ -15,8 +17,8 @@ TEST = (
     "tests/battery/test_printed_point_conditions.py::"
     "test_jacobson_table1_points_keep_printed_temperature_and_typed_reason"
 )
-CURRENT = b"method_class: quoted_attributed\n        attribution: Jacobson et al. 2024, Table 1, FactSage 11.5 SLAG database"
-REVERTED = b"method_class: model_derived\n        attribution: Jacobson et al. 2024, Table 1, FactSage 11.5 SLAG database"
+CURRENT = b"method_class: quoted_attributed\n        attribution: Jacobson et al. 2024, Table 1, calculated with FactSage (ref. 115, Bale et al. 2002)"
+REVERTED = b"method_class: model_derived\n        attribution: Jacobson et al. 2024, Table 1, calculated with FactSage (ref. 115, Bale et al. 2002)"
 
 
 def main() -> int:
@@ -39,8 +41,10 @@ def main() -> int:
         SOURCE.write_bytes(original)
         os.utime(SOURCE, None)
     print(result.stdout, end="")
-    if result.returncode == 0:
-        raise SystemExit("model_derived mutation survived: regression test unexpectedly passed")
+    if not is_expected_test_failure(result, TEST):
+        raise SystemExit(
+            "model_derived mutation did not produce only the expected target-test failure"
+        )
     print("expected red: restoring model_derived fails the Jacobson regression")
     return 0
 
