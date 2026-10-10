@@ -2935,450 +2935,6 @@ species:
             published_page: 556
             pdf_page_index: 1
             paragraph: Ar flow 50-100 cc/min
-    - observation_id: ueshima_1983_femo_table1_phases
-      type: transition_point
-      locator:
-        table: '1'
-        published_page: 558
-        pdf_page_index: 3
-        note: Table 1. Phases in heat treated samples. IPTS-68. Parentheses = aimed composition
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - &id043
-          sample: SH 1
-          T_C: 1529.0
-          time_h: 10.0
-          at_pct_Mo: 38.2
-          aimed: false
-          optical: L + sigma
-          xray: sigma
-          epma: ''
-          T_K: 1802.15
-        - &id044
-          sample: SH 3
-          T_C: 1529.0
-          time_h: 0.5
-          at_pct_Mo: 39.2
-          aimed: false
-          optical: L + sigma
-          xray: sigma
-          epma: ''
-          T_K: 1802.15
-        - &id045
-          sample: SH 2
-          T_C: 1529.0
-          time_h: 10.0
-          at_pct_Mo: 47.5
-          aimed: false
-          optical: L + sigma
-          xray: ''
-          epma: L + sigma
-          T_K: 1802.15
-        - &id046
-          sample: SH 27
-          T_C: 1532.0
-          time_h: 2.0
-          at_pct_Mo: 45.0
-          aimed: true
-          optical: L + sigma
-          xray: ''
-          epma: ''
-          T_K: 1805.15
-        - &id047
-          sample: SH 28
-          T_C: 1532.0
-          time_h: 2.0
-          at_pct_Mo: 59.0
-          aimed: true
-          optical: sigma + (Mo)
-          xray: ''
-          epma: sigma + (Mo)
-          T_K: 1805.15
-        - &id048
-          sample: SH 29
-          T_C: 1552.0
-          time_h: 2.0
-          at_pct_Mo: 30.1
-          aimed: false
-          optical: L
-          xray: ''
-          epma: ''
-          T_K: 1825.15
-        - &id049
-          sample: SH 30
-          T_C: 1552.0
-          time_h: 2.0
-          at_pct_Mo: 34.0
-          aimed: false
-          optical: L
-          xray: ''
-          epma: ''
-          T_K: 1825.15
-        - &id050
-          sample: SH 31
-          T_C: 1552.0
-          time_h: 2.0
-          at_pct_Mo: 36.4
-          aimed: false
-          optical: L + sigma
-          xray: ''
-          epma: ''
-          T_K: 1825.15
-        - &id051
-          sample: SH 8
-          T_C: 1552.0
-          time_h: 4.0
-          at_pct_Mo: 38.8
-          aimed: false
-          optical: L + sigma
-          xray: ''
-          epma: ''
-          T_K: 1825.15
-        - &id052
-          sample: SH 10
-          T_C: 1552.0
-          time_h: 4.0
-          at_pct_Mo: 59.1
-          aimed: false
-          optical: sigma + (Mo)
-          xray: sigma, (Mo)
-          epma: ''
-          T_K: 1825.15
-        - &id053
-          sample: SH 11
-          T_C: 1552.0
-          time_h: 4.0
-          at_pct_Mo: 76.5
-          aimed: false
-          optical: sigma + (Mo)
-          xray: ''
-          epma: ''
-          T_K: 1825.15
-        - &id054
-          sample: SH 5
-          T_C: 1561.0
-          time_h: 0.5
-          at_pct_Mo: 39.2
-          aimed: false
-          optical: L + sigma
-          xray: ''
-          epma: ''
-          T_K: 1834.15
-        - &id055
-          sample: SH 6
-          T_C: 1561.0
-          time_h: 0.5
-          at_pct_Mo: 43.4
-          aimed: false
-          optical: L + sigma
-          xray: ''
-          epma: ''
-          T_K: 1834.15
-        - &id056
-          sample: SH 7
-          T_C: 1561.0
-          time_h: 0.5
-          at_pct_Mo: 50.8
-          aimed: false
-          optical: L + sigma
-          xray: ''
-          epma: ''
-          T_K: 1834.15
-        - &id057
-          sample: SH 12
-          T_C: 1585.0
-          time_h: 4.0
-          at_pct_Mo: 38.8
-          aimed: false
-          optical: L + sigma
-          xray: ''
-          epma: ''
-          T_K: 1858.15
-        - &id058
-          sample: SH 13
-          T_C: 1585.0
-          time_h: 4.0
-          at_pct_Mo: 44.3
-          aimed: false
-          optical: L + sigma
-          xray: ''
-          epma: ''
-          T_K: 1858.15
-        - &id059
-          sample: SH 14
-          T_C: 1585.0
-          time_h: 4.0
-          at_pct_Mo: 59.1
-          aimed: false
-          optical: sigma + (Mo)
-          xray: sigma, (Mo)
-          epma: ''
-          T_K: 1858.15
-        - &id060
-          sample: SH 15
-          T_C: 1585.0
-          time_h: 4.0
-          at_pct_Mo: 76.5
-          aimed: false
-          optical: sigma + (Mo)
-          xray: (Mo)
-          epma: ''
-          T_K: 1858.15
-        - &id061
-          sample: SH 16
-          T_C: 1587.0
-          time_h: 4.0
-          at_pct_Mo: 38.6
-          aimed: false
-          optical: L + sigma
-          xray: sigma, eps
-          epma: ''
-          T_K: 1860.15
-        - &id062
-          sample: SH 17
-          T_C: 1587.0
-          time_h: 4.0
-          at_pct_Mo: 44.1
-          aimed: false
-          optical: L + sigma
-          xray: sigma
-          epma: ''
-          T_K: 1860.15
-        - &id063
-          sample: SH 18
-          T_C: 1587.0
-          time_h: 4.0
-          at_pct_Mo: 87.8
-          aimed: false
-          optical: (Mo)
-          xray: ''
-          epma: ''
-          T_K: 1860.15
-        - &id064
-          sample: SH 19
-          T_C: 1597.0
-          time_h: 4.0
-          at_pct_Mo: 38.6
-          aimed: false
-          optical: L + sigma
-          xray: sigma, eps
-          epma: ''
-          T_K: 1870.15
-        - &id065
-          sample: SH 20
-          T_C: 1597.0
-          time_h: 4.0
-          at_pct_Mo: 44.1
-          aimed: false
-          optical: L + sigma
-          xray: sigma
-          epma: ''
-          T_K: 1870.15
-        - &id066
-          sample: SH 21
-          T_C: 1597.0
-          time_h: 4.0
-          at_pct_Mo: 87.8
-          aimed: false
-          optical: (Mo)
-          xray: (Mo)
-          epma: ''
-          T_K: 1870.15
-        - &id067
-          sample: SH 48
-          T_C: 1597.0
-          time_h: 2.0
-          at_pct_Mo: 55.4
-          aimed: false
-          optical: sigma + (Mo)
-          xray: ''
-          epma: ''
-          T_K: 1870.15
-        - &id068
-          sample: SH 49
-          T_C: 1597.0
-          time_h: 2.0
-          at_pct_Mo: 59.0
-          aimed: true
-          optical: sigma + (Mo)
-          xray: ''
-          epma: ''
-          T_K: 1870.15
-        - &id069
-          sample: SH 59
-          T_C: 1601.0
-          time_h: 1.0
-          at_pct_Mo: 45.0
-          aimed: true
-          optical: L + sigma
-          xray: ''
-          epma: ''
-          T_K: 1874.15
-        - &id070
-          sample: SH 57
-          T_C: 1602.0
-          time_h: 2.0
-          at_pct_Mo: 49.2
-          aimed: false
-          optical: L + sigma
-          xray: ''
-          epma: ''
-          T_K: 1875.15
-        - &id071
-          sample: SH 56
-          T_C: 1604.0
-          time_h: 2.0
-          at_pct_Mo: 45.0
-          aimed: true
-          optical: L + sigma
-          xray: ''
-          epma: ''
-          T_K: 1877.15
-        - &id072
-          sample: SH 51
-          T_C: 1604.0
-          time_h: 3.0
-          at_pct_Mo: 59.0
-          aimed: true
-          optical: sigma + (Mo)
-          xray: ''
-          epma: ''
-          T_K: 1877.15
-        - &id073
-          sample: SH 55
-          T_C: 1608.0
-          time_h: 2.0
-          at_pct_Mo: 45.0
-          aimed: true
-          optical: L + sigma
-          xray: ''
-          epma: L + sigma
-          T_K: 1881.15
-        - &id074
-          sample: SH 54
-          T_C: 1609.0
-          time_h: 2.5
-          at_pct_Mo: 50.0
-          aimed: true
-          optical: L + sigma
-          xray: ''
-          epma: L + sigma
-          T_K: 1882.15
-        - &id075
-          sample: SH 53
-          T_C: 1610.0
-          time_h: 4.0
-          at_pct_Mo: 59.0
-          aimed: true
-          optical: L + (Mo)
-          xray: ''
-          epma: L + (Mo)
-          T_K: 1883.15
-        - &id076
-          sample: SH 23
-          T_C: 1610.0
-          time_h: 2.0
-          at_pct_Mo: 76.5
-          aimed: false
-          optical: (Mo)
-          xray: ''
-          epma: ''
-          T_K: 1883.15
-        - &id077
-          sample: SH 60
-          T_C: 1611.0
-          time_h: 2.0
-          at_pct_Mo: 49.2
-          aimed: false
-          optical: L + (Mo)
-          xray: ''
-          epma: L + (Mo)
-          T_K: 1884.15
-        - &id078
-          sample: SH 52
-          T_C: 1614.0
-          time_h: 4.0
-          at_pct_Mo: 59.0
-          aimed: true
-          optical: L + (Mo)
-          xray: ''
-          epma: L + (Mo)
-          T_K: 1887.15
-        - &id079
-          sample: SH 37
-          T_C: 1618.0
-          time_h: 2.0
-          at_pct_Mo: 45.0
-          aimed: true
-          optical: L + (Mo)
-          xray: ''
-          epma: ''
-          T_K: 1891.15
-        - &id080
-          sample: SH 38
-          T_C: 1618.0
-          time_h: 2.0
-          at_pct_Mo: 59.0
-          aimed: true
-          optical: L + (Mo)
-          xray: ''
-          epma: ''
-          T_K: 1891.15
-        - &id081
-          sample: SH 24
-          T_C: 1622.0
-          time_h: 4.0
-          at_pct_Mo: 38.8
-          aimed: false
-          optical: L
-          xray: eps
-          epma: ''
-          T_K: 1895.15
-        - &id082
-          sample: SH 25
-          T_C: 1622.0
-          time_h: 4.0
-          at_pct_Mo: 59.1
-          aimed: false
-          optical: L + (Mo)
-          xray: (Mo)
-          epma: ''
-          T_K: 1895.15
-        - &id083
-          sample: SH 26
-          T_C: 1622.0
-          time_h: 0.5
-          at_pct_Mo: 76.5
-          aimed: false
-          optical: (Mo)
-          xray: ''
-          epma: ''
-          T_K: 1895.15
-        - sample: As melt
-          T_C_as_printed: As melt
-          at_pct_Mo: 38.8
-          aimed: false
-          optical: ''
-          xray: eps
-          epma: ''
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
     - observation_id: ueshima_1983_femo_table2_epma
       type: transition_point
       locator:
@@ -3783,1154 +3339,6 @@ species:
         note: 1610 C label matches Eq.(3) and quoted KEMS 1610 +/- 1 C; curves not digitised
       uncertainty:
         note: figure-only
-    - observation_id: ueshima_1983_femo_table1_phases::sh-1
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 1
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id043
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-1
-    - observation_id: ueshima_1983_femo_table1_phases::sh-3
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 3
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id044
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-3
-    - observation_id: ueshima_1983_femo_table1_phases::sh-2
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 2
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id045
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-2
-    - observation_id: ueshima_1983_femo_table1_phases::sh-27
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 27
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id046
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-27
-    - observation_id: ueshima_1983_femo_table1_phases::sh-28
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 28
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id047
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-28
-    - observation_id: ueshima_1983_femo_table1_phases::sh-29
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 29
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id048
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-29
-    - observation_id: ueshima_1983_femo_table1_phases::sh-30
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 30
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id049
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-30
-    - observation_id: ueshima_1983_femo_table1_phases::sh-31
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 31
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id050
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-31
-    - observation_id: ueshima_1983_femo_table1_phases::sh-8
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 8
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id051
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-8
-    - observation_id: ueshima_1983_femo_table1_phases::sh-10
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 10
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id052
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-10
-    - observation_id: ueshima_1983_femo_table1_phases::sh-11
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 11
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id053
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-11
-    - observation_id: ueshima_1983_femo_table1_phases::sh-5
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 5
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id054
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-5
-    - observation_id: ueshima_1983_femo_table1_phases::sh-6
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 6
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id055
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-6
-    - observation_id: ueshima_1983_femo_table1_phases::sh-7
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 7
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id056
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-7
-    - observation_id: ueshima_1983_femo_table1_phases::sh-12
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 12
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id057
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-12
-    - observation_id: ueshima_1983_femo_table1_phases::sh-13
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 13
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id058
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-13
-    - observation_id: ueshima_1983_femo_table1_phases::sh-14
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 14
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id059
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-14
-    - observation_id: ueshima_1983_femo_table1_phases::sh-15
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 15
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id060
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-15
-    - observation_id: ueshima_1983_femo_table1_phases::sh-16
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 16
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id061
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-16
-    - observation_id: ueshima_1983_femo_table1_phases::sh-17
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 17
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id062
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-17
-    - observation_id: ueshima_1983_femo_table1_phases::sh-18
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 18
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id063
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-18
-    - observation_id: ueshima_1983_femo_table1_phases::sh-19
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 19
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id064
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-19
-    - observation_id: ueshima_1983_femo_table1_phases::sh-20
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 20
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id065
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-20
-    - observation_id: ueshima_1983_femo_table1_phases::sh-21
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 21
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id066
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-21
-    - observation_id: ueshima_1983_femo_table1_phases::sh-48
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 48
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id067
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-48
-    - observation_id: ueshima_1983_femo_table1_phases::sh-49
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 49
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id068
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-49
-    - observation_id: ueshima_1983_femo_table1_phases::sh-59
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 59
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id069
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-59
-    - observation_id: ueshima_1983_femo_table1_phases::sh-57
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 57
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id070
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-57
-    - observation_id: ueshima_1983_femo_table1_phases::sh-56
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 56
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id071
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-56
-    - observation_id: ueshima_1983_femo_table1_phases::sh-51
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 51
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id072
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-51
-    - observation_id: ueshima_1983_femo_table1_phases::sh-55
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 55
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id073
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-55
-    - observation_id: ueshima_1983_femo_table1_phases::sh-54
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 54
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id074
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-54
-    - observation_id: ueshima_1983_femo_table1_phases::sh-53
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 53
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id075
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-53
-    - observation_id: ueshima_1983_femo_table1_phases::sh-23
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 23
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id076
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-23
-    - observation_id: ueshima_1983_femo_table1_phases::sh-60
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 60
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id077
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-60
-    - observation_id: ueshima_1983_femo_table1_phases::sh-52
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 52
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id078
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-52
-    - observation_id: ueshima_1983_femo_table1_phases::sh-37
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 37
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id079
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-37
-    - observation_id: ueshima_1983_femo_table1_phases::sh-38
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 38
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id080
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-38
-    - observation_id: ueshima_1983_femo_table1_phases::sh-24
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 24
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id081
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-24
-    - observation_id: ueshima_1983_femo_table1_phases::sh-25
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 25
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id082
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-25
-    - observation_id: ueshima_1983_femo_table1_phases::sh-26
-      type: transition_point
-      locator:
-        published_page: 558
-        table: '1'
-        record: SH 26
-      T_range_K:
-      - 1802.15
-      - 1895.15
-      phase: Fe-Mo_heat_treated
-      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
-      regime: annealing_quench_metallography
-      units: C, h, at% Mo as printed
-      values:
-        quantity: heat_treated_phase_identification
-        method_class: measured
-        not_kems: true
-        temperature_scale: IPTS-68
-        n_rows: 42
-        rows:
-        - *id083
-        sigma_decomposes_between_C:
-        - 1609.0
-        - 1610.0
-        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
-      uncertainty:
-        note: no numeric sigma on phase IDs; aimed compositions in parentheses
-      experiment: ueshima-1983-sh-26
     - observation_id: ueshima_1983_femo_table2_epma::sh-1
       type: transition_point
       locator:
@@ -5447,6 +3855,1599 @@ species:
         Mo_AAS_mean_of_3_sd_at_pct: 0.4
         note: EPMA vs calculated calibration differs by 2-5 at% Mo (Fig. 1); authors adopt the measured calibration
       experiment: ueshima-1983-sh-52
+    context:
+    - observation_id: ueshima_1983_femo_table1_phases
+      type: phase_observation
+      locator:
+        table: '1'
+        published_page: 558
+        pdf_page_index: 3
+        note: Table 1. Phases in heat treated samples. IPTS-68. Parentheses = aimed composition
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - &id043
+          sample: SH 1
+          T_C: 1529.0
+          time_h: 10.0
+          at_pct_Mo: 38.2
+          aimed: false
+          optical: L + sigma
+          xray: sigma
+          epma: ''
+          T_K: 1802.15
+        - &id044
+          sample: SH 3
+          T_C: 1529.0
+          time_h: 0.5
+          at_pct_Mo: 39.2
+          aimed: false
+          optical: L + sigma
+          xray: sigma
+          epma: ''
+          T_K: 1802.15
+        - &id045
+          sample: SH 2
+          T_C: 1529.0
+          time_h: 10.0
+          at_pct_Mo: 47.5
+          aimed: false
+          optical: L + sigma
+          xray: ''
+          epma: L + sigma
+          T_K: 1802.15
+        - &id046
+          sample: SH 27
+          T_C: 1532.0
+          time_h: 2.0
+          at_pct_Mo: 45.0
+          aimed: true
+          optical: L + sigma
+          xray: ''
+          epma: ''
+          T_K: 1805.15
+        - &id047
+          sample: SH 28
+          T_C: 1532.0
+          time_h: 2.0
+          at_pct_Mo: 59.0
+          aimed: true
+          optical: sigma + (Mo)
+          xray: ''
+          epma: sigma + (Mo)
+          T_K: 1805.15
+        - &id048
+          sample: SH 29
+          T_C: 1552.0
+          time_h: 2.0
+          at_pct_Mo: 30.1
+          aimed: false
+          optical: L
+          xray: ''
+          epma: ''
+          T_K: 1825.15
+        - &id049
+          sample: SH 30
+          T_C: 1552.0
+          time_h: 2.0
+          at_pct_Mo: 34.0
+          aimed: false
+          optical: L
+          xray: ''
+          epma: ''
+          T_K: 1825.15
+        - &id050
+          sample: SH 31
+          T_C: 1552.0
+          time_h: 2.0
+          at_pct_Mo: 36.4
+          aimed: false
+          optical: L + sigma
+          xray: ''
+          epma: ''
+          T_K: 1825.15
+        - &id051
+          sample: SH 8
+          T_C: 1552.0
+          time_h: 4.0
+          at_pct_Mo: 38.8
+          aimed: false
+          optical: L + sigma
+          xray: ''
+          epma: ''
+          T_K: 1825.15
+        - &id052
+          sample: SH 10
+          T_C: 1552.0
+          time_h: 4.0
+          at_pct_Mo: 59.1
+          aimed: false
+          optical: sigma + (Mo)
+          xray: sigma, (Mo)
+          epma: ''
+          T_K: 1825.15
+        - &id053
+          sample: SH 11
+          T_C: 1552.0
+          time_h: 4.0
+          at_pct_Mo: 76.5
+          aimed: false
+          optical: sigma + (Mo)
+          xray: ''
+          epma: ''
+          T_K: 1825.15
+        - &id054
+          sample: SH 5
+          T_C: 1561.0
+          time_h: 0.5
+          at_pct_Mo: 39.2
+          aimed: false
+          optical: L + sigma
+          xray: ''
+          epma: ''
+          T_K: 1834.15
+        - &id055
+          sample: SH 6
+          T_C: 1561.0
+          time_h: 0.5
+          at_pct_Mo: 43.4
+          aimed: false
+          optical: L + sigma
+          xray: ''
+          epma: ''
+          T_K: 1834.15
+        - &id056
+          sample: SH 7
+          T_C: 1561.0
+          time_h: 0.5
+          at_pct_Mo: 50.8
+          aimed: false
+          optical: L + sigma
+          xray: ''
+          epma: ''
+          T_K: 1834.15
+        - &id057
+          sample: SH 12
+          T_C: 1585.0
+          time_h: 4.0
+          at_pct_Mo: 38.8
+          aimed: false
+          optical: L + sigma
+          xray: ''
+          epma: ''
+          T_K: 1858.15
+        - &id058
+          sample: SH 13
+          T_C: 1585.0
+          time_h: 4.0
+          at_pct_Mo: 44.3
+          aimed: false
+          optical: L + sigma
+          xray: ''
+          epma: ''
+          T_K: 1858.15
+        - &id059
+          sample: SH 14
+          T_C: 1585.0
+          time_h: 4.0
+          at_pct_Mo: 59.1
+          aimed: false
+          optical: sigma + (Mo)
+          xray: sigma, (Mo)
+          epma: ''
+          T_K: 1858.15
+        - &id060
+          sample: SH 15
+          T_C: 1585.0
+          time_h: 4.0
+          at_pct_Mo: 76.5
+          aimed: false
+          optical: sigma + (Mo)
+          xray: (Mo)
+          epma: ''
+          T_K: 1858.15
+        - &id061
+          sample: SH 16
+          T_C: 1587.0
+          time_h: 4.0
+          at_pct_Mo: 38.6
+          aimed: false
+          optical: L + sigma
+          xray: sigma, eps
+          epma: ''
+          T_K: 1860.15
+        - &id062
+          sample: SH 17
+          T_C: 1587.0
+          time_h: 4.0
+          at_pct_Mo: 44.1
+          aimed: false
+          optical: L + sigma
+          xray: sigma
+          epma: ''
+          T_K: 1860.15
+        - &id063
+          sample: SH 18
+          T_C: 1587.0
+          time_h: 4.0
+          at_pct_Mo: 87.8
+          aimed: false
+          optical: (Mo)
+          xray: ''
+          epma: ''
+          T_K: 1860.15
+        - &id064
+          sample: SH 19
+          T_C: 1597.0
+          time_h: 4.0
+          at_pct_Mo: 38.6
+          aimed: false
+          optical: L + sigma
+          xray: sigma, eps
+          epma: ''
+          T_K: 1870.15
+        - &id065
+          sample: SH 20
+          T_C: 1597.0
+          time_h: 4.0
+          at_pct_Mo: 44.1
+          aimed: false
+          optical: L + sigma
+          xray: sigma
+          epma: ''
+          T_K: 1870.15
+        - &id066
+          sample: SH 21
+          T_C: 1597.0
+          time_h: 4.0
+          at_pct_Mo: 87.8
+          aimed: false
+          optical: (Mo)
+          xray: (Mo)
+          epma: ''
+          T_K: 1870.15
+        - &id067
+          sample: SH 48
+          T_C: 1597.0
+          time_h: 2.0
+          at_pct_Mo: 55.4
+          aimed: false
+          optical: sigma + (Mo)
+          xray: ''
+          epma: ''
+          T_K: 1870.15
+        - &id068
+          sample: SH 49
+          T_C: 1597.0
+          time_h: 2.0
+          at_pct_Mo: 59.0
+          aimed: true
+          optical: sigma + (Mo)
+          xray: ''
+          epma: ''
+          T_K: 1870.15
+        - &id069
+          sample: SH 59
+          T_C: 1601.0
+          time_h: 1.0
+          at_pct_Mo: 45.0
+          aimed: true
+          optical: L + sigma
+          xray: ''
+          epma: ''
+          T_K: 1874.15
+        - &id070
+          sample: SH 57
+          T_C: 1602.0
+          time_h: 2.0
+          at_pct_Mo: 49.2
+          aimed: false
+          optical: L + sigma
+          xray: ''
+          epma: ''
+          T_K: 1875.15
+        - &id071
+          sample: SH 56
+          T_C: 1604.0
+          time_h: 2.0
+          at_pct_Mo: 45.0
+          aimed: true
+          optical: L + sigma
+          xray: ''
+          epma: ''
+          T_K: 1877.15
+        - &id072
+          sample: SH 51
+          T_C: 1604.0
+          time_h: 3.0
+          at_pct_Mo: 59.0
+          aimed: true
+          optical: sigma + (Mo)
+          xray: ''
+          epma: ''
+          T_K: 1877.15
+        - &id073
+          sample: SH 55
+          T_C: 1608.0
+          time_h: 2.0
+          at_pct_Mo: 45.0
+          aimed: true
+          optical: L + sigma
+          xray: ''
+          epma: L + sigma
+          T_K: 1881.15
+        - &id074
+          sample: SH 54
+          T_C: 1609.0
+          time_h: 2.5
+          at_pct_Mo: 50.0
+          aimed: true
+          optical: L + sigma
+          xray: ''
+          epma: L + sigma
+          T_K: 1882.15
+        - &id075
+          sample: SH 53
+          T_C: 1610.0
+          time_h: 4.0
+          at_pct_Mo: 59.0
+          aimed: true
+          optical: L + (Mo)
+          xray: ''
+          epma: L + (Mo)
+          T_K: 1883.15
+        - &id076
+          sample: SH 23
+          T_C: 1610.0
+          time_h: 2.0
+          at_pct_Mo: 76.5
+          aimed: false
+          optical: (Mo)
+          xray: ''
+          epma: ''
+          T_K: 1883.15
+        - &id077
+          sample: SH 60
+          T_C: 1611.0
+          time_h: 2.0
+          at_pct_Mo: 49.2
+          aimed: false
+          optical: L + (Mo)
+          xray: ''
+          epma: L + (Mo)
+          T_K: 1884.15
+        - &id078
+          sample: SH 52
+          T_C: 1614.0
+          time_h: 4.0
+          at_pct_Mo: 59.0
+          aimed: true
+          optical: L + (Mo)
+          xray: ''
+          epma: L + (Mo)
+          T_K: 1887.15
+        - &id079
+          sample: SH 37
+          T_C: 1618.0
+          time_h: 2.0
+          at_pct_Mo: 45.0
+          aimed: true
+          optical: L + (Mo)
+          xray: ''
+          epma: ''
+          T_K: 1891.15
+        - &id080
+          sample: SH 38
+          T_C: 1618.0
+          time_h: 2.0
+          at_pct_Mo: 59.0
+          aimed: true
+          optical: L + (Mo)
+          xray: ''
+          epma: ''
+          T_K: 1891.15
+        - &id081
+          sample: SH 24
+          T_C: 1622.0
+          time_h: 4.0
+          at_pct_Mo: 38.8
+          aimed: false
+          optical: L
+          xray: eps
+          epma: ''
+          T_K: 1895.15
+        - &id082
+          sample: SH 25
+          T_C: 1622.0
+          time_h: 4.0
+          at_pct_Mo: 59.1
+          aimed: false
+          optical: L + (Mo)
+          xray: (Mo)
+          epma: ''
+          T_K: 1895.15
+        - &id083
+          sample: SH 26
+          T_C: 1622.0
+          time_h: 0.5
+          at_pct_Mo: 76.5
+          aimed: false
+          optical: (Mo)
+          xray: ''
+          epma: ''
+          T_K: 1895.15
+        - sample: As melt
+          T_C_as_printed: As melt
+          at_pct_Mo: 38.8
+          aimed: false
+          optical: ''
+          xray: eps
+          epma: ''
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+    - observation_id: ueshima_1983_femo_table1_phases::sh-1
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 1
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id043
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-1
+    - observation_id: ueshima_1983_femo_table1_phases::sh-3
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 3
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id044
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-3
+    - observation_id: ueshima_1983_femo_table1_phases::sh-2
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 2
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id045
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-2
+    - observation_id: ueshima_1983_femo_table1_phases::sh-27
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 27
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id046
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-27
+    - observation_id: ueshima_1983_femo_table1_phases::sh-28
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 28
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id047
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-28
+    - observation_id: ueshima_1983_femo_table1_phases::sh-29
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 29
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id048
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-29
+    - observation_id: ueshima_1983_femo_table1_phases::sh-30
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 30
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id049
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-30
+    - observation_id: ueshima_1983_femo_table1_phases::sh-31
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 31
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id050
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-31
+    - observation_id: ueshima_1983_femo_table1_phases::sh-8
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 8
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id051
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-8
+    - observation_id: ueshima_1983_femo_table1_phases::sh-10
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 10
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id052
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-10
+    - observation_id: ueshima_1983_femo_table1_phases::sh-11
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 11
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id053
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-11
+    - observation_id: ueshima_1983_femo_table1_phases::sh-5
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 5
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id054
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-5
+    - observation_id: ueshima_1983_femo_table1_phases::sh-6
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 6
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id055
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-6
+    - observation_id: ueshima_1983_femo_table1_phases::sh-7
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 7
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id056
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-7
+    - observation_id: ueshima_1983_femo_table1_phases::sh-12
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 12
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id057
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-12
+    - observation_id: ueshima_1983_femo_table1_phases::sh-13
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 13
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id058
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-13
+    - observation_id: ueshima_1983_femo_table1_phases::sh-14
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 14
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id059
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-14
+    - observation_id: ueshima_1983_femo_table1_phases::sh-15
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 15
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id060
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-15
+    - observation_id: ueshima_1983_femo_table1_phases::sh-16
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 16
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id061
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-16
+    - observation_id: ueshima_1983_femo_table1_phases::sh-17
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 17
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id062
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-17
+    - observation_id: ueshima_1983_femo_table1_phases::sh-18
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 18
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id063
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-18
+    - observation_id: ueshima_1983_femo_table1_phases::sh-19
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 19
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id064
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-19
+    - observation_id: ueshima_1983_femo_table1_phases::sh-20
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 20
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id065
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-20
+    - observation_id: ueshima_1983_femo_table1_phases::sh-21
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 21
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id066
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-21
+    - observation_id: ueshima_1983_femo_table1_phases::sh-48
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 48
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id067
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-48
+    - observation_id: ueshima_1983_femo_table1_phases::sh-49
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 49
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id068
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-49
+    - observation_id: ueshima_1983_femo_table1_phases::sh-59
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 59
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id069
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-59
+    - observation_id: ueshima_1983_femo_table1_phases::sh-57
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 57
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id070
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-57
+    - observation_id: ueshima_1983_femo_table1_phases::sh-56
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 56
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id071
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-56
+    - observation_id: ueshima_1983_femo_table1_phases::sh-51
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 51
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id072
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-51
+    - observation_id: ueshima_1983_femo_table1_phases::sh-55
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 55
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id073
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-55
+    - observation_id: ueshima_1983_femo_table1_phases::sh-54
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 54
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id074
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-54
+    - observation_id: ueshima_1983_femo_table1_phases::sh-53
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 53
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id075
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-53
+    - observation_id: ueshima_1983_femo_table1_phases::sh-23
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 23
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id076
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-23
+    - observation_id: ueshima_1983_femo_table1_phases::sh-60
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 60
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id077
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-60
+    - observation_id: ueshima_1983_femo_table1_phases::sh-52
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 52
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id078
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-52
+    - observation_id: ueshima_1983_femo_table1_phases::sh-37
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 37
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id079
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-37
+    - observation_id: ueshima_1983_femo_table1_phases::sh-38
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 38
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id080
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-38
+    - observation_id: ueshima_1983_femo_table1_phases::sh-24
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 24
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id081
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-24
+    - observation_id: ueshima_1983_femo_table1_phases::sh-25
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 25
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id082
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-25
+    - observation_id: ueshima_1983_femo_table1_phases::sh-26
+      type: phase_observation
+      locator:
+        published_page: 558
+        table: '1'
+        record: SH 26
+      T_range_K:
+      - 1802.15
+      - 1895.15
+      phase: Fe-Mo_heat_treated
+      standard_state: phases identified after anneal and water quench; at% Mo; T in C IPTS-68
+      regime: annealing_quench_metallography
+      units: C, h, at% Mo as printed
+      values:
+        quantity: heat_treated_phase_identification
+        method_class: measured
+        not_kems: true
+        temperature_scale: IPTS-68
+        n_rows: 42
+        rows:
+        - *id083
+        sigma_decomposes_between_C:
+        - 1609.0
+        - 1610.0
+        sigma_decomposes_note: Table 1 shows sigma present at 1609 C (SH 54 L+sigma) and absent at 1610 C (SH 53 L+(Mo))
+      uncertainty:
+        note: no numeric sigma on phase IDs; aimed compositions in parentheses
+      experiment: ueshima-1983-sh-26
 deepening:
   dispatch_id: extract-alloys-b4
   date: '2026-09-13'
