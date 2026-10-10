@@ -4279,6 +4279,33 @@ def predict_with_engine(
     # different species into the residual.
     compared = formula
     if static_equilibrium_pressure:
+        invalid_components = tuple(
+            getattr(cell, "invalid_gas_partial_pressure_components", ()) or ()
+        )
+        if invalid_components:
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(
+                    state=ExecutionState.PRODUCED,
+                    call_evidence=call_evidence,
+                ),
+                authority=Authority.REFUSED,
+                notices=notices,
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.METRIC_DOMAIN,
+                refusal_detail={
+                    "reason": "static_equilibrium_total_pressure_invalid",
+                    "reported": sorted(
+                        {*pressures, *invalid_components}
+                    ),
+                    "invalid_components": list(invalid_components),
+                },
+                identity=identity,
+                requested_composition=requested,
+                version=engine_version,
+            )
         if not pressures:
             return EnginePrediction(
                 engine=engine,

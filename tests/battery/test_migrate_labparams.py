@@ -69,6 +69,8 @@ def test_ntrs_static_capsule_rows_migrate_with_source_validity_flags() -> None:
     flags = method_record["values"]["validity_flags"]
     assert flags["temperature_uniformity"]["status"] == "intentional_gradient"
     assert flags["outgassing"]["status"] == "not_reported"
+    assert flags["outgassing"]["locator"]["published_page"] == 4
+    assert flags["outgassing"]["locator"]["pdf_page_index"] == 6
     assert flags["capsule_reaction"]["status"] == "not_reported"
     assert "tantalum" in flags["impurity_note"]["note"]
 

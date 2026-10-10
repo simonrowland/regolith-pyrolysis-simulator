@@ -1919,6 +1919,117 @@ def test_static_equilibrium_pressure_refuses_missing_reservoir_or_engine_total(
     assert abs(float(total.value) - 33991.26) <= 33991.26e-6
 
 
+@pytest.mark.parametrize("invalid_na2", (float("nan"), float("inf"), -1.0, None))
+def test_static_equilibrium_pressure_refuses_invalid_reported_component(
+    invalid_na2: float | None,
+) -> None:
+    from types import SimpleNamespace
+
+    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+
+    experiment = F.tabulation_experiment(
+        method=MethodToken.STATIC_EQUILIBRIUM, T_K=Decimal("1056")
+    )
+    reference = F.observation(
+        "static-invalid-component",
+        experiment.experiment_id,
+        replace(
+            F.psat_identity("Na", T_K=Decimal("1056")),
+            species=Species("Na", Phase.L),
+        ),
+        Decimal("33991.26"),
+        source_id="static-source",
+    )
+
+    class Backend:
+        reported_pressures = {"Na": 20000.0, "Na2": invalid_na2}
+
+        def equilibrate(self, **_kwargs):
+            return SimpleNamespace(
+                status="ok",
+                vapor_pressures_Pa=self.reported_pressures,
+                activity_coefficients={},
+                liquid_fraction=1.0,
+                diagnostics={},
+            )
+
+    handle = EngineHandle(
+        name=Engine.THERMOENGINE.value,
+        backend=Backend(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=False,
+        supports_intrinsic_fo2=True,
+    )
+    prediction = predict_with_engine(
+        Engine.THERMOENGINE,
+        reference,
+        experiment=experiment,
+        handles={Engine.THERMOENGINE.value: handle},
+        isolated=False,
+    )
+    if invalid_na2 is None:
+        # None is intentionally kept inside the backend's declared map.
+        assert handle.backend.reported_pressures["Na2"] is None
+
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.METRIC_DOMAIN
+    assert prediction.refusal_detail["reason"] == (
+        "static_equilibrium_total_pressure_invalid"
+    )
+    assert prediction.refusal_detail["reported"] == ["Na", "Na2"]
+
+
+def test_static_equilibrium_pressure_sums_valid_reported_components() -> None:
+    from types import SimpleNamespace
+
+    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+
+    experiment = F.tabulation_experiment(
+        method=MethodToken.STATIC_EQUILIBRIUM, T_K=Decimal("1056")
+    )
+    reference = F.observation(
+        "static-valid-total",
+        experiment.experiment_id,
+        replace(
+            F.psat_identity("Na", T_K=Decimal("1056")),
+            species=Species("Na", Phase.L),
+        ),
+        Decimal("33991.26"),
+        source_id="static-source",
+    )
+
+    class Backend:
+        def equilibrate(self, **_kwargs):
+            return SimpleNamespace(
+                status="ok",
+                vapor_pressures_Pa={"Na": 20000.0, "Na2": 13991.26166001457},
+                activity_coefficients={},
+                liquid_fraction=1.0,
+                diagnostics={},
+            )
+
+    handle = EngineHandle(
+        name=Engine.THERMOENGINE.value,
+        backend=Backend(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=False,
+        supports_intrinsic_fo2=True,
+    )
+    prediction = predict_with_engine(
+        Engine.THERMOENGINE,
+        reference,
+        experiment=experiment,
+        handles={Engine.THERMOENGINE.value: handle},
+        isolated=False,
+    )
+
+    assert prediction.value is not None
+    assert float(prediction.value) == pytest.approx(33991.26166001457)
+    assert prediction.unit == "Pa"
+
+
 def test_static_equilibrium_method_is_scoped_to_the_vapour_rail() -> None:
     experiment = F.tabulation_experiment(method=MethodToken.STATIC_EQUILIBRIUM)
     reference = F.observation(
