@@ -886,7 +886,9 @@ def _locator_from_plain(payload: object) -> Locator | None:
     return Locator(**kwargs)
 
 
-def _derivation_from_plain(payload: object) -> Derivation | None:
+def _derivation_from_plain(
+    payload: object, *, require_sequence_inputs: bool = False
+) -> Derivation | None:
     if not isinstance(payload, Mapping):
         return None
     params_raw = payload.get("parameters") or ()
@@ -894,9 +896,17 @@ def _derivation_from_plain(payload: object) -> Derivation | None:
     for item in params_raw:
         if isinstance(item, (list, tuple)) and len(item) == 2:
             parameters.append((str(item[0]), _located_from_plain(item[1], as_decimal)))
-    inputs = payload.get("inputs") or ()
-    if isinstance(inputs, str):
+    inputs = (
+        payload["inputs"]
+        if "inputs" in payload
+        else (() if "raw_inputs" in payload else None)
+    )
+    if isinstance(inputs, str) and not require_sequence_inputs:
         inputs = (inputs,)
+    if not isinstance(inputs, (list, tuple)) or any(
+        not isinstance(item, str) for item in inputs
+    ):
+        raise ValueError("Derivation.inputs must contain only strings")
     raw_marker = payload.get("pure_substance_reference")
     raw_inputs = payload.get("raw_inputs")
     return Derivation(
@@ -5555,22 +5565,26 @@ _CONDITIONAL_REDUCED_METHODS = frozenset({"calculated", "author_derived"})
 
 def source_derivation_from_source(
     obs: Mapping[str, Any], values: Mapping[str, Any]
-) -> Derivation | None:
+) -> tuple[Derivation | None, tuple[tuple[str, str], ...]]:
     """Read an author-supplied derivation without inventing one."""
 
+    derivation: Derivation | None = None
+    invalid: list[tuple[str, str]] = []
     for payload in (values, obs):
         raw = payload.get("derivation")
         if not isinstance(raw, Mapping):
             continue
-        if not raw.get("relation") or (
-            not raw.get("inputs") and "raw_inputs" not in raw
-        ):
-            continue
         try:
-            return _derivation_from_plain(raw)
-        except (TypeError, ValueError):
+            parsed = _derivation_from_plain(raw)
+        except ValueError as exc:
+            if not str(exc).startswith("Derivation.inputs"):
+                raise
+            field = "values.derivation" if payload is values else "derivation"
+            invalid.append((field, str(exc)))
             continue
-    return None
+        if derivation is None:
+            derivation = parsed
+    return derivation, tuple(invalid)
 
 
 def conditional_reduced_lineage_is_measured(
@@ -12354,7 +12368,17 @@ class Migrator:
                 detail=str(exc),
             ))
         derived_from = derived_parents or None
-        source_derivation = source_derivation_from_source(obs, values)
+        source_derivation, invalid_derivations = source_derivation_from_source(
+            obs, values
+        )
+        for field_path, detail in invalid_derivations:
+            self.result.registry_issues.append(
+                ValidationIssue(
+                    path=f"observations.{obs_id}.{field_path}",
+                    reason=RefusalReason.INVALID_SOURCE,
+                    detail=f"invalid derivation annotation: {detail}",
+                )
+            )
         if source_derivation is not None:
             derivation_parents, derivation_prose = lineage_parents_from_source(
                 {"derived_from": source_derivation.inputs},
@@ -12364,11 +12388,15 @@ class Migrator:
                 source_asset_ids,
             )
             derived_prose = tuple(dict.fromkeys((*derived_prose, *derivation_prose)))
-            source_derivation = (
-                replace(source_derivation, inputs=derivation_parents)
-                if derivation_parents or source_derivation.raw_inputs is not None
-                else None
-            )
+            if derivation_parents:
+                source_derivation = replace(
+                    source_derivation, inputs=derivation_parents
+                )
+            elif source_derivation.has_located_unprinted_raw_inputs:
+                source_derivation = replace(source_derivation, inputs=())
+            elif source_derivation.raw_inputs is None:
+                source_derivation = None
+            # Invalid declarations stay attached for validate_corpus to report.
             if not derived_prose:
                 if source_derivation is not None:
                     self._author_derivations[obs_id] = source_derivation
@@ -12406,9 +12434,12 @@ class Migrator:
             if not isinstance(payload.get("inference"), Mapping):
                 continue
             try:
-                extractor_derivation = _derivation_from_plain(payload["inference"])
+                inference_payload = payload["inference"]
+                extractor_derivation = _derivation_from_plain(
+                    inference_payload, require_sequence_inputs=True
+                )
             except ValueError as exc:
-                if str(exc) != "Derivation.inputs is required":
+                if not str(exc).startswith("Derivation.inputs"):
                     raise
                 field_path = "values.inference" if payload is values else "inference"
                 self.result.registry_issues.append(
