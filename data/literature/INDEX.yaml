@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 272
-  extracts: 270
+  sources: 279
+  extracts: 277
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 60
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 270
+  extracts_without_pdf: 277
   alias_groups_needing_resolution: 41
 gaps:
   pdfs_without_extract: []
@@ -59,6 +59,8 @@ gaps:
   - fray-schmitt-2009-nh3
   - giauque-powell-1939-cl2
   - giauque-ruehrwein-1939-hcn-psat
+  - gibbons-1963-thesis-cas-slags-cas
+  - gornerup-1996-cao-corner-liquidus
   - guo-2021-mgo-activity-cmas-slag
   - habermann-daane-1964
   - hashimoto-nakano-2021-bubbles-to-chondrites-ii
@@ -157,6 +159,7 @@ gaps:
   - kems-200-ueshima-1983
   - kems-201-ichise-1986
   - kems-ms2000-044
+  - kor-1967-thesis-sulphur-oxides-slags
   - kume-2000-cao-activities
   - lamoreaux-hildenbrand-1984
   - lamoreaux-hildenbrand-hildenbrand-1987
@@ -191,6 +194,7 @@ gaps:
   - murchison-hydropyrolysis-1990s-gca
   - nagabayashi-hino-banya-1989-phosphorus
   - nagahara-ozawa-1999-forsterite-surface-microstructures
+  - nagata-1989-emf-calcium-aluminates
   - nakamura-2022-science-ryugu-thermal
   - nakano-hashimoto-2020-bubbles-to-chondrites-i
   - nasa-cea-thermo
@@ -202,6 +206,7 @@ gaps:
   - ntrs-19650014783
   - ntrs-19730008085
   - ntrs-20250004626
+  - ohta-1996-cao-mgo-al2o3-activities
   - okazaki-2022-ryugu-gas-treasure-box
   - oneill-2002-feo-activity-coefficients-cmas
   - pahlevan-2026-protolunar-volatile-outflows
@@ -244,6 +249,7 @@ gaps:
   - safarian-engh-2013-si-pure-langmuir
   - schaefer-and-fegley-2007-icarus-outgassing-of-oc
   - schaefer-fegley-2011-vaporization-earth
+  - seki-2011-ca-o-solubility-fe-cao-al2o3
   - senior-1991-solar-heating-jbis
   - senior-1991-vacuum-pyrolysis
   - senior-1992-vacuum-pyrolysis
@@ -275,6 +281,7 @@ gaps:
   - takeda-1990-sn-slag-matertrans
   - thomas-2022-chlorine-bonding-silicate-melts
   - thomas-wood-2021-chlorine-silicate-melts
+  - tomioka-1991-nitride-capacity-cao-al2o3
   - ts1985
   - ueshima-1982-fe-mo-thermal
   - usgs-lunar-sourcebook-tab8-1
@@ -771,7 +778,7 @@ sources:
     extract:
       path: extracts/1997jonesthermo-jones-1997.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/1997jonesthermo-jones-1997.yaml
       present: false
@@ -829,7 +836,7 @@ sources:
     extract:
       path: extracts/2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019.yaml
       present: true
@@ -1003,7 +1010,7 @@ sources:
     extract:
       path: extracts/ammin-73-470-oneill-1988.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/ammin-73-470-oneill-1988.yaml
       present: false
@@ -1062,7 +1069,7 @@ sources:
     extract:
       path: extracts/ammin-75-781-hemingway-1990.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/ammin-75-781-hemingway-1990.yaml
       present: false
@@ -1121,7 +1128,7 @@ sources:
     extract:
       path: extracts/ammin-76-904-lange-1991.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/ammin-76-904-lange-1991.yaml
       present: false
@@ -1239,7 +1246,7 @@ sources:
     extract:
       path: extracts/arxiv-1902-05005.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/arxiv-1902-05005.yaml
       present: true
@@ -1587,7 +1594,7 @@ sources:
     extract:
       path: extracts/boulliung-2025-mercury-volatile-metals-magmatic.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/boulliung-2025-mercury-volatile-metals-magmatic.yaml
       present: true
@@ -1646,7 +1653,7 @@ sources:
     extract:
       path: extracts/boulliung-wood-2022-so2-solubility-silicate-melts.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/boulliung-wood-2022-so2-solubility-silicate-melts.yaml
       present: true
@@ -1705,7 +1712,7 @@ sources:
     extract:
       path: extracts/britt-2019-asteroid-simulants.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/britt-2019-asteroid-simulants.yaml
       present: true
@@ -1822,7 +1829,7 @@ sources:
     extract:
       path: extracts/busemann-2000-phase-q-noble-gases.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/busemann-2000-phase-q-noble-gases.yaml
       present: false
@@ -1881,7 +1888,7 @@ sources:
     extract:
       path: extracts/busemann-2024-noble-gases-ryugu-bennu.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/busemann-2024-noble-gases-ryugu-bennu.yaml
       present: true
@@ -1999,7 +2006,7 @@ sources:
     extract:
       path: extracts/charnoz-2023-hydrogen-magma-ocean.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/charnoz-2023-hydrogen-magma-ocean.yaml
       present: true
@@ -2057,7 +2064,7 @@ sources:
     extract:
       path: extracts/cooper-2007-sintering-lunar-simulant.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/cooper-2007-sintering-lunar-simulant.yaml
       present: true
@@ -2354,7 +2361,7 @@ sources:
     extract:
       path: extracts/deguzman-2026-simulant-physicochemical.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/deguzman-2026-simulant-physicochemical.yaml
       present: true
@@ -2413,7 +2420,7 @@ sources:
     extract:
       path: extracts/engelschion-2020-eac1a-simulant.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/engelschion-2020-eac1a-simulant.yaml
       present: true
@@ -2645,7 +2652,7 @@ sources:
     extract:
       path: extracts/fegley-2023-chemical-equilibrium-calculations-bu.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/fegley-2023-chemical-equilibrium-calculations-bu.yaml
       present: true
@@ -2705,7 +2712,7 @@ sources:
     extract:
       path: extracts/filiberto-lpsc2011-2064-volatiles.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/filiberto-lpsc2011-2064-volatiles.yaml
       present: true
@@ -3010,6 +3017,122 @@ sources:
       last_stage: extracted
       date: '2026-09-06'
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: gibbons-1963-thesis-cas-slags-cas
+  aliases: []
+  citation: T. B. Gibbons, A study of the thermodynamics of lime/alumina/silica slags containing calcium
+    sulphide, PhD thesis, University of Glasgow, January 1963.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/gibbons-1963-thesis-cas-slags-cas.yaml
+    review_status: draft
+    rows: 6
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/gibbons-1963-thesis-cas-slags-cas/gibbons-1963-thesis-cas-slags-cas.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/gibbons-1963-thesis-cas-slags-cas/sidecar.yaml
+      present: false
+    text:
+      path: text/gibbons-1963-thesis-cas-slags-cas
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/gibbons-1963-thesis-cas-slags-cas
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/gibbons-1963-thesis-cas-slags-cas.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/gibbons-1963-thesis-cas-slags-cas.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: gornerup-1996-cao-corner-liquidus
+  aliases: []
+  citation: M. Görnerup and O. Wijk, "Liquidus Relationships in the CaO-corner of the Ternary System CaO-Al2O3-SiO2",
+    ISIJ International, 36(12) (1996), 1465-1470.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: OA
+  extracts:
+  - path: data/literature/extracts/gornerup-1996-cao-corner-liquidus.yaml
+    review_status: draft
+    rows: 39
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/gornerup-1996-cao-corner-liquidus/gornerup-1996-cao-corner-liquidus.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/gornerup-1996-cao-corner-liquidus/sidecar.yaml
+      present: false
+    text:
+      path: text/gornerup-1996-cao-corner-liquidus
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/gornerup-1996-cao-corner-liquidus
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/gornerup-1996-cao-corner-liquidus.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/gornerup-1996-cao-corner-liquidus.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: guo-2021-mgo-activity-cmas-slag
   aliases: []
   citation: Guo, Y., Shen, F., Zheng, H., Wang, S., Jiang, X. and Gao, Q. (2021), "Activity of MgO in
@@ -3175,7 +3298,7 @@ sources:
     extract:
       path: extracts/hashimoto-nakano-2021-bubbles-to-chondrites-ii.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/hashimoto-nakano-2021-bubbles-to-chondrites-ii.yaml
       present: true
@@ -3412,7 +3535,7 @@ sources:
     extract:
       path: extracts/itoh-hino-banya-1997-mg-deoxidation.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/itoh-hino-banya-1997-mg-deoxidation.yaml
       present: true
@@ -3471,7 +3594,7 @@ sources:
     extract:
       path: extracts/itoh-hino-banya-1998-spinel.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/itoh-hino-banya-1998-spinel.yaml
       present: true
@@ -3824,7 +3947,7 @@ sources:
     extract:
       path: extracts/jgr-p-2024-mars-sam-clay-sulfate-ega.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/jgr-p-2024-mars-sam-clay-sulfate-ega.yaml
       present: true
@@ -3883,7 +4006,7 @@ sources:
     extract:
       path: extracts/jsc-a16-special-samples.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/jsc-a16-special-samples.yaml
       present: true
@@ -3941,7 +4064,7 @@ sources:
     extract:
       path: extracts/jsc-lunar-catalog-12023.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/jsc-lunar-catalog-12023.yaml
       present: true
@@ -4714,7 +4837,7 @@ sources:
   extracts:
   - path: data/literature/extracts/kems-016-stolyarova-1992.yaml
     review_status: draft
-    rows: 10
+    rows: 9
     locator_status: private_path
   battery_datasets: []
   hunt_ids: []
@@ -4741,7 +4864,7 @@ sources:
     extract:
       path: extracts/kems-016-stolyarova-1992.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-016-stolyarova-1992.yaml
       present: true
@@ -4932,7 +5055,7 @@ sources:
   extracts:
   - path: data/literature/extracts/kems-020-hastie-1981-nbsir.yaml
     review_status: draft
-    rows: 38
+    rows: 41
     locator_status: private_path
   battery_datasets: []
   hunt_ids: []
@@ -5044,7 +5167,7 @@ sources:
   extracts:
   - path: data/literature/extracts/kems-022-demaria-1971.yaml
     review_status: draft
-    rows: 31
+    rows: 32
     locator_status: private_path
   battery_datasets: []
   hunt_ids: []
@@ -5162,7 +5285,7 @@ sources:
   extracts:
   - path: data/literature/extracts/kems-024-gibson-hubbard-1972.yaml
     review_status: draft
-    rows: 108
+    rows: 102
     locator_status: private_path
   battery_datasets: []
   hunt_ids: []
@@ -5189,7 +5312,7 @@ sources:
     extract:
       path: extracts/kems-024-gibson-hubbard-1972.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-024-gibson-hubbard-1972.yaml
       present: true
@@ -5684,7 +5807,7 @@ sources:
   extracts:
   - path: data/literature/extracts/kems-035-sauerborn-2005.yaml
     review_status: draft
-    rows: 60
+    rows: 62
     locator_status: private_path
   battery_datasets: []
   hunt_ids: []
@@ -5711,7 +5834,7 @@ sources:
     extract:
       path: extracts/kems-035-sauerborn-2005.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-035-sauerborn-2005.yaml
       present: true
@@ -5948,7 +6071,7 @@ sources:
     extract:
       path: extracts/kems-039-wolf-2023-vaporock.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-039-wolf-2023-vaporock.yaml
       present: true
@@ -6062,7 +6185,7 @@ sources:
     extract:
       path: extracts/kems-041-sossi-fegley-2018.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-041-sossi-fegley-2018.yaml
       present: true
@@ -6300,7 +6423,7 @@ sources:
     extract:
       path: extracts/kems-046-van-limpt-2007.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-046-van-limpt-2007.yaml
       present: true
@@ -6417,7 +6540,7 @@ sources:
     extract:
       path: extracts/kems-048-turkdogan-2001-sio2-gamma.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-048-turkdogan-2001-sio2-gamma.yaml
       present: true
@@ -6475,7 +6598,7 @@ sources:
     extract:
       path: extracts/kems-049-kato-1993-ms-review.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-049-kato-1993-ms-review.yaml
       present: true
@@ -6624,7 +6747,7 @@ sources:
   extracts:
   - path: data/literature/extracts/kems-053-stolyarova-1991.yaml
     review_status: draft
-    rows: 17
+    rows: 18
   battery_datasets: []
   hunt_ids: []
   copies: []
@@ -7796,7 +7919,7 @@ sources:
     extract:
       path: extracts/kems-127-qi-1989.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-127-qi-1989.yaml
       present: true
@@ -8397,7 +8520,7 @@ sources:
     extract:
       path: extracts/kems-190-wu-1993.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-190-wu-1993.yaml
       present: true
@@ -8455,7 +8578,7 @@ sources:
     extract:
       path: extracts/kems-198-ichise-ueshima-1989.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-198-ichise-ueshima-1989.yaml
       present: true
@@ -8513,7 +8636,7 @@ sources:
     extract:
       path: extracts/kems-200-ueshima-1983.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-200-ueshima-1983.yaml
       present: true
@@ -8632,6 +8755,64 @@ sources:
       error: null
       last_stage: deepened
       date: '2026-09-06'
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: kor-1967-thesis-sulphur-oxides-slags
+  aliases: []
+  citation: G. J. W. Kor, "Sulphur in crystalline oxides and liquid slags", PhD thesis, University of
+    London (Imperial College), 1967.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kor-1967-thesis-sulphur-oxides-slags.yaml
+    review_status: draft
+    rows: 4
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kor-1967-thesis-sulphur-oxides-slags/kor-1967-thesis-sulphur-oxides-slags.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/kor-1967-thesis-sulphur-oxides-slags/sidecar.yaml
+      present: false
+    text:
+      path: text/kor-1967-thesis-sulphur-oxides-slags
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/kor-1967-thesis-sulphur-oxides-slags
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/kor-1967-thesis-sulphur-oxides-slags.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/kor-1967-thesis-sulphur-oxides-slags.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: kume-2000-cao-activities
   aliases: []
@@ -8865,7 +9046,7 @@ sources:
     extract:
       path: extracts/lebrun-2013-magma-ocean-atmosphere.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/lebrun-2013-magma-ocean-atmosphere.yaml
       present: true
@@ -9396,7 +9577,7 @@ sources:
     extract:
       path: extracts/llnl-2021-cai-aerodynamic-levitation.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/llnl-2021-cai-aerodynamic-levitation.yaml
       present: true
@@ -9453,7 +9634,7 @@ sources:
     extract:
       path: extracts/lpi-compendium-14240.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/lpi-compendium-14240.yaml
       present: true
@@ -9511,7 +9692,7 @@ sources:
     extract:
       path: extracts/lpi-compendium-15013.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/lpi-compendium-15013.yaml
       present: true
@@ -9568,7 +9749,7 @@ sources:
     extract:
       path: extracts/lpi-compendium-62231.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/lpi-compendium-62231.yaml
       present: true
@@ -9626,7 +9807,7 @@ sources:
     extract:
       path: extracts/lpi-compendium-65701.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/lpi-compendium-65701.yaml
       present: true
@@ -9685,7 +9866,7 @@ sources:
     extract:
       path: extracts/lpi-lunar-soils.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/lpi-lunar-soils.yaml
       present: true
@@ -9743,7 +9924,7 @@ sources:
     extract:
       path: extracts/lpi-lunar-sourcebook-chapter08.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/lpi-lunar-sourcebook-chapter08.yaml
       present: true
@@ -9860,7 +10041,7 @@ sources:
     extract:
       path: extracts/lpsc-2017-2171.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/lpsc-2017-2171.yaml
       present: true
@@ -9919,7 +10100,7 @@ sources:
     extract:
       path: extracts/lpsc-2019-2641.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/lpsc-2019-2641.yaml
       present: true
@@ -10159,7 +10340,7 @@ sources:
     extract:
       path: extracts/mendybaev-2021-cai-low-pressure-h2-evap.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/mendybaev-2021-cai-low-pressure-h2-evap.yaml
       present: true
@@ -10395,7 +10576,7 @@ sources:
     extract:
       path: extracts/mogul-2023-pioneer-venus-co2-icarus.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/mogul-2023-pioneer-venus-co2-icarus.yaml
       present: true
@@ -10456,7 +10637,7 @@ sources:
     extract:
       path: extracts/murchison-degassing-2023-springer.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/murchison-degassing-2023-springer.yaml
       present: true
@@ -10575,7 +10756,7 @@ sources:
     extract:
       path: extracts/nagabayashi-hino-banya-1989-phosphorus.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/nagabayashi-hino-banya-1989-phosphorus.yaml
       present: true
@@ -10633,13 +10814,71 @@ sources:
     extract:
       path: extracts/nagahara-ozawa-1999-forsterite-surface-microstructures.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/nagahara-ozawa-1999-forsterite-surface-microstructures.yaml
       present: true
       error: null
       last_stage: decoded
       date: '2026-09-06'
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: nagata-1989-emf-calcium-aluminates
+  aliases: []
+  citation: K. Nagata, J. Tanabe, K. S. Goto, "Standard Free Energies of Formation of CaO-Al2O3 Intermediate
+    Compounds by Means of EMF Measurement of Galvanic Cells", Tetsu-to-Hagane 75 (1989) No. 11, 2023–2030.
+  doi: 10.2355/tetsutohagane1955.75.11_2023
+  report_number: null
+  identifier: 10.2355/tetsutohagane1955.75.11_2023
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: OA
+  extracts:
+  - path: data/literature/extracts/nagata-1989-emf-calcium-aluminates.yaml
+    review_status: draft
+    rows: 1
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/nagata-1989-emf-calcium-aluminates/nagata-1989-emf-calcium-aluminates.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/nagata-1989-emf-calcium-aluminates/sidecar.yaml
+      present: false
+    text:
+      path: text/nagata-1989-emf-calcium-aluminates
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/nagata-1989-emf-calcium-aluminates
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/nagata-1989-emf-calcium-aluminates.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/nagata-1989-emf-calcium-aluminates.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: nakamura-2022-science-ryugu-thermal
   aliases: []
@@ -10691,7 +10930,7 @@ sources:
     extract:
       path: extracts/nakamura-2022-science-ryugu-thermal.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/nakamura-2022-science-ryugu-thermal.yaml
       present: true
@@ -10868,7 +11107,7 @@ sources:
     extract:
       path: extracts/nasa-tm-2024-simulant-guide.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/nasa-tm-2024-simulant-guide.yaml
       present: true
@@ -11156,7 +11395,7 @@ sources:
     extract:
       path: extracts/norris-2017-earth-volatiles-nature.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/norris-2017-earth-volatiles-nature.yaml
       present: true
@@ -11214,7 +11453,7 @@ sources:
     extract:
       path: extracts/ntrs-19650014783.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/ntrs-19650014783.yaml
       present: true
@@ -11346,6 +11585,64 @@ sources:
       last_stage: null
       date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: ohta-1996-cao-mgo-al2o3-activities
+  aliases: []
+  citation: H. Ohta and H. Suito, "Activities in CaO-MgO-Al2O3 Slags and Deoxidation Equilibria of Al,
+    Mg, and Ca", ISIJ International 36(8) (1996) 983–990.
+  doi: 10.2355/isijinternational.36.983
+  report_number: null
+  identifier: 10.2355/isijinternational.36.983
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/ohta-1996-cao-mgo-al2o3-activities.yaml
+    review_status: draft
+    rows: 11
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/ohta-1996-cao-mgo-al2o3-activities/ohta-1996-cao-mgo-al2o3-activities.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/ohta-1996-cao-mgo-al2o3-activities/sidecar.yaml
+      present: false
+    text:
+      path: text/ohta-1996-cao-mgo-al2o3-activities
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/ohta-1996-cao-mgo-al2o3-activities
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/ohta-1996-cao-mgo-al2o3-activities.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/ohta-1996-cao-mgo-al2o3-activities.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: okazaki-2022-ryugu-gas-treasure-box
   aliases: []
   citation: 'Okazaki, R., Miura, Y. N., Takano, Y., Sawada, H., Sakamoto, K., Yada, T., Yamada, K., Kawagucci,
@@ -11397,7 +11694,7 @@ sources:
     extract:
       path: extracts/okazaki-2022-ryugu-gas-treasure-box.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/okazaki-2022-ryugu-gas-treasure-box.yaml
       present: true
@@ -11515,7 +11812,7 @@ sources:
     extract:
       path: extracts/pahlevan-2026-protolunar-volatile-outflows.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/pahlevan-2026-protolunar-volatile-outflows.yaml
       present: true
@@ -13396,7 +13693,7 @@ sources:
     extract:
       path: extracts/reiss-2019-thermal-extraction-nulht2m.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/reiss-2019-thermal-extraction-nulht2m.yaml
       present: true
@@ -13626,7 +13923,7 @@ sources:
     extract:
       path: extracts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.yaml
       present: true
@@ -13742,7 +14039,7 @@ sources:
     extract:
       path: extracts/schaefer-and-fegley-2007-icarus-outgassing-of-oc.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/schaefer-and-fegley-2007-icarus-outgassing-of-oc.yaml
       present: true
@@ -13800,13 +14097,72 @@ sources:
     extract:
       path: extracts/schaefer-fegley-2011-vaporization-earth.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/schaefer-fegley-2011-vaporization-earth.yaml
       present: true
       error: null
       last_stage: decoded
       date: '2026-09-06'
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: seki-2011-ca-o-solubility-fe-cao-al2o3
+  aliases: []
+  citation: I. Seki, K. Nagata, T. Ashino, and J. Tanabe, Solubility of Calcium and Oxygen in Molten Iron
+    Equilibrated with Slag in CaO, Al2O3 or CaO-stabilized ZrO2 Crucible at 1873 K, ISIJ International
+    51(9) (2011) 1369–1374.
+  doi: 10.2355/isijinternational.51.1369
+  report_number: null
+  identifier: 10.2355/isijinternational.51.1369
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/seki-2011-ca-o-solubility-fe-cao-al2o3.yaml
+    review_status: draft
+    rows: 1
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/seki-2011-ca-o-solubility-fe-cao-al2o3/seki-2011-ca-o-solubility-fe-cao-al2o3.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/seki-2011-ca-o-solubility-fe-cao-al2o3/sidecar.yaml
+      present: false
+    text:
+      path: text/seki-2011-ca-o-solubility-fe-cao-al2o3
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/seki-2011-ca-o-solubility-fe-cao-al2o3
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/seki-2011-ca-o-solubility-fe-cao-al2o3.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/seki-2011-ca-o-solubility-fe-cao-al2o3.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: senior-1991-solar-heating-jbis
   aliases: []
@@ -14332,7 +14688,7 @@ sources:
     extract:
       path: extracts/slag-003-hino-kitagawa-banya-1993.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/slag-003-hino-kitagawa-banya-1993.yaml
       present: true
@@ -14677,7 +15033,7 @@ sources:
     extract:
       path: extracts/steurer-1985-vapor-phase-pyrolysis.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/steurer-1985-vapor-phase-pyrolysis.yaml
       present: true
@@ -14911,7 +15267,7 @@ sources:
     extract:
       path: extracts/street-2010-thermal-properties-simulants.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/street-2010-thermal-properties-simulants.yaml
       present: true
@@ -14970,7 +15326,7 @@ sources:
     extract:
       path: extracts/sublimation-kinetics-2023-minerals.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/sublimation-kinetics-2023-minerals.yaml
       present: true
@@ -15148,7 +15504,7 @@ sources:
     extract:
       path: extracts/ta-flemetakis-2024.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/ta-flemetakis-2024.yaml
       present: true
@@ -15440,7 +15796,7 @@ sources:
     extract:
       path: extracts/tachibana-tsuchiyama-1998-forsterite-dust-lpsc.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/tachibana-tsuchiyama-1998-forsterite-dust-lpsc.yaml
       present: true
@@ -15557,7 +15913,7 @@ sources:
     extract:
       path: extracts/thomas-2022-chlorine-bonding-silicate-melts.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/thomas-2022-chlorine-bonding-silicate-melts.yaml
       present: true
@@ -15622,6 +15978,64 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: tomioka-1991-nitride-capacity-cao-al2o3
+  aliases: []
+  citation: K. Tomioka and H. Suito, "Nitride Capacity of CaO-Al2O3 Melts", ISIJ International 31(11)
+    (1991) 1316–1321.
+  doi: 10.2355/isijinternational.31.1316
+  report_number: null
+  identifier: 10.2355/isijinternational.31.1316
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/tomioka-1991-nitride-capacity-cao-al2o3.yaml
+    review_status: draft
+    rows: 8
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/tomioka-1991-nitride-capacity-cao-al2o3/tomioka-1991-nitride-capacity-cao-al2o3.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/tomioka-1991-nitride-capacity-cao-al2o3/sidecar.yaml
+      present: false
+    text:
+      path: text/tomioka-1991-nitride-capacity-cao-al2o3
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/tomioka-1991-nitride-capacity-cao-al2o3
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/tomioka-1991-nitride-capacity-cao-al2o3.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/tomioka-1991-nitride-capacity-cao-al2o3.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: ts1985
   aliases: []
@@ -15908,7 +16322,7 @@ sources:
     extract:
       path: extracts/usgs-lunar-sourcebook-tab8-4.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/usgs-lunar-sourcebook-tab8-4.yaml
       present: true
@@ -15966,7 +16380,7 @@ sources:
     extract:
       path: extracts/van-kooten-2020-lunar-outgassing.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/van-kooten-2020-lunar-outgassing.yaml
       present: true
@@ -16083,7 +16497,7 @@ sources:
     extract:
       path: extracts/vanbuchem-2025-lavatmos2.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/vanbuchem-2025-lavatmos2.yaml
       present: true
@@ -16321,7 +16735,7 @@ sources:
     extract:
       path: extracts/wilkerson-2023-jsc1a-outgassing.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/wilkerson-2023-jsc1a-outgassing.yaml
       present: true
@@ -16489,7 +16903,7 @@ sources:
     extract:
       path: extracts/yam1983.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/yam1983.yaml
       present: true

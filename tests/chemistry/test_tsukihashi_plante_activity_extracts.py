@@ -154,7 +154,13 @@ def test_plante_superscript_a_rows_stay_pending() -> None:
         values = obs["values"]
         assert values["admission_status"] == "pending"
         assert values["two_phase_marker"] == "a"
-        assert "composition_wt_pct" not in values
+        # d-088 binds each row's printed K2O composition while it remains
+        # pending for its superscript-a two-phase marker.
+        comp = values["composition_wt_pct"]
+        printed_k2o = _wt(values["composition_K2O_wt_percent_as_published"])
+        assert _wt(comp["K2O"]) == printed_k2o
+        assert _wt(comp["SiO2"]) == Decimal("100") - printed_k2o
+        assert "SiO2" in values["composition_derivation"]
         assert "activity" not in values
         assert obs["quote"].split("|", 1)[0].strip().endswith("a")
         assert "superscript a" in obs["quote_normalization"]

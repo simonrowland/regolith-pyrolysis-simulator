@@ -52,6 +52,11 @@ from typing import Any, Iterable, Iterator, Mapping, Sequence, Union, get_args, 
 
 import yaml
 
+from simulator.battery.polymorph_dictionary import (
+    POLYMORPH_ALIASES,
+    is_generic_polymorph_name,
+    resolve_formula_polymorph,
+)
 from simulator.battery.enums import (
     AdmissionStatus,
     AmountBasis,
@@ -145,6 +150,13 @@ from simulator.battery.validate import (
     validate_corpus,
 )
 from simulator.physical_constants import STANDARD_ATMOSPHERE_PA
+from simulator.battery.phase_field import (
+    OUTSIDE_SINGLE_LIQUID_FIELD,
+    PhaseFieldRecords,
+    PointPhaseField,
+    classify_point,
+    phase_field_records,
+)
 
 # ---------------------------------------------------------------------------
 # Paths
@@ -638,6 +650,21 @@ def _as_dec_or_none(value: object) -> Decimal | None:
         return as_decimal(value)
     except (TypeError, ValueError, ArithmeticError):
         return None
+
+
+def parse_declared_amount(value: object) -> Decimal:
+    """Single owner for source-declared numeric amounts.
+
+    Soft optional fields keep ``_as_dec_or_none``. A declared amount that is
+    absent, boolean, or unparseable is a typed refusal — never a silent drop.
+    """
+
+    if value is None or value == "" or isinstance(value, bool):
+        raise ValueError(f"malformed declared amount: {value!r}")
+    try:
+        return as_decimal(value)
+    except (TypeError, ValueError, ArithmeticError) as exc:
+        raise ValueError(f"malformed declared amount: {value!r}") from exc
 
 
 def _provenance_from_extract(
@@ -2942,14 +2969,14 @@ def _kume_mole_amounts_from_mapping(
         return {}, ()
     amounts: dict[str, Decimal] = {}
     omitted: list[str] = []
-    for name, amount in raw.items():
-        token = str(name).strip()
-        equivalent = _kume_formula_unit_oxide(token)
-        if equivalent is None:
+    for token, amount in _composition_mol_items(raw):
+        printed = str(amount).strip().casefold() if isinstance(amount, str) else ""
+        if printed in {"tr.", "tr"} or printed.startswith(("<", ">", "≤", "≥")):
             omitted.append(token)
             continue
-        parsed = _as_dec_or_none(amount)
-        if parsed is None:
+        parsed = parse_declared_amount(amount)
+        equivalent = _kume_formula_unit_oxide(token)
+        if equivalent is None:
             omitted.append(token)
             continue
         oxide, factor = equivalent
@@ -2996,42 +3023,66 @@ def _oxide_map_from_mapping(obj: object) -> dict[str, Decimal] | None:
     return comps
 
 
+def _point_rows(values: object) -> list[Mapping[str, Any]]:
+    if not isinstance(values, Mapping):
+        return []
+    points = values.get("points")
+    if not isinstance(points, list):
+        points = values.get("tests")
+    if not isinstance(points, list):
+        return []
+    return [item for item in points if isinstance(item, Mapping)]
+
+
+def _printed_initial_charge_row_map(values: object) -> dict[str, Decimal] | None:
+    """Oxide map of the row the source prints as the series' starting charge.
+
+    Either flagged ``T_C_is_initial_composition: true`` or printed at
+    T_C = 0 with 0 mass loss (the unheated charge). This is the one nested
+    row that describes every row's starting material (b-718 "initial charge
+    only"); any other row map is that row's own state.
+    """
+
+    ranked = _point_rows(values)
+    for item in ranked:
+        if item.get("T_C_is_initial_composition") is True:
+            got = _oxide_map_from_mapping(item)
+            if got:
+                return got
+    for item in ranked:
+        t_c = _as_dec_or_none(item.get("T_C"))
+        loss_raw = (
+            item["mass_loss_pct"]
+            if "mass_loss_pct" in item
+            else item.get("mass_loss_wt_pct")
+        )
+        loss = _as_dec_or_none(loss_raw)
+        if t_c == 0 and loss == 0:
+            got = _oxide_map_from_mapping(item)
+            if got:
+                return got
+    return None
+
+
 def _initial_oxide_map_from_values(
     values: object,
 ) -> dict[str, Decimal] | None:
     if not isinstance(values, Mapping):
         return None
-    points = values.get("points")
-    if not isinstance(points, list):
-        points = values.get("tests")
-    if isinstance(points, list):
-        ranked: list[Mapping[str, Any]] = [
-            item for item in points if isinstance(item, Mapping)
-        ]
-        for item in ranked:
-            if item.get("T_C_is_initial_composition") is True:
-                got = _oxide_map_from_mapping(item)
-                if got:
-                    return got
-        for item in ranked:
-            t_c = _as_dec_or_none(item.get("T_C"))
-            loss = _as_dec_or_none(
-                item.get("mass_loss_pct") or item.get("mass_loss_wt_pct")
-            )
-            if t_c == 0 and loss == 0:
-                got = _oxide_map_from_mapping(item)
-                if got:
-                    return got
-        for item in ranked:
-            got = _oxide_map_from_mapping(item)
-            if got:
-                return got
+    ranked = _point_rows(values)
+    if ranked:
+        got = _printed_initial_charge_row_map(values)
+        if got:
+            return got
     got = _oxide_map_from_mapping(values)
     if got:
         return got
     raw_moles = values.get("composition_mole_fraction")
     if isinstance(raw_moles, Mapping):
-        formula_moles, omitted = _kume_mole_amounts_from_mapping(raw_moles)
+        try:
+            formula_moles, omitted = _kume_mole_amounts_from_mapping(raw_moles)
+        except ValueError:
+            return None
         if omitted or len(formula_moles) < 2:
             return None
         masses = {
@@ -3112,6 +3163,15 @@ _COMPOSITION_MOL_META_KEYS = frozenset(
 _DEFAULT_COMPOSITION_MOL_BASIS = "printed_mole_fraction"
 
 
+def _composition_mol_items(raw: object) -> Iterator[tuple[str, object]]:
+    if not isinstance(raw, Mapping):
+        return
+    for name, amount in raw.items():
+        token = str(name).strip()
+        if token not in _COMPOSITION_MOL_META_KEYS:
+            yield token, amount
+
+
 def _declared_composition_mol_basis(values: Mapping[str, object], raw: object) -> str | None:
     """Return an extract-declared Composition.basis for a composition_mol map.
 
@@ -3128,6 +3188,20 @@ def _declared_composition_mol_basis(values: Mapping[str, object], raw: object) -
     if isinstance(sibling, str) and sibling.strip():
         return sibling.strip()
     return None
+
+
+def _mole_fraction_composition_error(
+    exc: ValueError, values: Mapping[str, object]
+) -> tuple[str, str]:
+    detail = str(exc)
+    if not detail.startswith("malformed declared amount"):
+        raise exc
+    composition_key = (
+        "composition_mol"
+        if isinstance(values.get("composition_mol"), Mapping)
+        else "composition_mole_fraction"
+    )
+    return detail, composition_key
 
 
 def _mole_fraction_composition_from_values(
@@ -3164,13 +3238,9 @@ def _mole_fraction_composition_from_values(
                 return None, tuple(omitted)
             components = [(name, amount / total) for name, amount in mapped.items()]
         else:
-            for name, amount in raw.items():
-                token = str(name).strip()
-                if token in _COMPOSITION_MOL_META_KEYS:
-                    continue
-                parsed = _as_dec_or_none(amount)
-                if parsed is None:
-                    continue
+            for token, amount in _composition_mol_items(raw):
+                # Declared amounts have one owner; malformed → ValueError (hard issue).
+                parsed = parse_declared_amount(amount)
                 if parse_species_formula(token) is None:
                     omitted.append(token)
                     continue
@@ -3300,16 +3370,23 @@ def bulk_property_species_formula(
 
 
 def _located_printed_and_initial(
-    wt: Mapping[str, Decimal] | None,
+    wt: Mapping[str, Any] | None,
     locator: Locator | None,
 ) -> tuple[Located[Mapping[str, Any]] | None, Located[Composition] | None]:
-    if not wt or len(wt) < 2:
+    if not isinstance(wt, Mapping):
         return None, None
-    printed = located_value(_printed_map_payload(wt), locator)
+    oxide_map = {
+        str(key): as_decimal(value)
+        for key, value in wt.items()
+        if str(key) in _OXIDE_COMPONENT_KEYS and _as_dec_or_none(value) is not None
+    }
+    if len(oxide_map) < 2:
+        return None, None
+    printed = located_value(_printed_map_payload(oxide_map), locator)
     initial = Located(
-        State.of(wt_pct_to_mole_fraction(wt)),
+        State.of(wt_pct_to_mole_fraction(oxide_map)),
         locator=locator,
-        inference=wt_pct_to_mole_fraction_derivation(wt, locator),
+        inference=wt_pct_to_mole_fraction_derivation(oxide_map, locator),
     )
     return printed, initial
 
@@ -6073,7 +6150,65 @@ def reference_state_from_extract(
             "source standard_state does not name one reference endmember"
         )
     phase = _reference_phase_for_formula(text, lowered, formula, convention)
-    endmember = make_species(formula, phase)
+    polymorph = None
+    if phase is Phase.CR:
+        printed_names = sorted(
+            POLYMORPH_ALIASES,
+            key=len,
+            reverse=True,
+        )
+        name_pattern = re.compile(
+            r"(?<![A-Za-z0-9_])(?:"
+            + "|".join(re.escape(name) for name in printed_names)
+            + r")(?![A-Za-z0-9_])",
+            re.IGNORECASE,
+        )
+        named_polymorphs = set()
+        for match in name_pattern.finditer(text):
+            printed_name = match.group()
+            if is_generic_polymorph_name(printed_name):
+                # These qualifiers also occur as coefficients or table
+                # numerals; require a named phase context for them.
+                before = text[max(0, match.start() - 48) : match.start()]
+                after = text[match.end() : match.end() + 48]
+                formula_before = re.search(
+                    rf"\b{re.escape(formula)}\s*[- ]\s*$", before, re.I
+                )
+                formula_after = re.match(
+                    rf"\s*[- ]\s*\b{re.escape(formula)}\b", after, re.I
+                )
+                context = text[
+                    max(0, match.start() - 48) : match.end() + 48
+                ]
+                qualifier_formula_link = re.search(
+                    rf"\b{re.escape(printed_name)}\b"
+                    rf"(?:\s+(?:phase|polymorph))?(?:\s+of)?\s+"
+                    rf"\b{re.escape(formula)}\b",
+                    context,
+                    re.I,
+                ) or re.search(
+                    rf"\b{re.escape(formula)}\b"
+                    rf"\s+(?:phase|polymorph)\s+"
+                    rf"\b{re.escape(printed_name)}\b",
+                    context,
+                    re.I,
+                )
+                is_named_form = bool(
+                    formula_before
+                    or formula_after
+                    or qualifier_formula_link
+                )
+                if not is_named_form:
+                    continue
+            token = resolve_formula_polymorph(formula, printed_name)
+            if token is None or token is Polymorph.REFERENCE:
+                continue
+            named_polymorphs.add(token)
+        if len(named_polymorphs) > 1:
+            polymorph = State.unknown("source names more than one polymorph")
+        elif named_polymorphs:
+            polymorph = State.of(next(iter(named_polymorphs)))
+    endmember = make_species(formula, phase, polymorph)
     return State.of(
         StandardState(
             convention=convention,
@@ -9183,14 +9318,43 @@ def _merge_located_mapping(
     return out or None
 
 
-def _printed_composition_from_roots(
+PrintedFingerprint = tuple[tuple[str, str], ...]
+
+
+def _printed_fingerprint(raw: object) -> PrintedFingerprint | None:
+    """Identity of a printed composition map (b-718: the one owner).
+
+    Numeric components only, keys sorted, decimals normalised by _dec_str, so
+    ``{"Al2O3": "26.0"}`` and ``{"Al2O3": 26}`` agree. ``locator``/skip keys and
+    non-numeric cells are ignored. A ``{"components": {...}}`` wrapper is
+    unwrapped. Returns None when no numeric component is left.
+    """
+
+    if isinstance(raw, Mapping) and isinstance(raw.get("components"), Mapping):
+        raw = raw["components"]
+    if not isinstance(raw, Mapping):
+        return None
+    pairs: list[tuple[str, str]] = []
+    for key, value in raw.items():
+        if key in _WALK_SKIP_KEYS or key == "locator":
+            continue
+        number = _as_dec_or_none(value)
+        if number is None:
+            continue
+        pairs.append((str(key), _dec_str(number)))
+    return tuple(sorted(pairs)) or None
+
+
+def _printed_composition_candidates(
     roots: Iterable[object],
     vocabulary: tuple[VocabEntry, ...],
     *,
     fallback_locator: Locator | None = None,
-) -> Located[Mapping[str, Any]] | None:
+) -> list[tuple[PrintedFingerprint, Locator, str]]:
+    """Every vocabulary-named printed map under ``roots`` that has a locator."""
+
     names = {e.printed for e in vocabulary if e.field == "sample.printed_composition"}
-    found: list[tuple[tuple[tuple[str, str], ...], Locator, str]] = []
+    found: list[tuple[PrintedFingerprint, Locator, str]] = []
 
     def walk(obj: object, parent_loc: Locator | None, depth: int) -> None:
         if depth > 14:
@@ -9200,17 +9364,8 @@ def _printed_composition_from_roots(
             for key, value in obj.items():
                 name = str(key)
                 if name in names and isinstance(value, Mapping):
-                    comps = {
-                        str(k): v
-                        for k, v in value.items()
-                        if k not in _WALK_SKIP_KEYS
-                        and k != "locator"
-                        and _as_dec_or_none(v) is not None
-                    }
-                    if comps and loc is not None:
-                        fingerprint = tuple(
-                            sorted((k, _dec_str(as_decimal(v))) for k, v in comps.items())
-                        )
+                    fingerprint = _printed_fingerprint(value)
+                    if fingerprint is not None and loc is not None:
                         found.append((fingerprint, loc, name))
                 if name not in _WALK_SKIP_KEYS and name != "locator":
                     walk(value, loc, depth + 1)
@@ -9225,6 +9380,18 @@ def _printed_composition_from_roots(
             else root
         )
         walk(obj, fallback_locator, 0)
+    return found
+
+
+def _printed_composition_from_roots(
+    roots: Iterable[object],
+    vocabulary: tuple[VocabEntry, ...],
+    *,
+    fallback_locator: Locator | None = None,
+) -> Located[Mapping[str, Any]] | None:
+    found = _printed_composition_candidates(
+        roots, vocabulary, fallback_locator=fallback_locator
+    )
     if not found:
         return None
     fingerprints = {item[0] for item in found}
@@ -9240,6 +9407,85 @@ def _printed_composition_from_roots(
         return located_value({k: v for k, v in fingerprint}, loc)
     fingerprint, loc, _name = found[0]
     return located_value({k: v for k, v in fingerprint}, loc)
+
+
+def _is_printed_initial_charge(
+    printed: Located[Mapping[str, Any]] | None,
+    values: object,
+) -> bool:
+    """``printed`` is the series' printed starting-charge row (see above).
+
+    That map is the experiment's initial charge, shared by every row, so it
+    stays on experiment.sample (Markova 1984 Table 2 T0 row).
+    """
+
+    if printed is None or not printed.state.is_value:
+        return False
+    charge = _printed_initial_charge_row_map(values)
+    return charge is not None and _printed_fingerprint(
+        _printed_map_payload(charge)
+    ) == _printed_fingerprint(printed.state.value)
+
+
+def _values_without_row_lists(values: object) -> object:
+    """``values`` with every nested list of row mappings removed.
+
+    Lists of mappings (``rows``, ``series``, ``points``, ``tests``,
+    ``rows_as_printed``, ``samples`` ...) are per-row payloads; what is left is
+    what the observation prints for itself. Scalar lists (``T_range_K``) stay.
+    """
+
+    if isinstance(values, Mapping):
+        return {
+            key: _values_without_row_lists(value)
+            for key, value in values.items()
+            if not (
+                isinstance(value, list)
+                and any(isinstance(item, Mapping) for item in value)
+            )
+        }
+    return values
+
+
+def _printed_map_is_observation_level(
+    printed: Located[Mapping[str, Any]] | None,
+    *,
+    equipment: object,
+    values: object,
+    vocabulary: tuple[VocabEntry, ...],
+    locator: Locator | None,
+) -> bool:
+    """b-718 ROR P0: may ``printed`` sit on the observation's own conditions?
+
+    Yes only when the same map is printed outside every nested row list (on
+    the observation's own values or equipment). A map found only inside
+    ``values.rows`` / ``series`` / ``points`` belongs to that one row; the
+    exploded child already carries it via ``_oxide_map_from_mapping`` in
+    ``_emit_exploded_point``. Attaching it to the parent would copy it onto
+    every sibling (quoted Hastie 1981 Table 2: the body-row-16 illite map).
+    """
+
+    if printed is None or not printed.state.is_value:
+        return False
+    target = _printed_fingerprint(printed.state.value)
+    if target is None:
+        return False
+    own_values = _values_without_row_lists(values)
+    own_roots = _lab_roots(equipment, own_values)
+    if any(
+        fingerprint == target
+        for fingerprint, _loc, _name in _printed_composition_candidates(
+            own_roots, vocabulary, fallback_locator=locator
+        )
+    ):
+        return True
+    # Same fallback sample_from_equipment uses (top-level oxide keys or a
+    # printed mole-fraction map), now unable to reach into row lists.
+    fallback = _initial_oxide_map_from_values(own_values)
+    return (
+        fallback is not None
+        and _printed_fingerprint(_printed_map_payload(fallback)) == target
+    )
 
 
 def _lab_roots(
@@ -9584,13 +9830,9 @@ def sample_from_equipment(
     if initial is None and printed is not None and printed.state.is_value:
         raw = printed.state.value
         if isinstance(raw, Mapping):
-            wt = {
-                str(k): as_decimal(v)
-                for k, v in raw.items()
-                if str(k) in _OXIDE_COMPONENT_KEYS and _as_dec_or_none(v) is not None
-            }
-            if len(wt) >= 2:
-                _, initial = _located_printed_and_initial(wt, printed.locator or locator)
+            _, initial = _located_printed_and_initial(
+                raw, printed.locator or locator
+            )
     if (
         mass_located is None
         and volume_located is None
@@ -10617,8 +10859,15 @@ class Migrator:
         # Only an initial composition declared as a registry value may take
         # precedence over later legacy lab-parameter rows.
         self._registry_value_initial_experiments: set[str] = set()
+        self._registry_printed_composition_experiments: set[str] = set()
+        # b-718 ROR: exploded children whose printed map is their own row's
+        # (not the parent observation's). A row-local map describes that row
+        # (often an evaporation residue), so it never promotes to the sample.
+        self._row_local_printed_observations: set[str] = set()
         # Compilation record JSON paths registered as Work assets (not INDEX).
         self._work_extra_assets: dict[str, dict[str, SourceFile]] = defaultdict(dict)
+        # t-1123a: per-source printed liquidus / plateau records (phase_field.py).
+        self._phase_field_records: dict[str, PhaseFieldRecords | None] = {}
 
     def _count(self, path: str) -> SourceCount:
         rec = self.result.source_counts.get(path)
@@ -10784,13 +11033,32 @@ class Migrator:
             values=values,
             locator=locator,
         )
+        # b-718: observation-row printed maps stay on the observation
+        # (attached by the caller). Promote to experiment.sample only from an
+        # explicit registry declaration, or later when every row shares one map.
+        row_printed = sample.printed_composition
+        if experiment_id in self._registry_printed_composition_experiments:
+            sample = replace(sample, printed_composition=None)
+            if row_printed is not None and not self._repeats_declared_sample_map(
+                experiment_id, row_printed
+            ):
+                sample = replace(sample, initial_composition=None)
+        elif row_printed is not None and not _is_printed_initial_charge(
+            row_printed, values
+        ):
+            sample = replace(
+                sample,
+                printed_composition=None,
+                initial_composition=None,
+            )
         if existing is not None:
             merged = _merge_experiment_lab_params(
                 existing,
                 sample,
                 apparatus,
                 pressure_env,
-                prefer_existing_initial=prefer_existing_initial,
+                prefer_existing_initial=prefer_existing_initial
+                or experiment_id in self._registry_printed_composition_experiments,
             )
             self.result.experiments[experiment_id] = merged
             return merged
@@ -11334,6 +11602,21 @@ class Migrator:
                 and experiment.sample.initial_composition.state.is_value
             ):
                 self._registry_value_initial_experiments.add(experiment.experiment_id)
+            # Only a declared oxide map owns the sample. A prose string
+            # ("12 MgO, 46 SiO2, ...") is not a composition the readers can
+            # use, so it must not block the parsed observation map (ROR fix:
+            # Badro 2021 vp-series regressed from a map to the string).
+            if (
+                experiment.sample.printed_composition is not None
+                and experiment.sample.printed_composition.state.is_value
+                and _printed_fingerprint(
+                    experiment.sample.printed_composition.state.value
+                )
+                is not None
+            ):
+                self._registry_printed_composition_experiments.add(
+                    experiment.experiment_id
+                )
             self.result.experiments[experiment.experiment_id] = experiment
             if experiment.experiment_id not in self.result.experiments_by_work[work.work_id]:
                 self.result.experiments_by_work[work.work_id].append(
@@ -11453,6 +11736,107 @@ class Migrator:
             experiment, equipment_context_id=record["context_id"]
         )
 
+    def _repeats_declared_sample_map(
+        self,
+        experiment_id: str,
+        printed: Located[Mapping[str, Any]],
+    ) -> bool:
+        """True when ``printed`` restates the registry-declared sample map.
+
+        The declaration owns experiment.sample; a row that repeats it (often
+        with the printed ``Total`` cell the declaration left out) adds nothing
+        and, as a point condition, would shadow the usable declaration with a
+        map the reader refuses (Britt 2019 Cr XRF: ``Total 100`` counts as a
+        100 wt% non-oxide). A row printing a different map still attaches.
+        """
+
+        if experiment_id not in self._registry_printed_composition_experiments:
+            return False
+        experiment = self.result.experiments.get(experiment_id)
+        declared = None if experiment is None else experiment.sample.printed_composition
+        if declared is None or not declared.state.is_value:
+            return False
+
+        def without_totals(
+            fingerprint: PrintedFingerprint | None,
+        ) -> PrintedFingerprint | None:
+            if fingerprint is None:
+                return None
+            return tuple(
+                pair for pair in fingerprint if pair[0].casefold() not in {"total", "sum"}
+            )
+
+        mine = without_totals(_printed_fingerprint(printed.state.value))
+        return bool(mine) and mine == without_totals(
+            _printed_fingerprint(declared.state.value)
+        )
+
+    def _promote_universal_observation_printed_compositions(
+        self, work_id: str
+    ) -> None:
+        """b-718 rule (2): same map on every observation → experiment.sample.
+
+        Registry declarations already own experiment.sample.printed_composition
+        and are left untouched. Experiments whose observations all carry one
+        identical printed fingerprint receive that map at sample level so
+        normalized_composition can fall back without subset leakage.
+
+        ROR fix: only observation-level maps count. A child carrying its own
+        series-row map (``_row_local_printed_observations``) blocks promotion:
+        one row's measured composition, often a residue after mass loss, is
+        not the experiment's starting sample (Mendybaev 2017 FUNC-N).
+        """
+
+        by_experiment: dict[str, list[Observation]] = defaultdict(list)
+        for observation in self.result.observations.values():
+            experiment = self.result.experiments.get(observation.experiment_id)
+            if experiment is None or experiment.work_id != work_id:
+                continue
+            by_experiment[observation.experiment_id].append(observation)
+
+        for experiment_id, rows in by_experiment.items():
+            if experiment_id in self._registry_printed_composition_experiments:
+                continue
+            if not rows:
+                continue
+            fingerprints: list[tuple[PrintedFingerprint, Located[Any]]] = []
+            all_present = True
+            for observation in rows:
+                if observation.observation_id in self._row_local_printed_observations:
+                    all_present = False
+                    break
+                located = (observation.point_conditions or {}).get("printed_composition")
+                if located is None or not located.state.is_value:
+                    all_present = False
+                    break
+                fingerprint = _printed_fingerprint(located.state.value)
+                if fingerprint is None:
+                    all_present = False
+                    break
+                fingerprints.append((fingerprint, located))
+            if not all_present or not fingerprints:
+                continue
+            unique = {item[0] for item in fingerprints}
+            if len(unique) != 1:
+                continue
+            located = fingerprints[0][1]
+            experiment = self.result.experiments[experiment_id]
+            printed = located
+            initial = None
+            raw = located.state.value
+            if isinstance(raw, Mapping):
+                _, initial = _located_printed_and_initial(raw, located.locator)
+            sample = replace(
+                experiment.sample,
+                printed_composition=printed,
+                initial_composition=initial
+                if experiment.sample.initial_composition is None
+                else experiment.sample.initial_composition,
+            )
+            self.result.experiments[experiment_id] = replace(
+                experiment, sample=sample
+            )
+
     def _migrate_extract(self, path: Path) -> None:
         rel = path.relative_to(self.root).as_posix() if path.is_relative_to(self.root) else str(path)
         count = self._count(rel)
@@ -11498,6 +11882,16 @@ class Migrator:
         )
         rows = list(iter_extract_observations(doc))
         pressure_identity_context = _pressure_identity_context(doc, rows)
+        records = phase_field_records(doc)
+        self._phase_field_records[source_id] = records
+        for problem in () if records is None else records.problems:
+            self.result.registry_issues.append(
+                ValidationIssue(
+                    path=f"extract[{rel}].phase_field_records",
+                    reason=RefusalReason.CONDITIONAL_FIELD,
+                    detail=problem,
+                )
+            )
         count.rows_in += len(rows)
         self.result.measured.citations += 1
         local_ids = {str(obs.get("observation_id")) for _, obs in rows if obs.get("observation_id")}
@@ -11553,6 +11947,73 @@ class Migrator:
         self._record_silent_extract_if_needed(
             doc=doc, work=work, source_key=rel, path_stem=path.stem
         )
+
+    def _point_phase_field(
+        self,
+        *,
+        source_id: str,
+        parent_id: str,
+        point_id: str,
+        raw_item: object,
+        point_conditions: Mapping[str, Located[Any]] | None,
+        printed_phase_kind: str | None,
+    ) -> PointPhaseField:
+        """Apply the phase_field.py two-test rule to one printed point."""
+
+        records = self._phase_field_records.get(source_id)
+        declared = raw_item.get("phase_field_class") if isinstance(raw_item, Mapping) else None
+        located = (point_conditions or {}).get("composition")
+        composition = (
+            located.state.value
+            if isinstance(located, Located) and located.state.is_value
+            else None
+        )
+        outcome = PointPhaseField(None, None)
+        if records is None:
+            if declared is not None:
+                outcome = PointPhaseField(
+                    None, None, "phase_field_class without phase_field_records"
+                )
+        elif printed_phase_kind is not None:
+            # A printed phase wins over a classified one; both on one point is a conflict.
+            if declared is not None:
+                outcome = PointPhaseField(
+                    None, None, "phase_field_class on a point with a printed phase"
+                )
+        elif (
+            isinstance(composition, Composition)
+            and composition.amount_basis is AmountBasis.MOLE_FRACTION
+        ):
+            point_temperature = (point_conditions or {}).get("temperature_K")
+            temperature_K = (
+                _temperature_number(point_temperature.state.value)
+                if isinstance(point_temperature, Located)
+                and point_temperature.state.is_value
+                else None
+            )
+            prefix = f"{source_id}::"
+            outcome = classify_point(
+                records,
+                observation_id=(
+                    parent_id[len(prefix):] if parent_id.startswith(prefix) else parent_id
+                ),
+                x_by_component=dict(composition.components),
+                temperature_K=temperature_K,
+                declared=declared,
+            )
+        elif declared is not None:
+            outcome = PointPhaseField(
+                None, None, "phase_field_class needs a printed mole-fraction composition"
+            )
+        if outcome.problem is not None:
+            self.result.registry_issues.append(
+                ValidationIssue(
+                    path=f"observation[{point_id}].phase_field_class",
+                    reason=RefusalReason.CONDITIONAL_FIELD,
+                    detail=outcome.problem,
+                )
+            )
+        return outcome
 
     def _record_silent_extract_if_needed(
         self,
@@ -11772,9 +12233,22 @@ class Migrator:
         initial_oxide_map = _initial_oxide_map_from_values(values)
         composition_located = _composition_located_from_values(values, locator)
         catalogue_composition = _catalogue_composition_located_from_values(values, locator)
-        initial_composition, omitted_components = _mole_fraction_composition_from_values(
-            values
-        )
+        malformed_composition_amount: str | None = None
+        try:
+            initial_composition, omitted_components = (
+                _mole_fraction_composition_from_values(values)
+            )
+        except ValueError as exc:
+            detail, composition_key = _mole_fraction_composition_error(exc, values)
+            initial_composition, omitted_components = None, ()
+            malformed_composition_amount = detail
+            self.result.registry_issues.append(
+                ValidationIssue(
+                    path=f"observations.{obs_id}.values.{composition_key}",
+                    reason=RefusalReason.INVALID_SOURCE,
+                    detail=detail,
+                )
+            )
         if omitted_components:
             self.result.add_queue(
                 work.work_id,
@@ -11797,6 +12271,11 @@ class Migrator:
             )
 
         t_payload = dict(values)
+        if (
+            q_token is Quantity.P_PARTIAL
+            and t_payload.get("reference_temperature_K") is not None
+        ):
+            t_payload.setdefault("temperature_K", t_payload["reference_temperature_K"])
         if obs.get("T_K") is not None:
             t_payload.setdefault("T_K", obs.get("T_K"))
         if obs.get("T_range_K") is not None:
@@ -12043,7 +12522,9 @@ class Migrator:
                 choose_read_from(work, locator),
                 source_derivation,
             )
-        if omitted_components:
+        if malformed_composition_amount is not None:
+            ident_kwargs["composition"] = State.unknown(malformed_composition_amount)
+        elif omitted_components:
             ident_kwargs["composition"] = State.unknown(
                 partial_composition_unknown_reason(omitted_components)
             )
@@ -12261,6 +12742,49 @@ class Migrator:
                 **(point_conditions or {}),
                 "composition": catalogue_composition,
             }
+        if malformed_composition_amount is not None:
+            point_conditions = {
+                **(point_conditions or {}),
+                "composition": Located(
+                    State.unknown(malformed_composition_amount), locator=locator
+                ),
+            }
+        # b-718: keep observation-row printed maps on point_conditions so
+        # subset promotions no longer live only on experiment.sample. Exploded
+        # children inherit these conditions, so only a map the observation
+        # prints for itself attaches here; a map found only inside a nested
+        # row list stays on that row's child (ROR P0, quoted Hastie Table 2).
+        row_sample = sample_from_equipment(
+            obs.get("equipment"),
+            vocabulary=self._vocab,
+            values=values if isinstance(values, Mapping) else None,
+            locator=locator,
+        )
+        if (
+            row_sample.printed_composition is not None
+            and row_sample.printed_composition.state.is_value
+            and "printed_composition" not in (point_conditions or {})
+            and _printed_map_is_observation_level(
+                row_sample.printed_composition,
+                equipment=obs.get("equipment"),
+                values=values,
+                vocabulary=self._vocab,
+                locator=locator,
+            )
+            and not self._repeats_declared_sample_map(
+                experiment_id, row_sample.printed_composition
+            )
+        ):
+            point_conditions = {
+                **(point_conditions or {}),
+                "printed_composition": row_sample.printed_composition,
+            }
+            if (
+                row_sample.initial_composition is not None
+                and row_sample.initial_composition.state.is_value
+                and "composition" not in point_conditions
+            ):
+                point_conditions["composition"] = row_sample.initial_composition
         if declared_experiment_id is None or (
             declared_experiment_id in self.result.experiments
             and bool(obs.get("equipment"))
@@ -12892,6 +13416,7 @@ class Migrator:
         point_oxide_map: dict[str, Decimal] | None = None
         point_composition_located: Located[Composition] | None = None
         point_catalogue: Located[Composition] | None = None
+        malformed_composition_amount: str | None = None
         if isinstance(raw_item, Mapping):
             q_for_species = (
                 quantity.value
@@ -12955,9 +13480,16 @@ class Migrator:
                     )
                     or locator
                 )
-            point_composition, _point_omitted = _mole_fraction_composition_from_values(
-                raw_item
-            )
+            try:
+                point_composition, _point_omitted = (
+                    _mole_fraction_composition_from_values(raw_item)
+                )
+            except ValueError as exc:
+                detail, composition_key = _mole_fraction_composition_error(
+                    exc, raw_item
+                )
+                point_composition = None
+                malformed_composition_amount = detail
             point_composition_located = (
                 None
                 if point_composition is None
@@ -13042,7 +13574,16 @@ class Migrator:
                 point_id = f"{parent_id}::point:{index}"
 
         ident_kwargs = dict(ident_kwargs)
-        if point_catalogue is not None:
+        if malformed_composition_amount is not None:
+            self.result.registry_issues.append(
+                ValidationIssue(
+                    path=f"observations.{point_id}.values.{composition_key}",
+                    reason=RefusalReason.INVALID_SOURCE,
+                    detail=malformed_composition_amount,
+                )
+            )
+            ident_kwargs["composition"] = State.unknown(malformed_composition_amount)
+        elif point_catalogue is not None:
             ident_kwargs["composition"] = point_catalogue.state
             point_composition_located = point_catalogue
         elif point_composition_located is not None:
@@ -13094,7 +13635,11 @@ class Migrator:
                     "melt_reference_pairing",
                 }
             } or None
-        if ident_kwargs.get("composition") is None:
+        if q_token_point is Quantity.P_PARTIAL and point_oxide_map:
+            ident_kwargs["composition"] = State.of(
+                wt_pct_to_mole_fraction(point_oxide_map)
+            )
+        elif ident_kwargs.get("composition") is None:
             initial_map = _initial_oxide_map_from_values(parent_values)
             if initial_map:
                 ident_kwargs["composition"] = State.of(
@@ -13320,6 +13865,14 @@ class Migrator:
             point_conditions = {
                 **(point_conditions or {}),
                 "composition": point_composition_located,
+            }
+        elif malformed_composition_amount is not None:
+            point_conditions = {
+                **(point_conditions or {}),
+                "composition": Located(
+                    State.unknown(malformed_composition_amount),
+                    locator=point_locator,
+                ),
             }
         if (
             q_token_point is Quantity.RESIDUE_COMPONENT_COMPOSITION
@@ -13606,6 +14159,19 @@ class Migrator:
                 **(point_conditions or {}),
                 "total_pressure_Pa": partial_total_condition,
             }
+        child_printed = (point_conditions or {}).get("printed_composition")
+        parent_printed = (parent_point_conditions or {}).get("printed_composition")
+        if (
+            child_printed is not None
+            and child_printed.state.is_value
+            and (
+                parent_printed is None
+                or not parent_printed.state.is_value
+                or _printed_fingerprint(parent_printed.state.value)
+                != _printed_fingerprint(child_printed.state.value)
+            )
+        ):
+            self._row_local_printed_observations.add(point_id)
         if parent_point_conditions:
             # Parent located conditions, including conversion provenance, are
             # defaults. The child replaces only the keys it printed.
@@ -13691,6 +14257,33 @@ class Migrator:
                     ),
                     origin=point_id,
                     band=_TWO_PHASE_BULK_COMPOSITION_STATUS,
+                )
+            )
+        phase_field = self._point_phase_field(
+            source_id=source_id,
+            parent_id=parent_id,
+            point_id=point_id,
+            raw_item=raw_item,
+            point_conditions=point_conditions,
+            printed_phase_kind=printed_phase_kind,
+        )
+        if phase_field.kind is not None and isinstance(q_token_point, Quantity):
+            # The class rides on a notice only: species phase and
+            # identity.composition are never written from it (t-1123a R1).
+            child_notices.append(
+                Notice(
+                    kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                    affected_quantities=(q_token_point,),
+                    reason=phase_field.notice_reason(),
+                    origin=point_id,
+                    band=_TWO_PHASE_BULK_COMPOSITION_STATUS,
+                )
+                if phase_field.kind == OUTSIDE_SINGLE_LIQUID_FIELD
+                else Notice(
+                    kind=NoticeKind.LIQUIDUS_POSITION_CONTESTED,
+                    affected_quantities=(q_token_point,),
+                    reason=phase_field.notice_reason(),
+                    origin=point_id,
                 )
             )
         observation = Observation(
@@ -15385,6 +15978,8 @@ class Migrator:
     def finalize(self) -> None:
         self._rebuild_works()
         self._apply_supersedes()
+        for work_id in self.result.works:
+            self._promote_universal_observation_printed_compositions(work_id)
         self._resolve_queue_ids()
         self._retarget_exploded_parents()
         self._close_conditional_method_classes()

@@ -203,6 +203,9 @@ class NoticeKind(StrEnum):
     ADMISSION_DEFAULTED = "admission_defaulted"
     FIGURE_ONLY = "figure_only"
     REACTIVE_CELL_NOT_MODELLED = "reactive_cell_not_modelled"
+    # t-1123a: printed point sits between printed liquidus positions; scored as
+    # liquid, flagged (all-numeric line only). Reason carries the stated liquidus.
+    LIQUIDUS_POSITION_CONTESTED = "liquidus_position_contested"
 
 
 class ReferenceStateConvention(StrEnum):
@@ -240,6 +243,7 @@ class Polymorph(StrEnum):
     BETA_RHOMBOHEDRAL = "beta_rhombohedral"
     QUARTZ = "quartz"
     ALPHA_QUARTZ = "alpha_quartz"
+    TRIDYMITE = "tridymite"
     CRISTOBALITE_HIGH = "cristobalite_high"
     CRISTOBALITE_LOW = "cristobalite_low"
     CORUNDUM = "corundum"

@@ -58,6 +58,7 @@ from simulator.battery.migrate import (
     convert_mass_to_kg,
     convert_pressure_to_pa,
     convert_temperature_to_k,
+    wt_pct_to_mole_fraction,
     dump_yaml,
     iter_observation_store_paths,
     lineage_parents_from_source,
@@ -75,6 +76,7 @@ from simulator.battery.migrate import (
     compilation_column_series_from_record,
     _provenance_from_extract,
     _initial_oxide_map_from_values,
+    _located_printed_and_initial,
     load_migrated_store,
     expand_queue_entries,
     group_queue_entries,
@@ -474,6 +476,60 @@ def _run_migrate_cli(args: list[str]) -> subprocess.CompletedProcess[str]:
         env=env,
         check=False,
     )
+
+
+def test_kor_sulfur_tables_are_typed_refusals_and_keep_24_hour_footnote() -> None:
+    extract = REPO_ROOT / "data/literature/extracts/kor-1967-thesis-sulphur-oxides-slags.yaml"
+    tables = {
+        row["observation_id"]: row
+        for row in _extract_observations(extract.name)
+        if row["observation_id"] in {
+            "kor_1967_table_xxii_sulphur_melt_values",
+            "kor_1967_table_xxiii_sulphur_melt_values",
+            "kor_1967_table_xxv_sulphur_solid_aluminates",
+        }
+    }
+    expected_rows = {
+        "kor_1967_table_xxii_sulphur_melt_values": 12,
+        "kor_1967_table_xxiii_sulphur_melt_values": 24,
+        "kor_1967_table_xxv_sulphur_solid_aluminates": 18,
+    }
+    assert set(tables) == set(expected_rows)
+    for observation_id, row_count in expected_rows.items():
+        table = tables[observation_id]
+        assert table["type"] == "sulfur_solubility_and_sulfate_capacity_series"
+        assert table["values"]["quantity"] == "sulfur_solubility_wt_percent"
+        assert len(table["values"]["rows"]) == row_count
+
+    xxii = tables["kor_1967_table_xxii_sulphur_melt_values"]["values"]
+    average_row = next(row for row in xxii["rows"] if row[0] == "150")
+    assert average_row[3] == "0.268"
+
+    xxiii = tables["kor_1967_table_xxiii_sulphur_melt_values"]["values"]
+    assert xxiii["columns"][-1] == "treatment_time_hours"
+    assert xxiii["rows"][-1][0] == "8800^2"
+    assert xxiii["rows"][-1][-1] == 24
+
+    migrator = Migrator(root=REPO_ROOT, index=None, aliases={})
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+    observations = migrator.result.observations.values()
+    table_rows = [obs for obs in observations if "::rows:" in obs.observation_id]
+    assert len(table_rows) == 54
+    assert all(
+        obs.identity.quantity.is_unknown and obs.value.kind is ValueKind.UNAVAILABLE
+        for obs in table_rows
+    )
+    activities = [
+        obs
+        for obs in observations
+        if obs.identity.quantity.is_value
+        and obs.identity.quantity.value is Quantity.ACTIVITY
+    ]
+    assert len(activities) == 2
+    assert all(obs.admission.status is AdmissionStatus.ADMITTED for obs in activities)
+    assert migrator.result.validation is not None
+    assert migrator.result.validation.hard_issues == ()
 
 
 def test_identity_complete_compilation_cells_are_admitted_at_source_level() -> None:
@@ -3469,6 +3525,18 @@ def test_equal_temperature_range_is_a_point_but_true_range_is_not() -> None:
     assert "temperature domain" in (interval.reason or "")
 
 
+def test_bencze_2016_reference_temperature_is_bound(tmp_path: Path) -> None:
+    result = _migrate_real_extract(tmp_path, "bencze-yazhenskikh-2016.yaml")
+    observations = list(result.observations.values())
+    assert len(observations) == 70
+    assert all(
+        observation.identity.temperature_K is not None
+        and observation.identity.temperature_K.is_value
+        and observation.identity.temperature_K.value == as_decimal("1273")
+        for observation in observations
+    )
+
+
 @pytest.mark.parametrize(
     "extra, expected",
     [
@@ -3578,6 +3646,112 @@ def _scalar_extract(*, quantity: str, units: str, values: dict, obs_type: str = 
     row["units"] = units
     row["values"] = values
     return extract
+
+
+def test_located_printed_and_initial_pins_numeric_composition() -> None:
+    _printed, initial = _located_printed_and_initial(
+        {"SiO2": Decimal("60"), "MgO": Decimal("40")}, None
+    )
+
+    assert initial is not None
+    assert to_plain(initial.state.value)["components"] == [
+        ["SiO2", "0.5015472170832676561113000772"],
+        ["MgO", "0.4984527829167323438886999229"],
+    ]
+
+
+def test_b718_partial_pressure_point_composition_stays_on_own_point(
+    tmp_path: Path,
+) -> None:
+    point_composition = {"K2O": 7.4, "Al2O3": 26, "SiO2": 66.6}
+    extract = _scalar_extract(
+        quantity="partial_pressure",
+        units="atm",
+        values={
+            "quantity": "partial_pressure",
+            "method_class": "measured_direct",
+            "points": [
+                {
+                    "T_K": 1300,
+                    "pressure_atm": 1,
+                    "locator": {"table": "2", "note": "1"},
+                },
+                {
+                    "T_K": 1400,
+                    "pressure_atm": 2,
+                    "locator": {"table": "2", "note": "2"},
+                    "composition_wt_pct": point_composition,
+                },
+                {
+                    "T_K": 1500,
+                    "pressure_atm": 3,
+                    "locator": {"table": "2", "note": "3"},
+                },
+            ],
+        },
+    )
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    rows = sorted(
+        (
+            observation
+            for observation in result.observations.values()
+            if quantity_token(observation.identity) is Quantity.P_PARTIAL
+        ),
+        key=lambda observation: observation.identity.temperature_K.value,
+    )
+
+    assert len(rows) == 3
+    sibling_compositions = (
+        rows[0].identity.composition,
+        rows[2].identity.composition,
+    )
+    assert all(
+        composition is None or not composition.is_value
+        for composition in sibling_compositions
+    )
+    assert rows[1].identity.composition is not None
+    assert rows[1].identity.composition.value == wt_pct_to_mole_fraction(
+        {name: Decimal(str(value)) for name, value in point_composition.items()}
+    )
+
+
+def test_b718_zero_mass_loss_row_is_initial_without_optional_flag(
+    tmp_path: Path,
+) -> None:
+    initial_wt_pct = {"SiO2": 60, "MgO": 40}
+    extract = _scalar_extract(
+        quantity="mass_loss_fraction",
+        units="wt_pct",
+        values={
+            "quantity": "mass_loss_fraction",
+            "method_class": "measured_direct",
+            "points": [
+                {
+                    "T_C": 0,
+                    "mass_loss_pct": 0,
+                    "composition_wt_pct": initial_wt_pct,
+                },
+                {"T_C": 1300, "mass_loss_pct": 10},
+            ],
+        },
+        obs_type="mass_loss_series",
+    )
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+    sample = result.experiments[observation.experiment_id].sample
+
+    assert sample.printed_composition is not None
+    assert sample.printed_composition.state.is_value
+    assert sample.initial_composition is not None
+    assert sample.initial_composition.state.is_value
+    expected = wt_pct_to_mole_fraction(
+        {name: Decimal(str(value)) for name, value in initial_wt_pct.items()}
+    )
+    assert dict(sample.initial_composition.state.value.components) == dict(
+        expected.components
+    )
 
 
 def test_k01_scalar_psat_does_not_take_alpha(tmp_path: Path) -> None:
@@ -4925,6 +5099,28 @@ def test_guo_structured_standard_state_lifts_periclase_reference(tmp_path: Path)
         assert reference_state.value.endmember.polymorph.value is Polymorph.PERICLASE
 
 
+def test_ohta_feto_standard_state_lifts_liquid_reference(tmp_path: Path) -> None:
+    result = _migrate_real_extract(
+        tmp_path,
+        "ohta-1996-cao-mgo-al2o3-activities.yaml",
+        use_repository_index_row=True,
+    )
+    observation = next(
+        obs
+        for obs in result.observations.values()
+        if "ohta_1996_feto_activity_coefficient_spinel_line" in obs.observation_id
+    )
+    reference_state = observation.identity.reference_state
+    assert reference_state is not None and reference_state.is_value
+    assert (
+        reference_state.value.convention
+        is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+    )
+    assert reference_state.value.component_basis == "Fe_tO"
+    assert reference_state.value.endmember.formula == "Fe_tO"
+    assert reference_state.value.endmember.phase.value is Phase.L
+
+
 def test_stolyarova_table3_137_row_ids_and_reference_states_unchanged(
     tmp_path: Path,
 ) -> None:
@@ -5098,6 +5294,188 @@ def test_reference_prose_keeps_printed_endmember_and_does_not_stamp_one_bar() ->
     assert henry.value.endmember.phase.value is Phase.L
 
 
+def test_ts1985_and_yam1983_tridymite_reference_state_baseline() -> None:
+    ts1985 = next(
+        row
+        for row in _extract_observations("ts1985.yaml")
+        if row.get("observation_id") == "ts1985_sio2_gibbs_duhem_1200C_X0500"
+    )
+    ts_state = reference_state_from_extract(
+        ts1985["standard_state"], species_formula="SiO2", values=ts1985["values"]
+    )
+    assert ts_state is not None and ts_state.is_value
+    assert ts_state.value.endmember.polymorph is not None
+    assert ts_state.value.endmember.polymorph.is_value
+    assert ts_state.value.endmember.polymorph.value is Polymorph.TRIDYMITE
+
+    allibert = next(
+        row
+        for row in _extract_observations("kems-051-allibert-1981.yaml")
+        if row.get("observation_id")
+        == "allibert_1981_table2_alumina_activity_kems"
+    )
+    allibert_state = reference_state_from_extract(
+        allibert["standard_state"],
+        species_formula="Al2O3",
+        values=allibert["values"],
+    )
+    assert allibert_state is not None and allibert_state.is_value
+    allibert_polymorph = allibert_state.value.endmember.polymorph
+    assert allibert_polymorph is not None and allibert_polymorph.is_value
+    assert allibert_polymorph.value is Polymorph.CORUNDUM
+
+    without_printed_form = reference_state_from_extract(
+        allibert["standard_state"].replace("alpha-Al2O3", "Al2O3"),
+        species_formula="Al2O3",
+        values=allibert["values"],
+    )
+    assert without_printed_form is not None and without_printed_form.is_value
+    missing_polymorph = without_printed_form.value.endmember.polymorph
+    assert missing_polymorph is not None and missing_polymorph.is_unknown
+    assert missing_polymorph.reason == "source does not state polymorph"
+
+    ca2sio4_alpha = next(
+        row
+        for row in _extract_observations(
+            "robie-hemingway-wilson-1980-usgs-of-80-908.yaml"
+        )
+        if row.get("observation_id")
+        == "t1101_robie1980_ca2sio4_alpha_summary_29815_absent"
+    )
+    ca2sio4_state = reference_state_from_extract(
+        ca2sio4_alpha["standard_state"],
+        species_formula="Ca2SiO4_alpha",
+        values=ca2sio4_alpha["values"],
+    )
+    assert ca2sio4_state is not None and ca2sio4_state.is_value
+    ca2sio4_polymorph = ca2sio4_state.value.endmember.polymorph
+    assert ca2sio4_polymorph is not None and ca2sio4_polymorph.is_value
+    assert ca2sio4_polymorph.value is Polymorph.ALPHA
+
+    ambiguous = reference_state_from_extract(
+        "Pure solid tridymite or quartz; endmember=SiO2",
+        species_formula="SiO2",
+        values={},
+    )
+    assert ambiguous is not None and ambiguous.is_value
+    ambiguous_polymorph = ambiguous.value.endmember.polymorph
+    assert ambiguous_polymorph is not None and ambiguous_polymorph.is_unknown
+    assert ambiguous_polymorph.reason == "source names more than one polymorph"
+
+    coefficient = reference_state_from_extract(
+        "Raoultian pure solid SiO2; gamma_SiO2 relative to solid SiO2",
+        species_formula="SiO2",
+        values={},
+    )
+    assert coefficient is not None and coefficient.is_value
+    coefficient_polymorph = coefficient.value.endmember.polymorph
+    assert coefficient_polymorph is not None and coefficient_polymorph.is_unknown
+    assert coefficient_polymorph.reason == "source does not state polymorph"
+
+    table_number = reference_state_from_extract(
+        "solid CaO standard state; Table II footnote",
+        species_formula="CaO",
+        values={},
+    )
+    assert table_number is not None and table_number.is_value
+    table_polymorph = table_number.value.endmember.polymorph
+    assert table_polymorph is not None and table_polymorph.is_unknown
+    assert table_polymorph.reason == "source does not state polymorph"
+
+    yam1983 = next(
+        row
+        for row in _extract_observations("yam1983.yaml")
+        if row.get("observation_id") == "yam1983_sio2_table2_minus_log10_a_AT_B"
+    )
+    yam_state = reference_state_from_extract(
+        yam1983["standard_state"], species_formula="SiO2", values=yam1983["values"]
+    )
+    assert yam_state is not None and yam_state.is_unknown
+    assert yam_state.reason == (
+        "source standard_state does not name one reference endmember"
+    )
+
+
+def test_reference_prose_binds_polymorphs_to_their_own_endmember() -> None:
+    ms2000_text = (
+        "raoultian pure solid; beta-Na2O, solid K2O, and quartz as published; "
+        "endmember=K2O"
+    )
+    k2o_state = reference_state_from_extract(
+        ms2000_text, species_formula="K2O", values={}
+    )
+    assert k2o_state is not None and k2o_state.is_value
+    assert k2o_state.value.endmember.phase.value is Phase.CR
+    assert k2o_state.value.endmember.polymorph.is_unknown
+
+    na2o_state = reference_state_from_extract(
+        ms2000_text.replace("endmember=K2O", "endmember=Na2O"),
+        species_formula="Na2O",
+        values={},
+    )
+    assert na2o_state is not None and na2o_state.is_value
+    assert na2o_state.value.endmember.polymorph.is_value
+    assert na2o_state.value.endmember.polymorph.value is Polymorph.BETA
+
+    multi_endmember_text = (
+        "raoultian pure solid; quartz for SiO2 and corundum for Al2O3; "
+        "endmember=SiO2"
+    )
+    quartz_state = reference_state_from_extract(
+        multi_endmember_text, species_formula="SiO2", values={}
+    )
+    corundum_state = reference_state_from_extract(
+        multi_endmember_text.replace("endmember=SiO2", "endmember=Al2O3"),
+        species_formula="Al2O3",
+        values={},
+    )
+    assert quartz_state is not None and quartz_state.is_value
+    assert quartz_state.value.endmember.polymorph.value is Polymorph.QUARTZ
+    assert corundum_state is not None and corundum_state.is_value
+    assert corundum_state.value.endmember.polymorph.value is Polymorph.CORUNDUM
+
+
+@pytest.mark.parametrize(
+    ("filename", "experiment_id"),
+    (
+        ("kems-010-richter-2007.yaml", "type-b-cai-like-lab-melt"),
+        ("kems-015-hashimoto-1983.yaml", "fcmas-free-evap-series"),
+    ),
+)
+def test_richter_hashimoto_declared_experiments_resolve_langmuir_method(
+    tmp_path: Path, filename: str, experiment_id: str
+) -> None:
+    result = _migrate_real_extract(tmp_path / filename, filename)
+    experiment = next(
+        experiment
+        for experiment in result.experiments.values()
+        if experiment.experiment_id.endswith(f"::experiment::{experiment_id}")
+    )
+    assert experiment.method.is_value
+    assert experiment.method.value is MethodToken.LANGMUIR_FREE_EVAPORATION
+
+
+def test_allibert_alumina_polymorph_binds_in_isolated_migration(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-051-allibert-1981.yaml")
+    rows = [
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.startswith(
+            "kems-051-allibert-1981::allibert_1981_table2_alumina_activity_kems"
+        )
+    ]
+
+    assert len(rows) == 8
+    for observation in rows:
+        reference_state = observation.identity.reference_state
+        assert reference_state is not None and reference_state.is_value
+        polymorph = reference_state.value.endmember.polymorph
+        assert polymorph is not None and polymorph.is_value
+        assert polymorph.value is Polymorph.CORUNDUM
+
+
 def test_reference_prose_rejects_ambiguous_or_negated_raoult_conventions() -> None:
     furukawa = next(
         row
@@ -5117,15 +5495,26 @@ def test_reference_prose_rejects_ambiguous_or_negated_raoult_conventions() -> No
         if row.get("observation_id") == "plante_hastie_1983_nabo2_activity_approx"
     )
     negated = reference_state_from_extract(
-        plante["standard_state"],
+        plante["standard_state"]["note"],
         species_formula="NaBO2",
         values=plante["values"],
     )
     assert negated is not None and negated.is_unknown
+    typed = reference_state_from_extract(
+        plante["standard_state"],
+        species_formula="NaBO2",
+        values=plante["values"],
+    )
+    assert typed is not None and typed.is_value
+    assert typed.value.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+    assert typed.value.endmember.formula == "NaBO2"
+    assert typed.value.endmember.phase.value is Phase.L
 
 
-def test_demaria_fe_rows_do_not_print_a_reference_state(tmp_path: Path) -> None:
+def test_demaria_fe_rows_use_the_pure_iron_reference_state(tmp_path: Path) -> None:
     result = _migrate_real_extract(tmp_path, "kems-022-demaria-1971.yaml")
+    assert result.validation is not None
+    assert result.validation.hard_issues == ()
     expected = {
         "demaria_1971_fe_lunar_basalt_kems_main_cell",
         "demaria_1971_fe_activity_multi_rotating_cell",
@@ -5138,7 +5527,14 @@ def test_demaria_fe_rows_do_not_print_a_reference_state(tmp_path: Path) -> None:
     assert set(loaded) == expected
     for obs in loaded.values():
         reference = obs.identity.reference_state
-        assert reference is not None and reference.is_unknown
+        assert reference is not None and reference.is_value
+        assert reference.value.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+        assert reference.value.endmember.formula == "Fe"
+        assert reference.value.endmember.phase.value is Phase.CR
+        assert reference.value.component_basis == "Fe"
+        polymorph = reference.value.endmember.polymorph
+        assert polymorph is not None and polymorph.is_unknown
+        assert polymorph.reason == "source does not state polymorph"
 
 
 def test_tsaplin_gibbs_duhem_sio2_is_not_measured_direct(tmp_path: Path) -> None:
@@ -5396,6 +5792,139 @@ def test_kume_malformed_declared_composition_amount_makes_whole_composition_unkn
     )
     assert observation.identity.composition is not None
     assert observation.identity.composition.is_unknown
+    hard = result.validation.hard_issues if result.validation is not None else ()
+    key_matches = [
+        issue
+        for issue in hard
+        if issue.reason is RefusalReason.INVALID_SOURCE
+        and composition_key in (issue.path or "")
+        and "malformed declared amount" in (issue.detail or "")
+    ]
+    if composition_key == "composition_mole_fraction":
+        assert len(key_matches) == 1
+    else:
+        assert key_matches == []
+
+
+def _score_activity_composition_case(
+    tmp_path: Path, *, malformed: bool, exploded: bool
+):
+    values = {
+        "quantity": "activity",
+        "activity": 0.2,
+        "method_class": "measured_direct",
+    }
+    if malformed:
+        values["composition_mol"] = {
+            "SiO2": 0.6,
+            "MgO": "not-a-number",
+            "CaO": 0.4,
+        }
+    if exploded:
+        values["points"] = [{"T_K": 1773.15, "activity": 0.2}]
+    extract = _scalar_extract(
+        quantity="activity",
+        units="dimensionless",
+        values=values,
+        obs_type="activity_coefficient",
+    )
+    row = extract["species"]["Na"]["observations"][0]
+    row.update(
+        {
+            "experiment": "sample",
+            "T_K": 1773.15,
+            "standard_state": "Raoultian pure liquid MgO",
+        }
+    )
+    extract["species"] = {"MgO": {"observations": [row]}}
+    extract["experiments"] = [
+        {
+            "experiment_id": "sample",
+            "sample": {
+                "printed_composition": {
+                    "state": {"tag": "value", "value": {"SiO2": 50, "MgO": 50}},
+                    "locator": {"table": "1", "page": 1},
+                }
+            },
+        }
+    ]
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+    assert ("::T=" in observation.observation_id) is exploded
+    experiment = result.experiments[observation.experiment_id]
+    prediction = predict_with_engine(
+        Engine.OPENIMCC, observation, experiment=experiment
+    )
+    return observation, experiment, prediction
+
+
+@pytest.mark.parametrize("exploded", [False, True], ids=["row", "exploded-child"])
+def test_malformed_activity_composition_is_terminal_refusal(
+    tmp_path: Path, exploded: bool
+) -> None:
+    observation, _experiment, prediction = _score_activity_composition_case(
+        tmp_path, malformed=True, exploded=exploded
+    )
+
+    assert observation.identity.composition is not None
+    assert observation.identity.composition.is_unknown
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.INVALID_SOURCE
+    assert prediction.refusal_detail["reason"] == RefusalReason.INVALID_SOURCE.value
+    (gap,) = prediction.refusal_detail["gaps"]
+    assert gap["waypoint"] == "normalized_composition"
+    assert gap["reason"] == "unsupported_print_form"
+    assert gap["missing"] == [
+        f"observation[{observation.observation_id}].point_conditions.composition"
+    ]
+
+
+def test_activity_without_row_composition_uses_sample_numeric_pin(tmp_path: Path) -> None:
+    _observation, _experiment, prediction = _score_activity_composition_case(
+        tmp_path, malformed=False, exploded=False
+    )
+
+    assert prediction.value is not None
+    assert float(prediction.value).hex() == "0x1.a4079127a495dp-5"
+    assert prediction.refusal_reason is None
+    assert prediction.requested_composition is not None
+    assert prediction.requested_composition.is_value
+    assert prediction.requested_composition.value.as_map() == {
+        "SiO2": Decimal("0.40148624821939094"),
+        "MgO": Decimal("0.5985137517806091"),
+    }
+
+
+@pytest.mark.parametrize("printed_marker", ["<0.01", "tr."])
+def test_kume_bound_and_trace_composition_amounts_are_typed_absence(
+    tmp_path: Path, printed_marker: str
+) -> None:
+    name = "kume-2000-cao-activities.yaml"
+    source = REPO_ROOT / "data" / "literature" / "extracts" / name
+    extract = yaml.safe_load(source.read_text(encoding="utf-8"))
+    extract["source_id"] = "fixture-source"
+    observation_id = "kume_2000_table2_sample_101"
+    row = next(
+        row
+        for row in extract["species"]["CaO"]["observations"]
+        if row.get("observation_id") == observation_id
+    )
+    row["values"]["composition_mole_fraction"]["CaO"] = printed_marker
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(
+        item
+        for item in result.observations.values()
+        if item.observation_id.endswith(f"::{observation_id}")
+    )
+    assert observation.identity.composition is not None
+    assert observation.identity.composition.is_unknown
+    hard = result.validation.hard_issues if result.validation is not None else ()
+    assert not any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and "composition_mole_fraction" in (issue.path or "")
+        for issue in hard
+    )
 
 
 def test_kume_measured_reduced_activity_preserves_structured_derivation(
@@ -5620,6 +6149,58 @@ def test_l02_value_k_lifts_transition_temperature(tmp_path: Path) -> None:
     assert nbp.identity.subtype.value == "normal_boiling_point"
     assert nbp.identity.total_pressure_Pa.is_value
     assert nbp.identity.total_pressure_Pa.value == as_decimal("101325")
+
+
+def test_gornerup_liquidus_rows_preserve_printed_temperature_and_composition(
+    tmp_path: Path,
+) -> None:
+    filename = "gornerup-1996-cao-corner-liquidus.yaml"
+    source = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts" / filename).read_text(
+            encoding="utf-8"
+        )
+    )
+    printed_row = source["species"]["CaO"]["observations"][0]
+    printed_values = printed_row["values"]
+    printed_composition = {
+        key: as_decimal(value)
+        for key, value in printed_values["composition_mass_percent"].items()
+    }
+    assert printed_values["property_kind"] == "liquidus"
+    assert printed_values["points"][0]["T_C"] == 1600
+    assert printed_composition == {
+        "Al2O3": as_decimal("35.3"),
+        "CaO": as_decimal("59.8"),
+        "SiO2": as_decimal("4.9"),
+    }
+
+    result = _migrate_real_extract(
+        tmp_path, filename, use_repository_index_row=True
+    )
+    liquidus_rows = [
+        observation
+        for observation in result.observations.values()
+        if quantity_token(observation.identity) is Quantity.TRANSITION_TEMPERATURE
+        and observation.identity.subtype.is_value
+        and observation.identity.subtype.value == "liquidus"
+    ]
+    assert len(liquidus_rows) == 39
+    assert result.validation is not None
+    assert not result.validation.hard_issues
+
+    observation = next(
+        observation
+        for observation in liquidus_rows
+        if observation.observation_id.split("::")[-2]
+        == "gornerup_1996_t1_exp_3_4"
+    )
+    assert observation.value.kind is ValueKind.POINT
+    assert observation.value.point == as_decimal("1873.15")
+    assert observation.identity.composition is not None
+    assert observation.identity.composition.is_value
+    assert observation.identity.composition.value == wt_pct_to_mole_fraction(
+        printed_composition
+    )
 
 
 def test_l05g0_rows_list_alone_does_not_name_delta_fg() -> None:

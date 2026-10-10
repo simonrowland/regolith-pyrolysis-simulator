@@ -62,10 +62,12 @@ from simulator.battery.enums import (
 from simulator.battery.identity import (
     Identity,
     IdentityEqualKind,
+    THERMOCHEMICAL_CALORIE_J,
     identity_equal,
     profile_for,
     quantity_token,
 )
+from simulator.battery.phase_field import is_outside_single_liquid_field_reason
 from simulator.battery.migrate import (
     REPO_ROOT,
     canonicalize_rail,
@@ -149,6 +151,12 @@ MELTS_ENGINES: frozenset[Engine] = frozenset(
 # AlphaMELTS, ThermoEngine, and MAGEMin can resolve a liquid from a bulk input.
 SINGLE_LIQUID_ENGINES: frozenset[Engine] = frozenset(
     {Engine.VAPOROCK, *IMCC_ENGINES, Engine.INTERNAL_ANALYTICAL}
+)
+# Generic engine cells report melt activities and vapour pressures. Thermo
+# quantities come from the engine-specific compilation tier.
+_ENGINE_CELL_PREDICTED_QUANTITIES = frozenset(
+    _VAPOUR_EQUILIBRIUM
+    | {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
 )
 TWO_PHASE_BULK_COMPOSITION_STATUS = "two_phase_bulk_composition_not_liquid_composition"
 TWO_PHASE_BULK_COMPOSITION_PHASE_MARKER = "bulk_composition_in_two_phase_region"
@@ -375,16 +383,7 @@ FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION = "imcc_complex_saturation"
 FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION = "reference_converted_via_fusion"
 FLAGGED_STRATUM_FIGURE_ONLY = "figure_only"
 FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED = "reactive-cell-not-modelled"
-_FLAGGED_STRATUM_NOTICE_KINDS: frozenset[NoticeKind] = frozenset(
-    {
-        NoticeKind.UNVERIFIED_APPARATUS,
-        NoticeKind.CELL_MATERIAL_INFERRED,
-        NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG,
-        NoticeKind.IMCC_COMPLEX_SATURATION,
-        NoticeKind.FIGURE_ONLY,
-        NoticeKind.REACTIVE_CELL_NOT_MODELLED,
-    }
-)
+FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED = "liquidus-position-contested"
 
 
 @dataclass(frozen=True)
@@ -405,6 +404,10 @@ class EnginePrediction:
     refusal_detail: Mapping[str, object] = field(default_factory=dict)
     identity: Identity | None = None
     version: str | None = None
+
+
+def _quantity_not_predicted_detail(quantity: Quantity) -> dict[str, str]:
+    return {"reason": "quantity_not_predicted", "quantity": quantity.value}
 
 
 @dataclass(frozen=True)
@@ -1133,37 +1136,47 @@ def _cell_apparatus_inference_notices(
 
 
 def flagged_strata(notices: Sequence[Notice]) -> tuple[str, ...]:
-    strata: list[str] = []
-    kinds = {notice.kind for notice in notices}
-    unverified_apparatus = tuple(
-        notice
-        for notice in notices
-        if notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+    return _classify_flagged_notice_facts(
+        tuple((notice.kind.value, notice.reason) for notice in notices)
     )
-    if any(_is_calibration_not_grounded_reason(n.reason) for n in unverified_apparatus):
+
+
+def _classify_flagged_notice_facts(
+    notices: Sequence[tuple[str, object]],
+) -> tuple[str, ...]:
+    strata: list[str] = []
+    kinds = {kind for kind, _reason in notices}
+    unverified_apparatus = tuple(
+        reason
+        for kind, reason in notices
+        if kind == NoticeKind.UNVERIFIED_APPARATUS.value
+    )
+    if any(_is_calibration_not_grounded_reason(reason) for reason in unverified_apparatus):
         strata.append(FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED)
     if any(
-        not _is_calibration_not_grounded_reason(notice.reason)
-        for notice in unverified_apparatus
+        not _is_calibration_not_grounded_reason(reason)
+        for reason in unverified_apparatus
     ):
         strata.append(FLAGGED_STRATUM_UNVERIFIED_APPARATUS)
-    if NoticeKind.CELL_MATERIAL_INFERRED in kinds:
+    if NoticeKind.CELL_MATERIAL_INFERRED.value in kinds:
         strata.append(FLAGGED_STRATUM_CELL_MATERIAL_INFERRED)
-    if NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG in kinds:
+    if NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG.value in kinds:
         strata.append(FLAGGED_STRATUM_CATALOGUE_COMPOSITION)
     if any(
-        _is_source_internally_inconsistent(notice.kind, notice.reason)
-        for notice in notices
+        _is_source_internally_inconsistent(kind, reason)
+        for kind, reason in notices
     ):
         strata.append(FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT)
-    if NoticeKind.IMCC_COMPLEX_SATURATION in kinds:
+    if NoticeKind.IMCC_COMPLEX_SATURATION.value in kinds:
         strata.append(FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION)
-    if any(_is_fusion_conversion_notice(notice) for notice in notices):
+    if any(_is_fusion_conversion_reason(reason) for _kind, reason in notices):
         strata.append(FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION)
-    if NoticeKind.FIGURE_ONLY in kinds:
+    if NoticeKind.FIGURE_ONLY.value in kinds:
         strata.append(FLAGGED_STRATUM_FIGURE_ONLY)
-    if NoticeKind.REACTIVE_CELL_NOT_MODELLED in kinds:
+    if NoticeKind.REACTIVE_CELL_NOT_MODELLED.value in kinds:
         strata.append(FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED)
+    if NoticeKind.LIQUIDUS_POSITION_CONTESTED.value in kinds:
+        strata.append(FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED)
     return tuple(strata)
 
 
@@ -1182,11 +1195,7 @@ def _is_fusion_conversion_reason(reason: object) -> bool:
 
 
 def _is_flagged_stratum_notice(notice: Notice) -> bool:
-    return (
-        notice.kind in _FLAGGED_STRATUM_NOTICE_KINDS
-        or _is_source_internally_inconsistent(notice.kind, notice.reason)
-        or _is_fusion_conversion_notice(notice)
-    )
+    return bool(flagged_strata((notice,)))
 
 
 @lru_cache(maxsize=1)
@@ -1236,6 +1245,93 @@ def _janaf_pure_solid_table_temperature_range(
     if len(set(temperatures)) < 2:
         return None
     return min(temperatures), max(temperatures)
+
+
+@lru_cache(maxsize=1)
+def _b1259_tridymite_cristobalite_offset_rows() -> tuple[
+    tuple[Decimal, Decimal, Decimal], ...
+]:
+    """Load common B1259 H/S rows as (T K, dH J/mol, dS J/mol/K)."""
+
+    from simulator.reference_data.robie_waldbaum_1968_usgs_b1259_loader import (
+        load_records,
+    )
+
+    wanted = {"b1259-ht-0113-cristobalite", "b1259-ht-0114-tridymite"}
+    tables: dict[str, dict[Decimal, tuple[Decimal, Decimal]]] = {}
+    for record in load_records(include_ocr_suspect=True):
+        if record.get("record_id") not in wanted:
+            continue
+        rows: dict[Decimal, tuple[Decimal, Decimal]] = {}
+        for row in record.get("rows", ()):
+            if row.get("kind") != "data":
+                continue
+            temperature = row.get("temperature", {}).get("value")
+            enthalpy = row.get("delta_f_H", {}).get("value")
+            entropy = row.get("entropy", {}).get("value")
+            if temperature is None or enthalpy is None or entropy is None:
+                continue
+            key = Decimal(str(temperature))
+            # A duplicated T is a printed phase boundary, not a unique H/S
+            # point for this polymorph comparison.
+            if key in rows:
+                rows.pop(key)
+                continue
+            # B1259 H is kcal/mol and S is cal/(mol K). Convert both to SI.
+            rows[key] = (
+                Decimal(str(enthalpy)) * Decimal(1000) * THERMOCHEMICAL_CALORIE_J,
+                Decimal(str(entropy)) * THERMOCHEMICAL_CALORIE_J,
+            )
+        tables[str(record["record_id"])] = rows
+    cristobalite = tables["b1259-ht-0113-cristobalite"]
+    tridymite = tables["b1259-ht-0114-tridymite"]
+    return tuple(
+        (
+            temperature,
+            cristobalite[temperature][0] - tridymite[temperature][0],
+            cristobalite[temperature][1] - tridymite[temperature][1],
+        )
+        for temperature in sorted(cristobalite.keys() & tridymite.keys())
+    )
+
+
+def _b1259_tridymite_cristobalite_delta_g(
+    temperature_K: Decimal,
+) -> tuple[Decimal, Decimal, Decimal, bool]:
+    """Return ΔG(cristobalite−tridymite), certified bounds and extrapolation."""
+
+    rows = _b1259_tridymite_cristobalite_offset_rows()
+    lower, upper = rows[0][0], rows[-1][0]
+    if temperature_K <= lower:
+        edge = rows[0]
+        extrapolated = temperature_K < lower
+        delta_h, delta_s = edge[1], edge[2]
+    elif temperature_K >= upper:
+        edge = rows[-1]
+        extrapolated = temperature_K > upper
+        delta_h, delta_s = edge[1], edge[2]
+    else:
+        extrapolated = False
+        for left, right in zip(rows, rows[1:]):
+            if left[0] <= temperature_K <= right[0]:
+                fraction = (temperature_K - left[0]) / (right[0] - left[0])
+                delta_h = left[1] + fraction * (right[1] - left[1])
+                delta_s = left[2] + fraction * (right[2] - left[2])
+                break
+        else:
+            raise ValueError("B1259 common tridymite/cristobalite grid has a gap")
+
+    # Premise: B1259's two SiO2 tables print formation H (kcal/mol) and S
+    # (cal/(mol K)); the element reference cancels in their difference.
+    # Thus ΔG_tr=G_cr−G_tr=ΔH_tr−TΔS_tr, interpolating H and S on their
+    # common printed grid; beyond it use the edge ΔH/ΔS (dCp=0). At 2000 K,
+    # dH=0.105 kcal/mol and dS=0.060 cal/(mol K), so dG=−15 cal/mol, matching
+    # the printed ΔfG difference (−131.621−(−131.606) kcal/mol) to precision.
+    # At the printed 1743 K tridymite→cristobalite transition the computed
+    # difference is +5.94 J/mol (the two printed ΔfG values tie at precision),
+    # and it is −12.55 J/mol at 1800 K, consistent with the transition crossing.
+    # Units: kcal/mol×4184 J/kcal − K×cal/(mol K)×4.184 J/cal = J/mol.
+    return delta_h - temperature_K * delta_s, lower, upper, extrapolated
 
 
 def _fusion_comparison_reference(
@@ -1349,6 +1445,11 @@ def _fusion_comparison_reference(
         "O-035": Polymorph.CRISTOBALITE_HIGH,
     }.get(fusion.crystal_table)
     observed_polymorph = polymorph_token(standard_state.endmember)
+    tridymite_to_cristobalite = (
+        formula == "SiO2"
+        and fusion.crystal_table == "O-035"
+        and observed_polymorph is Polymorph.TRIDYMITE
+    )
     source_polymorph = standard_state.endmember.polymorph
     source_polymorph_is_unknown = (
         source_polymorph is not None
@@ -1376,6 +1477,7 @@ def _fusion_comparison_reference(
     if (
         expected_polymorph is not None
         and observed_polymorph is not expected_polymorph
+        and not tridymite_to_cristobalite
         and not unique_unknown_polymorph_table
     ):
         observed = "unknown" if observed_polymorph is None else observed_polymorph.value
@@ -1395,6 +1497,40 @@ def _fusion_comparison_reference(
             ),
         )
         return replace(reference, notices=union_notices(reference.notices, (notice,)))
+
+    tridymite_notice: Notice | None = None
+    tridymite_offset_dex = Decimal(0)
+    if tridymite_to_cristobalite:
+        delta_g_tr_J_per_mol, band_lo, band_hi, extrapolated = (
+            _b1259_tridymite_cristobalite_delta_g(temperature_K)
+        )
+        # At equal chemical potential, G_cr + RT ln(a_cr) =
+        # G_tr + RT ln(a_tr), so ln(a_cr/a_tr) = -ΔG_tr/(RT).
+        tridymite_offset_dex = -delta_g_tr_J_per_mol / (
+            JANAF_R_J_PER_MOL_K * temperature_K * Decimal(10).ln()
+        )
+        authority = Authority.EXTRAPOLATED if extrapolated else Authority.CERTIFIED
+        band = f"B1259 common printed H/S band [{band_lo}, {band_hi}] K"
+        original_reason = (
+            "fusion conversion missing input: JANAF solid table O-035 represents "
+            "polymorph cristobalite_high, but measured reference polymorph is tridymite"
+        )
+        tridymite_notice = Notice(
+            kind=NoticeKind.DERIVATION_USES_COMPILATION,
+            affected_quantities=(Quantity.ACTIVITY,),
+            reason=(
+                f"B1259 tridymite→cristobalite offset applied; {original_reason}; "
+                f"DeltaG_cristobalite_minus_tridymite={delta_g_tr_J_per_mol} J/mol; "
+                f"offset_dex={tridymite_offset_dex}; authority={authority.value}; "
+                f"certified_band=[{band_lo}, {band_hi}] K"
+            ),
+            origin=reference.observation_id,
+            band=band,
+            authority=authority,
+            certification=(
+                "Robie & Waldbaum 1968, USGS Bulletin 1259 common printed H/S grid"
+            ),
+        )
 
     delta_g_fus_J_per_mol = fusion.delta_g_fus_kJ_per_mol * Decimal(1000)
     offset_dex = delta_g_fus_J_per_mol / (
@@ -1441,7 +1577,15 @@ def _fusion_comparison_reference(
                 band="MELTS/JANAF liquid reference gap",
             )
 
-    if temperature_K >= fusion.melting_temperature_K:
+    # For tridymite above the O-035 crossing, first use B1259 to move the
+    # reported solid activity to cristobalite, then JANAF ΔG_fus=G_l−G_cr to
+    # move it to liquid. Since μ=G°+RT ln(a), each step multiplies activity
+    # by exp(−ΔG/RT). B1259's common printed H/S grid ends at 2000 K; its edge
+    # H/S are held beyond that limit (dCp=0) and the notice marks extrapolation.
+    if (
+        temperature_K >= fusion.melting_temperature_K
+        and not tridymite_to_cristobalite
+    ):
         notice = Notice(
             kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
             affected_quantities=(Quantity.ACTIVITY,),
@@ -1472,9 +1616,21 @@ def _fusion_comparison_reference(
     # 32.966 kJ/mol at those temperatures.
     converted_activity = reference.value.point * (
         -delta_g_fus_J_per_mol / (JANAF_R_J_PER_MOL_K * temperature_K)
+        + tridymite_offset_dex * Decimal(10).ln()
     ).exp()
     mismatch_K = fusion.melting_temperature_K - fusion.accepted_melting_temperature_K
     extrapolation_K = fusion.melting_temperature_K - temperature_K
+    if temperature_K >= fusion.melting_temperature_K:
+        fusion_distance = (
+            f"distance_above_JANAF_Tm={temperature_K - fusion.melting_temperature_K} K"
+        )
+        fusion_reference_note = "liquid is stable above the JANAF fusion crossing"
+    else:
+        fusion_distance = f"distance_below_JANAF_Tm={extrapolation_K} K"
+        fusion_reference_note = (
+            "table/accepted melting-point mismatch adds uncertainty to the "
+            "metastable-liquid reference"
+        )
     notice = Notice(
         kind=NoticeKind.DERIVATION_USES_COMPILATION,
         affected_quantities=(Quantity.ACTIVITY,),
@@ -1486,17 +1642,18 @@ def _fusion_comparison_reference(
             f"converted_activity_liquid={converted_activity}; "
             f"offset_dex=+{offset_dex}; "
             f"DeltaG_fus={fusion.delta_g_fus_kJ_per_mol} kJ/mol; T={temperature_K} K; "
-            f"JANAF_Tm={fusion.melting_temperature_K} K; "
-            f"distance_below_JANAF_Tm={extrapolation_K} K; "
+            f"JANAF_Tm={fusion.melting_temperature_K} K; {fusion_distance}; "
             f"accepted_Tm~{fusion.accepted_melting_temperature_K} K; "
             f"JANAF_minus_accepted_Tm={mismatch_K} K; "
-            "table/accepted melting-point mismatch adds uncertainty to the "
-            f"metastable-liquid reference; tables={fusion.crystal_table}/"
+            f"{fusion_reference_note}; tables={fusion.crystal_table}/"
             f"{fusion.liquid_table}; source_sha256={fusion.source_sha256[0]}/"
             f"{fusion.source_sha256[1]}"
         ),
         origin=reference.observation_id,
     )
+    notices = (notice,) if melts_notice is None else (notice, melts_notice)
+    if tridymite_notice is not None:
+        notices += (tridymite_notice,)
     return replace(
         reference,
         identity=comparison_identity,
@@ -1507,10 +1664,7 @@ def _fusion_comparison_reference(
                 "activity converted from a solid to liquid reference with JANAF fusion Gibbs energy"
             ),
         ),
-        notices=union_notices(
-            reference.notices,
-            (notice,) if melts_notice is None else (notice, melts_notice),
-        ),
+        notices=union_notices(reference.notices, notices),
     )
 
 
@@ -2727,11 +2881,22 @@ def _activity_contract_refusal(
     requested: State[Composition] | None,
     generated,
 ) -> EnginePrediction:
-    from simulator.battery.waypoints import GapReason
+    from simulator.battery.waypoints import GapReason, is_invalid_row_composition_gap
 
     gaps = () if generated is None else generated.readiness.gaps
     first = gaps[0] if gaps else None
-    reason_token = first.reason.value if first is not None else "engine_does_not_report_melt_activity"
+    invalid_row_composition = first is not None and is_invalid_row_composition_gap(
+        first.waypoint, first.reason, first.missing
+    )
+    reason_token = (
+        RefusalReason.INVALID_SOURCE.value
+        if invalid_row_composition
+        else (
+            first.reason.value
+            if first is not None
+            else "engine_does_not_report_melt_activity"
+        )
+    )
     detail: dict[str, object] = {
         "reason": reason_token,
         "consumer": "melt_activity",
@@ -2747,11 +2912,12 @@ def _activity_contract_refusal(
     if first is not None and first.reason is GapReason.REFERENCE_STATE_MISMATCH and len(first.missing) >= 2:
         detail["row_convention"] = first.missing[0]
         detail["engine_convention"] = first.missing[1]
-    refusal = (
-        RefusalReason.UNSUPPORTED
-        if first is None or first.reason is GapReason.REFERENCE_STATE_MISMATCH
-        else RefusalReason.IDENTITY_INCOMPLETE
-    )
+    if invalid_row_composition:
+        refusal = RefusalReason.INVALID_SOURCE
+    elif first is None or first.reason is GapReason.REFERENCE_STATE_MISMATCH:
+        refusal = RefusalReason.UNSUPPORTED
+    else:
+        refusal = RefusalReason.IDENTITY_INCOMPLETE
     return EnginePrediction(
         engine=engine,
         channel=channel,
@@ -3280,52 +3446,20 @@ def predict_with_engine(
             refusal_reason=RefusalReason.IDENTITY_UNKNOWN,
             refusal_detail={"reason": "quantity_unknown"},
         )
-    if quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION:
-        if (
-            observation.source_id == "kems-012-sossi-2019"
-            and identity.species.formula not in {"Mn", "Ti"}
-        ):
+    if quantity not in _ENGINE_CELL_PREDICTED_QUANTITIES:
+        from simulator.battery.compilation_tier import _engine_thermo_quantities
+
+        if quantity not in _engine_thermo_quantities(engine):
             return EnginePrediction(
                 engine=engine,
                 channel=channel,
                 execution=Execution(state=ExecutionState.UNSUPPORTED),
                 coefficient_sources=sources,
                 lineage_complete=False,
-                refusal_reason=RefusalReason.OUTSIDE_SUPPORTED_SPECIES,
-                refusal_detail={
-                    "reason": "channel_missing",
-                    "element": identity.species.formula,
-                    "quantity": quantity.value,
-                },
+                refusal_reason=RefusalReason.UNSUPPORTED,
+                refusal_detail=_quantity_not_predicted_detail(quantity),
                 identity=identity,
             )
-        if engine in OXYGEN_BALANCE_EFFUSION_ENGINES:
-            return EnginePrediction(
-                engine=engine,
-                channel=channel,
-                execution=Execution(state=ExecutionState.NOT_PROBED),
-                coefficient_sources=sources,
-                lineage_complete=False,
-                refusal_reason=RefusalReason.IDENTITY_INCOMPLETE,
-                refusal_detail={
-                    "reason": "melt_surface_area_evolution_missing",
-                    "quantity": quantity.value,
-                },
-                identity=identity,
-            )
-        return EnginePrediction(
-            engine=engine,
-            channel=channel,
-            execution=Execution(state=ExecutionState.UNSUPPORTED),
-            coefficient_sources=sources,
-            lineage_complete=False,
-            refusal_reason=RefusalReason.UNSUPPORTED,
-            refusal_detail={
-                "reason": "quantity_not_predicted",
-                "quantity": quantity.value,
-            },
-            identity=identity,
-        )
     formula = identity.species.formula
     if parse_species_formula(formula) is None:
         return EnginePrediction(
@@ -3349,21 +3483,6 @@ def predict_with_engine(
             refusal_detail={
                 "reason": "imcc_built_on_sf04_workbook",
                 "source_id": observation.source_id,
-            },
-            identity=identity,
-        )
-
-    if quantity in EQUILIBRIUM_FIT_QUANTITIES:
-        return EnginePrediction(
-            engine=engine,
-            channel=channel,
-            execution=Execution(state=ExecutionState.UNSUPPORTED),
-            coefficient_sources=sources,
-            lineage_complete=False,
-            refusal_reason=RefusalReason.UNSUPPORTED,
-            refusal_detail={
-                "reason": "unsupported_observable:logKstar_not_activity_coefficient",
-                "quantity": quantity.value,
             },
             identity=identity,
         )
@@ -3908,7 +4027,6 @@ def predict_with_engine(
     activities = dict(getattr(cell, "melt_activities", None) or {})
     pressures = dict(getattr(cell, "gas_partial_pressures_Pa", None) or {})
     reported: Mapping[str, float]
-    unit = QUANTITY_UNITS[quantity]
     coefficient_basis: str | None = None
     if quantity in MELT_ACTIVITY_QUANTITIES:
         coefficients = dict(getattr(cell, "melt_activity_coefficients", None) or {})
@@ -4002,7 +4120,23 @@ def predict_with_engine(
         reported = pressures
         unit = "Pa"
     else:
-        reported = {**activities, **pressures}
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(
+                state=ExecutionState.PRODUCED, call_evidence=call_evidence
+            ),
+            authority=Authority.REFUSED,
+            notices=notices,
+            coefficient_sources=sources,
+            lineage_complete=False,
+            certified_band=certified_band,
+            refusal_reason=RefusalReason.UNSUPPORTED,
+            refusal_detail=_quantity_not_predicted_detail(quantity),
+            identity=identity,
+            requested_composition=requested,
+            version=engine_version,
+        )
 
     magnitude: float | None = None
     converter_reason = ""
@@ -4569,6 +4703,36 @@ def _is_bulk_not_liquid_composition(observation: Observation) -> bool:
     )
 
 
+def _without_outside_single_liquid_field(observation: Observation) -> Observation | None:
+    """The same row without its phase_field_class notice; None if it has none."""
+
+    kept = tuple(
+        notice
+        for notice in observation.notices
+        if not is_outside_single_liquid_field_reason(notice.reason)
+    )
+    if len(kept) == len(observation.notices):
+        return None
+    return replace(observation, notices=kept)
+
+
+def _bulk_composition_diagnostic(residual: Residual) -> dict[str, object]:
+    """Non-scored record of what a single-liquid engine gives at bulk composition (E16)."""
+
+    numeric = residual.numeric
+    refusal = residual.refusal
+    return {
+        "scored": False,
+        "basis": "single_liquid_engine_at_bulk_composition",
+        "status": residual.status.value,
+        "execution": residual.execution.state.value,
+        "value": None if numeric is None else str(numeric.value),
+        "unit": None if numeric is None else numeric.unit,
+        "operation": None if numeric is None else numeric.operation.value,
+        "refusal_reason": None if refusal is None else str(refusal.reason.value),
+    }
+
+
 def _none_uncertainty() -> Uncertainty:
     from simulator.battery.enums import UncertaintyKind
 
@@ -4590,6 +4754,7 @@ def compile_residual(
     point_observations: Sequence[Observation] | None = None,
 ) -> tuple[Residual, Observation | None]:
     _require_score_engine(engine)
+    source_reference = reference
     reference = _fusion_comparison_reference(reference, engine=engine)
     identity = reference.identity
     quantity = quantity_token(identity) if isinstance(identity, Identity) else None
@@ -4709,13 +4874,36 @@ def compile_residual(
             exclusions=("status_match_or_mismatch",),
         )
     if engine in SINGLE_LIQUID_ENGINES and _is_bulk_not_liquid_composition(reference):
+        bulk_detail: dict[str, object] = {
+            "reason": RefusalReason.BULK_NOT_LIQUID_COMPOSITION.value,
+            "composition_status": TWO_PHASE_BULK_COMPOSITION_STATUS,
+            "engine": engine.value,
+        }
+        unclassified = _without_outside_single_liquid_field(source_reference)
+        if unclassified is not None:
+            # t-1123a / E16: a classified (not printed) outside-single-liquid row
+            # is never scored at bulk composition, but the number the engine
+            # gives there is kept as a non-scored diagnostic so nothing
+            # disappears silently.
+            diagnostic, _ = compile_residual(
+                unclassified,
+                engine,
+                context=context,
+                prediction=prediction,
+                comparison_ids=comparison_ids,
+                predict=predict,
+                handles=handles,
+                lineage_observation_id=lineage_observation_id,
+                table_index=table_index,
+                derived_band=derived_band,
+                point_observations=point_observations,
+            )
+            bulk_detail["bulk_composition_diagnostic"] = _bulk_composition_diagnostic(
+                diagnostic
+            )
         return _refused(
             RefusalReason.BULK_NOT_LIQUID_COMPOSITION,
-            {
-                "reason": RefusalReason.BULK_NOT_LIQUID_COMPOSITION.value,
-                "composition_status": TWO_PHASE_BULK_COMPOSITION_STATUS,
-                "engine": engine.value,
-            },
+            bulk_detail,
             execution=Execution(state=ExecutionState.NOT_PROBED),
         )
     if (
@@ -7477,47 +7665,11 @@ def _headline_payload_admits(row: Mapping[str, object], *, tier: str) -> bool:
 
 def _flagged_payload_strata(row: Mapping[str, object]) -> tuple[str, ...]:
     notices = tuple(
-        notice
-        for notice in row.get("notices") or ()
+        (str(notice.get("kind") or ""), notice.get("reason"))
+        for notice in (row.get("notices") or ())
         if isinstance(notice, Mapping)
     )
-    kinds = {str(notice.get("kind")) for notice in notices if notice.get("kind")}
-    out: list[str] = []
-    unverified_apparatus = tuple(
-        notice
-        for notice in notices
-        if notice.get("kind") == NoticeKind.UNVERIFIED_APPARATUS.value
-    )
-    if any(
-        _is_calibration_not_grounded_reason(notice.get("reason"))
-        for notice in unverified_apparatus
-    ):
-        out.append(FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED)
-    if any(
-        not _is_calibration_not_grounded_reason(notice.get("reason"))
-        for notice in unverified_apparatus
-    ):
-        out.append(FLAGGED_STRATUM_UNVERIFIED_APPARATUS)
-    if NoticeKind.CELL_MATERIAL_INFERRED.value in kinds:
-        out.append(FLAGGED_STRATUM_CELL_MATERIAL_INFERRED)
-    if NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG.value in kinds:
-        out.append(FLAGGED_STRATUM_CATALOGUE_COMPOSITION)
-    if any(
-        _is_source_internally_inconsistent(
-            str(notice.get("kind") or ""), notice.get("reason")
-        )
-        for notice in notices
-    ):
-        out.append(FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT)
-    if NoticeKind.IMCC_COMPLEX_SATURATION.value in kinds:
-        out.append(FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION)
-    if any(_is_fusion_conversion_reason(notice.get("reason")) for notice in notices):
-        out.append(FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION)
-    if NoticeKind.FIGURE_ONLY.value in kinds:
-        out.append(FLAGGED_STRATUM_FIGURE_ONLY)
-    if NoticeKind.REACTIVE_CELL_NOT_MODELLED.value in kinds:
-        out.append(FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED)
-    return tuple(out)
+    return _classify_flagged_notice_facts(notices)
 
 
 def _has_flagged_decision_notice(residual: Residual) -> bool:

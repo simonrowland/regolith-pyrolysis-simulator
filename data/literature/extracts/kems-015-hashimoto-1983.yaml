@@ -26,6 +26,15 @@ benches:
   temperature_measurement:
     sensor: {state: {tag: value, value: optical pyrometer on crucible surface; Pt/Pt-13%Rh and W/W-26%Re thermocouples for monitoring}, locator: {published_page: 113, section: Experimental device}}
 experiments:
+- experiment_id: fcmas-free-evap-series
+  method: langmuir_free_evaporation
+  locator: {table: '1', published_page: 113, note: FCMAS solar-abundance starting composition shared by free-evap geometry and derived rows}
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: {SiO2: 35.43, Al2O3: 3.16, FeO: 35.04, MgO: 23.84, CaO: 2.53}
+      locator: {published_page: 113, pdf_page_index: 3, table: '1', note: 'Table 1 row (1) Ave.; regarded as the starting composition in the experiments'}
 - experiment_id: hashimoto-1983-run-17c1
   bench_id: graphite-vacuum-furnace
   method: free_evaporation
@@ -4370,6 +4379,7 @@ species:
   Fe:
     observations:
     - observation_id: hashimoto_1983_fe_fcmas_free_evap_geometry
+      experiment: fcmas-free-evap-series
       type: rate_series
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
@@ -4682,6 +4692,7 @@ species:
             pdf_page_index: 8
             paragraph: The vacuum level in the chamber was about 10^{-4} Torr during the experiments
     - observation_id: hashimoto_1983_fe_geometry_class_b1
+      experiment: fcmas-free-evap-series
       type: rate_series
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
@@ -4742,6 +4753,7 @@ species:
             pdf_page_index: 8
             paragraph: The vacuum level in the chamber was about 10^{-4} Torr during the experiments
     - observation_id: hashimoto_1983_fcmas_qualitative_volatility_order
+      experiment: fcmas-free-evap-series
       type: rate_series
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
@@ -4793,6 +4805,7 @@ species:
             pdf_page_index: 8
             paragraph: The vacuum level in the chamber was about 10^{-4} Torr during the experiments
     - observation_id: hashimoto_1983_table1_starting_composition
+      experiment: fcmas-free-evap-series
       type: rate_series
       locator:
         table: '1'
@@ -6404,6 +6417,7 @@ species:
         quote: Table 6. Enthalpies of vaporization (at 2,000 K)
       class: model
     - observation_id: hashimoto_1983_derived_feo_activation_energy_quoted
+      experiment: fcmas-free-evap-series
       type: gibbs_table
       locator:
         published_page: 123
@@ -6432,6 +6446,7 @@ species:
       class_note: Published second-law fitted activation energy; not a measured rate series.
       class: model
     - observation_id: hashimoto_1983_alpha_hertz_knudsen_assumed_unity_ratio_quoted
+      experiment: fcmas-free-evap-series
       type: alpha
       locator:
         published_page: 133
@@ -17860,6 +17875,7 @@ species:
   Mg:
     observations:
     - observation_id: hashimoto_1983_mg_fcmas_free_evap_geometry
+      experiment: fcmas-free-evap-series
       type: rate_series
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
@@ -17893,6 +17909,7 @@ species:
             paragraph: single spherules
             line_range: '90'
     - observation_id: hashimoto_1983_mg_geometry_class_b1
+      experiment: fcmas-free-evap-series
       type: rate_series
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
@@ -18219,6 +18236,7 @@ species:
           texture: C
           minerals: OL+(G)
     - observation_id: hashimoto_1983_derived_mgo_activation_energy
+      experiment: fcmas-free-evap-series
       type: rate_series
       locator:
         published_page: 123
@@ -18675,6 +18693,7 @@ species:
         note: Instrument accuracy as printed; no invented per-cell composition error.
       class: measured
     - observation_id: hashimoto_1983_derived_mgo_activation_energy_quoted
+      experiment: fcmas-free-evap-series
       type: gibbs_table
       locator:
         published_page: 123
@@ -22846,6 +22865,7 @@ species:
   SiO:
     observations:
     - observation_id: hashimoto_1983_sio_fcmas_free_evap_geometry
+      experiment: fcmas-free-evap-series
       type: rate_series
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
@@ -22872,6 +22892,7 @@ species:
             paragraph: Graphite crucible
             line_range: 70-74
     - observation_id: hashimoto_1983_sio_geometry_class_b1
+      experiment: fcmas-free-evap-series
       type: rate_series
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
@@ -23198,6 +23219,7 @@ species:
           texture: C
           minerals: OL+(G)
     - observation_id: hashimoto_1983_derived_sio2_activation_energy
+      experiment: fcmas-free-evap-series
       type: rate_series
       locator:
         published_page: 123
@@ -23665,6 +23687,7 @@ species:
         note: Instrument accuracy as printed; no invented per-cell composition error.
       class: measured
     - observation_id: hashimoto_1983_derived_sio2_activation_energy_quoted
+      experiment: fcmas-free-evap-series
       type: gibbs_table
       locator:
         published_page: 123

@@ -70,6 +70,20 @@ class GapReason(StrEnum):
     NO_SCOREABLE_OBSERVATIONS = "no_scoreable_observations"
 
 
+def is_invalid_row_composition_gap(
+    waypoint: str, reason: GapReason, missing: tuple[str, ...]
+) -> bool:
+    return (
+        waypoint == "normalized_composition"
+        and reason is GapReason.UNSUPPORTED_PRINT_FORM
+        and any(
+            path.startswith("observation[")
+            and path.endswith(".point_conditions.composition")
+            for path in missing
+        )
+    )
+
+
 class UnknownCompositionRelationError(ValueError):
     """A composition derivation relation lacks an explicit provenance mapping."""
 
@@ -737,6 +751,22 @@ def normalized_composition(
         located = point.get(key) if key in point else getattr(experiment.sample, field)
         path = (f"observation[{observation.observation_id}].point_conditions.{key}"
                 if key in point else f"experiment.sample.{field}")
+        if (
+            field == "initial_composition"
+            and key in point
+            and located is not None
+            and not located.state.is_value
+        ):
+            return WaypointResult(
+                "normalized_composition",
+                None,
+                (),
+                WaypointAbsence(
+                    "normalized_composition",
+                    GapReason.UNSUPPORTED_PRINT_FORM,
+                    (path,),
+                ),
+            )
         if located is None or not located.state.is_value:
             absent.append(path)
             continue

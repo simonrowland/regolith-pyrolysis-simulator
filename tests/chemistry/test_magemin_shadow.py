@@ -389,6 +389,41 @@ def test_shadow_backend_exception_surfaces_warning():
     )
 
 
+def test_projected_field_repair_warning_reaches_shadow_caller():
+    fake_backend = _FakeMAGEMinBackend(
+        equilibrium=_FakeEquilibriumResult(
+            phase_masses_kg={'liquid': 1.0, 'olivine': 0.0},
+            liquid_composition_wt_pct={
+                'SiO2': 50.0,
+                'MgO': 50.0,
+                'FeO': 0.0,
+                'CaO': -1.0,
+                'Na2O': float('nan'),
+            },
+        ),
+    )
+    shadow = MAGEMinShadowProvider(backend=fake_backend)
+
+    result = shadow.dispatch(
+        _make_request(ChemistryIntent.SILICATE_EQUILIBRIUM)
+    )
+
+    assert result.status == 'ok'
+    assert len(result.warnings) == 2
+    assert result.warnings == result.diagnostic['backend_warnings']
+    assert any(
+        'nonfinite' in warning and "'Na2O'" in warning
+        for warning in result.warnings
+    )
+    assert result.diagnostic['phase_masses_kg'] == {'liquid': 1.0}
+    assert result.diagnostic['liquid_composition_wt_pct'] == {
+        'SiO2': 50.0,
+        'MgO': 50.0,
+        'FeO': 0.0,
+        'CaO': -1.0,
+    }
+
+
 def test_kernel_dispatch_does_not_commit_shadow_transitions():
     """A shadow may not write the ledger; the kernel's writer-purity
     invariant binds this and is enforced by transition=None on

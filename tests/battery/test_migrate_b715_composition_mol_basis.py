@@ -1,6 +1,6 @@
 """b-715: composition_mol reader honours declared basis; default unchanged.
 
-PIN commit 4cf55b32a captured the pre-fix always-printed_mole_fraction
+PIN commit f8a834487 captured the pre-fix always-printed_mole_fraction
 behaviour. This file now asserts the accepting contract.
 """
 

@@ -36,6 +36,7 @@ from simulator.battery.enums import (
     NoticeKind,
     PerBasis,
     Phase,
+    Polymorph,
     Quantity,
     QUANTITY_UNITS,
     Rail,
@@ -96,6 +97,7 @@ from simulator.battery.score import (
     load_score_context,
     parse_species_formula,
     pooled_log_pressure_sd,
+    predict_with_engine,
     resolve_source_relation,
     residual_to_plain,
     score_eligible_from_conjuncts,
@@ -2474,6 +2476,7 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
     from simulator.battery.score import (
         FLAGGED_STRATUM_CATALOGUE_COMPOSITION,
         FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION,
+        FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
         FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
         FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
         FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
@@ -2508,6 +2511,11 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
             NoticeKind.DERIVATION_USES_COMPILATION,
             "reference_converted_via_fusion;probe",
         ),
+        (
+            FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
+            NoticeKind.LIQUIDUS_POSITION_CONTESTED,
+            "liquidus_position_contested:probe",
+        ),
     )
     for stratum, kind, reason in cases:
         notice = Notice(
@@ -2521,6 +2529,71 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
         assert flagged_strata((notice,)) == (stratum,)
         assert _is_flagged_stratum_notice(notice) is True
         assert _flagged_payload_strata(payload) == (stratum,)
+
+
+def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
+        FLAGGED_STRATUM_CATALOGUE_COMPOSITION,
+        FLAGGED_STRATUM_CELL_MATERIAL_INFERRED,
+        FLAGGED_STRATUM_FIGURE_ONLY,
+        FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION,
+        FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
+        FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED,
+        FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
+        FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
+        FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
+        _flagged_payload_strata,
+        flagged_strata,
+    )
+
+    facts = (
+        (NoticeKind.UNVERIFIED_APPARATUS, "calibration_not_grounded:probe"),
+        (NoticeKind.UNVERIFIED_APPARATUS, "apparatus_unverified:probe"),
+        (NoticeKind.CELL_MATERIAL_INFERRED, "cell_material_inferred:probe"),
+        (NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG, "catalogue_composition:probe"),
+        (NoticeKind.SOURCE_DISAGREEMENT, "source_internally_inconsistent:probe"),
+        (NoticeKind.IMCC_COMPLEX_SATURATION, "imcc_complex_saturation:probe"),
+        (
+            NoticeKind.DERIVATION_USES_COMPILATION,
+            "reference_converted_via_fusion;probe",
+        ),
+        (NoticeKind.FIGURE_ONLY, "figure_only:probe"),
+        (NoticeKind.REACTIVE_CELL_NOT_MODELLED, "reactive_cell_not_modelled:probe"),
+        (
+            NoticeKind.LIQUIDUS_POSITION_CONTESTED,
+            "liquidus_position_contested:probe",
+        ),
+    )
+    notices = tuple(
+        Notice(
+            kind=kind,
+            affected_quantities=(Quantity.P_PARTIAL,),
+            reason=reason,
+            origin="ordered-pin",
+        )
+        for kind, reason in facts
+    )
+    expected = (
+        FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
+        FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
+        FLAGGED_STRATUM_CELL_MATERIAL_INFERRED,
+        FLAGGED_STRATUM_CATALOGUE_COMPOSITION,
+        FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
+        FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION,
+        FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
+        FLAGGED_STRATUM_FIGURE_ONLY,
+        FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED,
+        FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
+    )
+    payload = {
+        "notices": [
+            {"kind": kind.value, "reason": reason} for kind, reason in facts
+        ]
+    }
+
+    assert flagged_strata(notices) == expected
+    assert _flagged_payload_strata(payload) == expected
 
 
 def test_knudsen_absolute_flux_requires_orifice_area() -> None:
@@ -3077,8 +3150,8 @@ def test_residue_composition_has_its_own_rail_and_typed_engine_refusal() -> None
     for engine in ENGINE_CHANNELS:
         prediction = predict_with_engine(engine, observation)
         assert prediction.execution.state is ExecutionState.UNSUPPORTED
-        assert prediction.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
-        assert prediction.refusal_detail["reason"] == "channel_missing"
+        assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+        assert prediction.refusal_detail["reason"] == "quantity_not_predicted"
         assert prediction.refusal_detail["quantity"] == "residue_component_composition"
 
 
@@ -5484,6 +5557,190 @@ def test_unknown_polymorph_with_multiple_eligible_solid_tables_still_refuses() -
     )
 
 
+def test_tridymite_fusion_conversion_extrapolation_is_flagged() -> None:
+    from simulator.battery.enums import Polymorph
+    from simulator.battery.generators.janaf import (
+        JANAF_R_J_PER_MOL_K,
+        janaf_fusion_energy,
+    )
+    from simulator.battery.score import _fusion_comparison_reference
+
+    experiment = F.kems_experiment()
+    base_identity = F.activity_identity(
+        formula="SiO2",
+        T_K=Decimal("2001"),
+        endmember_phase=Phase.CR,
+        component_basis="SiO2",
+    )
+    before = F.observation(
+        "silica-unknown-polymorph-before-tridymite-lift",
+        experiment.experiment_id,
+        _with_activity_reference_polymorph(base_identity, None),
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-tridymite-reference",
+    )
+    after = F.observation(
+        "silica-tridymite-reference-after-lift",
+        experiment.experiment_id,
+        _with_activity_reference_polymorph(base_identity, Polymorph.TRIDYMITE),
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-tridymite-reference",
+    )
+
+    before_comparison = _fusion_comparison_reference(
+        before, engine=Engine.OPENIMCC
+    )
+    after_comparison = _fusion_comparison_reference(after, engine=Engine.OPENIMCC)
+
+    assert (
+        before_comparison.identity.reference_state.value.endmember.phase.value
+        is Phase.L
+    )
+    assert (
+        after_comparison.identity.reference_state.value.endmember.phase.value
+        is Phase.L
+    )
+    offset_notice = next(
+        notice
+        for notice in after_comparison.notices
+        if "B1259 tridymite→cristobalite offset applied" in notice.reason
+    )
+    assert offset_notice.authority is Authority.EXTRAPOLATED
+    assert offset_notice.band == "B1259 common printed H/S band [298.15, 2000.0] K"
+    assert "fusion conversion missing input:" in offset_notice.reason
+    assert "authority=extrapolated" in offset_notice.reason
+    # Freeze the printed 2000 K differences beyond the B1259 band:
+    # ΔH=0.105 kcal/mol and ΔS=0.060 cal/(mol K) at 2001 K.
+    delta_g_tr_J_per_mol = (
+        Decimal("0.105") * Decimal("4184")
+        - Decimal("2001") * Decimal("0.060") * Decimal("4.184")
+    )
+    fusion = janaf_fusion_energy("SiO2", Decimal("2001"))
+    expected = Decimal("0.3") * (
+        -(
+            delta_g_tr_J_per_mol
+            + fusion.delta_g_fus_kJ_per_mol * Decimal("1000")
+        )
+        / (JANAF_R_J_PER_MOL_K * Decimal("2001"))
+    ).exp()
+    assert after_comparison.value.point == expected
+    assert after_comparison.identity.reference_state.value.endmember.polymorph is None
+
+
+def test_tridymite_fusion_conversion_applies_b1259_offset_to_value() -> None:
+    from simulator.battery.enums import Polymorph
+    from simulator.battery.generators.janaf import (
+        JANAF_R_J_PER_MOL_K,
+        janaf_fusion_energy,
+    )
+    from simulator.battery.score import (
+        _b1259_tridymite_cristobalite_delta_g,
+        _fusion_comparison_reference,
+    )
+
+    temperature = Decimal("1900")
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="SiO2",
+            T_K=temperature,
+            endmember_phase=Phase.CR,
+            component_basis="SiO2",
+        ),
+        Polymorph.TRIDYMITE,
+    )
+    reference = F.observation(
+        "silica-tridymite-reference-at-1900K",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-tridymite-reference",
+    )
+
+    converted = _fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    # B1259 p. 145/p. 144 prints ΔfG=-136.315/-136.324 kcal/mol at 1900 K.
+    # For equal chemical potential, both that source offset and the production
+    # JANAF fusion Gibbs energy multiply activity by exp(-ΔG/RT).
+    delta_g_tr_J_per_mol = Decimal("-0.009") * Decimal("4184")
+    fusion = janaf_fusion_energy("SiO2", temperature)
+    expected = Decimal("0.3") * (
+        -(delta_g_tr_J_per_mol + fusion.delta_g_fus_kJ_per_mol * Decimal(1000))
+        / (JANAF_R_J_PER_MOL_K * temperature)
+    ).exp()
+    assert converted.value.point == expected
+    assert converted.identity.reference_state.value.endmember.phase.value is Phase.L
+    assert any(
+        "B1259 tridymite→cristobalite offset applied" in notice.reason
+        and notice.authority is Authority.CERTIFIED
+        for notice in converted.notices
+    )
+    # Linear interpolation between the printed 1800 and 1900 K H/S rows:
+    # ΔH=0.105 kcal/mol and ΔS=0.060 cal/(mol K), so ΔG at 1850 K is −6 cal/mol.
+    assert _b1259_tridymite_cristobalite_delta_g(Decimal("1850"))[0] == Decimal(
+        "-25.104"
+    )
+
+
+def test_tridymite_offset_real_predictor_scores_above_fusion() -> None:
+    from simulator.battery.enums import Polymorph
+
+    experiment = F.kems_experiment()
+    composition = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(
+            ("SiO2", Decimal("0.6")),
+            ("CaO", Decimal("0.4")),
+        ),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    for temperature in (Decimal("2001"), Decimal("2300")):
+        identity = _with_activity_reference_polymorph(
+            F.activity_identity(
+                formula="SiO2",
+                T_K=temperature,
+                endmember_phase=Phase.CR,
+                component_basis="SiO2",
+                composition=composition,
+            ),
+            Polymorph.TRIDYMITE,
+        )
+        reference = F.observation(
+            f"silica-tridymite-residual-at-{temperature}K",
+            experiment.experiment_id,
+            identity,
+            Decimal("0.3"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="synthetic-tridymite-residual-reference",
+        )
+        residual, candidate = compile_residual(
+            reference,
+            Engine.OPENIMCC,
+            context=_context(F.work(), experiment, reference, review="reviewed"),
+        )
+
+        assert candidate is not None
+        assert residual.numeric is not None
+        assert (
+            candidate.identity.reference_state.value.endmember.phase.value
+            is Phase.L
+        )
+        offset_notices = [
+            notice
+            for notice in residual.notices
+            if "B1259 tridymite→cristobalite offset applied" in notice.reason
+        ]
+        assert len(offset_notices) == 1
+        offset_notice = offset_notices[0]
+        assert offset_notice.authority is Authority.EXTRAPOLATED
+        assert offset_notice.reason.startswith(
+            "B1259 tridymite→cristobalite offset applied;"
+        )
+        assert "fusion conversion missing input:" in offset_notice.reason
+
+
 @pytest.mark.parametrize("polymorph", (None, "quartz"))
 def test_solid_activity_with_unmatched_polymorph_refuses_conversion(
     polymorph: str | None,
@@ -6886,14 +7143,35 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
             for row in allibert_cao_rows
         )
         assert len(allibert_alumina_rows) == 8
-        assert all(
-            any(
-                "fusion conversion missing input" in notice.reason
-                and "measured reference polymorph is unknown" in notice.reason
-                for notice in row.notices
+        for row in allibert_alumina_rows:
+            polymorph = (
+                observations[row.reference]
+                .identity.reference_state.value.endmember.polymorph
             )
-            for row in allibert_alumina_rows
-        )
+            assert polymorph is not None
+            if polymorph.is_value:
+                assert polymorph.value is Polymorph.CORUNDUM
+                conversion_notice = next(
+                    notice
+                    for notice in row.notices
+                    if notice.kind is NoticeKind.DERIVATION_USES_COMPILATION
+                    and notice.reason.startswith("reference_converted_via_fusion;")
+                )
+                assert "source polymorph is unknown" not in conversion_notice.reason
+            else:
+                assert polymorph.is_unknown
+                missing_input_notice = next(
+                    notice
+                    for notice in row.notices
+                    if notice.kind is NoticeKind.OUT_OF_GAMMA_DOMAIN
+                    and notice.reason.startswith("fusion conversion missing input:")
+                )
+                assert "JANAF solid table Al-096 represents polymorph corundum" in (
+                    missing_input_notice.reason
+                )
+                assert "measured reference polymorph is unknown" in (
+                    missing_input_notice.reason
+                )
         assert not any(row.reference in allibert_rejected for row in residuals)
 
         stolyarova_rows = engine_rows(
@@ -6935,12 +7213,30 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
             row.refusal.reason
             for row in stolyarova_1996_rows
             if row.refusal is not None
-        } == {
-            RefusalReason.IDENTITY_INCOMPLETE,
-            RefusalReason.EFFUSION_REGIME_UNVERIFIED,
-        }
+        } == {RefusalReason.IDENTITY_INCOMPLETE}
         assert all(row.status is ResidualStatus.REFUSED for row in stolyarova_rows)
         assert all(row.status is ResidualStatus.REFUSED for row in activity_rows)
+        # t-1123a classifies the printed x(SiO2)=0.33/0.25 activity points as
+        # two-phase bulk compositions. On a regenerated store their 12 rows
+        # correctly refuse the single-liquid engine; the diagnostic headline
+        # assertions above still exclude every model-derived row from measured
+        # headlines. The store is intentionally not regenerated in this lane.
+        class_s_activity_refs = {
+            row.reference
+            for row in activity_rows
+            if any(
+                notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+                and notice.band == score_module.TWO_PHASE_BULK_COMPOSITION_STATUS
+                for notice in observations[row.reference].notices
+            )
+        }
+        bulk_refused_activity_refs = {
+            row.reference
+            for row in activity_rows
+            if row.refusal is not None
+            and row.refusal.reason is RefusalReason.BULK_NOT_LIQUID_COMPOSITION
+        }
+        assert bulk_refused_activity_refs == class_s_activity_refs
         assert all(
             row.refusal is not None
                 and row.refusal.reason
@@ -6950,6 +7246,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
                     RefusalReason.UNDERDETERMINED_APPARATUS,
                 }
             for row in activity_rows
+            if row.reference not in class_s_activity_refs
         )
         assert any(
             row.refusal is not None
@@ -7967,3 +8264,127 @@ def test_score_store_records_each_in_scope_observation_in_small_fixture() -> Non
     records_by_reference = Counter(row.reference for row in residuals)
     assert records_by_reference.keys() == {activity.observation_id, figure.observation_id}
     assert all(records_by_reference[obs.observation_id] >= 1 for obs in (activity, figure))
+
+
+def test_transition_temperature_refuses_before_generic_engine_pot(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        EngineHandle,
+        EquilibrateCell,
+    )
+
+    identity = replace(
+        F.activity_identity(
+            formula="CaO",
+            component_basis="CaO",
+            composition=Composition(
+                basis="ordered_complete_mole_inventory",
+                components=(("SiO2", Decimal("0.5")), ("CaO", Decimal("0.5"))),
+                amount_basis=AmountBasis.MOLE_FRACTION,
+            ),
+        ),
+        quantity=Quantity.TRANSITION_TEMPERATURE,
+        subtype=State.of("liquidus"),
+    )
+    reference = F.observation(
+        "transition-temperature-generic-fallthrough",
+        F.tabulation_experiment().experiment_id,
+        identity,
+        Decimal("1673.15"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="work-1",
+    )
+    opened: list[str] = []
+    pots = []
+
+    def open_probe_engine(name: str) -> EngineHandle:
+        opened.append(name)
+        return EngineHandle(
+            name=name,
+            backend=object(),
+            available=True,
+            unavailable_reason=None,
+            takes_fo2=False,
+            supports_intrinsic_fo2=True,
+        )
+
+    def equilibrate_probe(handle, pot, **kwargs):
+        pots.append(pot)
+        return EquilibrateCell(
+            pot_id="transition-probe",
+            engine=handle.name,
+            temperature_K=kwargs["temperature_K"],
+            po2=kwargs["po2"],
+            status="ok",
+            refusal_reason=None,
+            engine_status="ok",
+            engine_reason=None,
+            melt_activities={"CaO": 0.25},
+            gas_partial_pressures_Pa={},
+            liquid_fraction=1.0,
+            wall_s=0.0,
+            cpu_s=0.0,
+            hostname="test",
+        )
+
+    monkeypatch.setattr(battery, "open_battery_engine", open_probe_engine)
+    monkeypatch.setattr(battery, "equilibrate_cell", equilibrate_probe)
+    from simulator.battery import score as score_module
+
+    parsed_formulas: list[str] = []
+    parse_formula = score_module.parse_species_formula
+
+    def track_formula_parse(formula: str):
+        parsed_formulas.append(formula)
+        return parse_formula(formula)
+
+    monkeypatch.setattr(score_module, "parse_species_formula", track_formula_parse)
+
+    predictions = {
+        engine: predict_with_engine(engine, reference)
+        for engine in score_module.SCORE_ENGINE_SET
+    }
+
+    assert opened == []
+    assert pots == []
+    assert parsed_formulas == []
+    prediction = predictions[Engine.OPENIMCC]
+    assert prediction.value is None
+    assert prediction.unit is None
+    assert prediction.execution.state is ExecutionState.UNSUPPORTED
+    assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+    assert prediction.refusal_detail == {
+        "reason": "quantity_not_predicted",
+        "quantity": Quantity.TRANSITION_TEMPERATURE.value,
+    }
+
+    for prediction in predictions.values():
+        assert prediction.value is None
+        assert prediction.unit is None
+        assert prediction.execution.state is ExecutionState.UNSUPPORTED
+        assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+        assert prediction.refusal_detail == {
+            "reason": "quantity_not_predicted",
+            "quantity": Quantity.TRANSITION_TEMPERATURE.value,
+        }
+
+    monkeypatch.setattr(
+        score_module,
+        "_ENGINE_CELL_PREDICTED_QUANTITIES",
+        score_module._ENGINE_CELL_PREDICTED_QUANTITIES
+        | {Quantity.TRANSITION_TEMPERATURE},
+    )
+    prediction = predict_with_engine(Engine.OPENIMCC, reference)
+
+    assert len(opened) == 1
+    assert len(pots) == 1
+    assert "CaO" in parsed_formulas
+    assert prediction.value is None
+    assert prediction.unit is None
+    assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+    assert prediction.refusal_detail == {
+        "reason": "quantity_not_predicted",
+        "quantity": Quantity.TRANSITION_TEMPERATURE.value,
+    }
