@@ -186,6 +186,44 @@ _SOL_RAMP_READER_FO2 = {
 }
 
 
+def _stub_native_fe_extent(sim):
+    """Match the production extent signature, including trial fO2.
+
+    23b797efd passes fO2_log on the saturation search so a trial is not
+    replaced by the load-seed reader. The sizing call still omits it.
+    The first explicit value is the live reader.
+    """
+    base = float(sim._current_melt_redox_fO2_log())
+    omitted: list[bool] = []
+    explicit: list[float] = []
+
+    def extent(
+        comp=None,
+        *,
+        fe3_over_sigma_fe=None,
+        T_K=None,
+        pressure_bar=None,
+        fO2_log=None,
+    ):
+        if fO2_log is None:
+            omitted.append(True)
+        else:
+            explicit.append(float(fO2_log))
+        return {
+            'native_fe_frac': 0.5,
+            'native_fe_mol': 1.0,
+        }
+
+    def assert_fO2_log() -> None:
+        assert omitted
+        assert explicit
+        assert explicit[0] == pytest.approx(base)
+        assert all(math.isfinite(value) for value in explicit)
+
+    extent.assert_fO2_log = assert_fO2_log
+    return extent
+
+
 def _live_fo2_buckets(sim, temperatures_C=_UNADOPTED_SEED_RAMP_C) -> list[float]:
     """fO2 buckets of the live reader. Does not dispatch the gate.
 
@@ -248,10 +286,8 @@ def test_native_fe_no_commit_split_suppresses_vapor_route(
     sim.melt.temperature_C = 1600.0
     sim._melt_redox_temperature_shift_is_liquid = lambda *a, **k: True
     sim._re_reference_melt_fO2_to_temperature = lambda *a, **k: None
-    sim._compute_native_fe_saturation_extent = lambda: {
-        'native_fe_frac': 0.5,
-        'native_fe_mol': 1.0,
-    }
+    extent = _stub_native_fe_extent(sim)
+    sim._compute_native_fe_saturation_extent = extent
     sim._compute_fe_redox_split_diagnostic = lambda: {}
     sim._native_fe_partition_diagnostic = lambda mol: {
         'native_fe_vapor_mol': 0.25,
@@ -271,6 +307,7 @@ def test_native_fe_no_commit_split_suppresses_vapor_route(
     )
 
     diagnostic = sim._apply_native_fe_saturation_split(sample_time_h=1.0)
+    extent.assert_fO2_log()
 
     assert route_calls == []
     assert diagnostic['native_fe_event_status'] == 'refused'
@@ -297,10 +334,8 @@ def test_native_fe_vapor_only_route_survives_no_tap_proposal(
     sim.melt.temperature_C = 1600.0
     sim._melt_redox_temperature_shift_is_liquid = lambda *a, **k: True
     sim._re_reference_melt_fO2_to_temperature = lambda *a, **k: None
-    sim._compute_native_fe_saturation_extent = lambda: {
-        'native_fe_frac': 0.5,
-        'native_fe_mol': 1.0,
-    }
+    extent = _stub_native_fe_extent(sim)
+    sim._compute_native_fe_saturation_extent = extent
     sim._compute_fe_redox_split_diagnostic = lambda: {}
     sim._native_fe_partition_diagnostic = lambda mol: {
         'native_fe_vapor_mol': 0.25,
@@ -329,6 +364,7 @@ def test_native_fe_vapor_only_route_survives_no_tap_proposal(
     sim._route_native_fe_vapor_to_condensation = route_vapor
 
     diagnostic = sim._apply_native_fe_saturation_split(sample_time_h=1.0)
+    extent.assert_fO2_log()
 
     assert route_calls == [pytest.approx(0.25)]
     assert diagnostic['native_fe_event_status'] == 'ok'
@@ -353,9 +389,8 @@ def test_native_fe_transitionless_route_requires_explicit_mol_native_attribution
     sim.melt.temperature_C = 1600.0
     sim._melt_redox_temperature_shift_is_liquid = lambda *a, **k: True
     sim._re_reference_melt_fO2_to_temperature = lambda *a, **k: None
-    sim._compute_native_fe_saturation_extent = lambda: {
-        'native_fe_frac': 0.5, 'native_fe_mol': 1.0,
-    }
+    extent = _stub_native_fe_extent(sim)
+    sim._compute_native_fe_saturation_extent = extent
     sim._compute_fe_redox_split_diagnostic = lambda: {}
     sim._native_fe_partition_diagnostic = lambda mol: {
         'native_fe_vapor_mol': 0.25,
@@ -374,6 +409,7 @@ def test_native_fe_transitionless_route_requires_explicit_mol_native_attribution
     )
 
     diagnostic = sim._apply_native_fe_saturation_split(sample_time_h=1.0)
+    extent.assert_fO2_log()
 
     partition = diagnostic['native_fe_partition']
     assert partition['native_fe_vapor_route_status'] == (
@@ -396,10 +432,8 @@ def test_native_fe_error_without_transition_refuses_before_vapor_mutation(
     sim.melt.temperature_C = 1600.0
     sim._melt_redox_temperature_shift_is_liquid = lambda *a, **k: True
     sim._re_reference_melt_fO2_to_temperature = lambda *a, **k: None
-    sim._compute_native_fe_saturation_extent = lambda: {
-        'native_fe_frac': 0.5,
-        'native_fe_mol': 1.0,
-    }
+    extent = _stub_native_fe_extent(sim)
+    sim._compute_native_fe_saturation_extent = extent
     sim._compute_fe_redox_split_diagnostic = lambda: {}
     sim._native_fe_partition_diagnostic = lambda mol: {
         'native_fe_vapor_mol': 0.25,
@@ -430,6 +464,7 @@ def test_native_fe_error_without_transition_refuses_before_vapor_mutation(
     transitions_before = tuple(sim.atom_ledger.transitions)
 
     diagnostic = sim._apply_native_fe_saturation_split(sample_time_h=1.0)
+    extent.assert_fO2_log()
 
     assert route_calls == []
     assert sim.atom_ledger.mol_by_account() == balances_before
