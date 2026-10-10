@@ -28,3 +28,7 @@ Inventory captured before implementation at `e4fc365b75527c1710906b8a7f42f50ea33
 - `simulator/optimize/evaluate.py:1426, 1430, 1436` and `simulator/optimize/pool.py:1379` serialize solver/worker failure dispositions; these are consumers/translators, not raw declared-input validation sites.
 
 No invalid-input-style member exists in `simulator/fidelity_vocabulary.py` or `simulator/battery/enums.py`. The existing canonical `refused` status is already accepted by the liquidus refusal vocabulary and scorer dispatch, and is the typed refusal outcome used for an engine that declines an invalid call. Implementation will use that status and preserve the reason in diagnostics rather than introduce a parallel status token.
+
+## Audit addendum
+
+The implementation pass also found that MAGEMin's scalar admission converted declared values but did not reject non-finite temperature, pressure, fO2, or explicit call-timeout values. Those values now fail admission as invalid input before invoking the engine. A zero remaining timeout continues to mean an exhausted aggregate budget and remains `not_converged`.

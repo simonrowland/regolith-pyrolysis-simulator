@@ -1041,9 +1041,34 @@ def test_magemin_liquidus_finder_rejects_none_budget(monkeypatch):
         max_T_C=1000.0,
         scan_step_C=100.0,
     )
-    assert result.status == "not_converged"
+    assert result.status == "refused"
     assert any("None is rejected" in w for w in result.warnings)
-    assert result.diagnostics.get("reason") == "invalid_liquidus_finder_budget"
+    assert result.diagnostics.get("reason") == "invalid_input"
+    assert result.diagnostics.get("budget_reason") == (
+        "invalid_liquidus_finder_budget"
+    )
+
+
+@pytest.mark.parametrize(
+    'budget',
+    (object(), float('nan'), 0.0, -1.0),
+    ids=('non-numeric', 'non-finite', 'zero', 'negative'),
+)
+def test_magemin_liquidus_finder_invalid_budget_is_refused(budget):
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = 'subprocess'
+    backend._config = {'liquidus_finder_budget_s': budget}
+
+    result = backend.find_liquidus_solidus(
+        composition_mol={'SiO2': 1.0},
+        min_T_C=800.0,
+        max_T_C=1000.0,
+        scan_step_C=100.0,
+    )
+
+    assert result.status == 'refused'
+    assert result.diagnostics['reason'] == 'invalid_input'
 
 
 def test_magemin_subprocess_timeout_clamped_to_remaining_budget(
@@ -1790,6 +1815,21 @@ def test_magemin_remote_builtin_with_multi_argument_constructor_is_preserved():
             {'temperature_C': 'hot'}, 'ValueError', 'hot', id='bad-temperature',
         ),
         pytest.param(
+            {'temperature_C': float('nan')},
+            'ValueError', 'temperature_C must be finite',
+            id='non-finite-temperature',
+        ),
+        pytest.param(
+            {'pressure_bar': float('inf')},
+            'ValueError', 'pressure_bar must be finite',
+            id='non-finite-pressure',
+        ),
+        pytest.param(
+            {'fO2_log': float('nan')},
+            'ValueError', 'fO2_log must be finite',
+            id='non-finite-fo2',
+        ),
+        pytest.param(
             {'call_timeout_s': 'oops'},
             'ValueError',
             'oops',
@@ -1800,6 +1840,11 @@ def test_magemin_remote_builtin_with_multi_argument_constructor_is_preserved():
             'TypeError',
             'object',
             id='bad-timeout-type',
+        ),
+        pytest.param(
+            {'call_timeout_s': float('inf')},
+            'ValueError', 'call_timeout_s must be finite',
+            id='non-finite-timeout',
         ),
     ),
 )
@@ -1820,7 +1865,8 @@ def test_magemin_equilibrate_invalid_declared_scalar_is_typed_refusal(
 
     result = backend.equilibrate(**params)
 
-    assert result.status == 'not_converged'
+    assert result.status == 'refused'
+    assert result.diagnostics['reason'] == 'invalid_input'
     assert result.diagnostics['backend_failure_exception'] == exception_type
     assert message in result.diagnostics['backend_failure_message']
     assert any(message in warning for warning in result.warnings)
