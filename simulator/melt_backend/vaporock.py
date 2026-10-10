@@ -834,14 +834,14 @@ def _log10_bar_maps_equivalent(
     return True
 
 
-def _eval_system_log10_bar(
+def _call_system_eval_gas_abundances(
     system: Any,
     *,
     composition_wt_pct: Mapping[str, float],
     temperature_K: float,
     fO2_log: float,
-) -> tuple[Dict[str, float], Dict[str, Any]]:
-    """Run set_melt_comp + eval_gas_abundances on *system*; return log10 map."""
+) -> Any:
+    """Resolve and call VapoRock's System equilibrium methods."""
     composition = dict(composition_wt_pct)
     temperature = float(temperature_K)
     log_fO2 = float(fO2_log)
@@ -856,19 +856,23 @@ def _eval_system_log10_bar(
         logP = eval_gas_abundances(temperature, log_fO2)
     except Exception as exc:
         raise VapoRockCallError(exc) from exc
-    return _serialize_log10_bar_pressures(logP)
+    return logP
 
 
-def _construct_system(resource: dict[str, Any]) -> Any:
-    """Construct a new System and bump the worker construct counter."""
-    system_cls = resource['system_cls']
+def _construct_system(
+    system_cls: Any,
+    *,
+    resource: Optional[dict[str, Any]] = None,
+) -> Any:
+    """Construct a new System, optionally recording the worker count."""
     try:
         system = system_cls()
     except Exception as exc:
         raise VapoRockCallError(exc) from exc
-    resource['system_construct_count'] = (
-        int(resource.get('system_construct_count') or 0) + 1
-    )
+    if resource is not None:
+        resource['system_construct_count'] = (
+            int(resource.get('system_construct_count') or 0) + 1
+        )
     return system
 
 
@@ -978,19 +982,23 @@ def _handle_vaporock_request(
         # Actual reuse path — optionally probe against a fresh System.
         checks_done = int(resource.get('reuse_equivalence_checks_done') or 0)
         probe = checks_done < int(VAPOROCK_REUSE_EQUIVALENCE_PROBE_LIMIT)
-        reused_log, reused_stats = _eval_system_log10_bar(
-            stored,
-            composition_wt_pct=composition_wt_pct,
-            temperature_K=temperature_K,
-            fO2_log=fO2_log,
-        )
-        if probe:
-            fresh_system = _construct_system(resource)
-            fresh_log, fresh_stats = _eval_system_log10_bar(
-                fresh_system,
+        reused_log, reused_stats = _serialize_log10_bar_pressures(
+            _call_system_eval_gas_abundances(
+                stored,
                 composition_wt_pct=composition_wt_pct,
                 temperature_K=temperature_K,
                 fO2_log=fO2_log,
+            )
+        )
+        if probe:
+            fresh_system = _construct_system(system_cls, resource=resource)
+            fresh_log, fresh_stats = _serialize_log10_bar_pressures(
+                _call_system_eval_gas_abundances(
+                    fresh_system,
+                    composition_wt_pct=composition_wt_pct,
+                    temperature_K=temperature_K,
+                    fO2_log=fO2_log,
+                )
             )
             resource['reuse_equivalence_checks_done'] = checks_done + 1
             if not _log10_bar_maps_equivalent(reused_log, fresh_log):
@@ -1022,14 +1030,16 @@ def _handle_vaporock_request(
             spec_stats = reused_stats
             reuse_mode = 'reused'
     else:
-        system = _construct_system(resource)
+        system = _construct_system(system_cls, resource=resource)
         if want_reuse:
             resource['system'] = system
-        log10_bar, spec_stats = _eval_system_log10_bar(
-            system,
-            composition_wt_pct=composition_wt_pct,
-            temperature_K=temperature_K,
-            fO2_log=fO2_log,
+        log10_bar, spec_stats = _serialize_log10_bar_pressures(
+            _call_system_eval_gas_abundances(
+                system,
+                composition_wt_pct=composition_wt_pct,
+                temperature_K=temperature_K,
+                fO2_log=fO2_log,
+            )
         )
         reuse_mode = 'fresh_latched' if latched else (
             'fresh_seed' if want_reuse else 'fresh'
@@ -2216,35 +2226,29 @@ class VapoRockBackend(MeltBackend):
 
         system_cls = getattr(module, 'System', None)
         if callable(system_cls):
-            try:
-                # Fresh System per request (in-process path). Reuse is an
-                # opt-in warm-worker flag with a finite reused-vs-fresh
-                # prefix probe, not a proven admitted-grid equivalence.
-                system = system_cls()
-                set_melt_comp = getattr(system, 'set_melt_comp')
-                eval_gas_abundances = getattr(system, 'eval_gas_abundances')
-                # VapoRock's System.set_melt_comp takes the oxide wt%
-                # dict positionally; eval_gas_abundances expects an
-                # absolute temperature in Kelvin (verified against the
-                # installed vaporock build, 2026-05-14).
-                set_melt_comp(composition_wt_pct)
-                logP = eval_gas_abundances(temperature_K, fO2_log)
-            except Exception as exc:
-                last_attr_error = exc
-            else:
-                self._last_pressure_authority_warning = (
-                    'This adapter calls System.eval_gas_abundances without '
-                    'the optional P argument, so upstream evaluates liquid '
-                    'chemical potentials at its default P (installed '
-                    'source: P=1e-10 bar) rather than the requested '
-                    'pressure_bar. The vapor result is non-authoritative '
-                    'for pressure-sensitive transport.'
-                )
-                # log10(bar) result is unit-unambiguous; convert directly
-                # without the declared-unit dict path.
-                return self._log10_bar_pressures_to_pa(
-                    logP, composition_wt_pct=composition_wt_pct
-                )
+            # Fresh System per request (in-process path). Reuse is an
+            # opt-in warm-worker flag with a finite reused-vs-fresh
+            # prefix probe, not a proven admitted-grid equivalence.
+            system = _construct_system(system_cls)
+            logP = _call_system_eval_gas_abundances(
+                system,
+                composition_wt_pct=composition_wt_pct,
+                temperature_K=temperature_K,
+                fO2_log=fO2_log,
+            )
+            self._last_pressure_authority_warning = (
+                'This adapter calls System.eval_gas_abundances without '
+                'the optional P argument, so upstream evaluates liquid '
+                'chemical potentials at its default P (installed '
+                'source: P=1e-10 bar) rather than the requested '
+                'pressure_bar. The vapor result is non-authoritative '
+                'for pressure-sensitive transport.'
+            )
+            # log10(bar) result is unit-unambiguous; convert directly
+            # without the declared-unit dict path.
+            return self._log10_bar_pressures_to_pa(
+                logP, composition_wt_pct=composition_wt_pct
+            )
 
         if last_attr_error is not None:
             raise VapoRockCallError(
