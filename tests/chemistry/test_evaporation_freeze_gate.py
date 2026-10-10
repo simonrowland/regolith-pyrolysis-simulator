@@ -2504,6 +2504,9 @@ def test_freeze_gate_cache_quantization_holds_super_liquidus_ticks(
 
     monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
     monkeypatch.setattr(sim, '_get_equilibrium', lambda: _equilibrium())
+    # b-763: pumped headspace exchange moves fO2 on a zero-evaporation
+    # plateau and re-keys the cache. This probe is the quiescent case.
+    monkeypatch.setattr(sim, '_apply_oxygen_reservoir_exchange', lambda: None)
 
     factors = []
     balance_errors = []

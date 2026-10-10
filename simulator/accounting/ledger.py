@@ -948,26 +948,46 @@ class AtomLedger:
                             withdrawal_tolerance,
                             self.relative_tolerance,
                         )
-                        if live_origins > 1 and not pool_ratio and not full_withdrawal:
+                        # Ferry V / V1-S13 R2: never mint unresolved origin
+                        # atoms to close a full-withdrawal shortfall. Float dust
+                        # within withdrawal_tolerance is clipped by the pool
+                        # allocator; anything larger refuses.
+                        #
+                        # A reservoir credit limit is the exception. An empty
+                        # buffer already books the whole debit as unresolved
+                        # (the branch above) and the species credit limit bounds
+                        # the negative balance. A later trace of tracked atoms
+                        # must not turn that same draw into an overdraft:
+                        # withdraw the tracked pool, and book only the uncovered
+                        # moles as unresolved. Accounts that do not allow a
+                        # negative balance still refuse.
+                        credit_line = self.account_policy(account).allows_negative
+                        shortfall = amount - available
+                        use_credit_line = (
+                            credit_line and shortfall > withdrawal_tolerance
+                        )
+                        if (
+                            live_origins > 1
+                            and not pool_ratio
+                            and not full_withdrawal
+                            and not use_credit_line
+                        ):
                             raise OriginUnresolvedError(
                                 f"partial withdrawal from mixed-origin "
                                 f"{account}.{element} requires an explicitly "
                                 f"amalgamated pool"
                             )
-                        # Ferry V / V1-S13 R2: never mint unresolved origin
-                        # atoms to close a full-withdrawal shortfall. Float dust
-                        # within withdrawal_tolerance is clipped by the pool
-                        # allocator; anything larger refuses.
+                        pool = {
+                            **{
+                                origin: account_origins.get(origin, 0.0)
+                                for origin in MATERIAL_ORIGINS
+                            },
+                            "unresolved": account_unresolved,
+                        }
                         try:
                             pool_withdrawal = allocate_pool_withdrawal(
-                                {
-                                    **{
-                                        origin: account_origins.get(origin, 0.0)
-                                        for origin in MATERIAL_ORIGINS
-                                    },
-                                    "unresolved": account_unresolved,
-                                },
-                                amount,
+                                pool,
+                                available if use_credit_line else amount,
                                 absolute_tolerance=withdrawal_tolerance,
                             )
                         except PoolWithdrawalError as exc:
@@ -976,6 +996,12 @@ class AtomLedger:
                                 f"debit={amount:.12g}, "
                                 f"available={available:.12g} mol-atoms"
                             ) from exc
+                        if use_credit_line:
+                            pool_withdrawal = dict(pool_withdrawal)
+                            pool_withdrawal["unresolved"] = (
+                                float(pool_withdrawal.get("unresolved", 0.0))
+                                + shortfall
+                            )
                         for origin in MATERIAL_ORIGINS:
                             origin_amount = float(pool_withdrawal.get(origin, 0.0))
                             if origin_amount > 0.0:

@@ -6376,6 +6376,80 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'source_campaign_hour': int(source_context.get('campaign_hour', 0)),
         }
 
+    def _headspace_one_hour_o2_removal_mol(self, arriving_o2_mol: float) -> float:
+        """O2 moles the existing one-hour bleed would remove after a credit.
+
+        Premise: the exchange asks, before it sizes dn, whether the bleed
+        that already runs later this hour can take the arriving O2 back out.
+        Algebra matches ``_bled_species_mol`` with no cold-train override.
+        Conductance is the kg/s capacity against vacuum at the ideal-gas
+        pressure of (current overhead + arriving O2). A finite downstream
+        pressure multiplies by ``compressible_pressure_capacity_fraction``.
+        ``bleed_kg = min(total_kg, conductance_kg_s * fraction * 3600 s)``,
+        then O2 takes its mole-fraction share, capped at the holdup.
+        Units: mol in, mol out. Returns 0 when the headspace is off or the
+        volume, temperature, or conductance cannot move gas. Does not commit.
+        """
+        if not math.isfinite(arriving_o2_mol) or arriving_o2_mol <= 0.0:
+            return 0.0
+        if not self._overhead_headspace_enabled():
+            return 0.0
+        volume_m3 = self._headspace_volume_m3()
+        temperature_K = self._headspace_temperature_K()
+        if (
+            volume_m3 <= 0.0
+            or temperature_K <= 0.0
+            or not math.isfinite(volume_m3)
+            or not math.isfinite(temperature_K)
+        ):
+            return 0.0
+        holdup = {
+            species: amount
+            for species, mol in self._overhead_holdup_mol().items()
+            if (amount := max(0.0, float(mol))) > 0.0
+        }
+        holdup[OXYGEN_SPECIES] = (
+            holdup.get(OXYGEN_SPECIES, 0.0) + float(arriving_o2_mol)
+        )
+        species_kg = self._overhead_holdup_species_kg(holdup)
+        total_mol = sum(holdup.values())
+        total_kg = sum(species_kg.values())
+        if total_mol <= 0.0 or total_kg <= 0.0:
+            return 0.0
+        p_total_bar = (
+            total_mol * GAS_CONSTANT * temperature_K / (volume_m3 * 1.0e5)
+        )
+        if not math.isfinite(p_total_bar) or p_total_bar <= 0.0:
+            return 0.0
+        conductance = self._headspace_bleed_conductance_kg_s(
+            species_kg_for_M_avg=species_kg,
+            p_upstream_Pa=p_total_bar * 1.0e5,
+        )
+        try:
+            conductance_kg_s = float(conductance)
+        except (TypeError, ValueError):
+            return 0.0
+        if not math.isfinite(conductance_kg_s) or conductance_kg_s <= 0.0:
+            return 0.0
+        try:
+            downstream_bar = float(self._headspace_downstream_pressure_bar())
+        except (TypeError, ValueError):
+            return 0.0
+        from engines.builtin.overhead_bleed import (
+            compressible_pressure_capacity_fraction,
+        )
+
+        fraction = compressible_pressure_capacity_fraction(
+            p_total_bar,
+            downstream_bar,
+        )
+        bleed_kg = min(total_kg, conductance_kg_s * fraction * 3600.0)
+        if bleed_kg <= 0.0 or not math.isfinite(bleed_kg):
+            return 0.0
+        bleed_total_mol = min(total_mol, bleed_kg * total_mol / total_kg)
+        o2_mol = holdup[OXYGEN_SPECIES]
+        return min(o2_mol, o2_mol * bleed_total_mol / total_mol)
+
     def _apply_oxygen_reservoir_exchange(
         self,
         *,
@@ -6456,30 +6530,64 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 f"attribution={self._oxygen_reservoir_guard_context(context='exchange_transport_pO2')!r}"
             )
         x_h = math.log(effective_transport_pO2)
-        denominator = (1.0 / C_m + 1.0 / C_h)
-        dn_to_headspace = alpha * ((x_m - x_h) / denominator)
+        # Headspace oxygen exchange (Ferry V / V1-S13 R1, b-763 boundary).
+        #
+        # Premise: melt redox potential and headspace O2 share one atom
+        # ledger. A sealed or slow-bleed headspace is a finite capacitor
+        # C_h (mol per ln p). A pumped headspace is not: the bleed removes
+        # what arrives, so p_held stays fixed over the hour and C_h drops
+        # out. The reverse leg is never that sink. A vacuum floor is not
+        # an oxygen source, and a CONTROLLED_O2 floor may enlarge effective
+        # C_h above the real overhead inventory so the sealed network still
+        # has a finite target, but atoms cannot be invented.
+        #
+        # Algebra, one hour. alpha = 1 - exp(-1 h / tau), tau = h_eff / k_O
+        # (h_eff in m, k_O in m/s, tau in s, alpha dimensionless),
+        # x = ln(p / 1 bar):
+        #   sealed:  dn = alpha (x_m - x_h) / (1/C_m + 1/C_h)
+        #   pumped:  dn = alpha C_m (x_m - x_h)
+        # C_m and C_h are mol per ln, so dn is mol O2 toward the headspace.
+        # The pumped form is the sealed form at C_h -> infinity. Use it
+        # only when that dn is positive and the existing bleed, evaluated
+        # at the post-credit holdup, removes at least those moles of O2
+        # in the hour. Otherwise keep the sealed form.
+        #
+        # One hour cannot cross equilibrium. For a finite tau, alpha is in
+        # (0, 1), so x_after = (1 - alpha) x_m + alpha x_h lies strictly
+        # between x_m and x_h. The cap below keeps that true if alpha is
+        # ever out of range.
+        #
+        # Sanity, Mars C2A snapshot 24, 1365 C, capacitor removed:
+        # alpha 0.1441, C_m 24.548 mol/ln, delta-ln 10.732,
+        # dn = 0.1441 * 24.548 * 10.732 ≈ 38 mol/h.
+        #
+        # Absorbable claim on the way back in is clamped to (C_h - n_floor);
+        # the ledger commit is further clamped to real
+        # (head_o2_mol - n_floor). Drive fO2 only with dn_ledger. Advancing
+        # melt_intrinsic_fO2_log with the unbacked remainder would mint
+        # oxidizing potential without O atoms.
+        delta_ln = x_m - x_h
+        closed_denominator = (1.0 / C_m) + (1.0 / C_h)
+        dn_closed = alpha * (delta_ln / closed_denominator)
+        dn_fixed = alpha * C_m * delta_ln
+        pressure_held = False
+        if math.isfinite(dn_fixed) and dn_fixed > OXYGEN_RESERVOIR_NOOP_MOL:
+            removed_o2_mol = self._headspace_one_hour_o2_removal_mol(dn_fixed)
+            if removed_o2_mol + OXYGEN_RESERVOIR_NOOP_MOL >= dn_fixed:
+                pressure_held = True
+        dn_to_headspace = dn_fixed if pressure_held else dn_closed
+        if alpha > 0.0 and math.isfinite(alpha) and math.isfinite(dn_to_headspace):
+            dn_equilibrium = dn_to_headspace / alpha
+            if dn_equilibrium >= 0.0:
+                dn_to_headspace = min(dn_to_headspace, dn_equilibrium)
+            else:
+                dn_to_headspace = max(dn_to_headspace, dn_equilibrium)
         if not math.isfinite(dn_to_headspace):
             self._raise_nonfinite_oxygen_reservoir_fO2(
                 dn_to_headspace,
                 context='oxygen_reservoir_exchange_delta',
                 melt_redox_capacity_mol_per_ln_fO2=C_m,
             )
-        # Two-reservoir oxygen exchange (Ferry V / V1-S13 R1).
-        #
-        # Premise: melt redox potential and headspace O₂ share one atom ledger.
-        # A CONTROLLED_O2 floor may enlarge *effective* headspace capacity C_h
-        # above the real overhead O₂ inventory so the RC network still has a
-        # finite target, but atoms cannot be invented.
-        #
-        # Algebra: dn_desired = α (x_m - x_h) / (1/C_m + 1/C_h) mol O₂ toward
-        # headspace. Absorbable claim is clamped to (C_h - n_floor); the ledger
-        # commit is further clamped to real (head_o2_mol - n_floor).
-        # Unit check: C_m has units mol / ln(fO₂), so Δln fO₂ = -dn_ledger / C_m
-        # is dimensionless in ln-space; log10(fO₂) = ln(fO₂)/ln(10).
-        # Sanity: advancing melt_intrinsic_fO2_log with dn_desired while the
-        # ledger only books dn_ledger would mint oxidizing potential without O
-        # atoms (managed_headspace_to_melt / exchange_clamped remainder). Drive
-        # fO₂ only with dn_ledger; surface the unbacked remainder explicitly.
         dn_ledger_to_headspace = dn_to_headspace
         exchange_clamped = False
         if dn_to_headspace < 0.0:
