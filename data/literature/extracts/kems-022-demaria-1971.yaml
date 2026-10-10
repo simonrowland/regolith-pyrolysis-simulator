@@ -1849,11 +1849,39 @@ species:
           sample_alkali_content_wt_pct:
             Na2O: 0.36
             K2O: 0.068
-          composition_source_gap: >-
-            DeMaria 1971 p. 1368 says “The chemical and mineralogical composition of the 12022 specimen
-            is reported elsewhere (SMALES, 1971).” The p. 1369 alkaline-components paragraph prints only
-            Na2O and K2O contents; no full charge composition is printed here. Do not import the Smales
-            analysis as this paper's composition.
+          composition_method_class: quoted_literature
+          composition_attribution: "Smales 1971, as cited by DeMaria et al. 1971 ('reported elsewhere (SMALES, 1971)')"
+          composition_source: >-
+            Smales 1971, as cited by DeMaria et al. 1971 (“reported elsewhere (SMALES, 1971)”); the authors
+            adopt this as the composition of sample 12022. DeMaria's p. 1369 alkaline-components paragraph
+            separately prints Na2O 0.36 wt % and K2O 0.068 wt %.
+          printed_composition:
+            Na2O: 0.36
+            K2O: 0.068
+          printed_composition_source: DeMaria 1971, p. 1369, alkaline-components paragraph; printed alkalis take precedence for those named fields, while Smales supplies the unprinted bulk oxides.
+          composition_basis: printed_alkali_fields_plus_same_sample_catalog_major_oxides
+          composition_from_sample_catalog: true
+          composition_source_kind: published_same_sample_bulk_analysis
+          sample_oxide_composition_wt_pct:
+            SiO2: 42.3
+            Al2O3: 8.2
+            FeO: 21.6
+            MgO: 11.9
+            CaO: 9.0
+            Na2O: 0.23
+            K2O: 0.061
+            TiO2: 4.9
+            MnO: 0.31
+          composition_source_locator:
+            source_id: smales-1971-lpsc-12022
+            observation_id: smales_1971_apollo_12022_bulk_composition_tables1_2_3
+            published_pages: 1254–1255
+            quote: Apollo 12 rock 12022 analytical composition
+            cited_by_source_id: kems-022-demaria-1971
+            citing_published_page: 1368
+            citing_pdf_page_index: 2
+            citing_paragraph: sample 12022 composition
+            citing_quote: “The chemical and mineralogical composition of the 12022 specimen is reported elsewhere (SMALES, 1971).”
         prior_figure_digitization_present: true
         first_observed_T_K: 1250.0
         selection_context_note: >-
