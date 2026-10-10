@@ -91,12 +91,13 @@ class LiquidusSampleError(RuntimeError):
         super().__init__('; '.join(self.warnings) or self.status)
 
 
-class _LiquidusExternalCallError(RuntimeError):
-    """Keep exceptions from the supplied engine callback at its call site."""
-
-    def __init__(self, error: Exception) -> None:
-        self.error = error
-        super().__init__(str(error))
+def _sample_error_with_exception_context(
+    exc: LiquidusSampleError,
+) -> LiquidusSampleError:
+    diagnostics = dict(exc.diagnostics)
+    diagnostics.setdefault('exception_class', type(exc).__name__)
+    diagnostics.setdefault('exception_message', str(exc))
+    return LiquidusSampleError(exc.status, exc.warnings, diagnostics)
 
 
 class _LiquidusNonMonotoneError(RuntimeError):
@@ -152,27 +153,6 @@ def liquidus_sample_error_from_exception(
         if value is not None:
             diagnostics[f'{field_name}_fO2_log'] = value
     return LiquidusSampleError(status, (str(exc),), diagnostics)
-
-
-def _external_sample_error(exc: Exception) -> LiquidusSampleError:
-    failure = liquidus_sample_error_from_exception(exc)
-    if failure is not None:
-        diagnostics = dict(failure.diagnostics)
-        diagnostics.setdefault('exception_class', type(exc).__name__)
-        diagnostics.setdefault('exception_message', str(exc))
-        return LiquidusSampleError(
-            failure.status,
-            failure.warnings,
-            diagnostics,
-        )
-    return LiquidusSampleError(
-        'not_converged',
-        (f'{type(exc).__name__}: {exc}',),
-        {
-            'exception_class': type(exc).__name__,
-            'exception_message': str(exc),
-        },
-    )
 
 
 @dataclass(frozen=True)
@@ -481,9 +461,9 @@ def find_liquidus_solidus_by_fraction(
                 )
             except _LiquidusFinderBudgetExceeded:
                 raise
-            except _LiquidusExternalCallError as exc:
-                _raise_budget_if_engine_exhausted(exc.error)
-                raise _external_sample_error(exc.error) from exc.error
+            except LiquidusSampleError as exc:
+                _raise_budget_if_engine_exhausted(exc)
+                raise _sample_error_with_exception_context(exc) from exc
             raw_fraction_by_temperature[temperature_C] = raw
         frac = _clamp_fraction(raw)
         point = _monotone_point(
@@ -620,19 +600,24 @@ def build_equilibrium_crystallization_path(
     path: list[LiquidFractionPathPoint] = []
     smoothing_warnings: list[str] = []
     try:
-        solidus_T = _declared_float(solidus_T_C, 'solidus_T_C')
-        liquidus_T = _declared_float(liquidus_T_C, 'liquidus_T_C')
-        grid_step_C = _declared_float(grid_step_C, 'grid_step_C')
-        monotonicity_tolerance = _declared_float(
-            monotonicity_tolerance,
-            'monotonicity_tolerance',
-        )
-        monotone_smoothing_max = _declared_float(
-            monotone_smoothing_max,
-            'monotone_smoothing_max',
-        )
+        try:
+            solidus_T = _declared_float(solidus_T_C, 'solidus_T_C')
+            liquidus_T = _declared_float(liquidus_T_C, 'liquidus_T_C')
+            grid_step_C = _declared_float(grid_step_C, 'grid_step_C')
+            monotonicity_tolerance = _declared_float(
+                monotonicity_tolerance,
+                'monotonicity_tolerance',
+            )
+            monotone_smoothing_max = _declared_float(
+                monotone_smoothing_max,
+                'monotone_smoothing_max',
+            )
+        except TypeError as exc:
+            raise _LiquidusFinderConfigurationError(str(exc)) from exc
         if not is_declared_real_scalar(max_points, allow_numeric_str=True):
-            raise TypeError('max_points must be numeric')
+            raise _LiquidusFinderConfigurationError(
+                'max_points must be numeric'
+            )
         if not solidus_T <= liquidus_T:
             return EquilibriumCrystallizationPathResult(
                 status='not_converged',
@@ -645,12 +630,9 @@ def build_equilibrium_crystallization_path(
             max_points=max_points,
         )
         for temperature_C in temperatures:
-            try:
-                raw_fraction, raw_composition = sample_liquid_state(
-                    float(temperature_C)
-                )
-            except Exception as exc:  # noqa: BLE001 - engine callback only
-                raise _external_sample_error(exc) from exc
+            raw_fraction, raw_composition = sample_liquid_state(
+                float(temperature_C)
+            )
             fraction_point = _monotone_point(
                 MeltFractionSample(
                     float(temperature_C),
@@ -672,6 +654,7 @@ def build_equilibrium_crystallization_path(
     except LiquidFractionInvalidError:
         raise
     except LiquidusSampleError as exc:
+        exc = _sample_error_with_exception_context(exc)
         return EquilibriumCrystallizationPathResult(
             status=exc.status,
             warnings=tuple([
@@ -1016,10 +999,7 @@ def _invoke_sample_fraction(
             ]
             if len(positional) >= 2:
                 args = (*args, float(remaining_budget_s))
-    try:
-        raw = sample_fraction(*args, **kwargs)
-    except Exception as exc:  # noqa: BLE001 - engine callback only
-        raise _LiquidusExternalCallError(exc) from exc
+    raw = sample_fraction(*args, **kwargs)
     return _declared_float(raw, 'frac_M')
 
 
