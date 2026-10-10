@@ -1524,7 +1524,8 @@ def test_magemin_fake_bridge_library_error_returns_warning(monkeypatch):
     backend = MAGEMinBackend()
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
-        backend.initialize({})
+        backend.initialize({'python_bridge': 'pymagemin'})
+    backend._binary_path = None
 
     result = backend.equilibrate(
         1500.0,
@@ -1537,6 +1538,64 @@ def test_magemin_fake_bridge_library_error_returns_warning(monkeypatch):
     assert result.ledger_transition is None
     assert any("synthetic MAGEMin failure" in w for w in result.warnings)
     assert result.status == "not_converged"
+    assert result.diagnostics['backend_failure_exception'] == 'RuntimeError'
+    assert result.diagnostics['backend_failure_message'] == 'synthetic MAGEMin failure'
+
+
+def test_magemin_equilibrate_propagates_local_call_helper_errors(monkeypatch):
+    fake_module = types.SimpleNamespace(minimize=lambda **_kwargs: {})
+    _make_available_magemin(monkeypatch, fake_module)
+    backend = MAGEMinBackend()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        backend.initialize({})
+
+    def broken_local_helper(**_kwargs):
+        raise KeyError('local MAGEMin wrapper defect')
+
+    monkeypatch.setattr(backend, '_call_magemin', broken_local_helper)
+    with pytest.raises(KeyError, match='local MAGEMin wrapper defect'):
+        backend.equilibrate(
+            1500.0,
+            composition_mol={'SiO2': 1.0},
+            fO2_log=-8.0,
+            pressure_bar=1.0,
+        )
+
+
+def test_magemin_bridge_import_propagates_non_import_errors(monkeypatch):
+    import builtins
+
+    real_import = builtins.__import__
+
+    def broken_import(name, *args, **kwargs):
+        if name == 'pymagemin':
+            raise KeyError('local import hook defect')
+        return real_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, '__import__', broken_import)
+    with pytest.raises(KeyError, match='local import hook defect'):
+        MAGEMinBackend()._import_magemin_bridge(requested='pymagemin')
+
+
+def test_magemin_julia_bridge_init_propagates_untyped_errors(monkeypatch):
+    import sys
+
+    fake_julia = types.ModuleType('julia')
+    fake_julia.__path__ = []
+    fake_julia.Main = types.SimpleNamespace(
+        eval=lambda _source: (_ for _ in ()).throw(KeyError('local Julia hook defect'))
+    )
+    fake_core = types.ModuleType('julia.core')
+
+    class JuliaError(Exception):
+        pass
+
+    fake_core.JuliaError = JuliaError
+    monkeypatch.setitem(sys.modules, 'julia', fake_julia)
+    monkeypatch.setitem(sys.modules, 'julia.core', fake_core)
+    with pytest.raises(KeyError, match='local Julia hook defect'):
+        MAGEMinBackend()._import_magemin_bridge(requested='julia')
 
 
 def test_magemin_only_consumes_cleaned_melt_account(monkeypatch):
