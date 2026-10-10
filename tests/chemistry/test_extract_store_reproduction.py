@@ -22,6 +22,7 @@ artifact it validates.
 from __future__ import annotations
 
 import os
+from copy import deepcopy
 from pathlib import Path
 
 import pytest
@@ -2002,9 +2003,6 @@ _LIVE_QUALITATIVE_SKIP_BY_ID = {
     "stolyarova_2015_table1_vapour_species_map": (
         "unsupported_observable:vapour_species_map_no_numeric_pressures"
     ),
-    "sossi_fegley_2018_table1_pure_oxide_vapour_speciation_index": (
-        "unsupported_observable:pure_oxide_speciation_index"
-    ),
     "demaria_1971_tio_tio2_figure6_comparable_pressures": (
         "unsupported_observable:figure_only_not_digitized"
     ),
@@ -2024,6 +2022,71 @@ def test_live_qualitative_catch_all_is_split_by_payload_class(
         obs = by_id[observation_id]
         assert parse_ordering_claim(obs) is None, observation_id
         assert qualitative_payload_skip_reason(obs) == reason, observation_id
+
+
+_CONTEXT_RELOCATIONS = (
+    ("kems-200-ueshima-1983", "ueshima_1983_femo_table1_phases"),
+    (
+        "kems-041-sossi-fegley-2018",
+        "sossi_fegley_2018_table1_pure_oxide_vapour_speciation_index",
+    ),
+)
+
+
+def _assert_context_relocation(document: dict, observation_id: str) -> None:
+    rows_by_container = {
+        container: {
+            row["observation_id"]
+            for species in document["species"].values()
+            for row in species.get(container, [])
+        }
+        for container in ("context", "observations")
+    }
+    assert observation_id in rows_by_container["context"]
+    assert observation_id not in rows_by_container["observations"]
+
+
+@pytest.mark.parametrize(("source_id", "observation_id"), _CONTEXT_RELOCATIONS)
+def test_pilot_rows_remain_context_and_are_not_scored(
+    source_id: str,
+    observation_id: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    source_path = REPO_ROOT / "data" / "literature" / "extracts" / f"{source_id}.yaml"
+    document = yaml.safe_load(source_path.read_text())
+    _assert_context_relocation(document, observation_id)
+    extract_reproduction._ensure_tools_path()
+    import extract_merge
+
+    monkeypatch.setattr(extract_merge, "load_extracts", lambda _directory: [document])
+    adopted_observations = load_adopted_observations()
+    battery_evaluations = evaluate_all(
+        observations=adopted_observations,
+        vapor_pressure_data={"species": {}},
+    )
+    assert observation_id not in {obs.observation_id for obs in adopted_observations}
+    assert observation_id not in {
+        evaluation.observation.observation_id for evaluation in battery_evaluations
+    }
+
+
+@pytest.mark.parametrize(("source_id", "observation_id"), _CONTEXT_RELOCATIONS)
+def test_context_relocation_assertion_detects_reversion(
+    source_id: str, observation_id: str
+) -> None:
+    source_path = REPO_ROOT / "data" / "literature" / "extracts" / f"{source_id}.yaml"
+    document = deepcopy(yaml.safe_load(source_path.read_text()))
+    for species in document["species"].values():
+        context = species.get("context", [])
+        moved = [row for row in context if row["observation_id"] == observation_id]
+        if moved:
+            context[:] = [row for row in context if row["observation_id"] != observation_id]
+            species.setdefault("observations", []).extend(moved)
+            break
+    else:
+        pytest.fail(f"{observation_id} was not present in context to mutate")
+    with pytest.raises(AssertionError):
+        _assert_context_relocation(document, observation_id)
 
 
 def test_ordering_bound_emits_declared_verdict() -> None:
