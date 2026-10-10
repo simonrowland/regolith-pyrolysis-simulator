@@ -2,7 +2,6 @@
 
 import json
 import re
-import subprocess
 from collections.abc import Mapping
 from collections import Counter
 from decimal import Decimal
@@ -880,7 +879,7 @@ STORE_PATHS = sorted(
 )
 
 
-def absence_audit(paths=STORE_PATHS, *, source_documents=None):
+def absence_audit(paths=STORE_PATHS):
     """Independent source lookup; never calls migration's inference/census helpers."""
     judged, bad = Counter(), []
     compilation_audit_cache = {}
@@ -889,10 +888,8 @@ def absence_audit(paths=STORE_PATHS, *, source_documents=None):
             store = yaml.load(path.read_text(), Loader=_YAML_LOADER)
             legacy = {}
             if directory == "extracts-v2":
-                source_doc = (source_documents or {}).get(path.name)
-                if source_doc is None:
-                    source_path = REPO_ROOT / "data/literature/extracts" / path.name
-                    source_doc = yaml.load(source_path.read_text(), Loader=_YAML_LOADER)
+                source_path = REPO_ROOT / "data/literature/extracts" / path.name
+                source_doc = yaml.load(source_path.read_text(), Loader=_YAML_LOADER)
                 for body in (source_doc.get("species") or {}).values():
                     for row in body.get("observations") or []:
                         legacy[str(row["observation_id"])] = row
@@ -1019,33 +1016,7 @@ def _source_observation_rows(path: Path) -> int | None:
 
 @pytest.mark.parametrize("path", STORE_PATHS, ids=lambda p: p.name)
 def test_g1_whole_store_absence_claims_match_sources(path):
-    source_documents = None
-    if path.name == "kems-016-stolyarova-1992.yaml":
-        source_revision = "f52151badbd918f7e096b14d45dc8639a1d0278f"
-        source_path = "data/literature/extracts/kems-016-stolyarova-1992.yaml"
-        source_object = f"{source_revision}:{source_path}"
-        available = subprocess.run(
-            ["git", "cat-file", "-e", source_object],
-            cwd=REPO_ROOT,
-            capture_output=True,
-            check=False,
-        )
-        if available.returncode != 0:
-            pytest.skip(
-                "git_history_unavailable: required source revision "
-                f"{source_revision!r} is absent"
-            )
-        green_source = subprocess.run(
-            ["git", "show", source_object],
-            cwd=REPO_ROOT,
-            check=True,
-            capture_output=True,
-            text=True,
-        ).stdout
-        source_documents = {
-            path.name: yaml.load(green_source, Loader=_YAML_LOADER)
-        }
-    judged, bad = absence_audit([path], source_documents=source_documents)
+    judged, bad = absence_audit([path])
     if _store_kind(path) == "extracts-v2" or compilation_family_from_store_path(path):
         # Zero source rows have no absence claims. Leaked context ids still
         # fail inside absence_audit (they are not in the source observations).
