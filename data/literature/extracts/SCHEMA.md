@@ -181,6 +181,29 @@ species:
 
 ## Observation types
 
+### Derived observation lineage
+
+`model_derived` and `measured_reduced` observations require a derivation
+recording the stated method; the observation's required `locator` locates that
+method. They also require `derived_from`, except a `measured_reduced`
+derivation may declare that the source does not print the raw inputs:
+
+```yaml
+locator: {page: 164, section: '3.3'}
+derivation:
+  relation: "calculated from measured quantities"
+  inputs: ["pdf:source-id"]
+  output_unit: dimensionless
+  raw_inputs:
+    state: {tag: value, value: not_printed}
+    locator: {page: 164, section: '3.3'}
+```
+
+`raw_inputs` is a typed `not_printed` value with its own source locator. It is
+valid only for `measured_reduced`, cannot appear with `derived_from`, and does
+not replace the required derivation method or locator. Model-derived rows
+always require `derived_from`.
+
 Exactly one of:
 
 | `type` | Payload intent |
