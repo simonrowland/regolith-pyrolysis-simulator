@@ -349,6 +349,7 @@ PAGE_METHOD_CLASSES = frozenset(
 # rows but are the same identity class.
 # Reviewed source spelling: solid_arsenolite (explicit extract + polymorph).
 # No title inference, no substring heuristics.
+# NTRS prints the sodium phase and sample form as liquid_sodium / Liquid sodium.
 PHASE_MAP: dict[str, Phase] = {
     "gas": Phase.G,
     "condensed_solid": Phase.CR,
@@ -356,6 +357,8 @@ PHASE_MAP: dict[str, Phase] = {
     "g": Phase.G,
     "cr": Phase.CR,
     "l": Phase.L,
+    "liquid_sodium": Phase.L,
+    "liquid sodium": Phase.L,
     "aq": Phase.AQ,
     "glass": Phase.GLASS,
     "supercooled_l": Phase.SUPERCOOLED_L,
@@ -499,6 +502,9 @@ RAIL_MAP = {
 
 METHOD_TOKENS = {m.value: m for m in MethodToken}
 REGIME_TO_METHOD = {
+    # Static, closed-vessel pressure measurements report equilibrium pressure;
+    # they do not use the Knudsen-effusion correction.
+    "static_capsule_vapor_pressure": MethodToken.STATIC_EQUILIBRIUM,
     # These extract labels all describe the Knudsen-effusion mass-spectrometric
     # pressure method; the closed schema token is KNUDSEN_EFFUSION.
     "kems_effusion": MethodToken.KNUDSEN_EFFUSION,
@@ -7201,12 +7207,13 @@ def _pressure_identity_context(
     doc: Mapping[str, Any],
     rows: Iterable[tuple[str, Mapping[str, Any]]],
 ) -> dict[str, Any]:
-    """Collect repeated source declarations for rows that omit duplicates."""
+    """Collect source declarations and validity flags shared across rows."""
 
     context: dict[str, Any] = {
         "standard_states": [],
         "condensed_forms": [],
         "reactions": [],
+        "validity_flags": [],
         "source_text": _extract_text(
             {
                 "fO2_control": doc.get("fO2_control"),
@@ -7220,6 +7227,9 @@ def _pressure_identity_context(
         values = obs.get("values")
         if not isinstance(values, Mapping):
             values = {}
+        validity_flags = values.get("validity_flags")
+        if isinstance(validity_flags, Mapping):
+            context["validity_flags"].append(validity_flags)
         quantity, _reason = map_quantity(
             obs.get("type"), values, units=obs.get("units"), row=obs
         )
@@ -11715,14 +11725,17 @@ class Migrator:
         existing: Mapping[str, Any],
         *,
         method: State[MethodToken] | None = None,
+        quantity: Quantity | None = None,
+        species_formula: str | None = None,
     ) -> tuple[dict[str, Any], tuple[str, ...]]:
         """Lift printed experiment conditions into an observation identity.
 
         An observation may omit conditions that its declared experiment records
-        once. Only an exact experiment-scope pressure is inherited. The C–CO
-        route is deliberately resolved through the same guarded waypoint used
-        by consumers; its log pressure is converted to Pa and remains marked
-        derived in the observation lineage.
+        once. Pressure inherits only an exact experiment-scope value; a static
+        p_sat row also gets a pure reservoir when the sample's printed form and
+        single-component composition agree. The C–CO route is resolved through
+        the same guarded waypoint used by consumers, with derived pressure
+        provenance retained.
         """
 
         experiment = self.result.experiments.get(experiment_id)
@@ -11730,6 +11743,51 @@ class Migrator:
             return {}, ()
         known: dict[str, Any] = {}
         provenance: list[str] = []
+
+        effective_method = (
+            method
+            if method is not None and method.is_value
+            else experiment.method
+        )
+        if (
+            quantity is Quantity.P_SAT
+            and species_formula is not None
+            and effective_method.is_value
+            and effective_method.value is MethodToken.STATIC_EQUILIBRIUM
+        ):
+            sample = experiment.sample
+            form = (
+                sample.form.state.value.strip().casefold()
+                if sample.form is not None and sample.form.state.is_value
+                else None
+            )
+            sample_phase = PHASE_MAP.get(form) if form is not None else None
+            initial = sample.initial_composition
+            pure_sample = (
+                initial is not None
+                and initial.state.is_value
+                and isinstance(initial.state.value, Composition)
+                and initial.state.value.components
+                == ((species_formula, Decimal("1")),)
+            )
+            existing_reservoir = existing.get("reservoir")
+            reservoir_can_fill = "reservoir" not in existing or (
+                isinstance(existing_reservoir, State)
+                and existing_reservoir.is_unknown
+            )
+            if (
+                reservoir_can_fill
+                and sample_phase
+                in {Phase.CR, Phase.L, Phase.GLASS, Phase.SUPERCOOLED_L}
+                and pure_sample
+            ):
+                known["reservoir"] = State.of(
+                    make_species(species_formula, sample_phase)
+                )
+                provenance.append(
+                    "identity.reservoir=experiment.sample.form and pure "
+                    "initial_composition (printed sample)"
+                )
 
         existing_pressure = existing.get("total_pressure_Pa")
         pressure_can_fill = "total_pressure_Pa" not in existing
@@ -11739,11 +11797,6 @@ class Migrator:
             pressure_source = "experiment.pressure_environment.total_pressure_Pa"
             pressure = _printed_experiment_pressure(
                 experiment.pressure_environment.total_pressure_Pa,
-            )
-            effective_method = (
-                method
-                if method is not None and method.is_value
-                else experiment.method
             )
             # Knudsen effusion: experiment total is chamber background for the
             # KEMS validity gates — never the pressure a prediction is made at.
@@ -13241,6 +13294,61 @@ class Migrator:
                 source=source_key,
                 observation_id=obs_id,
             )
+        experiment = self.result.experiments.get(experiment_id)
+        effective_method = (
+            method
+            if method.is_value
+            else (experiment.method if experiment is not None else method)
+        )
+        validity_notices: list[Notice] = []
+        if (
+            q_token is Quantity.P_SAT
+            and effective_method.is_value
+            and effective_method.value is MethodToken.STATIC_EQUILIBRIUM
+        ):
+            raw_validity_flags = (source_context or {}).get("validity_flags", ())
+            if isinstance(raw_validity_flags, (list, tuple)):
+                for flag_set in raw_validity_flags:
+                    if not isinstance(flag_set, Mapping):
+                        continue
+                    for name, flag in flag_set.items():
+                        if not isinstance(flag, Mapping):
+                            continue
+                        status = flag.get("status")
+                        note = flag.get("note")
+                        locator_data = flag.get("locator")
+                        detail = "; ".join(
+                            item
+                            for item in (
+                                (
+                                    f"status={status}"
+                                    if status not in (None, "")
+                                    else None
+                                ),
+                                str(note).strip()
+                                if isinstance(note, str) and note.strip()
+                                else None,
+                                (
+                                    "locator="
+                                    + ", ".join(
+                                        f"{key}={value}"
+                                        for key, value in locator_data.items()
+                                    )
+                                    if isinstance(locator_data, Mapping)
+                                    else None
+                                ),
+                            )
+                            if item
+                        )
+                        if detail:
+                            validity_notices.append(
+                                Notice(
+                                    kind=NoticeKind.UNVERIFIED_APPARATUS,
+                                    affected_quantities=(Quantity.P_SAT,),
+                                    reason=f"apparatus_unverified:{name}: {detail}",
+                                    origin=obs_id,
+                                )
+                            )
         point_conditions = None
         if t_known is not None:
             point_conditions = {
@@ -13387,6 +13495,8 @@ class Migrator:
             experiment_id,
             ident_kwargs,
             method=method,
+            quantity=q_token,
+            species_formula=species.formula,
         )
         identity_for_profile = (
             Identity(
@@ -13717,7 +13827,12 @@ class Migrator:
                     phase_provenance=phase_provenance,
                     identity_provenance=identity_provenance,
                     notices=(
-                        () if total_iron_notice is None else (total_iron_notice,)
+                        *(
+                            ()
+                            if total_iron_notice is None
+                            else (total_iron_notice,)
+                        ),
+                        *validity_notices,
                     ),
                     equipment=obs.get("equipment"),
                     parent_reason=hold_reason,
@@ -13854,7 +13969,12 @@ class Migrator:
                         derived_from=derived_from,
                         source_derivation=source_derivation,
                         notices=(
-                            () if total_iron_notice is None else (total_iron_notice,)
+                            *(
+                                ()
+                                if total_iron_notice is None
+                                else (total_iron_notice,)
+                            ),
+                            *validity_notices,
                         ),
                         equipment=obs.get("equipment"),
                         parent_reason=hold_reason,
@@ -13894,6 +14014,7 @@ class Migrator:
         observation_notices: list[Notice] = []
         if total_iron_notice is not None:
             observation_notices.append(total_iron_notice)
+        observation_notices.extend(validity_notices)
         from simulator.battery.validity import comparison_method_cell_constant_cancels
 
         if (

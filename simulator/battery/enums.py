@@ -330,6 +330,7 @@ class AmountBasis(StrEnum):
 
 class MethodToken(StrEnum):
     KNUDSEN_EFFUSION = "knudsen_effusion"
+    STATIC_EQUILIBRIUM = "static_equilibrium"
     LANGMUIR_FREE_EVAPORATION = "langmuir_free_evaporation"
     TRANSPIRATION = "transpiration"
     TGA = "tga"

@@ -3482,6 +3482,12 @@ def predict_with_engine(
             refusal_detail={"reason": "species_formula_unparsed", "formula": formula},
             identity=identity,
         )
+    static_equilibrium_pressure = (
+        quantity is Quantity.P_SAT
+        and experiment is not None
+        and experiment.method.is_value
+        and experiment.method.value is MethodToken.STATIC_EQUILIBRIUM
+    )
     if is_sf04_workbook(observation) and engine in IMCC_ENGINES:
         return EnginePrediction(
             engine=engine,
@@ -3509,6 +3515,124 @@ def predict_with_engine(
             refusal_detail={"reason": "temperature_unknown"},
             identity=identity,
         )
+
+    if static_equilibrium_pressure:
+        reservoir = stated_pure_substance_reservoir(identity)
+        if reservoir is None:
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.IDENTITY_INCOMPLETE,
+                refusal_detail={
+                    "reason": "static_equilibrium_pure_reservoir_not_stated",
+                    "quantity": quantity.value,
+                    "formula": formula,
+                },
+                identity=identity,
+            )
+        if engine is Engine.INTERNAL_ANALYTICAL:
+            from engines.antoine import _antoine_log10_pressure
+            from engines.builtin.vapor_pressure import (
+                COEFF_BLOCK_PURE_COMPONENT,
+                VaporPressureComputationError,
+                _pow10_pressure_or_raise,
+                vapor_pressure_valid_range_K,
+                wall_condensation_antoine_coefficients,
+            )
+            from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+
+            vapor_pressure_data = vapor_pressure_legacy_view(
+                load_yaml(REPO_ROOT / "data/vapor_pressures.yaml")
+            )
+            row = vapor_pressure_data.get("metals", {}).get(formula)
+            coefficients, coefficient_block = wall_condensation_antoine_coefficients(
+                row, float(T)
+            )
+            if not coefficients or coefficient_block != COEFF_BLOCK_PURE_COMPONENT:
+                return EnginePrediction(
+                    engine=engine,
+                    channel=channel,
+                    execution=Execution(state=ExecutionState.UNSUPPORTED),
+                    coefficient_sources=sources,
+                    lineage_complete=False,
+                    refusal_reason=RefusalReason.UNSUPPORTED,
+                    refusal_detail={
+                        "reason": "static_equilibrium_total_pressure_not_available",
+                        "formula": formula,
+                    },
+                    identity=identity,
+                )
+            log_pressure = _antoine_log10_pressure(
+                float(coefficients["A"]),
+                float(coefficients["B"]),
+                float(coefficients.get("C", 0.0)),
+                float(T),
+            )
+            try:
+                pressure = _pow10_pressure_or_raise(
+                    log_pressure,
+                    species=formula,
+                    field="static_equilibrium_total_pressure_Pa",
+                )
+            except (OverflowError, VaporPressureComputationError):
+                return EnginePrediction(
+                    engine=engine,
+                    channel=channel,
+                    execution=Execution(state=ExecutionState.NOT_PROBED),
+                    coefficient_sources=sources,
+                    lineage_complete=False,
+                    refusal_reason=RefusalReason.INVALID_IDENTITY,
+                    refusal_detail={
+                        "reason": "static_equilibrium_pressure_invalid",
+                        "formula": formula,
+                    },
+                    identity=identity,
+                )
+            source_range = vapor_pressure_valid_range_K(
+                row, coefficient_block, temperature_K=float(T)
+            )
+            certified_band = None
+            notices: tuple[Notice, ...] = ()
+            authority = Authority.CERTIFIED
+            if source_range and len(source_range) == 2:
+                low, high = (float(source_range[0]), float(source_range[1]))
+                certified_band = {
+                    "temperature_K": (Decimal(str(low)), Decimal(str(high)))
+                }
+                if float(T) < low or float(T) > high:
+                    authority = Authority.EXTRAPOLATED
+                    notices = (
+                        Notice(
+                            kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                            affected_quantities=(Quantity.P_SAT,),
+                            reason="pure_component_antoine_extrapolated",
+                            origin=observation.observation_id,
+                            band=f"[{low:g}, {high:g}] K",
+                            authority=Authority.EXTRAPOLATED,
+                        ),
+                    )
+            sidecar_sources = expand_coefficient_sources(("antoine_sidecar",))
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(
+                    state=ExecutionState.PRODUCED,
+                    call_evidence=f"{engine.value}:static-pure-pressure:{formula}",
+                ),
+                value=as_decimal(str(pressure)),
+                unit="Pa",
+                coefficient_basis=COEFF_BLOCK_PURE_COMPONENT,
+                authority=authority,
+                notices=notices,
+                coefficient_sources=sidecar_sources,
+                lineage_complete=lineage_complete_for(sidecar_sources),
+                certified_band=certified_band,
+                identity=identity,
+                version="builtin-vapor-pressure",
+            )
 
     if (
         quantity in MELT_ACTIVITY_QUANTITIES
@@ -4154,7 +4278,94 @@ def predict_with_engine(
     # the admitted endmember. Compare that exact identity; never substitute a
     # different species into the residual.
     compared = formula
-    if quantity is Quantity.ACTIVITY and engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE):
+    if static_equilibrium_pressure:
+        invalid_components = tuple(
+            getattr(cell, "invalid_gas_partial_pressure_components", ()) or ()
+        )
+        if invalid_components:
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(
+                    state=ExecutionState.PRODUCED,
+                    call_evidence=call_evidence,
+                ),
+                authority=Authority.REFUSED,
+                notices=notices,
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.METRIC_DOMAIN,
+                refusal_detail={
+                    "reason": "static_equilibrium_total_pressure_invalid",
+                    "reported": sorted(
+                        {*pressures, *invalid_components}
+                    ),
+                    "invalid_components": list(invalid_components),
+                },
+                identity=identity,
+                requested_composition=requested,
+                version=engine_version,
+            )
+        if not pressures:
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(
+                    state=ExecutionState.PRODUCED,
+                    call_evidence=call_evidence,
+                ),
+                authority=Authority.REFUSED,
+                notices=notices,
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.UNSUPPORTED,
+                refusal_detail={
+                    "reason": "static_equilibrium_total_pressure_not_reported",
+                    "engine": engine.value,
+                },
+                identity=identity,
+                requested_composition=requested,
+                version=engine_version,
+            )
+        try:
+            partial_pressures = tuple(float(value) for value in pressures.values())
+            magnitude = math.fsum(partial_pressures)
+        except (TypeError, ValueError, OverflowError):
+            partial_pressures = ()
+            magnitude = 0.0
+        if (
+            not partial_pressures
+            or any(
+                not math.isfinite(value) or value < 0.0
+                for value in partial_pressures
+            )
+            or not math.isfinite(magnitude)
+            or magnitude <= 0.0
+        ):
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(
+                    state=ExecutionState.PRODUCED,
+                    call_evidence=call_evidence,
+                ),
+                authority=Authority.REFUSED,
+                notices=notices,
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.METRIC_DOMAIN,
+                refusal_detail={
+                    "reason": "static_equilibrium_total_pressure_invalid",
+                    "reported": sorted(str(name) for name in pressures),
+                },
+                identity=identity,
+                requested_composition=requested,
+                version=engine_version,
+            )
+    elif quantity is Quantity.ACTIVITY and engine in (
+        Engine.ALPHAMELTS,
+        Engine.THERMOENGINE,
+    ):
         # The converter refuses Na2O, CaO, MgO, FeO, and K2O, including a
         # same-named key. It returns a(SiO2) from SiO2_Liq and a(H2O)
         # from H2O or H2O_Liq. Element labels are not oxide activities.
@@ -4882,6 +5093,21 @@ def compile_residual(
             },
             execution=Execution(state=ExecutionState.NOT_PROBED),
             exclusions=("status_match_or_mismatch",),
+        )
+    if (
+        experiment is not None
+        and experiment.method.is_value
+        and experiment.method.value is MethodToken.STATIC_EQUILIBRIUM
+        and rail is not Rail.VAPOUR
+    ):
+        return _refused(
+            RefusalReason.UNSUPPORTED,
+            {
+                "reason": "static_equilibrium_method_is_vapour_rail_only",
+                "quantity": quantity.value,
+                "rail": rail.value,
+            },
+            execution=Execution(state=ExecutionState.NOT_PROBED),
         )
     if engine in SINGLE_LIQUID_ENGINES and _is_bulk_not_liquid_composition(reference):
         bulk_detail: dict[str, object] = {
