@@ -520,6 +520,84 @@ def test_markova_1983_rows_use_each_points_own_printed_composition(
     assert not mismatches, f"{len(mismatches)} composition mismatches: {mismatches}"
 
 
+def test_hashimoto_residue_cells_keep_full_printed_point_compositions(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.enums import Quantity
+
+    source_id = "kems-015-hashimoto-1983"
+    result = _migrate_real_extract(
+        tmp_path,
+        f"{source_id}.yaml",
+        write=False,
+    )
+    # Hashimoto 1983, Table 3, p. 116. The two C3-(2) run observations at
+    # 1700 and 1800 C are the explicitly labelled run rows; the other two
+    # pins cover the remaining printed temperatures.
+    expected_by_row = {
+        (
+            "table3_residue_composition_series_quoted__run_17c3-2::"
+            "T=1973.15:row=c3-(2):"
+        ): {
+            "SiO2": Decimal("39.09"),
+            "Al2O3": Decimal("3.57"),
+            "FeO": Decimal("27.92"),
+            "MgO": Decimal("26.32"),
+            "CaO": Decimal("3.09"),
+        },
+        (
+            "table3_residue_composition_series_quoted__run_18c3-2::"
+            "T=2073.15:row=c3-(2):"
+        ): {
+            "SiO2": Decimal("45.30"),
+            "Al2O3": Decimal("4.33"),
+            "FeO": Decimal("12.87"),
+            "MgO": Decimal("33.57"),
+            "CaO": Decimal("3.93"),
+        },
+        "table3_residue_composition_series::T=2173.15:row=19b2:": {
+            "SiO2": Decimal("37.94"),
+            "Al2O3": Decimal("3.55"),
+            "FeO": Decimal("29.14"),
+            "MgO": Decimal("26.09"),
+            "CaO": Decimal("3.29"),
+        },
+        "table3_residue_composition_series::T=2273.15:row=20b2:": {
+            "SiO2": Decimal("40.87"),
+            "Al2O3": Decimal("4.14"),
+            "FeO": Decimal("20.46"),
+            "MgO": Decimal("30.81"),
+            "CaO": Decimal("3.72"),
+        },
+    }
+    rows = [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == source_id
+        and observation.identity.quantity.is_value
+        and observation.identity.quantity.value
+        is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and observation.identity.species.formula == "SiO2"
+    ]
+    for locator, expected in expected_by_row.items():
+        matching = [row for row in rows if locator in row.observation_id]
+        assert len(matching) == 1, locator
+        observation = matching[0]
+        printed = observation.point_conditions["printed_composition"]
+        assert printed.state.is_value
+        actual = {
+            oxide: as_decimal(str(value))
+            for oxide, value in printed.state.value.items()
+        }
+        assert actual == expected
+        starting = result.experiments[
+            observation.experiment_id
+        ].sample.printed_composition.state.value
+        assert actual != {
+            oxide: as_decimal(str(value)) for oxide, value in starting.items()
+        }
+
+
 def test_markova_table2_migrates_both_quantities_and_printed_charge(tmp_path: Path) -> None:
     result = _migrate_real_extract(
         tmp_path,
