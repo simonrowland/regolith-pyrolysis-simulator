@@ -117,6 +117,15 @@ def test_cleaned_melt_rejects_invalid_inventory(invalid_inventory) -> None:
     assert repr(invalid_inventory) in str(refusal)
 
 
+def test_evaluate_cleaned_melt_refuses_feo_alias_collision() -> None:
+    with pytest.raises(OpenImccCompositionPolicyRefusal) as exc_info:
+        evaluate_cleaned_melt(
+            {"SiO2": 1.0, "FeO": 0.1, "FeO_total": 0.1}, 2200.0
+        )
+
+    assert exc_info.value.code == "openimcc_composition_canonicalization"
+
+
 @pytest.mark.parametrize("iron_oxide", ("FeO", "Fe2O3"))
 @pytest.mark.parametrize(
     "invalid_inventory",

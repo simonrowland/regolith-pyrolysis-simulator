@@ -659,6 +659,25 @@ def test_invalid_inventory_reaches_typed_constant_gamma_fallback() -> None:
     )
 
 
+def test_feo_alias_collision_keeps_typed_c3_fallback_reason() -> None:
+    authority = vapor_pressure_module._build_high_t_melt_activity_authority(
+        composition_mol={"SiO2": 1.0, "FeO": 0.1, "FeO_total": 0.1},
+        temperature_K=CAP_PLUS_T_K,
+        controls={"high_t_melt_activity": "openimcc"},
+        below_cap_fe_activity=0.1,
+        below_cap_fe_activity_basis="constant_gamma",
+    )
+
+    assert authority["provider"] == "constant_gamma"
+    assert authority["fallback"] is True
+    assert authority["fallback_reason"]["code"] == (
+        "openimcc_composition_canonicalization"
+    )
+    assert authority["fallback_reason"]["type"] == (
+        "OpenImccCompositionPolicyRefusal"
+    )
+
+
 def test_provider_provenance_records_typed_refusal(
     monkeypatch,
 ) -> None:

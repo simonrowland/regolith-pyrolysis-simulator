@@ -297,7 +297,11 @@ def _canonical_composition(composition: Mapping[str, float]) -> dict[str, float]
     normalized = {str(name): value for name, value in composition.items()}
     if "FeO_total" in normalized:
         if "FeO" in normalized:
-            raise ValueError("composition cannot contain both FeO and FeO_total")
+            raise OpenImccCompositionPolicyRefusal(
+                "openimcc_composition_canonicalization",
+                "cannot canonicalize cleaned-melt composition: "
+                "composition cannot contain both FeO and FeO_total",
+            )
         # The simulator's cleaned-melt FeO/FeO_total convention is an FeO
         # equivalent.  This is a rename, not an Fe3+/Fe2+ split.
         normalized["FeO"] = normalized.pop("FeO_total")
