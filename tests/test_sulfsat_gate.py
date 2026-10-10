@@ -239,6 +239,16 @@ def test_gate_unavailable_when_pysulfsat_import_fails(monkeypatch):
     assert any('PySulfSat' in w for w in result.warnings)
 
 
+def test_import_helper_key_error_propagates(monkeypatch):
+    monkeypatch.setattr(
+        sulfsat_module.importlib,
+        'import_module',
+        lambda _name: (_ for _ in ()).throw(KeyError('local import helper')),
+    )
+    with pytest.raises(KeyError, match='local import helper'):
+        SulfSatGate().initialize()
+
+
 # ---------------------------------------------------------------------------
 # 2. Mocked-present path
 # ---------------------------------------------------------------------------
@@ -280,6 +290,38 @@ def test_gate_populates_every_field_with_fake_pysulfsat(monkeypatch):
     assert result.S_in_sulfide_ppm == pytest.approx(expected_sulfide)
     # MORB comp is inside the calibration window: no warnings expected.
     assert result.warnings == []
+
+
+def test_pysulfsat_failure_is_diagnostic_and_local_helper_errors_propagate(monkeypatch):
+    fake = _make_fake_pysulfsat()
+    fake.calculate_S2017_SCSS = lambda **_kwargs: (_ for _ in ()).throw(
+        RuntimeError('SCSS engine rejected state')
+    )
+    monkeypatch.setitem(sys.modules, 'PySulfSat', fake)
+    gate = SulfSatGate()
+    assert gate.initialize()
+    result = gate.compute_sulfur_saturation(
+        liquid_comp_wt=_MORB_COMP_WT,
+        T_K=1400.0, P_bar=1.0, fO2_log=-9.0, S_input_ppm=1000.0,
+        Fe3Fet_Liq=0.1,
+    )
+    assert result.calibration_status == 'unavailable'
+    assert any(
+        'RuntimeError' in warning and 'SCSS engine rejected state' in warning
+        for warning in result.warnings
+    )
+
+    monkeypatch.setattr(
+        gate,
+        '_run_pysulfsat',
+        lambda **_kwargs: (_ for _ in ()).throw(KeyError('local helper bug')),
+    )
+    with pytest.raises(KeyError, match='local helper bug'):
+        gate.compute_sulfur_saturation(
+            liquid_comp_wt=_MORB_COMP_WT,
+            T_K=1400.0, P_bar=1.0, fO2_log=-9.0, S_input_ppm=1000.0,
+            Fe3Fet_Liq=0.1,
+        )
 
 
 def test_jugo_delta_qfm_uses_frost_1991_buffer(monkeypatch):
@@ -622,30 +664,23 @@ def test_sulfsat_gate_wires_shared_kress91_split_into_scss(monkeypatch):
     assert result.calibration_status == 'in_range'
 
 
-def test_kress_carmichael_failure_tags_out_of_range(monkeypatch):
-    """
-    If neither operator-set nor Kress-Carmichael yields a usable ratio,
-    the result is tagged ``out_of_range`` with an explicit warning -
-    not silently filled with a fabricated default.
-    """
+def test_kress_carmichael_helper_key_error_propagates(monkeypatch):
     fake = _make_fake_pysulfsat()
-
-    def _kress_split(**kwargs):
-        raise RuntimeError('shared fit blew up')
-
     monkeypatch.setitem(sys.modules, 'PySulfSat', fake)
-    monkeypatch.setattr(sulfsat_module, 'kress91_split', _kress_split)
+    monkeypatch.setattr(
+        sulfsat_module,
+        'kress91_split',
+        lambda **_kwargs: (_ for _ in ()).throw(KeyError('local redox helper')),
+    )
 
     gate = SulfSatGate()
     assert gate.initialize({}) is True
 
-    result = gate.compute_sulfur_saturation(
-        liquid_comp_wt=_MORB_COMP_WT,
-        T_K=1400.0, P_bar=1.0, fO2_log=-9.0, S_input_ppm=1000.0,
-    )
-
-    assert result.calibration_status == 'out_of_range'
-    assert any('Kress-Carmichael' in w for w in result.warnings)
+    with pytest.raises(KeyError, match='local redox helper'):
+        gate.compute_sulfur_saturation(
+            liquid_comp_wt=_MORB_COMP_WT,
+            T_K=1400.0, P_bar=1.0, fO2_log=-9.0, S_input_ppm=1000.0,
+        )
 
 
 def test_invalid_operator_fe3fet_returns_unavailable(monkeypatch):
