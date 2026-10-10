@@ -214,17 +214,31 @@ def test_sr23_runtime_notice_does_not_change_curve_record_bytes() -> None:
 
     run_notice = sim.composition_projected_liquidus_run_notice()
     assert run_notice is not None
-    assert run_notice["notices"][0]["repair_notice"] == {
-        "kind": "kress_fixed_liquidus_bound_repair",
-        "repaired": "missing or unusable projected liquidus bound",
-        "reason": "no usable composition-projected liquidus bound",
-        "replacement": "fixed Kress91 liquidus floor",
-        "floor_T_C": 1200.0,
-    }
+    notice = run_notice["notices"][0]
+    assert notice["bounds_source"] == _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
+    assert notice["projected_bounds"] == "invalid"
+    assert notice["floor_T_C"] == KRESS91_LIQUID_CALIBRATION_MIN_T_C
     metadata: dict[str, object] = {}
     _attach_composition_projected_liquidus_notice(metadata, sim)
     assert metadata["composition_projected_liquidus_notice"] == run_notice
     assert _curve_payload(curve) == before
+
+
+def test_sr23_missing_floor_value_keeps_projected_run_notice() -> None:
+    sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    sim._record_composition_projected_liquidus_notice(
+        {
+            **_projected_notice(),
+            "bounds_source": _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE,
+        }
+    )
+
+    run_notice = sim.composition_projected_liquidus_run_notice()
+    assert run_notice is not None
+    notice = run_notice["notices"][0]
+    assert notice["bounds_source"] == _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
+    assert "floor_T_C" not in notice
+    assert "repair_notice" not in notice
 
 
 def test_sr23_usable_projected_bound_has_no_repair_notice() -> None:
