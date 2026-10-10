@@ -18,6 +18,7 @@ from simulator.melt_backend.liquidus import (
     liquidus_sample_error_from_exception,
 )
 from simulator.melt_backend.thermoengine import ThermoEngineBackend
+from simulator.melt_backend import thermoengine as thermoengine_module
 
 
 def _attribute_bearing_runtime_error() -> RuntimeError:
@@ -176,6 +177,25 @@ def test_initialize_preserves_execution_failure_and_real_absence(
         backend.initialize({})
     assert raised_absence.value.__cause__ is absence
     assert 'transport unavailable' in str(raised_absence.value)
+
+
+def test_initialize_propagates_local_model_resolution_error(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        ThermoEngineBackend,
+        '_initialize_vaporock_delegate',
+        lambda _self: None,
+    )
+
+    def broken_model_resolver(*_args: object) -> str:
+        raise KeyError('local model resolution defect')
+
+    monkeypatch.setattr(
+        thermoengine_module, 'resolve_grid_engine_model', broken_model_resolver
+    )
+    with pytest.raises(KeyError, match='local model resolution defect'):
+        ThermoEngineBackend().initialize({})
 
 
 def test_thermoengine_commissioning_notice_does_not_retype_to_refusal(

@@ -111,57 +111,70 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
         self._health_timeout_s = float(raw_health_timeout_s)
         self._initialize_vaporock_delegate()
 
+        transport = ThermoEngineTransport(
+            model_name=resolve_grid_engine_model(self._model, 'thermoengine'),
+            activity_converter=activity_from_chem_potential,
+            equilibrate_timeout_s=float(raw_equilibrate_timeout_s),
+            health_timeout_s=self._health_timeout_s,
+        )
+        self._thermoengine_transport = transport
         try:
-            transport = ThermoEngineTransport(
-                model_name=resolve_grid_engine_model(self._model, 'thermoengine'),
-                activity_converter=activity_from_chem_potential,
-                equilibrate_timeout_s=float(raw_equilibrate_timeout_s),
-                health_timeout_s=self._health_timeout_s,
-            )
-            self._thermoengine_transport = transport
             transport.initialize()
-            health_check = getattr(transport, 'health_check', None)
-            if callable(health_check):
+        except Exception as exc:  # noqa: BLE001 - optional engine boundary
+            self._handle_transport_initialization_failure(exc)
+
+        health_check = getattr(transport, 'health_check', None)
+        if callable(health_check):
+            try:
                 ok, reason = health_check(timeout_s=self._health_timeout_s)
-                if not ok:
-                    timeout_cause = thermoengine_timeout_cause_from_exception(
-                        RuntimeError(reason)
-                    )
-                    if timeout_cause is not None:
-                        raise ThermoEngineTimeoutError(
+            except Exception as exc:  # noqa: BLE001 - optional engine boundary
+                self._handle_transport_initialization_failure(exc)
+            if not ok:
+                timeout_cause = thermoengine_timeout_cause_from_exception(
+                    RuntimeError(reason)
+                )
+                if timeout_cause is not None:
+                    self._handle_transport_initialization_failure(
+                        ThermoEngineTimeoutError(
                             timeout_cause,
                             timeout_s=self._health_timeout_s,
                         )
-                    refusal_cause = thermoengine_refusal_cause_from_exception(
-                        RuntimeError(reason)
                     )
-                    if refusal_cause is not None:
-                        raise reconstruct_thermoengine_out_of_domain_error(
-                            reason
-                        )
-                    raise RuntimeError(reason)
-            self._engine_version = transport.engine_version
-            self._mode = 'thermoengine'
-            self._unavailable_reason = None
-            return True
-        except Exception as exc:  # noqa: BLE001 - optional engine boundary
-            disposition = thermoengine_failure_disposition_from_exception(exc)
-            classified = disposition.exception
-            if disposition.status != 'unavailable':
-                try:
-                    self.close()
-                except Exception as cleanup_error:  # noqa: BLE001 - preserve typed
-                    classified.add_note(
-                        f'ThermoEngine cleanup also failed: {cleanup_error}'
+                refusal_cause = thermoengine_refusal_cause_from_exception(
+                    RuntimeError(reason)
+                )
+                if refusal_cause is not None:
+                    self._handle_transport_initialization_failure(
+                        reconstruct_thermoengine_out_of_domain_error(reason)
                     )
-                if classified is exc:
-                    raise
-                raise classified from exc
-            self._thermoengine_import_error = exc
-            self._close_after_failure(exc)
-            raise ImportError(
-                f'ThermoEngine transport unavailable: {exc}'
-            ) from exc
+                self._handle_transport_initialization_failure(
+                    RuntimeError(reason)
+                )
+        self._engine_version = transport.engine_version
+        self._mode = 'thermoengine'
+        self._unavailable_reason = None
+        return True
+
+    def _handle_transport_initialization_failure(
+        self, exc: Exception
+    ) -> None:
+        disposition = thermoengine_failure_disposition_from_exception(exc)
+        classified = disposition.exception
+        if disposition.status != 'unavailable':
+            try:
+                self.close()
+            except Exception as cleanup_error:  # noqa: BLE001 - preserve typed
+                classified.add_note(
+                    f'ThermoEngine cleanup also failed: {cleanup_error}'
+                )
+            if classified is exc:
+                raise
+            raise classified from exc
+        self._thermoengine_import_error = exc
+        self._close_after_failure(exc)
+        raise ImportError(
+            f'ThermoEngine transport unavailable: {type(exc).__name__}: {exc}'
+        ) from exc
 
     @staticmethod
     def _thermoengine_config(config: dict) -> dict:
