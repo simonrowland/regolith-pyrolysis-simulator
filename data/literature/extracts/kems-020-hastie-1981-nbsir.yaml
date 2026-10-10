@@ -358,6 +358,15 @@ experiments:
     figure: '20'
     pdf_page_index: 58
     note: 'Figure 20 caption: "KMS data with Pt-cell orifice diameter of 0.34 mm."'
+- experiment_id: hastie-1981-k1-kms
+  method: knudsen_effusion
+  locator:
+    page: 10
+    section: '6.2 Partial Pressure Determination'
+    equation: '1–3'
+    note: >-
+      General KMS ion-intensity/partial-pressure relationships. This does not
+      identify the K1 cell material or a K1-specific calibration.
 - experiment_id: hastie-1981-pt-tms
   bench_id: hastie-1981-tms
   method: transpiration
@@ -2293,7 +2302,7 @@ species:
         note: estimated Cp(l); compilation-derived; no experimental sigma
     - observation_id: hastie_1981_fig11_k1_slag_k2o_gamma_digitized
       type: activity_coefficient
-      experiment: hastie-1981-pt-kms
+      experiment: hastie-1981-k1-kms
       locator:
         figure: '11'
         page: 61

@@ -498,7 +498,8 @@ def test_hastie_initial_charges_bind_to_figure_points_as_proxies(
     expected_counts = {
         "fig4_illite_K_SiO_digitized": 6,
         "fig5_glass_Na_this_work_digitized": 6,
-        "fig11_k1_slag_k2o_gamma_digitized": 19,
+        # The Figure 11 caption moves one point to TMS: 19 - 1 = 18 KMS.
+        "fig11_k1_slag_k2o_gamma_digitized": 18,
     }
     for series, composition_wt_pct in expected_wt_pct.items():
         rows = [
@@ -516,6 +517,122 @@ def test_hastie_initial_charges_bind_to_figure_points_as_proxies(
             assert composition is not None and composition.is_value
             assert composition.value.as_map() == expected.as_map()
             assert composition.value.proxy_flag == "initial_charge_only"
+
+    k1 = next(
+        row
+        for row in _extract_observations("kems-020-hastie-1981-nbsir.yaml")
+        if row.get("observation_id") == "hastie_1981_fig11_k1_slag_k2o_gamma_digitized"
+    )
+    k1_experiment = result.experiments[
+        next(
+            observation.experiment_id
+            for observation in result.observations.values()
+            if "::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T="
+            in observation.observation_id
+        )
+    ]
+    assert k1["experiment"] == "hastie-1981-k1-kms"
+    assert k1_experiment.experiment_id.endswith("::experiment::hastie-1981-k1-kms")
+    assert k1_experiment.bench_id is None
+    assert k1_experiment.apparatus is None
+    assert k1_experiment.locator is not None
+    assert k1_experiment.locator.page == 10
+    assert k1_experiment.locator.section == "6.2 Partial Pressure Determination"
+
+    k2_experiment = next(
+        experiment
+        for experiment in result.experiments.values()
+        if experiment.experiment_id.endswith("::experiment::hastie-1981-pt-kms")
+    )
+    assert k2_experiment.apparatus is not None
+    assert k2_experiment.apparatus.calibration is not None
+    k2_calibration = k2_experiment.apparatus.calibration["pressure_method"]
+    assert k2_calibration.locator is not None
+    assert k2_calibration.locator.page == 32
+    assert k2_calibration.locator.section == "discussion of Figure 12 KMS data"
+    assert k2_experiment.bench_id is not None
+    k2_bench = result.benches[k2_experiment.bench_id]
+    assert k2_bench.cell_material_and_liner is not None
+    assert k2_bench.cell_material_and_liner.state.is_value
+    assert k2_bench.cell_material_and_liner.state.value == "platinum KMS cell"
+
+    moved = next(
+        row
+        for row in _extract_observations("kems-020-hastie-1981-nbsir.yaml")
+        if row.get("observation_id")
+        == "hastie_1981_fig11_k1_slag_k2o_gamma_tms_open_square"
+    )
+    (moved_point,) = moved["values"]["points"]
+    assert moved["experiment"] == "hastie-1981-pt-tms"
+    assert moved["regime"] == "transpiration_mass_spectrometry"
+    assert moved_point["run"] == 1
+    assert moved_point["T_K"] == 1575.0
+    assert "Digitization read 1559.9 K" in moved_point["note"]
+    assert "caption prints 1575 K" in moved_point["note"]
+    moved_migrated = [
+        observation
+        for observation in result.observations.values()
+        if "::hastie_1981_fig11_k1_slag_k2o_gamma_tms_open_square::T=1575.0:"
+        in observation.observation_id
+    ]
+    assert len(moved_migrated) == 1
+    moved_observation = moved_migrated[0]
+    assert result.experiments[moved_observation.experiment_id].experiment_id.endswith(
+        "::experiment::hastie-1981-pt-tms"
+    )
+    assert moved_observation.identity.temperature_K.is_value
+    assert moved_observation.identity.temperature_K.value == Decimal("1575.0")
+    moved_composition = moved_observation.identity.composition
+    assert moved_composition is not None and moved_composition.is_value
+    assert moved_composition.value.proxy_flag == "initial_charge_only"
+    moved_prediction = predict_with_engine(
+        Engine.OPENIMCC,
+        moved_observation,
+        experiment=result.experiments[moved_observation.experiment_id],
+    )
+    assert moved_prediction.value is None
+    assert moved_prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert moved_prediction.refusal_detail["reason"] == "missing_evidence"
+    (oxygen_gap,) = moved_prediction.refusal_detail["gaps"]
+    assert oxygen_gap["waypoint"] == "oxygen_condition"
+    assert "fO2_log" in oxygen_gap["missing"]
+
+    na_kms = next(
+        row
+        for row in _extract_observations("kems-020-hastie-1981-nbsir.yaml")
+        if row.get("observation_id") == "hastie_1981_fig5_glass_Na_this_work_digitized"
+    )
+    assert na_kms["experiment"] == "hastie-1981-measured-soda-lime-glass-kms"
+    assert na_kms["phase"] == "gas"
+    assert [point["series"] for point in na_kms["values"]["points"]] == [
+        "KMS_1",
+        "KMS_1",
+        "KMS_3",
+    ]
+    assert [point["T_K"] for point in na_kms["values"]["points"]] == [
+        1488.8,
+        1333.3,
+        1428.6,
+    ]
+    na_kms_migrated = [
+        observation
+        for observation in result.observations.values()
+        if "::hastie_1981_fig5_glass_Na_this_work_digitized::T="
+        in observation.observation_id
+        and result.experiments[observation.experiment_id].experiment_id.endswith(
+            "::experiment::hastie-1981-measured-soda-lime-glass-kms"
+        )
+    ]
+    assert len(na_kms_migrated) == 3
+    assert {
+        observation.identity.temperature_K.value
+        for observation in na_kms_migrated
+    } == {Decimal("1488.8"), Decimal("1333.3"), Decimal("1428.6")}
+    assert all(
+        observation.identity.species.phase.is_value
+        and observation.identity.species.phase.value is Phase.G
+        for observation in na_kms_migrated
+    )
 
 
 def _run_migrate_cli(args: list[str]) -> subprocess.CompletedProcess[str]:
