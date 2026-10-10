@@ -156,20 +156,10 @@ def test_costa_redox_grounding_uses_owner_figure_series_once():
         row for row in grounding_evidence("silicate_melt_cation_redox")
         if "costa" in row.source_id
     ]
-    assert [
-        (row.source_id, row.observation_id, row.alpha) for row in costa
-    ] == [
-        (
-            "kems-007-costa-2015",
-            "costa_2015_fe_vaporization_coefficient_alpha_digitized",
-            pytest.approx(0.01978),
-        ),
-        (
-            "costa-jacobson-2015",
-            "costa_jacobson_2015_fe_olivine_kems",
-            pytest.approx(0.02),
-        ),
-    ]
+    assert len(costa) == 1
+    assert costa[0].source_id == "kems-007-costa-2015"
+    assert costa[0].observation_id == "costa_2015_fe_vaporization_coefficient_alpha_digitized"
+    assert costa[0].alpha == pytest.approx(0.01978)
 
 
 def test_redox_class_band_covers_every_grounded_alpha():
@@ -199,7 +189,6 @@ def test_consolidated_duplicate_evidence_alpha_values_stay_pinned():
         if row["observation_id"] == "fedkin_2006_mg_hashimoto_langmuir_table3"
     )
     targets = {
-        ("costa-jacobson-2015", "costa_jacobson_2015_fe_olivine_kems"): 0.02,
         ("kems-005-fedkin-2006", "fedkin_2006_sio_hashimoto_langmuir_table3"): 0.17,
         ("kems-005-fedkin-2006", "fedkin_2006_fe_hashimoto_langmuir_table3"): 0.24,
         ("kems-005-fedkin-2006", "fedkin_2006_mg_hashimoto_langmuir_table3"): mg_owner[

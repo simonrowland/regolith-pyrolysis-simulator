@@ -28,6 +28,11 @@ TOOLS = REPO_ROOT / "tools"
 EXTRACTS = REPO_ROOT / "data" / "literature" / "extracts"
 FIDELITY_POLICY = EXTRACTS / "_fidelity_pre_policy_allowlist.yaml"
 FIDELITY_GRADUATION_LEDGER = EXTRACTS / "_fidelity_graduation_ledger.yaml"
+RETIRED_DUPLICATE_OBSERVATION_ALIASES = {
+    "costa-jacobson-2015::costa_jacobson_2015_fe_olivine_kems": (
+        "kems-007-costa-2015::costa_2015_fe_vaporization_coefficient_alpha_digitized"
+    ),
+}
 RETIRED_DUPLICATE_SOURCE_IDS = {
     "fedkin-grossman-ghiorso-2006",
     "sossi-et-al-2019",
@@ -2999,13 +3004,13 @@ def test_fidelity_sample_mutation_reds():
     Pins must be independent literals (no YAML alias). Mutate the body without
     deepcopying samples — a co-mutated alias would keep the match green.
     """
-    path = EXTRACTS / "costa-jacobson-2015.yaml"
-    assert path.is_file(), "Costa extract required for mutation pin"
+    path = EXTRACTS / "kems-007-costa-2015.yaml"
+    assert path.is_file(), "Costa owner extract required for mutation pin"
     doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
     samples = doc.get("fidelity_samples") or []
-    assert samples, "Costa extract must carry fidelity samples"
+    assert samples, "Costa owner extract must carry at least one fidelity sample"
     # Baseline green with independent (non-aliased) pins.
-    assert vle.check_all_fidelity_samples_match(doc, label="costa") == []
+    assert vle.check_all_fidelity_samples_match(doc, label="costa-owner") == []
     # Prove samples do not share identity with body values.
     for i, s in enumerate(samples):
         exp = s.get("value") if "value" in s else s.get("draft_value")
@@ -3015,48 +3020,36 @@ def test_fidelity_sample_mutation_reds():
                 f"sample[{i}] still shares identity with body — re-dump without aliases"
             )
 
-    # Mutate the restored Fe summary and the retained unique SiO interval.
-    target = next(obs for obs in doc["species"]["Fe"]["observations"]
-                  if obs.get("observation_id") == "costa_jacobson_2015_fe_olivine_kems")
-    original = copy.deepcopy(target["values"])
-    target["values"]["alpha"] += 0.5
-    errs = vle.check_all_fidelity_samples_match(doc, label="costa-mutated-fe")
-    assert errs and any("mismatch" in e for e in errs), errs
-    target["values"] = original
-
-    target = next(obs for obs in doc["species"]["SiO"]["observations"]
-                  if obs.get("observation_id") == "costa_jacobson_2015_sio_olivine_kems")
-    original = copy.deepcopy(target["values"])
-    target["values"]["alpha_range"][0] = 0.5
-    errs = vle.check_all_fidelity_samples_match(doc, label="costa-mutated-sio")
-    assert errs and any("mismatch" in e for e in errs), errs
-
-    # The owner's digitized per-point Fe series remains pinned independently.
-    owner_path = EXTRACTS / "kems-007-costa-2015.yaml"
-    owner_doc = load_cached_safe_yaml(owner_path.read_text(encoding="utf-8"))
-    owner_target = next(
-        obs for obs in owner_doc["species"]["Fe"]["observations"]
-        if obs.get("observation_id") == "costa_2015_fe_vaporization_coefficient_alpha_digitized"
+    # Mutate the Fe alpha pin in the extract body (samples left untouched).
+    target = next(
+        obs for obs in doc["species"]["Fe"]["observations"]
+        if obs.get("observation_id")
+        == "costa_2015_fe_vaporization_coefficient_alpha_digitized"
     )
-    owner_target["values"]["points"][2]["alpha"] += 0.5
-    owner_errs = vle.check_all_fidelity_samples_match(owner_doc, label="costa-owner-mutated-fe")
-    assert owner_errs and any("mismatch" in e for e in owner_errs), owner_errs
+    original = copy.deepcopy(target["values"])
+    target["values"]["points"][2]["alpha"] += 0.5
+
+    errs = vle.check_all_fidelity_samples_match(doc, label="costa-owner-mutated")
+    assert errs, (
+        "mutation of pinned extract value must turn fidelity match RED; "
+        f"original={original!r}"
+    )
+    assert any("mismatch" in e for e in errs), errs
 
 
-def test_costa_fe_summary_and_owner_series_remain_pinned():
+def test_costa_fe_summary_key_is_retired_to_owner_series():
     secondary = load_cached_safe_yaml(
         (EXTRACTS / "costa-jacobson-2015.yaml").read_text(encoding="utf-8")
     )
     owner = load_cached_safe_yaml(
         (EXTRACTS / "kems-007-costa-2015.yaml").read_text(encoding="utf-8")
     )
-    owner_source = "kems-007-costa-2015"
-    owner_observation = "costa_2015_fe_vaporization_coefficient_alpha_digitized"
+    retired_key, owner_key = next(iter(RETIRED_DUPLICATE_OBSERVATION_ALIASES.items()))
+    retired_source, retired_observation = retired_key.split("::", 1)
+    owner_source, owner_observation = owner_key.split("::", 1)
     secondary_rows = secondary["species"].get("Fe", {}).get("observations", [])
-    assert any(
-        row.get("observation_id") == "costa_jacobson_2015_fe_olivine_kems"
-        for row in secondary_rows
-    )
+    assert retired_source == secondary["source_id"]
+    assert all(row.get("observation_id") != retired_observation for row in secondary_rows)
     assert secondary["species"]["SiO"]["observations"]
     assert owner_source == owner["source_id"]
     owner_row = next(
