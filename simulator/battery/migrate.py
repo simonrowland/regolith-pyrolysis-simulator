@@ -497,6 +497,9 @@ RAIL_MAP = {
 
 METHOD_TOKENS = {m.value: m for m in MethodToken}
 REGIME_TO_METHOD = {
+    # Static, closed-vessel pressure measurements report equilibrium pressure;
+    # they do not use the Knudsen-effusion correction.
+    "static_capsule_vapor_pressure": MethodToken.STATIC_EQUILIBRIUM,
     # These extract labels all describe the Knudsen-effusion mass-spectrometric
     # pressure method; the closed schema token is KNUDSEN_EFFUSION.
     "kems_effusion": MethodToken.KNUDSEN_EFFUSION,

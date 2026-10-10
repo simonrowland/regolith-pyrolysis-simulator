@@ -40,6 +40,7 @@ def test_equal_pressure_duplicates_keep_printed_approximation() -> None:
 @pytest.mark.parametrize(
     ("printed_method", "expected"),
     [
+        ("static_capsule_vapor_pressure", MethodToken.STATIC_EQUILIBRIUM),
         ("solar_furnace", MethodToken.SOLAR_FURNACE_PYROLYSIS),
         ("melt_equilibration_quench", MethodToken.QUENCH_EQUILIBRATION),
         ("kems_effusion", MethodToken.KNUDSEN_EFFUSION),
@@ -54,6 +55,39 @@ def test_printed_method_aliases_map_to_closed_tokens(
     mapped = map_method(printed_method)
     assert mapped.is_value
     assert mapped.value is expected
+
+
+def test_ntrs_static_capsule_rows_migrate_with_source_validity_flags() -> None:
+    extract = REPO_ROOT / "data/literature/extracts/ntrs-19650014783.yaml"
+    doc = yaml.safe_load(extract.read_text(encoding="utf-8"))
+    method_record = next(
+        item
+        for item in doc["species"]["Na"]["observations"]
+        if item["observation_id"] == "bowles_rosenblum_1965_na_method_and_apparatus"
+    )
+    flags = method_record["values"]["validity_flags"]
+    assert flags["temperature_uniformity"]["status"] == "intentional_gradient"
+    assert flags["outgassing"]["status"] == "not_reported"
+    assert flags["capsule_reaction"]["status"] == "not_reported"
+    assert "tantalum" in flags["impurity_note"]["note"]
+
+    migrator = Migrator(REPO_ROOT)
+    migrator._migrate_extract(extract)
+    rows = [
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.source_id == "ntrs-19650014783"
+        and observation.observation_id.startswith(
+            "ntrs-19650014783::bowles_rosenblum_1965_na_table1_static_capsule::"
+        )
+    ]
+    assert len(rows) == 49
+    assert all(
+        migrator.result.experiments[row.experiment_id].method.value
+        is MethodToken.STATIC_EQUILIBRIUM
+        for row in rows
+    )
+    assert all(not row.identity.species.phase.is_value for row in rows)
 
 
 # Printed 「3. 起電力測定」 under 「II. 実験方法」. The heading is on published

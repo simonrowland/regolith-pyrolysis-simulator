@@ -1784,6 +1784,79 @@ def test_unknown_method_on_vapour_is_typed_method_unknown() -> None:
     assert residual.refusal.reason is not RefusalReason.UNDERDETERMINED_APPARATUS
 
 
+def test_static_equilibrium_pressure_requires_a_stated_vapour_species(monkeypatch) -> None:
+    class ReachedEngineOpen(Exception):
+        pass
+
+    from simulator.diagnostic_helpers import binary_pot_battery
+
+    monkeypatch.setattr(
+        binary_pot_battery,
+        "open_battery_engine",
+        lambda _engine: (_ for _ in ()).throw(ReachedEngineOpen()),
+    )
+    experiment = F.tabulation_experiment(
+        method=MethodToken.STATIC_EQUILIBRIUM, T_K=Decimal("1200")
+    )
+    unspecified_identity = replace(
+        F.psat_identity("Na", T_K=Decimal("1200")),
+        species=Species("Na", State.unknown("source does not state vapour species")),
+    )
+    unspecified = F.observation(
+        "static-unspecified-vapour",
+        experiment.experiment_id,
+        unspecified_identity,
+        Decimal("10"),
+        source_id="static-source",
+    )
+    refusal = predict_with_engine(
+        Engine.THERMOENGINE, unspecified, experiment=experiment
+    )
+    assert refusal.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert refusal.refusal_detail["reason"] == "static_equilibrium_pressure_species_not_stated"
+
+    explicitly_speciated = F.observation(
+        "static-specified-vapour",
+        experiment.experiment_id,
+        F.psat_identity("Na", T_K=Decimal("1200")),
+        Decimal("10"),
+        source_id="static-source",
+    )
+
+    with pytest.raises(ReachedEngineOpen):
+        predict_with_engine(
+            Engine.THERMOENGINE, explicitly_speciated, experiment=experiment
+        )
+
+
+def test_static_equilibrium_method_is_scoped_to_the_vapour_rail() -> None:
+    experiment = F.tabulation_experiment(method=MethodToken.STATIC_EQUILIBRIUM)
+    reference = F.observation(
+        "static-method-activity",
+        experiment.experiment_id,
+        F.activity_identity(formula="NaO0.5"),
+        Decimal("0.5"),
+        source_id="static-source",
+    )
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=ScoreContext(
+            works={},
+            experiments={experiment.experiment_id: experiment},
+            observations={reference.observation_id: reference},
+        ),
+    )
+    assert residual.rail is Rail.MELT_ACTIVITY
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.UNSUPPORTED
+    assert (
+        residual.refusal.detail["reason"]
+        == "static_equilibrium_method_is_vapour_rail_only"
+    )
+
+
 @pytest.mark.parametrize(
     "quantity", (Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT)
 )

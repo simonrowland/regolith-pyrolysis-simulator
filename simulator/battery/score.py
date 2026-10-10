@@ -3482,6 +3482,27 @@ def predict_with_engine(
             refusal_detail={"reason": "species_formula_unparsed", "formula": formula},
             identity=identity,
         )
+    if (
+        quantity is Quantity.P_SAT
+        and experiment is not None
+        and experiment.method.is_value
+        and experiment.method.value is MethodToken.STATIC_EQUILIBRIUM
+        and phase_token(identity.species) is not Phase.G
+    ):
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=RefusalReason.IDENTITY_INCOMPLETE,
+            refusal_detail={
+                "reason": "static_equilibrium_pressure_species_not_stated",
+                "quantity": quantity.value,
+                "formula": formula,
+            },
+            identity=identity,
+        )
     if is_sf04_workbook(observation) and engine in IMCC_ENGINES:
         return EnginePrediction(
             engine=engine,
@@ -4882,6 +4903,21 @@ def compile_residual(
             },
             execution=Execution(state=ExecutionState.NOT_PROBED),
             exclusions=("status_match_or_mismatch",),
+        )
+    if (
+        experiment is not None
+        and experiment.method.is_value
+        and experiment.method.value is MethodToken.STATIC_EQUILIBRIUM
+        and rail is not Rail.VAPOUR
+    ):
+        return _refused(
+            RefusalReason.UNSUPPORTED,
+            {
+                "reason": "static_equilibrium_method_is_vapour_rail_only",
+                "quantity": quantity.value,
+                "rail": rail.value,
+            },
+            execution=Execution(state=ExecutionState.NOT_PROBED),
         )
     if engine in SINGLE_LIQUID_ENGINES and _is_bulk_not_liquid_composition(reference):
         bulk_detail: dict[str, object] = {
