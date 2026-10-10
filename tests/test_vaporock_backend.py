@@ -3727,6 +3727,11 @@ def test_incall_typeerror_is_not_a_signature_mismatch(monkeypatch):
     def opaque_body(_comp, _temp, _fo2):
         raise TypeError("upstream engine arithmetic bug")
 
+    def switches(*_args, **kwargs):
+        if kwargs:
+            raise TypeError("upstream keyword solve failed")
+        return {"Na": 0.001}
+
     def keyword_only(
         *,
         composition=None,
@@ -3745,6 +3750,7 @@ def test_incall_typeerror_is_not_a_signature_mismatch(monkeypatch):
             np.frompyfunc(opaque_body, 3, 1),
             "upstream engine arithmetic bug",
         ),
+        ("switches", switches, "upstream keyword solve failed"),
         ("keyword_only", keyword_only, "upstream keyword solve failed"),
     )
     for label, fn, message in cases:

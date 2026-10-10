@@ -2272,23 +2272,21 @@ class VapoRockBackend(MeltBackend):
                 signature = inspect.signature(fn)
             except (AttributeError, TypeError, ValueError):
                 signature = None
-            # Bind before invoking. Signatures with only variadic or no
-            # inspectable parameters use the positional convention once;
-            # a different convention or candidate is tried only when
-            # bind rejects the call first.
+            # Bind before invoking. Opaque callables and NumPy ufuncs use
+            # the legacy positional convention once; other inspectable
+            # candidates use the established keyword convention when it
+            # binds. A different convention or candidate is tried only
+            # when bind rejects the call first.
             keyword_binds = False
             positional_binds = False
             prefer_positional = signature is None
             bind_error: Optional[Exception] = None
             if signature is not None:
-                concrete = any(
-                    parameter.kind in (
-                        inspect.Parameter.POSITIONAL_ONLY,
-                        inspect.Parameter.POSITIONAL_OR_KEYWORD,
-                        inspect.Parameter.KEYWORD_ONLY,
-                    )
-                    for parameter in signature.parameters.values()
+                is_numpy_ufunc = (
+                    type(fn).__module__ == 'numpy'
+                    and type(fn).__name__ == 'ufunc'
                 )
+                prefer_positional = prefer_positional or is_numpy_ufunc
                 try:
                     signature.bind(**candidate_kwargs)
                     keyword_binds = True
@@ -2299,8 +2297,6 @@ class VapoRockBackend(MeltBackend):
                     positional_binds = True
                 except TypeError as exc:
                     bind_error = exc
-                if not concrete and positional_binds:
-                    prefer_positional = True
             else:
                 positional_binds = True
             if keyword_binds and not prefer_positional:
