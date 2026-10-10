@@ -3234,7 +3234,7 @@ def _mass_loss_oxide_map_from_mapping(obj: object) -> dict[str, Decimal] | None:
         for oxide in ("SiO2", "Al2O3", "FeO", "MgO", "CaO")
         if f"{oxide}_wt_pct" in obj
     }
-    return _oxide_map_from_mapping(components)
+    return _oxide_map_from_mapping(components, declared_map=True)
 
 
 def _initial_oxide_map_from_values(
