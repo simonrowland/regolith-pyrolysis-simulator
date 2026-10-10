@@ -176,6 +176,33 @@ def _freeze_gate_key_for_current_state(sim) -> tuple:
     )
 
 
+# Sol's unadopted-seed ramp. lunar_mare_low_ti reader values are Holzheid
+# IW(T) plus the lunar alkali offset, one existing fO2 bucket each.
+_UNADOPTED_SEED_RAMP_C = (950.0, 1150.0, 1400.0)
+_SOL_RAMP_READER_FO2 = {
+    950.0: -15.066,
+    1150.0: -12.270,
+    1400.0: -9.736,
+}
+
+
+def _live_fo2_buckets(sim, temperatures_C=_UNADOPTED_SEED_RAMP_C) -> list[float]:
+    """fO2 buckets of the live reader. Does not dispatch the gate.
+
+    `_freeze_gate_cache_key` is (version, pressure bucket, fO2 bucket,
+    composition). Index 2 is the existing fO2 quantum.
+    """
+    saved = float(sim.melt.temperature_C)
+    buckets = []
+    try:
+        for temperature_C in temperatures_C:
+            sim.melt.temperature_C = float(temperature_C)
+            buckets.append(_freeze_gate_key_for_current_state(sim)[2])
+    finally:
+        sim.melt.temperature_C = saved
+    return buckets
+
+
 def test_freeze_gate_cache_key_ignores_corpus_version(
     monkeypatch,
     vapor_pressure_data,
@@ -608,10 +635,16 @@ def test_freeze_gate_enabled_uses_ec_table_zero_mush_full(
         raise AssertionError(f'unexpected dispatch: {intent}')
 
     monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
+    # Class (a). Green expected one call because the seed was a constant
+    # -9 floor, so this ramp shared one bucket. b-747 (b03045041) and
+    # 18b40176d read the unadopted seed as IW(T). One dispatch per
+    # distinct fO2 bucket. The count is that bucket function on the live
+    # fO2, not the observed dispatch tally.
+    expected_dispatches = len(set(_live_fo2_buckets(sim)))
 
     rates = []
     factors = []
-    for temperature_C in (950.0, 1150.0, 1400.0):
+    for temperature_C in _UNADOPTED_SEED_RAMP_C:
         sim.melt.temperature_C = temperature_C
         flux = sim._calculate_evaporation(_equilibrium())
         rates.append(flux.species_kg_hr.get('Na', 0.0))
@@ -620,8 +653,8 @@ def test_freeze_gate_enabled_uses_ec_table_zero_mush_full(
     assert rates == pytest.approx([0.0, 5.0, 10.0])
     assert factors == pytest.approx([0.0, 0.5, 1.0])
     assert rates == sorted(rates)
-    assert gate_calls == 1
-    assert sim._freeze_gate_cache_rebuild_count == 1
+    assert gate_calls == expected_dispatches
+    assert sim._freeze_gate_cache_rebuild_count == expected_dispatches
     assert sim._last_freeze_gate_diagnostic['source'] == (
         'gate_liquid_fraction'
     )
@@ -817,16 +850,22 @@ def test_freeze_gate_enabled_reaches_magemin_gate_fallback(
         return original_dispatch(intent, *args, **kwargs)
 
     monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
+    # Class (a). Green expected one call because the seed was a constant
+    # -9 floor, so this ramp shared one bucket. b-747 (b03045041) and
+    # 18b40176d read the unadopted seed as IW(T). One dispatch per
+    # distinct fO2 bucket. The count is that bucket function on the live
+    # fO2, not the observed request tally.
+    expected_dispatches = len(set(_live_fo2_buckets(sim)))
 
     rates = []
-    for temperature_C in (950.0, 1150.0, 1400.0):
+    for temperature_C in _UNADOPTED_SEED_RAMP_C:
         sim.melt.temperature_C = temperature_C
         flux = sim._calculate_evaporation(_equilibrium())
         rates.append(flux.species_kg_hr.get('Na', 0.0))
 
     assert rates == pytest.approx([0.0, 5.0, 10.0])
-    assert len(authoritative.requests) == 1
-    assert len(fallback.requests) == 1
+    assert len(authoritative.requests) == expected_dispatches
+    assert len(fallback.requests) == expected_dispatches
     assert fallback.requests[0].intent is ChemistryIntent.GATE_LIQUID_FRACTION
     assert fallback.requests[0].account_view.accounts[_CLEANED_MELT_ACCOUNT]
     assert fallback.requests[0].pressure_bar == pytest.approx(
@@ -835,6 +874,71 @@ def test_freeze_gate_enabled_reaches_magemin_gate_fallback(
     assert sim._last_freeze_gate_diagnostic['source'] == (
         'gate_liquid_fraction:fallback:magemin-shadow'
     )
+
+
+def test_unadopted_seed_ramp_cache_key_follows_live_fo2(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    """Sol probe: the cached curve is the one dispatched at the live fO2.
+
+    At 950 / 1150 / 1400 C the unadopted seed reads as three fO2 values
+    in three existing buckets. The cache key at each temperature is that
+    live value's bucket, and the dispatch that filled it received that
+    live fO2.
+    """
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    dispatched_fO2_by_key = {}
+
+    def fake_dispatch(intent, *args, **kwargs):
+        if intent is ChemistryIntent.EVAPORATION_FLUX:
+            return SimpleNamespace(
+                status='ok',
+                diagnostic={'evaporation_flux_kg_hr': {'Na': 10.0}},
+            )
+        if intent is ChemistryIntent.GATE_LIQUID_FRACTION:
+            dispatched_fO2_by_key[
+                _freeze_gate_key_for_current_state(sim)
+            ] = float(kwargs['fO2_log'])
+            return SimpleNamespace(
+                status='ok',
+                diagnostic={
+                    'backend_status': 'ok',
+                    'solidus_T_C': 1000.0,
+                    'liquidus_T_C': 1300.0,
+                },
+            )
+        if intent is ChemistryIntent.OVERHEAD_GAS_EQUILIBRIUM:
+            return _OVERHEAD_GAS_EQUILIBRIUM_STUB
+        raise AssertionError(f'unexpected dispatch: {intent}')
+
+    monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
+    buckets = _live_fo2_buckets(sim)
+    assert len(set(buckets)) == len(buckets)
+
+    for temperature_C in _UNADOPTED_SEED_RAMP_C:
+        sim.melt.temperature_C = temperature_C
+        reader = float(sim._current_melt_redox_fO2_log())
+        assert reader == pytest.approx(
+            _SOL_RAMP_READER_FO2[temperature_C], abs=1.0e-3,
+        )
+        live_key = _freeze_gate_key_for_current_state(sim)
+        sim._calculate_evaporation(_equilibrium())
+        cache = sim._freeze_gate_liquid_fraction_cache
+        assert cache['key'] == live_key
+        assert dispatched_fO2_by_key[live_key] == pytest.approx(
+            sim._freeze_gate_liquidus_fO2_log(reader)
+        )
+        assert sim.melt.oxygen_reservoir.reference_T_K is None
+
+    assert len(dispatched_fO2_by_key) == len(buckets)
 
 
 def test_kernel_liquidus_aggregate_budget_exhaustion_production_default_no_authority(

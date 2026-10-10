@@ -2075,11 +2075,10 @@ class EvaporationMixin:
         fO2_log = self._freeze_gate_liquidus_fO2_log(
             float(self._current_melt_redox_fO2_log())
         )
-        # The dispatch still receives this temperature's fO2. The cache key
-        # uses the hour pin so a later read of the same load seed does not
-        # dispatch the gate again.
+        # Same live fO2 the dispatch receives. The cache buckets it; a
+        # temperature path that crosses buckets dispatches again.
         redox_key_fO2_log = self._freeze_gate_redox_key_fO2_log(
-            fO2_log=self._hour_stable_load_seed_fO2_log(fO2_log),
+            fO2_log=fO2_log,
         )
         key = self._freeze_gate_cache_key(
             pressure_bar=pressure_bar,

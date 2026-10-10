@@ -1547,8 +1547,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # The untouched load seed. A later read at a different temperature
         # recomputes IW(T) only while the reservoir still holds this value.
         self._load_time_unadopted_fO2_log = base_intrinsic_fO2_log
-        self._unadopted_seed_gate_fO2_hour = None
-        self._unadopted_seed_gate_fO2_log = None
         self._melt_fO2_seed_without_ferric_iron = (
             melt_fO2_seed_without_ferric_iron(self._melt_oxide_wt_pct())
         )
@@ -4403,27 +4401,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             and math.isclose(stored_f, load_f, rel_tol=0.0, abs_tol=1.0e-9)
         )
 
-    def _hour_stable_load_seed_fO2_log(self, fO2_log: float) -> float:
-        # Premise: the unadopted load seed tracks IW(T) on read. That
-        # number changes with temperature, but it is still one redox
-        # state. The liquidus cache key must not treat each temperature
-        # read as a new fO2 and dispatch the gate again. A real assignment
-        # is not the load seed and keeps its own key.
-        # Algebra: key fO2 = first reader value this hour while the
-        # reservoir still holds the load seed; otherwise the live value.
-        # Units: fO2 is log10(bar); hour is the melt hour index.
-        # Sanity: 950 C, 1150 C, and 1400 C in one hour share one gate call.
-        if not self._reservoir_holds_load_time_seed():
-            return float(fO2_log)
-        hour = int(getattr(self.melt, 'hour', 0) or 0)
-        pinned_hour = getattr(self, '_unadopted_seed_gate_fO2_hour', None)
-        pinned = getattr(self, '_unadopted_seed_gate_fO2_log', None)
-        if pinned_hour == hour and pinned is not None:
-            return float(pinned)
-        self._unadopted_seed_gate_fO2_hour = hour
-        self._unadopted_seed_gate_fO2_log = float(fO2_log)
-        return float(fO2_log)
-
     def _current_melt_redox_fO2_log(self) -> float:
         reservoir = getattr(self.melt, 'oxygen_reservoir', None)
         # Premise: load_batch stores Holzheid IW(298.15 K) = -78.50 with
@@ -4897,7 +4874,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self,
     ) -> Mapping[str, Any] | _MeltRedoxLiquidusFloorFallback | None:
         pressure_bar = float(self.melt.p_total_mbar) / 1000.0
-        fO2_log = self._hour_stable_load_seed_fO2_log(
+        fO2_log = self._freeze_gate_liquidus_fO2_log(
             float(self._current_melt_redox_fO2_log())
         )
         redox_key_fO2_log = self._freeze_gate_redox_key_fO2_log(
