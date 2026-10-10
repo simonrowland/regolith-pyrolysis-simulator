@@ -165,6 +165,61 @@ def test_replaced_start_runtimeerror_is_not_worker_death():
     worker.close()
 
 
+def _assert_call_death(caught):
+    assert type(caught.value) is EngineWorkerDied
+    assert caught.value.phase == 'call'
+    assert caught.value.__cause__ is None
+    assert str(caught.value) == 'test engine worker exited without a result'
+
+
+def test_inflight_disable_during_send_is_call_death():
+    pool = EngineWorkerPool(
+        lambda _index: _test_worker(timeout_s=30.0), size=1
+    )
+    try:
+        worker = pool.workers[0]
+        connection = worker.connection
+        real_send = connection.send
+
+        def send_then_disable(request):
+            real_send(request)
+            worker.request_disable()
+
+        connection.send = send_then_disable
+        future = pool.submit(_points()[0], timeout_s=30.0)
+        with pytest.raises(EngineWorkerDied) as caught:
+            future.result(timeout=_RENDEZVOUS_TIMEOUT_S)
+        _assert_call_death(caught)
+    finally:
+        pool.close(cancel_pending=True)
+
+
+def test_inflight_disable_after_recv_is_call_death():
+    pool = EngineWorkerPool(
+        lambda _index: _test_worker(timeout_s=30.0), size=1
+    )
+    try:
+        assert pool.submit(_points()[0], timeout_s=30.0).result(
+            timeout=_RENDEZVOUS_TIMEOUT_S
+        )
+        worker = pool.workers[0]
+        connection = worker.connection
+        real_recv = connection.recv
+
+        def recv_then_disable(*args, **kwargs):
+            message = real_recv(*args, **kwargs)
+            worker.request_disable()
+            return message
+
+        connection.recv = recv_then_disable
+        future = pool.submit(_points()[1], timeout_s=30.0)
+        with pytest.raises(EngineWorkerDied) as caught:
+            future.result(timeout=_RENDEZVOUS_TIMEOUT_S)
+        _assert_call_death(caught)
+    finally:
+        pool.close(cancel_pending=True)
+
+
 def test_timeout_discards_slot_and_next_call_respawns():
     worker = _test_worker(timeout_s=0.05)
     worker.start()
@@ -397,8 +452,9 @@ def test_canceling_close_fails_in_flight_request_without_orphan():
     pool.close(cancel_pending=True)
 
     assert future.done()
-    with pytest.raises(RuntimeError, match='worker exited without a result'):
+    with pytest.raises(EngineWorkerDied, match='worker exited without a result') as caught:
         future.result(timeout=0.1)
+    assert caught.value.phase == 'call'
     # The orphan assertion itself: after close() the worker process must
     # be gone (close joins/reaps, so a live pid here is a real orphan).
     with pytest.raises(ProcessLookupError):

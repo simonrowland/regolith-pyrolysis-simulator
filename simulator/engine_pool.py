@@ -561,8 +561,10 @@ class WarmEngineWorker:
                         and self.connection is connection
                     )
                 if not current:
-                    raise RuntimeError(
-                        f'{self.name} worker exited without a result'
+                    # In-flight state loss is worker death, not a local error.
+                    raise EngineWorkerDied(
+                        'call',
+                        f'{self.name} worker exited without a result',
                     )
                 poll_remaining = deadline - time.monotonic()
                 if poll_remaining <= 0.0:
@@ -607,7 +609,12 @@ class WarmEngineWorker:
                 and self.connection is connection
             )
         if not current:
-            raise RuntimeError(f'{self.name} worker exited without a result')
+            # The result arrived after the slot was dropped. Same death
+            # as a mid-call EOF: the pool owns it.
+            raise EngineWorkerDied(
+                'call',
+                f'{self.name} worker exited without a result',
+            )
         if message[0] == 'ok':
             return message[1]
         if message[0] == 'timeout':

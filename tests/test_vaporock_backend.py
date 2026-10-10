@@ -3680,6 +3680,62 @@ def test_uninspectable_positional_candidate_is_not_an_engine_failure(
     )
 
 
+def test_incall_typeerror_is_not_a_signature_mismatch(monkeypatch):
+    """A TypeError inside an accepted candidate is the engine failure.
+
+    An opaque or variadic entry whose body raises TypeError must not be
+    replaced by the next candidate, and a keyword-body TypeError must
+    not be retried as a positional success.
+    """
+    import numpy as np
+
+    later_calls = {"n": 0}
+
+    def succeeds(**_kwargs):
+        later_calls["n"] += 1
+        return {"Na": 0.001}
+
+    def variadic(*_args, **_kwargs):
+        raise TypeError("upstream engine arithmetic bug")
+
+    def opaque_body(_comp, _temp, _fo2):
+        raise TypeError("upstream engine arithmetic bug")
+
+    def switches(*_args, **kwargs):
+        if kwargs:
+            raise TypeError("upstream keyword solve failed")
+        return {"Na": 0.001}
+
+    cases = (
+        ("variadic", variadic, "upstream engine arithmetic bug"),
+        (
+            "opaque",
+            np.frompyfunc(opaque_body, 3, 1),
+            "upstream engine arithmetic bug",
+        ),
+        ("switches", switches, "upstream keyword solve failed"),
+    )
+    for label, fn, message in cases:
+        later_calls["n"] = 0
+        _install_fake_import(
+            monkeypatch,
+            types.SimpleNamespace(
+                calc_vapor_pressures=fn,
+                calc_vapor=succeeds,
+            ),
+        )
+        backend = VapoRockBackend()
+        assert backend.initialize({"warm_worker": False}), label
+        result = backend.equilibrate(
+            1600.0, composition_mol={"Na2O": 1.0}
+        )
+        assert result.status == "not_converged", label
+        assert result.diagnostics["engine_exception"] == "TypeError", label
+        assert result.diagnostics["engine_exception_message"] == message, label
+        assert getattr(result, "vaporock_full_speciation_Pa", {}) == {}, label
+        assert later_calls["n"] == 0, label
+
+
 def test_upstream_pressure_accessor_failure_is_typed(monkeypatch):
     class BrokenWrapper:
         @property
@@ -3757,3 +3813,29 @@ def test_warm_pool_local_runtimeerror_propagates():
             backend.equilibrate(1600.0, composition_mol={"Na2O": 1.0})
     finally:
         backend.close()
+
+
+def test_warm_pool_inflight_disable_is_typed_worker_death():
+    pool = _restart_pool()
+    backend = VapoRockBackend()
+    backend._available = True
+    backend._warm_pool = pool
+    try:
+        worker = pool.workers[0]
+        connection = worker.connection
+        real_send = connection.send
+
+        def send_then_disable(request):
+            real_send(request)
+            worker.request_disable()
+
+        connection.send = send_then_disable
+        result = backend.equilibrate(1600.0, composition_mol={"Na2O": 1.0})
+    finally:
+        backend.close()
+
+    assert result.status == "not_converged"
+    assert result.diagnostics["engine_exception"] == "EngineWorkerDied"
+    assert "worker exited without a result" in (
+        result.diagnostics["engine_exception_message"]
+    )

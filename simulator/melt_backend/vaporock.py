@@ -568,6 +568,18 @@ def _vaporock_incompatible_api_error(
     return VapoRockCallError('VapoRockIncompatibleAPI', message)
 
 
+def _call_typeerror_is_binding_failure(exc: BaseException) -> bool:
+    """True when ``TypeError`` rejected the call before the body ran.
+
+    The interpreter raises an argument-mismatch ``TypeError`` at the
+    call, so the traceback stops on that line. A ``TypeError`` raised
+    inside an accepted call has a further frame. Only a binding failure
+    may try another convention or a later candidate.
+    """
+    traceback = exc.__traceback__
+    return traceback is not None and traceback.tb_next is None
+
+
 def _speciation_value_stats(
     items: Sequence[tuple[Any, Any]],
 ) -> Dict[str, int]:
@@ -2274,8 +2286,9 @@ class VapoRockBackend(MeltBackend):
                 signature = None
             # A missing signature, or one that names no parameters and
             # accepts every convention, does not describe the callable.
-            # Probe keyword then positional. A TypeError there is an
-            # API-variant mismatch; any other error ran inside the entry.
+            # Probe keyword then positional. Only a binding TypeError
+            # may try the other convention. A TypeError raised inside
+            # an accepted call is the engine failure.
             probe_legacy = signature is None
             keyword_binds = False
             positional_binds = False
@@ -2309,10 +2322,18 @@ class VapoRockBackend(MeltBackend):
                 try:
                     raw = fn(**candidate_kwargs)
                 except TypeError as exc:
+                    if not _call_typeerror_is_binding_failure(exc):
+                        raise VapoRockCallError(exc) from exc
                     last_attr_error = exc
                     try:
                         raw = fn(*legacy_args)
                     except TypeError as positional_exc:
+                        if not _call_typeerror_is_binding_failure(
+                            positional_exc
+                        ):
+                            raise VapoRockCallError(
+                                positional_exc
+                            ) from positional_exc
                         last_attr_error = positional_exc
                         continue
                     except Exception as exc:
