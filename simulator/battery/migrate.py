@@ -73,6 +73,7 @@ from simulator.battery.enums import (
     Phase,
     Polymorph,
     Quantity,
+    RawInputStatus,
     Rail,
     ReferenceStateConvention,
     RefusalReason,
@@ -897,12 +898,18 @@ def _derivation_from_plain(payload: object) -> Derivation | None:
     if isinstance(inputs, str):
         inputs = (inputs,)
     raw_marker = payload.get("pure_substance_reference")
+    raw_inputs = payload.get("raw_inputs")
     return Derivation(
         relation=str(payload.get("relation") or "identity"),
         inputs=tuple(str(x) for x in inputs),
         parameters=tuple(parameters),
         output_unit=str(payload.get("output_unit") or "as_published"),
         pure_substance_reference=raw_marker if isinstance(raw_marker, bool) else None,
+        raw_inputs=(
+            _located_from_plain(raw_inputs, lambda value: _enum(RawInputStatus, value))
+            if raw_inputs is not None
+            else None
+        ),
     )
 
 

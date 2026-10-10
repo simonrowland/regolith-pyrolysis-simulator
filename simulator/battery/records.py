@@ -46,6 +46,7 @@ from simulator.battery.enums import (
     Phase,
     Polymorph,
     Quantity,
+    RawInputStatus,
     Rail,
     ReferenceStateConvention,
     RefusalReason,
@@ -421,6 +422,7 @@ class Derivation:
     # pure-substance reference and engine_point does not apply. Absent means
     # not declared — never a stamped false.
     pure_substance_reference: bool | None = None
+    raw_inputs: Located[RawInputStatus] | None = None
 
     def __post_init__(self) -> None:
         if not self.relation:
