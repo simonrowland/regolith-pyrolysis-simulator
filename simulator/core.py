@@ -572,6 +572,29 @@ class _MeltRedoxLiquidusFloorFallback:
     liquidus_status: _MeltRedoxLiquidusStatus
 
 
+def _liquidus_engine_exceptions() -> tuple[type[BaseException], ...]:
+    """Return the engine failures eligible for liquidus floor fallback."""
+    from engines.alphamelts.thermoengine import (
+        ThermoEngineFO2OmittedError,
+        ThermoEngineFO2UndefinedError,
+        ThermoEngineIsolationError,
+        ThermoEngineNonFiniteField,
+        ThermoEngineOutOfDomainError,
+        ThermoEngineTimeoutError,
+    )
+    from simulator.engine_pool import EngineWorkerTimeout
+
+    return (
+        ThermoEngineOutOfDomainError,
+        ThermoEngineIsolationError,
+        ThermoEngineFO2UndefinedError,
+        ThermoEngineNonFiniteField,
+        ThermoEngineFO2OmittedError,
+        ThermoEngineTimeoutError,
+        EngineWorkerTimeout,
+    )
+
+
 def _liquidus_status_from_freeze_gate_exception(
     exc: BaseException,
 ) -> _MeltRedoxLiquidusStatus:
@@ -598,28 +621,10 @@ def _liquidus_status_from_freeze_gate_exception(
         return 'unavailable'
 
     from engines.alphamelts.thermoengine import (
-        ThermoEngineFO2OmittedError,
-        ThermoEngineFO2UndefinedError,
-        ThermoEngineIsolationError,
-        ThermoEngineNonFiniteField,
-        ThermoEngineOutOfDomainError,
-        ThermoEngineTimeoutError,
         thermoengine_failure_disposition_from_exception,
     )
-    from simulator.engine_pool import EngineWorkerTimeout
 
-    if isinstance(
-        exc,
-        (
-            ThermoEngineOutOfDomainError,
-            ThermoEngineIsolationError,
-            ThermoEngineFO2UndefinedError,
-            ThermoEngineNonFiniteField,
-            ThermoEngineFO2OmittedError,
-            ThermoEngineTimeoutError,
-            EngineWorkerTimeout,
-        ),
-    ):
+    if isinstance(exc, _liquidus_engine_exceptions()):
         mapped = thermoengine_failure_disposition_from_exception(exc).status
         if mapped == 'out_of_domain':
             return 'out_of_domain'
@@ -4720,28 +4725,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             }
             return None
         if curve is None:
-            from engines.alphamelts.thermoengine import (
-                ThermoEngineFO2OmittedError,
-                ThermoEngineFO2UndefinedError,
-                ThermoEngineIsolationError,
-                ThermoEngineNonFiniteField,
-                ThermoEngineOutOfDomainError,
-                ThermoEngineTimeoutError,
-            )
-            from simulator.engine_pool import EngineWorkerTimeout
             from simulator.melt_backend.liquidus import LiquidusSampleError
 
             liquidus_provider_failures = (
                 ProviderUnavailableError,
                 LiquidusSampleError,
-                ThermoEngineOutOfDomainError,
-                ThermoEngineIsolationError,
-                ThermoEngineFO2UndefinedError,
-                ThermoEngineNonFiniteField,
-                ThermoEngineFO2OmittedError,
-                ThermoEngineTimeoutError,
-                EngineWorkerTimeout,
-            )
+            ) + _liquidus_engine_exceptions()
             try:
                 curve = self._freeze_gate_curve()
             except EvaporationFluxRefusal:
