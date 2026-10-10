@@ -1,0 +1,345 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2355/isijinternational.51.1369
+  citation: I. Seki, K. Nagata, T. Ashino, and J. Tanabe, Solubility of Calcium and Oxygen in Molten Iron Equilibrated with
+    Slag in CaO, Al2O3 or CaO-stabilized ZrO2 Crucible at 1873 K, ISIJ International 51(9) (2011) 1369–1374.
+  source_ids:
+  - seki-2011-ca-o-solubility-fe-cao-al2o3
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+    files:
+    - asset_id: pdf:seki-2011-ca-o-solubility-fe-cao-al2o3
+      role: pdf
+      path: raw/seki-2011-ca-o-solubility-fe-cao-al2o3/seki-2011-ca-o-solubility-fe-cao-al2o3.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:seki-2011-ca-o-solubility-fe-cao-al2o3
+      role: pdftotext
+      path: text/seki-2011-ca-o-solubility-fe-cao-al2o3
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:seki-2011-ca-o-solubility-fe-cao-al2o3
+      role: table_csv
+      path: tables/seki-2011-ca-o-solubility-fe-cao-al2o3
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: unknown:seki-2011-ca-o-solubility-fe-cao-al2o3
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2355/isijinternational.51.1369
+experiments:
+- experiment_id: 10.2355/isijinternational.51.1369::seki-2011-ca-o-solubility-fe-cao-al2o3
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.51.1369
+  locator:
+    published_page: 1373
+    pdf_page_index: 5
+    table: '3'
+context:
+- observation_id: seki_2011_abstract_slag_compositions
+  type: table
+  locator:
+    published_page: 1369
+    pdf_page_index: 1
+    section: Synopsis
+  units: mass%
+  values:
+    compositions_as_printed:
+      CaO_crucible:
+        CaO: '57.36'
+        Al2O3: '34.86'
+        ZrO2: '7.78'
+      Al2O3_crucible:
+        CaO: '27.08'
+        Al2O3: '53.42'
+        ZrO2: '19.50'
+      CaO_stabilized_ZrO2_crucible:
+        CaO: '30.38'
+        Al2O3: '51.56'
+        ZrO2: '18.06'
+    compounds_as_printed_in_synopsis_and_section_3_1:
+      Al2O3_crucible: CaO·2Al2O3
+    quote: Abstract and section 3.1 slag compositions and phases.
+  context_id: seki-2011-ca-o-solubility-fe-cao-al2o3::context::seki_2011_abstract_slag_compositions
+  work_id: 10.2355/isijinternational.51.1369
+  source_id: seki-2011-ca-o-solubility-fe-cao-al2o3
+  species: CaO
+- observation_id: seki_2011_abstract_solubility_averages
+  type: table
+  locator:
+    published_page: 1369
+    pdf_page_index: 1
+    section: Synopsis
+  units: ppm in molten iron
+  values:
+    averages_as_printed:
+      CaO_crucible:
+        O: 251
+        Ca: 3
+      Al2O3_crucible:
+        O: 33
+        Ca: 4
+      CaO_stabilized_ZrO2_crucible:
+        O: 21
+        Ca: 5
+    quote: The abstract reports average oxygen and calcium concentrations for each crucible.
+  context_id: seki-2011-ca-o-solubility-fe-cao-al2o3::context::seki_2011_abstract_solubility_averages
+  work_id: 10.2355/isijinternational.51.1369
+  source_id: seki-2011-ca-o-solubility-fe-cao-al2o3
+  species: CaO
+- observation_id: seki_2011_method
+  type: method
+  locator:
+    published_page: 1369
+    pdf_page_index: 1
+    section: Synopsis / Experiments
+  units: K; mass%
+  values:
+    quantity: slag_metal_equilibration_ca_o_solubility
+    method_class: method_only
+    experimental_method: slag-metal equilibration of molten iron with CaO-Al2O3-ZrO2 slag in CaO, Al2O3, or 5.5 mass% CaO-stabilized
+      ZrO2 crucible at 1873 K
+    temperature_K: 1873
+    argon_flow_Nml_s_as_printed: 2
+    argon_pO2_Pa_at_1100_K_as_printed: '0.0000000000000000000000000083'
+    holding_time_after_calcium_addition_s_as_printed: 3600
+    equilibration_check_interval_s_as_printed:
+    - 1800
+    - 10800
+    temperature_uncertainty_K_as_printed: 2
+    temperature_couple_as_printed: Pt/Pt-13%Rh
+    calcium_analysis_as_printed: ICP-OES, Ca II 393.368 nm
+    aluminum_analysis_as_printed: ICP-OES, Al I 396.152 nm
+    zirconium_analysis_as_printed: ICP-OES, Zr II 339.198 nm
+    oxygen_analysis_as_printed: LECO TC-436 infrared absorption
+    how_equilibrium_shown_as_printed: held at 1873 K, quenched, and analyzed for Ca and O; Table 2 gives measured concentrations
+    fitted_parameters_as_printed:
+      log_K: '-4.38'
+      e_O^Ca: '31.8'
+      e_Ca^O: '12.7'
+      e_Ca^Zr: 3
+    abstract_parameter_sentence_as_printed: e_Ca^O = 31.8
+    hino_recommended_parameters_as_printed:
+      log_K: '-9.08'
+      e_Ca^Ca: '-0.002'
+      e_Ca^O: -1293
+      e_Ca^Al: '-0.072'
+      e_O^O: '-0.17'
+      e_O^Ca: -515
+      e_O^Al: '-1.17'
+      e_O^Zr: '-2.1'
+      trial_e_Ca^Zr: 0
+    comparison_activity_values_as_attributed:
+      Nagata_a_CaO_in_equilibrium_with_CaO_2Al2O3: '0.25'
+      Tanabe_a_CaO_for_Al2O3_and_CSZ_slags: '0.03'
+    note: The 1100 K Ar-sensor pO2 is not the pO2 of the 1873 K iron; the paper does not report that value.
+  context_id: seki-2011-ca-o-solubility-fe-cao-al2o3::context::seki_2011_method
+  work_id: 10.2355/isijinternational.51.1369
+  source_id: seki-2011-ca-o-solubility-fe-cao-al2o3
+  species: CaO
+- observation_id: seki_2011_table2_solubilities
+  type: table
+  locator:
+    published_page: 1372
+    pdf_page_index: 4
+    table: '2'
+  units: mass% in molten iron; slag composition mol%
+  values:
+    rows:
+    - run: 1
+      crucible: Al2O3
+      replicates_mass_percent:
+        O:
+        - '0.0044'
+        - '0.0036'
+        Ca:
+        - '0.0004'
+        - '0.0004'
+        Al:
+        - '0.0017'
+        - '0.0015'
+        Zr:
+        - '0.0032'
+        - '0.0032'
+      average_mass_percent:
+        O: '0.0040'
+        Ca: '0.0004'
+        Al: '0.0016'
+        Zr: '0.0032'
+    - run: 2
+      crucible: Al2O3
+      replicates_mass_percent:
+        O:
+        - '0.0031'
+        - '0.0021'
+        Ca:
+        - '0.0005'
+        - '0.0003'
+        Al:
+        - '0.1140'
+        - '0.1130'
+        - '0.0834'
+        - '0.0683'
+        Zr:
+        - '0.0070'
+        - '0.0057'
+      average_mass_percent:
+        O: '0.0026'
+        Ca: '0.0004'
+        Al: '0.0947'
+        Zr: '0.0063'
+    - run: 3
+      crucible: CaO-stabilized ZrO2
+      replicates_mass_percent:
+        O:
+        - '0.0015'
+        - '0.0013'
+        Ca:
+        - <0.0005
+        - '0.0010'
+        Al:
+        - '0.0044'
+        - '0.0043'
+        Zr:
+        - <0.0003
+        - <0.0003
+      average_mass_percent:
+        O: '0.0014'
+        Ca: '0.0008'
+        Al: '0.0044'
+        Zr: '0.0003'
+    - run: 4
+      crucible: CaO-stabilized ZrO2
+      replicates_mass_percent:
+        O:
+        - '0.0020'
+        - '0.0020'
+        Ca:
+        - <0.0005
+        Al:
+        - '0.0033'
+        Zr:
+        - <0.0003
+      average_mass_percent:
+        O: '0.0020'
+        Ca: '0.0005'
+        Al: '0.0033'
+        Zr: '0.0003'
+    - run: 5
+      crucible: CaO-stabilized ZrO2
+      replicates_mass_percent:
+        O:
+        - '0.0031'
+        - '0.0027'
+        Ca:
+        - '0.0003'
+        - '0.0003'
+        Al:
+        - '0.0889'
+        - '0.0838'
+        - '0.0788'
+        - '0.0782'
+        Zr:
+        - '0.0065'
+        - '0.0064'
+      average_mass_percent:
+        O: '0.0029'
+        Ca: '0.0003'
+        Al: '0.0824'
+        Zr: '0.0064'
+    - run: 6
+      crucible: CaO
+      replicates_mass_percent:
+        O:
+        - '0.0268'
+        - '0.0250'
+        Ca:
+        - '0.0002'
+        - '0.0002'
+        Al:
+        - '0.0003'
+        - '0.0002'
+        Zr:
+        - '0.0032'
+        - '0.0031'
+      average_mass_percent:
+        O: '0.0259'
+        Ca: '0.0002'
+        Al: '0.0003'
+        Zr: '0.0032'
+    - run: 7
+      crucible: CaO
+      replicates_mass_percent:
+        O:
+        - '0.0249'
+        - '0.0238'
+        Ca:
+        - '0.0005'
+        - '0.0002'
+        Al:
+        - '0.0003'
+        - '0.0002'
+        Zr:
+        - '0.0032'
+        - '0.0031'
+      average_mass_percent:
+        O: '0.0244'
+        Ca: '0.0004'
+        Al: '0.0003'
+        Zr: '0.0032'
+    equilibrated_slag_compositions_mol_percent:
+      Al2O3_crucible:
+        CaO: '41.45'
+        Al2O3: '44.97'
+        ZrO2: '13.59'
+      CaO_stabilized_ZrO2_crucible:
+        CaO: '45.37'
+        Al2O3: '42.36'
+        ZrO2: '12.28'
+      CaO_crucible:
+        CaO: '71.63'
+        Al2O3: '23.95'
+        ZrO2: '4.42'
+    compounds_as_printed:
+      Al2O3_crucible: ZrO2-CaO (Css) and 2CaO·Al2O3
+      CaO_stabilized_ZrO2_crucible: ZrO2-CaO (Css) and CaO·ZrO2
+      CaO_crucible: CaO·ZrO2 and CaO
+    quote: Table 2.
+  context_id: seki-2011-ca-o-solubility-fe-cao-al2o3::context::seki_2011_table2_solubilities
+  work_id: 10.2355/isijinternational.51.1369
+  source_id: seki-2011-ca-o-solubility-fe-cao-al2o3
+  species: CaO

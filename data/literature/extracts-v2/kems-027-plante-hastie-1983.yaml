@@ -134,8 +134,18 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: 'source standard_state is not typed: a(CsBO2)=P/P° with P° from Gurvich and Veits 1983; not ideal CsBO2(l) mixing'
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CsBO2
+          phase:
+            tag: value
+            value: l
+          charge:
+            tag: value
+            value: 0
+        component_basis: CsBO2
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -4272,8 +4282,18 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: 'source standard_state is not typed: a(LiBO2)=P/P°(JANAF 1971 LiBO2,l)'
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: LiBO2
+          phase:
+            tag: value
+            value: l
+          charge:
+            tag: value
+            value: 0
+        component_basis: LiBO2
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -4503,9 +4523,18 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: 'source explicitly excludes a Raoultian reference state: a(NaBO2) = P(NaBO2)/P°(NaBO2,l) with P° from JANAF
-        1971. Not a Raoultian Na2O activity.'
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: NaBO2
+          phase:
+            tag: value
+            value: l
+          charge:
+            tag: value
+            value: 0
+        component_basis: NaBO2
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir

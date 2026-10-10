@@ -1,0 +1,184 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2355/isijinternational.31.1316
+  citation: K. Tomioka and H. Suito, "Nitride Capacity of CaO-Al2O3 Melts", ISIJ International 31(11) (1991) 1316–1321.
+  source_ids:
+  - tomioka-1991-nitride-capacity-cao-al2o3
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+    files:
+    - asset_id: pdf:tomioka-1991-nitride-capacity-cao-al2o3
+      role: pdf
+      path: raw/tomioka-1991-nitride-capacity-cao-al2o3/tomioka-1991-nitride-capacity-cao-al2o3.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:tomioka-1991-nitride-capacity-cao-al2o3
+      role: pdftotext
+      path: text/tomioka-1991-nitride-capacity-cao-al2o3
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:tomioka-1991-nitride-capacity-cao-al2o3
+      role: table_csv
+      path: tables/tomioka-1991-nitride-capacity-cao-al2o3
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: unknown:tomioka-1991-nitride-capacity-cao-al2o3
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2355/isijinternational.31.1316
+experiments:
+- experiment_id: 10.2355/isijinternational.31.1316::tomioka-1991-nitride-capacity-cao-al2o3
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.31.1316
+  locator:
+    published_page: 1319
+    pdf_page_index: 4
+    table: '1'
+context:
+- observation_id: tomioka_1991_activity_derivation
+  type: activity_derivation
+  locator:
+    published_page: 1320
+    pdf_page_index: 5
+    section: 3.6 Activity Coefficient of AlN
+  units: J/mol; dimensionless
+  values:
+    equations_as_printed:
+      equation_4: 2 Al + 3/2 O2(g) = Al2O3(s)
+      equation_5: ΔG°4 = −1 554 000 + 377.6 T J/mol
+      equation_6: 1/2 Al2O3(s) + 1/2 N2(g) = AlN(s) + 3/4 O2(g)
+      equation_7: ΔG°6 = 516 600 − 47.91 T J/mol
+      equation_8: γ_AlN = (K6 / α_AlN) a_Al2O3^(1/2) / C_N3−
+      alpha_AlN_definition: mole fraction of AlN divided by mass% N
+  context_id: tomioka-1991-nitride-capacity-cao-al2o3::context::tomioka_1991_activity_derivation
+  work_id: 10.2355/isijinternational.31.1316
+  source_id: tomioka-1991-nitride-capacity-cao-al2o3
+  species: CaO
+- observation_id: tomioka_1991_fig7_liquidus_figure_only
+  type: method
+  locator:
+    published_page: 1320
+    pdf_page_index: 5
+    figure: '7'
+  units: none
+  values:
+    quantity: cao_al2o3_phase_diagram_with_present_liquidus_points
+    method_class: method_only
+    admission_status: figure_only
+    note: Fig. 7 Hallstedt diagram with present liquidus points; not digitised
+  context_id: tomioka-1991-nitride-capacity-cao-al2o3::context::tomioka_1991_fig7_liquidus_figure_only
+  work_id: 10.2355/isijinternational.31.1316
+  source_id: tomioka-1991-nitride-capacity-cao-al2o3
+  species: CaO
+- observation_id: tomioka_1991_liquidus_molar_ratio_ranges
+  type: liquidus_composition_ranges
+  locator:
+    published_page: 1320
+    pdf_page_index: 5
+    section: 3.4 Temperature Dependence / 3.5 Dependence of Slag Composition
+  T_range_K:
+  - '1723'
+  - '1923'
+  phase: liquid CaO-Al2O3 at Al2O3 or CaO saturation (liquidus)
+  units: molar ratio CaO/Al2O3 as printed
+  values:
+    note: Authors state Table I slag compositions correspond to liquidus; molar ratios varied as follows (printed). Fig. 7
+      plots points on Hallstedt CaO-Al2O3 diagram — figure_only, not digitised.
+    Al2O3_crucible_CaO_over_Al2O3_molar_range_as_printed: 1.5 to 0.85 (1723-1923 K)
+    CaO_crucible_CaO_over_Al2O3_molar_range_as_printed: 1.9 to 2.8 (1723-1823 K)
+    Mo_crucible_CaO_over_Al2O3_molar_ratio_as_printed: almost constant at 2.3
+    agreement_as_printed: present slag compositions in good agreement with liquidus lines (Hallstedt)
+  quote: since the molar ratios of CaO/Al2O3 in the slags were those corresponding to liquidus compositions, they varied from
+    1.5 to 0.85 (1723-1923 K) when Al2O3 crucibles were used, and from 1.9 to 2.8 (1723-1823 K) in the case of CaO crucibles.
+  context_id: tomioka-1991-nitride-capacity-cao-al2o3::context::tomioka_1991_liquidus_molar_ratio_ranges
+  work_id: 10.2355/isijinternational.31.1316
+  source_id: tomioka-1991-nitride-capacity-cao-al2o3
+  species: CaO
+- observation_id: tomioka_1991_method
+  type: method
+  locator:
+    published_page: 1316
+    pdf_page_index: 1
+    section: Experimental
+  units: K; atm
+  values:
+    quantity: gas_slag_equilibration_nitride_capacity
+    method_class: method_only
+    experimental_method: gas-slag equilibration with N2-H2-H2O; Po2 by ZrO2-MgO solid electrolyte EMF; CaO, Al2O3, and Mo
+      crucibles; 1723-1923 K
+    how_equilibrium_shown_as_printed: approach from AlN-added and N-free sides; ~9 h to plateau in log CN3- vs time (Fig.
+      4); runs 12-24 h
+    CN3_definition_as_printed: CN3- = (%N) * Po2^(3/4) / PN2^(1/2)
+    temperature_measurement_as_printed: Pt–20%Rh/Pt–40%Rh thermocouple; hot zone 3 cm within ±2 K
+    oxygen_potential_calibration_as_printed:
+      Mo/MoO2: ΔG° = −56100 + 169.2 T J/mol; EMF measured at 1073 K
+      H2O: ΔG° = −247500 + 55.86 T J/mol; P_H2O/P_H2 measured at 1073 K and used to recalculate P_O2 at 1723–1923 K
+    analysis_method_as_printed:
+      N: ion chromatography after Kjeldahl extraction; ±0.2 mass ppm; Kjeldahl-indophenol inaccurate below 10 mass ppm N
+      Ca and Al: ICP emission spectrometry; ±0.5%
+  context_id: tomioka-1991-nitride-capacity-cao-al2o3::context::tomioka_1991_method
+  work_id: 10.2355/isijinternational.31.1316
+  source_id: tomioka-1991-nitride-capacity-cao-al2o3
+  species: CaO
+- observation_id: tomioka_1991_table1_gas_slag_equilibrium
+  type: equilibrium_table
+  locator:
+    published_page: 1319
+    pdf_page_index: 4
+    table: '1'
+  T_range_K:
+  - '1723'
+  - '1923'
+  phase: liquid CaO-Al2O3 (crucible-saturated)
+  units: mass ratio (Ca)/(Al); (N)x10^4 mass%; log(Po2/atm); log CN3-
+  values:
+    table_title_as_printed: Table 1. Equilibrium data for the gas-slag experiments in CaO-Al2O3 melts using the 90%N2-10%H2
+      gas mixture.
+    columns_as_printed: Time (h); (Ca)/(Al); (N)x10^4 (mass%); log(Po2/atm); log CN3-
+    footnotes_as_printed:
+    - '* 0.05 mass% AlN added'
+    - '** 75 mass% H2SO4 in the saturator'
+    - 1 atm = 1.013e5 Pa
+    row_count_Al2O3_crucible: 19
+    row_count_CaO_crucible: 7
+    row_count_Mo_crucible: 4
+    row_count_total: 30
+    note: Table 1 row data are stored in the row-level observation below; Fig. 7 remains figure_only.
+  context_id: tomioka-1991-nitride-capacity-cao-al2o3::context::tomioka_1991_table1_gas_slag_equilibrium
+  work_id: 10.2355/isijinternational.31.1316
+  source_id: tomioka-1991-nitride-capacity-cao-al2o3
+  species: CaO

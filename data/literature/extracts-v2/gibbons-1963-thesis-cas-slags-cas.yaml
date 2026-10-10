@@ -1,0 +1,962 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/gibbons-1963-thesis-cas-slags-cas.yaml
+observations:
+- observation_id: gibbons-1963-thesis-cas-slags-cas::gibbons_1963_carter_macfarlane_reference_lime_activity
+  experiment_id: 1ad441819fecd5fd1caf2f12dfa89d68b0e48cc6b3162452d0e4332c2f6fcf87::gibbons-1963-thesis-cas-slags-cas
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: The thesis does not identify a typed pure-endmember reference state for this activity.
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.95'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_literature
+    attribution: Carter and Macfarlane suggested a reference-lime activity of 0.95.
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: empirical-cao-al2o3-slot-05
+      date: '2026-10-04'
+      evidence:
+        published_page: 52
+        pdf_page_index: 74
+        section: Thermodynamic Discussion
+  notices: []
+  source_id: gibbons-1963-thesis-cas-slags-cas
+  locator:
+    published_page: 52
+    pdf_page_index: 74
+    section: Thermodynamic Discussion
+  read_from: pdf:gibbons-1963-thesis-cas-slags-cas
+- observation_id: gibbons-1963-thesis-cas-slags-cas::gibbons_1963_first_eutectic_lime_activity_rejected
+  experiment_id: 1ad441819fecd5fd1caf2f12dfa89d68b0e48cc6b3162452d0e4332c2f6fcf87::gibbons-1963-thesis-cas-slags-cas
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: The thesis does not identify a typed pure-endmember reference state for this activity.
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.6422301465203623770678523739'
+        - - Al2O3
+          - '0.280538204213996810562048883'
+        - - SiO2
+          - '0.07723164926564081237009874296'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '1'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: The thesis reports approximately unity and states this calculated value is in error.
+    model: model_derived
+  admission:
+    status: rejected
+    reason: Gibbons states the printed activity is in error; retained as typed refusal.
+    decided_by:
+      worker: empirical-cao-al2o3-slot-05
+      date: '2026-10-04'
+      evidence:
+        published_page: 63
+        pdf_page_index: 98
+        section: Thermodynamic Discussion
+  notices: []
+  source_id: gibbons-1963-thesis-cas-slags-cas
+  locator:
+    published_page: 63
+    pdf_page_index: 98
+    section: Thermodynamic Discussion
+  read_from: pdf:gibbons-1963-thesis-cas-slags-cas
+  point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '41.3'
+          CaO: '52'
+          SiO2: '6.7'
+      locator:
+        published_page: 63
+        pdf_page_index: 98
+        section: Thermodynamic Discussion
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.280538204213996810562048883'
+          - - CaO
+            - '0.6422301465203623770678523739'
+          - - SiO2
+            - '0.07723164926564081237009874296'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 63
+        pdf_page_index: 98
+        section: Thermodynamic Discussion
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '41.3'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '52'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '6.7'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        output_unit: mole_fraction
+  derived_from:
+  - tables:gibbons-1963-thesis-cas-slags-cas
+  derivation:
+    relation: Calculated from the printed eutectic phase relation and compound free-energy data; context row gibbons_1963_eutectic_and_peritectic_activities,
+      PDF pp. 98–99.
+    inputs:
+    - tables:gibbons-1963-thesis-cas-slags-cas
+    parameters: []
+    output_unit: as_published
+- observation_id: gibbons-1963-thesis-cas-slags-cas::gibbons_1963_first_eutectic_silica_activity
+  experiment_id: 1ad441819fecd5fd1caf2f12dfa89d68b0e48cc6b3162452d0e4332c2f6fcf87::gibbons-1963-thesis-cas-slags-cas
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: The thesis does not identify a typed pure-endmember reference state for this activity.
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.6422301465203623770678523739'
+        - - Al2O3
+          - '0.280538204213996810562048883'
+        - - SiO2
+          - '0.07723164926564081237009874296'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.00004'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Gibbons prints a_SiO2 = 4 x 10^-5 for the first eutectic.
+    model: model_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: empirical-cao-al2o3-slot-05
+      date: '2026-10-04'
+      evidence:
+        published_page: 63
+        pdf_page_index: 98
+        section: Thermodynamic Discussion
+  notices: []
+  source_id: gibbons-1963-thesis-cas-slags-cas
+  locator:
+    published_page: 63
+    pdf_page_index: 98
+    section: Thermodynamic Discussion
+  read_from: pdf:gibbons-1963-thesis-cas-slags-cas
+  point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '41.3'
+          CaO: '52'
+          SiO2: '6.7'
+      locator:
+        published_page: 63
+        pdf_page_index: 98
+        section: Thermodynamic Discussion
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.280538204213996810562048883'
+          - - CaO
+            - '0.6422301465203623770678523739'
+          - - SiO2
+            - '0.07723164926564081237009874296'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 63
+        pdf_page_index: 98
+        section: Thermodynamic Discussion
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '41.3'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '52'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '6.7'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        output_unit: mole_fraction
+  derived_from:
+  - tables:gibbons-1963-thesis-cas-slags-cas
+  derivation:
+    relation: Calculated from the printed eutectic phase relation and compound free-energy data; context row gibbons_1963_eutectic_and_peritectic_activities,
+      PDF pp. 98–99.
+    inputs:
+    - tables:gibbons-1963-thesis-cas-slags-cas
+    parameters: []
+    output_unit: as_published
+- observation_id: gibbons-1963-thesis-cas-slags-cas::gibbons_1963_later_reference_lime_activity
+  experiment_id: 1ad441819fecd5fd1caf2f12dfa89d68b0e48cc6b3162452d0e4332c2f6fcf87::gibbons-1963-thesis-cas-slags-cas
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: The thesis does not identify a typed pure-endmember reference state for this activity.
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.8'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_unattributed
+    attribution: Gibbons reports more recent data suggesting a reference-lime activity of 0.8.
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: empirical-cao-al2o3-slot-05
+      date: '2026-10-04'
+      evidence:
+        published_page: 52
+        pdf_page_index: 74
+        section: Thermodynamic Discussion
+  notices: []
+  source_id: gibbons-1963-thesis-cas-slags-cas
+  locator:
+    published_page: 52
+    pdf_page_index: 74
+    section: Thermodynamic Discussion
+  read_from: pdf:gibbons-1963-thesis-cas-slags-cas
+- observation_id: gibbons-1963-thesis-cas-slags-cas::gibbons_1963_second_eutectic_lime_activity
+  experiment_id: 1ad441819fecd5fd1caf2f12dfa89d68b0e48cc6b3162452d0e4332c2f6fcf87::gibbons-1963-thesis-cas-slags-cas
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: The thesis does not identify a typed pure-endmember reference state for this activity.
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.6208705027889803394347788003'
+        - - Al2O3
+          - '0.3008537330735824033704007649'
+        - - SiO2
+          - '0.07827576413743725719482043514'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.32'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Gibbons prints a_CaO = 0.32 for the second eutectic.
+    model: model_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: empirical-cao-al2o3-slot-05
+      date: '2026-10-04'
+      evidence:
+        published_page: 63
+        pdf_page_index: 98
+        section: Thermodynamic Discussion
+  notices: []
+  source_id: gibbons-1963-thesis-cas-slags-cas
+  locator:
+    published_page: 63
+    pdf_page_index: 98
+    section: Thermodynamic Discussion
+  read_from: pdf:gibbons-1963-thesis-cas-slags-cas
+  point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '43.7'
+          CaO: '49.6'
+          SiO2: '6.7'
+      locator:
+        published_page: 63
+        pdf_page_index: 98
+        section: Thermodynamic Discussion
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.3008537330735824033704007649'
+          - - CaO
+            - '0.6208705027889803394347788003'
+          - - SiO2
+            - '0.07827576413743725719482043514'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 63
+        pdf_page_index: 98
+        section: Thermodynamic Discussion
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '43.7'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '49.6'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '6.7'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        output_unit: mole_fraction
+  derived_from:
+  - tables:gibbons-1963-thesis-cas-slags-cas
+  derivation:
+    relation: Calculated from the printed eutectic phase relation and compound free-energy data; context row gibbons_1963_eutectic_and_peritectic_activities,
+      PDF pp. 98–99.
+    inputs:
+    - tables:gibbons-1963-thesis-cas-slags-cas
+    parameters: []
+    output_unit: as_published
+- observation_id: gibbons-1963-thesis-cas-slags-cas::gibbons_1963_second_eutectic_silica_activity
+  experiment_id: 1ad441819fecd5fd1caf2f12dfa89d68b0e48cc6b3162452d0e4332c2f6fcf87::gibbons-1963-thesis-cas-slags-cas
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: The thesis does not identify a typed pure-endmember reference state for this activity.
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.6208705027889803394347788003'
+        - - Al2O3
+          - '0.3008537330735824033704007649'
+        - - SiO2
+          - '0.07827576413743725719482043514'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.000416'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Gibbons prints a_SiO2 = 4.16 x 10^-4 for the second eutectic.
+    model: model_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: empirical-cao-al2o3-slot-05
+      date: '2026-10-04'
+      evidence:
+        published_page: 63
+        pdf_page_index: 98
+        section: Thermodynamic Discussion
+  notices: []
+  source_id: gibbons-1963-thesis-cas-slags-cas
+  locator:
+    published_page: 63
+    pdf_page_index: 98
+    section: Thermodynamic Discussion
+  read_from: pdf:gibbons-1963-thesis-cas-slags-cas
+  point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '43.7'
+          CaO: '49.6'
+          SiO2: '6.7'
+      locator:
+        published_page: 63
+        pdf_page_index: 98
+        section: Thermodynamic Discussion
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.3008537330735824033704007649'
+          - - CaO
+            - '0.6208705027889803394347788003'
+          - - SiO2
+            - '0.07827576413743725719482043514'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 63
+        pdf_page_index: 98
+        section: Thermodynamic Discussion
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '43.7'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '49.6'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '6.7'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        output_unit: mole_fraction
+  derived_from:
+  - tables:gibbons-1963-thesis-cas-slags-cas
+  derivation:
+    relation: Calculated from the printed eutectic phase relation and compound free-energy data; context row gibbons_1963_eutectic_and_peritectic_activities,
+      PDF pp. 98–99.
+    inputs:
+    - tables:gibbons-1963-thesis-cas-slags-cas
+    parameters: []
+    output_unit: as_published

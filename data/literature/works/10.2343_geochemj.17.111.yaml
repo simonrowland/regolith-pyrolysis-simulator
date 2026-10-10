@@ -37,6 +37,267 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.2343/geochemj.17.111
 experiments:
+- experiment_id: 10.2343/geochemj.17.111::experiment::fcmas-free-evap-series
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: false
+      locator:
+        published_page: 112
+        paragraph: finally their weights were adjusted to 100.0mg with a knife
+        section: Sample preparation
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        - as_published=100.0 mg
+        - printed=initial_sample_mass_mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              published_page: 112
+              paragraph: finally their weights were adjusted to 100.0mg with a knife
+              section: Sample preparation
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 112
+              paragraph: finally their weights were adjusted to 100.0mg with a knife
+              section: Sample preparation
+        output_unit: kg
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.0177605412496463051663569829'
+          - - CaO
+            - '0.02585443302100830695634774454'
+          - - FeO
+            - '0.279494240044188115007600164'
+          - - MgO
+            - '0.338966961036585759784575344'
+          - - SiO2
+            - '0.3379238246485715130851197642'
+          amount_basis: mole_fraction
+      locator:
+        figure: '1'
+        section: EXPERIMENTS
+        line_range: 33-90
+        source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              figure: '1'
+              section: EXPERIMENTS
+              line_range: 33-90
+              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              figure: '1'
+              section: EXPERIMENTS
+              line_range: 33-90
+              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              figure: '1'
+              section: EXPERIMENTS
+              line_range: 33-90
+              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              figure: '1'
+              section: EXPERIMENTS
+              line_range: 33-90
+              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              figure: '1'
+              section: EXPERIMENTS
+              line_range: 33-90
+              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              figure: '1'
+              section: EXPERIMENTS
+              line_range: 33-90
+              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              figure: '1'
+              section: EXPERIMENTS
+              line_range: 33-90
+              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              figure: '1'
+              section: EXPERIMENTS
+              line_range: 33-90
+              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              figure: '1'
+              section: EXPERIMENTS
+              line_range: 33-90
+              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              figure: '1'
+              section: EXPERIMENTS
+              line_range: 33-90
+              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '35.43'
+          Al2O3: '3.16'
+          FeO: '35.04'
+          MgO: '23.84'
+          CaO: '2.53'
+      locator:
+        published_page: 113
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 row (1) Ave.; regarded as the starting composition in the experiments
+    form:
+      state:
+        tag: value
+        value: molten_spherule
+      locator:
+        published_page: 113
+        paragraph: the silicate sample showed a single spherule after quenching
+        section: Experimental device
+    container:
+      state:
+        tag: value
+        value: high-purity graphite crucible (atomic-pile grade block)
+      locator:
+        published_page: 113
+        section: Experimental device
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.01333223684210526315789473684'
+          approximate: false
+      locator:
+        published_page: 118
+        pdf_page_index: 8
+        paragraph: The vacuum level in the chamber was about 10^-4 Torr during the experiments
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=0.0001 Torr
+        - printed=chamber_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0001'
+            locator:
+              published_page: 118
+              pdf_page_index: 8
+              paragraph: The vacuum level in the chamber was about 10^-4 Torr during the experiments
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              published_page: 118
+              pdf_page_index: 8
+              paragraph: The vacuum level in the chamber was about 10^-4 Torr during the experiments
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2343/geochemj.17.111
+  locator:
+    published_page: 113
+    table: '1'
+    note: FCMAS solar-abundance starting composition shared by free-evap geometry and derived rows
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: high-purity graphite crucible (atomic-pile grade)
+      locator:
+        paragraph: graphite crucible
+        source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+    temperature_measurement:
+      pyrometer:
+        state:
+          tag: value
+          value: optical pyrometer on the crucible surface
+        locator:
+          published_page: 113
+          section: Experimental device
 - experiment_id: 10.2343/geochemj.17.111::experiment::hashimoto-1983-run-17c1
   kind: literature
   method:
@@ -7744,9 +8005,10 @@ experiments:
           point: '0.0001'
           approximate: false
       locator:
-        published_page: 112
-        paragraph: finally their weights were adjusted to 100.0mg with a knife
-        section: Sample preparation
+        published_page: 114
+        pdf_page_index: 4
+        table: '2'
+        note: Heating conditions and run notations
       inference:
         relation: mg_to_kg
         inputs:
@@ -7760,151 +8022,20 @@ experiments:
               tag: value
               value: '100'
             locator:
-              published_page: 112
-              paragraph: finally their weights were adjusted to 100.0mg with a knife
-              section: Sample preparation
+              published_page: 114
+              pdf_page_index: 4
+              table: '2'
+              note: Heating conditions and run notations
         - - factor
           - state:
               tag: value
               value: '1000000'
             locator:
-              published_page: 112
-              paragraph: finally their weights were adjusted to 100.0mg with a knife
-              section: Sample preparation
+              published_page: 114
+              pdf_page_index: 4
+              table: '2'
+              note: Heating conditions and run notations
         output_unit: kg
-    initial_composition:
-      state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - Al2O3
-            - '0.0177605412496463051663569829'
-          - - CaO
-            - '0.02585443302100830695634774454'
-          - - FeO
-            - '0.279494240044188115007600164'
-          - - MgO
-            - '0.338966961036585759784575344'
-          - - SiO2
-            - '0.3379238246485715130851197642'
-          amount_basis: mole_fraction
-      locator:
-        figure: '1'
-        section: EXPERIMENTS
-        line_range: 33-90
-        source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '3.16'
-            locator:
-              figure: '1'
-              section: EXPERIMENTS
-              line_range: 33-90
-              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              figure: '1'
-              section: EXPERIMENTS
-              line_range: 33-90
-              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '2.53'
-            locator:
-              figure: '1'
-              section: EXPERIMENTS
-              line_range: 33-90
-              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              figure: '1'
-              section: EXPERIMENTS
-              line_range: 33-90
-              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '35.04'
-            locator:
-              figure: '1'
-              section: EXPERIMENTS
-              line_range: 33-90
-              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              figure: '1'
-              section: EXPERIMENTS
-              line_range: 33-90
-              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '23.84'
-            locator:
-              figure: '1'
-              section: EXPERIMENTS
-              line_range: 33-90
-              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              figure: '1'
-              section: EXPERIMENTS
-              line_range: 33-90
-              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '35.43'
-            locator:
-              figure: '1'
-              section: EXPERIMENTS
-              line_range: 33-90
-              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              figure: '1'
-              section: EXPERIMENTS
-              line_range: 33-90
-              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-        output_unit: mole_fraction
-    printed_composition:
-      state:
-        tag: value
-        value:
-          Al2O3: '3.16'
-          CaO: '2.53'
-          FeO: '35.04'
-          MgO: '23.84'
-          SiO2: '35.43'
-      locator:
-        figure: '1'
-        section: EXPERIMENTS
-        line_range: 33-90
-        source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
     form:
       state:
         tag: value
@@ -7928,40 +8059,11 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: value
-        value:
-          kind: point
-          point: '0.01333223684210526315789473684'
-          approximate: false
-      locator:
-        published_page: 118
-        pdf_page_index: 8
-        paragraph: The vacuum level in the chamber was about 10^-4 Torr during the experiments
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        - as_published=0.0001 Torr
-        - printed=chamber_pressure
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.0001'
-            locator:
-              published_page: 118
-              pdf_page_index: 8
-              paragraph: The vacuum level in the chamber was about 10^-4 Torr during the experiments
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              published_page: 118
-              pdf_page_index: 8
-              paragraph: The vacuum level in the chamber was about 10^-4 Torr during the experiments
-        output_unit: Pa
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
     sweep_gas:
       state:
         tag: unknown
@@ -7972,18 +8074,20 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.2343/geochemj.17.111
   locator:
-    figure: '1'
-    section: EXPERIMENTS
-    line_range: 33-90
-    source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+    published_page: 114
+    pdf_page_index: 4
+    table: '2'
+    note: Heating conditions and run notations
   apparatus:
     cell_material_and_liner:
       state:
         tag: value
-        value: high-purity graphite crucible (atomic-pile grade)
+        value: high-purity graphite crucible (atomic-pile grade block)
       locator:
-        paragraph: graphite crucible
-        source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        published_page: 113
+        figure: '1'
+        paragraph: made of a high purity graphite block commonly used in atomic piles
+        section: Experimental device
     temperature_measurement:
       pyrometer:
         state:

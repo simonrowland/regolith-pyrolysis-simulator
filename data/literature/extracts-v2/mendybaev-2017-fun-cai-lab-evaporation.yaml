@@ -142,6 +142,109 @@ observations:
     table: '1'
     paragraph: FUNC-5
   read_from: pdf:mendybaev-2017-fun-cai-lab-evaporation
+  point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '11.6'
+          CaO: '7.6'
+          MgO: '37.9'
+          SiO2: '42.9'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-5
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.05976372234900118543359010501'
+          - - CaO
+            - '0.07119321826435993042515170709'
+          - - MgO
+            - '0.4939703307923544594320550803'
+          - - SiO2
+            - '0.3750727285942844247092031078'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-5
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '11.6'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-5
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-5
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '7.6'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-5
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-5
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '37.9'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-5
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-5
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '42.9'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-5
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-5
+        output_unit: mole_fraction
 - observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_table1_mass_loss::func-10::T=2173.15:row=func-10:h=78e3f117200d
   experiment_id: 10.1016/j.gca.2016.08.034::experiment::func-10
   identity:
@@ -282,39 +385,6 @@ observations:
               table: '1'
               paragraph: FUNC-10
         output_unit: K
-    mass_kg:
-      state:
-        tag: value
-        value: '0.000025'
-      locator:
-        pdf_page_index: 39
-        table: '1'
-        paragraph: FUNC-10
-      inference:
-        relation: g_to_kg
-        inputs:
-        - m_kg = m_g / 1000
-        - original_unit=g
-        - as_published=0.025 g
-        - printed=initial_mass_g
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.025'
-            locator:
-              pdf_page_index: 39
-              table: '1'
-              paragraph: FUNC-10
-        - - factor
-          - state:
-              tag: value
-              value: '1000'
-            locator:
-              pdf_page_index: 39
-              table: '1'
-              paragraph: FUNC-10
-        output_unit: kg
     printed_composition:
       state:
         tag: value
@@ -417,6 +487,39 @@ observations:
               table: '1'
               paragraph: FUNC-10
         output_unit: mole_fraction
+    mass_kg:
+      state:
+        tag: value
+        value: '0.000025'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-10
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.025 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.025'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-10
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-10
+        output_unit: kg
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -579,39 +682,6 @@ observations:
               table: '1'
               paragraph: FUNC-1
         output_unit: K
-    mass_kg:
-      state:
-        tag: value
-        value: '0.0000334'
-      locator:
-        pdf_page_index: 39
-        table: '1'
-        paragraph: FUNC-1
-      inference:
-        relation: g_to_kg
-        inputs:
-        - m_kg = m_g / 1000
-        - original_unit=g
-        - as_published=0.0334 g
-        - printed=initial_mass_g
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.0334'
-            locator:
-              pdf_page_index: 39
-              table: '1'
-              paragraph: FUNC-1
-        - - factor
-          - state:
-              tag: value
-              value: '1000'
-            locator:
-              pdf_page_index: 39
-              table: '1'
-              paragraph: FUNC-1
-        output_unit: kg
     printed_composition:
       state:
         tag: value
@@ -714,6 +784,39 @@ observations:
               table: '1'
               paragraph: FUNC-1
         output_unit: mole_fraction
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000334'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-1
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.0334 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0334'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-1
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-1
+        output_unit: kg
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -876,39 +979,6 @@ observations:
               table: '1'
               paragraph: FUNC-3
         output_unit: K
-    mass_kg:
-      state:
-        tag: value
-        value: '0.0000294'
-      locator:
-        pdf_page_index: 39
-        table: '1'
-        paragraph: FUNC-3
-      inference:
-        relation: g_to_kg
-        inputs:
-        - m_kg = m_g / 1000
-        - original_unit=g
-        - as_published=0.0294 g
-        - printed=initial_mass_g
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.0294'
-            locator:
-              pdf_page_index: 39
-              table: '1'
-              paragraph: FUNC-3
-        - - factor
-          - state:
-              tag: value
-              value: '1000'
-            locator:
-              pdf_page_index: 39
-              table: '1'
-              paragraph: FUNC-3
-        output_unit: kg
     printed_composition:
       state:
         tag: value
@@ -1011,6 +1081,39 @@ observations:
               table: '1'
               paragraph: FUNC-3
         output_unit: mole_fraction
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000294'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-3
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.0294 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0294'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-3
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-3
+        output_unit: kg
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -1173,39 +1276,6 @@ observations:
               table: '1'
               paragraph: FUNC-4
         output_unit: K
-    mass_kg:
-      state:
-        tag: value
-        value: '0.000034'
-      locator:
-        pdf_page_index: 39
-        table: '1'
-        paragraph: FUNC-4
-      inference:
-        relation: g_to_kg
-        inputs:
-        - m_kg = m_g / 1000
-        - original_unit=g
-        - as_published=0.034 g
-        - printed=initial_mass_g
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.034'
-            locator:
-              pdf_page_index: 39
-              table: '1'
-              paragraph: FUNC-4
-        - - factor
-          - state:
-              tag: value
-              value: '1000'
-            locator:
-              pdf_page_index: 39
-              table: '1'
-              paragraph: FUNC-4
-        output_unit: kg
     printed_composition:
       state:
         tag: value
@@ -1308,6 +1378,39 @@ observations:
               table: '1'
               paragraph: FUNC-4
         output_unit: mole_fraction
+    mass_kg:
+      state:
+        tag: value
+        value: '0.000034'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-4
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.034 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.034'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-4
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-4
+        output_unit: kg
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -1767,39 +1870,6 @@ observations:
               table: '1'
               paragraph: FUNC-6
         output_unit: K
-    mass_kg:
-      state:
-        tag: value
-        value: '0.000039'
-      locator:
-        pdf_page_index: 39
-        table: '1'
-        paragraph: FUNC-6
-      inference:
-        relation: g_to_kg
-        inputs:
-        - m_kg = m_g / 1000
-        - original_unit=g
-        - as_published=0.039 g
-        - printed=initial_mass_g
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.039'
-            locator:
-              pdf_page_index: 39
-              table: '1'
-              paragraph: FUNC-6
-        - - factor
-          - state:
-              tag: value
-              value: '1000'
-            locator:
-              pdf_page_index: 39
-              table: '1'
-              paragraph: FUNC-6
-        output_unit: kg
     printed_composition:
       state:
         tag: value
@@ -1902,6 +1972,39 @@ observations:
               table: '1'
               paragraph: FUNC-6
         output_unit: mole_fraction
+    mass_kg:
+      state:
+        tag: value
+        value: '0.000039'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-6
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.039 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.039'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-6
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-6
+        output_unit: kg
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -2064,39 +2167,6 @@ observations:
               table: '1'
               paragraph: FUNC-7
         output_unit: K
-    mass_kg:
-      state:
-        tag: value
-        value: '0.0000342'
-      locator:
-        pdf_page_index: 39
-        table: '1'
-        paragraph: FUNC-7
-      inference:
-        relation: g_to_kg
-        inputs:
-        - m_kg = m_g / 1000
-        - original_unit=g
-        - as_published=0.0342 g
-        - printed=initial_mass_g
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.0342'
-            locator:
-              pdf_page_index: 39
-              table: '1'
-              paragraph: FUNC-7
-        - - factor
-          - state:
-              tag: value
-              value: '1000'
-            locator:
-              pdf_page_index: 39
-              table: '1'
-              paragraph: FUNC-7
-        output_unit: kg
     printed_composition:
       state:
         tag: value
@@ -2199,6 +2269,39 @@ observations:
               table: '1'
               paragraph: FUNC-7
         output_unit: mole_fraction
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000342'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-7
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.0342 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0342'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-7
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-7
+        output_unit: kg
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -2361,39 +2464,6 @@ observations:
               table: '1'
               paragraph: FUNC-8
         output_unit: K
-    mass_kg:
-      state:
-        tag: value
-        value: '0.0000361'
-      locator:
-        pdf_page_index: 39
-        table: '1'
-        paragraph: FUNC-8
-      inference:
-        relation: g_to_kg
-        inputs:
-        - m_kg = m_g / 1000
-        - original_unit=g
-        - as_published=0.0361 g
-        - printed=initial_mass_g
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.0361'
-            locator:
-              pdf_page_index: 39
-              table: '1'
-              paragraph: FUNC-8
-        - - factor
-          - state:
-              tag: value
-              value: '1000'
-            locator:
-              pdf_page_index: 39
-              table: '1'
-              paragraph: FUNC-8
-        output_unit: kg
     printed_composition:
       state:
         tag: value
@@ -2496,6 +2566,39 @@ observations:
               table: '1'
               paragraph: FUNC-8
         output_unit: mole_fraction
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000361'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-8
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.0361 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0361'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-8
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-8
+        output_unit: kg
   derivation:
     relation: percent_to_fraction
     inputs:
@@ -2658,39 +2761,6 @@ observations:
               table: '1'
               paragraph: FUNC-9
         output_unit: K
-    mass_kg:
-      state:
-        tag: value
-        value: '0.0000276'
-      locator:
-        pdf_page_index: 39
-        table: '1'
-        paragraph: FUNC-9
-      inference:
-        relation: g_to_kg
-        inputs:
-        - m_kg = m_g / 1000
-        - original_unit=g
-        - as_published=0.0276 g
-        - printed=initial_mass_g
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.0276'
-            locator:
-              pdf_page_index: 39
-              table: '1'
-              paragraph: FUNC-9
-        - - factor
-          - state:
-              tag: value
-              value: '1000'
-            locator:
-              pdf_page_index: 39
-              table: '1'
-              paragraph: FUNC-9
-        output_unit: kg
     printed_composition:
       state:
         tag: value
@@ -2793,6 +2863,39 @@ observations:
               table: '1'
               paragraph: FUNC-9
         output_unit: mole_fraction
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0000276'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-9
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.0276 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0276'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-9
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-9
+        output_unit: kg
   derivation:
     relation: percent_to_fraction
     inputs:

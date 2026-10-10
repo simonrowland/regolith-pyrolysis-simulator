@@ -69,6 +69,243 @@ observations:
     section: 'Apollo 11 Samples Data Sheet, SOIL: 10002'
     source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
   read_from: pdf:lpi-lunar-soils
+  point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '13.6'
+          CaO: '11.94'
+          Cr2O3: '0.3'
+          FeO: '15.34'
+          K2O: '0.16'
+          MgO: '7.76'
+          MnO: '0.2'
+          Na2O: '0.47'
+          P2O5: '0.05'
+          S: '0.12'
+          SiO2: '42.16'
+          TiO2: '7.75'
+      locator:
+        pdf_page_index: 11
+        section: 'Apollo 11 Samples Data Sheet, SOIL: 10002'
+        source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.08520184745324769234386567368'
+          - - CaO
+            - '0.1360065465485117243888155863'
+          - - Cr2O3
+            - '0.001260807500710294724489468641'
+          - - FeO
+            - '0.1363876711001578392273197207'
+          - - K2O
+            - '0.001084999714845602705990370296'
+          - - MgO
+            - '0.1229854768329683661979145104'
+          - - MnO
+            - '0.001800931385365283445071141607'
+          - - Na2O
+            - '0.004843918023047031975558626706'
+          - - P2O5
+            - '0.0002250078858120033746695867007'
+          - - SiO2
+            - '0.4482179563822329892898798186'
+          - - TiO2
+            - '0.06198483717310117232642549639'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 11
+        section: 'Apollo 11 Samples Data Sheet, SOIL: 10002'
+        source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '13.6'
+            locator:
+              pdf_page_index: 11
+              section: 'Apollo 11 Samples Data Sheet, SOIL: 10002'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 11
+              section: 'Apollo 11 Samples Data Sheet, SOIL: 10002'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '11.94'
+            locator:
+              pdf_page_index: 11
+              section: 'Apollo 11 Samples Data Sheet, SOIL: 10002'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 11
+              section: 'Apollo 11 Samples Data Sheet, SOIL: 10002'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_Cr2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.3'
+            locator:
+              pdf_page_index: 11
+              section: 'Apollo 11 Samples Data Sheet, SOIL: 10002'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_Cr2O3_g_mol
+          - state:
+              tag: value
+              value: '151.98919999999998'
+            locator:
+              pdf_page_index: 11
+              section: 'Apollo 11 Samples Data Sheet, SOIL: 10002'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '15.34'
+            locator:
+              pdf_page_index: 11
+              section: 'Apollo 11 Samples Data Sheet, SOIL: 10002'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              pdf_page_index: 11
+              section: 'Apollo 11 Samples Data Sheet, SOIL: 10002'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.16'
+            locator:
+              pdf_page_index: 11
+              section: 'Apollo 11 Samples Data Sheet, SOIL: 10002'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              pdf_page_index: 11
+              section: 'Apollo 11 Samples Data Sheet, SOIL: 10002'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.76'
+            locator:
+              pdf_page_index: 11
+              section: 'Apollo 11 Samples Data Sheet, SOIL: 10002'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 11
+              section: 'Apollo 11 Samples Data Sheet, SOIL: 10002'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.2'
+            locator:
+              pdf_page_index: 11
+              section: 'Apollo 11 Samples Data Sheet, SOIL: 10002'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              pdf_page_index: 11
+              section: 'Apollo 11 Samples Data Sheet, SOIL: 10002'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.47'
+            locator:
+              pdf_page_index: 11
+              section: 'Apollo 11 Samples Data Sheet, SOIL: 10002'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              pdf_page_index: 11
+              section: 'Apollo 11 Samples Data Sheet, SOIL: 10002'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_P2O5_wt_pct
+          - state:
+              tag: value
+              value: '0.05'
+            locator:
+              pdf_page_index: 11
+              section: 'Apollo 11 Samples Data Sheet, SOIL: 10002'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_P2O5_g_mol
+          - state:
+              tag: value
+              value: '141.942523996'
+            locator:
+              pdf_page_index: 11
+              section: 'Apollo 11 Samples Data Sheet, SOIL: 10002'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '42.16'
+            locator:
+              pdf_page_index: 11
+              section: 'Apollo 11 Samples Data Sheet, SOIL: 10002'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 11
+              section: 'Apollo 11 Samples Data Sheet, SOIL: 10002'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '7.75'
+            locator:
+              pdf_page_index: 11
+              section: 'Apollo 11 Samples Data Sheet, SOIL: 10002'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              pdf_page_index: 11
+              section: 'Apollo 11 Samples Data Sheet, SOIL: 10002'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        output_unit: mole_fraction
 - observation_id: lpi-lunar-soils::lpi_1983_soil_12032_provenance_and_characterization
   experiment_id: 425cde4c797b6bb0228af3d1c12c27515a49095ea600db7a6e753076c9436cc0::experiment::handbook-sample-characterization
   identity:
@@ -134,6 +371,223 @@ observations:
     section: 'Apollo 12 Samples Data Sheet, SOIL: 12032'
     source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
   read_from: pdf:lpi-lunar-soils
+  point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '15.2'
+          CaO: '10.7'
+          Cr2O3: '0.26'
+          FeO: '14.1'
+          K2O: '0.36'
+          MgO: '9.4'
+          MnO: '0.2'
+          Na2O: '0.59'
+          SiO2: '46.5'
+          TiO2: '2.9'
+      locator:
+        pdf_page_index: 84
+        section: 'Apollo 12 Samples Data Sheet, SOIL: 12032'
+        source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.09332040921346317140083990362'
+          - - CaO
+            - '0.119443413763682414269811085'
+          - - Cr2O3
+            - '0.001070838113376258619394971996'
+          - - FeO
+            - '0.1228547096358398450086509308'
+          - - K2O
+            - '0.002392407114939716972315963298'
+          - - MgO
+            - '0.145996654741916068294321779'
+          - - MnO
+            - '0.001764900027535649184911103494'
+          - - Na2O
+            - '0.005959006807230657161043131748'
+          - - SiO2
+            - '0.4844673848895474957671091188'
+          - - TiO2
+            - '0.02273027569246872332160201249'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 84
+        section: 'Apollo 12 Samples Data Sheet, SOIL: 12032'
+        source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.2'
+            locator:
+              pdf_page_index: 84
+              section: 'Apollo 12 Samples Data Sheet, SOIL: 12032'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 84
+              section: 'Apollo 12 Samples Data Sheet, SOIL: 12032'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10.7'
+            locator:
+              pdf_page_index: 84
+              section: 'Apollo 12 Samples Data Sheet, SOIL: 12032'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 84
+              section: 'Apollo 12 Samples Data Sheet, SOIL: 12032'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_Cr2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.26'
+            locator:
+              pdf_page_index: 84
+              section: 'Apollo 12 Samples Data Sheet, SOIL: 12032'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_Cr2O3_g_mol
+          - state:
+              tag: value
+              value: '151.98919999999998'
+            locator:
+              pdf_page_index: 84
+              section: 'Apollo 12 Samples Data Sheet, SOIL: 12032'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '14.1'
+            locator:
+              pdf_page_index: 84
+              section: 'Apollo 12 Samples Data Sheet, SOIL: 12032'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              pdf_page_index: 84
+              section: 'Apollo 12 Samples Data Sheet, SOIL: 12032'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.36'
+            locator:
+              pdf_page_index: 84
+              section: 'Apollo 12 Samples Data Sheet, SOIL: 12032'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              pdf_page_index: 84
+              section: 'Apollo 12 Samples Data Sheet, SOIL: 12032'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '9.4'
+            locator:
+              pdf_page_index: 84
+              section: 'Apollo 12 Samples Data Sheet, SOIL: 12032'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 84
+              section: 'Apollo 12 Samples Data Sheet, SOIL: 12032'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.2'
+            locator:
+              pdf_page_index: 84
+              section: 'Apollo 12 Samples Data Sheet, SOIL: 12032'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              pdf_page_index: 84
+              section: 'Apollo 12 Samples Data Sheet, SOIL: 12032'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.59'
+            locator:
+              pdf_page_index: 84
+              section: 'Apollo 12 Samples Data Sheet, SOIL: 12032'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              pdf_page_index: 84
+              section: 'Apollo 12 Samples Data Sheet, SOIL: 12032'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.5'
+            locator:
+              pdf_page_index: 84
+              section: 'Apollo 12 Samples Data Sheet, SOIL: 12032'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 84
+              section: 'Apollo 12 Samples Data Sheet, SOIL: 12032'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '2.9'
+            locator:
+              pdf_page_index: 84
+              section: 'Apollo 12 Samples Data Sheet, SOIL: 12032'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              pdf_page_index: 84
+              section: 'Apollo 12 Samples Data Sheet, SOIL: 12032'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        output_unit: mole_fraction
 - observation_id: lpi-lunar-soils::lpi_1983_soil_14148_provenance_and_characterization
   experiment_id: 425cde4c797b6bb0228af3d1c12c27515a49095ea600db7a6e753076c9436cc0::experiment::handbook-sample-characterization
   identity:
@@ -199,6 +653,224 @@ observations:
     section: 'Apollo 14 Samples Data Sheet, SOIL: 14148 (<1 mm fraction)'
     source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
   read_from: pdf:lpi-lunar-soils
+  point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '17.38'
+          CaO: '10.4'
+          FeO: '10.55'
+          K2O: '0.53'
+          MgO: '9.66'
+          MnO: '0.13'
+          Na2O: '0.71'
+          P2O5: '0.5'
+          S: '0.19'
+          SiO2: '48.5'
+          TiO2: '1.71'
+      locator:
+        pdf_page_index: 244
+        section: 'Apollo 14 Samples Data Sheet, SOIL: 14148 (<1 mm fraction)'
+        source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1069708518276457139584804978'
+          - - CaO
+            - '0.1163843014870913727955818547'
+          - - FeO
+            - '0.09215264229801138024425806408'
+          - - K2O
+            - '0.00353094611258234548020193341'
+          - - MgO
+            - '0.150409342610556603834350598'
+          - - MnO
+            - '0.001150048357401885729510266719'
+          - - Na2O
+            - '0.00718890681378481478776953419'
+          - - P2O5
+            - '0.002210565143239686373831445557'
+          - - SiO2
+            - '0.5065659171684998243898801022'
+          - - TiO2
+            - '0.01343647818118637240613570301'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 244
+        section: 'Apollo 14 Samples Data Sheet, SOIL: 14148 (<1 mm fraction)'
+        source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '17.38'
+            locator:
+              pdf_page_index: 244
+              section: 'Apollo 14 Samples Data Sheet, SOIL: 14148 (<1 mm fraction)'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 244
+              section: 'Apollo 14 Samples Data Sheet, SOIL: 14148 (<1 mm fraction)'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10.4'
+            locator:
+              pdf_page_index: 244
+              section: 'Apollo 14 Samples Data Sheet, SOIL: 14148 (<1 mm fraction)'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 244
+              section: 'Apollo 14 Samples Data Sheet, SOIL: 14148 (<1 mm fraction)'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '10.55'
+            locator:
+              pdf_page_index: 244
+              section: 'Apollo 14 Samples Data Sheet, SOIL: 14148 (<1 mm fraction)'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              pdf_page_index: 244
+              section: 'Apollo 14 Samples Data Sheet, SOIL: 14148 (<1 mm fraction)'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.53'
+            locator:
+              pdf_page_index: 244
+              section: 'Apollo 14 Samples Data Sheet, SOIL: 14148 (<1 mm fraction)'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              pdf_page_index: 244
+              section: 'Apollo 14 Samples Data Sheet, SOIL: 14148 (<1 mm fraction)'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '9.66'
+            locator:
+              pdf_page_index: 244
+              section: 'Apollo 14 Samples Data Sheet, SOIL: 14148 (<1 mm fraction)'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 244
+              section: 'Apollo 14 Samples Data Sheet, SOIL: 14148 (<1 mm fraction)'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.13'
+            locator:
+              pdf_page_index: 244
+              section: 'Apollo 14 Samples Data Sheet, SOIL: 14148 (<1 mm fraction)'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              pdf_page_index: 244
+              section: 'Apollo 14 Samples Data Sheet, SOIL: 14148 (<1 mm fraction)'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.71'
+            locator:
+              pdf_page_index: 244
+              section: 'Apollo 14 Samples Data Sheet, SOIL: 14148 (<1 mm fraction)'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              pdf_page_index: 244
+              section: 'Apollo 14 Samples Data Sheet, SOIL: 14148 (<1 mm fraction)'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_P2O5_wt_pct
+          - state:
+              tag: value
+              value: '0.5'
+            locator:
+              pdf_page_index: 244
+              section: 'Apollo 14 Samples Data Sheet, SOIL: 14148 (<1 mm fraction)'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_P2O5_g_mol
+          - state:
+              tag: value
+              value: '141.942523996'
+            locator:
+              pdf_page_index: 244
+              section: 'Apollo 14 Samples Data Sheet, SOIL: 14148 (<1 mm fraction)'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '48.5'
+            locator:
+              pdf_page_index: 244
+              section: 'Apollo 14 Samples Data Sheet, SOIL: 14148 (<1 mm fraction)'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 244
+              section: 'Apollo 14 Samples Data Sheet, SOIL: 14148 (<1 mm fraction)'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.71'
+            locator:
+              pdf_page_index: 244
+              section: 'Apollo 14 Samples Data Sheet, SOIL: 14148 (<1 mm fraction)'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              pdf_page_index: 244
+              section: 'Apollo 14 Samples Data Sheet, SOIL: 14148 (<1 mm fraction)'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        output_unit: mole_fraction
 - observation_id: lpi-lunar-soils::lpi_1983_soil_15020_provenance_and_characterization
   experiment_id: 425cde4c797b6bb0228af3d1c12c27515a49095ea600db7a6e753076c9436cc0::experiment::handbook-sample-characterization
   identity:
@@ -264,6 +936,224 @@ observations:
     section: 'Apollo 15 Samples Data Sheet, SOIL: 15020'
     source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
   read_from: pdf:lpi-lunar-soils
+  point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '13.73'
+          CaO: '10.54'
+          FeO: '15.21'
+          K2O: '0.2'
+          MgO: '10.37'
+          MnO: '0.2'
+          Na2O: '0.41'
+          P2O5: '0.18'
+          S: '0.06'
+          SiO2: '46.56'
+          TiO2: '1.75'
+      locator:
+        pdf_page_index: 367
+        section: 'Apollo 15 Samples Data Sheet, SOIL: 15020'
+        source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.08409527254284683442984724566'
+          - - CaO
+            - '0.1173780902062143389576827274'
+          - - FeO
+            - '0.1322117061824337856476253437'
+          - - K2O
+            - '0.001325960475754883854669230157'
+          - - MgO
+            - '0.1606799937547729219343657339'
+          - - MnO
+            - '0.001760711125628758052293255075'
+          - - Na2O
+            - '0.004131176262919844743078447757'
+          - - P2O5
+            - '0.0007919379983279909539448855114'
+          - - SiO2
+            - '0.4839411613094535312507877758'
+          - - TiO2
+            - '0.01368399014164711017570535517'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 367
+        section: 'Apollo 15 Samples Data Sheet, SOIL: 15020'
+        source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '13.73'
+            locator:
+              pdf_page_index: 367
+              section: 'Apollo 15 Samples Data Sheet, SOIL: 15020'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 367
+              section: 'Apollo 15 Samples Data Sheet, SOIL: 15020'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10.54'
+            locator:
+              pdf_page_index: 367
+              section: 'Apollo 15 Samples Data Sheet, SOIL: 15020'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 367
+              section: 'Apollo 15 Samples Data Sheet, SOIL: 15020'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '15.21'
+            locator:
+              pdf_page_index: 367
+              section: 'Apollo 15 Samples Data Sheet, SOIL: 15020'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              pdf_page_index: 367
+              section: 'Apollo 15 Samples Data Sheet, SOIL: 15020'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.2'
+            locator:
+              pdf_page_index: 367
+              section: 'Apollo 15 Samples Data Sheet, SOIL: 15020'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              pdf_page_index: 367
+              section: 'Apollo 15 Samples Data Sheet, SOIL: 15020'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '10.37'
+            locator:
+              pdf_page_index: 367
+              section: 'Apollo 15 Samples Data Sheet, SOIL: 15020'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 367
+              section: 'Apollo 15 Samples Data Sheet, SOIL: 15020'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.2'
+            locator:
+              pdf_page_index: 367
+              section: 'Apollo 15 Samples Data Sheet, SOIL: 15020'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              pdf_page_index: 367
+              section: 'Apollo 15 Samples Data Sheet, SOIL: 15020'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.41'
+            locator:
+              pdf_page_index: 367
+              section: 'Apollo 15 Samples Data Sheet, SOIL: 15020'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              pdf_page_index: 367
+              section: 'Apollo 15 Samples Data Sheet, SOIL: 15020'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_P2O5_wt_pct
+          - state:
+              tag: value
+              value: '0.18'
+            locator:
+              pdf_page_index: 367
+              section: 'Apollo 15 Samples Data Sheet, SOIL: 15020'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_P2O5_g_mol
+          - state:
+              tag: value
+              value: '141.942523996'
+            locator:
+              pdf_page_index: 367
+              section: 'Apollo 15 Samples Data Sheet, SOIL: 15020'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.56'
+            locator:
+              pdf_page_index: 367
+              section: 'Apollo 15 Samples Data Sheet, SOIL: 15020'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 367
+              section: 'Apollo 15 Samples Data Sheet, SOIL: 15020'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.75'
+            locator:
+              pdf_page_index: 367
+              section: 'Apollo 15 Samples Data Sheet, SOIL: 15020'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              pdf_page_index: 367
+              section: 'Apollo 15 Samples Data Sheet, SOIL: 15020'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        output_unit: mole_fraction
 - observation_id: lpi-lunar-soils::lpi_1983_soil_60050_provenance_and_characterization
   experiment_id: 425cde4c797b6bb0228af3d1c12c27515a49095ea600db7a6e753076c9436cc0::experiment::handbook-sample-characterization
   identity:
@@ -327,6 +1217,204 @@ observations:
     section: 'Apollo 16 Samples Data Sheet, SOIL: 60050'
     source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
   read_from: pdf:lpi-lunar-soils
+  point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '28.5'
+          CaO: '16.2'
+          FeO: '4.5'
+          K2O: '0.14'
+          MgO: '5.05'
+          MnO: '0.04'
+          Na2O: '0.46'
+          SiO2: '44.8'
+          TiO2: '0.44'
+      locator:
+        pdf_page_index: 584
+        section: 'Apollo 16 Samples Data Sheet, SOIL: 60050'
+        source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1842640727868984309978554365'
+          - - CaO
+            - '0.19043913654120911092929902'
+          - - FeO
+            - '0.04129029355200691106107207533'
+          - - K2O
+            - '0.0009797682906468710559210661531'
+          - - MgO
+            - '0.08259793481898373371968535799'
+          - - MnO
+            - '0.0003717173780113951956575482377'
+          - - Na2O
+            - '0.004892630982277362295239304138'
+          - - SiO2
+            - '0.491532643834463164543013519'
+          - - TiO2
+            - '0.003631801815503020202256673023'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 584
+        section: 'Apollo 16 Samples Data Sheet, SOIL: 60050'
+        source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '28.5'
+            locator:
+              pdf_page_index: 584
+              section: 'Apollo 16 Samples Data Sheet, SOIL: 60050'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 584
+              section: 'Apollo 16 Samples Data Sheet, SOIL: 60050'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '16.2'
+            locator:
+              pdf_page_index: 584
+              section: 'Apollo 16 Samples Data Sheet, SOIL: 60050'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 584
+              section: 'Apollo 16 Samples Data Sheet, SOIL: 60050'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '4.5'
+            locator:
+              pdf_page_index: 584
+              section: 'Apollo 16 Samples Data Sheet, SOIL: 60050'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              pdf_page_index: 584
+              section: 'Apollo 16 Samples Data Sheet, SOIL: 60050'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.14'
+            locator:
+              pdf_page_index: 584
+              section: 'Apollo 16 Samples Data Sheet, SOIL: 60050'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              pdf_page_index: 584
+              section: 'Apollo 16 Samples Data Sheet, SOIL: 60050'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '5.05'
+            locator:
+              pdf_page_index: 584
+              section: 'Apollo 16 Samples Data Sheet, SOIL: 60050'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 584
+              section: 'Apollo 16 Samples Data Sheet, SOIL: 60050'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.04'
+            locator:
+              pdf_page_index: 584
+              section: 'Apollo 16 Samples Data Sheet, SOIL: 60050'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              pdf_page_index: 584
+              section: 'Apollo 16 Samples Data Sheet, SOIL: 60050'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.46'
+            locator:
+              pdf_page_index: 584
+              section: 'Apollo 16 Samples Data Sheet, SOIL: 60050'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              pdf_page_index: 584
+              section: 'Apollo 16 Samples Data Sheet, SOIL: 60050'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '44.8'
+            locator:
+              pdf_page_index: 584
+              section: 'Apollo 16 Samples Data Sheet, SOIL: 60050'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 584
+              section: 'Apollo 16 Samples Data Sheet, SOIL: 60050'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '0.44'
+            locator:
+              pdf_page_index: 584
+              section: 'Apollo 16 Samples Data Sheet, SOIL: 60050'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              pdf_page_index: 584
+              section: 'Apollo 16 Samples Data Sheet, SOIL: 60050'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        output_unit: mole_fraction
 - observation_id: lpi-lunar-soils::lpi_1983_soil_74220_provenance_and_characterization
   experiment_id: 425cde4c797b6bb0228af3d1c12c27515a49095ea600db7a6e753076c9436cc0::experiment::handbook-sample-characterization
   identity:
@@ -394,3 +1482,240 @@ observations:
     section: 'Apollo 17 Samples Data Sheet, SOIL: 74220'
     source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
   read_from: pdf:lpi-lunar-soils
+  point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '6.32'
+          CaO: '7.68'
+          Cr2O3: '0.75'
+          FeO: '22.04'
+          K2O: '0.09'
+          MgO: '14.44'
+          MnO: '0.3'
+          Na2O: '0.36'
+          P2O5: '0.04'
+          S: '0.07'
+          SiO2: '38.57'
+          TiO2: '8.81'
+      locator:
+        pdf_page_index: 921
+        section: 'Apollo 17 Samples Data Sheet, SOIL: 74220'
+        source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.03797036928403595918830978502'
+          - - CaO
+            - '0.08389466528916029987340278641'
+          - - Cr2O3
+            - '0.003022779245876980880967896828'
+          - - FeO
+            - '0.1879225874178887624623495662'
+          - - K2O
+            - '0.0005852882292049041297784876751'
+          - - MgO
+            - '0.2194708979330922957561804444'
+          - - MnO
+            - '0.00259063402392377986349710849'
+          - - Na2O
+            - '0.00355810751294316829976282685'
+          - - P2O5
+            - '0.0001726256652522791500037266289'
+          - - SiO2
+            - '0.3932384060098347359170451526'
+          - - TiO2
+            - '0.06757363938878683447870221907'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 921
+        section: 'Apollo 17 Samples Data Sheet, SOIL: 74220'
+        source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '6.32'
+            locator:
+              pdf_page_index: 921
+              section: 'Apollo 17 Samples Data Sheet, SOIL: 74220'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 921
+              section: 'Apollo 17 Samples Data Sheet, SOIL: 74220'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '7.68'
+            locator:
+              pdf_page_index: 921
+              section: 'Apollo 17 Samples Data Sheet, SOIL: 74220'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 921
+              section: 'Apollo 17 Samples Data Sheet, SOIL: 74220'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_Cr2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.75'
+            locator:
+              pdf_page_index: 921
+              section: 'Apollo 17 Samples Data Sheet, SOIL: 74220'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_Cr2O3_g_mol
+          - state:
+              tag: value
+              value: '151.98919999999998'
+            locator:
+              pdf_page_index: 921
+              section: 'Apollo 17 Samples Data Sheet, SOIL: 74220'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '22.04'
+            locator:
+              pdf_page_index: 921
+              section: 'Apollo 17 Samples Data Sheet, SOIL: 74220'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              pdf_page_index: 921
+              section: 'Apollo 17 Samples Data Sheet, SOIL: 74220'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.09'
+            locator:
+              pdf_page_index: 921
+              section: 'Apollo 17 Samples Data Sheet, SOIL: 74220'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              pdf_page_index: 921
+              section: 'Apollo 17 Samples Data Sheet, SOIL: 74220'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '14.44'
+            locator:
+              pdf_page_index: 921
+              section: 'Apollo 17 Samples Data Sheet, SOIL: 74220'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 921
+              section: 'Apollo 17 Samples Data Sheet, SOIL: 74220'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.3'
+            locator:
+              pdf_page_index: 921
+              section: 'Apollo 17 Samples Data Sheet, SOIL: 74220'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              pdf_page_index: 921
+              section: 'Apollo 17 Samples Data Sheet, SOIL: 74220'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.36'
+            locator:
+              pdf_page_index: 921
+              section: 'Apollo 17 Samples Data Sheet, SOIL: 74220'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              pdf_page_index: 921
+              section: 'Apollo 17 Samples Data Sheet, SOIL: 74220'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_P2O5_wt_pct
+          - state:
+              tag: value
+              value: '0.04'
+            locator:
+              pdf_page_index: 921
+              section: 'Apollo 17 Samples Data Sheet, SOIL: 74220'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_P2O5_g_mol
+          - state:
+              tag: value
+              value: '141.942523996'
+            locator:
+              pdf_page_index: 921
+              section: 'Apollo 17 Samples Data Sheet, SOIL: 74220'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '38.57'
+            locator:
+              pdf_page_index: 921
+              section: 'Apollo 17 Samples Data Sheet, SOIL: 74220'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 921
+              section: 'Apollo 17 Samples Data Sheet, SOIL: 74220'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '8.81'
+            locator:
+              pdf_page_index: 921
+              section: 'Apollo 17 Samples Data Sheet, SOIL: 74220'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              pdf_page_index: 921
+              section: 'Apollo 17 Samples Data Sheet, SOIL: 74220'
+              source_path: corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+        output_unit: mole_fraction

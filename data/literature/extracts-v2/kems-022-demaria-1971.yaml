@@ -1642,8 +1642,21 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: 'source standard_state is not typed: pure Fe chips in Fe crucible (multi-rotating cell reference)'
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -1733,8 +1746,21 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: source standard_state does not name one reference endmember
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
