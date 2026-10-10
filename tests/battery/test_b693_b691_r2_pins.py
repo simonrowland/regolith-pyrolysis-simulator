@@ -449,7 +449,9 @@ def test_r2_f4_residue_element_ppm_figure_band_follows_identity_metric(tmp_path)
     assert residual.numeric.operation is MetricOperation.DEX
     assert residual.numeric.value == Decimal("0.3010299956639812")
     assert residual.numeric.decision_band is not None
-    assert residual.numeric.decision_band.value == Decimal("0.3")
+    # The owner policy treats an unstated ±0.3 as 1σ, so the 95% ticket line
+    # is z95 × sigma = 1.959963984540054 × 0.3 = 0.5879891953620162 dex.
+    assert residual.numeric.decision_band.value == Decimal("0.5879891953620162")
     assert residual.numeric.decision_band.unit == "dimensionless"
     assert residual.status is not ResidualStatus.NO_BAND
     assert residual.score_eligible is False

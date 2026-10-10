@@ -264,12 +264,11 @@ QUANTITY_METRIC: dict[Quantity, MetricOperation] = {
 
 # The ticket line uses the two-sided normal percentile p=95. 1.95996398454 is
 # Φ⁻¹((1 + .95) / 2); evaluating Φ(1.95996398454) gives 0.975, the upper
-# endpoint of the central 95% interval. The MAD consistency scale below is
-# derived from MAD(N(0,1)) = Φ⁻¹(.75) = .67448975, hence 1/.67448975 = 1.4826;
-# at a standard normal, this recovers σ to four significant digits.
+# endpoint of the central 95% interval. MAD(N(0,1)) = Φ⁻¹(.75), so the
+# consistency scale is 1/Φ⁻¹(.75) = 1.482602218505602.
 DECISION_BAND_PERCENTILE = 95
 NORMAL_95_TICKET_MULTIPLIER = Decimal("1.959963984540054")
-MAD_NORMAL_SCALE = Decimal("1.4826")
+MAD_NORMAL_SCALE = Decimal("1.482602218505602")
 DECISION_BAND_POLICY_VERSION = "q6-v1"
 DECISION_BAND_RATCHET_RELATIVE_PATH = Path("data/battery/decision-band-ratchet.yaml")
 # Minimum n for a descriptive residual bias/scatter ratio; it does not gate bands.
@@ -2431,7 +2430,7 @@ def _source_alignment_group_key(
             return None
         axes[name] = value
     if isinstance(identity.temperature_K, State) and identity.temperature_K.is_value:
-        aligned_temperature = str(identity.temperature_K.value)
+        aligned_temperature = to_plain(identity.temperature_K.value)
     else:
         aligned_temperature = None
     return {
@@ -2451,40 +2450,23 @@ def _group_token(group_key: Mapping[str, object]) -> str:
     return json.dumps(group_key, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
 
 
-def _metric_precision_floor(
-    source_half_quanta: Sequence[Decimal],
-    center: Decimal,
-    operation: MetricOperation,
-) -> Decimal | None:
-    # Decimal's exponent retains the last stored digit. Its half-quantum is the
-    # printed-resolution floor; use the coarsest aligned source resolution so
-    # one coarse source cannot create a zero-width ticket line.
-    floors: list[Decimal] = []
-    for quantum in source_half_quanta:
-        if operation is MetricOperation.ABSOLUTE:
-            floor = quantum
-        else:
-            high = compute_metric(operation, center + quantum, center)
-            low = compute_metric(operation, center - quantum, center) if center > quantum else None
-            candidates = [abs(part) for part in (high, low) if part is not None]
-            if not candidates:
-                return None
-            floor = max(candidates)
-        floors.append(floor)
-    return max(floors) if floors else None
-
-
 def _read_decision_band_ratchet(
     root: Path,
-) -> tuple[dict[str, dict[str, object]], bool]:
+) -> tuple[dict[str, dict[str, object]], bool, list[dict[str, object]]]:
     path = root / DECISION_BAND_RATCHET_RELATIVE_PATH
     if not path.is_file():
-        return {}, True
+        return {}, True, []
     payload = load_yaml(path)
     if not isinstance(payload, Mapping) or not isinstance(payload.get("groups", []), list):
         raise ValueError(f"invalid decision-band ratchet: {path}")
+    raw_history = payload.get("history", [])
+    if not isinstance(raw_history, list) or any(
+        not isinstance(row, Mapping) for row in raw_history
+    ):
+        raise ValueError(f"invalid decision-band ratchet history: {path}")
+    history = [dict(row) for row in raw_history]
     if payload.get("policy_version") != DECISION_BAND_POLICY_VERSION:
-        return {}, False
+        return {}, False, history
     entries: dict[str, dict[str, object]] = {}
     for raw in payload.get("groups", []):
         if not isinstance(raw, Mapping) or raw.get("policy_version") != DECISION_BAND_POLICY_VERSION:
@@ -2498,13 +2480,13 @@ def _read_decision_band_ratchet(
             continue
         if line.is_finite() and line > 0:
             entries[_group_token(group_key)] = dict(raw)
-    return entries, False
+    return entries, False, history
 
 
 def _source_band_catalog(
     context: ScoreContext,
     ratchet_entries: Mapping[str, Mapping[str, object]],
-) -> tuple[dict[str, DecisionBand], list[dict[str, object]]]:
+) -> tuple[dict[str, DecisionBand], list[dict[str, object]], dict[str, str]]:
     from simulator.battery.compilation_tier import (
         _iter_compilation_series_cells,
         is_compilation_evidence,
@@ -2544,14 +2526,13 @@ def _source_band_catalog(
             identities[key] = cell.identity
             source = sources[key].setdefault(
                 parent.source_id,
-                {"values": set(), "precision": Decimal(0)},
+                {"values": set()},
             )
             source["values"].add(magnitude)
-            quantum = Decimal(1).scaleb(magnitude.as_tuple().exponent) / Decimal(2)
-            source["precision"] = max(as_decimal(source["precision"]), quantum)
 
     bands: dict[str, DecisionBand] = {}
     records: list[dict[str, object]] = []
+    no_band_reasons: dict[str, str] = {}
     for key, by_source in sources.items():
         if len(by_source) < 2 or any(len(row["values"]) != 1 for row in by_source.values()):
             continue
@@ -2571,15 +2552,11 @@ def _source_band_catalog(
         mad = _median([abs(value) for value in deviations if value is not None])
         if mad is None:
             continue
+        if mad == 0:
+            no_band_reasons[key] = "zero_scatter_aligned_group"
+            continue
         sigma = MAD_NORMAL_SCALE * mad
         unit = "dimensionless" if operation in {MetricOperation.RELATIVE, MetricOperation.DEX} else QUANTITY_UNITS[quantity]
-        precision_floor = None
-        if mad == 0:
-            source_precision = [as_decimal(by_source[source]["precision"]) for source in source_ids]
-            precision_floor = _metric_precision_floor(source_precision, center, operation)
-            if precision_floor is None or precision_floor <= 0:
-                continue
-            sigma = precision_floor
         ticket = NORMAL_95_TICKET_MULTIPLIER * sigma
         if not ticket.is_finite() or ticket <= 0:
             continue
@@ -2591,18 +2568,27 @@ def _source_band_catalog(
             except (TypeError, ValueError, ArithmeticError, InvalidOperation):
                 old_line = None
         effective = min(ticket, old_line) if old_line is not None and old_line > 0 else ticket
-        floor_note = "" if precision_floor is None else f"; precision_floor_sigma={precision_floor}"
+        action = (
+            "new"
+            if old_line is None or old_line <= 0
+            else "down"
+            if ticket < old_line
+            else "held"
+        )
         rule = (
-            f"derived_scatter: source-only sigma=1.4826×MAD; n_sources={len(source_ids)}; "
+            f"derived_scatter: source-only sigma=1.482602218505602×MAD; n_sources={len(source_ids)}; "
             f"mad={mad}; sigma={sigma}; percentile={DECISION_BAND_PERCENTILE}; "
-            f"ticket_line={effective}; ratchet_action={'down' if old_line is not None and effective < ticket else 'unchanged'}"
-            f"{floor_note}"
+            f"ticket_line={effective}; ratchet_action={action}"
         )
         bands[key] = DecisionBand(effective, unit, rule)
         records.append({
             "group_key": group_keys[key],
             "policy_version": DECISION_BAND_POLICY_VERSION,
             "ticket_line": str(effective),
+            "old_line": None if old_line is None else str(old_line),
+            "new_line": str(ticket),
+            "effective_line": str(effective),
+            "ratchet_action": action,
             "unit": unit,
             "band_kind": "derived_scatter",
             "sigma": str(sigma),
@@ -2613,25 +2599,28 @@ def _source_band_catalog(
             "percentile": DECISION_BAND_PERCENTILE,
         })
     records.sort(key=lambda row: _group_token(row["group_key"]))
-    return bands, records
+    return bands, records, no_band_reasons
 
 
 def update_decision_band_ratchet(context: ScoreContext) -> int:
     """Explicitly accept current source-derived minima into the YAML ratchet."""
-    existing, _missing = _read_decision_band_ratchet(context.root)
-    _bands, current = _source_band_catalog(context, existing)
+    existing, _missing, history = _read_decision_band_ratchet(context.root)
+    _bands, current, no_band_reasons = _source_band_catalog(context, existing)
     merged = dict(existing)
+    for key, reason in no_band_reasons.items():
+        if reason == "zero_scatter_aligned_group":
+            merged.pop(key, None)
     for row in current:
         key = _group_token(row["group_key"])
-        previous = existing.get(key)
-        if previous is not None and previous.get("unit") == row["unit"]:
-            old_line = as_decimal(previous["ticket_line"])
-            derived_line = NORMAL_95_TICKET_MULTIPLIER * as_decimal(row["sigma"])
-            if old_line <= derived_line:
-                merged[key] = dict(previous)
-                continue
-            row["ticket_line"] = str(derived_line)
         merged[key] = row
+        history.append({
+            "group_key": row["group_key"],
+            "policy_version": row["policy_version"],
+            "old_line": row["old_line"],
+            "new_line": row["new_line"],
+            "effective_line": row["effective_line"],
+            "action": row["ratchet_action"],
+        })
     # Preserve accepted groups that temporarily have no current aligned source;
     # a later reappearance of the same exact group remains ratchet-down-only.
     ordered = [merged[key] for key in sorted(merged)]
@@ -2644,6 +2633,7 @@ def update_decision_band_ratchet(context: ScoreContext) -> int:
                 "policy_version": DECISION_BAND_POLICY_VERSION,
                 "percentile": DECISION_BAND_PERCENTILE,
                 "groups": ordered,
+                "history": history,
             },
             sort_keys=False,
             allow_unicode=True,
@@ -2695,7 +2685,7 @@ def populate_numeric(
         printed_band=printed_band,
         printed_refusal=printed_refusal,
         derived_band=derived_band,
-        operation=band_operation or operation_override,
+        operation=band_operation,
     )
     # Dimension guard. decision_band_for normally filters mismatched bands;
     # keep this check for callers that replace it in a focused test.
@@ -4984,6 +4974,7 @@ def compile_residual(
     lineage_observation_id: str | None = None,
     table_index: Mapping[tuple[str, Quantity], tuple[Observation, ...]] | None = None,
     derived_band: DecisionBand | None = None,
+    derived_band_reason: str | None = None,
     ratchet_missing: bool = False,
     point_observations: Sequence[Observation] | None = None,
 ) -> tuple[Residual, Observation | None]:
@@ -5425,6 +5416,22 @@ def compile_residual(
         )
         if printed.notice is not None:
             notices = union_notices(notices, (printed.notice,))
+        if (
+            derived_band_reason is not None
+            and printed.band is None
+            and printed.refusal is None
+        ):
+            notices = union_notices(
+                notices,
+                (
+                    Notice(
+                        kind=NoticeKind.FALLBACK,
+                        affected_quantities=(quantity,),
+                        reason=derived_band_reason,
+                        origin="decision-band",
+                    ),
+                ),
+            )
         if printed.band is None and printed.refusal is None and derived_band is not None and ratchet_missing:
             notices = union_notices(
                 notices,
@@ -5802,8 +5809,12 @@ def _score_store_with_decisions(
     from simulator.battery.validate import bound_work_inputs, build_printed_thermo_index
 
     table_index = build_printed_thermo_index(observations)
-    ratchet_entries, ratchet_missing = _read_decision_band_ratchet(context.root)
-    source_bands, _source_band_records = _source_band_catalog(context, ratchet_entries)
+    ratchet_entries, ratchet_missing, _ratchet_history = _read_decision_band_ratchet(
+        context.root
+    )
+    source_bands, _source_band_records, source_band_reasons = _source_band_catalog(
+        context, ratchet_entries
+    )
     residue_prediction_cache: dict[tuple[str, Engine], Mapping[str, object]] = {}
     try:
         with bound_work_inputs(context.works, observations, context.experiments):
@@ -5842,6 +5853,7 @@ def _score_store_with_decisions(
                         else None
                     )
                     source_band = None
+                    source_band_reason = None
                     if (
                         source_tier is not None
                         and not is_internal_consistency(point_origin)
@@ -5851,7 +5863,9 @@ def _score_store_with_decisions(
                             point, tier=source_tier
                         )
                         if group_key is not None:
-                            source_band = source_bands.get(_group_token(group_key))
+                            source_key = _group_token(group_key)
+                            source_band = source_bands.get(source_key)
+                            source_band_reason = source_band_reasons.get(source_key)
                     for engine in engine_set:
                         prediction = None
                         if (
@@ -5912,6 +5926,7 @@ def _score_store_with_decisions(
                             ),
                             table_index=table_index,
                             derived_band=source_band,
+                            derived_band_reason=source_band_reason,
                             ratchet_missing=ratchet_missing,
                             point_observations=point_observations_by_experiment.get(
                                 point.experiment_id, ()
