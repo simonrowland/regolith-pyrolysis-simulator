@@ -22,6 +22,7 @@ import warnings
 from concurrent.futures import Future
 from pathlib import Path
 
+import numpy as np
 import pytest
 
 from simulator.engine_pool import (
@@ -1044,9 +1045,39 @@ def test_magemin_liquidus_finder_rejects_none_budget(monkeypatch):
         max_T_C=1000.0,
         scan_step_C=100.0,
     )
-    assert result.status == "not_converged"
+    assert result.status == "refused"
     assert any("None is rejected" in w for w in result.warnings)
-    assert result.diagnostics.get("reason") == "invalid_liquidus_finder_budget"
+    assert result.diagnostics.get("reason") == "invalid_input"
+    assert result.diagnostics.get("budget_reason") == (
+        "invalid_liquidus_finder_budget"
+    )
+
+
+@pytest.mark.parametrize(
+    'budget',
+    (object(), float('nan'), 0.0, -1.0, True, np.bool_(True)),
+    ids=('non-numeric', 'non-finite', 'zero', 'negative', 'boolean', 'numpy-boolean'),
+)
+def test_magemin_liquidus_finder_invalid_budget_is_refused(budget):
+    calls = []
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = 'pymagemin'
+    backend._magemin_module = types.SimpleNamespace(
+        minimize=lambda **kwargs: calls.append(kwargs),
+    )
+    backend._config = {'liquidus_finder_budget_s': budget}
+
+    result = backend.find_liquidus_solidus(
+        composition_mol={'SiO2': 1.0},
+        min_T_C=800.0,
+        max_T_C=1000.0,
+        scan_step_C=100.0,
+    )
+
+    assert result.status == 'refused'
+    assert result.diagnostics['reason'] == 'invalid_input'
+    assert calls == []
 
 
 def test_magemin_subprocess_timeout_clamped_to_remaining_budget(
@@ -1785,34 +1816,75 @@ def test_magemin_remote_builtin_with_multi_argument_constructor_is_preserved():
 @pytest.mark.parametrize(
     ('override', 'exception_type', 'message'),
     (
-        pytest.param({'fO2_log': None}, 'TypeError', 'NoneType', id='none-fo2'),
         pytest.param(
-            {'pressure_bar': 'oops'}, 'ValueError', 'oops', id='bad-pressure',
+            {'fO2_log': None},
+            'TypeError', 'declared scalar must be numeric', id='none-fo2',
         ),
         pytest.param(
-            {'temperature_C': 'hot'}, 'ValueError', 'hot', id='bad-temperature',
+            {'pressure_bar': 'oops'},
+            'TypeError', 'declared scalar must be numeric', id='bad-pressure',
+        ),
+        pytest.param(
+            {'temperature_C': 'hot'},
+            'TypeError', 'declared scalar must be numeric', id='bad-temperature',
+        ),
+        pytest.param(
+            {'temperature_C': float('nan')},
+            'ValueError', 'temperature_C must be finite',
+            id='non-finite-temperature',
+        ),
+        pytest.param(
+            {'pressure_bar': float('inf')},
+            'ValueError', 'pressure_bar must be finite',
+            id='non-finite-pressure',
+        ),
+        pytest.param(
+            {'fO2_log': float('nan')},
+            'ValueError', 'fO2_log must be finite',
+            id='non-finite-fo2',
         ),
         pytest.param(
             {'call_timeout_s': 'oops'},
-            'ValueError',
-            'oops',
+            'TypeError',
+            'declared scalar must be numeric',
             id='bad-timeout-str',
         ),
         pytest.param(
             {'call_timeout_s': object()},
             'TypeError',
-            'object',
+            'declared scalar must be numeric',
             id='bad-timeout-type',
+        ),
+        pytest.param(
+            {'call_timeout_s': float('inf')},
+            'ValueError', 'call_timeout_s must be finite',
+            id='non-finite-timeout',
+        ),
+        pytest.param(
+            {'temperature_C': True},
+            'TypeError', 'declared scalar must be numeric',
+            id='boolean-temperature',
+        ),
+        pytest.param(
+            {'fO2_log': np.bool_(False)},
+            'TypeError', 'declared scalar must be numeric',
+            id='numpy-boolean-fo2',
         ),
     ),
 )
 def test_magemin_equilibrate_invalid_declared_scalar_is_typed_refusal(
     override, exception_type, message,
 ):
+    calls = []
+
+    def fake_minimize(**kwargs):
+        calls.append(kwargs)
+        return {'phases': {'liq': {'mass_kg': 1.0}}}
+
     backend = MAGEMinBackend()
     backend._available = True
-    backend._bridge = 'subprocess'
-    backend._binary_path = Path('/fake/MAGEMin')
+    backend._bridge = 'pymagemin'
+    backend._magemin_module = types.SimpleNamespace(minimize=fake_minimize)
     params = {
         'temperature_C': 1500.0,
         'composition_mol': {'SiO2': 1.0},
@@ -1823,10 +1895,16 @@ def test_magemin_equilibrate_invalid_declared_scalar_is_typed_refusal(
 
     result = backend.equilibrate(**params)
 
-    assert result.status == 'not_converged'
+    assert result.status == 'refused'
+    assert result.diagnostics['reason'] == 'invalid_input'
     assert result.diagnostics['backend_failure_exception'] == exception_type
     assert message in result.diagnostics['backend_failure_message']
     assert any(message in warning for warning in result.warnings)
+    if (
+        isinstance(override.get('temperature_C'), bool)
+        or isinstance(override.get('fO2_log'), np.bool_)
+    ):
+        assert calls == []
 
 
 @pytest.mark.parametrize(

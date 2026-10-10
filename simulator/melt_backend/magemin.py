@@ -347,6 +347,10 @@ class _MAGEMinEngineCallError(RuntimeError):
         super().__init__(f'{exception_type}: {message}')
 
 
+class _MAGEMinDeclaredInputError(_MAGEMinEngineCallError):
+    """A caller-declared scalar could not be admitted for an engine call."""
+
+
 class _MAGEMinEngineLifecycleError(_MAGEMinEngineCallError):
     """A MAGEMin worker, budget, or subprocess slot lifecycle failure."""
 
@@ -371,13 +375,27 @@ def _admit_magemin_call_scalars(
         declared.append(call_timeout_s)
     admitted: List[float] = []
     for value in declared:
+        if not is_declared_real_scalar(value, allow_numeric_str=True):
+            raise _MAGEMinDeclaredInputError(
+                'TypeError',
+                'declared scalar must be numeric',
+            )
         try:
             admitted.append(float(value))
         except (TypeError, ValueError) as exc:
-            raise _MAGEMinEngineCallError(
+            raise _MAGEMinDeclaredInputError(
                 type(exc).__name__,
                 str(exc),
             ) from exc
+    scalar_names = ('temperature_C', 'pressure_bar', 'fO2_log')
+    if timeout_declared:
+        scalar_names += ('call_timeout_s',)
+    for name, value in zip(scalar_names, admitted):
+        if not math.isfinite(value):
+            raise _MAGEMinDeclaredInputError(
+                'ValueError',
+                f'{name} must be finite',
+            )
     admitted_timeout = admitted[3] if timeout_declared else None
     return admitted[0], admitted[1], admitted[2], admitted_timeout
 
@@ -1398,11 +1416,17 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 'backend_failure_exception': exc.exception_type,
                 'backend_failure_message': exc.engine_message,
             })
+            if isinstance(exc, _MAGEMinDeclaredInputError):
+                failure_diagnostics['reason'] = 'invalid_input'
             return EquilibriumResult(
                 temperature_C=temperature_C,
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
-                status='not_converged',
+                status=(
+                    'refused'
+                    if isinstance(exc, _MAGEMinDeclaredInputError)
+                    else 'not_converged'
+                ),
                 warnings=[*prior_warnings, *bulk_projection.warnings, message],
                 diagnostics=failure_diagnostics,
             )
@@ -1567,29 +1591,38 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             )
         if raw_budget is None:
             return LiquidusSolidusResult(
-                status='not_converged',
+                status='refused',
                 warnings=(
                     'liquidus_finder_budget_s=None is rejected; '
                     'MAGEMin requires a finite aggregate liquidus budget',
                 ),
                 diagnostics={
-                    'reason': 'invalid_liquidus_finder_budget',
+                    'reason': 'invalid_input',
+                    'budget_reason': 'invalid_liquidus_finder_budget',
                     'liquidus_finder_budget_s': None,
                 },
+            )
+        if not is_declared_real_scalar(raw_budget, allow_numeric_str=True):
+            return LiquidusSolidusResult(
+                status='refused',
+                warnings=('invalid liquidus_finder_budget_s: must be numeric',),
+                diagnostics={'reason': 'invalid_input'},
             )
         try:
             budget_s = float(raw_budget)
         except (TypeError, ValueError) as exc:
             return LiquidusSolidusResult(
-                status='not_converged',
+                status='refused',
                 warnings=(f'invalid liquidus_finder_budget_s: {exc}',),
+                diagnostics={'reason': 'invalid_input'},
             )
         if not math.isfinite(budget_s) or budget_s <= 0.0:
             return LiquidusSolidusResult(
-                status='not_converged',
+                status='refused',
                 warnings=(
                     'invalid liquidus_finder_budget_s: must be finite and positive',
                 ),
+                diagnostics={'reason': 'invalid_input'},
             )
 
         def sample_fraction(

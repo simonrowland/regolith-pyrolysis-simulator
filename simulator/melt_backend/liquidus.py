@@ -341,17 +341,30 @@ def find_liquidus_solidus_by_fraction(
             raise TypeError('max_bisection_iterations must be numeric')
         budget = None if budget_s is None else _declared_float(budget_s, 'budget_s')
     except (TypeError, ValueError) as exc:
-        return _not_converged(f'invalid finder parameter: {exc}')
-    if not all(math.isfinite(value) for value in (min_T, max_T, step, tolerance)):
-        return _not_converged('invalid finder parameter: temperatures and steps must be finite')
+        return _refused_input(f'invalid finder parameter: {exc}')
+    if not all(math.isfinite(value) for value in (
+        min_T, max_T, step, tolerance, max_bisection_iterations,
+        solid_threshold, liquid_epsilon_value, monotonicity_tolerance,
+        monotone_smoothing_max,
+    )):
+        return _refused_input('invalid finder parameters must be finite')
     if not min_T < max_T:
-        return _not_converged('invalid finder window: min_T_C must be below max_T_C')
+        return _refused_input(
+            'invalid finder window: min_T_C must be below max_T_C'
+        )
     if step <= 0.0:
-        return _not_converged('invalid finder scan_step_C: must be positive')
+        return _refused_input('invalid finder scan_step_C: must be positive')
     if tolerance <= 0.0:
-        return _not_converged('invalid finder tolerance_C: must be positive')
+        return _refused_input('invalid finder tolerance_C: must be positive')
     if budget is not None and (not math.isfinite(budget) or budget <= 0.0):
-        return _not_converged('invalid finder budget_s: must be finite and positive')
+        return _refused_input(
+            'invalid finder budget_s: must be finite and positive'
+        )
+
+    try:
+        grid = _bounded_scan_grid(min_T, max_T, step)
+    except RuntimeError as exc:
+        return _refused_input(str(exc))
 
     liquid_threshold = 1.0 - liquid_epsilon_value
     samples: list[MeltFractionSample] = []
@@ -451,7 +464,6 @@ def find_liquidus_solidus_by_fraction(
         return point
 
     try:
-        grid = _bounded_scan_grid(min_T, max_T, step)
         grid_points = [sample(T) for T in grid]
 
         solidus_bracket = None
@@ -595,10 +607,18 @@ def build_equilibrium_crystallization_path(
         )
         if not is_declared_real_scalar(max_points, allow_numeric_str=True):
             raise TypeError('max_points must be numeric')
+        for name, value in (
+            ('grid_step_C', grid_step_C),
+            ('monotonicity_tolerance', monotonicity_tolerance),
+            ('monotone_smoothing_max', monotone_smoothing_max),
+        ):
+            if not math.isfinite(value):
+                raise ValueError(f'{name} must be finite')
         if not solidus_T <= liquidus_T:
             return EquilibriumCrystallizationPathResult(
-                status='not_converged',
+                status='refused',
                 warnings=('invalid EC interval: solidus_T_C exceeds liquidus_T_C',),
+                diagnostics={'reason': 'invalid_input'},
             )
         temperatures = _temperature_grid(
             solidus_T,
@@ -606,6 +626,13 @@ def build_equilibrium_crystallization_path(
             grid_step_C=grid_step_C,
             max_points=max_points,
         )
+    except (TypeError, ValueError, RuntimeError) as exc:
+        return EquilibriumCrystallizationPathResult(
+            status='refused',
+            warnings=(f'invalid EC input: {exc}',),
+            diagnostics={'reason': 'invalid_input'},
+        )
+    try:
         for temperature_C in temperatures:
             raw_fraction, raw_composition = sample_liquid_state(float(temperature_C))
             fraction_point = _monotone_point(
@@ -780,7 +807,12 @@ def _bounded_scan_grid(
         raise RuntimeError(
             'invalid finder scan_step_C: step does not advance temperature'
         )
-    intervals = math.ceil(span / step)
+    interval_ratio = span / step
+    if not math.isfinite(interval_ratio):
+        raise RuntimeError(
+            'invalid finder scan grid: interval count is not finite'
+        )
+    intervals = math.ceil(interval_ratio)
     point_count = intervals + 1
     if point_count > MAX_LIQUIDUS_SCAN_POINTS:
         raise RuntimeError(
@@ -801,17 +833,27 @@ def _temperature_grid(
     max_points: int,
 ) -> Tuple[float, ...]:
     step = _declared_float(grid_step_C, 'grid_step_C')
-    if not is_declared_real_scalar(max_points, allow_numeric_str=True):
-        raise TypeError('max_points must be numeric')
-    point_cap = int(max_points)
-    if step <= 0.0:
-        raise RuntimeError('invalid EC grid_step_C: must be positive')
+    point_limit = _declared_float(max_points, 'max_points')
+    for name, value in (
+        ('solidus_T_C', solidus_T_C),
+        ('liquidus_T_C', liquidus_T_C),
+    ):
+        if not math.isfinite(float(value)):
+            raise ValueError(f'{name} must be finite')
+    if not math.isfinite(point_limit):
+        raise ValueError('max_points must be finite')
+    point_cap = int(point_limit)
+    if not math.isfinite(step) or step <= 0.0:
+        raise RuntimeError('invalid EC grid_step_C: must be finite and positive')
     if point_cap < 2:
         raise RuntimeError('invalid EC max_points: must be at least 2')
     span = float(liquidus_T_C) - float(solidus_T_C)
     if span == 0.0:
         return (float(solidus_T_C),)
-    intervals = min(max(1, math.ceil(span / step)), point_cap - 1)
+    interval_ratio = span / step
+    if not math.isfinite(interval_ratio):
+        raise RuntimeError('invalid EC grid: interval count is not finite')
+    intervals = min(max(1, math.ceil(interval_ratio)), point_cap - 1)
     return tuple(
         float(solidus_T_C) + span * index / intervals
         for index in range(intervals + 1)
@@ -926,8 +968,12 @@ def _validate_temperature_pair(
         )
 
 
-def _not_converged(message: str) -> LiquidusSolidusResult:
-    return LiquidusSolidusResult(status='not_converged', warnings=(message,))
+def _refused_input(message: str) -> LiquidusSolidusResult:
+    return LiquidusSolidusResult(
+        status='refused',
+        warnings=(message,),
+        diagnostics={'reason': 'invalid_input'},
+    )
 
 
 def _invoke_sample_fraction(

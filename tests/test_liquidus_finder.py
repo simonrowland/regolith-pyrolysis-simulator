@@ -8,6 +8,7 @@ import simulator.melt_backend.liquidus as liquidus_module
 from simulator.melt_backend.liquidus import (
     LiquidusSampleError,
     LiquidusSolidusResult,
+    build_equilibrium_crystallization_path,
     find_liquidus_solidus_by_fraction,
 )
 
@@ -52,6 +53,65 @@ def test_liquidus_finder_bisects_monotone_fraction_curve():
     assert frac_M(result.solidus_T_C) <= 1.0e-3
     assert frac_M(result.liquidus_T_C) >= 1.0 - 1.0e-3
     assert result.iterations <= 64
+
+
+@pytest.mark.parametrize(
+    'overrides',
+    (
+        {'min_T_C': object()},
+        {'scan_step_C': float('inf')},
+        {'min_T_C': 1000.0, 'max_T_C': 1000.0},
+        {'scan_step_C': 0.0},
+        {'tolerance_C': 0.0},
+        {'budget_s': float('nan')},
+    ),
+    ids=(
+        'non-numeric-scalar',
+        'non-finite-step',
+        'inverted-window',
+        'non-positive-step',
+        'non-positive-tolerance',
+        'non-finite-budget',
+    ),
+)
+def test_liquidus_finder_invalid_declared_input_is_refused(overrides):
+    calls = 0
+
+    def sample(_temperature_C: float) -> float:
+        nonlocal calls
+        calls += 1
+        return 0.5
+
+    result = find_liquidus_solidus_by_fraction(sample, **overrides)
+
+    assert result.status == 'refused'
+    assert result.diagnostics['reason'] == 'invalid_input'
+    assert calls == 0
+
+
+def test_equilibrium_crystallization_invalid_interval_is_refused():
+    result = build_equilibrium_crystallization_path(
+        lambda _temperature_C: (0.5, {'SiO2': 100.0}),
+        solidus_T_C=1200.0,
+        liquidus_T_C=1000.0,
+    )
+
+    assert result.status == 'refused'
+    assert result.diagnostics['reason'] == 'invalid_input'
+    assert 'invalid EC interval' in result.warnings[0]
+
+
+def test_equilibrium_crystallization_non_finite_step_is_refused():
+    result = build_equilibrium_crystallization_path(
+        lambda _temperature_C: (0.5, {'SiO2': 100.0}),
+        solidus_T_C=800.0,
+        liquidus_T_C=1000.0,
+        grid_step_C=float('inf'),
+    )
+
+    assert result.status == 'refused'
+    assert result.diagnostics['reason'] == 'invalid_input'
+    assert 'grid_step_C' in result.warnings[0]
 
 
 def test_liquidus_finder_is_deterministic():
@@ -209,9 +269,96 @@ def test_liquidus_finder_rejects_non_advancing_scan_step_without_sampling():
         budget_s=0.01,
     )
 
-    assert result.status == 'not_converged'
+    assert result.status == 'refused'
     assert calls == 0
+    assert result.diagnostics['reason'] == 'invalid_input'
     assert any('does not advance temperature' in warning for warning in result.warnings)
+
+
+@pytest.mark.parametrize(
+    ('control', 'value'),
+    (
+        ('solid_epsilon', float('nan')),
+        ('liquid_epsilon', float('inf')),
+        ('monotonicity_tolerance', float('nan')),
+        ('monotone_smoothing_max', float('inf')),
+        ('max_bisection_iterations', float('nan')),
+    ),
+)
+def test_liquidus_finder_rejects_non_finite_controls_before_sampling(control, value):
+    calls = []
+    result = find_liquidus_solidus_by_fraction(
+        lambda temperature_C: calls.append(temperature_C) or 0.5,
+        **{control: value},
+    )
+    assert result.status == 'refused'
+    assert result.diagnostics['reason'] == 'invalid_input'
+    assert calls == []
+
+
+@pytest.mark.parametrize(
+    ('min_T_C', 'max_T_C', 'scan_step_C'),
+    (
+        (0.0, 1.0, 1.0e-6),
+        (400.0, 500.0, 1.0e-300),
+        (0.0, 1000.0, 1.0e-308),
+    ),
+    ids=('grid-cap', 'non-advancing', 'non-finite-interval-count'),
+)
+def test_liquidus_finder_rejects_invalid_grid_before_sampling(
+    min_T_C, max_T_C, scan_step_C,
+):
+    calls = []
+    result = find_liquidus_solidus_by_fraction(
+        lambda temperature_C: calls.append(temperature_C) or 0.5,
+        min_T_C=min_T_C,
+        max_T_C=max_T_C,
+        scan_step_C=scan_step_C,
+    )
+    assert result.status == 'refused'
+    assert result.diagnostics['reason'] == 'invalid_input'
+    assert calls == []
+
+
+@pytest.mark.parametrize(
+    ('override', 'warning'),
+    (
+        ({'max_points': float('inf')}, 'max_points must be finite'),
+        ({'liquidus_T_C': float('inf')}, 'liquidus_T_C must be finite'),
+    ),
+)
+def test_liquidus_ec_rejects_non_finite_limits_before_sampling(override, warning):
+    calls = []
+    params = {'solidus_T_C': 800.0, 'liquidus_T_C': 1000.0}
+    params.update(override)
+    result = build_equilibrium_crystallization_path(
+        lambda temperature_C: calls.append(temperature_C) or (0.5, {'SiO2': 100.0}),
+        **params,
+    )
+    assert result.status == 'refused'
+    assert result.diagnostics['reason'] == 'invalid_input'
+    assert calls == []
+    assert any(warning in message for message in result.warnings)
+
+
+def test_liquidus_ec_rejects_non_finite_interval_count_before_sampling():
+    calls = []
+    result = build_equilibrium_crystallization_path(
+        lambda temperature_C: calls.append(temperature_C) or (
+            0.5,
+            {'SiO2': 100.0},
+        ),
+        solidus_T_C=800.0,
+        liquidus_T_C=1000.0,
+        grid_step_C=1.0e-308,
+    )
+    assert result.status == 'refused'
+    assert result.diagnostics['reason'] == 'invalid_input'
+    assert calls == []
+    assert any(
+        'interval count is not finite' in message
+        for message in result.warnings
+    )
 
 
 @pytest.mark.parametrize('fraction', [-0.5, 1.5])
