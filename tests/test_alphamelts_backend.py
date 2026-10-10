@@ -9798,6 +9798,93 @@ def test_imposed_fo2_failed_status_reaches_typed_not_converged(monkeypatch):
     assert backend.transport_close_count() == 0
 
 
+def test_echo_conversion_remote_failure_reaches_liquidus_as_not_converged(
+    monkeypatch,
+):
+    from simulator.engine_pool import EngineWorkerRemoteError
+    from simulator.melt_backend.thermoengine import ThermoEngineBackend
+    import tests.test_alphamelts_provider as provider_tests
+
+    monkeypatch.setattr(
+        'simulator.fe_redox.kress91_split',
+        lambda **_kwargs: {'fe3': 0.2},
+    )
+
+    class Model:
+        def set_bulk_composition(self, _bulk):
+            return None
+
+        def equilibrate_tp(self, *_args, **_kwargs):
+            return [('success', 1400.0, 0.1, object())]
+
+        def get_list_of_phases_in_assemblage(self, _root):
+            return ('Liquid',)
+
+        def get_composition_of_phase(self, _root, _phase, _basis):
+            return {'SiO2': 50.0, 'FeO': 10.0, 'Fe2O3': 1.0}
+
+    class Chem:
+        OXIDE_ORDER = ('SiO2', 'FeO', 'Fe2O3')
+
+        def wt_to_mol_oxide(self, _values):
+            raise RuntimeError('review-external-wt-to-mol-failure')
+
+    transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
+        activity_converter=lambda *_args: 1.0,
+    )
+    transport._chem = Chem()
+    transport._database = object()
+    transport._new_melts_model = lambda: Model()
+    transport._track_operation_root = lambda *_args: None
+
+    class Worker:
+        process = object()
+        start_count = 1
+
+        def call(self, kwargs):
+            try:
+                return transport._solve_imposed_fO2(
+                    temperature_C=kwargs['temperature_C'],
+                    pressure_bar=kwargs['pressure_bar'],
+                    pressure_mpa=kwargs['pressure_bar'] / 10.0,
+                    bulk_wt=kwargs['comp_wt'],
+                    target_fO2_log=kwargs['fO2_log'],
+                )
+            except Exception as exc:
+                raise EngineWorkerRemoteError(
+                    type(exc).__name__,
+                    str(exc),
+                    'native conversion traceback',
+                ) from exc
+
+        def close(self):
+            raise AssertionError(
+                'row-local nonconvergence must keep the handle'
+            )
+
+    transport._worker = Worker()
+    backend = ThermoEngineBackend()
+    backend._mode = 'thermoengine'
+    backend._thermoengine_transport = transport
+    result = backend.find_liquidus_solidus(
+        composition_mol=provider_tests._basalt_species_mol(),
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        min_T_C=1400.0,
+        max_T_C=1500.0,
+        scan_step_C=100.0,
+    )
+
+    assert result.status == 'not_converged'
+    assert any(
+        'RuntimeError: review-external-wt-to-mol-failure' in warning
+        for warning in result.warnings
+    )
+    assert backend._thermoengine_transport is transport
+    assert backend.transport_close_count() == 0
+
+
 @pytest.mark.parametrize(
     'method_name',
     [

@@ -2230,7 +2230,9 @@ print('ok')
             float(liquid.get(str(oxide), 0.0) or 0.0)
             for oxide in self._chem.OXIDE_ORDER
         ])
-        mol = self._chem.wt_to_mol_oxide(wt)
+        mol = _thermoengine_native_call(
+            lambda: self._chem.wt_to_mol_oxide(wt)
+        )
         redox = _thermoengine_native_call(
             lambda: self._database.redox_state(
                 np.array([temperature_C + 273.15]),
