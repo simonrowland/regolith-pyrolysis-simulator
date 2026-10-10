@@ -7898,7 +7898,6 @@ def _render_score_report_from_payloads_legacy(
                 f"{row['n_no_band']} | {rate_s} |"
             )
     lines.extend(_e15_report_lines(aggregate.e15_points, context.observations))
-    lines.extend(["", *aggregate.condition_hull_lines()])
     lines.extend(
         [
             "",

@@ -265,7 +265,9 @@ HULL_COMPILATION = (
 
 def _hull_section(report: str) -> list[str]:
     lines = report.splitlines()
-    start = lines.index("## Condition hull per rail × engine")
+    heading = "## Condition hull per rail × engine"
+    assert lines.count(heading) == 1
+    start = lines.index(heading)
     end = next(i for i in range(start + 1, len(lines)) if lines[i].startswith("## "))
     return [line for line in lines[start:end] if line.startswith("| ") and "---" not in line]
 
