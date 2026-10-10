@@ -3500,17 +3500,21 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
         "transition_temperature": 58
     }
     # The reviewed residue-composition rail adds 516 Sossi ppm and 648 Hashimoto
-    # oxide cells. The independent source census validates each typed component
-    # against its own printed field; the seven all-null Hashimoto rows stay absent.
+    # oxide cells. t-1152 adds 110 printed Markova 1984 Table 2 residue cells.
+    # The independent source census validates each typed component against its
+    # own printed field; the seven all-null Hashimoto rows stay absent.
     # t-1122 adds four 14163 1050°C residue-ppm cells each for K and Na from
     # Gibson & Hubbard (1972), Table 2: K 4220/3027/1437/88 and Na
     # 4660/4110/3140/1730. These are residual component abundances, so all eight
     # are residue_component_composition points.
-    assert census.get("residue_component_composition") == 1172
+    assert census.get("residue_component_composition") == 1282
     assert per_source.get("kems-012-sossi-2019") == {"residue_component_composition": 516}
     assert per_source.get("kems-015-hashimoto-1983") == {"residue_component_composition": 648}
     assert per_source.get("kems-024-gibson-hubbard-1972") == {
         "residue_component_composition": 8
+    }
+    assert per_source.get("kems-026-markova-1984") == {
+        "residue_component_composition": 110
     }
     # Re-pinned for the loader-survival batch: Richter 2007 +50 printed mass-loss cells
     # (starting-material initial compositions now survive migration), on top of the
@@ -3519,7 +3523,8 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     # total is 1668; mismatches remains 0.
     # O'Neill & Eggins 2002 adds 91 activity_coefficient cells: n_numeric 1668->1759.
     # t-1122 adds the eight printed residue component points above: 1759->1767.
-    assert n_numeric == 1767, (n_numeric, census, n_unavailable)
+    # t-1152 adds 110 printed residue component cells: 1767->1877.
+    assert n_numeric == 1877, (n_numeric, census, n_unavailable)
 
 
 def test_residue_point_condition_values_keep_their_printed_types() -> None:
