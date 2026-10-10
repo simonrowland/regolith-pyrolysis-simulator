@@ -5,6 +5,12 @@ from __future__ import annotations
 import pytest
 
 import simulator.melt_backend.liquidus as liquidus_module
+from engines.alphamelts.thermoengine import (
+    ThermoEngineFO2OmittedError,
+    ThermoEngineFO2UndefinedError,
+    ThermoEngineIsolationError,
+    ThermoEngineNonFiniteField,
+)
 from simulator.melt_backend.liquidus import (
     LiquidusSampleError,
     LiquidusSolidusResult,
@@ -129,6 +135,69 @@ def test_ec_path_propagates_local_sample_callback_error():
             liquidus_T_C=1100.0,
             grid_step_C=100.0,
         )
+
+
+@pytest.mark.parametrize(
+    ('exception_type', 'expected_status', 'expected_reason'),
+    [
+        (
+            ThermoEngineIsolationError,
+            'refused',
+            'thermoengine_isolation_required',
+        ),
+        (
+            ThermoEngineFO2UndefinedError,
+            'not_converged',
+            'thermoengine_fo2_undefined',
+        ),
+        (
+            ThermoEngineNonFiniteField,
+            'not_converged',
+            'thermoengine_nonfinite_field',
+        ),
+        (
+            ThermoEngineFO2OmittedError,
+            'not_converged',
+            'thermoengine_fo2_omitted',
+        ),
+    ],
+)
+def test_ec_path_preserves_declared_engine_failure(
+    exception_type,
+    expected_status,
+    expected_reason,
+):
+    def sample(_temperature_C):
+        raise exception_type('declared engine reason')
+
+    result = build_equilibrium_crystallization_path(
+        sample,
+        solidus_T_C=800.0,
+        liquidus_T_C=900.0,
+    )
+    assert result.status == expected_status
+    assert result.diagnostics['backend_status_reason'] == expected_reason
+
+
+@pytest.mark.parametrize(
+    'overrides',
+    [
+        {'max_points': '3.0'},
+        {'max_points': float('nan')},
+        {'max_points': float('inf')},
+        {'grid_step_C': float('nan')},
+        {'liquidus_T_C': float('inf')},
+    ],
+)
+def test_ec_path_refuses_invalid_configuration(overrides):
+    kwargs = {'solidus_T_C': 1000.0, 'liquidus_T_C': 1100.0}
+    kwargs.update(overrides)
+    result = build_equilibrium_crystallization_path(
+        lambda _temperature_C: (0.5, {'SiO2': 100.0}),
+        **kwargs,
+    )
+    assert result.status == 'not_converged'
+    assert result.liquid_fraction_path == ()
 
 
 def test_ec_path_preserves_typed_backend_sample_failure():

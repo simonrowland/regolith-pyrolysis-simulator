@@ -63,6 +63,15 @@ def test_thermoengine_failure_disposition_pins_both_directions() -> None:
         assert disposition.status not in {'refused', 'out_of_domain'}
 
 
+def test_unclassified_exception_propagates() -> None:
+    with pytest.raises(KeyError, match='review-local'):
+        thermoengine_failure_disposition_from_exception(
+            KeyError('review-local')
+        )
+    with pytest.raises(KeyError, match='review-local'):
+        liquidus_sample_error_from_exception(KeyError('review-local'))
+
+
 def test_liquidus_projection_pins_policy_and_execution_failures() -> None:
     refused = liquidus_sample_error_from_exception(
         ThermoEngineIsolationError('isolated worker required')

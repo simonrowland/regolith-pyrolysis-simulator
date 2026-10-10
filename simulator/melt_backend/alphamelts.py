@@ -828,6 +828,36 @@ def _decode_petthermotools_remote_failure(
     )
 
 
+_PETTHERMOTOOLS_OPTIONAL_IMPORT_NAMES = frozenset({
+    'ImportError',
+    'ModuleNotFoundError',
+})
+
+
+def _reraise_petthermotools_startup_failure(
+    exc: EngineWorkerRemoteError,
+) -> None:
+    """Apply the shared remote decoder to the first worker start."""
+
+    external_failure = _decode_petthermotools_remote_failure(
+        exc.exc_name,
+        exc.detail,
+    )
+    origin_name = (
+        external_failure.exception_class
+        if external_failure is not None
+        else exc.exc_name
+    )
+    if origin_name in _PETTHERMOTOOLS_OPTIONAL_IMPORT_NAMES:
+        raise ImportError(
+            'PetThermoTools worker initialization failed: '
+            f'{exc.detail}\n{exc.remote_traceback}'
+        ) from exc
+    if external_failure is not None:
+        raise external_failure from exc
+    raise exc
+
+
 PETTHERMOTOOLS_NON_PHASE_KEYS = {
     'All', 'Mass', 'Volume', 'rho', 'Conditions', 'Input', 'Affinity',
     'Activities', 'activities', 'activity_coefficients',
@@ -1192,15 +1222,7 @@ class _MELTSBackendSupport(MeltBackend):
                 try:
                     self._pet_worker.start()
                 except EngineWorkerRemoteError as exc:
-                    if exc.exc_name == 'ImportError':
-                        raise ImportError(
-                            f'PetThermoTools worker initialization failed: '
-                            f'{exc.detail}\n{exc.remote_traceback}'
-                        ) from exc
-                    raise RuntimeError(
-                        f'PetThermoTools worker initialization failed: '
-                        f'{exc.detail}\n{exc.remote_traceback}'
-                    ) from exc
+                    _reraise_petthermotools_startup_failure(exc)
             self._pet_available = True
             self._mode = 'python_api'
         except ImportError:

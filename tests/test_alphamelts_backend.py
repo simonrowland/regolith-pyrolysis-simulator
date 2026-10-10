@@ -696,6 +696,97 @@ def test_petthermotools_warm_bootstrap_import_failure_is_typed(monkeypatch):
 
 
 @pytest.mark.parametrize(
+    'failure',
+    [ImportError, ModuleNotFoundError, KeyError],
+)
+def test_petthermotools_initial_start_decodes_bootstrap_origin(
+    monkeypatch,
+    failure,
+):
+    from simulator.engine_pool import EngineWorkerRemoteError
+    from unittest.mock import patch
+
+    def failed_import(_name):
+        raise failure('external-init')
+
+    class InitWorker:
+        def __init__(self, **kwargs):
+            self.bootstrap = kwargs['bootstrap']
+
+        def start(self):
+            try:
+                with patch.object(
+                    alphamelts_module.importlib,
+                    'import_module',
+                    failed_import,
+                ):
+                    self.bootstrap(1)
+            except Exception as exc:
+                raise EngineWorkerRemoteError(
+                    type(exc).__name__,
+                    str(exc),
+                    'review bootstrap traceback',
+                ) from exc
+
+        def close(self):
+            return None
+
+    backend = AlphaMELTSBackend()
+    backend._pet_warm_enabled = True
+    backend._import_petthermotools = lambda: types.SimpleNamespace()
+    backend._preload_petthermotools_payload = lambda _module: None
+    monkeypatch.setattr(
+        alphamelts_module,
+        'WarmEngineWorker',
+        InitWorker,
+    )
+    if issubclass(failure, ImportError):
+        backend._initialize_petthermotools(require_petthermotools=False)
+        assert backend._pet_available is False
+        assert backend._mode is None
+        return
+    with pytest.raises(
+        alphamelts_module._PetThermoToolsExternalCallFailure
+    ) as raised:
+        backend._initialize_petthermotools(require_petthermotools=False)
+    assert raised.value.exception_class == failure.__name__
+    assert 'external-init' in raised.value.message
+    assert 'worker initialization failed' not in str(raised.value)
+
+
+def test_petthermotools_initial_start_propagates_untagged_local_error(
+    monkeypatch,
+):
+    from simulator.engine_pool import EngineWorkerRemoteError
+
+    class InitWorker:
+        def __init__(self, **_kwargs):
+            return None
+
+        def start(self):
+            raise EngineWorkerRemoteError(
+                'KeyError',
+                "'loader'",
+                'local bootstrap preparation',
+            )
+
+        def close(self):
+            return None
+
+    backend = AlphaMELTSBackend()
+    backend._pet_warm_enabled = True
+    backend._import_petthermotools = lambda: types.SimpleNamespace()
+    backend._preload_petthermotools_payload = lambda _module: None
+    monkeypatch.setattr(
+        alphamelts_module,
+        'WarmEngineWorker',
+        InitWorker,
+    )
+    with pytest.raises(EngineWorkerRemoteError, match='loader'):
+        backend._initialize_petthermotools(require_petthermotools=False)
+
+
+@pytest.mark.parametrize(
     ('model_name', 'expected_code'),
     [
         ('', 1),
@@ -883,6 +974,29 @@ def test_alphamelts_liquidus_propagates_local_result_processing_error():
 
     with pytest.raises(KeyError, match='local result-field defect'):
         backend.find_liquidus_solidus(composition_kg={'SiO2': 100.0})
+
+
+def test_alphamelts_liquidus_propagates_sampler_wrapper_key_error():
+    backend = AlphaMELTSBackend()
+    _select_python_api_for_test(backend)
+    backend._composition_for_liquidus_finder = (
+        lambda **_kwargs: {'SiO2': 100.0}
+    )
+    backend._find_petthermotools_liquidus_C = (
+        lambda *_args, **_kwargs: (1000.0, ())
+    )
+
+    def equilibrate(*_args, **_kwargs):
+        raise KeyError('review-local')
+
+    backend.equilibrate = equilibrate
+
+    with pytest.raises(KeyError, match='review-local'):
+        backend.find_liquidus_solidus(
+            composition_kg={'SiO2': 1},
+            min_T_C=800,
+            max_T_C=1000,
+        )
 
 
 def test_alphamelts_python_liquidus_finder_requires_findliq_call():

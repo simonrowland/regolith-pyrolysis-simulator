@@ -593,28 +593,11 @@ def _liquidus_status_from_freeze_gate_exception(
         return 'unavailable'
 
     from engines.alphamelts.thermoengine import (
-        ThermoEngineFO2OmittedError,
-        ThermoEngineFO2UndefinedError,
-        ThermoEngineIsolationError,
-        ThermoEngineNonFiniteField,
-        ThermoEngineOutOfDomainError,
-        ThermoEngineTimeoutError,
+        DECLARED_THERMOENGINE_FAILURE_TYPES,
         thermoengine_failure_disposition_from_exception,
     )
-    from simulator.engine_pool import EngineWorkerTimeout
 
-    if isinstance(
-        exc,
-        (
-            ThermoEngineOutOfDomainError,
-            ThermoEngineIsolationError,
-            ThermoEngineFO2UndefinedError,
-            ThermoEngineNonFiniteField,
-            ThermoEngineFO2OmittedError,
-            ThermoEngineTimeoutError,
-            EngineWorkerTimeout,
-        ),
-    ):
+    if isinstance(exc, DECLARED_THERMOENGINE_FAILURE_TYPES):
         mapped = thermoengine_failure_disposition_from_exception(exc).status
         if mapped == 'out_of_domain':
             return 'out_of_domain'

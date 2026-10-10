@@ -280,13 +280,16 @@ def test_provider_rejects_ec_sample_without_residual_liquid_composition():
     backend = _FakeECAlphaMELTSBackend(empty_comp=True)
     provider = AlphaMELTSProvider(backend=backend)
 
-    with pytest.raises(
-        RuntimeError,
-        match='lacks residual liquid composition',
-    ):
-        provider.dispatch(
-            _make_request(ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION)
-        )
+    result = provider.dispatch(
+        _make_request(ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION)
+    )
+
+    assert result.status == 'not_converged'
+    assert result.transition is None
+    assert any(
+        'lacks residual liquid composition' in warning
+        for warning in result.warnings
+    )
 
 
 @pytest.mark.parametrize('mode', ('thermoengine', 'python_api'))

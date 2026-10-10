@@ -590,6 +590,19 @@ class ThermoEngineOutOfDomainError(ValueError):
         return STATUS_BY_REFUSAL_CAUSE[self.cause]
 
 
+# One membership for typed ThermoEngine / worker failures. The freeze-gate
+# and the liquidus finder import this tuple; they do not restate it.
+DECLARED_THERMOENGINE_FAILURE_TYPES = (
+    ThermoEngineOutOfDomainError,
+    ThermoEngineIsolationError,
+    ThermoEngineFO2UndefinedError,
+    ThermoEngineNonFiniteField,
+    ThermoEngineFO2OmittedError,
+    ThermoEngineTimeoutError,
+    EngineWorkerTimeout,
+)
+
+
 @dataclass(frozen=True)
 class ThermoEngineFailureDisposition:
     """Type-keyed public disposition for one ThermoEngine failure."""
@@ -602,7 +615,12 @@ class ThermoEngineFailureDisposition:
 def thermoengine_failure_disposition_from_exception(
     exc: BaseException,
 ) -> ThermoEngineFailureDisposition:
-    """Classify one failure by exception type, never attached attributes."""
+    """Classify one failure by exception type, never attached attributes.
+
+    Only the declared typed family, optional-import absence, and a bare
+    ``RuntimeError`` (the generic solver failure) receive a disposition.
+    Every other type propagates.
+    """
 
     if isinstance(exc, ThermoEngineOutOfDomainError):
         return ThermoEngineFailureDisposition(
@@ -651,11 +669,13 @@ def thermoengine_failure_disposition_from_exception(
             reason_code='thermoengine_adapter_unavailable',
             exception=exc,
         )
-    return ThermoEngineFailureDisposition(
-        status='not_converged',
-        reason_code='not_converged',
-        exception=exc,
-    )
+    if type(exc) is RuntimeError:
+        return ThermoEngineFailureDisposition(
+            status='not_converged',
+            reason_code='not_converged',
+            exception=exc,
+        )
+    raise exc
 
 
 _FO2_ECHO_TOLERANCE = 1.0e-3
@@ -2316,6 +2336,7 @@ __all__ = (
     'THERMOENGINE_PRIOR_TRANSPORT_CLOSED_STATUS',
     'ThermoEngineFO2OmittedError',
     'ThermoEngineFO2UndefinedError',
+    'DECLARED_THERMOENGINE_FAILURE_TYPES',
     'ThermoEngineFailureDisposition',
     'ThermoEngineIsolationError',
     'ThermoEngineNonFiniteField',

@@ -116,10 +116,24 @@ class _LiquidusBisectionError(RuntimeError):
     """Bisection reached its declared iteration bound without convergence."""
 
 
+def _sample_error_for_declared_engine_failure(
+    exc: BaseException,
+) -> LiquidusSampleError | None:
+    """Project one declared ThermoEngine failure. Other types return None."""
+
+    from engines.alphamelts.thermoengine import (
+        DECLARED_THERMOENGINE_FAILURE_TYPES,
+    )
+
+    if not isinstance(exc, DECLARED_THERMOENGINE_FAILURE_TYPES):
+        return None
+    return liquidus_sample_error_from_exception(exc)
+
+
 def liquidus_sample_error_from_exception(
     exc: BaseException,
 ) -> LiquidusSampleError | None:
-    """Project a backend failure without trusting exception attributes."""
+    """Project a declared backend failure. Unknown types propagate."""
 
     if isinstance(exc, LiquidusSampleError):
         return exc
@@ -133,7 +147,9 @@ def liquidus_sample_error_from_exception(
             or status
         )
     else:
-        from engines.alphamelts.thermoengine import (
+        # The backend module re-exports this classifier. Resolve it there
+        # so a reload of that module is the function the sampler calls.
+        from simulator.melt_backend.thermoengine import (
             thermoengine_failure_disposition_from_exception,
         )
 
@@ -346,6 +362,10 @@ def find_liquidus_solidus_by_fraction(
     callable accepts it, so engine call timeouts can be clamped to the
     residual rather than only checking the budget between calls.
     """
+    from engines.alphamelts.thermoengine import (
+        DECLARED_THERMOENGINE_FAILURE_TYPES,
+    )
+
     try:
         min_T = _declared_float(min_T_C, 'min_T_C')
         max_T = _declared_float(max_T_C, 'max_T_C')
@@ -464,6 +484,12 @@ def find_liquidus_solidus_by_fraction(
             except LiquidusSampleError as exc:
                 _raise_budget_if_engine_exhausted(exc)
                 raise _sample_error_with_exception_context(exc) from exc
+            except DECLARED_THERMOENGINE_FAILURE_TYPES as exc:
+                _raise_budget_if_engine_exhausted(exc)
+                projected = _sample_error_for_declared_engine_failure(exc)
+                if projected is None:
+                    raise
+                raise projected from exc
             raw_fraction_by_temperature[temperature_C] = raw
         frac = _clamp_fraction(raw)
         point = _monotone_point(
@@ -585,6 +611,76 @@ def find_liquidus_solidus_by_fraction(
     )
 
 
+def _validated_ec_configuration(
+    *,
+    solidus_T_C: float,
+    liquidus_T_C: float,
+    grid_step_C: float,
+    max_points: int,
+    monotonicity_tolerance: float,
+    monotone_smoothing_max: float,
+) -> tuple[float, float, float, float, float]:
+    """Reject public EC settings before int() or math.ceil can raise."""
+
+    try:
+        solidus_T = _declared_float(solidus_T_C, 'solidus_T_C')
+        liquidus_T = _declared_float(liquidus_T_C, 'liquidus_T_C')
+        step = _declared_float(grid_step_C, 'grid_step_C')
+        tolerance = _declared_float(
+            monotonicity_tolerance,
+            'monotonicity_tolerance',
+        )
+        smoothing = _declared_float(
+            monotone_smoothing_max,
+            'monotone_smoothing_max',
+        )
+    except TypeError as exc:
+        raise _LiquidusFinderConfigurationError(str(exc)) from exc
+    if not is_declared_real_scalar(max_points, allow_numeric_str=True):
+        raise _LiquidusFinderConfigurationError(
+            'max_points must be numeric'
+        )
+    try:
+        int(max_points)
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise _LiquidusFinderConfigurationError(
+            'max_points must be numeric'
+        ) from exc
+    if not math.isfinite(solidus_T) or not math.isfinite(liquidus_T):
+        raise _LiquidusFinderConfigurationError(
+            'invalid EC temperature bound: must be finite'
+        )
+    if not math.isfinite(step):
+        raise _LiquidusFinderConfigurationError(
+            'invalid EC grid_step_C: must be finite'
+        )
+    return solidus_T, liquidus_T, step, tolerance, smoothing
+
+
+def _equilibrium_path_from_sample_error(
+    exc: LiquidusSampleError,
+    *,
+    smoothing_warnings: list[str],
+    path: list[LiquidFractionPathPoint],
+    samples: list[MeltFractionSample],
+) -> EquilibriumCrystallizationPathResult:
+    exc = _sample_error_with_exception_context(exc)
+    return EquilibriumCrystallizationPathResult(
+        status=exc.status,
+        warnings=tuple([
+            *smoothing_warnings,
+            *(
+                f'equilibrium crystallization path failed: {warning}'
+                for warning in exc.warnings
+            ),
+        ]),
+        liquid_fraction_path=tuple(path),
+        samples=tuple(samples),
+        iterations=len(samples),
+        diagnostics=exc.diagnostics,
+    )
+
+
 def build_equilibrium_crystallization_path(
     sample_liquid_state: Callable[[float], tuple[float, Mapping[str, float]]],
     *,
@@ -596,28 +692,28 @@ def build_equilibrium_crystallization_path(
     monotone_smoothing_max: float = 5.0e-1,
 ) -> EquilibriumCrystallizationPathResult:
     """Build a monotone liquid-fraction path over solidus -> liquidus."""
+    from engines.alphamelts.thermoengine import (
+        DECLARED_THERMOENGINE_FAILURE_TYPES,
+    )
+
     samples: list[MeltFractionSample] = []
     path: list[LiquidFractionPathPoint] = []
     smoothing_warnings: list[str] = []
     try:
-        try:
-            solidus_T = _declared_float(solidus_T_C, 'solidus_T_C')
-            liquidus_T = _declared_float(liquidus_T_C, 'liquidus_T_C')
-            grid_step_C = _declared_float(grid_step_C, 'grid_step_C')
-            monotonicity_tolerance = _declared_float(
-                monotonicity_tolerance,
-                'monotonicity_tolerance',
-            )
-            monotone_smoothing_max = _declared_float(
-                monotone_smoothing_max,
-                'monotone_smoothing_max',
-            )
-        except TypeError as exc:
-            raise _LiquidusFinderConfigurationError(str(exc)) from exc
-        if not is_declared_real_scalar(max_points, allow_numeric_str=True):
-            raise _LiquidusFinderConfigurationError(
-                'max_points must be numeric'
-            )
+        (
+            solidus_T,
+            liquidus_T,
+            grid_step_C,
+            monotonicity_tolerance,
+            monotone_smoothing_max,
+        ) = _validated_ec_configuration(
+            solidus_T_C=solidus_T_C,
+            liquidus_T_C=liquidus_T_C,
+            grid_step_C=grid_step_C,
+            max_points=max_points,
+            monotonicity_tolerance=monotonicity_tolerance,
+            monotone_smoothing_max=monotone_smoothing_max,
+        )
         if not solidus_T <= liquidus_T:
             return EquilibriumCrystallizationPathResult(
                 status='not_converged',
@@ -654,20 +750,21 @@ def build_equilibrium_crystallization_path(
     except LiquidFractionInvalidError:
         raise
     except LiquidusSampleError as exc:
-        exc = _sample_error_with_exception_context(exc)
-        return EquilibriumCrystallizationPathResult(
-            status=exc.status,
-            warnings=tuple([
-                *smoothing_warnings,
-                *(
-                    f'equilibrium crystallization path failed: {warning}'
-                    for warning in exc.warnings
-                ),
-            ]),
-            liquid_fraction_path=tuple(path),
-            samples=tuple(samples),
-            iterations=len(samples),
-            diagnostics=exc.diagnostics,
+        return _equilibrium_path_from_sample_error(
+            exc,
+            smoothing_warnings=smoothing_warnings,
+            path=path,
+            samples=samples,
+        )
+    except DECLARED_THERMOENGINE_FAILURE_TYPES as exc:
+        projected = _sample_error_for_declared_engine_failure(exc)
+        if projected is None:
+            raise
+        return _equilibrium_path_from_sample_error(
+            projected,
+            smoothing_warnings=smoothing_warnings,
+            path=path,
+            samples=samples,
         )
     except (
         _LiquidusNonMonotoneError,

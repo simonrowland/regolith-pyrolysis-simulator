@@ -145,7 +145,20 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
             self._unavailable_reason = None
             return True
         except Exception as exc:  # noqa: BLE001 - optional engine boundary
-            disposition = thermoengine_failure_disposition_from_exception(exc)
+            try:
+                disposition = thermoengine_failure_disposition_from_exception(
+                    exc
+                )
+            except Exception as propagated:
+                if propagated is not exc:
+                    raise
+                try:
+                    self.close()
+                except Exception as cleanup_error:  # noqa: BLE001 - preserve typed
+                    propagated.add_note(
+                        f'ThermoEngine cleanup also failed: {cleanup_error}'
+                    )
+                raise
             classified = disposition.exception
             if disposition.status != 'unavailable':
                 try:
