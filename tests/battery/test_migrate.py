@@ -5488,6 +5488,59 @@ def test_kume_measured_reduced_activity_preserves_structured_derivation(
     )
 
 
+def test_kume_tables3_and4_derivation_evidence_fresh_migration_and_mutations(
+    tmp_path: Path,
+) -> None:
+    name = "kume-2000-cao-activities.yaml"
+    result = _migrate_real_extract(tmp_path / "fresh", name)
+    assert len(result.observations) == 375
+    assert result.validation is not None
+    assert not result.validation.hard_issues
+
+    table3_id = "kume_2000_table3_sample_207_mgo_activity"
+    table4_id = "kume_2000_table4_sample_306_mgo_activity"
+    table3 = next(
+        obs for obs in result.observations.values()
+        if obs.observation_id.endswith(f"::{table3_id}")
+    )
+    table4 = next(
+        obs for obs in result.observations.values()
+        if obs.observation_id.endswith(f"::{table4_id}")
+    )
+    assert table3.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+    assert table3.derivation is not None
+    assert "exchange reaction (3) and Eq. (4)" in table3.derivation.relation
+    assert table3.derivation.inputs == table3.derived_from
+    assert table4.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+    assert table4.derived_from is None
+    assert table4.derivation is None
+
+    source = REPO_ROOT / "data" / "literature" / "extracts" / name
+    extract = yaml.safe_load(source.read_text(encoding="utf-8"))
+    extract["source_id"] = "fixture-source"
+    rows = {
+        row["observation_id"]: row
+        for block in extract["species"].values()
+        for row in block["observations"]
+    }
+    rows[table3_id].pop("derivation")
+    mutated_table4 = rows[table4_id]
+    mutated_table4["values"]["method_class"] = "measured_reduced"
+    mutated_table4["values"]["evidence_class"] = "measured_reduced"
+    mutated_table4["derived_from"] = ["missing-parent"]
+    mutated = migrate(_write_min_tree(tmp_path / "mutated", extract), write=False)
+    issues = {
+        issue.path: issue.detail
+        for issue in mutated.validation.hard_issues
+    }
+    assert issues[
+        f"observation[fixture-source::{table3_id}].derivation"
+    ] == "derived observation requires derivation"
+    assert issues[
+        f"observation[fixture-source::{table4_id}].derivation"
+    ] == "derived observation requires derivation"
+
+
 def test_unregistered_table_derivation_input_is_not_retained(
     tmp_path: Path,
 ) -> None:
