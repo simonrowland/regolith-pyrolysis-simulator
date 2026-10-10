@@ -81,14 +81,15 @@ def test_alpha_writer_preserves_retired_sources(tmp_path, monkeypatch):
     assert not destinations & RETIRED_DESTINATIONS
 
 
-def test_real_alpha_draft_emits_only_nonretired_destinations(tmp_path, monkeypatch):
+def test_alpha_writer_emits_only_nonretired_destinations(tmp_path, monkeypatch):
     extracts = tmp_path / "extracts"
     extracts.mkdir()
-    draft = (
-        REPO_ROOT.parents[1]
-        / "docs-private/research/2026-08-01-vp-acquire-6/alpha-kinetics.md"
+    records = yaml.safe_load(
+        (REPO_ROOT / "tests" / "fixtures" / "pilot_alpha_records.yaml").read_text(
+            encoding="utf-8"
+        )
     )
-    assert draft.is_file(), f"real acquisition draft is unavailable: {draft}"
+    draft = _draft_with_records(tmp_path / "alpha-kinetics.md", records)
 
     destinations, written = _run_writer(draft, extracts, monkeypatch)
 

@@ -1,0 +1,161 @@
+- record_id: costa_jacobson_2015_sio_olivine_kems
+  citation: Costa & Jacobson (2015) NASA NTRS 20150002321; D(SiO+) plot band ~0.01-0.04 class (prior runtime cross-check REF-016)
+  doi_or_url: https://ntrs.nasa.gov/citations/20150002321
+  species: SiO
+  temperature_range_K: [1700.0, 1800.0]
+  alpha_value: null
+  alpha_range: [0.003, 0.036]
+  gas_species: SiO(g)
+  material: Fo93Fa7_olivine
+  phase: solid_solution_olivine
+  regime: kems_effusion
+  note: Range from figure band / prior extract; not a single pin
+- record_id: fedkin_2006_table3_fe_hashimoto_langmuir
+  citation: "Fedkin, A. V., Grossman, L. & Ghiorso, M. S. (2006), Geochim. Cosmochim. Acta 70:206-223, Table 3 pp. 212-213; primary vacuum free-evaporation data Hashimoto, A. (1983), Geochem. J. 17:111-145"
+  doi_or_url: https://doi.org/10.1016/j.gca.2005.08.014
+  species: Fe
+  temperature_range_K: [1973.0, 2273.0]
+  alpha_value: 0.24
+  alpha_range: [0.21, 0.27]
+  gas_species: Fe(g)
+  material: Hashimoto_1983_FMSCA_silicate_melt
+  per_temperature:
+    - {T_K: 1973.0, alpha: 0.23, sigma: 0.02}
+    - {T_K: 2073.0, alpha: 0.25, sigma: 0.02}
+    - {T_K: 2173.0, alpha: 0.24, sigma: 0.02}
+    - {T_K: 2273.0, alpha: 0.23, sigma: 0.02}
+  phase: silicate_melt
+  standard_state_note: "MELTS activities for P_sat; α is free-evaporation coefficient for Fe(g). α_FeO assumed equal to α_Fe within ±0.04 class sensitivity (Fedkin Fig. 3)."
+  regime: langmuir_free_evaporation
+  note: Distinct from Costa KEMS pin; do not average into one Fe alpha
+- record_id: fedkin_2006_yu_na_vacuum_langmuir
+  citation: "Fedkin et al. (2006) GCA 70:206-223 pp. 213-214; primary experiment Yu, Y., Hewins, R. H., Alexander, C. M. O'D. & Wang, J. (2003) Geochim. Cosmochim. Acta 67:773-786"
+  doi_or_url: https://doi.org/10.1016/j.gca.2005.08.014
+  species: Na
+  temperature_range_K: [1723.15, 1723.15]
+  alpha_value: 0.26
+  alpha_range: [0.21, 0.31]
+  gas_species: Na(g)
+  material: Yu_et_al_2003_C1_silicate_melt
+  phase: silicate_melt
+  standard_state_note: MELTS Na2SiO3 activity basis in Fedkin model; gas is monatomic Na
+  regime: langmuir_free_evaporation
+  note: "OWNER GATE: flip runtime Na from open-furnace 1.0 to vacuum 0.26 only after series-resistance model review"
+- record_id: sossi_2019_na_open_furnace_apparent
+  citation: "Sossi, P. A. et al. (2019), Geochim. Cosmochim. Acta 260:204-231, DOI 10.1016/j.gca.2019.06.021"
+  doi_or_url: https://doi.org/10.1016/j.gca.2019.06.021
+  species: Na
+  temperature_range_K: [1573.15, 1823.15]
+  alpha_value: 1.0
+  alpha_range: [0.9, 1.0]
+  gas_species: Na(g)
+  material: ferrobasalt_FCMAS_open_furnace
+  phase: silicate_melt
+  standard_state_note: 1-bar gas-mixing furnace apparent alpha; transport-limited
+  regime: open_furnace_apparent
+  note: Retain as regime-tagged apparent alpha; do not treat as intrinsic vacuum alpha
+- record_id: fedkin_2006_yu_k_vacuum_langmuir
+  citation: "Fedkin et al. (2006) GCA 70:206-223 models Yu et al. (2003) GCA 67:773-786; tabulated with uncertainty also by Richter lineage; rail sidecar vapour_rail_langmuir_anchors.yaml::fedkin_2006_k_silicate_vacuum_langmuir"
+  doi_or_url: https://doi.org/10.1016/j.gca.2005.08.014
+  species: K
+  temperature_range_K: [1723.15, 1723.15]
+  alpha_value: 0.13
+  alpha_range: [0.11, 0.15]
+  gas_species: K(g)
+  material: Yu_et_al_2003_C1_silicate_melt
+  phase: silicate_melt
+  standard_state_note: MELTS activities; monatomic K(g); NOT KEMS effusion
+  regime: langmuir_free_evaporation
+- record_id: fedkin_2006_table3_mg_hashimoto_langmuir
+  citation: "Fedkin et al. (2006) GCA 70:206-223 Table 3; Hashimoto (1983) Geochem. J. 17:111-145 vacuum free evaporation"
+  doi_or_url: https://doi.org/10.1016/j.gca.2005.08.014
+  species: Mg
+  temperature_range_K: [1973.0, 2273.0]
+  alpha_value: 0.27
+  alpha_range: [0.23, 0.29]
+  gas_species: Mg(g)
+  material: Hashimoto_1983_FMSCA_silicate_melt
+  per_temperature:
+    - {T_K: 1973.0, alpha: 0.24, sigma: 0.01}
+    - {T_K: 2073.0, alpha: 0.28, sigma: 0.01}
+    - {T_K: 2173.0, alpha: 0.28, sigma: 0.01}
+    - {T_K: 2273.0, alpha: 0.27, sigma: 0.01}
+  phase: silicate_melt
+  standard_state_note: MELTS Mg activity in P_sat; α free-evaporation
+  regime: langmuir_free_evaporation
+  note: "Runtime 0.20 [0.1,0.21] is lower-bound conservative vs Table 3; either keep pin or re-center on 0.27 with wider envelope"
+- record_id: fedkin_2006_table3_sio_hashimoto_langmuir
+  citation: Fedkin et al. (2006) GCA 70:206-223 Table 3; Hashimoto (1983)
+  doi_or_url: https://doi.org/10.1016/j.gca.2005.08.014
+  species: SiO
+  temperature_range_K: [1973.0, 2273.0]
+  alpha_value: 0.17
+  alpha_range: [0.11, 0.22]
+  gas_species: SiO(g)
+  material: Hashimoto_1983_FMSCA_silicate_melt
+  per_temperature:
+    - {T_K: 1973.0, alpha: 0.12, sigma: 0.01}
+    - {T_K: 2073.0, alpha: 0.17, sigma: 0.01}
+    - {T_K: 2173.0, alpha: 0.2, sigma: 0.01}
+    - {T_K: 2273.0, alpha: 0.21, sigma: 0.01}
+  phase: silicate_melt
+  regime: langmuir_free_evaporation
+  note: Cross-check only; T band mostly above Wetzel valid_range_K ceiling
+- record_id: pound_1972_cr_langmuir_knudsen
+  citation: "Pound, G. M. (1972), J. Phys. Chem. Ref. Data 1:135-146 Table 1, DOI 10.1063/1.3253096; primary McCabe, Hudson & Paxton (1958), Trans. Met. Soc. AIME 212:102"
+  doi_or_url: https://doi.org/10.1063/1.3253096
+  species: Cr
+  temperature_range_K: [1318.0, 1563.0]
+  alpha_value: 0.9
+  alpha_range: [0.8, 1.0]
+  gas_species: Cr(g)
+  material: 99.9_percent_polycrystalline_solid_chromium
+  phase: solid_metal
+  standard_state_note: Pure solid Cr; melt activity must live in P_sat for dissolved Cr
+  regime: langmuir_free_evaporation
+- record_id: safarian_engh_2013_si_pure_langmuir
+  citation: "Safarian, J. & Engh, T. A. (2013), Metall. Mater. Trans. A 44:747-753, DOI 10.1007/s11661-012-1464-2"
+  doi_or_url: https://doi.org/10.1007/s11661-012-1464-2
+  species: Si
+  temperature_range_K: [1687.0, 2000.0]
+  alpha_value: 1.0
+  alpha_range: [0.84, 1.0]
+  gas_species: Si(g)
+  material: pure_elemental_silicon
+  phase: pure_liquid_or_solid_elemental_Si
+  standard_state_note: Pure elemental branch only; melt Si path is SiO(g)
+  regime: langmuir_free_evaporation
+- record_id: richter_2007_mg_cai_arrhenius_langmuir
+  citation: "Richter, F. M. et al. (2007), Geochim. Cosmochim. Acta 71:5544-5564, abstract and Fig. 3 pp. 5551-5553, DOI 10.1016/j.gca.2007.09.005"
+  doi_or_url: https://doi.org/10.1016/j.gca.2007.09.005
+  species: Mg
+  temperature_range_K: [1873.0, 2173.0]
+  gas_species: Mg(g)
+  material: Type_B_CAI_like_liquid
+  alpha_form:
+    type: arrhenius
+    expression: c = c0 * exp(-E/(R*T))
+    c0: 143.0
+    E_J_per_mol: 121000.0
+    E_uncertainty_J_per_mol: 53000.0
+    R_J_per_mol_K: 8.314
+  phase: silicate_melt_CMAS
+  standard_state_note: Berman CMAS activities for P_sat; vacuum free evaporation
+  regime: langmuir_free_evaporation
+  note: Optional T-dependent Mg form; composition is CAI-like not basalt
+- record_id: wetzel_gail_2013_sio_arrhenius
+  citation: "Wetzel, S. & Gail, H.-P. (2013), Astron. Astrophys. 553:A92, DOI 10.1051/0004-6361/201220803"
+  doi_or_url: https://doi.org/10.1051/0004-6361/201220803
+  species: SiO
+  temperature_range_K: [1000.0, 1800.0]
+  gas_species: SiO(g)
+  material: reaction_rate_limited_SiO_source_compilation
+  alpha_form:
+    type: arrhenius
+    expression: alpha = 0.52 * exp(-3685/T_K)
+    A: 0.52
+    B_K: 3685.0
+    uncertainty_envelope: [0.003, 0.067]
+  phase: oxide_source_evaporation
+  standard_state_note: HOT source evaporation only; cold-wall condensation uses Pound unity separately
+  regime: langmuir_free_evaporation
