@@ -844,14 +844,22 @@ def _initial_charge_composition_notice(reference: Observation) -> Notice | None:
         for state in states
     ):
         return None
-    return Notice(
-        kind=NoticeKind.SOURCE_DISAGREEMENT,
-        affected_quantities=(quantity,),
-        reason=(
+    if reference.source_id == "kems-020-hastie-1981-nbsir":
+        reason = (
+            f"{SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX} "
+            "composition_role=initial_charge_only: composition = printed initial "
+            "charge; run composition evolves during vaporization"
+        )
+    else:
+        reason = (
             f"{SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX} "
             f"composition_role={INITIAL_CHARGE_ONLY_PROXY_FLAG}: the printed "
             "composition is the starting charge, not the state of this datum"
-        ),
+        )
+    return Notice(
+        kind=NoticeKind.SOURCE_DISAGREEMENT,
+        affected_quantities=(quantity,),
+        reason=reason,
         origin=reference.observation_id,
     )
 

@@ -465,6 +465,59 @@ def _extract_observations(name: str) -> list[dict]:
     return found
 
 
+def test_hastie_initial_charges_bind_to_figure_points_as_proxies(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.migrate import wt_pct_to_mole_fraction
+
+    result = _migrate_real_extract(tmp_path, "kems-020-hastie-1981-nbsir.yaml")
+    expected_wt_pct = {
+        "fig4_illite_K_SiO_digitized": {
+            "K2O": Decimal("7.4"),
+            "Al2O3": Decimal("26.0"),
+            "Fe2O3": Decimal("4.4"),
+            "MgO": Decimal("2.1"),
+            "SiO2": Decimal("60.2"),
+            "Na2O": Decimal("0.2"),
+        },
+        "fig5_glass_Na_this_work_digitized": {
+            "Na2O": Decimal("17"),
+            "CaO": Decimal("12"),
+            "SiO2": Decimal("71"),
+        },
+        "fig11_k1_slag_k2o_gamma_digitized": {
+            "K2O": Decimal("19.5"),
+            "Al2O3": Decimal("12.1"),
+            "Fe2O3": Decimal("14.3"),
+            "CaO": Decimal("3.8"),
+            "MgO": Decimal("1.0"),
+            "SiO2": Decimal("46.8"),
+            "Na2O": Decimal("0.5"),
+        },
+    }
+    expected_counts = {
+        "fig4_illite_K_SiO_digitized": 6,
+        "fig5_glass_Na_this_work_digitized": 6,
+        "fig11_k1_slag_k2o_gamma_digitized": 19,
+    }
+    for series, composition_wt_pct in expected_wt_pct.items():
+        rows = [
+            observation
+            for observation in result.observations.values()
+            if series in observation.observation_id
+            and observation.identity.quantity.is_value
+            and observation.identity.quantity.value
+            in {Quantity.P_PARTIAL, Quantity.ACTIVITY_COEFFICIENT}
+        ]
+        assert len(rows) == expected_counts[series]
+        expected = wt_pct_to_mole_fraction(composition_wt_pct)
+        for observation in rows:
+            composition = observation.identity.composition
+            assert composition is not None and composition.is_value
+            assert composition.value.as_map() == expected.as_map()
+            assert composition.value.proxy_flag == "initial_charge_only"
+
+
 def _run_migrate_cli(args: list[str]) -> subprocess.CompletedProcess[str]:
     env = os.environ.copy()
     env["PYTHONPATH"] = str(REPO_ROOT)

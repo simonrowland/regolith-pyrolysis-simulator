@@ -2369,6 +2369,53 @@ def test_catalogue_composition_is_flagged_and_excluded_from_headline() -> None:
     )] == [("catalogue-composition", 1)]
 
 
+def test_hastie_initial_charge_notice_reaches_residual() -> None:
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
+        flagged_strata,
+    )
+
+    experiment = F.kems_experiment()
+    identity = F.activity_identity()
+    assert identity.composition is not None and identity.composition.is_value
+    identity = replace(
+        identity,
+        composition=State.of(
+            replace(
+                identity.composition.value,
+                proxy_flag="initial_charge_only",
+            )
+        ),
+    )
+    reference = F.observation(
+        "hastie-initial-charge-point",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="kems-020-hastie-1981-nbsir",
+    )
+    residual, _ = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+        prediction=_predict(Decimal("0.3"), identity),
+    )
+    hastie_notices = [
+        notice
+        for notice in residual.notices
+        if "composition = printed initial charge; run composition evolves during vaporization"
+        in notice.reason
+    ]
+    assert len(hastie_notices) == 1
+    assert residual.numeric is not None
+    assert residual.score_eligible is False
+    assert "not_flagged_stratum" in residual.exclusions
+    assert flagged_strata(residual.notices) == (
+        FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
+    )
+
+
 def test_source_internal_inconsistency_is_flagged_reported_and_excluded() -> None:
     from simulator.battery.score import (
         FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
