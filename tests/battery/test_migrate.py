@@ -5202,6 +5202,48 @@ def test_stolyarova_table3_137_row_ids_and_reference_states_unchanged(
     assert digest == "a3f9988c9f64bb73c07eefa07b1d2edaac77abb0b2496799dba925c6bedaa968"
 
 
+def test_schaefer_photochemical_lifetimes_retain_table4_rate_ancestry(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(
+        tmp_path,
+        "schaefer-fegley-2011-vaporization-earth.yaml",
+        use_repository_index_row=True,
+    )
+    lifetime_rows = [
+        obs
+        for obs in result.observations.values()
+        if "schaefer_2012_table4_photochemical_lifetimes" in obs.observation_id
+    ]
+
+    assert len(lifetime_rows) == 33
+    for obs in lifetime_rows:
+        gas = obs.observation_id.rsplit("::rows:row=", 1)[1].split(":", 1)[0]
+        rate_record = (
+            "schaefer_2012_table4_sio_j1_photolysis_rate"
+            if gas == "sio"
+            else (
+                "schaefer_2012_table4_j1_photolysis_rates"
+                if gas == "h2o"
+                else f"schaefer_2012_table4_j1_photolysis_rates_{gas}"
+            )
+        )
+        assert obs.derived_from is not None and len(obs.derived_from) == 1
+        assert obs.derived_from[0].startswith(
+            "schaefer-fegley-2011-vaporization-earth::"
+            f"{rate_record}::rows:row={gas}:"
+        )
+        assert obs.derivation is not None
+        assert obs.derivation.inputs == obs.derived_from
+        assert "§4.3" in obs.derivation.relation
+        assert "PDF page index 24" in obs.derivation.relation
+        assert (
+            "We then scaled the solar flux as a function of radial distance"
+            in obs.derivation.relation
+        )
+        assert all("table2" not in parent for parent in obs.derived_from)
+
+
 def test_stolyarova_1996_comparison_provenance_is_activity_only(
     tmp_path: Path,
 ) -> None:
