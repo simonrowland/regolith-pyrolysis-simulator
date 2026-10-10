@@ -13,13 +13,11 @@ SOURCE = ROOT / 'simulator/melt_backend/magemin.py'
 NARROW = '''                except (
                     EngineWorkerExitedError,
                     EngineWorkerPoolLifecycleError,
-                    EngineWorkerTimeout,
                     EngineWorkerUnavailable,
                 ) as exc:'''
 UNAVAILABLE_ONLY = '                except EngineWorkerUnavailable as exc:'
 TESTS = (
     'tests/test_magemin_backend.py::test_magemin_worker_exit_returns_typed_not_converged',
-    'tests/test_magemin_backend.py::test_magemin_equilibrate_maps_pool_timeout_to_typed_status',
     'tests/test_magemin_backend.py::test_magemin_pool_lifecycle_error_returns_typed_not_converged',
 )
 
@@ -55,7 +53,7 @@ def main() -> int:
     output = result.stdout + result.stderr
     if result.returncode == 0 or 'EngineWorkerExitedError' not in output:
         raise SystemExit('lifecycle catch mutation did not break the regressions')
-    print('PASS: unnormalized worker death and pool timeout escape status handling')
+    print('PASS: unnormalized worker death and pool lifecycle escape status handling')
     return 0
 
 

@@ -106,7 +106,7 @@ import time
 import warnings
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, Mapping, Optional, Tuple
+from typing import Any, Dict, Iterator, List, Mapping, NoReturn, Optional, Tuple
 
 from engines.domain_reason import OutOfDomainReason
 from simulator.melt_backend.base import (
@@ -349,6 +349,40 @@ class _MAGEMinEngineCallError(RuntimeError):
 
 class _MAGEMinEngineLifecycleError(_MAGEMinEngineCallError):
     """A MAGEMin worker, budget, or subprocess slot lifecycle failure."""
+
+
+def _admit_magemin_call_scalars(
+    temperature_C: Any,
+    pressure_bar: Any,
+    fO2_log: Any,
+) -> Tuple[float, float, float]:
+    """Admit declared call scalars, or raise the typed input refusal.
+
+    ``float()`` on a missing or non-numeric temperature, pressure, or fO2
+    used to become ``not_converged`` only because equilibrate's broad catch
+    laundered the TypeError/ValueError. Raise that refusal here so the
+    call boundary stays narrow.
+    """
+    admitted: List[float] = []
+    for value in (temperature_C, pressure_bar, fO2_log):
+        try:
+            admitted.append(float(value))
+        except (TypeError, ValueError) as exc:
+            raise _MAGEMinEngineCallError(
+                type(exc).__name__,
+                str(exc),
+            ) from exc
+    return admitted[0], admitted[1], admitted[2]
+
+
+def _raise_magemin_output_invalid(
+    message: str,
+    cause: Optional[BaseException] = None,
+) -> NoReturn:
+    """Known-invalid MAGEMin output, not a defect in the parser."""
+    if cause is None:
+        raise _MAGEMinEngineCallError('MAGEMinOutputError', message)
+    raise _MAGEMinEngineCallError('MAGEMinOutputError', message) from cause
 
 
 def _as_mapping(value: Any) -> Mapping[str, Any] | None:
@@ -1342,6 +1376,11 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 fO2_log=fO2_log,
                 call_timeout_s=call_timeout_s,
             )
+        except EngineWorkerTimeout:
+            # A hang is a control-plane event, not an equilibrium refusal.
+            # The pool has already killed the slot; preserve the typed signal
+            # so the caller can retry while the next call respawns it.
+            raise
         except _MAGEMinEngineCallError as exc:
             # MAGEMin is present but the minimisation did not produce a
             # usable result.
@@ -1833,7 +1872,10 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         # https://github.com/JuliaPy/pyjulia/blob/v0.6.2/src/julia/juliainfo.py#L55
                         from julia import Main as JuliaMain  # noqa: F401
                     except ImportError as exc:
-                        self._last_error = f'julia bridge import failed: {exc}'
+                        self._last_error = (
+                            'julia bridge import failed: '
+                            f'{type(exc).__name__}: {exc}'
+                        )
                     except (
                         JuliaError,
                         JuliaNotFound,
@@ -1841,17 +1883,26 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         OSError,
                         subprocess.SubprocessError,
                     ) as exc:
-                        self._last_error = f'julia bridge import failed: {exc}'
+                        self._last_error = (
+                            'julia bridge import failed: '
+                            f'{type(exc).__name__}: {exc}'
+                        )
                     except RuntimeError as exc:
                         if str(exc) != 'PyJulia does not support Julia < 0.7 anymore':
                             raise
-                        self._last_error = f'julia bridge import failed: {exc}'
+                        self._last_error = (
+                            'julia bridge import failed: '
+                            f'{type(exc).__name__}: {exc}'
+                        )
                     else:
                         try:
                             JuliaMain.eval('import MAGEMin_C')
                             return 'julia', julia
                         except JuliaError as exc:
-                            self._last_error = f'julia bridge import failed: {exc}'
+                            self._last_error = (
+                                'julia bridge import failed: '
+                                f'{type(exc).__name__}: {exc}'
+                            )
 
         # Subprocess fallback: the binary located in initialize() is
         # itself the bridge.  This is the supported default — MAGEMin
@@ -1998,6 +2049,11 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         """
         module = self._magemin_module
         call_started = time.monotonic()
+        temperature_C, pressure_bar, fO2_log = _admit_magemin_call_scalars(
+            temperature_C,
+            pressure_bar,
+            fO2_log,
+        )
         temperature_K = temperature_C + 273.15
         pressure_GPa = self._pressure_bar_to_GPa(pressure_bar)
         pressure_kbar = self._GPa_to_kbar(pressure_GPa)
@@ -2133,10 +2189,11 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         'call_timeout_s': timeout_s + 0.5,
                     }, timeout_s=timeout_s)
                     return future.result()
+                except EngineWorkerTimeout:
+                    raise
                 except (
                     EngineWorkerExitedError,
                     EngineWorkerPoolLifecycleError,
-                    EngineWorkerTimeout,
                     EngineWorkerUnavailable,
                 ) as exc:
                     raise _MAGEMinEngineLifecycleError(
@@ -2397,8 +2454,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 'operating_point_diagnostics': operating_point_diagnostics,
             }
         if not phases:
-            raise _MAGEMinEngineCallError(
-                'MAGEMinOutputError',
+            _raise_magemin_output_invalid(
                 'MAGEMin binary produced no parseable Phase/Mode block'
             )
         return {
@@ -2667,11 +2723,12 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             try:
                 fraction = float(raw)
             except ValueError as exc:
-                raise RuntimeError(
-                    f'MAGEMin Mode token for {name!r} is not numeric: {raw!r}'
-                ) from exc
+                _raise_magemin_output_invalid(
+                    f'MAGEMin Mode token for {name!r} is not numeric: {raw!r}',
+                    exc,
+                )
             if not math.isfinite(fraction) or not 0.0 <= fraction <= 1.0:
-                raise RuntimeError(
+                _raise_magemin_output_invalid(
                     f'MAGEMin Mode token for {name!r} is invalid: {raw!r}'
                 )
             parsed_modes.append((name, fraction))
@@ -2682,7 +2739,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     mode_sum=mode_total,
                     parsed_modes=parsed_modes,
                 )
-            raise RuntimeError(
+            _raise_magemin_output_invalid(
                 'MAGEMin Mode vector must sum to 1.0; '
                 f'got {mode_total:.9g}'
             )

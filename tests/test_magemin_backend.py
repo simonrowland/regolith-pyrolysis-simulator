@@ -281,23 +281,26 @@ def test_magemin_runtime_pool_uses_right_sized_warm_timeout(monkeypatch):
     )
 
 
-def test_magemin_equilibrate_maps_pool_timeout_to_typed_status():
-    backend = _make_pooled_subprocess_backend(
-        EngineWorkerTimeout('MAGEMin slot 0', 2.0, phase='job')
+def test_magemin_equilibrate_surfaces_typed_hang_without_disabling_backend():
+    timeout = EngineWorkerTimeout(
+        'MAGEMin slot 0',
+        2.0,
+        phase='job',
+        failed_slots=(0,),
     )
+    backend = _make_pooled_subprocess_backend(timeout)
 
-    result = backend.equilibrate(
-        1200.0,
-        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
-    )
+    with pytest.raises(EngineWorkerTimeout) as raised:
+        backend.equilibrate(
+            1200.0,
+            composition_mol={'SiO2': 1.0, 'MgO': 1.0},
+        )
 
-    assert result.status == 'not_converged'
-    assert result.diagnostics['backend_failure_exception'] == (
-        'EngineWorkerTimeout'
-    )
-    assert 'exceeded hard timeout of 2s' in (
-        result.diagnostics['backend_failure_message']
-    )
+    assert raised.value is timeout
+    assert raised.value.worker_name == 'MAGEMin slot 0'
+    assert raised.value.timeout_s == 2.0
+    assert raised.value.phase == 'job'
+    assert raised.value.failed_slots == (0,)
     assert backend.is_available() is True
 
 
@@ -782,17 +785,25 @@ def test_magemin_object_negative_convergence_discards_phase_rows(monkeypatch):
     ['0.8 bad', '0.8 nan', '0.8 -0.2', '0.8 1.2'],
 )
 def test_magemin_subprocess_parser_rejects_any_invalid_mode_token(mode_line):
-    with pytest.raises(RuntimeError, match='Mode token'):
+    from simulator.melt_backend.magemin import _MAGEMinEngineCallError
+
+    with pytest.raises(_MAGEMinEngineCallError, match='Mode token') as raised:
         MAGEMinBackend._parse_subprocess_stdout(
             f'Phase: liq ol\nMode: {mode_line}\n'
         )
+    assert raised.value.exception_type == 'MAGEMinOutputError'
 
 
 def test_magemin_subprocess_parser_rejects_nonunit_mode_vector():
-    with pytest.raises(RuntimeError, match='Mode vector must sum to 1.0'):
+    from simulator.melt_backend.magemin import _MAGEMinEngineCallError
+
+    with pytest.raises(
+        _MAGEMinEngineCallError, match='Mode vector must sum to 1.0'
+    ) as raised:
         MAGEMinBackend._parse_subprocess_stdout(
             'Phase: liq ol\nMode: 0.8 0.8\n'
         )
+    assert raised.value.exception_type == 'MAGEMinOutputError'
 
 
 def test_magemin_plante_mode_deficit_is_typed_out_of_domain(monkeypatch):
@@ -1768,6 +1779,105 @@ def test_magemin_remote_builtin_with_multi_argument_constructor_is_preserved():
     )
 
 
+@pytest.mark.parametrize(
+    ('override', 'exception_type', 'message'),
+    (
+        pytest.param({'fO2_log': None}, 'TypeError', 'NoneType', id='none-fo2'),
+        pytest.param(
+            {'pressure_bar': 'oops'}, 'ValueError', 'oops', id='bad-pressure',
+        ),
+        pytest.param(
+            {'temperature_C': 'hot'}, 'ValueError', 'hot', id='bad-temperature',
+        ),
+    ),
+)
+def test_magemin_equilibrate_invalid_declared_scalar_is_typed_refusal(
+    override, exception_type, message,
+):
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = 'subprocess'
+    backend._binary_path = Path('/fake/MAGEMin')
+    params = {
+        'temperature_C': 1500.0,
+        'composition_mol': {'SiO2': 1.0},
+        'pressure_bar': 1.0,
+        'fO2_log': -8.0,
+    }
+    params.update(override)
+
+    result = backend.equilibrate(**params)
+
+    assert result.status == 'not_converged'
+    assert result.diagnostics['backend_failure_exception'] == exception_type
+    assert message in result.diagnostics['backend_failure_message']
+    assert any(message in warning for warning in result.warnings)
+
+
+@pytest.mark.parametrize(
+    'stdout',
+    (
+        pytest.param('Phase: liq ol\nMode: 0.8 nan\n', id='nan-token'),
+        pytest.param('Phase: liq ol\nMode: 0.8 bad\n', id='non-numeric'),
+        pytest.param('Phase: liq ol\nMode: 0.8 0.8\n', id='overfull'),
+    ),
+)
+def test_magemin_equilibrate_invalid_engine_output_is_typed_not_converged(
+    monkeypatch, stdout,
+):
+    monkeypatch.setattr(
+        'simulator.melt_backend.magemin.subprocess.run',
+        lambda args, **_kwargs: subprocess.CompletedProcess(
+            args, 0, stdout=stdout, stderr='',
+        ),
+    )
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = 'subprocess'
+    backend._binary_path = Path('/fake/MAGEMin')
+
+    result = backend.equilibrate(
+        1500.0,
+        composition_mol={'SiO2': 1.0},
+        pressure_bar=1.0,
+        fO2_log=-8.0,
+    )
+
+    assert result.status == 'not_converged'
+    assert result.diagnostics['backend_failure_exception'] == (
+        'MAGEMinOutputError'
+    )
+    assert 'MAGEMin Mode' in result.diagnostics['backend_failure_message']
+
+
+@pytest.mark.parametrize('local_error', (KeyError, TypeError, ValueError))
+def test_magemin_equilibrate_parser_local_defect_propagates(
+    monkeypatch, local_error,
+):
+    monkeypatch.setattr(
+        'simulator.melt_backend.magemin.subprocess.run',
+        lambda args, **_kwargs: subprocess.CompletedProcess(
+            args, 0, stdout='Phase: liq\nMode: 1.0\n', stderr='',
+        ),
+    )
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = 'subprocess'
+    backend._binary_path = Path('/fake/MAGEMin')
+
+    def broken_parser(_stdout):
+        raise local_error('local MAGEMin parser defect')
+
+    monkeypatch.setattr(backend, '_parse_subprocess_stdout', broken_parser)
+    with pytest.raises(local_error, match='local MAGEMin parser defect'):
+        backend.equilibrate(
+            1500.0,
+            composition_mol={'SiO2': 1.0},
+            pressure_bar=1.0,
+            fO2_log=-8.0,
+        )
+
+
 def test_magemin_subprocess_parser_value_error_propagates(monkeypatch):
     from simulator.melt_backend import magemin as magemin_module
 
@@ -1998,8 +2108,18 @@ def test_magemin_julia_runtime_discovery_failures_return_unavailable(
         warnings.simplefilter('ignore', UserWarning)
         bridge = backend._import_magemin_bridge(requested='julia')
 
+    expected_class = {
+        'julia': 'JuliaError',
+        'unsupported-python': 'UnsupportedPythonError',
+        'julia-not-found': 'JuliaNotFound',
+        'unsupported-version': 'RuntimeError',
+        'os': 'FileNotFoundError',
+        'process': 'CalledProcessError',
+    }[failure]
     assert bridge == (None, None)
-    assert 'julia bridge import failed:' in backend._last_error
+    assert (
+        f'julia bridge import failed: {expected_class}:' in backend._last_error
+    )
     assert any(
         message in backend._last_error
         for message in (
