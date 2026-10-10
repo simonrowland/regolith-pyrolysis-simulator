@@ -62,8 +62,10 @@ from simulator.battery.enums import (
 from simulator.battery.identity import (
     Identity,
     IdentityEqualKind,
+    PA_PER_BAR_DEC,
     THERMOCHEMICAL_CALORIE_J,
     identity_equal,
+    log10K_from_delta_fG_kJ_mol,
     profile_for,
     quantity_token,
 )
@@ -6344,6 +6346,568 @@ def _headline_band_width(bucket: Sequence[Residual]) -> Decimal | None:
     return next(iter(widths)) if len(widths) == 1 else None
 
 
+_E15_LEVEL_BASIS = {
+    "kems-053-stolyarova-1991": "level anchored to the x(SiO2)=0.25 row",
+    "stolyarova-1995-cao-alumina-kems": (
+        "Table 2 partial pressures only; activities are figure_only"
+    ),
+    "stolyarova-1996-cao-alumina-silica-kems": (
+        "level tied to the absolute p(Ca) and p(O) scales"
+    ),
+}
+_E15_CONTESTED_STRATUM = FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED
+
+
+@dataclass(frozen=True)
+class _E15ResidualPoint:
+    source: str
+    table: str
+    series: str
+    temperature_K: Decimal
+    engine: str
+    population: str
+    flags: tuple[str, ...]
+    x_axis: str
+    x: Decimal
+    residual_dex: Decimal
+
+
+def _e15_axis_component(observation: Observation, series: str) -> str | None:
+    source = observation.source_id
+    if source == "kems-053-stolyarova-1991":
+        return "SiO2"
+    if source == "stolyarova-1995-cao-alumina-kems":
+        return "CaO"
+    if source != "stolyarova-1996-cao-alumina-silica-kems":
+        return None
+    if "_pO_double_prime_" in series:
+        return "SiO2"
+    if "_pO_prime_" in series:
+        return "Al2O3"
+    if observation.identity.species.formula in {"Ca", "CaO"}:
+        return "CaO"
+    if observation.identity.species.formula in {"SiO", "SiO2"}:
+        return "SiO2"
+    if observation.identity.species.formula in {"Al", "AlO", "Al2O3", "O"}:
+        return "Al2O3" if "_pO_" not in series else "CaO"
+    return None
+
+
+def _e15_residual_point(
+    row: Residual | Mapping[str, object], observation: Observation | None
+) -> _E15ResidualPoint | None:
+    if (
+        observation is None
+        or observation.source_id not in _E15_LEVEL_BASIS
+        or not isinstance(observation.identity, Identity)
+    ):
+        return None
+    if isinstance(row, Residual):
+        numeric = row.numeric
+        if numeric is None:
+            return None
+        if row.status is ResidualStatus.REFUSED:
+            return None
+        if numeric.operation is not MetricOperation.DEX:
+            return None
+        flags = flagged_strata(row.notices)
+        engine = _engine_of(row)
+        residual_dex = numeric.value
+    else:
+        if row.get("status") == ResidualStatus.REFUSED.value:
+            return None
+        numeric = row.get("numeric")
+        if not isinstance(numeric, Mapping) or numeric.get("value") is None:
+            return None
+        if numeric.get("operation") != MetricOperation.DEX.value:
+            return None
+        flags = _flagged_payload_strata(row)
+        request = row.get("candidate_request")
+        engine = str(
+            request.get("engine")
+            if isinstance(request, Mapping) and request.get("engine")
+            else str(row.get("key") or "").rsplit("::", 1)[-1]
+        )
+        try:
+            residual_dex = as_decimal(numeric.get("value"))
+        except (TypeError, ValueError, ArithmeticError):
+            return None
+    if not _reference_has_measured_evidence(observation):
+        return None
+    if (
+        _is_bulk_not_liquid_composition(observation)
+        or _without_outside_single_liquid_field(observation) is not None
+    ):
+        return None
+    located = (observation.point_conditions or {}).get("composition")
+    if located is None or not located.state.is_value:
+        return None
+    components = dict(located.state.value.components)
+    series_parts = observation.observation_id.split("::")
+    if len(series_parts) < 3:
+        return None
+    series = series_parts[1]
+    component = _e15_axis_component(observation, series)
+    x = components.get(component) if component is not None else None
+    temperature = observation.identity.temperature_K
+    if x is None or temperature is None or not temperature.is_value:
+        return None
+    return _E15ResidualPoint(
+        source=observation.source_id or "",
+        table=(observation.locator.table if observation.locator and observation.locator.table else "?"),
+        series=series,
+        temperature_K=as_decimal(temperature.value),
+        engine=engine,
+        population=("contested" if _E15_CONTESTED_STRATUM in flags else "liquid"),
+        flags=flags,
+        x_axis=f"x({component})",
+        x=as_decimal(x),
+        residual_dex=residual_dex,
+    )
+
+
+def _e15_level_shape_rows(
+    points: Iterable[_E15ResidualPoint],
+) -> list[dict[str, object]]:
+    groups: dict[tuple[str, str, str, Decimal, str, str, str], list[_E15ResidualPoint]] = defaultdict(list)
+    for point in points:
+        groups[(
+            point.population,
+            point.source,
+            point.table,
+            point.temperature_K,
+            point.engine,
+            point.series,
+            point.x_axis,
+        )].append(point)
+    rows: list[dict[str, object]] = []
+    for (population, source, table, temperature, engine, series, x_axis), group in sorted(groups.items()):
+        n = len(group)
+        level = sum((point.residual_dex for point in group), Decimal(0)) / Decimal(n)
+        centered = [point.residual_dex - level for point in group]
+        centered_mean = sum(centered, Decimal(0)) / Decimal(n)
+        rms = _rms(centered)
+        x_mean = sum((point.x for point in group), Decimal(0)) / Decimal(n)
+        x_ss = sum(((point.x - x_mean) ** 2 for point in group), Decimal(0))
+        # For residuals r_i in dex, level = mean(r), shape q_i = r_i − mean(r),
+        # shape RMS = sqrt(sum(q_i²)/n), and OLS slope =
+        # sum((x_i−mean(x))(q_i−mean(q))) / sum((x_i−mean(x))²), in dex per
+        # unit x. A pure level offset r_i=c gives q_i=0, so RMS=0 and slope=0.
+        # The slope is diagnostic only; a zero x variance has no defined slope.
+        slope = (
+            None
+            if x_ss == 0
+            else sum(
+                (
+                    (point.x - x_mean) * (shape - centered_mean)
+                    for point, shape in zip(group, centered)
+                ),
+                Decimal(0),
+            ) / x_ss
+        )
+        common = {
+            "population": population,
+            "source": source,
+            "table": table,
+            "series": series,
+            "temperature_K": temperature,
+            "engine": engine,
+            "flags": tuple(sorted({flag for point in group for flag in point.flags})),
+            "x_axis": x_axis,
+            "n": n,
+        }
+        rows.extend((
+            {
+                **common,
+                "statistic": "level",
+                "level_basis": _E15_LEVEL_BASIS[source],
+                "level_dex": level,
+                "shape_rms_dex": None,
+                "slope_dex_per_x": None,
+            },
+            {
+                **common,
+                "statistic": "shape",
+                "level_basis": None,
+                "level_dex": None,
+                "shape_rms_dex": rms,
+                "slope_dex_per_x": slope,
+            },
+        ))
+    return rows
+
+
+def _e15_activity_methods(
+    source: str, oxide: str
+) -> tuple[tuple[str, tuple[str, ...], tuple[tuple[str, int], ...]], ...]:
+    if source == "kems-053-stolyarova-1991":
+        if oxide == "CaO":
+            return (
+                (
+                    "method 1",
+                    (
+                        "stolyarova_1991_ca_partial_pressure_1993k_complete_evaporation",
+                        "stolyarova_1991_o_atomic_partial_pressure_1933k_equilibrium",
+                    ),
+                    (("Ca", 1), ("O", 1)),
+                ),
+                (
+                    "method 2",
+                    (
+                        "stolyarova_1991_ca_partial_pressure_1993k_ion_comparison",
+                        "stolyarova_1991_o_atomic_partial_pressure_1933k_equilibrium",
+                    ),
+                    (("Ca", 1), ("O", 1)),
+                ),
+            )
+        if oxide == "SiO2":
+            return (
+                (
+                    "method 1",
+                    (
+                        "stolyarova_1991_sio_partial_pressure_1933k_complete_evaporation",
+                        "stolyarova_1991_o_atomic_partial_pressure_1933k_equilibrium",
+                    ),
+                    (("SiO", 1), ("O", 1)),
+                ),
+                (
+                    "method 2",
+                    (
+                        "stolyarova_1991_sio_partial_pressure_1933k_ion_comparison",
+                        "stolyarova_1991_o_atomic_partial_pressure_1933k_equilibrium",
+                    ),
+                    (("SiO", 1), ("O", 1)),
+                ),
+            )
+    if source == "stolyarova-1996-cao-alumina-silica-kems":
+        if oxide == "CaO":
+            return ((
+                "method 1",
+                ("stolyarova_1996_table2_pCa_1933k", "stolyarova_1996_table2_pO_1933k"),
+                (("Ca", 1), ("O", 1)),
+            ),)
+        if oxide == "SiO2":
+            return ((
+                "method 1",
+                (
+                    "stolyarova_1996_table2_pSiO_1933k",
+                    "stolyarova_1996_table2_pO_double_prime_1933k",
+                ),
+                (("SiO", 1), ("O", 1)),
+            ),)
+        if oxide == "Al2O3":
+            return (
+                (
+                    "method 1",
+                    ("stolyarova_1996_table2_pAl_1933k", "stolyarova_1996_table2_pO_1933k"),
+                    (("Al", 2), ("O", 3)),
+                ),
+                (
+                    "method 2",
+                    ("stolyarova_1996_table2_pAlO_1933k", "stolyarova_1996_table2_pO_prime_1933k"),
+                    (("AlO", 2), ("O", 1)),
+                ),
+            )
+    return ()
+
+
+@lru_cache(maxsize=32)
+def _e15_binding_log10_k(
+    oxide: str,
+    condensed_phase: str,
+    temperature_K: Decimal,
+    gas_products: tuple[tuple[str, int], ...],
+) -> Decimal:
+    """Resolve log10(K°) from the installed OpenIMCC JANAF binding."""
+
+    from openimcc import load_gas_datapack, species_thermo
+
+    gas_pack = load_gas_datapack()
+    delta_g_kJ_mol = Decimal(0)
+    for formula, coefficient in gas_products:
+        state = species_thermo(
+            formula, "g", float(temperature_K), datapack=gas_pack
+        )
+        delta_g_kJ_mol += (
+            Decimal(coefficient) * as_decimal(state.G_J_mol) / Decimal(1000)
+        )
+    condensed = species_thermo(
+        oxide, condensed_phase, float(temperature_K), datapack=gas_pack
+    )
+    delta_g_kJ_mol -= as_decimal(condensed.G_J_mol) / Decimal(1000)
+    return log10K_from_delta_fG_kJ_mol(delta_g_kJ_mol, temperature_K)
+
+
+def _e15_condensed_phase(observation: Observation) -> str | None:
+    identity = observation.identity
+    if isinstance(identity, Identity) and identity.reference_state.is_value:
+        endmember = identity.reference_state.value.endmember
+        phase = endmember.phase
+        if phase is not None and phase.is_value:
+            return str(phase.value.value)
+    # R5 identifies SiO2(cr) for the 1991 absolute-scale comparison. The same
+    # source explicitly leaves CaO's pure-oxide phase unresolved, so do not
+    # choose its liquid or crystalline binding row.
+    if (
+        observation.source_id == "kems-053-stolyarova-1991"
+        and isinstance(identity, Identity)
+        and identity.species.formula == "SiO2"
+    ):
+        return "cr"
+    return None
+
+
+def _e15_reaction_label(
+    oxide: str, phase: str | None, gas_products: tuple[tuple[str, int], ...]
+) -> str:
+    products = " + ".join(
+        f"{coefficient} {formula}(g)" if coefficient != 1 else f"{formula}(g)"
+        for formula, coefficient in gas_products
+    )
+    condensed = phase or "phase unspecified"
+    return f"{oxide}({condensed}) -> {products}"
+
+
+def _e15_composition_key(observation: Observation) -> tuple[tuple[str, Decimal], ...] | None:
+    located = (observation.point_conditions or {}).get("composition")
+    if located is None or not located.state.is_value:
+        return None
+    return tuple(sorted((name, as_decimal(value)) for name, value in located.state.value.components))
+
+
+def _e15_precheck_rows(
+    observations: Mapping[str, Observation],
+) -> list[dict[str, object]]:
+    """Compare printed activities with same-run pressure products and binding K°.
+
+    Pressures are converted to dimensionless p/P° using the OpenIMCC binding's
+    1 bar standard pressure. Thus log10(a_printed/a_abs) is log10(a_printed) −
+    Σν log10(p/P°) + log10(K°), with a_abs = Π(p/P°)^ν/K°. The reported sd is
+    the sample standard deviation in dex (n−1 denominator).
+    """
+
+    by_source_series: dict[tuple[str, str], list[Observation]] = defaultdict(list)
+    for observation in observations.values():
+        if observation.source_id in _E15_LEVEL_BASIS:
+            parts = observation.observation_id.split("::")
+            if len(parts) > 2:
+                by_source_series[(observation.source_id or "", parts[1])].append(observation)
+    pressure_index: dict[
+        tuple[str, str, str, Decimal, tuple[tuple[str, Decimal], ...]], list[Observation]
+    ] = defaultdict(list)
+    for (source, series), rows in by_source_series.items():
+        for observation in rows:
+            if quantity_token(observation.identity) is not Quantity.P_PARTIAL:
+                continue
+            identity = observation.identity
+            temperature = identity.temperature_K
+            composition = _e15_composition_key(observation)
+            if temperature is None or not temperature.is_value or composition is None:
+                continue
+            pressure_index[(
+                source,
+                series,
+                observation.experiment_id,
+                as_decimal(temperature.value),
+                composition,
+            )].append(observation)
+
+    results: list[dict[str, object]] = []
+    for (source, activity_series), rows in sorted(by_source_series.items()):
+        activity_rows = [
+            observation
+            for observation in rows
+            if quantity_token(observation.identity) is Quantity.ACTIVITY
+            and observation.value.kind is ValueKind.POINT
+            and observation.value.point is not None
+        ]
+        if not activity_rows:
+            continue
+        activity = activity_rows[0]
+        oxide = activity.identity.species.formula
+        methods = _e15_activity_methods(source, oxide)
+        if not methods:
+            continue
+        temperature_state = activity.identity.temperature_K
+        if temperature_state is None or not temperature_state.is_value:
+            continue
+        temperature = as_decimal(temperature_state.value)
+        table = activity.locator.table if activity.locator and activity.locator.table else "?"
+        component = _e15_axis_component(activity, activity_series)
+        phase = _e15_condensed_phase(activity)
+        for method, pressure_series, gas_products in methods:
+            reaction = _e15_reaction_label(oxide, phase, gas_products)
+            if phase is None:
+                results.append({
+                    "source": source,
+                    "table": table,
+                    "temperature_K": temperature,
+                    "activity_series": activity_series,
+                    "x_axis": f"x({component})" if component else "—",
+                    "method": method,
+                    "reaction": reaction,
+                    "result": (
+                        "not computed: reference phase not printed; "
+                        f"binding has no {oxide}(cr) K at {temperature} K"
+                    ),
+                    "n": 0,
+                })
+                continue
+            from openimcc import (
+                ImccGasSpeciesNotFoundError,
+                ImccGasTemperatureOutsideDomainError,
+            )
+
+            try:
+                log10_k = _e15_binding_log10_k(oxide, phase, temperature, gas_products)
+            except (
+                ImccGasSpeciesNotFoundError,
+                ImccGasTemperatureOutsideDomainError,
+            ):
+                results.append({
+                    "source": source,
+                    "table": table,
+                    "temperature_K": temperature,
+                    "activity_series": activity_series,
+                    "x_axis": f"x({component})" if component else "—",
+                    "method": method,
+                    "reaction": reaction,
+                    "result": f"not computed: no binding K° for {reaction}",
+                    "n": 0,
+                })
+                continue
+            ratios: list[Decimal] = []
+            for activity_point in activity_rows:
+                activity_composition = _e15_composition_key(activity_point)
+                if activity_composition is None or activity_point.value.point <= 0:
+                    continue
+                pressure_points: list[Observation] = []
+                for pressure_series_id in pressure_series:
+                    matches = pressure_index.get((
+                        source,
+                        pressure_series_id,
+                        activity_point.experiment_id,
+                        temperature,
+                        activity_composition,
+                    ), ())
+                    if len(matches) != 1 or matches[0].value.point is None or matches[0].value.point <= 0:
+                        pressure_points = []
+                        break
+                    pressure_points.append(matches[0])
+                if len(pressure_points) != len(gas_products):
+                    continue
+                log10_q = sum((
+                    Decimal(coefficient)
+                    * (pressure.value.point / PA_PER_BAR_DEC).log10()
+                    for pressure, (_formula, coefficient) in zip(pressure_points, gas_products)
+                ), Decimal(0))
+                ratios.append(activity_point.value.point.log10() - log10_q + log10_k)
+            if not ratios:
+                result = f"not computed: no same-T composition/run pressure pair for {reaction}"
+                mean = sd = None
+                n = 0
+            else:
+                n = len(ratios)
+                mean = sum(ratios, Decimal(0)) / Decimal(n)
+                sd = (
+                    None
+                    if n < 2
+                    else (
+                        sum(((value - mean) ** 2 for value in ratios), Decimal(0))
+                        / Decimal(n - 1)
+                    ).sqrt()
+                )
+                result = "computed"
+            results.append({
+                "source": source,
+                "table": table,
+                "temperature_K": temperature,
+                "activity_series": activity_series,
+                "x_axis": f"x({component})" if component else "—",
+                "method": method,
+                "reaction": reaction,
+                "result": result,
+                "mean_dex": mean,
+                "sd_dex": sd,
+                "n": n,
+            })
+    if any(
+        observation.source_id == "stolyarova-1995-cao-alumina-kems"
+        for observation in observations.values()
+    ):
+        results.append({
+            "source": "stolyarova-1995-cao-alumina-kems",
+            "table": "Figure 1",
+            "temperature_K": Decimal(1933),
+            "activity_series": "figure_only",
+            "x_axis": "x(CaO)",
+            "method": "—",
+            "reaction": "—",
+            "result": "not computed: activities are figure_only",
+            "n": 0,
+        })
+    return results
+
+
+def _e15_number(value: Decimal | None, *, places: int = 3, signed: bool = False) -> str:
+    if value is None:
+        return "—"
+    rendered = f"{value:.{places}f}"
+    return f"+{rendered}" if signed and value >= 0 else rendered
+
+
+def _e15_report_lines(
+    points: Iterable[_E15ResidualPoint],
+    observations: Mapping[str, Observation],
+) -> list[str]:
+    shape_rows = _e15_level_shape_rows(points)
+    precheck_rows = _e15_precheck_rows(observations)
+    if not shape_rows and not precheck_rows:
+        return []
+    lines = [
+        "",
+        "## E15 level, shape, and activity pre-check",
+        "",
+        "Each group uses numeric single-liquid residuals. Flags label rows and",
+        "contested rows are a separate population; the OLS slope is diagnostic only.",
+        "",
+        "| population | source | table | series | T (K) | engine | flags | line | level basis | level (dex) | shape RMS (dex) | OLS slope (dex per unit x) | axis | n |",
+        "|---|---|---|---|---:|---|---|---|---|---:|---:|---:|---|---:|",
+    ]
+    for row in shape_rows:
+        lines.append(
+            f"| {row['population']} | {row['source']} | {row['table']} | "
+            f"{row['series']} | {row['temperature_K']} | {row['engine']} | "
+            f"{', '.join(row['flags']) or '—'} | "
+            f"{row['statistic']} | {row['level_basis'] or '—'} | "
+            f"{_e15_number(row['level_dex'])} | "
+            f"{_e15_number(row['shape_rms_dex'])} | "
+            f"{_e15_number(row['slope_dex_per_x'], places=2, signed=True)} | "
+            f"{row['x_axis']} | {row['n']} |"
+        )
+    if precheck_rows:
+        lines.extend([
+            "",
+            "Activity self-consistency uses log10(a_printed/a_abs); pressures are",
+            "dimensionless p/1 bar and K° comes from the bound OpenIMCC JANAF data.",
+            "",
+            "| source | table | T (K) | activity series | method | reaction | log10 ratio mean ± sd (dex) | axis | n |",
+            "|---|---|---:|---|---|---|---:|---|---:|",
+        ])
+        for row in precheck_rows:
+            result = str(row["result"])
+            if result == "computed":
+                mean = _e15_number(row.get("mean_dex"))
+                sd = _e15_number(row.get("sd_dex"))
+                result = f"{mean} ± {sd}"
+            lines.append(
+                f"| {row['source']} | {row['table']} | {row['temperature_K']} | "
+                f"{row['activity_series']} | {row['method']} | {row['reaction']} | "
+                f"{result} | {row['x_axis']} | {row['n']} |"
+            )
+    return lines
+
+
 def _headline_metric_row(
     rail: str,
     engine: str,
@@ -7333,6 +7897,7 @@ def _render_score_report_from_payloads_legacy(
                 f"{row['band_width_dex'] or '—'} | {row['rms_over_band'] or '—'} | "
                 f"{row['n_no_band']} | {rate_s} |"
             )
+    lines.extend(_e15_report_lines(aggregate.e15_points, context.observations))
     lines.extend(
         [
             "",
@@ -8388,6 +8953,7 @@ class _ScorePayloadAccumulator:
             str, dict[tuple[str, str], dict[str, object]]
         ] = {"measured": {}, "compilation": {}}
         self.all_numeric = _AllNumericHeadline()
+        self.e15_points: list[_E15ResidualPoint] = []
         self.report_engine_names: set[str] = set()
         self.count = 0
         self.scored_count = 0
@@ -8703,28 +9269,30 @@ class _ScorePayloadAccumulator:
                     value=numeric_value,
                 )
             )
-        if measured:
-            if in_measured_headline:
-                self.report_engine_names.add(engine)
-                self._add_headline(
-                    row,
-                    tier="measured",
-                    rail=rail,
-                    engine=engine,
-                    numeric_value=numeric_value,
+        e15_point = _e15_residual_point(row, metadata.observation)
+        if e15_point is not None:
+            self.e15_points.append(e15_point)
+        if in_measured_headline:
+            self.report_engine_names.add(engine)
+            self._add_headline(
+                row,
+                tier="measured",
+                rail=rail,
+                engine=engine,
+                numeric_value=numeric_value,
+            )
+        if measured and row.get("status") == ResidualStatus.REFUSED.value:
+            refusal = row.get("refusal") or {}
+            if isinstance(refusal, Mapping):
+                reason = str(refusal.get("reason") or "refused")
+                detail = (
+                    refusal.get("detail")
+                    if isinstance(refusal.get("detail"), Mapping)
+                    else {}
                 )
-            if row.get("status") == ResidualStatus.REFUSED.value:
-                refusal = row.get("refusal") or {}
-                if isinstance(refusal, Mapping):
-                    reason = str(refusal.get("reason") or "refused")
-                    detail = (
-                        refusal.get("detail")
-                        if isinstance(refusal.get("detail"), Mapping)
-                        else {}
-                    )
-                    token = _short_refusal_token((detail or {}).get("reason"))
-                    key = reason if token is None else f"{reason}:{token}"
-                    self.refusal_counts[key] += 1
+                token = _short_refusal_token((detail or {}).get("reason"))
+                key = reason if token is None else f"{reason}:{token}"
+                self.refusal_counts[key] += 1
         if compilation_observation is not None:
             self.tier_accumulator.add(
                 _tier_cell_from_payload_fields(
@@ -9097,6 +9665,17 @@ def render_score_report_from_payloads(
             f"{row['n_inside_band']} | {rms} | {med} | {med_abs} | {band} | {ratio} | "
             f"{row['n_no_band']} | {rate_s} |"
         )
+    if observations is not None:
+        e15_points = (
+            point
+            for row in rows
+            if (
+                point := _e15_residual_point(
+                    row, observations.get(str(row.get("reference") or ""))
+                )
+            ) is not None
+        )
+        lines.extend(_e15_report_lines(e15_points, observations))
     lines.extend(
         [
             "",

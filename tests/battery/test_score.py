@@ -71,6 +71,7 @@ from simulator.battery.records import (
     Execution,
     Located,
     Notice,
+    Residual,
     ResidualNumeric,
     DecisionBand,
     Species,
@@ -2517,6 +2518,575 @@ def test_source_internal_inconsistency_is_flagged_reported_and_excluded() -> Non
 
     ordinary_disagreement = replace(notice, reason="independent source values differ")
     assert flagged_strata((ordinary_disagreement,)) == ()
+
+
+def test_e15_level_shape_pin_and_constant_offset_mutation() -> None:
+    from dataclasses import replace
+
+    from simulator.battery.score import _E15ResidualPoint, _e15_level_shape_rows
+
+    points = tuple(
+        _E15ResidualPoint(
+            source="stolyarova-1995-cao-alumina-kems",
+            table="2",
+            series="stolyarova_1995_ca_partial_pressure_table2",
+            temperature_K=Decimal("1933"),
+            engine=Engine.OPENIMCC.value,
+            population="liquid",
+            flags=(),
+            x_axis="x(CaO)",
+            x=x,
+            residual_dex=r,
+        )
+        for x, r in zip(
+            (Decimal("0.1"), Decimal("0.2"), Decimal("0.3"), Decimal("0.4")),
+            (Decimal("1"), Decimal("3"), Decimal("3"), Decimal("5")),
+        )
+    )
+    level, shape = _e15_level_shape_rows(points)
+    assert level["level_dex"] == Decimal("3")
+    assert shape["shape_rms_dex"].quantize(Decimal("0.000001")) == Decimal("1.414214")
+    assert shape["slope_dex_per_x"] == Decimal("12")
+    assert shape["x_axis"] == "x(CaO)"
+    # Mutation: adding the same offset changes level while mean-removed shape
+    # remains pinned. A pure offset therefore has zero shape RMS and slope.
+    shifted = tuple(
+        replace(point, residual_dex=point.residual_dex + Decimal("7"))
+        for point in points
+    )
+    shifted_level, shifted_shape = _e15_level_shape_rows(shifted)
+    assert shifted_level["level_dex"] == Decimal("10")
+    assert shifted_shape["shape_rms_dex"] == shape["shape_rms_dex"]
+    assert shifted_shape["slope_dex_per_x"] == shape["slope_dex_per_x"]
+    constant = tuple(replace(point, residual_dex=Decimal("7")) for point in points)
+    _constant_level, constant_shape = _e15_level_shape_rows(constant)
+    assert constant_shape["shape_rms_dex"] == 0
+    assert constant_shape["slope_dex_per_x"] == 0
+
+
+def test_e15_report_rows_cover_three_stolyarova_sources() -> None:
+    from simulator.battery.migrate import to_plain
+    from simulator.battery.score import render_score_report_from_payloads
+
+    context = load_score_context(
+        sources=("stolyarova-1991", "stolyarova-1995", "stolyarova-1996")
+    )
+    selected = (
+        (
+            "kems-053-stolyarova-1991",
+            "stolyarova_1991_ca_partial_pressure_1993k_complete_evaporation",
+            "SiO2",
+        ),
+        (
+            "stolyarova-1995-cao-alumina-kems",
+            "stolyarova_1995_ca_partial_pressure_table2",
+            "CaO",
+        ),
+        (
+            "stolyarova-1996-cao-alumina-silica-kems",
+            "stolyarova_1996_table2_pCa_1933k",
+            "CaO",
+        ),
+    )
+    rows = []
+    for source, series, axis_component in selected:
+        candidates = [
+            observation
+            for observation in context.observations.values()
+            if observation.source_id == source
+            and observation.observation_id.split("::")[1] == series
+            and observation.value.point is not None
+            and axis_component
+            in dict(observation.point_conditions["composition"].state.value.components)
+        ]
+        candidates.sort(
+            key=lambda observation: dict(
+                observation.point_conditions["composition"].state.value.components
+            )[axis_component]
+        )
+        if source == "kems-053-stolyarova-1991":
+            candidates = [
+                observation
+                for observation in candidates
+                if dict(observation.point_conditions["composition"].state.value.components)[
+                    axis_component
+                ] >= Decimal("0.41")
+            ]
+        assert len(candidates) >= 3
+        for index, observation in enumerate(candidates[:3]):
+            rows.append(
+                {
+                    "key": f"e15-test::{Engine.OPENIMCC.value}",
+                    "reference": observation.observation_id,
+                    "candidate_request": {"engine": Engine.OPENIMCC.value},
+                    "rail": Rail.VAPOUR.value,
+                    "status": ResidualStatus.NO_BAND.value,
+                    "score_eligible": False,
+                    "exclusions": [],
+                    "numeric": {
+                        "operation": MetricOperation.DEX.value,
+                        "unit": "dimensionless",
+                        "value": str(index + 1),
+                    },
+                    "notices": to_plain(observation.notices),
+                }
+            )
+
+    contested_row = next(
+        row
+        for row in rows
+        if row["reference"].startswith(
+            "stolyarova-1996-cao-alumina-silica-kems::"
+        )
+    )
+    contested_row["notices"].append(
+        {
+            "kind": NoticeKind.LIQUIDUS_POSITION_CONTESTED.value,
+            "reason": "liquidus_position_contested:test",
+        }
+    )
+    from simulator.battery.score import _ScorePayloadAccumulator, _e15_report_lines
+
+    aggregate = _ScorePayloadAccumulator.from_rows(
+        rows, context=context, engines=(Engine.OPENIMCC,)
+    )
+    contested_points = [
+        point for point in aggregate.e15_points if point.population == "contested"
+    ]
+    assert contested_points
+    assert _e15_report_lines(contested_points, context.observations)
+
+    report = render_score_report_from_payloads(
+        rows,
+        engines=(Engine.OPENIMCC,),
+        hostname="test",
+        observations=context.observations,
+    )
+    assert "## E15 level, shape, and activity pre-check" in report
+    assert "kems-053-stolyarova-1991" in report and "x(SiO2)" in report
+    assert "stolyarova-1995-cao-alumina-kems" in report and "x(CaO)" in report
+    assert "stolyarova-1996-cao-alumina-silica-kems" in report
+    assert "level anchored to the x(SiO2)=0.25 row" in report
+    assert "Table 2 partial pressures only; activities are figure_only" in report
+    assert "level tied to the absolute p(Ca) and p(O) scales" in report
+    assert "0.473 ± 0.031 | x(SiO2) | 9 |" in report
+    assert "CaO(phase unspecified) -> Ca(g) + O(g)" in report
+    assert (
+        "not computed: reference phase not printed; binding has no CaO(cr) K at 1933 K"
+        in report
+    )
+    assert "not computed: no binding K° for CaO(cr) -> Ca(g) + O(g)" in report
+    assert "not computed: no binding K° for Al2O3(cr) -> 2 Al(g) + 3 O(g)" in report
+
+
+@pytest.mark.parametrize(
+    (
+        "source_token",
+        "source",
+        "series",
+        "x_axis",
+        "expected_n",
+        "expected_slope",
+        "expected_population",
+    ),
+    (
+        (
+            "stolyarova-1991",
+            "kems-053-stolyarova-1991",
+            "stolyarova_1991_ca_partial_pressure_1993k_complete_evaporation",
+            "x(SiO2)",
+            6,
+            Decimal("-7.33"),
+            "contested",
+        ),
+        (
+            "stolyarova-1995",
+            "stolyarova-1995-cao-alumina-kems",
+            "stolyarova_1995_ca_partial_pressure_table2",
+            "x(CaO)",
+            8,
+            Decimal("1.04"),
+            "liquid",
+        ),
+    ),
+)
+def test_e15_production_accumulator_pins_stolyarova_pca(
+    source_token: str,
+    source: str,
+    series: str,
+    x_axis: str,
+    expected_n: int,
+    expected_slope: Decimal,
+    expected_population: str,
+) -> None:
+    from simulator.battery import score as score_mod
+    from simulator.battery.score import _ScorePayloadAccumulator
+
+    context = load_score_context(sources=(source_token,))
+    residuals, _ = score_store(context, engines=(Engine.OPENIMCC,))
+    payloads = [residual_to_plain(residual) for residual in residuals]
+    aggregate = _ScorePayloadAccumulator.from_rows(
+        payloads, context=context, engines=(Engine.OPENIMCC,)
+    )
+    _assert_no_model_derived_e15_points(residuals, context)
+    shape = next(
+        row
+        for row in score_mod._e15_level_shape_rows(aggregate.e15_points)
+        if row["source"] == source
+        and row["series"] == series
+        and row["statistic"] == "shape"
+    )
+    assert shape["population"] == expected_population
+    assert shape["x_axis"] == x_axis
+    assert shape["n"] == expected_n
+    assert shape["slope_dex_per_x"].quantize(Decimal("0.01")) == expected_slope
+
+
+def _assert_no_model_derived_e15_points(
+    residuals: tuple[Residual, ...],
+    context: ScoreContext,
+) -> None:
+    from simulator.battery import score as score_mod
+
+    oxygen_candidates_by_source: dict[str, int] = {}
+    model_derived_oxygen_sources = {
+        observation.source_id
+        for observation in context.observations.values()
+        if observation.source_id in score_mod._E15_LEVEL_BASIS
+        and isinstance(observation.identity, Identity)
+        and observation.identity.species.formula in {"O", "O2"}
+        and observation.evidence.class_.is_value
+        and observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+    }
+    for residual in residuals:
+        observation = context.observations.get(residual.reference)
+        if observation is None:
+            continue
+        is_model_derived = (
+            observation.evidence.class_.is_value
+            and observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+        )
+        if (
+            is_model_derived
+            and isinstance(observation.identity, Identity)
+            and observation.identity.species.formula in {"O", "O2"}
+        ):
+            measured_observation = replace(
+                observation,
+                evidence=replace(
+                    observation.evidence,
+                    class_=State.of(EvidenceClass.MEASURED_DIRECT),
+                ),
+            )
+            oxygen_candidates_by_source[observation.source_id] = (
+                oxygen_candidates_by_source.get(observation.source_id, 0)
+                + int(
+                    score_mod._e15_residual_point(
+                        residual, measured_observation
+                    )
+                    is not None
+                )
+            )
+        point = score_mod._e15_residual_point(residual, observation)
+        if point is not None:
+            assert not is_model_derived
+    assert model_derived_oxygen_sources
+    assert all(
+        oxygen_candidates_by_source.get(source_id, 0) >= 1
+        for source_id in model_derived_oxygen_sources
+    )
+
+
+def test_e15_production_accumulator_uses_exact_residual_predicate() -> None:
+    from simulator.battery import score as score_mod
+    from simulator.battery.enums import MEASURED_EVIDENCE
+    from simulator.battery.score import _ScorePayloadAccumulator
+
+    context = load_score_context(
+        sources=("stolyarova-1991", "stolyarova-1995", "stolyarova-1996")
+    )
+
+    def payload(
+        observation,
+        *,
+        status: ResidualStatus = ResidualStatus.NO_BAND,
+        numeric: bool = True,
+        notice: NoticeKind | None = None,
+    ) -> dict[str, object]:
+        reference = observation.observation_id
+        notices = []
+        if notice is not None:
+            notices.append(
+                {
+                    "kind": notice.value,
+                    "reason": f"{notice.value}:test",
+                }
+            )
+        return {
+            "key": f"e15-predicate-test::{Engine.OPENIMCC.value}",
+            "reference": reference,
+            "candidate_request": {"engine": Engine.OPENIMCC.value},
+            "rail": Rail.VAPOUR.value,
+            "status": status.value,
+            "score_eligible": False,
+            "exclusions": [],
+            "numeric": (
+                {
+                    "operation": MetricOperation.DEX.value,
+                    "unit": "dimensionless",
+                    "value": "1",
+                }
+                if numeric
+                else None
+            ),
+            "notices": notices,
+        }
+
+    model_derived_oxygen = [
+        observation
+        for observation in context.observations.values()
+        if observation.source_id in score_mod._E15_LEVEL_BASIS
+        and observation.identity.species.formula == "O"
+        and observation.evidence.class_.is_value
+        and observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+    ]
+    model_derived_e15 = []
+    for observation in model_derived_oxygen:
+        measured_observation = replace(
+            observation,
+            evidence=replace(
+                observation.evidence,
+                class_=State.of(EvidenceClass.MEASURED_DIRECT),
+            ),
+        )
+        if (
+            score_mod._e15_residual_point(
+                payload(measured_observation), measured_observation
+            )
+            is not None
+        ):
+            model_derived_e15.append(observation)
+    assert model_derived_e15
+
+    measured_reference = next(
+        observation
+        for observation in context.observations.values()
+        if observation.source_id in score_mod._E15_LEVEL_BASIS
+        and observation.evidence.class_.is_value
+        and observation.evidence.class_.value in MEASURED_EVIDENCE
+        and score_mod._e15_residual_point(payload(observation), observation)
+        is not None
+    )
+    two_phase_reference = replace(
+        measured_reference,
+        observation_id=f"{measured_reference.observation_id}::two-phase-fixture",
+        notices=(*measured_reference.notices, _two_phase_notice()),
+    )
+    outside_single_liquid_reference = replace(
+        measured_reference,
+        observation_id=f"{measured_reference.observation_id}::outside-single-liquid-fixture",
+        notices=(
+            *measured_reference.notices,
+            Notice(
+                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                affected_quantities=(Quantity.P_PARTIAL,),
+                origin="test_score",
+                reason="outside_single_liquid_field:e15-predicate-fixture",
+            ),
+        ),
+    )
+    context = replace(
+        context,
+        observations={
+            **context.observations,
+            two_phase_reference.observation_id: two_phase_reference,
+            outside_single_liquid_reference.observation_id: (
+                outside_single_liquid_reference
+            ),
+        },
+    )
+    rows = [payload(observation) for observation in model_derived_e15]
+    rows.extend(
+        (
+            payload(measured_reference, status=ResidualStatus.REFUSED),
+            payload(measured_reference, numeric=False),
+            payload(two_phase_reference),
+            payload(outside_single_liquid_reference),
+            payload(
+                measured_reference,
+                notice=NoticeKind.CELL_MATERIAL_INFERRED,
+            ),
+            payload(
+                measured_reference,
+                notice=NoticeKind.LIQUIDUS_POSITION_CONTESTED,
+            ),
+        )
+    )
+    aggregate = _ScorePayloadAccumulator.from_rows(
+        rows, context=context, engines=(Engine.OPENIMCC,)
+    )
+
+    assert len(aggregate.e15_points) == 2
+    for phase_reference in (
+        two_phase_reference,
+        outside_single_liquid_reference,
+    ):
+        phase_aggregate = _ScorePayloadAccumulator.from_rows(
+            (payload(phase_reference),),
+            context=context,
+            engines=(Engine.OPENIMCC,),
+        )
+        assert phase_aggregate.e15_points == []
+    flagged_liquid = next(
+        point for point in aggregate.e15_points if point.population == "liquid"
+    )
+    contested = next(
+        point for point in aggregate.e15_points if point.population == "contested"
+    )
+    assert (
+        score_mod.FLAGGED_STRATUM_CELL_MATERIAL_INFERRED in flagged_liquid.flags
+    )
+    assert (
+        score_mod.FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED in contested.flags
+    )
+
+
+def test_measured_no_rail_refusal_stays_in_accumulator_and_legacy_report() -> None:
+    from simulator.battery import score as score_mod
+    from simulator.battery.score import _ScorePayloadAccumulator
+    from tests.battery import test_compilation_tier as fixture
+
+    identity = fixture._na2o_liquid(Quantity.VISCOSITY)
+    experiment = fixture.F.tabulation_experiment()
+    observation = fixture.F.observation(
+        "viscosity-no-rail",
+        experiment.experiment_id,
+        identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="ror-measured-viscosity-source",
+    )
+    context = fixture._context(observation)
+    residual, _ = compile_residual(
+        observation, Engine.OPENIMCC, context=context
+    )
+    payload = score_mod.residual_to_plain(residual)
+    aggregate = _ScorePayloadAccumulator.from_rows(
+        (payload,), context=context, engines=(Engine.OPENIMCC,)
+    )
+
+    assert residual.rail is None
+    assert aggregate.refusal_counts == {"unsupported:no_headline_rail:viscosity": 1}
+    report = score_mod._render_score_report_from_payloads_legacy(
+        (payload,), context=context, engines=(Engine.OPENIMCC,)
+    )
+    refusal_census = report.split("## Refusal census", 1)[1].split(
+        "## Admission", 1
+    )[0]
+    assert "`unsupported:no_headline_rail:viscosity` | 1" in refusal_census
+
+
+def test_e15_stolyarova_1996_real_axis_slope_and_report_path() -> None:
+    from simulator.battery import score as score_mod
+
+    context = load_score_context(
+        sources=("stolyarova-1996-cao-alumina-silica-kems",)
+    )
+    residuals, _ = score_store(context, engines=(Engine.OPENIMCC,))
+    selected = [
+        (residual, point)
+        for residual in residuals
+        if (
+            point := score_mod._e15_residual_point(
+                residual, context.observations.get(residual.reference)
+            )
+        ) is not None
+        and point.series == "stolyarova_1996_table2_pCa_1933k"
+    ]
+    assert len(selected) == 22
+    e15_residual = selected[0][0]
+    e15_observation = context.observations[e15_residual.reference]
+    assert (
+        score_mod._e15_residual_point(
+            replace(e15_residual, status=ResidualStatus.REFUSED), e15_observation
+        )
+        is None
+    )
+    assert (
+        score_mod._e15_residual_point(
+            replace(e15_residual, numeric=None), e15_observation
+        )
+        is None
+    )
+    points = tuple(point for _residual, point in selected)
+    shape = score_mod._e15_level_shape_rows(points)[1]
+    assert shape["x_axis"] == "x(CaO)"
+    assert shape["slope_dex_per_x"].quantize(Decimal("0.01")) == Decimal("6.38")
+
+    from simulator.battery.score import (
+        _ScorePayloadAccumulator,
+        residual_to_plain,
+    )
+
+    payloads = [residual_to_plain(residual) for residual in residuals]
+    aggregate = _ScorePayloadAccumulator.from_rows(
+        payloads, context=context, engines=(Engine.OPENIMCC,)
+    )
+    _assert_no_model_derived_e15_points(residuals, context)
+    production_shape = next(
+        row
+        for row in score_mod._e15_level_shape_rows(aggregate.e15_points)
+        if row["source"] == "stolyarova-1996-cao-alumina-silica-kems"
+        and row["series"] == "stolyarova_1996_table2_pCa_1933k"
+        and row["statistic"] == "shape"
+    )
+    assert production_shape["n"] == 22
+    assert production_shape["population"] == "liquid"
+    assert production_shape["x_axis"] == "x(CaO)"
+    assert production_shape["slope_dex_per_x"].quantize(
+        Decimal("0.01")
+    ) == Decimal("6.38")
+    assert (
+        score_mod.FLAGGED_STRATUM_CELL_MATERIAL_INFERRED
+        in production_shape["flags"]
+    )
+
+    si_axis_points = tuple(
+        replace(
+            point,
+            x_axis="x(SiO2)",
+            x=dict(
+                context.observations[residual.reference]
+                .point_conditions["composition"].state.value.components
+            )["SiO2"],
+        )
+        for residual, point in selected
+    )
+    wrong_axis_shape = score_mod._e15_level_shape_rows(si_axis_points)[1]
+    assert wrong_axis_shape["slope_dex_per_x"].quantize(
+        Decimal("0.01")
+    ) == Decimal("-4.94")
+
+    contested_payload = next(
+        payload
+        for payload in payloads
+        if payload["reference"] == selected[0][0].reference
+    )
+    contested_payload = dict(contested_payload)
+    contested_payload["notices"] = [
+        *contested_payload["notices"],
+        {
+            "kind": NoticeKind.LIQUIDUS_POSITION_CONTESTED.value,
+            "reason": "liquidus_position_contested:test",
+        },
+    ]
+    report = score_mod._render_score_report_from_payloads_legacy(
+        (*payloads, contested_payload),
+        context=context,
+        engines=(Engine.OPENIMCC,),
+    )
+    assert "## E15 level, shape, and activity pre-check" in report
+    assert "| contested | stolyarova-1996-cao-alumina-silica-kems |" in report
 
 
 def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
