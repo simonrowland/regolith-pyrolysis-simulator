@@ -12964,7 +12964,7 @@ class Migrator:
             )
             before = self._count(source_key).observations_out
             for index, item in enumerate(yield_items):
-                if not isinstance(item, Mapping) or _item_mass_loss_field(item) is None:
+                if not isinstance(item, Mapping):
                     continue
                 point_locator = locator
                 if item.get("locator"):
@@ -12974,6 +12974,20 @@ class Migrator:
                         )
                         or locator
                     )
+                if _item_mass_loss_field(item) is None:
+                    self.result.add_queue(
+                        work.work_id,
+                        point_locator,
+                        ["value"],
+                        str(
+                            item.get("omitted_reason")
+                            or item.get("reason")
+                            or "yield point has no numeric mass-loss value"
+                        ),
+                        source=source_key,
+                        observation_id=f"{obs_id}::point:{index}",
+                    )
+                    continue
                 t_sel = select_declared_source(AXIS_TEMPERATURE_K, None, item)
                 point_admission = _yield_point_admission(
                     item=item,
@@ -13123,6 +13137,9 @@ class Migrator:
                 point_items = values.get("points")
                 if isinstance(point_items, list) and point_items:
                     row_point_containers.append(("points", point_items))
+                test_items = values.get("tests")
+                if isinstance(test_items, list) and test_items:
+                    row_point_containers.append(("tests", test_items))
         if (
             exploded
             and isinstance(values.get("series"), list)
@@ -13165,12 +13182,98 @@ class Migrator:
                 source=source_key,
                 observation_id=obs_id,
             )
-        elif row_point_containers and not _parent_bound_categorical(value_sel):
+        elif row_point_containers and (
+            not _parent_bound_categorical(value_sel)
+            or any(name in {"points", "tests"} for name, _items in row_point_containers)
+        ):
             # Same _emit_exploded_point path as series. Yield tables already
             # returned. Explicit row point_conditions overwrite inferred ones.
             before = self._count(source_key).observations_out
+            point_identity_kwargs = dict(ident_kwargs)
+            point_parent_conditions = point_conditions
+            rowless_values = _values_without_row_lists(values)
+            rowless_initial_map = _initial_oxide_map_from_values(rowless_values)
+            has_non_yield_points = any(
+                name in {"points", "tests"} for name, _items in row_point_containers
+            )
+            if has_non_yield_points and initial_oxide_map != rowless_initial_map:
+                # A nested row may be identified as the initial charge for
+                # its own point. It does not become the parent identity or a
+                # default condition on every sibling point.
+                if rowless_initial_map:
+                    point_identity_kwargs["composition"] = State.of(
+                        wt_pct_to_mole_fraction(rowless_initial_map)
+                    )
+                else:
+                    point_identity_kwargs.pop("composition", None)
+                if point_parent_conditions:
+                    point_parent_conditions = {
+                        key: condition
+                        for key, condition in point_parent_conditions.items()
+                        if key != "composition"
+                    }
+                if rowless_initial_map:
+                    _printed, parent_composition = _located_printed_and_initial(
+                        rowless_initial_map, locator
+                    )
+                    if parent_composition is not None:
+                        point_parent_conditions = {
+                            **(point_parent_conditions or {}),
+                            "composition": parent_composition,
+                        }
             for container_name, container in row_point_containers:
                 for index, raw in enumerate(container):
+                    non_yield_points = container_name in {"points", "tests"}
+                    if _parent_bound_categorical(value_sel) and not non_yield_points:
+                        continue
+                    if non_yield_points and isinstance(raw, Mapping):
+                        point_value = select_declared_source(
+                            q_token, str(obs.get("units") or ""), raw
+                        )
+                        condition_fields = {
+                            "T",
+                            "T_K",
+                            "T_C",
+                            "Tmax_C",
+                            "temperature_K",
+                            "temperature_C",
+                            "locator",
+                            "composition_basis",
+                        }
+                        has_numeric_value = point_value.available or any(
+                            key not in condition_fields
+                            and not str(key).endswith("_as_printed")
+                            and not (
+                                str(key).startswith("N_")
+                                and raw.get("composition_basis") == "mole_fraction"
+                            )
+                            and _numeric_field(raw, str(key)) is not None
+                            for key in raw
+                        )
+                        if not has_numeric_value:
+                            point_locator = (
+                                locator_from_mapping(
+                                    raw.get("locator"),
+                                    fallback=f"{obs_id}:point:{index}",
+                                )
+                                or locator
+                            )
+                            self.result.add_queue(
+                                work.work_id,
+                                point_locator,
+                                ["value"],
+                                str(
+                                    raw.get("omitted_reason")
+                                    or raw.get("reason")
+                                    or point_value.reason
+                                    or "point has no numeric value; no observation emitted"
+                                ),
+                                source=source_key,
+                                observation_id=(
+                                    f"{obs_id}::point:{container_name}:{index}"
+                                ),
+                            )
+                            continue
                     self._emit_exploded_point(
                         parent_id=obs_id,
                         item={
@@ -13184,7 +13287,11 @@ class Migrator:
                         source_key=source_key,
                         experiment_id=experiment_id,
                         locator=locator,
-                        identity_base=(quantity, species, ident_kwargs),
+                        identity_base=(
+                            quantity,
+                            species,
+                            point_identity_kwargs if non_yield_points else ident_kwargs,
+                        ),
                         evidence=evidence,
                         admission=admission,
                         uncertainty=uncertainty_for(obs.get("uncertainty")),
@@ -13194,9 +13301,15 @@ class Migrator:
                         source_derivation=source_derivation,
                         equipment=obs.get("equipment"),
                         parent_reason=hold_reason,
-                        parent_values=values,
+                        parent_values=(
+                            _values_without_row_lists(values)
+                            if non_yield_points
+                            else values
+                        ),
                         provenance=observation_provenance,
-                        parent_point_conditions=point_conditions,
+                        parent_point_conditions=(
+                            point_parent_conditions if non_yield_points else point_conditions
+                        ),
                         content_stable_id=True,
                     )
             if self._count(source_key).observations_out > before:

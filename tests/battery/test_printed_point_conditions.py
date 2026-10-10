@@ -91,19 +91,33 @@ def test_printed_point_temperature_routes(
         assert getattr(locator, locator_key) == locator_value
 
 
-def test_jacobson_table1_bound_parent_keeps_printed_temperature(tmp_path: Path) -> None:
+def test_jacobson_table1_points_keep_printed_temperature_and_typed_reason(
+    tmp_path: Path,
+) -> None:
     result = _migrate_real_extract(tmp_path, "kems-139-jacobson-2024")
-    obs = result.observations[
-        "kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat"
+    parent_id = (
+        "kems-139-jacobson-2024::"
+        "jacobson_2024_t1_factsage_2500k_predicted_psat"
+    )
+    assert parent_id not in result.observations
+    points = [
+        obs for oid, obs in result.observations.items()
+        if oid.startswith(parent_id + "::")
     ]
-    assert obs.value.kind is ValueKind.CATEGORICAL
-    assert obs.value.categorical == "bound_not_point_ordering"
-    temperature = (obs.point_conditions or {}).get("temperature_K")
-    assert temperature is not None
-    assert temperature.state.is_value
-    assert temperature.state.value == Decimal("2500.0")
-    assert temperature.locator is not None
-    assert temperature.locator.table == "1"
+    assert len(points) == 21
+    for obs in points:
+        assert obs.identity.quantity.is_unknown
+        assert obs.value.kind is ValueKind.UNAVAILABLE
+        temperature = (obs.point_conditions or {}).get("temperature_K")
+        assert temperature is not None and temperature.state.is_value
+        assert temperature.state.value == Decimal("2500.0")
+        assert temperature.locator is not None
+        assert temperature.locator.table == "1"
+    assert any(
+        entry.observation_id in {obs.observation_id for obs in points}
+        and "unsupported quantity 'predicted_partial_pressure'" in entry.why
+        for entry in result.queue
+    )
 
 
 def test_kato_table1_routes_every_printed_1873k_row(tmp_path: Path) -> None:
