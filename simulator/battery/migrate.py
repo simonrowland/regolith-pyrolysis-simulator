@@ -5574,13 +5574,24 @@ def source_derivation_from_source(
         raw = payload.get("derivation")
         if not isinstance(raw, Mapping):
             continue
+        field = "values.derivation" if payload is values else "derivation"
+        relation = raw.get("relation")
+        relation_missing = not isinstance(relation, str) or not relation.strip()
         try:
             parsed = _derivation_from_plain(raw)
         except ValueError as exc:
             if not str(exc).startswith("Derivation.inputs"):
                 raise
-            field = "values.derivation" if payload is values else "derivation"
             invalid.append((field, str(exc)))
+            if relation_missing:
+                invalid.append(
+                    (field, "derivation relation (author method) is required")
+                )
+            continue
+        if relation_missing:
+            invalid.append(
+                (field, "derivation relation (author method) is required")
+            )
             continue
         if derivation is None:
             derivation = parsed
