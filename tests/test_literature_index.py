@@ -57,6 +57,19 @@ def test_regenerated_index_matches_committed(tmp_path: Path) -> None:
     assert regenerated == committed
 
 
+def test_index_extract_row_counts_match_source_extracts() -> None:
+    """Every indexed row count must agree with its owning extract file."""
+    index = yaml.safe_load(COMMITTED_YAML.read_text())
+    for source in index["sources"]:
+        for extract in source.get("extracts") or []:
+            doc = yaml.safe_load((REPO_ROOT / extract["path"]).read_text())
+            rows = sum(
+                len(body.get("observations") or [])
+                for body in (doc.get("species") or {}).values()
+            )
+            assert extract["rows"] == rows, extract["path"]
+
+
 def test_builder_temp_corpus_row_truth(tmp_path: Path) -> None:
     """Two fake PDFs + one extract + one preset: exact rows without the corpus."""
     root = tmp_path / "corpus"

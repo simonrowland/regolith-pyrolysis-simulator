@@ -1,0 +1,528 @@
+schema_version: literature_extract.v1
+source_id: fujisawa-1990-cao-al2o3-activities
+source:
+  citation: 'T. Fujisawa, C. Yamauchi, and H. Sakao, "Equilibrium between Molten Iron Alloys and CaO-Al2O3-CaS Slags Saturated with CaS," Tetsu-to-Hagane, 76(3) (1990), 368-375.'
+  doi: 10.2355/tetsutohagane1955.76.3_368
+  url: 'https://www.jstage.jst.go.jp/article/tetsutohagane1955/76/3/76_3_368/_pdf'
+  year: 1990
+extraction:
+  method: 'Manual transcription with 220 dpi page-image verification; Japanese method text read in the original.'
+  date: '2026-10-04'
+  worker: extract-fujisawa1990
+  provenance_path: tables/fujisawa-1990-cao-al2o3-activities/
+review_status: draft
+fidelity_samples:
+  - species: CaO
+    observable: figure_only
+    observation_id: fujisawa_1990_fig7_cao_binary_comparison
+    field: axes
+    value:
+      x: {label: 'N_CaO/(N_CaO+N_Al2O3)', scale: linear, range: [0.5, 0.8]}
+      y: {label: a_CaO, scale: logarithmic, range: [0.001, 1]}
+    locator: {page: 6, published_page: 373, figure: '7'}
+  - species: Al2O3
+    observable: figure_only
+    observation_id: fujisawa_1990_fig6_caosat_activity_curves_alumina
+    field: axes
+    value:
+      x: {label: 'N_Al2O3/(N_CaO+N_Al2O3)', scale: linear, range: [0, 1]}
+      y: {label: activity, scale: logarithmic, range: [0.01, 1]}
+    locator: {page: 6, published_page: 373, figure: '6'}
+  - species: Al2O3
+    observable: figure_only
+    observation_id: fujisawa_1990_fig8_alumina_binary_comparison
+    field: axes
+    value:
+      x: {label: 'N_Al2O3/(N_CaO+N_Al2O3)', scale: linear, range: [0.2, 0.5]}
+      y: {label: a_Al2O3, scale: logarithmic, range: [0.001, 1]}
+    locator: {page: 6, published_page: 373, figure: '8'}
+benches:
+  - id: fujisawa-1873k-cas-crucible-furnace
+    identity: {basis: described_in_this_work}
+    apparatus_family:
+      state: {tag: value, value: 'LaCrO3 electric furnace with suspended CaS crucible inside an alumina protective crucible'}
+      locator: {page: 3, published_page: 370, figure: '1', section: '3.4 Experimental procedure'}
+    heating_method:
+      state: {tag: value, value: 'Electric furnace with LaCrO3 heater; PID automatic temperature control'}
+      locator: {page: 2, published_page: 369, section: '3.4 Experimental procedure', figure: '1'}
+    cell_material_and_liner:
+      state: {tag: value, value: 'Self-made CaS crucible; alumina protective crucible, alumina tube, and alumina-insulated suspension wire'}
+      locator: {page: 3, published_page: 370, figure: '1', note: 'CaS crucible is identified in the apparatus figure and text; surrounding liner components are alumina.'}
+    temperature_measurement:
+      sample_sensor:
+        state: {tag: value, value: 'Type B thermocouple'}
+        locator: {page: 3, published_page: 370, figure: '1'}
+      control_sensor:
+        state: {tag: value, value: 'Thermocouple for control; type not stated'}
+        locator: {page: 3, published_page: 370, figure: '1'}
+    temperature_calibration:
+      calibration:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, published_page: 369, section: '3.4 Experimental procedure', note: 'A temperature calibration procedure is not stated.'}
+      uncertainty:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, published_page: 369, section: '3.4 Experimental procedure', note: 'The paper states the furnace setpoint control band 1873 ± 1 K, but does not state a calibration or measurement uncertainty.'}
+    other_facts:
+      - name: temperature_control_tolerance
+        unit: K
+        value:
+          state: {tag: value, value: {kind: point, point: '1'}}
+          locator: {page: 2, published_page: 369, section: '3.4 Experimental procedure', note: 'PID control stated as 1873 ± 1 K; value is the stated ±1 K magnitude, not a calibration uncertainty.'}
+      - name: purified_argon_flow
+        unit: Nl/h
+        value:
+          state: {tag: value, value: {kind: point, point: '50'}}
+          locator: {page: 2, published_page: 369, section: '3.4 Experimental procedure', note: 'Printed as approximately 1.39 × 10^-5 Nm3/s (50 Nl/h).'}
+experiments:
+  - experiment_id: fujisawa-cas-slag-metal-equilibrium-1873k
+    bench_id: fujisawa-1873k-cas-crucible-furnace
+    method: quench_equilibration
+    locator: {page: 2, published_page: 369, section: '2. Measurement principle; 3.4 Experimental procedure'}
+    sample:
+      mass_kg:
+        state: {tag: unknown, reason: would_invent}
+        locator: {page: 2, published_page: 369, section: '3.4 Experimental procedure', note: 'Metal and slag charge masses are separately stated and vary with whether the slag melts; no single sample mass applies.'}
+      printed_composition:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 3, published_page: 370, figure: '2-3', note: 'No row-wise starting or final alloy/slag composition table is printed; only plotted relationships and composition-ratio labels are shown.'}
+      characterization:
+        state: {tag: value, value: 'Fe-Al-S alloy and prepared CaO-Al2O3(-CaS) slag reacted in a self-made CaS crucible; approximately 15 g alloy and approximately 7 g molten slag or 3 g non-melting slag were charged.'}
+        locator: {page: 2, published_page: 369, section: '3.4 Experimental procedure'}
+    conditions:
+      temperature_K:
+        state: {tag: value, value: 1873}
+        locator: {page: 2, published_page: 369, section: '3.4 Experimental procedure'}
+    fO2_control:
+      channel: intrinsic
+      oxygen_partial_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, published_page: 369, section: '3.4 Experimental procedure', note: 'No numeric oxygen partial pressure is given.'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, published_page: 369, section: '3.4 Experimental procedure', note: 'Furnace pressure is not stated.'}
+      sweep_gas:
+        state: {tag: value, value: {species: Ar, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
+        locator: {page: 2, published_page: 369, section: '3.4 Experimental procedure', note: 'Purified Ar is printed as 50 Nl/h; no sccm conversion or partial pressure is reported.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: 'Isothermal equilibration in purified Ar; hold depended on whether the slag composition was molten at 1873 K.'}
+        locator: {page: 2, published_page: 369, section: '3.4 Experimental procedure'}
+      total_duration_s:
+        state: {tag: unknown, reason: would_invent}
+        locator: {page: 2, published_page: 369, section: '3.4 Experimental procedure', note: '18 ks applies to molten slag compositions; non-melting compositions were held up to 28.8 ks, so no one duration applies to the experiment registry.'}
+      cooling_or_quench:
+        state: {tag: value, value: 'Crucible removed quickly and placed in a water-filled copper quenching device while a He gas jet was blown over it.'}
+        locator: {page: 2, published_page: 369, section: '3.4 Experimental procedure'}
+species:
+  CaO:
+    observations: []
+    context:
+      - observation_id: fujisawa_1990_fig7_cao_binary_comparison
+        type: figure_only
+        locator: {page: 6, published_page: 373, figure: '7'}
+        units: dimensionless activity and mole-fraction ratio
+        values:
+          method_class: figure_only
+          quantity: a_CaO in the CaO-Al2O3 binary system compared across studies
+          temperature_K_present_work: 1873
+          axes:
+            x: {label: 'N_CaO/(N_CaO+N_Al2O3)', scale: linear, range: [0.5, 0.8]}
+            y: {label: a_CaO, scale: logarithmic, range: [0.001, 1]}
+          comparison_series: ['Present work (1873 K)', 'Sharma & Richardson (1773 K)', 'Kor & Richardson (1773 K)', 'Edmunds & Taylor (1773 K)', 'Cameron et al. (1823 K)', 'Allibert et al. (2060 K)', 'Rein & Chipman (1873 K)']
+          numeric_activity_values_printed_in_text: false
+          curve_digitized: false
+      - observation_id: fujisawa_1990_fig2_equilibrium_approach
+        type: figure_only
+        experiment: fujisawa-cas-slag-metal-equilibrium-1873k
+        locator: {page: 3, published_page: 370, figure: '2', section: '4.1 Activity of Al and S in molten iron'}
+        units: dimensionless axes and as-printed ratios
+        values:
+          method_class: figure_only
+          quantity: equilibrium approach plot
+          axes:
+            x: {label: log h_Al, range: [-3, 1]}
+            y: {label: 'log(h_Al^2 h_S^3)', range: [-15, 0]}
+          plotted_series: 'Initial alloy compositions were set at high and low log(h_Al^2 h_S^3); after-reaction points for identical slag compositions converge.'
+          printed_CaO_Al2O3_composition_ratios: ['0.1/0.9', '0.3/0.7', '0.45/0.55', '0.55/0.45', '0.6/0.4', '0.65/0.35', '0.7/0.3']
+          numeric_points_digitized: false
+          note: 'The plotted coordinates are not tabulated and were not digitized.'
+      - observation_id: fujisawa_1990_fig3_al_s_equilibrium_relation
+        type: figure_only
+        experiment: fujisawa-cas-slag-metal-equilibrium-1873k
+        locator: {page: 4, published_page: 371, figure: '3', section: '4.1 Activity of Al and S in molten iron'}
+        units: dimensionless axes
+        values:
+          method_class: figure_only
+          quantity: relationship between sulfur and aluminum activities in molten iron
+          axes:
+            x: {label: log h_Al, range: [-3, 1]}
+            y: {label: log h_S, range: [-4, 0]}
+          printed_relation: 'log h_S has slope -2/3 against log h_Al for each slag composition.'
+          prior_series: 'Ozturk and Turkdogan CaS/CaO·Al2O3 (CA)-saturated and CaS/CaO-saturated melts are also plotted.'
+          numeric_points_digitized: false
+      - observation_id: fujisawa_1990_interaction_e_al_al
+        type: method
+        locator: {page: 3, published_page: 370, equation: '6', section: '4.1 Activity of Al and S in molten iron'}
+        units: as printed
+        values:
+          method_class: quoted_attributed
+          attribution: 'L. E. Rohde, A. Choudhury, and M. Wahlster, Arch. Eisenhüttenwes., 42 (1971), 165 (reference 3).'
+          parameter: e_Al^Al
+          expression: '80.5/T - 0.043'
+          temperature_K: 1873
+      - observation_id: fujisawa_1990_interaction_e_al_s
+        type: method
+        locator: {page: 3, published_page: 370, equation: '7', section: '4.1 Activity of Al and S in molten iron'}
+        units: as printed
+        values:
+          method_class: quoted_attributed
+          attribution: 'F. Ishii and Y. Fuwa, Tetsu-to-Hagane, 67 (1981), 746 (reference 4).'
+          parameter: e_Al^S
+          value: 0.035
+          temperature_K: 1823
+      - observation_id: fujisawa_1990_interaction_e_s_s
+        type: method
+        locator: {page: 3, published_page: 370, equation: '8', section: '4.1 Activity of Al and S in molten iron'}
+        units: as printed
+        values:
+          method_class: quoted_attributed
+          attribution: 'F. Ishii and Y. Fuwa, Tetsu-to-Hagane, 67 (1981), 736 (reference 5).'
+          parameter: e_S^S
+          expression: '-120/T + 0.018'
+          value_at_1873_K: -0.046
+          temperature_K: 1873
+      - observation_id: fujisawa_1990_interaction_e_s_al
+        type: method
+        locator: {page: 3, published_page: 370, equation: '9', section: '4.1 Activity of Al and S in molten iron'}
+        units: as printed
+        values:
+          method_class: quoted_attributed
+          attribution: 'F. Ishii and Y. Fuwa, Tetsu-to-Hagane, 67 (1981), 746 (reference 4).'
+          parameter: e_S^Al
+          value: 0.041
+          temperature_K: 1873
+      - observation_id: fujisawa_1990_method_quote_japanese
+        type: method
+        experiment: fujisawa-cas-slag-metal-equilibrium-1873k
+        locator: {page: 2, published_page: 369, section: '2. Measurement principle'}
+        units: as printed
+        values:
+          method_quote_ja: '本研究においては、自作したCaSるつぼ中において、Fe-Al-S合金とCaO-Al2O3-CaS系スラグを反応させて平衡させる。'
+          translation_en: 'My translation: In this study, an Fe-Al-S alloy and a CaO-Al2O3-CaS slag are reacted and equilibrated in a self-made CaS crucible.'
+          equilibrium_temperature_K: 1873
+          equilibrium_reaction: '3CaO(s) + 2Al + 3S = 3CaS(s) + Al2O3(s)'
+      - observation_id: fujisawa_1990_equilibrium_demonstration
+        type: experiment_series
+        experiment: fujisawa-cas-slag-metal-equilibrium-1873k
+        locator: {page: 3, published_page: 370, figure: '2', section: '4.1 Activity of Al and S in molten iron'}
+        units: as printed
+        values:
+          approach: 'Initial alloy compositions were selected at high and low log(h_Al^2 h_S^3); for an identical slag composition, both approaches gave nearly the same final log(h_Al^2 h_S^3).'
+          alloy_charge_mass_approx_g: 15
+          molten_slag_charge_mass_approx_g: 7
+          non_melting_slag_charge_mass_approx_g: 3
+          temperature_control_target_K: 1873
+          temperature_control_tolerance_K: 1
+          purified_Ar_flow_Nl_h: 50
+          purified_Ar_flow_Nm3_s: 0.0000139
+          quench: 'Water-filled copper device with He gas jet.'
+          holding_time_molten_slag_ks: 18
+          printed_equivalent_molten_slag_h: 5
+          holding_time_non_melting_slag_max_ks: 28.8
+          printed_equivalent_non_melting_slag_max_h: 8
+          figure_coordinates_digitized: false
+          equilibrium_demonstration_quote_ja: '本研究では、合金の初期組成をlog(h_Al^2 h_S^3)の大きな値と小さな値に設定して、同図の上下両方向から反応を行わせたところ、実験後のlog(h_Al^2 h_S^3)の値として、同一組成のスラグについてはほぼ同じ値が得られた。'
+          equilibrium_claim_translation_en: 'My translation: We set the initial alloy composition to high and low log(h_Al^2 h_S^3) values and reacted from both directions; for the same slag composition, nearly the same final log(h_Al^2 h_S^3) value was obtained.'
+          duration_conversion_note: 'Source prints 18 ks (5 h) and up to 28.8 ks (8 h); SI seconds are not substituted here.'
+      - observation_id: fujisawa_1990_slag_preparation
+        type: method
+        experiment: fujisawa-cas-slag-metal-equilibrium-1873k
+        locator: {page: 2, published_page: 369, section: '3.1 Preparation of CaO-Al2O3-CaS slags'}
+        units: as printed
+        values:
+          base_reagents: 'Reagent-grade CaCO3 and Al2O3 powder (at least 99.6 mass% Al2O3).'
+          CaCO3_drying_temperature_K: 383
+          CaCO3_drying_temperature_qualifier: about
+          first_calcination_temperature_K: 1573
+          first_calcination_duration_ks: 172.8
+          first_calcination_duration_h: 48
+          first_calcination_atmosphere: purified Ar
+          molten_composition_CaS_addition: 'CaS powder, 99 mass%, -325 mesh; amount slightly greater than predicted solubility.'
+          non_melting_composition_second_calcination_temperature_K: 1773
+          non_melting_composition_second_calcination_duration_ks: 86.4
+          non_melting_composition_second_calcination_duration_h: 24
+          non_melting_composition_added_CaS: false
+          pre_reaction_phase_confirmation: X-ray diffraction
+          result_table: {state: unknown, reason: not_published}
+      - observation_id: fujisawa_1990_metal_alloy_preparation
+        type: method
+        experiment: fujisawa-cas-slag-metal-equilibrium-1873k
+        locator: {page: 2, published_page: 369, section: '3.2 Preparation of Fe-Al-S alloy'}
+        units: as printed
+        values:
+          starting_iron: electrolytic iron
+          melting_method: high-frequency induction in an alumina crucible under purified Ar
+          metal_preparation_temperature_K: 1873
+          deoxidation_gas: 'Ar-H2 mixture, 1:1'
+          deoxidation_duration_ks: 3.6
+          deoxidation_duration_h: 1
+          FeS_purity_mass_percent_min: 99.9
+          FeS_particle_size: '-100 mesh'
+          iron_sheet_for_FeS_capsule_purity_mass_percent: 99.5
+          aluminum_master_alloy: 'Fe-50 mass% Al, sealed in a capsule'
+          sample_tube_inner_diameter_mm: 4
+          post_sampling_treatment: 'Sample aspirated into a quartz tube and water quenched; surface polished and washed.'
+      - observation_id: fujisawa_1990_cas_crucible_preparation
+        type: apparatus
+        experiment: fujisawa-cas-slag-metal-equilibrium-1873k
+        locator: {page: 2, published_page: 369, section: '3.3 Preparation of CaS crucible'}
+        units: as printed
+        values:
+          CaS_powder_purity_mass_percent: 99
+          CaS_powder_particle_size: '-325 mesh'
+          CIP_molding_pressure_GPa: 0.329
+          CIP_molding_pressure_kg_cm2: 4000
+          CIP_molding_duration_s: 30
+          sintering_temperature_K: 1823
+          sintering_duration_ks: 86.4
+          sintering_duration_h: 24
+          sintering_atmosphere: purified Ar
+          crucible_dimensions_mm_as_printed: [19, 30, 43]
+          crucible_dimensions_note: 'Approximate φ19 × φ30 × 43 mm; the paper does not assign the three dimensions to named axes.'
+          apparent_density_Mg_m3: 2.23
+          pure_CaS_density_Mg_m3: 2.59
+          pure_CaS_density_attribution: 'Reference 1: H. Nakamura and Y. Gunji, Journal of the Japan Institute of Metals, 42 (1978), 635.'
+          estimated_porosity_percent: 14
+      - observation_id: fujisawa_1990_alloy_analysis_methods
+        type: method
+        experiment: fujisawa-cas-slag-metal-equilibrium-1873k
+        locator: {page: 3, published_page: 370, section: '3.4 Experimental procedure'}
+        units: as printed
+        values:
+          aluminum_analysis: 'MIBK iron-separation atomic absorption spectrophotometry, JIS G1257.'
+          sulfur_analysis: 'Reduction-distillation methylene-blue spectrophotometry, JIS G1215.'
+          precision: {state: unknown, reason: not_published}
+          calcium_analysis: {state: unknown, reason: not_published}
+          oxygen_analysis: {state: unknown, reason: not_published}
+          precision_note: 'No analytical precision or uncertainty is stated.'
+      - observation_id: fujisawa_1990_slag_composition_estimate
+        type: composition
+        experiment: fujisawa-cas-slag-metal-equilibrium-1873k
+        locator: {page: 4, published_page: 371, equation: '10-12', section: '4.2 Estimation of slag composition change'}
+        units: as printed
+        values:
+          post_equilibration_slag_assay: {state: unknown, reason: not_published}
+          composition_method: 'Slag composition after equilibration was not quantitatively analyzed. Al2O3 change was inferred from the change in alloy Al by reaction stoichiometry; CaO change was inferred from alloy S change; slag and alloy mass changes were ignored.'
+          reaction_al_oxidation: '2Al + 3/2 O2 = Al2O3'
+          molten_slag_composition_change_max_mass_percent: 1
+          non_melting_slag_al2o3_change_max_mass_percent: 4
+          composition_used: 'Prepared charge composition was used as the slag composition; authors state its reaction change is negligible for composition assignment.'
+          phase_confirmation: 'X-ray diffraction confirmed target stable oxide phases and post-reaction phase coexistence.'
+      - observation_id: fujisawa_1990_activity_equations_and_standards
+        type: method
+        locator: {page: 1, published_page: 368, equation: '1-5', section: '2. Measurement principle'}
+        units: as printed
+        values:
+          reaction: '3CaO(s) + 2Al + 3S = 3CaS(s) + Al2O3(s)'
+          equilibrium_constant: 'K = (a_CaS^3 a_Al2O3)/(a_CaO^3 h_Al^2 h_S^3)'
+          cas_saturated_form: 'a_CaS = 1; K = a_Al2O3/(a_CaO^3 h_Al^2 h_S^3)'
+          alloy_activity_definitions:
+            log_h_Al: 'e_Al^Al[%Al] + e_Al^S[%S] + log[%Al]'
+            log_h_S: 'e_S^S[%S] + e_S^Al[%Al] + log[%S]'
+          standard_states:
+            slag_CaO: 'Raoultian, pure solid CaO(s)'
+            slag_Al2O3: 'Raoultian, pure solid Al2O3(s); no polymorph is named in the paper'
+            crucible_CaS: 'pure solid CaS(s), with a_CaS = 1 at saturation'
+            alloy_Al_and_S: 'Henry standard state for each dissolved solute; concentration expressed in mass percent'
+      - observation_id: fujisawa_1990_gibbs_duhem_integration
+        type: method
+        locator: {page: 4, published_page: 371, equation: '13-17', section: '4.3 Activities of CaO and Al2O3'}
+        units: as printed
+        values:
+          gibbs_duhem_CaS_saturated: 'N_Al2O3 d ln(a_Al2O3) + N_CaO d ln(a_CaO) = 0; the CaS term vanishes because a_CaS = 1.'
+          differentiated_equilibrium: 'd ln(a_Al2O3) = 3 d ln(a_CaO) + d ln(h_Al^2 h_S^3), at fixed temperature.'
+          integrate_CaO: 'ln(a_CaO) = - integral [1/(3 + N_CaO/N_Al2O3)] d ln(h_Al^2 h_S^3), along the CaS-saturated liquid composition path; start at the CaO-saturated liquid boundary where a_CaO = 1.'
+          integrate_Al2O3: 'ln(a_Al2O3) = integral [1/(3(N_Al2O3/N_CaO) + 1)] d ln(h_Al^2 h_S^3), along the CaS-saturated liquid composition path; start at Al2O3 + CA6 coexistence where a_Al2O3 = 1.'
+          phase_boundary_sources:
+            oxide_binary_phase_diagram: 'R. W. Nurse, J. H. Welch, and A. J. Majumdar, Trans. Brit. Ceram. Soc., 64 (1965), 409 (reference 7).'
+            cao_saturated_liquid_boundary: 'B. Ozturk and E. T. Turkdogan, Met. Sci., 18 (1984), 299 (reference 6), plus the present CaS-solubility measurements.'
+          cas_solubility_at_CA_liquidus_mass_percent: 2
+          cas_solubility_qualifier: 'Approximately 2 mass percent at the CaO·Al2O3 (CA) liquidus, as cited from reference 6.'
+      - observation_id: fujisawa_1990_thermochemical_equations
+        type: thermodynamic_example
+        locator: {page: 7, published_page: 374, equation: '18-33', section: '4.3-4.5'}
+        units: as printed
+        values:
+          sulfide_capacity_reaction_18: 'CaO(s) + 1/2 S2(g) = CaS(s) + 1/2 O2(g)'
+          sulfide_capacity_equilibrium_constant_19: 'K = (a_CaS(s)/a_CaO(s)) × (P_O2/P_S2)^(1/2)'
+          sulfide_capacity_standard_states: 'Pure solid CaS(s) and CaO(s); at CaS saturation a_CaS(s) = 1.'
+          CO_pressure_reaction_20: 'CaO(s) + 3C(graphite) = CaC2(s) + CO(g)'
+          compound_formation_reactions_and_constants:
+            CA: 'CaO(s) + Al2O3(s) = CaO·Al2O3(s); log K_CA = -log a_CaO - log a_Al2O3.'
+            CA2: 'CaO(s) + 2Al2O3(s) = CaO·2Al2O3(s); log K_CA2 = -log a_CaO - 2 log a_Al2O3.'
+            CA6: 'CaO(s) + 6Al2O3(s) = CaO·6Al2O3(s); log K_CA6 = -log a_CaO - 6 log a_Al2O3.'
+          compound_formation_standard_states: 'Pure solid CaO(s), pure solid Al2O3(s), and the named solid calcium-aluminate compound.'
+          measured_reaction_free_energy_27_kJ_mol: -338
+          measured_reaction_free_energy_uncertainty_kJ_mol: 19
+          measured_reaction_free_energy_note: 'Authors calculate the mean from reaction equilibria at their measurement points.'
+          reaction_free_energy_expressions:
+            equation_28: 'CaO(s) = Ca(g) + 1/2 O2(g); ΔG° = 795378 - 195.06 T J/mol.'
+            equation_29: 'CaS(s) = Ca(g) + 1/2 S2(g); ΔG° = 704397 - 191.29 T J/mol.'
+            equation_30: 'Al2O3(s) = 2Al(l) + 3/2 O2(g); ΔG° = 1697700 + 15.69 T log T - 385.85 T J/mol.'
+            equation_31: 'Al(l) = [Al]; ΔG° = -71100 - 19.4 T J/mol.'
+          equation_32: '1/2 S2(g) = [S]; ΔG° = -125100 + 18.5 T J/mol.'
+          equation_33: '3CaO(s) + 2[Al] + 3[S] = 3CaS(s) + Al2O3(s); ΔG° = -907257 - 15.69 T log T + 357.84 T J/mol (±80 kJ/mol).'
+          alumina_saturation_boundary_log_hAl2_hS3_text: '-2.0 (approximately), at Al2O3 + CA6 coexistence.'
+          calcium_aluminate_free_energy_changes_at_that_boundary_kJ_mol: {CA: -2.8, CA2: -5.7, CA6: -17}
+          boundary_energy_change_note: 'These are changes in the calculated ΔG° values at the CA6/A coexistence composition, not absolute formation free energies.'
+          equation_28_29_30_source: 'O. Kubaschewski and C. B. Alcock, Metallurgical Thermochemistry, 5th edition (1979), Pergamon Press (reference 16).'
+          equation_31_source: 'E. Ichise, T. Yamauchi, and T. Mori, Tetsu-to-Hagane, 63 (1977), 417 (reference 17).'
+          equation_32_source: 'F. Ishii and Y. Fuwa, Tetsu-to-Hagane, 67 (1981), 736 (reference 5).'
+          temperature_variable: T is absolute temperature in K
+          logarithm_basis: 'The paper uses log T in Eq. 30 and Eq. 33; it does not specify a base beside those expressions.'
+          agreement_note: 'The paper states the measured reaction free energy and the combined thermodynamic estimate agree closely.'
+      - observation_id: fujisawa_1990_binary_projection_quote
+        type: method
+        locator: {page: 6, published_page: 373, section: '4.3 Activities of CaO and Al2O3'}
+        units: as printed
+        values:
+          quote_ja: '彼らは、このCaS飽和において求めたa_CaO(s)がCaOとAl2O3のモル比のみに依存するものとして、CaO-Al2O3二成分系に外挿し、二成分系の活量線図を求めた。'
+          translation_en: 'My translation: They extrapolated the a_CaO(s) obtained under CaS saturation to the binary CaO-Al2O3 system, assuming it depended only on the CaO-to-Al2O3 mole ratio, and obtained the binary activity curves.'
+          assumption: 'The 1873 K CaS solubility in CaO-Al2O3 liquid is not large, so the CaS-saturated ternary activities are treated as the binary oxide activities.'
+          binary_activity_values: 'Figures only; not tabulated and not digitized.'
+      - observation_id: fujisawa_1990_fig4_cao_integration_plot
+        type: figure_only
+        locator: {page: 5, published_page: 372, figure: '4'}
+        units: dimensionless axes
+        values:
+          method_class: figure_only
+          quantity: CaO integration factor against log(h_Al^2 h_S^3)
+          axes:
+            x: {label: 'log(h_Al^2 h_S^3)', range: [-14, -2]}
+            y: {label: '1/(3 + N_CaO/N_Al2O3)', range: [0.15, 0.35]}
+          data_points_digitized: false
+      - observation_id: fujisawa_1990_fig5_alumina_integration_plot
+        type: figure_only
+        locator: {page: 5, published_page: 372, figure: '5'}
+        units: dimensionless axes
+        values:
+          method_class: figure_only
+          quantity: Al2O3 integration factor against log(h_Al^2 h_S^3)
+          axes:
+            x: {label: 'log(h_Al^2 h_S^3)', range: [-14, -2]}
+            y: {label: '3(N_Al2O3/N_CaO) + 1', range: [0, 0.5]}
+          data_points_digitized: false
+  Al2O3:
+    observations: []
+    context:
+      - observation_id: fujisawa_1990_fig6_caosat_activity_curves_alumina
+        type: figure_only
+        locator: {page: 6, published_page: 373, figure: '6'}
+        units: dimensionless activities and mole-fraction ratio
+        values:
+          method_class: figure_only
+          quantity: CaO and Al2O3 activities in CaO-Al2O3-CaS saturated liquid, used as binary curves
+          temperature_K: 1873
+          axes:
+            x: {label: 'N_Al2O3/(N_CaO+N_Al2O3)', scale: linear, range: [0, 1]}
+            y: {label: activity, scale: logarithmic, range: [0.01, 1]}
+          standard_states: {CaO: 'pure solid CaO(s)', Al2O3: 'pure solid Al2O3(s); polymorph not specified'}
+          polymorph_notes: 'The authors state pure solid Al2O3(s) as the standard state but do not specify alpha-Al2O3 or another polymorph.'
+          phase_diagram_below: 'Temperature (K) versus the same oxide mole-fraction ratio; shows liquid and CA, CA2, CA6, CaO-saturated and Al2O3-saturated fields.'
+          numeric_activity_values_printed_in_text: false
+          curve_digitized: false
+          note: 'The plotted values are only graphical. No individual numeric activity values are tabulated or stated in the text.'
+      - observation_id: fujisawa_1990_fig8_alumina_binary_comparison
+        type: figure_only
+        locator: {page: 6, published_page: 373, figure: '8'}
+        units: dimensionless activity and mole-fraction ratio
+        values:
+          method_class: figure_only
+          quantity: a_Al2O3 in CaO-Al2O3 binary system compared across studies
+          temperature_K_present_work: 1873
+          axes:
+            x: {label: 'N_Al2O3/(N_CaO+N_Al2O3)', scale: linear, range: [0.2, 0.5]}
+            y: {label: a_Al2O3, scale: logarithmic, range: [0.001, 1]}
+          comparison_series: ['Present work (1873 K)', 'Sharma & Richardson (1773 K)', 'Cameron et al. (1823 K)', 'Allibert et al. (2060 K)', 'Rein & Chipman (1873 K)']
+          curve_digitized: false
+  Fe:
+    observations: []
+    context:
+      - observation_id: fujisawa_1990_comparator_sharma_richardson
+        type: method
+        locator: {page: 6, published_page: 373, figure: '7', section: '4.3 Activities of CaO and Al2O3'}
+        units: as printed
+        values:
+          method_class: quoted_attributed
+          attribution: 'R. A. Sharma and F. D. Richardson, J. Iron Steel Inst., 198 (1961), 386 (reference 8).'
+          property: a_CaO
+          temperature_K: 1773
+          method: 'Sulfide-capacity measurement using the CaO/CaS equilibrium relation.'
+      - observation_id: fujisawa_1990_comparator_kor_richardson
+        type: method
+        locator: {page: 6, published_page: 373, figure: '7', section: '4.3 Activities of CaO and Al2O3'}
+        units: as printed
+        values:
+          method_class: quoted_attributed
+          attribution: 'G. J. W. Kor and F. D. Richardson, J. Iron Steel Inst., 206 (1968), 700 (reference 9).'
+          property: a_CaO
+          temperature_K: 1773
+          method: 'Sulfide-capacity measurement; included in the Richardson et al. sulfide-capacity group described by the paper.'
+      - observation_id: fujisawa_1990_comparator_cameron
+        type: method
+        locator: {page: 6, published_page: 373, figure: '7', section: '4.3 Activities of CaO and Al2O3'}
+        units: as printed
+        values:
+          method_class: quoted_attributed
+          attribution: 'J. Cameron, T. B. Gibbons, and J. Taylor, J. Iron Steel Inst., 204 (1966), 1223 (reference 10).'
+          property: a_CaO; a_Al2O3 comparison also shown in Fig. 8
+          temperature_K: 1823
+          method: 'Sulfide-capacity measurement.'
+      - observation_id: fujisawa_1990_comparator_edmunds_taylor
+        type: method
+        locator: {page: 6, published_page: 373, figure: '7', section: '4.3 Activities of CaO and Al2O3'}
+        units: as printed
+        values:
+          method_class: quoted_attributed
+          attribution: 'D. M. Edmunds and J. Taylor, J. Iron Steel Inst., 210 (1972), 280 (reference 11).'
+          property: a_CaO
+          temperature_K: 1773
+          method: 'CO partial-pressure measurement for the reaction CaO(s) + 3C(graphite) = CaC2(s) + CO(g).'
+      - observation_id: fujisawa_1990_comparator_allibert
+        type: method
+        locator: {page: 6, published_page: 373, figure: '7-8', section: '4.3 Activities of CaO and Al2O3'}
+        units: as printed
+        values:
+          method_class: quoted_attributed
+          attribution: 'M. Allibert, C. Chatillon, K. T. Jacob, and R. Lourtau, J. Am. Ceram. Soc., 64 (1981), 307 (reference 12).'
+          property: 'a_CaO and a_Al2O3'
+          temperature_K: 2060
+          method: Knudsen-cell mass spectrometry; both binary oxide activities measured simultaneously.
+      - observation_id: fujisawa_1990_comparator_rein_chipman
+        type: method
+        locator: {page: 6, published_page: 373, figure: '7-8', section: '4.3 Activities of CaO and Al2O3'}
+        units: as printed
+        values:
+          method_class: quoted_attributed
+          attribution: 'R. H. Rein and J. Chipman, Trans. Metall. Soc. AIME, 233 (1965), 415 (reference 13).'
+          property: 'a_CaO and a_Al2O3'
+          temperature_K: 1873
+          method: 'Thermodynamic estimate assembled from Sharma and Richardson CaO activities at 1773 K, intermediate-compound formation free energies, and the binary phase diagram; not a direct activity measurement.'
+      - observation_id: fujisawa_1990_no_tabulated_activity_values
+        type: characterization
+        locator: {page: 6, published_page: 373, figure: '6-8', note: 'All eight PDF pages were checked; figures 6-8 contain the activity results and the article has no result table.'}
+        units: as printed
+        values:
+          activity_values_tabulated: false
+          a_CaO_locations: ['Figure 6 (CaS-saturated ternary curves)', 'Figure 7 (binary comparison)']
+          a_Al2O3_locations: ['Figure 6 (CaS-saturated ternary curves)', 'Figure 8 (binary comparison)']
+          binary_activity_values: figure_only
+          numeric_lime_saturation_composition_in_text: false
+          numeric_alumina_saturation_composition_in_text: false
+          CaS_solubility_numeric_in_text_other_than_CA_liquidus: false
+          figure_points_digitized: false
+          experimental_data_tables: 0
+          experimental_table_rows: 0

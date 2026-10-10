@@ -1,0 +1,473 @@
+schema_version: literature_extract.v1
+source_id: deffrennes-2020-ca-o-calphad
+source:
+  citation: 'G. Deffrennes, N. Jakse, C. M. S. S. Alvares, I. Nuta, A. Pasturel, A. Khvan, A. Pisch, "Thermodynamic modelling of the Ca-O system including 3rd generation description of CaO and CaO2", Calphad, 69 (2020), 101764.'
+  doi: 10.1016/j.calphad.2020.101764
+  url: https://hal.science/hal-02559067v1
+  year: 2020
+extraction:
+  method: manual transcription from the controller-fetched HAL PDF; all 28 pages rendered at 180 dpi and read; every table value checked against its rendered page
+  date: '2026-10-04'
+  worker: extract-deffrennes2020
+  provenance_path: tables/deffrennes-2020-ca-o-calphad/
+review_status: draft
+experiments:
+  - experiment_id: manara_2014_air_laser_heating
+    method: {tag: unknown, reason: 'unmapped published method: quasi-containerless laser heating'}
+    method_as_published: quasi-containerless laser heating
+    locator: {page: 6, section: '2.3', note: 'Cited air result from Manara et al. [19]; this paper provides no apparatus description.'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '300000'}}
+        locator: {page: 6, section: '2.3', note: 'Printed 0.3 MPa; converted 0.3 × 10^6 Pa/MPa = 300000 Pa.'}
+      sweep_gas:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 6, section: '2.3', note: 'Air is printed as the atmosphere; no flow rate or gas partial-pressure split is reported.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    fO2_control:
+      channel: {tag: value, value: gas_mix}
+      oxygen_partial_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 6, section: '2.3', note: 'Air atmosphere is stated, but oxygen partial pressure is not printed.'}
+  - experiment_id: manara_2014_reducing_laser_heating
+    method: {tag: unknown, reason: 'unmapped published method: quasi-containerless laser heating'}
+    method_as_published: quasi-containerless laser heating
+    locator: {page: 6, section: '2.3', note: 'Cited reducing-atmosphere result from Manara et al. [19]; this paper provides no apparatus description.'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '300000'}}
+        locator: {page: 6, section: '2.3', note: 'Printed 0.3 MPa; converted 0.3 × 10^6 Pa/MPa = 300000 Pa.'}
+      sweep_gas:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 6, section: '2.3', note: 'Ar + 6% H2 atmosphere is printed; flow rate and gas partial pressures are not reported.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    fO2_control:
+      channel: {tag: value, value: gas_mix}
+      oxygen_partial_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 6, section: '2.3', note: 'Reducing gas mixture is stated, but oxygen partial pressure is not printed.'}
+  - experiment_id: yamada_1986_digital_pyrometry
+    method: {tag: unknown, reason: 'unmapped published method: digital pyrometry'}
+    method_as_published: digital pyrometry
+    locator: {page: 23, section: '5', note: 'Cited result from Yamada et al. [58]; this paper provides no apparatus description.'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '100000'}}
+        locator: {page: 23, section: '5', note: 'Printed 0.1 MPa; converted 0.1 × 10^6 Pa/MPa = 100000 Pa.'}
+      sweep_gas:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 23, section: '5', note: 'Air atmosphere is stated; no flow rate or gas partial-pressure split is reported.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    fO2_control:
+      channel: {tag: value, value: gas_mix}
+      oxygen_partial_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 23, section: '5', note: 'Air atmosphere is stated, but oxygen partial pressure is not printed.'}
+fidelity_samples:
+  - species: CaO
+    observation_id: deffrennes_2020_manara_air_solidification
+    observable: transition_point
+    field: value_K
+    value: 3222
+    locator: {page: 6, section: '2.3', note: 'Manara et al. [19], oxidizing air at 0.3 MPa'}
+  - species: CaO
+    observation_id: deffrennes_2020_manara_reducing_solidification
+    observable: transition_point
+    field: value_K
+    value: 3192
+    locator: {page: 6, section: '2.3', note: 'Manara et al. [19], Ar + 6% H2 at 0.3 MPa'}
+  - species: CaO
+    observation_id: deffrennes_2020_yamada_solidification
+    observable: transition_point
+    field: value_K
+    value: 3178
+    locator: {page: 23, section: '5', note: 'Yamada et al. [58], digital pyrometry in air at 0.1 MPa'}
+  - species: CaO
+    observation_id: deffrennes_2020_table_1_parameters
+    field: crystal_below_tm_E0
+    value: -652134.4
+    locator: {page: 16, table: '1', section: '3.6'}
+  - species: CaO
+    observation_id: deffrennes_2020_table_2_parameters
+    field: crystal_single_einstein_E0
+    value: -652291.4
+    locator: {page: 17, table: '2', section: '3.6'}
+  - species: CaO
+    observation_id: deffrennes_2020_table_3_properties
+    field: this_work_CaO_crystal_Cp_J_mol_K
+    value: 42.73
+    locator: {page: 18, table: '3', note: '298.15 K, 1 bar'}
+  - species: CaO
+    observation_id: deffrennes_2020_table_4_eutectic
+    field: accepted_temperature_K
+    value: 1094.6
+    locator: {page: 22, table: '4', note: 'Accepted calculation using solubility data [47]'}
+species:
+  CaO:
+    observations:
+      - observation_id: deffrennes_2020_manara_air_solidification
+        experiment: manara_2014_air_laser_heating
+        type: transition_point
+        locator: {page: 6, section: '2.3'}
+        units: K
+        polymorph_notes: The paper calls the solid phase crystalline CaO and does not identify an enum polymorph.
+        uncertainty: {note: '3222±25 K as printed'}
+        values:
+          quantity: transition_temperature
+          property_kind: melting_point
+          value_K: 3222
+          phase_from: crystalline CaO
+          phase_to: liquid CaO
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          attribution: 'Manara et al. [19], as reported in Deffrennes et al. (2020)'
+          method_as_published: quasi-containerless laser heating
+          atmosphere: air (oxidizing)
+          pressure_MPa: 0.3
+          result_as_published: solidification point, attributed to congruent melting
+          selected_by_this_assessment: true
+          selection_reason: 'Manara et al. attributed the point to congruent melting and considered pressure influence negligible under oxidizing conditions.'
+      - observation_id: deffrennes_2020_manara_reducing_solidification
+        experiment: manara_2014_reducing_laser_heating
+        type: transition_point
+        locator: {page: 6, section: '2.3'}
+        units: K
+        polymorph_notes: The paper calls the solid phase crystalline CaO and does not identify an enum polymorph.
+        uncertainty: {note: '3192±40 K as printed'}
+        values:
+          quantity: transition_temperature
+          property_kind: melting_point
+          value_K: 3192
+          phase_from: crystalline CaO
+          phase_to: liquid CaO with oxygen defects
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          attribution: 'Manara et al. [19], as reported in Deffrennes et al. (2020)'
+          method_as_published: quasi-containerless laser heating
+          atmosphere: Ar + 6% H2 (reducing)
+          pressure_MPa: 0.3
+          result_as_published: solidification point attributed to three-phase equilibrium with gas
+          three_phase_equilibrium: crystalline CaO + oxygen-defective CaO liquid + gas
+          selected_by_this_assessment: false
+          selection_reason: 'The authors distinguish this oxygen-defective three-phase condition from congruent melting.'
+      - observation_id: deffrennes_2020_yamada_solidification
+        experiment: yamada_1986_digital_pyrometry
+        type: transition_point
+        locator: {page: 23, section: '5'}
+        units: K
+        polymorph_notes: The paper calls the solid phase CaO and does not identify an enum polymorph.
+        values:
+          quantity: transition_temperature
+          property_kind: melting_point
+          value_K: 3178
+          phase_from: CaO solid
+          phase_to: CaO liquid
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          attribution: 'Yamada et al. [58], as reported by Manara et al. [19] and Deffrennes et al. (2020)'
+          method_as_published: digital pyrometry
+          atmosphere: air (oxidizing)
+          pressure_MPa: 0.1
+          selected_by_this_assessment: false
+          selection_reason: Manara et al. treated this result as consistent with congruent melting under oxidizing conditions.
+    context:
+      - observation_id: deffrennes_2020_source_metadata
+        type: source_metadata
+        locator: {page: 1, note: 'HAL cover, citation and deposit notice.'}
+        units: bibliographic record
+        values:
+          method_class: compilation_assessed
+          evidence_class: compilation_assessed
+          citation_as_printed: 'G. Deffrennes, N. Jakse, C. M. S. S. Alvares, I. Nuta, A. Pasturel, A. Khvan, A. Pisch, "Thermodynamic modelling of the Ca-O system including 3rd generation description of CaO and CaO2", Calphad 69 (2020), 101764.'
+          doi: 10.1016/j.calphad.2020.101764
+          hal_document_url: https://hal.science/hal-02559067/document
+          hal_record_url: https://hal.science/hal-02559067v1
+          author_deposit_status: The PDF has an HAL cover and author-formatted body, not publisher journal layout; it does not label itself accepted manuscript or preprint.
+          licence_statement: HAL Authorization notice only; no named licence or Creative Commons terms appear in the PDF.
+          fetched_by: regolith-main
+          fetched_at: '2026-10-04'
+          corpus_relative_pdf_path: raw/deffrennes-2020-ca-o-calphad/deffrennes-2020-ca-o-calphad.pdf
+          pdf_sha256: 8b5c40c419d3bdcc1c7966613bb8a8adf6a6379231ff24a82d2435889ea24be7
+          pdf_size_bytes: 1898110
+      - observation_id: deffrennes_2020_melting_literature_context
+        type: thermodynamic_context
+        locator: {page: 6, section: '2.3'}
+        units: K
+        values:
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          attribution: Deffrennes et al. (2020), review of melting data in section 2.3
+          literature_range_as_printed: [2843, 3223]
+          lower_endpoint_attribution: not specified in the cited sentence
+          qualification: 'The paper says conflicting literature values span 2843–3223 K and explains that melting versus boiling, congruence, and stoichiometry are difficult to determine.'
+          experimental_values:
+            - {source: 'Manara et al. [19]', value_K: 3222, uncertainty_K: 25, method: quasi-containerless laser heating, atmosphere: air (oxidizing), pressure_MPa: 0.3, attribution: congruent melting; pressure influence considered negligible by Manara et al.}
+            - {source: 'Manara et al. [19]', value_K: 3192, uncertainty_K: 40, method: quasi-containerless laser heating, atmosphere: Ar + 6% H2 (reducing), pressure_MPa: 0.3, attribution: three-phase equilibrium of crystalline CaO + oxygen-defective CaO liquid + gas}
+            - {source: 'Yamada et al. [58]', value_K: 3178, method: digital pyrometry, atmosphere: air, pressure_MPa: 0.1, attribution: compared by Manara et al. with the 3222±25 K result}
+      - observation_id: deffrennes_2020_fusion_values
+        type: thermodynamic_context
+        locator: {page: 6, section: '2.3', note: 'Additional optimized fusion values: PDF p. 20, section 4.2.'}
+        units: as printed per value
+        values:
+          method_class: compilation_assessed
+          evidence_class: compilation_assessed
+          experimental_fusion_enthalpy_or_entropy: {state: {tag: unknown, reason: not_published}}
+          entropy_values:
+            JANAF_4th_ed_1998: {value: 25.06, units: J mol-1 K-1, evidence_class: author_estimate, attribution: 'Chase [41], JANAF; explicitly called purely estimated'}
+            Gurvich_1994: {value_as_printed: '25±5', units: J mol-1 K-1, evidence_class: author_estimate, attribution: 'Gurvich et al. [43]; estimated from BeO and other alkaline-earth oxides'}
+            corresponding_enthalpy_from_Gurvich_estimate: {value_as_printed: '80±16', units: kJ mol-1, at_T_K: 3222, evidence_class: author_estimate, attribution: 'Deffrennes et al. (2020), calculated from the cited entropy estimate at the selected melting temperature'}
+          accepted_inputs:
+            melting_temperature_K: 3222
+            melting_temperature_attribution: 'Manara et al. [19], solidification point in air at 0.3 MPa; uncertainty ±25 K'
+            fusion_enthalpy_kJ_mol: 80.92
+            fusion_enthalpy_method: molecular dynamics simulation
+            fusion_enthalpy_attribution: 'Alvares et al. [37], calculated; selected in the present assessment'
+            corresponding_fusion_entropy_J_mol_K: 25.12
+            corresponding_fusion_entropy_status: corresponding value used in the assessment, as printed in section 4.1
+          printed_functions_recomputation:
+            at_T_m_K: 3222
+            fusion_enthalpy_kJ_mol: 80.924
+            fusion_entropy_J_mol_K: 25.116
+            note: 'Evaluation of the printed accepted functions reproduces the quoted MD inputs 80.92 kJ/mol and 25.12 J/mol/K at 3222 K; the results section separately quotes modelled values 81.1 kJ/mol and 25.2 J/mol/K.'
+            source_quotes:
+              - locator: {page: 6, published_page: 5, section: '2.3'}
+                quote: 'The molecular dynamics simulations conducted by Alvares et al. [37] lead to a very similar enthalpy of fusion of 80.92 kJ.mol -1. Therefore, this value was accepted in the present assessment.'
+              - locator: {page: 14, published_page: 13, section: '3.5'}
+                quote: 'the enthalpy of fusion of 80.92 kJ.mol-1 calculated by Alvares et al. [37] and the corresponding entropy of fusion of 25.12 J.mol-1.K-1.'
+              - locator: {page: 20, published_page: 19, section: '4.2'}
+                quote: 'The selected melting point of CaO at 3222 K based on the work of Manara et al. [19] was perfectly fitted, and the modelled enthalpy of fusion of 81.1 kJ.mol-1 is in good agreement with the value of 80.92 kJ.mol-1 calculated by Alvares et al. [37] as well as with the value of 80±16 kJ.mol-1 estimated by Gurvich et al. [43]. The corresponding modelled entropy of fusion is 25.2 J.mol-1.K-1.'
+          optimized_assessment_values:
+            fusion_enthalpy_kJ_mol: 81.1
+            fusion_entropy_J_mol_K: 25.2
+            locator: {page: 20, section: '4.2'}
+            label: modelled by this work
+      - observation_id: deffrennes_2020_table_1_parameters
+        type: thermodynamic_parameter_table
+        locator: {page: 16, published_page: 15, table: '1', section: '3.6'}
+        units: parameter values as printed; the table has no per-parameter unit column
+        values:
+          table_number: 1
+          method_class: compilation_assessed
+          evidence_class: compilation_assessed
+          assessment_label: this work, accepted and alternative parameterizations as marked
+          row_count: 57
+          transcription: tables/deffrennes-2020-ca-o-calphad/t1.csv
+          R_J_mol_K: 8.31446
+          equations:
+            Cp_crystal_below_Tm_Eq5: 'Cp = 3R Σ_i α_i(θ_i/T)^2 exp(θ_i/T)/(exp(θ_i/T)−1)^2 + aT + T exp(b+cT)'
+            G_crystal_below_Tm_Eq8: 'G = E0 + (3/2)RΣ_i α_iθ_i + 3RTΣ_i α_i ln(1−exp(−θ_i/T)) − (a/2)T^2 − exp(b+cT)/c^2'
+            Cp_crystal_above_Tm_Eq9: 'Cp = A − T/(B+CT)^3'
+            G_crystal_above_Tm_Eq10: "G = H' − S'T + AT(1−ln(T)) + 1/(2C^2(B+CT))"
+            G_liquid_amorphous_Eq11: 'G_liq-am = G_am − RT ln(1+exp(−ΔGd/(RT)))'
+            G_amorphous_Eq12: 'G_am = G_cryst + A + BT; the high-order exponential anharmonic term is excluded'
+            DeltaGd_Eq13: 'ΔGd = A + BT + CT ln(T) + …; Table 1 fitted terms retain A, B, and C only'
+            G_liquid_solution_Eq14: 'G_m^liq = Σ_k x_k G_k^liq + RTΣ_k x_k ln(x_k) + Σ_iΣ_j x_i x_j 0L_i,j^liq; i, j, k are Ca, CaO, and O'
+            L_liquid_interaction_Eq15: '0L_i,j^liq = 0a_i,j^liq + 0b_i,j^liq T'
+          parameter_sets:
+            cao_crystal_below_tm_0_to_3222_K: {E0: -652134.4, α1: 1.142993, θ1_K: 369.447, α2: 0.62542, θ2_K: 601.229, α3: 0.218718, θ3_K: 188.291, a: 0.00364916, b: -15.0586, c: 0.00304142, Σαi: 1.987}
+            cao_crystal_above_tm_3222_to_6000_K: {H_prime: -731248.3, S_prime: -492.1078, A: 81.5229, B: -191.395, C: 0.06241502}
+            cao_amorphous_accepted_0_to_6000_K: {E0_prime: -618466.5, α1: 1.142993, θ1_K: 369.447, α2: 0.62542, θ2_K: 601.229, α3: 0.218718, θ3_K: 188.291, a: 0.00364916, B_parameter_as_printed: '-'}
+            cao_amorphous_alternative_0_to_6000_K: {E0_prime: -614661.3, B: 3.0, α1: 1.142993, θ1_K: 369.447, α2: 0.62542, θ2_K: 601.229, α3: 0.218718, θ3_K: 188.291, a: 0.00364916}
+            cao_liquid_amorphous_accepted_0_to_6000_K: {A: 31233.8, B: 85.5245, C: -12.76672}
+            cao_liquid_amorphous_alternative_0_to_6000_K: {A: 38814.6, B: 71.14105, C: -10.95002}
+            cao2_crystal_0_to_6000_K: {E0: -676359.7, α1: 2.04814, θ1_K: 398.195, α2: 0.45973, θ2_K: 184.418, α3: 0.56518, θ3_K: 954.326, Σαi: 3.073, parameters_shown_as_dash: [a, b, c]}
+            cao_o_liquid_interaction: {0a_CaO_O_liq_as_printed: '-', 0b_CaO_O_liq: '+30'}
+            ca_cao_liquid_interaction_accepted: {0a_Ca_CaO_liq: -9625, 0b_Ca_CaO_liq: 12.30, optimized_on: 'Fischbach [47]'}
+            ca_cao_liquid_interaction_alternative: {0a_Ca_CaO_liq: 9284, 0b_Ca_CaO_liq_as_printed: '-', optimized_on: 'Zaitsev [49]'}
+          accepted_amorphous_B_text_statement: {value: 0, units: 'J mol-1 K-1', statement: 'The parameter B was kept equal to zero.', locator: {page: 14, section: '3.6', note: 'Table 1 prints a dash for B; the section text says the accepted amorphous description kept B equal to zero.'}}
+          crystal_below_tm_E0: -652134.4
+      - observation_id: deffrennes_2020_table_2_parameters
+        type: thermodynamic_parameter_table
+        locator: {page: 17, published_page: 16, table: '2', section: '3.6'}
+        units: parameter values as printed; the table has no per-parameter unit column
+        values:
+          table_number: 2
+          method_class: compilation_assessed
+          evidence_class: compilation_assessed
+          assessment_label: alternative single-Einstein parameterization; valid from 298.15 K as stated
+          row_count: 18
+          transcription: tables/deffrennes-2020-ca-o-calphad/t2.csv
+          equations:
+            G_crystal_single_Einstein_below_Tm_Eq8: 'G_cryst = E0 + BT + (6/2)RθE + 6RT ln(1−exp(−θE/T)) − (a/2)T^2 − exp(b+cT)/c^2'
+            G_amorphous_single_Einstein_Eq12: 'G_am = E0_prime + BT + (6/2)RθE + 6RT ln(1−exp(−θE/T)) − (a/2)T^2'
+            G_liquid_amorphous_Eq11: 'G_liq-am = G_am − RT ln(1+exp(−ΔGd/(RT)))'
+            DeltaGd_Eq13: 'ΔGd = A + BT + CT ln(T) + …; Table 2 fitted terms retain A, B, and C only'
+          parameter_sets:
+            cao_crystal_single_einstein_below_tm_298p15_to_3222_K: {E0: -652291.4, B: -5.1278, θE_K: 445.626, a: 0.00330042, b: -11.93755, c: 0.00208731}
+            cao_crystal_above_tm_3222_to_6000_K: {H_prime: -730132.6, S_prime: -491.6656, A: 81.5229, B: -119.5876, C: 0.04012844}
+            cao_amorphous_single_einstein_298p15_to_6000_K: {E0_prime: -617860.5, B: -5.1278, θE_K: 445.626, a: 0.00330042}
+            cao_liquid_amorphous_single_einstein_298p15_to_6000_K: {A: 27914.1, B: 95.5796, C: -13.9605}
+          crystal_single_einstein_E0: -652291.4
+      - observation_id: deffrennes_2020_table_3_properties
+        type: thermodynamic_data_table
+        locator: {page: 18, published_page: 17, table: '3', section: '4.1'}
+        units: {Cp: J mol-1 K-1, S: J mol-1 K-1, delta_fH: kJ mol-1}
+        values:
+          table_number: 3
+          method_class: compilation_assessed
+          evidence_class: compilation_assessed
+          temperature_K: 298.15
+          pressure_bar: 1
+          columns: [substance, reference, Cp_o, S_o, delta_fH_o]
+          rows:
+            - {substance: 'CaO(cr)', reference: 'This Work – CALPHAD Modelling', Cp_o: 42.73, S_o: 40.35, delta_fH_o: -634.6}
+            - {substance: 'CaO(cr)', reference: '[18] – CALPHAD Modelling', Cp_o: 42.05, S_o: 38.10, delta_fH_o: -634.0}
+            - {substance: 'CaO(cr)', reference: '[17] – CALPHAD Modelling', Cp_o: 42.02, S_o: 37.75, delta_fH_o: -635.1}
+            - {substance: 'CaO(cr)', reference: '[18] – Critical literature review', Cp_o: '-', S_o: '-', delta_fH_o: '-634±1.5'}
+            - {substance: 'CaO(cr)', reference: '[24] – DFT calculations', Cp_o: 42.73, S_o: 40.35, delta_fH_o: -634.6}
+            - {substance: 'CaO(cr)', reference: '[41] – Thermodynamic compilation', Cp_o: 42.12, S_o: 38.21, delta_fH_o: -635.1}
+            - {substance: 'CaO(liq-am)', reference: 'This Work – CALPHAD Modelling', Cp_o: 42.73, S_o: 40.35, delta_fH_o: -600.9}
+            - {substance: 'CaO(liq-am)', reference: '[18] – CALPHAD Modelling', Cp_o: 42.04, S_o: 58.69, delta_fH_o: -565.6}
+            - {substance: 'CaO(liq-am)', reference: '[17] – CALPHAD Modelling', Cp_o: 42.02, S_o: 65.69, delta_fH_o: -555.6}
+            - {substance: 'CaO(liq-am)', reference: '[41] – Thermodynamic compilation (estimates)', Cp_o: 42.12, S_o: 62.32, delta_fH_o: -557.3}
+            - {substance: 'CaO2(cr)', reference: 'This Work – CALPHAD Modelling', Cp_o: 61.63, S_o: 59.60, delta_fH_o: -648.1}
+            - {substance: 'CaO2(cr)', reference: '[18] – CALPHAD Modelling', Cp_o: 82.84, S_o: 83.68, delta_fH_o: -652.7}
+            - {substance: 'CaO2(cr)', reference: '[17] – CALPHAD Modelling', Cp_o: 82.84, S_o: 83.68, delta_fH_o: -659.0}
+            - {substance: 'CaO2(cr)', reference: '[24] – DFT calculations', Cp_o: 61.58, S_o: 59.60, delta_fH_o: -648.1}
+          this_work_CaO_crystal_Cp_J_mol_K: 42.73
+      - observation_id: deffrennes_2020_table_4_eutectic
+        type: thermodynamic_data_table
+        locator: {page: 22, published_page: 21, table: '4', section: '5'}
+        units: {temperature: K, invariant_composition: at.% O}
+        values:
+          table_number: 4
+          method_class: compilation_assessed
+          evidence_class: compilation_assessed
+          invariant: eutectic between β-Ca and CaO
+          columns: [temperature_K, invariant_composition_at_percent_O, note]
+          rows:
+            - {temperature_K: 1094.6, invariant_composition_at_percent_O: 1.70, note: 'Modelling using the solubility data from [47] (85Fis) - Accepted'}
+            - {temperature_K: 1103.2, invariant_composition_at_percent_O: 0.98, note: 'Modelling using the activity data from [49] (01Zai)'}
+          accepted_temperature_K: 1094.6
+      - observation_id: deffrennes_2020_equations_and_units
+        type: method
+        locator: {page: 11, published_page: 10, sections: ['3.1', '3.2']}
+        units: as defined by equations; Table 1 and Table 2 do not print a separate unit column
+        values:
+          attribution: Deffrennes et al. (2020), Eqs. 5 and 8–13
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          R_J_mol_K: 8.31446
+          parameter_unit_note: 'θ_i and θ_E are temperatures in K; the alpha coefficients are dimensionless. Other fitted coefficients are kept as printed because no individual parameter units are printed in Tables 1–2.'
+          lower_temperature_range: '0 < T < 3222 K for the accepted three-Einstein crystalline CaO model; 0 < T < 6000 K for amorphous/liquid-amorphous model'
+          high_temperature_range: '3222 < T < 6000 K for crystalline CaO above melting'
+      - observation_id: deffrennes_2020_liquid_heat_content_anchor
+        type: thermodynamic_context
+        locator: {page: 5, section: '2.2'}
+        units: kJ mol-1
+        values:
+          quantity: liquid_CaO_heat_content_relative_to_crystal_at_300_K
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          attribution: 'Alvares et al. [37], as reported and selected by Deffrennes et al. (2020)'
+          value: 248.2
+          temperature_K: 3200
+          reference: crystalline CaO at 300 K
+          method_as_published: ab initio molecular dynamics
+          present_work_modelled_value_kJ_mol: 245.6
+          present_work_modelled_reference: crystalline CaO at 298.15 K
+          present_work_locator: {page: 20, section: '4.2'}
+      - observation_id: deffrennes_2020_liquid_fit_datasets
+        type: literature_data_sources
+        locator: {page: 4, section: '2.1', note: 'Further dataset selection at PDF pp. 5 and 14, sections 2.2 and 3.5.'}
+        units: bibliographic and fit-role records
+        values:
+          method_class: compilation_assessed
+          evidence_class: compilation_assessed
+          crystal_heat_capacity_fit: 'Parks and Kelley [26] preferred below 298.15 K to Nernst [25] and Gmelin [40]; DFT/phonon data [24] used to 1700 K; the 1700–2000 K DFT range was considered less reliable near two-thirds of Tm; high-temperature heat-content data [28], [30]–[37] assessed, with Gmelin [27] not closely fit.'
+          crystal_heat_content_fit: 'Sources [28]–[37]; the fit uses data broadly from [28], [30]–[33], and [35]–[37]; Roth [29] and Chekhovskoi et al. [34] are not closely fit, though the high-temperature rise around 2600 K is noted in [34] and [37].'
+          liquid_fit: 'Alvares et al. [37] molecular-dynamics heat-content trend converted to Cp and accepted after comparison with the Gurvich et al. [43] estimate; raw shifted enthalpy data were discarded. The ab initio MD value at 3200 K is separately retained above.'
+          hara_1997_method: {tag: unknown, reason: 'unmapped published method: drop calorimeter'}
+          hara_1997_method_as_published: drop calorimeter
+          method_vocabulary_note: There is no drop_calorimetry token; this cited dataset is not represented as a new experiment or bench of the present modelling paper.
+          fetch_list:
+            - '[24] A. Pisch, G. Deffrennes, A. Pasturel, Thermodynamics of alkaline earth oxides using DFT, submitted (as cited; incomplete bibliographic data in the paper).'
+            - '[25] W. Nernst and F. Schwers, Untersuchungen über die spezifische Wärme bei tiefen Temperaturen, Ber. Kgl. Pr. Akad. Wiss., 10 (1914), 355–370.'
+            - '[26] G.S. Parks and K.K. Kelley, The Heat Capacities of Some Metallic Oxides, J. Phys. Chem., 30 (1926), 47–55, doi: 10.1021/j150259a005.'
+            - '[27] E. Gmelin, Thermal Properties of Alcaline-Earth-Oxides, Z. Naturforsch., 24a (1969), 1794–1800.'
+            - '[28] A. Magnus, Specific heat measurements of stable solids at high temperatures, Phys. Z., 14 (1913), 5–11.'
+            - '[29] W.A. Roth and W. Bertram, Measurements of the Specific Heat of Metallurgically Important Substances in a Large Temperature Interval with Help of Two New Calorimeter Types, Z. Elektrochem., 35 (1929), 297–308.'
+            - '[30] H. Esser, K. Averdieck and W. Grass, Wärmeinhalt einiger Metalle, Legierungen und Schlackenbildner bei Temperaturen bis 1200°, Archiv für das Eisenhüttenwesen, 6 (1933), 289–292, doi: 10.1002/srin.193300418.'
+            - '[31] H.E. von Gronow and H.E. Schwiete, Die spezifischen Wärmen von CaO, Al2O3, CaO·Al2O3, 3CaO·Al2O3, 2CaO·SiO2, 3CaO·SiO2, 2CaO·Al2O3·SiO2 von 20° bis 1500°C, Z. anorg. allg. Chem., 216 (1933), 185–195, doi: 10.1002/zaac.19332160212.'
+            - '[32] J.J. Lander, Experimental Heat Contents of SrO, BaO, CaO, BaCO3 and SrCO3 at High Temperatures. Dissociation Pressures of BaCO3 and SrCO3, J. Am. Chem. Soc., 73 (1951), 5794–5797, doi: 10.1021/ja01156a094.'
+            - '[33] W.A. Fischer and W. Ertmer, Die Bestimmung des Wärmeinhalts und der spezifischen Wärme von Schmelzkalkkristallen zwischen 0 und 1720°C, Archiv für das Eisenhüttenwesen, 37 (1966), 275–281, doi: 10.1002/srin.196602760.'
+            - '[34] V.Y. Chekhovskoi, K. Irgashov and V.D. Tarasov, Experimental investigation of the enthalpy and heat capacity of calcium oxides up to the temperature 3100 K (in Russian), Teplofiz. Vys. Temp., 24 (1986), 614.'
+            - '[35] P. Richet and G. Fiquet, High-temperature heat capacity and premelting of minerals in system MgO-CaO-Al2O3-SiO2, J. Geophys. Res.: Solid Earth, 96(B1) (1991), 445–456, doi: 10.1029/90JB02172.'
+            - '[36] S. Hara, Measurement of heat contents of oxides at elevated temperature using a drop calorimeter, Koon Gakkaishi, 23 (1997), 25–30.'
+            - '[37] C.M.S. Alvares, G. Deffrennes, A. Pisch and N. Jakse, Thermodynamics and structural properties of CaO: A molecular dynamics simulations study, submitted to JCP (as cited).'
+            - '[38] A. Pisch, A. Pasturel, G. Deffrennes, O. Dezellus, P. Benigni and G. Mikaelian, Investigation of the thermodynamic properties of Al4C3: A combined DFT and DSC study, Computational Materials Science, 171 (2020), 109100, doi: 10.1016/j.commatsci.2019.109100 (method context; not a CaO dataset).'
+            - '[39] J. Sun, A. Ruzsinszky and J.P. Perdew, Strongly Constrained and Appropriately Normed Semilocal Density Functional, Phys. Rev. Lett., 115 (2015), 036402, doi: 10.1103/PhysRevLett.115.036402.'
+            - '[40] E. Gmelin, Mesures de la chaleur spécifique de l’oxyde de béryllium et de l’oxyde de calcium à basses températures, C.R. Acad. Sci. Paris, Série C, 262 (1966), 1452.'
+            - '[41] M.W. Chase, NIST-JANAF Thermochemical Tables, 4th ed., J. Phys. Chem. Ref. Data Monograph 9, Parts I–II (1998), 1963.'
+            - '[42] P. Richet et al., Premelting effects in minerals: an experimental study, Earth Planet. Sci. Lett., 121 (1994), 589–600, doi: 10.1016/0012-821X(94)90093-0.'
+            - '[43] L.V. Gurvich, L.V. Veyts and C.B. Alcock, Thermodynamic Properties of Individual Substances, CRC Press, vol. 3 (1994).'
+      - observation_id: deffrennes_2020_liquid_validity_quotes
+        type: quoted_statement
+        locator: {page: 20, published_page: 19, section: '4.2'}
+        units: verbatim text
+        values:
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          attribution: Deffrennes et al. (2020), section 4.2
+          quote: 'Below the melting point however, the description of the metastable liquid phase proposed by Liang et al. [18] does not feature the expected increase in heat capacity with the decreasing temperature.'
+      - observation_id: deffrennes_2020_second_generation_validity_quote
+        type: quoted_statement
+        locator: {page: 12, published_page: 11, section: '3.2'}
+        units: verbatim text
+        values:
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          attribution: Deffrennes et al. (2020), section 3.2
+          quote: 'While this is unphysical, it is directly linked to the fact the Gibbs energy difference between the liquid-like and the amorphous-like atoms is expressed in a 2nd generation CALPHAD expression, which is typically not valid below 298.15 K.'
+      - observation_id: deffrennes_2020_positive_b_low_temperature_entropy_quote
+        type: quoted_statement
+        locator: {page: 12, published_page: 11, section: '3.2'}
+        units: verbatim text
+        values:
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          attribution: Deffrennes et al. (2020), section 3.2
+          quote: 'It is further noted that using the parameter C that should be negative, the parameter B may be positive, which would mean that the entropy of the amorphous phase is higher than the one of the liquid phase in the very low temperature range.'
+      - observation_id: deffrennes_2020_figure_8_validity_caption
+        type: quoted_statement
+        locator: {page: 20, published_page: 19, figure: '8', section: '4.2'}
+        units: verbatim text
+        values:
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          attribution: Deffrennes et al. (2020), Figure 8 caption
+          quote: 'It is noted that although the heat capacity modelled in previous assessments are plotted on the whole temperature range, their validity range was suggested by the authors to be limited below 298.15 K and above 3500 K in the case of Lindberg et al. [17].'
+      - observation_id: deffrennes_2020_cao2_phase_results
+        type: phase_diagram_context
+        locator: {page: 23, published_page: 22, section: '5'}
+        units: K and bar as stated
+        values:
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          attribution: Deffrennes et al. (2020), section 5
+          CaO2_decomposition_temperature_K_at_1_bar: 163
+          CaO2_decomposition_temperature_K_at_1e_minus_5_bar: 104
+          CaO_congruent_melting_pressure_limit_bar: 0.05
+          CaO_congruent_melting_temperature_K_at_0p05_bar: 3221.9
+          pseudo_unary_CaO_melting_temperature_K: 3222.0
+      - observation_id: deffrennes_2020_phase_diagram_figure_labels
+        type: figure_data
+        locator: {page: 23, published_page: 22, figure: '12', section: '5'}
+        units: K
+        values:
+          method_class: figure_only
+          evidence_class: figure_only
+          labelled_temperature_values: [3217.3, 3221.3, 1776.9, 1094.6, 716.0, 163.3]
+          note: Only figure-labeled values retained; phase-diagram curves were not digitized.
+      - observation_id: deffrennes_2020_melting_figure_labels
+        type: figure_data
+        locator: {page: 24, published_page: 23, figure: '13', section: '5'}
+        units: K
+        values:
+          method_class: figure_only
+          evidence_class: figure_only
+          labelled_temperature_values: [3219.1, 3221.9, 3221.5]
+          note: Only figure-labeled values retained; melting curves were not digitized.

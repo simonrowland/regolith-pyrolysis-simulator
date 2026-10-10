@@ -1,0 +1,3765 @@
+schema_version: literature_extract.v1
+source_id: miki-1999-si-alloy-thermodynamics
+source:
+  citation: T. Miki, K. Morita and N. Sano, “Thermodynamic Properties of Si–Al, –Ca, –Mg Binary and Si–Ca–Al, –Ti,
+    –Fe Ternary Alloys,” Materials Transactions, JIM 40(10) (1999), 1108–1116.
+  url: https://www.jstage.jst.go.jp/article/matertrans1989/40/10/40_10_1108/_pdf/-char/en
+  year: 1999
+extraction:
+  method: OCR-assisted manual transcription with every table cell checked against rendered page images
+  date: '2026-10-04'
+  worker: extract-miki1999
+  provenance_path: tables/miki-1999-si-alloy-thermodynamics/
+review_status: draft
+fidelity_samples:
+- species: Si
+  observation_id: miki_1999_t1_sample_1_si_rich_composition
+  field: composition_mol
+  value:
+    Al: 0.00199
+    Pb: 0.0231
+    Si: 0.975
+  locator:
+    page: 2
+    published_page: 1109
+    table: '1'
+- species: Si
+  observation_id: miki_1999_t2_sample_7_si_rich_composition
+  field: composition_mol
+  value:
+    Ca: 0.00794
+    Pb: 0.024
+    Si: 0.968
+  locator:
+    page: 2
+    published_page: 1109
+    table: '2'
+- species: Si
+  observation_id: miki_1999_t3_sample_12_si_rich_composition
+  field: composition_mol
+  value:
+    Mg: 0.00375
+    Pb: 0.0228
+    Si: 0.973
+  locator:
+    page: 2
+    published_page: 1109
+    table: '3'
+- species: Si
+  observation_id: miki_1999_t4_sample_18_al_composition_and_ion_current
+  field: composition_mol
+  value:
+    Al: 0.00543
+    Si: 0.99457
+  locator:
+    page: 4
+    published_page: 1111
+    table: '4'
+- species: Si
+  observation_id: miki_1999_t5_sample_23_ca_composition_and_ion_current
+  field: composition_mol
+  value:
+    Ca: 0.00111
+    Si: 0.99889
+  locator:
+    page: 4
+    published_page: 1111
+    table: '5'
+- species: Si
+  observation_id: miki_1999_t6_sample_28_si_rich_composition
+  field: composition_mol
+  value:
+    Ca: 0.00255
+    Al: 0.0103
+    Pb: 0.0245
+    Si: 0.963
+  locator:
+    page: 6
+    published_page: 1113
+    table: '6'
+- species: Si
+  observation_id: miki_1999_t7_sample_35_si_rich_composition
+  field: composition_mol
+  value:
+    Ca: 0.00457
+    Ti: 0.0563
+    Pb: 0.0146
+    Si: 0.925
+  locator:
+    page: 7
+    published_page: 1114
+    table: '7'
+- species: Si
+  observation_id: miki_1999_t8_sample_44_si_rich_composition
+  field: composition_mol
+  value:
+    Ca: 0.00996
+    Fe: 0.0049
+    Pb: 0.0201
+    Si: 0.965
+  locator:
+    page: 7
+    published_page: 1114
+    table: '8'
+- species: Al
+  observation_id: miki_1999_t9_ln_gamma0_Al_in_Si
+  field: printed_expression
+  value: -3610/T + 0.452
+  locator:
+    page: 8
+    published_page: 1115
+    table: '9'
+- species: Ca
+  observation_id: miki_1999_t9_ln_gamma0_Ca_in_Si
+  field: printed_expression
+  value: -14300/T + 1.55
+  locator:
+    page: 8
+    published_page: 1115
+    table: '9'
+- species: Mg
+  observation_id: miki_1999_t9_ln_gamma0_Mg_in_Si
+  field: printed_expression
+  value: '-2.04'
+  locator:
+    page: 8
+    published_page: 1115
+    table: '9'
+- species: Si
+  observation_id: miki_1999_t10_gamma0_Al_in_Pb
+  field: gamma
+  value: 3.86
+  locator:
+    page: 8
+    published_page: 1115
+    table: '10'
+- species: Si
+  observation_id: miki_1999_t10_gamma0_Ca_in_Pb
+  field: gamma
+  value: 0.00401
+  locator:
+    page: 8
+    published_page: 1115
+    table: '10'
+- species: Si
+  observation_id: miki_1999_t10_gamma0_Mg_in_Pb
+  field: gamma
+  value: 0.221
+  locator:
+    page: 8
+    published_page: 1115
+    table: '10'
+- species: Si
+  observation_id: miki_1999_t10_row_4_epsilon_Al_Si_in_Pb
+  field: wagner_interaction_parameter
+  value: -8.63
+  locator:
+    page: 8
+    published_page: 1115
+    table: '10'
+- species: Si
+  observation_id: miki_1999_t10_row_5_epsilon_Ca_Si_in_Pb
+  field: wagner_interaction_parameter
+  value: -14.3
+  locator:
+    page: 8
+    published_page: 1115
+    table: '10'
+- species: Si
+  observation_id: miki_1999_t10_row_6_epsilon_Mg_Si_in_Pb
+  field: wagner_interaction_parameter
+  value: -4.03
+  locator:
+    page: 8
+    published_page: 1115
+    table: '10'
+benches:
+- id: miki-1999-knudsen-mass-spectrometer
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Nuclide Corp. 12-90HT magnetic single-focusing high-temperature mass spectrometer
+    locator:
+      page: 1
+      published_page: 1108
+      section: Experimental
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: R-type Pt–Rh thermocouple spot-welded in a hole at the bottom of a Ta cell holder
+      locator:
+        page: 1
+        published_page: 1108
+        section: Experimental
+  temperature_calibration:
+    calibration:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1108
+        section: Experimental
+        note: No calibration procedure stated.
+    uncertainty:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1108
+        section: Experimental
+        note: Temperature measurement uncertainty is not stated.
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: BN Knudsen cell
+    locator:
+      page: 1
+      published_page: 1108
+      section: Experimental
+  cell_materials:
+  - state:
+      tag: value
+      value: BN
+    locator:
+      page: 1
+      published_page: 1108
+      section: Experimental
+  other_facts:
+  - name: ionizing_energy
+    unit: eV
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '30'
+      locator:
+        page: 1
+        published_page: 1108
+        section: Experimental
+  - name: ion_counting_method
+    unit: categorical
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: pulse-counting method
+      locator:
+        page: 1
+        published_page: 1108
+        section: Experimental
+experiments:
+- experiment_id: binary-pb-equilibration
+  method: quench_equilibration
+  locator:
+    page: 1
+    published_page: 1108
+    section: Experimental
+    table: 1-3
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.003'
+      locator:
+        page: 1
+        published_page: 1108
+        section: Experimental
+        note: 3 g Si–M alloy; converted to kg.
+    characterization:
+      state:
+        tag: value
+        value: 'Si–M alloy (M: Al, Ca, Mg); 0.5–5 mass% M initially.'
+      locator:
+        page: 1
+        published_page: 1108
+        section: Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: 1723
+      locator:
+        page: 1
+        published_page: 1108
+        section: Experimental
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1108
+        section: Experimental
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 1
+        published_page: 1108
+        section: Experimental
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Equilibrated for 14.4 ks at 1723 K in Ar.
+      locator:
+        page: 1
+        published_page: 1108
+        section: Experimental
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '14400'
+      locator:
+        page: 1
+        published_page: 1108
+        section: Experimental
+        note: 14.4 ks as printed.
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Sample quenched after equilibration.
+      locator:
+        page: 1
+        published_page: 1108
+        section: Experimental
+- experiment_id: ternary-pb-equilibration
+  method: quench_equilibration
+  locator: &id001
+    page: 2
+    published_page: 1109
+    section: Experimental
+    table: 6-8
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.003'
+      locator:
+        page: 2
+        published_page: 1109
+        section: Experimental
+        note: 3 g Si–Ca–M alloy; converted to kg.
+    characterization:
+      state:
+        tag: value
+        value: 'Si–Ca–M alloy (M: Al, Ti, Fe).'
+      locator:
+        page: 2
+        published_page: 1109
+        section: Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: 1723
+      locator:
+        page: 2
+        published_page: 1109
+        section: Experimental
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Equilibrated for 14.4 ks at 1723 K in Ar.
+      locator:
+        page: 2
+        published_page: 1109
+        section: Experimental
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '14400'
+      locator:
+        page: 2
+        published_page: 1109
+        section: Experimental
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Sample quenched after equilibration.
+      locator:
+        page: 2
+        published_page: 1109
+        section: Experimental
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id001
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id001
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+- experiment_id: knudsen-effusion
+  bench_id: miki-1999-knudsen-mass-spectrometer
+  method: knudsen_effusion
+  locator: &id002
+    page: 4
+    published_page: 1111
+    section: Experimental
+    table: 4-5
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0003'
+      locator:
+        page: 1
+        published_page: 1108
+        section: Experimental
+        note: 0.3 g sample, converted to kg.
+    characterization:
+      state:
+        tag: value
+        value: Al content 0.7–2 mass%; Ca content 0.2–0.6 mass% preliminarily.
+      locator:
+        page: 1
+        published_page: 1108
+        section: Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: would_invent
+      locator:
+        page: 4
+        published_page: 1111
+        section: Experimental
+        table: 4-5
+        note: The tables span 1723–1823 K; the scalar experiment temperature field has no range representation in the reader.
+  apparatus:
+    geometry:
+      cell_outer_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.008'
+        locator:
+          page: 1
+          published_page: 1108
+          section: Experimental
+          note: 8 mm O.D.
+      cell_inner_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0055'
+        locator:
+          page: 1
+          published_page: 1108
+          section: Experimental
+          note: 5.5 mm I.D.
+      cell_height_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.012'
+        locator:
+          page: 1
+          published_page: 1108
+          section: Experimental
+          note: 12 mm high.
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0005'
+        locator:
+          page: 1
+          published_page: 1108
+          section: Experimental
+          note: 0.5 mm orifice.
+  thermal_schedule:
+    method:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1108
+        section: Experimental
+        note: No hold duration specified for Knudsen effusion.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id002
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id002
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+species:
+  Si:
+    observations:
+    - observation_id: miki_1999_t1_sample_1_si_rich_composition
+      type: concentration_series
+      experiment: binary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 2
+        published_page: 1109
+        table: '1'
+        note: Sample 1, Si-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 1
+        phase_as_printed: Si-rich liquid
+        composition_mol:
+          Al: 0.00199
+          Pb: 0.0231
+          Si: 0.975
+        T_K: 1723
+    - observation_id: miki_1999_t1_sample_1_pb_rich_composition
+      type: concentration_series
+      experiment: binary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 2
+        published_page: 1109
+        table: '1'
+        note: Sample 1, Pb-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 1
+        phase_as_printed: Pb-rich liquid
+        composition_mol:
+          Al: 0.000138
+          Si: 0.0217
+          Pb: 0.978
+        T_K: 1723
+    - observation_id: miki_1999_t1_sample_2_si_rich_composition
+      type: concentration_series
+      experiment: binary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 2
+        published_page: 1109
+        table: '1'
+        note: Sample 2, Si-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 2
+        phase_as_printed: Si-rich liquid
+        composition_mol:
+          Al: 0.0168
+          Pb: 0.023
+          Si: 0.96
+        T_K: 1723
+    - observation_id: miki_1999_t1_sample_2_pb_rich_composition
+      type: concentration_series
+      experiment: binary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 2
+        published_page: 1109
+        table: '1'
+        note: Sample 2, Pb-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 2
+        phase_as_printed: Pb-rich liquid
+        composition_mol:
+          Al: 0.00145
+          Si: 0.0214
+          Pb: 0.977
+        T_K: 1723
+    - observation_id: miki_1999_t1_sample_3_si_rich_composition
+      type: concentration_series
+      experiment: binary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 2
+        published_page: 1109
+        table: '1'
+        note: Sample 3, Si-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 3
+        phase_as_printed: Si-rich liquid
+        composition_mol:
+          Al: 0.0305
+          Pb: 0.0219
+          Si: 0.948
+        T_K: 1723
+    - observation_id: miki_1999_t1_sample_3_pb_rich_composition
+      type: concentration_series
+      experiment: binary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 2
+        published_page: 1109
+        table: '1'
+        note: Sample 3, Pb-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 3
+        phase_as_printed: Pb-rich liquid
+        composition_mol:
+          Al: 0.00309
+          Si: 0.0216
+          Pb: 0.975
+        T_K: 1723
+    - observation_id: miki_1999_t1_sample_4_si_rich_composition
+      type: concentration_series
+      experiment: binary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 2
+        published_page: 1109
+        table: '1'
+        note: Sample 4, Si-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 4
+        phase_as_printed: Si-rich liquid
+        composition_mol:
+          Al: 0.0401
+          Pb: 0.0218
+          Si: 0.938
+        T_K: 1723
+    - observation_id: miki_1999_t1_sample_4_pb_rich_composition
+      type: concentration_series
+      experiment: binary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 2
+        published_page: 1109
+        table: '1'
+        note: Sample 4, Pb-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 4
+        phase_as_printed: Pb-rich liquid
+        composition_mol:
+          Al: 0.0054
+          Si: 0.0219
+          Pb: 0.973
+        T_K: 1723
+    - observation_id: miki_1999_t1_sample_5_si_rich_composition
+      type: concentration_series
+      experiment: binary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 2
+        published_page: 1109
+        table: '1'
+        note: Sample 5, Si-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 5
+        phase_as_printed: Si-rich liquid
+        composition_mol:
+          Al: 0.0426
+          Pb: 0.0209
+          Si: 0.936
+        T_K: 1723
+    - observation_id: miki_1999_t1_sample_5_pb_rich_composition
+      type: concentration_series
+      experiment: binary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 2
+        published_page: 1109
+        table: '1'
+        note: Sample 5, Pb-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 5
+        phase_as_printed: Pb-rich liquid
+        composition_mol:
+          Al: 0.00575
+          Si: 0.022
+          Pb: 0.972
+        T_K: 1723
+    - observation_id: miki_1999_t1_sample_6_si_rich_composition
+      type: concentration_series
+      experiment: binary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 2
+        published_page: 1109
+        table: '1'
+        note: Sample 6, Si-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 6
+        phase_as_printed: Si-rich liquid
+        composition_mol:
+          Al: 0.0639
+          Pb: 0.019
+          Si: 0.917
+        T_K: 1723
+    - observation_id: miki_1999_t1_sample_6_pb_rich_composition
+      type: concentration_series
+      experiment: binary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 2
+        published_page: 1109
+        table: '1'
+        note: Sample 6, Pb-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 6
+        phase_as_printed: Pb-rich liquid
+        composition_mol:
+          Al: 0.0133
+          Si: 0.0222
+          Pb: 0.965
+        T_K: 1723
+    - observation_id: miki_1999_t2_sample_7_si_rich_composition
+      type: concentration_series
+      experiment: binary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 2
+        published_page: 1109
+        table: '2'
+        note: Sample 7, Si-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 7
+        phase_as_printed: Si-rich liquid
+        composition_mol:
+          Ca: 0.00794
+          Pb: 0.024
+          Si: 0.968
+        T_K: 1723
+    - observation_id: miki_1999_t2_sample_7_pb_rich_composition
+      type: concentration_series
+      experiment: binary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 2
+        published_page: 1109
+        table: '2'
+        note: Sample 7, Pb-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 7
+        phase_as_printed: Pb-rich liquid
+        composition_mol:
+          Ca: 0.00294
+          Si: 0.022
+          Pb: 0.975
+        T_K: 1723
+    - observation_id: miki_1999_t2_sample_8_si_rich_composition
+      type: concentration_series
+      experiment: binary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 2
+        published_page: 1109
+        table: '2'
+        note: Sample 8, Si-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 8
+        phase_as_printed: Si-rich liquid
+        composition_mol:
+          Ca: 0.0141
+          Pb: 0.0254
+          Si: 0.961
+        T_K: 1723
+    - observation_id: miki_1999_t2_sample_8_pb_rich_composition
+      type: concentration_series
+      experiment: binary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 2
+        published_page: 1109
+        table: '2'
+        note: Sample 8, Pb-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 8
+        phase_as_printed: Pb-rich liquid
+        composition_mol:
+          Ca: 0.00532
+          Si: 0.0228
+          Pb: 0.972
+        T_K: 1723
+    - observation_id: miki_1999_t2_sample_9_si_rich_composition
+      type: concentration_series
+      experiment: binary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 2
+        published_page: 1109
+        table: '2'
+        note: Sample 9, Si-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 9
+        phase_as_printed: Si-rich liquid
+        composition_mol:
+          Ca: 0.0294
+          Pb: 0.0288
+          Si: 0.942
+        T_K: 1723
+    - observation_id: miki_1999_t2_sample_9_pb_rich_composition
+      type: concentration_series
+      experiment: binary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 2
+        published_page: 1109
+        table: '2'
+        note: Sample 9, Pb-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 9
+        phase_as_printed: Pb-rich liquid
+        composition_mol:
+          Ca: 0.0128
+          Si: 0.0245
+          Pb: 0.963
+        T_K: 1723
+    - observation_id: miki_1999_t2_sample_10_si_rich_composition
+      type: concentration_series
+      experiment: binary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 2
+        published_page: 1109
+        table: '2'
+        note: Sample 10, Si-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 10
+        phase_as_printed: Si-rich liquid
+        composition_mol:
+          Ca: 0.0377
+          Pb: 0.0313
+          Si: 0.931
+        T_K: 1723
+    - observation_id: miki_1999_t2_sample_10_pb_rich_composition
+      type: concentration_series
+      experiment: binary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 2
+        published_page: 1109
+        table: '2'
+        note: Sample 10, Pb-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 10
+        phase_as_printed: Pb-rich liquid
+        composition_mol:
+          Ca: 0.0184
+          Si: 0.0271
+          Pb: 0.955
+        T_K: 1723
+    - observation_id: miki_1999_t2_sample_11_si_rich_composition
+      type: concentration_series
+      experiment: binary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 2
+        published_page: 1109
+        table: '2'
+        note: Sample 11, Si-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 11
+        phase_as_printed: Si-rich liquid
+        composition_mol:
+          Ca: 0.0538
+          Pb: 0.0377
+          Si: 0.909
+        T_K: 1723
+    - observation_id: miki_1999_t2_sample_11_pb_rich_composition
+      type: concentration_series
+      experiment: binary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 2
+        published_page: 1109
+        table: '2'
+        note: Sample 11, Pb-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 11
+        phase_as_printed: Pb-rich liquid
+        composition_mol:
+          Ca: 0.0311
+          Si: 0.0309
+          Pb: 0.938
+        T_K: 1723
+    - observation_id: miki_1999_t3_sample_12_si_rich_composition
+      type: concentration_series
+      experiment: binary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 2
+        published_page: 1109
+        table: '3'
+        note: Sample 12, Si-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 12
+        phase_as_printed: Si-rich liquid
+        composition_mol:
+          Mg: 0.00375
+          Pb: 0.0228
+          Si: 0.973
+        T_K: 1723
+    - observation_id: miki_1999_t3_sample_12_pb_rich_composition
+      type: concentration_series
+      experiment: binary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 2
+        published_page: 1109
+        table: '3'
+        note: Sample 12, Pb-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 12
+        phase_as_printed: Pb-rich liquid
+        composition_mol:
+          Mg: 0.00218
+          Si: 0.0218
+          Pb: 0.976
+        T_K: 1723
+    - observation_id: miki_1999_t3_sample_13_si_rich_composition
+      type: concentration_series
+      experiment: binary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 2
+        published_page: 1109
+        table: '3'
+        note: Sample 13, Si-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 13
+        phase_as_printed: Si-rich liquid
+        composition_mol:
+          Mg: 0.0169
+          Pb: 0.0247
+          Si: 0.958
+        T_K: 1723
+    - observation_id: miki_1999_t3_sample_13_pb_rich_composition
+      type: concentration_series
+      experiment: binary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 2
+        published_page: 1109
+        table: '3'
+        note: Sample 13, Pb-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 13
+        phase_as_printed: Pb-rich liquid
+        composition_mol:
+          Mg: 0.0101
+          Si: 0.0222
+          Pb: 0.968
+        T_K: 1723
+    - observation_id: miki_1999_t3_sample_14_si_rich_composition
+      type: concentration_series
+      experiment: binary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 2
+        published_page: 1109
+        table: '3'
+        note: Sample 14, Si-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 14
+        phase_as_printed: Si-rich liquid
+        composition_mol:
+          Mg: 0.0282
+          Pb: 0.0263
+          Si: 0.946
+        T_K: 1723
+    - observation_id: miki_1999_t3_sample_14_pb_rich_composition
+      type: concentration_series
+      experiment: binary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 2
+        published_page: 1109
+        table: '3'
+        note: Sample 14, Pb-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 14
+        phase_as_printed: Pb-rich liquid
+        composition_mol:
+          Mg: 0.0184
+          Si: 0.023
+          Pb: 0.959
+        T_K: 1723
+    - observation_id: miki_1999_t3_sample_15_si_rich_composition
+      type: concentration_series
+      experiment: binary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 2
+        published_page: 1109
+        table: '3'
+        note: Sample 15, Si-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 15
+        phase_as_printed: Si-rich liquid
+        composition_mol:
+          Mg: 0.0421
+          Pb: 0.0289
+          Si: 0.929
+        T_K: 1723
+    - observation_id: miki_1999_t3_sample_15_pb_rich_composition
+      type: concentration_series
+      experiment: binary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 2
+        published_page: 1109
+        table: '3'
+        note: Sample 15, Pb-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 15
+        phase_as_printed: Pb-rich liquid
+        composition_mol:
+          Mg: 0.0295
+          Si: 0.0232
+          Pb: 0.947
+        T_K: 1723
+    - observation_id: miki_1999_t3_sample_16_si_rich_composition
+      type: concentration_series
+      experiment: binary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 2
+        published_page: 1109
+        table: '3'
+        note: Sample 16, Si-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 16
+        phase_as_printed: Si-rich liquid
+        composition_mol:
+          Mg: 0.0534
+          Pb: 0.0313
+          Si: 0.915
+        T_K: 1723
+    - observation_id: miki_1999_t3_sample_16_pb_rich_composition
+      type: concentration_series
+      experiment: binary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 2
+        published_page: 1109
+        table: '3'
+        note: Sample 16, Pb-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 16
+        phase_as_printed: Pb-rich liquid
+        composition_mol:
+          Mg: 0.0402
+          Si: 0.0236
+          Pb: 0.936
+        T_K: 1723
+    - observation_id: miki_1999_t3_sample_17_si_rich_composition
+      type: concentration_series
+      experiment: binary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 2
+        published_page: 1109
+        table: '3'
+        note: Sample 17, Si-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 17
+        phase_as_printed: Si-rich liquid
+        composition_mol:
+          Mg: 0.07
+          Pb: 0.0354
+          Si: 0.895
+        T_K: 1723
+    - observation_id: miki_1999_t3_sample_17_pb_rich_composition
+      type: concentration_series
+      experiment: binary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 2
+        published_page: 1109
+        table: '3'
+        note: Sample 17, Pb-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 17
+        phase_as_printed: Pb-rich liquid
+        composition_mol:
+          Mg: 0.0535
+          Si: 0.0239
+          Pb: 0.923
+        T_K: 1723
+    - observation_id: miki_1999_t4_sample_18_al_composition_and_ion_current
+      type: concentration_series
+      experiment: knudsen-effusion
+      regime: knudsen_effusion
+      phase: l
+      T_range_K:
+      - 1723
+      - 1823
+      locator:
+        page: 4
+        published_page: 1111
+        table: '4'
+        note: Sample 18; measured mass percent and mole fraction with ion counts tabulated at each temperature.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 18
+        composition_mol:
+          Al: 0.00543
+          Si: 0.99457
+        composition_mass_percent:
+          Al: 0.522
+        ion_current_counts_s-1_by_T_K:
+          '1723': 119
+          '1748': 164
+          '1773': 225
+          '1798': 305
+          '1823': 410
+    - observation_id: miki_1999_t4_sample_19_al_composition_and_ion_current
+      type: concentration_series
+      experiment: knudsen-effusion
+      regime: knudsen_effusion
+      phase: l
+      T_range_K:
+      - 1723
+      - 1823
+      locator:
+        page: 4
+        published_page: 1111
+        table: '4'
+        note: Sample 19; measured mass percent and mole fraction with ion counts tabulated at each temperature.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 19
+        composition_mol:
+          Al: 0.00668
+          Si: 0.99332
+        composition_mass_percent:
+          Al: 0.642
+        ion_current_counts_s-1_by_T_K:
+          '1723': 225
+          '1748': 309
+          '1773': 423
+          '1798': 572
+          '1823': 767
+    - observation_id: miki_1999_t4_sample_20_al_composition_and_ion_current
+      type: concentration_series
+      experiment: knudsen-effusion
+      regime: knudsen_effusion
+      phase: l
+      T_range_K:
+      - 1723
+      - 1823
+      locator:
+        page: 4
+        published_page: 1111
+        table: '4'
+        note: Sample 20; measured mass percent and mole fraction with ion counts tabulated at each temperature.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 20
+        composition_mol:
+          Al: 0.0136
+          Si: 0.9864
+        composition_mass_percent:
+          Al: 1.31
+        ion_current_counts_s-1_by_T_K:
+          '1723': 404
+          '1748': 550
+          '1773': 742
+          '1798': 993
+          '1823': 1317
+    - observation_id: miki_1999_t4_sample_21_al_composition_and_ion_current
+      type: concentration_series
+      experiment: knudsen-effusion
+      regime: knudsen_effusion
+      phase: l
+      T_range_K:
+      - 1723
+      - 1823
+      locator:
+        page: 4
+        published_page: 1111
+        table: '4'
+        note: Sample 21; measured mass percent and mole fraction with ion counts tabulated at each temperature.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 21
+        composition_mol:
+          Al: 0.0139
+          Si: 0.9861
+        composition_mass_percent:
+          Al: 1.34
+        ion_current_counts_s-1_by_T_K:
+          '1723': 218
+          '1748': 296
+          '1773': 399
+          '1798': 534
+          '1823': 709
+    - observation_id: miki_1999_t4_sample_22_al_composition_and_ion_current
+      type: concentration_series
+      experiment: knudsen-effusion
+      regime: knudsen_effusion
+      phase: l
+      T_range_K:
+      - 1723
+      - 1823
+      locator:
+        page: 4
+        published_page: 1111
+        table: '4'
+        note: Sample 22; measured mass percent and mole fraction with ion counts tabulated at each temperature.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 22
+        composition_mol:
+          Al: 0.0195
+          Si: 0.9805
+        composition_mass_percent:
+          Al: 1.87
+        ion_current_counts_s-1_by_T_K:
+          '1723': 443
+          '1748': 601
+          '1773': 808
+          '1798': 1076
+          '1823': 1421
+    - observation_id: miki_1999_t5_sample_23_ca_composition_and_ion_current
+      type: concentration_series
+      experiment: knudsen-effusion
+      regime: knudsen_effusion
+      phase: l
+      T_range_K:
+      - 1723
+      - 1823
+      locator:
+        page: 4
+        published_page: 1111
+        table: '5'
+        note: Sample 23; measured mass percent and mole fraction with ion counts tabulated at each temperature.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 23
+        composition_mol:
+          Ca: 0.00111
+          Si: 0.99889
+        composition_mass_percent:
+          Ca: 0.158
+        ion_current_counts_s-1_by_T_K:
+          '1723': 79.8
+          '1748': 105
+          '1773': 137
+          '1798': 178
+          '1823': 229
+    - observation_id: miki_1999_t5_sample_24_ca_composition_and_ion_current
+      type: concentration_series
+      experiment: knudsen-effusion
+      regime: knudsen_effusion
+      phase: l
+      T_range_K:
+      - 1723
+      - 1823
+      locator:
+        page: 4
+        published_page: 1111
+        table: '5'
+        note: Sample 24; measured mass percent and mole fraction with ion counts tabulated at each temperature.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 24
+        composition_mol:
+          Ca: 0.00139
+          Si: 0.99861
+        composition_mass_percent:
+          Ca: 0.199
+        ion_current_counts_s-1_by_T_K:
+          '1723': 43.9
+          '1748': 57.0
+          '1773': 73.6
+          '1798': 94.3
+          '1823': 120
+    - observation_id: miki_1999_t5_sample_25_ca_composition_and_ion_current
+      type: concentration_series
+      experiment: knudsen-effusion
+      regime: knudsen_effusion
+      phase: l
+      T_range_K:
+      - 1723
+      - 1823
+      locator:
+        page: 4
+        published_page: 1111
+        table: '5'
+        note: Sample 25; measured mass percent and mole fraction with ion counts tabulated at each temperature.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 25
+        composition_mol:
+          Ca: 0.00277
+          Si: 0.99723
+        composition_mass_percent:
+          Ca: 0.396
+        ion_current_counts_s-1_by_T_K:
+          '1723': 86.3
+          '1748': 113
+          '1773': 147
+          '1798': 190
+          '1823': 243
+    - observation_id: miki_1999_t5_sample_26_ca_composition_and_ion_current
+      type: concentration_series
+      experiment: knudsen-effusion
+      regime: knudsen_effusion
+      phase: l
+      T_range_K:
+      - 1723
+      - 1823
+      locator:
+        page: 4
+        published_page: 1111
+        table: '5'
+        note: Sample 26; measured mass percent and mole fraction with ion counts tabulated at each temperature.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 26
+        composition_mol:
+          Ca: 0.00411
+          Si: 0.99589
+        composition_mass_percent:
+          Ca: 0.587
+        ion_current_counts_s-1_by_T_K:
+          '1723': 96.6
+          '1748': 126
+          '1773': 162
+          '1798': 208
+          '1823': 264
+    - observation_id: miki_1999_t5_sample_27_ca_composition_and_ion_current
+      type: concentration_series
+      experiment: knudsen-effusion
+      regime: knudsen_effusion
+      phase: l
+      T_range_K:
+      - 1723
+      - 1823
+      locator:
+        page: 4
+        published_page: 1111
+        table: '5'
+        note: Sample 27; measured mass percent and mole fraction with ion counts tabulated at each temperature.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 27
+        composition_mol:
+          Ca: 0.00418
+          Si: 0.99582
+        composition_mass_percent:
+          Ca: 0.597
+        ion_current_counts_s-1_by_T_K:
+          '1723': 196
+          '1748': 259
+          '1773': 340
+          '1798': 443
+          '1823': 573
+    - observation_id: miki_1999_t6_sample_28_si_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 6
+        published_page: 1113
+        table: '6'
+        note: Sample 28, Si-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 28
+        phase_as_printed: Si-rich liquid
+        composition_mol:
+          Ca: 0.00255
+          Al: 0.0103
+          Pb: 0.0245
+          Si: 0.963
+        T_K: 1723
+    - observation_id: miki_1999_t6_sample_28_pb_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 6
+        published_page: 1113
+        table: '6'
+        note: Sample 28, Pb-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 28
+        phase_as_printed: Pb-rich liquid
+        composition_mol:
+          Ca: 0.00154
+          Al: 0.00091
+          Si: 0.0534
+          Pb: 0.944
+        T_K: 1723
+    - observation_id: miki_1999_t6_sample_29_si_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 6
+        published_page: 1113
+        table: '6'
+        note: Sample 29, Si-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 29
+        phase_as_printed: Si-rich liquid
+        composition_mol:
+          Ca: 0.00718
+          Al: 0.0189
+          Pb: 0.0251
+          Si: 0.949
+        T_K: 1723
+    - observation_id: miki_1999_t6_sample_29_pb_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 6
+        published_page: 1113
+        table: '6'
+        note: Sample 29, Pb-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 29
+        phase_as_printed: Pb-rich liquid
+        composition_mol:
+          Ca: 0.00372
+          Al: 0.0026
+          Si: 0.0377
+          Pb: 0.956
+        T_K: 1723
+    - observation_id: miki_1999_t6_sample_30_si_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 6
+        published_page: 1113
+        table: '6'
+        note: Sample 30, Si-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 30
+        phase_as_printed: Si-rich liquid
+        composition_mol:
+          Ca: 0.00905
+          Al: 0.0208
+          Pb: 0.0269
+          Si: 0.943
+        T_K: 1723
+    - observation_id: miki_1999_t6_sample_30_pb_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 6
+        published_page: 1113
+        table: '6'
+        note: Sample 30, Pb-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 30
+        phase_as_printed: Pb-rich liquid
+        composition_mol:
+          Ca: 0.00597
+          Al: 0.00283
+          Si: 0.0525
+          Pb: 0.939
+        T_K: 1723
+    - observation_id: miki_1999_t6_sample_31_si_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 6
+        published_page: 1113
+        table: '6'
+        note: Sample 31, Si-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 31
+        phase_as_printed: Si-rich liquid
+        composition_mol:
+          Ca: 0.00742
+          Al: 0.0261
+          Pb: 0.021
+          Si: 0.945
+        T_K: 1723
+    - observation_id: miki_1999_t6_sample_31_pb_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 6
+        published_page: 1113
+        table: '6'
+        note: Sample 31, Pb-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 31
+        phase_as_printed: Pb-rich liquid
+        composition_mol:
+          Ca: 0.0046
+          Al: 0.00351
+          Si: 0.0428
+          Pb: 0.949
+        T_K: 1723
+    - observation_id: miki_1999_t6_sample_32_si_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 6
+        published_page: 1113
+        table: '6'
+        note: Sample 32, Si-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 32
+        phase_as_printed: Si-rich liquid
+        composition_mol:
+          Ca: 0.00895
+          Al: 0.0417
+          Pb: 0.0282
+          Si: 0.921
+        T_K: 1723
+    - observation_id: miki_1999_t6_sample_32_pb_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 6
+        published_page: 1113
+        table: '6'
+        note: Sample 32, Pb-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 32
+        phase_as_printed: Pb-rich liquid
+        composition_mol:
+          Ca: 0.0053
+          Al: 0.00574
+          Si: 0.0356
+          Pb: 0.953
+        T_K: 1723
+    - observation_id: miki_1999_t6_sample_33_si_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 6
+        published_page: 1113
+        table: '6'
+        note: Sample 33, Si-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 33
+        phase_as_printed: Si-rich liquid
+        composition_mol:
+          Ca: 0.0097
+          Al: 0.0531
+          Pb: 0.0269
+          Si: 0.91
+        T_K: 1723
+    - observation_id: miki_1999_t6_sample_33_pb_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 6
+        published_page: 1113
+        table: '6'
+        note: Sample 33, Pb-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 33
+        phase_as_printed: Pb-rich liquid
+        composition_mol:
+          Ca: 0.00568
+          Al: 0.00571
+          Si: 0.0291
+          Pb: 0.96
+        T_K: 1723
+    - observation_id: miki_1999_t6_sample_34_si_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 6
+        published_page: 1113
+        table: '6'
+        note: Sample 34, Si-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 34
+        phase_as_printed: Si-rich liquid
+        composition_mol:
+          Ca: 0.00928
+          Al: 0.0598
+          Pb: 0.022
+          Si: 0.909
+        T_K: 1723
+    - observation_id: miki_1999_t6_sample_34_pb_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 6
+        published_page: 1113
+        table: '6'
+        note: Sample 34, Pb-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 34
+        phase_as_printed: Pb-rich liquid
+        composition_mol:
+          Ca: 0.00611
+          Al: 0.00641
+          Si: 0.0323
+          Pb: 0.955
+        T_K: 1723
+    - observation_id: miki_1999_t7_sample_35_si_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 7
+        published_page: 1114
+        table: '7'
+        note: Sample 35, Si-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 35
+        phase_as_printed: Si-rich liquid
+        composition_mol:
+          Ca: 0.00457
+          Ti: 0.0563
+          Pb: 0.0146
+          Si: 0.925
+        T_K: 1723
+    - observation_id: miki_1999_t7_sample_35_pb_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 7
+        published_page: 1114
+        table: '7'
+        note: Sample 35, Pb-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 35
+        phase_as_printed: Pb-rich liquid
+        composition_mol:
+          Ca: 0.00219
+          Ti: 0.000294
+          Si: 0.0259
+          Pb: 0.972
+        T_K: 1723
+    - observation_id: miki_1999_t7_sample_36_si_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 7
+        published_page: 1114
+        table: '7'
+        note: Sample 36, Si-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 36
+        phase_as_printed: Si-rich liquid
+        composition_mol:
+          Ca: 0.0058
+          Ti: 0.0785
+          Pb: 0.0196
+          Si: 0.896
+        T_K: 1723
+    - observation_id: miki_1999_t7_sample_36_pb_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 7
+        published_page: 1114
+        table: '7'
+        note: Sample 36, Pb-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 36
+        phase_as_printed: Pb-rich liquid
+        composition_mol:
+          Ca: 0.00319
+          Ti: 0.000416
+          Si: 0.0264
+          Pb: 0.97
+        T_K: 1723
+    - observation_id: miki_1999_t7_sample_37_si_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 7
+        published_page: 1114
+        table: '7'
+        note: Sample 37, Si-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 37
+        phase_as_printed: Si-rich liquid
+        composition_mol:
+          Ca: 0.0078
+          Ti: 0.0702
+          Pb: 0.0167
+          Si: 0.905
+        T_K: 1723
+    - observation_id: miki_1999_t7_sample_37_pb_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 7
+        published_page: 1114
+        table: '7'
+        note: Sample 37, Pb-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 37
+        phase_as_printed: Pb-rich liquid
+        composition_mol:
+          Ca: 0.00404
+          Ti: 0.000417
+          Si: 0.0285
+          Pb: 0.967
+        T_K: 1723
+    - observation_id: miki_1999_t7_sample_38_si_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 7
+        published_page: 1114
+        table: '7'
+        note: Sample 38, Si-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 38
+        phase_as_printed: Si-rich liquid
+        composition_mol:
+          Ca: 0.0107
+          Ti: 0.0645
+          Pb: 0.0207
+          Si: 0.904
+        T_K: 1723
+    - observation_id: miki_1999_t7_sample_38_pb_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 7
+        published_page: 1114
+        table: '7'
+        note: Sample 38, Pb-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 38
+        phase_as_printed: Pb-rich liquid
+        composition_mol:
+          Ca: 0.00526
+          Ti: 0.00053
+          Si: 0.0281
+          Pb: 0.966
+        T_K: 1723
+    - observation_id: miki_1999_t7_sample_39_si_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 7
+        published_page: 1114
+        table: '7'
+        note: Sample 39, Si-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 39
+        phase_as_printed: Si-rich liquid
+        composition_mol:
+          Ca: 0.0132
+          Ti: 0.0545
+          Pb: 0.0179
+          Si: 0.914
+        T_K: 1723
+    - observation_id: miki_1999_t7_sample_39_pb_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 7
+        published_page: 1114
+        table: '7'
+        note: Sample 39, Pb-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 39
+        phase_as_printed: Pb-rich liquid
+        composition_mol:
+          Ca: 0.00636
+          Ti: 0.000491
+          Si: 0.029
+          Pb: 0.964
+        T_K: 1723
+    - observation_id: miki_1999_t7_sample_40_si_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 7
+        published_page: 1114
+        table: '7'
+        note: Sample 40, Si-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 40
+        phase_as_printed: Si-rich liquid
+        composition_mol:
+          Ca: 0.0254
+          Ti: 0.055
+          Pb: 0.0209
+          Si: 0.899
+        T_K: 1723
+    - observation_id: miki_1999_t7_sample_40_pb_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 7
+        published_page: 1114
+        table: '7'
+        note: Sample 40, Pb-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 40
+        phase_as_printed: Pb-rich liquid
+        composition_mol:
+          Ca: 0.0124
+          Ti: 0.000546
+          Si: 0.0304
+          Pb: 0.957
+        T_K: 1723
+    - observation_id: miki_1999_t7_sample_41_si_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 7
+        published_page: 1114
+        table: '7'
+        note: Sample 41, Si-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 41
+        phase_as_printed: Si-rich liquid
+        composition_mol:
+          Ca: 0.0343
+          Ti: 0.0523
+          Pb: 0.0213
+          Si: 0.892
+        T_K: 1723
+    - observation_id: miki_1999_t7_sample_41_pb_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 7
+        published_page: 1114
+        table: '7'
+        note: Sample 41, Pb-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 41
+        phase_as_printed: Pb-rich liquid
+        composition_mol:
+          Ca: 0.0205
+          Ti: 0.00079
+          Si: 0.0324
+          Pb: 0.946
+        T_K: 1723
+    - observation_id: miki_1999_t7_sample_42_si_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 7
+        published_page: 1114
+        table: '7'
+        note: Sample 42, Si-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 42
+        phase_as_printed: Si-rich liquid
+        composition_mol:
+          Ca: 0.0377
+          Ti: 0.0551
+          Pb: 0.0226
+          Si: 0.885
+        T_K: 1723
+    - observation_id: miki_1999_t7_sample_42_pb_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 7
+        published_page: 1114
+        table: '7'
+        note: Sample 42, Pb-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 42
+        phase_as_printed: Pb-rich liquid
+        composition_mol:
+          Ca: 0.0237
+          Ti: 0.000911
+          Si: 0.0327
+          Pb: 0.943
+        T_K: 1723
+    - observation_id: miki_1999_t7_sample_43_si_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 7
+        published_page: 1114
+        table: '7'
+        note: Sample 43, Si-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 43
+        phase_as_printed: Si-rich liquid
+        composition_mol:
+          Ca: 0.048
+          Ti: 0.055
+          Pb: 0.0253
+          Si: 0.872
+        T_K: 1723
+    - observation_id: miki_1999_t7_sample_43_pb_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 7
+        published_page: 1114
+        table: '7'
+        note: Sample 43, Pb-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 43
+        phase_as_printed: Pb-rich liquid
+        composition_mol:
+          Ca: 0.0307
+          Ti: 0.000932
+          Si: 0.0355
+          Pb: 0.933
+        T_K: 1723
+    - observation_id: miki_1999_t8_sample_44_si_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 7
+        published_page: 1114
+        table: '8'
+        note: Sample 44, Si-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 44
+        phase_as_printed: Si-rich liquid
+        composition_mol:
+          Ca: 0.00996
+          Fe: 0.0049
+          Pb: 0.0201
+          Si: 0.965
+        T_K: 1723
+    - observation_id: miki_1999_t8_sample_44_pb_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 7
+        published_page: 1114
+        table: '8'
+        note: Sample 44, Pb-rich liquid phase mole-fraction composition. Printed X_Fe in Pb is table value multiplied
+          by 10^5.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 44
+        phase_as_printed: Pb-rich liquid
+        composition_mol:
+          Ca: 0.0104
+          Fe: 2.6e-06
+          Si: 0.0267
+          Pb: 0.963
+        T_K: 1723
+    - observation_id: miki_1999_t8_sample_45_si_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 7
+        published_page: 1114
+        table: '8'
+        note: Sample 45, Si-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 45
+        phase_as_printed: Si-rich liquid
+        composition_mol:
+          Ca: 0.0254
+          Fe: 0.0171
+          Pb: 0.0231
+          Si: 0.934
+        T_K: 1723
+    - observation_id: miki_1999_t8_sample_45_pb_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 7
+        published_page: 1114
+        table: '8'
+        note: Sample 45, Pb-rich liquid phase mole-fraction composition. Printed X_Fe in Pb is table value multiplied
+          by 10^5.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 45
+        phase_as_printed: Pb-rich liquid
+        composition_mol:
+          Ca: 0.0114
+          Fe: 1.0800000000000002e-05
+          Si: 0.0283
+          Pb: 0.96
+        T_K: 1723
+    - observation_id: miki_1999_t8_sample_46_si_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 7
+        published_page: 1114
+        table: '8'
+        note: Sample 46, Si-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 46
+        phase_as_printed: Si-rich liquid
+        composition_mol:
+          Ca: 0.0337
+          Fe: 0.00908
+          Pb: 0.0232
+          Si: 0.934
+        T_K: 1723
+    - observation_id: miki_1999_t8_sample_46_pb_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 7
+        published_page: 1114
+        table: '8'
+        note: Sample 46, Pb-rich liquid phase mole-fraction composition. Printed X_Fe in Pb is table value multiplied
+          by 10^5.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 46
+        phase_as_printed: Pb-rich liquid
+        composition_mol:
+          Ca: 0.0182
+          Fe: 5.74e-06
+          Si: 0.029
+          Pb: 0.953
+        T_K: 1723
+    - observation_id: miki_1999_t8_sample_47_si_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 7
+        published_page: 1114
+        table: '8'
+        note: Sample 47, Si-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 47
+        phase_as_printed: Si-rich liquid
+        composition_mol:
+          Ca: 0.0358
+          Fe: 0.00767
+          Pb: 0.0234
+          Si: 0.933
+        T_K: 1723
+    - observation_id: miki_1999_t8_sample_47_pb_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 7
+        published_page: 1114
+        table: '8'
+        note: Sample 47, Pb-rich liquid phase mole-fraction composition. Printed X_Fe in Pb is table value multiplied
+          by 10^5.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 47
+        phase_as_printed: Pb-rich liquid
+        composition_mol:
+          Ca: 0.0184
+          Fe: 5.03e-06
+          Si: 0.0302
+          Pb: 0.951
+        T_K: 1723
+    - observation_id: miki_1999_t8_sample_48_si_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 7
+        published_page: 1114
+        table: '8'
+        note: Sample 48, Si-rich liquid phase mole-fraction composition.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 48
+        phase_as_printed: Si-rich liquid
+        composition_mol:
+          Ca: 0.0604
+          Fe: 0.00542
+          Pb: 0.0285
+          Si: 0.906
+        T_K: 1723
+    - observation_id: miki_1999_t8_sample_48_pb_rich_composition
+      type: concentration_series
+      experiment: ternary-pb-equilibration
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 7
+        published_page: 1114
+        table: '8'
+        note: Sample 48, Pb-rich liquid phase mole-fraction composition. Printed X_Fe in Pb is table value multiplied
+          by 10^5.
+      units: mole_fraction
+      values:
+        method_class: measured_tabulated
+        sample_no: 48
+        phase_as_printed: Pb-rich liquid
+        composition_mol:
+          Ca: 0.0835
+          Fe: 4.360000000000001e-06
+          Si: 0.0341
+          Pb: 0.882
+        T_K: 1723
+    - observation_id: miki_1999_t9_row_6_epsilon_Mg_Mg_in_Si
+      type: interaction_parameter
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 8
+        published_page: 1115
+        table: '9'
+        note: epsilon_Mg_Mg_in_Si; mole-fraction Wagner interaction parameter, 1723 K. measured here from chemical-equilibration
+          slopes; Table 3, Fig. 3.
+      units: dimensionless
+      uncertainty: No parameter-specific uncertainty or fit confidence interval is stated.
+      values:
+        method_class: model_derived
+        quantity: wagner_interaction_parameter
+        wagner_interaction_parameter: 6.02
+        parameter: epsilon_Mg_Mg_in_Si
+        T_K: 1723
+        basis: mole-fraction Wagner interaction parameter, 1723 K
+        derivation:
+          relation: Eq. 4 regression from Table 3 Mg Si/Pb distribution data, using the previously cited infinite-dilution activity coefficient [4] and the Table 3/Fig. 1–2 interaction results.
+          inputs: &id003
+          - miki_1999_t3_sample_12_si_rich_composition
+          - miki_1999_t3_sample_12_pb_rich_composition
+          - miki_1999_t3_sample_13_si_rich_composition
+          - miki_1999_t3_sample_13_pb_rich_composition
+          - miki_1999_t3_sample_14_si_rich_composition
+          - miki_1999_t3_sample_14_pb_rich_composition
+          - miki_1999_t3_sample_15_si_rich_composition
+          - miki_1999_t3_sample_15_pb_rich_composition
+          - miki_1999_t3_sample_16_si_rich_composition
+          - miki_1999_t3_sample_16_pb_rich_composition
+          - miki_1999_t3_sample_17_si_rich_composition
+          - miki_1999_t3_sample_17_pb_rich_composition
+          - miki_1999_t9_row_9_epsilon_Mg_Pb_in_Si
+          - miki_1999_t10_row_6_epsilon_Mg_Si_in_Pb
+          - miki_1999_t10_gamma0_Mg_in_Pb
+          - miki_1999_ref4_gamma0_Ca_Mg_relation_1723
+          output_unit: dimensionless
+        derived_from: *id003
+        paraphrase: Derived by regression from the Mg binary Si/Pb distribution data in Table 3 and Fig. 3.
+      inference:
+        relation: least-squares regression of distribution-equilibrium composition data
+        inputs: *id003
+        output_unit: dimensionless
+    - observation_id: miki_1999_t9_row_7_epsilon_Al_Pb_in_Si
+      type: interaction_parameter
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 8
+        published_page: 1115
+        table: '9'
+        note: epsilon_Al_Pb_in_Si; mole-fraction Wagner interaction parameter, 1723 K. measured here from chemical-equilibration
+          slopes; Table 1, Fig. 1.
+      units: dimensionless
+      uncertainty: No parameter-specific uncertainty or fit confidence interval is stated.
+      values:
+        method_class: model_derived
+        quantity: wagner_interaction_parameter
+        wagner_interaction_parameter: 2.34
+        parameter: epsilon_Al_Pb_in_Si
+        T_K: 1723
+        basis: mole-fraction Wagner interaction parameter, 1723 K
+        derivation:
+          relation: Eq. 2 regression of Table 1 Al Si/Pb distribution data (Fig. 1), using the prior ln gamma°_Pb in Si intercept 3.74 from reference [3].
+          inputs: &id004
+          - miki_1999_t1_sample_1_si_rich_composition
+          - miki_1999_t1_sample_1_pb_rich_composition
+          - miki_1999_t1_sample_2_si_rich_composition
+          - miki_1999_t1_sample_2_pb_rich_composition
+          - miki_1999_t1_sample_3_si_rich_composition
+          - miki_1999_t1_sample_3_pb_rich_composition
+          - miki_1999_t1_sample_4_si_rich_composition
+          - miki_1999_t1_sample_4_pb_rich_composition
+          - miki_1999_t1_sample_5_si_rich_composition
+          - miki_1999_t1_sample_5_pb_rich_composition
+          - miki_1999_t1_sample_6_si_rich_composition
+          - miki_1999_t1_sample_6_pb_rich_composition
+          - miki_1999_ref3_intercept_Pb_in_Si_1723
+          output_unit: dimensionless
+        derived_from: *id004
+        paraphrase: Derived by regression from the Al binary Si/Pb distribution data in Table 1 and Fig. 1.
+      inference:
+        relation: least-squares regression of Si/Pb distribution data in Table 1, Fig. 1, using prior intercept [3].
+        inputs: *id004
+        output_unit: dimensionless
+    - observation_id: miki_1999_t9_row_8_epsilon_Ca_Pb_in_Si
+      type: interaction_parameter
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 8
+        published_page: 1115
+        table: '9'
+        note: epsilon_Ca_Pb_in_Si; mole-fraction Wagner interaction parameter, 1723 K. measured here from chemical-equilibration
+          slopes; Table 2, Fig. 1.
+      units: dimensionless
+      uncertainty: No parameter-specific uncertainty or fit confidence interval is stated.
+      values:
+        method_class: model_derived
+        quantity: wagner_interaction_parameter
+        wagner_interaction_parameter: -9.01
+        parameter: epsilon_Ca_Pb_in_Si
+        T_K: 1723
+        basis: mole-fraction Wagner interaction parameter, 1723 K
+        derivation:
+          relation: Eq. 2 regression of Table 2 Ca Si/Pb distribution data (Fig. 1), using the prior ln gamma°_Pb in Si intercept 3.74 from reference [3].
+          inputs: &id005
+          - miki_1999_t2_sample_7_si_rich_composition
+          - miki_1999_t2_sample_7_pb_rich_composition
+          - miki_1999_t2_sample_8_si_rich_composition
+          - miki_1999_t2_sample_8_pb_rich_composition
+          - miki_1999_t2_sample_9_si_rich_composition
+          - miki_1999_t2_sample_9_pb_rich_composition
+          - miki_1999_t2_sample_10_si_rich_composition
+          - miki_1999_t2_sample_10_pb_rich_composition
+          - miki_1999_t2_sample_11_si_rich_composition
+          - miki_1999_t2_sample_11_pb_rich_composition
+          - miki_1999_ref3_intercept_Pb_in_Si_1723
+          output_unit: dimensionless
+        derived_from: *id005
+        paraphrase: Derived by regression from the Ca binary Si/Pb distribution data in Table 2 and Fig. 1.
+      inference:
+        relation: least-squares regression of Si/Pb distribution data in Table 2, Fig. 1, using prior intercept [3].
+        inputs: *id005
+        output_unit: dimensionless
+    - observation_id: miki_1999_t9_row_9_epsilon_Mg_Pb_in_Si
+      type: interaction_parameter
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 8
+        published_page: 1115
+        table: '9'
+        note: epsilon_Mg_Pb_in_Si; mole-fraction Wagner interaction parameter, 1723 K. measured here from chemical-equilibration
+          slopes; Table 3, Fig. 1.
+      units: dimensionless
+      uncertainty: No parameter-specific uncertainty or fit confidence interval is stated.
+      values:
+        method_class: model_derived
+        quantity: wagner_interaction_parameter
+        wagner_interaction_parameter: -6.37
+        parameter: epsilon_Mg_Pb_in_Si
+        T_K: 1723
+        basis: mole-fraction Wagner interaction parameter, 1723 K
+        derivation:
+          relation: Eq. 2 regression of Table 3 Mg Si/Pb distribution data (Fig. 1), using the prior ln gamma°_Pb in Si intercept 3.74 from reference [3].
+          inputs: &id006
+          - miki_1999_t3_sample_12_si_rich_composition
+          - miki_1999_t3_sample_12_pb_rich_composition
+          - miki_1999_t3_sample_13_si_rich_composition
+          - miki_1999_t3_sample_13_pb_rich_composition
+          - miki_1999_t3_sample_14_si_rich_composition
+          - miki_1999_t3_sample_14_pb_rich_composition
+          - miki_1999_t3_sample_15_si_rich_composition
+          - miki_1999_t3_sample_15_pb_rich_composition
+          - miki_1999_t3_sample_16_si_rich_composition
+          - miki_1999_t3_sample_16_pb_rich_composition
+          - miki_1999_t3_sample_17_si_rich_composition
+          - miki_1999_t3_sample_17_pb_rich_composition
+          - miki_1999_ref3_intercept_Pb_in_Si_1723
+          output_unit: dimensionless
+        derived_from: *id006
+        paraphrase: Derived by regression from the Mg binary Si/Pb distribution data in Table 3 and Fig. 1.
+      inference:
+        relation: least-squares regression of Si/Pb distribution data in Table 3, Fig. 1, using prior intercept [3].
+        inputs: *id006
+        output_unit: dimensionless
+    - observation_id: miki_1999_distribution_epsilon_Ca_Ca_in_Si_1723
+      type: interaction_parameter
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 3
+        published_page: 1110
+        equation: '6'
+      units: dimensionless
+      quote: ln γ_Ca(l) in Si = −6.71 + 9.90 X_Ca in Si (1723 K).
+      values:
+        method_class: quoted_attributed
+        quantity: wagner_interaction_parameter
+        wagner_interaction_parameter: 9.90
+        parameter: epsilon_Ca_Ca_in_Si
+        T_K: 1723
+        attribution: Present paper, Eq. 6.
+      attribution: Present paper, Eq. 6.
+    - observation_id: miki_1999_t9_row_10_epsilon_Al_Ca_in_Si
+      type: interaction_parameter
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 8
+        published_page: 1115
+        table: '9'
+        note: epsilon_Al_Ca_in_Si; mole-fraction Wagner interaction parameter, 1723 K. measured here from ternary
+          equilibration; Table 6, Fig. 10.
+      units: dimensionless
+      uncertainty: No parameter-specific uncertainty or fit confidence interval is stated.
+      values:
+        method_class: model_derived
+        quantity: wagner_interaction_parameter
+        wagner_interaction_parameter: 6.46
+        parameter: epsilon_Al_Ca_in_Si
+        T_K: 1723
+        basis: mole-fraction Wagner interaction parameter, 1723 K
+        derivation:
+          relation: Eq. 21 regression of Table 6 Si–Ca–Al/Pb distribution data (Fig. 10), using the plotted ordinate with epsilon_Ca_Ca_in_Si=9.90, epsilon_Ca_Pb_in_Si=-9.01, and epsilon_Si_Ca_in_Pb=-14.3.
+          inputs: &id007
+          - miki_1999_t6_sample_28_si_rich_composition
+          - miki_1999_t6_sample_28_pb_rich_composition
+          - miki_1999_t6_sample_29_si_rich_composition
+          - miki_1999_t6_sample_29_pb_rich_composition
+          - miki_1999_t6_sample_30_si_rich_composition
+          - miki_1999_t6_sample_30_pb_rich_composition
+          - miki_1999_t6_sample_31_si_rich_composition
+          - miki_1999_t6_sample_31_pb_rich_composition
+          - miki_1999_t6_sample_32_si_rich_composition
+          - miki_1999_t6_sample_32_pb_rich_composition
+          - miki_1999_t6_sample_33_si_rich_composition
+          - miki_1999_t6_sample_33_pb_rich_composition
+          - miki_1999_t6_sample_34_si_rich_composition
+          - miki_1999_t6_sample_34_pb_rich_composition
+          - miki_1999_distribution_epsilon_Ca_Ca_in_Si_1723
+          - miki_1999_t9_row_8_epsilon_Ca_Pb_in_Si
+          - miki_1999_t10_row_5_epsilon_Ca_Si_in_Pb
+          output_unit: dimensionless
+        derived_from: *id007
+        paraphrase: Derived by regression from the Si–Ca–Al/Pb distribution data in Table 6 and Fig. 10.
+      inference:
+        relation: least-squares regression of distribution-equilibrium composition data
+        inputs: *id007
+        output_unit: dimensionless
+    - observation_id: miki_1999_t9_row_11_epsilon_Ca_Ti_in_Si
+      type: interaction_parameter
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 8
+        published_page: 1115
+        table: '9'
+        note: epsilon_Ca_Ti_in_Si; mole-fraction Wagner interaction parameter, 1723 K. measured here from ternary
+          equilibration; Table 7, Fig. 11.
+      units: dimensionless
+      uncertainty: No parameter-specific uncertainty or fit confidence interval is stated.
+      values:
+        method_class: model_derived
+        quantity: wagner_interaction_parameter
+        wagner_interaction_parameter: 25.3
+        parameter: epsilon_Ca_Ti_in_Si
+        T_K: 1723
+        basis: mole-fraction Wagner interaction parameter, 1723 K
+        derivation:
+          relation: Eq. 22 regression of Table 7 Si–Ca–Ti/Pb distribution data (Fig. 11), using the plotted ordinate with epsilon_Ti_Ti_in_Si=3.97, epsilon_Pb_Ti_in_Si=13.2, and epsilon_Si_Ti_in_Pb=-10.8.
+          inputs: &id008
+          - miki_1999_t7_sample_35_si_rich_composition
+          - miki_1999_t7_sample_35_pb_rich_composition
+          - miki_1999_t7_sample_36_si_rich_composition
+          - miki_1999_t7_sample_36_pb_rich_composition
+          - miki_1999_t7_sample_37_si_rich_composition
+          - miki_1999_t7_sample_37_pb_rich_composition
+          - miki_1999_t7_sample_38_si_rich_composition
+          - miki_1999_t7_sample_38_pb_rich_composition
+          - miki_1999_t7_sample_39_si_rich_composition
+          - miki_1999_t7_sample_39_pb_rich_composition
+          - miki_1999_t7_sample_40_si_rich_composition
+          - miki_1999_t7_sample_40_pb_rich_composition
+          - miki_1999_t7_sample_41_si_rich_composition
+          - miki_1999_t7_sample_41_pb_rich_composition
+          - miki_1999_t7_sample_42_si_rich_composition
+          - miki_1999_t7_sample_42_pb_rich_composition
+          - miki_1999_t7_sample_43_si_rich_composition
+          - miki_1999_t7_sample_43_pb_rich_composition
+          - miki_1999_ref3_epsilon_Ti_Ti_in_Si
+          - miki_1999_ref3_epsilon_Fe_Ti_in_Si
+          - miki_1999_ref3_epsilon_Ti_Pb_in_Si
+          output_unit: dimensionless
+        derived_from: *id008
+        paraphrase: Derived by regression from the Si–Ca–Ti/Pb distribution data in Table 7 and Fig. 11.
+      inference:
+        relation: least-squares regression of distribution-equilibrium composition data
+        inputs: *id008
+        output_unit: dimensionless
+    - observation_id: miki_1999_t9_row_12_epsilon_Ca_Fe_in_Si
+      type: interaction_parameter
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 8
+        published_page: 1115
+        table: '9'
+        note: epsilon_Ca_Fe_in_Si; mole-fraction Wagner interaction parameter, 1723 K. measured here from ternary
+          equilibration; Table 8, Fig. 12.
+      units: dimensionless
+      uncertainty: No parameter-specific uncertainty or fit confidence interval is stated.
+      values:
+        method_class: model_derived
+        quantity: wagner_interaction_parameter
+        wagner_interaction_parameter: 2.25
+        parameter: epsilon_Ca_Fe_in_Si
+        T_K: 1723
+        basis: mole-fraction Wagner interaction parameter, 1723 K
+        derivation:
+          relation: Eq. 22 regression of Table 8 Si–Ca–Fe/Pb distribution data (Fig. 12), using the plotted ordinate with epsilon_Fe_Fe_in_Si=3.17, epsilon_Pb_Fe_in_Si=14.1, and epsilon_Si_Fe_in_Pb=-23.8.
+          inputs: &id009
+          - miki_1999_t8_sample_44_si_rich_composition
+          - miki_1999_t8_sample_44_pb_rich_composition
+          - miki_1999_t8_sample_45_si_rich_composition
+          - miki_1999_t8_sample_45_pb_rich_composition
+          - miki_1999_t8_sample_46_si_rich_composition
+          - miki_1999_t8_sample_46_pb_rich_composition
+          - miki_1999_t8_sample_47_si_rich_composition
+          - miki_1999_t8_sample_47_pb_rich_composition
+          - miki_1999_t8_sample_48_si_rich_composition
+          - miki_1999_t8_sample_48_pb_rich_composition
+          - miki_1999_ref3_epsilon_Fe_Fe_in_Si
+          - miki_1999_ref3_epsilon_Fe_Pb_in_Si
+          - miki_1999_ref3_epsilon_Fe_Si_in_Pb
+          output_unit: dimensionless
+        derived_from: *id009
+        paraphrase: Derived by regression from the Si–Ca–Fe/Pb distribution data in Table 8 and Fig. 12.
+      inference:
+        relation: least-squares regression of distribution-equilibrium composition data
+        inputs: *id009
+        output_unit: dimensionless
+    - observation_id: miki_1999_t10_gamma0_Al_in_Pb
+      type: activity_coefficient
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 8
+        published_page: 1115
+        table: '10'
+        figure: '3'
+        note: Infinite-dilution activity coefficient in molten Pb relative to pure liquid solute.
+      units: dimensionless
+      uncertainty: No parameter-specific uncertainty is stated.
+      values:
+        method_class: model_derived
+        quantity: activity_coefficient
+        formula: Al
+        gamma: 3.86
+        standard_state: pure liquid Al
+        T_K: 1723
+        derivation:
+          relation: Eq. 4/Fig. 3 regression of Table 1 Al Si/Pb distribution rows using the Pb-in-Si and Si-in-Pb interaction corrections and corrected 1723 K infinite-dilution Al activity coefficient.
+          inputs: &id010
+          - miki_1999_t1_sample_1_si_rich_composition
+          - miki_1999_t1_sample_1_pb_rich_composition
+          - miki_1999_t1_sample_2_si_rich_composition
+          - miki_1999_t1_sample_2_pb_rich_composition
+          - miki_1999_t1_sample_3_si_rich_composition
+          - miki_1999_t1_sample_3_pb_rich_composition
+          - miki_1999_t1_sample_4_si_rich_composition
+          - miki_1999_t1_sample_4_pb_rich_composition
+          - miki_1999_t1_sample_5_si_rich_composition
+          - miki_1999_t1_sample_5_pb_rich_composition
+          - miki_1999_t1_sample_6_si_rich_composition
+          - miki_1999_t1_sample_6_pb_rich_composition
+          - miki_1999_t9_row_7_epsilon_Al_Pb_in_Si
+          - miki_1999_t10_row_4_epsilon_Al_Si_in_Pb
+          - miki_1999_ref4_gamma0_Al_in_Si_1723
+          output_unit: dimensionless
+        derived_from: *id010
+        source_status: derived here from intercept in Fig. 3
+      inference:
+        relation: least-squares regression intercept of chemical-equilibration data as described in the paper
+        inputs: *id010
+        output_unit: dimensionless
+    - observation_id: miki_1999_t10_gamma0_Ca_in_Pb
+      type: activity_coefficient
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 8
+        published_page: 1115
+        table: '10'
+        figure: '3'
+        note: Infinite-dilution activity coefficient in molten Pb relative to pure liquid solute.
+      units: dimensionless
+      uncertainty: No parameter-specific uncertainty is stated.
+      values:
+        method_class: model_derived
+        quantity: activity_coefficient
+        formula: Ca
+        gamma: 0.00401
+        standard_state: pure liquid Ca
+        T_K: 1723
+        derivation:
+          relation: Eq. 4/Fig. 3 regression of Table 2 Ca Si/Pb distribution rows using the Pb-in-Si and Si-in-Pb interaction corrections and prior 1723 K Ca infinite-dilution activity coefficient relation.
+          inputs: &id011
+          - miki_1999_t2_sample_7_si_rich_composition
+          - miki_1999_t2_sample_7_pb_rich_composition
+          - miki_1999_t2_sample_8_si_rich_composition
+          - miki_1999_t2_sample_8_pb_rich_composition
+          - miki_1999_t2_sample_9_si_rich_composition
+          - miki_1999_t2_sample_9_pb_rich_composition
+          - miki_1999_t2_sample_10_si_rich_composition
+          - miki_1999_t2_sample_10_pb_rich_composition
+          - miki_1999_t2_sample_11_si_rich_composition
+          - miki_1999_t2_sample_11_pb_rich_composition
+          - miki_1999_t9_row_8_epsilon_Ca_Pb_in_Si
+          - miki_1999_t10_row_5_epsilon_Ca_Si_in_Pb
+          - miki_1999_ref4_gamma0_Ca_Mg_relation_1723
+          output_unit: dimensionless
+        derived_from: *id011
+        source_status: derived here from intercept in Fig. 3
+      inference:
+        relation: least-squares regression intercept of chemical-equilibration data as described in the paper
+        inputs: *id011
+        output_unit: dimensionless
+    - observation_id: miki_1999_t10_gamma0_Mg_in_Pb
+      type: activity_coefficient
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 8
+        published_page: 1115
+        table: '10'
+        figure: '3'
+        note: Infinite-dilution activity coefficient in molten Pb relative to pure liquid solute.
+      units: dimensionless
+      uncertainty: No parameter-specific uncertainty is stated.
+      values:
+        method_class: model_derived
+        quantity: activity_coefficient
+        formula: Mg
+        gamma: 0.221
+        standard_state: pure liquid Mg
+        T_K: 1723
+        derivation:
+          relation: Eq. 4/Fig. 3 regression of Table 3 Mg Si/Pb distribution rows using the Pb-in-Si and Si-in-Pb interaction corrections and prior 1723 K Mg infinite-dilution activity coefficient relation.
+          inputs: &id012
+          - miki_1999_t3_sample_12_si_rich_composition
+          - miki_1999_t3_sample_12_pb_rich_composition
+          - miki_1999_t3_sample_13_si_rich_composition
+          - miki_1999_t3_sample_13_pb_rich_composition
+          - miki_1999_t3_sample_14_si_rich_composition
+          - miki_1999_t3_sample_14_pb_rich_composition
+          - miki_1999_t3_sample_15_si_rich_composition
+          - miki_1999_t3_sample_15_pb_rich_composition
+          - miki_1999_t3_sample_16_si_rich_composition
+          - miki_1999_t3_sample_16_pb_rich_composition
+          - miki_1999_t3_sample_17_si_rich_composition
+          - miki_1999_t3_sample_17_pb_rich_composition
+          - miki_1999_t9_row_9_epsilon_Mg_Pb_in_Si
+          - miki_1999_t10_row_6_epsilon_Mg_Si_in_Pb
+          - miki_1999_ref4_gamma0_Ca_Mg_relation_1723
+          output_unit: dimensionless
+        derived_from: *id012
+        source_status: derived here from intercept in Fig. 3
+      inference:
+        relation: least-squares regression intercept of chemical-equilibration data as described in the paper
+        inputs: *id012
+        output_unit: dimensionless
+    - observation_id: miki_1999_t10_row_4_epsilon_Al_Si_in_Pb
+      type: interaction_parameter
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 8
+        published_page: 1115
+        table: '10'
+        note: epsilon_Al_Si_in_Pb; mole-fraction Wagner interaction parameter, 1723 K. measured here from chemical-equilibration
+          slopes; Table 1, Fig. 2.
+      units: dimensionless
+      uncertainty: No parameter-specific uncertainty or fit confidence interval is stated.
+      values:
+        method_class: model_derived
+        quantity: wagner_interaction_parameter
+        wagner_interaction_parameter: -8.63
+        parameter: epsilon_Al_Si_in_Pb
+        T_K: 1723
+        basis: mole-fraction Wagner interaction parameter, 1723 K
+        derivation:
+          relation: least-squares slope of the Al Si/Pb distribution data in Table 1, Fig. 2.
+          inputs: &id013
+          - miki_1999_t1_sample_1_si_rich_composition
+          - miki_1999_t1_sample_1_pb_rich_composition
+          - miki_1999_t1_sample_2_si_rich_composition
+          - miki_1999_t1_sample_2_pb_rich_composition
+          - miki_1999_t1_sample_3_si_rich_composition
+          - miki_1999_t1_sample_3_pb_rich_composition
+          - miki_1999_t1_sample_4_si_rich_composition
+          - miki_1999_t1_sample_4_pb_rich_composition
+          - miki_1999_t1_sample_5_si_rich_composition
+          - miki_1999_t1_sample_5_pb_rich_composition
+          - miki_1999_t1_sample_6_si_rich_composition
+          - miki_1999_t1_sample_6_pb_rich_composition
+          output_unit: dimensionless
+        derived_from: *id013
+        paraphrase: Derived by regression from the Al binary Si/Pb distribution data in Table 1 and Fig. 2.
+      inference:
+        relation: least-squares regression of distribution-equilibrium composition data
+        inputs: *id013
+        output_unit: dimensionless
+    - observation_id: miki_1999_t10_row_5_epsilon_Ca_Si_in_Pb
+      type: interaction_parameter
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 8
+        published_page: 1115
+        table: '10'
+        note: epsilon_Ca_Si_in_Pb; mole-fraction Wagner interaction parameter, 1723 K. measured here from chemical-equilibration
+          slopes; Table 2, Fig. 2.
+      units: dimensionless
+      uncertainty: No parameter-specific uncertainty or fit confidence interval is stated.
+      values:
+        method_class: model_derived
+        quantity: wagner_interaction_parameter
+        wagner_interaction_parameter: -14.3
+        parameter: epsilon_Ca_Si_in_Pb
+        T_K: 1723
+        basis: mole-fraction Wagner interaction parameter, 1723 K
+        derivation:
+          relation: least-squares slope of the Ca Si/Pb distribution data in Table 2, Fig. 2.
+          inputs: &id014
+          - miki_1999_t2_sample_7_si_rich_composition
+          - miki_1999_t2_sample_7_pb_rich_composition
+          - miki_1999_t2_sample_8_si_rich_composition
+          - miki_1999_t2_sample_8_pb_rich_composition
+          - miki_1999_t2_sample_9_si_rich_composition
+          - miki_1999_t2_sample_9_pb_rich_composition
+          - miki_1999_t2_sample_10_si_rich_composition
+          - miki_1999_t2_sample_10_pb_rich_composition
+          - miki_1999_t2_sample_11_si_rich_composition
+          - miki_1999_t2_sample_11_pb_rich_composition
+          output_unit: dimensionless
+        derived_from: *id014
+        paraphrase: Derived by regression from the Ca binary Si/Pb distribution data in Table 2 and Fig. 2.
+      inference:
+        relation: least-squares regression of distribution-equilibrium composition data
+        inputs: *id014
+        output_unit: dimensionless
+    - observation_id: miki_1999_t10_row_6_epsilon_Mg_Si_in_Pb
+      type: interaction_parameter
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 8
+        published_page: 1115
+        table: '10'
+        note: epsilon_Mg_Si_in_Pb; mole-fraction Wagner interaction parameter, 1723 K. measured here from chemical-equilibration
+          slopes; Table 3, Fig. 2.
+      units: dimensionless
+      uncertainty: No parameter-specific uncertainty or fit confidence interval is stated.
+      values:
+        method_class: model_derived
+        quantity: wagner_interaction_parameter
+        wagner_interaction_parameter: -4.03
+        parameter: epsilon_Mg_Si_in_Pb
+        T_K: 1723
+        basis: mole-fraction Wagner interaction parameter, 1723 K
+        derivation:
+          relation: least-squares slope of the Mg Si/Pb distribution data in Table 3, Fig. 2.
+          inputs: &id015
+          - miki_1999_t3_sample_12_si_rich_composition
+          - miki_1999_t3_sample_12_pb_rich_composition
+          - miki_1999_t3_sample_13_si_rich_composition
+          - miki_1999_t3_sample_13_pb_rich_composition
+          - miki_1999_t3_sample_14_si_rich_composition
+          - miki_1999_t3_sample_14_pb_rich_composition
+          - miki_1999_t3_sample_15_si_rich_composition
+          - miki_1999_t3_sample_15_pb_rich_composition
+          - miki_1999_t3_sample_16_si_rich_composition
+          - miki_1999_t3_sample_16_pb_rich_composition
+          - miki_1999_t3_sample_17_si_rich_composition
+          - miki_1999_t3_sample_17_pb_rich_composition
+          output_unit: dimensionless
+        derived_from: *id015
+        paraphrase: Derived by regression from the Mg binary Si/Pb distribution data in Table 3 and Fig. 2.
+      inference:
+        relation: least-squares regression of distribution-equilibrium composition data
+        inputs: *id015
+        output_unit: dimensionless
+    - observation_id: miki_1999_ref3_epsilon_Ti_Ti_in_Si
+      type: interaction_parameter
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 6
+        published_page: 1113
+        section: Thermodynamic properties of Si ternary alloys
+        equation: 21-22
+      units: dimensionless
+      quote: The interaction parameters at 1723 K used in Eqs. (21) and (22) are ε_Ca_Ca in Si=9.90, ε_Pb_Ca in Si=−9.01, ε_Si_Ca in Pb=−14.3 determined in the present work, and ε_Ti_Ti in Si=3.97, ε_Pb_Ti in Si=13.2, ε_Si_Ti in Pb=−10.8, ε_Fe_Fe in Si=3.17, ε_Pb_Fe in Si=14.1, and ε_Si_Fe in Pb=−23.8 determined previously [3].
+      values:
+        method_class: quoted_attributed
+        quantity: wagner_interaction_parameter
+        wagner_interaction_parameter: 3.97
+        parameter: epsilon_Ti_Ti_in_Si
+        T_K: 1723
+        attribution: Miki, Morita and Sano, Metallurgical and Materials Transactions B 28B (1997), 861–867.
+      attribution: Miki, Morita and Sano, Metallurgical and Materials Transactions B 28B (1997), 861–867.
+    - observation_id: miki_1999_ref3_epsilon_Fe_Ti_in_Si
+      type: interaction_parameter
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 6
+        published_page: 1113
+        section: Thermodynamic properties of Si ternary alloys
+        equation: 21-22
+      units: dimensionless
+      quote: The interaction parameters at 1723 K used in Eqs. (21) and (22) are ε_Ca_Ca in Si=9.90, ε_Pb_Ca in Si=−9.01, ε_Si_Ca in Pb=−14.3 determined in the present work, and ε_Ti_Ti in Si=3.97, ε_Pb_Ti in Si=13.2, ε_Si_Ti in Pb=−10.8, ε_Fe_Fe in Si=3.17, ε_Pb_Fe in Si=14.1, and ε_Si_Fe in Pb=−23.8 determined previously [3].
+      values:
+        method_class: quoted_attributed
+        quantity: wagner_interaction_parameter
+        wagner_interaction_parameter: 13.2
+        parameter: epsilon_Pb_Ti_in_Si
+        legacy_identifier: miki_1999_ref3_epsilon_Fe_Ti_in_Si retained for compatibility
+        T_K: 1723
+        attribution: Miki, Morita and Sano, Metallurgical and Materials Transactions B 28B (1997), 861–867.
+      attribution: Miki, Morita and Sano, Metallurgical and Materials Transactions B 28B (1997), 861–867.
+    - observation_id: miki_1999_ref3_epsilon_Ti_Pb_in_Si
+      type: interaction_parameter
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 6
+        published_page: 1113
+        section: Thermodynamic properties of Si ternary alloys
+        equation: 21-22
+      units: dimensionless
+      quote: The interaction parameters at 1723 K used in Eqs. (21) and (22) are ε_Ca_Ca in Si=9.90, ε_Pb_Ca in Si=−9.01, ε_Si_Ca in Pb=−14.3 determined in the present work, and ε_Ti_Ti in Si=3.97, ε_Pb_Ti in Si=13.2, ε_Si_Ti in Pb=−10.8, ε_Fe_Fe in Si=3.17, ε_Pb_Fe in Si=14.1, and ε_Si_Fe in Pb=−23.8 determined previously [3].
+      values:
+        method_class: quoted_attributed
+        quantity: wagner_interaction_parameter
+        wagner_interaction_parameter: -10.8
+        parameter: epsilon_Si_Ti_in_Pb
+        legacy_identifier: miki_1999_ref3_epsilon_Ti_Pb_in_Si retained for compatibility
+        T_K: 1723
+        attribution: Miki, Morita and Sano, Metallurgical and Materials Transactions B 28B (1997), 861–867.
+      attribution: Miki, Morita and Sano, Metallurgical and Materials Transactions B 28B (1997), 861–867.
+    - observation_id: miki_1999_ref3_epsilon_Fe_Fe_in_Si
+      type: interaction_parameter
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 6
+        published_page: 1113
+        section: Thermodynamic properties of Si ternary alloys
+        equation: 21-22
+      units: dimensionless
+      quote: The interaction parameters at 1723 K used in Eqs. (21) and (22) are ε_Ca_Ca in Si=9.90, ε_Pb_Ca in Si=−9.01, ε_Si_Ca in Pb=−14.3 determined in the present work, and ε_Ti_Ti in Si=3.97, ε_Pb_Ti in Si=13.2, ε_Si_Ti in Pb=−10.8, ε_Fe_Fe in Si=3.17, ε_Pb_Fe in Si=14.1, and ε_Si_Fe in Pb=−23.8 determined previously [3].
+      values:
+        method_class: quoted_attributed
+        quantity: wagner_interaction_parameter
+        wagner_interaction_parameter: 3.17
+        parameter: epsilon_Fe_Fe_in_Si
+        T_K: 1723
+        attribution: Miki, Morita and Sano, Metallurgical and Materials Transactions B 28B (1997), 861–867.
+      attribution: Miki, Morita and Sano, Metallurgical and Materials Transactions B 28B (1997), 861–867.
+    - observation_id: miki_1999_ref3_epsilon_Fe_Pb_in_Si
+      type: interaction_parameter
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 6
+        published_page: 1113
+        section: Thermodynamic properties of Si ternary alloys
+        equation: 21-22
+      units: dimensionless
+      quote: The interaction parameters at 1723 K used in Eqs. (21) and (22) are ε_Ca_Ca in Si=9.90, ε_Pb_Ca in Si=−9.01, ε_Si_Ca in Pb=−14.3 determined in the present work, and ε_Ti_Ti in Si=3.97, ε_Pb_Ti in Si=13.2, ε_Si_Ti in Pb=−10.8, ε_Fe_Fe in Si=3.17, ε_Pb_Fe in Si=14.1, and ε_Si_Fe in Pb=−23.8 determined previously [3].
+      values:
+        method_class: quoted_attributed
+        quantity: wagner_interaction_parameter
+        wagner_interaction_parameter: 14.1
+        parameter: epsilon_Pb_Fe_in_Si
+        legacy_identifier: miki_1999_ref3_epsilon_Fe_Pb_in_Si retained for compatibility
+        T_K: 1723
+        attribution: Miki, Morita and Sano, Metallurgical and Materials Transactions B 28B (1997), 861–867.
+      attribution: Miki, Morita and Sano, Metallurgical and Materials Transactions B 28B (1997), 861–867.
+    - observation_id: miki_1999_ref3_epsilon_Fe_Si_in_Pb
+      type: interaction_parameter
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 6
+        published_page: 1113
+        section: Thermodynamic properties of Si ternary alloys
+        equation: 21-22
+      units: dimensionless
+      quote: The interaction parameters at 1723 K used in Eqs. (21) and (22) are ε_Ca_Ca in Si=9.90, ε_Pb_Ca in Si=−9.01, ε_Si_Ca in Pb=−14.3 determined in the present work, and ε_Ti_Ti in Si=3.97, ε_Pb_Ti in Si=13.2, ε_Si_Ti in Pb=−10.8, ε_Fe_Fe in Si=3.17, ε_Pb_Fe in Si=14.1, and ε_Si_Fe in Pb=−23.8 determined previously [3].
+      values:
+        method_class: quoted_attributed
+        quantity: wagner_interaction_parameter
+        wagner_interaction_parameter: -23.8
+        parameter: epsilon_Si_Fe_in_Pb
+        legacy_identifier: miki_1999_ref3_epsilon_Fe_Si_in_Pb retained for compatibility
+        T_K: 1723
+        attribution: Miki, Morita and Sano, Metallurgical and Materials Transactions B 28B (1997), 861–867.
+      attribution: Miki, Morita and Sano, Metallurgical and Materials Transactions B 28B (1997), 861–867.
+    - observation_id: miki_1999_gamma0_Si_in_Pb_1723
+      type: activity_coefficient
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 3
+        published_page: 1110
+        equation: '3'
+        figure: '2'
+        note: Average intercept of three regression lines.
+      units: dimensionless
+      values:
+        method_class: model_derived
+        quantity: activity_coefficient
+        gamma: 45.6
+        T_K: 1723
+        standard_state: pure liquid Si
+        derivation:
+          relation: Average of the three Table 1–3 Si/Pb distribution regression intercepts from Eq. 3/Fig. 2, then exponential conversion from ln(gamma); the average does not use the 3.74 ln gamma°_Pb-in-Si intercept.
+          inputs: &id016
+          - miki_1999_t1_sample_1_si_rich_composition
+          - miki_1999_t1_sample_1_pb_rich_composition
+          - miki_1999_t1_sample_2_si_rich_composition
+          - miki_1999_t1_sample_2_pb_rich_composition
+          - miki_1999_t1_sample_3_si_rich_composition
+          - miki_1999_t1_sample_3_pb_rich_composition
+          - miki_1999_t1_sample_4_si_rich_composition
+          - miki_1999_t1_sample_4_pb_rich_composition
+          - miki_1999_t1_sample_5_si_rich_composition
+          - miki_1999_t1_sample_5_pb_rich_composition
+          - miki_1999_t1_sample_6_si_rich_composition
+          - miki_1999_t1_sample_6_pb_rich_composition
+          - miki_1999_t2_sample_7_si_rich_composition
+          - miki_1999_t2_sample_7_pb_rich_composition
+          - miki_1999_t2_sample_8_si_rich_composition
+          - miki_1999_t2_sample_8_pb_rich_composition
+          - miki_1999_t2_sample_9_si_rich_composition
+          - miki_1999_t2_sample_9_pb_rich_composition
+          - miki_1999_t2_sample_10_si_rich_composition
+          - miki_1999_t2_sample_10_pb_rich_composition
+          - miki_1999_t2_sample_11_si_rich_composition
+          - miki_1999_t2_sample_11_pb_rich_composition
+          - miki_1999_t3_sample_12_si_rich_composition
+          - miki_1999_t3_sample_12_pb_rich_composition
+          - miki_1999_t3_sample_13_si_rich_composition
+          - miki_1999_t3_sample_13_pb_rich_composition
+          - miki_1999_t3_sample_14_si_rich_composition
+          - miki_1999_t3_sample_14_pb_rich_composition
+          - miki_1999_t3_sample_15_si_rich_composition
+          - miki_1999_t3_sample_15_pb_rich_composition
+          - miki_1999_t3_sample_16_si_rich_composition
+          - miki_1999_t3_sample_16_pb_rich_composition
+          - miki_1999_t3_sample_17_si_rich_composition
+          - miki_1999_t3_sample_17_pb_rich_composition
+          output_unit: dimensionless
+        derived_from: *id016
+      inference:
+        relation: average intercept of three regression lines, followed by exponential conversion from ln(gamma)
+        inputs: *id016
+        output_unit: dimensionless
+    - observation_id: miki_1999_ref3_intercept_Pb_in_Si_1723
+      type: interaction_parameter
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 2
+        published_page: 1109
+        equation: '2'
+      units: dimensionless
+      quote: The value of 3.74 for the intercept determined previously(3) is used in the present work.
+      values:
+        method_class: quoted_attributed
+        quantity: intercept
+        parameter: ln_gamma0_Pb_in_Si
+        value: 3.74
+        T_K: 1723
+        attribution: Miki, Morita and Sano, Metallurgical and Materials Transactions B 28B (1997), 861–867 [3].
+      attribution: Miki, Morita and Sano, Metallurgical and Materials Transactions B 28B (1997), 861–867 [3].
+    - observation_id: miki_1999_ref4_gamma0_Al_in_Si_1723
+      type: activity_coefficient
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 3
+        published_page: 1110
+        section: Results and Discussion
+        equation: '5'
+      units: dimensionless
+      quote: The previously reported value of 0.212 [4] for the activity coefficient of Al in molten Si at infinitely dilute solution at 1723 K was slightly corrected to 0.194 in the present study, because this had been determined at 0.5 mass% Al, which was found not to be dilute enough.
+      values:
+        method_class: quoted_attributed
+        quantity: activity_coefficient
+        formula: Al
+        gamma: 0.212
+        T_K: 1723
+        standard_state: pure liquid Al
+        attribution: Miki, Morita and Sano, Metallurgical and Materials Transactions B 29B (1998), 1043–1049.
+      attribution: Miki, Morita and Sano, Metallurgical and Materials Transactions B 29B (1998), 1043–1049.
+    - observation_id: miki_1999_ref4_gamma0_Ca_Mg_relation_1723
+      type: activity_coefficient
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 3
+        published_page: 1110
+        equation: 5-7
+      units: dimensionless activity coefficient
+      quote: The activity coefficient of Ca and Mg in molten Si at infinitely dilute solution at 1723 K was found to be identical with that of the previous work(4).
+      values:
+        method_class: quoted_attributed
+        relation: The authors report the Ca and Mg infinite-dilution coefficients as identical to reference [4].
+        formula: Ca, Mg
+        T_K: 1723
+        standard_state: pure liquid solute
+        attribution: Miki, Morita and Sano, Metallurgical and Materials Transactions B 29B (1998), 1043–1049.
+      attribution: Miki, Morita and Sano, Metallurgical and Materials Transactions B 29B (1998), 1043–1049.
+    - observation_id: miki_1999_ref5_gamma0_Si_in_Pb_1693
+      type: activity_coefficient
+      regime: quench_equilibration
+      phase: l
+      locator:
+        page: 3
+        published_page: 1110
+        figure: '3'
+      units: dimensionless
+      quote: The value of 3.82 for the intercept was deduced from the average value of three regression lines. From this value, γ°_Si(l) in Pb at 1723 K can be calculated as 45.6, which is larger than 30.6 at 1693 K obtained using the results of Kirkwood et al. [5].
+      values:
+        method_class: quoted_attributed
+        quantity: activity_coefficient
+        formula: Si
+        gamma: 30.6
+        T_K: 1693
+        standard_state: pure liquid Si
+        attribution: D. H. Kirkwood and J. Chipman, Journal of Physical Chemistry 65 (1961), 1082–1084.
+      attribution: D. H. Kirkwood and J. Chipman, Journal of Physical Chemistry 65 (1961), 1082–1084.
+    context:
+    - observation_id: miki_1999_experiment_binary_protocol
+      type: experiment_series
+      experiment: binary-pb-equilibration
+      locator:
+        page: 1
+        published_page: 1108
+        section: Experimental
+      units: as printed
+      values:
+        what_was_equilibrated: '3 g Si–M alloy (M: Al, Ca, Mg) with 10 g Pb; two liquid phases; 14.4 ks at 1723
+          K in Ar. M content initially 0.5–5 mass%.'
+        crucibles: Graphite or alumina; graphite lid placed on crucible to avoid Pb evaporation.
+        quench: Sample quenched after equilibration.
+        analysis: Pb and M in Si phase, Si and M in Pb phase determined by chemical analysis.
+        analysis_instrument:
+          tag: unknown
+          reason: not_published
+        analytical_precision:
+          tag: unknown
+          reason: not_published
+        equilibrium_evidence: No time series or approach-from-both-sides test reported; distribution equilibrium
+          is treated as attained after 14.4 ks. Kirkwood and Chipman phase-solubility measurements cited as background.
+        sample_mass_Si_alloy_g: 3
+        sample_mass_Pb_g: 10
+        equilibration_duration_ks: 14.4
+        temperature_K: 1723
+        gas_purification:
+          tag: unknown
+          reason: not_published
+        furnace:
+          tag: unknown
+          reason: not_published
+        temperature_sensor:
+          tag: unknown
+          reason: not_published
+        temperature_uncertainty_K:
+          tag: unknown
+          reason: not_published
+        fO2_control:
+          tag: unknown
+          reason: Ar atmosphere stated; no oxygen-fugacity control reported
+        chemical_equilibration_reaction:
+          tag: unknown
+          reason: no net reaction or standard Gibbs-energy expression is printed for Si/Pb distribution equilibrium
+    - observation_id: miki_1999_experiment_ternary_protocol
+      type: experiment_series
+      experiment: ternary-pb-equilibration
+      locator:
+        page: 2
+        published_page: 1109
+        section: Experimental
+      units: as printed
+      values:
+        what_was_equilibrated: '3 g Si–Ca–M (M: Al, Ti, Fe) alloy with 10 g Pb for 14.4 ks at 1723 K in Ar.'
+        sample_mass_Si_alloy_g: 3
+        sample_mass_Pb_g: 10
+        equilibration_duration_ks: 14.4
+        temperature_K: 1723
+        gas_purification:
+          tag: unknown
+          reason: not_published
+        furnace:
+          tag: unknown
+          reason: not_published
+        temperature_sensor:
+          tag: unknown
+          reason: not_published
+        temperature_uncertainty_K:
+          tag: unknown
+          reason: not_published
+        crucibles: Alumina for Si–Ca–Al; graphite for Si–Ca–Ti and Si–Ca–Fe.
+        composition_control: Ca in Si held constant for Si–Ca–Al to avoid excess Ca evaporation; Ti and Fe held
+          at relatively high levels to improve their chemical-analysis accuracy in Pb.
+        quench: Sample quenched; both Si-rich and Pb-rich phases chemically analyzed.
+        analysis: Pb, Ca and M in Si-rich phase; Si, Ca and M in Pb-rich phase.
+        analysis_instrument:
+          tag: unknown
+          reason: not_published
+        analytical_precision:
+          tag: unknown
+          reason: not_published
+        equilibrium_evidence: No explicit equilibrium verification series is reported.
+        fO2_control:
+          tag: unknown
+          reason: Ar atmosphere stated; no oxygen-fugacity control reported
+        chemical_equilibration_reaction:
+          tag: unknown
+          reason: no net reaction or standard Gibbs-energy expression is printed for Si/Pb distribution equilibrium
+    - observation_id: miki_1999_knudsen_setup
+      type: apparatus
+      experiment: knudsen-effusion
+      locator:
+        page: 1
+        published_page: 1108
+        section: Experimental
+      units: as printed
+      values:
+        instrument: Nuclide Corp. 12-90HT magnetic single-focusing high-temperature mass spectrometer.
+        cell: BN Knudsen cell, 8 mm O.D., 5.5 mm I.D., 12 mm high, 0.5 mm orifice diameter.
+        sample_mass: 0.3 g (alloy sample).
+        sample_composition: Al preliminarily adjusted to 0.7–2 mass%; Ca preliminarily adjusted to 0.2–0.6 mass%.
+        temperature_measurement: R-type Pt–Rh thermocouple spot-welded into a hole at the bottom of a Ta cell holder.
+        ionization_energy_eV: 30
+        ion_counting: Pulse-counting method, attributed to Yamawaki et al.
+        temperature_uncertainty: Not stated.
+        atmosphere_or_chamber_pressure:
+          tag: unknown
+          reason: not_published
+    - observation_id: miki_1999_activity_method_equations
+      type: method
+      locator:
+        page: 2
+        published_page: 1109
+        section: Results and Discussion
+        equation: 1-2
+      units: as printed
+      values:
+        chemical_equilibration_equation_1: ln γ_i(l) in Si + ln X_i in Si = ln γ_i(l) in Pb + ln X_i in Pb; activity
+          equality for liquid phases, each solute referenced to pure liquid i.
+        chemical_equilibration_equation_2: ln X_Pb in Pb − ln X_Pb in Si = ln γ°_Pb in Si + ε^M_Pb in Si X_M in
+          Si; Henry-law approximations, neglecting Pb self-interaction term.
+        standard_state: Pure liquid solute for γ_M; mole-fraction scale; infinite-dilution intercept γ°.
+    - observation_id: miki_1999_knudsen_activity_method_equations
+      type: method
+      locator:
+        page: 4
+        published_page: 1111
+        section: Knudsen effusion method
+        equation: 11-18
+      units: as printed
+      quote: When the effusion of vapor from the Knudsen cell orifice satisfies molecular flow conditions, the relation between ion current and vapor pressure, P_M, can be written as follows.
+      values:
+        knudsen_reaction: M(l) = M(g), M = Al or Ca (Eq. 11).
+        knudsen_equilibrium: K = P_M/(γ_M(l) in Si(T) X_M in Si) = exp(−ΔG°vap_M(T)/(RT)) (Eq. 12).
+        current_pressure_relation: P_M = A I_M(T) T (Eq. 13), conditional on molecular-flow conditions at the Knudsen-cell orifice.
+        knudsen_gamma_equation: ln γ_M(l) in Si(T) = ln γ_M(l) in Si(1723) + ln[I_M(T)T/(I_M(1723)·1723)] + ΔG°vap_M(T)/(RT) − ΔG°vap_M(1723)/(R·1723) (Eqs. 14-16).
+        deltaG_vaporization_Al: Al(l)=Al(g); ΔG°=304900−110.2T J mol−1, JANAF [9] (Eq. 17).
+        deltaG_vaporization_Ca: Ca(l)=Ca(g); ΔG°=150100−84.65T J mol−1, JANAF [9] (Eq. 18).
+    - observation_id: miki_1999_knudsen_results_tables
+      type: method
+      locator:
+        page: 4
+        published_page: 1111
+        section: Knudsen effusion method
+        table: 4-5
+      units: as printed
+      quote: Experimental results for the Knudsen effusion method are listed in Tables 4 and 5.
+      values:
+        method: Knudsen effusion using ion currents and alloy composition.
+        temperature_range_K: [1723, 1823]
+    - observation_id: miki_1999_knudsen_boron_qualifier
+      type: method
+      locator:
+        page: 4
+        published_page: 1111
+        section: Knudsen effusion method
+      units: as printed
+      quote: Also, the effect of B on thermodynamic properties of Al and Ca in Si was neglected since the B content after the experiment was lower than 0.05 mass%.
+      values:
+        post_experiment_B_mass_percent: {operator: '<', value: 0.05}
+        author_interpretation: Effect of B on Al and Ca thermodynamic properties was neglected.
+    - observation_id: miki_1999_equilibrium_qualification
+      type: method
+      locator:
+        page: 4
+        published_page: 1111
+        section: Knudsen effusion method
+      units: as printed
+      values:
+        quote: “Since the reproducible ion currents during the same experiment were observed, the change in composition
+          of Si–Al and Si–Ca alloys and experimental conditions such as apparatus constant and ionization cross
+          section can be neglected.”
+        interpretation: Reproducibility of ion currents is the stated repeatability evidence for Knudsen measurements.
+          The chemical-equilibration experiments report a 14.4 ks hold and invoke equilibrium relations, but no
+          equilibration time series or approach-from-both-sides test.
+    - observation_id: miki_1999_silica_scope_absence
+      type: scope
+      locator:
+        page: 1
+        published_page: 1108
+        section: Title and abstract
+      units: as printed
+      values:
+        finding: No SiO2 activity, slag composition, silica-saturation point, or slag/metal equilibration reaction
+          appears in this paper. The article concerns liquid Si solute thermodynamics using Pb alloy equilibration
+          and Knudsen effusion.
+        requested_silica_method: Not present in this source; a(SiO2) cannot be attributed to Miki et al. (1999).
+    - observation_id: miki_1999_parameter_uncertainties_and_qualifications
+      type: method
+      locator:
+        page: 8
+        published_page: 1115
+        section: Conclusions
+      units: as printed
+      values:
+        parameter_uncertainty: {tag: unknown, reason: not_published}
+        regression_statistics: No standard errors, confidence intervals, or regression goodness-of-fit statistics are stated; least-squares fitting is specified for the temperature-dependent Al and Ca parameters in Eqs. 19–20 (p. 1112).
+    - observation_id: miki_1999_ueno_waseda_comparison_qualification
+      type: quoted_comparison
+      locator:
+        page: 8
+        published_page: 1115
+        figure: '13'
+      units: as printed
+      paraphrase: All signs of the interaction parameters estimated with the Ueno and Waseda model agree with the authors' values. Estimated and measured absolute values agree well when the parameters are relatively small; the authors conclude that Si interaction parameters can therefore be estimated approximately with that model.
+      attribution: Ueno and Waseda [16, 21, 22].
+      values:
+        sign_agreement: all interaction-parameter signs
+        magnitude_agreement_qualification: good agreement when the parameters are relatively small
+    - observation_id: miki_1999_t9_epsilon_Al_Al_in_Si_expression
+      type: thermodynamic_parameter
+      locator:
+        page: 5
+        published_page: 1112
+        equation: '19'
+      units: mole-fraction Wagner parameter
+      values:
+        parameter: epsilon_Al_Al_in_Si
+        printed_expression: 1.00e5/T - 40.1
+        temperature_or_basis: mole-fraction Wagner interaction parameter, T=1723–1823 K
+        standard_state: Henry infinite-dilution solute activity relative to pure liquid solute; mole-fraction interaction
+          expansion
+        source_status: measured here by least-squares fit; Table 4, Fig. 6; Eq. 19
+        uncertainty: No parameter-specific uncertainty or confidence interval stated.
+    - observation_id: miki_1999_t9_epsilon_Ca_Ca_in_Si_expression
+      type: thermodynamic_parameter
+      locator:
+        page: 5
+        published_page: 1112
+        equation: '20'
+      units: mole-fraction Wagner parameter
+      values:
+        parameter: epsilon_Ca_Ca_in_Si
+        printed_expression: 55600/T - 22.1
+        temperature_or_basis: mole-fraction Wagner interaction parameter, T=1723–1823 K
+        standard_state: Henry infinite-dilution solute activity relative to pure liquid solute; mole-fraction interaction
+          expansion
+        source_status: measured here by least-squares fit; Table 5, Fig. 7; Eq. 20
+        uncertainty: No parameter-specific uncertainty or confidence interval stated.
+    - observation_id: miki_1999_eq5_7_activity_coefficients
+      type: thermodynamic_parameter
+      locator:
+        page: 3
+        published_page: 1110
+        equation: 5-7
+      units: ln(activity_coefficient)
+      values:
+        Al: ln gamma_Al(l) in Si = -1.64 + 18.0 X_Al in Si (1723 K)
+        Ca: ln gamma_Ca(l) in Si = -6.71 + 9.90 X_Ca in Si (1723 K)
+        Mg: ln gamma_Mg(l) in Si = -2.04 + 6.02 X_Mg in Si (1723 K)
+        standard_state: Pure liquid solute; infinite-dilution Henry reference; mole-fraction scale.
+        paraphrase: The authors state the infinitely dilute Al coefficient corrected from 0.212 to 0.194 because
+          0.5 mass% Al was not dilute enough; Ca/Mg infinite-dilution coefficients at 1723 K matched earlier work
+          [4].
+    - observation_id: miki_1999_ca_distribution_composition_range
+      type: thermodynamic_parameter
+      locator:
+        page: 2
+        published_page: 1109
+        table: '2'
+      units: mole fraction
+      values:
+        composition_range: Ca in Si distribution data reaches X_Ca=0.0538 at 1723 K.
+        upper_X_Ca: 0.0538
+        T_K: 1723
+    - observation_id: miki_1999_ca_knudsen_composition_range
+      type: thermodynamic_parameter
+      locator:
+        page: 4
+        published_page: 1111
+        table: '5'
+      units: mole fraction
+      values:
+        composition_range: Current-run Knudsen Ca mole fractions span X_Ca=0.00111–0.00418.
+        X_Ca_low: 0.00111
+        X_Ca_high: 0.00418
+    - observation_id: miki_1999_ca_table9_temperature_and_uncertainty
+      type: thermodynamic_parameter
+      locator:
+        page: 8
+        published_page: 1115
+        table: '9'
+      units: as printed
+      values:
+        temperature_range_K: [1723, 1823]
+        parameter_uncertainty: {tag: unknown, reason: not_published}
+        uncertainty_note: No parameter uncertainty printed.
+    - observation_id: miki_1999_ca_intercept_slope_extractor_computation
+      type: thermodynamic_parameter
+      locator:
+        page: 3
+        published_page: 1110
+        equation: '6'
+        note: Extractor computation compares Eq. 6 with the temperature expression in Eq. 20 on p. 1112; arithmetic below is not an author statement.
+      units: natural logarithm of activity coefficient
+      values:
+        extractor_computation_not_author_statement:
+          distribution_ln_gamma0: -6.71
+          temperature_expression_at_1723_K: '-14300/1723 + 1.55 = -6.7494776553 (approximately -6.749)'
+          intercept_difference: '(-14300/1723 + 1.55) - (-6.71) = -0.0394776553, magnitude approximately 0.039 in ln gamma'
+          distribution_epsilon_Ca_Ca: 9.90
+          temperature_expression_epsilon_at_1723_K: '55600/1723 - 22.1 = 10.1692977365 (approximately 10.17)'
+          slope_difference: '(55600/1723 - 22.1) - 9.90 = 0.2692977365, approximately 0.27'
+    - observation_id: miki_1999_prior_intercepts_and_gamma_si_pb
+      type: thermodynamic_parameter
+      locator:
+        page: 3
+        published_page: 1110
+        equation: '3'
+        figure: '2'
+      units: as printed
+      quote: The value of 3.82 for the intercept was deduced from the average value of three regression lines. From this value, γ°_Si(l) in Pb at 1723 K can be calculated as 45.6, which is larger than 30.6 at 1693 K obtained using the results of Kirkwood et al. [5].
+      attribution: Present paper for 3.82 and 45.6; Kirkwood and Chipman [5] for 30.6.
+      values:
+        ln_gamma0_Si_in_Pb_intercept_here: 3.82
+        gamma0_Si_in_Pb_at_1723_here: 45.6
+        gamma0_Si_in_Pb_at_1693_Kirkwood_Chipman: 30.6
+        temperature_K_present: 1723
+        temperature_K_comparator: 1693
+    - observation_id: miki_1999_prior_ternary_activity_log_differences
+      type: quoted_comparison
+      locator:
+        page: 6
+        published_page: 1113
+        equation: 21-22
+      units: natural logarithm difference
+      paraphrase: The present values -1.16, -6.03, and -8.49 agree with previously determined values -1.19, -5.97 [3],
+        and -8.47 [3], respectively.
+      attribution: Miki, Morita and Sano, Metallurgical and Materials Transactions B 28B (1997), 861–867 [3].
+      values:
+        present_Ca_log_gamma_difference: -1.16
+        prior_Ca_log_gamma_difference: -1.19
+        present_Ti_log_gamma_difference: -6.03
+        prior_Ti_log_gamma_difference: -5.97
+        present_Fe_log_gamma_difference: -8.49
+        prior_Fe_log_gamma_difference: -8.47
+        temperature_K: 1723
+    - observation_id: miki_1999_prior_thermodynamic_data
+      type: thermodynamic_parameter
+      locator:
+        page: 6
+        published_page: 1113
+        equation: 21-22
+      units: dimensionless interaction parameters
+      paraphrase: The prior parameters used in the ternary equations include ε_Ti^Ti in Si=3.97, ε_Pb^Ti in Si=13.2, ε_Si^Ti in Pb=−10.8, ε_Fe^Fe in Si=3.17, ε_Pb^Fe in Si=14.1, and ε_Si^Fe in Pb=−23.8.
+      attribution: Miki, Morita and Sano, Metallurgical and Materials Transactions B 28B (1997), 861–867.
+      values:
+        parameter_values_as_printed:
+          epsilon_Ti_Ti_in_Si: 3.97
+          epsilon_Pb_Ti_in_Si: 13.2
+          epsilon_Si_Ti_in_Pb: -10.8
+          epsilon_Fe_Fe_in_Si: 3.17
+          epsilon_Pb_Fe_in_Si: 14.1
+          epsilon_Si_Fe_in_Pb: -23.8
+        temperature_K: 1723
+        source_status: taken from prior paper [3]
+    - observation_id: miki_1999_gamma_infinite_dilution_qualification
+      type: thermodynamic_parameter
+      locator:
+        page: 3
+        published_page: 1110
+        equation: 5-7
+      units: dimensionless activity coefficient
+      paraphrase: The infinite-dilution activity coefficient of Al in molten Si at 1723 K was corrected from 0.212 [4]
+        to 0.194 because 0.5 mass% Al was not sufficiently dilute. The Ca and Mg infinite-dilution coefficients
+        at 1723 K were found identical to previous work [4].
+      attribution: Miki, Morita and Sano, Metallurgical and Materials Transactions B 29B (1998), 1043–1049.
+      values:
+        gamma0_Al_previous: 0.212
+        gamma0_Al_corrected_here: 0.194
+        gamma0_Ca_previous_relation: identical to [4]
+        gamma0_Mg_previous_relation: identical to [4]
+        temperature_K: 1723
+    - observation_id: miki_1999_kirkwood_solubility_context
+      type: quoted_composition
+      locator:
+        page: 1
+        published_page: 1108
+        section: Experimental
+      units: at%
+      paraphrase: Kirkwood and Chipman [5] reported that at 1693 K Pb solubility in Si-rich liquid was 2.1 at% Pb and
+        Si solubility in Pb-rich liquid was 3.2 at% Si.
+      attribution: D. H. Kirkwood and J. Chipman, Journal of Physical Chemistry 65 (1961), 1082–1084.
+      values:
+        method_class: quoted_attributed
+        Pb_in_Si_rich_at_percent: 2.1
+        Si_in_Pb_rich_at_percent: 3.2
+        temperature_K: 1693
+    - observation_id: miki_1999_figures_prior_work_comparison
+      type: quoted_comparison
+      locator:
+        page: 5
+        published_page: 1112
+        figure: '8'
+      units: as printed
+      paraphrase: The activity coefficient of Al from this work agrees with values calculated from Gizenko et al. assuming regular solution. The comparison is shown in Fig. 8.
+      attribution: N. V. Gizenko et al. [11].
+      values:
+        comparison_only: Comparator points are plotted in Fig. 8 and are not tabulated numerically.
+    - observation_id: miki_1999_tanida_al_comparison
+      type: quoted_comparison
+      locator:
+        page: 6
+        published_page: 1113
+        figure: '8'
+      units: as printed
+      paraphrase: The present Al activity-coefficient result agrees with Tanida et al. for a dilute solution, but disagrees for a relatively concentrated solution.
+      attribution: K. Tanida et al. [10].
+      values:
+        dilute_solution: agreement
+        relatively_concentrated_solution: disagreement
+        comparison_only: Comparator points are plotted in Fig. 8 and are not tabulated numerically.
+    - observation_id: miki_1999_ca_prior_work_comparison
+      type: quoted_comparison
+      locator:
+        page: 6
+        published_page: 1113
+        figure: '9'
+      units: as printed
+      quote: The present result agrees well with Iwahori et al. and Sudavtsova et al. but disagrees with Esin et al.
+      attribution: S. Iwahori et al. [13]; Yu. O. Esin et al. [14]; V. S. Sudavtsova and G. I. Batalin [15].
+      values:
+        comparison_only: Fig. 9 shows the Ca activity-coefficient comparison; exact comparator point values are not tabulated.
+    - observation_id: miki_1999_regular_solution_packing_assumptions
+      type: method
+      locator:
+        page: 7
+        published_page: 1114
+        section: Thermodynamic properties of Si ternary alloys
+      units: as printed
+      paraphrase: The hard-sphere interaction term depends on component diameter, atomic volume, and solvent packing fraction; the discussion uses packing fraction 0.45 reported by Ashcroft and Lekner. Binary alloys in this discussion are assumed to be regular solutions.
+      attribution: N. W. Ashcroft and J. Lekner [17].
+      values:
+        packing_fraction: 0.45
+        binary_alloy_assumption: regular solution
+    - observation_id: miki_1999_binary_composition_ranges
+      type: thermodynamic_parameter
+      locator:
+        page: 2
+        published_page: 1109
+        table: '1, 3'
+      units: mole fraction
+      paraphrase: Binary distribution data ranges are X(Al in Si)=0.00199–0.0639 in Table 1 and X(Mg in Si)=0.00375–0.0700 in Table 3. The Table 2 Ca range is retained in its separate table-located context.
+      values:
+        Al_in_Si_X: [0.00199, 0.0639]
+        Mg_in_Si_X: [0.00375, 0.0700]
+        T_K: 1723
+    - observation_id: miki_1999_al_knudsen_composition_range
+      type: thermodynamic_parameter
+      locator:
+        page: 4
+        published_page: 1111
+        table: '4'
+      units: mole fraction
+      paraphrase: Current-run Knudsen Al mole fractions span X(Al in Si)=0.00543–0.0195.
+      values:
+        X_Al_low: 0.00543
+        X_Al_high: 0.0195
+  Al:
+    observations: []
+    context:
+    - observation_id: miki_1999_t9_ln_gamma0_Al_in_Si
+      type: thermodynamic_parameter
+      locator:
+        page: 8
+        published_page: 1115
+        table: '9'
+        note: Infinite-dilution activity-coefficient expression, relative to pure liquid solute standard state.
+      units: ln(activity_coefficient)
+      values:
+        parameter: ln_gamma0_Al_in_Si
+        printed_expression: -3610/T + 0.452
+        temperature_or_basis: ln(gamma), T=1723–1823 K
+        source_status: measured here; KEMS baseline from Table 4 and earlier chemical-equilibration data; Eq. 19
+        uncertainty: No parameter-specific uncertainty or fit confidence interval is stated.
+        gamma0_at_1723_derived: 0.1933636201053583
+        derived_value_note: Derived as exp(printed ln(gamma) expression) at 1723 K; this numeric conversion is not
+          printed as a separate table cell.
+  Ca:
+    observations: []
+    context:
+    - observation_id: miki_1999_t9_ln_gamma0_Ca_in_Si
+      type: thermodynamic_parameter
+      locator:
+        page: 8
+        published_page: 1115
+        table: '9'
+        note: Infinite-dilution activity-coefficient expression, relative to pure liquid solute standard state.
+      units: ln(activity_coefficient)
+      values:
+        parameter: ln_gamma0_Ca_in_Si
+        printed_expression: -14300/T + 1.55
+        temperature_or_basis: ln(gamma), T=1723–1823 K
+        source_status: measured here; KEMS baseline from Table 5 and earlier chemical-equilibration data; Eq. 20
+        uncertainty: No parameter-specific uncertainty or fit confidence interval is stated.
+        gamma0_at_1723_derived: 0.001171491383372664
+        derived_value_note: Derived as exp(printed ln(gamma) expression) at 1723 K; this numeric conversion is not
+          printed as a separate table cell.
+  Mg:
+    observations: []
+    context:
+    - observation_id: miki_1999_t9_ln_gamma0_Mg_in_Si
+      type: thermodynamic_parameter
+      locator:
+        page: 8
+        published_page: 1115
+        table: '9'
+        note: Infinite-dilution activity-coefficient expression, relative to pure liquid solute standard state.
+      units: ln(activity_coefficient)
+      values:
+        parameter: ln_gamma0_Mg_in_Si
+        printed_expression: '-2.04'
+        temperature_or_basis: ln(gamma), 1723 K
+        source_status: taken as identical to previous work [4]; Table 3 discussion
+        uncertainty: No parameter-specific uncertainty or fit confidence interval is stated.
+        gamma0_at_1723_derived: 0.1300287108784259
+        derived_value_note: Derived as exp(printed ln(gamma) expression) at 1723 K; this numeric conversion is not
+          printed as a separate table cell.
+source_references:
+- '[1] Elkem, U.S. Patent 4,304,763, December 8, 1981.'
+- '[2] T. Miki, K. Morita and N. Sano, Metallurgical and Materials Transactions B 27B (1996), 937–941.'
+- '[3] T. Miki, K. Morita and N. Sano, Metallurgical and Materials Transactions B 28B (1997), 861–867.'
+- '[4] T. Miki, K. Morita and N. Sano, Metallurgical and Materials Transactions B 29B (1998), 1043–1049.'
+- '[6] M. Yamawaki, M. Yasumoto, C. Nakano and M. Kanno, Mass Spectrometry 28 (1980), 317–326.'
+- '[7] M. Yamawaki, M. Yasumoto, C. Nakano and M. Kanno, Mass Spectrometry 29 (1981), 345–353.'
+- '[8] M. Yamawaki, M. Yasumoto, C. Nakano and M. Kanno, High Temperature–High Pressure 14 (1982), 423–430.'
+- '[5] D. H. Kirkwood and J. Chipman, Journal of Physical Chemistry 65 (1961), 1082–1084.'
+- '[9] JANAF Thermochemical Tables, 3rd ed., Journal of Physical and Chemical Reference Data 14 (1985), Supplement
+  1, 65 and 690.'
+- '[10] K. Tanida, M. Tanahashi, H. Hayashi, T. Fujisawa and C. Yamauchi, Proceedings of the Mining and Materials
+  Processing Institute of Japan, Fall Meetings (D) (1998), 130.'
+- '[11] N. V. Gizenko, B. I. Emlin, S. N. Kilesso, M. I. Gasik and A. L. Zav’yalov, Russian Metallurgy 1 (1983),
+  29–30.'
+- '[12] A. F. Loseva, A. I. Al’mukhamedov, V. N. Tyumentsev and M. A. Luzhnova, Russian Journal of Physical Chemistry
+  51 (1977), 495–496.'
+- '[13] S. Iwahori, N. Mouri, M. Tanahashi, T. Fujisawa and C. Yamauchi, Proceedings of the Mining and Materials
+  Processing Institute of Japan, Fall Meetings, Abstract of Poster Session (1998), 27.'
+- '[14] Yu. O. Esin, A. S. Demin and P. V. Gel’d, Abstracts of Papers at the Fifth All-Union Conference on Thermodynamics
+  of Metal Alloys, Moscow (1985), 18.'
+- '[15] V. S. Sudavtsova and G. I. Batalin, Inorganic Materials 29 (1988), 1352–1354.'
+- '[16] S. Ueno and Y. Waseda, Journal of the Japan Institute of Metals 51 (1987), 208–217.'
+- '[17] N. W. Ashcroft and J. Lekner, Physical Review 145 (1966), 83–90.'
+- '[18] Y. Kobayashi, Doctoral Thesis, The University of Tokyo, Japan (1998), 123.'
+- '[19] The Japan Society for the Promotion of Science, The 19th Committee on Steelmaking, Steelmaking Data Sourcebook,
+  Gordon and Breach Publishers, New York (1988), 278.'
+- '[20] E. Schürmann, P. Fünders and H. Litterscheidt, Archiv für das Eisenhüttenwesen 46 (1975), 473–476.'
+- '[21] S. Ueno and Y. Waseda, Journal of the Japan Institute of Metals 50 (1986), 788–796.'
+- '[22] S. Ueno and Y. Waseda, Journal of the Japan Institute of Metals 52 (1988), 204–210.'
