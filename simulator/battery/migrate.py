@@ -13861,7 +13861,15 @@ class Migrator:
             point_identity_kwargs = dict(ident_kwargs)
             point_parent_conditions = point_conditions
             rowless_values = _values_without_row_lists(values)
-            rowless_initial_map = _initial_oxide_map_from_values(rowless_values)
+            # Same declared-map rule as the parent probe. Without it a
+            # composition_wt_pct on a non-composition quantity is invisible,
+            # the maps compare unequal, and the stamped proxy is cleared.
+            rowless_initial_map = _initial_oxide_map_from_values(
+                rowless_values,
+                declared_map=_declared_wt_composition_point_map(
+                    rowless_values, obs.get("units")
+                ),
+            )
             has_non_yield_points = any(
                 name in {"points", "tests"} for name, _items in row_point_containers
             )
