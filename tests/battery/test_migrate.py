@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import csv
 import json
 import os
 import re
@@ -1808,6 +1809,34 @@ def test_j02_model_derived_without_parent_is_conditional_field(tmp_path: Path) -
         "derived_from" in (e.axes or ()) or "derivation" in (e.axes or ())
         for e in result.queue
     )
+
+
+def test_dump_hard_issues_writes_complete_source_labeled_census(tmp_path: Path) -> None:
+    from tools.dump_hard_issues import dump_hard_issues
+
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    values = extract["species"]["Na"]["observations"][0]["values"]
+    values["method_class"] = "model_derived"
+    values.pop("series", None)
+    root = _write_min_tree(tmp_path / "tree", extract)
+    result = migrate(root, write=False)
+    out = tmp_path / "issues.tsv"
+
+    written = dump_hard_issues(root, out)
+    with out.open(encoding="utf-8", newline="") as stream:
+        rows = list(csv.DictReader(stream, delimiter="\t"))
+
+    assert written == len(rows) == len(result.validation.hard_issues)
+    assert any(
+        row["source_id"] == "fixture-source"
+        and row["field"] == "derived_from"
+        and row["issue_code"] == "conditional_field"
+        for row in rows
+    )
+
+    filtered = tmp_path / "filtered.tsv"
+    assert dump_hard_issues(root, filtered, "fixture-source") == len(rows)
+    assert dump_hard_issues(root, tmp_path / "empty.tsv", "other-source") == 0
 
 
 def test_j02_source_stated_derived_from_is_stored(tmp_path: Path) -> None:
