@@ -177,7 +177,7 @@ species:
       - observation_id: schaefer_2012_cc_100bar_major_gas_summary
         type: gas_speciation
         derived_from: [schaefer_2012_table2_continental_crust_bulk_composition]
-        derivation: {relation: authors Gibbs-energy-minimization equilibrium calculation, output_unit: as_printed}
+        derivation: {relation: authors Gibbs-energy-minimization equilibrium calculation, inputs: [schaefer_2012_table2_continental_crust_bulk_composition], output_unit: as_printed}
         locator: {pdf_page_index: 7, figure: '1', section: '3.1.1 Continental Crust', row: prose summaries, column: printed model results}
         T_range_K: [500, 4000]
         phase: gas_phase
@@ -234,7 +234,7 @@ species:
       - observation_id: schaefer_2012_cc_variable_h_model_outputs
         type: gas_speciation
         derived_from: [schaefer_2012_table2_continental_crust_bulk_composition]
-        derivation: {relation: authors variable-hydrogen Gibbs-energy-minimization equilibrium calculation, output_unit: as_printed}
+        derivation: {relation: authors variable-hydrogen Gibbs-energy-minimization equilibrium calculation, inputs: [schaefer_2012_table2_continental_crust_bulk_composition], output_unit: as_printed}
         locator: {pdf_page_index: 11, figure: '3', section: '3.2.1 Hydrogen', row: prose summaries, column: printed model results}
         phase: gas_phase
         regime: engine_evaluation
@@ -266,7 +266,7 @@ species:
       - observation_id: schaefer_2012_cc_variable_c_model_outputs
         type: gas_speciation
         derived_from: [schaefer_2012_table2_continental_crust_bulk_composition]
-        derivation: {relation: authors variable-carbon Gibbs-energy-minimization equilibrium calculation, output_unit: as_printed}
+        derivation: {relation: authors variable-carbon Gibbs-energy-minimization equilibrium calculation, inputs: [schaefer_2012_table2_continental_crust_bulk_composition], output_unit: as_printed}
         locator: {pdf_page_index: 13, figure: '4', section: '3.2.2 Carbon', row: prose summaries, column: printed model results}
         phase: gas_phase
         regime: engine_evaluation
@@ -295,7 +295,7 @@ species:
       - observation_id: schaefer_2012_cc_variable_o_model_outputs
         type: gas_speciation
         derived_from: [schaefer_2012_table2_continental_crust_bulk_composition]
-        derivation: {relation: authors variable-oxygen Gibbs-energy-minimization equilibrium calculation, output_unit: as_printed}
+        derivation: {relation: authors variable-oxygen Gibbs-energy-minimization equilibrium calculation, inputs: [schaefer_2012_table2_continental_crust_bulk_composition], output_unit: as_printed}
         locator: {pdf_page_index: 14, figure: '5', section: '3.2.3 Oxygen', row: prose summaries, column: printed model results}
         phase: gas_phase
         regime: engine_evaluation
@@ -330,7 +330,7 @@ species:
       - observation_id: schaefer_2012_table3_cc_extreme_atmospheres
         type: gas_speciation
         derived_from: [schaefer_2012_table2_continental_crust_bulk_composition]
-        derivation: {relation: authors Gibbs-energy-minimization equilibrium calculation at the four Table 3 T-P points, output_unit: as_printed}
+        derivation: {relation: authors Gibbs-energy-minimization equilibrium calculation at the four Table 3 T-P points, inputs: [schaefer_2012_table2_continental_crust_bulk_composition], output_unit: as_printed}
         locator: {pdf_page_index: 33, table: '3', row: all CC cells, column: major atmospheric composition}
         phase: gas_phase
         regime: engine_evaluation
@@ -359,7 +359,7 @@ species:
       - observation_id: schaefer_2012_cc_pressure_effects_printed
         type: gas_speciation
         derived_from: [schaefer_2012_table2_continental_crust_bulk_composition]
-        derivation: {relation: authors pressure-sweep Gibbs-energy-minimization equilibrium calculation, output_unit: as_printed}
+        derivation: {relation: authors pressure-sweep Gibbs-energy-minimization equilibrium calculation, inputs: [schaefer_2012_table2_continental_crust_bulk_composition], output_unit: as_printed}
         locator: {pdf_page_index: 15, figure: '7', section: '3.3 Effects of Total Pressure on Gas Composition', row: prose summaries, column: printed model results}
         phase: gas_phase
         regime: engine_evaluation
@@ -385,7 +385,7 @@ species:
       - observation_id: schaefer_2012_cc_exoplanet_atmospheric_profiles
         type: gas_speciation
         derived_from: [schaefer_2012_table2_continental_crust_bulk_composition]
-        derivation: {relation: authors dry-adiabatic CoRoT-7b equilibrium-profile calculation, output_unit: as_printed}
+        derivation: {relation: authors dry-adiabatic CoRoT-7b equilibrium-profile calculation, inputs: [schaefer_2012_table2_continental_crust_bulk_composition], output_unit: as_printed}
         locator: {pdf_page_index: 22, figure: '11', section: '4.2.2 Hot Super-Earths', row: prose summaries, column: condensation pressures}
         phase: gas_phase_and_condensate
         regime: engine_evaluation
@@ -466,7 +466,7 @@ species:
       - observation_id: schaefer_2012_bse_100bar_major_gas_summary
         type: gas_speciation
         derived_from: [schaefer_2012_table2_bse_bulk_composition]
-        derivation: {relation: authors Gibbs-energy-minimization equilibrium calculation, output_unit: as_printed}
+        derivation: {relation: authors Gibbs-energy-minimization equilibrium calculation, inputs: [schaefer_2012_table2_bse_bulk_composition], output_unit: as_printed}
         locator: {pdf_page_index: 10, figure: '2', section: '3.1.2 Bulk Silicate Earth', row: prose summaries, column: printed model results}
         T_range_K: [500, 4000]
         phase: gas_phase
@@ -501,7 +501,7 @@ species:
       - observation_id: schaefer_2012_table3_bse_extreme_atmospheres
         type: gas_speciation
         derived_from: [schaefer_2012_table2_bse_bulk_composition]
-        derivation: {relation: authors Gibbs-energy-minimization equilibrium calculation at the four Table 3 T-P points, output_unit: as_printed}
+        derivation: {relation: authors Gibbs-energy-minimization equilibrium calculation at the four Table 3 T-P points, inputs: [schaefer_2012_table2_bse_bulk_composition], output_unit: as_printed}
         locator: {pdf_page_index: 33, table: '3', row: all BSE cells, column: major atmospheric composition}
         phase: gas_phase
         regime: engine_evaluation
@@ -530,7 +530,7 @@ species:
       - observation_id: schaefer_2012_bse_variable_h_model_outputs
         type: gas_speciation
         derived_from: [schaefer_2012_table2_bse_bulk_composition]
-        derivation: {relation: authors variable-hydrogen Gibbs-energy-minimization equilibrium calculation, output_unit: as_printed}
+        derivation: {relation: authors variable-hydrogen Gibbs-energy-minimization equilibrium calculation, inputs: [schaefer_2012_table2_bse_bulk_composition], output_unit: as_printed}
         locator: {pdf_page_index: 12, figure: '3', section: '3.2.1 Hydrogen', row: BSE prose summaries, column: printed model results}
         phase: gas_phase
         regime: engine_evaluation
@@ -553,7 +553,7 @@ species:
       - observation_id: schaefer_2012_bse_variable_c_model_outputs
         type: gas_speciation
         derived_from: [schaefer_2012_table2_bse_bulk_composition]
-        derivation: {relation: authors variable-carbon Gibbs-energy-minimization equilibrium calculation, output_unit: as_printed}
+        derivation: {relation: authors variable-carbon Gibbs-energy-minimization equilibrium calculation, inputs: [schaefer_2012_table2_bse_bulk_composition], output_unit: as_printed}
         locator: {pdf_page_index: 13, figure: '4', section: '3.2.2 Carbon', row: BSE prose summaries, column: printed model results}
         phase: gas_phase
         regime: engine_evaluation
@@ -575,7 +575,7 @@ species:
       - observation_id: schaefer_2012_bse_variable_o_model_outputs
         type: gas_speciation
         derived_from: [schaefer_2012_table2_bse_bulk_composition]
-        derivation: {relation: authors variable-oxygen Gibbs-energy-minimization equilibrium calculation, output_unit: as_printed}
+        derivation: {relation: authors variable-oxygen Gibbs-energy-minimization equilibrium calculation, inputs: [schaefer_2012_table2_bse_bulk_composition], output_unit: as_printed}
         locator: {pdf_page_index: 14, figure: '5', section: '3.2.3 Oxygen', row: BSE prose summaries, column: printed model results}
         phase: gas_phase
         regime: engine_evaluation
@@ -601,7 +601,7 @@ species:
       - observation_id: schaefer_2012_bse_exoplanet_atmospheric_profiles
         type: gas_speciation
         derived_from: [schaefer_2012_table2_bse_bulk_composition]
-        derivation: {relation: authors dry-adiabatic CoRoT-7b equilibrium-profile calculation, output_unit: as_printed}
+        derivation: {relation: authors dry-adiabatic CoRoT-7b equilibrium-profile calculation, inputs: [schaefer_2012_table2_bse_bulk_composition], output_unit: as_printed}
         locator: {pdf_page_index: 22, figure: '11', section: '4.2.2 Hot Super-Earths', row: prose summaries, column: condensation pressures}
         phase: gas_phase_and_condensate
         regime: engine_evaluation
@@ -641,7 +641,7 @@ species:
       - observation_id: schaefer_2012_table4_photochemical_lifetimes
         type: rate_series
         derived_from: [schaefer_2012_table2_continental_crust_bulk_composition]
-        derivation: {relation: authors photochemical lifetime calculation from printed photodissociation rates, output_unit: as_printed}
+        derivation: {relation: authors photochemical lifetime calculation from printed photodissociation rates, inputs: [schaefer_2012_table2_continental_crust_bulk_composition], output_unit: as_printed}
         locator: {pdf_page_index: 34, table: '4', row: all, column: 'tchem (s) at 1 AU, 0.25 AU, 0.017 AU'}
         phase: gas_phase
         regime: engine_evaluation
@@ -832,7 +832,7 @@ species:
       - observation_id: schaefer_2012_observable_gas_thresholds
         type: gas_speciation
         derived_from: [schaefer_2012_cc_100bar_major_gas_summary, schaefer_2012_bse_100bar_major_gas_summary]
-        derivation: {relation: authors equilibrium and atmospheric-chemistry calculations, output_unit: as_printed}
+        derivation: {relation: authors equilibrium and atmospheric-chemistry calculations, inputs: [schaefer_2012_cc_100bar_major_gas_summary, schaefer_2012_bse_100bar_major_gas_summary], output_unit: as_printed}
         locator: {pdf_page_index: 25, section: '4.4 Spectroscopically Observable Gases', row: prose summaries, column: threshold and peak abundances}
         phase: gas_phase
         regime: engine_evaluation
