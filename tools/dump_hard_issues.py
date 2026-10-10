@@ -17,7 +17,7 @@ from simulator.battery.identity import quantity_token
 from simulator.battery.migrate import migrate
 
 
-_OBSERVATION_PATH = re.compile(r"^observation\[(.+)\](?:\.(.*))?$")
+_OBSERVATION_PATH = re.compile(r"^observation\[(.+?)\](?:\.(.*))?$")
 _FIELDS = (
     "source_id",
     "observation_id",

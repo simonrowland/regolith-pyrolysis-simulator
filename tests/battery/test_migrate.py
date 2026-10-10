@@ -319,6 +319,7 @@ def test_reference_phase_convention_notice_round_trips_and_legacy_notice_stays_v
 from simulator.battery.records import (
     Bench,
     BenchIdentity,
+    Notice,
     Reaction,
     Species,
     State,
@@ -1837,6 +1838,57 @@ def test_dump_hard_issues_writes_complete_source_labeled_census(tmp_path: Path) 
     filtered = tmp_path / "filtered.tsv"
     assert dump_hard_issues(root, filtered, "fixture-source") == len(rows)
     assert dump_hard_issues(root, tmp_path / "empty.tsv", "other-source") == 0
+
+
+def test_dump_hard_issues_preserves_indexed_notice_path(tmp_path: Path) -> None:
+    from unittest.mock import patch
+
+    import tools.dump_hard_issues as exporter
+
+    root = _write_min_tree(tmp_path / "tree")
+    result = migrate(root, write=False)
+    observation_id = "fixture-source::na_psat::T=1200.0:h=8f69f8b68978"
+    observation = result.observations[observation_id]
+    result.observations[observation_id] = replace(
+        observation,
+        notices=(
+            Notice(
+                kind=NoticeKind.FALLBACK,
+                affected_quantities=(Quantity.P_SAT,),
+                reason="validator regression fixture",
+                origin=observation_id,
+            ),
+        ),
+    )
+    result.validation = validate_corpus(
+        result.works,
+        result.experiments,
+        result.observations,
+        benches=result.benches,
+    )
+    assert any(
+        issue.path == f"observation[{observation_id}].notices[0]"
+        for issue in result.validation.hard_issues
+    )
+
+    out = tmp_path / "indexed-issues.tsv"
+    with patch.object(exporter, "migrate", return_value=result):
+        assert exporter.dump_hard_issues(root, out, "fixture-source") == 1
+    with out.open(encoding="utf-8", newline="") as stream:
+        rows = list(csv.DictReader(stream, delimiter="\t"))
+
+    assert rows == [
+        {
+            "source_id": "fixture-source",
+            "observation_id": observation_id,
+            "field": "notices[0]",
+            "issue_code": "conditional_field",
+            "message": "fallback notice requires from/to",
+            "evidence_class": "measured_direct",
+            "method_class": "measured_direct",
+            "quantity": "p_sat",
+        }
+    ]
 
 
 def test_j02_source_stated_derived_from_is_stored(tmp_path: Path) -> None:
