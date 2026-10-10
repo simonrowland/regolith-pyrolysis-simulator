@@ -460,7 +460,9 @@ def test_run_split_observations_keep_source_species_bucket() -> None:
         species_by_id = {
             observation["observation_id"]: species
             for species, block in doc["species"].items()
-            for observation in block.get("observations", [])
+            for observation in (
+                (block.get("observations") or []) + (block.get("context") or [])
+            )
             if observation.get("observation_id")
         }
         for observation_id, species in species_by_id.items():
