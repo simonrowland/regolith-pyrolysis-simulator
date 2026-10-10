@@ -11984,6 +11984,13 @@ class Migrator:
             isinstance(composition, Composition)
             and composition.amount_basis is AmountBasis.MOLE_FRACTION
         ):
+            point_temperature = (point_conditions or {}).get("temperature_K")
+            temperature_K = (
+                _temperature_number(point_temperature.state.value)
+                if isinstance(point_temperature, Located)
+                and point_temperature.state.is_value
+                else None
+            )
             prefix = f"{source_id}::"
             outcome = classify_point(
                 records,
@@ -11991,6 +11998,7 @@ class Migrator:
                     parent_id[len(prefix):] if parent_id.startswith(prefix) else parent_id
                 ),
                 x_by_component=dict(composition.components),
+                temperature_K=temperature_K,
                 declared=declared,
             )
         elif declared is not None:

@@ -61,6 +61,7 @@ class Liquidus:
     component: str
     position: Decimal
     sigma: Decimal
+    temperature_K: Decimal
     outside_side: str
     superseded_positions: tuple[Decimal, ...]
     locator: Mapping[str, object]
@@ -250,16 +251,35 @@ def phase_field_records(doc: Mapping[str, object]) -> PhaseFieldRecords | None:
             continue
         record_id = str(item.get("id") or "")
         position, sigma = _dec(item.get("position")), _dec(item.get("sigma"))
+        temperature = _dec(item.get("temperature_K_as_captioned"))
         side = str(item.get("outside_side") or "")
         locator = item.get("locator")
-        if not record_id or position is None or sigma is None or side not in _OUTSIDE_SIDES or not item.get("component") or not isinstance(locator, Mapping):
-            problems.append(f"liquidus record {record_id!r} needs component, position, sigma, outside_side and a locator")
+        if (
+            not record_id
+            or position is None
+            or sigma is None
+            or temperature is None
+            or side not in _OUTSIDE_SIDES
+            or not item.get("component")
+            or not isinstance(locator, Mapping)
+        ):
+            problems.append(
+                f"liquidus record {record_id!r} needs component, position, sigma, "
+                "temperature_K_as_captioned, outside_side and a locator"
+            )
             continue
         superseded = tuple(
             d for d in (_dec(s) for s in item.get("superseded_positions") or ()) if d is not None
         )
         liquidus[record_id] = Liquidus(
-            record_id, str(item["component"]), position, sigma, side, superseded, dict(locator)
+            record_id=record_id,
+            component=str(item["component"]),
+            position=position,
+            sigma=sigma,
+            temperature_K=temperature,
+            outside_side=side,
+            superseded_positions=superseded,
+            locator=dict(locator),
         )
     observations = _observations_by_id(doc)
     plateaus = {
@@ -282,6 +302,7 @@ def classify_point(
     *,
     observation_id: str,
     x_by_component: Mapping[str, Decimal],
+    temperature_K: Decimal | None,
     declared: object,
 ) -> PointPhaseField:
     """Apply the two-test rule to one printed point."""
@@ -305,6 +326,16 @@ def classify_point(
         "liquidus_record": liquidus.record_id,
         "locator": dict(liquidus.locator),
     }
+    if temperature_K != liquidus.temperature_K:
+        if liquidus.outside_any_position(x):
+            return PointPhaseField(LIQUIDUS_POSITION_CONTESTED, contested_payload)
+        if declared is not None:
+            return PointPhaseField(
+                None,
+                None,
+                "phase_field_class has no liquidus evidence at the point temperature",
+            )
+        return PointPhaseField(None, None)
     problem: str | None = None
     if declared is not None:
         outcome = _check_declared(records, liquidus, x, observation_id, declared)

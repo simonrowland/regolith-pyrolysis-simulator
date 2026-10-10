@@ -50,6 +50,31 @@ def internal_analytical_residuals(migrated):
     return {residual.reference: residual for residual in residuals}
 
 
+@pytest.fixture(scope="module")
+def openimcc_1993k_residuals(migrated):
+    pytest.importorskip("openimcc", reason="openimcc is not importable")
+    from simulator.battery.score import ScoreContext, score_store
+
+    observations = {
+        observation.observation_id: observation
+        for observation in migrated.observations.values()
+        if observation.source_id == SOURCE
+        and _x_sio2(observation) in CLASS_S_X
+        and _point_temperature(observation) == Decimal("1993.0")
+    }
+    context = ScoreContext(
+        works=migrated.works,
+        experiments=migrated.experiments,
+        observations=observations,
+        benches=migrated.benches,
+        extract_review={SOURCE: "draft"},
+    )
+    residuals, _candidates = score_store(
+        context, engines=(Engine.OPENIMCC,), include_diagnostics=True
+    )
+    return {residual.reference: residual for residual in residuals}
+
+
 def _x_sio2(observation) -> Decimal | None:
     located = (observation.point_conditions or {}).get("composition")
     if located is None or not located.state.is_value:
@@ -177,7 +202,7 @@ def _payload(notice, prefix):
     return json.loads(notice.reason[len(prefix) + 1 :])
 
 
-def test_stolyarova_1991_class_s_is_exactly_the_28_points_at_x033_and_x025(migrated) -> None:
+def test_stolyarova_1991_class_s_is_exactly_the_20_points_at_1933k(migrated) -> None:
     from simulator.battery.enums import NoticeKind
     from simulator.battery.phase_field import OUTSIDE_SINGLE_LIQUID_FIELD
 
@@ -192,13 +217,13 @@ def test_stolyarova_1991_class_s_is_exactly_the_28_points_at_x033_and_x025(migra
         if hits:
             assert len(hits) == 1
             classified[observation.observation_id] = (_x_sio2(observation), hits[0])
-    assert len(classified) == 28
+    assert len(classified) == 20
     assert {x for x, _notice in classified.values()} == set(CLASS_S_X)
     assert Counter(
         _point_temperature(observation)
         for observation in _printed_rows(migrated)
         if observation.observation_id in classified
-    ) == {Decimal("1933.0"): 20, Decimal("1993.0"): 8}
+    ) == {Decimal("1933.0"): 20}
     for x, notice in classified.values():
         payload = _payload(notice, OUTSIDE_SINGLE_LIQUID_FIELD)
         assert payload["criterion"] == "stated_liquidus_side_and_printed_plateau_within_2_sigma"
@@ -220,10 +245,16 @@ def test_stolyarova_1991_contested_rows_carry_stated_liquidus_and_sigma(migrated
         for observation in rows
         if _notices(observation, NoticeKind.LIQUIDUS_POSITION_CONTESTED)
     }
-    assert len(contested) == 44
+    assert len(contested) == 52
     for observation in rows:
         flagged = observation.observation_id in contested
-        assert flagged == (_x_sio2(observation) in CONTESTED_X), observation.observation_id
+        at_unqualified_class_s_temperature = (
+            _point_temperature(observation) == Decimal("1993.0")
+            and _x_sio2(observation) in CLASS_S_X
+        )
+        assert flagged == (
+            _x_sio2(observation) in CONTESTED_X or at_unqualified_class_s_temperature
+        ), observation.observation_id
     for observation in contested.values():
         (notice,) = _notices(observation, NoticeKind.LIQUIDUS_POSITION_CONTESTED)
         payload = _payload(notice, LIQUIDUS_POSITION_CONTESTED)
@@ -235,7 +266,7 @@ def test_stolyarova_1991_contested_rows_carry_stated_liquidus_and_sigma(migrated
         assert not any(notice.band for notice in observation.notices)
 
 
-def test_stolyarova_1991_class_s_refuses_single_liquid_with_bulk_diagnostic(
+def test_stolyarova_1991_1933k_class_s_refuses_single_liquid_at_bulk_composition(
     migrated, internal_analytical_residuals
 ) -> None:
     from simulator.battery.enums import RefusalReason
@@ -244,34 +275,50 @@ def test_stolyarova_1991_class_s_refuses_single_liquid_with_bulk_diagnostic(
         observation
         for observation in _printed_rows(migrated)
         if _x_sio2(observation) in CLASS_S_X
+        and _point_temperature(observation) == Decimal("1933.0")
     ]
-    assert len(class_s) == 28
-    diagnostics = []
+    assert len(class_s) == 20
     for observation in class_s:
         residual = internal_analytical_residuals[observation.observation_id]
         assert residual.numeric is None and not residual.score_eligible
         assert residual.refusal.reason is RefusalReason.BULK_NOT_LIQUID_COMPOSITION
-        diagnostic = residual.refusal.detail["bulk_composition_diagnostic"]
-        assert diagnostic["scored"] is False
-        assert diagnostic["basis"] == "single_liquid_engine_at_bulk_composition"
-        diagnostics.append((observation, diagnostic))
-    numeric = [d for _o, d in diagnostics if d["value"] is not None]
-    # Green has 8 internal-analytical numeric residuals on these rows; all 8
-    # survive as non-scored diagnostics, the rest keep their green refusal.
-    assert len(numeric) == 8
-    assert {d["refusal_reason"] for _o, d in diagnostics if d["value"] is None} == {
-        "effusion_regime_unverified",
-        "unsupported",
-    }
-    sio_025 = [
-        d
-        for o, d in diagnostics
-        if o.observation_id.split("::")[1]
-        == "stolyarova_1991_sio_partial_pressure_1933k_complete_evaporation"
-        and _x_sio2(o) == Decimal("0.25")
+
+    gas_rows = [
+        observation
+        for observation in class_s
+        if quantity_token(observation.identity) is Quantity.P_PARTIAL
     ]
-    # ROR-t1123 spot value: internal-analytical +0.833 dex at x(SiO2) = 0.25.
-    assert len(sio_025) == 1 and sio_025[0]["value"].startswith("0.833")
+    assert Counter(observation.identity.species.formula for observation in gas_rows) == {
+        "SiO": 4,
+        "SiO2": 2,
+        "O": 2,
+    }
+
+
+def test_stolyarova_1991_1993k_class_s_positions_are_predicted_and_flagged(
+    migrated, openimcc_1993k_residuals
+) -> None:
+    from simulator.battery.enums import NoticeKind
+    from simulator.battery.phase_field import LIQUIDUS_POSITION_CONTESTED
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
+        flagged_strata,
+    )
+
+    rows = [
+        observation
+        for observation in _printed_rows(migrated)
+        if _point_temperature(observation) == Decimal("1993.0")
+        and _x_sio2(observation) in CLASS_S_X
+    ]
+    assert len(rows) == 8
+    for observation in rows:
+        assert not _notices(observation, NoticeKind.OUT_OF_CERTIFIED_BAND)
+        (notice,) = _notices(observation, NoticeKind.LIQUIDUS_POSITION_CONTESTED)
+        assert notice.reason.startswith(LIQUIDUS_POSITION_CONTESTED + ":")
+        residual = openimcc_1993k_residuals[observation.observation_id]
+        assert residual.numeric is not None and residual.refusal is None
+        assert FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED in flagged_strata(residual.notices)
 
 
 def test_stolyarova_1991_contested_numeric_rows_are_flagged_out_of_certified_line(
@@ -299,6 +346,19 @@ def _records(liquidus=None, plateau_cells=None, named_failure=None):
     from simulator.battery.phase_field import phase_field_records
 
     cells = plateau_cells or {"0.33": ("10.0 ± 1.0", "1.00 ± 0.05"), "0.25": ("10.5 ± 1.0", "0.98 ± 0.05")}
+    liquidus_record = dict(
+        liquidus
+        or {
+            "id": "liq",
+            "component": "SiO2",
+            "position": "0.37",
+            "sigma": "0.02",
+            "outside_side": "below",
+            "superseded_positions": ["0.41"],
+            "locator": {"page": 1},
+        }
+    )
+    liquidus_record.setdefault("temperature_K_as_captioned", "1933")
     points_a = [{"x": x, "p": a} for x, (a, _b) in cells.items()]
     points_b = [{"x": x, "p": b} for x, (_a, b) in cells.items()]
     doc = {
@@ -307,18 +367,7 @@ def _records(liquidus=None, plateau_cells=None, named_failure=None):
             "B": {"observations": [{"observation_id": "series_b", "values": {"points": points_b}}]},
         },
         "phase_field_records": {
-            "liquidus": [
-                liquidus
-                or {
-                    "id": "liq",
-                    "component": "SiO2",
-                    "position": "0.37",
-                    "sigma": "0.02",
-                    "outside_side": "below",
-                    "superseded_positions": ["0.41"],
-                    "locator": {"page": 1},
-                }
-            ],
+            "liquidus": [liquidus_record],
             "plateaus": [
                 {
                     "id": "plat",
@@ -373,9 +422,24 @@ def test_two_test_rule_classifies_lime_side_plateau_points() -> None:
         records,
         observation_id="series_a",
         x_by_component={"SiO2": Decimal("0.33"), "CaO": Decimal("0.67")},
+        temperature_K=Decimal("1933"),
         declared=_declared("0.33"),
     )
     assert outcome.kind == OUTSIDE_SINGLE_LIQUID_FIELD and outcome.problem is None
+
+
+def test_liquidus_classification_requires_the_captioned_temperature() -> None:
+    from simulator.battery.phase_field import LIQUIDUS_POSITION_CONTESTED, classify_point
+
+    outcome = classify_point(
+        _records(),
+        observation_id="series_a",
+        x_by_component={"SiO2": Decimal("0.33")},
+        temperature_K=Decimal("1993"),
+        declared=_declared("0.33"),
+    )
+    assert outcome.kind == LIQUIDUS_POSITION_CONTESTED
+    assert outcome.problem is None
 
 
 def test_plateau_z_just_above_two_sigma_is_a_failing_series() -> None:
@@ -405,6 +469,7 @@ def test_plateau_z_just_above_two_sigma_is_a_failing_series() -> None:
                         "component": "CaO",
                         "position": "0.5",
                         "sigma": "0.01",
+                        "temperature_K_as_captioned": "1933",
                         "outside_side": "below",
                         "locator": {"table": "fixture"},
                     }
@@ -445,6 +510,7 @@ def test_two_test_rule_refuses_points_inside_the_liquidus_sigma_band() -> None:
         records,
         observation_id="series_a",
         x_by_component={"SiO2": Decimal("0.36")},
+        temperature_K=Decimal("1933"),
         declared=_declared("0.36"),
     )
     # 0.36 is not below 0.37 - 0.02: test (i) fails, the row stays liquid and contested.
@@ -464,6 +530,7 @@ def test_two_test_rule_refuses_a_plateau_that_is_not_flat_within_2_sigma() -> No
         records,
         observation_id="series_a",
         x_by_component={"SiO2": Decimal("0.33")},
+        temperature_K=Decimal("1933"),
         declared=_declared("0.33"),
     )
     assert outcome.kind == LIQUIDUS_POSITION_CONTESTED
@@ -489,6 +556,7 @@ def test_two_test_rule_refuses_carried_test_values_that_do_not_match() -> None:
         _records(),
         observation_id="series_a",
         x_by_component={"SiO2": Decimal("0.33")},
+        temperature_K=Decimal("1933"),
         declared=_declared("0.33", plateau_max_z="0.10"),
     )
     assert outcome.kind == LIQUIDUS_POSITION_CONTESTED
@@ -501,11 +569,19 @@ def test_two_test_rule_leaves_single_liquid_rows_and_mirrors_the_outside_side() 
     records = _records()
     for x in ("0.41", "0.50"):
         outcome = classify_point(
-            records, observation_id="series_a", x_by_component={"SiO2": Decimal(x)}, declared=None
+            records,
+            observation_id="series_a",
+            x_by_component={"SiO2": Decimal(x)},
+            temperature_K=Decimal("1933"),
+            declared=None,
         )
         assert outcome.kind is None and outcome.problem is None
     outcome = classify_point(
-        records, observation_id="series_a", x_by_component={"SiO2": Decimal("0.40")}, declared=None
+        records,
+        observation_id="series_a",
+        x_by_component={"SiO2": Decimal("0.40")},
+        temperature_K=Decimal("1933"),
+        declared=None,
     )
     assert outcome.kind == LIQUIDUS_POSITION_CONTESTED
     above = _records(
@@ -520,23 +596,38 @@ def test_two_test_rule_leaves_single_liquid_rows_and_mirrors_the_outside_side() 
         }
     )
     assert classify_point(
-        above, observation_id="series_a", x_by_component={"SiO2": Decimal("0.56")}, declared=None
+        above,
+        observation_id="series_a",
+        x_by_component={"SiO2": Decimal("0.56")},
+        temperature_K=Decimal("1933"),
+        declared=None,
     ).kind == LIQUIDUS_POSITION_CONTESTED
     assert classify_point(
-        above, observation_id="series_a", x_by_component={"SiO2": Decimal("0.50")}, declared=None
+        above,
+        observation_id="series_a",
+        x_by_component={"SiO2": Decimal("0.50")},
+        temperature_K=Decimal("1933"),
+        declared=None,
     ).kind is None
 
 
 # --- t-1123a r2: remaining reader guards (each has a mutation proof) ---------
 
 
-def _classify(records, x="0.33", declared=None, observation_id="series_a"):
+def _classify(
+    records,
+    x="0.33",
+    declared=None,
+    observation_id="series_a",
+    temperature_K=Decimal("1933"),
+):
     from simulator.battery.phase_field import classify_point
 
     return classify_point(
         records,
         observation_id=observation_id,
         x_by_component={"SiO2": Decimal(x)},
+        temperature_K=temperature_K,
         declared=declared if declared is not None else _declared(x),
     )
 
