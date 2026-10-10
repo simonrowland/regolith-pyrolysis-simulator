@@ -680,8 +680,9 @@ species:
           extracts when available for the same system.
       uncertainty:
         note: range endpoints as printed; compilation from heterogeneous methods/labs
+    context:
     - observation_id: sossi_fegley_2018_table1_GeO2_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 404
@@ -1005,8 +1006,9 @@ species:
           extracts when available for the same system.
       uncertainty:
         note: range endpoints as printed; compilation from heterogeneous methods/labs
+    context:
     - observation_id: sossi_fegley_2018_table1_MoO2_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 404
@@ -1092,8 +1094,9 @@ species:
           extracts when available for the same system.
       uncertainty:
         note: range endpoints as printed; compilation from heterogeneous methods/labs
+    context:
     - observation_id: sossi_fegley_2018_table1_MoO3_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 405
@@ -1427,8 +1430,9 @@ species:
           extracts when available for the same system.
       uncertainty:
         note: range endpoints as printed; compilation from heterogeneous methods/labs
+    context:
     - observation_id: sossi_fegley_2018_table1_SiO2_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 405
@@ -1561,8 +1565,9 @@ species:
           extracts when available for the same system.
       uncertainty:
         note: range endpoints as printed; compilation from heterogeneous methods/labs
+    context:
     - observation_id: sossi_fegley_2018_table1_TiO2_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 406
@@ -1881,8 +1886,9 @@ species:
           extracts when available for the same system.
       uncertainty:
         note: approximate range endpoints as printed; compilation from heterogeneous methods/labs
+    context:
     - observation_id: sossi_fegley_2018_table1_WO3_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 407
@@ -1972,9 +1978,10 @@ species:
         anhydrous_ferrobasalt_1573_1823K_1_bar: Zn
         missing_as_printed: em-dash means true absence, never 0
   SiO:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_pure_oxide_vapour_speciation_index
-      type: rate_series
+      type: gas_species_index
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
         table: '1'
@@ -1994,9 +2001,10 @@ species:
           multicarrier-mine pass (table is long). Do not treat pure-oxide carriers as melt partial pressures.
         distinct_from_table2: Table 2 = melt activity coefficients; Table 1 = pure oxide vapour speciation
   Al2O3:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_Al2O3_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 402
@@ -2025,9 +2033,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   As2O3:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_As2O3_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 402
@@ -2056,9 +2065,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   B2O3:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_B2O3_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 403
@@ -2087,9 +2097,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   BaO:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_BaO_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 403
@@ -2118,9 +2129,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   BeO:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_BeO_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 403
@@ -2149,9 +2161,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   Bi2O3:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_Bi2O3_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 403
@@ -2180,9 +2193,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   CaO:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_CaO_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 403
@@ -2211,9 +2225,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   CdO:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_CdO_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 403
@@ -2243,9 +2258,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   CeO2:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_CeO2_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 403
@@ -2274,9 +2290,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   Ce2O3:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_Ce2O3_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 403
@@ -2305,9 +2322,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   CoO:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_CoO_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 403
@@ -2336,9 +2354,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   Cr2O3:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_Cr2O3_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 403
@@ -2367,9 +2386,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   CrO3:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_CrO3_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 403
@@ -2398,9 +2418,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   Cs2O:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_Cs2O_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 403
@@ -2429,9 +2450,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   Cu2O:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_Cu2O_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 403
@@ -2460,9 +2482,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   CuO:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_CuO_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 403
@@ -2491,9 +2514,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   Dy2O3:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_Dy2O3_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 403
@@ -2522,9 +2546,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   Er2O3:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_Er2O3_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 403
@@ -2553,9 +2578,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   Eu2O3:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_Eu2O3_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 403
@@ -2584,9 +2610,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   Fe1-xO:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_Fe1_xO_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 403
@@ -2615,9 +2642,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   Fe3O4:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_Fe3O4_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 404
@@ -2646,9 +2674,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   Fe2O3:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_Fe2O3_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 404
@@ -2678,9 +2707,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   Ga2O3:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_Ga2O3_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 404
@@ -2709,9 +2739,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   Gd2O3:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_Gd2O3_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 404
@@ -2740,9 +2771,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   HfO2:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_HfO2_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 404
@@ -2771,9 +2803,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   Ho2O3:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_Ho2O3_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 404
@@ -2802,9 +2835,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   In2O3:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_In2O3_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 404
@@ -2833,9 +2867,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   K2O:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_K2O_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 404
@@ -2865,9 +2900,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   La2O3:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_La2O3_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 404
@@ -2896,9 +2932,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   Li2O:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_Li2O_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 404
@@ -2927,9 +2964,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   Lu2O3:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_Lu2O3_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 404
@@ -2958,9 +2996,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   MgO:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_MgO_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 404
@@ -2989,9 +3028,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   MnO:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_MnO_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 404
@@ -3020,9 +3060,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   Na2O:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_Na2O_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 405
@@ -3051,9 +3092,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   NbO:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_NbO_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 405
@@ -3082,9 +3124,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   NbO2:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_NbO2_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 405
@@ -3114,9 +3157,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   Nb2O5:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_Nb2O5_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 405
@@ -3145,9 +3189,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   Nd2O3:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_Nd2O3_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 405
@@ -3176,9 +3221,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   NiO:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_NiO_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 405
@@ -3207,9 +3253,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   OsO4:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_OsO4_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 405
@@ -3239,35 +3286,6 @@ species:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   P4O10:
     observations:
-    - observation_id: sossi_fegley_2018_table1_P4O10_speciation
-      type: gas_speciation
-      locator:
-        table: 1
-        page: 405
-        pdf_page_index: 13
-        note: The metal bearing gases in the saturated vapour over 77 pure oxides
-      T_range_K:
-      - 313.0
-      - 923.0
-      phase: pure_oxide_solid_or_liquid
-      standard_state: saturated vapour over the named pure oxide as compiled
-      regime: compiled_pure_oxide_vapour
-      units: species names (no P series; compilation index)
-      values:
-        quantity: pure_oxide_dominant_gas_species_index
-        semantics: bound_not_point_ordering
-        oxide_as_published: P4O10(s)
-        melting_point_K_as_published: 699
-        gas_species_as_published: P4O10 ≫ P4O9, P4O8, P4O7, P4O6
-        dominant_gas_species: P4O10
-        temperature_windows_as_published: 333–923^a; 313–773^b; 370–423^c
-        primary_citation: Hashizume et al. 1966
-        references_as_published: "^a Hashizume et al. 1966; ^b Muenow et al. 1970; ^c Kazenas & Petrov 1997"
-        condensed_phase: pure_oxide_not_melt
-        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
-        primary_citation_doi_status: resolver_miss_year
-      uncertainty:
-        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
     - observation_id: sossi_fegley_2018_alias_SF18_T1_P4O10_KEMS_dominance
       type: activity_coefficient
       locator:
@@ -3320,10 +3338,41 @@ species:
         fO2_exponent: 0.0
         standard_pressure: 1 bar
         se5_ban: do not set a_P2O5=1 for dilute basalt
+    context:
+    - observation_id: sossi_fegley_2018_table1_P4O10_speciation
+      type: gas_species_index
+      locator:
+        table: 1
+        page: 405
+        pdf_page_index: 13
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
+      T_range_K:
+      - 313.0
+      - 923.0
+      phase: pure_oxide_solid_or_liquid
+      standard_state: saturated vapour over the named pure oxide as compiled
+      regime: compiled_pure_oxide_vapour
+      units: species names (no P series; compilation index)
+      values:
+        quantity: pure_oxide_dominant_gas_species_index
+        semantics: bound_not_point_ordering
+        oxide_as_published: P4O10(s)
+        melting_point_K_as_published: 699
+        gas_species_as_published: P4O10 ≫ P4O9, P4O8, P4O7, P4O6
+        dominant_gas_species: P4O10
+        temperature_windows_as_published: 333–923^a; 313–773^b; 370–423^c
+        primary_citation: Hashizume et al. 1966
+        references_as_published: "^a Hashizume et al. 1966; ^b Muenow et al. 1970; ^c Kazenas & Petrov 1997"
+        condensed_phase: pure_oxide_not_melt
+        compilation_note: "Secondary compilation (Sossi & Fegley 2018 Table 1). Bold type in the source marks the most abundant metal-bearing gas; others listed in descending order. Monatomic/diatomic oxygen present in all cases but not listed."
+        primary_citation_doi_status: resolver_miss_year
+      uncertainty:
+        note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   PbO:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_PbO_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 405
@@ -3352,9 +3401,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   Pr2O3:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_Pr2O3_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 405
@@ -3383,9 +3433,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   Rb2O:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_Rb2O_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 405
@@ -3414,9 +3465,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   Re2O7:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_Re2O7_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 405
@@ -3445,9 +3497,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   Sb2O4:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_Sb2O4_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 405
@@ -3478,9 +3531,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   Sb2O3:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_Sb2O3_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 405
@@ -3510,9 +3564,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   Sc2O3:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_Sc2O3_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 405
@@ -3541,9 +3596,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   Sm2O3:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_Sm2O3_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 406
@@ -3572,9 +3628,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   SnO2:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_SnO2_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 406
@@ -3603,9 +3660,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   SrO:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_SrO_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 406
@@ -3634,9 +3692,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   Ta2O5:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_Ta2O5_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 406
@@ -3665,9 +3724,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   Tb2O3:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_Tb2O3_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 406
@@ -3696,9 +3756,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   ThO2:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_ThO2_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 406
@@ -3727,9 +3788,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   TiO:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_TiO_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 406
@@ -3758,9 +3820,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   Ti2O3:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_Ti2O3_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 406
@@ -3789,9 +3852,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   Ti3O5:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_Ti3O5_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 406
@@ -3820,9 +3884,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   Tl2O:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_Tl2O_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 406
@@ -3851,9 +3916,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   Tl4O3:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_Tl4O3_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 406
@@ -3882,9 +3948,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   Tl2O3:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_Tl2O3_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 406
@@ -3913,9 +3980,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   Tm2O3:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_Tm2O3_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 406
@@ -3944,9 +4012,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   UO2:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_UO2_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 406
@@ -3975,9 +4044,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   U3O8:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_U3O8_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 406
@@ -4006,9 +4076,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   VO:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_VO_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 407
@@ -4037,9 +4108,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   V2O3:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_V2O3_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 407
@@ -4068,9 +4140,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   V2O4:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_V2O4_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 407
@@ -4099,9 +4172,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   V2O5:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_V2O5_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 407
@@ -4130,9 +4204,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   Y2O3:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_Y2O3_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 407
@@ -4161,9 +4236,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   Yb2O3:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_Yb2O3_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 407
@@ -4192,9 +4268,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   ZnO:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_ZnO_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 407
@@ -4223,9 +4300,10 @@ species:
       uncertainty:
         note: compilation from heterogeneous methods/labs; bold marking as printed on 150 dpi render
   ZrO2:
-    observations:
+    observations: []
+    context:
     - observation_id: sossi_fegley_2018_table1_ZrO2_speciation
-      type: gas_speciation
+      type: gas_species_index
       locator:
         table: 1
         page: 407
@@ -4908,7 +4986,7 @@ fidelity_samples:
     table: '2'
 
 - species: Al2O3
-  observable: gas_speciation
+  observable: gas_species_index
   observation_id: sossi_fegley_2018_table1_Al2O3_speciation
   field: dominant_gas_species
   value: Al
@@ -4918,7 +4996,7 @@ fidelity_samples:
     pdf_page_index: 10
     note: bold Al is the most abundant metal-bearing gas over α-Al2O3
 - species: SiO2
-  observable: gas_speciation
+  observable: gas_species_index
   observation_id: sossi_fegley_2018_table1_SiO2_speciation
   field: dominant_gas_species
   value: SiO
@@ -4928,7 +5006,7 @@ fidelity_samples:
     pdf_page_index: 13
     note: bold SiO over cristobalite/SiO2(l)
 - species: As2O3
-  observable: gas_speciation
+  observable: gas_species_index
   observation_id: sossi_fegley_2018_table1_As2O3_speciation
   field: dominant_gas_species
   value: As4O6
