@@ -1179,6 +1179,275 @@ def test_unsupported_vapor_pressure_units_fails_closed(monkeypatch):
     assert "vapor_pressure_units" in backend._last_error
 
 
+def test_vaporock_table_boundary_propagates_local_errors_and_reports_engine_type(
+    monkeypatch,
+):
+    backend = VapoRockBackend()
+    with monkeypatch.context() as scoped:
+        scoped.setattr(
+            vaporock_module,
+            "_flatten_log10_bar",
+            lambda _raw: (_ for _ in ()).throw(KeyError("local flatten bug")),
+        )
+        with pytest.raises(KeyError, match="local flatten bug"):
+            backend._log10_bar_pressures_to_pa({"Na(g)": -2.0})
+
+    class BrokenTable:
+        @property
+        def shape(self):
+            return (1, 1)
+
+        @property
+        def iloc(self):
+            raise ValueError("upstream table read failed")
+
+    class FakeSystem:
+        def set_melt_comp(self, _composition):
+            pass
+
+        def eval_gas_abundances(self, _temperature, _log_fO2):
+            return BrokenTable()
+
+    _install_fake_import(monkeypatch, types.SimpleNamespace(System=FakeSystem))
+    result = VapoRockBackend()
+    assert result.initialize({"warm_worker": False})
+    failed = result.equilibrate(1600.0, composition_mol={"Na2O": 1.0})
+    assert failed.status == "not_converged"
+    assert failed.diagnostics["engine_exception"] == "ValueError"
+    assert failed.diagnostics["engine_exception_message"] == (
+        "upstream table read failed"
+    )
+
+
+def test_vaporock_worker_import_boundary_only_handles_import_errors(monkeypatch):
+    def fail_import(_name):
+        raise KeyError("local import wrapper bug")
+
+    monkeypatch.setattr(vaporock_module.importlib, "import_module", fail_import)
+    with pytest.raises(KeyError, match="local import wrapper bug"):
+        vaporock_module._bootstrap_vaporock_worker("C", "bar", False)
+
+    backend = VapoRockBackend()
+    with pytest.raises(KeyError, match="local import wrapper bug"):
+        backend._import_vaporock()
+
+    def missing_import(name):
+        raise ModuleNotFoundError(f"no module named {name}")
+
+    monkeypatch.setattr(vaporock_module.importlib, "import_module", missing_import)
+    assert backend._import_vaporock() is None
+    assert "ModuleNotFoundError" in backend._last_error
+    with pytest.raises(ModuleNotFoundError, match="ModuleNotFoundError"):
+        vaporock_module._bootstrap_vaporock_worker("C", "bar", False)
+
+
+def test_vaporock_runtime_probe_propagates_our_initialize_error(monkeypatch):
+    monkeypatch.setattr(
+        VapoRockBackend,
+        "initialize",
+        lambda _self, _config: (_ for _ in ()).throw(KeyError("local init bug")),
+    )
+    with pytest.raises(KeyError, match="local init bug"):
+        vaporock_module.vaporock_runtime_available()
+
+
+def test_vaporock_warm_pool_catches_typed_startup_errors_only(monkeypatch):
+    backend = VapoRockBackend()
+    monkeypatch.setattr(
+        vaporock_module,
+        "EngineWorkerPool",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(KeyError("pool bug")),
+    )
+    with pytest.raises(KeyError, match="pool bug"):
+        backend._initialize_warm_pool()
+
+    local_remote = vaporock_module.EngineWorkerRemoteError(
+        "KeyError", "local worker preparation bug", "trace"
+    )
+    monkeypatch.setattr(
+        vaporock_module,
+        "EngineWorkerPool",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(local_remote),
+    )
+    with pytest.raises(vaporock_module.EngineWorkerRemoteError) as caught:
+        backend._initialize_warm_pool()
+    assert caught.value.exc_name == "KeyError"
+
+    remote = vaporock_module.EngineWorkerRemoteError(
+        "ModuleNotFoundError", "VapoRock missing", "trace"
+    )
+    monkeypatch.setattr(
+        vaporock_module,
+        "EngineWorkerPool",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(remote),
+    )
+    assert backend._initialize_warm_pool() is False
+    assert "ModuleNotFoundError: VapoRock missing" in backend._last_error
+
+    startup_timeout = vaporock_module.EngineWorkerTimeout(
+        "VapoRock warm worker", 0.1, phase="initialization"
+    )
+    monkeypatch.setattr(
+        vaporock_module,
+        "EngineWorkerPool",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(startup_timeout),
+    )
+    assert backend._initialize_warm_pool() is False
+    assert "EngineWorkerTimeout" in backend._last_error
+
+
+def test_vaporock_warm_result_classifies_engine_errors_and_lifecycle_failures():
+    from concurrent.futures import Future
+
+    class FailedPool:
+        def __init__(self, failure):
+            self.failure = failure
+
+        def submit(self, *_args, **_kwargs):
+            future = Future()
+            future.set_exception(self.failure)
+            return future
+
+    def run_with_failure(failure):
+        backend = VapoRockBackend()
+        backend._available = True
+        backend._warm_pool = FailedPool(failure)
+        return backend.equilibrate(
+            1600.0,
+            composition_mol={"Na2O": 1.0},
+        )
+
+    local_failure = vaporock_module.EngineWorkerRemoteError(
+        "KeyError", "our worker request/parser bug", "trace"
+    )
+    backend = VapoRockBackend()
+    backend._available = True
+    backend._warm_pool = FailedPool(local_failure)
+    with pytest.raises(vaporock_module.EngineWorkerRemoteError) as caught:
+        backend.equilibrate(1600.0, composition_mol={"Na2O": 1.0})
+    assert caught.value.exc_name == "KeyError"
+
+    external_failure = vaporock_module.EngineWorkerRemoteError(
+        "VapoRockCallError", "ValueError: VapoRock evaluation failed", "trace"
+    )
+    failed = run_with_failure(external_failure)
+    assert failed.status == "not_converged"
+    assert failed.diagnostics["engine_exception"] == "ValueError"
+    assert failed.diagnostics["engine_exception_message"] == (
+        "VapoRock evaluation failed"
+    )
+
+    worker_died = RuntimeError(
+        "VapoRock warm pool slot 0 worker exited without a result"
+    )
+    failed = run_with_failure(worker_died)
+    assert failed.status == "not_converged"
+    assert failed.diagnostics["engine_exception"] == "RuntimeError"
+    assert failed.diagnostics["engine_exception_message"] == str(worker_died)
+
+    timeout = vaporock_module.EngineWorkerTimeout(
+        "VapoRock warm worker", 0.1, phase="equilibrate"
+    )
+    failed = run_with_failure(timeout)
+    assert failed.status == "not_converged"
+    assert failed.diagnostics["engine_exception"] == "EngineWorkerTimeout"
+
+
+def test_vaporock_equilibrate_does_not_convert_our_call_error(monkeypatch):
+    _install_fake_import(monkeypatch, types.SimpleNamespace())
+    backend = VapoRockBackend()
+    assert backend.initialize({"warm_worker": False})
+    monkeypatch.setattr(
+        backend,
+        "_call_vaporock",
+        lambda **_kwargs: (_ for _ in ()).throw(KeyError("local call bug")),
+    )
+    with pytest.raises(KeyError, match="local call bug"):
+        backend.equilibrate(1600.0, composition_mol={"Na2O": 1.0})
+
+
+def test_vaporock_candidate_and_system_boundaries_keep_local_errors_outside(
+    monkeypatch,
+):
+    candidate_module = types.SimpleNamespace(
+        calc_vapor_pressures=lambda **_kwargs: {"Na": 0.001}
+    )
+    _install_fake_import(monkeypatch, candidate_module)
+    backend = VapoRockBackend()
+    assert backend.initialize({"warm_worker": False})
+    monkeypatch.setattr(
+        backend,
+        "_normalize_vapor_pressures",
+        lambda _raw: (_ for _ in ()).throw(KeyError("local normalize bug")),
+    )
+    with pytest.raises(KeyError, match="local normalize bug"):
+        backend._call_vaporock({"Na2O": 100.0}, 1600.0, 1e-6, -8.0)
+
+    class BrokenCandidate:
+        @staticmethod
+        def calc_vapor_pressures(**_kwargs):
+            raise ValueError("candidate engine failed")
+
+    _install_fake_import(monkeypatch, BrokenCandidate)
+    backend = VapoRockBackend()
+    assert backend.initialize({"warm_worker": False})
+    result = backend.equilibrate(1600.0, composition_mol={"Na2O": 1.0})
+    assert result.status == "not_converged"
+    assert result.diagnostics["engine_exception"] == "ValueError"
+    assert "candidate engine failed" in result.diagnostics[
+        "engine_exception_message"
+    ]
+
+    class BrokenSystem:
+        def set_melt_comp(self, _composition):
+            pass
+
+        def eval_gas_abundances(self, _temperature, _log_fO2):
+            raise RuntimeError("system engine failed")
+
+    _install_fake_import(monkeypatch, types.SimpleNamespace(System=BrokenSystem))
+    backend = VapoRockBackend()
+    assert backend.initialize({"warm_worker": False})
+    result = backend.equilibrate(1600.0, composition_mol={"Na2O": 1.0})
+    assert result.status == "not_converged"
+    assert result.diagnostics["engine_exception"] == "RuntimeError"
+    assert "system engine failed" in result.diagnostics[
+        "engine_exception_message"
+    ]
+
+
+def test_vaporock_to_dict_boundary_reports_error_and_propagates_our_latch(
+    monkeypatch,
+):
+    class BrokenTable:
+        def to_dict(self):
+            raise OSError("upstream conversion failed")
+
+    _install_fake_import(
+        monkeypatch,
+        types.SimpleNamespace(
+            calc_vapor_pressures=lambda **_kwargs: BrokenTable()
+        ),
+    )
+    backend = VapoRockBackend()
+    assert backend.initialize({"warm_worker": False})
+    result = backend.equilibrate(1600.0, composition_mol={"Na2O": 1.0})
+    assert result.status == "not_converged"
+    assert result.diagnostics["engine_exception"] == "OSError"
+    assert result.diagnostics["engine_exception_message"] == (
+        "upstream conversion failed"
+    )
+
+    backend._clear_empty_speciation()
+    monkeypatch.setattr(
+        backend,
+        "_latch_empty_speciation",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(KeyError("local latch bug")),
+    )
+    with pytest.raises(KeyError, match="local latch bug"):
+        backend._normalize_vapor_pressures(BrokenTable())
+
+
 # ---------------------------------------------------------------------------
 # VR-5: external domain gate + warm pool (DESIGN-REV5 §4.2.1 / §5.5)
 # ---------------------------------------------------------------------------
@@ -2363,6 +2632,8 @@ def test_empty_speciation_unreadable_serialize_does_not_claim_zero_rows():
     assert payload["empty_speciation_cause"] == (
         EmptySpeciationCause.TABLE_UNREADABLE.value
     )
+    assert payload["engine_exception"] == "RuntimeError"
+    assert payload["engine_exception_message"] == "cannot read table"
     assert "speciation_row_count" not in payload
 
     none_log, none_payload = _serialize_log10_bar_pressures(None)
