@@ -6,6 +6,7 @@ import re
 from decimal import Decimal
 from pathlib import Path
 
+import pytest
 import yaml
 
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
@@ -660,6 +661,105 @@ def test_markova_table2_migrates_both_quantities_and_printed_charge(tmp_path: Pa
                 for oxide, amount in composition["components"]
             }
             assert actual_moles == dict(wt_pct_to_mole_fraction(expected).components)
+
+    for panel, charge in charges.items():
+        panel_rows = [
+            row
+            for row in mass_loss_rows.values()
+            if row["experiment_id"].endswith(f"::{panel}")
+        ]
+        experiment_ids = {row["experiment_id"] for row in panel_rows}
+        assert len(experiment_ids) == 1
+        sample = result.experiments[next(iter(experiment_ids))].sample
+        assert sample.printed_composition is not None
+        assert {
+            oxide: as_decimal(value)
+            for oxide, value in sample.printed_composition.state.value.items()
+        } == charge
+        expected_identity = dict(wt_pct_to_mole_fraction(charge).components)
+        panel_residue = [
+            row
+            for row in residue.values()
+            if row["experiment_id"].endswith(f"::{panel}")
+        ]
+        assert len(panel_residue) == 55
+        for row in panel_residue:
+            assert _identity_composition_components(row) == expected_identity
+
+
+@pytest.mark.parametrize(
+    "mode",
+    ("tie", "missing-point", "missing-coordinates", "mismatched-coordinates"),
+)
+def test_markova_residue_uses_its_point_map_without_parent_lookup(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    mode: str,
+) -> None:
+    from simulator.battery import migrate as migration
+
+    original = migration.Migrator._emit_exploded_point
+
+    def emit(self, **kwargs):
+        item = kwargs["item"]["item"]
+        if (
+            isinstance(item, dict)
+            and item.get("T_C") == 1475
+            and "MgO_wt_pct" in item
+            and as_decimal(str(item.get("MgO_wt_pct"))) == Decimal("36.92")
+        ):
+            kwargs = dict(kwargs)
+            parent_values = dict(kwargs["parent_values"])
+            series = list(parent_values["series"])
+            if mode == "tie":
+                match = next(
+                    point
+                    for point in series
+                    if point.get("T_C") == item.get("T_C")
+                    and point.get("mass_loss_pct") == item.get("mass_loss_pct")
+                )
+                series.append({**match, "SiO2_wt_pct": Decimal("99")})
+                parent_values["series"] = series
+                kwargs["parent_values"] = parent_values
+            elif mode == "missing-point":
+                parent_values["series"] = []
+                kwargs["parent_values"] = parent_values
+            elif mode == "missing-coordinates":
+                item = dict(item)
+                item.pop("T_C", None)
+                item.pop("mass_loss_pct", None)
+                kwargs["item"] = {**kwargs["item"], "item": item}
+            elif mode == "mismatched-coordinates":
+                item = dict(item)
+                item["mass_loss_pct"] = Decimal(str(item["mass_loss_pct"])) + Decimal(
+                    "1e-12"
+                )
+                kwargs["item"] = {**kwargs["item"], "item": item}
+        return original(self, **kwargs)
+
+    monkeypatch.setattr(migration.Migrator, "_emit_exploded_point", emit)
+    result = _migrate_real_extract(
+        tmp_path,
+        "kems-026-markova-1984.yaml",
+        use_repository_index_row=True,
+    )
+    matches = []
+    for observation in result.observations.values():
+        row = to_plain(observation)
+        if (
+            _quantity(row) == "residue_component_composition"
+            and row["identity"]["species"]["formula"] == "MgO"
+            and Decimal(row["value"]["point"]) == Decimal("36.92")
+        ):
+            matches.append(row)
+    assert len(matches) == 1
+    assert _printed_wt_map(matches[0]) == {
+        "SiO2": Decimal("44.4"),
+        "Al2O3": Decimal("4.62"),
+        "FeO": Decimal("7.01"),
+        "MgO": Decimal("36.92"),
+        "CaO": Decimal("7.05"),
+    }
 
 
 def test_holzheid_v69_activity_does_not_gain_printed_composition(

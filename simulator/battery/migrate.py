@@ -3026,12 +3026,11 @@ def _oxide_map_from_mapping(obj: object) -> dict[str, Decimal] | None:
 def _point_rows(values: object) -> list[Mapping[str, Any]]:
     if not isinstance(values, Mapping):
         return []
-    points = values.get("points")
-    if not isinstance(points, list):
-        points = values.get("tests")
-    if not isinstance(points, list):
-        return []
-    return [item for item in points if isinstance(item, Mapping)]
+    for key in ("points", "tests", "series"):
+        points = values.get(key)
+        if isinstance(points, list):
+            return [item for item in points if isinstance(item, Mapping)]
+    return []
 
 
 def _printed_initial_charge_row_map(values: object) -> dict[str, Decimal] | None:
@@ -3047,6 +3046,8 @@ def _printed_initial_charge_row_map(values: object) -> dict[str, Decimal] | None
     for item in ranked:
         if item.get("T_C_is_initial_composition") is True:
             got = _mass_loss_oxide_map_from_mapping(item) or _oxide_map_from_mapping(item)
+            if got is None and isinstance(values, Mapping):
+                got = _oxide_map_from_mapping(values.get("composition_wt_pct"))
             if got:
                 return got
     for item in ranked:
@@ -13142,6 +13143,9 @@ class Migrator:
                         parent_values=values,
                         provenance=observation_provenance,
                         parent_point_conditions=point_conditions,
+                        source_point_oxide_map=_mass_loss_oxide_map_from_mapping(
+                            raw_item
+                        ),
                     )
             return
         row_point_containers: list[tuple[str, list[Any]]] = []
@@ -13424,6 +13428,7 @@ class Migrator:
         parent_values: object = None,
         provenance: Mapping[str, Any] | None = None,
         parent_point_conditions: Mapping[str, Located[Any]] | None = None,
+        source_point_oxide_map: Mapping[str, Decimal] | None = None,
         content_stable_id: bool = False,
     ) -> None:
         raw_item = item.get("item")
@@ -13463,22 +13468,11 @@ class Migrator:
             sample = raw_item.get("sample") or raw_item.get("id")
             sample_label = sample.strip() if isinstance(sample, str) else None
             if q_for_species is Quantity.RESIDUE_COMPONENT_COMPOSITION:
-                point_oxide_map = _mass_loss_oxide_map_from_mapping(raw_item)
-                if point_oxide_map is None and isinstance(parent_values, Mapping):
-                    temperature = _as_dec_or_none(raw_item.get("T_C"))
-                    mass_loss = _as_dec_or_none(raw_item.get("mass_loss_pct"))
-                    series = parent_values.get("series")
-                    matching_points = [
-                        point
-                        for point in (series if isinstance(series, list) else ())
-                        if isinstance(point, Mapping)
-                        and _as_dec_or_none(point.get("T_C")) == temperature
-                        and _as_dec_or_none(point.get("mass_loss_pct")) == mass_loss
-                    ]
-                    if len(matching_points) == 1:
-                        point_oxide_map = _mass_loss_oxide_map_from_mapping(
-                            matching_points[0]
-                        )
+                point_oxide_map = (
+                    dict(source_point_oxide_map)
+                    if source_point_oxide_map is not None
+                    else _mass_loss_oxide_map_from_mapping(raw_item)
+                )
             else:
                 point_oxide_map = _oxide_map_from_mapping(raw_item)
             if q_for_species is Quantity.MASS_LOSS_FRACTION:
