@@ -123,6 +123,7 @@ from engines.engine_commissioning import assess_engine_commissioning
 from simulator.engine_pool import (
     EngineWorkerPool,
     EngineWorkerRemoteError,
+    EngineWorkerTimeout,
     WarmEngineWorker,
 )
 from simulator.melt_backend.base import (
@@ -495,18 +496,38 @@ def _flatten_log10_bar(raw: Any) -> Optional[List[tuple[Any, Any]]]:
             '_flatten_log10_bar does not accept None; classify '
             'EmptySpeciationCause.PAYLOAD_ABSENT at the caller'
         )
-    if hasattr(raw, 'iloc') and hasattr(raw, 'index'):
-        try:
+    try:
+        is_table = hasattr(raw, 'iloc') and hasattr(raw, 'index')
+        if is_table:
             if len(getattr(raw, 'shape', ())) == 2:
                 series = raw.iloc[:, 0]
             else:
                 series = raw
             return list(series.items())
-        except Exception:  # noqa: BLE001
-            return None
+    except Exception as exc:  # VapoRock's pandas-like result owns these calls.
+        # These operations are delegated to VapoRock's pandas-like result.
+        # Preserve the failing upstream type/message for the caller's status.
+        raise VapoRockCallError(exc) from exc
     if isinstance(raw, dict):
         return list(raw.items())
     return None
+
+
+class VapoRockCallError(RuntimeError):
+    """A failure raised by an upstream VapoRock call."""
+
+    def __init__(
+        self,
+        cause: BaseException | str,
+        message: Optional[str] = None,
+    ) -> None:
+        if isinstance(cause, BaseException):
+            self.external_exception = type(cause).__name__
+            self.external_message = str(cause)
+        else:
+            self.external_exception = cause
+            self.external_message = message or ''
+        super().__init__(f'{self.external_exception}: {self.external_message}')
 
 
 def _speciation_value_stats(
@@ -702,7 +723,17 @@ def _serialize_log10_bar_pressures(
     """
     if raw is None:
         return {}, _serialize_cause_payload(EmptySpeciationCause.PAYLOAD_ABSENT)
-    items = _flatten_log10_bar(raw)
+    try:
+        items = _flatten_log10_bar(raw)
+    except VapoRockCallError as exc:
+        payload = _serialize_cause_payload(
+            EmptySpeciationCause.TABLE_UNREADABLE
+        )
+        payload.update({
+            'engine_exception': exc.external_exception,
+            'engine_exception_message': exc.external_message,
+        })
+        return {}, payload
     if items is None:
         return {}, _serialize_cause_payload(
             EmptySpeciationCause.TABLE_UNREADABLE
@@ -811,21 +842,30 @@ def _eval_system_log10_bar(
     fO2_log: float,
 ) -> tuple[Dict[str, float], Dict[str, Any]]:
     """Run set_melt_comp + eval_gas_abundances on *system*; return log10 map."""
-    set_melt_comp = getattr(system, 'set_melt_comp')
-    eval_gas_abundances = getattr(system, 'eval_gas_abundances')
-    set_melt_comp(dict(composition_wt_pct))
-    # Installed System.eval_gas_abundances(T, logfO2, P=1e-10, ...) uses P
-    # in _calc_liquid_chempot. This helper calls (T, logfO2) only, so
-    # upstream stays at its default. Passing P is a golden-affecting
-    # change and is not done here.
-    logP = eval_gas_abundances(float(temperature_K), float(fO2_log))
+    composition = dict(composition_wt_pct)
+    temperature = float(temperature_K)
+    log_fO2 = float(fO2_log)
+    try:
+        set_melt_comp = getattr(system, 'set_melt_comp')
+        eval_gas_abundances = getattr(system, 'eval_gas_abundances')
+        set_melt_comp(composition)
+        # Installed System.eval_gas_abundances(T, logfO2, P=1e-10, ...) uses P
+        # in _calc_liquid_chempot. This helper calls (T, logfO2) only, so
+        # upstream stays at its default. Passing P is a golden-affecting
+        # change and is not done here.
+        logP = eval_gas_abundances(temperature, log_fO2)
+    except Exception as exc:
+        raise VapoRockCallError(exc) from exc
     return _serialize_log10_bar_pressures(logP)
 
 
 def _construct_system(resource: dict[str, Any]) -> Any:
     """Construct a new System and bump the worker construct counter."""
     system_cls = resource['system_cls']
-    system = system_cls()
+    try:
+        system = system_cls()
+    except Exception as exc:
+        raise VapoRockCallError(exc) from exc
     resource['system_construct_count'] = (
         int(resource.get('system_construct_count') or 0) + 1
     )
@@ -878,10 +918,10 @@ def _bootstrap_vaporock_worker(
         try:
             module = importlib.import_module(module_name)
             break
-        except Exception as exc:  # noqa: BLE001
-            errors.append(f'{module_name}: {exc}')
+        except ImportError as exc:
+            errors.append(f'{module_name}: {type(exc).__name__}: {exc}')
     if module is None:
-        raise RuntimeError(
+        raise ModuleNotFoundError(
             'VapoRock import failed in warm worker: ' + '; '.join(errors)
         )
     system_cls = getattr(module, 'System', None)
@@ -1033,12 +1073,9 @@ def vaporock_runtime_available() -> bool:
     if _VAPOROCK_RUNTIME_AVAILABLE_CACHE is True:
         return True
     backend = VapoRockBackend()
-    try:
-        with warnings.catch_warnings():
-            warnings.simplefilter('ignore', UserWarning)
-            initialized = backend.initialize({'warm_worker': False})
-    except Exception:  # noqa: BLE001 - mirrors provider boundary catch
-        return False
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore', UserWarning)
+        initialized = backend.initialize({'warm_worker': False})
     if not initialized:
         return False
     available = backend.is_available()
@@ -1213,6 +1250,7 @@ class VapoRockBackend(MeltBackend):
         self._last_empty_speciation_cause: Optional[EmptySpeciationCause] = None
         self._last_empty_speciation_stats: Optional[Dict[str, int]] = None
         self._last_empty_speciation_reason: Optional[str] = None
+        self._last_empty_speciation_error: Optional[Dict[str, str]] = None
         self._last_silent_zero_notes: List[Dict[str, Any]] = []
         # Warm pool (DESIGN-REV5 §5.5 / VR-5). Opt-in: calibration runners
         # and live warm-path tests pass warm_worker=True. Default off so
@@ -1408,15 +1446,19 @@ class VapoRockBackend(MeltBackend):
                 size=self._warm_pool_size,
             )
         except EngineWorkerRemoteError as exc:
+            if exc.exc_name not in {'ImportError', 'ModuleNotFoundError'}:
+                raise
             self._last_error = (
-                f'VapoRock warm pool failed to initialize: {exc.detail}'
+                'VapoRock warm pool failed to initialize: '
+                f'{exc.exc_name}: {exc.detail}'
             )
             self._warnings.append(self._last_error)
             self._warm_pool = None
             return False
-        except Exception as exc:  # noqa: BLE001
+        except EngineWorkerTimeout as exc:
             self._last_error = (
-                f'VapoRock warm pool failed to initialize: {exc}'
+                'VapoRock warm pool failed to initialize: '
+                f'{type(exc).__name__}: {exc}'
             )
             self._warnings.append(self._last_error)
             self._warm_pool = None
@@ -1863,9 +1905,14 @@ class VapoRockBackend(MeltBackend):
                 pressure=pressure_value,
                 fO2_log=fO2_log,
             )
-        except Exception as exc:  # noqa: BLE001 - library-boundary catch
+        except VapoRockCallError as exc:
             # VapoRock is present but the call did not produce a usable result.
-            message = f'VapoRock equilibrate failed: {exc}'
+            external_type = exc.external_exception
+            external_message = exc.external_message
+            message = (
+                f'VapoRock equilibrate failed: {external_type}: '
+                f'{external_message}'
+            )
             self._last_error = message
             return EquilibriumResult(
                 temperature_C=temperature_C,
@@ -1874,7 +1921,11 @@ class VapoRockBackend(MeltBackend):
                 liquid_fraction=liquid_fraction,
                 status='not_converged',
                 warnings=[*prior_warnings, message],
-                diagnostics=projection_diagnostics,
+                diagnostics={
+                    **projection_diagnostics,
+                    'engine_exception': external_type,
+                    'engine_exception_message': external_message,
+                },
             )
 
         # --- Sum-pressure sanity (defense against silent fabrication) ---
@@ -1945,6 +1996,18 @@ class VapoRockBackend(MeltBackend):
             empty_reason = empty_speciation_reason(
                 cause, self._last_empty_speciation_stats
             )
+            if self._last_empty_speciation_error is not None:
+                external_error = self._last_empty_speciation_error
+                projection_diagnostics['engine_exception'] = (
+                    external_error['exception']
+                )
+                projection_diagnostics['engine_exception_message'] = (
+                    external_error['message']
+                )
+                empty_reason += (
+                    f" ({external_error['exception']}: "
+                    f"{external_error['message']})"
+                )
             self._last_empty_speciation_reason = empty_reason
             if empty_reason not in prior_warnings:
                 prior_warnings.append(empty_reason)
@@ -2019,8 +2082,8 @@ class VapoRockBackend(MeltBackend):
         for module_name in _IMPORT_CANDIDATES:
             try:
                 return importlib.import_module(module_name)
-            except Exception as exc:  # noqa: BLE001 - import-boundary catch
-                errors.append(f'{module_name}: {exc}')
+            except ImportError as exc:
+                errors.append(f'{module_name}: {type(exc).__name__}: {exc}')
 
         self._last_error = (
             'VapoRock import failed: ' + '; '.join(errors)
@@ -2037,6 +2100,7 @@ class VapoRockBackend(MeltBackend):
         self._last_empty_speciation_cause = None
         self._last_empty_speciation_stats = None
         self._last_empty_speciation_reason = None
+        self._last_empty_speciation_error = None
         self._last_silent_zero_notes = []
 
     def _latch_empty_speciation(
@@ -2117,41 +2181,38 @@ class VapoRockBackend(MeltBackend):
             if fn is None:
                 continue
             try:
-                vapor_pressures = self._normalize_vapor_pressures(fn(
+                raw = fn(
                     composition=composition_wt_pct,
                     T_C=temperature if self._temperature_units == 'C' else None,
                     T_K=temperature if self._temperature_units == 'K' else None,
                     P_bar=pressure if self._pressure_units == 'bar' else None,
                     P_Pa=pressure if self._pressure_units == 'Pa' else None,
                     log_fO2=fO2_log,
-                ))
-                self._last_pressure_authority_warning = (
-                    'VapoRock candidate vapor function has unverified total '
-                    'pressure authority; requested pressure_bar is '
-                    'diagnostic-only and this vapor result is '
-                    'non-authoritative for pressure-sensitive transport.'
                 )
-                return vapor_pressures
             except TypeError as exc:
                 # Older builds use positional / shorter signatures.
                 # Fall back to a minimal call before declaring failure.
                 last_attr_error = exc
                 try:
-                    vapor_pressures = self._normalize_vapor_pressures(fn(
+                    raw = fn(
                         composition_wt_pct,
                         temperature,
                         fO2_log,
-                    ))
-                    self._last_pressure_authority_warning = (
-                        'VapoRock legacy candidate vapor function did not '
-                        'accept total pressure; requested pressure_bar is '
-                        'diagnostic-only and this vapor result is '
-                        'non-authoritative for pressure-sensitive transport.'
                     )
-                    return vapor_pressures
-                except Exception as inner_exc:  # noqa: BLE001
+                except Exception as inner_exc:
                     last_attr_error = inner_exc
                     continue
+            except Exception as exc:
+                last_attr_error = exc
+                continue
+            vapor_pressures = self._normalize_vapor_pressures(raw)
+            self._last_pressure_authority_warning = (
+                'VapoRock candidate vapor function has unverified total '
+                'pressure authority; requested pressure_bar is '
+                'diagnostic-only and this vapor result is '
+                'non-authoritative for pressure-sensitive transport.'
+            )
+            return vapor_pressures
 
         system_cls = getattr(module, 'System', None)
         if callable(system_cls):
@@ -2168,6 +2229,9 @@ class VapoRockBackend(MeltBackend):
                 # installed vaporock build, 2026-05-14).
                 set_melt_comp(composition_wt_pct)
                 logP = eval_gas_abundances(temperature_K, fO2_log)
+            except Exception as exc:
+                last_attr_error = exc
+            else:
                 self._last_pressure_authority_warning = (
                     'This adapter calls System.eval_gas_abundances without '
                     'the optional P argument, so upstream evaluates liquid '
@@ -2181,9 +2245,11 @@ class VapoRockBackend(MeltBackend):
                 return self._log10_bar_pressures_to_pa(
                     logP, composition_wt_pct=composition_wt_pct
                 )
-            except Exception as exc:  # noqa: BLE001 - upstream boundary
-                last_attr_error = exc
 
+        if last_attr_error is not None:
+            raise VapoRockCallError(
+                type(last_attr_error).__name__, str(last_attr_error)
+            ) from last_attr_error
         raise RuntimeError(
             'VapoRock library does not expose a recognised equilibrium '
             'entry point (tried: '
@@ -2212,7 +2278,26 @@ class VapoRockBackend(MeltBackend):
         future = pool.submit(
             request, timeout_s=self._warm_call_timeout_s
         )
-        payload = future.result()
+        try:
+            payload = future.result()
+        except EngineWorkerRemoteError as exc:
+            if exc.exc_name != 'VapoRockCallError':
+                raise
+            external_type, separator, external_message = exc.detail.partition(
+                ': '
+            )
+            if not separator:
+                external_type = exc.exc_name
+                external_message = exc.detail
+            raise VapoRockCallError(
+                external_type, external_message
+            ) from exc
+        except EngineWorkerTimeout as exc:
+            raise VapoRockCallError(exc) from exc
+        except RuntimeError as exc:
+            # EngineWorkerPool reports a dead child through this result
+            # boundary after it has already discarded the worker handle.
+            raise VapoRockCallError(exc) from exc
         if not isinstance(payload, dict):
             raise RuntimeError(
                 f'VapoRock warm worker returned non-dict payload: '
@@ -2247,6 +2332,11 @@ class VapoRockBackend(MeltBackend):
             }:
                 stats = None
             self._latch_empty_speciation(cause, stats)
+            if payload.get('engine_exception') is not None:
+                self._last_empty_speciation_error = {
+                    'exception': str(payload['engine_exception']),
+                    'message': str(payload.get('engine_exception_message', '')),
+                }
             return {}
         return self._log10_bar_pressures_to_pa(
             log10_bar,
@@ -2294,7 +2384,11 @@ class VapoRockBackend(MeltBackend):
                 if callable(to_dict):
                     try:
                         raw = to_dict()
-                    except Exception:  # noqa: BLE001
+                    except Exception as exc:  # VapoRock result object's method.
+                        self._last_empty_speciation_error = {
+                            'exception': type(exc).__name__,
+                            'message': str(exc),
+                        }
                         self._latch_empty_speciation(
                             EmptySpeciationCause.TABLE_UNREADABLE
                         )
@@ -2429,7 +2523,17 @@ class VapoRockBackend(MeltBackend):
             if self._last_empty_speciation_cause is None:
                 self._latch_empty_speciation(EmptySpeciationCause.PAYLOAD_ABSENT)
             return {}
-        items = _flatten_log10_bar(raw)
+        try:
+            items = _flatten_log10_bar(raw)
+        except VapoRockCallError as exc:
+            self._last_empty_speciation_error = {
+                'exception': exc.external_exception,
+                'message': exc.external_message,
+            }
+            self._latch_empty_speciation(
+                EmptySpeciationCause.TABLE_UNREADABLE
+            )
+            return {}
         if items is None:
             if self._last_empty_speciation_cause is None:
                 self._latch_empty_speciation(
