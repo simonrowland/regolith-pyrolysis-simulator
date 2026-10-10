@@ -412,6 +412,7 @@ QUANTITY_ALIASES = {
     "delta_fH": Quantity.DELTA_FH,
     "deltafH": Quantity.DELTA_FH,
     "delta_f_H": Quantity.DELTA_FH,
+    "negative_enthalpy_change_on_cooling": Quantity.H_MINUS_H298,
     "log10_Kf": Quantity.LOG10_KF,
     "log10_kf": Quantity.LOG10_KF,
     "log10_K_star_equilibrium_fit": Quantity.LOG10_K_STAR,
@@ -437,6 +438,7 @@ QUANTITY_ALIASES = {
     "total_integrated_mass_loss": Quantity.MASS_LOSS_FRACTION,
     "total_gas_evolution_mass_loss": Quantity.MASS_LOSS_FRACTION,
     "isothermal_hold_mass_loss": Quantity.MASS_LOSS_FRACTION,
+    "specific_gas_yield": Quantity.EVOLVED_GAS_YIELD,
     "water_released_during_drying": Quantity.MASS_LOSS_FRACTION,
     "dta_transition_temperatures": Quantity.TRANSITION_TEMPERATURE,
     "invariant_transformation_temperature": Quantity.TRANSITION_TEMPERATURE,
@@ -2852,6 +2854,12 @@ _CONVERSION_META: dict[str, tuple[Decimal, str, str, str]] = {
         "dimensionless",
         "percent",
     ),
+    "negative_cooling_enthalpy_to_H_minus_H298": (
+        Decimal("1"),
+        "H(T) - H(298 K) = -DeltaH_cool",
+        "kJ/mol",
+        "kJ/mol",
+    ),
 }
 
 
@@ -3772,6 +3780,28 @@ def conversion_derivation(
 
     if not trail or str(trail).startswith("identity"):
         return None
+    if str(trail).startswith("specific_gas_yield:"):
+        _, species, raw_molar_mass, raw_factor = str(trail).split(":", 3)
+        molar_mass = _as_dec_or_none(raw_molar_mass)
+        factor = _as_dec_or_none(raw_factor)
+        original = _as_dec_or_none(original_value)
+        if molar_mass is None or molar_mass <= 0 or factor is None:
+            return None
+        parameters: list[tuple[str, Located[Decimal]]] = [
+            ("molar_mass_g_mol", Located(State.of(molar_mass), locator=locator)),
+            ("factor", Located(State.of(factor), locator=locator)),
+        ]
+        if original is not None:
+            parameters.insert(0, ("original", Located(State.of(original), locator=locator)))
+        return Derivation(
+            relation=f"specific_gas_yield_{species}_ug_g_to_mol_per_initial_kg",
+            inputs=(
+                "Y[mol/kg] = y[ug/g] * 1e-3[g/kg] / M[g/mol]",
+                "original_unit=ug/g",
+            ),
+            parameters=tuple(parameters),
+            output_unit="mol_species_per_initial_kg",
+        )
     meta = _CONVERSION_META.get(str(trail))
     if meta is None:
         return None
@@ -5216,6 +5246,15 @@ def map_quantity(
     raw = None
     if isinstance(values, Mapping):
         raw = values.get("quantity")
+        if (
+            raw == "specific_gas_yield"
+            and values.get("method_class") == "quoted_from_other_workers"
+        ):
+            reason = (
+                "specific_gas_yield conversion has no verified input basis for "
+                "quoted_from_other_workers rows"
+            )
+            return State.unknown(reason), reason
         if isinstance(raw, str) and raw in QUANTITY_ALIASES:
             inferred = QUANTITY_ALIASES[raw]
             contradiction = _quantity_contradiction(inferred, obs_type, values, units, row)
@@ -7562,6 +7601,7 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
     Quantity.H_MINUS_H298: (
         "enthalpy_increment",
         "H_minus_H298",
+        "minus_delta_H_cool_kJ_mol-1",
         "value",
     ),
     Quantity.DELTA_FH: (
@@ -7633,6 +7673,7 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
         "yield_fraction",
         "mass_yield_percent",
     ),
+    Quantity.EVOLVED_GAS_YIELD: ("yield_ug_g",),
     Quantity.INTERACTION_PARAMETER: ("wagner_interaction_parameter", "epsilon"),
     Quantity.TRANSITION_TEMPERATURE: (
         "value_K",
@@ -8650,6 +8691,30 @@ def select_declared_source(
         )
 
     q_token = _quantity_token(declared)
+    if (
+        q_token is Quantity.H_MINUS_H298
+        and "minus_delta_H_cool_kJ_mol-1" in payload
+    ):
+        amount = _as_dec_or_none(payload.get("minus_delta_H_cool_kJ_mol-1"))
+        if amount is None:
+            return _unavailable_selection(
+                "minus_delta_H_cool_kJ_mol-1 is not numeric",
+                condition_ranges=condition_ranges,
+                field_name="minus_delta_H_cool_kJ_mol-1",
+                unit_trail="negative_cooling_enthalpy_to_H_minus_H298",
+            )
+        # Premise: the source says these values are -DeltaH_cool while cooling
+        # from T to 298 K, so DeltaH_cool = H(298 K)-H(T). Algebra gives
+        # H(T)-H(298 K) = -DeltaH_cool; the printed value already has that sign.
+        # Unit check: both sides are kJ/mol. Worked source point: Zigo's 1519 K
+        # value 335.9 kJ/mol is H(1519 K)-H(298 K), so it remains +335.9.
+        return _point_selection(
+            amount,
+            "minus_delta_H_cool_kJ_mol-1",
+            "negative_cooling_enthalpy_to_H_minus_H298",
+            payload,
+            condition_ranges,
+        )
     if q_token is Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT:
         a_printed = payload.get("A_printed")
         b_printed = payload.get("B_printed")
@@ -8714,6 +8779,51 @@ def select_declared_source(
                 unit_trail="as_published",
                 condition_ranges=condition_ranges,
             )
+    if q_token is Quantity.EVOLVED_GAS_YIELD and "yield_ug_g" in payload:
+        amount = _as_dec_or_none(payload.get("yield_ug_g"))
+        gas_species = payload.get("gas_species")
+        if amount is None:
+            return _unavailable_selection(
+                "yield_ug_g is not numeric",
+                condition_ranges=condition_ranges,
+                field_name="yield_ug_g",
+            )
+        if not isinstance(gas_species, str) or not gas_species.strip():
+            return _unavailable_selection(
+                "yield_ug_g conversion requires the printed gas_species",
+                condition_ranges=condition_ranges,
+                field_name="gas_species",
+            )
+        try:
+            from simulator.accounting.formulas import parse_formula
+
+            formula = parse_formula(gas_species.strip())
+            molar_mass = Decimal(str(formula.molar_mass_g_per_mol()))
+        except (KeyError, ValueError):
+            return _unavailable_selection(
+                f"printed gas_species {gas_species!r} has no resolved molar mass",
+                condition_ranges=condition_ranges,
+                field_name="gas_species",
+            )
+        if molar_mass <= 0:
+            return _unavailable_selection(
+                f"printed gas_species {gas_species!r} has no positive molar mass",
+                condition_ranges=condition_ranges,
+                field_name="gas_species",
+            )
+        # Premise: the source reports micrograms of each named gas per gram of
+        # initial powder. Algebra: Y = y * 1e-3 / M, with y in ug/g and M in
+        # g/mol. Unit check: (ug/g)*(1e-3 g/kg)/(g/mol) = mol/kg. Worked
+        # source point: 4.98 ug/g H2 / 2.016 g/mol * 1e-3 = 0.002470238 mol/kg.
+        factor = Decimal("0.001") / molar_mass
+        amount = amount * factor
+        return _point_selection(
+            amount,
+            "yield_ug_g",
+            f"specific_gas_yield:{gas_species.strip()}:{molar_mass}:{factor}",
+            payload,
+            condition_ranges,
+        )
     if q_token is None and payload.get("semantics") in {"bound_not_point_ordering", "bound_not_point"}:
         reason = (declared.reason if isinstance(declared, State) else None) or (
             f"unsupported quantity {payload['quantity']!r}" if payload.get("quantity")
@@ -12887,7 +12997,12 @@ class Migrator:
         value_derivation = source_derivation
         value_conversion: Derivation | None = None
         if (
-            q_token in {Quantity.MASS_LOSS_AREAL_DENSITY, Quantity.FUGACITY}
+            q_token in {
+                Quantity.MASS_LOSS_AREAL_DENSITY,
+                Quantity.FUGACITY,
+                Quantity.H_MINUS_H298,
+                Quantity.EVOLVED_GAS_YIELD,
+            }
             and value_sel.available
             and value_sel.field_name
         ):
@@ -14024,7 +14139,15 @@ class Migrator:
                 and point_oxide_map is None
             ):
                 point_oxide_map = _initial_oxide_map_from_values(parent_values)
-            if q_for_species in _BULK_PROPERTY_QUANTITIES:
+            if (
+                q_for_species is Quantity.EVOLVED_GAS_YIELD
+                and isinstance(parent_values, Mapping)
+                and isinstance(parent_values.get("gas_species"), str)
+            ):
+                species = make_species(
+                    str(parent_values["gas_species"]), Phase.G, charge=species.charge
+                )
+            elif q_for_species in _BULK_PROPERTY_QUANTITIES:
                 species_formula = bulk_property_species_formula(
                     quantity=q_for_species,
                     parent_formula=species.formula,
@@ -14146,7 +14269,18 @@ class Migrator:
             q_token = quantity.value if isinstance(quantity, State) and quantity.is_value else (
                 quantity if isinstance(quantity, Quantity) else None
             )
-            value_sel = select_declared_source(q_token, units, raw_item)
+            selection_payload: Mapping[str, Any] = raw_item
+            if (
+                q_token is Quantity.EVOLVED_GAS_YIELD
+                and isinstance(parent_values, Mapping)
+                and isinstance(parent_values.get("gas_species"), str)
+                and "gas_species" not in raw_item
+            ):
+                selection_payload = {
+                    **raw_item,
+                    "gas_species": parent_values["gas_species"],
+                }
+            value_sel = select_declared_source(q_token, units, selection_payload)
             val = value_sel.amount
             trail = value_sel.unit_trail
             if not value_sel.available and value_sel.field_name in {"P", "p"}:
