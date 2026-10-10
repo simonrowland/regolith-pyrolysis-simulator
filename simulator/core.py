@@ -1544,6 +1544,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.melt.p_total_mbar = self.melt.ambient_pressure_mbar
         self.melt.pO2_mbar = 0.0
         base_intrinsic_fO2_log = self._compute_intrinsic_melt_fO2()
+        # The untouched load seed. A later read at a different temperature
+        # recomputes IW(T) only while the reservoir still holds this value.
+        self._load_time_unadopted_fO2_log = base_intrinsic_fO2_log
         self._melt_fO2_seed_without_ferric_iron = (
             melt_fO2_seed_without_ferric_iron(self._melt_oxide_wt_pct())
         )
@@ -4370,6 +4373,51 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     def _current_melt_redox_fO2_log(self) -> float:
         reservoir = getattr(self.melt, 'oxygen_reservoir', None)
+        # Premise: load_batch stores Holzheid IW(298.15 K) = -78.50 with
+        # reference_T_K None. A consumer that reads before the hourly
+        # refresh was still seeing that room-temperature seed (the freeze
+        # gate then clamps it to -30). b03045041 already tracks IW(T) on
+        # refresh. This read does the same only while the reservoir still
+        # holds that load value. An explicit assignment (a live -6.5 or
+        # -10 with reference still None) is not the load seed and is
+        # returned as stored; calling the intrinsic helper there is the
+        # heuristic the live-path guard forbids.
+        # Algebra: log10(fO2/bar) = intrinsic_melt_fO2(composition, T_now)
+        # when the stored log still equals the cached load seed.
+        # Units: T_now = temperature_C + 273.15 is kelvin; the result is
+        # dimensionless log10(bar).
+        # Sanity: lunar alkali offset is +0.005 dex, so 1423.15 K is
+        # -12.270, not the stored -78.50 and not the ±30 clamp.
+        if (
+            reservoir is not None
+            and self._current_melt_redox_reference_T_K() is None
+        ):
+            T_now = float(self.melt.temperature_C) + 273.15
+            load_seed = getattr(self, '_load_time_unadopted_fO2_log', None)
+            stored_seed = getattr(reservoir, 'melt_intrinsic_fO2_log', None)
+            if (
+                load_seed is not None
+                and stored_seed is not None
+                and math.isfinite(T_now)
+                and T_now > 0.0
+                and not math.isclose(
+                    T_now, 25.0 + 273.15, rel_tol=0.0, abs_tol=1.0e-9,
+                )
+            ):
+                try:
+                    stored_f = float(stored_seed)
+                    load_f = float(load_seed)
+                except (TypeError, ValueError):
+                    stored_f = float('nan')
+                    load_f = float('nan')
+                if (
+                    math.isfinite(stored_f)
+                    and math.isfinite(load_f)
+                    and math.isclose(
+                        stored_f, load_f, rel_tol=0.0, abs_tol=1.0e-9,
+                    )
+                ):
+                    return self._compute_intrinsic_melt_fO2(T_now)
         raw = getattr(reservoir, 'melt_intrinsic_fO2_log', None)
         if raw is None:
             raw = getattr(self.melt, 'melt_fO2_log', None)
@@ -5082,15 +5130,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             _RESOLVE_MELT_REDOX_GATE_AUTHORITY
         ),
     ) -> float:
+        resolved = self._resolved_melt_redox_gate_authority(gate_authority)
         C_m_full = self._melt_redox_capacity_mol_per_ln_fO2(
             fO2_log=fO2_log,
             T_K=T_K,
         )
         liquid_fraction = self._melt_redox_liquid_fraction_factor(
             T_K,
-            gate_authority=gate_authority,
+            gate_authority=resolved,
         )
-        # Derivation: Kress91 capacity is proportional to melt Fe inventory;
         # freeze-gate liquid_fraction is the active residual-liquid fraction,
         # so C_m_effective = C_m_full * liquid_fraction and tends to 0 at solidus.
         return C_m_full * liquid_fraction
@@ -5353,6 +5401,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             T_K=T_K,
             gate_authority=gate_authority,
         )
+        # Premise: Kress91 is calibrated only above 1200 C. Below that
+        # floor a partial freeze-gate fraction (1150 C is ~0.32 under a
+        # 1372 C liquidus) is not a capacity to integrate. Dividing the
+        # shuttle by it drives log10(fO2) to about -30. Between the floor
+        # and the liquidus the fraction stays the magnitude: a C2A step
+        # reaches the exchange at 1250 C, still under the 1372 C liquidus,
+        # and that exchange has to run. The bubbler reads the ungated
+        # magnitude and defers on its own.
+        # Algebra: integrating C = 0 when T_C <= 1200, else
+        # C_full * liquid_fraction.
+        # Units: T_C is celsius; C is mol per ln(fO2).
+        # Sanity: 1150 C refuses the shuttle and keeps IW(T). 1250 C keeps
+        # the freeze-gate magnitude.
+        if (float(T_K) - 273.15) <= KRESS91_LIQUID_CALIBRATION_MIN_T_C:
+            C_m = 0.0
         reservoir = self.melt.oxygen_reservoir
         existing_direction = str(getattr(reservoir, 'exchange_direction', '') or '')
         reservoir.melt_intrinsic_fO2_log = base_fO2_log
@@ -6411,6 +6474,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             T_K=T_K,
             gate_authority=gate_authority,
         )
+        # Same 1200 C calibration floor as the source-term integrator.
+        # Recording C = 0 takes the existing noop refusal, so 0.05 mol of
+        # overhead O2 at 1150 C is not absorbed. A 1250 C exchange is above
+        # the floor and keeps C_full * liquid_fraction.
+        # Algebra: exchange C = 0 when T_C <= 1200, else the magnitude above.
+        # Units: T_C is celsius; C is mol per ln(fO2).
+        # Sanity: 1150 C exchanges 0 mol. 1250 C does not take this refusal.
+        if (float(T_K) - 273.15) <= KRESS91_LIQUID_CALIBRATION_MIN_T_C:
+            C_m = 0.0
         n_floor_mol = self._headspace_floor_o2_mol()
         effective_floor_mol = self._effective_headspace_floor_o2_mol()
         C_h = max(head_o2_mol, effective_floor_mol)
