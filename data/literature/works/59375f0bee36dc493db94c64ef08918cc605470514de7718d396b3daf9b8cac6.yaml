@@ -81,16 +81,16 @@ experiments:
         value:
           basis: printed_oxides
           components:
-          - - SiO2
-            - '0.5530662514490768651412607624'
           - - Al2O3
             - '0.1191642125515218052625040402'
+          - - CaO
+            - '0.1464450799127098654554014769'
           - - FeO
             - '0.08283428328675280554755471357'
           - - MgO
             - '0.09849017279993865859327900714'
-          - - CaO
-            - '0.1464450799127098654554014769'
+          - - SiO2
+            - '0.5530662514490768651412607624'
           amount_basis: mole_fraction
       locator:
         published_page: 510
@@ -104,26 +104,6 @@ experiments:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
         parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '52.32'
-            locator:
-              published_page: 510
-              pdf_page_index: 2
-              table: '2'
-              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
-                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 510
-              pdf_page_index: 2
-              table: '2'
-              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
-                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
         - - original_Al2O3_wt_pct
           - state:
               tag: value
@@ -138,6 +118,26 @@ experiments:
           - state:
               tag: value
               value: '101.960077'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '12.93'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
             locator:
               published_page: 510
               pdf_page_index: 2
@@ -184,20 +184,20 @@ experiments:
               table: '2'
               note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
                 pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
-        - - original_CaO_wt_pct
+        - - original_SiO2_wt_pct
           - state:
               tag: value
-              value: '12.93'
+              value: '52.32'
             locator:
               published_page: 510
               pdf_page_index: 2
               table: '2'
               note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
                 pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
-        - - M_CaO_g_mol
+        - - M_SiO2_g_mol
           - state:
               tag: value
-              value: '56.077000000000005'
+              value: '60.083'
             locator:
               published_page: 510
               pdf_page_index: 2
@@ -209,11 +209,11 @@ experiments:
       state:
         tag: value
         value:
-          SiO2: '52.32'
           Al2O3: '19.13'
+          CaO: '12.93'
           FeO: '9.37'
           MgO: '6.25'
-          CaO: '12.93'
+          SiO2: '52.32'
       locator:
         published_page: 510
         pdf_page_index: 2
@@ -260,16 +260,16 @@ experiments:
         value:
           basis: printed_oxides
           components:
-          - - SiO2
-            - '0.3821173839269460708474485548'
           - - Al2O3
             - '0.02332561240102551057000802657'
+          - - CaO
+            - '0.06463956121087332567375331089'
           - - FeO
             - '0.05836653496472179772464472096'
           - - MgO
             - '0.4715509074964332951841453868'
-          - - CaO
-            - '0.06463956121087332567375331089'
+          - - SiO2
+            - '0.3821173839269460708474485548'
           amount_basis: mole_fraction
       locator:
         published_page: 510
@@ -283,26 +283,6 @@ experiments:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
         parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '44.02'
-            locator:
-              published_page: 510
-              pdf_page_index: 2
-              table: '2'
-              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
-                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 510
-              pdf_page_index: 2
-              table: '2'
-              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
-                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
         - - original_Al2O3_wt_pct
           - state:
               tag: value
@@ -317,6 +297,26 @@ experiments:
           - state:
               tag: value
               value: '101.960077'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '6.95'
+            locator:
+              published_page: 510
+              pdf_page_index: 2
+              table: '2'
+              note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
+                pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
             locator:
               published_page: 510
               pdf_page_index: 2
@@ -363,20 +363,20 @@ experiments:
               table: '2'
               note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
                 pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
-        - - original_CaO_wt_pct
+        - - original_SiO2_wt_pct
           - state:
               tag: value
-              value: '6.95'
+              value: '44.02'
             locator:
               published_page: 510
               pdf_page_index: 2
               table: '2'
               note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
                 pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
-        - - M_CaO_g_mol
+        - - M_SiO2_g_mol
           - state:
               tag: value
-              value: '56.077000000000005'
+              value: '60.083'
             locator:
               published_page: 510
               pdf_page_index: 2
@@ -388,11 +388,11 @@ experiments:
       state:
         tag: value
         value:
-          SiO2: '44.02'
           Al2O3: '4.56'
+          CaO: '6.95'
           FeO: '8.04'
           MgO: '36.44'
-          CaO: '6.95'
+          SiO2: '44.02'
       locator:
         published_page: 510
         pdf_page_index: 2

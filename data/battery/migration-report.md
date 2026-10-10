@@ -1,10 +1,10 @@
 # Battery v2.1 migration report
 
-rows in: 47898
-records out (observations): 121992
+rows in: 47960
+records out (observations): 122164
 works: 276
 experiments: 3576
-queue size: 77705
+queue size: 77761
 identical-payload dedupe aliases: 342
 metadata files: 43
 index sources: 279
@@ -17,18 +17,18 @@ hard issues: 3631
 | citations | 147 | 278 (mismatch) |
 | doi_works | 56 | 133 (mismatch) |
 | no_doi_works | 91 | 143 (mismatch) |
-| admission_statuses | 374 | 1201 (mismatch) |
+| admission_statuses | 374 | 1264 (mismatch) |
 | supersedes | 422 | 650 (mismatch) |
-| series | 60 | 599 (mismatch) |
+| series | 60 | 601 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1635 (mismatch) |
 | gibbs_reference_100000 | 1023 | 1029 (mismatch) |
 | gibbs_reference_101325 | 594 | 594 |
 | formulas | 1625 | 2047 (mismatch) |
 | equipment_payloads | 670 | 965 (mismatch) |
-| absent_admissions | 3511 | 5078 (mismatch) |
-| absent_classes | 2174 | 2203 (mismatch) |
-| range_only_T | 3125 | 2668 (mismatch) |
-| system_like_phases | 1065 | 2710 (mismatch) |
+| absent_admissions | 3511 | 5077 (mismatch) |
+| absent_classes | 2174 | 2202 (mismatch) |
+| range_only_T | 3125 | 2667 (mismatch) |
+| system_like_phases | 1065 | 2709 (mismatch) |
 | missing_phases | 237 | 591 (mismatch) |
 | tabulated_lists | — | 6 |
 
@@ -36,7 +36,7 @@ hard issues: 3631
 
 | source method_class | count |
 |---|---:|
-| `absent` | 544 |
+| `absent` | 543 |
 | `method_only` | 39 |
 | `derived_from_kems_equilibrium_constants` | 8 |
 | `third_law_kems` | 8 |
@@ -17988,7 +17988,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/cardiff-2007-vacuum-pyrolysis-gsfc.yaml` | 7 | 15 | 33 |
 | `data/literature/extracts/charnoz-2023-hydrogen-magma-ocean.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/cooper-2007-sintering-lunar-simulant.yaml` | 8 | 8 | 33 |
-| `data/literature/extracts/costa-jacobson-2015.yaml` | 2 | 2 | 6 |
+| `data/literature/extracts/costa-jacobson-2015.yaml` | 1 | 1 | 3 |
 | `data/literature/extracts/datz-1961-na2cl2.yaml` | 1 | 1 | 6 |
 | `data/literature/extracts/datz-and-smith-1961.yaml` | 3 | 3 | 12 |
 | `data/literature/extracts/datz-smith-taylor-1961-nacl-vapor.yaml` | 1 | 1 | 5 |
@@ -18045,7 +18045,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-023-demaria-1973.yaml` | 30 | 75 | 58 |
 | `data/literature/extracts/kems-024-gibson-hubbard-1972.yaml` | 102 | 108 | 292 |
 | `data/literature/extracts/kems-025-markova-1983.yaml` | 22 | 44 | 63 |
-| `data/literature/extracts/kems-026-markova-1984.yaml` | 15 | 37 | 61 |
+| `data/literature/extracts/kems-026-markova-1984.yaml` | 15 | 147 | 57 |
 | `data/literature/extracts/kems-027-plante-hastie-1983.yaml` | 26 | 48 | 107 |
 | `data/literature/extracts/kems-028-yakovlev-1984.yaml` | 19 | 29 | 55 |
 | `data/literature/extracts/kems-029-yakovlev-shornikov-2011.yaml` | 5 | 15 | 26 |
@@ -18105,7 +18105,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-201-ichise-1986.yaml` | 11 | 27 | 65 |
 | `data/literature/extracts/kems-ms2000-044.yaml` | 100 | 140 | 383 |
 | `data/literature/extracts/kor-1967-thesis-sulphur-oxides-slags.yaml` | 4 | 56 | 64 |
-| `data/literature/extracts/kume-2000-cao-activities.yaml` | 312 | 312 | 728 |
+| `data/literature/extracts/kume-2000-cao-activities.yaml` | 375 | 375 | 791 |
 | `data/literature/extracts/lamoreaux-hildenbrand-1984.yaml` | 20 | 20 | 92 |
 | `data/literature/extracts/lamoreaux-hildenbrand-hildenbrand-1987.yaml` | 6 | 6 | 27 |
 | `data/literature/extracts/lebrun-2013-magma-ocean-atmosphere.yaml` | 0 | 0 | 1 |
@@ -18316,8 +18316,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 218223
+advisory issues: 218305
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 218223 |
+| `identity_incomplete` | 218305 |

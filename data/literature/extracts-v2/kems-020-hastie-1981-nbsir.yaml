@@ -54,8 +54,26 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1598819803598172038690991183'
+        - - Al2O3
+          - '0.09165385576989872858295440087'
+        - - Fe2O3
+          - '0.06916111716920942071948801596'
+        - - CaO
+          - '0.05233525556470525650915578215'
+        - - MgO
+          - '0.01916228849103378096819570357'
+        - - SiO2
+          - '0.6015749840393268275727422232'
+        - - Na2O
+          - '0.006230518606008781778364755852'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -111,6 +129,197 @@ observations:
     note: report figure page after captions; PDF page 71
   read_from: pdf:kems-020-hastie-1981-nbsir
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '12.1'
+          CaO: '3.8'
+          Fe2O3: '14.3'
+          K2O: '19.5'
+          MgO: '1'
+          Na2O: '0.5'
+          SiO2: '46.8'
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 70
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          amount_basis: mole_fraction
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 70
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '12.1'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '3.8'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '14.3'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '19.5'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.5'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.8'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -179,8 +388,26 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1598819803598172038690991183'
+        - - Al2O3
+          - '0.09165385576989872858295440087'
+        - - Fe2O3
+          - '0.06916111716920942071948801596'
+        - - CaO
+          - '0.05233525556470525650915578215'
+        - - MgO
+          - '0.01916228849103378096819570357'
+        - - SiO2
+          - '0.6015749840393268275727422232'
+        - - Na2O
+          - '0.006230518606008781778364755852'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -236,6 +463,197 @@ observations:
     note: report figure page after captions; PDF page 71
   read_from: pdf:kems-020-hastie-1981-nbsir
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '12.1'
+          CaO: '3.8'
+          Fe2O3: '14.3'
+          K2O: '19.5'
+          MgO: '1'
+          Na2O: '0.5'
+          SiO2: '46.8'
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 70
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          amount_basis: mole_fraction
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 70
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '12.1'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '3.8'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '14.3'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '19.5'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.5'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.8'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -304,8 +722,26 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1598819803598172038690991183'
+        - - Al2O3
+          - '0.09165385576989872858295440087'
+        - - Fe2O3
+          - '0.06916111716920942071948801596'
+        - - CaO
+          - '0.05233525556470525650915578215'
+        - - MgO
+          - '0.01916228849103378096819570357'
+        - - SiO2
+          - '0.6015749840393268275727422232'
+        - - Na2O
+          - '0.006230518606008781778364755852'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -361,6 +797,197 @@ observations:
     note: report figure page after captions; PDF page 71
   read_from: pdf:kems-020-hastie-1981-nbsir
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '12.1'
+          CaO: '3.8'
+          Fe2O3: '14.3'
+          K2O: '19.5'
+          MgO: '1'
+          Na2O: '0.5'
+          SiO2: '46.8'
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 70
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          amount_basis: mole_fraction
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 70
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '12.1'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '3.8'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '14.3'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '19.5'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.5'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.8'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -429,8 +1056,26 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1598819803598172038690991183'
+        - - Al2O3
+          - '0.09165385576989872858295440087'
+        - - Fe2O3
+          - '0.06916111716920942071948801596'
+        - - CaO
+          - '0.05233525556470525650915578215'
+        - - MgO
+          - '0.01916228849103378096819570357'
+        - - SiO2
+          - '0.6015749840393268275727422232'
+        - - Na2O
+          - '0.006230518606008781778364755852'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -486,6 +1131,197 @@ observations:
     note: report figure page after captions; PDF page 71
   read_from: pdf:kems-020-hastie-1981-nbsir
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '12.1'
+          CaO: '3.8'
+          Fe2O3: '14.3'
+          K2O: '19.5'
+          MgO: '1'
+          Na2O: '0.5'
+          SiO2: '46.8'
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 70
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          amount_basis: mole_fraction
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 70
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '12.1'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '3.8'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '14.3'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '19.5'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.5'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.8'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -554,8 +1390,26 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1598819803598172038690991183'
+        - - Al2O3
+          - '0.09165385576989872858295440087'
+        - - Fe2O3
+          - '0.06916111716920942071948801596'
+        - - CaO
+          - '0.05233525556470525650915578215'
+        - - MgO
+          - '0.01916228849103378096819570357'
+        - - SiO2
+          - '0.6015749840393268275727422232'
+        - - Na2O
+          - '0.006230518606008781778364755852'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -611,6 +1465,197 @@ observations:
     note: report figure page after captions; PDF page 71
   read_from: pdf:kems-020-hastie-1981-nbsir
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '12.1'
+          CaO: '3.8'
+          Fe2O3: '14.3'
+          K2O: '19.5'
+          MgO: '1'
+          Na2O: '0.5'
+          SiO2: '46.8'
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 70
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          amount_basis: mole_fraction
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 70
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '12.1'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '3.8'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '14.3'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '19.5'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.5'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.8'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -679,8 +1724,26 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1598819803598172038690991183'
+        - - Al2O3
+          - '0.09165385576989872858295440087'
+        - - Fe2O3
+          - '0.06916111716920942071948801596'
+        - - CaO
+          - '0.05233525556470525650915578215'
+        - - MgO
+          - '0.01916228849103378096819570357'
+        - - SiO2
+          - '0.6015749840393268275727422232'
+        - - Na2O
+          - '0.006230518606008781778364755852'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -736,6 +1799,197 @@ observations:
     note: report figure page after captions; PDF page 71
   read_from: pdf:kems-020-hastie-1981-nbsir
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '12.1'
+          CaO: '3.8'
+          Fe2O3: '14.3'
+          K2O: '19.5'
+          MgO: '1'
+          Na2O: '0.5'
+          SiO2: '46.8'
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 70
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          amount_basis: mole_fraction
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 70
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '12.1'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '3.8'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '14.3'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '19.5'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.5'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.8'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -804,8 +2058,26 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1598819803598172038690991183'
+        - - Al2O3
+          - '0.09165385576989872858295440087'
+        - - Fe2O3
+          - '0.06916111716920942071948801596'
+        - - CaO
+          - '0.05233525556470525650915578215'
+        - - MgO
+          - '0.01916228849103378096819570357'
+        - - SiO2
+          - '0.6015749840393268275727422232'
+        - - Na2O
+          - '0.006230518606008781778364755852'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -861,6 +2133,197 @@ observations:
     note: report figure page after captions; PDF page 71
   read_from: pdf:kems-020-hastie-1981-nbsir
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '12.1'
+          CaO: '3.8'
+          Fe2O3: '14.3'
+          K2O: '19.5'
+          MgO: '1'
+          Na2O: '0.5'
+          SiO2: '46.8'
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 70
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          amount_basis: mole_fraction
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 70
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '12.1'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '3.8'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '14.3'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '19.5'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.5'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.8'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -929,8 +2392,26 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1598819803598172038690991183'
+        - - Al2O3
+          - '0.09165385576989872858295440087'
+        - - Fe2O3
+          - '0.06916111716920942071948801596'
+        - - CaO
+          - '0.05233525556470525650915578215'
+        - - MgO
+          - '0.01916228849103378096819570357'
+        - - SiO2
+          - '0.6015749840393268275727422232'
+        - - Na2O
+          - '0.006230518606008781778364755852'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -986,6 +2467,197 @@ observations:
     note: report figure page after captions; PDF page 71
   read_from: pdf:kems-020-hastie-1981-nbsir
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '12.1'
+          CaO: '3.8'
+          Fe2O3: '14.3'
+          K2O: '19.5'
+          MgO: '1'
+          Na2O: '0.5'
+          SiO2: '46.8'
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 70
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          amount_basis: mole_fraction
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 70
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '12.1'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '3.8'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '14.3'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '19.5'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.5'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.8'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -1054,8 +2726,26 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1598819803598172038690991183'
+        - - Al2O3
+          - '0.09165385576989872858295440087'
+        - - Fe2O3
+          - '0.06916111716920942071948801596'
+        - - CaO
+          - '0.05233525556470525650915578215'
+        - - MgO
+          - '0.01916228849103378096819570357'
+        - - SiO2
+          - '0.6015749840393268275727422232'
+        - - Na2O
+          - '0.006230518606008781778364755852'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1111,6 +2801,197 @@ observations:
     note: report figure page after captions; PDF page 71
   read_from: pdf:kems-020-hastie-1981-nbsir
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '12.1'
+          CaO: '3.8'
+          Fe2O3: '14.3'
+          K2O: '19.5'
+          MgO: '1'
+          Na2O: '0.5'
+          SiO2: '46.8'
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 70
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          amount_basis: mole_fraction
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 70
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '12.1'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '3.8'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '14.3'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '19.5'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.5'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.8'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -1179,8 +3060,26 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1598819803598172038690991183'
+        - - Al2O3
+          - '0.09165385576989872858295440087'
+        - - Fe2O3
+          - '0.06916111716920942071948801596'
+        - - CaO
+          - '0.05233525556470525650915578215'
+        - - MgO
+          - '0.01916228849103378096819570357'
+        - - SiO2
+          - '0.6015749840393268275727422232'
+        - - Na2O
+          - '0.006230518606008781778364755852'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1236,6 +3135,197 @@ observations:
     note: report figure page after captions; PDF page 71
   read_from: pdf:kems-020-hastie-1981-nbsir
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '12.1'
+          CaO: '3.8'
+          Fe2O3: '14.3'
+          K2O: '19.5'
+          MgO: '1'
+          Na2O: '0.5'
+          SiO2: '46.8'
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 70
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          amount_basis: mole_fraction
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 70
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '12.1'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '3.8'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '14.3'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '19.5'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.5'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.8'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -1304,8 +3394,26 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1598819803598172038690991183'
+        - - Al2O3
+          - '0.09165385576989872858295440087'
+        - - Fe2O3
+          - '0.06916111716920942071948801596'
+        - - CaO
+          - '0.05233525556470525650915578215'
+        - - MgO
+          - '0.01916228849103378096819570357'
+        - - SiO2
+          - '0.6015749840393268275727422232'
+        - - Na2O
+          - '0.006230518606008781778364755852'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1361,6 +3469,197 @@ observations:
     note: report figure page after captions; PDF page 71
   read_from: pdf:kems-020-hastie-1981-nbsir
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '12.1'
+          CaO: '3.8'
+          Fe2O3: '14.3'
+          K2O: '19.5'
+          MgO: '1'
+          Na2O: '0.5'
+          SiO2: '46.8'
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 70
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          amount_basis: mole_fraction
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 70
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '12.1'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '3.8'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '14.3'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '19.5'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.5'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.8'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -1429,8 +3728,26 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1598819803598172038690991183'
+        - - Al2O3
+          - '0.09165385576989872858295440087'
+        - - Fe2O3
+          - '0.06916111716920942071948801596'
+        - - CaO
+          - '0.05233525556470525650915578215'
+        - - MgO
+          - '0.01916228849103378096819570357'
+        - - SiO2
+          - '0.6015749840393268275727422232'
+        - - Na2O
+          - '0.006230518606008781778364755852'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1486,6 +3803,197 @@ observations:
     note: report figure page after captions; PDF page 71
   read_from: pdf:kems-020-hastie-1981-nbsir
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '12.1'
+          CaO: '3.8'
+          Fe2O3: '14.3'
+          K2O: '19.5'
+          MgO: '1'
+          Na2O: '0.5'
+          SiO2: '46.8'
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 70
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          amount_basis: mole_fraction
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 70
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '12.1'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '3.8'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '14.3'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '19.5'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.5'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.8'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -1554,8 +4062,26 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1598819803598172038690991183'
+        - - Al2O3
+          - '0.09165385576989872858295440087'
+        - - Fe2O3
+          - '0.06916111716920942071948801596'
+        - - CaO
+          - '0.05233525556470525650915578215'
+        - - MgO
+          - '0.01916228849103378096819570357'
+        - - SiO2
+          - '0.6015749840393268275727422232'
+        - - Na2O
+          - '0.006230518606008781778364755852'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1611,6 +4137,197 @@ observations:
     note: report figure page after captions; PDF page 71
   read_from: pdf:kems-020-hastie-1981-nbsir
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '12.1'
+          CaO: '3.8'
+          Fe2O3: '14.3'
+          K2O: '19.5'
+          MgO: '1'
+          Na2O: '0.5'
+          SiO2: '46.8'
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 70
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          amount_basis: mole_fraction
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 70
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '12.1'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '3.8'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '14.3'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '19.5'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.5'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.8'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -1679,8 +4396,26 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1598819803598172038690991183'
+        - - Al2O3
+          - '0.09165385576989872858295440087'
+        - - Fe2O3
+          - '0.06916111716920942071948801596'
+        - - CaO
+          - '0.05233525556470525650915578215'
+        - - MgO
+          - '0.01916228849103378096819570357'
+        - - SiO2
+          - '0.6015749840393268275727422232'
+        - - Na2O
+          - '0.006230518606008781778364755852'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1736,6 +4471,197 @@ observations:
     note: report figure page after captions; PDF page 71
   read_from: pdf:kems-020-hastie-1981-nbsir
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '12.1'
+          CaO: '3.8'
+          Fe2O3: '14.3'
+          K2O: '19.5'
+          MgO: '1'
+          Na2O: '0.5'
+          SiO2: '46.8'
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 70
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          amount_basis: mole_fraction
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 70
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '12.1'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '3.8'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '14.3'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '19.5'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.5'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.8'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -1804,8 +4730,26 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1598819803598172038690991183'
+        - - Al2O3
+          - '0.09165385576989872858295440087'
+        - - Fe2O3
+          - '0.06916111716920942071948801596'
+        - - CaO
+          - '0.05233525556470525650915578215'
+        - - MgO
+          - '0.01916228849103378096819570357'
+        - - SiO2
+          - '0.6015749840393268275727422232'
+        - - Na2O
+          - '0.006230518606008781778364755852'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1861,6 +4805,197 @@ observations:
     note: report figure page after captions; PDF page 71
   read_from: pdf:kems-020-hastie-1981-nbsir
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '12.1'
+          CaO: '3.8'
+          Fe2O3: '14.3'
+          K2O: '19.5'
+          MgO: '1'
+          Na2O: '0.5'
+          SiO2: '46.8'
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 70
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          amount_basis: mole_fraction
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 70
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '12.1'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '3.8'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '14.3'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '19.5'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.5'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.8'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -1929,8 +5064,26 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1598819803598172038690991183'
+        - - Al2O3
+          - '0.09165385576989872858295440087'
+        - - Fe2O3
+          - '0.06916111716920942071948801596'
+        - - CaO
+          - '0.05233525556470525650915578215'
+        - - MgO
+          - '0.01916228849103378096819570357'
+        - - SiO2
+          - '0.6015749840393268275727422232'
+        - - Na2O
+          - '0.006230518606008781778364755852'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1986,6 +5139,197 @@ observations:
     note: report figure page after captions; PDF page 71
   read_from: pdf:kems-020-hastie-1981-nbsir
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '12.1'
+          CaO: '3.8'
+          Fe2O3: '14.3'
+          K2O: '19.5'
+          MgO: '1'
+          Na2O: '0.5'
+          SiO2: '46.8'
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 70
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          amount_basis: mole_fraction
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 70
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '12.1'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '3.8'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '14.3'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '19.5'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.5'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.8'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -2054,8 +5398,26 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1598819803598172038690991183'
+        - - Al2O3
+          - '0.09165385576989872858295440087'
+        - - Fe2O3
+          - '0.06916111716920942071948801596'
+        - - CaO
+          - '0.05233525556470525650915578215'
+        - - MgO
+          - '0.01916228849103378096819570357'
+        - - SiO2
+          - '0.6015749840393268275727422232'
+        - - Na2O
+          - '0.006230518606008781778364755852'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2111,6 +5473,197 @@ observations:
     note: report figure page after captions; PDF page 71
   read_from: pdf:kems-020-hastie-1981-nbsir
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '12.1'
+          CaO: '3.8'
+          Fe2O3: '14.3'
+          K2O: '19.5'
+          MgO: '1'
+          Na2O: '0.5'
+          SiO2: '46.8'
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 70
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          amount_basis: mole_fraction
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 70
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '12.1'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '3.8'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '14.3'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '19.5'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.5'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.8'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -2179,8 +5732,26 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1598819803598172038690991183'
+        - - Al2O3
+          - '0.09165385576989872858295440087'
+        - - Fe2O3
+          - '0.06916111716920942071948801596'
+        - - CaO
+          - '0.05233525556470525650915578215'
+        - - MgO
+          - '0.01916228849103378096819570357'
+        - - SiO2
+          - '0.6015749840393268275727422232'
+        - - Na2O
+          - '0.006230518606008781778364755852'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2236,6 +5807,197 @@ observations:
     note: report figure page after captions; PDF page 71
   read_from: pdf:kems-020-hastie-1981-nbsir
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '12.1'
+          CaO: '3.8'
+          Fe2O3: '14.3'
+          K2O: '19.5'
+          MgO: '1'
+          Na2O: '0.5'
+          SiO2: '46.8'
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 70
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          amount_basis: mole_fraction
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 70
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '12.1'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '3.8'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '14.3'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '19.5'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.5'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.8'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -2304,8 +6066,26 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - K2O
+          - '0.1598819803598172038690991183'
+        - - Al2O3
+          - '0.09165385576989872858295440087'
+        - - Fe2O3
+          - '0.06916111716920942071948801596'
+        - - CaO
+          - '0.05233525556470525650915578215'
+        - - MgO
+          - '0.01916228849103378096819570357'
+        - - SiO2
+          - '0.6015749840393268275727422232'
+        - - Na2O
+          - '0.006230518606008781778364755852'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2361,6 +6141,197 @@ observations:
     note: report figure page after captions; PDF page 71
   read_from: pdf:kems-020-hastie-1981-nbsir
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '12.1'
+          CaO: '3.8'
+          Fe2O3: '14.3'
+          K2O: '19.5'
+          MgO: '1'
+          Na2O: '0.5'
+          SiO2: '46.8'
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 70
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          amount_basis: mole_fraction
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 70
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '12.1'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '3.8'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '14.3'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '19.5'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.5'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.8'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 61
+              published_page: 61
+              pdf_page_index: 70
+              figure: '11'
+              note: report figure page after captions; PDF page 71
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -2794,8 +6765,24 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Al2O3
+          - '0.1797820613723733935429852061'
+        - - Fe2O3
+          - '0.01942612938755720548152465748'
+        - - SiO2
+          - '0.7063956960876583521508856851'
+        - - K2O
+          - '0.05538654380782761733608500688'
+        - - Na2O
+          - '0.002275054614640206303170828876'
+        - - MgO
+          - '0.03673451472994322518534861618'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2850,6 +6837,160 @@ observations:
     figure: '4'
   read_from: pdf:kems-020-hastie-1981-nbsir
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '26'
+          Fe2O3: '4.4'
+          K2O: '7.4'
+          MgO: '2.1'
+          Na2O: '0.2'
+          SiO2: '60.2'
+      locator:
+        page: 58
+        published_page: 58
+        pdf_page_index: 63
+        figure: '4'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1797820613723733935429852059'
+          - - Fe2O3
+            - '0.01942612938755720548152465747'
+          - - K2O
+            - '0.05538654380782761733608500684'
+          - - MgO
+            - '0.03673451472994322518534861615'
+          - - Na2O
+            - '0.002275054614640206303170828875'
+          - - SiO2
+            - '0.7063956960876583521508856846'
+          amount_basis: mole_fraction
+      locator:
+        page: 58
+        published_page: 58
+        pdf_page_index: 63
+        figure: '4'
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '26'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '4.4'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '7.4'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '2.1'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.2'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '60.2'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -2925,8 +7066,24 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Al2O3
+          - '0.1797820613723733935429852061'
+        - - Fe2O3
+          - '0.01942612938755720548152465748'
+        - - SiO2
+          - '0.7063956960876583521508856851'
+        - - K2O
+          - '0.05538654380782761733608500688'
+        - - Na2O
+          - '0.002275054614640206303170828876'
+        - - MgO
+          - '0.03673451472994322518534861618'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2981,6 +7138,160 @@ observations:
     figure: '4'
   read_from: pdf:kems-020-hastie-1981-nbsir
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '26'
+          Fe2O3: '4.4'
+          K2O: '7.4'
+          MgO: '2.1'
+          Na2O: '0.2'
+          SiO2: '60.2'
+      locator:
+        page: 58
+        published_page: 58
+        pdf_page_index: 63
+        figure: '4'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1797820613723733935429852059'
+          - - Fe2O3
+            - '0.01942612938755720548152465747'
+          - - K2O
+            - '0.05538654380782761733608500684'
+          - - MgO
+            - '0.03673451472994322518534861615'
+          - - Na2O
+            - '0.002275054614640206303170828875'
+          - - SiO2
+            - '0.7063956960876583521508856846'
+          amount_basis: mole_fraction
+      locator:
+        page: 58
+        published_page: 58
+        pdf_page_index: 63
+        figure: '4'
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '26'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '4.4'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '7.4'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '2.1'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.2'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '60.2'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -3056,8 +7367,24 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Al2O3
+          - '0.1797820613723733935429852061'
+        - - Fe2O3
+          - '0.01942612938755720548152465748'
+        - - SiO2
+          - '0.7063956960876583521508856851'
+        - - K2O
+          - '0.05538654380782761733608500688'
+        - - Na2O
+          - '0.002275054614640206303170828876'
+        - - MgO
+          - '0.03673451472994322518534861618'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -3112,6 +7439,160 @@ observations:
     figure: '4'
   read_from: pdf:kems-020-hastie-1981-nbsir
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '26'
+          Fe2O3: '4.4'
+          K2O: '7.4'
+          MgO: '2.1'
+          Na2O: '0.2'
+          SiO2: '60.2'
+      locator:
+        page: 58
+        published_page: 58
+        pdf_page_index: 63
+        figure: '4'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1797820613723733935429852059'
+          - - Fe2O3
+            - '0.01942612938755720548152465747'
+          - - K2O
+            - '0.05538654380782761733608500684'
+          - - MgO
+            - '0.03673451472994322518534861615'
+          - - Na2O
+            - '0.002275054614640206303170828875'
+          - - SiO2
+            - '0.7063956960876583521508856846'
+          amount_basis: mole_fraction
+      locator:
+        page: 58
+        published_page: 58
+        pdf_page_index: 63
+        figure: '4'
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '26'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '4.4'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '7.4'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '2.1'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.2'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '60.2'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -3187,8 +7668,24 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Al2O3
+          - '0.1797820613723733935429852061'
+        - - Fe2O3
+          - '0.01942612938755720548152465748'
+        - - SiO2
+          - '0.7063956960876583521508856851'
+        - - K2O
+          - '0.05538654380782761733608500688'
+        - - Na2O
+          - '0.002275054614640206303170828876'
+        - - MgO
+          - '0.03673451472994322518534861618'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -3243,6 +7740,160 @@ observations:
     figure: '4'
   read_from: pdf:kems-020-hastie-1981-nbsir
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '26'
+          Fe2O3: '4.4'
+          K2O: '7.4'
+          MgO: '2.1'
+          Na2O: '0.2'
+          SiO2: '60.2'
+      locator:
+        page: 58
+        published_page: 58
+        pdf_page_index: 63
+        figure: '4'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1797820613723733935429852059'
+          - - Fe2O3
+            - '0.01942612938755720548152465747'
+          - - K2O
+            - '0.05538654380782761733608500684'
+          - - MgO
+            - '0.03673451472994322518534861615'
+          - - Na2O
+            - '0.002275054614640206303170828875'
+          - - SiO2
+            - '0.7063956960876583521508856846'
+          amount_basis: mole_fraction
+      locator:
+        page: 58
+        published_page: 58
+        pdf_page_index: 63
+        figure: '4'
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '26'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '4.4'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '7.4'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '2.1'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.2'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '60.2'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -3318,8 +7969,24 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Al2O3
+          - '0.1797820613723733935429852061'
+        - - Fe2O3
+          - '0.01942612938755720548152465748'
+        - - SiO2
+          - '0.7063956960876583521508856851'
+        - - K2O
+          - '0.05538654380782761733608500688'
+        - - Na2O
+          - '0.002275054614640206303170828876'
+        - - MgO
+          - '0.03673451472994322518534861618'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -3374,6 +8041,160 @@ observations:
     figure: '4'
   read_from: pdf:kems-020-hastie-1981-nbsir
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '26'
+          Fe2O3: '4.4'
+          K2O: '7.4'
+          MgO: '2.1'
+          Na2O: '0.2'
+          SiO2: '60.2'
+      locator:
+        page: 58
+        published_page: 58
+        pdf_page_index: 63
+        figure: '4'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1797820613723733935429852059'
+          - - Fe2O3
+            - '0.01942612938755720548152465747'
+          - - K2O
+            - '0.05538654380782761733608500684'
+          - - MgO
+            - '0.03673451472994322518534861615'
+          - - Na2O
+            - '0.002275054614640206303170828875'
+          - - SiO2
+            - '0.7063956960876583521508856846'
+          amount_basis: mole_fraction
+      locator:
+        page: 58
+        published_page: 58
+        pdf_page_index: 63
+        figure: '4'
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '26'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '4.4'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '7.4'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '2.1'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.2'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '60.2'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -3449,8 +8270,24 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Al2O3
+          - '0.1797820613723733935429852061'
+        - - Fe2O3
+          - '0.01942612938755720548152465748'
+        - - SiO2
+          - '0.7063956960876583521508856851'
+        - - K2O
+          - '0.05538654380782761733608500688'
+        - - Na2O
+          - '0.002275054614640206303170828876'
+        - - MgO
+          - '0.03673451472994322518534861618'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -3505,6 +8342,160 @@ observations:
     figure: '4'
   read_from: pdf:kems-020-hastie-1981-nbsir
   point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '26'
+          Fe2O3: '4.4'
+          K2O: '7.4'
+          MgO: '2.1'
+          Na2O: '0.2'
+          SiO2: '60.2'
+      locator:
+        page: 58
+        published_page: 58
+        pdf_page_index: 63
+        figure: '4'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1797820613723733935429852059'
+          - - Fe2O3
+            - '0.01942612938755720548152465747'
+          - - K2O
+            - '0.05538654380782761733608500684'
+          - - MgO
+            - '0.03673451472994322518534861615'
+          - - Na2O
+            - '0.002275054614640206303170828875'
+          - - SiO2
+            - '0.7063956960876583521508856846'
+          amount_basis: mole_fraction
+      locator:
+        page: 58
+        published_page: 58
+        pdf_page_index: 63
+        figure: '4'
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '26'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '4.4'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '7.4'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '2.1'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.2'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '60.2'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 58
+              published_page: 58
+              pdf_page_index: 63
+              figure: '4'
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -3731,8 +8722,18 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.1642467099008939029808868101'
+        - - CaO
+          - '0.1281402488755988200303977262'
+        - - SiO2
+          - '0.7076130412235072769887154639'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -3838,8 +8839,18 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.1642467099008939029808868101'
+        - - CaO
+          - '0.1281402488755988200303977262'
+        - - SiO2
+          - '0.7076130412235072769887154639'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -3945,8 +8956,18 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.1642467099008939029808868101'
+        - - CaO
+          - '0.1281402488755988200303977262'
+        - - SiO2
+          - '0.7076130412235072769887154639'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -4076,8 +9097,18 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.1642467099008939029808868101'
+        - - CaO
+          - '0.1281402488755988200303977262'
+        - - SiO2
+          - '0.7076130412235072769887154639'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -4207,8 +9238,18 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.1642467099008939029808868101'
+        - - CaO
+          - '0.1281402488755988200303977262'
+        - - SiO2
+          - '0.7076130412235072769887154639'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -4338,8 +9379,18 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.1642467099008939029808868101'
+        - - CaO
+          - '0.1281402488755988200303977262'
+        - - SiO2
+          - '0.7076130412235072769887154639'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
