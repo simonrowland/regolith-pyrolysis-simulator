@@ -25,7 +25,7 @@ extraction:
 review_status: draft
 corrections:
 - observation_id: markova_1984_table2_residual_melt_VI_lherzolite
-  field: points[T_C=0].FeO
+  field: composition_wt_pct.FeO
   old: 4.04
   new: 8.04
   page: 510
@@ -35,7 +35,7 @@ corrections:
     gives FeO=8.04, SiO2=44.02, Al2O3=4.56, MgO=36.44, CaO=6.95, matching the other four printed T=0 cells.
     Five-oxide sum with FeO=8.04 is 100.01.
 - observation_id: markova_1984_table2_residual_melt_VI_lherzolite
-  field: points[T_C=1726].CaO
+  field: series[T_C=1726].CaO_wt_pct
   old: 4.79
   new: 8.79
   page: 510
@@ -44,7 +44,7 @@ corrections:
     8/4. With the other four oxides as printed (41.77, 5.83, 1.57, 41.95) CaO=8.79 closes the five-oxide
     sum to 99.91; neighboring CaO cells are 7.70 (1632 C) and 11.27 (1796 C).
 - observation_id: markova_1984_table2_residual_melt_VI_lherzolite
-  field: points[T_C=1960].mass_loss_pct
+  field: series[T_C=1960].mass_loss_pct
   old: 36.05
   new: 86.05
   page: 510
@@ -53,7 +53,7 @@ corrections:
     every other VI row (65.21 at 1883 C, 89.25 at 2038 C), so 36.05 is impossible. The 400 dpi glyph is
     a damaged 8/3; 86.05 sits between 65.21 and 89.25.
 - observation_id: markova_1984_table2_residual_melt_V_alumina_basalt
-  field: points[T_C=1640].T_C
+  field: series[T_C=1640].T_C
   old: 1540
   new: 1640
   page: 510
@@ -62,7 +62,7 @@ corrections:
     other V row (1544 then 1719). The 400 dpi glyph is a damaged 6/5; 1640 C is the reading consistent
     with increasing T.
 - observation_id: markova_1984_table2_residual_melt_V_alumina_basalt
-  field: points[T_C=1719].MgO
+  field: series[T_C=1719].MgO_wt_pct
   old: 3.11
   new: 8.11
   page: 510
@@ -72,7 +72,7 @@ corrections:
     sum to 100.00. Neighboring MgO cells are 7.17 (1640 C) and 7.20 (1790 C); 3.11 would be a one-row
     collapse and rebound.
 - observation_id: markova_1984_table2_residual_melt_V_alumina_basalt
-  field: points[T_C=1809].T_C
+  field: series[T_C=1809].T_C
   old: 1309
   new: 1809
   page: 510
@@ -88,7 +88,7 @@ fidelity_samples:
     published_page: 510
     pdf_page_index: 2
     note: Table 1 sample I (anorthite) SiO2 = 42.94
-- path: species.SiO2.observations[markova_1984_table2_residual_melt_V_alumina_basalt].values.points[0].SiO2
+- path: species.SiO2.observations[markova_1984_table2_residual_melt_V_alumina_basalt].values.composition_wt_pct.SiO2
   value: 52.32
   locator:
     table: '2'
@@ -110,6 +110,20 @@ fidelity_samples:
     published_page: 509
     pdf_page_index: 1
     paragraph: The temperature step was 70, duration of the temperature step 15 min
+- path: species.SiO2.observations[markova_1984_table2_residual_melt_VI_lherzolite].values.series[1].MgO_wt_pct
+  value: 36.92
+  locator:
+    table: '2'
+    published_page: 510
+    pdf_page_index: 2
+    note: Table 2 left panel (VI), T=1475 C, MgO column = 36.92
+- path: species.SiO2.observations[markova_1984_table2_residual_melt_V_alumina_basalt].values.series[4].MgO_wt_pct
+  value: 8.11
+  locator:
+    table: '2'
+    published_page: 510
+    pdf_page_index: 2
+    note: Table 2 right panel (V), T=1719 C, MgO column = 8.11
 benches:
 - id: markova-1984-kems
   identity: {basis: described_in_this_work}
@@ -333,126 +347,165 @@ species:
       regime: kems_effusion
       units: wt percent as published; T in C as printed; T_K = T_C + 273.15
       values:
-        quantity: residual_melt_composition_vs_T_and_mass_loss
+        quantity: residue_composition_vs_time
         method_class: measured_direct
         evidence_class: authors_table_from_this_work_kems
         composition_id: VI
         composition_name: lherzolite
         panel: left
         oxide_basis: SiO2 Al2O3 FeO MgO CaO as printed (header MgO is a damaged typewriter glyph)
-        T_C_0_note: T=0 / M=0 is the initial five-oxide recast, not a run temperature
-        points:
-        - T_C: 0
-          mass_loss_pct: 0.0
+        composition_wt_pct:
           SiO2: 44.02
           Al2O3: 4.56
           FeO: 8.04
           MgO: 36.44
           CaO: 6.95
-          T_K: null
+          locator:
+            table: '2'
+            published_page: 510
+            pdf_page_index: 2
+        T_C_0_note: T=0 / M=0 is the initial five-oxide recast, not a run temperature
+        series:
+        - mass_loss_pct: 0
           T_C_is_initial_composition: true
+          locator:
+            published_page: 510
+            table: '2'
+            pdf_page_index: 2
+            note: Table 2 left panel (composition VI), printed T=0 / M%=0 initial charge
         - T_C: 1475
           mass_loss_pct: 1.46
-          SiO2: 44.4
-          Al2O3: 4.62
-          FeO: 7.01
-          MgO: 36.92
-          CaO: 7.05
-          T_K: 1748.15
-          T_C_is_initial_composition: false
+          SiO2_wt_pct: 44.4
+          Al2O3_wt_pct: 4.62
+          FeO_wt_pct: 7.01
+          MgO_wt_pct: 36.92
+          CaO_wt_pct: 7.05
+          locator:
+            published_page: 510
+            table: '2'
+            pdf_page_index: 2
+            note: Table 2 left panel (composition VI), T=1475 C; oxide wt% and mass-loss row
         - T_C: 1492
           mass_loss_pct: 4.16
-          SiO2: 44.9
-          Al2O3: 4.75
-          FeO: 5.33
-          MgO: 37.72
-          CaO: 7.25
-          T_K: 1765.15
-          T_C_is_initial_composition: false
+          SiO2_wt_pct: 44.9
+          Al2O3_wt_pct: 4.75
+          FeO_wt_pct: 5.33
+          MgO_wt_pct: 37.72
+          CaO_wt_pct: 7.25
+          locator:
+            published_page: 510
+            table: '2'
+            pdf_page_index: 2
+            note: Table 2 left panel (composition VI), T=1492 C; oxide wt% and mass-loss row
         - T_C: 1632
           mass_loss_pct: 9.74
-          SiO2: 44.9
-          Al2O3: 5.05
-          FeO: 3.23
-          MgO: 39.06
-          CaO: 7.7
-          T_K: 1905.15
-          T_C_is_initial_composition: false
+          SiO2_wt_pct: 44.9
+          Al2O3_wt_pct: 5.05
+          FeO_wt_pct: 3.23
+          MgO_wt_pct: 39.06
+          CaO_wt_pct: 7.7
+          locator:
+            published_page: 510
+            table: '2'
+            pdf_page_index: 2
+            note: Table 2 left panel (composition VI), T=1632 C; oxide wt% and mass-loss row
         - T_C: 1726
           mass_loss_pct: 21.8
-          SiO2: 41.77
-          Al2O3: 5.83
-          FeO: 1.57
-          MgO: 41.95
-          CaO: 8.79
-          T_K: 1999.15
-          T_C_is_initial_composition: false
+          SiO2_wt_pct: 41.77
+          Al2O3_wt_pct: 5.83
+          FeO_wt_pct: 1.57
+          MgO_wt_pct: 41.95
+          CaO_wt_pct: 8.79
+          locator:
+            published_page: 510
+            table: '2'
+            pdf_page_index: 2
+            note: Table 2 left panel (composition VI), T=1726 C; oxide wt% and mass-loss row
         - T_C: 1796
           mass_loss_pct: 38.35
-          SiO2: 35.57
-          Al2O3: 7.39
-          FeO: 1.11
-          MgO: 44.67
-          CaO: 11.27
-          T_K: 2069.15
-          T_C_is_initial_composition: false
+          SiO2_wt_pct: 35.57
+          Al2O3_wt_pct: 7.39
+          FeO_wt_pct: 1.11
+          MgO_wt_pct: 44.67
+          CaO_wt_pct: 11.27
+          locator:
+            published_page: 510
+            table: '2'
+            pdf_page_index: 2
+            note: Table 2 left panel (composition VI), T=1796 C; oxide wt% and mass-loss row
         - T_C: 1883
           mass_loss_pct: 65.21
-          SiO2: 13.6
-          Al2O3: 13.09
-          FeO: 1.79
-          MgO: 46.61
-          CaO: 16.34
-          T_K: 2156.15
-          T_C_is_initial_composition: false
+          SiO2_wt_pct: 13.6
+          Al2O3_wt_pct: 13.09
+          FeO_wt_pct: 1.79
+          MgO_wt_pct: 46.61
+          CaO_wt_pct: 16.34
+          locator:
+            published_page: 510
+            table: '2'
+            pdf_page_index: 2
+            note: Table 2 left panel (composition VI), T=1883 C; oxide wt% and mass-loss row
         - T_C: 1960
           mass_loss_pct: 86.05
-          SiO2: 1.17
-          Al2O3: 32.64
-          FeO: 1.66
-          MgO: 16.34
-          CaO: 43.2
-          T_K: 2233.15
-          T_C_is_initial_composition: false
+          SiO2_wt_pct: 1.17
+          Al2O3_wt_pct: 32.64
+          FeO_wt_pct: 1.66
+          MgO_wt_pct: 16.34
+          CaO_wt_pct: 43.2
+          locator:
+            published_page: 510
+            table: '2'
+            pdf_page_index: 2
+            note: Table 2 left panel (composition VI), T=1960 C; oxide wt% and mass-loss row
         - T_C: 2038
           mass_loss_pct: 89.25
-          SiO2: 1.09
-          Al2O3: 42.1
-          FeO: 0.41
-          MgO: 0.0
-          CaO: 56.4
-          T_K: 2311.15
-          T_C_is_initial_composition: false
+          SiO2_wt_pct: 1.09
+          Al2O3_wt_pct: 42.1
+          FeO_wt_pct: 0.41
+          MgO_wt_pct: 0.0
+          CaO_wt_pct: 56.4
+          locator:
+            published_page: 510
+            table: '2'
+            pdf_page_index: 2
+            note: Table 2 left panel (composition VI), T=2038 C; oxide wt% and mass-loss row
         - T_C: 2118
           mass_loss_pct: 91.81
-          SiO2: 0.23
-          Al2O3: 53.05
-          FeO: 0.14
-          MgO: 0.0
-          CaO: 46.59
-          T_K: 2391.15
-          T_C_is_initial_composition: false
+          SiO2_wt_pct: 0.23
+          Al2O3_wt_pct: 53.05
+          FeO_wt_pct: 0.14
+          MgO_wt_pct: 0.0
+          CaO_wt_pct: 46.59
+          locator:
+            published_page: 510
+            table: '2'
+            pdf_page_index: 2
+            note: Table 2 left panel (composition VI), T=2118 C; oxide wt% and mass-loss row
         - T_C: 2207
           mass_loss_pct: 95.51
-          SiO2: 0.0
-          Al2O3: 79.28
-          FeO: 0.08
-          MgO: 0.0
-          CaO: 21.64
-          T_K: 2480.15
-          T_C_is_initial_composition: false
+          SiO2_wt_pct: 0.0
+          Al2O3_wt_pct: 79.28
+          FeO_wt_pct: 0.08
+          MgO_wt_pct: 0.0
+          CaO_wt_pct: 21.64
+          locator:
+            published_page: 510
+            table: '2'
+            pdf_page_index: 2
+            note: Table 2 left panel (composition VI), T=2207 C; oxide wt% and mass-loss row
         - T_C: 2291
           mass_loss_pct: 98.34
-          SiO2: 0.0
-          Al2O3: 74.65
-          FeO: 0.0
-          MgO: 0.0
-          CaO: 25.36
-          T_K: 2564.15
-          T_C_is_initial_composition: false
-        row_sum_note: Most VI rows close to 100 wt% on the five printed oxides after the FeO and CaO glyph
-          corrections. The T=1883 C row sums to 91.43 as printed and was not renormalized. The T=1960
-          C row sums to 95.01 as printed after the M% correction and was not renormalized.
+          SiO2_wt_pct: 0.0
+          Al2O3_wt_pct: 74.65
+          FeO_wt_pct: 0.0
+          MgO_wt_pct: 0.0
+          CaO_wt_pct: 25.36
+          locator:
+            published_page: 510
+            table: '2'
+            pdf_page_index: 2
+            note: Table 2 left panel (composition VI), T=2291 C; oxide wt% and mass-loss row
+        row_sum_note: Most VI rows close to 100 wt% on the five printed oxides after the FeO and CaO glyph corrections. The T=1883 C row sums to 91.43 as printed and was not renormalized. The T=1960 C row sums to 95.01 as printed after the M% correction and was not renormalized.
       uncertainty:
         note: No per-cell uncertainty printed. Damaged-glyph corrections are in the correction ledger.
     - observation_id: markova_1984_table2_residual_melt_V_alumina_basalt
@@ -478,126 +531,165 @@ species:
       regime: kems_effusion
       units: wt percent as published; T in C as printed; T_K = T_C + 273.15
       values:
-        quantity: residual_melt_composition_vs_T_and_mass_loss
+        quantity: residue_composition_vs_time
         method_class: measured_direct
         evidence_class: authors_table_from_this_work_kems
         composition_id: V
         composition_name: alumina_basalt
         panel: right
         oxide_basis: SiO2 Al2O3 FeO MgO CaO as printed
-        T_C_0_note: T=0 / M=0 is the initial five-oxide recast, not a run temperature
-        points:
-        - T_C: 0
-          mass_loss_pct: 0.0
+        composition_wt_pct:
           SiO2: 52.32
           Al2O3: 19.13
           FeO: 9.37
           MgO: 6.25
           CaO: 12.93
-          T_K: null
+          locator:
+            table: '2'
+            published_page: 510
+            pdf_page_index: 2
+        T_C_0_note: T=0 / M=0 is the initial five-oxide recast, not a run temperature
+        series:
+        - mass_loss_pct: 0
           T_C_is_initial_composition: true
+          locator:
+            published_page: 510
+            table: '2'
+            pdf_page_index: 2
+            note: Table 2 right panel (composition V), printed T=0 / M%=0 initial charge
         - T_C: 1476
           mass_loss_pct: 1.17
-          SiO2: 52.4
-          Al2O3: 19.15
-          FeO: 8.63
-          MgO: 6.25
-          CaO: 12.94
-          T_K: 1749.15
-          T_C_is_initial_composition: false
+          SiO2_wt_pct: 52.4
+          Al2O3_wt_pct: 19.15
+          FeO_wt_pct: 8.63
+          MgO_wt_pct: 6.25
+          CaO_wt_pct: 12.94
+          locator:
+            published_page: 510
+            table: '2'
+            pdf_page_index: 2
+            note: Table 2 right panel (composition V), T=1476 C; oxide wt% and mass-loss row
         - T_C: 1544
           mass_loss_pct: 4.39
-          SiO2: 52.74
-          Al2O3: 20.12
-          FeO: 7.01
-          MgO: 6.54
-          CaO: 13.59
-          T_K: 1817.15
-          T_C_is_initial_composition: false
+          SiO2_wt_pct: 52.74
+          Al2O3_wt_pct: 20.12
+          FeO_wt_pct: 7.01
+          MgO_wt_pct: 6.54
+          CaO_wt_pct: 13.59
+          locator:
+            published_page: 510
+            table: '2'
+            pdf_page_index: 2
+            note: Table 2 right panel (composition V), T=1544 C; oxide wt% and mass-loss row
         - T_C: 1640
           mass_loss_pct: 14.41
-          SiO2: 50.9
-          Al2O3: 22.35
-          FeO: 4.46
-          MgO: 7.17
-          CaO: 15.11
-          T_K: 1913.15
-          T_C_is_initial_composition: false
+          SiO2_wt_pct: 50.9
+          Al2O3_wt_pct: 22.35
+          FeO_wt_pct: 4.46
+          MgO_wt_pct: 7.17
+          CaO_wt_pct: 15.11
+          locator:
+            published_page: 510
+            table: '2'
+            pdf_page_index: 2
+            note: Table 2 right panel (composition V), T=1640 C; oxide wt% and mass-loss row
         - T_C: 1719
           mass_loss_pct: 37.17
-          SiO2: 40.46
-          Al2O3: 29.51
-          FeO: 1.97
-          MgO: 8.11
-          CaO: 19.95
-          T_K: 1992.15
-          T_C_is_initial_composition: false
+          SiO2_wt_pct: 40.46
+          Al2O3_wt_pct: 29.51
+          FeO_wt_pct: 1.97
+          MgO_wt_pct: 8.11
+          CaO_wt_pct: 19.95
+          locator:
+            published_page: 510
+            table: '2'
+            pdf_page_index: 2
+            note: Table 2 right panel (composition V), T=1719 C; oxide wt% and mass-loss row
         - T_C: 1790
           mass_loss_pct: 53.53
-          SiO2: 22.94
-          Al2O3: 41.13
-          FeO: 1.03
-          MgO: 7.2
-          CaO: 27.66
-          T_K: 2063.15
-          T_C_is_initial_composition: false
+          SiO2_wt_pct: 22.94
+          Al2O3_wt_pct: 41.13
+          FeO_wt_pct: 1.03
+          MgO_wt_pct: 7.2
+          CaO_wt_pct: 27.66
+          locator:
+            published_page: 510
+            table: '2'
+            pdf_page_index: 2
+            note: Table 2 right panel (composition V), T=1790 C; oxide wt% and mass-loss row
         - T_C: 1809
           mass_loss_pct: 66.01
-          SiO2: 4.43
-          Al2O3: 56.29
-          FeO: 0.32
-          MgO: 1.69
-          CaO: 37.27
-          T_K: 2082.15
-          T_C_is_initial_composition: false
+          SiO2_wt_pct: 4.43
+          Al2O3_wt_pct: 56.29
+          FeO_wt_pct: 0.32
+          MgO_wt_pct: 1.69
+          CaO_wt_pct: 37.27
+          locator:
+            published_page: 510
+            table: '2'
+            pdf_page_index: 2
+            note: Table 2 right panel (composition V), T=1809 C; oxide wt% and mass-loss row
         - T_C: 1957
           mass_loss_pct: 69.35
-          SiO2: 0.15
-          Al2O3: 62.13
-          FeO: 0.0
-          MgO: 0.0
-          CaO: 37.72
-          T_K: 2230.15
-          T_C_is_initial_composition: false
+          SiO2_wt_pct: 0.15
+          Al2O3_wt_pct: 62.13
+          FeO_wt_pct: 0.0
+          MgO_wt_pct: 0.0
+          CaO_wt_pct: 37.72
+          locator:
+            published_page: 510
+            table: '2'
+            pdf_page_index: 2
+            note: Table 2 right panel (composition V), T=1957 C; oxide wt% and mass-loss row
         - T_C: 2030
           mass_loss_pct: 71.33
-          SiO2: 0.0
-          Al2O3: 65.62
-          FeO: 0.0
-          MgO: 0.0
-          CaO: 34.3
-          T_K: 2303.15
-          T_C_is_initial_composition: false
+          SiO2_wt_pct: 0.0
+          Al2O3_wt_pct: 65.62
+          FeO_wt_pct: 0.0
+          MgO_wt_pct: 0.0
+          CaO_wt_pct: 34.3
+          locator:
+            published_page: 510
+            table: '2'
+            pdf_page_index: 2
+            note: Table 2 right panel (composition V), T=2030 C; oxide wt% and mass-loss row
         - T_C: 2119
           mass_loss_pct: 76.19
-          SiO2: 0.0
-          Al2O3: 74.21
-          FeO: 0.0
-          MgO: 0.0
-          CaO: 25.29
-          T_K: 2392.15
-          T_C_is_initial_composition: false
+          SiO2_wt_pct: 0.0
+          Al2O3_wt_pct: 74.21
+          FeO_wt_pct: 0.0
+          MgO_wt_pct: 0.0
+          CaO_wt_pct: 25.29
+          locator:
+            published_page: 510
+            table: '2'
+            pdf_page_index: 2
+            note: Table 2 right panel (composition V), T=2119 C; oxide wt% and mass-loss row
         - T_C: 2200
           mass_loss_pct: 83.68
-          SiO2: 0.0
-          Al2O3: 81.43
-          FeO: 0.0
-          MgO: 0.0
-          CaO: 18.57
-          T_K: 2473.15
-          T_C_is_initial_composition: false
+          SiO2_wt_pct: 0.0
+          Al2O3_wt_pct: 81.43
+          FeO_wt_pct: 0.0
+          MgO_wt_pct: 0.0
+          CaO_wt_pct: 18.57
+          locator:
+            published_page: 510
+            table: '2'
+            pdf_page_index: 2
+            note: Table 2 right panel (composition V), T=2200 C; oxide wt% and mass-loss row
         - T_C: 2255
           mass_loss_pct: 97.99
-          SiO2: 0.0
-          Al2O3: 79.49
-          FeO: 0.0
-          MgO: 0.0
-          CaO: 20.51
-          T_K: 2528.15
-          T_C_is_initial_composition: false
-        row_sum_note: Most V rows close to 100 wt% on the five printed oxides after the MgO glyph correction.
-          The T=1476 C row sums to 99.37 as printed (FeO 8.63 kept; not forced to 9.26). The T=2030 C
-          CaO is printed to one decimal (34.3).
+          SiO2_wt_pct: 0.0
+          Al2O3_wt_pct: 79.49
+          FeO_wt_pct: 0.0
+          MgO_wt_pct: 0.0
+          CaO_wt_pct: 20.51
+          locator:
+            published_page: 510
+            table: '2'
+            pdf_page_index: 2
+            note: Table 2 right panel (composition V), T=2255 C; oxide wt% and mass-loss row
+        row_sum_note: Most V rows close to 100 wt% on the five printed oxides after the MgO glyph correction. The T=1476 C row sums to 99.37 as printed (FeO 8.63 kept; not forced to 9.26). The T=2030 C CaO is printed to one decimal (34.3).
       uncertainty:
         note: No per-cell uncertainty printed. Damaged-glyph corrections are in the correction ledger.
     - observation_id: markova_1984_text_basalt_ANT_window
