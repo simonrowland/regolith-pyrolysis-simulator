@@ -2751,6 +2751,9 @@ class EvaporationMixin:
         if temperature_C >= liquidus_T_C:
             return 1.0
         path = tuple(curve.get('path') or ())
+        if not path:
+            span = max(liquidus_T_C - solidus_T_C, _FREEZE_GATE_EPSILON)
+            return max(0.0, min(1.0, (temperature_C - solidus_T_C) / span))
         previous_T, previous_fraction = path[0]
         for next_T, next_fraction in path[1:]:
             previous_T = float(previous_T)

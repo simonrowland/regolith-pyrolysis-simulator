@@ -1196,10 +1196,10 @@ def test_c3_na_source_terms_preserve_same_hour_exchange_observables() -> None:
     sim = _make_sim(additives_kg={"Na": 12.0})
     sim._init_shuttle_inventory(CampaignPhase.C3_NA)
     sim.melt.campaign = CampaignPhase.C3_NA
-    # Below the Kress91 liquid gate the unadopted reservoir tracks IW(T).
-    # That potential's differential capacity is at the noop floor, so the
-    # headspace O2 is not absorbed. The shuttle still commits, and its
-    # refused source term must not rewrite the exchange record.
+    # Below the first liquid redox anchor the exchange books nothing, even
+    # when a partial melt still has differential capacity. The shuttle's
+    # own capacity gate is unchanged: at the noop floor the source is
+    # skipped, and above it the source still integrates.
     sim.melt.temperature_C = 1150.0
     sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
     sim.melt.pO2_mbar = 1.5
@@ -1222,7 +1222,13 @@ def test_c3_na_source_terms_preserve_same_hour_exchange_observables() -> None:
     transport_pO2 = exchange.headspace_transport_pO2_bar
 
     assert exchange_o2_mol == pytest.approx(0.0)
-    assert exchange_direction == "none:no_melt_redox_capacity"
+    assert exchange.reference_T_K is None
+    assert exchange_direction == (
+        "none:solid_state_ferric_decomposition_not_modelled"
+    )
+    assert exchange.exchange_notice["message"] == (
+        "solid-state ferric decomposition not modelled"
+    )
     assert k_O_m_s > 0.0
     assert tau_hr > 0.0
 
@@ -1231,9 +1237,9 @@ def test_c3_na_source_terms_preserve_same_hour_exchange_observables() -> None:
     reservoir = snapshot.oxygen_reservoir
     label = "redox_source:c3_na_shuttle_reduction"
 
-    # Same-hour exchange observables survive the subsequent C3-Na source
-    # term. k_O / tau / exchange mol / headspace pO2 stay on the passive
-    # exchange; the direction gains the skipped source label.
+    # Passive exchange observables survive the shuttle. The direction keeps
+    # the solid-state prefix. A noop capacity still records the skip; a
+    # real partial-melt capacity integrates the source and does not.
     assert reservoir["k_O_m_s"] == pytest.approx(k_O_m_s)
     assert reservoir["tau_hr"] == pytest.approx(tau_hr)
     assert reservoir["exchange_o2_mol"] == pytest.approx(exchange_o2_mol)
@@ -1242,13 +1248,23 @@ def test_c3_na_source_terms_preserve_same_hour_exchange_observables() -> None:
     assert reservoir["headspace_transport_pO2_bar"] == pytest.approx(
         transport_pO2
     )
-    assert reservoir["exchange_direction"] == (
-        f"{exchange_direction}|{label}:skipped:no_melt_redox_capacity"
+    assert reservoir["exchange_notice"]["message"] == (
+        "solid-state ferric decomposition not modelled"
     )
+    assert reservoir["exchange_direction"].split("|")[0] == exchange_direction
     assert label in reservoir["redox_source_terms_mol_o2_equiv"]
-    assert label in reservoir["redox_source_skipped_terms_mol_o2_equiv"]
-    assert reservoir["redox_source_applied_terms_mol_o2_equiv"] == {}
-    assert reservoir["redox_source_terms_applied"] is False
+    if (
+        float(reservoir["melt_redox_capacity_mol_per_ln_fO2"])
+        <= OXYGEN_RESERVOIR_NOOP_MOL
+    ):
+        assert reservoir["exchange_direction"] == (
+            f"{exchange_direction}|{label}:skipped:no_melt_redox_capacity"
+        )
+        assert label in reservoir["redox_source_skipped_terms_mol_o2_equiv"]
+        assert reservoir["redox_source_applied_terms_mol_o2_equiv"] == {}
+        assert reservoir["redox_source_terms_applied"] is False
+    else:
+        assert reservoir["redox_source_terms_applied"] is True
 
 
 def test_c3_k_source_term_comes_from_committed_transition() -> None:

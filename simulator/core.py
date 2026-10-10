@@ -1997,8 +1997,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'BuiltinOxygenReservoirExchangeProvider',
             (ChemistryIntent.OXYGEN_RESERVOIR_EXCHANGE,),
             False,
-            'OXYGEN_RESERVOIR_EXCHANGE -- AUTHORITATIVE: pure O2 move '
-            'between reservoir.fo2_buffer and process.overhead_gas.',
+            'OXYGEN_RESERVOIR_EXCHANGE -- AUTHORITATIVE: melt-to-headspace '
+            'O2 is Fe2O3 -> 2 FeO + 1/2 O2 on process.cleaned_melt, with '
+            'O2 credited to process.overhead_gas. The reverse leg draws '
+            'real overhead O2 into reservoir.fo2_buffer.',
         ),
         (
             'engines.builtin.backend_equilibrium',
@@ -5213,9 +5215,32 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 # Sanity: lunar alkali offset is +0.005 dex, so 1338.15 K is
                 # Holzheid -13.3588 + 0.005, not the 1e-9 bar headspace floor.
                 return self._compute_intrinsic_melt_fO2(T_now), None
-            # After a liquid adoption, sub-solidus redox is quenched: Kress91
-            # is a liquid relation, so glass keeps the last liquid couple.
-            return self._current_melt_redox_fO2_log(), reference_T_K
+            # Glass, and any hour at or below the Kress floor, keeps the last
+            # liquid couple. Kress91 is not a solid relation.
+            temperature_C = T_now - 273.15
+            if temperature_C <= KRESS91_LIQUID_CALIBRATION_MIN_T_C:
+                return self._current_melt_redox_fO2_log(), reference_T_K
+            partial_capacity = self._melt_redox_source_capacity_mol_per_ln_fO2(
+                fO2_log=self._current_melt_redox_fO2_log(),
+                T_K=T_now,
+                gate_authority=gate_authority,
+            )
+            if partial_capacity <= OXYGEN_RESERVOIR_NOOP_MOL:
+                return self._current_melt_redox_fO2_log(), reference_T_K
+            # Premise: this hour is below the projected liquidus, so the
+            # binary liquid gate quenches, but C_m is still Kress capacity
+            # times a nonzero liquid fraction. The exchange then moves
+            # ln fO2 by -dn/C_m. Omitting the fixed-redox temperature
+            # endpoint leaves Kress(T_now, fO2) off the ledger by d(fe3)/dT
+            # while the oxides stay put. Fall through to that endpoint.
+            # Algebra: ln fO2(T_now) = ln fO2(T_ref) + Δ_Kress(T_ref, T_now);
+            # the ledger fraction is unchanged by this step.
+            # Units: partial_capacity is mol O2 per ln fO2; the logs are
+            # dimensionless.
+            # Sanity: CI at fixed fO2 drops about 0.019 in Fe3+/FeT from
+            # 1215 C to 1230 C. Thirteen such steps, 1215 C to 1365 C, are
+            # about 0.16, past the 0.05 ledger/scalar band. The endpoint
+            # cancels that at fixed ferric fraction.
         if reference_T_K is None:
             # First liquid tick: fix the seed at this temperature. Later
             # ticks move only by the Kress91 block below plus source terms.
@@ -6213,6 +6238,33 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
             self._fe_redox_respeciation_diagnostics_this_hr.append(dict(diagnostic))
             self.melt.oxygen_reservoir.ferric_divergence = dict(divergence)
+            # Below the projected liquidus the respeciation itself does not
+            # run. A partial melt above the Kress floor has already taken
+            # the fixed-redox endpoint, so the ledger and the scalar still
+            # have to agree. Glass and sub-floor hours keep the deferred
+            # attribution: there is no Kress couple to match.
+            temperature_C = float(T_K) - 273.15
+            if (
+                self._current_melt_redox_reference_T_K() is not None
+                and temperature_C > KRESS91_LIQUID_CALIBRATION_MIN_T_C
+            ):
+                partial_capacity = self._melt_redox_source_capacity_mol_per_ln_fO2(
+                    fO2_log=self._current_melt_redox_fO2_log(),
+                    T_K=T_K,
+                    gate_authority=gate_authority,
+                )
+                if (
+                    partial_capacity > OXYGEN_RESERVOIR_NOOP_MOL
+                    and float(divergence.get('delta_abs', 0.0) or 0.0)
+                    > FERRIC_DIVERGENCE_WARNING_THRESHOLD
+                ):
+                    raise AccountingError(
+                        'partial-melt ferric ledger and scalar-implied '
+                        'fraction diverged below the projected liquidus; '
+                        f"delta_abs={float(divergence.get('delta_abs', 0.0)):.6g} "
+                        f"ledger={divergence.get('ledger_ferric_fraction')!r} "
+                        f"implied={divergence.get('implied_ferric_fraction')!r}"
+                    )
             return diagnostic
         fO2_log, reference_T_K = self._melt_fO2_reference_state_at_temperature(
             T_K,
@@ -6306,6 +6358,29 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.melt.oxygen_reservoir.ferric_divergence = dict(
             diagnostic['ferric_divergence_after']
         )
+        # Liquid hours must leave the ledger ferric fraction on the scalar.
+        # Sub-liquidus skips return above. A refused or unfunded oxidizing
+        # pass is already attributed and is not this agreement.
+        unfunded_o2_mol = max(
+            0.0,
+            float(diagnostic.get('unfunded_o2_mol', 0.0) or 0.0),
+        )
+        respeciation_status = str(diagnostic.get('respeciation_status', '') or '')
+        if (
+            reference_T_K is not None
+            and str(diagnostic.get('status', '') or '') != 'refused'
+            and respeciation_status not in {'refused', 'skipped_solid'}
+            and unfunded_o2_mol <= OXYGEN_RESERVOIR_NOOP_MOL
+            and float(divergence.get('delta_abs', 0.0) or 0.0)
+            > FERRIC_DIVERGENCE_WARNING_THRESHOLD
+        ):
+            raise AccountingError(
+                'liquid ferric ledger and scalar-implied fraction diverged '
+                f'after Fe redox respeciation; '
+                f"delta_abs={float(divergence.get('delta_abs', 0.0)):.6g} "
+                f"ledger={divergence.get('ledger_ferric_fraction')!r} "
+                f"implied={divergence.get('implied_ferric_fraction')!r}"
+            )
         return diagnostic
 
     def _redox_source_breakdown_diagnostic(self) -> Dict[str, Any]:
@@ -6511,8 +6586,52 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             headspace_capacity_mol_per_ln_pO2=C_h,
         )
 
+        if reference_T_K is None:
+            # Premise: Kress91 is a liquid relation. Until the first liquid
+            # tick there is no adopted redox anchor, so this exchange does
+            # not move oxygen. Hematite and maghemite do decompose at low
+            # pO2 below the solidus; that path is t-1170, not this step.
+            # Algebra: dn = 0. Re-reference already left the scalar on the
+            # intrinsic track; do not apply -dn/C_m.
+            # Sanity: Mars C2A hours 1-16 booked 143 mol while Fe3+/FeT
+            # stayed 0.300 when this return was absent.
+            reservoir.exchange_direction = (
+                'none:solid_state_ferric_decomposition_not_modelled'
+            )
+            reservoir.exchange_notice = {
+                'flagged': True,
+                'code': 'solid_state_ferric_decomposition_not_modelled',
+                'message': 'solid-state ferric decomposition not modelled',
+            }
+            self.melt.oxygen_reservoir = reservoir
+            self._sync_oxygen_reservoir_mirror()
+            return reservoir
+
         if C_m <= OXYGEN_RESERVOIR_NOOP_MOL:
             reservoir.exchange_direction = 'none:no_melt_redox_capacity'
+            self.melt.oxygen_reservoir = reservoir
+            self._sync_oxygen_reservoir_mirror()
+            return reservoir
+        if not self._melt_redox_temperature_shift_is_liquid(
+            T_K,
+            gate_authority=gate_authority,
+        ):
+            # Premise: C_m is full-melt Kress capacity times the liquid
+            # fraction, but the oxide ledger and the scalar-implied fraction
+            # are the bulk melt. dn sized on C_m then debited as 2*dn Fe2O3
+            # on the whole inventory does not land on bulk Kress, and the
+            # projected-liquidus gate does not run respeciation to close it.
+            # Algebra: Δf_ledger = -4 dn / N_Fe, Δf_implied ≈ -dn / C_full,
+            # and C_m = C_full * liquid_fraction, so the gap per hour is
+            # about (1/liquid_fraction - 1) * 4 dn / N_Fe.
+            # Units: dn mol O2, N_Fe mol, both fractions dimensionless.
+            # Sanity: CI hour 14, liquid fraction ~0.61, reached
+            # delta_abs 0.062 (ledger 0.344, implied 0.282) when this
+            # return was absent. Re-reference has already applied the
+            # fixed-redox endpoint when this hour has Kress capacity.
+            reservoir.exchange_direction = 'none:below_projected_liquidus'
+            reservoir.exchange_o2_mol = 0.0
+            reservoir.exchange_o2_kg = 0.0
             self.melt.oxygen_reservoir = reservoir
             self._sync_oxygen_reservoir_mirror()
             return reservoir
@@ -6540,6 +6659,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # an oxygen source, and a CONTROLLED_O2 floor may enlarge effective
         # C_h above the real overhead inventory so the sealed network still
         # has a finite target, but atoms cannot be invented.
+        #
+        # Forward dn is Fe2O3 -> 2 FeO + 1/2 O2 on process.cleaned_melt,
+        # not a draw on reservoir.fo2_buffer. The provider books 2*dn mol
+        # Fe2O3 out and 4*dn mol FeO in. The scalar still moves by
+        # Δ ln fO2 = -dn_ledger / C_m.
         #
         # Algebra, one hour. alpha = 1 - exp(-1 h / tau), tau = h_eff / k_O
         # (h_eff in m, k_O in m/s, tau in s, alpha dimensionless),
@@ -6597,6 +6721,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 exchange_clamped = True
             max_real_absorbable = max(0.0, head_o2_mol - n_floor_mol)
             dn_ledger_to_headspace = max(dn_to_headspace, -max_real_absorbable)
+        elif dn_ledger_to_headspace > OXYGEN_RESERVOIR_NOOP_MOL:
+            # Fe2O3 -> 2 FeO + 1/2 O2, so the forward commit cannot exceed
+            # the ferric inventory. Clamp the ledger dn; fO2 follows only
+            # that clamped dn. A shortfall is unbacked, not an overdraft.
+            fe2o3_mol = max(0.0, float(
+                self.atom_ledger.mol_by_account('process.cleaned_melt').get(
+                    'Fe2O3',
+                    0.0,
+                )
+                or 0.0
+            ))
+            max_o2_from_ferric = 0.5 * fe2o3_mol
+            if dn_ledger_to_headspace > max_o2_from_ferric:
+                dn_ledger_to_headspace = max_o2_from_ferric
+                exchange_clamped = True
 
         if abs(dn_to_headspace) < OXYGEN_RESERVOIR_NOOP_MOL:
             dn_to_headspace = 0.0
@@ -6619,6 +6758,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     if result.transition is not None
                     else ''
                 )
+                if dn_ledger_to_headspace > 0.0:
+                    self._project_cleaned_melt_from_atom_ledger()
             reservoir.exchange_direction = (
                 'melt_to_headspace'
                 if dn_to_headspace > 0.0

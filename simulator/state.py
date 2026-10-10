@@ -469,6 +469,9 @@ class OxygenReservoirState:
     # clamp remainder). Zero when every mol of exchange_o2_mol is backed.
     exchange_unbacked_o2_mol: float = 0.0
     exchange_direction: str = ""
+    # Empty unless this hour refused melt-to-headspace exchange because no
+    # liquid redox anchor exists yet. The message is the flagged notice.
+    exchange_notice: Dict[str, Any] = field(default_factory=dict)
     exchange_clamped: bool = False
     exchange_transition_name: str = ""
     redox_source_terms_mol_o2_equiv: Dict[str, float] = field(default_factory=dict)

@@ -300,6 +300,13 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
                 "unfunded_o2_mol": max(0.0, required_o2_mol - o2_debit_mol),
             })
         else:
+            # OXYGEN_RESERVOIR_EXCHANGE owns kinetic melt-to-headspace O2
+            # and has already booked Fe2O3 -> 2 FeO + 1/2 O2 for that dn.
+            # This credit is only the Fe2O3 still standing between the
+            # ledger and the scalar afterwards (adoption, finite-step
+            # curvature, a later source). The 1/2 O2 stays: dropping it
+            # would unbalance the same reaction. The exchange's prior
+            # oxide move is what keeps this from repeating that dn.
             fe2o3_debit_mol = -delta_fe2o3_mol
             if fe2o3_debit_mol > fe2o3_mol + NOOP_MOL:
                 return IntentResult(
