@@ -17,6 +17,10 @@ from simulator.fe_redox import (
     floor_vacuum_pressure_bar,
     kress91_ln_fO2_temperature_delta,
 )
+from simulator.feedstock_composition import (
+    feot_equivalent_moles,
+    iron_oxide_values,
+)
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.runner import _required_stage0_carbon_kg
 from simulator.state import Atmosphere
@@ -330,19 +334,57 @@ def test_partial_melt_above_kress_floor_keeps_the_isoferric_endpoint() -> None:
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = original_fO2
     sim.melt.oxygen_reservoir.reference_T_K = reference_C + 273.15
     sim._sync_oxygen_reservoir_mirror()
-    fe2o3_before = sim.atom_ledger.mol_by_account("process.cleaned_melt").get(
-        "Fe2O3",
-        0.0,
-    )
+    melt_before = sim.atom_ledger.project_account_mol("process.cleaned_melt")
+    _feo_before, fe2o3_before = iron_oxide_values(melt_before)
+    n_fe = feot_equivalent_moles(melt_before)
+    ledger_before = (2.0 * fe2o3_before) / n_fe
     reservoir = sim._apply_oxygen_reservoir_exchange(gate_authority=partial)
-    assert reservoir.exchange_o2_mol == pytest.approx(0.0, abs=1e-15)
-    assert reservoir.exchange_direction == "none:below_projected_liquidus"
+    # Liquid fraction on the straight solidus-liquidus path. The flux
+    # capacity is that fraction of the bulk Kress capacity; the scalar
+    # still moves by -dn / C_full so the bulk ledger tracks Kress.
+    liquid_fraction = (target_C - 500.0) / (1800.0 - 500.0)
+    c_flux = reservoir.melt_redox_capacity_mol_per_ln_fO2
+    c_full = c_flux / liquid_fraction
+    dn = reservoir.exchange_o2_mol
+    assert dn > 0.0
+    assert reservoir.exchange_direction == "melt_to_headspace"
     assert reservoir.reference_T_K == pytest.approx(target_C + 273.15)
-    assert reservoir.melt_intrinsic_fO2_log == pytest.approx(expected, abs=1.0e-9)
-    assert sim.atom_ledger.mol_by_account("process.cleaned_melt").get(
-        "Fe2O3",
-        0.0,
-    ) == pytest.approx(fe2o3_before)
+    assert c_flux == pytest.approx(c_full * liquid_fraction, rel=1e-12)
+    assert reservoir.melt_intrinsic_fO2_log == pytest.approx(
+        expected - (dn / c_full) / math.log(10.0),
+        abs=1.0e-9,
+    )
+    melt_after = sim.atom_ledger.project_account_mol("process.cleaned_melt")
+    _feo_after, fe2o3_after = iron_oxide_values(melt_after)
+    ledger_after = (2.0 * fe2o3_after) / feot_equivalent_moles(melt_after)
+    # Bulk debit: Δ(Fe3+/FeT) = -4 dn / N_Fe exactly. The scalar step
+    # -dn/C_full is the Kress derivative of that same change.
+    assert fe2o3_after == pytest.approx(fe2o3_before - 2.0 * dn, rel=1e-9)
+    assert ledger_after - ledger_before == pytest.approx(
+        -4.0 * dn / n_fe,
+        abs=1e-12,
+    )
+    pressure_bar = floor_vacuum_pressure_bar(
+        float(sim.melt.p_total_mbar) / 1000.0,
+        floor_bar=sim._vacuum_floor_bar(),
+    )
+    comp = sim._melt_oxide_wt_pct()
+    implied_at_endpoint = sim._fe3_over_sigma_fe_at_fO2(
+        comp,
+        fO2_log=expected,
+        T_K=target_C + 273.15,
+        pressure_bar=pressure_bar,
+    )
+    implied_after = sim._fe3_over_sigma_fe_at_fO2(
+        comp,
+        fO2_log=reservoir.melt_intrinsic_fO2_log,
+        T_K=target_C + 273.15,
+        pressure_bar=pressure_bar,
+    )
+    assert implied_after - implied_at_endpoint == pytest.approx(
+        ledger_after - ledger_before,
+        abs=1e-4,
+    )
 
 
 def test_subliquidus_hour_does_not_exchange() -> None:

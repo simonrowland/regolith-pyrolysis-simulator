@@ -6827,6 +6827,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         h_eff_m = self._oxygen_exchange_effective_melt_depth_m()
         tau_s = h_eff_m / k_O
         alpha = 1.0 - math.exp(-3600.0 / tau_s)
+        # C_full is the bulk Kress capacity. C_m is the liquid's share,
+        # the same product _melt_redox_source_capacity stores for redox
+        # source terms. The exchange rate uses C_m; the scalar uses C_full.
+        C_full = self._melt_redox_capacity_mol_per_ln_fO2(
+            fO2_log=base_fO2_log,
+            T_K=T_K,
+        )
         C_m = self._melt_redox_source_capacity_mol_per_ln_fO2(
             fO2_log=base_fO2_log,
             T_K=T_K,
@@ -6876,29 +6883,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self.melt.oxygen_reservoir = reservoir
             self._sync_oxygen_reservoir_mirror()
             return reservoir
-        if not self._melt_redox_temperature_shift_is_liquid(
-            T_K,
-            gate_authority=gate_authority,
-        ):
-            # Premise: C_m is full-melt Kress capacity times the liquid
-            # fraction, but the oxide ledger and the scalar-implied fraction
-            # are the bulk melt. dn sized on C_m then debited as 2*dn Fe2O3
-            # on the whole inventory does not land on bulk Kress, and the
-            # projected-liquidus gate does not run respeciation to close it.
-            # Algebra: Δf_ledger = -4 dn / N_Fe, Δf_implied ≈ -dn / C_full,
-            # and C_m = C_full * liquid_fraction, so the gap per hour is
-            # about (1/liquid_fraction - 1) * 4 dn / N_Fe.
-            # Units: dn mol O2, N_Fe mol, both fractions dimensionless.
-            # Sanity: CI hour 14, liquid fraction ~0.61, reached
-            # delta_abs 0.062 (ledger 0.344, implied 0.282) when this
-            # return was absent. Re-reference has already applied the
-            # fixed-redox endpoint when this hour has Kress capacity.
-            reservoir.exchange_direction = 'none:below_projected_liquidus'
-            reservoir.exchange_o2_mol = 0.0
-            reservoir.exchange_o2_kg = 0.0
-            self.melt.oxygen_reservoir = reservoir
-            self._sync_oxygen_reservoir_mirror()
-            return reservoir
         if C_h <= 0.0:
             reservoir.exchange_direction = 'none:no_headspace_capacity'
             self.melt.oxygen_reservoir = reservoir
@@ -6926,8 +6910,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         #
         # Forward dn is Fe2O3 -> 2 FeO + 1/2 O2 on process.cleaned_melt,
         # not a draw on reservoir.fo2_buffer. The provider books 2*dn mol
-        # Fe2O3 out and 4*dn mol FeO in. The scalar still moves by
-        # Δ ln fO2 = -dn_ledger / C_m. C_m here is the flux capacity.
+        # Fe2O3 out and 4*dn mol FeO in. C_m below is the flux capacity
+        # C_full * liquid_fraction. The scalar moves by
+        # Δ ln fO2 = -dn_ledger / C_full, the bulk capacity.
         #
         # Algebra, one hour. alpha = 1 - exp(-1 h / tau), tau = h_eff / k_O
         # (h_eff in m, k_O in m/s, tau in s, alpha dimensionless),
@@ -7077,13 +7062,30 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         # fO₂ advances only with ledger-committed O₂ (dn_ledger), never with the
         # managed-floor / clamp remainder that has no atom backing.
-        x_m_after = x_m - dn_ledger_to_headspace / C_m
+        #
+        # Premise: the debit is bulk. 2*dn Fe2O3 out and 4*dn FeO in changes
+        # Fe3+/FeT by -4 dn / N_Fe on the whole iron inventory. C_full =
+        # (N_Fe/4) * d(Fe3+/FeT)/d(ln fO2), so Δ ln fO2 = -dn / C_full moves
+        # the Kress fraction by the same -4 dn / N_Fe. C_m = C_full *
+        # liquid_fraction only limits the flux; using it as the divisor
+        # moves the scalar 1/liquid_fraction too far and the projected
+        # liquidus does not run respeciation to close the gap.
+        # Units: dn mol O2, N_Fe mol, C_full mol per ln, both fractions
+        # dimensionless. Sanity: CI hour 14, liquid fraction ~0.61, reached
+        # delta_abs 0.062 (ledger 0.344, implied 0.282) when the divisor
+        # was C_m.
+        if C_full <= OXYGEN_RESERVOIR_NOOP_MOL:
+            raise AccountingError(
+                'oxygen reservoir exchange scalar requires bulk redox capacity; '
+                f'C_full={C_full!r} C_flux={C_m!r}'
+            )
+        x_m_after = x_m - dn_ledger_to_headspace / C_full
         candidate_fO2_log = x_m_after / math.log(10.0)
         reservoir.melt_intrinsic_fO2_log = self._finite_oxygen_reservoir_fO2_log(
             candidate_fO2_log,
             context='oxygen_reservoir_exchange',
-            melt_redox_capacity_mol_per_ln_fO2=C_m,
-            delta_ln_fO2=(-dn_ledger_to_headspace / C_m),
+            melt_redox_capacity_mol_per_ln_fO2=C_full,
+            delta_ln_fO2=(-dn_ledger_to_headspace / C_full),
             candidate_fO2_log=candidate_fO2_log,
         )
         post_head_o2_mol = max(0.0, float(
