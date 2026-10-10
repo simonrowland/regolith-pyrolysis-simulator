@@ -3362,3 +3362,49 @@ def test_vaporock_absent_status_reports_unavailable_not_ok():
 
     assert result.status == "non_authoritative"
     assert result.diagnostic["backend_status"] == "unavailable"
+
+
+def test_system_call_warm_and_cold_paths_match_float_hex_golden():
+    class FakeSystem:
+        def set_melt_comp(self, composition):
+            assert composition == {"Na2O": 100.0}
+
+        def eval_gas_abundances(self, temperature, log_fO2):
+            assert temperature == 1600.0
+            assert log_fO2 == -8.0
+            return {"Na(g)": -0.5, "SiO(g)": -1.25}
+
+    request = {
+        "composition_wt_pct": {"Na2O": 100.0},
+        "temperature_K": 1600.0,
+        "fO2_log": -8.0,
+    }
+    resource = {
+        "system_cls": FakeSystem,
+        "system": None,
+        "temperature_units": "K",
+        "vapor_pressure_units": "bar",
+        "reuse_system": False,
+        "system_construct_count": 0,
+        "reuse_equivalence_checks_done": 0,
+        "reuse_latched_fresh": False,
+    }
+    warm = vaporock_module._handle_vaporock_request(resource, request, None)
+
+    backend = VapoRockBackend()
+    backend._temperature_units = "K"
+    backend._pressure_units = "bar"
+    backend._vapor_pressure_units = "bar"
+    backend._vaporock = types.SimpleNamespace(System=FakeSystem)
+    cold = backend._call_vaporock(
+        {"Na2O": 100.0}, 1600.0, 1e-6, -8.0
+    )
+    warm_pa = backend._log10_bar_pressures_to_pa(
+        warm["log10_bar"], composition_wt_pct={"Na2O": 100.0}
+    )
+
+    assert {key: value.hex() for key, value in cold.items()} == {
+        "Na": "0x1.ee1b1b3d78c7bp+14",
+        "SiO": "0x1.5f769cae07281p+12",
+    }
+    assert warm_pa == cold
