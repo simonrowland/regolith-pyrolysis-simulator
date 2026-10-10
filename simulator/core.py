@@ -4422,6 +4422,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'campaign_hour': int(self.melt.campaign_hour),
             'campaign': self.melt.campaign.name,
         }
+        if source in (
+            'none:invalid_liquidus_curve',
+            'none:invalid_liquidus_bounds',
+            'none:nonfinite_liquid_fraction',
+        ):
+            diagnostic['repair_notice'] = {
+                'kind': 'kress_liquidus_floor_repair',
+                'repaired': 'unusable liquidus bounds or interpolation',
+                'reason': reason,
+                'replacement': 'deterministic Kress91 liquidus floor',
+                'floor_T_C': KRESS91_LIQUID_CALIBRATION_MIN_T_C,
+            }
         self._last_melt_redox_liquidus_gate_diagnostic = dict(diagnostic)
         fallback_diagnostics = getattr(
             self,
@@ -9183,12 +9195,23 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             and not diagnostic_silicate_equilibrium
             and self._equilibrium_result_has_phase_species(result)
         ):
-            self._last_backend_error = (
-                'backend returned post-equilibrium phase material without an '
-                'AtomLedger transition'
+            backend_name = getattr(self.backend, 'backend_name', None)
+            producer = (
+                backend_name
+                if backend_name and backend_name != 'unknown'
+                else getattr(self.backend, 'name', None)
+                or backend_name
+                or type(self.backend).__name__
             )
+            self._last_backend_error = (
+                f'{producer} returned post-equilibrium phase material without '
+                'an AtomLedger transition'
+            )
+            allows_fallback = self._backend_allows_internal_analytical_fallback()
+            if allows_fallback:
+                self._last_backend_error += '; using internal-analytical fallback'
             self._disable_backend_after_failure()
-            if not self._backend_allows_internal_analytical_fallback():
+            if not allows_fallback:
                 raise RuntimeError(self._last_backend_error)
             return self._record_equilibrium_status(self._internal_analytical_equilibrium())
         if transition is not None:

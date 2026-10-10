@@ -1774,8 +1774,6 @@ class EvaporationMixin:
             stored_notice['bounds_source'] = notice.get('bounds_source')
         if 'projected_bounds' in notice:
             stored_notice['projected_bounds'] = notice.get('projected_bounds')
-        # Present only on the Kress-floor curve. A usable projection and a
-        # later real liquidus keep the historical notice shape.
         projection_band = notice.get('projection_certified_band')
         if isinstance(projection_band, Mapping):
             stored_notice['projection_certified_band'] = dict(projection_band)

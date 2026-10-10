@@ -2001,6 +2001,13 @@ def test_nonfinite_mapping_curve_floor_falls_back_instead_of_zeroing_capacity(
     assert fallback['status'] == 'liquidus_unavailable_floor_fallback'
     assert fallback['liquidus_status'] == 'invalid'
     assert fallback['source'] == 'none:nonfinite_liquid_fraction'
+    assert fallback['repair_notice'] == {
+        'kind': 'kress_liquidus_floor_repair',
+        'repaired': 'unusable liquidus bounds or interpolation',
+        'reason': 'non-finite liquid_fraction=nan',
+        'replacement': 'deterministic Kress91 liquidus floor',
+        'floor_T_C': 1200.0,
+    }
     assert sim._melt_redox_liquid_fraction_factor(1200.0 + 273.15) == 0.0
     assert sim._last_melt_redox_liquid_fraction_diagnostic['status'] == (
         'invalid'
