@@ -51,6 +51,7 @@ from engines.alphamelts.domain import (
     canonical_melt_oxide_activity_name,
     canonical_oxide_activity_map,
 )
+from engines.alphamelts.petthermo import _PetThermoToolsExternalCallFailure
 from engines.domain_reason import OutOfDomainReason, reason_value
 from engines.engine_commissioning import (
     assess_engine_commissioning,
@@ -795,15 +796,6 @@ def _handle_petthermotools_request(resource, request, _errlog):
     return _petthermotools_external_call(
         lambda: function(*args, **call_kwargs)
     )
-
-
-class _PetThermoToolsExternalCallFailure(RuntimeError):
-    """Tag a remote exception raised by a PetThermoTools-owned operation."""
-
-    def __init__(self, exception_class: str, message: str) -> None:
-        self.exception_class = str(exception_class)
-        self.message = str(message)
-        super().__init__(f'{self.exception_class}: {self.message}')
 
 
 def _petthermotools_external_call(call):
@@ -2704,16 +2696,13 @@ class _MELTSBackendSupport(MeltBackend):
         except EngineWorkerTimeout:
             # The worker was already killed and will respawn on the next call.
             raise
-        except (
-            ImportError,
-            AlphaMELTSConfigurationError,
-            AlphaMELTSSubprocessContractError,
-        ):
+        except Exception:
+            # Keep the original type. A PetThermoTools failure is already
+            # origin-tagged at the library call; wrapping it as a bare
+            # RuntimeError would make that tag indistinguishable from a
+            # local defect.
             self._mode = None
             raise
-        except Exception as e:
-            self._mode = None
-            raise RuntimeError(f'AlphaMELTS Python equilibrium failed: {e}') from e
 
     def _require_petthermotools_runtime(self):
         if not self._pet_payload_preloaded or self._pet_melts is None:

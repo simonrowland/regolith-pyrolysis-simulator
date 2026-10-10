@@ -10,10 +10,12 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / 'simulator/melt_backend/liquidus.py'
-TARGET = '''            raise _LiquidusFinderConfigurationError(
-                'max_points must be numeric'
-            )'''
-MUTATION = "            raise TypeError('max_points must be numeric')"
+TARGET = '''    if not is_declared_real_scalar(max_points, allow_numeric_str=True):
+        raise _LiquidusFinderConfigurationError(
+            'max_points must be numeric'
+        )'''
+MUTATION = '''    if not is_declared_real_scalar(max_points, allow_numeric_str=True):
+        raise TypeError('max_points must be numeric')'''
 TEST = (
     'tests/test_scalar_boundary_bool_poison.py::'
     'test_liquidus_max_points_rejects_boolean_values'

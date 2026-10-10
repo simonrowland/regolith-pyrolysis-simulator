@@ -10,7 +10,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / 'engines/alphamelts/thermoengine.py'
-TARGET = '''    if type(exc) is RuntimeError:
+TARGET = '''    if isinstance(exc, _PetThermoToolsExternalCallFailure):
         return ThermoEngineFailureDisposition(
             status='not_converged',
             reason_code='not_converged',

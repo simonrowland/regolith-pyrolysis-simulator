@@ -37,6 +37,7 @@ from simulator.engine_pool import (
     EngineWorkerTimeout,
     WarmEngineWorker,
 )
+from engines.alphamelts.petthermo import _PetThermoToolsExternalCallFailure
 from simulator.melt_backend.pure_phase import (
     GIBBS_CONVENTION_APPARENT_298,
     PurePhaseAccessError,
@@ -617,9 +618,10 @@ def thermoengine_failure_disposition_from_exception(
 ) -> ThermoEngineFailureDisposition:
     """Classify one failure by exception type, never attached attributes.
 
-    Only the declared typed family, optional-import absence, and a bare
-    ``RuntimeError`` (the generic solver failure) receive a disposition.
-    Every other type propagates.
+    Only the declared typed family, optional-import absence, and an
+    origin-tagged PetThermoTools external call receive a disposition.
+    A bare ``RuntimeError`` is not an engine origin. Every other type
+    propagates.
     """
 
     if isinstance(exc, ThermoEngineOutOfDomainError):
@@ -669,7 +671,7 @@ def thermoengine_failure_disposition_from_exception(
             reason_code='thermoengine_adapter_unavailable',
             exception=exc,
         )
-    if type(exc) is RuntimeError:
+    if isinstance(exc, _PetThermoToolsExternalCallFailure):
         return ThermoEngineFailureDisposition(
             status='not_converged',
             reason_code='not_converged',

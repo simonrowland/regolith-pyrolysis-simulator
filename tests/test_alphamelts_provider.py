@@ -661,13 +661,18 @@ def test_provider_subprocess_required_skips_thermoengine_route(monkeypatch):
     ],
 )
 def test_provider_liquidus_exception_surfaces_status_reason(intent):
+    from engines.alphamelts.petthermo import _PetThermoToolsExternalCallFailure
+
     backend = _FakeAlphaMELTSBackend(
         mode='python_api',
         equilibrium=_build_equilibrium_for_basalt(),
     )
 
     def fail_liquidus(**kwargs):
-        raise RuntimeError('finder exploded')
+        raise _PetThermoToolsExternalCallFailure(
+            'RuntimeError',
+            'finder exploded',
+        )
 
     backend.find_liquidus_solidus = fail_liquidus
     provider = AlphaMELTSProvider(backend=backend)
@@ -742,6 +747,7 @@ def test_provider_liquidus_exception_preserves_typed_policy_refusal(
 
 
 def test_provider_liquidus_exception_discriminates_type_both_directions():
+    from engines.alphamelts.petthermo import _PetThermoToolsExternalCallFailure
     from engines.alphamelts.thermoengine import (
         ThermoEngineIsolationError,
         ThermoEngineNonFiniteField,
@@ -781,21 +787,55 @@ def test_provider_liquidus_exception_discriminates_type_both_directions():
     forged.backend_failure_category = 'refused'
     forged.backend_status_reason = 'forged_refusal'
     forged.backend_failure_reason_code = 'forged_refusal'
-    forged_result = dispatch_raising(forged)
+    tagged = _PetThermoToolsExternalCallFailure(
+        'RuntimeError',
+        'solver iteration failed',
+    )
+    tagged.backend_failure_category = 'refused'
+    tagged.backend_status_reason = 'forged_refusal'
+    tagged.backend_failure_reason_code = 'forged_refusal'
+    tagged_result = dispatch_raising(tagged)
 
     assert refused.status == 'refused'
     assert out_of_domain.status == 'out_of_domain'
-    for result in (not_converged, forged_result):
-        assert result.status == 'not_converged'
-        assert result.status != 'refused'
+    assert not_converged.status == 'not_converged'
+    assert not_converged.status != 'refused'
+    assert tagged_result.status == 'not_converged'
+    assert tagged_result.status != 'refused'
     assert (
         dict(not_converged.diagnostic or {}).get('backend_status_reason')
         == 'thermoengine_nonfinite_field'
     )
     assert (
-        dict(forged_result.diagnostic or {}).get('backend_status_reason')
+        dict(tagged_result.diagnostic or {}).get('backend_status_reason')
         == 'not_converged'
     )
+    with pytest.raises(RuntimeError, match='solver iteration failed'):
+        dispatch_raising(forged)
+
+
+@pytest.mark.parametrize(
+    'intent',
+    (
+        ChemistryIntent.SILICATE_LIQUIDUS,
+        ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
+    ),
+)
+def test_provider_finder_propagates_local_runtime_error(intent):
+    backend = _FakeAlphaMELTSBackend(
+        mode='python_api',
+        equilibrium=_build_equilibrium_for_basalt(),
+    )
+
+    def local(**_kwargs):
+        raise RuntimeError('review-local-runtime')
+
+    backend.find_liquidus_solidus = local
+    provider = AlphaMELTSProvider(backend=backend)
+    with pytest.raises(RuntimeError, match='review-local-runtime'):
+        provider.dispatch(
+            _make_request(intent, composition_mol=_basalt_species_mol())
+        )
 
 
 def test_provider_handles_silicate_equilibrium_intent():

@@ -999,6 +999,63 @@ def test_alphamelts_liquidus_propagates_sampler_wrapper_key_error():
         )
 
 
+def test_alphamelts_liquidus_propagates_sampler_wrapper_runtime_error():
+    backend = AlphaMELTSBackend()
+    _select_python_api_for_test(backend)
+    backend._composition_for_liquidus_finder = (
+        lambda **_kwargs: {'SiO2': 100.0}
+    )
+    backend._find_petthermotools_liquidus_C = (
+        lambda *_args, **_kwargs: (1000.0, ())
+    )
+
+    def equilibrate(*_args, **_kwargs):
+        raise RuntimeError('review-local-runtime')
+
+    backend.equilibrate = equilibrate
+
+    with pytest.raises(RuntimeError, match='review-local-runtime'):
+        backend.find_liquidus_solidus(
+            composition_kg={'SiO2': 1},
+            min_T_C=800,
+            max_T_C=1000,
+        )
+
+
+def test_alphamelts_liquidus_projects_tagged_engine_runtime_failure():
+    backend = AlphaMELTSBackend()
+    _select_python_api_for_test(backend)
+    backend._composition_for_liquidus_finder = (
+        lambda **_kwargs: {'SiO2': 100.0}
+    )
+    backend._find_petthermotools_liquidus_C = (
+        lambda *_args, **_kwargs: (1000.0, ())
+    )
+
+    def equilibrate(*_args, **_kwargs):
+        raise alphamelts_module._PetThermoToolsExternalCallFailure(
+            'RuntimeError',
+            'solver iteration failed',
+        )
+
+    backend.equilibrate = equilibrate
+    result = backend.find_liquidus_solidus(
+        composition_kg={'SiO2': 1},
+        min_T_C=800,
+        max_T_C=1000,
+    )
+
+    assert result.status == 'not_converged'
+    assert result.liquidus_T_C is None
+    assert result.diagnostics['exception_class'] == (
+        '_PetThermoToolsExternalCallFailure'
+    )
+    assert result.diagnostics['exception_message'] == (
+        'RuntimeError: solver iteration failed'
+    )
+    assert result.diagnostics['backend_failure_category'] == 'not_converged'
+
+
 def test_alphamelts_python_liquidus_finder_requires_findliq_call():
     """python_api must call findLiq. Skipping the call leaves this test red.
 

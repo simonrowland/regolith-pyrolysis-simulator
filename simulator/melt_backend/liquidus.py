@@ -147,9 +147,10 @@ def liquidus_sample_error_from_exception(
             or status
         )
     else:
-        # The backend module re-exports this classifier. Resolve it there
-        # so a reload of that module is the function the sampler calls.
-        from simulator.melt_backend.thermoengine import (
+        # Deferred: importing the classifier module while this module is
+        # still initialising crashes. The owner is the classifier module,
+        # not the backend adapter that imports this module back.
+        from engines.alphamelts.thermoengine import (
             thermoengine_failure_disposition_from_exception,
         )
 
