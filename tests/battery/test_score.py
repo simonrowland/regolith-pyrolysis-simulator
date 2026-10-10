@@ -4105,7 +4105,7 @@ def test_compilation_pin_join_uses_sidecar_not_engine_residuals() -> None:
         [_pin_test_record("nasa_cea_9")],
         compilation_comparisons=[
             {
-                "reference_id": "pin-ref",
+                "reference_id": "pin-ref#t1100v1.03",
                 "quantity": "delta_fG",
                 "comparison_channel": "nasa_cea_9",
                 "comparison_key": "janaf::record:T=1100::nasa_cea_9::delta_fG_kJ_mol",

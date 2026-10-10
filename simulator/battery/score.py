@@ -5548,7 +5548,7 @@ def _score_store_with_decisions(
     from simulator.battery.compilation_tier import (
         compilation_family,
         _compilation_series_point_count,
-        _iter_compilation_series_points,
+        _iter_compilation_series_cells,
         is_compilation_evidence,
     )
 
@@ -5584,7 +5584,7 @@ def _score_store_with_decisions(
         with bound_work_inputs(context.works, observations, context.experiments):
             for obs in refs:
                 origin = origins.get(obs.observation_id)
-                for point in _iter_compilation_series_points(obs, origin):
+                for point in _iter_compilation_series_cells(obs, origin):
                     family_quantity: tuple[str, Quantity] | None = None
                     point_origin = origins.get(point.observation_id, origin or "")
                     diagnostic = (

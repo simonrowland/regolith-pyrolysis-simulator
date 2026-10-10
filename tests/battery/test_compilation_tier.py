@@ -13,8 +13,8 @@ from fractions import Fraction
 
 from simulator.battery.compilation_tier import (
     _parse_product,
+    _iter_compilation_series_cells,
     compilation_family,
-    compilation_series_points,
     predict_thermo_attempt,
 )
 from simulator.battery.enums import (
@@ -293,6 +293,30 @@ def test_compilation_comparison_sidecar_is_additive_and_streamed(tmp_path) -> No
     assert after == before
 
 
+def test_janaf_comparison_writer_streams_series_cell_references(tmp_path) -> None:
+    from simulator.battery.compilation_tier import (
+        iter_compilation_comparisons_jsonl,
+        write_compilation_comparisons_jsonl,
+    )
+
+    parent = _mgo_janaf_observation()
+    series = replace(
+        parent,
+        identity=replace(parent.identity, temperature_K=State.unknown("series")),
+        value=Value(
+            ValueKind.SERIES,
+            series=((Decimal("1100"), Decimal("-481.399")),),
+        ),
+    )
+    path = tmp_path / "series-comparisons.jsonl"
+
+    assert write_compilation_comparisons_jsonl(_context(series), path) == 2
+    rows = tuple(iter_compilation_comparisons_jsonl(path))
+    assert [row["reference_id"] for row in rows] == [
+        "janaf-4th::Mg-008:T=1100#t1100v-481.399"
+    ] * 2
+
+
 def test_real_janaf_rows_join_real_compilation_pins(tmp_path) -> None:
     from pathlib import Path
 
@@ -518,7 +542,9 @@ def test_every_ellingham_segment_names_one_product() -> None:
             assert product.formula
 
 
-def test_series_cells_are_points_and_intervals_are_not_midpoints() -> None:
+def test_series_cells_are_scalar_views_and_intervals_are_not_midpoints() -> None:
+    from simulator.battery.records import Observation
+
     identity = _na2o_liquid()
     experiment = F.tabulation_experiment()
     series = F.observation(
@@ -539,11 +565,13 @@ def test_series_cells_are_points_and_intervals_are_not_midpoints() -> None:
             ),
         ),
     )
-    points = compilation_series_points(series, "compilations-janaf/janaf-Na.yaml")
-    assert [point.observation_id for point in points] == [
+    cells = tuple(_iter_compilation_series_cells(series, "compilations-janaf/janaf-Na.yaml"))
+    assert [cell.observation_id for cell in cells] == [
         "na2o-series#t2200v-3.886",
         "na2o-series#t2100v-10",
     ]
+    assert all(not isinstance(cell, Observation) for cell in cells)
+    assert all(cell.parent is series for cell in cells)
     swapped = replace(
         series,
         value=Value(
@@ -554,15 +582,15 @@ def test_series_cells_are_points_and_intervals_are_not_midpoints() -> None:
             ),
         ),
     )
-    assert [point.observation_id for point in compilation_series_points(swapped, "compilations-janaf/janaf-Na.yaml")] == [
+    assert [cell.observation_id for cell in _iter_compilation_series_cells(swapped, "compilations-janaf/janaf-Na.yaml")] == [
         "na2o-series#t2100v-10",
         "na2o-series#t2200v-3.886",
     ]
-    assert points[0].value.point == _PRINTED_DFG
-    assert points[1].value.point == Decimal("-10")
-    assert points[0].identity.temperature_K.value == _T
+    assert cells[0].value.point == _PRINTED_DFG
+    assert cells[1].value.point == Decimal("-10")
+    assert cells[0].identity.temperature_K.value == _T
     # Not the mean of −3.886 and −10.
-    assert points[0].value.point != ( _PRINTED_DFG + Decimal("-10") ) / 2
+    assert cells[0].value.point != ( _PRINTED_DFG + Decimal("-10") ) / 2
     ctx = _context(series)
     assert comparison_candidates(ctx) == ()
 
@@ -764,7 +792,7 @@ def test_transition_temperature_and_empirical_series_stay_series() -> None:
         transition,
         value=Value(ValueKind.SERIES, series=((Decimal("1405"), Decimal("1405")),)),
     )
-    assert compilation_series_points(transition, "compilations-janaf/x.yaml") == (
+    assert tuple(_iter_compilation_series_cells(transition, "compilations-janaf/x.yaml")) == (
         transition,
     )
     empirical = replace(
@@ -775,7 +803,7 @@ def test_transition_temperature_and_empirical_series_stay_series() -> None:
         ),
         value=Value(ValueKind.SERIES, series=((Decimal("1"), Decimal("2")), (Decimal("3"), Decimal("4")))),
     )
-    assert compilation_series_points(empirical, "kems.yaml") == (empirical,)
+    assert tuple(_iter_compilation_series_cells(empirical, "kems.yaml")) == (empirical,)
 
 
 def test_ellingham_na2o_matches_printed_janaf_within_fit_bound() -> None:
@@ -2479,6 +2507,96 @@ def test_report_rebuilt_from_payloads_keeps_the_tier_split() -> None:
     assert "internal-analytical" not in census or "0 |" in report
 
 
+def test_streamed_series_payloads_keep_each_cell_in_the_compilation_tier(tmp_path) -> None:
+    from simulator.battery.enums import QUANTITY_UNITS
+    from simulator.battery.records import Execution
+    from simulator.battery.score import (
+        _ResidualJsonlRows,
+        _score_store_to_jsonl,
+        headline_payload_records,
+        load_residuals_jsonl,
+        render_score_report_from_payloads,
+    )
+
+    engine = Engine.INTERNAL_ANALYTICAL
+    identity = replace(_na2o_liquid(), temperature_K=State.unknown("series"))
+    series = F.observation(
+        "payload-cell-series",
+        "exp-1",
+        identity,
+        Decimal("0"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+    series = replace(
+        series,
+        value=Value(
+            ValueKind.SERIES,
+            series=((Decimal("2100"), Decimal("-4")), (_T, _PRINTED_DFG)),
+        ),
+    )
+    ctx = _context(
+        series,
+        origins={series.observation_id: "compilations-janaf/janaf-Na.yaml"},
+    )
+
+    def predict(engine, cell, **kwargs):
+        del kwargs
+        return EnginePrediction(
+            engine,
+            "internal-analytical",
+            Execution(
+                state=ExecutionState.PRODUCED,
+                call_evidence=f"payload-cell-{cell.identity.temperature_K.value}",
+            ),
+            value=cell.value.point,
+            unit=QUANTITY_UNITS[Quantity.DELTA_FG],
+            identity=cell.identity,
+        )
+
+    path = tmp_path / "residuals.jsonl"
+    count, _metadata = _score_store_to_jsonl(
+        ctx,
+        path,
+        engines=(engine,),
+        predict=predict,
+    )
+    partial_path = path.with_name(path.name + ".partial")
+    rows = load_residuals_jsonl(partial_path)
+    assert count == 2
+    assert [row["reference"] for row in rows] == [
+        "payload-cell-series#t2100v-4",
+        "payload-cell-series#t2200v-3.886",
+    ]
+    records = headline_payload_records(
+        rows,
+        engines=(engine,),
+        observations=ctx.observations,
+        origins=ctx.origins,
+    )
+    compilation = next(
+        row
+        for row in records
+        if row["tier"] == "compilation"
+        and row["rail"] == "thermochemistry"
+        and row["engine"] == engine.value
+    )
+    assert (
+        compilation["n_candidates"],
+        compilation["n_scored"],
+        compilation["n_no_band"],
+        compilation["n_refused"],
+    ) == (2, 2, 2, 0)
+    report = render_score_report_from_payloads(
+        _ResidualJsonlRows(partial_path, metadata=_metadata),
+        engines=(engine,),
+        hostname="test",
+        observations=ctx.observations,
+        origins=ctx.origins,
+    )
+    assert "| `compilations-janaf` | `delta_fG` | 2 | 2 | 0 |" in report
+
+
 def test_replaced_observation_is_not_served_from_the_work_cache() -> None:
     from simulator.battery.validate import _inputs_registered_under_work, _table_ids
 
@@ -2618,3 +2736,60 @@ def test_score_progress_total_is_series_cells(monkeypatch, capsys) -> None:
     printed = capsys.readouterr().out
     assert "score progress 1/2 " in printed
     assert "score progress 1/1 " not in printed
+
+
+def test_scorer_streams_series_cells_without_child_observations(monkeypatch) -> None:
+    from simulator.battery.records import Execution, Observation
+    from simulator.battery.score import ENGINE_CHANNELS, score_store
+
+    identity = replace(_na2o_liquid(), temperature_K=State.unknown("series"))
+    series = F.observation(
+        "cell-view-series",
+        "exp-1",
+        identity,
+        Decimal("0"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+    series = replace(
+        series,
+        value=Value(
+            ValueKind.SERIES,
+            series=((Decimal("2100"), Decimal("-4")), (_T, _PRINTED_DFG)),
+        ),
+    )
+    ctx = _context(
+        series,
+        origins={series.observation_id: "compilations-janaf/janaf-Na.yaml"},
+    )
+    references: list[str] = []
+
+    def no_observation_construction(*args, **kwargs):
+        del args, kwargs
+        raise AssertionError("scoring constructed an Observation for a series cell")
+
+    monkeypatch.setattr(Observation, "__init__", no_observation_construction)
+
+    def predict(engine, cell, **kwargs):
+        del kwargs
+        assert not isinstance(cell, Observation)
+        references.append(cell.observation_id)
+        return EnginePrediction(
+            engine,
+            ENGINE_CHANNELS[engine],
+            Execution(state=ExecutionState.NOT_PROBED),
+            refusal_reason=RefusalReason.UNSUPPORTED,
+            refusal_detail={"reason": "cell-view-test"},
+            identity=cell.identity,
+        )
+
+    residuals, _ = score_store(
+        ctx,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        predict=predict,
+    )
+    assert references == [
+        "cell-view-series#t2100v-4",
+        "cell-view-series#t2200v-3.886",
+    ]
+    assert [row.reference for row in residuals] == references
