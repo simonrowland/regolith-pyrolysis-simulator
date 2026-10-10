@@ -533,6 +533,20 @@ def test_knudsen_chamber_vacuum_not_commanded_oxygen_for_melt_activity() -> None
     assert openimcc.payload is None or "fO2_log" not in openimcc.payload
 
 
+def _assert_supported_melt_activity_payloads(rows, expected_fO2_log: float) -> None:
+    """internal-analytical may refuse SiO2. The other three engines may not."""
+    by_engine = {}
+    for item in rows:
+        engine = item.readiness.engine
+        assert engine not in by_engine, engine
+        by_engine[engine] = item
+    assert by_engine["internal-analytical"].payload is None
+    for engine in ("alphamelts", "thermoengine", "openimcc"):
+        payload = by_engine[engine].payload
+        assert payload is not None, engine
+        assert payload.get("fO2_log") == expected_fO2_log
+
+
 def test_non_knudsen_vacuum_bound_and_knudsen_row_oxygen_controls() -> None:
     """Controls: non-Knudsen vacuum bound still works; Knudsen row oxygen preserved."""
 
@@ -570,15 +584,22 @@ def test_non_knudsen_vacuum_bound_and_knudsen_row_oxygen_controls() -> None:
     assert selected.value.point == Decimal("-9")
     melt = melt_activity_requests(collect_consumer_inputs(experiment, bench, observation))
     # 7cd3173c9 added internal-analytical as a melt-activity engine. It
-    # refuses SiO2 (not a trace parent) and must not invent an fO2. Every
-    # scored payload still carries the vacuum-bound -9.
-    scored = [item for item in melt if item.payload is not None]
-    refused = [
-        item for item in melt if item.readiness.engine == "internal-analytical"
-    ]
-    assert scored
-    assert all(item.payload.get("fO2_log") == -9.0 for item in scored)
-    assert len(refused) == 1 and refused[0].payload is None
+    # refuses SiO2 (not a trace parent) and must not invent an fO2. That
+    # exemption is only that engine: AlphaMELTS, ThermoEngine, and OpenIMCC
+    # still have to carry the vacuum-bound -9.
+    _assert_supported_melt_activity_payloads(melt, -9.0)
+    for engine in ("alphamelts", "thermoengine", "openimcc"):
+        mutated = tuple(
+            replace(item, payload=None)
+            if item.readiness.engine == engine
+            else item
+            for item in melt
+        )
+        try:
+            _assert_supported_melt_activity_payloads(mutated, -9.0)
+        except AssertionError:
+            continue
+        raise AssertionError(f"dropped {engine} payload was accepted")
 
     # Knudsen with source-grounded printed sample oxygen still commands fO2_log.
     knudsen, bench_k, obs_k = _case(
@@ -600,10 +621,16 @@ def test_non_knudsen_vacuum_bound_and_knudsen_row_oxygen_controls() -> None:
     assert selected_k is not None
     assert selected_k.route == "observation_fO2_log"
     melt_k = melt_activity_requests(collect_consumer_inputs(knudsen, bench_k, obs_k))
-    scored_k = [item for item in melt_k if item.payload is not None]
-    refused_k = [
-        item for item in melt_k if item.readiness.engine == "internal-analytical"
-    ]
-    assert scored_k
-    assert all(item.payload.get("fO2_log") == -7.0 for item in scored_k)
-    assert len(refused_k) == 1 and refused_k[0].payload is None
+    _assert_supported_melt_activity_payloads(melt_k, -7.0)
+    for engine in ("alphamelts", "thermoengine", "openimcc"):
+        mutated_k = tuple(
+            replace(item, payload=None)
+            if item.readiness.engine == engine
+            else item
+            for item in melt_k
+        )
+        try:
+            _assert_supported_melt_activity_payloads(mutated_k, -7.0)
+        except AssertionError:
+            continue
+        raise AssertionError(f"dropped {engine} payload was accepted")
