@@ -523,6 +523,91 @@ def test_pack_digest_refuses_missing_binding_digest(pack) -> None:
     assert "install the recorded pin" in str(exc_info.value)
 
 
+def test_composition_helpers_do_not_launder_local_errors(monkeypatch) -> None:
+    from simulator.melt_backend import openimcc_bridge
+
+    canonicalize = openimcc_bridge._canonical_composition
+    monkeypatch.setattr(
+        openimcc_bridge,
+        '_canonical_composition',
+        lambda _value: (_ for _ in ()).throw(KeyError('canonicalizer bug')),
+    )
+    with pytest.raises(KeyError, match='canonicalizer bug'):
+        _cleaned_melt_projection({'SiO2': 1.0})
+
+    monkeypatch.setattr(openimcc_bridge, '_canonical_composition', canonicalize)
+    monkeypatch.setattr(
+        openimcc_bridge,
+        'resolve_species_formula',
+        lambda _name: (_ for _ in ()).throw(KeyError('formula registry bug')),
+    )
+    with pytest.raises(KeyError, match='formula registry bug'):
+        _cleaned_melt_projection({'SiO2': 1.0})
+
+
+def test_unknown_composition_formula_refusal_keeps_exception_diagnostic(monkeypatch) -> None:
+    from simulator.accounting.exceptions import UnknownSpeciesError
+    from simulator.melt_backend import openimcc_bridge
+
+    monkeypatch.setattr(
+        openimcc_bridge,
+        'resolve_species_formula',
+        lambda _name: (_ for _ in ()).throw(UnknownSpeciesError('unknown test oxide')),
+    )
+    with pytest.raises(OpenImccCompositionPolicyRefusal) as exc_info:
+        _cleaned_melt_projection({'BadOxide': 1.0})
+    assert 'UnknownSpeciesError' in str(exc_info.value)
+    assert 'unknown test oxide' in str(exc_info.value)
+
+
+def test_gas_solver_missing_binding_carries_attribute_error_detail(monkeypatch) -> None:
+    from simulator.melt_backend import openimcc_bridge
+
+    class BrokenPackage:
+        def __getattr__(self, name):
+            if name == 'evaluate_gas_oxygen_balance':
+                raise KeyError('local package proxy bug')
+            raise AttributeError(name)
+
+    monkeypatch.setattr(openimcc_bridge, '_openimcc', BrokenPackage())
+    with pytest.raises(KeyError, match='local package proxy bug'):
+        openimcc_bridge.evaluate_gas_oxygen_balance({}, 1500.0, object())
+
+    monkeypatch.setattr(openimcc_bridge, '_openimcc', SimpleNamespace())
+    with pytest.raises(openimcc_bridge.OpenImccOxygenBalanceUnavailableError) as exc_info:
+        openimcc_bridge.evaluate_gas_oxygen_balance({}, 1500.0, object())
+    assert 'AttributeError' in str(exc_info.value)
+    assert 'evaluate_gas_oxygen_balance' in str(exc_info.value)
+
+
+def test_binding_identity_only_converts_external_call_failures(monkeypatch) -> None:
+    from simulator.melt_backend import openimcc_bridge
+
+    package = SimpleNamespace(
+        engine_binding_identity=lambda *_args: (_ for _ in ()).throw(
+            ValueError('binding computation failed')
+        )
+    )
+    monkeypatch.setattr(openimcc_bridge, '_openimcc', package)
+    with pytest.raises(OpenImccBindingDigestUnavailableError) as exc_info:
+        openimcc_bridge.engine_binding_identity(object(), object())
+    assert 'ValueError' in str(exc_info.value)
+    assert 'binding computation failed' in str(exc_info.value)
+
+    class BrokenIdentity:
+        @property
+        def digest(self):
+            raise KeyError('local identity mapping bug')
+
+        melt_binding_digest = 'melt'
+        condensate_table_digest = 'condensate'
+        gas_table_digest = 'gas'
+
+    package.engine_binding_identity = lambda *_args: BrokenIdentity()
+    with pytest.raises(KeyError, match='local identity mapping bug'):
+        openimcc_bridge.engine_binding_identity(object(), object())
+
+
 def test_engine_binding_identity_changes_with_condensate_coefficient(
     tmp_path: Path,
 ) -> None:
