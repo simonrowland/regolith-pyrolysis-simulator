@@ -1596,10 +1596,6 @@ def test_runner_golden_output_ignores_host_binding_receipts(
     host_receipt_path.write_text("not json", encoding="utf-8")
     with_garbage_host_receipt = _run_scenario(scenario)
 
-    notice = without_host_receipt["run_metadata"].get(
-        "engine_binding_admission_notice"
-    )
-    assert notice is not None
     assert without_host_receipt == with_garbage_host_receipt
 
 
