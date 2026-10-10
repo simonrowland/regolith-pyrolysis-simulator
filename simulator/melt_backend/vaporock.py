@@ -568,18 +568,6 @@ def _vaporock_incompatible_api_error(
     return VapoRockCallError('VapoRockIncompatibleAPI', message)
 
 
-def _call_typeerror_is_binding_failure(exc: BaseException) -> bool:
-    """True when ``TypeError`` rejected the call before the body ran.
-
-    The interpreter raises an argument-mismatch ``TypeError`` at the
-    call, so the traceback stops on that line. A ``TypeError`` raised
-    inside an accepted call has a further frame. Only a binding failure
-    may try another convention or a later candidate.
-    """
-    traceback = exc.__traceback__
-    return traceback is not None and traceback.tb_next is None
-
-
 def _speciation_value_stats(
     items: Sequence[tuple[Any, Any]],
 ) -> Dict[str, int]:
@@ -2284,14 +2272,13 @@ class VapoRockBackend(MeltBackend):
                 signature = inspect.signature(fn)
             except (AttributeError, TypeError, ValueError):
                 signature = None
-            # A missing signature, or one that names no parameters and
-            # accepts every convention, does not describe the callable.
-            # Probe keyword then positional. Only a binding TypeError
-            # may try the other convention. A TypeError raised inside
-            # an accepted call is the engine failure.
-            probe_legacy = signature is None
+            # Bind before invoking. Signatures with only variadic or no
+            # inspectable parameters use the positional convention once;
+            # a different convention or candidate is tried only when
+            # bind rejects the call first.
             keyword_binds = False
             positional_binds = False
+            prefer_positional = signature is None
             bind_error: Optional[Exception] = None
             if signature is not None:
                 concrete = any(
@@ -2312,35 +2299,11 @@ class VapoRockBackend(MeltBackend):
                     positional_binds = True
                 except TypeError as exc:
                     bind_error = exc
-                if (
-                    not concrete
-                    and keyword_binds
-                    and positional_binds
-                ):
-                    probe_legacy = True
-            if probe_legacy:
-                try:
-                    raw = fn(**candidate_kwargs)
-                except TypeError as exc:
-                    if not _call_typeerror_is_binding_failure(exc):
-                        raise VapoRockCallError(exc) from exc
-                    last_attr_error = exc
-                    try:
-                        raw = fn(*legacy_args)
-                    except TypeError as positional_exc:
-                        if not _call_typeerror_is_binding_failure(
-                            positional_exc
-                        ):
-                            raise VapoRockCallError(
-                                positional_exc
-                            ) from positional_exc
-                        last_attr_error = positional_exc
-                        continue
-                    except Exception as exc:
-                        raise VapoRockCallError(exc) from exc
-                except Exception as exc:
-                    raise VapoRockCallError(exc) from exc
-            elif keyword_binds:
+                if not concrete and positional_binds:
+                    prefer_positional = True
+            else:
+                positional_binds = True
+            if keyword_binds and not prefer_positional:
                 try:
                     raw = fn(**candidate_kwargs)
                 except Exception as exc:
@@ -2348,6 +2311,11 @@ class VapoRockBackend(MeltBackend):
             elif positional_binds:
                 try:
                     raw = fn(*legacy_args)
+                except Exception as exc:
+                    raise VapoRockCallError(exc) from exc
+            elif keyword_binds:
+                try:
+                    raw = fn(**candidate_kwargs)
                 except Exception as exc:
                     raise VapoRockCallError(exc) from exc
             else:

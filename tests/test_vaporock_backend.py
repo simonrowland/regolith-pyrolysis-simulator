@@ -3658,6 +3658,32 @@ def test_candidate_signature_mismatch_uses_positional_variant(monkeypatch):
     assert calls[0][1:] == (1600.0, -8.0)
 
 
+def test_candidate_bind_rejection_falls_through_without_calling_it(monkeypatch):
+    rejected_calls = []
+
+    def incompatible_candidate(composition, temperature, fO2_log, required):
+        rejected_calls.append((composition, temperature, fO2_log, required))
+        return {"Na": 9.0}
+
+    _install_fake_import(
+        monkeypatch,
+        types.SimpleNamespace(
+            calc_vapor_pressures=incompatible_candidate,
+            calc_vapor=lambda **_kwargs: {"Na": 0.001},
+        ),
+    )
+    backend = VapoRockBackend()
+    assert backend.initialize({"warm_worker": False})
+
+    result = backend.equilibrate(1600.0, composition_mol={"Na2O": 1.0})
+
+    assert result.status == "non_authoritative"
+    assert rejected_calls == []
+    assert getattr(result, "vaporock_full_speciation_Pa", {})["Na"] == (
+        pytest.approx(100.0)
+    )
+
+
 def test_uninspectable_positional_candidate_is_not_an_engine_failure(
     monkeypatch,
 ):
@@ -3701,10 +3727,16 @@ def test_incall_typeerror_is_not_a_signature_mismatch(monkeypatch):
     def opaque_body(_comp, _temp, _fo2):
         raise TypeError("upstream engine arithmetic bug")
 
-    def switches(*_args, **kwargs):
-        if kwargs:
-            raise TypeError("upstream keyword solve failed")
-        return {"Na": 0.001}
+    def keyword_only(
+        *,
+        composition=None,
+        T_C=None,
+        T_K=None,
+        P_bar=None,
+        P_Pa=None,
+        log_fO2=None,
+    ):
+        raise TypeError("upstream keyword solve failed")
 
     cases = (
         ("variadic", variadic, "upstream engine arithmetic bug"),
@@ -3713,7 +3745,7 @@ def test_incall_typeerror_is_not_a_signature_mismatch(monkeypatch):
             np.frompyfunc(opaque_body, 3, 1),
             "upstream engine arithmetic bug",
         ),
-        ("switches", switches, "upstream keyword solve failed"),
+        ("keyword_only", keyword_only, "upstream keyword solve failed"),
     )
     for label, fn, message in cases:
         later_calls["n"] = 0
@@ -3734,6 +3766,41 @@ def test_incall_typeerror_is_not_a_signature_mismatch(monkeypatch):
         assert result.diagnostics["engine_exception_message"] == message, label
         assert getattr(result, "vaporock_full_speciation_Pa", {}) == {}, label
         assert later_calls["n"] == 0, label
+
+
+def test_native_body_typeerror_does_not_fall_through(monkeypatch):
+    import numpy as np
+
+    later_calls = []
+    native = np.frompyfunc(pow, 3, 1)
+
+    def later(**_kwargs):
+        later_calls.append(True)
+        return {"Na": 0.001}
+
+    _install_fake_import(
+        monkeypatch,
+        types.SimpleNamespace(
+            calc_vapor_pressures=native,
+            calc_vapor=later,
+        ),
+    )
+    backend = VapoRockBackend()
+    assert backend.initialize({"warm_worker": False})
+
+    result = backend.equilibrate(
+        1600.0,
+        composition_mol={"Na2O": 1.0},
+        fO2_log=-8.0,
+    )
+
+    assert result.status == "not_converged"
+    assert result.diagnostics["engine_exception"] == "TypeError"
+    assert "3rd argument not allowed" in result.diagnostics[
+        "engine_exception_message"
+    ]
+    assert getattr(result, "vaporock_full_speciation_Pa", {}) == {}
+    assert later_calls == []
 
 
 def test_upstream_pressure_accessor_failure_is_typed(monkeypatch):

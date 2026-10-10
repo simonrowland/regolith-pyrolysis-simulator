@@ -1,4 +1,4 @@
-"""Prove an in-call TypeError is not retried as a signature mismatch.
+"""Prove a native-body TypeError is not retried as a signature mismatch.
 
 Treating every TypeError as argument rejection lets the next candidate
 replace a failed solve with a number.
@@ -16,23 +16,33 @@ ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "simulator/melt_backend/vaporock.py"
 TEST = (
     "tests/test_vaporock_backend.py::"
-    "test_incall_typeerror_is_not_a_signature_mismatch"
+    "test_native_body_typeerror_does_not_fall_through"
 )
-NARROW = (
-    "    traceback = exc.__traceback__\n"
-    "    return traceback is not None and traceback.tb_next is None\n"
-)
-MUTANT = (
-    "    traceback = exc.__traceback__\n"
-    "    return True\n"
-)
+NARROW = '''            elif positional_binds:
+                try:
+                    raw = fn(*legacy_args)
+                except Exception as exc:
+                    raise VapoRockCallError(exc) from exc
+'''
+MUTANT = '''            elif positional_binds:
+                try:
+                    raw = fn(*legacy_args)
+                except TypeError as exc:
+                    traceback = exc.__traceback__
+                    if traceback is not None and traceback.tb_next is None:
+                        last_attr_error = exc
+                        continue
+                    raise VapoRockCallError(exc) from exc
+                except Exception as exc:
+                    raise VapoRockCallError(exc) from exc
+'''
 
 
 def main() -> int:
     original = SOURCE.read_text()
     if original.count(NARROW) != 1:
         raise SystemExit(
-            "expected one binding-failure check, "
+            "expected one accepted positional-call handler, "
             f"found {original.count(NARROW)}"
         )
 
@@ -63,9 +73,9 @@ def main() -> int:
 
     if result.returncode == 0:
         raise SystemExit(
-            "mutation survived: in-call TypeError was still an engine failure"
+            "mutation survived: native TypeError did not fall through"
         )
-    print("mutation killed: every TypeError fell through as a mismatch")
+    print("mutation killed: native-body TypeError fell through as a mismatch")
     return 0
 
 
