@@ -1,7 +1,8 @@
 """Pump-limited headspace boundary for the oxygen-reservoir exchange.
 
 An open pipe settles where melt release equals bleed removal. A closed
-pipe keeps the two-capacitor step. The reverse leg stays clamped to real O2.
+pipe keeps the two-capacitor step. Headspace-to-melt O2 is
+2 FeO + 1/2 O2 -> Fe2O3 drawn from the overhead, clamped to real O2.
 """
 
 from __future__ import annotations
@@ -15,6 +16,7 @@ import yaml
 from simulator.core import OXYGEN_RESERVOIR_NOOP_MOL, PyrolysisSimulator
 from simulator.fe_redox import (
     floor_vacuum_pressure_bar,
+    kress91_fO2_log_for_fe3_fraction,
     kress91_ln_fO2_temperature_delta,
 )
 from simulator.feedstock_composition import (
@@ -464,3 +466,86 @@ def test_reverse_exchange_without_inventory_stays_clamped() -> None:
     assert sim.atom_ledger.mol_by_account("process.overhead_gas").get("O2", 0.0) == (
         pytest.approx(0.0, abs=1e-15)
     )
+
+
+def test_reverse_exchange_with_inventory_oxidizes_the_melt() -> None:
+    """Real overhead O2 oxidizes FeO. Respeciation must not draw it again."""
+    sim = _mars_at_hour24()
+    sim.melt.temperature_C = 1600.0
+    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+    sim.melt.pO2_mbar = 100.0
+    sim.melt.p_total_mbar = 100.0
+    sim._overhead_headspace_config["enabled"] = True
+    melt_before = sim.atom_ledger.project_account_mol("process.cleaned_melt")
+    feo_before, fe2o3_before = iron_oxide_values(melt_before)
+    n_fe = feot_equivalent_moles(melt_before)
+    ledger_fraction = (2.0 * fe2o3_before) / n_fe
+    pressure_bar = floor_vacuum_pressure_bar(
+        float(sim.melt.p_total_mbar) / 1000.0,
+        floor_bar=sim._vacuum_floor_bar(),
+    )
+    # Start on the Kress fraction of this ledger so the only oxidizing
+    # oxygen is the exchange. A cold scalar would make respeciation
+    # close a pre-existing gap and look like a second draw.
+    isoferric = kress91_fO2_log_for_fe3_fraction(
+        fe3_fraction=ledger_fraction,
+        composition_wt_pct=sim._melt_oxide_wt_pct(),
+        T_K=1600.0 + 273.15,
+        pressure_bar=pressure_bar,
+    )
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = isoferric
+    sim.melt.oxygen_reservoir.reference_T_K = 1600.0 + 273.15
+    sim._sync_oxygen_reservoir_mirror()
+    c_full = sim._melt_redox_capacity_mol_per_ln_fO2(
+        fO2_log=isoferric,
+        T_K=1600.0 + 273.15,
+    )
+    loaded_o2_mol = 0.05
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"O2": loaded_o2_mol},
+        source="test reverse-exchange headspace O2",
+        material_origin="feedstock",
+    )
+
+    reservoir = sim._apply_oxygen_reservoir_exchange()
+
+    dn = reservoir.exchange_o2_mol
+    melt_after = sim.atom_ledger.project_account_mol("process.cleaned_melt")
+    feo_after, fe2o3_after = iron_oxide_values(melt_after)
+    overhead_after_exchange = sim.atom_ledger.mol_by_account(
+        "process.overhead_gas"
+    ).get("O2", 0.0)
+    transitions = [
+        t for t in sim.atom_ledger.transitions
+        if t.name == "oxygen_reservoir_exchange"
+    ]
+    touched = {
+        lot.account
+        for lot in transitions[-1].debits + transitions[-1].credits
+    }
+    assert reservoir.exchange_direction == "headspace_to_melt"
+    assert dn < -1.0e-6
+    assert feo_after == pytest.approx(feo_before + 4.0 * dn, rel=1e-9)
+    assert fe2o3_after == pytest.approx(fe2o3_before - 2.0 * dn, rel=1e-9)
+    assert overhead_after_exchange == pytest.approx(loaded_o2_mol + dn, rel=1e-9)
+    assert sim.atom_ledger.mol_by_account("reservoir.fo2_buffer").get(
+        "O2", 0.0
+    ) == pytest.approx(0.0, abs=1e-15)
+    assert touched == {"process.cleaned_melt", "process.overhead_gas"}
+    assert reservoir.melt_intrinsic_fO2_log == pytest.approx(
+        isoferric - (dn / c_full) / math.log(10.0),
+        abs=1.0e-9,
+    )
+
+    diagnostic = sim._apply_fe_redox_respeciation()
+    overhead_after_respeciation = sim.atom_ledger.mol_by_account(
+        "process.overhead_gas"
+    ).get("O2", 0.0)
+    extra = overhead_after_respeciation - overhead_after_exchange
+    unfunded = max(0.0, float(diagnostic.get("unfunded_o2_mol", 0.0) or 0.0))
+    assert abs(extra) < 0.2 * abs(dn)
+    assert unfunded < 0.2 * abs(dn)
+    assert sim.atom_ledger.mol_by_account("reservoir.fo2_buffer").get(
+        "O2", 0.0
+    ) == pytest.approx(0.0, abs=1e-15)

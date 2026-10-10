@@ -1999,8 +1999,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             False,
             'OXYGEN_RESERVOIR_EXCHANGE -- AUTHORITATIVE: melt-to-headspace '
             'O2 is Fe2O3 -> 2 FeO + 1/2 O2 on process.cleaned_melt, with '
-            'O2 credited to process.overhead_gas. The reverse leg draws '
-            'real overhead O2 into reservoir.fo2_buffer.',
+            'O2 credited to process.overhead_gas. The reverse leg is '
+            '2 FeO + 1/2 O2 -> Fe2O3, taking O2 from process.overhead_gas.',
         ),
         (
             'engines.builtin.backend_equilibrium',
@@ -5230,9 +5230,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # Premise: this hour is below the projected liquidus, so the
             # binary liquid gate quenches, but C_m is still Kress capacity
             # times a nonzero liquid fraction. The exchange then moves
-            # ln fO2 by -dn/C_m. Omitting the fixed-redox temperature
-            # endpoint leaves Kress(T_now, fO2) off the ledger by d(fe3)/dT
-            # while the oxides stay put. Fall through to that endpoint.
+            # ln fO2 by -dn/C_full, the bulk capacity, not by -dn/C_m.
+            # Omitting the fixed-redox temperature endpoint leaves
+            # Kress(T_now, fO2) off the ledger by d(fe3)/dT while the
+            # oxides stay put. Fall through to that endpoint.
             # Algebra: ln fO2(T_now) = ln fO2(T_ref) + Δ_Kress(T_ref, T_now);
             # the ledger fraction is unchanged by this step.
             # Units: partial_capacity is mol O2 per ln fO2; the logs are
@@ -6935,11 +6936,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # needs 57.7 Pa to pass 38 mol/h, which the melt cannot sustain,
         # so the hour is pump-limited and dn is well below 38 mol/h.
         #
+        # The reverse ledger transition is 2 FeO + 1/2 O2 -> Fe2O3.
+        # |dn| mol O2 debits 4*|dn| mol FeO and credits 2*|dn| mol Fe2O3.
+        # It takes the O2 from process.overhead_gas and does not credit
+        # reservoir.fo2_buffer. The scalar uses the same
+        # Δ ln fO2 = -dn_ledger / C_full (dn_ledger negative), so
+        # respeciation's oxidizing branch sees the curvature residual
+        # and does not draw this |dn| from overhead a second time.
+        #
         # Absorbable claim on the way back in is clamped to (C_h - n_floor);
         # the ledger commit is further clamped to real
-        # (head_o2_mol - n_floor). Drive fO2 only with dn_ledger. Advancing
-        # melt_intrinsic_fO2_log with the unbacked remainder would mint
-        # oxidizing potential without O atoms.
+        # (head_o2_mol - n_floor) and to FeO/4. Drive fO2 only with
+        # dn_ledger. Advancing melt_intrinsic_fO2_log with the unbacked
+        # remainder would mint oxidizing potential without O atoms.
         p_low = effective_transport_pO2
         p_eq = math.exp(x_m)
         delta_ln = x_m - x_h
@@ -7010,7 +7019,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 dn_to_headspace = -max_effective_absorbable
                 exchange_clamped = True
             max_real_absorbable = max(0.0, head_o2_mol - n_floor_mol)
+            # 2 FeO + 1/2 O2 -> Fe2O3 binds 4 mol FeO per mol O2.
+            feo_mol = max(0.0, float(
+                self.atom_ledger.mol_by_account('process.cleaned_melt').get(
+                    'FeO',
+                    0.0,
+                )
+                or 0.0
+            ))
+            max_o2_from_feo = 0.25 * feo_mol
             dn_ledger_to_headspace = max(dn_to_headspace, -max_real_absorbable)
+            if -dn_ledger_to_headspace > max_o2_from_feo:
+                dn_ledger_to_headspace = -max_o2_from_feo
+                exchange_clamped = True
         elif dn_ledger_to_headspace > OXYGEN_RESERVOIR_NOOP_MOL:
             # Fe2O3 -> 2 FeO + 1/2 O2, so the forward commit cannot exceed
             # the ferric inventory. Clamp the ledger dn; fO2 follows only
@@ -7048,8 +7069,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     if result.transition is not None
                     else ''
                 )
-                if dn_ledger_to_headspace > 0.0:
-                    self._project_cleaned_melt_from_atom_ledger()
+                # Both directions rewrite FeO and Fe2O3 on the cleaned melt.
+                self._project_cleaned_melt_from_atom_ledger()
             reservoir.exchange_direction = (
                 'melt_to_headspace'
                 if dn_to_headspace > 0.0

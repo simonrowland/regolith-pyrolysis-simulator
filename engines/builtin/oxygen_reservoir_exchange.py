@@ -24,7 +24,6 @@ from simulator.chemistry.kernel.provider import ChemistryProvider
 
 PROCESS_OVERHEAD_GAS_ACCOUNT = "process.overhead_gas"
 PROCESS_CLEANED_MELT_ACCOUNT = "process.cleaned_melt"
-RESERVOIR_FO2_BUFFER_ACCOUNT = "reservoir.fo2_buffer"
 OXYGEN_SPECIES = "O2"
 FERRIC_OXIDE_SPECIES = "Fe2O3"
 FERROUS_OXIDE_SPECIES = "FeO"
@@ -32,18 +31,17 @@ TRANSITION_NAME = "oxygen_reservoir_exchange"
 
 
 class BuiltinOxygenReservoirExchangeProvider(ChemistryProvider):
-    """Melt-to-headspace O2 from the melt's own ferric inventory.
+    """Melt/headspace O2 as the Fe2O3 / FeO couple on the cleaned melt.
 
-    The reverse leg is still a pure O2 move from overhead into
-    ``reservoir.fo2_buffer``. The buffer is not an oxygen source for
-    the forward leg.
+    Forward releases O2 into ``process.overhead_gas``. Reverse takes
+    that O2 back. ``reservoir.fo2_buffer`` is not an account of this
+    provider.
     """
 
     name = "builtin-oxygen-reservoir-exchange"
     DECLARED_ACCOUNTS = frozenset({
         PROCESS_CLEANED_MELT_ACCOUNT,
         PROCESS_OVERHEAD_GAS_ACCOUNT,
-        RESERVOIR_FO2_BUFFER_ACCOUNT,
     })
 
     def capability_profile(self) -> CapabilityProfile:
@@ -111,8 +109,8 @@ class BuiltinOxygenReservoirExchangeProvider(ChemistryProvider):
             # Campaign sanity. N_Fe = 2505 mol and Δ(Fe3+/FeT) = 0.19558
             # give dn = N_Fe * Δf / 4 = 2505 * 0.19558 / 4 = 122.48 mol O2,
             # which removes 244.96 mol Fe2O3 and adds 489.93 mol FeO.
-            # Δ(Fe3+/FeT) = -4*dn/N_Fe, the same oxygen the scalar step
-            # Δ ln fO2 = -dn / C_m spends when C_m is the local derivative.
+            # Δ(Fe3+/FeT) = -4*dn/N_Fe. C_full = (N_Fe/4)*d(Fe3+/FeT)/d(ln fO2),
+            # so the scalar step Δ ln fO2 = -dn / C_full is that same change.
             fe2o3_mol = 2.0 * amount_mol
             feo_mol = 4.0 * amount_mol
             debits = {
@@ -124,11 +122,29 @@ class BuiltinOxygenReservoirExchangeProvider(ChemistryProvider):
             }
             direction = "melt_to_headspace"
         else:
+            # Premise: headspace-to-melt O2 is the reverse of the same
+            # couple, 2 FeO + 1/2 O2 -> Fe2O3. |dn| mol O2 removes
+            # 4*|dn| mol FeO from process.cleaned_melt and |dn| mol O2
+            # from process.overhead_gas, and credits 2*|dn| mol Fe2O3.
+            # Crediting reservoir.fo2_buffer and then moving the scalar
+            # left this oxygen in the buffer while respeciation drew a
+            # second |dn| from overhead.
+            #
+            # Atom check. Fe: 4*|dn| out of FeO, 2*(2*|dn|) into Fe2O3.
+            # O: 4*|dn| from FeO + 2*|dn| from O2 = 6*|dn|, and
+            # 3*(2*|dn|) = 6*|dn| into Fe2O3.
+            #
+            # Sanity, |dn| = 1 mol. Remove 4 mol FeO (4 * 71.844 = 287.376 g)
+            # and 1 mol O2 (31.998 g). Add 2 mol Fe2O3 (2 * 159.687 = 319.374 g).
+            # 287.376 + 31.998 = 319.374 g.
+            feo_mol = 4.0 * amount_mol
+            fe2o3_mol = 2.0 * amount_mol
             debits = {
-                PROCESS_OVERHEAD_GAS_ACCOUNT: {OXYGEN_SPECIES: amount_mol}
+                PROCESS_CLEANED_MELT_ACCOUNT: {FERROUS_OXIDE_SPECIES: feo_mol},
+                PROCESS_OVERHEAD_GAS_ACCOUNT: {OXYGEN_SPECIES: amount_mol},
             }
             credits = {
-                RESERVOIR_FO2_BUFFER_ACCOUNT: {OXYGEN_SPECIES: amount_mol}
+                PROCESS_CLEANED_MELT_ACCOUNT: {FERRIC_OXIDE_SPECIES: fe2o3_mol},
             }
             direction = "headspace_to_melt"
 

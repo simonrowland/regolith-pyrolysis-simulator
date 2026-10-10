@@ -1221,10 +1221,7 @@ def test_fe_redox_and_sio_use_coupled_oxygen_reservoirs():
         lot.account
         for lot in transitions[-1].debits + transitions[-1].credits
     }
-    if reservoir.exchange_direction == "melt_to_headspace":
-        assert touched == {"process.cleaned_melt", "process.overhead_gas"}
-    else:
-        assert touched == {"reservoir.fo2_buffer", "process.overhead_gas"}
+    assert touched == {"process.cleaned_melt", "process.overhead_gas"}
 
     after_gap = abs(
         math.log10(reservoir.headspace_transport_pO2_bar)

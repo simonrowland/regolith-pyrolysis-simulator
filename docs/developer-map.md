@@ -74,7 +74,7 @@ This guide is for contributors and coding agents that need to find the right fil
   | `engines/builtin/overhead_gas_equilibrium.py` | `BuiltinOverheadGasEquilibriumProvider` | `OVERHEAD_GAS_EQUILIBRIUM` | authoritative, diagnostic (no transition) | `process.overhead_gas` |
   | `engines/builtin/overhead_bleed.py` | `BuiltinOverheadBleedProvider` | `OVERHEAD_BLEED` | authoritative, ledger-mutating | `process.overhead_gas` plus terminal offgas/O₂ accounts |
   | `engines/builtin/oxygen_bubbler.py` | `BuiltinOxygenBubblerProvider` | `OXYGEN_BUBBLER` | authoritative, ledger-mutating | `process.overhead_gas`, `reservoir.fo2_buffer` |
-  | `engines/builtin/oxygen_reservoir_exchange.py` | `BuiltinOxygenReservoirExchangeProvider` | `OXYGEN_RESERVOIR_EXCHANGE` | authoritative, ledger-mutating | `process.overhead_gas`, `reservoir.fo2_buffer` |
+  | `engines/builtin/oxygen_reservoir_exchange.py` | `BuiltinOxygenReservoirExchangeProvider` | `OXYGEN_RESERVOIR_EXCHANGE` | authoritative, ledger-mutating | `process.cleaned_melt`, `process.overhead_gas` |
   | `engines/builtin/backend_equilibrium.py` | `BuiltinBackendEquilibriumProvider` | `BACKEND_EQUILIBRIUM` | authoritative, validates/forwards backend transitions | `process.cleaned_melt`, `process.metal_phase`, `process.overhead_gas`, `reservoir.fo2_buffer` |
 
 - `engines/magemin/__init__.py` re-exports the MAGEMin shadow provider surface (`MAGEMinShadowProvider`, `MAGEMinDomainGate`, `MAGEMinParityComparator`, `ParityReport`).
