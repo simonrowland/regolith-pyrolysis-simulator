@@ -807,7 +807,12 @@ def _bounded_scan_grid(
         raise RuntimeError(
             'invalid finder scan_step_C: step does not advance temperature'
         )
-    intervals = math.ceil(span / step)
+    interval_ratio = span / step
+    if not math.isfinite(interval_ratio):
+        raise RuntimeError(
+            'invalid finder scan grid: interval count is not finite'
+        )
+    intervals = math.ceil(interval_ratio)
     point_count = intervals + 1
     if point_count > MAX_LIQUIDUS_SCAN_POINTS:
         raise RuntimeError(
@@ -845,7 +850,10 @@ def _temperature_grid(
     span = float(liquidus_T_C) - float(solidus_T_C)
     if span == 0.0:
         return (float(solidus_T_C),)
-    intervals = min(max(1, math.ceil(span / step)), point_cap - 1)
+    interval_ratio = span / step
+    if not math.isfinite(interval_ratio):
+        raise RuntimeError('invalid EC grid: interval count is not finite')
+    intervals = min(max(1, math.ceil(interval_ratio)), point_cap - 1)
     return tuple(
         float(solidus_T_C) + span * index / intervals
         for index in range(intervals + 1)

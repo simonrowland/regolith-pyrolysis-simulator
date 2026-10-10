@@ -10,16 +10,16 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / 'simulator/melt_backend/magemin.py'
-TYPED = '''        except (TypeError, ValueError) as exc:
+TYPED = '''        if not is_declared_real_scalar(value, allow_numeric_str=True):
             raise _MAGEMinDeclaredInputError(
-                type(exc).__name__,
-                str(exc),
-            ) from exc'''
-UNTYPED = '''        except (TypeError, ValueError) as exc:
+                'TypeError',
+                'declared scalar must be numeric',
+            )'''
+UNTYPED = '''        if not is_declared_real_scalar(value, allow_numeric_str=True):
             raise _MAGEMinEngineCallError(
-                type(exc).__name__,
-                str(exc),
-            ) from exc'''
+                'TypeError',
+                'declared scalar must be numeric',
+            )'''
 TEST = (
     'tests/test_magemin_backend.py::'
     'test_magemin_equilibrate_invalid_declared_scalar_is_typed_refusal'
@@ -79,6 +79,7 @@ def main() -> int:
             f'missing={missing}\n'
             + output[-2000:]
         )
+    print('\n'.join(failed))
     print('PASS: untyped scalar admission fails the typed-refusal regression')
     return 0
 
