@@ -136,7 +136,7 @@ species:
         published_page: 163
         pdf_page_index: 12
         table: '7'
-        note: Table 7 gamma_FeO by melt at 1400 °C
+        note: Table 7 gamma_FeO by melt at 1400 °C; authors calculate from oxygen fugacity and analytical melt data using Eq. (8), p. 153.
       T_range_K: [1673.15, 1673.15]
       phase: condensed_liquid
       standard_state: pure liquid FeO at the temperature and pressure of interest; Table 6 (p. 163) gives Fe(s) + 0.5 O2 = FeO(liq) at 1 bar. The paper's general statement is on p. 153.
@@ -160,6 +160,7 @@ species:
         method_class: directly_reduced_measurement
         evidence_class: measured_reduced
         admission_status: admitted
+        inference: {relation: "authors' activity-coefficient reduction from oxygen fugacity and analytical melt data using Eq. (8), p. 153", output_unit: dimensionless activity coefficient}
         reference_state_note: "The paper describes the oxide reference as 'pure liquid MOx/2 at the temperature and pressure of interest' (p. 153)."
         temperature_conversion: T_K = T_C + 273.15; 1400 °C -> 1673.15 K
         composition_basis_note: >-
@@ -960,7 +961,7 @@ species:
         published_page: 163
         pdf_page_index: 12
         table: '7'
-        note: Table 7 gamma_NiO by melt at 1400 °C
+        note: Table 7 gamma_NiO by melt at 1400 °C; authors calculate from oxygen fugacity and analytical melt data using Eq. (8), p. 153.
       T_range_K: [1673.15, 1673.15]
       phase: condensed_liquid
       standard_state: pure liquid NiO at the temperature and pressure of interest; Table 6 (p. 163) gives Ni(s) + 0.5 O2 = NiO(liq) at 1 bar. The paper's general statement is on p. 153.
@@ -984,6 +985,7 @@ species:
         method_class: directly_reduced_measurement
         evidence_class: measured_reduced
         admission_status: admitted
+        inference: {relation: "authors' activity-coefficient reduction from oxygen fugacity and analytical melt data using Eq. (8), p. 153", output_unit: dimensionless activity coefficient}
         reference_state_note: "The paper describes the oxide reference as 'pure liquid MOx/2 at the temperature and pressure of interest' (p. 153)."
         temperature_conversion: T_K = T_C + 273.15; 1400 °C -> 1673.15 K
         composition_basis_note: Table 4 does not print wt.% in its major-oxide column heading; wt.% is inferred because the EDS compositions sum to about 100 and is also consistent with Table 1.
@@ -1567,7 +1569,7 @@ species:
         published_page: 163
         pdf_page_index: 12
         table: '7'
-        note: Table 7 gamma_CoO by melt at 1400 °C
+        note: Table 7 gamma_CoO by melt at 1400 °C; authors calculate from oxygen fugacity and analytical melt data using Eq. (8), p. 153.
       T_range_K: [1673.15, 1673.15]
       phase: condensed_liquid
       standard_state: pure liquid CoO at the temperature and pressure of interest; Table 6 (p. 163) gives Co(s) + 0.5 O2 = CoO(liq) at 1 bar. The paper's general statement is on p. 153.
@@ -1591,6 +1593,7 @@ species:
         method_class: directly_reduced_measurement
         evidence_class: measured_reduced
         admission_status: admitted
+        inference: {relation: "authors' activity-coefficient reduction from oxygen fugacity and analytical melt data using Eq. (8), p. 153", output_unit: dimensionless activity coefficient}
         reference_state_note: "The paper describes the oxide reference as 'pure liquid MOx/2 at the temperature and pressure of interest' (p. 153)."
         temperature_conversion: T_K = T_C + 273.15; 1400 °C -> 1673.15 K
         composition_basis_note: Table 4 does not print wt.% in its major-oxide column heading; wt.% is inferred because the EDS compositions sum to about 100 and is also consistent with Table 1.
@@ -2174,7 +2177,7 @@ species:
         published_page: 163
         pdf_page_index: 12
         table: '7'
-        note: Table 7 gamma_MoO2 by melt at 1400 °C; pure-liquid MoO2 standard state is hypothetical
+        note: Table 7 gamma_MoO2 by melt at 1400 °C; pure-liquid MoO2 standard state is hypothetical; coefficients are calculated using Eq. (11), p. 163.
       T_range_K: [1673.15, 1673.15]
       phase: condensed_liquid
       standard_state: pure liquid MoO2 (hypothetical); Table 6 (p. 163) estimates MoO2(s) = MoO2(liq) using a hypothetical melting point of 2200 K and entropy of melting 31.4 J K-1 mol-1. The paper's general statement is on p. 153.
@@ -2198,6 +2201,7 @@ species:
         method_class: directly_reduced_measurement
         evidence_class: measured_reduced
         admission_status: admitted
+        inference: {relation: "authors' activity-coefficient calculation from Mo solubility using Eq. (11), p. 163", output_unit: dimensionless activity coefficient}
         reference_state_note: "The paper describes the oxide reference as 'pure liquid MOx/2 at the temperature and pressure of interest' (p. 153); MoO2(liq) is a hypothetical pure-liquid standard."
         temperature_conversion: T_K = T_C + 273.15; 1400 °C -> 1673.15 K
         composition_basis_note: Table 4 does not print wt.% in its major-oxide column heading; wt.% is inferred because the EDS compositions sum to about 100 and is also consistent with Table 1.
@@ -2722,7 +2726,7 @@ species:
         published_page: 163
         pdf_page_index: 12
         table: '7'
-        note: Table 7 gamma_MoO3 by melt at 1400 °C
+        note: Table 7 gamma_MoO3 by melt at 1400 °C; coefficients are calculated using Eq. (11), p. 163.
       T_range_K: [1673.15, 1673.15]
       phase: condensed_liquid
       standard_state: pure liquid MoO3; Table 6 (p. 163) gives Mo(s) + 1.5O2 = MoO3(liq) at 1 bar. The paper's general statement is on p. 153.
@@ -2746,6 +2750,7 @@ species:
         method_class: directly_reduced_measurement
         evidence_class: measured_reduced
         admission_status: admitted
+        inference: {relation: "authors' activity-coefficient calculation from Mo solubility using Eq. (11), p. 163", output_unit: dimensionless activity coefficient}
         reference_state_note: "The paper describes the oxide reference as 'pure liquid MOx/2 at the temperature and pressure of interest' (p. 153)."
         temperature_conversion: T_K = T_C + 273.15; 1400 °C -> 1673.15 K
         composition_basis_note: Table 4 does not print wt.% in its major-oxide column heading; wt.% is inferred because the EDS compositions sum to about 100 and is also consistent with Table 1.
