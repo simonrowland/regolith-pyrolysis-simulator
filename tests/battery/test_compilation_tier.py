@@ -664,24 +664,9 @@ def test_compilation_series_score_pins_cell_results_and_partial_refusal(monkeypa
     ]
     assert [row.reference for row in residuals] == expected_references
     assert [row.status for row in residuals] == [
-        ResidualStatus.MATCH,
-        ResidualStatus.MATCH,
-        ResidualStatus.MATCH,
-        ResidualStatus.MATCH,
-        ResidualStatus.MATCH,
-        ResidualStatus.MATCH,
-        ResidualStatus.MISMATCH,
-        ResidualStatus.MISMATCH,
-        ResidualStatus.MISMATCH,
-        ResidualStatus.MISMATCH,
-        ResidualStatus.MISMATCH,
+        *(ResidualStatus.NO_BAND for _ in range(11)),
         ResidualStatus.REFUSED,
     ]
-    expected_band = DecisionBand(
-        Decimal("6"),
-        QUANTITY_UNITS[Quantity.DELTA_FG],
-        "compilations-janaf/delta_fG residual distribution: 2x median absolute deviation; derived_n=11",
-    )
     for index, row in enumerate(residuals[:-1], start=1):
         assert row.numeric is not None
         assert (
@@ -697,7 +682,7 @@ def test_compilation_series_score_pins_cell_results_and_partial_refusal(monkeypa
             MetricOperation.ABSOLUTE,
             None,
             None,
-            expected_band,
+            None,
         )
         assert [
             (notice.kind, notice.reason, notice.origin)
@@ -1001,7 +986,7 @@ def test_log10_kf_follows_delta_fg_and_has_no_kj_band() -> None:
     assert attempt.value == log10K_from_delta_fG_kJ_mol(gibbs.value, _T)
     assert abs(attempt.value - _PRINTED_LOGK) < Decimal("0.01")
     assert decision_band_for(Quantity.LOG10_KF, SourceRelation.INDEPENDENT) is None
-    assert decision_band_for(Quantity.DELTA_FG, SourceRelation.INDEPENDENT) is not None
+    assert decision_band_for(Quantity.DELTA_FG, SourceRelation.INDEPENDENT) is None
     for quantity in (
         Quantity.CP,
         Quantity.S,
@@ -1012,7 +997,7 @@ def test_log10_kf_follows_delta_fg_and_has_no_kj_band() -> None:
         assert decision_band_for(quantity, SourceRelation.SAME_INPUT) is None
 
 
-def test_score_store_uses_printed_cell_then_family_mad_for_unknown_relation(
+def test_engine_prediction_mutation_cannot_create_a_source_band(
     monkeypatch,
 ) -> None:
     from simulator.battery import score as score_module
@@ -1094,29 +1079,22 @@ def test_score_store_uses_printed_cell_then_family_mad_for_unknown_relation(
         residual = by_reference[(observation.observation_id, Engine.INTERNAL_ANALYTICAL.value)]
         assert residual.source_relation is SourceRelation.UNKNOWN
         assert residual.numeric is not None
-        assert residual.numeric.decision_band is not None
-        assert residual.numeric.decision_band.value == Decimal("2")
-        assert residual.numeric.decision_band.rule.startswith(
-            "compilations-usgs-b1452/cp residual distribution"
-        )
-        assert residual.status is (
-            ResidualStatus.MISMATCH if Decimal(offset) == Decimal("10") else ResidualStatus.MATCH
-        )
+        assert residual.numeric.decision_band is None
+        assert residual.status is ResidualStatus.NO_BAND
+        vaporock_residual = by_reference[(observation.observation_id, Engine.VAPOROCK.value)]
+        assert vaporock_residual.numeric is not None
+        assert vaporock_residual.numeric.decision_band is None
+        assert vaporock_residual.status is ResidualStatus.NO_BAND
     printed = by_reference[(observations[10].observation_id, Engine.INTERNAL_ANALYTICAL.value)]
     assert printed.source_relation is SourceRelation.UNKNOWN
     assert printed.numeric is not None
     assert printed.numeric.decision_band is not None
-    assert printed.numeric.decision_band.value == Decimal("0.1")
-    assert printed.numeric.decision_band.rule == "source-printed per-cell uncertainty"
+    assert printed.numeric.decision_band.rule.startswith("printed_unstated:")
+    assert printed.numeric.decision_band.value > Decimal("0.1")
     assert printed.status is ResidualStatus.MISMATCH
     vaporock = by_reference[(observations[0].observation_id, Engine.VAPOROCK.value)]
     assert vaporock.numeric is not None
-    assert vaporock.numeric.decision_band == DecisionBand(
-        Decimal("20"),
-        "J_per_declared_mol_basis_per_K",
-        "compilations-usgs-b1452/cp residual distribution: "
-        "2x median absolute deviation; derived_n=10",
-    )
+    assert vaporock.numeric.decision_band is None
     small_ctx = _context(
         *observations[:9],
         origins={item.observation_id: origins[item.observation_id] for item in observations[:9]},
@@ -1254,7 +1232,7 @@ def test_census_keeps_unknown_relation_decision_when_band_exists(monkeypatch) ->
     )
     stratum = out["rows"][0]["decision_strata"][0]
     assert stratum["relation"] == "unknown"
-    assert stratum["band_kind"] == "printed"
+    assert stratum["band_kind"] == "printed_unstated"
     assert stratum["mismatch_count"] == 1
     unprinted = replace(
         observation,
@@ -1268,8 +1246,8 @@ def test_census_keeps_unknown_relation_decision_when_band_exists(monkeypatch) ->
         audit_compile_residual=False,
     )["rows"][0]["decision_strata"][0]
     assert no_band["band_kind"] == "no_band"
-    assert no_band["no_band_reason"] == "derived_band_insufficient_n"
-    assert no_band["band_derived_n"] == 1
+    assert no_band["no_band_reason"] is None
+    assert no_band["band_derived_n"] is None
     assert no_band["n"] == 1
     assert no_band["signed_median_residual"] == "1"
     assert no_band["mad"] == "0"
@@ -1393,8 +1371,11 @@ def test_census_strata_use_scorer_pool_for_refusals_and_observation_flags(monkey
     assert census_stratum["n"] == 10
     assert census_stratum["signed_median_residual"] == "4.5"
     assert census_stratum["bias_to_scatter_ratio"] == "1.8"
-    assert census_stratum["band_value"] == "5.0"
-    assert census_stratum["match_count"] == 6
+    assert census_stratum["band_value"] is None
+    assert census_stratum["band_kind"] == "no_band"
+    assert census_stratum["band_derived_n"] is None
+    assert census_stratum["match_count"] == 0
+    assert census_stratum["no_band_count"] == 10
 
 
 def test_census_decision_counters_partition_same_source_no_band_rows(monkeypatch) -> None:
@@ -1493,7 +1474,7 @@ def test_headline_decision_strata_are_scoped_to_each_rail() -> None:
             decision_band=DecisionBand(
                 Decimal("2"),
                 "J_per_declared_mol_basis_per_K",
-                "compilation/cp residual distribution: 2x median absolute deviation; derived_n=10",
+                "derived_scatter: source-only sigma=1.4826×MAD; n_sources=10; mad=1",
             ),
         ),
     )
@@ -1509,7 +1490,7 @@ def test_headline_decision_strata_are_scoped_to_each_rail() -> None:
             unit="Pa",
             value=Decimal("1"),
             decision_band=DecisionBand(
-                Decimal("2"), "Pa", "compilation/p_sat residual distribution; derived_n=10"
+                Decimal("2"), "Pa", "derived_scatter: source-only sigma=1.4826×MAD; n_sources=10; mad=1"
             ),
         ),
     )
@@ -2045,7 +2026,7 @@ def test_compilation_tier_is_beside_measured_and_same_source_is_flagged() -> Non
     assert residual.numeric.unit == "kJ_per_declared_mol_basis"
     assert residual.numeric.operation.value == "absolute"
     assert residual.source_relation is SourceRelation.SAME_INPUT
-    assert residual.status is ResidualStatus.MATCH
+    assert residual.status is ResidualStatus.NO_BAND
     assert any(
         notice.kind is NoticeKind.DERIVATION_USES_COMPILATION
         and "nist-janaf-4th" in notice.reason
@@ -2091,7 +2072,7 @@ def test_compilation_tier_is_beside_measured_and_same_source_is_flagged() -> Non
     assert independent.source_relation is SourceRelation.INDEPENDENT
     assert independent.score_eligible is False
     assert independent.numeric is not None
-    assert independent.status is ResidualStatus.MATCH
+    assert independent.status is ResidualStatus.NO_BAND
     assert all(
         notice.kind is not NoticeKind.DERIVATION_USES_COMPILATION
         for notice in independent.notices
@@ -2126,8 +2107,8 @@ def test_compilation_tier_is_beside_measured_and_same_source_is_flagged() -> Non
     assert "implementation fidelity, not" in compilation_report
     assert (
         "| compilation | rail | engine | relation | quantity | unit | n | signed median residual | MAD | bias-to-scatter ratio | max |residual| | median abs residual | "
-        "RMS residual | band value | band kind | band derived n | no-band reason | band-kind-specific matches / tail-in | "
-        "band-kind-specific mismatches / tail-out | n no band | n same-source |"
+        "RMS residual | band value | band kind | band source n | no-band reason | in-band | "
+        "out-of-band | n no band | n same-source |"
     ) in compilation_report
     assert (
         f"`compilations-janaf` | `delta_fG` | 1 | 1 | 0 | "
@@ -2141,11 +2122,11 @@ def test_compilation_tier_is_beside_measured_and_same_source_is_flagged() -> Non
         )
     )
     summary_cells = [cell.strip() for cell in summary.strip("|").split("|")]
-    assert "|residual| ≤ band width." in compilation_report
+    assert "|residual| ≤ ticket line." in compilation_report
     assert summary_cells[5] == "kJ/mol"
     assert summary_cells[6] == "1"
     assert summary_cells[7] == str(residual.numeric.value)
-    assert summary_cells[17:] == ["legacy_fallback match=1", "legacy_fallback mismatch=0", "0", "1"]
+    assert summary_cells[17:] == ["no_band in-band=0", "no_band out-of-band=0", "1", "1"]
     assert compilation_family("ATcT.yaml", None) == "ATcT"
     measured = [
         row
@@ -2158,7 +2139,7 @@ def test_compilation_tier_is_beside_measured_and_same_source_is_flagged() -> Non
     assert "| internal-analytical | 2 |" in report
 
 
-def test_unknown_relation_uses_legacy_delta_fg_fallback() -> None:
+def test_unknown_relation_keeps_residual_without_band() -> None:
     from simulator.battery.records import Execution
     from simulator.battery.score import EnginePrediction
 
@@ -2193,11 +2174,9 @@ def test_unknown_relation_uses_legacy_delta_fg_fallback() -> None:
         ),
     )
     assert residual.source_relation is SourceRelation.UNKNOWN
-    assert residual.status is ResidualStatus.MATCH
+    assert residual.status is ResidualStatus.NO_BAND
     assert residual.numeric is not None
-    assert residual.numeric.decision_band is not None
-    assert residual.numeric.decision_band.value == Decimal("1.0")
-    assert residual.numeric.decision_band.rule.startswith("LEGACY fallback:")
+    assert residual.numeric.decision_band is None
 
 
 def test_out_of_range_reaction_is_not_formation_gibbs() -> None:
