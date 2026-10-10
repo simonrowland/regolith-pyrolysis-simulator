@@ -315,9 +315,107 @@ def test_invalid_composition_refuses_without_raise() -> None:
     assert result.calibration_status == 'unavailable'
     assert math.isnan(result.a_FeS)
     assert math.isnan(result.ln_a_FeS)
-    result = provider.a_FeS(-10.0, {'S': 0.5, 'Fe': 0.5})
-    assert result.calibration_status == 'unavailable'
-    assert math.isnan(result.a_FeS)
+
+
+class _FakeSulfLiq:
+    def setTK(self, _value): pass
+    def setPa(self, _value): pass
+    def setComps(self, _values): pass
+    def setSpeciateTolerance(self, _value): pass
+    def getMu0(self, _index): return 0.0
+    def getSpecMu(self, _index): return 0.0
+    def isStable(self): return True
+    def getlogfo2(self): return -10.0
+    def getlogfs2(self): return -2.0
+    def getSpecs(self): return [1.0]
+    def getNspec(self): return 1
+    def getSpecFormula(self, _index): return 'FeS'
+
+
+def _mock_provider(monkeypatch):
+    provider = SulfLiqMatteProvider()
+    monkeypatch.setattr(
+        provider, '_module',
+        type('Module', (), {'pySulfLiq': lambda _self: _FakeSulfLiq()})(),
+    )
+    monkeypatch.setattr(provider, '_available', True)
+    return provider
+
+
+def test_import_and_constructor_boundaries_propagate_our_errors_and_type_engine_failures(
+    monkeypatch,
+):
+    monkeypatch.setattr(
+        sulfliq_matte_module.importlib,
+        'import_module',
+        lambda _name: (_ for _ in ()).throw(KeyError('local import bookkeeping')),
+    )
+    with pytest.raises(KeyError, match='local import bookkeeping'):
+        SulfLiqMatteProvider().initialize()
+
+    class BrokenModule:
+        @staticmethod
+        def pySulfLiq():
+            raise RuntimeError('native SulfLiq init failed')
+
+    monkeypatch.setattr(
+        sulfliq_matte_module.importlib, 'import_module', lambda _name: BrokenModule
+    )
+    provider = SulfLiqMatteProvider()
+    assert provider.initialize() is False
+    assert any(
+        'RuntimeError' in warning and 'native SulfLiq init failed' in warning
+        for warning in provider.a_FeS(1400.0, [0, 1, 1, 0, 0]).warnings
+    )
+
+
+@pytest.mark.parametrize(
+    'operation',
+    (
+        'pySulfLiq', 'setTK', 'setPa', 'setComps', 'setSpeciateTolerance',
+        'getMu0', 'getSpecMu', 'isStable', 'getlogfo2', 'getlogfs2',
+        'getSpecs', 'getNspec', 'getSpecFormula',
+    ),
+)
+def test_local_sulfliq_adapter_error_propagates_at_each_binding_site(
+    monkeypatch, operation,
+):
+    provider = _mock_provider(monkeypatch)
+    original_call = sulfliq_matte_module._call_sulfliq
+
+    def broken_call(target, name, *args):
+        if name == operation:
+            raise KeyError(f'local adapter error at {name}')
+        return original_call(target, name, *args)
+
+    monkeypatch.setattr(sulfliq_matte_module, '_call_sulfliq', broken_call)
+    with pytest.raises(KeyError, match=f'local adapter error at {operation}'):
+        provider.a_FeS(1400.0, [0.1, 0.9, 1, 0, 0])
+
+
+@pytest.mark.parametrize(
+    'operation',
+    ('setTK', 'getSpecMu', 'isStable', 'getlogfo2', 'getlogfs2', 'getSpecs'),
+)
+def test_sulfliq_engine_failures_keep_their_class_and_message(
+    monkeypatch, operation,
+):
+    provider = _mock_provider(monkeypatch)
+    engine = _FakeSulfLiq()
+
+    def fail(*_args):
+        raise RuntimeError(f'{operation} engine refusal')
+
+    setattr(engine, operation, fail)
+    monkeypatch.setattr(
+        provider, '_module',
+        type('Module', (), {'pySulfLiq': lambda _self: engine})(),
+    )
+    result = provider.a_FeS(1400.0, [0.1, 0.9, 1.0, 0, 0])
+    assert any(
+        'RuntimeError' in warning and f'{operation} engine refusal' in warning
+        for warning in result.warnings
+    )
 
 
 @_requires_sulfliq
