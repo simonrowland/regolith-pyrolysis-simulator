@@ -1016,7 +1016,7 @@ def test_score_store_uses_printed_cell_then_family_mad_for_unknown_relation(
     monkeypatch,
 ) -> None:
     from simulator.battery import score as score_module
-    from simulator.battery.records import Derivation, Execution, Locator
+    from simulator.battery.records import DecisionBand, Derivation, Execution, Locator
     from simulator.battery.score import EnginePrediction, score_store
     from simulator.battery.validity import GateOutcome
 
@@ -1111,9 +1111,12 @@ def test_score_store_uses_printed_cell_then_family_mad_for_unknown_relation(
     assert printed.status is ResidualStatus.MISMATCH
     vaporock = by_reference[(observations[0].observation_id, Engine.VAPOROCK.value)]
     assert vaporock.numeric is not None
-    assert vaporock.numeric.decision_band is not None
-    assert vaporock.numeric.decision_band.value == Decimal("20")
-    assert "derived_n=10" in vaporock.numeric.decision_band.rule
+    assert vaporock.numeric.decision_band == DecisionBand(
+        Decimal("20"),
+        "J_per_declared_mol_basis_per_K",
+        "compilations-usgs-b1452/cp residual distribution: "
+        "2x median absolute deviation; derived_n=10",
+    )
     small_ctx = _context(
         *observations[:9],
         origins={item.observation_id: origins[item.observation_id] for item in observations[:9]},
