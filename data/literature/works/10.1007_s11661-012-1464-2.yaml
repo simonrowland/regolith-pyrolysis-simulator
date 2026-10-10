@@ -1,46 +1,46 @@
 schema_version: battery_work.v2.1
 work:
-  work_id: 86b58c54293da87d96fa9a5c5bce3a23f3793d880fe71d44d6e088fd66bd0c69
-  citation: Safarian, J. & Engh, T. A. (2013), "Vacuum Evaporation of Pure Metals", Metall. Mater. Trans. A (Hertz-Knudsen
-    / Schrage theory; pure Si context in corpus)
+  work_id: 10.1007/s11661-012-1464-2
+  citation: Safarian, J. & Engh, T. A. (2013), Metall. Mater. Trans. A 44:747-753, DOI 10.1007/s11661-012-1464-2
   source_ids:
-  - kems-009-safarian-2013
+  - safarian-engh-2013-si-pure-langmuir
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
       value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
-    - asset_id: pdf:kems-009-safarian-2013
+    - asset_id: pdf:safarian-engh-2013-si-pure-langmuir
       role: pdf
-      path: raw/kems-009-safarian-2013/kems-009-safarian-2013.pdf
+      path: raw/safarian-engh-2013-si-pure-langmuir/safarian-engh-2013-si-pure-langmuir.pdf
       sha256:
-        tag: value
-        value: 4b8330567349e54b9642880efc46f7633c1af7ccfa280ae3808cf8601fa624d3
-    - asset_id: pdftotext:kems-009-safarian-2013
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:safarian-engh-2013-si-pure-langmuir
       role: pdftotext
-      path: text/kems-009-safarian-2013
+      path: text/safarian-engh-2013-si-pure-langmuir
       sha256:
         tag: unknown
         reason: INDEX does not give text sha256
-    - asset_id: tables:kems-009-safarian-2013
+    - asset_id: tables:safarian-engh-2013-si-pure-langmuir
       role: table_csv
-      path: tables/kems-009-safarian-2013
+      path: tables/safarian-engh-2013-si-pure-langmuir
       sha256:
         tag: unknown
         reason: INDEX does not give table sha256
-    - asset_id: unknown:kems-009-safarian-2013
+    - asset_id: unknown:safarian-engh-2013-si-pure-langmuir
       role: pdftotext
       path: unknown
       sha256:
         tag: unknown
         reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1007/s11661-012-1464-2
 experiments:
-- experiment_id: 86b58c54293da87d96fa9a5c5bce3a23f3793d880fe71d44d6e088fd66bd0c69::kems-009-safarian-2013
+- experiment_id: 10.1007/s11661-012-1464-2::safarian-engh-2013-si-pure-langmuir
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'langmuir_free_evaporation_theory' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: langmuir_free_evaporation
   sample: {}
   conditions:
     temperature_K:
@@ -63,10 +63,7 @@ experiments:
       regime_class:
         tag: unknown
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 86b58c54293da87d96fa9a5c5bce3a23f3793d880fe71d44d6e088fd66bd0c69
+  work_id: 10.1007/s11661-012-1464-2
   locator:
-    page: '747'
-    section: Hertz-Knudsen / Schrage / vapor velocity / flux (theory review)
-    line_range: 112-245
-    note: Primary theory block; S_cr and p_eff at line 229; flux-ratio figure context 245; repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-009-safarian-2013/tables.md
-    source_path: docs-private/research/ocr-artifacts/kems-009-safarian-2013/spool/out/kems-009-safarian-2013/vlm/kems-009-safarian-2013.md
+    note: Safarian, J. & Engh, T. A. (2013), Metall. Mater. Trans. A 44:747-753, DOI 10.1007/s11661-012-1464-2
+    record: safarian_engh_2013_si_pure_langmuir

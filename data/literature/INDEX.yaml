@@ -9,14 +9,14 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 279
-  extracts: 277
+  sources: 273
+  extracts: 271
   pdfs_present_in_worktree: 0
-  extracts_with_private_locators: 60
+  extracts_with_private_locators: 59
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 277
-  alias_groups_needing_resolution: 41
+  extracts_without_pdf: 271
+  alias_groups_needing_resolution: 36
 gaps:
   pdfs_without_extract: []
   extracts_without_pdf:
@@ -50,7 +50,6 @@ gaps:
   - deguzman-2026-simulant-physicochemical
   - engelschion-2020-eac1a-simulant
   - fdm879
-  - fedkin-grossman-ghiorso-2006
   - fegley-2016-rock-steam-solubility
   - fegley-2023-chemical-equilibrium-calculations-bu
   - filiberto-lpsc2011-2064-volatiles
@@ -223,10 +222,7 @@ gaps:
   - pending-pages-wo3-polymer-vp
   - pending-re2o7-second-series
   - pending-teo2-vp
-  - pound-1972-cr-langmuir-knudsen
-  - pound-1972-mccabe-cr
   - rau-1974-se-vp
-  - ref-016-sio-kems-1700-2000k
   - ref-032-al
   - ref-032-bi
   - ref-032-ca
@@ -246,7 +242,6 @@ gaps:
   - robie-hemingway-wilson-1980-usgs-of-80-908
   - robinot-2025-promes-review
   - rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
-  - safarian-engh-2013-si-pure-langmuir
   - schaefer-and-fegley-2007-icarus-outgassing-of-oc
   - schaefer-fegley-2011-vaporization-earth
   - seki-2011-ca-o-solubility-fe-cao-al2o3
@@ -261,7 +256,6 @@ gaps:
   - slag-003-hino-kitagawa-banya-1993
   - smales-1971-lpsc-12022
   - sossi-2020-cu-zn-isotope-evap-formalism
-  - sossi-et-al-2019
   - span-wagner-1996-co2-psat
   - stebbins-carmichael-weill-1983
   - steurer-1985-vapor-phase-pyrolysis
@@ -351,7 +345,6 @@ gaps:
   - nagabayashi-hino-banya-1989-phosphorus
   - nasa-cea-thermo
   - pahlevan-2026-protolunar-volatile-outflows
-  - ref-016-sio-kems-1700-2000k
   - rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
   - smales-1971-lpsc-12022
   - stebbins-carmichael-weill-1983
@@ -495,7 +488,6 @@ gaps:
     key: 10.1016/j.gca.2005.08.014
     source_ids:
     - REF-014
-    - fedkin-grossman-ghiorso-2006
     - kems-005-fedkin-2006
     resolution: owner/controller
   - type: same_doi
@@ -505,16 +497,9 @@ gaps:
     - richter-et-al-2007
     resolution: owner/controller
   - type: same_doi
-    key: 10.1016/j.gca.2019.06.021
-    source_ids:
-    - kems-012-sossi-2019
-    - sossi-et-al-2019
-    resolution: owner/controller
-  - type: same_doi
     key: 10.1016/j.icarus.2003.08.023
     source_ids:
     - kems-008-schaefer-fegley-2004
-    - ref-016-sio-kems-1700-2000k
     - sf04-magma-companion-workbook
     resolution: owner/controller
   - type: same_doi
@@ -540,8 +525,6 @@ gaps:
     source_ids:
     - REF-040
     - kems-003-pound-1972
-    - pound-1972-cr-langmuir-knudsen
-    - pound-1972-mccabe-cr
     resolution: owner/controller
   - type: same_doi
     key: 10.1063/1.555706
@@ -610,12 +593,6 @@ gaps:
     - datz-smith-taylor-1961-nacl-vapor
     resolution: owner/controller
   - type: source_id_alias
-    key: fedkin-2006
-    source_ids:
-    - fedkin-grossman-ghiorso-2006
-    - kems-005-fedkin-2006
-    resolution: owner/controller
-  - type: source_id_alias
     key: fegley-2016
     source_ids:
     - arxiv-1602-00658-fegley-rock-steam-solubility
@@ -669,30 +646,11 @@ gaps:
     - lpi-compendium-65701
     resolution: owner/controller
   - type: source_id_alias
-    key: pound-1972
-    source_ids:
-    - kems-003-pound-1972
-    - pound-1972-cr-langmuir-knudsen
-    - pound-1972-mccabe-cr
-    resolution: owner/controller
-  - type: source_id_alias
     key: robinot-2026
     source_ids:
     - kems-044-robinot-2026
     - robinot_2026
     - robinot_2026_vacuum_pyrolysis
-    resolution: owner/controller
-  - type: source_id_alias
-    key: safarian-2013
-    source_ids:
-    - kems-009-safarian-2013
-    - safarian-engh-2013-si-pure-langmuir
-    resolution: owner/controller
-  - type: source_id_alias
-    key: schaefer-2004
-    source_ids:
-    - kems-008-schaefer-fegley-2004
-    - sf04-magma-companion-workbook
     resolution: owner/controller
   - type: source_id_alias
     key: senior-1991
@@ -2487,68 +2445,6 @@ sources:
       last_stage: decoded
       date: '2026-09-06'
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
-- source_id: fedkin-grossman-ghiorso-2006
-  aliases:
-  - REF-014
-  - kems-005-fedkin-2006
-  citation: Fedkin, A. V., Grossman, L. & Ghiorso, M. S. (2006), Geochim. Cosmochim. Acta 70:206-223,
-    Table 3 pp. 212-213; primary vacuum free-evaporation data Hashimoto, A. (1983), Geochem. J. 17:111-145
-  doi: 10.1016/j.gca.2005.08.014
-  report_number: null
-  identifier: 10.1016/j.gca.2005.08.014
-  pdf_status: ABSENT
-  pdf_path: null
-  pdf_last_seen: []
-  pdf_sha256: null
-  pdf_tracked: null
-  sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
-  access_status: unknown
-  extracts:
-  - path: data/literature/extracts/fedkin-grossman-ghiorso-2006.yaml
-    review_status: draft
-    rows: 8
-  battery_datasets:
-  - data/literature/langmuir_knudsen_flux_validation.yaml
-  hunt_ids: []
-  copies: []
-  measurement_sets:
-  - data/literature/langmuir_knudsen_flux_validation.yaml
-  corpus_status: available
-  corpus:
-    raw:
-      path: raw/fedkin-grossman-ghiorso-2006/fedkin-grossman-ghiorso-2006.pdf
-      present: false
-      sha256: null
-      matches_simulator: null
-    sidecar:
-      path: raw/fedkin-grossman-ghiorso-2006/sidecar.yaml
-      present: false
-    text:
-      path: text/fedkin-grossman-ghiorso-2006
-      exists: false
-      file_count: 0
-    tables:
-      path: tables/fedkin-grossman-ghiorso-2006
-      exists: false
-      file_count: 0
-    extract:
-      path: extracts/fedkin-grossman-ghiorso-2006.yaml
-      present: true
-      matches_simulator: true
-    ledger:
-      path: ledger/fedkin-grossman-ghiorso-2006.yaml
-      present: true
-      error: null
-      last_stage: extracted
-      date: '2026-09-06'
-    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: fegley-2016-rock-steam-solubility
   aliases: []
   citation: Fegley, B. Jr., Jacobson, N. S., Williams, K. B., Plane, J. M. C., Schaefer, L. & Lodders,
@@ -4187,8 +4083,6 @@ sources:
 - source_id: kems-003-pound-1972
   aliases:
   - REF-040
-  - pound-1972-cr-langmuir-knudsen
-  - pound-1972-mccabe-cr
   citation: Pound, G. M. (1972), "Selected values of evaporation and condensation coefficients for simple
     substances", J. Phys. Chem. Ref. Data 1:135-146, DOI 10.1063/1.3253096 (review compilation; Tables
     1-3)
@@ -4246,7 +4140,6 @@ sources:
 - source_id: kems-005-fedkin-2006
   aliases:
   - REF-014
-  - fedkin-grossman-ghiorso-2006
   citation: Fedkin, A. V., Grossman, L. & Ghiorso, M. S. (2006), "Vapor pressures and evaporation coefficients
     for melts of ferromagnesian chondrule-like compositions", Geochim. Cosmochim. Acta 70:206-223, DOI
     10.1016/j.gca.2005.08.014
@@ -4422,7 +4315,6 @@ sources:
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: kems-008-schaefer-fegley-2004
   aliases:
-  - ref-016-sio-kems-1700-2000k
   - sf04-magma-companion-workbook
   citation: Schaefer, L. & Fegley, B. (2004), "A thermodynamic model of high temperature lava vaporization
     on Io", Icarus 169:216-241 (MAGMA code; α_s survey Table 10)
@@ -4485,9 +4377,9 @@ sources:
   aliases: []
   citation: Safarian, J. & Engh, T. A. (2013), "Vacuum Evaporation of Pure Metals", Metall. Mater. Trans.
     A (Hertz-Knudsen / Schrage theory; pure Si context in corpus)
-  doi: null
+  doi: 10.1007/s11661-012-1464-2
   report_number: null
-  identifier: null
+  identifier: 10.1007/s11661-012-1464-2
   pdf_status: ABSENT
   pdf_path: null
   pdf_last_seen: []
@@ -4532,7 +4424,7 @@ sources:
     extract:
       path: extracts/kems-009-safarian-2013.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-009-safarian-2013.yaml
       present: true
@@ -4650,8 +4542,7 @@ sources:
       date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: kems-012-sossi-2019
-  aliases:
-  - sossi-et-al-2019
+  aliases: []
   citation: 'Sossi, P. A., Klemme, S., O''Neill, H. St.C., Berndt, J. & Moynier, F. (2019), "Evaporation
     of moderately volatile elements from silicate melts: experiments and theory", Geochim. Cosmochim.
     Acta 260:204-231, DOI 10.1016/j.gca.2019.06.021'
@@ -12571,134 +12462,6 @@ sources:
       last_stage: extracted
       date: '2026-09-06'
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
-- source_id: pound-1972-cr-langmuir-knudsen
-  aliases:
-  - REF-040
-  - kems-003-pound-1972
-  - pound-1972-mccabe-cr
-  citation: Pound, G. M. (1972), J. Phys. Chem. Ref. Data 1:135-146 Table 1, DOI 10.1063/1.3253096; primary
-    McCabe, Hudson & Paxton (1958), Trans. Met. Soc. AIME 212:102
-  doi: 10.1063/1.3253096
-  report_number: null
-  identifier: 10.1063/1.3253096
-  pdf_status: ABSENT
-  pdf_path: null
-  pdf_last_seen: []
-  pdf_sha256: null
-  pdf_tracked: null
-  sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
-  access_status: unknown
-  extracts:
-  - path: data/literature/extracts/pound-1972-cr-langmuir-knudsen.yaml
-    review_status: draft
-    rows: 1
-  battery_datasets:
-  - data/literature/langmuir_knudsen_flux_validation.yaml
-  hunt_ids: []
-  copies: []
-  measurement_sets:
-  - data/literature/langmuir_knudsen_flux_validation.yaml
-  corpus_status: available
-  corpus:
-    raw:
-      path: raw/pound-1972-cr-langmuir-knudsen/pound-1972-cr-langmuir-knudsen.pdf
-      present: false
-      sha256: null
-      matches_simulator: null
-    sidecar:
-      path: raw/pound-1972-cr-langmuir-knudsen/sidecar.yaml
-      present: false
-    text:
-      path: text/pound-1972-cr-langmuir-knudsen
-      exists: false
-      file_count: 0
-    tables:
-      path: tables/pound-1972-cr-langmuir-knudsen
-      exists: false
-      file_count: 0
-    extract:
-      path: extracts/pound-1972-cr-langmuir-knudsen.yaml
-      present: true
-      matches_simulator: true
-    ledger:
-      path: ledger/pound-1972-cr-langmuir-knudsen.yaml
-      present: true
-      error: null
-      last_stage: extracted
-      date: '2026-09-06'
-    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
-- source_id: pound-1972-mccabe-cr
-  aliases:
-  - REF-040
-  - kems-003-pound-1972
-  - pound-1972-cr-langmuir-knudsen
-  citation: McCabe, C.L., Hudson, R.G. & Paxton, H.W. (1958) Langmuir/Knudsen solid-Cr vaporization (as
-    selected in Pound 1972 J. Phys. Chem. Ref. Data Table 1, DOI 10.1063/1.3253096) — already used for
-    α_Cr in docs/lab-validation-whitepaper.md; Alcock et al. (1984) REF-032 Cr equations as second pure-Psat
-    set.
-  doi: 10.1063/1.3253096
-  report_number: null
-  identifier: 10.1063/1.3253096
-  pdf_status: ABSENT
-  pdf_path: null
-  pdf_last_seen: []
-  pdf_sha256: null
-  pdf_tracked: null
-  sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
-  access_status: unknown
-  extracts:
-  - path: data/literature/extracts/pound-1972-mccabe-cr.yaml
-    review_status: draft
-    rows: 1
-  battery_datasets:
-  - data/literature/langmuir_knudsen_flux_validation.yaml
-  hunt_ids: []
-  copies: []
-  measurement_sets:
-  - data/literature/langmuir_knudsen_flux_validation.yaml
-  corpus_status: available
-  corpus:
-    raw:
-      path: raw/pound-1972-mccabe-cr/pound-1972-mccabe-cr.pdf
-      present: false
-      sha256: null
-      matches_simulator: null
-    sidecar:
-      path: raw/pound-1972-mccabe-cr/sidecar.yaml
-      present: false
-    text:
-      path: text/pound-1972-mccabe-cr
-      exists: false
-      file_count: 0
-    tables:
-      path: tables/pound-1972-mccabe-cr
-      exists: false
-      file_count: 0
-    extract:
-      path: extracts/pound-1972-mccabe-cr.yaml
-      present: true
-      matches_simulator: true
-    ledger:
-      path: ledger/pound-1972-mccabe-cr.yaml
-      present: true
-      error: null
-      last_stage: extracted
-      date: '2026-09-06'
-    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: rau-1974-se-vp
   aliases: []
   citation: Declare fit = Stull 1947 total-P Antoine; anchor = Rau (1974) selenium vapor-pressure / speciation
@@ -12753,72 +12516,6 @@ sources:
       matches_simulator: true
     ledger:
       path: ledger/rau-1974-se-vp.yaml
-      present: true
-      error: null
-      last_stage: extracted
-      date: '2026-09-06'
-    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
-- source_id: ref-016-sio-kems-1700-2000k
-  aliases:
-  - kems-008-schaefer-fegley-2004
-  - sf04-magma-companion-workbook
-  citation: "(1) Costa, G.C.C. & Jacobson, N.S. (2015) olivine KEMS SiO partials —\n    Clausius–Clapeyron\
-    \ A=7.83, B=22.43 (grid-25-sio cj2015 @1700–2000 K:\n    4.32e-3 … 4.12e-1 Pa) — project REF-016;\
-    \ docs-private/vapor-pressure-\n    calibration-sio-tsweep-2026-05-19.md.\n(2) Schaefer, L. & Fegley,\
-    \ B. (2004) Icarus 169:216–241,\n    DOI 10.1016/j.icarus.2003.08.023 (REF-018), Table 9 SiO partials\
-    \ on\n    Io tholeiite (1.66e-4 Pa @1700 K; 1.31e-2 Pa @1900 K).\n(3) Sossi & Fegley (2018) Fig. 3\
-    \ lunar 12022 SiO digitization (sof2018-mineru\n    grid) — review figure; prefer (1)(2) as measured.\n\
-    NOT independent: Visscher & Fegley (2013) model grids; local VapoRock re-eval."
-  doi: 10.1016/j.icarus.2003.08.023
-  report_number: null
-  identifier: 10.1016/j.icarus.2003.08.023
-  pdf_status: ABSENT
-  pdf_path: null
-  pdf_last_seen: []
-  pdf_sha256: null
-  pdf_tracked: null
-  sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
-  access_status: unknown
-  extracts:
-  - path: data/literature/extracts/ref-016-sio-kems-1700-2000k.yaml
-    review_status: draft
-    rows: 1
-    locator_status: private_path
-  battery_datasets: []
-  hunt_ids: []
-  copies: []
-  measurement_sets: []
-  corpus_status: available
-  corpus:
-    raw:
-      path: raw/ref-016-sio-kems-1700-2000k/ref-016-sio-kems-1700-2000k.pdf
-      present: false
-      sha256: null
-      matches_simulator: null
-    sidecar:
-      path: raw/ref-016-sio-kems-1700-2000k/sidecar.yaml
-      present: false
-    text:
-      path: text/ref-016-sio-kems-1700-2000k
-      exists: false
-      file_count: 0
-    tables:
-      path: tables/ref-016-sio-kems-1700-2000k
-      exists: false
-      file_count: 0
-    extract:
-      path: extracts/ref-016-sio-kems-1700-2000k.yaml
-      present: true
-      matches_simulator: true
-    ledger:
-      path: ledger/ref-016-sio-kems-1700-2000k.yaml
       present: true
       error: null
       last_stage: extracted
@@ -13931,63 +13628,6 @@ sources:
       last_stage: decoded
       date: '2026-09-06'
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
-- source_id: safarian-engh-2013-si-pure-langmuir
-  aliases: []
-  citation: Safarian, J. & Engh, T. A. (2013), Metall. Mater. Trans. A 44:747-753, DOI 10.1007/s11661-012-1464-2
-  doi: 10.1007/s11661-012-1464-2
-  report_number: null
-  identifier: 10.1007/s11661-012-1464-2
-  pdf_status: ABSENT
-  pdf_path: null
-  pdf_last_seen: []
-  pdf_sha256: null
-  pdf_tracked: null
-  sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
-  access_status: unknown
-  extracts:
-  - path: data/literature/extracts/safarian-engh-2013-si-pure-langmuir.yaml
-    review_status: draft
-    rows: 1
-  battery_datasets: []
-  hunt_ids: []
-  copies: []
-  measurement_sets: []
-  corpus_status: available
-  corpus:
-    raw:
-      path: raw/safarian-engh-2013-si-pure-langmuir/safarian-engh-2013-si-pure-langmuir.pdf
-      present: false
-      sha256: null
-      matches_simulator: null
-    sidecar:
-      path: raw/safarian-engh-2013-si-pure-langmuir/sidecar.yaml
-      present: false
-    text:
-      path: text/safarian-engh-2013-si-pure-langmuir
-      exists: false
-      file_count: 0
-    tables:
-      path: tables/safarian-engh-2013-si-pure-langmuir
-      exists: false
-      file_count: 0
-    extract:
-      path: extracts/safarian-engh-2013-si-pure-langmuir.yaml
-      present: true
-      matches_simulator: true
-    ledger:
-      path: ledger/safarian-engh-2013-si-pure-langmuir.yaml
-      present: true
-      error: null
-      last_stage: extracted
-      date: '2026-09-06'
-    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
   aliases: []
   citation: Schaefer, L. & Fegley, B., Jr. (2007), "Outgassing of ordinary chondritic material and some
@@ -14346,7 +13986,6 @@ sources:
 - source_id: sf04-magma-companion-workbook
   aliases:
   - kems-008-schaefer-fegley-2004
-  - ref-016-sio-kems-1700-2000k
   citation: Schaefer, L. & Fegley, B. (2004), "A thermodynamic model of high temperature lava vaporization
     on Io", Icarus 169:216-241; numerical MAGMA grid preserved in the VapoRock Schaefer2004-MAGMA-valid.xlsx
     companion workbook.
@@ -14807,64 +14446,6 @@ sources:
       present: true
       error: null
       last_stage: decoded
-      date: '2026-09-06'
-    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
-- source_id: sossi-et-al-2019
-  aliases:
-  - kems-012-sossi-2019
-  citation: Sossi, P. A. et al. (2019), Geochim. Cosmochim. Acta 260:204-231, DOI 10.1016/j.gca.2019.06.021
-  doi: 10.1016/j.gca.2019.06.021
-  report_number: null
-  identifier: 10.1016/j.gca.2019.06.021
-  pdf_status: ABSENT
-  pdf_path: null
-  pdf_last_seen: []
-  pdf_sha256: null
-  pdf_tracked: null
-  sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
-  access_status: unknown
-  extracts:
-  - path: data/literature/extracts/sossi-et-al-2019.yaml
-    review_status: draft
-    rows: 1
-  battery_datasets: []
-  hunt_ids: []
-  copies: []
-  measurement_sets: []
-  corpus_status: available
-  corpus:
-    raw:
-      path: raw/sossi-et-al-2019/sossi-et-al-2019.pdf
-      present: false
-      sha256: null
-      matches_simulator: null
-    sidecar:
-      path: raw/sossi-et-al-2019/sidecar.yaml
-      present: false
-    text:
-      path: text/sossi-et-al-2019
-      exists: false
-      file_count: 0
-    tables:
-      path: tables/sossi-et-al-2019
-      exists: false
-      file_count: 0
-    extract:
-      path: extracts/sossi-et-al-2019.yaml
-      present: true
-      matches_simulator: true
-    ledger:
-      path: ledger/sossi-et-al-2019.yaml
-      present: true
-      error: null
-      last_stage: extracted
       date: '2026-09-06'
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: span-wagner-1996-co2-psat
