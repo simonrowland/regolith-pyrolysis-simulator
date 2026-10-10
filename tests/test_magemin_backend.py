@@ -1789,6 +1789,18 @@ def test_magemin_remote_builtin_with_multi_argument_constructor_is_preserved():
         pytest.param(
             {'temperature_C': 'hot'}, 'ValueError', 'hot', id='bad-temperature',
         ),
+        pytest.param(
+            {'call_timeout_s': 'oops'},
+            'ValueError',
+            'oops',
+            id='bad-timeout-str',
+        ),
+        pytest.param(
+            {'call_timeout_s': object()},
+            'TypeError',
+            'object',
+            id='bad-timeout-type',
+        ),
     ),
 )
 def test_magemin_equilibrate_invalid_declared_scalar_is_typed_refusal(
@@ -2045,6 +2057,10 @@ def test_magemin_julia_bridge_init_propagates_untyped_errors(monkeypatch):
         pytest.param('os', id='os-error'),
         pytest.param('process', id='process-error'),
         pytest.param('local-runtime', id='local-runtime-error-propagates'),
+        pytest.param('package-import', id='package-import-error'),
+        pytest.param('package-missing', id='package-module-not-found'),
+        pytest.param('core-import', id='core-import-error'),
+        pytest.param('core-missing', id='core-module-not-found'),
     ],
 )
 def test_magemin_julia_runtime_discovery_failures_return_unavailable(
@@ -2079,7 +2095,18 @@ def test_magemin_julia_runtime_discovery_failures_return_unavailable(
     real_import = builtins.__import__
 
     def fail_main_import(name, globals=None, locals=None, fromlist=(), level=0):
-        if name == 'julia' and 'Main' in (fromlist or ()):
+        package_hit = name == 'julia' and not fromlist
+        core_hit = name == 'julia.core'
+        main_hit = name == 'julia' and 'Main' in (fromlist or ())
+        if failure == 'package-import' and package_hit:
+            raise ImportError('same native initialization failure')
+        if failure == 'package-missing' and package_hit:
+            raise ModuleNotFoundError('same native initialization failure')
+        if failure == 'core-import' and core_hit:
+            raise ImportError('same native initialization failure')
+        if failure == 'core-missing' and core_hit:
+            raise ModuleNotFoundError('same native initialization failure')
+        if main_hit:
             if failure == 'julia':
                 raise JuliaError('PyCall initialization failed')
             if failure == 'unsupported-python':
@@ -2094,7 +2121,8 @@ def test_magemin_julia_runtime_discovery_failures_return_unavailable(
                 raise FileNotFoundError('Julia executable missing')
             if failure == 'local-runtime':
                 raise RuntimeError('local Julia import hook defect')
-            raise subprocess.CalledProcessError(1, ['julia'])
+            if failure == 'process':
+                raise subprocess.CalledProcessError(1, ['julia'])
         return real_import(name, globals, locals, fromlist, level)
 
     monkeypatch.setattr(builtins, '__import__', fail_main_import)
@@ -2115,6 +2143,10 @@ def test_magemin_julia_runtime_discovery_failures_return_unavailable(
         'unsupported-version': 'RuntimeError',
         'os': 'FileNotFoundError',
         'process': 'CalledProcessError',
+        'package-import': 'ImportError',
+        'package-missing': 'ModuleNotFoundError',
+        'core-import': 'ImportError',
+        'core-missing': 'ModuleNotFoundError',
     }[failure]
     assert bridge == (None, None)
     assert (
@@ -2129,6 +2161,7 @@ def test_magemin_julia_runtime_discovery_failures_return_unavailable(
             'PyJulia does not support Julia < 0.7 anymore',
             'Julia executable missing',
             'returned non-zero exit status',
+            'same native initialization failure',
         )
     )
 

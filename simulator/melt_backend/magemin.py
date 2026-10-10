@@ -355,16 +355,22 @@ def _admit_magemin_call_scalars(
     temperature_C: Any,
     pressure_bar: Any,
     fO2_log: Any,
-) -> Tuple[float, float, float]:
+    call_timeout_s: Any,
+) -> Tuple[float, float, float, Optional[float]]:
     """Admit declared call scalars, or raise the typed input refusal.
 
-    ``float()`` on a missing or non-numeric temperature, pressure, or fO2
-    used to become ``not_converged`` only because equilibrate's broad catch
-    laundered the TypeError/ValueError. Raise that refusal here so the
-    call boundary stays narrow.
+    ``float()`` on a missing or non-numeric temperature, pressure, fO2, or
+    declared call timeout used to become ``not_converged`` only because
+    equilibrate's broad catch laundered the TypeError/ValueError. Raise
+    that refusal here so the call boundary stays narrow. ``None`` is an
+    omitted timeout budget, not an invalid scalar, and stays unset.
     """
+    declared = [temperature_C, pressure_bar, fO2_log]
+    timeout_declared = call_timeout_s is not None
+    if timeout_declared:
+        declared.append(call_timeout_s)
     admitted: List[float] = []
-    for value in (temperature_C, pressure_bar, fO2_log):
+    for value in declared:
         try:
             admitted.append(float(value))
         except (TypeError, ValueError) as exc:
@@ -372,7 +378,8 @@ def _admit_magemin_call_scalars(
                 type(exc).__name__,
                 str(exc),
             ) from exc
-    return admitted[0], admitted[1], admitted[2]
+    admitted_timeout = admitted[3] if timeout_declared else None
+    return admitted[0], admitted[1], admitted[2], admitted_timeout
 
 
 def _raise_magemin_output_invalid(
@@ -1852,7 +1859,10 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             try:
                 import julia  # type: ignore[import-not-found]
             except ImportError as exc:
-                self._last_error = f'julia bridge import failed: {exc}'
+                self._last_error = (
+                    'julia bridge import failed: '
+                    f'{type(exc).__name__}: {exc}'
+                )
             else:
                 try:
                     from julia.core import (
@@ -1861,7 +1871,10 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         UnsupportedPythonError,
                     )
                 except ImportError as exc:
-                    self._last_error = f'julia bridge import failed: {exc}'
+                    self._last_error = (
+                        'julia bridge import failed: '
+                        f'{type(exc).__name__}: {exc}'
+                    )
                 else:
                     try:
                         # PyJulia's Main loader constructs Julia here, and its
@@ -2049,10 +2062,13 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         """
         module = self._magemin_module
         call_started = time.monotonic()
-        temperature_C, pressure_bar, fO2_log = _admit_magemin_call_scalars(
-            temperature_C,
-            pressure_bar,
-            fO2_log,
+        temperature_C, pressure_bar, fO2_log, call_timeout_s = (
+            _admit_magemin_call_scalars(
+                temperature_C,
+                pressure_bar,
+                fO2_log,
+                call_timeout_s,
+            )
         )
         temperature_K = temperature_C + 273.15
         pressure_GPa = self._pressure_bar_to_GPa(pressure_bar)
@@ -2061,7 +2077,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         # Even in-process bridges cannot be cancelled mid-call, but refuse to
         # start a new evaluation once the residual aggregate budget is gone.
         if call_timeout_s is not None:
-            remaining = float(call_timeout_s)
+            remaining = call_timeout_s
             if not math.isfinite(remaining) or remaining <= 0.0:
                 raise _MAGEMinEngineLifecycleError(
                     'MAGEMinAggregateBudgetExceeded',
