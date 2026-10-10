@@ -39,25 +39,14 @@ def test_toggle_off_existing_path_keeps_mass_balance_closed():
     )
 
     assert max(abs(s.mass_balance_error_pct) for s in snapshots) <= 1.0e-12
-    # 2026-08-05 carrier batch 1a1ab47: the added carrier route leaves
-    # +3.988089247730642e-20 kg Na roundoff in overhead. The exact audit and
-    # outward projection agree, while HI-2 above remains well inside contract.
-    # 2026-08-05 MC-4 wave 1B (a34318c): the composed Na carrier set routes
-    # the tick flux exactly; the residual Na roundoff dust is gone and the
-    # audited overhead is now empty. HI-2 above remains <= 1e-12 %.
-    # Restored flagged routing leaves only these identified roundoff parcels.
-    expected_overhead: dict[str, float] = {
-        "Na": 1.994044623865321e-20,
-        "SiO2_gas": 9.409239450400745e-14,
-    }
-    assert sim.atom_ledger.kg_by_account("process.overhead_gas") == pytest.approx(
-        expected_overhead,
-        rel=1.0e-12,
-        abs=0.0,
-    )
-    assert sim.atom_ledger.project_account_kg(
-        "process.overhead_gas"
-    ) == pytest.approx(expected_overhead, rel=1.0e-12, abs=0.0)
+    # The two-key map was numerical dust. 6ecc4ad4b took the positive
+    # elemental Na off this account (first completable at 39427ad72, with
+    # SiO2 still present). SiO2 was already gone at 9f07e8a8c, leaving only
+    # the negative Na dust through b03045041's parent. b03045041 (b-747)
+    # tracks the unadopted seed as IW(T) through the cold C0 bakeoff, and
+    # that dust leaves too. The closed mass balance above is the guard.
+    assert sim.atom_ledger.kg_by_account("process.overhead_gas") == {}
+    assert sim.atom_ledger.project_account_kg("process.overhead_gas") == {}
 
 
 def test_finite_headspace_keeps_oxygen_bins_distinct():

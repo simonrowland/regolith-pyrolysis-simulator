@@ -569,7 +569,16 @@ def test_non_knudsen_vacuum_bound_and_knudsen_row_oxygen_controls() -> None:
     assert selected.route == "vacuum_total_pressure_upper_bound"
     assert selected.value.point == Decimal("-9")
     melt = melt_activity_requests(collect_consumer_inputs(experiment, bench, observation))
-    assert all(item.payload is not None and item.payload.get("fO2_log") == -9.0 for item in melt)
+    # 7cd3173c9 added internal-analytical as a melt-activity engine. It
+    # refuses SiO2 (not a trace parent) and must not invent an fO2. Every
+    # scored payload still carries the vacuum-bound -9.
+    scored = [item for item in melt if item.payload is not None]
+    refused = [
+        item for item in melt if item.readiness.engine == "internal-analytical"
+    ]
+    assert scored
+    assert all(item.payload.get("fO2_log") == -9.0 for item in scored)
+    assert len(refused) == 1 and refused[0].payload is None
 
     # Knudsen with source-grounded printed sample oxygen still commands fO2_log.
     knudsen, bench_k, obs_k = _case(
@@ -591,4 +600,10 @@ def test_non_knudsen_vacuum_bound_and_knudsen_row_oxygen_controls() -> None:
     assert selected_k is not None
     assert selected_k.route == "observation_fO2_log"
     melt_k = melt_activity_requests(collect_consumer_inputs(knudsen, bench_k, obs_k))
-    assert all(item.payload is not None and item.payload.get("fO2_log") == -7.0 for item in melt_k)
+    scored_k = [item for item in melt_k if item.payload is not None]
+    refused_k = [
+        item for item in melt_k if item.readiness.engine == "internal-analytical"
+    ]
+    assert scored_k
+    assert all(item.payload.get("fO2_log") == -7.0 for item in scored_k)
+    assert len(refused_k) == 1 and refused_k[0].payload is None

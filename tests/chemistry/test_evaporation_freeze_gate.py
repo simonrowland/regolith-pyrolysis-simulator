@@ -2242,7 +2242,13 @@ def test_redox_reference_seed_builds_liquidus_curve_before_first_seed(
 
     assert gate_calls == 1
     assert sim.melt.oxygen_reservoir.reference_T_K == pytest.approx(1450.0 + 273.15)
-    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(-9.0)
+    # -9.0 was log10 of the 1e-9 bar headspace vacuum floor. b03045041
+    # stopped applying that floor to the melt seed, so the stored -9.0 is
+    # not the first liquid tick. That tick fixes Holzheid IW(1450 C) plus
+    # the alkali offset. The curve is still built before the seed is fixed.
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(
+        sim._compute_intrinsic_melt_fO2(1450.0 + 273.15)
+    )
     assert sim._last_melt_redox_liquidus_gate_diagnostic['status'] == 'ok'
 
 
@@ -2316,7 +2322,13 @@ def test_freeze_gate_pre_curve_tick_builds_curve_before_native_split(
     sim.melt.temperature_C = sim.campaign_mgr.furnace_max_T_C
     sim.melt.target_temperature_C = sim.campaign_mgr.furnace_max_T_C
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
-    sim.melt.oxygen_reservoir.reference_T_K = None
+    # b03045041: an unadopted seed (reference_T_K None) is IW(T)+offset.
+    # That sits above pure IW by the alkali offset, so native Fe does not
+    # partition. This guard is the adopted -10 couple, which is below IW:
+    # the split still commits, and the curve is still built before it.
+    sim.melt.oxygen_reservoir.reference_T_K = (
+        float(sim.melt.temperature_C) + 273.15
+    )
     sim._sync_oxygen_reservoir_mirror()
     original_dispatch = sim._dispatch_only
 

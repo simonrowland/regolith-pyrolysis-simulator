@@ -29,7 +29,9 @@ import pytest
 
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.core import OXYGEN_SPECIES
+from simulator.equilibrium import oxygen_potential_mode_for_atmosphere
 from simulator.state import Atmosphere, CampaignPhase
+from simulator.vapour_rail.stoich import surface_oxygen_potential_bar
 
 from .helpers import build_headspace_sim, run_campaign_headspace
 
@@ -179,13 +181,23 @@ def test_pn2_sweep_sio_provider_uses_transport_floor_not_holdup_reservoir():
     diagnostic = dict(sim._last_vapor_pressure_diagnostic or {})
     provenance = diagnostic["vapor_pressure_numerator_provenance"]["SiO"]
     p_sio = diagnostic["vapor_pressures_Pa"]["SiO"]
+    # d-099 (a98989941): PN2_SWEEP is a closed binding, so SiO mass action
+    # reads the melt surface oxygen potential. The 1e-9 bar figure was the
+    # transport floor. The transport channel above still has to stay on
+    # that floor and must not follow the holdup reservoir.
+    surface_pO2_bar = surface_oxygen_potential_bar(
+        mode=oxygen_potential_mode_for_atmosphere(sim.melt.atmosphere),
+        intrinsic_melt_fO2_bar=10.0 ** float(sim._current_melt_redox_fO2_log()),
+        imposed_pO2_bar=requested_transport_pO2_bar,
+    )
 
     assert diagnostic["pO2_bar"] == pytest.approx(requested_transport_pO2_bar)
-    assert provenance["pO2_bar"] == pytest.approx(requested_transport_pO2_bar)
+    assert provenance["pO2_bar"] == pytest.approx(surface_pO2_bar)
+    assert surface_pO2_bar < reservoir.headspace_ledger_pO2_bar
     assert p_sio == pytest.approx(provenance["P_eq_Pa"])
     assert equilibrium.vapor_pressures_Pa["SiO"] == pytest.approx(p_sio)
 
     holdup_substituted_p_sio = p_sio * math.sqrt(
-        requested_transport_pO2_bar / reservoir.headspace_ledger_pO2_bar
+        surface_pO2_bar / reservoir.headspace_ledger_pO2_bar
     )
     assert p_sio > holdup_substituted_p_sio * 100.0

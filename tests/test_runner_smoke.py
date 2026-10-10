@@ -2226,6 +2226,14 @@ def test_runner_envelopes_poisoned_hour_error_loudly(monkeypatch):
     )
     sim._establish_melt_redox_gate_authority_for_current_hour()
     sim._apply_fe_redox_respeciation()
+    # b03045041: an unadopted seed is IW(1600 C) plus the alkali offset,
+    # about -8.21. That sits above pure IW, so native Fe does not commit
+    # a ledger transition and the abort stays a generic failure. This
+    # adopted -10 couple is below IW, so a real transition still commits
+    # before the injected abort and the hour is poisoned.
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
+    sim.melt.oxygen_reservoir.reference_T_K = 1600.0 + 273.15
+    sim._sync_oxygen_reservoir_mirror()
 
     original_step = sim.step
     observed_errors = []
