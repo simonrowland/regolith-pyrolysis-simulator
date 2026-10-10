@@ -632,21 +632,34 @@ def test_markova_table2_migrates_both_quantities_and_printed_charge(tmp_path: Pa
             )
             assert _printed_wt_map(row) == expected
 
-    for panel, charge in charges.items():
-        row = next(
-            value for value in residue.values()
-            if value["experiment_id"].endswith(f"::{panel}")
-        )
-        identity = _identity_composition_components(row)
-        expected_moles = dict(wt_pct_to_mole_fraction(charge).components)
-        assert identity == expected_moles
-        sample = result.experiments[row["experiment_id"]].sample
-        assert sample.printed_composition is not None
-        assert sample.printed_composition.state.value == {
-            oxide: str(value) for oxide, value in charge.items()
-        }
-        assert sample.initial_composition is not None
-        assert dict(sample.initial_composition.state.value.components) == expected_moles
+    for panel in charges:
+        for row in residue.values():
+            if not row["experiment_id"].endswith(f"::{panel}"):
+                continue
+            temperature_c = (
+                Decimal(row["identity"]["temperature_K"]["value"])
+                - Decimal("273.15")
+            )
+            source_point = next(
+                point
+                for point in source_values[panel]["series"]
+                if "T_C" in point
+                and as_decimal(point["T_C"]) == temperature_c
+            )
+            expected = {
+                oxide: as_decimal(source_point[f"{oxide}_wt_pct"])
+                for oxide in charges[panel]
+            }
+            assert _printed_wt_map(row) == expected
+            composition = _state_value(
+                (row.get("point_conditions") or {}).get("composition")
+            )
+            assert composition["amount_basis"] == "mole_fraction"
+            actual_moles = {
+                oxide: as_decimal(amount)
+                for oxide, amount in composition["components"]
+            }
+            assert actual_moles == dict(wt_pct_to_mole_fraction(expected).components)
 
 
 def test_holzheid_v69_activity_does_not_gain_printed_composition(

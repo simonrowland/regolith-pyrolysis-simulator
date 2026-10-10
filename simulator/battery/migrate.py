@@ -13462,11 +13462,25 @@ class Migrator:
             )
             sample = raw_item.get("sample") or raw_item.get("id")
             sample_label = sample.strip() if isinstance(sample, str) else None
-            point_oxide_map = (
-                None
-                if q_for_species is Quantity.RESIDUE_COMPONENT_COMPOSITION
-                else _oxide_map_from_mapping(raw_item)
-            )
+            if q_for_species is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+                point_oxide_map = _mass_loss_oxide_map_from_mapping(raw_item)
+                if point_oxide_map is None and isinstance(parent_values, Mapping):
+                    temperature = _as_dec_or_none(raw_item.get("T_C"))
+                    mass_loss = _as_dec_or_none(raw_item.get("mass_loss_pct"))
+                    series = parent_values.get("series")
+                    matching_points = [
+                        point
+                        for point in (series if isinstance(series, list) else ())
+                        if isinstance(point, Mapping)
+                        and _as_dec_or_none(point.get("T_C")) == temperature
+                        and _as_dec_or_none(point.get("mass_loss_pct")) == mass_loss
+                    ]
+                    if len(matching_points) == 1:
+                        point_oxide_map = _mass_loss_oxide_map_from_mapping(
+                            matching_points[0]
+                        )
+            else:
+                point_oxide_map = _oxide_map_from_mapping(raw_item)
             if q_for_species is Quantity.MASS_LOSS_FRACTION:
                 point_oxide_map = (
                     _mass_loss_oxide_map_from_mapping(raw_item) or point_oxide_map
