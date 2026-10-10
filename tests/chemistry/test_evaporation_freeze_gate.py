@@ -36,6 +36,7 @@ from simulator.reduced_real_determinism import (
     _gate_provider_role_for_key,
     canonical_json_bytes,
     record_dependency_vector,
+    uncacheable_replay_disposition,
 )
 from simulator.runner import _attach_composition_projected_liquidus_notice
 from simulator.state import CampaignPhase, EvaporationFlux
@@ -1195,6 +1196,86 @@ def test_redox_liquid_gate_in_progress_refuses_reentrant_curve_request(
             'liquid_fraction': 0.0,
         }
     ]
+
+
+def test_uncacheable_gate_failure_survives_in_progress_redox_bootstrap(
+    monkeypatch,
+    tmp_path,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    sim.melt.temperature_C = 1600.0
+    sim.melt.p_total_mbar = 10.0
+    shared_cache = {}
+    sim._freeze_gate_shared_curve_cache = shared_cache
+    store = PT0DeterminismStore('capture', db_path=tmp_path / 'nested.db')
+    sim.configure_pt0_determinism_store(store)
+    monkeypatch.setattr(
+        engine_binding_admission,
+        'gate_curve_memo_eligibility',
+        lambda *_args, **_kwargs: True,
+    )
+    monkeypatch.setattr(
+        store,
+        'gate_curve_cache_eligible',
+        lambda *_args, **_kwargs: True,
+    )
+    bootstrap_curves = []
+
+    def unavailable_dispatch(intent, *args, **kwargs):
+        if intent is ChemistryIntent.GATE_LIQUID_FRACTION:
+            raise ProviderUnavailableError('outer gate provider unavailable')
+        return IntentResult(
+            intent=intent,
+            status='ok',
+            transition=None,
+            diagnostic={},
+        )
+
+    def backend_finder(**_kwargs):
+        assert uncacheable_replay_disposition(sim)
+        assert sim._freeze_gate_curve_in_progress
+        bootstrap_curves.append(sim._melt_redox_liquidus_gate_curve())
+        return SimpleNamespace(
+            status='ok',
+            solidus_T_C=1000.0,
+            liquidus_T_C=1300.0,
+            samples=(),
+        )
+
+    monkeypatch.setattr(sim, '_dispatch_only', unavailable_dispatch)
+    monkeypatch.setattr(
+        sim.backend,
+        'find_liquidus_solidus',
+        backend_finder,
+        raising=False,
+    )
+
+    curve = sim._freeze_gate_curve()
+
+    assert curve['source'] == 'liquidus_solidus:backend'
+    assert bootstrap_curves == [None]
+    actual = {
+        'sticky': uncacheable_replay_disposition(sim),
+        'local_admitted': sim._freeze_gate_liquid_fraction_cache is not None,
+        'shared_admitted': bool(shared_cache),
+        'pt0_admitted': bool(store.entries),
+        'pt1_admitted': bool(store.capture_sequence),
+    }
+    assert actual == {
+        'sticky': True,
+        'local_admitted': False,
+        'shared_admitted': False,
+        'pt0_admitted': False,
+        'pt1_admitted': False,
+    }
 
 
 def test_bootstrap_none_refreshes_stale_liquid_fraction_diagnostic(

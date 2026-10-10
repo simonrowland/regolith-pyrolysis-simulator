@@ -471,6 +471,32 @@ def test_interpolation_reemits_union_from_every_used_neighbor(tmp_path: Path) ->
     ]
 
 
+def test_interpolation_candidates_refuse_corrupt_replay_scope(
+    tmp_path: Path,
+) -> None:
+    key = _interpolation_key("stored", feo_fraction=0.20, temperature_K=1500.0)
+    db_path = tmp_path / "corrupt-scope.sqlite"
+    _put_interpolation_row(db_path, key, liquid_fraction=0.7, sio_pa=7.0)
+    corrupt_scope = "0" * 64
+
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} "
+            "SET replay_scope_sha256 = ?",
+            (corrupt_scope,),
+        )
+
+    store = rrd.PT1PersistentEquilibriumStore(db_path)
+    with pytest.raises(
+        rrd.PT1PersistentStoreCorrupt,
+        match="exact key replay scope mismatch",
+    ):
+        store.list_interpolation_candidates(
+            artifact="equilibrium_post_record",
+            replay_scope_sha256=corrupt_scope,
+        )
+
+
 def test_interpolation_refuses_attached_base_dependency_vector_mismatch(
     tmp_path: Path,
 ) -> None:
@@ -484,11 +510,11 @@ def test_interpolation_refuses_attached_base_dependency_vector_mismatch(
     _put_interpolation_row(base_db, high, liquid_fraction=0.71, sio_pa=7.05)
 
     with sqlite3.connect(base_db) as conn:
-        conn.execute(
-            f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} "
-            "SET replay_scope_sha256 = ?",
-            (rci.replay_scope_for_interpolation(query),),
-        )
+        stored_scope = conn.execute(
+            f"SELECT replay_scope_sha256 FROM {rrd.PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()[0]
+    assert stored_scope == rci.replay_scope_for_interpolation(high)
+    assert stored_scope != rci.replay_scope_for_interpolation(query)
 
     store = PT0DeterminismStore(
         "capture",
