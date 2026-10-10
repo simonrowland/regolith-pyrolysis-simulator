@@ -96,6 +96,10 @@ class EngineWorkerRemoteError(RuntimeError):
         self.remote_traceback = remote_traceback
 
 
+class EngineWorkerPoolLifecycleError(RuntimeError):
+    """The pool cannot accept work because its lifecycle has ended."""
+
+
 class EngineWorkerUnavailable(RuntimeError):
     """Parent-side: the isolated worker handle is absent after start.
 
@@ -927,7 +931,9 @@ class EngineWorkerPool:
     def submit(self, request: Any, *, timeout_s: Optional[float] = None) -> Future:
         with self._lifecycle_lock:
             if self._closed:
-                raise RuntimeError('engine worker pool is closed')
+                raise EngineWorkerPoolLifecycleError(
+                    'engine worker pool is closed'
+                )
             # A queued item MUST have someone who will run it. `timeout_s` is
             # not a wall on this call -- it is stashed in the queue item and
             # enforced later by `_consume` -> `worker.call`. So the wall is
@@ -950,15 +956,14 @@ class EngineWorkerPool:
             # long queue wait keeps every thread alive. It fires only when no
             # thread remains that could ever complete the future.
             #
-            # Deliberately a plain RuntimeError, matching the `is closed`
-            # guard immediately above -- both are lifecycle refusals of the
-            # same kind. NOT EngineWorkerUnavailable: that type is read
+            # This is a pool lifecycle refusal. It is NOT
+            # EngineWorkerUnavailable: that type is read
             # downstream as engine ABSENCE and routes to a fallback, which
             # would convert this loud refusal into a quiet substitution of
             # analytical curves for native results. A hang is bad; wrong
             # numbers that nobody notices are worse.
             if not any(thread.is_alive() for thread in self._threads):
-                raise RuntimeError(
+                raise EngineWorkerPoolLifecycleError(
                     f'engine worker pool has no live consumer to run this '
                     f'request ({len(self._threads)} slot(s), all exited); '
                     f'submitting would leave the future permanently pending'
