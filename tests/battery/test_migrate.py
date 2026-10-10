@@ -5666,10 +5666,22 @@ def test_kume_activity_values_use_schema_type_and_map_to_activity() -> None:
         assert quantity.is_value and quantity.value is Quantity.ACTIVITY
         assert reason is None
 
-    assert all(
-        sample["observable"] == "activity_coefficient"
+    expected_observables = {
+        "kume_2000_table1_sample_1": "activity_coefficient",
+        "kume_2000_table2_sample_101": "activity_coefficient",
+        "kume_2000_table3_sample_201": "activity_coefficient",
+        "kume_2000_table4_sample_301": "activity_coefficient",
+        "kume_2000_table3_sample_207_sio2_activity": "activity_coefficient",
+        "kume_2000_table3_sample_207_mgo_activity": "activity_coefficient",
+        "kume_2000_table4_sample_306_mgo_activity": "activity_coefficient",
+        "kume_2000_table4_sample_306_alo1_5_activity": "activity_coefficient",
+        "kume_2000_table3_sample_207_metal_composition": "concentration_series",
+        "kume_2000_table4_sample_306_metal_composition": "concentration_series",
+    }
+    assert {
+        sample["observation_id"]: sample["observable"]
         for sample in extract["fidelity_samples"]
-    )
+    } == expected_observables
 
 
 def test_kume_experiment_temperatures_have_table_locators(tmp_path: Path) -> None:
@@ -5758,6 +5770,61 @@ def test_kume_activity_compositions_map_to_parent_oxide_basis(tmp_path: Path) ->
     )
     assert unknown_observation.identity.composition is not None
     assert unknown_observation.identity.composition.is_unknown
+
+
+def test_kume_tables_3_and_4_printed_compositions_and_activities_bind(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(
+        tmp_path / "real", "kume-2000-cao-activities.yaml"
+    )
+    observations = {
+        obs.observation_id.rsplit("::", 1)[-1]: obs
+        for obs in result.observations.values()
+    }
+
+    sio2_rows = [
+        obs for obs in observations.values()
+        if obs.observation_id.endswith("_sio2_activity")
+    ]
+    assert len(sio2_rows) == 104
+    assert all(
+        obs.identity.composition is not None
+        and obs.identity.composition.is_value
+        for obs in sio2_rows
+    )
+    for sample_id in (
+        "kume_2000_table3_sample_207",
+        "kume_2000_table4_sample_306",
+    ):
+        assert (
+            observations[f"{sample_id}_sio2_activity"].identity.composition
+            == observations[sample_id].identity.composition
+        )
+
+    mgo_rows = [
+        obs for obs in observations.values()
+        if obs.observation_id.endswith("_mgo_activity")
+    ]
+    alo_rows = [
+        obs for obs in observations.values()
+        if obs.observation_id.endswith("_alo1_5_activity")
+    ]
+    assert len(mgo_rows) == 45
+    assert len(alo_rows) == 18
+
+    table3_mgo = observations["kume_2000_table3_sample_207_mgo_activity"]
+    assert table3_mgo.value.point == Decimal("0.103")
+    assert (
+        table3_mgo.identity.composition
+        == observations["kume_2000_table3_sample_207"].identity.composition
+    )
+    table4_mgo = observations["kume_2000_table4_sample_306_mgo_activity"]
+    table4_al = observations["kume_2000_table4_sample_306_alo1_5_activity"]
+    assert table4_mgo.value.point == Decimal("0.362")
+    assert table4_al.value.point == Decimal("0.0076")
+    assert table4_al.identity.composition.value.as_map()["Al2O3"] > 0
+    assert "AlO1.5" not in table4_al.identity.composition.value.as_map()
 
 
 @pytest.mark.parametrize(
@@ -5956,6 +6023,59 @@ def test_kume_measured_reduced_activity_preserves_structured_derivation(
         and entry.axes in (["derivation"], ["derived_from"])
         for entry in result.queue
     )
+
+
+def test_kume_tables3_and4_derivation_evidence_fresh_migration_and_mutations(
+    tmp_path: Path,
+) -> None:
+    name = "kume-2000-cao-activities.yaml"
+    result = _migrate_real_extract(tmp_path / "fresh", name)
+    assert len(result.observations) == 375
+    assert result.validation is not None
+    assert not result.validation.hard_issues
+
+    table3_id = "kume_2000_table3_sample_207_mgo_activity"
+    table4_id = "kume_2000_table4_sample_306_mgo_activity"
+    table3 = next(
+        obs for obs in result.observations.values()
+        if obs.observation_id.endswith(f"::{table3_id}")
+    )
+    table4 = next(
+        obs for obs in result.observations.values()
+        if obs.observation_id.endswith(f"::{table4_id}")
+    )
+    assert table3.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+    assert table3.derivation is not None
+    assert "exchange reaction (3) and Eq. (4)" in table3.derivation.relation
+    assert table3.derivation.inputs == table3.derived_from
+    assert table4.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+    assert table4.derived_from is None
+    assert table4.derivation is None
+
+    source = REPO_ROOT / "data" / "literature" / "extracts" / name
+    extract = yaml.safe_load(source.read_text(encoding="utf-8"))
+    extract["source_id"] = "fixture-source"
+    rows = {
+        row["observation_id"]: row
+        for block in extract["species"].values()
+        for row in block["observations"]
+    }
+    rows[table3_id].pop("derivation")
+    mutated_table4 = rows[table4_id]
+    mutated_table4["values"]["method_class"] = "measured_reduced"
+    mutated_table4["values"]["evidence_class"] = "measured_reduced"
+    mutated_table4["derived_from"] = ["missing-parent"]
+    mutated = migrate(_write_min_tree(tmp_path / "mutated", extract), write=False)
+    issues = {
+        issue.path: issue.detail
+        for issue in mutated.validation.hard_issues
+    }
+    assert issues[
+        f"observation[fixture-source::{table3_id}].derivation"
+    ] == "derived observation requires derivation"
+    assert issues[
+        f"observation[fixture-source::{table4_id}].derivation"
+    ] == "derived observation requires derivation"
 
 
 def test_unregistered_table_derivation_input_is_not_retained(
