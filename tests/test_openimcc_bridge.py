@@ -484,6 +484,32 @@ def test_pack_digest_preserves_the_v1_binding_value() -> None:
     assert _pack_digest(_load_pack("v1.0.2")) == expected
 
 
+def test_legacy_default_pack_matches_explicit_published_core() -> None:
+    _openimcc_or_skip()
+    import openimcc
+    from importlib import resources
+
+    composition = COMPOSITIONS["lunar_mare_low_ti"][0]
+    default_pack = _load_pack("v1.0.2")
+    with resources.as_file(
+        resources.files("openimcc").joinpath(
+            "data", "packs", "imcc-sf04-v1.0.2.json"
+        )
+    ) as published_path:
+        published_pack = openimcc.load_datapack(published_path)
+    assert default_pack.binding_digest == published_pack.binding_digest
+    default_result = openimcc.evaluate(
+        composition, 2200.0, default_pack, basis_type="wt"
+    )
+    published_result = openimcc.evaluate(
+        composition, 2200.0, published_pack, basis_type="wt"
+    )
+    assert default_result.parent_oxides == published_result.parent_oxides
+    assert tuple(default_result.parent_activity) == tuple(
+        published_result.parent_activity
+    )
+
+
 def test_pack_digest_uses_ext_binding_digest() -> None:
     _openimcc_or_skip()
     expected = "4cbec2ee85cd95314a5f62f5ce4e00cbe660935bde12df3a7e5daa425612ad03"
