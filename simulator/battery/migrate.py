@@ -15863,97 +15863,156 @@ class Migrator:
             )
 
     def _apply_supersedes(self) -> None:
-        for old_id, new_id, work_id, locator, source_key in reversed(
-            self._pending_supersedes
-        ):
-            old = self.result.observations.get(old_id)
-            if old is None:
-                matches = [
-                    oid
-                    for oid in self.result.observations
-                    if oid == old_id or oid.startswith(old_id + "::")
+        observations = self.result.observations
+        chosen_edges: dict[str, str] = {}
+
+        def measurement_key(observation_id: str) -> tuple[object, ...] | None:
+            observation = observations[observation_id]
+            temperature = observation.identity.temperature_K
+            if temperature is None or not temperature.is_value:
+                return None
+            time_min = (observation.point_conditions or {}).get("time_min")
+            row_match = re.search(r":row=([^:]+)", observation_id)
+            row_key = row_match.group(1) if row_match is not None else None
+            return (
+                temperature.value,
+                observation.identity.species.formula,
+                time_min.state.value
+                if time_min is not None and time_min.state.is_value
+                else None,
+                ("row", row_key)
+                if row_key is not None
+                else ("experiment", observation.experiment_id),
+            )
+
+        # The later source observation wins for a parent with competing
+        # successors, matching the established green precedence.
+        for old_id, new_id, work_id, locator, source_key in self._pending_supersedes:
+            if old_id in observations:
+                old_rows = [old_id]
+            else:
+                old_rows = [
+                    oid for oid in self._exploded_children.get(old_id, ())
+                    if oid in observations
                 ]
-                if not matches:
+            if not old_rows:
+                self.result.add_queue(
+                    work_id, locator, ["admission.superseded_by"],
+                    f"supersedes target {old_id!r} unresolved in this extract",
+                    source=source_key, observation_id=new_id,
+                )
+                continue
+
+            if new_id in observations:
+                new_rows = [new_id]
+            else:
+                new_rows = [
+                    oid for oid in self._exploded_children.get(new_id, ())
+                    if oid in observations
+                ]
+            if not new_rows:
+                self.result.add_queue(
+                    work_id, locator, ["admission.superseded_by"],
+                    f"superseding observation {new_id!r} was not retained",
+                    source=source_key, observation_id=new_id,
+                )
+                continue
+
+            for old_row in old_rows:
+                if len(old_rows) == 1 and len(new_rows) == 1:
+                    target_rows = new_rows
+                else:
+                    old_key = measurement_key(old_row)
+                    target_rows = [
+                        oid for oid in new_rows
+                        if old_key is not None and measurement_key(oid) == old_key
+                    ]
+                if len(target_rows) != 1:
                     self.result.add_queue(
-                        work_id,
-                        locator,
+                        work_id, observations[old_row].locator or locator,
                         ["admission.superseded_by"],
-                        f"supersedes target {old_id!r} unresolved in this extract",
-                        source=source_key,
-                        observation_id=new_id,
+                        f"supersedes row {old_row!r} has no unique matching row in {new_id!r}; row left live",
+                        source=source_key, observation_id=old_row,
                     )
                     continue
-            else:
-                matches = [old_id]
-            surviving_new = new_id if new_id in self.result.observations else None
-            if surviving_new is None:
-                children = [
-                    oid
-                    for oid in self.result.observations
-                    if oid.startswith(new_id + "::")
-                ]
-                surviving_new = children[0] if children else None
-            if surviving_new is None:
-                self.result.add_queue(
-                    work_id,
-                    locator,
-                    ["admission.superseded_by"],
-                    f"superseding observation {new_id!r} was not retained",
-                    source=source_key,
-                    observation_id=new_id,
+                chosen_edges[old_row] = target_rows[0]
+
+        terminal_by_parent: dict[str, str] = {}
+        cycle_nodes: set[str] = set()
+        for parent_id in chosen_edges:
+            current = parent_id
+            path: list[str] = []
+            positions: dict[str, int] = {}
+            while True:
+                if current in positions:
+                    cycle_nodes.update(path[positions[current]:])
+                    break
+                positions[current] = len(path)
+                path.append(current)
+                observation = observations.get(current)
+                if observation is None:
+                    break
+                edge = chosen_edges.get(current)
+                if edge is not None:
+                    current = edge
+                    continue
+                if observation.admission.status is AdmissionStatus.SUPERSEDED:
+                    target = observation.admission.superseded_by
+                    if target is not None and target in observations:
+                        current = target
+                        continue
+                    break
+                if observation.admission.status in {
+                    AdmissionStatus.ADMITTED,
+                    AdmissionStatus.PENDING,
+                }:
+                    for node in path:
+                        terminal_by_parent[node] = current
+                break
+
+        for node in sorted(cycle_nodes):
+            self.result.registry_issues.append(
+                ValidationIssue(
+                    path=f"observations.{node}.admission.superseded_by",
+                    reason=RefusalReason.INVALID_SOURCE,
+                    detail="supersedes_cycle: cycle contains " + ", ".join(sorted(cycle_nodes)),
                 )
+            )
+
+        for parent_id in chosen_edges:
+            terminal_id = terminal_by_parent.get(parent_id)
+            if terminal_id is None or parent_id in cycle_nodes:
                 continue
-            new_obs = self.result.observations[surviving_new]
-            seen = {surviving_new}
-            while (
-                new_obs.admission.status is AdmissionStatus.SUPERSEDED
-                and new_obs.admission.superseded_by is not None
-                and new_obs.admission.superseded_by in self.result.observations
-                and new_obs.admission.superseded_by not in seen
-            ):
-                surviving_new = new_obs.admission.superseded_by
-                seen.add(surviving_new)
-                new_obs = self.result.observations[surviving_new]
-            if new_obs.admission.status not in {
-                AdmissionStatus.ADMITTED,
-                AdmissionStatus.PENDING,
-            }:
-                continue
-            for match_id in matches:
-                old_obs = self.result.observations[match_id]
-                if old_obs.admission.reason.startswith(_ADMISSION_DEFAULTED_PREFIX):
-                    object.__setattr__(
-                        old_obs,
-                        "notices",
-                        tuple(
-                            notice
-                            for notice in old_obs.notices
-                            if not (
-                                notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
-                                and notice.origin == old_obs.observation_id
-                                and notice.reason.startswith(
-                                    "fO2_Pa is a DERIVED condition, not a measurement:"
-                                )
-                            )
-                        ),
-                    )
-                decided = old_obs.admission.decided_by or new_obs.admission.decided_by
-                if decided is None and old_obs.locator is not None:
-                    decided = AdmissionDecision(
-                        worker="extract-supersedes",
-                        date="unspecified",
-                        evidence=old_obs.locator,
-                    )
+            old_obs = observations[parent_id]
+            new_obs = observations[terminal_id]
+            if old_obs.admission.reason.startswith(_ADMISSION_DEFAULTED_PREFIX):
                 object.__setattr__(
-                    old_obs,
-                    "admission",
-                    Admission(
-                        status=AdmissionStatus.SUPERSEDED,
-                        reason="superseded by a later observation in the same extract",
-                        superseded_by=surviving_new,
-                        decided_by=decided,
+                    old_obs, "notices",
+                    tuple(
+                        notice for notice in old_obs.notices
+                        if not (
+                            notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
+                            and notice.origin == old_obs.observation_id
+                            and notice.reason.startswith(
+                                "fO2_Pa is a DERIVED condition, not a measurement:"
+                            )
+                        )
                     ),
                 )
+            decided = old_obs.admission.decided_by or new_obs.admission.decided_by
+            if decided is None and old_obs.locator is not None:
+                decided = AdmissionDecision(
+                    worker="extract-supersedes", date="unspecified", evidence=old_obs.locator
+                )
+            object.__setattr__(
+                old_obs, "admission",
+                Admission(
+                    status=AdmissionStatus.SUPERSEDED,
+                    reason="superseded by a later observation in the same extract",
+                    superseded_by=terminal_id,
+                    decided_by=decided,
+                ),
+            )
 
     def _resolve_queue_ids(self) -> None:
         observations = self.result.observations

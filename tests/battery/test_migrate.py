@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import itertools
 import json
 import os
 import re
@@ -47,6 +48,7 @@ from simulator.battery.migrate import (
     DuplicateContextIdError,
     QUEUE_SCHEMA_VERSION,
     DuplicateObservationIdError,
+    MigrationResult,
     Migrator,
     UnknownRailSpellingError,
     UnresolvedEquipmentContextError,
@@ -2404,6 +2406,107 @@ def test_g04_supersedes_marks_the_old_row(tmp_path: Path) -> None:
     assert newer.admission.status is AdmissionStatus.ADMITTED
     assert newer.admission.superseded_by is None
     assert any("missing_target" in (e.why or "") for e in result.queue)
+
+
+def _migrate_supersedes_rows(
+    tmp_path: Path, rows: list[tuple[str, str | None, str]]
+) -> MigrationResult:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"] = []
+    for observation_id, supersedes, status in rows:
+        row = {
+            "observation_id": observation_id,
+            "type": "alpha",
+            "locator": {"table": "1"},
+            "phase": "gas",
+            "values": {
+                "quantity": "literature_vaporization_coefficient",
+                "method_class": "measured_direct",
+                "admission_status": status,
+            },
+        }
+        if supersedes is not None:
+            row["supersedes"] = supersedes
+        extract["species"]["Na"]["observations"].append(row)
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    _assert_superseded_targets_are_live(result)
+    return result
+
+
+def _assert_superseded_targets_are_live(result: MigrationResult) -> None:
+    observations = result.observations
+    for observation in observations.values():
+        target_id = observation.admission.superseded_by
+        if target_id is None:
+            continue
+        assert target_id in observations
+        assert observations[target_id].admission.status in {
+            AdmissionStatus.ADMITTED, AdmissionStatus.PENDING
+        }
+
+
+@pytest.mark.parametrize("order", list(itertools.permutations(("A", "B", "C"))))
+def test_g04_supersedes_chain_is_order_independent_and_flattened(
+    tmp_path: Path, order: tuple[str, ...]
+) -> None:
+    specs = {
+        "A": (None, "admitted"),
+        "B": ("A", "admitted"),
+        "C": ("B", "admitted"),
+    }
+    result = _migrate_supersedes_rows(
+        tmp_path, [(name, *specs[name]) for name in order]
+    )
+    assert (
+        result.observations["fixture-source::A"].admission.superseded_by
+        == "fixture-source::C"
+    )
+    assert (
+        result.observations["fixture-source::B"].admission.superseded_by
+        == "fixture-source::C"
+    )
+    assert (
+        result.observations["fixture-source::C"].admission.status
+        is AdmissionStatus.ADMITTED
+    )
+
+
+def test_g04_supersedes_cycle_keeps_rows_live_and_emits_hard_issue(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_supersedes_rows(
+        tmp_path, [("A", "B", "admitted"), ("B", "A", "admitted")]
+    )
+    for name in ("A", "B"):
+        row = result.observations[f"fixture-source::{name}"]
+        assert row.admission.status is AdmissionStatus.ADMITTED
+        assert row.admission.superseded_by is None
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and "supersedes_cycle" in issue.detail
+        and "fixture-source::A" in issue.detail
+        and "fixture-source::B" in issue.detail
+        for issue in result.validation.hard_issues
+    )
+
+
+def test_g04_competing_superseders_keep_green_precedence(tmp_path: Path) -> None:
+    result = _migrate_supersedes_rows(
+        tmp_path,
+        [("A", None, "admitted"), ("B", "A", "admitted"), ("C", "A", "admitted")],
+    )
+    assert (
+        result.observations["fixture-source::A"].admission.superseded_by
+        == "fixture-source::C"
+    )
+    assert (
+        result.observations["fixture-source::B"].admission.status
+        is AdmissionStatus.ADMITTED
+    )
+    assert (
+        result.observations["fixture-source::C"].admission.status
+        is AdmissionStatus.ADMITTED
+    )
 
 
 def test_g04_rejected_superseder_does_not_supersede_measured_row(
@@ -10071,6 +10174,22 @@ def test_residue_cells_keep_run_identity_and_printed_conditions(
     hashimoto = _migrate_real_extract(
         tmp_path / "hashimoto", f"{hashimoto_id}.yaml"
     )
+    _assert_superseded_targets_are_live(hashimoto)
+    for row_label, run_id in (("c3-(2)", "17c3-2"), ("c5-(1)", "17c5-1")):
+        old = next(
+            obs
+            for obs in hashimoto.observations.values()
+            if obs.observation_id.startswith(
+                f"{hashimoto_id}::hashimoto_1983_table3_cao_residue_series::T=1973.15:row={row_label}:"
+            )
+        )
+        target = hashimoto.observations[old.admission.superseded_by]
+        assert target.observation_id.startswith(
+            f"{hashimoto_id}::hashimoto_1983_table3_residue_composition_series_quoted__run_{run_id}::T=1973.15:row={row_label}:"
+        )
+        assert target.admission.status in {
+            AdmissionStatus.ADMITTED, AdmissionStatus.PENDING
+        }
     hashimoto_source = _extract_observations(f"{hashimoto_id}.yaml")
     run_sources = {}
     for source_obs in hashimoto_source:
@@ -10093,6 +10212,8 @@ def test_residue_cells_keep_run_identity_and_printed_conditions(
         and obs.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
         and obs.value.point is not None
         and obs.admission.status is not AdmissionStatus.SUPERSEDED
+        and "::hashimoto_1983_table3_residue_composition_series_quoted__run_"
+        in obs.observation_id
     ]
     expected_hashimoto = Counter()
     for run_id, (values, item) in run_sources.items():
