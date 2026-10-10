@@ -93,6 +93,39 @@ fidelity_samples:
     first: {pixel_coordinates: [1976, 3292], T_C: 1574.01, log10_P_i_Torr: -5.1695}
     independent_repeat: {pixel_coordinates: [1975, 3293], T_C: 1572.30, log10_P_i_Torr: -5.1780}
   locator: {published_page: 461, pdf_page_index: 2, figure: '4', note: 'Independent second marker-center reading for FeO(g), sample 4'}
+- path: species.Al2O3.observations[markova_1983_kems_method_and_inventory].values.cell_material_as_printed
+  value:
+    value: Tungsten (W) cell
+    locator:
+      published_page: 869
+      pdf_page_index: 1
+      section: Technique
+      note: Technique described in cited companion paper [2].
+  locator: {published_page: 869, pdf_page_index: 1, section: Technique, note: "Technique described in cited companion paper [2]."}
+- path: species.Al2O3.observations[markova_1983_kems_method_and_inventory].values.instrument
+  value: MS-1301 mass spectrometer
+  locator: {published_page: 869, pdf_page_index: 1, section: Technique, note: "Technique described in cited companion paper [2]."}
+- path: species.Al2O3.observations[markova_1983_kems_method_and_inventory].values.heating_method_as_printed
+  value: Electron-bombardment heating up to 2500 °C
+  locator: {published_page: 869, pdf_page_index: 1, section: Technique, note: "Technique described in cited companion paper [2]."}
+- path: species.Al2O3.observations[markova_1983_kems_method_and_inventory].values.temperature_measurement_as_printed
+  value: Optical pyrometer (±5°)
+  locator: {published_page: 869, pdf_page_index: 1, section: Technique, note: "Technique described in cited companion paper [2]."}
+- path: species.Al2O3.observations[markova_1983_kems_method_and_inventory].values.electron_impact_energy_eV
+  value: '20'
+  locator: {published_page: 869, pdf_page_index: 1, section: Technique, note: "Technique described in cited companion paper [2]."}
+- path: species.Al2O3.observations[markova_1983_kems_method_and_inventory].values.calibration_standard_as_printed
+  value: Au standard jointly heated in the W cell
+  locator: {published_page: 869, pdf_page_index: 1, section: Technique, note: "Technique described in cited companion paper [2]; pressure-calibration role is unstated."}
+- path: species.Al2O3.observations[markova_1983_kems_method_and_inventory].values.sample_mass_range_mg
+  value: [8, 30]
+  locator: {published_page: 869, pdf_page_index: 1, section: Technique, note: "Companion paper prints sample materials of 8–30 mg."}
+- path: species.Al2O3.observations[markova_1983_kems_method_and_inventory].values.temperature_step_deg
+  value: 80
+  locator: {published_page: 869, pdf_page_index: 1, section: Technique, note: "Technique described in cited companion paper [2]."}
+- path: species.Al2O3.observations[markova_1983_kems_method_and_inventory].values.temperature_step_duration_min
+  value: 15
+  locator: {published_page: 869, pdf_page_index: 1, section: Technique, note: "Technique described in cited companion paper [2]."}
 benches:
 - id: markova-1983-kems
   identity: {basis: described_in_this_work}
@@ -100,23 +133,46 @@ benches:
     state: {tag: value, value: Knudsen mass spectrometry}
     locator: {published_page: 460, pdf_page_index: 1, section: Technique}
   cell_material_and_liner:
-    state: {tag: unknown, reason: not_published}
+    state: {tag: value, value: Tungsten (W) cell}
     locator:
-      published_page: 460
+      published_page: 869
       pdf_page_index: 1
       section: Technique
-      note: The two-page abstract does not print the cell material.
+      note: Technique described in cited companion paper [2].
   detector:
     state: {tag: value, value: MS-1301 mass spectrometer}
-    locator: {published_page: 460, pdf_page_index: 1, section: Technique}
+    locator: {published_page: 869, pdf_page_index: 1, section: Technique, note: "Technique described in cited companion paper [2]."}
+  heating_method:
+    state: {tag: value, value: Electron-bombardment heating up to 2500 °C}
+    locator:
+      published_page: 869
+      pdf_page_index: 1
+      section: Technique
+      note: Technique described in cited companion paper [2].
+  ionization:
+    electron_impact_energy_eV:
+      state: {tag: value, value: '20'}
+      locator:
+        published_page: 869
+        pdf_page_index: 1
+        section: Technique
+        note: Technique described in cited companion paper [2].
+  temperature_measurement:
+    optical_pyrometer:
+      state: {tag: value, value: Optical pyrometer (±5°)}
+      locator:
+        published_page: 869
+        pdf_page_index: 1
+        section: Technique
+        note: Technique described in cited companion paper [2].
   geometry:
     cell_internal_dimensions:
       diameter_m:
         state: {tag: unknown, reason: not_published}
-        locator: {published_page: 460, pdf_page_index: 1, section: Technique}
+        locator: {published_page: 869, pdf_page_index: 1, section: Technique, note: "Technique described in cited companion paper [2]; cell dimensions are not printed."}
       height_m:
         state: {tag: unknown, reason: not_published}
-        locator: {published_page: 460, pdf_page_index: 1, section: Technique}
+        locator: {published_page: 869, pdf_page_index: 1, section: Technique, note: "Technique described in cited companion paper [2]; cell dimensions are not printed."}
 experiments:
 - experiment_id: markova-1983-kems-series
   bench_id: markova-1983-kems
@@ -125,23 +181,61 @@ experiments:
     published_page: 460
     pdf_page_index: 1
     section: Technique
-    note: Four sample series are shown; separate run identifiers are not printed.
+    note: Four sample series are shown; separate run identifiers are not printed. The cited companion describes Knudsen effusion but reports no orifice dimensions or explicit regime determination.
   apparatus:
-    calibration:
-      calibration:
-        state: {tag: unknown, reason: not_published}
+    cell_material_and_liner:
+      state: {tag: value, value: Tungsten (W) cell}
+      locator:
+        published_page: 869
+        pdf_page_index: 1
+        section: Technique
+        note: Technique described in cited companion paper [2].
+    ionization:
+      electron_impact_energy_eV:
+        state: {tag: value, value: '20'}
         locator:
-          published_page: 460
+          published_page: 869
           pdf_page_index: 1
           section: Technique
-          note: No pressure calibration method or silver/gold standard is stated in this paper.
+          note: Technique described in cited companion paper [2].
+    temperature_measurement:
+      optical_pyrometer:
+        state: {tag: value, value: Optical pyrometer (±5°)}
+        locator:
+          published_page: 869
+          pdf_page_index: 1
+          section: Technique
+          note: Technique described in cited companion paper [2].
+    calibration:
+      method:
+        state: {tag: value, value: In-situ Au vapour-pressure calibration}
+        locator:
+          published_page: 869
+          pdf_page_index: 1
+          section: Technique
+          note: calibration role inferred from the jointly heated Au standard (1983LPI....14..869Y p. 869); not stated explicitly
+      reference_substance:
+        state: {tag: value, value: Au standard jointly heated in the W cell}
+        locator:
+          published_page: 869
+          pdf_page_index: 1
+          section: Technique
+          note: Technique described in cited companion paper [2].
     geometry:
       orifice_diameter_m:
         state: {tag: unknown, reason: not_published}
-        locator: {published_page: 460, pdf_page_index: 1, section: Technique}
+        locator: {published_page: 869, pdf_page_index: 1, section: Technique, note: "Technique described in cited companion paper [2]; no orifice dimensions are printed."}
       orifice_channel_length_m:
         state: {tag: unknown, reason: not_published}
-        locator: {published_page: 460, pdf_page_index: 1, section: Technique}
+        locator: {published_page: 869, pdf_page_index: 1, section: Technique, note: "Technique described in cited companion paper [2]; no orifice dimensions are printed."}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: interval, interval_low: '0.000008', interval_high: '0.000030'}}
+      locator: {published_page: 869, pdf_page_index: 1, section: Technique, note: Companion paper prints sample materials of 8–30 mg; unit conversion only.}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: Temperature increased in 80° steps held for 15 min each}
+      locator: {published_page: 869, pdf_page_index: 1, section: Technique, note: "Technique described in cited companion paper [2]."}
   pressure_environment:
     total_pressure_Pa:
       state: {tag: unknown, reason: not_published}
@@ -192,7 +286,7 @@ species:
       regime: kems_effusion
       units: as published
       uncertainty:
-        note: No numeric calibration envelope or orifice geometry printed in this abstract.
+        note: The cited companion reports an Au standard jointly heated in the W cell, but does not explicitly identify it as a pressure calibration; no orifice geometry is printed.
       values:
         quantity: kems_method_geometry_reference
         method_class: method_only
@@ -203,10 +297,24 @@ species:
         background_pressure_as_printed: not printed
         effusion_orifice_diameter_as_printed: not printed
         cell_dimensions_as_printed: not printed
-        calibration_standard_as_printed: not printed
+        calibration_standard_as_printed: Au standard jointly heated in the W cell
+        pressure_calibration_role_as_printed: not stated
+        cell_material_as_printed:
+          value: Tungsten (W) cell
+          locator:
+            published_page: 869
+            pdf_page_index: 1
+            section: Technique
+            note: Technique described in cited companion paper [2].
+        heating_method_as_printed: Electron-bombardment heating up to 2500 °C
+        temperature_measurement_as_printed: Optical pyrometer (±5°)
+        electron_impact_energy_eV: '20'
+        sample_mass_range_mg: [8, 30]
+        temperature_step_deg: 80
+        temperature_step_duration_min: 15
+        instrument_as_printed_in_companion: MS-1301 mass spectrometer
+        technique_reference: Yakovlev O.I., Markova O.M., Semenov G.A., Belov A.N. (1983), LPSC XIV, pp. 869–870; cited by Markova [2]
         full_vaporization: true
-        technique_reference: Yakovlev O.I., Markova O.M., Semenov G.A., Belov A.N. (1983) LPSC XIV (ref
-          2)
         analogous_prior_work: De Maria et al., Proc. 2nd L.S.C. v.2 pp. 1367-1380 (ref 1)
         detected_atomic_and_molecular_forms:
         - Na
@@ -234,8 +342,7 @@ species:
         - orifice_diameter
         - clausing_factor
         - sample_surface_area
-        - cell_material
-        geometry_note: Orifice, cell material, and calibration are not printed in this 2-page abstract.
+        geometry_note: The cited companion identifies the W cell but does not print its dimensions or effusion-orifice dimensions; Au is jointly heated, but its calibration role is unstated.
         release_sequence_as_printed: (Na,K)-Fe-SiO Mg-Ca,TiO-Al
         release_sequence_note: Sequence of components release into vapor phase (or sequence of reaching
           of maximum pressure) was similar in all cases and coincides in general with the row of volatilities
