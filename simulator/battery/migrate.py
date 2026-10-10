@@ -8445,20 +8445,10 @@ def select_declared_source(
                 field_name="gas_species",
             )
         try:
-            from simulator.accounting.formulas import (
-                ATOMIC_WEIGHTS_G_PER_MOL,
-                parse_formula,
-            )
+            from simulator.accounting.formulas import parse_formula
 
             formula = parse_formula(gas_species.strip())
-            molar_mass = sum(
-                (
-                    Decimal(str(count))
-                    * Decimal(str(ATOMIC_WEIGHTS_G_PER_MOL[element]))
-                    for element, count in formula.elements.items()
-                ),
-                Decimal("0"),
-            )
+            molar_mass = Decimal(str(formula.molar_mass_g_per_mol()))
         except (KeyError, ValueError):
             return _unavailable_selection(
                 f"printed gas_species {gas_species!r} has no resolved molar mass",
