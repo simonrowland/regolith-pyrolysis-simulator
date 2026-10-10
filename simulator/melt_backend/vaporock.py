@@ -109,6 +109,7 @@ from __future__ import annotations
 
 import enum
 import importlib
+import inspect
 import math
 import os
 import re
@@ -327,6 +328,12 @@ _IMPORT_CANDIDATES = (
     'vaporock',
     'VapoRock',
 )
+_VAPOROCK_CANDIDATE_ENTRYPOINTS = (
+    'calc_vapor_pressures',
+    'calc_vapor',
+    'equilibrium_vapor',
+    'vapor_equilibrium',
+)
 _VAPOROCK_MELT_BASIS = tuple(dict.fromkeys((*OXIDE_SPECIES, 'H2O', 'CO2')))
 
 
@@ -528,6 +535,36 @@ class VapoRockCallError(RuntimeError):
             self.external_exception = cause
             self.external_message = message or ''
         super().__init__(f'{self.external_exception}: {self.external_message}')
+
+
+def _vaporock_equilibrium_entrypoints(
+    module: Any,
+) -> tuple[list[tuple[str, Any]], Any]:
+    candidates = []
+    for name in _VAPOROCK_CANDIDATE_ENTRYPOINTS:
+        fn = getattr(module, name, None)
+        if callable(fn):
+            candidates.append((name, fn))
+    system_cls = getattr(module, 'System', None)
+    if callable(system_cls) and all(
+        callable(getattr(system_cls, name, None))
+        for name in ('set_melt_comp', 'eval_gas_abundances')
+    ):
+        return candidates, system_cls
+    return candidates, None
+
+
+def _vaporock_incompatible_api_error(
+    last_error: Optional[Exception] = None,
+) -> VapoRockCallError:
+    message = (
+        'VapoRock library does not expose a recognised equilibrium '
+        'entry point (tried: '
+        f'{", ".join(_VAPOROCK_CANDIDATE_ENTRYPOINTS)}, '
+        'System.set_melt_comp and System.eval_gas_abundances)'
+        + (f'; last signature error: {last_error}' if last_error else '')
+    )
+    return VapoRockCallError('VapoRockIncompatibleAPI', message)
 
 
 def _speciation_value_stats(
@@ -922,16 +959,23 @@ def _bootstrap_vaporock_worker(
         try:
             module = importlib.import_module(module_name)
             break
+        except OSError as exc:
+            raise VapoRockCallError(exc) from exc
         except ImportError as exc:
             errors.append(f'{module_name}: {type(exc).__name__}: {exc}')
     if module is None:
         raise ModuleNotFoundError(
             'VapoRock import failed in warm worker: ' + '; '.join(errors)
         )
-    system_cls = getattr(module, 'System', None)
+    _, system_cls = _vaporock_equilibrium_entrypoints(module)
+    if system_cls is None:
+        raise VapoRockCallError(
+            'VapoRockIncompatibleAPI',
+            'VapoRock warm worker has no System entry point',
+        )
     resource: dict[str, Any] = {
         'module': module,
-        'system_cls': system_cls if callable(system_cls) else None,
+        'system_cls': system_cls,
         'system': None,
         'temperature_units': str(temperature_units),
         'vapor_pressure_units': str(vapor_pressure_units),
@@ -968,8 +1012,9 @@ def _handle_vaporock_request(
     fO2_log = float(request['fO2_log'])
     system_cls = resource.get('system_cls')
     if system_cls is None:
-        raise RuntimeError(
-            'VapoRock warm worker has no System entry point'
+        raise VapoRockCallError(
+            'VapoRockIncompatibleAPI',
+            'VapoRock warm worker has no System entry point',
         )
 
     latched = bool(resource.get('reuse_latched_fresh'))
@@ -1285,7 +1330,8 @@ class VapoRockBackend(MeltBackend):
         """
         Lazy-import VapoRock and stash configuration.
 
-        Returns True only if the upstream library imports cleanly.
+        Returns True only if the upstream library imports cleanly and exposes
+        a supported equilibrium entry point.
 
         A missing library is a normal "not available" outcome: this
         method returns False and records ``_last_error``. Non-numeric or
@@ -1421,6 +1467,13 @@ class VapoRockBackend(MeltBackend):
         module = self._import_vaporock()
         if module is None:
             return False
+        candidate_functions, system_cls = (
+            _vaporock_equilibrium_entrypoints(module)
+        )
+        if not candidate_functions and system_cls is None:
+            self._last_error = str(_vaporock_incompatible_api_error())
+            self._warnings.append(self._last_error)
+            return False
         self._vaporock = module
         self._available = True
         return True
@@ -1456,11 +1509,27 @@ class VapoRockBackend(MeltBackend):
                 size=self._warm_pool_size,
             )
         except EngineWorkerRemoteError as exc:
-            if exc.exc_name not in {'ImportError', 'ModuleNotFoundError'}:
+            if exc.exc_name not in {
+                'ImportError',
+                'ModuleNotFoundError',
+                'VapoRockCallError',
+            }:
                 raise
+            failure = (
+                exc.detail
+                if exc.exc_name == 'VapoRockCallError'
+                else f'{exc.exc_name}: {exc.detail}'
+            )
+            self._last_error = (
+                'VapoRock warm pool failed to initialize: ' + failure
+            )
+            self._warnings.append(self._last_error)
+            self._warm_pool = None
+            return False
+        except EOFError as exc:
             self._last_error = (
                 'VapoRock warm pool failed to initialize: '
-                f'{exc.exc_name}: {exc.detail}'
+                f'{type(exc).__name__}: {exc}'
             )
             self._warnings.append(self._last_error)
             self._warm_pool = None
@@ -2092,7 +2161,7 @@ class VapoRockBackend(MeltBackend):
         for module_name in _IMPORT_CANDIDATES:
             try:
                 return importlib.import_module(module_name)
-            except ImportError as exc:
+            except (ImportError, OSError) as exc:
                 errors.append(f'{module_name}: {type(exc).__name__}: {exc}')
 
         self._last_error = (
@@ -2179,42 +2248,45 @@ class VapoRockBackend(MeltBackend):
         module = self._vaporock
         if module is None:
             raise RuntimeError('VapoRock module is not loaded')
-        candidate_names = (
-            'calc_vapor_pressures',
-            'calc_vapor',
-            'equilibrium_vapor',
-            'vapor_equilibrium',
+        candidate_functions, system_cls = (
+            _vaporock_equilibrium_entrypoints(module)
         )
         last_attr_error: Optional[Exception] = None
-        for name in candidate_names:
-            fn = getattr(module, name, None)
-            if fn is None:
-                continue
+        for _name, fn in candidate_functions:
+            candidate_kwargs = {
+                'composition': composition_wt_pct,
+                'T_C': temperature if self._temperature_units == 'C' else None,
+                'T_K': temperature if self._temperature_units == 'K' else None,
+                'P_bar': pressure if self._pressure_units == 'bar' else None,
+                'P_Pa': pressure if self._pressure_units == 'Pa' else None,
+                'log_fO2': fO2_log,
+            }
+            legacy_args = (composition_wt_pct, temperature, fO2_log)
             try:
-                raw = fn(
-                    composition=composition_wt_pct,
-                    T_C=temperature if self._temperature_units == 'C' else None,
-                    T_K=temperature if self._temperature_units == 'K' else None,
-                    P_bar=pressure if self._pressure_units == 'bar' else None,
-                    P_Pa=pressure if self._pressure_units == 'Pa' else None,
-                    log_fO2=fO2_log,
-                )
-            except TypeError as exc:
-                # Older builds use positional / shorter signatures.
-                # Fall back to a minimal call before declaring failure.
-                last_attr_error = exc
+                signature = inspect.signature(fn)
+            except (AttributeError, TypeError, ValueError):
+                signature = None
+            if signature is None:
+                call_args = ()
+                call_kwargs = candidate_kwargs
+            else:
                 try:
-                    raw = fn(
-                        composition_wt_pct,
-                        temperature,
-                        fO2_log,
-                    )
-                except Exception as inner_exc:
-                    last_attr_error = inner_exc
-                    continue
+                    signature.bind(**candidate_kwargs)
+                except TypeError:
+                    try:
+                        signature.bind(*legacy_args)
+                    except TypeError as exc:
+                        last_attr_error = exc
+                        continue
+                    call_args = legacy_args
+                    call_kwargs = {}
+                else:
+                    call_args = ()
+                    call_kwargs = candidate_kwargs
+            try:
+                raw = fn(*call_args, **call_kwargs)
             except Exception as exc:
-                last_attr_error = exc
-                continue
+                raise VapoRockCallError(exc) from exc
             vapor_pressures = self._normalize_vapor_pressures(raw)
             self._last_pressure_authority_warning = (
                 'VapoRock candidate vapor function has unverified total '
@@ -2224,8 +2296,7 @@ class VapoRockBackend(MeltBackend):
             )
             return vapor_pressures
 
-        system_cls = getattr(module, 'System', None)
-        if callable(system_cls):
+        if system_cls is not None:
             # Fresh System per request (in-process path). Reuse is an
             # opt-in warm-worker flag with a finite reused-vs-fresh
             # prefix probe, not a proven admitted-grid equivalence.
@@ -2250,16 +2321,10 @@ class VapoRockBackend(MeltBackend):
                 logP, composition_wt_pct=composition_wt_pct
             )
 
+        error = _vaporock_incompatible_api_error(last_attr_error)
         if last_attr_error is not None:
-            raise VapoRockCallError(
-                type(last_attr_error).__name__, str(last_attr_error)
-            ) from last_attr_error
-        raise RuntimeError(
-            'VapoRock library does not expose a recognised equilibrium '
-            'entry point (tried: '
-            f'{", ".join(candidate_names)}, System.eval_gas_abundances)'
-            + (f'; last error: {last_attr_error}' if last_attr_error else '')
-        )
+            raise error from last_attr_error
+        raise error
 
     def _call_vaporock_via_pool(
         self,
