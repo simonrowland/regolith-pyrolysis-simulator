@@ -179,7 +179,8 @@ species:
       units: bar as printed
       values:
         quantity: predicted_partial_pressure
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: Jacobson et al. 2024, Table 1, FactSage 11.5 SLAG database
         semantics: bound_not_point_ordering
         factsage_note: factsage_model_output_not_measurement
         model_as_printed: SLAG database in FactSage at 2500 K
@@ -578,7 +579,8 @@ species:
       units: kJ/mol as printed
       values:
         quantity: second_law_reaction_enthalpy
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: Jacobson et al. 2024, p. 23, second-law KEMS fit
         semantics: second_law_fit_not_measurement
         cited_primary: '[15] Bauschlicher, Kowalski & Jacobson 2022 JCP'
         cited_primary_doi: 10.1063/5.0120504
@@ -677,7 +679,8 @@ species:
       units: none (figure-only; no tabulated points)
       values:
         quantity: vant_hoff_plot_figure_only
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: Jacobson et al. 2024, Figure 16, second-law vaporization fit
         semantics: bound_not_point_ordering
         admission_status: rejected_no_figure_reading
         completeness: figure-only

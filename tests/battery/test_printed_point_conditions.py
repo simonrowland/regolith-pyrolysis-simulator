@@ -22,6 +22,7 @@ from simulator.yaml_cache import load_cached_safe_yaml
 
 from simulator.battery.migrate import REPO_ROOT, migrate
 from simulator.battery.score import rail_for_quantity
+from simulator.battery.validate import validate_corpus
 from tests.battery.test_migrate import _write_min_tree
 
 _EXTRACTS = REPO_ROOT / "data" / "literature" / "extracts"
@@ -117,8 +118,10 @@ def test_jacobson_table1_points_keep_printed_temperature_and_typed_reason(
         assert "predicted_partial_pressure" in obs.identity.quantity.reason
         assert obs.value.kind is ValueKind.UNAVAILABLE
         assert obs.evidence.class_.is_value
-        assert obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
-        assert obs.evidence.model == "model_derived"
+        assert obs.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+        assert obs.evidence.attribution == (
+            "Jacobson et al. 2024, Table 1, FactSage 11.5 SLAG database"
+        )
         assert rail_for_quantity(
             quantity_token(obs.identity),
             species_formula=obs.identity.species.formula,
@@ -133,6 +136,18 @@ def test_jacobson_table1_points_keep_printed_temperature_and_typed_reason(
         and "unsupported quantity 'predicted_partial_pressure'" in entry.why
         for entry in result.queue
     )
+    report = validate_corpus(
+        result.works, result.experiments, result.observations, residuals=None
+    )
+    assert result.observations[
+        "kems-139-jacobson-2024::jacobson_2024_t2_hfo_second_law_narrative"
+    ].evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+    assert not [
+        issue for issue in report.hard_issues
+        if issue.reason.value == "conditional_field"
+        and "kems-139-jacobson-2024::" in issue.path
+        and issue.path.endswith((".derived_from", ".derivation"))
+    ]
 
 
 def test_kato_table1_routes_every_printed_1873k_row(tmp_path: Path) -> None:
