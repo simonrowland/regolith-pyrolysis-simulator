@@ -4476,8 +4476,9 @@ species:
       units: "atm as printed (column P_O · 10^8; pressure_atm = printed value × 10^-8 atm)"
       values:
         quantity: partial_pressure
-        method_class: model_derived
-        evidence_class: model_derived
+        method_class: quoted_literature
+        evidence_class: quoted_attributed
+        attribution: Stolyarova, Shornikov & Shultz (1996), authors' KEMS atomic-oxygen pressure calculation from ion-current ratios via Eq. (7), p. 19; the ion-current inputs are not stored as observations.
         admission_status: admitted
         method: "thermodynamic equilibrium calculation"
         method_as_printed: "Author-calculated atomic oxygen partial-pressure estimate from Eq. (7), p_O = K2^o [I_MoO3+ × σ(MoO2) / (I_MoO2+ × σ(MoO3))] (MoO3 = MoO2 + O), printed p. 19; Table 2 prints this result, it is not a measured direct pressure."
@@ -5352,8 +5353,9 @@ species:
       units: "atm as printed (column P_O_prime · 10^8; pressure_atm = printed value × 10^-8 atm)"
       values:
         quantity: partial_pressure
-        method_class: model_derived
-        evidence_class: model_derived
+        method_class: quoted_literature
+        evidence_class: quoted_attributed
+        attribution: Stolyarova, Shornikov & Shultz (1996), authors' KEMS atomic-oxygen pressure calculation from ion-current ratios via Eq. (8), p. 19; the ion-current inputs are not stored as observations.
         admission_status: admitted
         method: "thermodynamic equilibrium calculation"
         method_as_printed: "Author-calculated atomic oxygen partial-pressure estimate from Eq. (8), p'_O = K3^o [I_AlO+ × σ(Al) / (I_Al+ × σ(AlO))] (AlO = Al + O), printed p. 19; Table 2 prints this result, it is not a measured direct pressure."
@@ -5668,8 +5670,9 @@ species:
       units: "atm as printed (column P_O_double_prime · 10^8; pressure_atm = printed value × 10^-8 atm)"
       values:
         quantity: partial_pressure
-        method_class: model_derived
-        evidence_class: model_derived
+        method_class: quoted_literature
+        evidence_class: quoted_attributed
+        attribution: Stolyarova, Shornikov & Shultz (1996), authors' KEMS atomic-oxygen pressure calculation from ion-current ratios via Eq. (9), p. 19; the ion-current inputs are not stored as observations.
         admission_status: admitted
         method: "thermodynamic equilibrium calculation"
         method_as_printed: "Author-calculated atomic oxygen partial-pressure estimate from Eq. (9), p''_O = K4^o [I_SiO+ × σ(SiO) / (I_SiO2+ × σ(SiO2))] (SiO2 = SiO + O), printed p. 19; Table 2 prints this result, it is not a measured direct pressure."
