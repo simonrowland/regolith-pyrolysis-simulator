@@ -15863,7 +15863,9 @@ class Migrator:
             )
 
     def _apply_supersedes(self) -> None:
-        for old_id, new_id, work_id, locator, source_key in self._pending_supersedes:
+        for old_id, new_id, work_id, locator, source_key in reversed(
+            self._pending_supersedes
+        ):
             old = self.result.observations.get(old_id)
             if old is None:
                 matches = [
@@ -15902,6 +15904,21 @@ class Migrator:
                 )
                 continue
             new_obs = self.result.observations[surviving_new]
+            seen = {surviving_new}
+            while (
+                new_obs.admission.status is AdmissionStatus.SUPERSEDED
+                and new_obs.admission.superseded_by is not None
+                and new_obs.admission.superseded_by in self.result.observations
+                and new_obs.admission.superseded_by not in seen
+            ):
+                surviving_new = new_obs.admission.superseded_by
+                seen.add(surviving_new)
+                new_obs = self.result.observations[surviving_new]
+            if new_obs.admission.status not in {
+                AdmissionStatus.ADMITTED,
+                AdmissionStatus.PENDING,
+            }:
+                continue
             for match_id in matches:
                 old_obs = self.result.observations[match_id]
                 if old_obs.admission.reason.startswith(_ADMISSION_DEFAULTED_PREFIX):

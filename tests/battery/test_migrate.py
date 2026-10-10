@@ -2398,12 +2398,102 @@ def test_g04_supersedes_marks_the_old_row(tmp_path: Path) -> None:
     new = result.observations["fixture-source::homma_1966_mn_olette_experimental_quoted_deep"]
     newer = result.observations["fixture-source::newer_list"]
     assert old.admission.status is AdmissionStatus.SUPERSEDED
-    assert old.admission.superseded_by == new.observation_id
+    assert old.admission.superseded_by == newer.observation_id
     assert new.admission.status is AdmissionStatus.SUPERSEDED
     assert new.admission.superseded_by == newer.observation_id
     assert newer.admission.status is AdmissionStatus.ADMITTED
     assert newer.admission.superseded_by is None
     assert any("missing_target" in (e.why or "") for e in result.queue)
+
+
+def test_g04_rejected_superseder_does_not_supersede_measured_row(
+    tmp_path: Path,
+) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"] = [
+        {
+            "observation_id": "measured_row",
+            "type": "alpha",
+            "locator": {"table": "1"},
+            "phase": "gas",
+            "values": {
+                "quantity": "literature_vaporization_coefficient",
+                "method_class": "measured_direct",
+                "admission_status": "admitted",
+            },
+        },
+        {
+            "observation_id": "rejected_figure_row",
+            "supersedes": "measured_row",
+            "type": "alpha",
+            "locator": {"figure": "1"},
+            "phase": "gas",
+            "values": {
+                "quantity": "unknown_figure_quantity",
+                "method_class": "figure_only",
+                "admission_status": "rejected",
+                "reason": "figure digitisation has no numeric point",
+            },
+        },
+    ]
+    root = _write_min_tree(tmp_path, extract)
+
+    result = migrate(root, write=False)
+
+    measured = result.observations["fixture-source::measured_row"]
+    assert measured.admission.status in {
+        AdmissionStatus.ADMITTED,
+        AdmissionStatus.PENDING,
+    }
+    assert measured.admission.superseded_by is None
+
+
+def test_g04_dangling_superseder_chain_keeps_measured_row_live(
+    tmp_path: Path,
+) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"] = [
+        {
+            "observation_id": "measured_row",
+            "type": "alpha",
+            "locator": {"table": "1"},
+            "phase": "gas",
+            "values": {
+                "quantity": "literature_vaporization_coefficient",
+                "method_class": "measured_direct",
+                "admission_status": "admitted",
+            },
+        }
+    ]
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    measured = result.observations["fixture-source::measured_row"]
+    dangling = replace(
+        measured,
+        observation_id="fixture-source::dangling_intermediate",
+        admission=replace(
+            measured.admission,
+            status=AdmissionStatus.SUPERSEDED,
+            reason="superseded test fixture",
+            superseded_by="fixture-source::missing_terminal",
+        ),
+    )
+    result.observations[dangling.observation_id] = dangling
+    migrator = Migrator(tmp_path)
+    migrator.result = result
+    migrator._pending_supersedes = [
+        (
+            measured.observation_id,
+            dangling.observation_id,
+            measured.experiment_id,
+            measured.locator,
+            "data/literature/extracts/fixture-source.yaml",
+        )
+    ]
+
+    migrator._apply_supersedes()
+
+    assert measured.admission.status is AdmissionStatus.ADMITTED
+    assert measured.admission.superseded_by is None
 
 
 def test_h03_pressure_conversion_keeps_derivation_trail() -> None:
