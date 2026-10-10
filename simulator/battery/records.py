@@ -424,18 +424,37 @@ class Derivation:
     pure_substance_reference: bool | None = None
     raw_inputs: Located[RawInputStatus] | None = None
 
+    @property
+    def declares_unprinted_raw_inputs(self) -> bool:
+        raw_inputs = self.raw_inputs
+        return (
+            raw_inputs is not None
+            and raw_inputs.state.is_value
+            and raw_inputs.state.value is RawInputStatus.NOT_PRINTED
+        )
+
+    @property
+    def has_located_unprinted_raw_inputs(self) -> bool:
+        return (
+            self.declares_unprinted_raw_inputs
+            and self.raw_inputs is not None
+            and self.raw_inputs.locator is not None
+        )
+
     def __post_init__(self) -> None:
         if not self.relation:
             raise ValueError("Derivation.relation is required")
-        if not self.inputs and not (
-            self.raw_inputs is not None
-            and self.raw_inputs.state.is_value
-            and self.raw_inputs.state.value is RawInputStatus.NOT_PRINTED
-            and self.raw_inputs.locator is not None
-        ):
-            raise ValueError(
+        if not self.inputs and not self.has_located_unprinted_raw_inputs:
+            detail = (
                 "Derivation.inputs is required unless raw_inputs is located not_printed"
             )
+            if (
+                self.declares_unprinted_raw_inputs
+                and self.raw_inputs is not None
+                and self.raw_inputs.locator is None
+            ):
+                detail += "; raw_inputs not_printed declaration requires a locator"
+            raise ValueError(detail)
         if not self.output_unit:
             raise ValueError("Derivation.output_unit is required")
         if self.pure_substance_reference is not None and not isinstance(

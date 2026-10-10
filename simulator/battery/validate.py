@@ -57,7 +57,6 @@ from simulator.battery.enums import (
     Phase,
     QUANTITY_UNITS,
     Quantity,
-    RawInputStatus,
     RefusalReason,
     ResidualStatus,
     SourceRelation,
@@ -1074,9 +1073,7 @@ def validate_observation(
         derivation = observation.derivation
         raw_inputs = derivation.raw_inputs if derivation is not None else None
         declares_unprinted_raw_inputs = (
-            raw_inputs is not None
-            and raw_inputs.state.is_value
-            and raw_inputs.state.value is RawInputStatus.NOT_PRINTED
+            derivation is not None and derivation.declares_unprinted_raw_inputs
         )
         if raw_inputs is not None:
             if not declares_unprinted_raw_inputs:
@@ -1117,9 +1114,8 @@ def validate_observation(
             )
         if not observation.derived_from and not (
             ev.value is EvidenceClass.MEASURED_REDUCED
-            and declares_unprinted_raw_inputs
-            and raw_inputs is not None
-            and raw_inputs.locator is not None
+            and derivation is not None
+            and derivation.has_located_unprinted_raw_inputs
         ):
             issues.append(
                 _issue(

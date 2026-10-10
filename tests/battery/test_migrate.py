@@ -495,15 +495,30 @@ def test_production_migration_keeps_located_unprinted_raw_input_declaration(
     assert observation.derivation.raw_inputs is not None
     assert observation.derivation.raw_inputs.state.value.value == "not_printed"
     assert observation.derivation.raw_inputs.locator is not None
-    assert not any(
-        issue.path.endswith(".derived_from")
-        for issue in result.validation.hard_issues
-    )
+    assert result.validation.hard_issues == ()
 
     reloaded = observation_from_plain(
         yaml.safe_load(yaml.safe_dump(to_plain(observation)))
     )
     assert reloaded.derivation == observation.derivation
+
+
+def test_null_derivation_inputs_are_invalid_even_with_raw_input_declaration(
+    tmp_path: Path,
+) -> None:
+    extract = _raw_inputs_extract("measured_reduced")
+    extract["species"]["Na"]["observations"][0]["values"]["derivation"][
+        "inputs"
+    ] = None
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    assert any(
+        issue.path.endswith(".values.derivation")
+        and issue.reason is RefusalReason.INVALID_SOURCE
+        and "Derivation.inputs" in issue.detail
+        for issue in result.validation.hard_issues
+    )
 
 
 def test_production_migration_rejects_unlocated_unprinted_raw_input_declaration(
@@ -518,6 +533,63 @@ def test_production_migration_rejects_unlocated_unprinted_raw_input_declaration(
     assert any(
         issue.path.endswith(".derived_from")
         and issue.detail == "derived observation requires derived_from"
+        for issue in result.validation.hard_issues
+    )
+
+
+@pytest.mark.parametrize(
+    ("inputs", "raw_inputs", "expected_path", "expected_detail"),
+    [
+        (
+            ["pdf:fixture-source"],
+            {"state": {"tag": "value", "value": "not_printed"}},
+            ".derivation.raw_inputs",
+            "requires a locator",
+        ),
+        (
+            [],
+            {"state": {"tag": "value", "value": "not_printed"}},
+            ".values.derivation",
+            "requires a locator",
+        ),
+        (
+            ["pdf:fixture-source"],
+            {
+                "state": {"tag": "unknown", "reason": "not known"},
+                "locator": {"page": 2},
+            },
+            ".derivation.raw_inputs",
+            "must be not_printed",
+        ),
+        (
+            None,
+            {"state": {"tag": "value", "value": "not_printed"}},
+            ".values.derivation",
+            "requires a locator",
+        ),
+    ],
+    ids=["unlocated-pdf-input", "unlocated-empty", "located-unknown", "omitted-input"],
+)
+def test_invalid_raw_input_declarations_return_typed_issues(
+    tmp_path: Path,
+    inputs: object,
+    raw_inputs: dict,
+    expected_path: str,
+    expected_detail: str,
+) -> None:
+    extract = _raw_inputs_extract("measured_reduced", include_locator=False)
+    annotation = extract["species"]["Na"]["observations"][0]["values"][
+        "derivation"
+    ]
+    if inputs is not None:
+        annotation["inputs"] = inputs
+    annotation["raw_inputs"] = raw_inputs
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    assert result.validation.hard_issues
+    assert any(
+        issue.path.endswith(expected_path) and expected_detail in issue.detail
         for issue in result.validation.hard_issues
     )
 
@@ -1901,25 +1973,40 @@ def test_j02_source_stated_derived_from_is_stored(tmp_path: Path) -> None:
     assert child_obs.derived_from == ("fixture-source::raw_parent",)
 
 
-def test_invalid_extractor_inference_is_a_typed_hard_issue(tmp_path: Path) -> None:
+@pytest.mark.parametrize("annotation", ["derivation", "inference"])
+@pytest.mark.parametrize("location", ["values", "observation"])
+@pytest.mark.parametrize(
+    ("inputs", "invalid"),
+    [([], True), (None, True), (7, True), (["source measurement"], False)],
+)
+def test_source_derivation_and_inference_inputs_are_validated(
+    tmp_path: Path,
+    annotation: str,
+    location: str,
+    inputs: object,
+    invalid: bool,
+) -> None:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     row = extract["species"]["Na"]["observations"][0]
-    row["values"]["inference"] = {
+    target = row["values"] if location == "values" else row
+    field = "values." + annotation if location == "values" else annotation
+    target[annotation] = {
         "relation": "author_calculation",
-        "inputs": [],
+        "inputs": inputs,
         "output_unit": "Pa",
     }
     root = _write_min_tree(tmp_path, extract)
 
     result = migrate(root, write=False)
 
-    issue = next(
-        issue
-        for issue in result.validation.hard_issues
-        if issue.path == "observations.fixture-source::na_psat.values.inference"
-    )
-    assert issue.reason is RefusalReason.INVALID_SOURCE
-    assert issue.detail == "Derivation.inputs is required"
+    path = f"observations.fixture-source::na_psat.{field}"
+    issues = [issue for issue in result.validation.hard_issues if issue.path == path]
+    if invalid:
+        assert len(issues) == 1
+        assert issues[0].reason is RefusalReason.INVALID_SOURCE
+        assert "Derivation.inputs" in issues[0].detail
+    else:
+        assert not issues
 
 
 def test_calculated_composition_requires_measured_lineage(tmp_path: Path) -> None:
