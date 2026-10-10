@@ -107,6 +107,10 @@ class EvidenceClass(StrEnum):
     ENGINE_PREDICTION = "engine_prediction"
 
 
+class RawInputStatus(StrEnum):
+    NOT_PRINTED = "not_printed"
+
+
 class RefusalReason(StrEnum):
     INVALID_SOURCE = "invalid_source"
     UNDERDETERMINED_APPARATUS = "underdetermined_apparatus"

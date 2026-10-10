@@ -57,6 +57,7 @@ from simulator.battery.enums import (
     Phase,
     QUANTITY_UNITS,
     Quantity,
+    RawInputStatus,
     RefusalReason,
     ResidualStatus,
     SourceRelation,
@@ -1070,7 +1071,56 @@ def validate_observation(
         EvidenceClass.MODEL_DERIVED,
         EvidenceClass.MEASURED_REDUCED,
     }:
-        if not observation.derived_from:
+        derivation = observation.derivation
+        raw_inputs = derivation.raw_inputs if derivation is not None else None
+        declares_unprinted_raw_inputs = (
+            raw_inputs is not None
+            and raw_inputs.state.is_value
+            and raw_inputs.state.value is RawInputStatus.NOT_PRINTED
+        )
+        if raw_inputs is not None:
+            if not declares_unprinted_raw_inputs:
+                issues.append(
+                    _issue(
+                        f"{path}.derivation.raw_inputs",
+                        RefusalReason.CONDITIONAL_FIELD,
+                        "raw_inputs declaration must be not_printed",
+                    )
+                )
+            if raw_inputs.locator is None:
+                issues.append(
+                    _issue(
+                        f"{path}.derivation.raw_inputs",
+                        RefusalReason.CONDITIONAL_FIELD,
+                        "raw_inputs not_printed declaration requires a locator",
+                    )
+                )
+        if ev.value is EvidenceClass.MODEL_DERIVED and raw_inputs is not None:
+            issues.append(
+                _issue(
+                    f"{path}.derivation.raw_inputs",
+                    RefusalReason.CONDITIONAL_FIELD,
+                    "raw_inputs not_printed declaration is invalid for model_derived evidence",
+                )
+            )
+        if (
+            ev.value is EvidenceClass.MEASURED_REDUCED
+            and declares_unprinted_raw_inputs
+            and observation.derived_from
+        ):
+            issues.append(
+                _issue(
+                    f"{path}.derivation.raw_inputs",
+                    RefusalReason.CONDITIONAL_FIELD,
+                    "raw_inputs not_printed declaration contradicts derived_from",
+                )
+            )
+        if not observation.derived_from and not (
+            ev.value is EvidenceClass.MEASURED_REDUCED
+            and declares_unprinted_raw_inputs
+            and raw_inputs is not None
+            and raw_inputs.locator is not None
+        ):
             issues.append(
                 _issue(
                     f"{path}.derived_from",
