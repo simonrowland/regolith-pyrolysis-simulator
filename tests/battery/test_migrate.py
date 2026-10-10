@@ -5850,6 +5850,7 @@ def _score_activity_composition_case(
     ]
     result = migrate(_write_min_tree(tmp_path, extract), write=False)
     observation = next(iter(result.observations.values()))
+    assert ("::T=" in observation.observation_id) is exploded
     experiment = result.experiments[observation.experiment_id]
     prediction = predict_with_engine(
         Engine.OPENIMCC, observation, experiment=experiment
@@ -5858,7 +5859,7 @@ def _score_activity_composition_case(
 
 
 @pytest.mark.parametrize("exploded", [False, True], ids=["row", "exploded-child"])
-def test_malformed_activity_composition_sample_fallback_numeric_pin(
+def test_malformed_activity_composition_is_terminal_refusal(
     tmp_path: Path, exploded: bool
 ) -> None:
     observation, _experiment, prediction = _score_activity_composition_case(
@@ -5867,9 +5868,15 @@ def test_malformed_activity_composition_sample_fallback_numeric_pin(
 
     assert observation.identity.composition is not None
     assert observation.identity.composition.is_unknown
-    assert prediction.value is not None
-    assert float(prediction.value).hex() == "0x1.a4079127a495dp-5"
-    assert prediction.refusal_reason is None
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.INVALID_SOURCE
+    assert prediction.refusal_detail["reason"] == RefusalReason.INVALID_SOURCE.value
+    (gap,) = prediction.refusal_detail["gaps"]
+    assert gap["waypoint"] == "normalized_composition"
+    assert gap["reason"] == "unsupported_print_form"
+    assert gap["missing"] == [
+        f"observation[{observation.observation_id}].point_conditions.composition"
+    ]
 
 
 def test_activity_without_row_composition_uses_sample_numeric_pin(tmp_path: Path) -> None:
@@ -5880,6 +5887,12 @@ def test_activity_without_row_composition_uses_sample_numeric_pin(tmp_path: Path
     assert prediction.value is not None
     assert float(prediction.value).hex() == "0x1.a4079127a495dp-5"
     assert prediction.refusal_reason is None
+    assert prediction.requested_composition is not None
+    assert prediction.requested_composition.is_value
+    assert prediction.requested_composition.value.as_map() == {
+        "SiO2": Decimal("0.40148624821939094"),
+        "MgO": Decimal("0.5985137517806091"),
+    }
 
 
 @pytest.mark.parametrize("printed_marker", ["<0.01", "tr."])

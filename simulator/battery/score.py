@@ -2881,11 +2881,22 @@ def _activity_contract_refusal(
     requested: State[Composition] | None,
     generated,
 ) -> EnginePrediction:
-    from simulator.battery.waypoints import GapReason
+    from simulator.battery.waypoints import GapReason, is_invalid_row_composition_gap
 
     gaps = () if generated is None else generated.readiness.gaps
     first = gaps[0] if gaps else None
-    reason_token = first.reason.value if first is not None else "engine_does_not_report_melt_activity"
+    invalid_row_composition = first is not None and is_invalid_row_composition_gap(
+        first.waypoint, first.reason, first.missing
+    )
+    reason_token = (
+        RefusalReason.INVALID_SOURCE.value
+        if invalid_row_composition
+        else (
+            first.reason.value
+            if first is not None
+            else "engine_does_not_report_melt_activity"
+        )
+    )
     detail: dict[str, object] = {
         "reason": reason_token,
         "consumer": "melt_activity",
@@ -2901,11 +2912,12 @@ def _activity_contract_refusal(
     if first is not None and first.reason is GapReason.REFERENCE_STATE_MISMATCH and len(first.missing) >= 2:
         detail["row_convention"] = first.missing[0]
         detail["engine_convention"] = first.missing[1]
-    refusal = (
-        RefusalReason.UNSUPPORTED
-        if first is None or first.reason is GapReason.REFERENCE_STATE_MISMATCH
-        else RefusalReason.IDENTITY_INCOMPLETE
-    )
+    if invalid_row_composition:
+        refusal = RefusalReason.INVALID_SOURCE
+    elif first is None or first.reason is GapReason.REFERENCE_STATE_MISMATCH:
+        refusal = RefusalReason.UNSUPPORTED
+    else:
+        refusal = RefusalReason.IDENTITY_INCOMPLETE
     return EnginePrediction(
         engine=engine,
         channel=channel,

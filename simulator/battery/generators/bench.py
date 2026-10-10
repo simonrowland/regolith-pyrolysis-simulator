@@ -12,6 +12,7 @@ from simulator.battery.waypoints import (
     ConsumerReadiness, ReadinessStatus, ReadinessGap, GapReason,
     ENGINE_POINT_CONSUMERS, MELT_ACTIVITY_ENGINES, Waypoint, WaypointFlag,
     WaypointResult, _prediction_pressure_waypoint, pure_substance_engine_point_gap,
+    is_invalid_row_composition_gap,
 )
 
 
@@ -326,6 +327,12 @@ def _reference_gap(state: StandardState, reported: str) -> ReadinessGap:
 def _melt_composition(inputs: ConsumerInputs) -> WaypointResult:
     """Row composition: an observation map, else the identity mole map, else the sample."""
     current = inputs.waypoints["normalized_composition"]
+    if current.absence is not None and is_invalid_row_composition_gap(
+        current.absence.name,
+        current.absence.reason,
+        current.absence.missing,
+    ):
+        return current
     selected = current.selected
     if selected is not None and str(selected.route).startswith("observation_"):
         return current

@@ -12734,6 +12734,13 @@ class Migrator:
                 **(point_conditions or {}),
                 "composition": catalogue_composition,
             }
+        if malformed_composition_amount is not None:
+            point_conditions = {
+                **(point_conditions or {}),
+                "composition": Located(
+                    State.unknown(malformed_composition_amount), locator=locator
+                ),
+            }
         # b-718: keep observation-row printed maps on point_conditions so
         # subset promotions no longer live only on experiment.sample. Exploded
         # children inherit these conditions, so only a map the observation
@@ -13850,6 +13857,14 @@ class Migrator:
             point_conditions = {
                 **(point_conditions or {}),
                 "composition": point_composition_located,
+            }
+        elif malformed_composition_amount is not None:
+            point_conditions = {
+                **(point_conditions or {}),
+                "composition": Located(
+                    State.unknown(malformed_composition_amount),
+                    locator=point_locator,
+                ),
             }
         if (
             q_token_point is Quantity.RESIDUE_COMPONENT_COMPOSITION
