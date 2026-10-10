@@ -1678,7 +1678,9 @@ class PT1PersistentEquilibriumStore:
                         canonical_physics_bucket_key_from_replay_key(entry["key"])
                     )
                     if row_replay_scope != replay_scope_sha256:
-                        continue
+                        raise PT1PersistentStoreCorrupt(
+                            f"PT-1 row exact key replay scope mismatch: {row_hash}"
+                        )
                     candidates.append(
                         {
                             "artifact": artifact,

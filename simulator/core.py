@@ -4689,7 +4689,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             uncacheable_replay_disposition,
         )
 
-        self._reduced_real_uncacheable_reasons = []
         pressure_bar = float(self.melt.p_total_mbar) / 1000.0
         fO2_log = float(self._current_melt_redox_fO2_log())
         redox_key_fO2_log = self._freeze_gate_redox_key_fO2_log(
