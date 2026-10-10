@@ -15918,8 +15918,13 @@ class Migrator:
                 )
                 continue
 
+            # An exploded parent is retargeted per measurement key, including
+            # a one-row explosion. Direct unexpanded A->B is not. A shell with
+            # no key is the series object an exploded successor replaces.
+            old_exploded = old_id not in observations
+            new_exploded = new_id not in observations
             for old_row in old_rows:
-                if len(old_rows) == 1 and len(new_rows) == 1:
+                if not old_exploded and not new_exploded:
                     target_rows = new_rows
                 else:
                     old_key = measurement_key(old_row)
@@ -15927,6 +15932,13 @@ class Migrator:
                         oid for oid in new_rows
                         if old_key is not None and measurement_key(oid) == old_key
                     ]
+                    if (
+                        len(target_rows) != 1
+                        and not old_exploded
+                        and old_key is None
+                        and new_exploded
+                    ):
+                        target_rows = [min(new_rows)]
                 if len(target_rows) != 1:
                     self.result.add_queue(
                         work_id, observations[old_row].locator or locator,

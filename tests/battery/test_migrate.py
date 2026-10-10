@@ -2509,6 +2509,124 @@ def test_g04_competing_superseders_keep_green_precedence(tmp_path: Path) -> None
     )
 
 
+def _stage_keyed_children(
+    tmp_path: Path,
+    specs: list[tuple[str, str, str | None]],
+) -> Migrator:
+    """Build admitted rows, then give each a temperature and a ``:row=`` id.
+
+    ``specs`` entries are ``(stored_id, row_label, temperature_K or None)``.
+    """
+
+    from simulator.battery.records import State
+
+    result = _migrate_supersedes_rows(
+        tmp_path, [(stored_id, None, "admitted") for stored_id, _row, _temp in specs]
+    )
+    staged = {}
+    for stored_id, row_label, temperature in specs:
+        observation = result.observations.pop(f"fixture-source::{stored_id}")
+        identity = observation.identity
+        if temperature is None:
+            identity = replace(identity, temperature_K=None)
+        else:
+            identity = replace(identity, temperature_K=State.of(Decimal(temperature)))
+        observation_id = f"fixture-source::{stored_id}::T={temperature}:row={row_label}"
+        staged[observation_id] = replace(
+            observation, observation_id=observation_id, identity=identity
+        )
+    result.observations = staged
+    migrator = Migrator(tmp_path)
+    migrator.result = result
+    return migrator
+
+
+def test_g04_singleton_explosion_requires_same_measurement_key(tmp_path: Path) -> None:
+    migrator = _stage_keyed_children(
+        tmp_path,
+        [("A-child", "a", "1000"), ("B-child", "b", "2000")],
+    )
+    parent_a = "fixture-source::A"
+    parent_b = "fixture-source::B"
+    child_a = "fixture-source::A-child::T=1000:row=a"
+    child_b = "fixture-source::B-child::T=2000:row=b"
+    migrator._exploded_children = {parent_a: [child_a], parent_b: [child_b]}
+    sample = migrator.result.observations[child_a]
+    migrator._pending_supersedes = [
+        (parent_a, parent_b, sample.experiment_id, sample.locator, "fixture-source.yaml")
+    ]
+
+    migrator._apply_supersedes()
+
+    kept = migrator.result.observations[child_a]
+    assert kept.admission.status is AdmissionStatus.ADMITTED
+    assert kept.admission.superseded_by is None
+    assert any(
+        "no unique matching row" in (entry.why or "") and "row left live" in (entry.why or "")
+        for entry in migrator.result.queue
+    )
+    _assert_superseded_targets_are_live(migrator.result)
+
+
+def test_g04_exploded_row_without_correspondence_stays_live(tmp_path: Path) -> None:
+    migrator = _stage_keyed_children(
+        tmp_path,
+        [("A-a", "a", "1000"), ("A-b", "b", "2000"), ("B-a", "a", "1000")],
+    )
+    parent_a = "fixture-source::A"
+    parent_b = "fixture-source::B"
+    row_a = "fixture-source::A-a::T=1000:row=a"
+    row_b = "fixture-source::A-b::T=2000:row=b"
+    successor = "fixture-source::B-a::T=1000:row=a"
+    migrator._exploded_children = {
+        parent_a: [row_a, row_b],
+        parent_b: [successor],
+    }
+    sample = migrator.result.observations[row_a]
+    migrator._pending_supersedes = [
+        (parent_a, parent_b, sample.experiment_id, sample.locator, "fixture-source.yaml")
+    ]
+
+    migrator._apply_supersedes()
+
+    matched = migrator.result.observations[row_a]
+    unmatched = migrator.result.observations[row_b]
+    assert matched.admission.status is AdmissionStatus.SUPERSEDED
+    assert matched.admission.superseded_by == successor
+    assert unmatched.admission.status is AdmissionStatus.ADMITTED
+    assert unmatched.admission.superseded_by is None
+    assert any(
+        row_b in (entry.why or "") and "row left live" in (entry.why or "")
+        for entry in migrator.result.queue
+    )
+    _assert_superseded_targets_are_live(migrator.result)
+
+
+def test_g04_unexpanded_shell_without_key_follows_exploded_series(
+    tmp_path: Path,
+) -> None:
+    migrator = _stage_keyed_children(
+        tmp_path,
+        [("shell", "shell", None), ("B-b", "b", "2000"), ("B-a", "a", "1000")],
+    )
+    shell_id = "fixture-source::shell::T=None:row=shell"
+    child_a = "fixture-source::B-a::T=1000:row=a"
+    child_b = "fixture-source::B-b::T=2000:row=b"
+    parent_b = "fixture-source::B"
+    migrator._exploded_children = {parent_b: [child_b, child_a]}
+    sample = migrator.result.observations[shell_id]
+    migrator._pending_supersedes = [
+        (shell_id, parent_b, sample.experiment_id, sample.locator, "fixture-source.yaml")
+    ]
+
+    migrator._apply_supersedes()
+
+    shell = migrator.result.observations[shell_id]
+    assert shell.admission.status is AdmissionStatus.SUPERSEDED
+    assert shell.admission.superseded_by == min(child_a, child_b)
+    _assert_superseded_targets_are_live(migrator.result)
+
+
 def test_g04_rejected_superseder_does_not_supersede_measured_row(
     tmp_path: Path,
 ) -> None:
@@ -10212,8 +10330,6 @@ def test_residue_cells_keep_run_identity_and_printed_conditions(
         and obs.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
         and obs.value.point is not None
         and obs.admission.status is not AdmissionStatus.SUPERSEDED
-        and "::hashimoto_1983_table3_residue_composition_series_quoted__run_"
-        in obs.observation_id
     ]
     expected_hashimoto = Counter()
     for run_id, (values, item) in run_sources.items():
