@@ -6664,6 +6664,131 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return 0.0
         return removal.bled_o2_mol
 
+    def _headspace_o2_removal_at_settled_pO2_bar(self, p_o2_bar: float) -> float:
+        """O2 mol/h the bleed removes if the O2 partial sits at ``p_o2_bar``.
+
+        Premise: a pumped headspace is a flow, not a capacitor. At a few
+        pascals, n = pV/RT is ~1e-5 mol while the pipe can pass tenths of
+        a mol per hour. Capping removal by that standing inventory puts
+        the balance on top of p_eq and recreates the sealed bug.
+        Algebra: other species stay; O2 is replaced by n(p_O2). Controls
+        (conductance or swallowed effective transport, downstream, cold
+        train) are built at that holdup's ideal-gas total. The holdup
+        passed to ``plan_overhead_bleed`` is then scaled at fixed mole
+        fraction until its mass covers the uncapped one-hour flow, so
+        the inventory min does not bind. The debit is the flow after
+        the cold-train partition.
+        Units: p_O2 in bar; result in mol/h. Sanity: pure O2 through the
+        default 0.12 m by 1 m pipe needs 57.7 Pa to pass 38 mol/h. At
+        the 4.58 Pa melt equilibrium the same pipe passes about
+        (4.58/57.7)^2 * 38 ≈ 0.24 mol/h. Does not commit.
+        """
+        try:
+            p_o2_bar = float(p_o2_bar)
+        except (TypeError, ValueError):
+            return 0.0
+        if (
+            not math.isfinite(p_o2_bar)
+            or p_o2_bar <= 0.0
+            or not self._overhead_headspace_enabled()
+        ):
+            return 0.0
+        volume_m3 = self._headspace_volume_m3()
+        temperature_K = self._headspace_temperature_K()
+        if (
+            volume_m3 <= 0.0
+            or temperature_K <= 0.0
+            or not math.isfinite(volume_m3)
+            or not math.isfinite(temperature_K)
+        ):
+            return 0.0
+        n_o2 = self._headspace_o2_mol_for_pO2_bar(p_o2_bar)
+        if not math.isfinite(n_o2) or n_o2 <= 0.0:
+            return 0.0
+        holdup = {
+            species: amount
+            for species, mol in self._overhead_holdup_mol().items()
+            if (amount := max(0.0, float(mol))) > 0.0
+            and species != OXYGEN_SPECIES
+        }
+        holdup[OXYGEN_SPECIES] = n_o2
+        total_mol = sum(holdup.values())
+        p_total_bar = (
+            total_mol * GAS_CONSTANT * temperature_K / (volume_m3 * 1.0e5)
+        )
+        if not math.isfinite(p_total_bar) or p_total_bar <= 0.0:
+            return 0.0
+        controls, _capacity = self._overhead_bleed_controls(
+            holdup_mol=holdup,
+            p_total_bar=p_total_bar,
+        )
+        from engines.builtin.overhead_bleed import (
+            BuiltinOverheadBleedProvider,
+            EffectiveTransportCapacity,
+            compressible_pressure_capacity_fraction,
+            plan_overhead_bleed,
+        )
+
+        if (
+            BuiltinOverheadBleedProvider._invalid_destructive_control(controls)
+            is not None
+        ):
+            return 0.0
+        if controls.get('force_drain_all', False):
+            return 0.0
+        dt_hr = max(0.0, float(controls.get('dt_hr', 1.0)))
+        flow_capacity = controls.get('effective_transport_capacity')
+        if isinstance(flow_capacity, EffectiveTransportCapacity):
+            bleed_kg = max(0.0, flow_capacity.swallowed_flux_kg_hr) * dt_hr
+        else:
+            conductance = max(
+                0.0,
+                float(controls.get('bleed_conductance_kg_s') or 0.0),
+            )
+            fraction = compressible_pressure_capacity_fraction(
+                p_total_bar,
+                controls.get('p_downstream_bar') or 0.0,
+            )
+            bleed_kg = conductance * fraction * dt_hr * 3600.0
+        if not math.isfinite(bleed_kg) or bleed_kg < 0.0:
+            return 0.0
+        species_kg = self._overhead_holdup_species_kg(holdup)
+        total_kg = sum(species_kg.values())
+        if total_kg <= 0.0 or not math.isfinite(total_kg):
+            return 0.0
+        # Relief and admission are rates. A holdup smaller than the rate
+        # would report n(p) instead. Scale after the controls are frozen
+        # so p_ref and conductance stay at the settled partial.
+        if bleed_kg > 0.0:
+            scale = max(1.0, bleed_kg / total_kg) * (1.0 + 1.0e-9)
+            if not math.isfinite(scale):
+                return 0.0
+            holdup = {
+                species: mol * scale for species, mol in holdup.items()
+            }
+        molar_mass = {
+            species: resolve_species_formula(
+                species,
+                self.atom_ledger.registry,
+            ).molar_mass_kg_per_mol()
+            for species in holdup
+        }
+        cistern_o2_mol = float(
+            self.atom_ledger.mol_by_account(
+                OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT
+            ).get(OXYGEN_SPECIES, 0.0)
+            or 0.0
+        )
+        removal = plan_overhead_bleed(
+            holdup,
+            molar_mass_kg_per_mol=molar_mass,
+            controls=controls,
+            cistern_o2_mol=cistern_o2_mol,
+        )
+        if removal.refusal_reason is not None:
+            return 0.0
+        return removal.bled_o2_mol
+
     def _apply_oxygen_reservoir_exchange(
         self,
         *,
@@ -6788,57 +6913,98 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 f"attribution={self._oxygen_reservoir_guard_context(context='exchange_transport_pO2')!r}"
             )
         x_h = math.log(effective_transport_pO2)
-        # Headspace oxygen exchange (Ferry V / V1-S13 R1, b-763 boundary).
+        # Headspace oxygen exchange (Ferry V / V1-S13 R1, b-763).
         #
-        # Premise: melt redox potential and headspace O2 share one atom
-        # ledger. A sealed or slow-bleed headspace is a finite capacitor
-        # C_h (mol per ln p). A pumped headspace is not: the bleed removes
-        # what arrives, so p_held stays fixed over the hour and C_h drops
-        # out. The reverse leg is never that sink. A vacuum floor is not
-        # an oxygen source, and a CONTROLLED_O2 floor may enlarge effective
-        # C_h above the real overhead inventory so the sealed network still
-        # has a finite target, but atoms cannot be invented.
+        # Premise: melt redox and headspace O2 share one atom ledger. A
+        # sealed headspace, or a closed pipe, is a finite capacitor C_h
+        # (mol per ln p). An open pipe is not an infinite sink: within
+        # the hour the O2 partial p_h settles where melt release equals
+        # bleed removal. The reverse leg is never that sink. A vacuum
+        # floor is not an oxygen source, and a CONTROLLED_O2 floor may
+        # enlarge effective C_h so the sealed network still has a finite
+        # target, but atoms cannot be invented.
         #
         # Forward dn is Fe2O3 -> 2 FeO + 1/2 O2 on process.cleaned_melt,
         # not a draw on reservoir.fo2_buffer. The provider books 2*dn mol
         # Fe2O3 out and 4*dn mol FeO in. The scalar still moves by
-        # Δ ln fO2 = -dn_ledger / C_m.
+        # Δ ln fO2 = -dn_ledger / C_m. C_m here is the flux capacity.
         #
         # Algebra, one hour. alpha = 1 - exp(-1 h / tau), tau = h_eff / k_O
         # (h_eff in m, k_O in m/s, tau in s, alpha dimensionless),
-        # x = ln(p / 1 bar):
-        #   sealed:  dn = alpha (x_m - x_h) / (1/C_m + 1/C_h)
-        #   pumped:  dn = alpha C_m (x_m - x_h)
-        # C_m and C_h are mol per ln, so dn is mol O2 toward the headspace.
-        # The pumped form is the sealed form at C_h -> infinity. Use it
-        # only when that dn is positive and the existing bleed, evaluated
-        # at the post-credit holdup, removes at least those moles of O2
-        # in the hour. Otherwise keep the sealed form.
+        # x = ln(p / 1 bar), p in bar:
+        #   R(p) = alpha * C_m * (x_m - ln p)          mol/h released
+        #   B(p) = bleed removal at that partial       mol/h
+        #   sealed: dn = alpha (x_m - x_h) / (1/C_m + 1/C_h)
+        # R falls and B rises with p, so bisection on R-B over
+        # [p_low, p_eq] converges. p_low is the transport partial the
+        # headspace is already held at (the vacuum floor when that
+        # partial is the floor). dn = R(p_h*). If R(p_low) <= B(p_low)
+        # the pump holds p_low. If the melt is below p_low, or B(p_eq)
+        # <= 0, or the headspace is off, the sealed form stands. One
+        # hour cannot cross equilibrium: alpha in (0, 1) keeps x_after
+        # between x_m and ln(p_h*).
         #
-        # One hour cannot cross equilibrium. For a finite tau, alpha is in
-        # (0, 1), so x_after = (1 - alpha) x_m + alpha x_h lies strictly
-        # between x_m and x_h. The cap below keeps that true if alpha is
-        # ever out of range.
-        #
-        # Sanity, Mars C2A snapshot 24, 1365 C, capacitor removed:
-        # alpha 0.1441, C_m 24.548 mol/ln, delta-ln 10.732,
-        # dn = 0.1441 * 24.548 * 10.732 ≈ 38 mol/h.
+        # Sanity, Mars C2A snapshot 24, 1365 C: alpha 0.1441, C_m 24.548
+        # mol/ln, x_m - ln(1e-9 bar) = 10.732, so R(p_floor) ≈ 38 mol/h.
+        # p_eq = 4.58 Pa. Pure O2 through the default 0.12 m, 1 m pipe
+        # needs 57.7 Pa to pass 38 mol/h, which the melt cannot sustain,
+        # so the hour is pump-limited and dn is well below 38 mol/h.
         #
         # Absorbable claim on the way back in is clamped to (C_h - n_floor);
         # the ledger commit is further clamped to real
         # (head_o2_mol - n_floor). Drive fO2 only with dn_ledger. Advancing
         # melt_intrinsic_fO2_log with the unbacked remainder would mint
         # oxidizing potential without O atoms.
+        p_low = effective_transport_pO2
+        p_eq = math.exp(x_m)
         delta_ln = x_m - x_h
         closed_denominator = (1.0 / C_m) + (1.0 / C_h)
         dn_closed = alpha * (delta_ln / closed_denominator)
-        dn_fixed = alpha * C_m * delta_ln
-        pressure_held = False
-        if math.isfinite(dn_fixed) and dn_fixed > OXYGEN_RESERVOIR_NOOP_MOL:
-            removed_o2_mol = self._headspace_one_hour_o2_removal_mol(dn_fixed)
-            if removed_o2_mol + OXYGEN_RESERVOIR_NOOP_MOL >= dn_fixed:
-                pressure_held = True
-        dn_to_headspace = dn_fixed if pressure_held else dn_closed
+        r_low = 0.0
+        if (
+            p_low > 0.0
+            and math.isfinite(p_low)
+            and math.isfinite(p_eq)
+            and p_eq > p_low
+        ):
+            r_low = alpha * C_m * (x_m - math.log(p_low))
+        reservoir.kinetic_exchange_o2_mol = r_low
+
+        def _release_at(p_bar: float) -> float:
+            return alpha * C_m * (x_m - math.log(p_bar))
+
+        dn_to_headspace = dn_closed
+        if (
+            r_low > OXYGEN_RESERVOIR_NOOP_MOL
+            and self._overhead_headspace_enabled()
+        ):
+            removed_at_equilibrium = (
+                self._headspace_o2_removal_at_settled_pO2_bar(p_eq)
+            )
+            if removed_at_equilibrium > 0.0:
+                removed_at_low = (
+                    self._headspace_o2_removal_at_settled_pO2_bar(p_low)
+                )
+                if r_low <= removed_at_low:
+                    p_star = p_low
+                else:
+                    # Log-space bisection. mid = sqrt(lo*hi) keeps the
+                    # bracket positive across the decades from p_low
+                    # (the vacuum floor, when the headspace is empty)
+                    # up to p_eq.
+                    lo = p_low
+                    hi = p_eq
+                    for _ in range(48):
+                        mid = math.sqrt(lo * hi)
+                        if _release_at(mid) > (
+                            self._headspace_o2_removal_at_settled_pO2_bar(mid)
+                        ):
+                            lo = mid
+                        else:
+                            hi = mid
+                    p_star = math.sqrt(lo * hi)
+                dn_to_headspace = _release_at(p_star)
+                reservoir.settled_headspace_pO2_bar = p_star
         if alpha > 0.0 and math.isfinite(alpha) and math.isfinite(dn_to_headspace):
             dn_equilibrium = dn_to_headspace / alpha
             if dn_equilibrium >= 0.0:

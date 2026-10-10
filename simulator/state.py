@@ -465,6 +465,12 @@ class OxygenReservoirState:
     headspace_capacity_mol_per_ln_pO2: float = 0.0
     exchange_o2_mol: float = 0.0
     exchange_o2_kg: float = 0.0
+    # R(p_floor) = alpha * C_flux * (ln fO2 - ln p_floor), mol O2 per hour,
+    # before the pump balance. The committed exchange can be smaller.
+    kinetic_exchange_o2_mol: float = 0.0
+    # Headspace O2 partial (bar) where melt release equals bleed removal.
+    # Zero when this hour kept the sealed two-capacitor exchange.
+    settled_headspace_pO2_bar: float = 0.0
     # Requested headspace Δn that lacked ledger O₂ inventory (managed floor /
     # clamp remainder). Zero when every mol of exchange_o2_mol is backed.
     exchange_unbacked_o2_mol: float = 0.0

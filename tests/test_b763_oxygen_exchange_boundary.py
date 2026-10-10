@@ -1,7 +1,7 @@
-"""Fixed-pressure headspace boundary for the oxygen-reservoir exchange.
+"""Pump-limited headspace boundary for the oxygen-reservoir exchange.
 
-A pumped vacuum is dn = alpha * C_m * (x_m - x_h). A slow bleed keeps
-the two-capacitor step. The reverse leg stays clamped to real O2.
+An open pipe settles where melt release equals bleed removal. A closed
+pipe keeps the two-capacitor step. The reverse leg stays clamped to real O2.
 """
 
 from __future__ import annotations
@@ -62,7 +62,7 @@ def _mars_at_hour24() -> PyrolysisSimulator:
     return sim
 
 
-def test_pumped_vacuum_is_a_fixed_pressure_sink() -> None:
+def test_pumped_vacuum_settles_where_release_equals_removal() -> None:
     sim = _mars_at_hour24()
     before = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
     melt_before = sim.atom_ledger.mol_by_account("process.cleaned_melt")
@@ -73,19 +73,37 @@ def test_pumped_vacuum_is_a_fixed_pressure_sink() -> None:
     alpha = 1.0 - math.exp(-1.0 / reservoir.tau_hr)
     c_m = reservoir.melt_redox_capacity_mol_per_ln_fO2
     x_m = before * math.log(10.0)
-    x_h = math.log(1.0e-9)
-    dn_fixed = alpha * c_m * (x_m - x_h)
+    p_floor = 1.0e-9
+    p_eq = math.exp(x_m)
+    p_h = reservoir.settled_headspace_pO2_bar
+    kinetic = alpha * c_m * (x_m - math.log(p_floor))
+    dn_at_settled = alpha * c_m * (x_m - math.log(p_h))
     x_after = reservoir.melt_intrinsic_fO2_log * math.log(10.0)
 
     assert reservoir.exchange_direction == "melt_to_headspace"
     assert reservoir.exchange_clamped is False
     assert reservoir.exchange_notice == {}
-    assert reservoir.exchange_o2_mol == pytest.approx(dn_fixed, rel=1e-9)
-    assert reservoir.exchange_o2_mol == pytest.approx(_MARS_HOUR24_DN_MOL, rel=1e-3)
+    # 10**(-4.33933) bar = 4.58 Pa. The unconstrained kinetic rate is the
+    # old fixed-floor sink, ~38 mol/h. The pipe that passes that rate
+    # needs 57.7 Pa, so the balance sits below p_eq and dn is far smaller.
+    assert p_eq == pytest.approx(4.58e-5, rel=1e-3)
+    assert reservoir.kinetic_exchange_o2_mol == pytest.approx(kinetic, rel=1e-9)
+    assert reservoir.kinetic_exchange_o2_mol == pytest.approx(
+        _MARS_HOUR24_DN_MOL, rel=1e-3
+    )
+    assert p_floor < p_h < p_eq
+    assert reservoir.exchange_o2_mol == pytest.approx(dn_at_settled, rel=1e-6)
+    assert reservoir.exchange_o2_mol < 2.0
+    assert reservoir.exchange_o2_mol == pytest.approx(
+        sim._headspace_o2_removal_at_settled_pO2_bar(p_h),
+        rel=1e-3,
+    )
     assert 0.0 < alpha < 1.0
-    # Closed form: x_after = (1 - alpha) x_m + alpha x_h, strictly between.
-    assert x_after == pytest.approx((1.0 - alpha) * x_m + alpha * x_h, rel=1e-9)
-    assert min(x_m, x_h) < x_after < max(x_m, x_h)
+    assert x_after == pytest.approx(
+        (1.0 - alpha) * x_m + alpha * math.log(p_h),
+        rel=1e-9,
+    )
+    assert min(x_m, math.log(p_h)) < x_after < max(x_m, math.log(p_h))
     dn = reservoir.exchange_o2_mol
     melt = sim.atom_ledger.mol_by_account("process.cleaned_melt")
     # Fe2O3 -> 2 FeO + 1/2 O2: dn mol O2 removes 2*dn Fe2O3 and adds 4*dn FeO.
@@ -118,7 +136,8 @@ def test_pumped_vacuum_is_a_fixed_pressure_sink() -> None:
     ]
     second = sim._apply_oxygen_reservoir_exchange()
     assert second.exchange_direction == "melt_to_headspace"
-    assert second.exchange_o2_mol > 1.0
+    assert second.exchange_o2_mol > 0.0
+    assert second.settled_headspace_pO2_bar > p_floor
     assert sim.atom_ledger.mol_by_account("process.cleaned_melt")["Fe2O3"] == (
         pytest.approx(fe2o3_after_first - 2.0 * second.exchange_o2_mol, rel=1e-9)
     )
@@ -181,9 +200,37 @@ def test_removal_forecast_matches_the_bleed_on_the_same_state(monkeypatch) -> No
     assert forecast < 0.1
 
 
-def test_slow_bleed_keeps_the_two_capacitor_exchange() -> None:
+def test_open_slow_pipe_is_pump_limited_near_equilibrium() -> None:
+    """A configured conductance is an open pipe, not a sealed capacitor.
+
+    1e-7 kg/s is constant in pressure. With vacuum downstream the removal
+    is flat, so R(p_h*) equals that rate and p_h* sits just below p_eq.
+    """
+    from simulator.core import OXYGEN_MOLAR_MASS_KG_PER_MOL
+
     sim = _mars_at_hour24()
     sim._overhead_headspace_config["conductance_kg_s"] = 1.0e-7
+    before = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+    reservoir = sim._apply_oxygen_reservoir_exchange()
+    p_eq = 10.0 ** before
+    rate_mol_h = 1.0e-7 * 3600.0 / OXYGEN_MOLAR_MASS_KG_PER_MOL
+
+    alpha = 1.0 - math.exp(-1.0 / reservoir.tau_hr)
+    c_m = reservoir.melt_redox_capacity_mol_per_ln_fO2
+    # R(p) = alpha * C_m * ln(p_eq / p) equals the flat pipe rate, so
+    # p_h* = p_eq * exp(-rate / (alpha * C_m)), just below p_eq.
+    expected_p = p_eq * math.exp(-rate_mol_h / (alpha * c_m))
+
+    assert reservoir.exchange_direction == "melt_to_headspace"
+    assert reservoir.kinetic_exchange_o2_mol > 30.0
+    assert reservoir.exchange_o2_mol == pytest.approx(rate_mol_h, rel=1e-3)
+    assert reservoir.settled_headspace_pO2_bar == pytest.approx(expected_p, rel=1e-4)
+    assert reservoir.settled_headspace_pO2_bar < p_eq
+
+
+def test_closed_pipe_keeps_the_two_capacitor_exchange() -> None:
+    sim = _mars_at_hour24()
+    sim._overhead_headspace_config["conductance_kg_s"] = 0.0
     before = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
     reservoir = sim._apply_oxygen_reservoir_exchange()
 
@@ -194,10 +241,9 @@ def test_slow_bleed_keeps_the_two_capacitor_exchange() -> None:
     dn_closed = alpha * (delta_ln / (1.0 / c_m + 1.0 / c_h))
 
     assert reservoir.exchange_direction == "melt_to_headspace"
+    assert reservoir.settled_headspace_pO2_bar == pytest.approx(0.0, abs=0.0)
     assert reservoir.exchange_o2_mol == pytest.approx(dn_closed, rel=1e-6, abs=1e-15)
-    assert reservoir.exchange_o2_mol < 1.0e-6
-    # The same hour on the pumped pipe is the ~38 mol/h sink, not this dn.
-    assert alpha * c_m * delta_ln > 30.0
+    assert reservoir.kinetic_exchange_o2_mol > 30.0
 
 
 def test_partial_melt_above_kress_floor_keeps_the_isoferric_endpoint() -> None:
@@ -347,7 +393,8 @@ def test_exchange_then_respeciation_does_not_credit_the_same_dn() -> None:
     ).get("O2", 0.0)
     residual = overhead_after_respeciation - overhead_after_exchange
     divergence = diagnostic["ferric_divergence_after"]
-    assert dn > 30.0
+    assert dn > 0.0
+    assert reservoir.kinetic_exchange_o2_mol > 30.0
     assert diagnostic["status"] == "ok"
     # Curvature may credit a residual. A second copy of dn would be ~dn.
     assert residual < 0.2 * dn
