@@ -381,7 +381,7 @@ def test_private_locator_reporting(tmp_path, monkeypatch):
 
 def test_nasa_cea_private_locator_backlog():
     index = yaml.safe_load(COMMITTED_YAML.read_text())
-    for source_id in ("nasa-cea-thermo", "ref-016-sio-kems-1700-2000k"):
+    for source_id in ("nasa-cea-thermo",):
         row = next(row for row in index["sources"] if row["source_id"] == source_id)
         assert row["extracts"][0]["locator_status"] == "private_path"
         assert source_id in index["gaps"]["extracts_with_private_locators"]

@@ -1570,6 +1570,34 @@ def test_g02_iron_olivine_kems_is_knudsen_not_langmuir(tmp_path: Path) -> None:
     assert obs.evidence.class_.value is not EvidenceClass.MEASURED_DIRECT
 
 
+def test_g02_langmuir_ledger_keeps_qualified_derived_from(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    parent = "10.1016/j.gca.2005.08.014::kems-005-fedkin-2006::fedkin_2006_k_yu_langmuir"
+    (root / "data" / "literature" / "langmuir_knudsen_flux_validation.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "measurements": {
+                    "potassium_silicate_vacuum": {
+                        "species": "K",
+                        "temperature_range_k": [1723.15, 1723.15],
+                        "measured_langmuir_to_effusion_flux_ratio": {"value": 0.13},
+                        "derived_from": [parent],
+                        "source": {
+                            "citation_id": "REF-014",
+                            "citation": "Fedkin et al. (2006), DOI 10.1016/j.gca.2005.08.014",
+                            "doi": "10.1016/j.gca.2005.08.014",
+                        },
+                    }
+                }
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    observation = migrate(root, write=False).observations["potassium_silicate_vacuum"]
+    assert observation.derived_from == (parent,)
+
+
 def test_g02_kems_row_without_method_is_unknown(tmp_path: Path) -> None:
     root = _write_min_tree(tmp_path)
     (root / "data" / "literature" / "kems_measurements.yaml").write_text(
@@ -2994,10 +3022,10 @@ def test_j01_explicit_pressure_atm_control_still_lifts(tmp_path: Path) -> None:
 
 
 def test_j01_fedkin_alpha_series_not_mass_loss_rate(tmp_path: Path) -> None:
-    src = REPO_ROOT / "data" / "literature" / "extracts" / "fedkin-grossman-ghiorso-2006.yaml"
+    src = REPO_ROOT / "data" / "literature" / "extracts" / "kems-005-fedkin-2006.yaml"
     extract = load_cached_safe_yaml(src.read_text(encoding="utf-8"))
     root = _write_min_tree(tmp_path, extract)
-    (root / "data" / "literature" / "extracts" / "fedkin-grossman-ghiorso-2006.yaml").write_text(
+    (root / "data" / "literature" / "extracts" / "kems-005-fedkin-2006.yaml").write_text(
         src.read_text(encoding="utf-8"), encoding="utf-8"
     )
     (root / "data" / "literature" / "extracts" / "fixture-source.yaml").unlink()
@@ -3005,7 +3033,8 @@ def test_j01_fedkin_alpha_series_not_mass_loss_rate(tmp_path: Path) -> None:
     alpha_points = [
         o
         for o in result.observations.values()
-        if "per_T_alpha_series::T=" in o.observation_id
+        if "_table3::T=" in o.observation_id
+        or "sio_hashimoto_table3_complete_b1::T=" in o.observation_id
     ]
     assert len(alpha_points) == 12
     for obs in alpha_points:
@@ -3015,7 +3044,7 @@ def test_j01_fedkin_alpha_series_not_mass_loss_rate(tmp_path: Path) -> None:
     fe0 = next(
         o
         for o in alpha_points
-        if "fe_hashimoto_langmuir_per_T_alpha_series::T=1973" in o.observation_id
+        if "fe_hashimoto_langmuir_table3::T=1973" in o.observation_id
     )
     assert fe0.value.point == as_decimal("0.23")
     assert float(fe0.identity.temperature_K.value) == 1973.0
@@ -3480,7 +3509,10 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     # cells, evaporation_coefficient_alpha 30->34 and n_numeric 450->454.
     assert census.get("p_partial") == 136
     assert census.get("p_sat") == 21
-    assert census.get("evaporation_coefficient_alpha") == 34
+    # Twelve repeated Fedkin table cells are no longer counted through the retired
+    # mirror; the KEMS owner extract retains the cells (Fedkin et al. 2006, Table 3,
+    # p. 212, DOI 10.1016/j.gca.2005.08.014).
+    assert census.get("evaporation_coefficient_alpha") == 22
     # Re-pinned with the d-032 store regen. _series_census skips a source with no
     # extracts-v2 sibling, and the pre-regen store was missing 26 sources' derived
     # files, so their series went uncounted: evaporation_rate 21->25,
@@ -3516,15 +3548,9 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     assert per_source.get("kems-026-markova-1984") == {
         "residue_component_composition": 110
     }
-    # Re-pinned for the loader-survival batch: Richter 2007 +50 printed mass-loss cells
-    # (starting-material initial compositions now survive migration), on top of the
-    # landed 450 (scorer p_partial +61, Holzheid +33): n_numeric 450->500; t-998 adds
-    # four Zhang Table 4 alpha cells, and 1164 residue components, so the merged
-    # total is 1668; mismatches remains 0.
-    # O'Neill & Eggins 2002 adds 91 activity_coefficient cells: n_numeric 1668->1759.
-    # t-1122 adds the eight printed residue component points above: 1759->1767.
-    # t-1152 adds 110 printed residue component cells: 1767->1877.
-    assert n_numeric == 1877, (n_numeric, census, n_unavailable)
+    # Current total includes the 110 Markova 1984 residue components and omits
+    # the 12 duplicate Fedkin mirror cells.
+    assert n_numeric == 1865, (n_numeric, census, n_unavailable)
 
 
 def test_residue_point_condition_values_keep_their_printed_types() -> None:
@@ -3669,7 +3695,7 @@ def test_k04_census_goes_red_when_stored_alpha_is_corrupted(tmp_path: Path) -> N
         pytest.skip("migrated store not generated yet")
     dest = tmp_path / "extracts-v2"
     shutil.copytree(extracts_v2, dest)
-    fedkin = dest / "fedkin-grossman-ghiorso-2006.yaml"
+    fedkin = dest / "kems-005-fedkin-2006.yaml"
     stored = yaml.safe_load(fedkin.read_text(encoding="utf-8"))
     n_mutated = 0
     for obs in stored.get("observations") or []:
@@ -10319,3 +10345,142 @@ def test_residue_series_emits_numeric_component_cells_with_component_identity(
     assert pressure["value"] == "0.00015"
     assert pressure["units"] == "Torr"
     assert pressure["kind"] == "about_nominal_by_temperature"
+
+
+def _same_work_observation_duplicate_pairs(observations: list[dict]) -> list[tuple[str, str, str]]:
+    """Return equal admitted values for one work that came from separate extracts."""
+    grouped: dict[tuple[object, ...], list[dict]] = {}
+
+    def canonical(value: object) -> object:
+        if isinstance(value, dict):
+            if value.get("tag") == "value":
+                return canonical(value.get("value"))
+            return tuple(sorted((key, canonical(item)) for key, item in value.items()))
+        if isinstance(value, list):
+            return tuple(canonical(item) for item in value)
+        if value is None:
+            return None
+        try:
+            return Decimal(str(value))
+        except Exception:
+            return value
+
+    for obs in observations:
+        if (obs.get("admission") or {}).get("status") not in {"admitted", "pending"}:
+            continue
+        identity = obs.get("identity") or {}
+        quantity = canonical(identity.get("quantity"))
+        species = (identity.get("species") or {}).get("formula")
+        temperature_state = identity.get("temperature_K") or {}
+        if isinstance(temperature_state, dict) and temperature_state.get("tag") != "value":
+            continue
+        temperature = canonical(temperature_state)
+        value = obs.get("value") or {}
+        value_payload = {key: item for key, item in value.items() if key not in {"kind", "approximate"}}
+        experiment_id = str(obs.get("experiment_id") or "")
+        work_id = experiment_id.split("::", 1)[0]
+        source_id = str(obs.get("source_id") or "")
+        if not all((quantity, species, temperature is not None, value_payload, work_id, source_id)):
+            continue
+        grouped.setdefault(
+            (work_id, quantity, species, temperature, canonical(value_payload)), []
+        ).append(obs)
+
+    pairs: list[tuple[str, str, str]] = []
+    for (work_id, *_), members in grouped.items():
+        for index, left in enumerate(members):
+            for right in members[index + 1 :]:
+                if left.get("source_id") == right.get("source_id"):
+                    continue
+                left_id = str(left.get("observation_id") or "")
+                right_id = str(right.get("observation_id") or "")
+                left_parents = left.get("derived_from") or []
+                right_parents = right.get("derived_from") or []
+                if isinstance(left_parents, str):
+                    left_parents = [left_parents]
+                if isinstance(right_parents, str):
+                    right_parents = [right_parents]
+                if left_id in right_parents or right_id in left_parents:
+                    continue
+                pairs.append((work_id, left_id, right_id))
+    return sorted(pairs)
+
+
+def test_literature_store_has_no_duplicate_values_across_extracts() -> None:
+    roots = (
+        REPO_ROOT / "data" / "literature" / "extracts-v2",
+        REPO_ROOT / "data" / "literature" / "observations-v2",
+    )
+    observations: list[dict] = []
+    summary = load_observation_store_summary(REPO_ROOT)
+    for root in roots:
+        for path in iter_observation_store_paths(root):
+            if compilation_family_from_store_path(path) is not None:
+                _account_compilation_shard(path, summary)
+                continue
+            stored = yaml.load(path.read_text(encoding="utf-8"), Loader=yaml.CSafeLoader)
+            if isinstance(stored, dict):
+                observations.extend(stored.get("observations") or [])
+    duplicates = _same_work_observation_duplicate_pairs(observations)
+    expected_fedkin_duplicates = [
+        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series::T=1973.0:h=1d21a3ff1eab", "kems-005-fedkin-2006::fedkin_2006_fe_hashimoto_langmuir_table3::T=1973.0:h=1d21a3ff1eab"),
+        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series::T=2073.0:h=d46e4f3675db", "kems-005-fedkin-2006::fedkin_2006_fe_hashimoto_langmuir_table3::T=2073.0:h=d46e4f3675db"),
+        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series::T=2173.0:h=8c30d44267dc", "kems-005-fedkin-2006::fedkin_2006_fe_hashimoto_langmuir_table3::T=2173.0:h=8c30d44267dc"),
+        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series::T=2273.0:h=1d21a3ff1eab", "kems-005-fedkin-2006::fedkin_2006_fe_hashimoto_langmuir_table3::T=2273.0:h=1d21a3ff1eab"),
+        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series::T=1973.0:h=54b5fe718864", "kems-005-fedkin-2006::fedkin_2006_mg_hashimoto_langmuir_table3::T=1973.0:h=54b5fe718864"),
+        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series::T=2073.0:h=dc4d8a196fbc", "kems-005-fedkin-2006::fedkin_2006_mg_hashimoto_langmuir_table3::T=2073.0:h=dc4d8a196fbc"),
+        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series::T=2173.0:h=dc4d8a196fbc", "kems-005-fedkin-2006::fedkin_2006_mg_hashimoto_langmuir_table3::T=2173.0:h=dc4d8a196fbc"),
+        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series::T=2273.0:h=c383b1787018", "kems-005-fedkin-2006::fedkin_2006_mg_hashimoto_langmuir_table3::T=2273.0:h=c383b1787018"),
+        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series::T=1973.0:h=c900cec45e7a", "kems-005-fedkin-2006::fedkin_2006_sio_hashimoto_table3_complete_b1::T=1973.0:h=c900cec45e7a"),
+        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series::T=2073.0:h=eb12d425d670", "kems-005-fedkin-2006::fedkin_2006_sio_hashimoto_table3_complete_b1::T=2073.0:h=eb12d425d670"),
+        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series::T=2173.0:h=efeb2f418fbe", "kems-005-fedkin-2006::fedkin_2006_sio_hashimoto_table3_complete_b1::T=2173.0:h=efeb2f418fbe"),
+        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series::T=2273.0:h=707e960142f9", "kems-005-fedkin-2006::fedkin_2006_sio_hashimoto_table3_complete_b1::T=2273.0:h=707e960142f9"),
+        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_yu_k_vacuum_langmuir", "kems-005-fedkin-2006::fedkin_2006_k_class_b1"),
+        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_yu_k_vacuum_langmuir", "kems-005-fedkin-2006::fedkin_2006_k_yu_langmuir"),
+        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_yu_k_vacuum_langmuir", "potassium_silicate_vacuum"),
+        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_yu_na_vacuum_langmuir", "kems-005-fedkin-2006::fedkin_2006_na_class_b1"),
+        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_yu_na_vacuum_langmuir", "kems-005-fedkin-2006::fedkin_2006_na_yu_langmuir"),
+        ("10.1016/j.gca.2005.08.014", "kems-005-fedkin-2006::fedkin_2006_k_class_b1", "potassium_silicate_vacuum"),
+        ("10.1016/j.gca.2005.08.014", "kems-005-fedkin-2006::fedkin_2006_k_yu_langmuir", "potassium_silicate_vacuum"),
+    ]
+    assert duplicates == expected_fedkin_duplicates, duplicates
+
+
+def test_duplicate_guard_catches_measured_copy_but_not_ulp_or_different_value() -> None:
+    owner = {
+        "observation_id": "owner::row",
+        "experiment_id": "10.1234/example::owner",
+        "source_id": "owner",
+        "identity": {
+            "quantity": {"tag": "value", "value": "evaporation_coefficient_alpha"},
+            "species": {"formula": "Fe"},
+            "temperature_K": {"tag": "value", "value": "2073"},
+        },
+        "value": {"kind": "point", "point": "0.25", "approximate": False},
+        "admission": {"status": "admitted"},
+    }
+    duplicate = {
+        **owner,
+        "observation_id": "secondary::row",
+        "experiment_id": "10.1234/example::secondary",
+        "source_id": "secondary",
+        "evidence": {"class": {"tag": "value", "value": "measured_direct"}},
+    }
+    assert _same_work_observation_duplicate_pairs([owner, duplicate]) == [
+        ("10.1234/example", "owner::row", "secondary::row")
+    ]
+
+    duplicate["derived_from"] = ["owner::row"]
+    assert _same_work_observation_duplicate_pairs([owner, duplicate]) == []
+    duplicate.pop("derived_from")
+
+    # A precise decimal difference well below displayed precision is not equality.
+    duplicate["value"] = {
+        "kind": "point",
+        "point": "0.2500000000000000000000000001",
+        "approximate": False,
+    }
+    assert _same_work_observation_duplicate_pairs([owner, duplicate]) == []
+
+    duplicate["value"] = {"kind": "point", "point": "0.3", "approximate": False}
+    assert _same_work_observation_duplicate_pairs([owner, duplicate]) == []

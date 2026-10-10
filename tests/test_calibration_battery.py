@@ -337,7 +337,7 @@ def test_headline_authority_columns_count_scored_population(observation):
 
 
 def test_hashimoto_alpha_rate_twins_are_not_double_scored(observation):
-    shared = {**observation, "dataset_id": "fedkin-grossman-ghiorso-2006", "species": "Fe",
+    shared = {**observation, "dataset_id": "fedkin-secondary-test-fixture", "species": "Fe",
               "measured": 0.23, "predicted": 0.02, "units": "alpha",
               "conditions": {"temperature_K": 1973.0}}
     alpha = envelope(**{**shared, "observation_id": "fedkin_2006_table3_fe_hashimoto_langmuir:T=1973",
@@ -423,7 +423,7 @@ def test_cross_ingest_physical_point_twins_are_not_double_scored(observation):
                       conditions={"temperature_K": temperature})
         rows.append(envelope(**{**observation, **shared,
             "observation_id": f"fedkin_2006_table3_fe_hashimoto_langmuir:T={int(temperature)}",
-            "dataset_id": "fedkin-grossman-ghiorso-2006", "evidence": "direct experiment"}))
+            "dataset_id": "fedkin-secondary-test-fixture", "evidence": "direct experiment"}))
         rows.append(envelope(**{**observation, **shared,
             "observation_id": f"fedkin_2006_fe_hashimoto_langmuir_table3:T={int(temperature)}",
             "dataset_id": "kems-005-fedkin-2006", "evidence": "derived measurement"}))
@@ -455,7 +455,7 @@ def test_cross_ingest_physical_point_twins_are_not_double_scored(observation):
         "observable": "evaporation_alpha", "units": "alpha", "measured": 0.12, "predicted": 0.08,
         "conditions": {"temperature_K": 1973.0},
         "observation_id": "fedkin_2006_table3_sio_hashimoto_langmuir:T=1973",
-        "dataset_id": "fedkin-grossman-ghiorso-2006", "evidence": "direct experiment"})
+        "dataset_id": "fedkin-secondary-test-fixture", "evidence": "direct experiment"})
     sio_kems = envelope(**{**observation, "species": "SiO", "rail": "SiO evolution",
         "observable": "evaporation_alpha", "units": "alpha", "measured": 0.12, "predicted": 0.08,
         "conditions": {"temperature_K": 1973.0},
@@ -473,10 +473,10 @@ def test_cross_ingest_physical_point_twins_are_not_double_scored(observation):
 
     scored_fe = [r for r in rows if r["score_eligible"] and r["species"] == "Fe"]
     fe_023 = {(r["conditions"]["temperature_K"], r["dataset_id"]) for r in scored_fe if r["measured"] == 0.23}
-    assert fe_023 == {(1973.0, "fedkin-grossman-ghiorso-2006"), (2273.0, "fedkin-grossman-ghiorso-2006")}
+    assert fe_023 == {(1973.0, "fedkin-secondary-test-fixture"), (2273.0, "fedkin-secondary-test-fixture")}
     assert class_b1["score_eligible"] is True and class_b1["selected"] is True
     hashimoto_2173 = next(r for r in rows if r["observation_id"].endswith("langmuir:T=2173")
-                          and r["dataset_id"] == "fedkin-grossman-ghiorso-2006")
+                          and r["dataset_id"] == "fedkin-secondary-test-fixture")
     assert hashimoto_2173["score_eligible"] is True
     kems_hashimoto = [r for r in rows if r["dataset_id"] == "kems-005-fedkin-2006"
                       and "class_b1" not in r["observation_id"]]
