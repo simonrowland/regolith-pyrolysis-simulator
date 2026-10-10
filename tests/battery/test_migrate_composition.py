@@ -6,6 +6,7 @@ import re
 from decimal import Decimal
 from pathlib import Path
 
+import pytest
 import yaml
 
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
@@ -517,6 +518,283 @@ def test_markova_1983_rows_use_each_points_own_printed_composition(
                 f"{row['observation_id']}: identity does not match its printed map"
             )
     assert not mismatches, f"{len(mismatches)} composition mismatches: {mismatches}"
+
+
+def test_markova_table2_migrates_both_quantities_and_printed_charge(tmp_path: Path) -> None:
+    result = _migrate_real_extract(
+        tmp_path,
+        "kems-026-markova-1984.yaml",
+        use_repository_index_row=True,
+    )
+    prefix = "kems-026-markova-1984::markova_1984_table2_residual_melt_"
+    rows = {
+        observation_id: to_plain(observation)
+        for observation_id, observation in result.observations.items()
+        if observation_id.startswith(prefix)
+    }
+    mass_loss_rows = {
+        observation_id: row
+        for observation_id, row in rows.items()
+        if _quantity(row) == "mass_loss_fraction"
+    }
+    assert len(mass_loss_rows) == 24
+    assert {
+        row["identity"]["species"]["formula"] for row in mass_loss_rows.values()
+    } == {"unknown"}
+    assert sum(
+        row["admission"]["status"] == "admitted"
+        for row in mass_loss_rows.values()
+    ) == 22
+    zero_rows = [
+        row
+        for row in mass_loss_rows.values()
+        if Decimal(row["value"]["point"]) == Decimal("0")
+    ]
+    assert len(zero_rows) == 2
+    for row in zero_rows:
+        assert row["admission"]["status"] == "pending"
+        assert row["identity"]["temperature_K"]["tag"] == "unknown"
+        assert "T_range_K" in row["identity"]["temperature_K"]["reason"]
+    assert {
+        Decimal(row["value"]["point"])
+        for row in mass_loss_rows.values()
+    } == {
+        Decimal(value)
+        for value in (
+            "0",
+            "0.0146", "0.0416", "0.0974", "0.218", "0.3835", "0.6521",
+            "0.8605", "0.8925", "0.9181", "0.9551", "0.9834", "0.0117",
+            "0.0439", "0.1441", "0.3717", "0.5353", "0.6601", "0.6935",
+            "0.7133", "0.7619", "0.8368", "0.9799",
+        )
+    }
+
+    residue = {
+        observation_id: row
+        for observation_id, row in rows.items()
+        if _quantity(row) == "residue_component_composition"
+    }
+    assert len(residue) == 110
+    printed_cells = {
+        ("VI", "1748.15", "MgO"): Decimal("36.92"),
+        ("VI", "2156.15", "SiO2"): Decimal("13.6"),
+        ("VI", "2311.15", "MgO"): Decimal("0.0"),
+        ("V", "1992.15", "MgO"): Decimal("8.11"),
+    }
+    for (panel, temperature, oxide), expected in printed_cells.items():
+        matching = [
+            row
+            for observation_id, row in residue.items()
+            if row["experiment_id"].endswith(f"::{panel}")
+            and row["identity"]["species"]["formula"] == oxide
+            and row["identity"]["temperature_K"]["value"] == temperature
+        ]
+        assert len(matching) == 1
+        assert Decimal(matching[0]["value"]["point"]) == expected
+
+    charges = {
+        "VI": {
+            "SiO2": Decimal("44.02"), "Al2O3": Decimal("4.56"),
+            "FeO": Decimal("8.04"), "MgO": Decimal("36.44"),
+            "CaO": Decimal("6.95"),
+        },
+        "V": {
+            "SiO2": Decimal("52.32"), "Al2O3": Decimal("19.13"),
+            "FeO": Decimal("9.37"), "MgO": Decimal("6.25"),
+            "CaO": Decimal("12.93"),
+        },
+    }
+    extract = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts/kems-026-markova-1984.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    source_values = {
+        observation["values"]["composition_id"]: observation["values"]
+        for observation in extract["species"]["SiO2"]["observations"]
+        if observation["values"].get("quantity") == "residue_composition_vs_time"
+    }
+    for panel, charge in charges.items():
+        series = source_values[panel]["series"]
+        panel_rows = [
+            row
+            for row in mass_loss_rows.values()
+            if row["experiment_id"].endswith(f"::{panel}")
+        ]
+        assert len(panel_rows) == len(series)
+        for row, source_point in zip(panel_rows, series):
+            expected = (
+                charge
+                if source_point.get("T_C_is_initial_composition")
+                else {
+                    oxide: as_decimal(source_point[f"{oxide}_wt_pct"])
+                    for oxide in charge
+                }
+            )
+            assert _printed_wt_map(row) == expected
+
+    for panel in charges:
+        for row in residue.values():
+            if not row["experiment_id"].endswith(f"::{panel}"):
+                continue
+            temperature_c = (
+                Decimal(row["identity"]["temperature_K"]["value"])
+                - Decimal("273.15")
+            )
+            source_point = next(
+                point
+                for point in source_values[panel]["series"]
+                if "T_C" in point
+                and as_decimal(point["T_C"]) == temperature_c
+            )
+            expected = {
+                oxide: as_decimal(source_point[f"{oxide}_wt_pct"])
+                for oxide in charges[panel]
+            }
+            assert _printed_wt_map(row) == expected
+            composition = _state_value(
+                (row.get("point_conditions") or {}).get("composition")
+            )
+            assert composition["amount_basis"] == "mole_fraction"
+            actual_moles = {
+                oxide: as_decimal(amount)
+                for oxide, amount in composition["components"]
+            }
+            assert actual_moles == dict(wt_pct_to_mole_fraction(expected).components)
+
+    for panel, charge in charges.items():
+        panel_rows = [
+            row
+            for row in mass_loss_rows.values()
+            if row["experiment_id"].endswith(f"::{panel}")
+        ]
+        experiment_ids = {row["experiment_id"] for row in panel_rows}
+        assert len(experiment_ids) == 1
+        sample = result.experiments[next(iter(experiment_ids))].sample
+        assert sample.printed_composition is not None
+        assert {
+            oxide: as_decimal(value)
+            for oxide, value in sample.printed_composition.state.value.items()
+        } == charge
+        expected_identity = dict(wt_pct_to_mole_fraction(charge).components)
+        panel_residue = [
+            row
+            for row in residue.values()
+            if row["experiment_id"].endswith(f"::{panel}")
+        ]
+        assert len(panel_residue) == 55
+        for row in panel_residue:
+            assert _identity_composition_components(row) == expected_identity
+
+
+@pytest.mark.parametrize(
+    "mode",
+    ("tie", "missing-point", "missing-coordinates", "mismatched-coordinates"),
+)
+def test_markova_residue_uses_its_point_map_without_parent_lookup(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    mode: str,
+) -> None:
+    from simulator.battery import migrate as migration
+
+    original = migration.Migrator._emit_exploded_point
+
+    def emit(self, **kwargs):
+        item = kwargs["item"]["item"]
+        if (
+            isinstance(item, dict)
+            and item.get("T_C") == 1475
+            and "MgO_wt_pct" in item
+            and as_decimal(str(item.get("MgO_wt_pct"))) == Decimal("36.92")
+        ):
+            kwargs = dict(kwargs)
+            parent_values = dict(kwargs["parent_values"])
+            series = list(parent_values["series"])
+            if mode == "tie":
+                match = next(
+                    point
+                    for point in series
+                    if point.get("T_C") == item.get("T_C")
+                    and point.get("mass_loss_pct") == item.get("mass_loss_pct")
+                )
+                series.append({**match, "SiO2_wt_pct": Decimal("99")})
+                parent_values["series"] = series
+                kwargs["parent_values"] = parent_values
+            elif mode == "missing-point":
+                parent_values["series"] = []
+                kwargs["parent_values"] = parent_values
+            elif mode == "missing-coordinates":
+                item = dict(item)
+                item.pop("T_C", None)
+                item.pop("mass_loss_pct", None)
+                kwargs["item"] = {**kwargs["item"], "item": item}
+            elif mode == "mismatched-coordinates":
+                item = dict(item)
+                item["mass_loss_pct"] = Decimal(str(item["mass_loss_pct"])) + Decimal(
+                    "1e-12"
+                )
+                kwargs["item"] = {**kwargs["item"], "item": item}
+        return original(self, **kwargs)
+
+    monkeypatch.setattr(migration.Migrator, "_emit_exploded_point", emit)
+    result = _migrate_real_extract(
+        tmp_path,
+        "kems-026-markova-1984.yaml",
+        use_repository_index_row=True,
+    )
+    matches = []
+    for observation in result.observations.values():
+        row = to_plain(observation)
+        if (
+            _quantity(row) == "residue_component_composition"
+            and row["identity"]["species"]["formula"] == "MgO"
+            and Decimal(row["value"]["point"]) == Decimal("36.92")
+        ):
+            matches.append(row)
+    assert len(matches) == 1
+    assert _printed_wt_map(matches[0]) == {
+        "SiO2": Decimal("44.4"),
+        "Al2O3": Decimal("4.62"),
+        "FeO": Decimal("7.01"),
+        "MgO": Decimal("36.92"),
+        "CaO": Decimal("7.05"),
+    }
+
+
+def test_holzheid_v69_activity_does_not_gain_printed_composition(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(
+        tmp_path,
+        "holzheid-1997-feo-nio-coo-activity-metal-saturated.yaml",
+        use_repository_index_row=True,
+    )
+    stem = "holzheid-1997-feo-nio-coo-activity-metal-saturated"
+    parent_id = "holzheid_1997_table3a_ad_co_variable_mgo_1_1"
+    source = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts" / f"{stem}.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    source_row = next(
+        point
+        for observation in source["species"]["CoO"]["observations"]
+        if observation["observation_id"] == parent_id
+        for point in observation["values"]["series"]
+        if point["run"] == "V 69"
+    )
+    assert as_decimal(str(source_row["CoO_wt_pct"])) == as_decimal("2.03")
+    assert as_decimal(str(source_row["MgO_wt_pct"])) == as_decimal("6.97")
+
+    prefix = f"{stem}::{parent_id}::"
+    matches = [
+        observation
+        for observation_id, observation in result.observations.items()
+        if observation_id.startswith(prefix)
+    ]
+    assert len(matches) == 1
+    assert "printed_composition" not in (matches[0].point_conditions or {})
 
 
 def test_bulk_property_rows_do_not_use_sample_code_as_formula() -> None:
