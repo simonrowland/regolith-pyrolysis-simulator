@@ -198,6 +198,47 @@ def test_initialize_propagates_local_model_resolution_error(
         ThermoEngineBackend().initialize({})
 
 
+def test_initialize_health_return_preserves_solver_failure_reason(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    reason = 'solver iteration failed'
+
+    class FakeThermoEngineTransport:
+        engine_version = 'thermoengine fake'
+
+        def __init__(self, **_kwargs: object) -> None:
+            pass
+
+        def initialize(self) -> None:
+            return None
+
+        def health_check(
+            self, timeout_s: float | None = None
+        ) -> tuple[bool, str]:
+            return False, reason
+
+        def close(self) -> None:
+            return None
+
+    monkeypatch.setattr(
+        'simulator.melt_backend.thermoengine.ThermoEngineTransport',
+        FakeThermoEngineTransport,
+    )
+    monkeypatch.setattr(
+        ThermoEngineBackend,
+        '_initialize_vaporock_delegate',
+        lambda _self: None,
+    )
+
+    with pytest.raises(RuntimeError) as raised:
+        ThermoEngineBackend().initialize({})
+
+    assert str(raised.value) == reason
+    assert thermoengine_failure_disposition_from_exception(
+        raised.value
+    ).status == 'not_converged'
+
+
 def test_thermoengine_commissioning_notice_does_not_retype_to_refusal(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

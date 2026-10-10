@@ -16,8 +16,10 @@ from simulator.engine_pool import (
     ENGINE_WORKER_CANCEL_POLL_S,
     ENGINE_WORKER_SPAWN_SLACK_S,
     ENGINE_WORKER_STOP_PAIR_JOIN_S,
-    EngineWorkerRemoteError,
+    EngineWorkerExitedError,
     EngineWorkerPool,
+    EngineWorkerPoolLifecycleError,
+    EngineWorkerRemoteError,
     EngineWorkerTimeout,
     WarmEngineWorker,
     _pool_ready_wait_s,
@@ -202,9 +204,8 @@ def test_submit_with_no_live_consumer_refuses_instead_of_hanging_forever():
         with pytest.raises(RuntimeError, match='no live consumer') as exc_info:
             pool.submit(_points()[1], timeout_s=1.0)
 
-        # EXACT type, not isinstance. EngineWorkerUnavailable subclasses
-        # RuntimeError, so `pytest.raises(RuntimeError)` alone accepts it --
-        # and the absence classifiers key on that exact type
+        # Pin the lifecycle type, not merely RuntimeError. The absence
+        # classifiers key on EngineWorkerUnavailable specifically
         # (optimize/evaluate.py, backends.py, run_executor.py), routing it to
         # a fallback. A guard that raised it here would turn "the pool is
         # broken" into "quietly use analytical curves instead of native
@@ -214,8 +215,8 @@ def test_submit_with_no_live_consumer_refuses_instead_of_hanging_forever():
         # the test has to pin it. Caught by review 2026-08-29: without this
         # line, mutating the guard to raise EngineWorkerUnavailable still
         # passed.
-        assert type(exc_info.value) is RuntimeError, (
-            f'guard must raise a PLAIN RuntimeError, not '
+        assert type(exc_info.value) is EngineWorkerPoolLifecycleError, (
+            f'guard must raise EngineWorkerPoolLifecycleError, not '
             f'{type(exc_info.value).__name__}'
         )
     finally:
@@ -301,7 +302,9 @@ def test_submit_racing_close_is_completed_or_rejected_without_orphan():
     assert not close_thread.is_alive()
     assert 'error' not in outcome
     assert outcome['future'].result(timeout=1.0)
-    with pytest.raises(RuntimeError, match='pool is closed'):
+    with pytest.raises(
+        EngineWorkerPoolLifecycleError, match='pool is closed'
+    ):
         pool.submit(_points()[1])
 
 
@@ -343,7 +346,9 @@ def test_canceling_close_fails_in_flight_request_without_orphan():
     pool.close(cancel_pending=True)
 
     assert future.done()
-    with pytest.raises(RuntimeError, match='worker exited without a result'):
+    with pytest.raises(
+        EngineWorkerExitedError, match='worker exited without a result'
+    ):
         future.result(timeout=0.1)
     # The orphan assertion itself: after close() the worker process must
     # be gone (close joins/reaps, so a live pid here is a real orphan).

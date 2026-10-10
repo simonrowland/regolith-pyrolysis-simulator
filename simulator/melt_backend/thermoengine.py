@@ -168,7 +168,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                     f'ThermoEngine cleanup also failed: {cleanup_error}'
                 )
             if classified is exc:
-                raise
+                raise classified
             raise classified from exc
         self._thermoengine_import_error = exc
         self._close_after_failure(exc)

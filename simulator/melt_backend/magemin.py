@@ -93,6 +93,7 @@ library is called.
 
 from __future__ import annotations
 
+import builtins
 from contextlib import contextmanager
 import fcntl
 import math
@@ -123,9 +124,12 @@ from simulator.melt_backend.base import (
     split_cleaned_melt_account,
 )
 from simulator.engine_pool import (
+    EngineWorkerExitedError,
     EngineWorkerPool,
+    EngineWorkerPoolLifecycleError,
     EngineWorkerRemoteError,
     EngineWorkerTimeout,
+    EngineWorkerUnavailable,
     WarmEngineWorker,
 )
 from simulator.melt_backend.liquidus import (
@@ -233,8 +237,9 @@ def _magemin_subprocess_slot(timeout_s: float) -> Iterator[None]:
                 break
             remaining = deadline - time.monotonic()
             if remaining <= 0.0:
-                raise RuntimeError(
-                    f'MAGEMin subprocess slot timed out after {timeout_s:g}s'
+                raise _MAGEMinEngineLifecycleError(
+                    'MAGEMinSubprocessSlotTimeout',
+                    f'MAGEMin subprocess slot timed out after {timeout_s:g}s',
                 )
             time.sleep(min(0.01, remaining))
         yield
@@ -340,6 +345,10 @@ class _MAGEMinEngineCallError(RuntimeError):
         self.exception_type = exception_type
         self.engine_message = message
         super().__init__(f'{exception_type}: {message}')
+
+
+class _MAGEMinEngineLifecycleError(_MAGEMinEngineCallError):
+    """A MAGEMin worker, budget, or subprocess slot lifecycle failure."""
 
 
 def _as_mapping(value: Any) -> Mapping[str, Any] | None:
@@ -1333,11 +1342,6 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 fO2_log=fO2_log,
                 call_timeout_s=call_timeout_s,
             )
-        except EngineWorkerTimeout:
-            # A hang is a control-plane event, not an equilibrium refusal.
-            # The pool has already killed the slot; preserve the typed signal
-            # so the caller can retry while the next call respawns it.
-            raise
         except _MAGEMinEngineCallError as exc:
             # MAGEMin is present but the minimisation did not produce a
             # usable result.
@@ -1808,18 +1812,46 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         if normalised == 'julia':
             try:
                 import julia  # type: ignore[import-not-found]
-                # PyJulia is heavy — only flag as available if the
-                # MAGEMin_C.jl package import succeeds.
-                from julia import Main as JuliaMain  # noqa: F401
-                from julia.core import JuliaError
             except ImportError as exc:
                 self._last_error = f'julia bridge import failed: {exc}'
             else:
                 try:
-                    JuliaMain.eval('import MAGEMin_C')  # may raise JuliaError
-                    return 'julia', julia
-                except JuliaError as exc:
+                    from julia.core import (
+                        JuliaError,
+                        JuliaNotFound,
+                        UnsupportedPythonError,
+                    )
+                except ImportError as exc:
                     self._last_error = f'julia bridge import failed: {exc}'
+                else:
+                    try:
+                        # PyJulia's Main loader constructs Julia here, and its
+                        # runtime discovery can fail before Main is returned.
+                        # https://github.com/JuliaPy/pyjulia/blob/master/src/julia/core.py#L420
+                        # PyJulia raises JuliaNotFound for missing runtimes and
+                        # a plain RuntimeError for Julia < 0.7 at core.py#L438.
+                        # https://github.com/JuliaPy/pyjulia/blob/v0.6.2/src/julia/juliainfo.py#L55
+                        from julia import Main as JuliaMain  # noqa: F401
+                    except ImportError as exc:
+                        self._last_error = f'julia bridge import failed: {exc}'
+                    except (
+                        JuliaError,
+                        JuliaNotFound,
+                        UnsupportedPythonError,
+                        OSError,
+                        subprocess.SubprocessError,
+                    ) as exc:
+                        self._last_error = f'julia bridge import failed: {exc}'
+                    except RuntimeError as exc:
+                        if str(exc) != 'PyJulia does not support Julia < 0.7 anymore':
+                            raise
+                        self._last_error = f'julia bridge import failed: {exc}'
+                    else:
+                        try:
+                            JuliaMain.eval('import MAGEMin_C')
+                            return 'julia', julia
+                        except JuliaError as exc:
+                            self._last_error = f'julia bridge import failed: {exc}'
 
         # Subprocess fallback: the binary located in initialize() is
         # itself the bridge.  This is the supported default — MAGEMin
@@ -1975,8 +2007,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         if call_timeout_s is not None:
             remaining = float(call_timeout_s)
             if not math.isfinite(remaining) or remaining <= 0.0:
-                raise RuntimeError(
-                    'MAGEMin call cancelled: aggregate liquidus budget exhausted'
+                raise _MAGEMinEngineLifecycleError(
+                    'MAGEMinAggregateBudgetExceeded',
+                    'MAGEMin call cancelled: aggregate liquidus budget exhausted',
                 )
 
         if self._bridge == 'pymagemin':
@@ -1984,16 +2017,17 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 fn = getattr(module, name, None)
                 if not callable(fn):
                     continue
+                call_kwargs = {
+                    'composition': bulk_projection.composition_wt_pct,
+                    'T_C': temperature_C,
+                    'T_K': temperature_K,
+                    'P_GPa': pressure_GPa,
+                    'P_kbar': pressure_kbar,
+                    'log_fO2': fO2_log,
+                    'database': self._database,
+                }
                 try:
-                    return fn(
-                        composition=bulk_projection.composition_wt_pct,
-                        T_C=temperature_C,
-                        T_K=temperature_K,
-                        P_GPa=pressure_GPa,
-                        P_kbar=pressure_kbar,
-                        log_fO2=fO2_log,
-                        database=self._database,
-                    )
+                    return fn(**call_kwargs)
                 except Exception as exc:  # noqa: BLE001 - third-party call
                     if self._binary_path is not None:
                         return self._call_magemin_subprocess_after_bridge_failure(
@@ -2030,14 +2064,18 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             # The Julia bridge expects a dict of oxide wt% and returns
             # a struct.  This is a thin wrapper — full marshaling is
             # the responsibility of MAGEMin_C.jl.
+            single_point_minimization = (
+                JuliaMain.MAGEMin.single_point_minimization
+            )
+            call_args = (
+                bulk_projection.composition_wt_pct,
+                temperature_K,
+                pressure_kbar,
+                self._database,
+                fO2_log,
+            )
             try:
-                return JuliaMain.MAGEMin.single_point_minimization(
-                    bulk_projection.composition_wt_pct,
-                    temperature_K,
-                    pressure_kbar,
-                    self._database,
-                    fO2_log,
-                )
+                return single_point_minimization(*call_args)
             except Exception as exc:  # noqa: BLE001 - third-party call
                 if self._binary_path is not None:
                     return self._call_magemin_subprocess_after_bridge_failure(
@@ -2083,25 +2121,68 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         float(call_timeout_s),
                     )
                 )
-                future = self._subprocess_pool.submit({
-                    'bulk_projection': bulk_projection,
-                    'temperature_C': temperature_C,
-                    'pressure_kbar': pressure_kbar,
-                    'fO2_log': fO2_log,
-                    # Let the pool's typed hard wall fire first. The inner
-                    # subprocess timeout is only a secondary containment
-                    # wall for platforms without process-group cleanup.
-                    'call_timeout_s': timeout_s + 0.5,
-                }, timeout_s=timeout_s)
                 try:
+                    future = self._subprocess_pool.submit({
+                        'bulk_projection': bulk_projection,
+                        'temperature_C': temperature_C,
+                        'pressure_kbar': pressure_kbar,
+                        'fO2_log': fO2_log,
+                        # Let the pool's typed hard wall fire first. The inner
+                        # subprocess timeout is only a secondary containment
+                        # wall for platforms without process-group cleanup.
+                        'call_timeout_s': timeout_s + 0.5,
+                    }, timeout_s=timeout_s)
                     return future.result()
-                except EngineWorkerTimeout:
-                    raise
+                except (
+                    EngineWorkerExitedError,
+                    EngineWorkerPoolLifecycleError,
+                    EngineWorkerTimeout,
+                    EngineWorkerUnavailable,
+                ) as exc:
+                    raise _MAGEMinEngineLifecycleError(
+                        type(exc).__name__, str(exc)
+                    ) from exc
                 except EngineWorkerRemoteError as exc:
-                    raise _MAGEMinEngineCallError(
-                        type(exc).__name__,
-                        f'MAGEMin subprocess worker failed: {exc.detail}\n'
-                        f'{exc.remote_traceback}',
+                    if exc.exc_name in (
+                        _MAGEMinEngineCallError.__name__,
+                        _MAGEMinEngineLifecycleError.__name__,
+                    ):
+                        exception_type, separator, engine_message = (
+                            exc.detail.partition(': ')
+                        )
+                        if not separator:
+                            exception_type = exc.exc_name
+                            engine_message = exc.detail
+                        error_type = (
+                            _MAGEMinEngineLifecycleError
+                            if exc.exc_name
+                            == _MAGEMinEngineLifecycleError.__name__
+                            else _MAGEMinEngineCallError
+                        )
+                        raise error_type(exception_type, engine_message) from exc
+
+                    remote_exception = getattr(builtins, exc.exc_name, None)
+                    remote_message = (
+                        f'{exc.detail}\nRemote worker traceback:\n'
+                        f'{exc.remote_traceback}'
+                    )
+                    if (
+                        isinstance(remote_exception, type)
+                        and issubclass(remote_exception, Exception)
+                    ):
+                        try:
+                            reconstructed = remote_exception(remote_message)
+                        except Exception:
+                            raise EngineWorkerRemoteError(
+                                exc.exc_name,
+                                remote_message,
+                                exc.remote_traceback,
+                            ) from exc
+                        raise reconstructed from exc
+                    raise EngineWorkerRemoteError(
+                        exc.exc_name,
+                        remote_message,
+                        exc.remote_traceback,
                     ) from exc
             return self._call_magemin_subprocess(
                 bulk_projection=bulk_projection,
@@ -2126,9 +2207,10 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             time.monotonic() - float(started_at),
         )
         if not math.isfinite(residual) or residual <= 0.0:
-            raise RuntimeError(
+            raise _MAGEMinEngineLifecycleError(
+                'MAGEMinAggregateBudgetExceeded',
                 'MAGEMin bridge consumed aggregate liquidus budget; '
-                'subprocess retry cancelled'
+                'subprocess retry cancelled',
             )
         return residual
 
@@ -2252,8 +2334,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             # started near the deadline cannot overrun by a full timeout_s.
             remaining = float(call_timeout_s)
             if not math.isfinite(remaining) or remaining <= 0.0:
-                raise RuntimeError(
-                    'MAGEMin call cancelled: aggregate liquidus budget exhausted'
+                raise _MAGEMinEngineLifecycleError(
+                    'MAGEMinAggregateBudgetExceeded',
+                    'MAGEMin call cancelled: aggregate liquidus budget exhausted',
                 )
             timeout_s = min(configured_timeout_s, remaining)
         call_started = time.monotonic()
@@ -2262,8 +2345,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 0.0, time.monotonic() - call_started
             )
             if remaining_timeout_s <= 0.0:
-                raise RuntimeError(
-                    'MAGEMin call cancelled while waiting for subprocess slot'
+                raise _MAGEMinEngineLifecycleError(
+                    'MAGEMinSubprocessSlotTimeout',
+                    'MAGEMin call cancelled while waiting for subprocess slot',
                 )
             with tempfile.TemporaryDirectory() as tmpdir:
                 try:

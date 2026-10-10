@@ -19,11 +19,18 @@ import threading
 import time
 import types
 import warnings
+from concurrent.futures import Future
 from pathlib import Path
 
 import pytest
 
-from simulator.engine_pool import EngineWorkerTimeout
+from simulator.engine_pool import (
+    EngineWorkerExitedError,
+    EngineWorkerPoolLifecycleError,
+    EngineWorkerRemoteError,
+    EngineWorkerTimeout,
+    EngineWorkerUnavailable,
+)
 from engines.alphamelts.domain import AlphaMELTSDomainGate
 from engines.domain_reason import OutOfDomainReason
 from engines.magemin.domain import MAGEMinDomainGate
@@ -89,6 +96,25 @@ def _make_absent_magemin(monkeypatch):
         "_import_magemin_bridge",
         lambda self, *, requested: (None, None),
     )
+
+
+class _ImmediateFailurePool:
+    def __init__(self, exception):
+        self.exception = exception
+
+    def submit(self, *_args, **_kwargs):
+        future = Future()
+        future.set_exception(self.exception)
+        return future
+
+
+def _make_pooled_subprocess_backend(exception):
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = 'subprocess'
+    backend._binary_path = Path('/fake/MAGEMin')
+    backend._subprocess_pool = _ImmediateFailurePool(exception)
+    return backend
 
 
 def _assert_magemin_bulk_drop_projected(
@@ -255,26 +281,152 @@ def test_magemin_runtime_pool_uses_right_sized_warm_timeout(monkeypatch):
     )
 
 
-def test_magemin_equilibrate_surfaces_typed_hang_without_disabling_backend(
-    monkeypatch,
+def test_magemin_equilibrate_maps_pool_timeout_to_typed_status():
+    backend = _make_pooled_subprocess_backend(
+        EngineWorkerTimeout('MAGEMin slot 0', 2.0, phase='job')
+    )
+
+    result = backend.equilibrate(
+        1200.0,
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
+    )
+
+    assert result.status == 'not_converged'
+    assert result.diagnostics['backend_failure_exception'] == (
+        'EngineWorkerTimeout'
+    )
+    assert 'exceeded hard timeout of 2s' in (
+        result.diagnostics['backend_failure_message']
+    )
+    assert backend.is_available() is True
+
+
+def test_magemin_worker_exit_returns_typed_not_converged():
+    backend = _make_pooled_subprocess_backend(
+        EngineWorkerExitedError('MAGEMin subprocess pool slot 0')
+    )
+
+    result = backend.equilibrate(
+        1500.0,
+        composition_mol={'SiO2': 1.0},
+        fO2_log=-8.0,
+        pressure_bar=1.0,
+    )
+
+    assert result.status == 'not_converged'
+    assert result.diagnostics['backend_failure_exception'] == (
+        'EngineWorkerExitedError'
+    )
+    assert 'worker exited without a result' in (
+        result.diagnostics['backend_failure_message']
+    )
+    assert backend.is_available() is True
+
+
+def test_magemin_pool_unavailable_returns_typed_not_converged():
+    backend = _make_pooled_subprocess_backend(
+        EngineWorkerUnavailable('MAGEMin subprocess pool slot 0')
+    )
+
+    result = backend.equilibrate(
+        1500.0,
+        composition_mol={'SiO2': 1.0},
+        fO2_log=-8.0,
+        pressure_bar=1.0,
+    )
+
+    assert result.status == 'not_converged'
+    assert result.diagnostics['backend_failure_exception'] == (
+        'EngineWorkerUnavailable'
+    )
+    assert 'worker is unavailable' in (
+        result.diagnostics['backend_failure_message']
+    )
+
+
+def test_magemin_pool_lifecycle_error_returns_typed_not_converged():
+    backend = _make_pooled_subprocess_backend(
+        EngineWorkerPoolLifecycleError(
+            'engine worker pool has no live consumer to run this request'
+        )
+    )
+
+    result = backend.equilibrate(
+        1500.0,
+        composition_mol={'SiO2': 1.0},
+        fO2_log=-8.0,
+        pressure_bar=1.0,
+    )
+
+    assert result.status == 'not_converged'
+    assert result.diagnostics['backend_failure_exception'] == (
+        'EngineWorkerPoolLifecycleError'
+    )
+    assert 'no live consumer' in result.diagnostics['backend_failure_message']
+
+
+def test_magemin_in_process_budget_exhaustion_returns_typed_status():
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = 'pymagemin'
+    backend._magemin_module = types.SimpleNamespace(
+        minimize=lambda **_kwargs: {'phases': {'liq': {'mass_kg': 1.0}}}
+    )
+
+    result = backend.equilibrate(
+        1500.0,
+        composition_mol={'SiO2': 1.0},
+        fO2_log=-8.0,
+        pressure_bar=1.0,
+        call_timeout_s=0.0,
+    )
+
+    assert result.status == 'not_converged'
+    assert result.diagnostics['backend_failure_exception'] == (
+        'MAGEMinAggregateBudgetExceeded'
+    )
+    assert 'aggregate liquidus budget exhausted' in (
+        result.diagnostics['backend_failure_message']
+    )
+
+
+def test_magemin_subprocess_slot_timeout_returns_typed_not_converged(
+    monkeypatch, tmp_path,
 ):
+    from simulator.melt_backend import magemin as magemin_module
+
     backend = MAGEMinBackend()
     backend._available = True
     backend._bridge = 'subprocess'
+    backend._binary_path = Path('/fake/MAGEMin')
+    backend._config = {'timeout_s': 0.001}
+    lock_path = tmp_path / 'magemin.lock'
     monkeypatch.setattr(
-        backend,
-        '_call_magemin',
-        lambda *_args, **_kwargs: (_ for _ in ()).throw(
-            EngineWorkerTimeout('MAGEMin slot 0', 2.0, phase='job')
-        ),
+        magemin_module, '_MAGEMIN_SUBPROCESS_LOCK_DIR', tmp_path
+    )
+    monkeypatch.setattr(magemin_module, '_MAGEMIN_SUBPROCESS_LOCK', lock_path)
+    monkeypatch.setattr(
+        magemin_module, '_magemin_subprocess_slot_count', lambda: 1
     )
 
-    with pytest.raises(EngineWorkerTimeout):
-        backend.equilibrate(
-            1200.0,
-            composition_mol={'SiO2': 1.0, 'MgO': 1.0},
-        )
-    assert backend.is_available() is True
+    def contended_flock(*_args, **_kwargs):
+        raise BlockingIOError
+
+    monkeypatch.setattr(magemin_module.fcntl, 'flock', contended_flock)
+    monkeypatch.setattr(magemin_module.time, 'sleep', lambda _seconds: None)
+
+    result = backend.equilibrate(
+        1500.0,
+        composition_mol={'SiO2': 1.0},
+        fO2_log=-8.0,
+        pressure_bar=1.0,
+    )
+
+    assert result.status == 'not_converged'
+    assert result.diagnostics['backend_failure_exception'] == (
+        'MAGEMinSubprocessSlotTimeout'
+    )
+    assert 'slot timed out' in result.diagnostics['backend_failure_message']
 
 
 @pytest.mark.parametrize(
@@ -1563,6 +1715,176 @@ def test_magemin_equilibrate_propagates_local_call_helper_errors(monkeypatch):
         )
 
 
+@pytest.mark.parametrize(
+    'remote_type',
+    (KeyError, TypeError, AttributeError, ValueError, IndexError),
+)
+def test_magemin_remote_handler_error_propagates_with_remote_traceback(
+    remote_type,
+):
+    backend = _make_pooled_subprocess_backend(
+        EngineWorkerRemoteError(
+            remote_type.__name__,
+            'local MAGEMin parser defect',
+            f'Traceback: _parse_subprocess_stdout -> {remote_type.__name__}',
+        )
+    )
+
+    with pytest.raises(remote_type) as raised:
+        backend.equilibrate(
+            1500.0,
+            composition_mol={'SiO2': 1.0},
+            fO2_log=-8.0,
+            pressure_bar=1.0,
+        )
+
+    assert 'local MAGEMin parser defect' in str(raised.value)
+    assert f'_parse_subprocess_stdout -> {remote_type.__name__}' in str(
+        raised.value
+    )
+
+
+def test_magemin_remote_builtin_with_multi_argument_constructor_is_preserved():
+    backend = _make_pooled_subprocess_backend(
+        EngineWorkerRemoteError(
+            'UnicodeDecodeError',
+            'remote decode failure',
+            'Traceback: _parse_subprocess_stdout -> UnicodeDecodeError',
+        )
+    )
+
+    with pytest.raises(EngineWorkerRemoteError) as raised:
+        backend.equilibrate(
+            1500.0,
+            composition_mol={'SiO2': 1.0},
+            fO2_log=-8.0,
+            pressure_bar=1.0,
+        )
+
+    assert raised.value.exc_name == 'UnicodeDecodeError'
+    assert 'remote decode failure' in raised.value.detail
+    assert '_parse_subprocess_stdout -> UnicodeDecodeError' in (
+        raised.value.remote_traceback
+    )
+
+
+def test_magemin_subprocess_parser_value_error_propagates(monkeypatch):
+    from simulator.melt_backend import magemin as magemin_module
+
+    backend = MAGEMinBackend()
+    backend._binary_path = Path('/fake/MAGEMin')
+    projection = backend._build_db_bulk_projection({'SiO2': 100.0})
+    monkeypatch.setattr(
+        magemin_module.subprocess,
+        'run',
+        lambda args, **_kwargs: subprocess.CompletedProcess(
+            args, 0, stdout='MAGEMin output', stderr=''
+        ),
+    )
+
+    def broken_parser(_stdout):
+        raise ValueError('local MAGEMin parser defect')
+
+    monkeypatch.setattr(backend, '_parse_subprocess_stdout', broken_parser)
+    with pytest.raises(ValueError, match='local MAGEMin parser defect'):
+        backend._call_magemin_subprocess(
+            bulk_projection=projection,
+            temperature_C=1500.0,
+            pressure_kbar=0.001,
+            fO2_log=-8.0,
+        )
+
+
+def test_magemin_remote_engine_call_error_returns_typed_not_converged():
+    from simulator.melt_backend.magemin import _MAGEMinEngineCallError
+
+    backend = _make_pooled_subprocess_backend(
+        EngineWorkerRemoteError(
+            _MAGEMinEngineCallError.__name__,
+            'CalledProcessError: MAGEMin binary exited 9: engine failure',
+            'Traceback: subprocess.run -> CalledProcessError',
+        )
+    )
+
+    result = backend.equilibrate(
+        1500.0,
+        composition_mol={'SiO2': 1.0},
+        fO2_log=-8.0,
+        pressure_bar=1.0,
+    )
+
+    assert result.status == 'not_converged'
+    assert result.diagnostics['backend_failure_exception'] == (
+        'CalledProcessError'
+    )
+    assert result.diagnostics['backend_failure_message'] == (
+        'MAGEMin binary exited 9: engine failure'
+    )
+
+
+def test_magemin_remote_engine_lifecycle_error_returns_typed_not_converged():
+    from simulator.melt_backend.magemin import _MAGEMinEngineLifecycleError
+
+    backend = _make_pooled_subprocess_backend(
+        EngineWorkerRemoteError(
+            _MAGEMinEngineLifecycleError.__name__,
+            'MAGEMinSubprocessSlotTimeout: subprocess slot timed out',
+            'Traceback: _magemin_subprocess_slot -> timeout',
+        )
+    )
+
+    result = backend.equilibrate(
+        1500.0,
+        composition_mol={'SiO2': 1.0},
+        fO2_log=-8.0,
+        pressure_bar=1.0,
+    )
+
+    assert result.status == 'not_converged'
+    assert result.diagnostics['backend_failure_exception'] == (
+        'MAGEMinSubprocessSlotTimeout'
+    )
+    assert result.diagnostics['backend_failure_message'] == (
+        'subprocess slot timed out'
+    )
+
+
+@pytest.mark.parametrize('bridge', ('pymagemin', 'julia'))
+@pytest.mark.parametrize('local_error', (KeyError, TypeError, ValueError))
+def test_magemin_bridge_argument_preparation_error_propagates(
+    bridge, local_error,
+):
+    class BrokenProjection:
+        @property
+        def composition_wt_pct(self):
+            raise local_error('local MAGEMin argument validation defect')
+
+    if bridge == 'pymagemin':
+        module = types.SimpleNamespace(minimize=lambda **_kwargs: None)
+    else:
+        module = types.SimpleNamespace(
+            Main=types.SimpleNamespace(
+                MAGEMin=types.SimpleNamespace(
+                    single_point_minimization=lambda *_args: None
+                )
+            )
+        )
+
+    backend = MAGEMinBackend()
+    backend._bridge = bridge
+    backend._magemin_module = module
+
+    with pytest.raises(
+        local_error, match='local MAGEMin argument validation defect'
+    ):
+        backend._call_magemin(
+            BrokenProjection(),
+            temperature_C=1500.0,
+            pressure_bar=1.0,
+            fO2_log=-8.0,
+        )
+
+
 def test_magemin_bridge_import_propagates_non_import_errors(monkeypatch):
     import builtins
 
@@ -1591,11 +1913,104 @@ def test_magemin_julia_bridge_init_propagates_untyped_errors(monkeypatch):
     class JuliaError(Exception):
         pass
 
+    class UnsupportedPythonError(Exception):
+        pass
+
+    fake_core.JuliaNotFound = RuntimeError
     fake_core.JuliaError = JuliaError
+    fake_core.UnsupportedPythonError = UnsupportedPythonError
     monkeypatch.setitem(sys.modules, 'julia', fake_julia)
     monkeypatch.setitem(sys.modules, 'julia.core', fake_core)
     with pytest.raises(KeyError, match='local Julia hook defect'):
         MAGEMinBackend()._import_magemin_bridge(requested='julia')
+
+
+@pytest.mark.parametrize(
+    'failure',
+    [
+        pytest.param('julia', id='julia-error'),
+        pytest.param('unsupported-python', id='unsupported-python'),
+        pytest.param('julia-not-found', id='julia-not-found'),
+        pytest.param('unsupported-version', id='unsupported-julia-version'),
+        pytest.param('os', id='os-error'),
+        pytest.param('process', id='process-error'),
+        pytest.param('local-runtime', id='local-runtime-error-propagates'),
+    ],
+)
+def test_magemin_julia_runtime_discovery_failures_return_unavailable(
+    monkeypatch, failure,
+):
+    import builtins
+    import sys
+
+    fake_julia = types.ModuleType('julia')
+    fake_julia.__path__ = []
+    fake_core = types.ModuleType('julia.core')
+
+    class JuliaError(Exception):
+        pass
+
+    class UnsupportedPythonError(Exception):
+        pass
+
+    class JuliaNotFound(RuntimeError):
+        def __init__(self, executable, kwargname):
+            self.executable = executable
+            self.kwargname = kwargname
+
+        def __str__(self):
+            return f'Julia executable {self.executable} cannot be found'
+
+    fake_core.JuliaError = JuliaError
+    fake_core.JuliaNotFound = JuliaNotFound
+    fake_core.UnsupportedPythonError = UnsupportedPythonError
+    monkeypatch.setitem(sys.modules, 'julia', fake_julia)
+    monkeypatch.setitem(sys.modules, 'julia.core', fake_core)
+    real_import = builtins.__import__
+
+    def fail_main_import(name, globals=None, locals=None, fromlist=(), level=0):
+        if name == 'julia' and 'Main' in (fromlist or ()):
+            if failure == 'julia':
+                raise JuliaError('PyCall initialization failed')
+            if failure == 'unsupported-python':
+                raise UnsupportedPythonError('Python runtime unsupported')
+            if failure == 'julia-not-found':
+                raise JuliaNotFound('julia', 'runtime')
+            if failure == 'unsupported-version':
+                raise RuntimeError(
+                    'PyJulia does not support Julia < 0.7 anymore'
+                )
+            if failure == 'os':
+                raise FileNotFoundError('Julia executable missing')
+            if failure == 'local-runtime':
+                raise RuntimeError('local Julia import hook defect')
+            raise subprocess.CalledProcessError(1, ['julia'])
+        return real_import(name, globals, locals, fromlist, level)
+
+    monkeypatch.setattr(builtins, '__import__', fail_main_import)
+    backend = MAGEMinBackend()
+    if failure == 'local-runtime':
+        with pytest.raises(RuntimeError, match='local Julia import hook defect'):
+            backend._import_magemin_bridge(requested='julia')
+        return
+
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore', UserWarning)
+        bridge = backend._import_magemin_bridge(requested='julia')
+
+    assert bridge == (None, None)
+    assert 'julia bridge import failed:' in backend._last_error
+    assert any(
+        message in backend._last_error
+        for message in (
+            'PyCall initialization failed',
+            'Python runtime unsupported',
+            'Julia executable julia cannot be found',
+            'PyJulia does not support Julia < 0.7 anymore',
+            'Julia executable missing',
+            'returned non-zero exit status',
+        )
+    )
 
 
 def test_magemin_only_consumes_cleaned_melt_account(monkeypatch):
