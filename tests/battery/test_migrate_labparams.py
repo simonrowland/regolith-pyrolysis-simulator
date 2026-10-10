@@ -469,6 +469,21 @@ def test_mendybaev_runs_use_starting_glass_and_retain_residue_printed() -> None:
         if raw_id != "func-5":
             assert initial.locator is not None
             assert initial.locator.paragraph == "FUNC starting"
+        if raw_id == "func-10":
+            resolved_start = wt_pct_to_mole_fraction(
+                {
+                    "MgO": as_decimal("37.9"),
+                    "Al2O3": as_decimal("11.6"),
+                    "SiO2": as_decimal("42.9"),
+                    "CaO": as_decimal("7.6"),
+                }
+            )
+            assert tuple(
+                (name, value.quantize(Decimal("0.000000000001")))
+                for name, value in resolved_start.components
+            ) == starting_components
+            assert initial.locator is not None
+            assert initial.locator.paragraph == "FUNC starting"
 
         observation = next(
             item

@@ -10,7 +10,7 @@ from collections.abc import Iterator, Mapping
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.battery.enums import AmountBasis, MethodToken, Quantity, ValueKind
 from simulator.battery.migrate import (
-    _OXIDE_COMPONENT_KEYS,
+    _is_engine_oxide_component,
     _knudsen_effusion_chamber_background_not_for_identity,
 )
 from simulator.battery.records import (
@@ -357,7 +357,7 @@ def _printed_composition_map(raw: object) -> Mapping[str, object] | None:
         return None
     if len({name for name, _value in pairs}) != len(pairs):
         return None
-    if any(name not in _OXIDE_COMPONENT_KEYS for name, _value in pairs):
+    if any(not _is_engine_oxide_component(name) for name, _value in pairs):
         return None
     try:
         amounts = [as_decimal(value) for _, value in pairs]
@@ -533,6 +533,10 @@ def charge_moles_by_species(
 class _EnginePrintRefused(Exception):
     """Printed map is a composition the engine must not flatten."""
 
+    def __init__(self, reason: object, components: tuple[str, ...] = ()) -> None:
+        super().__init__(reason)
+        self.components = components
+
 
 _TOTAL_IRON_AS_FEO = "total_iron_as_FeO"
 _FEOT_FLAG = "total iron reported as FeO; Fe3+/Fe2+ not printed"
@@ -638,10 +642,21 @@ def _engine_mole_fraction(
     parsed = _parse_component_amounts(pairs)
     if parsed is None:
         return None
-    non_oxides = [(name, amount) for name, amount in parsed if name not in _OXIDE_COMPONENT_KEYS]
+    non_oxides = [
+        (name, amount)
+        for name, amount in parsed
+        if not _is_engine_oxide_component(name)
+    ]
     if any(amount > 0 for _name, amount in non_oxides):
-        raise _EnginePrintRefused("non-oxide mole fraction")
-    oxides = {name: amount for name, amount in parsed if name in _OXIDE_COMPONENT_KEYS}
+        raise _EnginePrintRefused(
+            "non-oxide mole fraction",
+            tuple(name for name, amount in non_oxides if amount > 0),
+        )
+    oxides = {
+        name: amount
+        for name, amount in parsed
+        if _is_engine_oxide_component(name)
+    }
     if not oxides or sum(oxides.values(), Decimal("0")) <= 0:
         return None
     return oxides, {name for name, _amount in non_oxides}
@@ -666,7 +681,11 @@ def _engine_printed_oxides(
     if len(set(names)) != len(names):
         return None
     has_feot = "FeOT" in names
-    non_oxides = [name for name in names if name != "FeOT" and name not in _OXIDE_COMPONENT_KEYS]
+    non_oxides = [
+        name
+        for name in names
+        if name != "FeOT" and not _is_engine_oxide_component(name)
+    ]
     if not has_feot and not non_oxides:
         return None
     parsed: list[tuple[str, Decimal]] = []
@@ -679,18 +698,28 @@ def _engine_printed_oxides(
             return None
         parsed.append((name, amount))
     by_name = {name: amount for name, amount in parsed}
-    oxides = {name: amount for name, amount in parsed if name in _OXIDE_COMPONENT_KEYS}
+    oxides = {
+        name: amount
+        for name, amount in parsed
+        if _is_engine_oxide_component(name)
+    }
     feot = by_name.get("FeOT")
     others = [
         (name, amount)
         for name, amount in parsed
-        if name != "FeOT" and name not in _OXIDE_COMPONENT_KEYS
+        if name != "FeOT" and not _is_engine_oxide_component(name)
     ]
     omitted_total = sum((amount for _name, amount in others), Decimal("0"))
     if omitted_total > _TRACE_NON_OXIDE_LIMIT_WT_PCT:
-        raise _EnginePrintRefused(omitted_total)
+        raise _EnginePrintRefused(
+            omitted_total,
+            tuple(name for name, amount in others if amount > 0),
+        )
     if feot is not None and ("FeO" in oxides or "Fe2O3" in oxides):
-        raise _EnginePrintRefused("ambiguous total iron")
+        raise _EnginePrintRefused(
+            "ambiguous total iron",
+            ("FeOT", "FeO" if "FeO" in oxides else "Fe2O3"),
+        )
     raw_by_name = {name: value for name, value in pairs}
     exempt: set[str] = set()
     notes: list[str] = []
@@ -774,6 +803,7 @@ def normalized_composition(
         basis_exempt: set[str] = set()
         basis_notice: str | None = None
         basis_inference: Derivation | None = None
+        refused_components: tuple[str, ...] = ()
         as_moles = False
         if field == "printed_composition":
             components = raw.get("components") if isinstance(raw, Mapping) else None
@@ -799,7 +829,8 @@ def normalized_composition(
                 # molar-mass conversion both misread them.
                 try:
                     mole = _engine_mole_fraction(raw)
-                except _EnginePrintRefused:
+                except _EnginePrintRefused as exc:
+                    refused_components = exc.components
                     raw = None
                 else:
                     if mole is None:
@@ -816,7 +847,8 @@ def normalized_composition(
             else:
                 try:
                     engine_oxides = _engine_printed_oxides(raw)
-                except _EnginePrintRefused:
+                except _EnginePrintRefused as exc:
+                    refused_components = exc.components
                     raw = None
                 else:
                     if engine_oxides is not None:
@@ -899,8 +931,8 @@ def normalized_composition(
                     if (
                         is_binary_complement
                         and output_species != input_species
-                        and output_species in _OXIDE_COMPONENT_KEYS
-                        and input_species in _OXIDE_COMPONENT_KEYS
+                        and _is_engine_oxide_component(output_species)
+                        and _is_engine_oxide_component(input_species)
                         and printed_species == {output_species, input_species}
                     ):
                         origin = "printed binary oxide wt% composition"
@@ -935,7 +967,10 @@ def normalized_composition(
             missing.append(f"{path} (unknown relation: {located.inference.relation})")
         except (ValueError, TypeError, ArithmeticError):
             unsupported = True
-            missing.append(path)
+            if refused_components:
+                missing.extend(f"{path}.{species}" for species in refused_components)
+            else:
+                missing.append(path)
     routes = [route for _, route in sorted(zip(evidence_ranks, routes),
                                           key=lambda pair: pair[0], reverse=True)]
     result = _result("normalized_composition", routes, tuple(absent))
