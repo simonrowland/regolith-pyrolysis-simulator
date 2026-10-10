@@ -1547,6 +1547,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # The untouched load seed. A later read at a different temperature
         # recomputes IW(T) only while the reservoir still holds this value.
         self._load_time_unadopted_fO2_log = base_intrinsic_fO2_log
+        self._unadopted_seed_gate_fO2_hour = None
+        self._unadopted_seed_gate_fO2_log = None
         self._melt_fO2_seed_without_ferric_iron = (
             melt_fO2_seed_without_ferric_iron(self._melt_oxide_wt_pct())
         )
@@ -4359,17 +4361,68 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return (total_fe_mol / 4.0) * derivative
 
     def _sync_oxygen_reservoir_mirror(self) -> None:
+        # Publish the owning reader. A non-finite stored field is reported
+        # by this caller: the reader raises on that input and would drop
+        # the mirror context and the hour's source terms.
+        source_terms = getattr(self, '_redox_source_terms_this_hr', {})
+        stored = self.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+        try:
+            stored_f = float(stored)
+        except (TypeError, ValueError):
+            stored_f = float('nan')
+        if math.isfinite(stored_f):
+            published = self._current_melt_redox_fO2_log()
+        else:
+            published = stored
         fO2_log = self._finite_oxygen_reservoir_fO2_log(
-            self.melt.oxygen_reservoir.melt_intrinsic_fO2_log,
+            published,
             context='sync_oxygen_reservoir_mirror',
-            source_terms_mol_o2_equiv=getattr(
-                self,
-                '_redox_source_terms_this_hr',
-                {},
-            ),
+            source_terms_mol_o2_equiv=source_terms,
         )
         self.melt.fO2_log = fO2_log
         self.melt.melt_fO2_log = fO2_log
+
+    def _reservoir_holds_load_time_seed(self) -> bool:
+        reservoir = getattr(self.melt, 'oxygen_reservoir', None)
+        if reservoir is None:
+            return False
+        if self._current_melt_redox_reference_T_K() is not None:
+            return False
+        load_seed = getattr(self, '_load_time_unadopted_fO2_log', None)
+        stored_seed = getattr(reservoir, 'melt_intrinsic_fO2_log', None)
+        if load_seed is None or stored_seed is None:
+            return False
+        try:
+            stored_f = float(stored_seed)
+            load_f = float(load_seed)
+        except (TypeError, ValueError):
+            return False
+        return (
+            math.isfinite(stored_f)
+            and math.isfinite(load_f)
+            and math.isclose(stored_f, load_f, rel_tol=0.0, abs_tol=1.0e-9)
+        )
+
+    def _hour_stable_load_seed_fO2_log(self, fO2_log: float) -> float:
+        # Premise: the unadopted load seed tracks IW(T) on read. That
+        # number changes with temperature, but it is still one redox
+        # state. The liquidus cache key must not treat each temperature
+        # read as a new fO2 and dispatch the gate again. A real assignment
+        # is not the load seed and keeps its own key.
+        # Algebra: key fO2 = first reader value this hour while the
+        # reservoir still holds the load seed; otherwise the live value.
+        # Units: fO2 is log10(bar); hour is the melt hour index.
+        # Sanity: 950 C, 1150 C, and 1400 C in one hour share one gate call.
+        if not self._reservoir_holds_load_time_seed():
+            return float(fO2_log)
+        hour = int(getattr(self.melt, 'hour', 0) or 0)
+        pinned_hour = getattr(self, '_unadopted_seed_gate_fO2_hour', None)
+        pinned = getattr(self, '_unadopted_seed_gate_fO2_log', None)
+        if pinned_hour == hour and pinned is not None:
+            return float(pinned)
+        self._unadopted_seed_gate_fO2_hour = hour
+        self._unadopted_seed_gate_fO2_log = float(fO2_log)
+        return float(fO2_log)
 
     def _current_melt_redox_fO2_log(self) -> float:
         reservoir = getattr(self.melt, 'oxygen_reservoir', None)
@@ -4388,36 +4441,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # dimensionless log10(bar).
         # Sanity: lunar alkali offset is +0.005 dex, so 1423.15 K is
         # -12.270, not the stored -78.50 and not the ±30 clamp.
-        if (
-            reservoir is not None
-            and self._current_melt_redox_reference_T_K() is None
-        ):
+        if self._reservoir_holds_load_time_seed():
             T_now = float(self.melt.temperature_C) + 273.15
-            load_seed = getattr(self, '_load_time_unadopted_fO2_log', None)
-            stored_seed = getattr(reservoir, 'melt_intrinsic_fO2_log', None)
             if (
-                load_seed is not None
-                and stored_seed is not None
-                and math.isfinite(T_now)
+                math.isfinite(T_now)
                 and T_now > 0.0
                 and not math.isclose(
                     T_now, 25.0 + 273.15, rel_tol=0.0, abs_tol=1.0e-9,
                 )
             ):
-                try:
-                    stored_f = float(stored_seed)
-                    load_f = float(load_seed)
-                except (TypeError, ValueError):
-                    stored_f = float('nan')
-                    load_f = float('nan')
-                if (
-                    math.isfinite(stored_f)
-                    and math.isfinite(load_f)
-                    and math.isclose(
-                        stored_f, load_f, rel_tol=0.0, abs_tol=1.0e-9,
-                    )
-                ):
-                    return self._compute_intrinsic_melt_fO2(T_now)
+                return self._compute_intrinsic_melt_fO2(T_now)
         raw = getattr(reservoir, 'melt_intrinsic_fO2_log', None)
         if raw is None:
             raw = getattr(self.melt, 'melt_fO2_log', None)
@@ -4489,6 +4522,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'temperature_K': float(getattr(self.melt, 'temperature_C', 0.0) or 0.0)
             + 273.15,
             'headspace_o2_mol': head_o2_mol,
+            # Raw stored field, including a non-finite value. The owning
+            # reader raises on that input; this payload is what it reports.
             'reservoir_fO2_log': _json_safe_number(
                 getattr(reservoir, 'melt_intrinsic_fO2_log', None)
             ),
@@ -4862,7 +4897,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self,
     ) -> Mapping[str, Any] | _MeltRedoxLiquidusFloorFallback | None:
         pressure_bar = float(self.melt.p_total_mbar) / 1000.0
-        fO2_log = float(self._current_melt_redox_fO2_log())
+        fO2_log = self._hour_stable_load_seed_fO2_log(
+            float(self._current_melt_redox_fO2_log())
+        )
         redox_key_fO2_log = self._freeze_gate_redox_key_fO2_log(
             fO2_log=fO2_log,
         )
@@ -5296,6 +5333,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         reference_T_K: object = _PRESERVE_REFERENCE_T_K,
         exchange_direction: str = 'none:initialized',
     ) -> OxygenReservoirState:
+        # Default copies the stored reservoir. Writing the reader's tracked
+        # value would retire the load seed and stop a later temperature
+        # from recomputing IW(T) while reference_T_K is still None.
         fO2_raw = (
             melt_intrinsic_fO2_log
             if melt_intrinsic_fO2_log is not None
@@ -5401,21 +5441,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             T_K=T_K,
             gate_authority=gate_authority,
         )
-        # Premise: Kress91 is calibrated only above 1200 C. Below that
-        # floor a partial freeze-gate fraction (1150 C is ~0.32 under a
-        # 1372 C liquidus) is not a capacity to integrate. Dividing the
-        # shuttle by it drives log10(fO2) to about -30. Between the floor
-        # and the liquidus the fraction stays the magnitude: a C2A step
-        # reaches the exchange at 1250 C, still under the 1372 C liquidus,
-        # and that exchange has to run. The bubbler reads the ungated
-        # magnitude and defers on its own.
-        # Algebra: integrating C = 0 when T_C <= 1200, else
-        # C_full * liquid_fraction.
-        # Units: T_C is celsius; C is mol per ln(fO2).
-        # Sanity: 1150 C refuses the shuttle and keeps IW(T). 1250 C keeps
-        # the freeze-gate magnitude.
-        if (float(T_K) - 273.15) <= KRESS91_LIQUID_CALIBRATION_MIN_T_C:
-            C_m = 0.0
         reservoir = self.melt.oxygen_reservoir
         existing_direction = str(getattr(reservoir, 'exchange_direction', '') or '')
         reservoir.melt_intrinsic_fO2_log = base_fO2_log
@@ -6474,15 +6499,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             T_K=T_K,
             gate_authority=gate_authority,
         )
-        # Same 1200 C calibration floor as the source-term integrator.
-        # Recording C = 0 takes the existing noop refusal, so 0.05 mol of
-        # overhead O2 at 1150 C is not absorbed. A 1250 C exchange is above
-        # the floor and keeps C_full * liquid_fraction.
-        # Algebra: exchange C = 0 when T_C <= 1200, else the magnitude above.
-        # Units: T_C is celsius; C is mol per ln(fO2).
-        # Sanity: 1150 C exchanges 0 mol. 1250 C does not take this refusal.
-        if (float(T_K) - 273.15) <= KRESS91_LIQUID_CALIBRATION_MIN_T_C:
-            C_m = 0.0
         n_floor_mol = self._headspace_floor_o2_mol()
         effective_floor_mol = self._effective_headspace_floor_o2_mol()
         C_h = max(head_o2_mol, effective_floor_mol)
@@ -7082,13 +7098,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             else float(self.melt.temperature_C) + 273.15
         )
         comp = self._melt_oxide_wt_pct()
-        fO2_log = float(
-            getattr(
-                self.melt.oxygen_reservoir,
-                'melt_intrinsic_fO2_log',
-                getattr(self.melt, 'melt_fO2_log', -9.0),
-            )
-        )
+        fO2_log = float(self._current_melt_redox_fO2_log())
         # Diagnostic-only construction via ``__new__`` predates the runtime
         # projection. Preserve the exact pre-PHYS pressure source here only;
         # authoritative callers of the shared accessor fail loud if absent.
@@ -7378,13 +7388,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         melt_fO2_log = (
             float(fO2_log)
             if fO2_log is not None
-            else float(
-                getattr(
-                    self.melt.oxygen_reservoir,
-                    'melt_intrinsic_fO2_log',
-                    getattr(self.melt, 'melt_fO2_log', -9.0),
-                )
-            )
+            else float(self._current_melt_redox_fO2_log())
         )
         pressure = (
             float(pressure_bar)
@@ -7441,7 +7445,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         try:
             self.melt.oxygen_reservoir.melt_intrinsic_fO2_log = float(fO2_log)
             self._sync_oxygen_reservoir_mirror()
-            extent = self._compute_native_fe_saturation_extent()
+            # The trial argument is the fO2 under test. The owning reader
+            # would replace a trial that still equals the load seed.
+            extent = self._compute_native_fe_saturation_extent(
+                fO2_log=float(fO2_log),
+            )
             return max(0.0, float(extent.get('native_fe_frac', 0.0) or 0.0))
         finally:
             self.melt.oxygen_reservoir.melt_intrinsic_fO2_log = previous
@@ -9238,8 +9246,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self._backend_composition_mol_by_account())
             self._validate_backend_account_scope_support(
                 backend_composition_by_account)
-            intrinsic_fO2_log = float(
-                self.melt.oxygen_reservoir.melt_intrinsic_fO2_log)
+            intrinsic_fO2_log = float(self._current_melt_redox_fO2_log())
             temperature_C = float(self.melt.temperature_C)
             pressure_bar = float(self.melt.p_total_mbar) / 1000.0
             canonicalize_pt0_inputs = store is not None and getattr(
@@ -9622,25 +9629,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # The dispatch-only helper still routes melt-derived T/P through
         # the same single path the rest of the simulator uses.
         pO2_bar = self._vapor_pressure_dispatch_pO2_bar()
-        reservoir = getattr(self.melt, 'oxygen_reservoir', None)
-        intrinsic_fO2_log = getattr(
-            reservoir,
-            'melt_intrinsic_fO2_log',
-            None,
-        )
-        if intrinsic_fO2_log is None:
-            intrinsic_fO2_log = getattr(self.melt, 'melt_fO2_log', None)
-        if intrinsic_fO2_log is None:
-            current_fO2 = getattr(self, '_current_melt_redox_fO2_log', None)
-            if callable(current_fO2):
-                intrinsic_fO2_log = current_fO2()
-            else:
-                intrinsic_fO2_log = getattr(
-                    result,
-                    'fO2_log',
-                    getattr(self.melt, 'fO2_log', -9.0),
-                )
-        intrinsic_fO2_log = float(intrinsic_fO2_log)
+        intrinsic_fO2_log = float(self._current_melt_redox_fO2_log())
         vacuum_floor = (
             float(self._vacuum_floor_bar())
             if callable(getattr(self, '_vacuum_floor_bar', None))

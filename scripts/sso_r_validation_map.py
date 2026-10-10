@@ -593,7 +593,7 @@ def run_row(
         "dose_transition_reason": str(dose_result.get("dose_transition_reason", "")),
         "dose_feo_reduced_mol": float(dose_result.get("dose_feo_reduced_mol", 0.0) or 0.0),
         "post_exchange_fO2_log_diagnostic": float(
-            sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+            sim._current_melt_redox_fO2_log()
         ),
         "post_exchange_delta_IW_diagnostic": float(snapshot.fe_redox_split.get("fO2_log", 0.0) or 0.0)
         - float(snapshot.fe_redox_split.get("iw_log", 0.0) or 0.0),

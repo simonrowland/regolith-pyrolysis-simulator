@@ -1152,7 +1152,10 @@ def test_c3_na_source_term_comes_from_committed_transition() -> None:
     sim._init_shuttle_inventory(CampaignPhase.C3_NA)
     sim.melt.campaign = CampaignPhase.C3_NA
     sim.melt.temperature_C = 1150.0
-    tracked = sim._compute_intrinsic_melt_fO2(1150.0 + 273.15)
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -11.0
+    sim._sync_oxygen_reservoir_mirror()
+    before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+    before_native = sim._compute_fe_redox_split_diagnostic()["native_fe_frac"]
     transitions_before = len(sim.atom_ledger.transitions)
 
     sim._shuttle_inject_Na(target_stage="feo_cleanup", liquid_fraction=1.0)
@@ -1173,20 +1176,24 @@ def test_c3_na_source_term_comes_from_committed_transition() -> None:
     assert reservoir.redox_source_terms_mol_o2_equiv[label] == pytest.approx(
         expected_source
     )
-    # 1150 C is below the Kress91 liquid gate, so the unadopted reservoir
-    # tracks IW(T)+offset and has not fixed a reference. At that potential
-    # the Kress differential capacity is at the noop floor, and the committed
-    # term is refused instead of integrated.
-    assert reservoir.reference_T_K is None
-    assert reservoir.melt_intrinsic_fO2_log == pytest.approx(tracked)
-    assert (
-        reservoir.melt_redox_capacity_mol_per_ln_fO2
-        <= OXYGEN_RESERVOIR_NOOP_MOL
+    # 3716a2cf0 integrates this shuttle at 1150 C. A real liquidus curve
+    # supplies positive capacity below 1200 C; the <=1200 C C_m = 0 gates
+    # added in 18b40176d were not that behavior and are removed.
+    # Continuous freeze-gate liquid_fraction (0.5.9 / 6d72725) gives real mush
+    # capacity at 1150 C for lunar mare (solidus ~916 C, liquidus ~1370 C), so
+    # the committed C3-Na O2-equiv source term applies through the integrator
+    # (delta_ln = n_O2 / C_m). The bbf0134 inversion to no_melt_redox_capacity
+    # was an env-dependent retune (floor fallback when MAGEMin was unavailable);
+    # with a real liquidus curve the applied path is the correct invariant.
+    assert reservoir.melt_redox_capacity_mol_per_ln_fO2 > OXYGEN_RESERVOIR_NOOP_MOL
+    assert reservoir.redox_source_delta_ln_fO2 == pytest.approx(
+        expected_source / reservoir.melt_redox_capacity_mol_per_ln_fO2
     )
-    assert reservoir.redox_source_terms_applied is False
-    assert reservoir.redox_source_skipped_reasons_by_label[label] == (
-        "no_melt_redox_capacity"
-    )
+    assert reservoir.redox_source_terms_applied is True
+    assert reservoir.redox_source_skipped_terms_mol_o2_equiv == {}
+    assert reservoir.melt_intrinsic_fO2_log < before_fO2
+    assert sim._compute_fe_redox_split_diagnostic()["native_fe_frac"] > before_native
+    assert breakdown["ferric_divergence"]["status"] == "ok"
     assert breakdown["ferric_divergence"]["sampling_context"] == (
         "current_ledger_vs_current_reservoir"
     )
@@ -1196,15 +1203,16 @@ def test_c3_na_source_terms_preserve_same_hour_exchange_observables() -> None:
     sim = _make_sim(additives_kg={"Na": 12.0})
     sim._init_shuttle_inventory(CampaignPhase.C3_NA)
     sim.melt.campaign = CampaignPhase.C3_NA
-    # Below the Kress91 liquid gate the unadopted reservoir tracks IW(T).
-    # That potential's differential capacity is at the noop floor, so the
-    # headspace O2 is not absorbed. The shuttle still commits, and its
-    # refused source term must not rewrite the exchange record.
+    # 3716a2cf0 exchanges a nonzero O2 mol at 1150 C. The 18b40176d refusal
+    # (exchange_o2_mol == 0, direction none:no_melt_redox_capacity) was not
+    # inherited from that green.
     sim.melt.temperature_C = 1150.0
     sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
     sim.melt.pO2_mbar = 1.5
     sim.melt.p_total_mbar = 1.5
     sim._overhead_headspace_config["enabled"] = True
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -8.0
+    sim._sync_oxygen_reservoir_mirror()
     sim.atom_ledger.load_external_mol(
         "process.overhead_gas",
         {"O2": 0.05},
@@ -1221,8 +1229,8 @@ def test_c3_na_source_terms_preserve_same_hour_exchange_observables() -> None:
     ledger_pO2 = exchange.headspace_ledger_pO2_bar
     transport_pO2 = exchange.headspace_transport_pO2_bar
 
-    assert exchange_o2_mol == pytest.approx(0.0)
-    assert exchange_direction == "none:no_melt_redox_capacity"
+    assert abs(exchange_o2_mol) > OXYGEN_RESERVOIR_NOOP_MOL
+    assert exchange_direction
     assert k_O_m_s > 0.0
     assert tau_hr > 0.0
 
@@ -1231,9 +1239,10 @@ def test_c3_na_source_terms_preserve_same_hour_exchange_observables() -> None:
     reservoir = snapshot.oxygen_reservoir
     label = "redox_source:c3_na_shuttle_reduction"
 
-    # Same-hour exchange observables survive the subsequent C3-Na source
-    # term. k_O / tau / exchange mol / headspace pO2 stay on the passive
-    # exchange; the direction gains the skipped source label.
+    # Same-hour exchange observables must survive the subsequent C3-Na source
+    # term: k_O / tau / exchange mol / headspace pO2 are frozen from the
+    # earlier passive exchange; only exchange_direction is composed with the
+    # applied redox-source label.
     assert reservoir["k_O_m_s"] == pytest.approx(k_O_m_s)
     assert reservoir["tau_hr"] == pytest.approx(tau_hr)
     assert reservoir["exchange_o2_mol"] == pytest.approx(exchange_o2_mol)
@@ -1242,13 +1251,12 @@ def test_c3_na_source_terms_preserve_same_hour_exchange_observables() -> None:
     assert reservoir["headspace_transport_pO2_bar"] == pytest.approx(
         transport_pO2
     )
-    assert reservoir["exchange_direction"] == (
-        f"{exchange_direction}|{label}:skipped:no_melt_redox_capacity"
-    )
+    assert reservoir["exchange_direction"].split("|")[0] == exchange_direction
+    assert label in reservoir["exchange_direction"].split("|")
     assert label in reservoir["redox_source_terms_mol_o2_equiv"]
-    assert label in reservoir["redox_source_skipped_terms_mol_o2_equiv"]
-    assert reservoir["redox_source_applied_terms_mol_o2_equiv"] == {}
-    assert reservoir["redox_source_terms_applied"] is False
+    assert label in reservoir["redox_source_applied_terms_mol_o2_equiv"]
+    assert reservoir["redox_source_skipped_terms_mol_o2_equiv"] == {}
+    assert reservoir["redox_source_terms_applied"] is True
 
 
 def test_c3_k_source_term_comes_from_committed_transition() -> None:
