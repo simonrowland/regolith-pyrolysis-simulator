@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-import hashlib
 import csv
+import hashlib
+import itertools
 import json
 import os
 import re
@@ -49,6 +50,7 @@ from simulator.battery.migrate import (
     DuplicateContextIdError,
     QUEUE_SCHEMA_VERSION,
     DuplicateObservationIdError,
+    MigrationResult,
     Migrator,
     UnknownRailSpellingError,
     UnresolvedEquipmentContextError,
@@ -2508,12 +2510,461 @@ def test_g04_supersedes_marks_the_old_row(tmp_path: Path) -> None:
     new = result.observations["fixture-source::homma_1966_mn_olette_experimental_quoted_deep"]
     newer = result.observations["fixture-source::newer_list"]
     assert old.admission.status is AdmissionStatus.SUPERSEDED
-    assert old.admission.superseded_by == new.observation_id
+    assert old.admission.superseded_by == newer.observation_id
     assert new.admission.status is AdmissionStatus.SUPERSEDED
     assert new.admission.superseded_by == newer.observation_id
     assert newer.admission.status is AdmissionStatus.ADMITTED
     assert newer.admission.superseded_by is None
     assert any("missing_target" in (e.why or "") for e in result.queue)
+
+
+def _migrate_supersedes_rows(
+    tmp_path: Path, rows: list[tuple[str, str | None, str]]
+) -> MigrationResult:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"] = []
+    for observation_id, supersedes, status in rows:
+        row = {
+            "observation_id": observation_id,
+            "type": "alpha",
+            "locator": {"table": "1"},
+            "phase": "gas",
+            "values": {
+                "quantity": "literature_vaporization_coefficient",
+                "method_class": "measured_direct",
+                "admission_status": status,
+            },
+        }
+        if supersedes is not None:
+            row["supersedes"] = supersedes
+        extract["species"]["Na"]["observations"].append(row)
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    _assert_superseded_targets_are_live(result)
+    return result
+
+
+def _assert_superseded_targets_are_live(result: MigrationResult) -> None:
+    observations = result.observations
+    for observation in observations.values():
+        target_id = observation.admission.superseded_by
+        if target_id is None:
+            continue
+        assert target_id in observations
+        assert observations[target_id].admission.status in {
+            AdmissionStatus.ADMITTED, AdmissionStatus.PENDING
+        }
+
+
+@pytest.mark.parametrize("order", list(itertools.permutations(("A", "B", "C"))))
+def test_g04_supersedes_chain_is_order_independent_and_flattened(
+    tmp_path: Path, order: tuple[str, ...]
+) -> None:
+    specs = {
+        "A": (None, "admitted"),
+        "B": ("A", "admitted"),
+        "C": ("B", "admitted"),
+    }
+    result = _migrate_supersedes_rows(
+        tmp_path, [(name, *specs[name]) for name in order]
+    )
+    assert (
+        result.observations["fixture-source::A"].admission.superseded_by
+        == "fixture-source::C"
+    )
+    assert (
+        result.observations["fixture-source::B"].admission.superseded_by
+        == "fixture-source::C"
+    )
+    assert (
+        result.observations["fixture-source::C"].admission.status
+        is AdmissionStatus.ADMITTED
+    )
+
+
+def test_g04_supersedes_cycle_keeps_rows_live_and_emits_hard_issue(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_supersedes_rows(
+        tmp_path, [("A", "B", "admitted"), ("B", "A", "admitted")]
+    )
+    for name in ("A", "B"):
+        row = result.observations[f"fixture-source::{name}"]
+        assert row.admission.status is AdmissionStatus.ADMITTED
+        assert row.admission.superseded_by is None
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and "supersedes_cycle" in issue.detail
+        and "fixture-source::A" in issue.detail
+        and "fixture-source::B" in issue.detail
+        for issue in result.validation.hard_issues
+    )
+
+
+def test_g04_competing_superseders_keep_green_precedence(tmp_path: Path) -> None:
+    result = _migrate_supersedes_rows(
+        tmp_path,
+        [("A", None, "admitted"), ("B", "A", "admitted"), ("C", "A", "admitted")],
+    )
+    assert (
+        result.observations["fixture-source::A"].admission.superseded_by
+        == "fixture-source::C"
+    )
+    assert (
+        result.observations["fixture-source::B"].admission.status
+        is AdmissionStatus.ADMITTED
+    )
+    assert (
+        result.observations["fixture-source::C"].admission.status
+        is AdmissionStatus.ADMITTED
+    )
+
+
+def _stage_keyed_children(
+    tmp_path: Path,
+    specs: list[tuple[str, str, str | None]],
+) -> Migrator:
+    """Build admitted rows, then give each a temperature and a ``:row=`` id.
+
+    ``specs`` entries are ``(stored_id, row_label, temperature_K or None)``.
+    """
+
+    from simulator.battery.records import State
+
+    result = _migrate_supersedes_rows(
+        tmp_path, [(stored_id, None, "admitted") for stored_id, _row, _temp in specs]
+    )
+    staged = {}
+    for stored_id, row_label, temperature in specs:
+        observation = result.observations.pop(f"fixture-source::{stored_id}")
+        identity = observation.identity
+        if temperature is None:
+            identity = replace(identity, temperature_K=None)
+        else:
+            identity = replace(identity, temperature_K=State.of(Decimal(temperature)))
+        observation_id = f"fixture-source::{stored_id}::T={temperature}:row={row_label}"
+        staged[observation_id] = replace(
+            observation, observation_id=observation_id, identity=identity
+        )
+    result.observations = staged
+    migrator = Migrator(tmp_path)
+    migrator.result = result
+    return migrator
+
+
+def test_g04_singleton_explosion_requires_same_measurement_key(tmp_path: Path) -> None:
+    migrator = _stage_keyed_children(
+        tmp_path,
+        [("A-child", "a", "1000"), ("B-child", "b", "2000")],
+    )
+    parent_a = "fixture-source::A"
+    parent_b = "fixture-source::B"
+    child_a = "fixture-source::A-child::T=1000:row=a"
+    child_b = "fixture-source::B-child::T=2000:row=b"
+    migrator._exploded_children = {parent_a: [child_a], parent_b: [child_b]}
+    sample = migrator.result.observations[child_a]
+    migrator._pending_supersedes = [
+        (parent_a, parent_b, sample.experiment_id, sample.locator, "fixture-source.yaml")
+    ]
+
+    migrator._apply_supersedes()
+
+    kept = migrator.result.observations[child_a]
+    assert kept.admission.status is AdmissionStatus.ADMITTED
+    assert kept.admission.superseded_by is None
+    assert any(
+        "no unique matching row" in (entry.why or "") and "row left live" in (entry.why or "")
+        for entry in migrator.result.queue
+    )
+    _assert_superseded_targets_are_live(migrator.result)
+
+
+def test_g04_exploded_row_without_correspondence_stays_live(tmp_path: Path) -> None:
+    migrator = _stage_keyed_children(
+        tmp_path,
+        [("A-a", "a", "1000"), ("A-b", "b", "2000"), ("B-a", "a", "1000")],
+    )
+    parent_a = "fixture-source::A"
+    parent_b = "fixture-source::B"
+    row_a = "fixture-source::A-a::T=1000:row=a"
+    row_b = "fixture-source::A-b::T=2000:row=b"
+    successor = "fixture-source::B-a::T=1000:row=a"
+    migrator._exploded_children = {
+        parent_a: [row_a, row_b],
+        parent_b: [successor],
+    }
+    sample = migrator.result.observations[row_a]
+    migrator._pending_supersedes = [
+        (parent_a, parent_b, sample.experiment_id, sample.locator, "fixture-source.yaml")
+    ]
+
+    migrator._apply_supersedes()
+
+    matched = migrator.result.observations[row_a]
+    unmatched = migrator.result.observations[row_b]
+    assert matched.admission.status is AdmissionStatus.SUPERSEDED
+    assert matched.admission.superseded_by == successor
+    assert unmatched.admission.status is AdmissionStatus.ADMITTED
+    assert unmatched.admission.superseded_by is None
+    assert any(
+        row_b in (entry.why or "") and "row left live" in (entry.why or "")
+        for entry in migrator.result.queue
+    )
+    _assert_superseded_targets_are_live(migrator.result)
+
+
+def test_g04_unexpanded_shell_without_key_follows_exploded_series(
+    tmp_path: Path,
+) -> None:
+    migrator = _stage_keyed_children(
+        tmp_path,
+        [("shell", "shell", None), ("B-b", "b", "2000"), ("B-a", "a", "1000")],
+    )
+    shell_id = "fixture-source::shell::T=None:row=shell"
+    child_a = "fixture-source::B-a::T=1000:row=a"
+    child_b = "fixture-source::B-b::T=2000:row=b"
+    parent_b = "fixture-source::B"
+    migrator._exploded_children = {parent_b: [child_b, child_a]}
+    sample = migrator.result.observations[shell_id]
+    migrator._pending_supersedes = [
+        (shell_id, parent_b, sample.experiment_id, sample.locator, "fixture-source.yaml")
+    ]
+
+    migrator._apply_supersedes()
+
+    shell = migrator.result.observations[shell_id]
+    assert shell.admission.status is AdmissionStatus.SUPERSEDED
+    assert shell.admission.superseded_by == min(child_a, child_b)
+    _assert_superseded_targets_are_live(migrator.result)
+
+
+@pytest.mark.parametrize("temperature_kind", ["absent", "unknown"])
+def test_g04_numeric_row_without_temperature_stays_live(
+    tmp_path: Path, temperature_kind: str
+) -> None:
+    from types import SimpleNamespace
+
+    from simulator.battery.score import comparison_candidates
+
+    migrator = _stage_keyed_children(
+        tmp_path,
+        [("A", "a", None), ("B-a", "a", "1000"), ("B-b", "b", "2000")],
+    )
+    staged_id = "fixture-source::A::T=None:row=a"
+    old = migrator.result.observations.pop(staged_id)
+    temperature = (
+        None if temperature_kind == "absent" else State.unknown("not printed")
+    )
+    old = replace(
+        old,
+        observation_id="fixture-source::A",
+        identity=replace(old.identity, temperature_K=temperature),
+        value=Value(ValueKind.POINT, point=Decimal("0.7")),
+    )
+    migrator.result.observations[old.observation_id] = old
+    children = sorted(
+        oid for oid in migrator.result.observations if oid != old.observation_id
+    )
+    for child_id in children:
+        migrator.result.observations[child_id] = replace(
+            migrator.result.observations[child_id],
+            value=Value(ValueKind.POINT, point=Decimal("0.8")),
+        )
+    migrator._exploded_children = {"fixture-source::B": children}
+    migrator._pending_supersedes = [
+        (
+            old.observation_id,
+            "fixture-source::B",
+            old.experiment_id,
+            old.locator,
+            "fixture-source.yaml",
+        )
+    ]
+    before = comparison_candidates(
+        SimpleNamespace(observations=migrator.result.observations)
+    )
+
+    migrator._apply_supersedes()
+
+    kept = migrator.result.observations[old.observation_id]
+    after = comparison_candidates(
+        SimpleNamespace(observations=migrator.result.observations)
+    )
+    diagnostics = [
+        entry
+        for entry in migrator.result.queue
+        if entry.why
+        and "no unique matching row" in entry.why
+        and "row left live" in entry.why
+    ]
+    assert kept.admission.status is AdmissionStatus.ADMITTED
+    assert kept.admission.superseded_by is None
+    assert [row.observation_id for row in after] == [
+        row.observation_id for row in before
+    ]
+    assert len(diagnostics) == 1
+    assert old.observation_id in (diagnostics[0].why or "")
+    _assert_superseded_targets_are_live(migrator.result)
+
+
+def test_g04_correspondence_diagnostic_follows_the_final_successor_set(
+    tmp_path: Path,
+) -> None:
+    migrator = _stage_keyed_children(
+        tmp_path,
+        [
+            ("A-a", "a", "1000"),
+            ("A-b", "b", "2000"),
+            ("A-c", "c", "1800"),
+            ("E-b", "b", "2000"),
+            ("B-a", "a", "1000"),
+            ("C-x", "x", "1500"),
+            ("D-a", "a", "1000"),
+        ],
+    )
+    ids = {
+        "A-a": "fixture-source::A-a::T=1000:row=a",
+        "A-b": "fixture-source::A-b::T=2000:row=b",
+        "A-c": "fixture-source::A-c::T=1800:row=c",
+        "E-b": "fixture-source::E-b::T=2000:row=b",
+        "B-a": "fixture-source::B-a::T=1000:row=a",
+        "C-x": "fixture-source::C-x::T=1500:row=x",
+        "D-a": "fixture-source::D-a::T=1000:row=a",
+    }
+    migrator._exploded_children = {
+        "fixture-source::A": [ids["A-a"], ids["A-b"], ids["A-c"]],
+        "fixture-source::E": [ids["E-b"]],
+        "fixture-source::B": [ids["B-a"]],
+        "fixture-source::C": [ids["C-x"]],
+        "fixture-source::D": [ids["D-a"]],
+    }
+    sample = migrator.result.observations[ids["A-a"]]
+    migrator._pending_supersedes = [
+        (
+            "fixture-source::A",
+            successor,
+            sample.experiment_id,
+            sample.locator,
+            "fixture-source.yaml",
+        )
+        for successor in (
+            "fixture-source::E",
+            "fixture-source::B",
+            "fixture-source::C",
+            "fixture-source::D",
+        )
+    ]
+
+    migrator._apply_supersedes()
+
+    matched_later = migrator.result.observations[ids["A-a"]]
+    matched_earlier = migrator.result.observations[ids["A-b"]]
+    unmatched = migrator.result.observations[ids["A-c"]]
+    assert matched_later.admission.status is AdmissionStatus.SUPERSEDED
+    assert matched_later.admission.superseded_by == ids["D-a"]
+    assert matched_earlier.admission.status is AdmissionStatus.SUPERSEDED
+    assert matched_earlier.admission.superseded_by == ids["E-b"]
+    assert unmatched.admission.status is AdmissionStatus.ADMITTED
+    assert unmatched.admission.superseded_by is None
+    live_notes = [
+        entry
+        for entry in migrator.result.queue
+        if entry.why and "row left live" in entry.why
+    ]
+    assert len(live_notes) == 1
+    assert ids["A-c"] in (live_notes[0].why or "")
+    assert ids["A-a"] not in (live_notes[0].why or "")
+    assert ids["A-b"] not in (live_notes[0].why or "")
+    _assert_superseded_targets_are_live(migrator.result)
+
+
+def test_g04_rejected_superseder_does_not_supersede_measured_row(
+    tmp_path: Path,
+) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"] = [
+        {
+            "observation_id": "measured_row",
+            "type": "alpha",
+            "locator": {"table": "1"},
+            "phase": "gas",
+            "values": {
+                "quantity": "literature_vaporization_coefficient",
+                "method_class": "measured_direct",
+                "admission_status": "admitted",
+            },
+        },
+        {
+            "observation_id": "rejected_figure_row",
+            "supersedes": "measured_row",
+            "type": "alpha",
+            "locator": {"figure": "1"},
+            "phase": "gas",
+            "values": {
+                "quantity": "unknown_figure_quantity",
+                "method_class": "figure_only",
+                "admission_status": "rejected",
+                "reason": "figure digitisation has no numeric point",
+            },
+        },
+    ]
+    root = _write_min_tree(tmp_path, extract)
+
+    result = migrate(root, write=False)
+
+    measured = result.observations["fixture-source::measured_row"]
+    assert measured.admission.status in {
+        AdmissionStatus.ADMITTED,
+        AdmissionStatus.PENDING,
+    }
+    assert measured.admission.superseded_by is None
+
+
+def test_g04_dangling_superseder_chain_keeps_measured_row_live(
+    tmp_path: Path,
+) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"] = [
+        {
+            "observation_id": "measured_row",
+            "type": "alpha",
+            "locator": {"table": "1"},
+            "phase": "gas",
+            "values": {
+                "quantity": "literature_vaporization_coefficient",
+                "method_class": "measured_direct",
+                "admission_status": "admitted",
+            },
+        }
+    ]
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    measured = result.observations["fixture-source::measured_row"]
+    dangling = replace(
+        measured,
+        observation_id="fixture-source::dangling_intermediate",
+        admission=replace(
+            measured.admission,
+            status=AdmissionStatus.SUPERSEDED,
+            reason="superseded test fixture",
+            superseded_by="fixture-source::missing_terminal",
+        ),
+    )
+    result.observations[dangling.observation_id] = dangling
+    migrator = Migrator(tmp_path)
+    migrator.result = result
+    migrator._pending_supersedes = [
+        (
+            measured.observation_id,
+            dangling.observation_id,
+            measured.experiment_id,
+            measured.locator,
+            "data/literature/extracts/fixture-source.yaml",
+        )
+    ]
+
+    migrator._apply_supersedes()
+
+    assert measured.admission.status is AdmissionStatus.ADMITTED
+    assert measured.admission.superseded_by is None
 
 
 def test_h03_pressure_conversion_keeps_derivation_trail() -> None:
@@ -9956,6 +10407,26 @@ def test_residue_component_quantity_aliases_keep_printed_values_and_missing_cell
         assert "null" in (missing.reason or "")
 
 
+def test_hashimoto_row_left_live_diagnostics_are_final(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-015-hashimoto-1983.yaml")
+    left_live = [
+        entry
+        for entry in result.queue
+        if entry.why and "row left live" in entry.why
+    ]
+    contradicted = [
+        entry
+        for entry in left_live
+        if entry.observation_id in result.observations
+        and result.observations[entry.observation_id].admission.status
+        is AdmissionStatus.SUPERSEDED
+    ]
+    assert contradicted == []
+    assert len(left_live) == 0
+
+
 def test_residue_store_write_files_cells_under_their_extract_sources(
     tmp_path: Path,
 ) -> None:
@@ -10173,6 +10644,22 @@ def test_residue_cells_keep_run_identity_and_printed_conditions(
     hashimoto = _migrate_real_extract(
         tmp_path / "hashimoto", f"{hashimoto_id}.yaml"
     )
+    _assert_superseded_targets_are_live(hashimoto)
+    for row_label, run_id in (("c3-(2)", "17c3-2"), ("c5-(1)", "17c5-1")):
+        old = next(
+            obs
+            for obs in hashimoto.observations.values()
+            if obs.observation_id.startswith(
+                f"{hashimoto_id}::hashimoto_1983_table3_cao_residue_series::T=1973.15:row={row_label}:"
+            )
+        )
+        target = hashimoto.observations[old.admission.superseded_by]
+        assert target.observation_id.startswith(
+            f"{hashimoto_id}::hashimoto_1983_table3_residue_composition_series_quoted__run_{run_id}::T=1973.15:row={row_label}:"
+        )
+        assert target.admission.status in {
+            AdmissionStatus.ADMITTED, AdmissionStatus.PENDING
+        }
     hashimoto_source = _extract_observations(f"{hashimoto_id}.yaml")
     run_sources = {}
     for source_obs in hashimoto_source:
