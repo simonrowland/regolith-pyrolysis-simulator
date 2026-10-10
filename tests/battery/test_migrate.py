@@ -2009,6 +2009,81 @@ def test_source_derivation_and_inference_inputs_are_validated(
         assert not issues
 
 
+@pytest.mark.parametrize("location", ["values", "observation"])
+@pytest.mark.parametrize("relation", ["missing", None, ""])
+def test_calculated_child_without_author_relation_stays_unknown(
+    tmp_path: Path, location: str, relation: object
+) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    template = extract["species"]["Na"]["observations"][0]
+    parent = yaml.safe_load(yaml.safe_dump(template))
+    parent["observation_id"] = "measured_parent"
+    parent["values"]["pressure_atm"] = 1.0
+    parent["values"]["method_class"] = "measured_direct"
+    parent["values"].pop("series", None)
+
+    child = yaml.safe_load(yaml.safe_dump(template))
+    child["observation_id"] = "calculated_child"
+    child["values"]["method_class"] = "calculated"
+    child["values"]["derived_from"] = "measured_parent"
+    child["values"].pop("series", None)
+    child["values"]["pressure_atm"] = 1.0
+    derivation = {
+        "inputs": ["measured_parent"],
+        "output_unit": "Pa",
+    }
+    if relation != "missing":
+        derivation["relation"] = relation
+    target = child["values"] if location == "values" else child
+    target["derivation"] = derivation
+    extract["species"]["Na"]["observations"] = [parent, child]
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    observation = result.observations["fixture-source::calculated_child"]
+    assert observation.evidence.class_.is_unknown
+    path = (
+        "observations.fixture-source::calculated_child."
+        + ("values.derivation" if location == "values" else "derivation")
+    )
+    issues = [issue for issue in result.validation.hard_issues if issue.path == path]
+    assert len(issues) == 1
+    assert issues[0].reason is RefusalReason.INVALID_SOURCE
+    assert issues[0].detail.endswith(
+        "derivation relation (author method) is required"
+    )
+
+
+@pytest.mark.parametrize("location", ["values", "observation"])
+def test_located_not_printed_does_not_replace_author_relation(
+    tmp_path: Path, location: str
+) -> None:
+    extract = _raw_inputs_extract("calculated")
+    row = extract["species"]["Na"]["observations"][0]
+    row["values"].pop("series", None)
+    row["values"]["pressure_atm"] = 1.0
+    derivation = row["values"].pop("derivation")
+    derivation.pop("relation")
+    derivation["inputs"] = []
+    target = row["values"] if location == "values" else row
+    target["derivation"] = derivation
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    observation = result.observations["fixture-source::na_psat"]
+    assert observation.evidence.class_.is_unknown
+    path = (
+        "observations.fixture-source::na_psat."
+        + ("values.derivation" if location == "values" else "derivation")
+    )
+    issues = [issue for issue in result.validation.hard_issues if issue.path == path]
+    assert len(issues) == 1
+    assert issues[0].reason is RefusalReason.INVALID_SOURCE
+    assert issues[0].detail.endswith(
+        "derivation relation (author method) is required"
+    )
+
+
 def test_calculated_composition_requires_measured_lineage(tmp_path: Path) -> None:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     base = extract["species"]["Na"]["observations"][0]
