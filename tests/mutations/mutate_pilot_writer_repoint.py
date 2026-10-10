@@ -4,13 +4,13 @@ from __future__ import annotations
 
 import os
 import subprocess
+import sys
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[2]
 WRITER = ROOT / "tools" / "migrate_pilot_extracts.py"
 TEST = ROOT / "tests" / "test_migrate_pilot_retired_sources.py"
-PYTHON = Path("/Users/simonrowland/Repos/regolith-pyrolysis-simulator/.venv/bin/python")
 MUTATIONS = (
     '        "pound_1972_cr_langmuir_knudsen",\n',
     '        "safarian_engh_2013_si_pure_langmuir",\n',
@@ -27,7 +27,7 @@ def main() -> int:
         try:
             result = subprocess.run(
                 [
-                    str(PYTHON),
+                    sys.executable,
                     "-m",
                     "pytest",
                     "-n",
