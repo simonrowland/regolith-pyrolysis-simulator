@@ -20,6 +20,7 @@ from simulator.battery.enums import (
     ResidualStatus,
     residual_status_token,
 )
+from simulator.battery.compilation_tier import parent_observation_id
 from simulator.battery.migrate import REPO_ROOT, load_yaml
 from simulator.battery.records import Residual, as_decimal
 
@@ -311,7 +312,7 @@ def _pin_live_residual(row: Residual | Mapping[str, object]) -> _PinLiveResidual
 
 
 def _pin_live_comparison(row: Mapping[str, object]) -> _PinLiveComparison | None:
-    reference = str(row.get("reference_id") or "")
+    reference = parent_observation_id(str(row.get("reference_id") or ""))
     key = str(row.get("comparison_key") or "")
     try:
         quantity = Quantity(str(row.get("quantity") or ""))
