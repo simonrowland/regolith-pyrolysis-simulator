@@ -8,6 +8,7 @@ import simulator.melt_backend.liquidus as liquidus_module
 from simulator.melt_backend.liquidus import (
     LiquidusSampleError,
     LiquidusSolidusResult,
+    build_equilibrium_crystallization_path,
     find_liquidus_solidus_by_fraction,
 )
 
@@ -74,6 +75,64 @@ def test_liquidus_finder_is_deterministic():
     )
 
     assert first == second
+
+
+def test_finder_propagates_internal_monotone_error(monkeypatch):
+    def fail_local(*_args, **_kwargs):
+        raise KeyError('monotone bookkeeping defect')
+
+    monkeypatch.setattr(liquidus_module, '_monotone_point', fail_local)
+    with pytest.raises(KeyError, match='monotone bookkeeping defect'):
+        find_liquidus_solidus_by_fraction(
+            lambda _temperature_C: 0.5,
+            min_T_C=800.0,
+            max_T_C=1000.0,
+            scan_step_C=100.0,
+        )
+
+
+def test_finder_external_failure_carries_exception_class():
+    def fail_engine(_temperature_C):
+        raise RuntimeError('engine sample failed')
+
+    result = find_liquidus_solidus_by_fraction(
+        fail_engine,
+        min_T_C=800.0,
+        max_T_C=1000.0,
+        scan_step_C=100.0,
+    )
+    assert result.status == 'not_converged'
+    assert result.diagnostics['exception_class'] == 'RuntimeError'
+    assert result.diagnostics['exception_message'] == 'engine sample failed'
+
+
+def test_ec_path_propagates_internal_composition_error(monkeypatch):
+    def fail_local(*_args, **_kwargs):
+        raise KeyError('composition conversion defect')
+
+    monkeypatch.setattr(liquidus_module, '_coerce_composition', fail_local)
+    with pytest.raises(KeyError, match='composition conversion defect'):
+        build_equilibrium_crystallization_path(
+            lambda _temperature_C: (0.5, {'SiO2': 100.0}),
+            solidus_T_C=1000.0,
+            liquidus_T_C=1100.0,
+            grid_step_C=100.0,
+        )
+
+
+def test_ec_path_external_failure_carries_exception_class():
+    def fail_engine(_temperature_C):
+        raise RuntimeError('engine state failed')
+
+    result = build_equilibrium_crystallization_path(
+        fail_engine,
+        solidus_T_C=1000.0,
+        liquidus_T_C=1100.0,
+        grid_step_C=100.0,
+    )
+    assert result.status == 'not_converged'
+    assert result.diagnostics['exception_class'] == 'RuntimeError'
+    assert result.diagnostics['exception_message'] == 'engine state failed'
 
 
 def test_liquidus_finder_reuses_duplicate_bisection_temperatures(monkeypatch):
@@ -245,7 +304,11 @@ def test_liquidus_finder_preserves_typed_backend_sample_failure():
     )
 
     assert result.status == 'out_of_domain'
-    assert result.diagnostics == diagnostics
+    assert result.diagnostics == {
+        **diagnostics,
+        'exception_class': 'LiquidusSampleError',
+        'exception_message': 'engine rejected composition',
+    }
     assert result.warnings == ('engine rejected composition',)
 
 
