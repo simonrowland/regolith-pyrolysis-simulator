@@ -14,6 +14,7 @@ from pathlib import Path
 
 import pytest
 import yaml
+import simulator.melt_backend.alphamelts as alphamelts_module
 
 from simulator.engine_pool import EngineWorkerTimeout
 from engines.builtin.vapor_pressure import (
@@ -923,6 +924,179 @@ def test_alphamelts_python_liquidus_timeout_marks_backend_unavailable():
         )
 
     assert backend.is_available() is False
+
+
+def test_petthermotools_liquidus_propagates_local_composition_error():
+    backend = AlphaMELTSBackend()
+    _select_python_api_for_test(backend)
+    backend._require_petthermotools_runtime = lambda: types.SimpleNamespace(
+        findLiq_MELTS=lambda **_kwargs: None
+    )
+
+    def fail_local(_comp):
+        raise KeyError('local composition conversion')
+
+    backend._to_petthermotools_liq_comp = fail_local
+    with pytest.raises(KeyError, match='local composition conversion'):
+        backend._find_petthermotools_liquidus_C(
+            {'SiO2': 100.0}, pressure_bar=1.0, seed_T_C=1200.0
+        )
+
+
+@pytest.mark.parametrize('failure_type', [RuntimeError, ImportError])
+def test_petthermotools_liquidus_failure_notice_keeps_exception_class(
+    failure_type,
+):
+    from simulator.engine_pool import EngineWorkerRemoteError
+
+    backend = AlphaMELTSBackend()
+    _select_python_api_for_test(backend)
+    backend._require_petthermotools_runtime = lambda: types.SimpleNamespace(
+        findLiq_MELTS=lambda **_kwargs: None
+    )
+    backend._to_petthermotools_liq_comp = lambda comp: comp
+
+    class FailedWorker:
+        def call(self, *_args, **_kwargs):
+            raise EngineWorkerRemoteError(
+                alphamelts_module._PetThermoToolsExternalCallFailure.__name__,
+                f'{failure_type.__name__}: engine failed',
+                'external call traceback',
+            )
+
+    backend._pet_worker = FailedWorker()
+    temperature, warnings = backend._find_petthermotools_liquidus_C(
+        {'SiO2': 100.0}, pressure_bar=1.0, seed_T_C=1200.0
+    )
+    assert temperature is None
+    assert warnings == (
+        f'PetThermoTools findLiq failed ({failure_type.__name__}): engine failed',
+    )
+
+
+def test_petthermotools_liquidus_propagates_worker_local_error():
+    from simulator.engine_pool import EngineWorkerRemoteError
+
+    backend = AlphaMELTSBackend()
+    _select_python_api_for_test(backend)
+    backend._require_petthermotools_runtime = lambda: types.SimpleNamespace(
+        findLiq_MELTS=lambda **_kwargs: None
+    )
+    backend._to_petthermotools_liq_comp = lambda comp: comp
+
+    class FailedWorker:
+        def call(self, *_args, **_kwargs):
+            raise EngineWorkerRemoteError(
+                'KeyError',
+                'local worker request parsing defect',
+                'request[\'operation\'] raised KeyError',
+            )
+
+    backend._pet_worker = FailedWorker()
+    with pytest.raises(
+        EngineWorkerRemoteError,
+        match='local worker request parsing defect',
+    ):
+        backend._find_petthermotools_liquidus_C(
+            {'SiO2': 100.0}, pressure_bar=1.0, seed_T_C=1200.0
+        )
+
+
+def test_petthermotools_liquidus_worker_timeout_is_typed_notice():
+    backend = AlphaMELTSBackend()
+    _select_python_api_for_test(backend)
+    backend._require_petthermotools_runtime = lambda: types.SimpleNamespace(
+        findLiq_MELTS=lambda **_kwargs: None
+    )
+    backend._to_petthermotools_liq_comp = lambda comp: comp
+
+    class TimedOutWorker:
+        def call(self, *_args, **_kwargs):
+            raise EngineWorkerTimeout(
+                'PetThermoTools native operation', 1.0, phase='call'
+            )
+
+    backend._pet_worker = TimedOutWorker()
+    temperature, warnings = backend._find_petthermotools_liquidus_C(
+        {'SiO2': 100.0}, pressure_bar=1.0, seed_T_C=1200.0
+    )
+    assert temperature is None
+    assert warnings == (
+        'PetThermoTools findLiq failed '
+        '(EngineWorkerTimeout): PetThermoTools native operation '
+        'call exceeded hard timeout of 1s',
+    )
+
+
+def test_petthermotools_liquidus_worker_exit_keeps_typed_failure():
+    backend = AlphaMELTSBackend()
+    _select_python_api_for_test(backend)
+    backend._require_petthermotools_runtime = lambda: types.SimpleNamespace(
+        findLiq_MELTS=lambda **_kwargs: None
+    )
+    backend._to_petthermotools_liq_comp = lambda comp: comp
+
+    class ExitedWorker:
+        def call(self, *_args, **_kwargs):
+            raise RuntimeError('worker exited without a result')
+
+    backend._pet_worker = ExitedWorker()
+    with pytest.raises(AlphaMELTSSubprocessContractError) as captured:
+        backend._find_petthermotools_liquidus_C(
+            {'SiO2': 100.0}, pressure_bar=1.0, seed_T_C=1200.0
+        )
+    assert captured.value.backend_failure_category == 'engine_crash'
+
+
+def test_petthermotools_request_tags_engine_call_exception():
+    def fail_external(**_kwargs):
+        raise KeyError('PetThermoTools engine key')
+
+    resource = {
+        'module': types.SimpleNamespace(findLiq_MELTS=fail_external),
+        'loader': lambda _model_code: object(),
+        'model_code': 1,
+    }
+    with pytest.raises(
+        alphamelts_module._PetThermoToolsExternalCallFailure,
+    ) as captured:
+        alphamelts_module._handle_petthermotools_request(
+            resource,
+            {
+                'operation': 'findLiq_MELTS',
+                'args': (),
+                'kwargs': {},
+            },
+            None,
+        )
+
+    assert captured.value.exception_class == 'KeyError'
+    assert captured.value.message == "'PetThermoTools engine key'"
+
+
+def test_first_row_mapping_propagates_table_access_key_error():
+    class BrokenTable:
+        @property
+        def iloc(self):
+            raise KeyError('table access defect')
+
+    with pytest.raises(KeyError, match='table access defect'):
+        AlphaMELTSBackend()._first_row_mapping(BrokenTable())
+
+
+def test_oxide_mole_fractions_propagates_formula_resolution_key_error(
+    monkeypatch,
+):
+    def fail_resolution(*_args, **_kwargs):
+        raise KeyError('formula resolution defect')
+
+    monkeypatch.setattr(
+        alphamelts_module,
+        'resolve_species_formula',
+        fail_resolution,
+    )
+    with pytest.raises(KeyError, match='formula resolution defect'):
+        AlphaMELTSBackend()._oxide_mole_fractions({'SiO2': 50.0})
 
 
 @pytest.mark.parametrize(

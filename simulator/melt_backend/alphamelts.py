@@ -687,18 +687,37 @@ def _run_petthermotools_worker(
         try:
             module = importlib.import_module('petthermotools')
         except ImportError:
-            module = importlib.import_module('PetThermoTools')
+            module = _petthermotools_external_call(
+                lambda: importlib.import_module('PetThermoTools')
+            )
+        except Exception as exc:
+            raise _PetThermoToolsExternalCallFailure(
+                type(exc).__name__, str(exc)
+            ) from exc
         call_kwargs = dict(kwargs)
         if operation in {'equilibrate_MELTS', 'findLiq_MELTS'}:
-            loader = getattr(module, 'MELTSdynamic', None)
+            loader = _petthermotools_external_call(
+                lambda: getattr(module, 'MELTSdynamic', None)
+            )
             if loader is None:
-                meltsdynamic = importlib.import_module('meltsdynamic')
-                loader = getattr(meltsdynamic, 'MELTSdynamic', None)
+                meltsdynamic = _petthermotools_external_call(
+                    lambda: importlib.import_module('meltsdynamic')
+                )
+                loader = _petthermotools_external_call(
+                    lambda: getattr(meltsdynamic, 'MELTSdynamic', None)
+                )
             if loader is None:
                 raise ImportError('MELTSdynamic loader not found')
-            call_kwargs['melts'] = loader(model_code)
-        function = getattr(module, operation)
-        connection.send(('ok', function(*args, **call_kwargs)))
+            call_kwargs['melts'] = _petthermotools_external_call(
+                lambda: loader(model_code)
+            )
+        function = _petthermotools_external_call(
+            lambda: getattr(module, operation)
+        )
+        result = _petthermotools_external_call(
+            lambda: function(*args, **call_kwargs)
+        )
+        connection.send(('ok', result))
     except BaseException as exc:  # pragma: no cover - child/native boundary
         connection.send((
             'error', type(exc).__name__, str(exc), traceback.format_exc(),
@@ -749,9 +768,34 @@ def _handle_petthermotools_request(resource, request, _errlog):
         # operation. This module has no reused-versus-fresh A/B of
         # PetThermoTools output, so reconstruction is the implemented
         # isolation, not a measured counterfactual.
-        call_kwargs['melts'] = resource['loader'](resource['model_code'])
-    function = getattr(resource['module'], operation)
-    return function(*tuple(request.get('args') or ()), **call_kwargs)
+        call_kwargs['melts'] = _petthermotools_external_call(
+            lambda: resource['loader'](resource['model_code'])
+        )
+    function = _petthermotools_external_call(
+        lambda: getattr(resource['module'], operation)
+    )
+    args = tuple(request.get('args') or ())
+    return _petthermotools_external_call(
+        lambda: function(*args, **call_kwargs)
+    )
+
+
+class _PetThermoToolsExternalCallFailure(RuntimeError):
+    """Tag a remote exception raised by a PetThermoTools-owned operation."""
+
+    def __init__(self, exception_class: str, message: str) -> None:
+        self.exception_class = str(exception_class)
+        self.message = str(message)
+        super().__init__(f'{self.exception_class}: {self.message}')
+
+
+def _petthermotools_external_call(call):
+    try:
+        return call()
+    except Exception as exc:
+        raise _PetThermoToolsExternalCallFailure(
+            type(exc).__name__, str(exc)
+        ) from exc
 
 
 PETTHERMOTOOLS_NON_PHASE_KEYS = {
@@ -2667,10 +2711,13 @@ class _MELTSBackendSupport(MeltBackend):
                     f'PetThermoTools {operation} failed: {exc.detail}\n'
                     f'{exc.remote_traceback}'
                 ) from exc
-            raise RuntimeError(
-                f'PetThermoTools {operation} failed: {exc.detail}\n'
-                f'{exc.remote_traceback}'
-            ) from exc
+            if exc.exc_name == _PetThermoToolsExternalCallFailure.__name__:
+                exception_class, _, message = exc.detail.partition(': ')
+                raise _PetThermoToolsExternalCallFailure(
+                    exception_class or 'Exception',
+                    message or exc.detail,
+                ) from exc
+            raise
         except RuntimeError as exc:
             raise _alphamelts_backend_failure_error(
                 ALPHAMELTS_REASON_SUBPROCESS_DIED,
@@ -2741,8 +2788,16 @@ class _MELTSBackendSupport(MeltBackend):
                 f'PetThermoTools {operation} failed: {detail}\n'
                 f'{child_traceback}'
             )
-        raise RuntimeError(
-            f'PetThermoTools {operation} failed: {detail}\n{child_traceback}'
+        if exc_name == _PetThermoToolsExternalCallFailure.__name__:
+            exception_class, _, message = detail.partition(': ')
+            raise _PetThermoToolsExternalCallFailure(
+                exception_class or 'Exception',
+                message or detail,
+            )
+        raise EngineWorkerRemoteError(
+            exc_name,
+            detail,
+            child_traceback,
         )
 
     def _to_petthermotools_liq_comp(self, comp_wt: Mapping[str, float]) -> dict:
@@ -2879,45 +2934,59 @@ class _MELTSBackendSupport(MeltBackend):
         ptt_comp = self._to_petthermotools_liq_comp(comp_wt)
         find_liq_melts = getattr(ptt, 'findLiq_MELTS', None)
         find_liq = getattr(ptt, 'findLiq', None)
+        self._melts_model_code()
+        if callable(find_liq_melts):
+            operation = 'findLiq_MELTS'
+            args = ()
+            kwargs = {
+                'P_bar': max(pressure_bar, 1e-6),
+                'Model': self._model,
+                'T_C_init': float(seed_T_C),
+                'comp': ptt_comp,
+                'fO2_buffer': self._redox_buffer,
+                'fO2_offset': self._fo2_offset,
+                'Step': 50.0,
+            }
+        elif callable(find_liq):
+            operation = 'findLiq'
+            args = (None, 0)
+            kwargs = {
+                'Model': self._model,
+                'P_bar': max(pressure_bar, 1e-6),
+                'T_initial_C': float(seed_T_C),
+                'comp': ptt_comp,
+                'fO2_buffer': self._redox_buffer,
+                'fO2_offset': self._fo2_offset,
+            }
+        else:
+            return None, ('PetThermoTools findLiq API not found',)
         try:
-            self._melts_model_code()
-            if callable(find_liq_melts):
-                raw = self._run_petthermotools_isolated(
-                    'findLiq_MELTS',
-                    kwargs={
-                        'P_bar': max(pressure_bar, 1e-6),
-                        'Model': self._model,
-                        'T_C_init': float(seed_T_C),
-                        'comp': ptt_comp,
-                        'fO2_buffer': self._redox_buffer,
-                        'fO2_offset': self._fo2_offset,
-                        'Step': 50.0,
-                    },
-                )
-            elif callable(find_liq):
-                raw = self._run_petthermotools_isolated(
-                    'findLiq',
-                    args=(None, 0),
-                    kwargs={
-                        'Model': self._model,
-                        'P_bar': max(pressure_bar, 1e-6),
-                        'T_initial_C': float(seed_T_C),
-                        'comp': ptt_comp,
-                        'fO2_buffer': self._redox_buffer,
-                        'fO2_offset': self._fo2_offset,
-                    },
-                )
-            else:
-                return None, ('PetThermoTools findLiq API not found',)
+            raw = self._run_petthermotools_isolated(
+                operation,
+                args=args,
+                kwargs=kwargs,
+            )
         except (
-            ImportError,
             AlphaMELTSConfigurationError,
             AlphaMELTSSubprocessContractError,
         ):
             self._mode = None
             raise
-        except Exception as exc:  # noqa: BLE001 - optional engine boundary
-            return None, (f'PetThermoTools findLiq failed: {exc}',)
+        except EngineWorkerTimeout as exc:
+            return None, (
+                f'PetThermoTools findLiq failed '
+                f'({type(exc).__name__}): {exc}',
+            )
+        except ImportError as exc:
+            return None, (
+                f'PetThermoTools findLiq unavailable '
+                f'({type(exc).__name__}): {exc}',
+            )
+        except _PetThermoToolsExternalCallFailure as exc:
+            return None, (
+                f'PetThermoTools findLiq failed '
+                f'({exc.exception_class}): {exc.message}',
+            )
         return self._extract_temperature_C(raw), ()
 
     def _extract_temperature_C(self, raw: Any) -> Optional[float]:
@@ -4452,25 +4521,22 @@ class _MELTSBackendSupport(MeltBackend):
             return {}
         if isinstance(table, Mapping):
             return dict(table)
-        try:
-            if hasattr(table, 'empty') and bool(table.empty):
-                return {}
-            if hasattr(table, 'iloc'):
-                row = table.iloc[0]
-                if hasattr(row, 'to_dict'):
-                    return dict(row.to_dict())
-            if hasattr(table, 'to_dict'):
-                value = table.to_dict()
-                if isinstance(value, Mapping):
-                    if all(isinstance(v, Mapping) for v in value.values()):
-                        return {
-                            key: next(iter(v.values()))
-                            for key, v in value.items()
-                            if v
-                        }
-                    return dict(value)
-        except (IndexError, KeyError, TypeError, ValueError):
+        if hasattr(table, 'empty') and bool(table.empty):
             return {}
+        if hasattr(table, 'iloc'):
+            row = table.iloc[0]
+            if hasattr(row, 'to_dict'):
+                return dict(row.to_dict())
+        if hasattr(table, 'to_dict'):
+            value = table.to_dict()
+            if isinstance(value, Mapping):
+                if all(isinstance(v, Mapping) for v in value.values()):
+                    return {
+                        key: next(iter(v.values()))
+                        for key, v in value.items()
+                        if v
+                    }
+                return dict(value)
         return {}
 
     def _first_number(self, values: Mapping[str, object],
@@ -5564,11 +5630,8 @@ class _MELTSBackendSupport(MeltBackend):
         for oxide, wt in comp_wt.items():
             if not self._is_number(wt) or float(wt) <= 0.0:
                 continue
-            try:
-                molar_mass = resolve_species_formula(
-                    oxide, None).molar_mass_kg_per_mol()
-            except Exception:
-                continue
+            molar_mass = resolve_species_formula(
+                oxide, None).molar_mass_kg_per_mol()
             if molar_mass > 0.0:
                 moles[str(oxide)] = float(wt) / molar_mass
         total_moles = sum(moles.values())
