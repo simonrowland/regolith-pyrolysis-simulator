@@ -342,10 +342,12 @@ def find_liquidus_solidus_by_fraction(
         budget = None if budget_s is None else _declared_float(budget_s, 'budget_s')
     except (TypeError, ValueError) as exc:
         return _refused_input(f'invalid finder parameter: {exc}')
-    if not all(math.isfinite(value) for value in (min_T, max_T, step, tolerance)):
-        return _refused_input(
-            'invalid finder parameter: temperatures and steps must be finite'
-        )
+    if not all(math.isfinite(value) for value in (
+        min_T, max_T, step, tolerance, max_bisection_iterations,
+        solid_threshold, liquid_epsilon_value, monotonicity_tolerance,
+        monotone_smoothing_max,
+    )):
+        return _refused_input('invalid finder parameters must be finite')
     if not min_T < max_T:
         return _refused_input(
             'invalid finder window: min_T_C must be below max_T_C'
@@ -358,6 +360,11 @@ def find_liquidus_solidus_by_fraction(
         return _refused_input(
             'invalid finder budget_s: must be finite and positive'
         )
+
+    try:
+        grid = _bounded_scan_grid(min_T, max_T, step)
+    except RuntimeError as exc:
+        return _refused_input(str(exc))
 
     liquid_threshold = 1.0 - liquid_epsilon_value
     samples: list[MeltFractionSample] = []
@@ -457,7 +464,6 @@ def find_liquidus_solidus_by_fraction(
         return point
 
     try:
-        grid = _bounded_scan_grid(min_T, max_T, step)
         grid_points = [sample(T) for T in grid]
 
         solidus_bracket = None
@@ -601,6 +607,13 @@ def build_equilibrium_crystallization_path(
         )
         if not is_declared_real_scalar(max_points, allow_numeric_str=True):
             raise TypeError('max_points must be numeric')
+        for name, value in (
+            ('grid_step_C', grid_step_C),
+            ('monotonicity_tolerance', monotonicity_tolerance),
+            ('monotone_smoothing_max', monotone_smoothing_max),
+        ):
+            if not math.isfinite(value):
+                raise ValueError(f'{name} must be finite')
         if not solidus_T <= liquidus_T:
             return EquilibriumCrystallizationPathResult(
                 status='refused',
@@ -815,9 +828,16 @@ def _temperature_grid(
     max_points: int,
 ) -> Tuple[float, ...]:
     step = _declared_float(grid_step_C, 'grid_step_C')
-    if not is_declared_real_scalar(max_points, allow_numeric_str=True):
-        raise TypeError('max_points must be numeric')
-    point_cap = int(max_points)
+    point_limit = _declared_float(max_points, 'max_points')
+    for name, value in (
+        ('solidus_T_C', solidus_T_C),
+        ('liquidus_T_C', liquidus_T_C),
+    ):
+        if not math.isfinite(float(value)):
+            raise ValueError(f'{name} must be finite')
+    if not math.isfinite(point_limit):
+        raise ValueError('max_points must be finite')
+    point_cap = int(point_limit)
     if not math.isfinite(step) or step <= 0.0:
         raise RuntimeError('invalid EC grid_step_C: must be finite and positive')
     if point_cap < 2:

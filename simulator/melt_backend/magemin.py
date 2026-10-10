@@ -375,6 +375,11 @@ def _admit_magemin_call_scalars(
         declared.append(call_timeout_s)
     admitted: List[float] = []
     for value in declared:
+        if not is_declared_real_scalar(value, allow_numeric_str=True):
+            raise _MAGEMinDeclaredInputError(
+                'TypeError',
+                'declared scalar must be numeric',
+            )
         try:
             admitted.append(float(value))
         except (TypeError, ValueError) as exc:
@@ -1596,6 +1601,12 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     'budget_reason': 'invalid_liquidus_finder_budget',
                     'liquidus_finder_budget_s': None,
                 },
+            )
+        if not is_declared_real_scalar(raw_budget, allow_numeric_str=True):
+            return LiquidusSolidusResult(
+                status='refused',
+                warnings=('invalid liquidus_finder_budget_s: must be numeric',),
+                diagnostics={'reason': 'invalid_input'},
             )
         try:
             budget_s = float(raw_budget)
