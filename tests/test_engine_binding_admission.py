@@ -701,6 +701,46 @@ def test_live_cache_gate_fails_open_and_deduplicates_typed_notice(
     assert len(notice["notices"]) == 2
 
 
+def test_gate_curve_memo_is_receipt_free_and_still_records_notice_once(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    missing_receipt = tmp_path / "missing-binding-admission.json"
+    provenance = {
+        "binding_provenance_verifiable": True,
+        "runtime_artifact": "test-only",
+    }
+    monkeypatch.setattr(
+        admission,
+        "binding_receipt_path",
+        lambda *_args, **_kwargs: missing_receipt,
+    )
+    monkeypatch.setattr(
+        admission,
+        "selected_binding_identities",
+        lambda _sim, *, artifact, provider_role=None: (
+            (SYNTHETIC_IDENTITY,)
+            if artifact == "freeze_gate_curve"
+            else ()
+        ),
+    )
+    monkeypatch.setattr(
+        admission,
+        "selected_binding_provenance",
+        lambda _identity, _sim: provenance,
+    )
+    sim = SimpleNamespace()
+
+    assert admission.gate_curve_memo_eligibility(sim, SYNTHETIC_CURVE)
+    assert admission.gate_curve_memo_eligibility(sim, SYNTHETIC_CURVE)
+
+    notice = binding_admission_run_notice(sim)
+    assert notice is not None
+    assert len(notice["notices"]) == 1
+    assert notice["notices"][0]["identity"] == SYNTHETIC_IDENTITY.as_dict()
+    assert notice["notices"][0]["reason"] == "receipt missing"
+
+
 @pytest.mark.parametrize("failure", ["failed", "stale", "transport-mismatched"])
 def test_live_cache_gate_refuses_failed_stale_and_wrong_transport_receipts(
     tmp_path: Path,
