@@ -6901,27 +6901,25 @@ def test_unregistered_table_derivation_input_is_not_retained(
 def test_measured_reduced_derivation_prose_input_is_queued_not_pointed(
     tmp_path: Path,
 ) -> None:
-    name = "stebbins-carmichael-weill-1983.yaml"
-    source = REPO_ROOT / "data" / "literature" / "extracts" / name
-    extract = yaml.safe_load(source.read_text(encoding="utf-8"))
-    extract["source_id"] = "fixture-source"
-    raw = next(
-        row
-        for block in extract["species"].values()
-        for row in block["observations"]
-        if row.get("observation_id") == "stebbins_1983_diopside_table_4_fit"
-    )
-    assert raw["values"]["derivation"]["inputs"] == [
-        "Table 2 DSC Cp points",
-        "Table 3 drop-calorimetric heat contents",
-    ]
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    raw = extract["species"]["Na"]["observations"][0]
+    raw["values"]["method_class"] = "measured_reduced"
+    raw["values"]["derivation"] = {
+        "relation": "calculated from measured quantities",
+        "inputs": [
+            "Table 2 DSC Cp points",
+            "Table 3 drop-calorimetric heat contents",
+        ],
+        "output_unit": "atm",
+    }
 
     result = migrate(_write_min_tree(tmp_path, extract), write=True)
     observation = next(
         obs
         for obs in result.observations.values()
-        if obs.observation_id.endswith("::stebbins_1983_diopside_table_4_fit")
+        if obs.observation_id.startswith("fixture-source::na_psat::T=1200.0")
     )
+    assert observation.derived_from is None
     queued = [
         entry
         for entry in result.queue
