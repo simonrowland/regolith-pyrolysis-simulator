@@ -278,6 +278,19 @@ def test_magnesium_and_manganese_oxide_equation_mismatches_stay_typed():
         assert by_quantity["heat_capacity"]["gate"]["reason"] == "no_independent_check"
 
 
+def test_iron_equations_keep_each_printed_phase_curve_and_gate_outcomes():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "Fe"]
+    assert len(curves) == 14
+    assert {curve["phase"] for curve in curves} == {"c", "l", "g"}
+    by_key = {(curve["source_record_id"], curve["polymorph"], curve["quantity"]): curve for curve in curves}
+    for source_id, polymorph in (("table-394", "alpha"), ("table-394", "beta"), ("table-396", None)):
+        assert by_key[(source_id, polymorph, "heat_content_increment")]["gate"]["reason"] == "transcription_gate_failed"
+        assert by_key[(source_id, polymorph, "heat_capacity")]["gate"]["reason"] == "no_independent_check"
+    for source_id, polymorph in (("table-394", "gamma"), ("table-394", "delta"), ("table-394", None), ("table-395", "gamma")):
+        assert by_key[(source_id, polymorph, "heat_content_increment")]["gate"]["status"] == "passed"
+        assert by_key[(source_id, polymorph, "heat_capacity")]["gate"]["status"] == "passed"
+
+
 def test_heat_content_gate_detects_a_coefficient_mutation():
     heat = loader.load_published_curves()[0]
     changed = {**heat, "coefficients_as_printed": ["11.77", *heat["coefficients_as_printed"][1:]]}
