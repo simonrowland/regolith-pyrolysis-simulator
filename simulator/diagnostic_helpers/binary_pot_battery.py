@@ -2200,7 +2200,7 @@ def _internal_analytical_vapor_pressure_adapter(
             f"pressure_bar must be finite and non-negative; got {pressure_bar!r}",
         )
 
-    melt_composition_kg: dict[str, float] = {}
+    validated_melt_mass_kg_by_species: dict[str, float] = {}
     if composition_kg:
         for species, raw in composition_kg.items():
             value = _finite_float(raw)
@@ -2211,7 +2211,7 @@ def _internal_analytical_vapor_pressure_adapter(
                     f"oxide mass for {species!r} must be finite and non-negative; got {raw!r}",
                 )
             if value > 0.0:
-                melt_composition_kg[str(species)] = value
+                validated_melt_mass_kg_by_species[str(species)] = value
     else:
         from simulator.accounting.formulas import resolve_species_formula
 
@@ -2241,8 +2241,8 @@ def _internal_analytical_vapor_pressure_adapter(
                         "internal_analytical_invalid_composition",
                         f"oxide amount for {species!r} does not yield a positive finite mass",
                     )
-                melt_composition_kg[str(species)] = mass_kg
-    if not melt_composition_kg:
+                validated_melt_mass_kg_by_species[str(species)] = mass_kg
+    if not validated_melt_mass_kg_by_species:
         raise _InternalAnalyticalInputRefusal(
             2,
             "internal_analytical_invalid_composition",
@@ -2331,7 +2331,7 @@ def _internal_analytical_vapor_pressure_adapter(
     try:
         core._load_ledger_account(
             "process.cleaned_melt",
-            melt_composition_kg,
+            validated_melt_mass_kg_by_species,
             source="battery observation composition",
         )
     except Exception as exc:  # noqa: BLE001 - malformed oxides are category 2
@@ -2340,7 +2340,7 @@ def _internal_analytical_vapor_pressure_adapter(
             "internal_analytical_invalid_composition",
             f"oxide composition cannot seed the simulator melt: {exc}",
         ) from exc
-    core.melt.composition_kg = dict(melt_composition_kg)
+    core.melt.composition_kg = dict(validated_melt_mass_kg_by_species)
     core.melt.update_total_mass()
     core.melt.temperature_C = temperature
     core.melt.p_total_mbar = pressure * 1000.0
