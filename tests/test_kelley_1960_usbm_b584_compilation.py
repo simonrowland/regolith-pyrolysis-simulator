@@ -268,6 +268,32 @@ def test_magnesium_elemental_equations_pass_their_table_and_derivative_gates():
     assert all(curve["gate"]["kind"] == "analytic_derivative_of_gated_H" for curve in curves if curve["quantity"] == "heat_capacity")
 
 
+def test_manganese_equations_keep_all_printed_phases_and_gate_outcomes():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "Mn"]
+    assert len(curves) == 14
+    heat = [curve for curve in curves if curve["quantity"] == "heat_content_increment"]
+    cp = [curve for curve in curves if curve["quantity"] == "heat_capacity"]
+    assert {(curve["phase"], curve["polymorph"], tuple(curve["temperature_range_K"])) for curve in heat} == {
+        ("c", "alpha", (298, 1000)), ("c", "beta", (1000, 1374)),
+        ("c", "gamma", (1374, 1410)), ("c", "delta", (1410, 1517)),
+        ("l", None, (1517, 2300)), ("c", "gamma", (298, 1374)),
+        ("g", None, (298, 3000)),
+    }
+    by_equation = {curve["equation_as_printed"]: curve for curve in heat}
+    assert by_equation["H_T - H_298.15 = 4.97T - 1,482"]["gate"]["status"] == "transcription_gate_failed"
+    assert len(by_equation["H_T - H_298.15 = 4.97T - 1,482"]["gate"]["residuals"]) == 3
+    assert all(curve["gate"]["status"] in {"passed", "transcription_gate_failed"} for curve in heat)
+    assert all(curve["derivation"] and curve["units_as_printed"] == "cal/(mol·K)" for curve in cp)
+    assert any(curve["gate"].get("kind") == "analytic_derivative_of_gated_H" for curve in cp)
+    assert all(curve["gate"]["reason"] in {None, "no_independent_check"} for curve in cp)
+
+    # Printed H(T)-H(298.15) differentiated term by term gives Cp; cal/mol per kelvin is cal/(mol·K).
+    # The printed Mn(alpha) Cp coefficients give 6.291 cal/(mol·K) at 298.15 K as a sanity value.
+    alpha_cp = next(curve for curve in cp if curve["polymorph"] == "alpha")
+    a, b, c = (float(value.replace("×10^", "e")) for value in alpha_cp["coefficients_as_printed"])
+    assert a + b * 298.15 + c / 298.15**2 == pytest.approx(6.291, abs=0.001)
+
+
 def test_magnesium_and_manganese_oxide_equation_mismatches_stay_typed():
     curves = [curve for curve in loader.load_published_curves() if curve["formula"] in {"MgO", "MnO"}]
     assert len(curves) == 4

@@ -1343,5 +1343,124 @@
     "locator": {"printed_page": 194, "label": "Table 820, Ti(g), 2,000–6,000 K equation"},
     "source_record_id": "table-820", "derivation": "Differentiate the printed heat-content equation term by term: the negative T^-1 term gives a positive T^-2 term; cal/mol differentiated by kelvin gives cal/(mol·K).",
     "derivative_of_equation_index": 154
+  },
+  {
+    "formula": "Mn", "phase": "c", "polymorph": "alpha", "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 5.70T + 1.69×10^-3T^2 + 0.37×10^5T^-1 - 1,974",
+    "terms": ["a*T", "b*T^2", "c*T^-1", "d"], "coefficients_as_printed": ["5.70", "1.69×10^-3", "0.37×10^5", "-1,974"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [298, 1000], "accuracy_as_printed": "0.7 percent",
+    "locator": {"printed_page": 118, "label": "Table 491, Mn(alpha)"},
+    "source_record_id": "table-491", "gate_cells": [{"temperature_K": 400}, {"temperature_K": 600}, {"temperature_K": 1000, "source_row_index": 12}]
+  },
+  {
+    "formula": "Mn", "phase": "c", "polymorph": "alpha", "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 5.70 + 3.38×10^-3T - 0.37×10^5T^-2",
+    "terms": ["a", "b*T", "c*T^-2"], "coefficients_as_printed": ["5.70", "3.38×10^-3", "-0.37×10^5"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [298, 1000], "accuracy_as_printed": null,
+    "locator": {"printed_page": 118, "label": "Table 491, Mn(alpha)"},
+    "source_record_id": "table-491", "derivation": "Differentiate the printed heat-content equation term by term; the positive T^-1 term gives a negative T^-2 term, and cal/mol differentiated by kelvin gives cal/(mol·K).",
+    "derivative_of_equation_index": 156
+  },
+  {
+    "formula": "Mn", "phase": "c", "polymorph": "beta", "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 8.33T + 0.33×10^-3T^2 - 2,675",
+    "terms": ["a*T", "b*T^2", "d"], "coefficients_as_printed": ["8.33", "0.33×10^-3", "-2,675"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [1000, 1374], "accuracy_as_printed": "0.1 percent",
+    "locator": {"printed_page": 118, "label": "Table 491, Mn(beta)"},
+    "source_record_id": "table-491", "gate_cells": [{"temperature_K": 1000, "source_row_index": 14}, {"temperature_K": 1200}, {"temperature_K": 1374, "source_row_index": 22}]
+  },
+  {
+    "formula": "Mn", "phase": "c", "polymorph": "beta", "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 8.33 + 0.66×10^-3T",
+    "terms": ["a", "b*T"], "coefficients_as_printed": ["8.33", "0.66×10^-3"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [1000, 1374], "accuracy_as_printed": null,
+    "locator": {"printed_page": 118, "label": "Table 491, Mn(beta)"},
+    "source_record_id": "table-491", "derivation": "Differentiate the printed heat-content equation term by term; the derivative of 0.33×10^-3T^2 is 0.66×10^-3T, and cal/mol differentiated by kelvin gives cal/(mol·K).",
+    "derivative_of_equation_index": 158
+  },
+  {
+    "formula": "Mn", "phase": "c", "polymorph": "gamma", "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 10.70T - 4,760",
+    "terms": ["a*T", "d"], "coefficients_as_printed": ["10.70", "-4,760"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [1374, 1410], "accuracy_as_printed": "0.1 percent",
+    "locator": {"printed_page": 118, "label": "Table 491, Mn(gamma)"},
+    "source_record_id": "table-491", "gate_cells": [{"temperature_K": 1374, "source_row_index": 24}, {"temperature_K": 1400}, {"temperature_K": 1410, "source_row_index": 1}]
+  },
+  {
+    "formula": "Mn", "phase": "c", "polymorph": "gamma", "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 10.70",
+    "terms": ["a"], "coefficients_as_printed": ["10.70"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [1374, 1410], "accuracy_as_printed": null,
+    "locator": {"printed_page": 118, "label": "Table 491, Mn(gamma)"},
+    "source_record_id": "table-491", "derivation": "Differentiate the printed linear heat-content equation; its derivative is the constant 10.70, and cal/mol differentiated by kelvin gives cal/(mol·K).",
+    "derivative_of_equation_index": 160
+  },
+  {
+    "formula": "Mn", "phase": "c", "polymorph": "delta", "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 11.30T - 5,170",
+    "terms": ["a*T", "d"], "coefficients_as_printed": ["11.30", "-5,170"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [1410, 1517], "accuracy_as_printed": "0.1 percent",
+    "locator": {"printed_page": 118, "label": "Table 491, Mn(delta)"},
+    "source_record_id": "table-491", "gate_cells": [{"temperature_K": 1410, "source_row_index": 3}, {"temperature_K": 1500}, {"temperature_K": 1517, "source_row_index": 7}]
+  },
+  {
+    "formula": "Mn", "phase": "c", "polymorph": "delta", "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 11.30",
+    "terms": ["a"], "coefficients_as_printed": ["11.30"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [1410, 1517], "accuracy_as_printed": null,
+    "locator": {"printed_page": 118, "label": "Table 491, Mn(delta)"},
+    "source_record_id": "table-491", "derivation": "Differentiate the printed linear heat-content equation; its derivative is the constant 11.30, and cal/mol differentiated by kelvin gives cal/(mol·K).",
+    "derivative_of_equation_index": 162
+  },
+  {
+    "formula": "Mn", "phase": "l", "polymorph": null, "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 11.00T - 1,220",
+    "terms": ["a*T", "d"], "coefficients_as_printed": ["11.00", "-1,220"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [1517, 2300], "accuracy_as_printed": "0.1 percent",
+    "locator": {"printed_page": 118, "label": "Table 491, Mn(l)"},
+    "source_record_id": "table-491", "gate_cells": [{"temperature_K": 1517, "source_row_index": 9}, {"temperature_K": 1700}, {"temperature_K": 2300}]
+  },
+  {
+    "formula": "Mn", "phase": "l", "polymorph": null, "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 11.00",
+    "terms": ["a"], "coefficients_as_printed": ["11.00"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [1517, 2300], "accuracy_as_printed": null,
+    "locator": {"printed_page": 118, "label": "Table 491, Mn(l)"},
+    "source_record_id": "table-491", "derivation": "Differentiate the printed linear heat-content equation; its derivative is the constant 11.00, and cal/mol differentiated by kelvin gives cal/(mol·K).",
+    "derivative_of_equation_index": 164
+  },
+  {
+    "formula": "Mn", "phase": "c", "polymorph": "gamma", "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 6.03T + 1.78×10^-3T^2 + 0.44×10^5T^-1 - 2,104",
+    "terms": ["a*T", "b*T^2", "c*T^-1", "d"], "coefficients_as_printed": ["6.03", "1.78×10^-3", "0.44×10^5", "-2,104"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [298, 1374], "accuracy_as_printed": "0.1 percent",
+    "locator": {"printed_page": 118, "label": "Table 492, Mn(gamma)"},
+    "source_record_id": "table-492", "gate_cells": [{"temperature_K": 400}, {"temperature_K": 900}, {"temperature_K": 1374}]
+  },
+  {
+    "formula": "Mn", "phase": "c", "polymorph": "gamma", "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 6.03 + 3.56×10^-3T - 0.44×10^5T^-2",
+    "terms": ["a", "b*T", "c*T^-2"], "coefficients_as_printed": ["6.03", "3.56×10^-3", "-0.44×10^5"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [298, 1374], "accuracy_as_printed": null,
+    "locator": {"printed_page": 118, "label": "Table 492, Mn(gamma)"},
+    "source_record_id": "table-492", "derivation": "Differentiate the printed heat-content equation term by term; the positive T^-1 term gives a negative T^-2 term, and cal/mol differentiated by kelvin gives cal/(mol·K).",
+    "derivative_of_equation_index": 166
+  },
+  {
+    "formula": "Mn", "phase": "g", "polymorph": null, "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 4.97T - 1,482",
+    "terms": ["a*T", "d"], "coefficients_as_printed": ["4.97", "-1,482"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [298, 3000], "accuracy_as_printed": "0.2 percent",
+    "locator": {"printed_page": 118, "label": "Table 493, Mn(g)"},
+    "source_record_id": "table-493", "gate_cells": [{"temperature_K": 400}, {"temperature_K": 1500}, {"temperature_K": 3000}]
+  },
+  {
+    "formula": "Mn", "phase": "g", "polymorph": null, "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 4.97",
+    "terms": ["a"], "coefficients_as_printed": ["4.97"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [298, 3000], "accuracy_as_printed": null,
+    "locator": {"printed_page": 118, "label": "Table 493, Mn(g)"},
+    "source_record_id": "table-493", "derivation": "Differentiate the printed linear heat-content equation; its derivative is the constant 4.97, and cal/mol differentiated by kelvin gives cal/(mol·K).",
+    "derivative_of_equation_index": 168
   }
 ]
