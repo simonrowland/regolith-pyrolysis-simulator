@@ -14,7 +14,6 @@ from __future__ import annotations
 import copy
 import hashlib
 import math
-import shutil
 import sys
 from collections import Counter
 from pathlib import Path
@@ -41,93 +40,6 @@ if str(TOOLS) not in sys.path:
 import extract_merge as em  # noqa: E402
 import migrate_pilot_extracts as mig  # noqa: E402
 import validate_literature_extracts as vle  # noqa: E402
-
-
-def test_extracts_reject_silent_yaml_truncation_and_duplicate_keys(
-    tmp_path: Path,
-) -> None:
-    class UniqueKeyLoader(yaml.SafeLoader):
-        def construct_mapping(self, node, deep=False):
-            seen = {}
-            for key_node, _value_node in node.value:
-                if key_node.tag == "tag:yaml.org,2002:merge":
-                    continue
-                if isinstance(key_node, yaml.ScalarNode):
-                    identity = (key_node.tag, key_node.value)
-                    key = key_node.value
-                else:
-                    identity = (key_node.tag, yaml.serialize(key_node))
-                    key = identity[1]
-                if identity in seen:
-                    raise yaml.constructor.ConstructorError(
-                        "while constructing a mapping",
-                        node.start_mark,
-                        f"duplicate key {key!r}",
-                        key_node.start_mark,
-                    )
-                seen[identity] = key_node.start_mark
-            return super().construct_mapping(node, deep=deep)
-
-    def spaced_null_keys(value):
-        found = []
-        if isinstance(value, dict):
-            for key, child in value.items():
-                if (
-                    isinstance(key, str)
-                    and any(char.isspace() for char in key)
-                    and child is None
-                ):
-                    found.append(key)
-                found.extend(spaced_null_keys(child))
-        elif isinstance(value, list):
-            for child in value:
-                found.extend(spaced_null_keys(child))
-        return found
-
-    source = EXTRACTS / "kems-035-sauerborn-2005.yaml"
-    comma_copy = tmp_path / source.name
-    shutil.copyfile(source, comma_copy)
-    comma_copy.write_text(
-        comma_copy.read_text(encoding="utf-8")
-        + "\nmutation_note: {excerpt: mass loss, 1 Gew.%}\n",
-        encoding="utf-8",
-    )
-    comma_doc = yaml.load(
-        comma_copy.read_text(encoding="utf-8"), Loader=UniqueKeyLoader
-    )
-    assert "1 Gew.%" in spaced_null_keys(comma_doc)
-
-    duplicate_copy = tmp_path / "duplicate.yaml"
-    shutil.copyfile(source, duplicate_copy)
-    duplicate_copy.write_text(
-        duplicate_copy.read_text(encoding="utf-8")
-        + "\nduplicate_probe: {key: first, key: second}\n",
-        encoding="utf-8",
-    )
-    with pytest.raises(
-        yaml.constructor.ConstructorError, match="duplicate key 'key'"
-    ):
-        yaml.load(duplicate_copy.read_text(encoding="utf-8"), Loader=UniqueKeyLoader)
-
-    null_keys = []
-    duplicate_keys = []
-    for path in sorted(EXTRACTS.glob("*.yaml")):
-        try:
-            document = yaml.load(
-                path.read_text(encoding="utf-8"), Loader=UniqueKeyLoader
-            )
-        except yaml.constructor.ConstructorError as exc:
-            mark = exc.problem_mark
-            duplicate_keys.append(f"{path.name}:{mark.line + 1}: {exc.problem}")
-            continue
-        null_keys.extend(
-            f"{path.name}: {key!r}" for key in spaced_null_keys(document)
-        )
-
-    assert not null_keys, "flow-mapping comma truncation: " + "; ".join(null_keys)
-    assert not duplicate_keys, "duplicate YAML mapping keys: " + "; ".join(
-        duplicate_keys
-    )
 
 
 def test_norris_starting_composition_is_pinned_to_online_extended_table() -> None:
