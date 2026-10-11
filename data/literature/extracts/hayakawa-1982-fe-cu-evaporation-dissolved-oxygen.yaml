@@ -17,22 +17,22 @@ extraction:
   worker: hayakawa82
 review_status: draft
 fidelity_samples:
-- path: species.Fe.observations[hayakawa_1982_table_1_fe_oxygen_evaporation].values.rows[0].mass_loss_rate
+- path: species.Fe.observations[hayakawa_1982_table_1_fe_oxygen_evaporation].values.rows[0].mass_loss_areal_flux
   value: 1.48
   locator: {published_page: 639, pdf_page_index: 3, table: '1', note: 'Row-wise and column-wise image reread: Fe, 1550 °C, initial [O] 0.0087 wt%, evaporation-rate cell 1.48'}
-- path: species.Fe.observations[hayakawa_1982_table_1_fe_oxygen_evaporation].values.rows[8].mass_loss_rate
+- path: species.Fe.observations[hayakawa_1982_table_1_fe_oxygen_evaporation].values.rows[8].mass_loss_areal_flux
   value: 2.35
   locator: {published_page: 639, pdf_page_index: 3, table: '1', note: 'Row-wise and column-wise image reread: Fe, 1580 °C, initial [O] 0.014 wt%, evaporation-rate cell 2.35'}
-- path: species.Fe.observations[hayakawa_1982_table_1_fe_oxygen_evaporation].values.rows[14].mass_loss_rate
+- path: species.Fe.observations[hayakawa_1982_table_1_fe_oxygen_evaporation].values.rows[14].mass_loss_areal_flux
   value: 3.43
   locator: {published_page: 639, pdf_page_index: 3, table: '1', note: 'Row-wise and column-wise image reread: Fe, 1610 °C, initial [O] 0.021 wt%, evaporation-rate cell 3.43'}
-- path: species.Cu.observations[hayakawa_1982_table_2_cu_oxygen_evaporation].values.rows[0].mass_loss_rate
+- path: species.Cu.observations[hayakawa_1982_table_2_cu_oxygen_evaporation].values.rows[0].mass_loss_areal_flux
   value: 0.04
   locator: {published_page: 639, pdf_page_index: 3, table: '2', note: 'Row-wise and column-wise image reread: Cu, 1100 °C, initial [O] 0.011 wt%, evaporation-rate cell 0.04'}
-- path: species.Cu.observations[hayakawa_1982_table_2_cu_oxygen_evaporation].values.rows[4].mass_loss_rate
+- path: species.Cu.observations[hayakawa_1982_table_2_cu_oxygen_evaporation].values.rows[4].mass_loss_areal_flux
   value: 0.67
   locator: {published_page: 639, pdf_page_index: 3, table: '2', note: 'Row-wise and column-wise image reread: Cu, 1230 °C, initial [O] 0.003 wt%, evaporation-rate cell 0.67'}
-- path: species.Cu.observations[hayakawa_1982_table_2_cu_oxygen_evaporation].values.rows[11].mass_loss_rate
+- path: species.Cu.observations[hayakawa_1982_table_2_cu_oxygen_evaporation].values.rows[11].mass_loss_areal_flux
   value: 2.12
   locator: {published_page: 639, pdf_page_index: 3, table: '2', note: 'Row-wise and column-wise image reread: Cu, 1300 °C, initial [O] 0.003 wt%, evaporation-rate cell 2.12'}
 benches:
@@ -245,10 +245,12 @@ species:
         quantity: argon_pressure_dependence_of_iron_evaporation
         method_class: figure_only
         temperature_C: 1550
+        comparison_temperature_C: 1930
+        comparison_attribution: 'W. A. Fischer, D. Janke, and K. Stahlschmidt [3], quoted in this paper; open comparison points'
         sample_initial_oxygen_wt_pct: 0.0052
         x_axis: {quantity: residual argon pressure, units: mmHg, scale: logarithmic, plotted_range_as_axes: '10^-2 to 10^3', stated_study_scan_range: '0.001 to 600'}
         y_axis: {quantity: rate of evaporative loss, units: 'mg cm^-2 sec^-1', scale: logarithmic, plotted_range_as_axes: '6 x 10^-3 to 2 x 10^1'}
-        figure_only_summary: Figure 3 shows the 1550 °C Fe rate nearly independent of argon pressure below about 0.1 mmHg Ar and decreasing as Ar pressure increases above about 0.1 mmHg. The paper identifies about 0.1 mmHg as the critical pressure where gas-phase mass-transfer resistance starts to affect the rate.
+        figure_only_summary: 'Figure 3 shows present-work Fe data as black points at 1550 °C and W. A. Fischer, D. Janke, and K. Stahlschmidt [3] as open comparison points at 1930 °C (their data are quoted in this paper). The present-work rate is nearly independent of argon pressure below about 0.1 mmHg Ar and decreases as Ar pressure increases above about 0.1 mmHg; the paper identifies about 0.1 mmHg as the critical pressure where gas-phase mass-transfer resistance starts to affect the rate. No points are digitised.'
         no_digitisation: true
   Cu:
     observations:

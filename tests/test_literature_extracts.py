@@ -3027,6 +3027,17 @@ def test_fidelity_sample_mutation_reds():
     assert any("mismatch" in e for e in errs), errs
 
 
+def test_hayakawa_fidelity_sample_mutation_reds():
+    path = EXTRACTS / "hayakawa-1982-fe-cu-evaporation-dissolved-oxygen.yaml"
+    doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+    assert vle.check_all_fidelity_samples_match(doc, label="hayakawa-owner") == []
+
+    first_fe_row = doc["species"]["Fe"]["observations"][0]["values"]["rows"][0]
+    first_fe_row["mass_loss_areal_flux"] += 0.5
+    errs = vle.check_all_fidelity_samples_match(doc, label="hayakawa-mutated")
+    assert any("mismatch" in e for e in errs), errs
+
+
 def test_costa_fe_summary_key_is_retired_to_owner_series():
     secondary = load_cached_safe_yaml(
         (EXTRACTS / "costa-jacobson-2015.yaml").read_text(encoding="utf-8")
