@@ -124,8 +124,9 @@ system_conditions:
   temperature_C: 1600
   temperature_locator:
     source_path: corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
-    published_page: 7
-    paragraph: 'experiments conducted at 1600°C'
+    published_pages: '7-8'
+    paragraph: 'experiments conducted at 1600°C; Experimental protocols'
+    note: 'Hydrogen calibration: molybdenum-sheathed Type C thermocouple calibrated against melting Fe 1535°C, Ni 1455°C, and Rh-C eutectic 1657°C at the sample location'
   sample_form: molten CAI4B2 droplets on 1.5- or 2.5-mm diameter Ir-wire loops
   container: Alfa Aesar Ir wire, 99.8%; no crucible during evaporation
   sample_form_locator:
@@ -143,10 +144,6 @@ system_conditions:
   temperature_calibration:
     hydrogen: 'calibrated against melting Fe 1535°C, Ni 1455°C, and Rh-C eutectic 1657°C at the sample location'
   temperature_control: 'vacuum Eurotherm controller within ±1°C; H2 heating rate ~20°C/min and 5 min hold for complete melting'
-  temperature_locator:
-    source_path: corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
-    published_pages: '7-8'
-    paragraph: 'Experimental protocols'
   arms:
     h2_2e-4_bar:
       gas: H2
