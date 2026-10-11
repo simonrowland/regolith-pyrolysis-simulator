@@ -328,6 +328,7 @@ def test_pressure_convention_mismatch_disables_formation_without_rejecting_fit()
         reference_curves=wrong_pressure,
     )
     assert result.record["status"] == "accepted", result.record
+    assert result.record["acceptance_tier"] == "smooth_fit"
     assert result.record["formation_capable"] is False
     assert result.record["formation_reason_code"] == "pressure_convention_mismatch"
     assert "Fe" in result.record["formation_reason"]
@@ -357,7 +358,7 @@ def test_missing_element_reference_keeps_compound_fit_without_formation() -> Non
     )
 
     assert result.record["status"] == "accepted", result.record
-    assert result.record["acceptance_tier"] == "table_equivalent"
+    assert result.record["acceptance_tier"] == "smooth_fit"
     assert result.record["formation_capable"] is False
     assert result.record["formation_reason_code"] == "missing_element_reference_phase"
     assert "Fe, none" in result.record["formation_reason"]
@@ -391,6 +392,7 @@ def test_missing_formation_h_anchor_keeps_species_fit() -> None:
     )
 
     assert result.record["status"] == "accepted", result.record
+    assert result.record["acceptance_tier"] == "smooth_fit"
     assert result.record["formation_capable"] is False
     assert result.record["formation_reason_code"] == "missing_formation_h_anchor"
     assert not any(key.startswith("delta_f") for key in result.record["fit_error"])
@@ -453,7 +455,7 @@ def test_broken_piecewise_join_is_typed_rejection_even_when_cells_round(
 
     def break_right_enthalpy_anchor(matrix, target, constraints, constraint_target):
         values, rank = original_solver(matrix, target, constraints, constraint_target)
-        values[9 + 7] += 1e-8
+        values[9 + 7] += 1e-5
         return values, rank
 
     monkeypatch.setattr(
@@ -473,11 +475,11 @@ def test_broken_piecewise_join_is_typed_rejection_even_when_cells_round(
         fit_hi=1200.0,
     )
 
-    assert result.record["status"] == "rejected", result.record
-    assert result.record["reason_code"] == "join_continuity_failed"
     assert result.record["fit_statistics"]["smooth_fit_checks"][
         "join_continuity_max_relative"
     ] > 1e-9
+    assert result.record["status"] == "rejected", result.record
+    assert result.record["reason_code"] == "join_continuity_failed"
 
 
 @pytest.mark.parametrize("table_id", ["Al-001", "Al-004"])

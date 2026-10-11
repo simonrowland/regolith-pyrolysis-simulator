@@ -880,6 +880,14 @@ def _fit_piecewise_candidate(
         "delta_fH_kJ_per_mol": [],
         "delta_fG_kJ_per_mol": [],
     }
+    formation_precision_failures: list[dict[str, Any]] = []
+    formation_precision_complete = True
+    formation_cells = tuple(
+        cell
+        for quantity in (Quantity.DELTA_FH, Quantity.DELTA_FG)
+        for cell in channels.get(quantity, ())
+        if fit_lo <= cell.temperature_K <= fit_hi
+    )
     if formation_capable:
         for quantity, result_key in (
             (Quantity.DELTA_FH, "delta_fH_kJ_per_mol"),
@@ -909,11 +917,22 @@ def _fit_piecewise_candidate(
                         for coefficient, h_ref, g_ref in resolved
                     ]
                 derived = formation_subtraction_kJ_mol(species_property, references)
-                formation_residuals[result_key].append(derived - cell.value)
+                residual = derived - cell.value
+                formation_residuals[result_key].append(residual)
+                if cell.raw_token is None or cell.uncertainty is None:
+                    formation_precision_complete = False
+                elif abs(residual) > cell.uncertainty:
+                    formation_precision_failures.append({
+                        "quantity": quantity.value,
+                        "T_K": cell.temperature_K,
+                        "residual": residual,
+                        "allowance": cell.uncertainty,
+                    })
             if not formation_capable:
                 break
 
     if formation_capable:
+        over_precision.extend(formation_precision_failures)
         fit_statistics["derived_formation_H_kJ_per_mol"] = _residual_stats(
             formation_residuals["delta_fH_kJ_per_mol"]
         )
@@ -921,6 +940,7 @@ def _fit_piecewise_candidate(
             formation_residuals["delta_fG_kJ_per_mol"]
         )
     else:
+        formation_precision_complete = False
         formation_residuals["delta_fH_kJ_per_mol"].clear()
         formation_residuals["delta_fG_kJ_per_mol"].clear()
     cp_node_residuals = [
@@ -1030,7 +1050,15 @@ def _fit_piecewise_candidate(
         ratio is not None and ratio <= 1.0 for ratio in s_integral_ratios
     )
     ring_pass = not ring_failures
-    t1_pass = not failed_cells and ring_pass and positive_cp
+    formation_t1_pass = not formation_cells or (
+        formation_capable and formation_precision_complete
+    )
+    t1_pass = (
+        not failed_cells
+        and ring_pass
+        and positive_cp
+        and formation_t1_pass
+    )
     t2_pass = (
         ring_pass
         and positive_cp
