@@ -89,7 +89,6 @@ def test_sato_1976_migrates_all_numeric_table_cells() -> None:
     table1 = extract["species"]["O2"]["observations"]
     assert len(table1) == 11
     assert all("condition_as_published" in row["values"] for row in table1)
-    assert all("log_fO2" not in point for row in table1 for point in row["values"]["series"])
 
     migrator = battery_migrate.Migrator(root=REPO_ROOT)
     migrator._migrate_extract(source)
@@ -115,6 +114,58 @@ def test_sato_1976_migrates_all_numeric_table_cells() -> None:
     assert natural.experiment_id != added_fe.experiment_id
     assert migrator.result.experiments[natural.experiment_id].method.value.value == "emf_cell"
     assert migrator.result.experiments[added_fe.experiment_id].method.value.value == "emf_cell"
+
+    from decimal import Decimal
+
+    from simulator.battery.waypoints import oxygen_condition
+    from tests.battery.test_waypoints import _bench
+
+    source_cells = {}
+    bench = _bench()
+    for row in table1:
+        condition = "added_Fe" if "added_fe" in row["observation_id"] else "natural"
+        printed_key = (
+            "minus_log_fO2_atm_with_added_Fe"
+            if condition == "added_Fe"
+            else "minus_log_fO2_atm"
+        )
+        sample = row["values"]["sample_number_as_printed"]
+        for point in row["values"]["series"]:
+            printed_minus_log = Decimal(point[printed_key])
+            expected_log = -printed_minus_log
+            assert point["log_fO2"] == {
+                "value": str(expected_log),
+                "units": "log10(atm)",
+            }
+            key = (
+                sample,
+                Decimal(str(point["T_C"])) + Decimal("273.15"),
+                condition,
+            )
+            assert key not in source_cells
+            source_cells[key] = (row, point, expected_log)
+
+    assert len(source_cells) == 55
+    for key, (row, point, expected_log) in source_cells.items():
+        sample, temperature, condition = key
+        matches = [
+            obs
+            for obs in observations
+            if row["observation_id"] in obs.observation_id
+            and obs.identity.temperature_K.value == temperature
+        ]
+        assert len(matches) == 1, (sample, temperature, condition)
+        observation = matches[0]
+        assert observation.experiment_id.endswith(f"::{row['experiment']}")
+        assert f"row={sample}" in observation.locator.note
+        located_log = observation.point_conditions["fO2_log"]
+        assert located_log.state.value == expected_log
+        route = oxygen_condition(
+            migrator.result.experiments[observation.experiment_id], bench, observation
+        )
+        assert route.selected is not None
+        assert route.selected.route == "observation_fO2_log"
+        assert route.selected.value.point == expected_log
 
 
 def test_van_limpt_k2o_series_uses_section_and_figure_provenance() -> None:

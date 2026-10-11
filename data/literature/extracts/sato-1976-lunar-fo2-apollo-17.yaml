@@ -64,18 +64,23 @@ species:
           series:
             - T_C: 1000
               minus_log_fO2_atm: '15.65'
+              log_fO2: {value: '-15.65', units: 'log10(atm)'}
               fugacity_Pa: '2.2683842E-11'
             - T_C: 1050
               minus_log_fO2_atm: '14.65'
+              log_fO2: {value: '-14.65', units: 'log10(atm)'}
               fugacity_Pa: '2.2683842E-10'
             - T_C: 1100
               minus_log_fO2_atm: '13.86'
+              log_fO2: {value: '-13.86', units: 'log10(atm)'}
               fugacity_Pa: '1.3986744E-9'
             - T_C: 1150
               minus_log_fO2_atm: '13.16'
+              log_fO2: {value: '-13.16', units: 'log10(atm)'}
               fugacity_Pa: '7.0099773E-9'
             - T_C: 1200
               minus_log_fO2_atm: '12.52'
+              log_fO2: {value: '-12.52', units: 'log10(atm)'}
               fugacity_Pa: '3.0599661E-8'
         uncertainty: 'The accuracy of the values is probably +/- 0.1 log fO2 unit.'
         equipment: {}
@@ -96,11 +101,11 @@ species:
           gas_conditions_as_published: {state: {tag: unknown, reason: not_published}, locator: {page: 1324, section: Experimental Method, note: no cell gas composition or gas condition is specified}}
           fugacity_conversion: 'Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-minus_log_fO2_atm_with_added_Fe); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa. Parenthesized source values are retained.'
           series:
-            - {T_C: 1000, minus_log_fO2_atm_with_added_Fe: '15.82', fugacity_Pa: '1.5336159E-11'}
-            - {T_C: 1050, minus_log_fO2_atm_with_added_Fe: '15.04', fugacity_Pa: '9.2409498E-11'}
-            - {T_C: 1100, minus_log_fO2_atm_with_added_Fe: '14.26', fugacity_Pa: '5.5682229E-10'}
-            - {T_C: 1150, minus_log_fO2_atm_with_added_Fe: '13.60', fugacity_Pa: '2.5451689E-9'}
-            - {T_C: 1200, minus_log_fO2_atm_with_added_Fe: '13.04', fugacity_Pa: '9.2409498E-9'}
+            - {T_C: 1000, minus_log_fO2_atm_with_added_Fe: '15.82', log_fO2: {value: '-15.82', units: 'log10(atm)'}, fugacity_Pa: '1.5336159E-11'}
+            - {T_C: 1050, minus_log_fO2_atm_with_added_Fe: '15.04', log_fO2: {value: '-15.04', units: 'log10(atm)'}, fugacity_Pa: '9.2409498E-11'}
+            - {T_C: 1100, minus_log_fO2_atm_with_added_Fe: '14.26', log_fO2: {value: '-14.26', units: 'log10(atm)'}, fugacity_Pa: '5.5682229E-10'}
+            - {T_C: 1150, minus_log_fO2_atm_with_added_Fe: '13.60', log_fO2: {value: '-13.60', units: 'log10(atm)'}, fugacity_Pa: '2.5451689E-9'}
+            - {T_C: 1200, minus_log_fO2_atm_with_added_Fe: '13.04', log_fO2: {value: '-13.04', units: 'log10(atm)'}, fugacity_Pa: '9.2409498E-9'}
         uncertainty: 'The accuracy of the values is probably +/- 0.1 log fO2 unit.'
         equipment: {}
       - observation_id: sato_1976_table1_74275_39
@@ -130,18 +135,23 @@ species:
           series:
             - T_C: 1000
               minus_log_fO2_atm: '15.26'
+              log_fO2: {value: '-15.26', units: 'log10(atm)'}
               fugacity_Pa: '5.5682229E-11'
             - T_C: 1050
               minus_log_fO2_atm: '14.30'
+              log_fO2: {value: '-14.30', units: 'log10(atm)'}
               fugacity_Pa: '5.0782796E-10'
             - T_C: 1100
               minus_log_fO2_atm: '13.59'
+              log_fO2: {value: '-13.59', units: 'log10(atm)'}
               fugacity_Pa: '2.6044535E-9'
             - T_C: 1150
               minus_log_fO2_atm: '12.97'
+              log_fO2: {value: '-12.97', units: 'log10(atm)'}
               fugacity_Pa: '1.0857169E-8'
             - T_C: 1200
               minus_log_fO2_atm: '12.40'
+              log_fO2: {value: '-12.40', units: 'log10(atm)'}
               fugacity_Pa: '4.0338209E-8'
         uncertainty: 'The accuracy of the values is probably +/- 0.1 log fO2 unit.'
         equipment: {}
@@ -162,11 +172,11 @@ species:
           gas_conditions_as_published: {state: {tag: unknown, reason: not_published}, locator: {page: 1324, section: Experimental Method, note: no cell gas composition or gas condition is specified}}
           fugacity_conversion: 'Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-minus_log_fO2_atm_with_added_Fe); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa. Parenthesized source values are retained.'
           series:
-            - {T_C: 1000, minus_log_fO2_atm_with_added_Fe: '15.58', fugacity_Pa: '2.6651190E-11'}
-            - {T_C: 1050, minus_log_fO2_atm_with_added_Fe: '14.80', fugacity_Pa: '1.6058930E-10'}
-            - {T_C: 1100, minus_log_fO2_atm_with_added_Fe: '14.04', fugacity_Pa: '9.2409498E-10'}
-            - {T_C: 1150, minus_log_fO2_atm_with_added_Fe: '13.38', fugacity_Pa: '4.2239290E-9'}
-            - {T_C: 1200, minus_log_fO2_atm_with_added_Fe: '12.83', fugacity_Pa: '1.4987066E-8'}
+            - {T_C: 1000, minus_log_fO2_atm_with_added_Fe: '15.58', log_fO2: {value: '-15.58', units: 'log10(atm)'}, fugacity_Pa: '2.6651190E-11'}
+            - {T_C: 1050, minus_log_fO2_atm_with_added_Fe: '14.80', log_fO2: {value: '-14.80', units: 'log10(atm)'}, fugacity_Pa: '1.6058930E-10'}
+            - {T_C: 1100, minus_log_fO2_atm_with_added_Fe: '14.04', log_fO2: {value: '-14.04', units: 'log10(atm)'}, fugacity_Pa: '9.2409498E-10'}
+            - {T_C: 1150, minus_log_fO2_atm_with_added_Fe: '13.38', log_fO2: {value: '-13.38', units: 'log10(atm)'}, fugacity_Pa: '4.2239290E-9'}
+            - {T_C: 1200, minus_log_fO2_atm_with_added_Fe: '12.83', log_fO2: {value: '-12.83', units: 'log10(atm)'}, fugacity_Pa: '1.4987066E-8'}
         uncertainty: 'The accuracy of the values is probably +/- 0.1 log fO2 unit.'
         equipment: {}
       - observation_id: sato_1976_table1_12009_35
@@ -189,11 +199,11 @@ species:
             reason: not_published
             pointer: Sato, Hickling, and McLane (1973), Oxygen fugacity values of Apollo 12, 14, and 15 lunar samples and reduced state of lunar magmas; Table 1 dagger attributes these values to this source (pp. 1326, 1343)
           series:
-            - {T_C: 1000, minus_log_fO2_atm: '15.6', fugacity_Pa: '2.5451689E-11'}
-            - {T_C: 1050, minus_log_fO2_atm: '14.8', fugacity_Pa: '1.6058930E-10'}
-            - {T_C: 1100, minus_log_fO2_atm: '14.0', fugacity_Pa: '1.0132500E-9'}
-            - {T_C: 1150, minus_log_fO2_atm: '13.4', fugacity_Pa: '4.0338209E-9'}
-            - {T_C: 1200, minus_log_fO2_atm: '12.8', fugacity_Pa: '1.6058930E-8'}
+            - {T_C: 1000, minus_log_fO2_atm: '15.6', log_fO2: {value: '-15.6', units: 'log10(atm)'}, fugacity_Pa: '2.5451689E-11'}
+            - {T_C: 1050, minus_log_fO2_atm: '14.8', log_fO2: {value: '-14.8', units: 'log10(atm)'}, fugacity_Pa: '1.6058930E-10'}
+            - {T_C: 1100, minus_log_fO2_atm: '14.0', log_fO2: {value: '-14.0', units: 'log10(atm)'}, fugacity_Pa: '1.0132500E-9'}
+            - {T_C: 1150, minus_log_fO2_atm: '13.4', log_fO2: {value: '-13.4', units: 'log10(atm)'}, fugacity_Pa: '4.0338209E-9'}
+            - {T_C: 1200, minus_log_fO2_atm: '12.8', log_fO2: {value: '-12.8', units: 'log10(atm)'}, fugacity_Pa: '1.6058930E-8'}
         uncertainty: 'The accuracy of the values is probably +/- 0.1 log fO2 unit.'
         equipment: {}
       - observation_id: sato_1976_table1_added_fe_12009_35
@@ -212,11 +222,11 @@ species:
           gas_conditions_as_published: {state: {tag: unknown, reason: not_published}, locator: {page: 1326, table: '1', note: earlier measurements are attributed to Sato et al. (1973); gas condition is not stated here}}
           fugacity_conversion: 'Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-minus_log_fO2_atm_with_added_Fe); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa.'
           series:
-            - {T_C: 1000, minus_log_fO2_atm_with_added_Fe: '16.0', fugacity_Pa: '1.0132500E-11'}
-            - {T_C: 1050, minus_log_fO2_atm_with_added_Fe: '15.0', fugacity_Pa: '1.0132500E-10'}
-            - {T_C: 1100, minus_log_fO2_atm_with_added_Fe: '14.4', fugacity_Pa: '4.0338209E-10'}
-            - {T_C: 1150, minus_log_fO2_atm_with_added_Fe: '13.7', fugacity_Pa: '2.0216995E-9'}
-            - {T_C: 1200, minus_log_fO2_atm_with_added_Fe: '13.0', fugacity_Pa: '1.0132500E-8'}
+            - {T_C: 1000, minus_log_fO2_atm_with_added_Fe: '16.0', log_fO2: {value: '-16.0', units: 'log10(atm)'}, fugacity_Pa: '1.0132500E-11'}
+            - {T_C: 1050, minus_log_fO2_atm_with_added_Fe: '15.0', log_fO2: {value: '-15.0', units: 'log10(atm)'}, fugacity_Pa: '1.0132500E-10'}
+            - {T_C: 1100, minus_log_fO2_atm_with_added_Fe: '14.4', log_fO2: {value: '-14.4', units: 'log10(atm)'}, fugacity_Pa: '4.0338209E-10'}
+            - {T_C: 1150, minus_log_fO2_atm_with_added_Fe: '13.7', log_fO2: {value: '-13.7', units: 'log10(atm)'}, fugacity_Pa: '2.0216995E-9'}
+            - {T_C: 1200, minus_log_fO2_atm_with_added_Fe: '13.0', log_fO2: {value: '-13.0', units: 'log10(atm)'}, fugacity_Pa: '1.0132500E-8'}
         uncertainty: 'The accuracy of the values is probably +/- 0.1 log fO2 unit.'
         equipment: {}
       - observation_id: sato_1976_table1_12053_89
@@ -239,11 +249,11 @@ species:
             reason: not_published
             pointer: Sato, Hickling, and McLane (1973), Oxygen fugacity values of Apollo 12, 14, and 15 lunar samples and reduced state of lunar magmas; Table 1 dagger attributes these values to this source (pp. 1326, 1343)
           series:
-            - {T_C: 1000, minus_log_fO2_atm: '15.4', fugacity_Pa: '4.0338209E-11'}
-            - {T_C: 1050, minus_log_fO2_atm: '14.6', fugacity_Pa: '2.5451689E-10'}
-            - {T_C: 1100, minus_log_fO2_atm: '13.8', fugacity_Pa: '1.6058930E-9'}
-            - {T_C: 1150, minus_log_fO2_atm: '13.0', fugacity_Pa: '1.0132500E-8'}
-            - {T_C: 1200, minus_log_fO2_atm: '12.3', fugacity_Pa: '5.0782796E-8'}
+            - {T_C: 1000, minus_log_fO2_atm: '15.4', log_fO2: {value: '-15.4', units: 'log10(atm)'}, fugacity_Pa: '4.0338209E-11'}
+            - {T_C: 1050, minus_log_fO2_atm: '14.6', log_fO2: {value: '-14.6', units: 'log10(atm)'}, fugacity_Pa: '2.5451689E-10'}
+            - {T_C: 1100, minus_log_fO2_atm: '13.8', log_fO2: {value: '-13.8', units: 'log10(atm)'}, fugacity_Pa: '1.6058930E-9'}
+            - {T_C: 1150, minus_log_fO2_atm: '13.0', log_fO2: {value: '-13.0', units: 'log10(atm)'}, fugacity_Pa: '1.0132500E-8'}
+            - {T_C: 1200, minus_log_fO2_atm: '12.3', log_fO2: {value: '-12.3', units: 'log10(atm)'}, fugacity_Pa: '5.0782796E-8'}
         uncertainty: 'The accuracy of the values is probably +/- 0.1 log fO2 unit.'
         equipment: {}
       - observation_id: sato_1976_table1_added_fe_12053_89
@@ -262,11 +272,11 @@ species:
           gas_conditions_as_published: {state: {tag: unknown, reason: not_published}, locator: {page: 1326, table: '1', note: earlier measurements are attributed to Sato et al. (1973); gas condition is not stated here}}
           fugacity_conversion: 'Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-minus_log_fO2_atm_with_added_Fe); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa.'
           series:
-            - {T_C: 1000, minus_log_fO2_atm_with_added_Fe: '16.0', fugacity_Pa: '1.0132500E-11'}
-            - {T_C: 1050, minus_log_fO2_atm_with_added_Fe: '15.2', fugacity_Pa: '6.3931753E-11'}
-            - {T_C: 1100, minus_log_fO2_atm_with_added_Fe: '14.5', fugacity_Pa: '3.2041778E-10'}
-            - {T_C: 1150, minus_log_fO2_atm_with_added_Fe: '13.8', fugacity_Pa: '1.6058930E-9'}
-            - {T_C: 1200, minus_log_fO2_atm_with_added_Fe: '13.1', fugacity_Pa: '8.0485308E-9'}
+            - {T_C: 1000, minus_log_fO2_atm_with_added_Fe: '16.0', log_fO2: {value: '-16.0', units: 'log10(atm)'}, fugacity_Pa: '1.0132500E-11'}
+            - {T_C: 1050, minus_log_fO2_atm_with_added_Fe: '15.2', log_fO2: {value: '-15.2', units: 'log10(atm)'}, fugacity_Pa: '6.3931753E-11'}
+            - {T_C: 1100, minus_log_fO2_atm_with_added_Fe: '14.5', log_fO2: {value: '-14.5', units: 'log10(atm)'}, fugacity_Pa: '3.2041778E-10'}
+            - {T_C: 1150, minus_log_fO2_atm_with_added_Fe: '13.8', log_fO2: {value: '-13.8', units: 'log10(atm)'}, fugacity_Pa: '1.6058930E-9'}
+            - {T_C: 1200, minus_log_fO2_atm_with_added_Fe: '13.1', log_fO2: {value: '-13.1', units: 'log10(atm)'}, fugacity_Pa: '8.0485308E-9'}
         uncertainty: 'The accuracy of the values is probably +/- 0.1 log fO2 unit.'
         equipment: {}
       - observation_id: sato_1976_table1_15595_25
@@ -289,11 +299,11 @@ species:
             reason: not_published
             pointer: Sato, Hickling, and McLane (1973), Oxygen fugacity values of Apollo 12, 14, and 15 lunar samples and reduced state of lunar magmas; Table 1 dagger attributes these values to this source (pp. 1326, 1343)
           series:
-            - {T_C: 1000, minus_log_fO2_atm: '15.7', fugacity_Pa: '2.0216995E-11'}
-            - {T_C: 1050, minus_log_fO2_atm: '14.9', fugacity_Pa: '1.2756062E-10'}
-            - {T_C: 1100, minus_log_fO2_atm: '14.1', fugacity_Pa: '8.0485308E-10'}
-            - {T_C: 1150, minus_log_fO2_atm: '13.2', fugacity_Pa: '6.3931753E-9'}
-            - {T_C: 1200, minus_log_fO2_atm: '12.4', fugacity_Pa: '4.0338209E-8'}
+            - {T_C: 1000, minus_log_fO2_atm: '15.7', log_fO2: {value: '-15.7', units: 'log10(atm)'}, fugacity_Pa: '2.0216995E-11'}
+            - {T_C: 1050, minus_log_fO2_atm: '14.9', log_fO2: {value: '-14.9', units: 'log10(atm)'}, fugacity_Pa: '1.2756062E-10'}
+            - {T_C: 1100, minus_log_fO2_atm: '14.1', log_fO2: {value: '-14.1', units: 'log10(atm)'}, fugacity_Pa: '8.0485308E-10'}
+            - {T_C: 1150, minus_log_fO2_atm: '13.2', log_fO2: {value: '-13.2', units: 'log10(atm)'}, fugacity_Pa: '6.3931753E-9'}
+            - {T_C: 1200, minus_log_fO2_atm: '12.4', log_fO2: {value: '-12.4', units: 'log10(atm)'}, fugacity_Pa: '4.0338209E-8'}
         uncertainty: 'The accuracy of the values is probably +/- 0.1 log fO2 unit.'
         equipment: {}
       - observation_id: sato_1976_table1_added_fe_15595_25
@@ -312,11 +322,11 @@ species:
           gas_conditions_as_published: {state: {tag: unknown, reason: not_published}, locator: {page: 1326, table: '1', note: earlier measurements are attributed to Sato et al. (1973); gas condition is not stated here}}
           fugacity_conversion: 'Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-minus_log_fO2_atm_with_added_Fe); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa.'
           series:
-            - {T_C: 1000, minus_log_fO2_atm_with_added_Fe: '16.0', fugacity_Pa: '1.0132500E-11'}
-            - {T_C: 1050, minus_log_fO2_atm_with_added_Fe: '15.1', fugacity_Pa: '8.0485308E-11'}
-            - {T_C: 1100, minus_log_fO2_atm_with_added_Fe: '14.2', fugacity_Pa: '6.3931753E-10'}
-            - {T_C: 1150, minus_log_fO2_atm_with_added_Fe: '13.4', fugacity_Pa: '4.0338209E-9'}
-            - {T_C: 1200, minus_log_fO2_atm_with_added_Fe: '12.7', fugacity_Pa: '2.0216995E-8'}
+            - {T_C: 1000, minus_log_fO2_atm_with_added_Fe: '16.0', log_fO2: {value: '-16.0', units: 'log10(atm)'}, fugacity_Pa: '1.0132500E-11'}
+            - {T_C: 1050, minus_log_fO2_atm_with_added_Fe: '15.1', log_fO2: {value: '-15.1', units: 'log10(atm)'}, fugacity_Pa: '8.0485308E-11'}
+            - {T_C: 1100, minus_log_fO2_atm_with_added_Fe: '14.2', log_fO2: {value: '-14.2', units: 'log10(atm)'}, fugacity_Pa: '6.3931753E-10'}
+            - {T_C: 1150, minus_log_fO2_atm_with_added_Fe: '13.4', log_fO2: {value: '-13.4', units: 'log10(atm)'}, fugacity_Pa: '4.0338209E-9'}
+            - {T_C: 1200, minus_log_fO2_atm_with_added_Fe: '12.7', log_fO2: {value: '-12.7', units: 'log10(atm)'}, fugacity_Pa: '2.0216995E-8'}
         uncertainty: 'The accuracy of the values is probably +/- 0.1 log fO2 unit.'
         equipment: {}
       - observation_id: sato_1976_table1_15058_81
@@ -340,11 +350,11 @@ species:
           gas_conditions_as_published: {state: {tag: unknown, reason: not_published}, locator: {page: 1324, section: Experimental Method, note: no cell gas composition or gas condition is specified}}
           fugacity_conversion: 'Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-minus_log_fO2_atm); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa. Printed -log fO2 retained.'
           series:
-            - {T_C: 1000, minus_log_fO2_atm: '15.7', fugacity_Pa: '2.0216995E-11'}
-            - {T_C: 1050, minus_log_fO2_atm: '14.9', fugacity_Pa: '1.2756062E-10'}
-            - {T_C: 1100, minus_log_fO2_atm: '14.0', fugacity_Pa: '1.0132500E-9'}
-            - {T_C: 1150, minus_log_fO2_atm: '13.3', fugacity_Pa: '5.0782796E-9'}
-            - {T_C: 1200, minus_log_fO2_atm: '12.6', fugacity_Pa: '2.5451689E-8'}
+            - {T_C: 1000, minus_log_fO2_atm: '15.7', log_fO2: {value: '-15.7', units: 'log10(atm)'}, fugacity_Pa: '2.0216995E-11'}
+            - {T_C: 1050, minus_log_fO2_atm: '14.9', log_fO2: {value: '-14.9', units: 'log10(atm)'}, fugacity_Pa: '1.2756062E-10'}
+            - {T_C: 1100, minus_log_fO2_atm: '14.0', log_fO2: {value: '-14.0', units: 'log10(atm)'}, fugacity_Pa: '1.0132500E-9'}
+            - {T_C: 1150, minus_log_fO2_atm: '13.3', log_fO2: {value: '-13.3', units: 'log10(atm)'}, fugacity_Pa: '5.0782796E-9'}
+            - {T_C: 1200, minus_log_fO2_atm: '12.6', log_fO2: {value: '-12.6', units: 'log10(atm)'}, fugacity_Pa: '2.5451689E-8'}
         uncertainty: 'The accuracy of the values is probably +/- 0.1 log fO2 unit.'
         equipment: {}
   FeO:
