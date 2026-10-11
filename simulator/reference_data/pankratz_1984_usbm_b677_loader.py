@@ -44,7 +44,20 @@ def load_published_curves(root: Path = COMPILATION_ROOT) -> tuple[dict, ...]:
         record = records[curve["source_record_id"]]
         residuals = []
         for row_index, temperature in zip(curve["source_cell_rows"], curve["gate_temperatures_K"]):
-            cells = record["rows"][row_index]["cells"]
+            bound_row = record["rows"][row_index]
+            cells = bound_row["cells"]
+            if cells[0]["value"] != temperature:
+                results.append({**curve, "record_kind": "published_curve_fit", "gate": {
+                    "status": "transcription_gate_failed", "reason": "gate_row_temperature_mismatch", "residuals": []}})
+                break
+            duplicate_rows = [row for row in record["rows"] if row["cells"][0]["value"] == temperature]
+            if len(duplicate_rows) > 1:
+                phase_by_position = ("c", "l")
+                phase = phase_by_position[duplicate_rows.index(bound_row)] if duplicate_rows.index(bound_row) < 2 else None
+                if phase != curve["phase"]:
+                    results.append({**curve, "record_kind": "published_curve_fit", "gate": {
+                        "status": "transcription_gate_failed", "reason": "gate_row_phase_mismatch", "residuals": []}})
+                    break
             predicted = _evaluate(curve, temperature)
             observed = Decimal(str(cells[curve["source_cell_column"]]["value"]))
             if curve["quantity"] == "heat_content_increment":
@@ -61,6 +74,8 @@ def load_published_curves(root: Path = COMPILATION_ROOT) -> tuple[dict, ...]:
                 "tolerance": float(tolerance),
             })
         passed = three_cell_gate_passes(residuals)
+        if len(residuals) != len(curve["source_cell_rows"]):
+            continue
         results.append({
             **curve,
             "record_kind": "published_curve_fit",

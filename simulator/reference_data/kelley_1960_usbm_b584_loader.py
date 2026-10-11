@@ -104,13 +104,19 @@ def _gate_heat_content(curve: dict[str, Any], record: dict[str, Any]) -> dict[st
         if "source_row_index" in cell:
             printed = record["rows"][cell["source_row_index"]]["cells"]
             if printed["temperature"]["value"] != cell["temperature_K"]:
-                raise ValueError("published-curve gate row does not match its temperature")
+                return _gate_binding_failure(curve, "gate_row_temperature_mismatch")
         else:
-            printed = next(
-                row["cells"]
-                for row in record["rows"]
-                if row["cells"]["temperature"]["value"] == cell["temperature_K"]
-            )
+            matches = [row for row in record["rows"]
+                       if row["cells"]["temperature"]["value"] == cell["temperature_K"]]
+            if not matches:
+                return _gate_binding_failure(curve, "gate_row_temperature_mismatch")
+            printed = next((row["cells"] for row in matches
+                            if _b584_row_phase(row) == curve["phase"]), matches[0]["cells"])
+        same_temperature = [row for row in record["rows"]
+                            if row["cells"]["temperature"]["value"] == cell["temperature_K"]]
+        bound_phase = _b584_row_phase({"cells": printed})
+        if len(same_temperature) > 1 and bound_phase is not None and bound_phase != curve["phase"]:
+            return _gate_binding_failure(curve, "gate_row_phase_mismatch")
         observed = printed["heat_content"]["value"]
         accuracy_percent = (
             float(curve["accuracy_as_printed"].split()[0]) / 100
@@ -127,6 +133,19 @@ def _gate_heat_content(curve: dict[str, Any], record: dict[str, Any]) -> dict[st
                               "kind": "printed_heat_content_cells",
                               "reason": None if passed else "transcription_gate_failed" if len(residuals) >= 3 else "no_independent_check",
                               "residuals": residuals}}
+
+
+def _b584_row_phase(row: dict[str, Any]) -> str | None:
+    marker = row["cells"]["temperature"].get("footnote_or_leader_marker", "")
+    for phase in ("c", "l", "g"):
+        if f"({phase})" in marker or f"({phase})" in row["cells"]["temperature"]["raw"]:
+            return phase
+    return None
+
+
+def _gate_binding_failure(curve: dict[str, Any], reason: str) -> dict[str, Any]:
+    return {**curve, "gate": {"status": "transcription_gate_failed", "kind": "printed_heat_content_cells",
+                              "reason": reason, "residuals": []}}
 
 
 def _printed_decimals(token: str) -> int:
