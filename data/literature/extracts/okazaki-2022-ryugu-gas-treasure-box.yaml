@@ -13,13 +13,13 @@ extraction:
 review_status: draft
 corrections: []
 fidelity_samples:
-- path: species.He.observations.okazaki_2022_container_helium_isotope_ratio.values.ratio_3He_4He
-  value: '1.428 +/- 0.010 x 10^-4'
+- path: species.He.observations[okazaki_2022_container_helium_isotope_ratio].values.ratio_3He_4He
+  value: '1.428 x 10^-4'
   locator:
     published_page: 3
     figure: '2'
     note: weighted arithmetic mean of measured container-gas 3He/4He ratios; printed uncertainty is 1 sigma in Fig. 2 discussion
-- path: species.Ryugu_sample.observations.okazaki_2022_recovered_mass_density_size.values.total_recovered_mass_g
+- path: species.Ryugu_sample_container.observations[okazaki_2022_recovered_mass_density_size].values.total_recovered_mass_g
   value: 5.4
   locator:
     published_page: 5
