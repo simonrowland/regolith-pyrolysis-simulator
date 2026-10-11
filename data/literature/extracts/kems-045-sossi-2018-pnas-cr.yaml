@@ -564,6 +564,13 @@ species:
       values:
         quantity: delta_53Cr_Moon_minus_Earth
         method_class: model_derived
+        derived_from: &sossi_2018_delta_difference_inputs
+        - kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_bse_filtered_mean_model
+        - kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_moon_filtered_mean_model
+        derivation:
+          inputs: *sossi_2018_delta_difference_inputs
+          relation: Difference of the filtered lunar and bulk-silicate-Earth means, Delta53Cr Moon-Earth (p. 10922).
+          output_unit: permil
         delta_53Cr_Moon_minus_Earth_permil: -0.1
         earth_delta_53Cr_permil_2se: -0.11
         earth_n: 36
@@ -695,7 +702,9 @@ species:
           is from Moynier et al. 2011 (ref. 39).
       values:
         quantity: Delta53Cr_mineral_melt
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: 'Moynier, Yin and Schauble 2011, Science 331:1417–1420 (ref. 39)'
         prefactor_1e6_over_T2_Cr3plus_minus_Cr2plus: 0.35
         prefactor_cited_as: Moynier, Yin and Schauble 2011 Science 331:1417-1420 (ref. 39)
         Delta53Cr_chromite_minus_melt_permil_1200C: 0.16
@@ -769,6 +778,17 @@ species:
       values:
         quantity: evaporation_T_fO2_window_and_vapor_delta53Cr
         method_class: model_derived
+        derived_from: &sossi_2018_vapor_window_inputs
+        - kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_bse_filtered_mean_model
+        - kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_moon_filtered_mean_model
+        - kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_cr_abundance_moon_earth_model
+        - kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_eq3_fractionation_model
+        - kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_CrO2_stability_quoted_janaf
+        - kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_visscher_fegley_fO2_quoted
+        derivation:
+          inputs: *sossi_2018_vapor_window_inputs
+          relation: Vapor isotope composition follows the Eq. 4 mass balance from Earth and Moon means and lunar Cr retention; the temperature inversion uses Eq. 3 and the adopted thermodynamic fO2 constraint (p. 10923, Fig. 2).
+          output_unit: K, permil, fO2 buffer offset
         delta_53Cr_system_permil: -0.11
         delta_53Cr_silicate_moon_permil: -0.21
         f_Cr_silicate_moon: 0.84
