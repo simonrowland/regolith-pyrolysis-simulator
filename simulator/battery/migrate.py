@@ -5063,6 +5063,9 @@ class CompilationColumnSeries:
     value: Value
     temperature_K: State[Decimal]
     unit_trail: str | None = None
+    raw_tokens: tuple[str | None, ...] = ()
+    source_units: tuple[str | None, ...] = ()
+    cell_uncertainties: tuple[Decimal | None, ...] = ()
 
 
 def _normalize_compilation_column_label(label: str) -> str:
@@ -5140,6 +5143,46 @@ def _cell_numeric_amount(cell: object) -> Decimal | None:
     return _as_dec_or_none(cell)
 
 
+def _printed_cell_token(cell: object) -> str | None:
+    if isinstance(cell, Mapping):
+        token = cell.get("as_published")
+        return str(token) if token not in (None, "") else None
+    return str(cell) if isinstance(cell, str) and cell.strip() else None
+
+
+def _source_unit_for_cell(cell: object, default: str | None) -> str | None:
+    if isinstance(cell, Mapping):
+        unit = (
+            cell.get("units_as_published") or cell.get("units") or cell.get("unit")
+        )
+        if unit not in (None, ""):
+            return str(unit)
+    return default
+
+
+def _printed_rounding_allowance(token: str | None) -> Decimal | None:
+    if token is None:
+        return None
+    try:
+        printed = Decimal(token.strip())
+    except (InvalidOperation, ValueError):
+        return None
+    quantum = Decimal(1).scaleb(printed.as_tuple().exponent)
+    return abs(quantum) / Decimal(2)
+
+
+def _projected_cell_metadata(
+    cell: object, quantity: Quantity, default_unit: str | None
+) -> tuple[str | None, str | None, Decimal | None]:
+    token = _printed_cell_token(cell)
+    unit = _source_unit_for_cell(cell, default_unit)
+    allowance = _printed_rounding_allowance(token)
+    if allowance is None:
+        return token, unit, None
+    converted = _convert_compilation_amount(allowance, quantity, unit)
+    return token, unit, converted[0] if converted is not None else None
+
+
 def _compilation_rows(doc: Mapping[str, Any]) -> list[Mapping[str, Any]]:
     rows = doc.get("rows")
     if not isinstance(rows, list):
@@ -5181,9 +5224,20 @@ def _emit_series_or_point(
     *,
     point_temperature: Decimal | None = None,
     unit_trail: str | None = None,
+    raw_tokens: Sequence[str | None] = (),
+    source_units: Sequence[str | None] = (),
+    cell_uncertainties: Sequence[Decimal | None] = (),
 ) -> CompilationColumnSeries | None:
     if not points:
         return None
+    count = len(points)
+    raw = tuple(raw_tokens) if raw_tokens else (None,) * count
+    units = tuple(source_units) if source_units else (None,) * count
+    uncertainties = (
+        tuple(cell_uncertainties) if cell_uncertainties else (None,) * count
+    )
+    if len(raw) != count or len(units) != count or len(uncertainties) != count:
+        raise ValueError(f"{series_key}: cell metadata must align with series values")
     if len(points) == 1 and point_temperature is not None:
         return CompilationColumnSeries(
             quantity=quantity,
@@ -5191,6 +5245,9 @@ def _emit_series_or_point(
             value=Value.point_of(points[0][1]),
             temperature_K=State.of(point_temperature),
             unit_trail=unit_trail,
+            raw_tokens=raw,
+            source_units=units,
+            cell_uncertainties=uncertainties,
         )
     return CompilationColumnSeries(
         quantity=quantity,
@@ -5198,6 +5255,9 @@ def _emit_series_or_point(
         value=Value(ValueKind.SERIES, series=tuple(points)),
         temperature_K=_series_temperature_state(series_key),
         unit_trail=unit_trail,
+        raw_tokens=raw,
+        source_units=units,
+        cell_uncertainties=uncertainties,
     )
 
 
@@ -5231,6 +5291,9 @@ def _column_series_from_list_cells(
         unit = next(item[3] for item in headings if item[0] == index)
         points: list[tuple[Decimal, Decimal]] = []
         trails: list[str] = []
+        raw_tokens: list[str | None] = []
+        source_units: list[str | None] = []
+        uncertainties: list[Decimal | None] = []
         for row in rows:
             cells = row.get("cells")
             if not isinstance(cells, list):
@@ -5241,18 +5304,28 @@ def _column_series_from_list_cells(
             v_amt = _cell_numeric_amount(cells[index])
             if t_amt is None or v_amt is None:
                 continue
-            converted = _convert_compilation_amount(v_amt, quantity, unit)
+            cell = cells[index]
+            token, source_unit, uncertainty = _projected_cell_metadata(
+                cell, quantity, unit
+            )
+            converted = _convert_compilation_amount(v_amt, quantity, source_unit)
             if converted is None:
                 points = []
                 break
             v_amt, trail = converted
             points.append((t_amt, v_amt))
             trails.append(trail)
+            raw_tokens.append(token)
+            source_units.append(source_unit)
+            uncertainties.append(uncertainty)
         series = _emit_series_or_point(
             quantity,
             heading,
             points,
             unit_trail=_consistent_series_trail(trails),
+            raw_tokens=raw_tokens,
+            source_units=source_units,
+            cell_uncertainties=uncertainties,
         )
         if series is not None:
             emitted.append(series)
@@ -5283,10 +5356,14 @@ def _column_series_from_named_cells(
     # Kelley-style: Cp at temperatures encoded in column keys + entropy columns.
     cp_points: list[tuple[Decimal, Decimal]] = []
     cp_trails: list[str] = []
+    cp_metadata: list[tuple[str | None, str | None, Decimal | None]] = []
     entropy_series: list[CompilationColumnSeries] = []
     grid_points: dict[Quantity, list[tuple[Decimal, Decimal]]] = {}
     grid_keys: dict[Quantity, str] = {}
     grid_trails: dict[Quantity, list[str]] = {}
+    grid_metadata: dict[
+        Quantity, list[tuple[str | None, str | None, Decimal | None]]
+    ] = {}
 
     for row in rows:
         cells = row_cells(row)
@@ -5309,19 +5386,31 @@ def _column_series_from_named_cells(
                 continue
             cp_t = _temperature_from_cp_column_key(key)
             if cp_t is not None:
+                source_unit = _source_unit_for_cell(
+                    cell, _printed_unit_for_field(doc, key)
+                )
                 converted = _convert_compilation_amount(
-                    amount, Quantity.CP, _printed_unit_for_field(doc, key)
+                    amount, Quantity.CP, source_unit
                 )
                 if converted is not None:
                     cp_points.append((cp_t, converted[0]))
                     cp_trails.append(converted[1])
+                    cp_metadata.append(
+                        _projected_cell_metadata(cell, Quantity.CP, source_unit)
+                    )
                 continue
             if key in _KELLEY_ENTROPY_COLUMNS:
+                source_unit = _source_unit_for_cell(
+                    cell, _printed_unit_for_field(doc, key)
+                )
                 converted = _convert_compilation_amount(
-                    amount, Quantity.S, _printed_unit_for_field(doc, key)
+                    amount, Quantity.S, source_unit
                 )
                 if converted is None:
                     continue
+                token, source_unit, uncertainty = _projected_cell_metadata(
+                    cell, Quantity.S, source_unit
+                )
                 series = _emit_series_or_point(
                     Quantity.S,
                     key,
@@ -5331,6 +5420,9 @@ def _column_series_from_named_cells(
                     if not converted[1].startswith("identity")
                     and converted[1] != "as_published"
                     else None,
+                    raw_tokens=(token,),
+                    source_units=(source_unit,),
+                    cell_uncertainties=(uncertainty,),
                 )
                 if series is not None:
                     entropy_series.append(series)
@@ -5340,33 +5432,46 @@ def _column_series_from_named_cells(
             )
             if quantity is None or t_amt is None:
                 continue
+            source_unit = _source_unit_for_cell(
+                cell, _printed_unit_for_field(doc, key)
+            )
             converted = _convert_compilation_amount(
-                amount, quantity, _printed_unit_for_field(doc, key)
+                amount, quantity, source_unit
             )
             if converted is not None:
                 grid_points.setdefault(quantity, []).append((t_amt, converted[0]))
                 grid_trails.setdefault(quantity, []).append(converted[1])
+                grid_metadata.setdefault(quantity, []).append(
+                    _projected_cell_metadata(cell, quantity, source_unit)
+                )
             grid_keys.setdefault(quantity, key)
 
     emitted: list[CompilationColumnSeries] = []
     if cp_points:
         # Stable order by printed temperature.
-        cp_points.sort(key=lambda item: item[0])
+        ordered_cp = sorted(zip(cp_points, cp_metadata), key=lambda item: item[0][0])
         series = _emit_series_or_point(
             Quantity.CP,
             "cp_temperature_grid",
-            cp_points,
+            [point for point, _metadata in ordered_cp],
             unit_trail=_consistent_series_trail(cp_trails),
+            raw_tokens=[metadata[0] for _point, metadata in ordered_cp],
+            source_units=[metadata[1] for _point, metadata in ordered_cp],
+            cell_uncertainties=[metadata[2] for _point, metadata in ordered_cp],
         )
         if series is not None:
             emitted.append(series)
     emitted.extend(entropy_series)
     for quantity, points in grid_points.items():
+        metadata = grid_metadata.get(quantity, [])
         series = _emit_series_or_point(
             quantity,
             grid_keys.get(quantity, quantity.value),
             points,
             unit_trail=_consistent_series_trail(grid_trails.get(quantity, ())),
+            raw_tokens=[cell[0] for cell in metadata],
+            source_units=[cell[1] for cell in metadata],
+            cell_uncertainties=[cell[2] for cell in metadata],
         )
         if series is not None:
             emitted.append(series)
@@ -5406,6 +5511,15 @@ def compilation_column_series_from_record(
     omitted; the caller falls back to the single-quantity refusal path when
     this returns empty.
     """
+
+    table = doc.get("table")
+    if isinstance(table, Mapping) and isinstance(table.get("values"), list):
+        projected = dict(doc)
+        projected["rows"] = [
+            {"cells": row} for row in table["values"] if isinstance(row, Mapping)
+        ]
+        projected["units_as_published"] = table.get("units_as_published")
+        return _column_series_from_named_cells(projected)
 
     kind = str(doc.get("record_kind") or "")
     table_kind = str(doc.get("table_kind") or "")
@@ -7460,15 +7574,33 @@ def _convert_compilation_amount(
         return amount, "as_published"
     with localcontext() as ctx:
         ctx.prec = 80
-        if heat and token in {"cal/mol/k", "cal/molk", "cal/deg-mole", "cal/degmole"}:
+        if heat and token in {
+            "cal/mol/k",
+            "cal/molk",
+            "cal/deg-mole",
+            "cal/degmole",
+            "calmol^-1k^-1",
+        }:
             return amount * Decimal("4.184"), "thermochemical_calorie_to_J_exact"
-        if heat and token in {"j/mol/k", "j/molk", "j/deg-mole", "j/degmole"}:
+        if heat and token in {
+            "j/mol/k",
+            "j/molk",
+            "j/deg-mole",
+            "j/degmole",
+            "jk^-1mol^-1",
+            "jmol^-1k^-1",
+        }:
             return amount, "identity:J_per_mol_K"
         if energy and token in {"kcal/mol", "kcal/mole"}:
             return amount * Decimal("4.184"), "thermochemical_kcal_to_kJ_exact"
         if energy and token in {"j/mol", "j/mole"}:
             return amount / Decimal("1000"), "J_to_kJ_exact"
-        if energy and token in {"kj/mol", "kj/mole", "kjpermol"}:
+        if energy and token in {
+            "kj/mol",
+            "kj/mole",
+            "kjpermol",
+            "kjmol^-1",
+        }:
             return amount, "identity:kJ_per_mol"
     return None
 
