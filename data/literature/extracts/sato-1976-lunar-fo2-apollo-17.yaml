@@ -16,10 +16,10 @@ fidelity_samples:
   - path: species.O2.observations[sato_1976_table1_70017_31].values.series[0].minus_log_fO2_atm
     value: '15.65'
     locator: {page: 1326, table: '1', row: '70017,31', column: 1000C}
-  - path: species.FeO.observations[sato_1976_table2_70017].values.series[0].a_FeO
+  - path: species.FeO.observations[sato_1976_table2_70017].values.series[0].activity
     value: '.30'
     locator: {page: 1328, table: '2', row: '70017', column: 1000C}
-  - path: species.Fe.observations[sato_1976_table3_70017].values.series[0].a_Fe
+  - path: species.Fe.observations[sato_1976_table3_70017].values.series[0].activity
     value: '.90'
     locator: {page: 1328, table: '3', row: '70017', column: 975C}
 species:
@@ -322,11 +322,11 @@ species:
           method_class: model_derived
           quantity: activity
           series:
-            - {T_C: 1000, a_FeO: '.30', activity: '.30'}
-            - {T_C: 1050, a_FeO: '.29', activity: '.29'}
-            - {T_C: 1100, a_FeO: '.29', activity: '.29'}
-            - {T_C: 1150, a_FeO: '.28', activity: '.28'}
-            - {T_C: 1200, a_FeO: '.25', activity: '.25'}
+            - {T_C: 1000, activity: '.30'}
+            - {T_C: 1050, activity: '.29'}
+            - {T_C: 1100, activity: '.29'}
+            - {T_C: 1150, activity: '.28'}
+            - {T_C: 1200, activity: '.25'}
           calculation_basis: Difference between sample-plus-Fe and iron-wüstite buffer fO2 curves, as discussed by Sato et al. (1973); paper does not print the equilibrium equation, coefficients, or units for its free-energy expression (pp. 1326-1328).
           Fe_FeO_equilibrium_as_printed: '"iron-wüstite buffer curve"; Sato et al. (1973)'
           Fe_FeO_equilibrium_details: {state: unknown, reason: not_published, pages_searched: '1324, 1326-1328'}
@@ -349,7 +349,7 @@ species:
         values:
           method_class: model_derived
           quantity: activity
-          series: [{T_C: 1000, a_FeO: '.40', activity: '.40'}, {T_C: 1050, a_FeO: '.37', activity: '.37'}, {T_C: 1100, a_FeO: '.37', activity: '.37'}, {T_C: 1150, a_FeO: '.36', activity: '.36'}, {T_C: 1200, a_FeO: '.31', activity: '.31'}]
+          series: [{T_C: 1000, activity: '.40'}, {T_C: 1050, activity: '.37'}, {T_C: 1100, activity: '.37'}, {T_C: 1150, activity: '.36'}, {T_C: 1200, activity: '.31'}]
           calculation_basis: Difference between sample-plus-Fe and iron-wüstite buffer fO2 curves, as discussed by Sato et al. (1973); paper does not print the equilibrium equation, coefficients, or units for its free-energy expression (pp. 1326-1328).
           Fe_FeO_equilibrium_as_printed: '"iron-wüstite buffer curve"; Sato et al. (1973)'
           Fe_FeO_equilibrium_details: {state: unknown, reason: not_published, pages_searched: '1324, 1326-1328'}
@@ -372,7 +372,7 @@ species:
         values:
           method_class: model_derived
           quantity: activity
-          series: [{T_C: 1000, a_FeO: '.24', activity: '.24'}, {T_C: 1050, a_FeO: '.24', activity: '.24'}, {T_C: 1100, a_FeO: '.24', activity: '.24'}, {T_C: 1150, a_FeO: '.25', activity: '.25'}, {T_C: 1200, a_FeO: '.26', activity: '.26'}]
+          series: [{T_C: 1000, activity: '.24'}, {T_C: 1050, activity: '.24'}, {T_C: 1100, activity: '.24'}, {T_C: 1150, activity: '.25'}, {T_C: 1200, activity: '.26'}]
           calculation_basis: Table 2 gives available values for other mare basalts; the paper does not state the equilibrium expression separately for this row.
           Fe_FeO_equilibrium_as_printed: '"iron-wüstite buffer curve"; calculation discussed by Sato et al. (1973)'
           Fe_FeO_equilibrium_details: {state: unknown, reason: not_published, pages_searched: '1324, 1326-1328'}
@@ -395,7 +395,7 @@ species:
         values:
           method_class: model_derived
           quantity: activity
-          series: [{T_C: 1000, a_FeO: '.24', activity: '.24'}, {T_C: 1050, a_FeO: '.24', activity: '.24'}, {T_C: 1100, a_FeO: '.22', activity: '.22'}, {T_C: 1150, a_FeO: '.22', activity: '.22'}, {T_C: 1200, a_FeO: '.23', activity: '.23'}]
+          series: [{T_C: 1000, activity: '.24'}, {T_C: 1050, activity: '.24'}, {T_C: 1100, activity: '.22'}, {T_C: 1150, activity: '.22'}, {T_C: 1200, activity: '.23'}]
           calculation_basis: Table 2 gives available values for other mare basalts; the paper does not state the equilibrium expression separately for this row.
           Fe_FeO_equilibrium_as_printed: '"iron-wüstite buffer curve"; calculation discussed by Sato et al. (1973)'
           Fe_FeO_equilibrium_details: {state: unknown, reason: not_published, pages_searched: '1324, 1326-1328'}
@@ -418,7 +418,7 @@ species:
         values:
           method_class: model_derived
           quantity: activity
-          series: [{T_C: 1000, a_FeO: '.24', activity: '.24'}, {T_C: 1050, a_FeO: '.26', activity: '.26'}, {T_C: 1100, a_FeO: '.31', activity: '.31'}, {T_C: 1150, a_FeO: '.35', activity: '.35'}, {T_C: 1200, a_FeO: '.37', activity: '.37'}]
+          series: [{T_C: 1000, activity: '.24'}, {T_C: 1050, activity: '.26'}, {T_C: 1100, activity: '.31'}, {T_C: 1150, activity: '.35'}, {T_C: 1200, activity: '.37'}]
           calculation_basis: Table 2 gives available values for other mare basalts; the paper does not state the equilibrium expression separately for this row.
           Fe_FeO_equilibrium_as_printed: '"iron-wüstite buffer curve"; calculation discussed by Sato et al. (1973)'
           Fe_FeO_equilibrium_details: {state: unknown, reason: not_published, pages_searched: '1324, 1326-1328'}
@@ -441,7 +441,7 @@ species:
         values:
           method_class: model_derived
           quantity: activity
-          series: [{T_C: 975, a_Fe: '.90', activity: '.90'}, {T_C: 1000, a_Fe: '.82', activity: '.82'}, {T_C: 1025, a_Fe: '.72', activity: '.72'}, {T_C: 1050, a_Fe: '.64', activity: '.64'}, {T_C: 1100, a_Fe: '.63', activity: '.63'}, {T_C: 1150, a_Fe: '.60', activity: '.60'}, {T_C: 1200, a_Fe: '.55', activity: '.55'}]
+          series: [{T_C: 975, activity: '.90'}, {T_C: 1000, activity: '.82'}, {T_C: 1025, activity: '.72'}, {T_C: 1050, activity: '.64'}, {T_C: 1100, activity: '.63'}, {T_C: 1150, activity: '.60'}, {T_C: 1200, activity: '.55'}]
           metal_side_as_published: 'alloy with a(Fe) as printed in Table 3; the paper describes Fe^0 in the natural metallic phase and does not state that values were recalculated to pure metal.'
           metal_side_locator: {page: 1328, table: '3', section: discussion of Fe activity}
           bulk_composition: {state: not_published, reason: not_published, pointer: Hodges and Kushiro (1974), cited for 70017 petrology (pp. 1324, 1326; reference p. 1343)}
@@ -460,7 +460,7 @@ species:
         values:
           method_class: model_derived
           quantity: activity
-          series: [{T_C: 975, a_Fe: '.93', activity: '.93'}, {T_C: 1000, a_Fe: '.68', activity: '.68'}, {T_C: 1025, a_Fe: '.59', activity: '.59'}, {T_C: 1050, a_Fe: '.56', activity: '.56'}, {T_C: 1100, a_Fe: '.58', activity: '.58'}, {T_C: 1150, a_Fe: '.62', activity: '.62'}, {T_C: 1200, a_Fe: '.60', activity: '.60'}]
+          series: [{T_C: 975, activity: '.93'}, {T_C: 1000, activity: '.68'}, {T_C: 1025, activity: '.59'}, {T_C: 1050, activity: '.56'}, {T_C: 1100, activity: '.58'}, {T_C: 1150, activity: '.62'}, {T_C: 1200, activity: '.60'}]
           metal_side_as_published: 'alloy with a(Fe) as printed in Table 3; the paper describes Fe^0 in the natural metallic phase and does not state that values were recalculated to pure metal.'
           metal_side_locator: {page: 1328, table: '3', section: discussion of Fe activity}
           bulk_composition: {state: not_published, reason: not_published, pointer: Hodges and Kushiro (1974), cited for 74275 petrology (p. 1326; reference p. 1343)}
@@ -479,7 +479,7 @@ species:
         values:
           method_class: model_derived
           quantity: activity
-          series: [{T_C: 975, a_Fe: '—', activity: null}, {T_C: 1000, a_Fe: '.63', activity: '.63'}, {T_C: 1025, a_Fe: '—', activity: null}, {T_C: 1050, a_Fe: '.63', activity: '.63'}, {T_C: 1100, a_Fe: '.63', activity: '.63'}, {T_C: 1150, a_Fe: '.71', activity: '.71'}, {T_C: 1200, a_Fe: '.79', activity: '.79'}]
+          series: [{T_C: 975, a_Fe: '—', activity: null}, {T_C: 1000, activity: '.63'}, {T_C: 1025, a_Fe: '—', activity: null}, {T_C: 1050, activity: '.63'}, {T_C: 1100, activity: '.63'}, {T_C: 1150, activity: '.71'}, {T_C: 1200, activity: '.79'}]
           metal_side_as_published: 'alloy with a(Fe) as printed in Table 3; the paper describes Fe^0 in the natural metallic phase and does not state that values were recalculated to pure metal.'
           metal_side_locator: {page: 1328, table: '3', section: discussion of Fe activity}
           bulk_composition: {state: not_published, reason: not_published, pointer: Sato, Hickling, and McLane (1973), cited as the source of Table 1 values for sample 12009,35 (pp. 1326, 1343)}
@@ -498,7 +498,7 @@ species:
         values:
           method_class: model_derived
           quantity: activity
-          series: [{T_C: 975, a_Fe: '—', activity: null}, {T_C: 1000, a_Fe: '.50', activity: '.50'}, {T_C: 1025, a_Fe: '—', activity: null}, {T_C: 1050, a_Fe: '.50', activity: '.50'}, {T_C: 1100, a_Fe: '.45', activity: '.45'}, {T_C: 1150, a_Fe: '.40', activity: '.40'}, {T_C: 1200, a_Fe: '.40', activity: '.40'}]
+          series: [{T_C: 975, a_Fe: '—', activity: null}, {T_C: 1000, activity: '.50'}, {T_C: 1025, a_Fe: '—', activity: null}, {T_C: 1050, activity: '.50'}, {T_C: 1100, activity: '.45'}, {T_C: 1150, activity: '.40'}, {T_C: 1200, activity: '.40'}]
           metal_side_as_published: 'alloy with a(Fe) as printed in Table 3; the paper describes Fe^0 in the natural metallic phase and does not state that values were recalculated to pure metal.'
           metal_side_locator: {page: 1328, table: '3', section: discussion of Fe activity}
           bulk_composition: {state: not_published, reason: not_published, pointer: Sato, Hickling, and McLane (1973), cited as the source of Table 1 values for sample 12053,89 (pp. 1326, 1343)}
@@ -517,7 +517,7 @@ species:
         values:
           method_class: model_derived
           quantity: activity
-          series: [{T_C: 975, a_Fe: '—', activity: null}, {T_C: 1000, a_Fe: '.71', activity: '.71'}, {T_C: 1025, a_Fe: '—', activity: null}, {T_C: 1050, a_Fe: '.80', activity: '.80'}, {T_C: 1100, a_Fe: '.89', activity: '.89'}, {T_C: 1150, a_Fe: '.80', activity: '.80'}, {T_C: 1200, a_Fe: '.71', activity: '.71'}]
+          series: [{T_C: 975, a_Fe: '—', activity: null}, {T_C: 1000, activity: '.71'}, {T_C: 1025, a_Fe: '—', activity: null}, {T_C: 1050, activity: '.80'}, {T_C: 1100, activity: '.89'}, {T_C: 1150, activity: '.80'}, {T_C: 1200, activity: '.71'}]
           metal_side_as_published: 'alloy with a(Fe) as printed in Table 3; the paper describes Fe^0 in the natural metallic phase and does not state that values were recalculated to pure metal.'
           metal_side_locator: {page: 1328, table: '3', section: discussion of Fe activity}
           bulk_composition: {state: not_published, reason: not_published, pointer: Sato, Hickling, and McLane (1973), cited as the source of Table 1 values for sample 15595,25 (pp. 1326, 1343)}
