@@ -50,36 +50,167 @@ benches:
       state: {tag: value, value: Thermocouple}
       locator: {page: 2, published_page: 1062, figure: '1'}
     increments:
-      state: {tag: value, value: About 20 °C during heating and about 40 °C during cooling, after equilibration periods of about 1 h}
+      state: {tag: value, value: 'About 20 °C during heating and about 40 °C during cooling, after equilibration periods of about 1 h'}
       locator: {page: 2, published_page: 1062, section: Experimental Procedure}
 experiments:
-- experiment_id: sato-lunar-rock-oxygen-fugacity
-  series: Apollo 12, 14 and 15 lunar sample solid-electrolyte oxygen-fugacity measurements
+- experiment_id: sato73_12009_35_bulk_rock
   bench_id: sato-solid-electrolyte-oxygen-cell
-  method: solid_electrolyte_emf
-  locator: {page: 1, published_page: 1061, section: Experimental Procedure}
+  method: emf_cell
+  locator: {page: 3, published_page: 1063, table: '1', row: '12009,35'}
   sample:
-    characterization:
-      state: {tag: value, value: Bulk lunar rocks, separated olivine and pyroxenes, groundmass, and selected bulk rock plus iron-foil runs; sample/material identities are carried on each observation}
-      locator: {page: 1, published_page: 1061, section: Samples Studied, note: Table 1 lists the measured materials}
-    initial_composition:
-      state: {tag: unknown, reason: not_published}
-      locator: {page: 1, published_page: 1061, section: Samples Studied, note: This paper gives no bulk chemical composition for the measured rocks; it identifies them by lunar sample number and refers to the cited sample studies in its discussion and references}
-    mass_kg:
-      state: {tag: unknown, reason: not_published}
-      locator: {page: 2, published_page: 1062, section: Experimental Procedure, note: About 100 mg is stated for the bulk-rock plus metallic-iron procedure, not assigned to individual Table 1 observations}
-  fO2_control:
-    channel: {tag: value, value: intrinsic}
-    buffer:
-      state: {tag: value, value: Furnace atmosphere fO2 servo-matched to the sample; N2 diluent, about 1% CO2, and variable H2}
-      locator: {page: 2, published_page: 1062, section: Experimental Procedure, note: Furnace atmosphere held within about 0.1 log fO2 unit of the sample}
+    form: {state: {tag: value, value: 'Lunar sample 12009,35; bulk rock'}, locator: {page: 3, published_page: 1063, table: '1'}}
+    characterization: {state: {tag: value, value: 'Basaltic igneous rock; bulk rock'}, locator: {page: 1, published_page: 1061, section: Samples Studied}}
+    initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 1, published_page: 1061, section: Samples Studied}}
   thermal_schedule:
-    method:
-      state: {tag: value, value: At least one complete stepwise heating-cooling cycle between 1000 and 1200 °C; about 1 h equilibration periods}
-      locator: {page: 2, published_page: 1062, section: Experimental Procedure}
-    cooling_or_quench:
-      state: {tag: value, value: Stepwise cooling cycle; measurements taken at about 40 °C increments after equilibration}
-      locator: {page: 2, published_page: 1062, section: Experimental Procedure}
+    method: {state: {tag: value, value: 'First heating cycle; measurements from 1000 to 1200 °C'}, locator: {page: 3, published_page: 1063, table: '1'}}
+- experiment_id: sato73_12009_35_olivine
+  bench_id: sato-solid-electrolyte-oxygen-cell
+  method: emf_cell
+  locator: {page: 3, published_page: 1063, table: '1', row: '12009,35'}
+  sample:
+    form: {state: {tag: value, value: 'Lunar sample 12009,35; olivine'}, locator: {page: 3, published_page: 1063, table: '1'}}
+    characterization: {state: {tag: value, value: 'Basaltic igneous rock; olivine separate'}, locator: {page: 1, published_page: 1061, section: Samples Studied}}
+    initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 1, published_page: 1061, section: Samples Studied}}
+  thermal_schedule:
+    method: {state: {tag: value, value: 'First heating cycle; measurements from 1000 to 1200 °C'}, locator: {page: 3, published_page: 1063, table: '1'}}
+- experiment_id: sato73_12009_35_groundmass
+  bench_id: sato-solid-electrolyte-oxygen-cell
+  method: emf_cell
+  locator: {page: 3, published_page: 1063, table: '1', row: '12009,35'}
+  sample:
+    form: {state: {tag: value, value: 'Lunar sample 12009,35; groundmass'}, locator: {page: 3, published_page: 1063, table: '1'}}
+    characterization: {state: {tag: value, value: 'Basaltic igneous rock; groundmass'}, locator: {page: 1, published_page: 1061, section: Samples Studied}}
+    initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 1, published_page: 1061, section: Samples Studied}}
+  thermal_schedule:
+    method: {state: {tag: value, value: 'First heating cycle; measurements from 1000 to 1200 °C'}, locator: {page: 3, published_page: 1063, table: '1'}}
+- experiment_id: sato73_12009_35_bulk_plus_fe
+  bench_id: sato-solid-electrolyte-oxygen-cell
+  method: emf_cell
+  locator: {page: 3, published_page: 1063, table: '1', row: '12009,35'}
+  sample:
+    form: {state: {tag: value, value: 'Lunar sample 12009,35; bulk rock plus iron foil'}, locator: {page: 3, published_page: 1063, table: '1'}}
+    characterization: {state: {tag: value, value: 'Basaltic igneous rock; selected bulk-rock run with iron foil'}, locator: {page: 2, published_page: 1062, section: Experimental Procedure}}
+    mass_kg: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 1062, section: Experimental Procedure, note: 'About 100 mg for the bulk-rock plus metallic-iron procedure; not assigned to individual Table 1 observations.'}}
+    initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 1, published_page: 1061, section: Samples Studied}}
+    pretreatment: {state: {tag: value, value: 'Previously melted sample; 99.99% pure iron foil added'}, locator: {page: 2, published_page: 1062, section: Experimental Procedure}}
+  thermal_schedule:
+    method: {state: {tag: value, value: 'First heating cycle; measurements from 1000 to 1200 °C'}, locator: {page: 3, published_page: 1063, table: '1'}}
+- experiment_id: sato73_12022_36_bulk_plus_fe
+  bench_id: sato-solid-electrolyte-oxygen-cell
+  method: emf_cell
+  locator: {page: 3, published_page: 1063, table: '1', row: '12022,36'}
+  sample:
+    form: {state: {tag: value, value: 'Lunar sample 12022,36; bulk rock plus iron foil'}, locator: {page: 3, published_page: 1063, table: '1'}}
+    characterization: {state: {tag: value, value: 'Basaltic igneous rock; selected bulk-rock run with iron foil'}, locator: {page: 2, published_page: 1062, section: Experimental Procedure}}
+    mass_kg: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 1062, section: Experimental Procedure, note: 'About 100 mg for the bulk-rock plus metallic-iron procedure; not assigned to individual Table 1 observations.'}}
+    initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 1, published_page: 1061, section: Samples Studied}}
+    pretreatment: {state: {tag: value, value: 'Previously melted sample; 99.99% pure iron foil added'}, locator: {page: 2, published_page: 1062, section: Experimental Procedure}}
+  thermal_schedule:
+    method: {state: {tag: value, value: 'First heating cycle; measurements from 1000 to 1200 °C'}, locator: {page: 3, published_page: 1063, table: '1'}}
+- experiment_id: sato73_12053_89_bulk_rock
+  bench_id: sato-solid-electrolyte-oxygen-cell
+  method: emf_cell
+  locator: {page: 3, published_page: 1063, table: '1', row: '12053,89'}
+  sample:
+    form: {state: {tag: value, value: 'Lunar sample 12053,89; bulk rock'}, locator: {page: 3, published_page: 1063, table: '1'}}
+    characterization: {state: {tag: value, value: 'Basaltic igneous rock; bulk rock'}, locator: {page: 1, published_page: 1061, section: Samples Studied}}
+    initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 1, published_page: 1061, section: Samples Studied}}
+  thermal_schedule:
+    method: {state: {tag: value, value: 'First heating cycle; measurements from 1000 to 1200 °C'}, locator: {page: 3, published_page: 1063, table: '1'}}
+- experiment_id: sato73_12053_89_pyroxenes
+  bench_id: sato-solid-electrolyte-oxygen-cell
+  method: emf_cell
+  locator: {page: 3, published_page: 1063, table: '1', row: '12053,89'}
+  sample:
+    form: {state: {tag: value, value: 'Lunar sample 12053,89; pyroxenes'}, locator: {page: 3, published_page: 1063, table: '1'}}
+    characterization: {state: {tag: value, value: 'Basaltic igneous rock; pyroxene separates'}, locator: {page: 1, published_page: 1061, section: Samples Studied}}
+    initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 1, published_page: 1061, section: Samples Studied}}
+  thermal_schedule:
+    method: {state: {tag: value, value: 'First heating cycle; measurements from 1000 to 1200 °C'}, locator: {page: 3, published_page: 1063, table: '1'}}
+- experiment_id: sato73_12053_89_bulk_plus_fe
+  bench_id: sato-solid-electrolyte-oxygen-cell
+  method: emf_cell
+  locator: {page: 3, published_page: 1063, table: '1', row: '12053,89'}
+  sample:
+    form: {state: {tag: value, value: 'Lunar sample 12053,89; bulk rock plus iron foil'}, locator: {page: 3, published_page: 1063, table: '1'}}
+    characterization: {state: {tag: value, value: 'Basaltic igneous rock; selected bulk-rock run with iron foil'}, locator: {page: 2, published_page: 1062, section: Experimental Procedure}}
+    mass_kg: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 1062, section: Experimental Procedure, note: 'About 100 mg for the bulk-rock plus metallic-iron procedure; not assigned to individual Table 1 observations.'}}
+    initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 1, published_page: 1061, section: Samples Studied}}
+    pretreatment: {state: {tag: value, value: 'Previously melted sample; 99.99% pure iron foil added'}, locator: {page: 2, published_page: 1062, section: Experimental Procedure}}
+  thermal_schedule:
+    method: {state: {tag: value, value: 'First heating cycle; measurements from 1000 to 1200 °C'}, locator: {page: 3, published_page: 1063, table: '1'}}
+- experiment_id: sato73_14310_195_bulk_rock
+  bench_id: sato-solid-electrolyte-oxygen-cell
+  method: emf_cell
+  locator: {page: 3, published_page: 1063, table: '1', row: '14310,195'}
+  sample:
+    form: {state: {tag: value, value: 'Lunar sample 14310,195; bulk rock'}, locator: {page: 3, published_page: 1063, table: '1'}}
+    characterization: {state: {tag: value, value: '“Igneous” rock; origin disputed; bulk rock'}, locator: {page: 1, published_page: 1061, section: Samples Studied}}
+    initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 1, published_page: 1061, section: Samples Studied}}
+  thermal_schedule:
+    method: {state: {tag: value, value: 'First heating cycle; irreversible rise above about 1170 °C; cooling-cycle values were higher by as much as one log unit'}, locator: {page: 7, published_page: 1067, section: Experimental Results}}
+- experiment_id: sato73_14310_207_bulk_rock
+  bench_id: sato-solid-electrolyte-oxygen-cell
+  method: emf_cell
+  locator: {page: 3, published_page: 1063, table: '1', row: '14310,207'}
+  sample:
+    form: {state: {tag: value, value: 'Lunar sample 14310,207; bulk rock'}, locator: {page: 3, published_page: 1063, table: '1'}}
+    characterization: {state: {tag: value, value: '“Igneous” rock; origin disputed; bulk rock'}, locator: {page: 1, published_page: 1061, section: Samples Studied}}
+    initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 1, published_page: 1061, section: Samples Studied}}
+  thermal_schedule:
+    method: {state: {tag: value, value: 'First heating cycle; irreversible rise above about 1170 °C; cooling-cycle values were higher by as much as one log unit'}, locator: {page: 7, published_page: 1067, section: Experimental Results}}
+- experiment_id: sato73_14321_105_bulk_rock
+  bench_id: sato-solid-electrolyte-oxygen-cell
+  method: emf_cell
+  locator: {page: 3, published_page: 1063, table: '1', row: '14321,105'}
+  sample:
+    form: {state: {tag: value, value: 'Lunar sample 14321,105; bulk rock'}, locator: {page: 3, published_page: 1063, table: '1'}}
+    characterization: {state: {tag: value, value: 'Microbreccia; bulk rock'}, locator: {page: 1, published_page: 1061, section: Samples Studied}}
+    initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 1, published_page: 1061, section: Samples Studied}}
+  thermal_schedule:
+    method: {state: {tag: value, value: 'First heating cycle; measurements from 1000 to 1200 °C'}, locator: {page: 3, published_page: 1063, table: '1'}}
+- experiment_id: sato73_15058_81_bulk_rock
+  bench_id: sato-solid-electrolyte-oxygen-cell
+  method: emf_cell
+  locator: {page: 3, published_page: 1063, table: '1', row: '15058,81'}
+  sample:
+    form: {state: {tag: value, value: 'Lunar sample 15058,81; bulk rock'}, locator: {page: 3, published_page: 1063, table: '1'}}
+    characterization: {state: {tag: value, value: 'Basaltic igneous rock; bulk rock'}, locator: {page: 1, published_page: 1061, section: Samples Studied}}
+    initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 1, published_page: 1061, section: Samples Studied}}
+  thermal_schedule:
+    method: {state: {tag: value, value: 'First heating cycle; measurements from 1000 to 1200 °C'}, locator: {page: 3, published_page: 1063, table: '1'}}
+- experiment_id: sato73_15058_88_bulk_rock
+  bench_id: sato-solid-electrolyte-oxygen-cell
+  method: emf_cell
+  locator: {page: 3, published_page: 1063, table: '1', row: '15058,88'}
+  sample:
+    form: {state: {tag: value, value: 'Lunar sample 15058,88; bulk rock'}, locator: {page: 3, published_page: 1063, table: '1'}}
+    characterization: {state: {tag: value, value: 'Basaltic igneous rock; bulk rock'}, locator: {page: 1, published_page: 1061, section: Samples Studied}}
+    initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 1, published_page: 1061, section: Samples Studied}}
+  thermal_schedule:
+    method: {state: {tag: value, value: 'First heating cycle; measurements from 1000 to 1200 °C'}, locator: {page: 3, published_page: 1063, table: '1'}}
+- experiment_id: sato73_15595_25_bulk_rock
+  bench_id: sato-solid-electrolyte-oxygen-cell
+  method: emf_cell
+  locator: {page: 3, published_page: 1063, table: '1', row: '15595,25'}
+  sample:
+    form: {state: {tag: value, value: 'Lunar sample 15595,25; bulk rock'}, locator: {page: 3, published_page: 1063, table: '1'}}
+    characterization: {state: {tag: value, value: 'Basaltic igneous rock; bulk rock'}, locator: {page: 1, published_page: 1061, section: Samples Studied}}
+    initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 1, published_page: 1061, section: Samples Studied}}
+  thermal_schedule:
+    method: {state: {tag: value, value: 'First heating cycle; heating and cooling results agreed'}, locator: {page: 3, published_page: 1063, figure: '2'}}
+- experiment_id: sato73_15595_25_bulk_plus_fe
+  bench_id: sato-solid-electrolyte-oxygen-cell
+  method: emf_cell
+  locator: {page: 3, published_page: 1063, table: '1', row: '15595,25'}
+  sample:
+    form: {state: {tag: value, value: 'Lunar sample 15595,25; bulk rock plus iron foil'}, locator: {page: 3, published_page: 1063, table: '1'}}
+    characterization: {state: {tag: value, value: 'Basaltic igneous rock; selected bulk-rock run with iron foil'}, locator: {page: 2, published_page: 1062, section: Experimental Procedure}}
+    mass_kg: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 1062, section: Experimental Procedure, note: 'About 100 mg for the bulk-rock plus metallic-iron procedure; not assigned to individual Table 1 observations.'}}
+    initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 1, published_page: 1061, section: Samples Studied}}
+    pretreatment: {state: {tag: value, value: 'Previously melted sample; 99.99% pure iron foil added'}, locator: {page: 2, published_page: 1062, section: Experimental Procedure}}
+  thermal_schedule:
+    method: {state: {tag: value, value: 'First heating cycle; heating and cooling results agreed'}, locator: {page: 3, published_page: 1063, figure: '2'}}
 species:
   O2:
     context:
@@ -116,10 +247,12 @@ species:
         iron_foil_locator: {page: 2, published_page: 1062, section: Experimental Procedure}
     observations:
     - observation_id: sato73_12009_35_bulk_rock
-      experiment: sato-lunar-rock-oxygen-fugacity
+      experiment: sato73_12009_35_bulk_rock
+      regime: emf_cell
       type: partial_pressure
       locator: {page: 3, published_page: 1063, table: '1', note: 'Average −log fO2 (atm), first heating cycle'}
       units: Pa; printed −log fO2 (atm) retained in each point
+      uncertainty: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted from the reported within-0.2-log-unit scatter (published pages 1061 and 1063). Basis: log10(fO2/atm).'
       values:
         fugacity_conversion: "Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-neg_log_fO2_as_printed); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa. Printed -log fO2 (atm) and signed log condition are retained."
         method_class: measured_tabulated
@@ -134,86 +267,114 @@ species:
         - {temperature_K: '1423.15', temperature_C_as_printed: '1150', neg_log_fO2_as_printed: '13.4', log_fO2_as_signed: '-13.4', point_conditions: {temperature_K: {state: {tag: value, value: '1423.15'}, locator: {page: 3, published_page: 1063, table: '1', note: '1150 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-13.4'}, locator: {page: 3, published_page: 1063, table: '1', note: 'Printed −log fO2 = 13.4; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '4.0338209E-9'}
         - {temperature_K: '1473.15', temperature_C_as_printed: '1200', neg_log_fO2_as_printed: '12.8', log_fO2_as_signed: '-12.8', point_conditions: {temperature_K: {state: {tag: value, value: '1473.15'}, locator: {page: 3, published_page: 1063, table: '1', note: '1200 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-12.8'}, locator: {page: 3, published_page: 1063, table: '1', note: 'Printed −log fO2 = 12.8; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '1.6058930E-8'}
     - observation_id: sato73_12009_35_olivine
-      experiment: sato-lunar-rock-oxygen-fugacity
+      experiment: sato73_12009_35_olivine
+      regime: emf_cell
       type: partial_pressure
       locator: {page: 3, published_page: 1063, table: '1'}
       units: Pa; printed −log fO2 (atm) retained in each point
+      uncertainty: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted from the reported within-0.2-log-unit scatter (published pages 1061 and 1063). Basis: log10(fO2/atm).'
       values: {fugacity_conversion: "Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-neg_log_fO2_as_printed); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa. Printed -log fO2 (atm) and signed log condition are retained.", method_class: measured_tabulated, quantity: fugacity, sample_no_as_printed: '12009,35', material_as_printed: olivine, source_quantity_as_printed: '-log fO2 (atm)', points: [{temperature_K: '1273.15', temperature_C_as_printed: '1000', neg_log_fO2_as_printed: '15.5', log_fO2_as_signed: '-15.5', point_conditions: {temperature_K: {state: {tag: value, value: '1273.15'}, locator: {page: 3, table: '1', note: '1000 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-15.5'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 15.5; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '3.2041778E-11'}, {temperature_K: '1323.15', temperature_C_as_printed: '1050', neg_log_fO2_as_printed: '14.6', log_fO2_as_signed: '-14.6', point_conditions: {temperature_K: {state: {tag: value, value: '1323.15'}, locator: {page: 3, table: '1', note: '1050 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-14.6'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 14.6; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '2.5451689E-10'}, {temperature_K: '1373.15', temperature_C_as_printed: '1100', neg_log_fO2_as_printed: '13.9', log_fO2_as_signed: '-13.9', point_conditions: {temperature_K: {state: {tag: value, value: '1373.15'}, locator: {page: 3, table: '1', note: '1100 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-13.9'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 13.9; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '1.2756062E-9'}, {temperature_K: '1423.15', temperature_C_as_printed: '1150', neg_log_fO2_as_printed: '13.2', log_fO2_as_signed: '-13.2', point_conditions: {temperature_K: {state: {tag: value, value: '1423.15'}, locator: {page: 3, table: '1', note: '1150 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-13.2'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 13.2; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '6.3931753E-9'}, {temperature_K: '1473.15', temperature_C_as_printed: '1200', neg_log_fO2_as_printed: '12.4', log_fO2_as_signed: '-12.4', point_conditions: {temperature_K: {state: {tag: value, value: '1473.15'}, locator: {page: 3, table: '1', note: '1200 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-12.4'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 12.4; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '4.0338209E-8'}]}
     - observation_id: sato73_12009_35_groundmass
-      experiment: sato-lunar-rock-oxygen-fugacity
+      experiment: sato73_12009_35_groundmass
+      regime: emf_cell
       type: partial_pressure
       locator: {page: 3, published_page: 1063, table: '1'}
       units: Pa; printed −log fO2 (atm) retained in each point
+      uncertainty: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted from the reported within-0.2-log-unit scatter (published pages 1061 and 1063). Basis: log10(fO2/atm).'
       values: {fugacity_conversion: "Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-neg_log_fO2_as_printed); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa. Printed -log fO2 (atm) and signed log condition are retained.", method_class: measured_tabulated, quantity: fugacity, sample_no_as_printed: '12009,35', material_as_printed: groundmass, source_quantity_as_printed: '-log fO2 (atm)', points: [{temperature_K: '1273.15', temperature_C_as_printed: '1000', neg_log_fO2_as_printed: '16.0', log_fO2_as_signed: '-16.0', point_conditions: {temperature_K: {state: {tag: value, value: '1273.15'}, locator: {page: 3, table: '1', note: '1000 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-16.0'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 16.0; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '1.0132500E-11'}, {temperature_K: '1323.15', temperature_C_as_printed: '1050', neg_log_fO2_as_printed: '15.0', log_fO2_as_signed: '-15.0', point_conditions: {temperature_K: {state: {tag: value, value: '1323.15'}, locator: {page: 3, table: '1', note: '1050 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-15.0'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 15.0; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '1.0132500E-10'}, {temperature_K: '1373.15', temperature_C_as_printed: '1100', neg_log_fO2_as_printed: '14.3', log_fO2_as_signed: '-14.3', point_conditions: {temperature_K: {state: {tag: value, value: '1373.15'}, locator: {page: 3, table: '1', note: '1100 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-14.3'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 14.3; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '5.0782796E-10'}, {temperature_K: '1423.15', temperature_C_as_printed: '1150', neg_log_fO2_as_printed: '13.6', log_fO2_as_signed: '-13.6', point_conditions: {temperature_K: {state: {tag: value, value: '1423.15'}, locator: {page: 3, table: '1', note: '1150 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-13.6'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 13.6; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '2.5451689E-9'}, {temperature_K: '1473.15', temperature_C_as_printed: '1200', neg_log_fO2_as_printed: '12.8', log_fO2_as_signed: '-12.8', point_conditions: {temperature_K: {state: {tag: value, value: '1473.15'}, locator: {page: 3, table: '1', note: '1200 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-12.8'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 12.8; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '1.6058930E-8'}]}
     - observation_id: sato73_12009_35_bulk_plus_fe
-      experiment: sato-lunar-rock-oxygen-fugacity
+      experiment: sato73_12009_35_bulk_plus_fe
+      regime: emf_cell
       type: partial_pressure
       locator: {page: 3, published_page: 1063, table: '1'}
       units: Pa; printed −log fO2 (atm) retained in each point
+      uncertainty: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted from the reported within-0.2-log-unit scatter (published pages 1061 and 1063). Basis: log10(fO2/atm).'
       values: {fugacity_conversion: "Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-neg_log_fO2_as_printed); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa. Printed -log fO2 (atm) and signed log condition are retained.", method_class: measured_tabulated, quantity: fugacity, sample_no_as_printed: '12009,35', material_as_printed: 'bulk + Fe', source_quantity_as_printed: '-log fO2 (atm)', points: [{temperature_K: '1273.15', temperature_C_as_printed: '1000', neg_log_fO2_as_printed: '16.0', log_fO2_as_signed: '-16.0', point_conditions: {temperature_K: {state: {tag: value, value: '1273.15'}, locator: {page: 3, table: '1', note: '1000 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-16.0'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 16.0; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '1.0132500E-11'}, {temperature_K: '1323.15', temperature_C_as_printed: '1050', neg_log_fO2_as_printed: '15.2', log_fO2_as_signed: '-15.2', point_conditions: {temperature_K: {state: {tag: value, value: '1323.15'}, locator: {page: 3, table: '1', note: '1050 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-15.2'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 15.2; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '6.3931753E-11'}, {temperature_K: '1373.15', temperature_C_as_printed: '1100', neg_log_fO2_as_printed: '14.4', log_fO2_as_signed: '-14.4', point_conditions: {temperature_K: {state: {tag: value, value: '1373.15'}, locator: {page: 3, table: '1', note: '1100 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-14.4'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 14.4; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '4.0338209E-10'}, {temperature_K: '1423.15', temperature_C_as_printed: '1150', neg_log_fO2_as_printed: '13.7', log_fO2_as_signed: '-13.7', point_conditions: {temperature_K: {state: {tag: value, value: '1423.15'}, locator: {page: 3, table: '1', note: '1150 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-13.7'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 13.7; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '2.0216995E-9'}, {temperature_K: '1473.15', temperature_C_as_printed: '1200', neg_log_fO2_as_printed: '13.0', log_fO2_as_signed: '-13.0', point_conditions: {temperature_K: {state: {tag: value, value: '1473.15'}, locator: {page: 3, table: '1', note: '1200 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-13.0'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 13.0; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '1.0132500E-8'}]}
     - observation_id: sato73_12022_36_bulk_plus_fe
-      experiment: sato-lunar-rock-oxygen-fugacity
+      experiment: sato73_12022_36_bulk_plus_fe
+      regime: emf_cell
       type: partial_pressure
       locator: {page: 3, published_page: 1063, table: '1'}
       units: Pa; printed −log fO2 (atm) retained in each point
+      uncertainty: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted from the reported within-0.2-log-unit scatter (published pages 1061 and 1063). Basis: log10(fO2/atm).'
       values: {fugacity_conversion: "Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-neg_log_fO2_as_printed); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa. Printed -log fO2 (atm) and signed log condition are retained.", method_class: measured_tabulated, quantity: fugacity, sample_no_as_printed: '12022,36', material_as_printed: 'bulk + Fe', source_quantity_as_printed: '-log fO2 (atm)', points: [{temperature_K: '1273.15', temperature_C_as_printed: '1000', neg_log_fO2_as_printed: '15.7', log_fO2_as_signed: '-15.7', point_conditions: {temperature_K: {state: {tag: value, value: '1273.15'}, locator: {page: 3, table: '1', note: '1000 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-15.7'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 15.7; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '2.0216995E-11'}, {temperature_K: '1323.15', temperature_C_as_printed: '1050', neg_log_fO2_as_printed: '14.8', log_fO2_as_signed: '-14.8', point_conditions: {temperature_K: {state: {tag: value, value: '1323.15'}, locator: {page: 3, table: '1', note: '1050 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-14.8'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 14.8; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '1.6058930E-10'}, {temperature_K: '1373.15', temperature_C_as_printed: '1100', neg_log_fO2_as_printed: '14.0', log_fO2_as_signed: '-14.0', point_conditions: {temperature_K: {state: {tag: value, value: '1373.15'}, locator: {page: 3, table: '1', note: '1100 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-14.0'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 14.0; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '1.0132500E-9'}, {temperature_K: '1423.15', temperature_C_as_printed: '1150', neg_log_fO2_as_printed: '13.4', log_fO2_as_signed: '-13.4', point_conditions: {temperature_K: {state: {tag: value, value: '1423.15'}, locator: {page: 3, table: '1', note: '1150 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-13.4'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 13.4; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '4.0338209E-9'}, {temperature_K: '1473.15', temperature_C_as_printed: '1200', neg_log_fO2_as_printed: '12.7', log_fO2_as_signed: '-12.7', point_conditions: {temperature_K: {state: {tag: value, value: '1473.15'}, locator: {page: 3, table: '1', note: '1200 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-12.7'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 12.7; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '2.0216995E-8'}]}
     - observation_id: sato73_12053_89_bulk_rock
-      experiment: sato-lunar-rock-oxygen-fugacity
+      experiment: sato73_12053_89_bulk_rock
+      regime: emf_cell
       type: partial_pressure
       locator: {page: 3, published_page: 1063, table: '1'}
       units: Pa; printed −log fO2 (atm) retained in each point
+      uncertainty: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted from the reported within-0.2-log-unit scatter (published pages 1061 and 1063). Basis: log10(fO2/atm).'
       values: {fugacity_conversion: "Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-neg_log_fO2_as_printed); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa. Printed -log fO2 (atm) and signed log condition are retained.", method_class: measured_tabulated, quantity: fugacity, sample_no_as_printed: '12053,89', material_as_printed: bulk rock, source_quantity_as_printed: '-log fO2 (atm)', points: [{temperature_K: '1273.15', temperature_C_as_printed: '1000', neg_log_fO2_as_printed: '15.4', log_fO2_as_signed: '-15.4', point_conditions: {temperature_K: {state: {tag: value, value: '1273.15'}, locator: {page: 3, table: '1', note: '1000 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-15.4'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 15.4; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '4.0338209E-11'}, {temperature_K: '1323.15', temperature_C_as_printed: '1050', neg_log_fO2_as_printed: '14.6', log_fO2_as_signed: '-14.6', point_conditions: {temperature_K: {state: {tag: value, value: '1323.15'}, locator: {page: 3, table: '1', note: '1050 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-14.6'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 14.6; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '2.5451689E-10'}, {temperature_K: '1373.15', temperature_C_as_printed: '1100', neg_log_fO2_as_printed: '13.8', log_fO2_as_signed: '-13.8', point_conditions: {temperature_K: {state: {tag: value, value: '1373.15'}, locator: {page: 3, table: '1', note: '1100 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-13.8'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 13.8; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '1.6058930E-9'}, {temperature_K: '1423.15', temperature_C_as_printed: '1150', neg_log_fO2_as_printed: '13.0', log_fO2_as_signed: '-13.0', point_conditions: {temperature_K: {state: {tag: value, value: '1423.15'}, locator: {page: 3, table: '1'}}, fO2_log: {state: {tag: value, value: '-13.0'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 13.0; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '1.0132500E-8'}, {temperature_K: '1473.15', temperature_C_as_printed: '1200', neg_log_fO2_as_printed: '12.3', log_fO2_as_signed: '-12.3', point_conditions: {temperature_K: {state: {tag: value, value: '1473.15'}, locator: {page: 3, table: '1', note: '1200 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-12.3'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 12.3; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '5.0782796E-8'}]}
     - observation_id: sato73_12053_89_pyroxenes
-      experiment: sato-lunar-rock-oxygen-fugacity
+      experiment: sato73_12053_89_pyroxenes
+      regime: emf_cell
       type: partial_pressure
       locator: {page: 3, published_page: 1063, table: '1'}
       units: Pa; printed −log fO2 (atm) retained in each point
+      uncertainty: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted from the reported within-0.2-log-unit scatter (published pages 1061 and 1063). Basis: log10(fO2/atm).'
       values: {fugacity_conversion: "Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-neg_log_fO2_as_printed); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa. Printed -log fO2 (atm) and signed log condition are retained.", method_class: measured_tabulated, quantity: fugacity, sample_no_as_printed: '12053,89', material_as_printed: pyroxenes, source_quantity_as_printed: '-log fO2 (atm)', points: [{temperature_K: '1273.15', temperature_C_as_printed: '1000', neg_log_fO2_as_printed: '15.3', log_fO2_as_signed: '-15.3', point_conditions: {temperature_K: {state: {tag: value, value: '1273.15'}, locator: {page: 3, table: '1', note: '1000 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-15.3'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 15.3; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '5.0782796E-11'}, {temperature_K: '1323.15', temperature_C_as_printed: '1050', neg_log_fO2_as_printed: '14.4', log_fO2_as_signed: '-14.4', point_conditions: {temperature_K: {state: {tag: value, value: '1323.15'}, locator: {page: 3, table: '1', note: '1050 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-14.4'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 14.4; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '4.0338209E-10'}, {temperature_K: '1373.15', temperature_C_as_printed: '1100', neg_log_fO2_as_printed: '13.6', log_fO2_as_signed: '-13.6', point_conditions: {temperature_K: {state: {tag: value, value: '1373.15'}, locator: {page: 3, table: '1', note: '1100 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-13.6'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 13.6; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '2.5451689E-9'}, {temperature_K: '1423.15', temperature_C_as_printed: '1150', neg_log_fO2_as_printed: '12.8', log_fO2_as_signed: '-12.8', point_conditions: {temperature_K: {state: {tag: value, value: '1423.15'}, locator: {page: 3, table: '1', note: '1150 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-12.8'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 12.8; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '1.6058930E-8'}, {temperature_K: '1473.15', temperature_C_as_printed: '1200', neg_log_fO2_as_printed: '12.1', log_fO2_as_signed: '-12.1', point_conditions: {temperature_K: {state: {tag: value, value: '1473.15'}, locator: {page: 3, table: '1', note: '1200 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-12.1'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 12.1; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '8.0485308E-8'}]}
     - observation_id: sato73_12053_89_bulk_plus_fe
-      experiment: sato-lunar-rock-oxygen-fugacity
+      experiment: sato73_12053_89_bulk_plus_fe
+      regime: emf_cell
       type: partial_pressure
       locator: {page: 3, published_page: 1063, table: '1'}
       units: Pa; printed −log fO2 (atm) retained in each point
+      uncertainty: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted from the reported within-0.2-log-unit scatter (published pages 1061 and 1063). Basis: log10(fO2/atm).'
       values: {fugacity_conversion: "Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-neg_log_fO2_as_printed); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa. Printed -log fO2 (atm) and signed log condition are retained.", method_class: measured_tabulated, quantity: fugacity, sample_no_as_printed: '12053,89', material_as_printed: 'bulk + Fe', source_quantity_as_printed: '-log fO2 (atm)', points: [{temperature_K: '1273.15', temperature_C_as_printed: '1000', neg_log_fO2_as_printed: '16.0', log_fO2_as_signed: '-16.0', point_conditions: {temperature_K: {state: {tag: value, value: '1273.15'}, locator: {page: 3, table: '1', note: '1000 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-16.0'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 16.0; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '1.0132500E-11'}, {temperature_K: '1323.15', temperature_C_as_printed: '1050', neg_log_fO2_as_printed: '15.2', log_fO2_as_signed: '-15.2', point_conditions: {temperature_K: {state: {tag: value, value: '1323.15'}, locator: {page: 3, table: '1', note: '1050 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-15.2'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 15.2; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '6.3931753E-11'}, {temperature_K: '1373.15', temperature_C_as_printed: '1100', neg_log_fO2_as_printed: '14.5', log_fO2_as_signed: '-14.5', point_conditions: {temperature_K: {state: {tag: value, value: '1373.15'}, locator: {page: 3, table: '1', note: '1100 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-14.5'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 14.5; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '3.2041778E-10'}, {temperature_K: '1423.15', temperature_C_as_printed: '1150', neg_log_fO2_as_printed: '13.8', log_fO2_as_signed: '-13.8', point_conditions: {temperature_K: {state: {tag: value, value: '1423.15'}, locator: {page: 3, table: '1'}}, fO2_log: {state: {tag: value, value: '-13.8'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 13.8; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '1.6058930E-9'}, {temperature_K: '1473.15', temperature_C_as_printed: '1200', neg_log_fO2_as_printed: '13.1', log_fO2_as_signed: '-13.1', point_conditions: {temperature_K: {state: {tag: value, value: '1473.15'}, locator: {page: 3, table: '1', note: '1200 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-13.1'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 13.1; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '8.0485308E-9'}]}
     - observation_id: sato73_14310_195_bulk_rock
-      experiment: sato-lunar-rock-oxygen-fugacity
+      experiment: sato73_14310_195_bulk_rock
+      regime: emf_cell
       type: partial_pressure
       locator: {page: 3, published_page: 1063, table: '1'}
       units: Pa; printed −log fO2 (atm) retained in each point
+      uncertainty: 'Measurement accuracy mostly better than 0.2 log fO2 unit; first-heating values for 14310 rose irreversibly above about 1170 °C and are distinguished from cooling-cycle values (published pages 1063 and 1067). Basis: log10(fO2/atm).'
       values: {fugacity_conversion: "Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-neg_log_fO2_as_printed); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa. Printed -log fO2 (atm) and signed log condition are retained.", method_class: measured_tabulated, quantity: fugacity, sample_no_as_printed: '14310,195', material_as_printed: bulk rock, source_quantity_as_printed: '-log fO2 (atm)', points: [{temperature_K: '1273.15', temperature_C_as_printed: '1000', neg_log_fO2_as_printed: '15.4', log_fO2_as_signed: '-15.4', point_conditions: {temperature_K: {state: {tag: value, value: '1273.15'}, locator: {page: 3, table: '1', note: '1000 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-15.4'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 15.4; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '4.0338209E-11'}, {temperature_K: '1323.15', temperature_C_as_printed: '1050', neg_log_fO2_as_printed: '14.5', log_fO2_as_signed: '-14.5', point_conditions: {temperature_K: {state: {tag: value, value: '1323.15'}, locator: {page: 3, table: '1', note: '1050 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-14.5'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 14.5; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '3.2041778E-10'}, {temperature_K: '1373.15', temperature_C_as_printed: '1100', neg_log_fO2_as_printed: '13.8', log_fO2_as_signed: '-13.8', point_conditions: {temperature_K: {state: {tag: value, value: '1373.15'}, locator: {page: 3, table: '1'}}, fO2_log: {state: {tag: value, value: '-13.8'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 13.8; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '1.6058930E-9'}, {temperature_K: '1423.15', temperature_C_as_printed: '1150', neg_log_fO2_as_printed: '13.3', log_fO2_as_signed: '-13.3', point_conditions: {temperature_K: {state: {tag: value, value: '1423.15'}, locator: {page: 3, table: '1'}}, fO2_log: {state: {tag: value, value: '-13.3'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 13.3; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '5.0782796E-9'}, {temperature_K: '1473.15', temperature_C_as_printed: '1200', neg_log_fO2_as_printed: '11.5', log_fO2_as_signed: '-11.5', point_conditions: {temperature_K: {state: {tag: value, value: '1473.15'}, locator: {page: 3, table: '1', note: '1200 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-11.5'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 11.5; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '3.2041778E-7'}]}
     - observation_id: sato73_14310_207_bulk_rock
-      experiment: sato-lunar-rock-oxygen-fugacity
+      experiment: sato73_14310_207_bulk_rock
+      regime: emf_cell
       type: partial_pressure
       locator: {page: 3, published_page: 1063, table: '1'}
       units: Pa; printed −log fO2 (atm) retained in each point
+      uncertainty: 'Measurement accuracy mostly better than 0.2 log fO2 unit; first-heating values for 14310 rose irreversibly above about 1170 °C and are distinguished from cooling-cycle values (published pages 1063 and 1067). Basis: log10(fO2/atm).'
       values: {fugacity_conversion: "Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-neg_log_fO2_as_printed); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa. Printed -log fO2 (atm) and signed log condition are retained.", method_class: measured_tabulated, quantity: fugacity, sample_no_as_printed: '14310,207', material_as_printed: bulk rock, source_quantity_as_printed: '-log fO2 (atm)', points: [{temperature_K: '1273.15', temperature_C_as_printed: '1000', neg_log_fO2_as_printed: '15.3', log_fO2_as_signed: '-15.3', point_conditions: {temperature_K: {state: {tag: value, value: '1273.15'}, locator: {page: 3, table: '1', note: '1000 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-15.3'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 15.3; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '5.0782796E-11'}, {temperature_K: '1323.15', temperature_C_as_printed: '1050', neg_log_fO2_as_printed: '14.5', log_fO2_as_signed: '-14.5', point_conditions: {temperature_K: {state: {tag: value, value: '1323.15'}, locator: {page: 3, table: '1', note: '1050 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-14.5'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 14.5; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '3.2041778E-10'}, {temperature_K: '1373.15', temperature_C_as_printed: '1100', neg_log_fO2_as_printed: '13.9', log_fO2_as_signed: '-13.9', point_conditions: {temperature_K: {state: {tag: value, value: '1373.15'}, locator: {page: 3, table: '1', note: '1100 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-13.9'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 13.9; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '1.2756062E-9'}, {temperature_K: '1423.15', temperature_C_as_printed: '1150', neg_log_fO2_as_printed: '13.2', log_fO2_as_signed: '-13.2', point_conditions: {temperature_K: {state: {tag: value, value: '1423.15'}, locator: {page: 3, table: '1', note: '1150 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-13.2'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 13.2; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '6.3931753E-9'}, {temperature_K: '1473.15', temperature_C_as_printed: '1200', neg_log_fO2_as_printed: '10.9', log_fO2_as_signed: '-10.9', point_conditions: {temperature_K: {state: {tag: value, value: '1473.15'}, locator: {page: 3, table: '1', note: '1200 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-10.9'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 10.9; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '1.2756062E-6'}]}
     - observation_id: sato73_14321_105_bulk_rock
-      experiment: sato-lunar-rock-oxygen-fugacity
+      experiment: sato73_14321_105_bulk_rock
+      regime: emf_cell
       type: partial_pressure
       locator: {page: 3, published_page: 1063, table: '1'}
       units: Pa; printed −log fO2 (atm) retained in each point
+      uncertainty: 'Measurement accuracy mostly better than 0.2 log fO2 unit (published pages 1061 and 1063). Basis: log10(fO2/atm).'
       values: {fugacity_conversion: "Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-neg_log_fO2_as_printed); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa. Printed -log fO2 (atm) and signed log condition are retained.", method_class: measured_tabulated, quantity: fugacity, sample_no_as_printed: '14321,105', material_as_printed: bulk rock, source_quantity_as_printed: '-log fO2 (atm)', points: [{temperature_K: '1273.15', temperature_C_as_printed: '1000', neg_log_fO2_as_printed: '15.6', log_fO2_as_signed: '-15.6', point_conditions: {temperature_K: {state: {tag: value, value: '1273.15'}, locator: {page: 3, table: '1', note: '1000 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-15.6'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 15.6; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '2.5451689E-11'}, {temperature_K: '1323.15', temperature_C_as_printed: '1050', neg_log_fO2_as_printed: '14.6', log_fO2_as_signed: '-14.6', point_conditions: {temperature_K: {state: {tag: value, value: '1323.15'}, locator: {page: 3, table: '1', note: '1050 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-14.6'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 14.6; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '2.5451689E-10'}, {temperature_K: '1373.15', temperature_C_as_printed: '1100', neg_log_fO2_as_printed: '13.9', log_fO2_as_signed: '-13.9', point_conditions: {temperature_K: {state: {tag: value, value: '1373.15'}, locator: {page: 3, table: '1'}}, fO2_log: {state: {tag: value, value: '-13.9'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 13.9; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '1.2756062E-9'}, {temperature_K: '1423.15', temperature_C_as_printed: '1150', neg_log_fO2_as_printed: '13.0', log_fO2_as_signed: '-13.0', point_conditions: {temperature_K: {state: {tag: value, value: '1423.15'}, locator: {page: 3, table: '1', note: '1150 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-13.0'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 13.0; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '1.0132500E-8'}, {temperature_K: '1473.15', temperature_C_as_printed: '1200', neg_log_fO2_as_printed: '12.3', log_fO2_as_signed: '-12.3', point_conditions: {temperature_K: {state: {tag: value, value: '1473.15'}, locator: {page: 3, table: '1'}}, fO2_log: {state: {tag: value, value: '-12.3'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 12.3; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '5.0782796E-8'}]}
     - observation_id: sato73_15058_81_bulk_rock
-      experiment: sato-lunar-rock-oxygen-fugacity
+      experiment: sato73_15058_81_bulk_rock
+      regime: emf_cell
       type: partial_pressure
       locator: {page: 3, published_page: 1063, table: '1'}
       units: Pa; printed −log fO2 (atm) retained in each point
+      uncertainty: 'Measurement accuracy mostly better than 0.2 log fO2 unit (published pages 1061 and 1063). Basis: log10(fO2/atm).'
       values: {fugacity_conversion: "Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-neg_log_fO2_as_printed); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa. Printed -log fO2 (atm) and signed log condition are retained.", method_class: measured_tabulated, quantity: fugacity, sample_no_as_printed: '15058,81', material_as_printed: bulk rock, source_quantity_as_printed: '-log fO2 (atm)', points: [{temperature_K: '1273.15', temperature_C_as_printed: '1000', neg_log_fO2_as_printed: '15.7', log_fO2_as_signed: '-15.7', point_conditions: {temperature_K: {state: {tag: value, value: '1273.15'}, locator: {page: 3, table: '1', note: '1000 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-15.7'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 15.7; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '2.0216995E-11'}, {temperature_K: '1323.15', temperature_C_as_printed: '1050', neg_log_fO2_as_printed: '14.9', log_fO2_as_signed: '-14.9', point_conditions: {temperature_K: {state: {tag: value, value: '1323.15'}, locator: {page: 3, table: '1', note: '1050 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-14.9'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 14.9; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '1.2756062E-10'}, {temperature_K: '1373.15', temperature_C_as_printed: '1100', neg_log_fO2_as_printed: '14.0', log_fO2_as_signed: '-14.0', point_conditions: {temperature_K: {state: {tag: value, value: '1373.15'}, locator: {page: 3, table: '1'}}, fO2_log: {state: {tag: value, value: '-14.0'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 14.0; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '1.0132500E-9'}, {temperature_K: '1423.15', temperature_C_as_printed: '1150', neg_log_fO2_as_printed: '13.3', log_fO2_as_signed: '-13.3', point_conditions: {temperature_K: {state: {tag: value, value: '1423.15'}, locator: {page: 3, table: '1'}}, fO2_log: {state: {tag: value, value: '-13.3'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 13.3; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '5.0782796E-9'}, {temperature_K: '1473.15', temperature_C_as_printed: '1200', neg_log_fO2_as_printed: '12.6', log_fO2_as_signed: '-12.6', point_conditions: {temperature_K: {state: {tag: value, value: '1473.15'}, locator: {page: 3, table: '1'}}, fO2_log: {state: {tag: value, value: '-12.6'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 12.6; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '2.5451689E-8'}]}
     - observation_id: sato73_15058_88_bulk_rock
-      experiment: sato-lunar-rock-oxygen-fugacity
+      experiment: sato73_15058_88_bulk_rock
+      regime: emf_cell
       type: partial_pressure
       locator: {page: 3, published_page: 1063, table: '1'}
       units: Pa; printed −log fO2 (atm) retained in each point
+      uncertainty: 'Measurement accuracy mostly better than 0.2 log fO2 unit (published pages 1061 and 1063). Basis: log10(fO2/atm).'
       values: {fugacity_conversion: "Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-neg_log_fO2_as_printed); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa. Printed -log fO2 (atm) and signed log condition are retained.", method_class: measured_tabulated, quantity: fugacity, sample_no_as_printed: '15058,88', material_as_printed: bulk rock, source_quantity_as_printed: '-log fO2 (atm)', points: [{temperature_K: '1273.15', temperature_C_as_printed: '1000', neg_log_fO2_as_printed: '15.7', log_fO2_as_signed: '-15.7', point_conditions: {temperature_K: {state: {tag: value, value: '1273.15'}, locator: {page: 3, table: '1', note: '1000 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-15.7'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 15.7; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '2.0216995E-11'}, {temperature_K: '1323.15', temperature_C_as_printed: '1050', neg_log_fO2_as_printed: '14.9', log_fO2_as_signed: '-14.9', point_conditions: {temperature_K: {state: {tag: value, value: '1323.15'}, locator: {page: 3, table: '1', note: '1050 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-14.9'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 14.9; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '1.2756062E-10'}, {temperature_K: '1373.15', temperature_C_as_printed: '1100', neg_log_fO2_as_printed: '14.0', log_fO2_as_signed: '-14.0', point_conditions: {temperature_K: {state: {tag: value, value: '1373.15'}, locator: {page: 3, table: '1', note: '1100 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-14.0'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 14.0; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '1.0132500E-9'}, {temperature_K: '1423.15', temperature_C_as_printed: '1150', neg_log_fO2_as_printed: '13.3', log_fO2_as_signed: '-13.3', point_conditions: {temperature_K: {state: {tag: value, value: '1423.15'}, locator: {page: 3, table: '1'}}, fO2_log: {state: {tag: value, value: '-13.3'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 13.3; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '5.0782796E-9'}, {temperature_K: '1473.15', temperature_C_as_printed: '1200', neg_log_fO2_as_printed: '12.5', log_fO2_as_signed: '-12.5', point_conditions: {temperature_K: {state: {tag: value, value: '1473.15'}, locator: {page: 3, table: '1', note: '1200 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-12.5'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 12.5; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '3.2041778E-8'}]}
     - observation_id: sato73_15595_25_bulk_rock
-      experiment: sato-lunar-rock-oxygen-fugacity
+      experiment: sato73_15595_25_bulk_rock
+      regime: emf_cell
       type: partial_pressure
       locator: {page: 3, published_page: 1063, table: '1'}
       units: Pa; printed −log fO2 (atm) retained in each point
+      uncertainty: 'Measurement accuracy mostly better than 0.2 log fO2 unit; heating and cooling results agreed for 15595 (published pages 1061 and 1063). Basis: log10(fO2/atm).'
       values: {fugacity_conversion: "Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-neg_log_fO2_as_printed); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa. Printed -log fO2 (atm) and signed log condition are retained.", method_class: measured_tabulated, quantity: fugacity, sample_no_as_printed: '15595,25', material_as_printed: bulk rock, source_quantity_as_printed: '-log fO2 (atm)', points: [{temperature_K: '1273.15', temperature_C_as_printed: '1000', neg_log_fO2_as_printed: '15.7', log_fO2_as_signed: '-15.7', point_conditions: {temperature_K: {state: {tag: value, value: '1273.15'}, locator: {page: 3, table: '1', note: '1000 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-15.7'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 15.7; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '2.0216995E-11'}, {temperature_K: '1323.15', temperature_C_as_printed: '1050', neg_log_fO2_as_printed: '14.9', log_fO2_as_signed: '-14.9', point_conditions: {temperature_K: {state: {tag: value, value: '1323.15'}, locator: {page: 3, table: '1', note: '1050 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-14.9'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 14.9; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '1.2756062E-10'}, {temperature_K: '1373.15', temperature_C_as_printed: '1100', neg_log_fO2_as_printed: '14.1', log_fO2_as_signed: '-14.1', point_conditions: {temperature_K: {state: {tag: value, value: '1373.15'}, locator: {page: 3, table: '1'}}, fO2_log: {state: {tag: value, value: '-14.1'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 14.1; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '8.0485308E-10'}, {temperature_K: '1423.15', temperature_C_as_printed: '1150', neg_log_fO2_as_printed: '13.2', log_fO2_as_signed: '-13.2', point_conditions: {temperature_K: {state: {tag: value, value: '1423.15'}, locator: {page: 3, table: '1'}}, fO2_log: {state: {tag: value, value: '-13.2'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 13.2; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '6.3931753E-9'}, {temperature_K: '1473.15', temperature_C_as_printed: '1200', neg_log_fO2_as_printed: '12.4', log_fO2_as_signed: '-12.4', point_conditions: {temperature_K: {state: {tag: value, value: '1473.15'}, locator: {page: 3, table: '1', note: '1200 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-12.4'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 12.4; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '4.0338209E-8'}]}
     - observation_id: sato73_15595_25_bulk_plus_fe
-      experiment: sato-lunar-rock-oxygen-fugacity
+      experiment: sato73_15595_25_bulk_plus_fe
+      regime: emf_cell
       type: partial_pressure
       locator: {page: 3, published_page: 1063, table: '1'}
       units: Pa; printed −log fO2 (atm) retained in each point
+      uncertainty: 'Measurement accuracy mostly better than 0.2 log fO2 unit; heating and cooling results agreed for 15595 (published pages 1061 and 1063). Basis: log10(fO2/atm).'
       values: {fugacity_conversion: "Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-neg_log_fO2_as_printed); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa. Printed -log fO2 (atm) and signed log condition are retained.", method_class: measured_tabulated, quantity: fugacity, sample_no_as_printed: '15595,25', material_as_printed: 'bulk + Fe', source_quantity_as_printed: '-log fO2 (atm)', points: [{temperature_K: '1273.15', temperature_C_as_printed: '1000', neg_log_fO2_as_printed: '16.0', log_fO2_as_signed: '-16.0', point_conditions: {temperature_K: {state: {tag: value, value: '1273.15'}, locator: {page: 3, table: '1', note: '1000 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-16.0'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 16.0; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '1.0132500E-11'}, {temperature_K: '1323.15', temperature_C_as_printed: '1050', neg_log_fO2_as_printed: '15.1', log_fO2_as_signed: '-15.1', point_conditions: {temperature_K: {state: {tag: value, value: '1323.15'}, locator: {page: 3, table: '1', note: '1050 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-15.1'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 15.1; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '8.0485308E-11'}, {temperature_K: '1373.15', temperature_C_as_printed: '1100', neg_log_fO2_as_printed: '14.2', log_fO2_as_signed: '-14.2', point_conditions: {temperature_K: {state: {tag: value, value: '1373.15'}, locator: {page: 3, table: '1'}}, fO2_log: {state: {tag: value, value: '-14.2'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 14.2; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '6.3931753E-10'}, {temperature_K: '1423.15', temperature_C_as_printed: '1150', neg_log_fO2_as_printed: '13.4', log_fO2_as_signed: '-13.4', point_conditions: {temperature_K: {state: {tag: value, value: '1423.15'}, locator: {page: 3, table: '1', note: '1150 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-13.4'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 13.4; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '4.0338209E-9'}, {temperature_K: '1473.15', temperature_C_as_printed: '1200', neg_log_fO2_as_printed: '12.7', log_fO2_as_signed: '-12.7', point_conditions: {temperature_K: {state: {tag: value, value: '1473.15'}, locator: {page: 3, table: '1', note: '1200 °C converted to K'}}, fO2_log: {state: {tag: value, value: '-12.7'}, locator: {page: 3, table: '1', note: 'Printed −log fO2 = 12.7; signed log fO2 retained for oxygen_condition resolution'}}}, fugacity_Pa: '2.0216995E-8'}]}
