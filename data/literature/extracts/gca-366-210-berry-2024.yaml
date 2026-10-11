@@ -59,31 +59,32 @@ species:
           note: Table 2 states that uncertainty in Ti3+/ΣTi is estimated to be similar to the LCF uncertainty, ±0.015; applied here to each numeric table cell as the shared printed estimate.
         values:
           quantity_as_printed: Ti3+/ΣTi
-          method: Ti K-edge XANES; composition-specific Ti3+ and Ti4+ end-member spectra are fitted by linear combination, with end-member proportions determined by the model described in the paper.
+          method: Recorded spectra of the most oxidised and most reduced glasses are fitted by linear combination over 4960–5000 eV, with the reduced glass Ti3+ fraction initially unknown. Eq. (3) jointly optimises that fraction, log K′, and the fO2 shift using the expected redox relation with fixed −1/4 dependence. Only afterward, Eq. (4) derives pure Ti3+ and Ti4+ end-member spectra. Printed pp. 212–214.
+          table2_model_interpretation: These Ti3+/SumTi values are outputs of a fit that assumes the one-electron (-1/4) fO2 dependence; the fO2 slope of this table is therefore not an independent measurement. The independent information is the position (log K') per composition.
           fO2_representation_as_printed: Table 2 reports nominal and calculated log fO2 in the conventional standard state, calculated ΔFMQ, and defines log fO2 relative to IW as log fO2_cal + 9.71. The experimental section cites Chase (1998) for thermodynamic data used for absolute log fO2 and O'Neill et al. (2018) for FMQ-relative values; these apply at 1400 °C. No fO2 values have been computed in this extract.
           temperature: 1400 °C for all rows.
-          fixed_method_phrase: Ti K-edge XANES; composition-specific Ti3+/Ti4+ end-member linear-combination fit
+          fixed_method_phrase: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence end-member spectra.
           rows:
             - logfO2_nom: '−3.1'
               logfO2_cal: '−3.10'
               delta_FMQ_cal: '3.29'
               Ti3+_over_SumTi: {AD: '0.000', AD+Fo: '0.000', AD+Wo: '0.000', AD+En: '0.000', AD+Qz: '0.000'}
-              method: Ti K-edge XANES; composition-specific Ti3+/Ti4+ end-member linear-combination fit
+              method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence end-member spectra.
             - logfO2_nom: '−9.4'
               logfO2_cal: '−9.40'
               delta_FMQ_cal: '−3.01'
               Ti3+_over_SumTi: {AD: '0.019', AD+Fo: '0.023', AD+Wo: '0.020', AD+En: '0.032', AD+Qz: '0.014'}
-              method: Ti K-edge XANES; composition-specific Ti3+/Ti4+ end-member linear-combination fit
+              method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence end-member spectra.
             - logfO2_nom: '−11.0'
               logfO2_cal: '−10.99'
               delta_FMQ_cal: '−4.60'
               Ti3+_over_SumTi: {AD: '0.042', AD+Fo: '0.042', AD+Wo: '0.040', AD+En: '0.058', AD+Qz: '0.069'}
-              method: Ti K-edge XANES; composition-specific Ti3+/Ti4+ end-member linear-combination fit
+              method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence end-member spectra.
             - logfO2_nom: '−12.0'
               logfO2_cal: '−12.01'
               delta_FMQ_cal: '−5.62'
               Ti3+_over_SumTi: {AD: '0.094', AD+Fo: '0.087', AD+Wo: '0.073', AD+En: '0.109', AD+Qz: '0.129'}
-              method: Ti K-edge XANES; composition-specific Ti3+/Ti4+ end-member linear-combination fit
+              method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence end-member spectra.
             - logfO2_nom: '−13.0'
               logfO2_cal: '−13.01'
               delta_FMQ_cal: '−6.62'
@@ -93,36 +94,36 @@ species:
                 AD+Wo: '0.125'
                 AD+En: {as_printed: '–', state: {tag: unknown, reason: not_published}}
                 AD+Qz: {as_printed: '–', state: {tag: unknown, reason: not_published}}
-              method: Ti K-edge XANES; composition-specific Ti3+/Ti4+ end-member linear-combination fit
+              method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence end-member spectra.
             - logfO2_nom: '−13.5'
               logfO2_cal: '−13.52'
               delta_FMQ_cal: '−7.13'
               Ti3+_over_SumTi: {AD: '0.185', AD+Fo: '0.190', AD+Wo: '0.165', AD+En: '0.226', AD+Qz: '0.262'}
-              method: Ti K-edge XANES; composition-specific Ti3+/Ti4+ end-member linear-combination fit
+              method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence end-member spectra.
             - logfO2_nom: '−14.0'
               logfO2_cal: '−13.98'
               delta_FMQ_cal: '−7.59'
               Ti3+_over_SumTi: {AD: '0.243', AD+Fo: '0.239', AD+Wo: '0.198', AD+En: '0.248', AD+Qz: '0.293'}
-              method: Ti K-edge XANES; composition-specific Ti3+/Ti4+ end-member linear-combination fit
+              method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence end-member spectra.
             - logfO2_nom: '−16.1'
               logfO2_cal: '−16.10'
               delta_FMQ_cal: '−9.71'
               Ti3+_over_SumTi: {AD: '0.511', AD+Fo: '0.500', AD+Wo: '0.451', AD+En: '0.558', AD+Qz: '0.622'}
-              method: Ti K-edge XANES; composition-specific Ti3+/Ti4+ end-member linear-combination fit
+              method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence end-member spectra.
             - logfO2_nom: '−18.0'
               logfO2_cal: '−16.35'
               delta_FMQ_cal: '−9.96'
               Ti3+_over_SumTi: {AD: '0.551', AD+Fo: '0.551', AD+Wo: '0.498', AD+En: '0.592', AD+Qz: '0.605'}
-              method: Ti K-edge XANES; composition-specific Ti3+/Ti4+ end-member linear-combination fit
+              method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence end-member spectra.
             - logfO2_nom: '−20.0'
               logfO2_cal: '−16.62'
               delta_FMQ_cal: '−10.23'
               Ti3+_over_SumTi: {AD: '0.591', AD+Fo: '0.579', AD+Wo: '0.539', AD+En: '0.613', AD+Qz: '0.674'}
-              method: Ti K-edge XANES; composition-specific Ti3+/Ti4+ end-member linear-combination fit
+              method: Recorded most oxidised and most reduced glass spectra are fitted by linear combination; Eq. (3) jointly optimises the reduced-glass Ti3+ fraction, log K′ and fO2 shift using the fixed −1/4 redox relation, then Eq. (4) derives pure-valence end-member spectra.
           calibration_and_model:
             method_and_locator: Ti K-edge XANES spectra, printed pp. 212–215 (PDF pp. 4–7).
             energy_reference: Ti foil first derivative-spectrum peak set to 4966.4 eV; printed p. 212.
-            spectral_feature: LCF over 4960–5000 eV; printed p. 213. Pre-edge fit uses three same-line-shape pseudo-Voigt peaks and intensity-weighted centroid around 4970 eV; printed p. 212. Table 2 values use the LCF model rather than the centroid as direct valence calibration.
-            end_members: For each composition, calculated Ti3+ and Ti4+ end-member spectra are composition-specific. The most oxidised sample is assumed to have Ti3+/ΣTi = 0; the reduced end-member Ti3+/ΣTi is unknown and determined by nonlinear least squares against the expected log(Ti3+/Ti4+)–log fO2 relation. The resulting end-member spectra are combined by linear combination; printed pp. 213–215, especially Eqs. (3)–(4) and Fig. 7.
+            spectral_feature: LCF over 4960–5000 eV; printed p. 212. Pre-edge fit uses three same-line-shape pseudo-Voigt peaks and intensity-weighted centroid around 4970 eV; printed p. 212. Table 2 values use the LCF model rather than the centroid as direct valence calibration.
+            end_members: For each composition, the recorded spectra of the most oxidised and most reduced glasses are fitted by linear combination; the reduced glass Ti3+ fraction is initially unknown. Eq. (3) jointly optimises that fraction, log K′, and the shared fO2 shift using the expected log(Ti3+/Ti4+)–log fO2 relation with fixed −1/4 dependence (printed pp. 212–213). Only afterward, Eq. (4) derives pure Ti3+ and Ti4+ end-member spectra (printed p. 214).
             physical_compounds: Ti2O3, TiO2, and Ni2.62Ti0.69O4 (spinel) standards mixed with BN (~1 wt% Ti) are described as prepared previously; printed p. 212. The paper does not state that these compounds set the Table 2 Ti3+/ΣTi scale.
             model_note: The expected relation is log(Ti3+/Ti4+) = −1/4 log fO2 − log K′ (Eq. 1, printed p. 211). No slope or fO2 value has been calculated in this extract.
