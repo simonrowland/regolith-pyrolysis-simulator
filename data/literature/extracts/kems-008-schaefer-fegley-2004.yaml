@@ -71,7 +71,9 @@ species:
 
         SiO | ∼ 9.0(−7) | 7.1(−7)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Grossman et al. (2000) model and Schaefer & Fegley (2004) MAGMA model, Table 4"
         semantics: bound_not_point_ordering
         quantity: calculated_partial_vapor_pressures
         Grossman_as_published: ∼ 9.0(−7)
@@ -91,7 +93,9 @@ species:
 
         SiO | 3.01(12) | 1.60(14) | 1.19(16)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Schaefer & Fegley (2004) MAGMA model, Table 9"
         semantics: bound_not_point_ordering
         quantity: calculated_molecular_flux
         published_cells:
@@ -239,7 +243,9 @@ species:
 
         Mg | ∼ 2.0(−7)a | 1.4(−7)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Grossman et al. (2000) model and Schaefer & Fegley (2004) MAGMA model, Table 4"
         semantics: bound_not_point_ordering
         quantity: calculated_partial_vapor_pressures
         Grossman_as_published: ∼ 2.0(−7)a
@@ -259,7 +265,9 @@ species:
 
         Mg | 1.70(11) | 6.69(12) | 3.49(14)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Schaefer & Fegley (2004) MAGMA model, Table 9"
         semantics: bound_not_point_ordering
         quantity: calculated_molecular_flux
         published_cells:
@@ -669,7 +677,9 @@ species:
 
         MgO | ∼ 8.0(−10) | 3.6(−10)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Grossman et al. (2000) model and Schaefer & Fegley (2004) MAGMA model, Table 4"
         semantics: bound_not_point_ordering
         quantity: calculated_partial_vapor_pressures
         Grossman_as_published: ∼ 8.0(−10)
@@ -878,7 +888,9 @@ species:
 
         SiO2 | ∼ 7.0(−9) | 4.6(−9)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Grossman et al. (2000) model and Schaefer & Fegley (2004) MAGMA model, Table 4"
         semantics: bound_not_point_ordering
         quantity: calculated_partial_vapor_pressures
         Grossman_as_published: ∼ 7.0(−9)
@@ -898,7 +910,9 @@ species:
 
         SiO2 | 4.08(11) | 1.65(13) | 9.26(14)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Schaefer & Fegley (2004) MAGMA model, Table 9"
         semantics: bound_not_point_ordering
         quantity: calculated_molecular_flux
         published_cells:
@@ -1032,7 +1046,9 @@ species:
 
         K2 O (liq) + SiO2 (liq) = K2 SiO3 (liq) | 0.27 | 12735 | Hastie and Bonnell (1985)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Hastie and Bonnell (1985); quoted in Schaefer & Fegley (2004), Table 2"
         semantics: bound_not_point_ordering
         quantity: equilibrium_constant_parameters
         formula_as_published: log10 K = A + B/T
@@ -1040,7 +1056,7 @@ species:
         A: 0.27
         B: 12735
         reference: Hastie and Bonnell (1985)
-        evidence_class: thermodynamic_model_parameter
+        evidence_class: quoted_attributed
     - observation_id: sf2004_t2_reaction_2
       type: gibbs_table
       class: model
@@ -1055,7 +1071,9 @@ species:
 
         K2 O (liq) + 2SiO2 (liq) = K2 Si2 O5 (liq) | 0.35 | 14685 | Hastie and Bonnell (1985)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Hastie and Bonnell (1985); quoted in Schaefer & Fegley (2004), Table 2"
         semantics: bound_not_point_ordering
         quantity: equilibrium_constant_parameters
         formula_as_published: log10 K = A + B/T
@@ -1063,7 +1081,7 @@ species:
         A: 0.35
         B: 14685
         reference: Hastie and Bonnell (1985)
-        evidence_class: thermodynamic_model_parameter
+        evidence_class: quoted_attributed
     - observation_id: sf2004_t2_reaction_3
       type: gibbs_table
       class: model
@@ -1078,7 +1096,9 @@ species:
 
         K2 O (liq) + 4SiO2 (liq) = K2 Si4 O9 (liq) | −0.96 | 17572 | Hastie and Bonnell (1985)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Hastie and Bonnell (1985); quoted in Schaefer & Fegley (2004), Table 2"
         semantics: bound_not_point_ordering
         quantity: equilibrium_constant_parameters
         formula_as_published: log10 K = A + B/T
@@ -1086,7 +1106,7 @@ species:
         A: -0.96
         B: 17572
         reference: Hastie and Bonnell (1985)
-        evidence_class: thermodynamic_model_parameter
+        evidence_class: quoted_attributed
     - observation_id: sf2004_t2_reaction_4
       type: gibbs_table
       class: model
@@ -1102,7 +1122,9 @@ species:
         0.5K2 O (liq) + CaO (liq) + 0.5Al2 O3 + 2SiO2 (liq) = KCaAlSi2 O7 (liq) | 4.30 | 17037 | Hastie and Bonnell
         (1985)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Hastie and Bonnell (1985); quoted in Schaefer & Fegley (2004), Table 2"
         semantics: bound_not_point_ordering
         quantity: equilibrium_constant_parameters
         formula_as_published: log10 K = A + B/T
@@ -1110,7 +1132,7 @@ species:
         A: 4.3
         B: 17037
         reference: Hastie and Bonnell (1985)
-        evidence_class: thermodynamic_model_parameter
+        evidence_class: quoted_attributed
   "Na":
     observations:
     - observation_id: sf2004_t2_reaction_5
@@ -1127,7 +1149,9 @@ species:
 
         Na (g) = Na+ (g) + e− (g) | −15.33 | 36735 | Chase (1998)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Chase (1998); quoted in Schaefer & Fegley (2004), Table 2"
         semantics: bound_not_point_ordering
         quantity: equilibrium_constant_parameters
         formula_as_published: log10 K = A + B/T
@@ -1135,7 +1159,7 @@ species:
         A: -15.33
         B: 36735
         reference: Chase (1998)
-        evidence_class: thermodynamic_model_parameter
+        evidence_class: quoted_attributed
     - observation_id: sf2004_t8_na_model
       type: gibbs_table
       class: model
@@ -1150,7 +1174,9 @@ species:
 
         Na | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Schaefer & Fegley (2004) MAGMA model, Table 8"
         semantics: bound_not_point_ordering
         quantity: calculated_metal_to_sodium_abundance
         T_as_published: 1900 K
@@ -1194,7 +1220,9 @@ species:
 
         Na | 1.00(17)a | 7.94(17) | 7.67(18)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Schaefer & Fegley (2004) MAGMA model, Table 9"
         semantics: bound_not_point_ordering
         quantity: calculated_molecular_flux
         published_cells:
@@ -1218,7 +1246,9 @@ species:
 
         K (g) = K+ (g) + e− (g) | 2.76 | 23760 | Chase (1998)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Chase (1998); quoted in Schaefer & Fegley (2004), Table 2"
         semantics: bound_not_point_ordering
         quantity: equilibrium_constant_parameters
         formula_as_published: log10 K = A + B/T
@@ -1226,7 +1256,7 @@ species:
         A: 2.76
         B: 23760
         reference: Chase (1998)
-        evidence_class: thermodynamic_model_parameter
+        evidence_class: quoted_attributed
     - observation_id: sf2004_t8_k_model
       type: gibbs_table
       class: model
@@ -1241,7 +1271,9 @@ species:
 
         K | 0.10b | 2.11(−4)c | 1.88(−4) | 1.87(−4) | 2.92(−3) | 1.19(−4)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Schaefer & Fegley (2004) MAGMA model, Table 8"
         semantics: bound_not_point_ordering
         quantity: calculated_metal_to_sodium_abundance
         T_as_published: 1900 K
@@ -1285,7 +1317,9 @@ species:
 
         K | 1.01(13) | 9.84(13) | 1.22(15)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Schaefer & Fegley (2004) MAGMA model, Table 9"
         semantics: bound_not_point_ordering
         quantity: calculated_molecular_flux
         published_cells:
@@ -1309,7 +1343,9 @@ species:
 
         Al | ∼ 9.0(−12) | 3.4(−12)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Grossman et al. (2000) model and Schaefer & Fegley (2004) MAGMA model, Table 4"
         semantics: bound_not_point_ordering
         quantity: calculated_partial_vapor_pressures
         Grossman_as_published: ∼ 9.0(−12)
@@ -1329,7 +1365,9 @@ species:
 
         Al | < 0.008 | 8.77(−9) | 2.68(−9) | 5.79(−9) | 3.98(−10) | 1.31(−8)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Schaefer & Fegley (2004) MAGMA model, Table 8"
         semantics: bound_not_point_ordering
         quantity: calculated_metal_to_sodium_abundance
         T_as_published: 1900 K
@@ -1375,7 +1413,9 @@ species:
 
         AlO | ∼ 9.0(−11) | 2.7(−11)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Grossman et al. (2000) model and Schaefer & Fegley (2004) MAGMA model, Table 4"
         semantics: bound_not_point_ordering
         quantity: calculated_partial_vapor_pressures
         Grossman_as_published: ∼ 9.0(−11)
@@ -1397,7 +1437,9 @@ species:
 
         Al2 O | ∼ 10.0(−15) | 2.3(−15)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Grossman et al. (2000) model and Schaefer & Fegley (2004) MAGMA model, Table 4"
         semantics: bound_not_point_ordering
         quantity: calculated_partial_vapor_pressures
         Grossman_as_published: ∼ 10.0(−15)
@@ -1419,7 +1461,9 @@ species:
 
         O | ∼ 3.0(−7) | 3.4(−7)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Grossman et al. (2000) model and Schaefer & Fegley (2004) MAGMA model, Table 4"
         semantics: bound_not_point_ordering
         quantity: calculated_partial_vapor_pressures
         Grossman_as_published: ∼ 3.0(−7)
@@ -1439,7 +1483,9 @@ species:
 
         O | 5.65(14) | 8.84(15) | 1.76(17)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Schaefer & Fegley (2004) MAGMA model, Table 9"
         semantics: bound_not_point_ordering
         quantity: calculated_molecular_flux
         published_cells:
@@ -1463,7 +1509,9 @@ species:
 
         O2 | ∼ 3.0(−7) | 2.6(−7)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Grossman et al. (2000) model and Schaefer & Fegley (2004) MAGMA model, Table 4"
         semantics: bound_not_point_ordering
         quantity: calculated_partial_vapor_pressures
         Grossman_as_published: ∼ 3.0(−7)
@@ -1483,7 +1531,9 @@ species:
 
         O2 | 2.10(18) | 1.66(17) | 1.58(18)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Schaefer & Fegley (2004) MAGMA model, Table 9"
         semantics: bound_not_point_ordering
         quantity: calculated_molecular_flux
         published_cells:
@@ -1507,7 +1557,9 @@ species:
 
         Ca | ∼ 1.5(−9) | 1.1(−9)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Grossman et al. (2000) model and Schaefer & Fegley (2004) MAGMA model, Table 4"
         semantics: bound_not_point_ordering
         quantity: calculated_partial_vapor_pressures
         Grossman_as_published: ∼ 1.5(−9)
@@ -1527,7 +1579,9 @@ species:
 
         Ca | < 0.001 | 8.25(−9) | 4.15(−9) | 1.03(−8) | 7.91(−10) | 1.60(−7)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Schaefer & Fegley (2004) MAGMA model, Table 8"
         semantics: bound_not_point_ordering
         quantity: calculated_metal_to_sodium_abundance
         T_as_published: 1900 K
@@ -1573,7 +1627,9 @@ species:
 
         CaO | ∼ 2.5(−11) | 1.6(−11)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Grossman et al. (2000) model and Schaefer & Fegley (2004) MAGMA model, Table 4"
         semantics: bound_not_point_ordering
         quantity: calculated_partial_vapor_pressures
         Grossman_as_published: ∼ 2.5(−11)
@@ -1595,7 +1651,9 @@ species:
 
         Total | ∼ 1.7(−6) | 1.5(−6)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Grossman et al. (2000) model and Schaefer & Fegley (2004) MAGMA model, Table 4"
         semantics: bound_not_point_ordering
         quantity: calculated_partial_vapor_pressures
         Grossman_as_published: ∼ 1.7(−6)
@@ -1615,7 +1673,9 @@ species:
 
         Tholeiites | 4.719 | −16761 | 7.72(−5)d | 5.52(−5) | 7.72(−5)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Schaefer & Fegley (2004) MAGMA model, Table 7"
         semantics: bound_not_point_ordering
         quantity: calculated_total_vapor_pressure
         T_K: 1900.0
@@ -1641,7 +1701,9 @@ species:
 
         MORBs | – | – | 8.23(−5)e | 7.79(−5) | 1.01(−4)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Schaefer & Fegley (2004) MAGMA model, Table 7"
         semantics: bound_not_point_ordering
         quantity: calculated_total_vapor_pressure
         T_K: 1900.0
@@ -1667,7 +1729,9 @@ species:
 
         Alkalis | 4.716 | −16037 | 1.87(−4) | – | –'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Schaefer & Fegley (2004) MAGMA model, Table 7"
         semantics: bound_not_point_ordering
         quantity: calculated_total_vapor_pressure
         T_K: 1900.0
@@ -1693,7 +1757,9 @@ species:
 
         OIBs | – | – | 1.26(−4)e | 3.59(−5) | 4.43(−4)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Schaefer & Fegley (2004) MAGMA model, Table 7"
         semantics: bound_not_point_ordering
         quantity: calculated_total_vapor_pressure
         T_K: 1900.0
@@ -1719,7 +1785,9 @@ species:
 
         Komatiites | 4.480 | −16404 | 6.89(−5) | 2.08(−5) | 9.73(−5)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Schaefer & Fegley (2004) MAGMA model, Table 7"
         semantics: bound_not_point_ordering
         quantity: calculated_total_vapor_pressure
         T_K: 1900.0
@@ -1745,7 +1813,9 @@ species:
 
         Dunite | 4.618 | −15724 | 2.19(−4) | – | –'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Schaefer & Fegley (2004) MAGMA model, Table 7"
         semantics: bound_not_point_ordering
         quantity: calculated_total_vapor_pressure
         T_K: 1900.0
@@ -1771,7 +1841,9 @@ species:
 
         CAIs | 3.890 | −15373 | 6.46(−5) | 1.98(−5) | 1.62(−4)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Schaefer & Fegley (2004) MAGMA model, Table 7"
         semantics: bound_not_point_ordering
         quantity: calculated_total_vapor_pressure
         T_K: 1900.0
@@ -1799,7 +1871,9 @@ species:
 
         Si | < 0.014 | 2.35(−3) | 3.49(−4) | 1.27(−3) | 8.31(−5) | 3.79(−4)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Schaefer & Fegley (2004) MAGMA model, Table 8"
         semantics: bound_not_point_ordering
         quantity: calculated_metal_to_sodium_abundance
         T_as_published: 1900 K
@@ -1845,7 +1919,9 @@ species:
 
         Ti | < 0.014 | 1.68(−6) | 6.67(−7) | 2.08(−7) | 3.31(−8) | 6.79(−7)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Schaefer & Fegley (2004) MAGMA model, Table 8"
         semantics: bound_not_point_ordering
         quantity: calculated_metal_to_sodium_abundance
         T_as_published: 1900 K
@@ -1891,7 +1967,9 @@ species:
 
         Fe | < 0.038 | 4.10(−3) | 1.26(−3) | 4.53(−3) | 1.26(−3) | 2.64(−4)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Schaefer & Fegley (2004) MAGMA model, Table 8"
         semantics: bound_not_point_ordering
         quantity: calculated_metal_to_sodium_abundance
         T_as_published: 1900 K
@@ -1935,7 +2013,9 @@ species:
 
         Fe | 1.64(13) | 4.03(14) | 1.29(16)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Schaefer & Fegley (2004) MAGMA model, Table 9"
         semantics: bound_not_point_ordering
         quantity: calculated_molecular_flux
         published_cells:
@@ -1959,7 +2039,9 @@ species:
 
         e− | 6.51(14) | 1.10(16) | 2.42(17)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Schaefer & Fegley (2004) MAGMA model, Table 9"
         semantics: bound_not_point_ordering
         quantity: calculated_molecular_flux
         published_cells:
@@ -1983,7 +2065,9 @@ species:
 
         FeO | 1.30(13) | 2.56(14) | 6.45(15)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Schaefer & Fegley (2004) MAGMA model, Table 9"
         semantics: bound_not_point_ordering
         quantity: calculated_molecular_flux
         published_cells:
@@ -2007,7 +2091,9 @@ species:
 
         NaO | 1.26(13) | 2.43(14) | 6.20(15)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Schaefer & Fegley (2004) MAGMA model, Table 9"
         semantics: bound_not_point_ordering
         quantity: calculated_molecular_flux
         published_cells:
@@ -2031,7 +2117,9 @@ species:
 
         Na+ | 3.02(12) | 5.20(13) | 1.15(15)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Schaefer & Fegley (2004) MAGMA model, Table 9"
         semantics: bound_not_point_ordering
         quantity: calculated_molecular_flux
         published_cells:
@@ -2055,7 +2143,9 @@ species:
 
         K+ | 1.21(11) | 1.50(12) | 2.37(13)'
       values:
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: "Schaefer & Fegley (2004) MAGMA model, Table 9"
         semantics: bound_not_point_ordering
         quantity: calculated_molecular_flux
         published_cells:
