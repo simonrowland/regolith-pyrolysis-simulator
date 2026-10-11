@@ -728,10 +728,15 @@ def _fit_piecewise_candidate(
             if cell is h_anchor_cell:
                 continue
             index = _segment_index(cell.temperature_K, bounds)
-            row = h_row(index, cell.temperature_K)
+            # Difference observations from the printed T0 cell for numerical
+            # conditioning; the exact constraint below carries its absolute
+            # H298-baseline value into the fitted integration constant.
+            row = h_row(index, cell.temperature_K) - h_row(
+                h_anchor_index, h_anchor_cell.temperature_K
+            )
             add_observation(
                 row,
-                (h_anchor_J + cell.value * 1000.0) / R_J_PER_MOL_K,
+                (cell.value - h_anchor_cell.value) * 1000.0 / R_J_PER_MOL_K,
                 cell.uncertainty * 1000.0,
             )
 

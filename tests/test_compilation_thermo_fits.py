@@ -273,6 +273,12 @@ def test_compound_fit_anchors_and_formation_acceptance_across_fe_reference_trans
     assert abs(h_rt * R_J_PER_MOL_K * 298.15 - (12500.0 + elemental_H298)) < 1e-6
     assert abs(s_r * R_J_PER_MOL_K - 58.0) < 1e-8
     stats = result.record["fit_statistics"]
+    assert stats["derived_formation_H_kJ_per_mol"]["max_abs"] <= stats[
+        "maximum_printed_rounding_allowance"
+    ]["delta_fH_kJ_per_mol"]
+    assert stats["derived_formation_G_kJ_per_mol"]["max_abs"] <= stats[
+        "maximum_printed_rounding_allowance"
+    ]["delta_fG_kJ_per_mol"]
     assert stats["derived_formation_H_kJ_per_mol"]["max_abs"] < 5e-9
     assert stats["derived_formation_G_kJ_per_mol"]["max_abs"] < 5e-9
     assert stats["maximum_printed_rounding_allowance"]["Cp_J_per_mol_K"] == 5e-10
