@@ -90,14 +90,12 @@ from simulator.battery.score import (
     SINGLE_LIQUID_ENGINES,
     compile_residual,
     compute_metric,
-    derive_kems_partial_pressure_band,
     dumps_residual_line,
     engines_from_names,
     flagged_stratum_payloads,
     headline_payloads,
     load_score_context,
     parse_species_formula,
-    pooled_log_pressure_sd,
     predict_with_engine,
     resolve_source_relation,
     residual_to_plain,
@@ -562,124 +560,12 @@ def test_p_partial_without_composition_still_refuses_identity() -> None:
     assert "composition" in outcome.fields
 
 
-def test_pooled_log_pressure_sd_known_replicates() -> None:
-    assert pooled_log_pressure_sd(((-1, 0, 1), (9, 10, 11))) == Decimal("1")
 
 
-def test_kems_band_derives_known_replicate_scatter() -> None:
-    experiment = F.kems_experiment()
-    identity = replace(
-        _partial_identity(),
-        total_pressure_Pa=State.of(Decimal("1e-6")),
-    )
-    first = F.observation(
-        "kems-replicate-1",
-        experiment.experiment_id,
-        identity,
-        Decimal("10"),
-        evidence=EvidenceClass.MEASURED_DIRECT,
-    )
-    second = F.observation(
-        "kems-replicate-2",
-        experiment.experiment_id,
-        identity,
-        Decimal("100"),
-        evidence=EvidenceClass.MEASURED_DIRECT,
-    )
-    band = derive_kems_partial_pressure_band(
-        {first.observation_id: first, second.observation_id: second},
-        {experiment.experiment_id: experiment},
-    )
-    assert band is not None
-    assert band.unit == "dimensionless"
-    assert band.value == Decimal("0.5").sqrt()
-    assert "replicate scatter" in band.rule
-    assert "pooled replicate" in band.rule
 
 
-def test_kems_band_uses_source_printed_pressure_uncertainty() -> None:
-    experiment = F.kems_experiment()
-    reference = replace(
-        F.observation(
-            "kems-printed-pressure",
-            experiment.experiment_id,
-            _partial_identity(),
-            Decimal("10"),
-            evidence=EvidenceClass.MEASURED_DIRECT,
-            source_id="kems-042-plante-1979",
-        ),
-        uncertainty=Uncertainty(
-            kind=UncertaintyKind.PRINTED,
-            verbatim={
-                "temperature_quote": (
-                    "At 1500 K, the estimated 20 K error yields an error "
-                    "in K pressure of about 40 percent."
-                )
-            },
-        ),
-    )
-    band = derive_kems_partial_pressure_band(
-        {reference.observation_id: reference},
-        {experiment.experiment_id: experiment},
-    )
-    assert band is not None
-    assert band.value == Decimal("1.4").ln() / Decimal("10").ln()
-    assert "source-printed" in band.rule
-    assert "log10(1.40)" in band.rule
-    assert "page-280 1500 K sentence" in band.rule
-    assert "upper multiplicative edge" in band.rule
-    assert "[1/1.40, 1.40] (-28.6%..+40%)" in band.rule
-    assert "+/-40% relative band" in band.rule
-    assert "single 1500 K figure is applied across the tabulated T range" in band.rule
 
 
-def test_kems_band_prefers_printed_envelope_over_replicate_scatter() -> None:
-    experiment = F.kems_experiment()
-    identity = _partial_identity()
-    printed = replace(
-        F.observation(
-            "kems-printed-with-replicates",
-            experiment.experiment_id,
-            identity,
-            Decimal("10"),
-            evidence=EvidenceClass.MEASURED_DIRECT,
-            source_id="kems-042-plante-1979",
-        ),
-        uncertainty=Uncertainty(
-            kind=UncertaintyKind.PRINTED,
-            verbatim={
-                "temperature_quote": (
-                    "At 1500 K, the estimated 20 K error yields an error "
-                    "in K pressure of about 40 percent."
-                )
-            },
-        ),
-    )
-    replicate_low = F.observation(
-        "kems-replicate-low",
-        experiment.experiment_id,
-        identity,
-        Decimal("10"),
-        evidence=EvidenceClass.MEASURED_DIRECT,
-    )
-    replicate_high = F.observation(
-        "kems-replicate-high",
-        experiment.experiment_id,
-        identity,
-        Decimal("100"),
-        evidence=EvidenceClass.MEASURED_DIRECT,
-    )
-    band = derive_kems_partial_pressure_band(
-        {
-            item.observation_id: item
-            for item in (printed, replicate_low, replicate_high)
-        },
-        {experiment.experiment_id: experiment},
-    )
-    assert band is not None
-    assert band.value == Decimal("1.4").ln() / Decimal("10").ln()
-    assert "source-printed" in band.rule
-    assert "pooled replicate" not in band.rule
 
 
 @pytest.mark.parametrize(
@@ -824,27 +710,6 @@ def test_uncalibrated_kems_residual_matches_between_oxygen_balance_engines() -> 
     )
 
 
-def test_uncalibrated_kems_partial_pressure_is_excluded_from_band_population() -> None:
-    experiment = F.kems_experiment(kn=None, calibrated=False)
-    first = _uncalibrated_kems_partial_row(
-        experiment, "uncalibrated-kems-replicate-1", Decimal("10")
-    )
-    second = _uncalibrated_kems_partial_row(
-        experiment, "uncalibrated-kems-replicate-2", Decimal("100")
-    )
-    printed_pressure_error = Uncertainty(
-        kind=UncertaintyKind.PRINTED,
-        verbatim="10% pressure error",
-    )
-    first = replace(first, uncertainty=printed_pressure_error)
-    second = replace(second, uncertainty=printed_pressure_error)
-
-    band = derive_kems_partial_pressure_band(
-        {first.observation_id: first, second.observation_id: second},
-        {experiment.experiment_id: experiment},
-    )
-
-    assert band is None
 
 
 def test_zhang_alpha_gamma_bound_uses_implied_alpha_verdict() -> None:
@@ -1403,7 +1268,7 @@ def test_green_thermo_residual_is_score_eligible() -> None:
         source_id="work-1",
     )
     residual, candidate = _compile(ref, exp, _predict(Decimal("0"), ident))
-    assert residual.status is ResidualStatus.MATCH
+    assert residual.status is ResidualStatus.NO_BAND
     assert residual.score_eligible is True
     assert residual.numeric is not None
     assert residual.numeric.value == Decimal("0")
@@ -3448,7 +3313,7 @@ def test_report_states_admission_alone_deaths_without_changing_the_rule() -> Non
     residual_pending, _ = _compile(pending, exp, _predict(Decimal("0"), ident))
     assert residual_admitted.score_eligible is True
     assert residual_pending.score_eligible is False
-    assert residual_pending.status is ResidualStatus.MATCH
+    assert residual_pending.status is ResidualStatus.NO_BAND
     assert residual_pending.numeric is not None
     assert residual_pending.exclusions == ("admission_admitted",)
 
@@ -3509,7 +3374,7 @@ def test_non_thermo_quantities_keep_numeric_residual_without_invented_band() -> 
     )
     assert reason is None
     assert thermo is not None
-    assert thermo.decision_band.rule.startswith("LEGACY fallback: gibbs_battery_residual_ledger.yaml")
+    assert thermo.decision_band is None
 
     exp = F.tabulation_experiment()
     ident = F.psat_identity("Na")
@@ -3529,7 +3394,7 @@ def test_non_thermo_quantities_keep_numeric_residual_without_invented_band() -> 
     assert residual.refusal is None
 
 
-def test_no_band_residual_carries_printed_uncertainty() -> None:
+def test_unstated_printed_uncertainty_sets_a_band_and_notice() -> None:
     exp = F.tabulation_experiment()
     ident = F.psat_identity("Na")
     ref = replace(
@@ -3547,10 +3412,16 @@ def test_no_band_residual_carries_printed_uncertainty() -> None:
         ),
     )
     residual, _ = _compile(ref, exp, _predict(Decimal("0.2"), ident))
-    assert residual.status is ResidualStatus.NO_BAND
     assert residual.numeric is not None
     assert residual.numeric.metric_uncertainty == ref.uncertainty
     assert residual.numeric.value == Decimal(str(math.log10(2)))
+    assert residual.numeric.decision_band is not None
+    assert residual.numeric.decision_band.rule.startswith("printed_unstated:")
+    assert any(
+        notice.reason == "uncertainty_kind_unstated"
+        and notice.band == '{"sigma": "0.02"}'
+        for notice in residual.notices
+    )
 
 
 def test_headline_records_keep_tiers_separate_and_count_no_band() -> None:
@@ -3585,7 +3456,7 @@ def test_headline_records_keep_tiers_separate_and_count_no_band() -> None:
     derived_band = DecisionBand(
         Decimal("0.1"),
         "dimensionless",
-        "test residual distribution: 2x median absolute deviation; derived_n=10",
+        "derived_scatter: source-only sigma=1.4826×MAD; n_sources=10; mad=0.01",
     )
     measured = F.residual(
         "headline-measured::p_sat::vapour::internal-analytical",
@@ -3649,11 +3520,11 @@ def test_headline_records_keep_tiers_separate_and_count_no_band() -> None:
     assert by_tier["compilation"]["n_no_band"] == 0
     assert by_tier["compilation"]["rms_dex"] == "0.3"
     stratum = by_tier["compilation"]["decision_strata"][0]
-    assert stratum["band_kind"] == "derived_2xMAD"
+    assert stratum["band_kind"] == "derived_scatter"
     assert stratum["band_derived_n"] == 10
-    assert stratum["tail_out_count"] == 1
-    assert stratum["tail_in_count"] == 0
-    assert "tail membership, not accuracy" in by_tier["compilation"]["match_rate_label"]
+    assert stratum["tail_out_count"] is None
+    assert stratum["tail_in_count"] is None
+    assert by_tier["compilation"]["match_rate_label"] == "band membership"
     payload_record = next(
         row
         for row in headline_payload_records(
@@ -3667,9 +3538,10 @@ def test_headline_records_keep_tiers_separate_and_count_no_band() -> None:
         and row["engine"] == Engine.INTERNAL_ANALYTICAL.value
     )
     payload_stratum = payload_record["decision_strata"][0]
-    assert payload_stratum["band_kind"] == "derived_2xMAD"
-    assert payload_stratum["tail_out_count"] == 1
-    assert "tail membership, not accuracy" in payload_record["match_rate_label"]
+    assert payload_stratum["band_kind"] == "derived_scatter"
+    assert payload_stratum["band_derived_n"] == 10
+    assert payload_stratum["tail_out_count"] is None
+    assert payload_record["match_rate_label"] == "band membership"
 
 
 def test_compilation_series_does_not_change_empirical_headline() -> None:
@@ -3759,7 +3631,7 @@ def test_compilation_series_does_not_change_empirical_headline() -> None:
         thermochemistry["n_candidates"],
         thermochemistry["n_scored"],
         thermochemistry["n_inside_band"],
-    ) == (1, 1, 1)
+    ) == (1, 1, 0)
 
 
 def test_pyrolysis_yield_keeps_residual_without_robinot_floor() -> None:
@@ -4064,178 +3936,10 @@ def test_non_alkali_alpha_is_refused_with_no_rail() -> None:
     assert "::vapour::" not in residual.key
 
 
-def test_legacy_gibbs_band_is_relation_agnostic_and_derived_band_wins() -> None:
-    """Legacy ΔfG fallback ignores lineage; a supplied quantity band wins."""
-
-    from simulator.battery.score import decision_band_for, populate_numeric
-
-    for quantity in (
-        Quantity.CP,
-        Quantity.S,
-        Quantity.H_MINUS_H298,
-        Quantity.LOG10_KF,
-    ):
-        assert decision_band_for(quantity, SourceRelation.INDEPENDENT) is None
-        numeric, reason, detail = populate_numeric(
-            quantity=quantity,
-            candidate=Decimal("10"),
-            reference=Decimal("9"),
-            source_relation=SourceRelation.INDEPENDENT,
-        )
-        assert numeric is not None
-        assert numeric.decision_band is None
-        assert reason is None
-        assert detail == {}
-    assert decision_band_for(Quantity.DELTA_FH, SourceRelation.INDEPENDENT) is None
-    for relation in SourceRelation:
-        band = decision_band_for(Quantity.DELTA_FG, relation)
-        assert band is not None
-        assert band.value == Decimal("1.0")
-        assert band.unit == "kJ_per_declared_mol_basis"
-        assert band.rule.startswith("LEGACY fallback:")
-    family_band = DecisionBand(
-        Decimal("0.25"), "J_per_declared_mol_basis_per_K", "family residuals"
-    )
-    assert (
-        decision_band_for(
-            Quantity.CP, SourceRelation.UNKNOWN, derived_band=family_band
-        )
-        == family_band
-    )
-    numeric, reason, _detail = populate_numeric(
-        quantity=Quantity.DELTA_FG,
-        candidate=Decimal("1"),
-        reference=Decimal("1"),
-        source_relation=SourceRelation.INDEPENDENT,
-    )
-    assert reason is None
-    assert numeric is not None
-    assert numeric.decision_band.unit == "kJ_per_declared_mol_basis"
 
 
-def test_printed_cell_uncertainty_and_family_mad_are_quantity_scaled() -> None:
-    from types import SimpleNamespace
-
-    from simulator.battery.enums import QUANTITY_UNITS
-    from simulator.battery.score import (
-        _printed_uncertainty_band,
-        _residual_distribution_band,
-    )
-
-    def source(quantity: Quantity, unit: str):
-        return SimpleNamespace(
-            locator=SimpleNamespace(note=f"printed unit='{unit}'"),
-            derivation=SimpleNamespace(output_unit=QUANTITY_UNITS[quantity]),
-        )
-
-    printed = _printed_uncertainty_band(
-        Quantity.CP,
-        Uncertainty(kind=UncertaintyKind.PRINTED, verbatim="±0.24"),
-        Decimal("300"),
-        source_observation=source(Quantity.CP, "J/mol·K"),
-    )
-    assert printed == DecisionBand(
-        Decimal("0.24"),
-        "J_per_declared_mol_basis_per_K",
-        "source-printed per-cell uncertainty",
-    )
-    relative_printed = _printed_uncertainty_band(
-        Quantity.O2_YIELD,
-        Uncertainty(kind=UncertaintyKind.PRINTED, verbatim="2%"),
-        Decimal("0.5"),
-    )
-    assert relative_printed is not None
-    assert relative_printed.value == Decimal("0.02")
-    assert relative_printed.unit == "dimensionless"
-
-    kcal_printed = _printed_uncertainty_band(
-        Quantity.DELTA_FG,
-        Uncertainty(kind=UncertaintyKind.PRINTED, verbatim="0.137"),
-        Decimal("-1"),
-        source_observation=source(Quantity.DELTA_FG, "kcal gfw^-1"),
-    )
-    assert kcal_printed is not None
-    assert kcal_printed.value == Decimal("0.573208")
-
-    joule_printed = _printed_uncertainty_band(
-        Quantity.DELTA_FG,
-        Uncertainty(kind=UncertaintyKind.PRINTED, verbatim="100"),
-        Decimal("77.077"),
-        source_observation=source(Quantity.DELTA_FG, "J/mol"),
-    )
-    assert joule_printed is not None
-    assert joule_printed.value == Decimal("0.100")
-
-    parenthetical_printed = _printed_uncertainty_band(
-        Quantity.DELTA_FG,
-        Uncertainty(kind=UncertaintyKind.PRINTED, verbatim="(0.389)"),
-        Decimal("-2095.071"),
-        source_observation=source(Quantity.DELTA_FG, "kJ/mol"),
-    )
-    assert parenthetical_printed is not None
-    assert parenthetical_printed.value == Decimal("0.389")
-
-    log_k_printed = _printed_uncertainty_band(
-        Quantity.LOG10_KF,
-        Uncertainty(kind=UncertaintyKind.PRINTED, verbatim="(0.068)"),
-        Decimal("109.436"),
-        source_observation=source(Quantity.LOG10_KF, "dimensionless"),
-    )
-    assert log_k_printed is not None
-    assert log_k_printed.value == Decimal("0.068")
-
-    family = _residual_distribution_band(
-        [Decimal(value) for value in ("-10", "-1", "0", "1", "10") * 2],
-        unit="J_per_declared_mol_basis_per_K",
-        family="USGS",
-        quantity=Quantity.CP,
-    )
-    assert family is not None
-    assert family.value == Decimal("2")
-    assert family.unit == "J_per_declared_mol_basis_per_K"
-    assert "2x median absolute deviation" in family.rule
-    assert "derived_n=10" in family.rule
-    assert _residual_distribution_band(
-        [Decimal(value) for value in ("-10", "-1", "0", "1", "10")],
-        unit="J_per_declared_mol_basis_per_K",
-        family="USGS",
-        quantity=Quantity.CP,
-    ) is None
 
 
-def test_applying_kj_band_to_cp_is_refused(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Forcing the Gibbs kJ band onto cp is a dimension refusal, not a match."""
-
-    from simulator.battery import score as score_mod
-
-    band = score_mod.THERMOCHEMISTRY_DECISION_BANDS[SourceRelation.INDEPENDENT]
-    assert score_mod.band_dimension_matches(Quantity.CP, band) is False
-    assert score_mod.band_dimension_matches(Quantity.S, band) is False
-    assert score_mod.band_dimension_matches(Quantity.LOG10_KF, band) is False
-    assert score_mod.band_dimension_matches(Quantity.DELTA_FG, band) is True
-    assert score_mod.band_dimension_matches(Quantity.DELTA_FH, band) is True
-    # H-H298 shares the kJ/mol dimension and is still not a sourced band.
-    assert score_mod.band_dimension_matches(Quantity.H_MINUS_H298, band) is True
-    assert (
-        score_mod.decision_band_for(Quantity.H_MINUS_H298, SourceRelation.INDEPENDENT)
-        is None
-    )
-    monkeypatch.setattr(
-        score_mod,
-        "decision_band_for",
-        lambda quantity, source_relation: band,
-    )
-    numeric, reason, detail = score_mod.populate_numeric(
-        quantity=Quantity.CP,
-        candidate=Decimal("50"),
-        reference=Decimal("40"),
-        source_relation=SourceRelation.INDEPENDENT,
-    )
-    assert numeric is None
-    assert reason is RefusalReason.DECISION_RULE_MISSING
-    assert detail.get("reason") == "band_dimension_mismatch:cp"
-    assert detail.get("quantity_unit") == "J_per_declared_mol_basis_per_K"
-    assert detail.get("band_unit") == "kJ_per_declared_mol_basis"
 
 
 def test_candidate_census_splits_admitted_from_pending() -> None:
@@ -5068,7 +4772,7 @@ def _streaming_score_fixture():
             DecisionBand(
                 Decimal("2"),
                 unit,
-                "source-printed per-cell uncertainty",
+                "printed_1sigma: source-printed uncertainty",
             ),
         ),
     )
@@ -5096,7 +4800,7 @@ def _streaming_score_fixture():
             DecisionBand(
                 Decimal("0.231"),
                 "dimensionless",
-                "source-printed per-cell uncertainty",
+                "printed_1sigma: source-printed uncertainty",
             ),
         ),
     )
@@ -5249,13 +4953,7 @@ def test_streamed_scoring_is_byte_identical_to_legacy_fixture(
         isinstance(row.get("numeric"), dict)
         and isinstance(row["numeric"].get("decision_band"), dict)
         and row["numeric"]["decision_band"].get("rule")
-        == "source-printed per-cell uncertainty"
-        for row in rows
-    )
-    assert any(
-        isinstance(row.get("numeric"), dict)
-        and isinstance(row["numeric"].get("decision_band"), dict)
-        and "residual distribution" in row["numeric"]["decision_band"].get("rule", "")
+        .startswith("printed_1sigma:")
         for row in rows
     )
     assert any(row.get("status") == ResidualStatus.NO_BAND.value for row in rows)
@@ -8384,9 +8082,11 @@ def test_real_stolyarova_cell_passes_mo_gate_and_scores_with_notice(
         prediction=prediction,
         derived_band=band,
     )
-    assert residual.status is ResidualStatus.MATCH
+    assert residual.status is ResidualStatus.NO_BAND
     assert residual.numeric is not None
-    assert residual.numeric.decision_band == band
+    assert residual.numeric.decision_band is None
+    assert residual.refusal is not None
+    assert residual.refusal.detail["reason"] == "unparseable_printed_uncertainty"
     assert residual.score_eligible is False
     assert any(
         item.kind is NoticeKind.CELL_MATERIAL_INFERRED
@@ -8398,118 +8098,6 @@ def test_real_stolyarova_cell_passes_mo_gate_and_scores_with_notice(
     assert strata[0]["stratum"] == "cell-material-inferred"
 
 
-def test_stolyarova_rows_do_not_move_any_kems_band_path(tmp_path: Path) -> None:
-    from simulator.battery.enums import BenchIdentityBasis, CellMaterial
-    from simulator.battery.records import Bench, BenchIdentity
-    from simulator.battery.score import _derive_kems_partial_pressure_band
-
-    context = _migrated_stolyarova_cell_context(tmp_path)
-    flagged = next(
-        item
-        for item in context.observations.values()
-        if isinstance(item.identity, Identity)
-        and quantity_token(item.identity) is Quantity.P_PARTIAL
-        and item.evidence.class_.is_value
-        and item.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
-    )
-    flagged_experiment = context.experiments[flagged.experiment_id]
-    flagged_bench = context.benches[flagged_experiment.bench_id]
-
-    ordinary_kems = F.kems_experiment(
-        "stolyarova-clean-kems", flagged_experiment.work_id or "work-1"
-    )
-    clean_bench = Bench(
-        id="stolyarova-clean-pt",
-        work_id=ordinary_kems.work_id or "work-1",
-        identity=BenchIdentity(BenchIdentityBasis.DESCRIBED_IN_THIS_WORK),
-        cell_materials=(F.located(CellMaterial.PT),),
-    )
-    clean_experiment = replace(ordinary_kems, bench_id=clean_bench.id)
-    band_identity = replace(
-        flagged.identity,
-        species=replace(flagged.identity.species, phase=State.of(Phase.G)),
-        composition=_partial_identity().composition,
-    )
-    clean_rows = tuple(
-        replace(
-            flagged,
-            observation_id=f"stolyarova-clean-{index}",
-            experiment_id=clean_experiment.experiment_id,
-            source_id="stolyarova-clean-test",
-            identity=band_identity,
-            value=Value.point_of(value),
-            notices=(),
-        )
-        for index, value in enumerate((Decimal("1e-4"), Decimal("2e-4")))
-    )
-    clean = {row.observation_id: row for row in clean_rows}
-    experiments = {
-        flagged_experiment.experiment_id: flagged_experiment,
-        clean_experiment.experiment_id: clean_experiment,
-    }
-    benches = {flagged_bench.id: flagged_bench, clean_bench.id: clean_bench}
-
-    printed_clean = {
-        row.observation_id: replace(
-            row,
-            uncertainty=Uncertainty(
-                UncertaintyKind.PRINTED,
-                verbatim="10% pressure error",
-            ),
-        )
-        for row in clean_rows
-    }
-    printed_flagged = replace(
-        flagged,
-        uncertainty=Uncertainty(
-            UncertaintyKind.PRINTED,
-            verbatim="80% pressure error",
-        ),
-    )
-    printed_flagged_replica = replace(
-        printed_flagged,
-        observation_id="stolyarova-inferred-printed-replica",
-        value=Value.point_of(Decimal("1e-2")),
-    )
-    printed_mixed = {
-        **printed_clean,
-        printed_flagged.observation_id: printed_flagged,
-        printed_flagged_replica.observation_id: printed_flagged_replica,
-    }
-    printed_baseline = _derive_kems_partial_pressure_band(
-        printed_clean, experiments, {clean_bench.id: clean_bench}
-    )
-    printed_mixed_band = _derive_kems_partial_pressure_band(
-        printed_mixed, experiments, benches
-    )
-    assert printed_baseline is not None
-    assert "printed pressure envelope" in printed_baseline.rule
-    assert printed_mixed_band == printed_baseline
-
-    flagged_replica = replace(
-        flagged,
-        observation_id="stolyarova-inferred-replicate",
-        identity=band_identity,
-        value=Value.point_of(Decimal("1e-2")),
-    )
-    replicate_flagged = replace(flagged, identity=band_identity)
-    replicate_mixed = {
-        **clean,
-        flagged.observation_id: replicate_flagged,
-        flagged_replica.observation_id: flagged_replica,
-    }
-    replicate_baseline = _derive_kems_partial_pressure_band(
-        clean, experiments, {clean_bench.id: clean_bench}
-    )
-    replicate_mixed_band = _derive_kems_partial_pressure_band(
-        replicate_mixed, experiments, benches
-    )
-    assert replicate_baseline is not None
-    assert "replicate scatter" in replicate_baseline.rule
-    assert replicate_mixed_band == replicate_baseline
-    assert derive_kems_partial_pressure_band(
-        replicate_mixed, experiments, benches=benches
-    ) == replicate_baseline
 
 
 def test_inferred_mo_cell_scores_and_is_visible_on_residual_row() -> None:
@@ -8560,9 +8148,9 @@ def test_inferred_mo_cell_scores_and_is_visible_on_residual_row() -> None:
         predict=prediction,
     )
 
-    assert residual.status is ResidualStatus.MATCH
+    assert residual.status is ResidualStatus.NO_BAND
     assert residual.numeric is not None
-    assert residual.numeric.decision_band is not None
+    assert residual.numeric.decision_band is None
     assert residual.score_eligible is False
     assert "not_flagged_stratum" in residual.exclusions
     notice = next(
@@ -8592,102 +8180,8 @@ def test_inferred_mo_cell_scores_and_is_visible_on_residual_row() -> None:
             "rms_dex": "0",
         }
     ]
-    from simulator.battery.score import _derive_kems_partial_pressure_band
-
-    assert _derive_kems_partial_pressure_band(
-        context.observations, context.experiments, context.benches
-    ) == residual.numeric.decision_band
 
 
-def test_inferred_cell_replicates_do_not_move_fallback_band() -> None:
-    from simulator.battery.enums import CellMaterial
-    from simulator.battery.score import _derive_kems_partial_pressure_band
-
-    inference = Derivation(
-        relation="inferred from printed Mo oxide ions",
-        inputs=("Mo+;MoO+;MoO2+;MoO3+",),
-        parameters=(),
-        output_unit="cell material",
-    )
-    flagged, flagged_context, flagged_bench, _ = _cell_material_score_case(
-        CellMaterial.MO, inference
-    )
-    flagged_exp = flagged_context.experiments[flagged.experiment_id]
-    flagged_replica = replace(
-        flagged,
-        observation_id="inferred-replica",
-        value=Value.point_of(Decimal("1e-3")),
-    )
-
-    clean_exp = replace(flagged_exp, experiment_id="clean-kems", bench_id="clean-cell")
-    clean = replace(
-        flagged,
-        observation_id="clean-row",
-        experiment_id=clean_exp.experiment_id,
-        value=Value.point_of(Decimal("1e-6")),
-    )
-    clean_replica = replace(
-        clean,
-        observation_id="clean-replica",
-        value=Value.point_of(Decimal("2e-6")),
-    )
-    clean_bench = replace(
-        flagged_bench,
-        id="clean-cell",
-        cell_materials=(F.located(CellMaterial.PT),),
-    )
-    experiments = {
-        flagged_exp.experiment_id: flagged_exp,
-        clean_exp.experiment_id: clean_exp,
-    }
-    clean_rows = {row.observation_id: row for row in (clean, clean_replica)}
-    mixed_rows = {
-        row.observation_id: row
-        for row in (clean, clean_replica, flagged, flagged_replica)
-    }
-
-    clean_band = _derive_kems_partial_pressure_band(
-        clean_rows, experiments, {clean_bench.id: clean_bench}
-    )
-    mixed_band = _derive_kems_partial_pressure_band(
-        mixed_rows,
-        experiments,
-        {clean_bench.id: clean_bench, flagged_bench.id: flagged_bench},
-    )
-    assert clean_band is not None
-    assert mixed_band == clean_band
-    # The public helper must receive the same bench map as scoring so it can
-    # exclude inferred cell materials itself.
-    from simulator.battery.score import (
-        derive_kems_partial_pressure_band,
-        decision_band_for,
-    )
-
-    inferred_only = {
-        row.observation_id: row for row in (flagged, flagged_replica)
-    }
-    assert derive_kems_partial_pressure_band(
-        inferred_only, {flagged_exp.experiment_id: flagged_exp}
-    ) is not None
-    assert derive_kems_partial_pressure_band(
-        inferred_only,
-        {flagged_exp.experiment_id: flagged_exp},
-        benches={flagged_bench.id: flagged_bench},
-    ) is None
-    assert _derive_kems_partial_pressure_band(
-        inferred_only,
-        {flagged_exp.experiment_id: flagged_exp},
-        {flagged_bench.id: flagged_bench},
-    ) is None
-    assert decision_band_for(
-        Quantity.P_PARTIAL,
-        SourceRelation.INDEPENDENT,
-        rail=Rail.VAPOUR,
-        method=MethodToken.KNUDSEN_EFFUSION,
-        observations=inferred_only,
-        experiments={flagged_exp.experiment_id: flagged_exp},
-        derived_band=None,
-    ) is None
 
 
 @pytest.mark.parametrize(
