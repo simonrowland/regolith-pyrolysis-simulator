@@ -63,6 +63,7 @@ from simulator.battery.migrate import (
     dump_yaml,
     iter_observation_store_paths,
     lineage_parents_from_source,
+    source_derivation_from_source,
     load_migrated_context,
     map_phase,
     map_quantity,
@@ -2446,6 +2447,36 @@ def test_source_derivation_and_inference_inputs_are_validated(
         assert "Derivation.inputs" in issues[0].detail
     else:
         assert not issues
+
+
+def test_source_derivation_reports_relation_and_inputs_independently() -> None:
+    _, missing_both = source_derivation_from_source(
+        {}, {"derivation": {"output_unit": "Pa"}}
+    )
+    assert {detail for _, detail in missing_both} == {
+        "Derivation.inputs is required unless raw_inputs is located not_printed",
+        "derivation relation (author method) is required",
+    }
+
+    _, missing_relation = source_derivation_from_source(
+        {}, {"derivation": {"inputs": ["pdf:fixture"], "output_unit": "Pa"}}
+    )
+    assert [detail for _, detail in missing_relation] == [
+        "derivation relation (author method) is required"
+    ]
+
+    _, missing_inputs = source_derivation_from_source(
+        {},
+        {
+            "derivation": {
+                "relation": "author calculation",
+                "output_unit": "Pa",
+            }
+        },
+    )
+    assert [detail for _, detail in missing_inputs] == [
+        "Derivation.inputs is required unless raw_inputs is located not_printed"
+    ]
 
 
 @pytest.mark.parametrize("location", ["values", "observation"])

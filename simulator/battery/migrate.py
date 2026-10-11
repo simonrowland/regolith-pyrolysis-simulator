@@ -5711,11 +5711,11 @@ def source_derivation_from_source(
         parsed, error = _decode_author_annotation(raw, _derivation_from_plain)
         if error is not None:
             invalid.append((field, error))
-            continue
         if relation_missing:
             invalid.append(
                 (field, "derivation relation (author method) is required")
             )
+        if error is not None or relation_missing:
             continue
         if derivation is None and parsed is not None:
             derivation = parsed
