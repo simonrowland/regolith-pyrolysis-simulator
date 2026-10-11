@@ -391,17 +391,23 @@ def _zhang_k_case(tmp_path: Path, temperature: str):
     return context, reference
 
 
-@pytest.mark.parametrize(
-    ("temperature", "expected_alpha"),
-    [
-        ("1473.15", 20.0),
-        ("1673.15", 45.0),
-    ],
-)
+def _assert_zhang_rb2o_refused(residual, reference) -> None:
+    # The old pin depended on a silent Rb2O drop; follow-up t-1183 adds a
+    # flagged projection so the row predicts with a notice.
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
+    assert residual.refusal.detail["reason"] == "outside_supported_species"
+    assert residual.refusal.detail["engine_reason"] == "imcc_component_outside_domain"
+    weights = composition_wt_pct(reference.identity.composition.value)
+    assert weights is not None
+    assert weights["Rb2O"] == pytest.approx(1.86, abs=0.02)
+
+
+@pytest.mark.parametrize("temperature", ["1473.15", "1673.15"])
 def test_openimcc_zhang_implied_alpha_uses_coefficient_details(
     tmp_path: Path,
     temperature: str,
-    expected_alpha: float,
 ) -> None:
     _require_openimcc()
     context, reference = _zhang_k_case(tmp_path, temperature)
@@ -414,14 +420,8 @@ def test_openimcc_zhang_implied_alpha_uses_coefficient_details(
         context=context,
         handles={"openimcc": handle},
     )
-    assert candidate is not None
-    assert candidate.authority is Authority.EXTRAPOLATED
-    assert residual.status is ResidualStatus.MISMATCH
-    assert residual.numeric is not None
-    assert residual.numeric.verdict == "physically_impossible"
-    assert float(10 ** float(residual.numeric.value)) == pytest.approx(
-        expected_alpha, rel=0.03
-    )
+    assert candidate is None
+    _assert_zhang_rb2o_refused(residual, reference)
 
 
 @pytest.mark.parametrize(
@@ -443,7 +443,12 @@ def test_openimcc_zhang_implied_alpha_refuses_bad_coefficient_details(
 
     def altered_equilibrate_cell(*args, **kwargs):
         cell = real_equilibrate_cell(*args, **kwargs)
-        details = dict(cell.melt_activity_coefficient_details)
+        # Rb2O is refused before a KO0.5 coefficient detail exists. Leave
+        # that cell unchanged; the modes below still apply when a detail exists.
+        raw_details = cell.melt_activity_coefficient_details or {}
+        if "KO0.5" not in raw_details:
+            return cell
+        details = dict(raw_details)
         if details_mode == "absent":
             details.pop("KO0.5", None)
         elif details_mode == "parent_oxide":
@@ -485,9 +490,7 @@ def test_openimcc_zhang_implied_alpha_refuses_bad_coefficient_details(
         handles={"openimcc": handle},
     )
     assert candidate is None
-    assert residual.status is ResidualStatus.REFUSED
-    assert residual.refusal is not None
-    assert residual.refusal.reason is RefusalReason.COEFFICIENT_BASIS_MISMATCH
+    _assert_zhang_rb2o_refused(residual, reference)
 
 
 def test_openimcc_engine_is_registered() -> None:
