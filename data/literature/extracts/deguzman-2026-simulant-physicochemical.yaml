@@ -12,26 +12,17 @@ extraction:
 review_status: draft
 corrections: []
 fidelity_samples:
-- species: LHS-2
-  observable: simulant_characterisation
-  observation_id: deguzman_2026_table2_lhs2_elemental_composition
-  field: elemental_composition_wt_pct
+- path: species.LHS-2.observations[deguzman_2026_table2_lhs2_elemental_composition].values.rows[1].wt_pct
   value: 23.818
   locator:
     pdf_page_index: 5
     table: '2'
-- species: LHS-2
-  observable: rate_series
-  observation_id: deguzman_2026_table3_lhs2_bet_texture
-  field: surface_area_m2_g
+- path: species.LHS-2.observations[deguzman_2026_table3_bet_texture].values.rows[3].surface_area_m2_g
   value: 0.349
   locator:
     pdf_page_index: 7
     table: '3'
-- species: LHS-2
-  observable: rate_series
-  observation_id: deguzman_2026_table4_lhs2_gas_adsorption
-  field: co2_uptake_mmol_g
+- path: species.LHS-2.observations[deguzman_2026_table4_gas_adsorption].values.rows[3].CO2_mmol_g
   value: 0.044
   locator:
     pdf_page_index: 9
