@@ -986,5 +986,56 @@
     "locator": {"printed_page": 94, "label": "Table 396, Fe(g)"},
     "source_record_id": "table-396", "derivation": "Differentiate the printed heat-content equation term by term; cal/mol differentiated by kelvin gives cal/(mol·K), and the constant drops out.",
     "derivative_of_equation_index": 112
+  },
+  {
+    "formula": "Cr", "phase": "c", "polymorph": null, "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 4.16T + 1.81×10^-3T^2 - 0.30×10^5T^-1 - 1,301",
+    "terms": ["a*T", "b*T^2", "c*T^-1", "d"], "coefficients_as_printed": ["4.16", "1.81×10^-3", "-0.30×10^5", "-1,301"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [298, 2176], "accuracy_as_printed": "1.2 percent",
+    "locator": {"printed_page": 57, "label": "Table 227, Cr(c)"},
+    "source_record_id": "table-227", "gate_cells": [{"temperature_K": 500}, {"temperature_K": 1000}, {"temperature_K": 2000}]
+  },
+  {
+    "formula": "Cr", "phase": "c", "polymorph": null, "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 4.16 + 3.62×10^-3T + 0.30×10^5T^-2",
+    "terms": ["a", "b*T", "c*T^-2"], "coefficients_as_printed": ["4.16", "3.62×10^-3", "0.30×10^5"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [298, 2176], "accuracy_as_printed": null,
+    "locator": {"printed_page": 57, "label": "Table 227, Cr(c)"},
+    "source_record_id": "table-227", "derivation": "Differentiate the printed heat-content equation term by term: the negative T^-1 term gives a positive T^-2 term; cal/mol differentiated by kelvin gives cal/(mol·K).",
+    "derivative_of_equation_index": 114
+  },
+  {
+    "formula": "Cr", "phase": "l", "polymorph": null, "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 9.40T + 890",
+    "terms": ["a*T", "d"], "coefficients_as_printed": ["9.40", "890"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [2176, 3000], "accuracy_as_printed": "0.1 percent",
+    "locator": {"printed_page": 57, "label": "Table 227, Cr(l)"},
+    "source_record_id": "table-227", "gate_cells": [{"temperature_K": 2200}, {"temperature_K": 2600}, {"temperature_K": 3000}]
+  },
+  {
+    "formula": "Cr", "phase": "l", "polymorph": null, "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 9.40",
+    "terms": ["a"], "coefficients_as_printed": ["9.40"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [2176, 3000], "accuracy_as_printed": null,
+    "locator": {"printed_page": 57, "label": "Table 227, Cr(l)"},
+    "source_record_id": "table-227", "derivation": "The derivative of the linear heat-content term is the constant 9.40; cal/mol differentiated by kelvin gives cal/(mol·K).",
+    "derivative_of_equation_index": 116
+  },
+  {
+    "formula": "Cr", "phase": "g", "polymorph": null, "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 4.16T + 0.44×10^-3T^2 - 0.48×10^5T^-1 - 1,118",
+    "terms": ["a*T", "b*T^2", "c*T^-1", "d"], "coefficients_as_printed": ["4.16", "0.44×10^-3", "-0.48×10^5", "-1,118"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [298, 3000], "accuracy_as_printed": "1.6 percent",
+    "locator": {"printed_page": 57, "label": "Table 228, Cr(g)"},
+    "source_record_id": "table-228", "gate_cells": [{"temperature_K": 500}, {"temperature_K": 1000}, {"temperature_K": 2000}]
+  },
+  {
+    "formula": "Cr", "phase": "g", "polymorph": null, "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 4.16 + 0.88×10^-3T + 0.48×10^5T^-2",
+    "terms": ["a", "b*T", "c*T^-2"], "coefficients_as_printed": ["4.16", "0.88×10^-3", "0.48×10^5"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [298, 3000], "accuracy_as_printed": null,
+    "locator": {"printed_page": 57, "label": "Table 228, Cr(g)"},
+    "source_record_id": "table-228", "derivation": "Differentiate the printed heat-content equation term by term: the negative T^-1 term gives a positive T^-2 term; cal/mol differentiated by kelvin gives cal/(mol·K).",
+    "derivative_of_equation_index": 118
   }
 ]

@@ -291,6 +291,17 @@ def test_iron_equations_keep_each_printed_phase_curve_and_gate_outcomes():
         assert by_key[(source_id, polymorph, "heat_capacity")]["gate"]["status"] == "passed"
 
 
+def test_chromium_elemental_phases_keep_their_independent_table_gates():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "Cr"]
+    assert len(curves) == 6
+    by_key = {(curve["phase"], curve["quantity"]): curve for curve in curves}
+    assert by_key[("c", "heat_content_increment")]["gate"]["reason"] == "transcription_gate_failed"
+    assert by_key[("c", "heat_capacity")]["gate"]["reason"] == "no_independent_check"
+    assert all(by_key[("l", quantity)]["gate"]["status"] == "passed" for quantity in ("heat_content_increment", "heat_capacity"))
+    assert by_key[("g", "heat_content_increment")]["gate"]["reason"] == "transcription_gate_failed"
+    assert by_key[("g", "heat_capacity")]["gate"]["reason"] == "no_independent_check"
+
+
 def test_heat_content_gate_detects_a_coefficient_mutation():
     heat = loader.load_published_curves()[0]
     changed = {**heat, "coefficients_as_printed": ["11.77", *heat["coefficients_as_printed"][1:]]}
