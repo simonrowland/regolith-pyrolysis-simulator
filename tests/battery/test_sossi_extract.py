@@ -414,6 +414,18 @@ def test_sossi_collector_numbers_reject_mutation() -> None:
 def test_sossi_fields_survive_isolated_migration(tmp_path: Path) -> None:
     result = _migrate_real_extract(tmp_path, "kems-012-sossi-2019.yaml")
     assert len(result.observations) == 612
+    expected_air_mn_ids = {
+        "kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1573.15:h=3bdb08ba1e72",
+        "kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1573.15:h=13f3c4868a4d",
+        "kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=44d334f44b0e",
+        "kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=8200acd2224c",
+        "kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=e8a2c8af9513",
+        "kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1673.15:h=efd271c92791",
+        "kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1773.15:h=5ab4f131d56b",
+        "kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1773.15:h=8826f004c6d5",
+        "kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1823.15:h=d6142e9c92b7",
+    }
+    assert expected_air_mn_ids <= result.observations.keys()
     assert len(result.experiments) == 44
     assert len(result.benches) == 1
     assert result.validation is not None
