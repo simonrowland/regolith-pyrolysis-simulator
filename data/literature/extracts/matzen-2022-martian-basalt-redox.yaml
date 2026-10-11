@@ -29,10 +29,10 @@ benches:
     state: {tag: value, value: Furnace heating; experiments introduced at approximately 850 °C in the selected flowing gas mixture}
     locator: {page: 6, published_page: 6, section: Experimental Techniques}
   gas_mixing:
-    state: {tag: value, value: Flowing CO-CO2 mixtures or air, total flow approximately 200 ml/min; mass-flow controllers set mixtures to the desired fO2 at final run temperature}
+    state: {tag: value, value: 'Flowing CO-CO2 mixtures or air, total flow approximately 200 ml/min; mass-flow controllers set mixtures to the desired fO2 at final run temperature'}
     locator: {page: 6, published_page: 6, section: Experimental Techniques}
   fO2_measurement:
-    state: {tag: value, value: Yttria-stabilized zirconia oxygen sensor in most experiments; Table 2 footnote distinguishes sensor measurements (two decimal places) from gas-mixing-ratio fO2 values (one decimal place), except the air experiment}
+    state: {tag: value, value: 'Yttria-stabilized zirconia oxygen sensor in most experiments; Table 2 footnote distinguishes sensor measurements (two decimal places) from gas-mixing-ratio fO2 values (one decimal place), except the air experiment'}
     locator: {page: 6, published_page: 6, section: Experimental Techniques, note: Table 2 footnote a is on PDF page 39}
   temperature_measurement:
     instrument:
@@ -55,7 +55,7 @@ experiments:
     printed_composition: {state: {tag: value, value: Syn-MB1 Exp. Avg; Table 1 reports FeO* and footnote b states all Fe as FeO}, locator: {page: 38, table: 1}}
   conditions:
     temperature_C: {state: {tag: value, value: '1458'}, locator: {page: 39, table: 2}}
-    log_fO2: {state: {tag: value, value: '-0.68'}, locator: {page: 39, table: 2, note: Absolute log10 fO2; gas mixing ratio or air value at final run temperature (1458 °C), not relative to QFM}}
+    log_fO2: {state: {tag: value, value: '-0.68'}, locator: {page: 39, table: 2, note: 'Absolute log10 fO2; gas mixing ratio or air value at final run temperature (1458 °C), not relative to QFM'}}
     duration_h: {state: {tag: value, value: '15.5'}, locator: {page: 39, table: 2}}
     loop: {state: {tag: value, value: Pt1/3}, locator: {page: 39, table: 2}}
   thermal_schedule: {total_duration_s: {state: {tag: value, value: '55800'}, locator: {page: 39, table: 2, note: 'Converted from Table 2 duration 15.5 h'}}}
@@ -65,7 +65,7 @@ experiments:
   method: one_atmosphere_gas_mixing_furnace_then_drop_quench
   locator: {page: 39, table: 2}
   sample: {characterization: {state: {tag: value, value: 'Synthetic Martian basalt glass, MB1 based'}, locator: {page: 6, section: Starting compositions}}, printed_composition: {state: {tag: value, value: Syn-MB1 Exp. Avg; all Fe as FeO}, locator: {page: 38, table: 1}}}
-  conditions: {temperature_C: {state: {tag: value, value: '1451'}, locator: {page: 39, table: 2}}, log_fO2: {state: {tag: value, value: '-5.88'}, locator: {page: 39, table: 2, note: Absolute log10 fO2 at final run temperature (1451 °C), not relative to QFM}}, duration_h: {state: {tag: value, value: '48.6'}, locator: {page: 39, table: 2}}, loop: {state: {tag: value, value: Pt3/3}, locator: {page: 39, table: 2}}}
+  conditions: {temperature_C: {state: {tag: value, value: '1451'}, locator: {page: 39, table: 2}}, log_fO2: {state: {tag: value, value: '-5.88'}, locator: {page: 39, table: 2, note: 'Absolute log10 fO2 at final run temperature (1451 °C), not relative to QFM'}}, duration_h: {state: {tag: value, value: '48.6'}, locator: {page: 39, table: 2}}, loop: {state: {tag: value, value: Pt3/3}, locator: {page: 39, table: 2}}}
   thermal_schedule: {total_duration_s: {state: {tag: value, value: '174960'}, locator: {page: 39, table: 2, note: 'Converted from Table 2 duration 48.6 h'}}}
 - experiment_id: matzen-run-13
   series: Synthetic Martian basalt iron redox series
@@ -73,7 +73,7 @@ experiments:
   method: one_atmosphere_gas_mixing_furnace_then_drop_quench
   locator: {page: 39, table: 2}
   sample: {characterization: {state: {tag: value, value: 'Synthetic Martian basalt glass, MB1 based'}, locator: {page: 6, section: Starting compositions}}, printed_composition: {state: {tag: value, value: Syn-MB1 Exp. Avg; all Fe as FeO}, locator: {page: 38, table: 1}}}
-  conditions: {temperature_C: {state: {tag: value, value: '1450'}, locator: {page: 39, table: 2}}, log_fO2: {state: {tag: value, value: '-5.85'}, locator: {page: 39, table: 2, note: Absolute log10 fO2 at final run temperature (1450 °C), not relative to QFM}}, duration_h: {state: {tag: value, value: '23.3'}, locator: {page: 39, table: 2}}, loop: {state: {tag: value, value: Pt3/4}, locator: {page: 39, table: 2}}}
+  conditions: {temperature_C: {state: {tag: value, value: '1450'}, locator: {page: 39, table: 2}}, log_fO2: {state: {tag: value, value: '-5.85'}, locator: {page: 39, table: 2, note: 'Absolute log10 fO2 at final run temperature (1450 °C), not relative to QFM'}}, duration_h: {state: {tag: value, value: '23.3'}, locator: {page: 39, table: 2}}, loop: {state: {tag: value, value: Pt3/4}, locator: {page: 39, table: 2}}}
   thermal_schedule: {total_duration_s: {state: {tag: value, value: '83880'}, locator: {page: 39, table: 2, note: 'Converted from Table 2 duration 23.3 h'}}}
 - experiment_id: matzen-run-15
   series: Synthetic Martian basalt iron redox series
@@ -81,7 +81,7 @@ experiments:
   method: one_atmosphere_gas_mixing_furnace_then_drop_quench
   locator: {page: 39, table: 2}
   sample: {characterization: {state: {tag: value, value: 'Synthetic Martian basalt glass, MB1 based'}, locator: {page: 6, section: Starting compositions}}, printed_composition: {state: {tag: value, value: Syn-MB1 Exp. Avg; all Fe as FeO}, locator: {page: 38, table: 1}}}
-  conditions: {temperature_C: {state: {tag: value, value: '1451'}, locator: {page: 39, table: 2}}, log_fO2: {state: {tag: value, value: '-5.87'}, locator: {page: 39, table: 2, note: Absolute log10 fO2 at final run temperature (1451 °C), not relative to QFM}}, duration_h: {state: {tag: value, value: '13.5'}, locator: {page: 39, table: 2}}, loop: {state: {tag: value, value: Pt3/5}, locator: {page: 39, table: 2}}}
+  conditions: {temperature_C: {state: {tag: value, value: '1451'}, locator: {page: 39, table: 2}}, log_fO2: {state: {tag: value, value: '-5.87'}, locator: {page: 39, table: 2, note: 'Absolute log10 fO2 at final run temperature (1451 °C), not relative to QFM'}}, duration_h: {state: {tag: value, value: '13.5'}, locator: {page: 39, table: 2}}, loop: {state: {tag: value, value: Pt3/5}, locator: {page: 39, table: 2}}}
   thermal_schedule: {total_duration_s: {state: {tag: value, value: '48600'}, locator: {page: 39, table: 2, note: 'Converted from Table 2 duration 13.5 h'}}}
 - experiment_id: matzen-run-20
   series: Synthetic Martian basalt iron redox series
@@ -89,7 +89,7 @@ experiments:
   method: one_atmosphere_gas_mixing_furnace_then_drop_quench
   locator: {page: 39, table: 2}
   sample: {characterization: {state: {tag: value, value: 'Synthetic Martian basalt glass, MB1 based'}, locator: {page: 6, section: Starting compositions}}, printed_composition: {state: {tag: value, value: Syn-MB1 Exp. Avg; all Fe as FeO}, locator: {page: 38, table: 1}}}
-  conditions: {temperature_C: {state: {tag: value, value: '1451'}, locator: {page: 39, table: 2}}, log_fO2: {state: {tag: value, value: '-4.76'}, locator: {page: 39, table: 2, note: Absolute log10 fO2 at final run temperature (1451 °C), not relative to QFM}}, duration_h: {state: {tag: value, value: '12.5'}, locator: {page: 39, table: 2}}, loop: {state: {tag: value, value: Pt4/3}, locator: {page: 39, table: 2}}}
+  conditions: {temperature_C: {state: {tag: value, value: '1451'}, locator: {page: 39, table: 2}}, log_fO2: {state: {tag: value, value: '-4.76'}, locator: {page: 39, table: 2, note: 'Absolute log10 fO2 at final run temperature (1451 °C), not relative to QFM'}}, duration_h: {state: {tag: value, value: '12.5'}, locator: {page: 39, table: 2}}, loop: {state: {tag: value, value: Pt4/3}, locator: {page: 39, table: 2}}}
   thermal_schedule: {total_duration_s: {state: {tag: value, value: '45000'}, locator: {page: 39, table: 2, note: 'Converted from Table 2 duration 12.5 h'}}}
 - experiment_id: matzen-run-21
   series: Synthetic Martian basalt iron redox series
@@ -97,7 +97,7 @@ experiments:
   method: one_atmosphere_gas_mixing_furnace_then_drop_quench
   locator: {page: 39, table: 2}
   sample: {characterization: {state: {tag: value, value: 'Synthetic Martian basalt glass, MB1 based'}, locator: {page: 6, section: Starting compositions}}, printed_composition: {state: {tag: value, value: Syn-MB1 Exp. Avg; all Fe as FeO}, locator: {page: 38, table: 1}}}
-  conditions: {temperature_C: {state: {tag: value, value: '1451'}, locator: {page: 39, table: 2}}, log_fO2: {state: {tag: value, value: '-2.48'}, locator: {page: 39, table: 2, note: Absolute log10 fO2 at final run temperature (1451 °C), not relative to QFM}}, duration_h: {state: {tag: value, value: '13.4'}, locator: {page: 39, table: 2}}, loop: {state: {tag: value, value: Pt5/3}, locator: {page: 39, table: 2}}}
+  conditions: {temperature_C: {state: {tag: value, value: '1451'}, locator: {page: 39, table: 2}}, log_fO2: {state: {tag: value, value: '-2.48'}, locator: {page: 39, table: 2, note: 'Absolute log10 fO2 at final run temperature (1451 °C), not relative to QFM'}}, duration_h: {state: {tag: value, value: '13.4'}, locator: {page: 39, table: 2}}, loop: {state: {tag: value, value: Pt5/3}, locator: {page: 39, table: 2}}}
   thermal_schedule: {total_duration_s: {state: {tag: value, value: '48240'}, locator: {page: 39, table: 2, note: 'Converted from Table 2 duration 13.4 h'}}}
 - experiment_id: matzen-run-27
   series: Synthetic Martian basalt iron redox series
@@ -105,7 +105,7 @@ experiments:
   method: one_atmosphere_gas_mixing_furnace_then_drop_quench
   locator: {page: 39, table: 2}
   sample: {characterization: {state: {tag: value, value: 'Synthetic Martian basalt glass, MB1 based'}, locator: {page: 6, section: Starting compositions}}, printed_composition: {state: {tag: value, value: Syn-MB1 Exp. Avg; all Fe as FeO}, locator: {page: 38, table: 1}}}
-  conditions: {temperature_C: {state: {tag: value, value: '1450'}, locator: {page: 39, table: 2}}, log_fO2: {state: {tag: value, value: '-8.0'}, locator: {page: 39, table: 2, note: Absolute log10 fO2 at final run temperature (1450 °C), not relative to QFM; printed to one decimal place}}, duration_h: {state: {tag: value, value: '8.5'}, locator: {page: 39, table: 2}}, loop: {state: {tag: value, value: Re1/2}, locator: {page: 39, table: 2}}}
+  conditions: {temperature_C: {state: {tag: value, value: '1450'}, locator: {page: 39, table: 2}}, log_fO2: {state: {tag: value, value: '-8.0'}, locator: {page: 39, table: 2, note: 'Absolute log10 fO2 at final run temperature (1450 °C), not relative to QFM; printed to one decimal place'}}, duration_h: {state: {tag: value, value: '8.5'}, locator: {page: 39, table: 2}}, loop: {state: {tag: value, value: Re1/2}, locator: {page: 39, table: 2}}}
   thermal_schedule: {total_duration_s: {state: {tag: value, value: '30600'}, locator: {page: 39, table: 2, note: 'Converted from Table 2 duration 8.5 h'}}}
 - experiment_id: matzen-run-30
   series: Synthetic Martian basalt iron redox series
@@ -113,7 +113,7 @@ experiments:
   method: one_atmosphere_gas_mixing_furnace_then_drop_quench
   locator: {page: 39, table: 2}
   sample: {characterization: {state: {tag: value, value: 'Synthetic Martian basalt glass, MB1 based'}, locator: {page: 6, section: Starting compositions}}, printed_composition: {state: {tag: value, value: Syn-MB1 Exp. Avg; all Fe as FeO}, locator: {page: 38, table: 1}}}
-  conditions: {temperature_C: {state: {tag: value, value: '1449'}, locator: {page: 39, table: 2}}, log_fO2: {state: {tag: value, value: '-10.0'}, locator: {page: 39, table: 2, note: Absolute log10 fO2 at final run temperature (1449 °C), not relative to QFM; printed to one decimal place}}, duration_h: {state: {tag: value, value: '14.4'}, locator: {page: 39, table: 2}}, loop: {state: {tag: value, value: Re2/2}, locator: {page: 39, table: 2}}}
+  conditions: {temperature_C: {state: {tag: value, value: '1449'}, locator: {page: 39, table: 2}}, log_fO2: {state: {tag: value, value: '-10.0'}, locator: {page: 39, table: 2, note: 'Absolute log10 fO2 at final run temperature (1449 °C), not relative to QFM; printed to one decimal place'}}, duration_h: {state: {tag: value, value: '14.4'}, locator: {page: 39, table: 2}}, loop: {state: {tag: value, value: Re2/2}, locator: {page: 39, table: 2}}}
   thermal_schedule: {total_duration_s: {state: {tag: value, value: '51840'}, locator: {page: 39, table: 2, note: 'Converted from Table 2 duration 14.4 h'}}}
 - experiment_id: matzen-run-31
   series: Synthetic Martian basalt iron redox series
@@ -121,7 +121,7 @@ experiments:
   method: one_atmosphere_gas_mixing_furnace_then_drop_quench
   locator: {page: 39, table: 2}
   sample: {characterization: {state: {tag: value, value: 'Synthetic Martian basalt glass, MB1 based'}, locator: {page: 6, section: Starting compositions}}, printed_composition: {state: {tag: value, value: Syn-MB1 Exp. Avg; all Fe as FeO}, locator: {page: 38, table: 1}}}
-  conditions: {temperature_C: {state: {tag: value, value: '1500'}, locator: {page: 39, table: 2}}, log_fO2: {state: {tag: value, value: '-4.9'}, locator: {page: 39, table: 2, note: Absolute log10 fO2 at final run temperature (1500 °C), not relative to QFM; printed to one decimal place}}, duration_h: {state: {tag: value, value: '10.5'}, locator: {page: 39, table: 2}}, loop: {state: {tag: value, value: Pt6/2}, locator: {page: 39, table: 2}}}
+  conditions: {temperature_C: {state: {tag: value, value: '1500'}, locator: {page: 39, table: 2}}, log_fO2: {state: {tag: value, value: '-4.9'}, locator: {page: 39, table: 2, note: 'Absolute log10 fO2 at final run temperature (1500 °C), not relative to QFM; printed to one decimal place'}}, duration_h: {state: {tag: value, value: '10.5'}, locator: {page: 39, table: 2}}, loop: {state: {tag: value, value: Pt6/2}, locator: {page: 39, table: 2}}}
   thermal_schedule: {total_duration_s: {state: {tag: value, value: '37800'}, locator: {page: 39, table: 2, note: 'Converted from Table 2 duration 10.5 h'}}}
 - experiment_id: matzen-run-57
   series: Synthetic Martian basalt iron redox series
@@ -129,7 +129,7 @@ experiments:
   method: one_atmosphere_gas_mixing_furnace_then_drop_quench
   locator: {page: 39, table: 2}
   sample: {characterization: {state: {tag: value, value: 'Synthetic Martian basalt glass, MB1 based'}, locator: {page: 6, section: Starting compositions}}, printed_composition: {state: {tag: value, value: Syn-MB1 Exp. Avg; all Fe as FeO}, locator: {page: 38, table: 1}}}
-  conditions: {temperature_C: {state: {tag: value, value: '1451'}, locator: {page: 39, table: 2}}, log_fO2: {state: {tag: value, value: '-10.03'}, locator: {page: 39, table: 2, note: Absolute log10 fO2 at final run temperature (1451 °C), not relative to QFM}}, duration_h: {state: {tag: value, value: '11.0'}, locator: {page: 39, table: 2}}, loop: {state: {tag: value, value: Re16/2}, locator: {page: 39, table: 2}}}
+  conditions: {temperature_C: {state: {tag: value, value: '1451'}, locator: {page: 39, table: 2}}, log_fO2: {state: {tag: value, value: '-10.03'}, locator: {page: 39, table: 2, note: 'Absolute log10 fO2 at final run temperature (1451 °C), not relative to QFM'}}, duration_h: {state: {tag: value, value: '11.0'}, locator: {page: 39, table: 2}}, loop: {state: {tag: value, value: Re16/2}, locator: {page: 39, table: 2}}}
   thermal_schedule: {total_duration_s: {state: {tag: value, value: '39600'}, locator: {page: 39, table: 2, note: 'Converted from Table 2 duration 11.0 h'}}}
 - experiment_id: matzen-run-60
   series: Synthetic Martian basalt iron redox series
@@ -137,7 +137,7 @@ experiments:
   method: one_atmosphere_gas_mixing_furnace_then_drop_quench
   locator: {page: 39, table: 2}
   sample: {characterization: {state: {tag: value, value: 'Synthetic Martian basalt glass, MB1 based'}, locator: {page: 6, section: Starting compositions}}, printed_composition: {state: {tag: value, value: Syn-MB1 Exp. Avg; all Fe as FeO}, locator: {page: 38, table: 1}}}
-  conditions: {temperature_C: {state: {tag: value, value: '1452'}, locator: {page: 39, table: 2}}, log_fO2: {state: {tag: value, value: '-8.20'}, locator: {page: 39, table: 2, note: Absolute log10 fO2 at final run temperature (1452 °C), not relative to QFM}}, duration_h: {state: {tag: value, value: '9.5'}, locator: {page: 39, table: 2}}, loop: {state: {tag: value, value: Re18/2}, locator: {page: 39, table: 2}}}
+  conditions: {temperature_C: {state: {tag: value, value: '1452'}, locator: {page: 39, table: 2}}, log_fO2: {state: {tag: value, value: '-8.20'}, locator: {page: 39, table: 2, note: 'Absolute log10 fO2 at final run temperature (1452 °C), not relative to QFM'}}, duration_h: {state: {tag: value, value: '9.5'}, locator: {page: 39, table: 2}}, loop: {state: {tag: value, value: Re18/2}, locator: {page: 39, table: 2}}}
   thermal_schedule: {total_duration_s: {state: {tag: value, value: '34200'}, locator: {page: 39, table: 2, note: 'Converted from Table 2 duration 9.5 h'}}}
 - experiment_id: matzen-run-61
   series: Synthetic Martian basalt iron redox series
@@ -145,7 +145,7 @@ experiments:
   method: one_atmosphere_gas_mixing_furnace_then_drop_quench
   locator: {page: 39, table: 2}
   sample: {characterization: {state: {tag: value, value: 'Synthetic Martian basalt glass, MB1 based'}, locator: {page: 6, section: Starting compositions}}, printed_composition: {state: {tag: value, value: Syn-MB1 Exp. Avg; all Fe as FeO}, locator: {page: 38, table: 1}}}
-  conditions: {temperature_C: {state: {tag: value, value: '1300'}, locator: {page: 39, table: 2}}, log_fO2: {state: {tag: value, value: '-7.20'}, locator: {page: 39, table: 2, note: Absolute log10 fO2 at final run temperature (1300 °C), not relative to QFM}}, duration_h: {state: {tag: value, value: '36.1'}, locator: {page: 39, table: 2}}, loop: {state: {tag: value, value: Pt14/3}, locator: {page: 39, table: 2}}}
+  conditions: {temperature_C: {state: {tag: value, value: '1300'}, locator: {page: 39, table: 2}}, log_fO2: {state: {tag: value, value: '-7.20'}, locator: {page: 39, table: 2, note: 'Absolute log10 fO2 at final run temperature (1300 °C), not relative to QFM'}}, duration_h: {state: {tag: value, value: '36.1'}, locator: {page: 39, table: 2}}, loop: {state: {tag: value, value: Pt14/3}, locator: {page: 39, table: 2}}}
   thermal_schedule: {total_duration_s: {state: {tag: value, value: '129960'}, locator: {page: 39, table: 2, note: 'Converted from Table 2 duration 36.1 h'}}}
 - experiment_id: matzen-run-2-3
   series: Olivine-bearing partitioning experiment
@@ -153,7 +153,7 @@ experiments:
   method: one_atmosphere_gas_mixing_furnace_then_drop_quench
   locator: {page: 39, table: 2}
   sample: {characterization: {state: {tag: value, value: 'Syn-MB2 glass and olivine; Table 1 row Syn-MB2 gl/ol identifies coexisting glass and olivine from experiment 2-3'}, locator: {page: 38, table: 1}}, printed_composition: {state: {tag: value, value: Syn-MB2}, locator: {page: 38, table: 1}}}
-  conditions: {temperature_C: {state: {tag: value, value: '1300'}, locator: {page: 39, table: 2}}, log_fO2: {state: {tag: value, value: '-7.24'}, locator: {page: 39, table: 2, note: Absolute log10 fO2 at final run temperature (1300 °C), not relative to QFM}}, duration_h: {state: {tag: value, value: '41.2'}, locator: {page: 39, table: 2}}, loop: {state: {tag: value, value: Pt14/5}, locator: {page: 39, table: 2}}, redox_results: {state: {tag: unknown, reason: not_reported}, locator: {page: 39, table: 2, note: Both Fe3+/sum Fe cells are blank for run 2-3; this is the additional olivine-bearing partitioning run, not a redox result row}}}
+  conditions: {temperature_C: {state: {tag: value, value: '1300'}, locator: {page: 39, table: 2}}, log_fO2: {state: {tag: value, value: '-7.24'}, locator: {page: 39, table: 2, note: 'Absolute log10 fO2 at final run temperature (1300 °C), not relative to QFM'}}, duration_h: {state: {tag: value, value: '41.2'}, locator: {page: 39, table: 2}}, loop: {state: {tag: value, value: Pt14/5}, locator: {page: 39, table: 2}}, redox_results: {state: {tag: unknown, reason: not_reported}, locator: {page: 39, table: 2, note: 'Both Fe3+/sum Fe cells are blank for run 2-3; this is the additional olivine-bearing partitioning run, not a redox result row'}}}
   thermal_schedule: {total_duration_s: {state: {tag: value, value: '148320'}, locator: {page: 39, table: 2, note: 'Converted from Table 2 duration 41.2 h'}}, cooling_or_quench: {state: {tag: value, value: Drop quenched into a beaker of deionized water}, locator: {page: 6, published_page: 6, section: Experimental Techniques}}}
 starting_compositions:
   locator: {page: 38, table: 1}

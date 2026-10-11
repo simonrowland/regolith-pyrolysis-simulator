@@ -37,8 +37,8 @@ benches:
       state: {tag: value, value: Within ±15 °C; Table S1 gives run-specific temperature and uncertainty}
       locator: {page: 6, published_page: Supplementary Materials PDF p. 6, figure: S1, note: Stable levitation temperature control within ±15 °C is stated in the Fig. S1 discussion}
     temperature_variability_note:
-      state: {tag: value, value: The main-text ±50 °C describes variability among samples synthesized, not inherent run precision}
-      locator: {page: 6, published_page: Supplementary Materials PDF p. 6, figure: S1, note: The ±50 °C temperature uncertainty discussed here represents variability among samples, not inherent run precision}
+      state: {tag: value, value: 'The main-text ±50 °C describes variability among samples synthesized, not inherent run precision'}
+      locator: {page: 6, published_page: Supplementary Materials PDF p. 6, figure: S1, note: 'The ±50 °C temperature uncertainty discussed here represents variability among samples, not inherent run precision'}
 experiments:
 - experiment_id: sossi-per-f-o2-1
   series: Peridotite glass redox series
@@ -47,11 +47,11 @@ experiments:
   locator: {page: 2, table: S1, published_page: Supplementary Materials PDF p. 2}
   sample:
     characterization:
-      state: {tag: value, value: Synthetic peridotite composition modeled after KLB-1; oxide powders were mixed, ground, decarbonated, and pressed into pellets}
+      state: {tag: value, value: 'Synthetic peridotite composition modeled after KLB-1; oxide powders were mixed, ground, decarbonated, and pressed into pellets'}
       locator: {page: 6, published_page: 6, section: Materials and Methods}
     initial_composition:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 6, published_page: 6, section: Materials and Methods, note: Starting powders and KLB-1 model are described, but no starting-charge oxide analysis is tabulated; Table S2 analyzes experimental glasses}
+      locator: {page: 6, published_page: 6, section: Materials and Methods, note: 'Starting powders and KLB-1 model are described, but no starting-charge oxide analysis is tabulated; Table S2 analyzes experimental glasses'}
     form:
       state: {tag: value, value: Approximately 20-mg pellet pieces melted as levitated silicate beads}
       locator: {page: 6, published_page: 6, section: Materials and Methods}
@@ -67,9 +67,9 @@ experiments:
     regime: {regime_class: {tag: unknown, reason: not_published}}
   fO2_control:
     channel: {tag: value, value: gas_mix}
-    buffer: {state: {tag: value, value: Gas mixture; reported log fO2 is absolute, relative to ideal O2 at 1 bar}, locator: {page: 6, published_page: 6, section: Materials and Methods}}
+    buffer: {state: {tag: value, value: 'Gas mixture; reported log fO2 is absolute, relative to ideal O2 at 1 bar'}, locator: {page: 6, published_page: 6, section: Materials and Methods}}
   thermal_schedule:
-    method: {state: {tag: value, value: Re-melted in pure O2 at 1900 ± 50 °C for 30 s, then equilibrated in the listed gas mixture and quenched by switching off the laser}, locator: {page: 6, published_page: 6, section: Materials and Methods}}
+    method: {state: {tag: value, value: 'Re-melted in pure O2 at 1900 ± 50 °C for 30 s, then equilibrated in the listed gas mixture and quenched by switching off the laser'}, locator: {page: 6, published_page: 6, section: Materials and Methods}}
     total_duration_s: {state: {tag: value, value: {kind: point, point: '30'}}, locator: {page: 2, table: S1}}
     cooling_or_quench: {state: {tag: value, value: Laser switched off; reported cooling rate approximately 800 °C/s}, locator: {page: 6, published_page: 6, section: Materials and Methods}}
 - experiment_id: sossi-per-f-o2-2
@@ -77,7 +77,7 @@ experiments:
   bench_id: sossi-aerodynamic-laser-levitation
   method: aerodynamic_levitation_laser_heating_then_quench
   locator: {page: 2, table: S1, published_page: Supplementary Materials PDF p. 2}
-  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: Table S2 reports experimental glass analyses, not starting charge composition}}}
+  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: 'Table S2 reports experimental glass analyses, not starting charge composition'}}}
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '2166.15'}}, locator: {page: 2, table: S1, note: '1893 °C + 273.15'}}
     temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '40'}}, locator: {page: 2, table: S1, note: '±40 °C'}}
@@ -93,7 +93,7 @@ experiments:
   bench_id: sossi-aerodynamic-laser-levitation
   method: aerodynamic_levitation_laser_heating_then_quench
   locator: {page: 2, table: S1}
-  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: Table S2 reports experimental glass analyses, not starting charge composition}}}
+  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: 'Table S2 reports experimental glass analyses, not starting charge composition'}}}
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '2134.15'}}, locator: {page: 2, table: S1, note: '1861 °C + 273.15'}}
     temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '29'}}, locator: {page: 2, table: S1, note: '±29 °C'}}
@@ -109,7 +109,7 @@ experiments:
   bench_id: sossi-aerodynamic-laser-levitation
   method: aerodynamic_levitation_laser_heating_then_quench
   locator: {page: 2, table: S1}
-  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: Table S2 reports experimental glass analyses, not starting charge composition}}}
+  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: 'Table S2 reports experimental glass analyses, not starting charge composition'}}}
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '2151.15'}}, locator: {page: 2, table: S1, note: '1878 °C + 273.15'}}
     temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '23'}}, locator: {page: 2, table: S1, note: '±23 °C'}}
@@ -125,7 +125,7 @@ experiments:
   bench_id: sossi-aerodynamic-laser-levitation
   method: aerodynamic_levitation_laser_heating_then_quench
   locator: {page: 2, table: S1}
-  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: Table S2 reports experimental glass analyses, not starting charge composition}}}
+  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: 'Table S2 reports experimental glass analyses, not starting charge composition'}}}
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '2124.15'}}, locator: {page: 2, table: S1, note: '1851 °C + 273.15'}}
     temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '13'}}, locator: {page: 2, table: S1, note: '±13 °C'}}
@@ -141,7 +141,7 @@ experiments:
   bench_id: sossi-aerodynamic-laser-levitation
   method: aerodynamic_levitation_laser_heating_then_quench
   locator: {page: 2, table: S1}
-  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: Table S2 reports experimental glass analyses, not starting charge composition}}}
+  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: 'Table S2 reports experimental glass analyses, not starting charge composition'}}}
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '2139.15'}}, locator: {page: 2, table: S1, note: '1866 °C + 273.15'}}
     temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '13'}}, locator: {page: 2, table: S1, note: '±13 °C'}}
@@ -157,7 +157,7 @@ experiments:
   bench_id: sossi-aerodynamic-laser-levitation
   method: aerodynamic_levitation_laser_heating_then_quench
   locator: {page: 2, table: S1}
-  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: Table S2 reports experimental glass analyses, not starting charge composition}}}
+  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: 'Table S2 reports experimental glass analyses, not starting charge composition'}}}
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '2148.15'}}, locator: {page: 2, table: S1, note: '1875 °C + 273.15'}}
     temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '41'}}, locator: {page: 2, table: S1, note: '±41 °C'}}
@@ -173,7 +173,7 @@ experiments:
   bench_id: sossi-aerodynamic-laser-levitation
   method: aerodynamic_levitation_laser_heating_then_quench
   locator: {page: 2, table: S1}
-  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: Table S2 reports experimental glass analyses, not starting charge composition}}}
+  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: 'Table S2 reports experimental glass analyses, not starting charge composition'}}}
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '2197.15'}}, locator: {page: 2, table: S1, note: '1924 °C + 273.15'}}
     temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '13'}}, locator: {page: 2, table: S1, note: '±13 °C'}}
@@ -189,7 +189,7 @@ experiments:
   bench_id: sossi-aerodynamic-laser-levitation
   method: aerodynamic_levitation_laser_heating_then_quench
   locator: {page: 2, table: S1}
-  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: Table S2 reports experimental glass analyses, not starting charge composition}}}
+  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: 'Table S2 reports experimental glass analyses, not starting charge composition'}}}
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '2175.15'}}, locator: {page: 2, table: S1, note: '1902 °C + 273.15'}}
     temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '15'}}, locator: {page: 2, table: S1, note: '±15 °C'}}
@@ -205,7 +205,7 @@ experiments:
   bench_id: sossi-aerodynamic-laser-levitation
   method: aerodynamic_levitation_laser_heating_then_quench
   locator: {page: 2, table: S1}
-  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: Table S2 reports experimental glass analyses, not starting charge composition}}}
+  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: 'Table S2 reports experimental glass analyses, not starting charge composition'}}}
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '2173.15'}}, locator: {page: 2, table: S1, note: '1900 °C + 273.15'}}
     temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '21'}}, locator: {page: 2, table: S1, note: '±21 °C'}}
@@ -221,7 +221,7 @@ experiments:
   bench_id: sossi-aerodynamic-laser-levitation
   method: aerodynamic_levitation_laser_heating_then_quench
   locator: {page: 2, table: S1}
-  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: Table S2 reports experimental glass analyses, not starting charge composition}}}
+  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: 'Table S2 reports experimental glass analyses, not starting charge composition'}}}
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '2169.15'}}, locator: {page: 2, table: S1, note: '1896 °C + 273.15'}}
     temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '16'}}, locator: {page: 2, table: S1, note: '±16 °C'}}
@@ -237,7 +237,7 @@ experiments:
   bench_id: sossi-aerodynamic-laser-levitation
   method: aerodynamic_levitation_laser_heating_then_quench
   locator: {page: 2, table: S1}
-  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: Table S2 reports experimental glass analyses, not starting charge composition}}}
+  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: 'Table S2 reports experimental glass analyses, not starting charge composition'}}}
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '2112.15'}}, locator: {page: 2, table: S1, note: '1839 °C + 273.15'}}
     temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '17'}}, locator: {page: 2, table: S1, note: '±17 °C'}}
