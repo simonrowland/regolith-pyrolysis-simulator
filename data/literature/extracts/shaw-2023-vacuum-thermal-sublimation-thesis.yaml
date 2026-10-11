@@ -1,0 +1,628 @@
+schema_version: literature_extract.v1
+source_id: shaw-2023-vacuum-thermal-sublimation-thesis
+source:
+  citation: Shaw, Matthew (2023), "Vacuum Thermal Sublimation for Metal Production from Lunar Regolith", PhD thesis, Swinburne University of Technology.
+  doi: 10.25916/sut.26297335.v1
+  url: https://ndownloader.figshare.com/files/47665792
+  year: 2023
+extraction:
+  method: >-
+    Manual extraction from the source PDF. Chapter 8 Table 8.1 (PDF p. 227 / printed p. 203),
+    Chapter 8 Table 8.2 (PDF p. 242 / printed p. 218), and Chapter 7 Table 7.5 (PDF p. 206 /
+    printed p. 182) were rendered with pdftoppm at 300 dpi and transcribed from the images.
+    Each table was transcribed independently by rows and by columns, then compared; no differing
+    cells remained. Table 7.5 is retained as an author-calculated table: FactSage 8.2 vapour
+    pressures passed through the vacuum Hertz/Knudsen/Langmuir equation with evaporation
+    coefficient 1. Chapter 8 prose was read for apparatus, method, and run findings. The table
+    of contents and lists of tables and figures were used to identify chapter 7-8 material not
+    extracted here. Numeric error bounds and the mass-balance instrument resolution are not
+    reported for Chapter 8.
+  date: '2026-10-11'
+  worker: shaw23
+review_status: draft
+corrections: []
+fidelity_samples:
+  - species: Fe
+    observable: thermodynamic_example
+    observation_id: shaw_2023_table75_hkl_fe
+    field: rows
+    value:
+    - {temperature_C: 800, vapor_pressure_atm: 5.6e-13, evaporation_flux_mol_s_m2: 3.2e-11}
+    - {temperature_C: 900, vapor_pressure_atm: 2.5e-11, evaporation_flux_mol_s_m2: 1.4e-9}
+    - {temperature_C: 1000, vapor_pressure_atm: 6.0e-10, evaporation_flux_mol_s_m2: 3.1e-8}
+    - {temperature_C: 1050, vapor_pressure_atm: 2.5e-9, evaporation_flux_mol_s_m2: 1.3e-7}
+    - {temperature_C: 1100, vapor_pressure_atm: 9.1e-9, evaporation_flux_mol_s_m2: 4.6e-7}
+    - {temperature_C: 1150, vapor_pressure_atm: 3.0e-8, evaporation_flux_mol_s_m2: 1.5e-6}
+    - {temperature_C: 1200, vapor_pressure_atm: 9.4e-8, evaporation_flux_mol_s_m2: 4.6e-6}
+    locator: {table: '7.5', published_page: 182, pdf_page_index: 206, note: All Fe pressure and flux values}
+  - species: Na
+    observable: thermodynamic_example
+    observation_id: shaw_2023_table75_hkl_na
+    field: rows
+    value:
+    - {temperature_C: 800, vapor_pressure_atm: 3.8e-11, evaporation_flux_mol_s_m2: 3.4e-9}
+    - {temperature_C: 900, vapor_pressure_atm: 9.6e-10, evaporation_flux_mol_s_m2: 8.2e-8}
+    - {temperature_C: 1000, vapor_pressure_atm: 1.9e-8, evaporation_flux_mol_s_m2: 1.6e-6}
+    - {temperature_C: 1050, vapor_pressure_atm: 7.3e-8, evaporation_flux_mol_s_m2: 5.9e-6}
+    - {temperature_C: 1100, vapor_pressure_atm: 2.6e-7, evaporation_flux_mol_s_m2: 2.0e-5}
+    - {temperature_C: 1150, vapor_pressure_atm: 8.1e-7, evaporation_flux_mol_s_m2: 6.3e-5}
+    - {temperature_C: 1200, vapor_pressure_atm: 2.4e-6, evaporation_flux_mol_s_m2: 1.8e-4}
+    locator: {table: '7.5', published_page: 182, pdf_page_index: 206, note: All Na pressure and flux values}
+  - species: K
+    observable: thermodynamic_example
+    observation_id: shaw_2023_table75_hkl_k
+    field: rows
+    value:
+    - {temperature_C: 800, vapor_pressure_atm: 3.1e-11, evaporation_flux_mol_s_m2: 2.1e-9}
+    - {temperature_C: 900, vapor_pressure_atm: 9.1e-10, evaporation_flux_mol_s_m2: 6.0e-8}
+    - {temperature_C: 1000, vapor_pressure_atm: 1.5e-8, evaporation_flux_mol_s_m2: 9.7e-7}
+    - {temperature_C: 1050, vapor_pressure_atm: 5.4e-8, evaporation_flux_mol_s_m2: 3.3e-6}
+    - {temperature_C: 1100, vapor_pressure_atm: 1.7e-7, evaporation_flux_mol_s_m2: 1.0e-5}
+    - {temperature_C: 1150, vapor_pressure_atm: 5.0e-7, evaporation_flux_mol_s_m2: 3.0e-5}
+    - {temperature_C: 1200, vapor_pressure_atm: 1.4e-6, evaporation_flux_mol_s_m2: 8.0e-5}
+    locator: {table: '7.5', published_page: 182, pdf_page_index: 206, note: All K pressure and flux values}
+benches:
+- id: solar-simulator-high-vacuum-reactor
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Hybrid Swinburne Solar Simulator and high-vacuum reactor}
+    locator: {published_page: 198, pdf_page_index: 222, section: '8.1'}
+  heating_method:
+    state: {tag: value, value: Electrical furnace preheat followed by concentrated solar thermal heating; high-vacuum tests used the solar simulator}
+    locator: {published_page: 202, pdf_page_index: 226, section: '8.2'}
+  cell_material_and_liner:
+    state: {tag: value, value: Custom closed-end fused-quartz reaction tube; sample boat is alumina}
+    locator: {published_page: 200, pdf_page_index: 224, section: Reactor Design, note: Alumina sample boat described in section 5.4.4 and Chapter 8 test procedure}
+  geometry:
+    reactor_tube_inner_diameter_mm:
+      state: {tag: value, value: {kind: point, point: '29'}}
+      locator: {published_page: 201, pdf_page_index: 225, section: Reactor Design}
+    reactor_tube_wall_thickness_mm:
+      state: {tag: value, value: {kind: point, point: '2.5'}}
+      locator: {published_page: 201, pdf_page_index: 225, section: Reactor Design}
+    sample_boat_dimensions:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 202, pdf_page_index: 226, section: '8.2'}
+  pumping_type:
+    state: {tag: value, value: ILMvac STP 1 turbomolecular pumping station with mechanical backing pump}
+    locator: {published_page: 199, pdf_page_index: 223, section: The Hybrid Solar Furnace}
+  detector:
+    state: {tag: value, value: PEN101 cold-cathode sensor connected to a multi-range vacuum gauge}
+    locator: {published_page: 199, pdf_page_index: 223, section: The Hybrid Solar Furnace}
+  temperature_measurement:
+    method:
+      state: {tag: value, value: Table 8.1 reports Temp High; reactor temperature readings were used in heating profiles, while the calibration thermocouple was not used during active runs}
+      locator: {published_page: 200, pdf_page_index: 224, section: Reactor Design, note: The preceding chapter page describes temperature readings used in heating profiles}
+    sensor:
+      state: {tag: unknown, reason: not_published}
+      locator: {table: '8.1', published_page: 203, pdf_page_index: 227}
+  collector_arrangement:
+    state: {tag: value, value: No separate collector or staged collector is reported for these runs; deposits were sampled from the reactor tube and flange}
+    locator: {published_page: 203, pdf_page_index: 227, table: '8.1', note: Chapter 8 deposit findings describe reactor-tube bands; the cold finger belongs to an unused second setup}
+  quench_or_staged_collector:
+    state: {tag: unknown, reason: not_published}
+    locator: {published_page: 203, pdf_page_index: 227, table: '8.1'}
+  collector_temperature_C:
+    state: {tag: unknown, reason: not_published}
+    locator: {published_page: 203, pdf_page_index: 227, table: '8.1'}
+  collector_distance_from_sample_mm:
+    state: {tag: unknown, reason: not_published}
+    locator: {published_page: 203, pdf_page_index: 227, table: '8.1'}
+  radiation_shield_temperature_C:
+    state: {tag: unknown, reason: not_published}
+    locator: {published_page: 203, pdf_page_index: 227, table: '8.1'}
+  radiation_shield_distance_from_sample_mm:
+    state: {tag: unknown, reason: not_published}
+    locator: {published_page: 203, pdf_page_index: 227, table: '8.1'}
+experiments:
+- experiment_id: blank-high-vacuum
+  bench_id: solar-simulator-high-vacuum-reactor
+  method: vacuum_solar_thermal_dissociation
+  locator: {table: '8.1', published_page: 203, pdf_page_index: 227}
+  sample:
+    mass_kg: {state: {tag: unknown, reason: no_feed_in_blank}, locator: {table: '8.1', published_page: 203}}
+    printed_composition: {state: {tag: unknown, reason: no_feed_in_blank}, locator: {table: '8.1', published_page: 203}}
+    form: {state: {tag: value, value: 'N/A'}, locator: {table: '8.1', published_page: 203}}
+  conditions:
+    temperature_K: {state: {tag: value, value: {kind: point, point: '1421.15'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High 1148 C converted with T_K = T_C + 273.15}}
+    pressure_low_atm: {state: {tag: value, value: {kind: point, point: '7.13e-9'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227}}
+  pressure_environment:
+    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0013476225'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Pressure Average 1.33e-8 atm converted to Pa}}
+    sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {table: '8.1', published_page: 203}}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+  thermal_schedule:
+    total_duration_s: {state: {tag: value, value: {kind: point, point: '14040'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High Duration 3.9 h converted to seconds}}
+  species:
+    state: {tag: unknown, reason: no_feed_in_blank}
+- experiment_id: td1-nanophase-iron-oxide
+  bench_id: solar-simulator-high-vacuum-reactor
+  method: vacuum_solar_thermal_dissociation
+  locator: {table: '8.1', published_page: 203, pdf_page_index: 227}
+  sample:
+    mass_kg: {state: {tag: value, value: {kind: point, point: '0.0026', approximate: true}}, locator: {published_page: 152, pdf_page_index: 176, section: '5.4.4', note: Approximately 2.6 g sample; grams converted to kg}}
+    exposed_area_m2: {state: {tag: unknown, reason: not_reported}, locator: {table: '8.1', published_page: 203}}
+    printed_composition: {state: {tag: value, value: FeO/Fe2O3 powder}, locator: {table: '8.1', published_page: 203}}
+    form: {state: {tag: value, value: Loose material (as printed; Chapter 8 prose says the powder was pressed into a pellet for TD1)}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227}}
+    holder: {state: {tag: value, value: Alumina sample boat}, locator: {published_page: 202, pdf_page_index: 226, section: '8.2'}}
+  conditions:
+    temperature_K: {state: {tag: value, value: {kind: point, point: '1400.15'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High 1127 C converted with T_K = T_C + 273.15}}
+    pressure_low_atm: {state: {tag: value, value: {kind: point, point: '5.79e-8'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227}}
+  pressure_environment:
+    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.027661725'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Pressure Average 2.73e-7 atm converted to Pa}}
+    sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {table: '8.1', published_page: 203}}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+  thermal_schedule:
+    total_duration_s: {state: {tag: value, value: {kind: point, point: '6480'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High Duration 1.8 h converted to seconds}}
+- experiment_id: td2-nanophase-iron-oxide
+  bench_id: solar-simulator-high-vacuum-reactor
+  method: vacuum_solar_thermal_dissociation
+  locator: {table: '8.1', published_page: 203, pdf_page_index: 227}
+  sample:
+    mass_kg: {state: {tag: value, value: {kind: point, point: '0.0026', approximate: true}}, locator: {published_page: 152, pdf_page_index: 176, section: '5.4.4', note: Approximately 2.6 g sample; grams converted to kg}}
+    exposed_area_m2: {state: {tag: unknown, reason: not_reported}, locator: {table: '8.1', published_page: 203}}
+    printed_composition: {state: {tag: value, value: FeO/Fe2O3 powder}, locator: {table: '8.1', published_page: 203}}
+    form: {state: {tag: value, value: Pressed Tablets}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227}}
+    holder: {state: {tag: value, value: Alumina sample boat}, locator: {published_page: 202, pdf_page_index: 226, section: '8.2'}}
+  conditions:
+    temperature_K: {state: {tag: value, value: {kind: point, point: '1298.15'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High 1025 C converted with T_K = T_C + 273.15}}
+    pressure_low_atm: {state: {tag: value, value: {kind: point, point: '1.39e-7'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227}}
+  pressure_environment:
+    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.03465315'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Pressure Average 3.42e-7 atm converted to Pa}}
+    sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {table: '8.1', published_page: 203}}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+  thermal_schedule:
+    total_duration_s: {state: {tag: value, value: {kind: point, point: '15480'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High Duration 4.3 h converted to seconds}}
+- experiment_id: td3-ilmenite-concentrate
+  bench_id: solar-simulator-high-vacuum-reactor
+  method: vacuum_solar_thermal_dissociation
+  locator: {table: '8.1', published_page: 203, pdf_page_index: 227}
+  sample:
+    mass_kg: {state: {tag: value, value: {kind: point, point: '0.0026', approximate: true}}, locator: {published_page: 152, pdf_page_index: 176, section: '5.4.4', note: Approximately 2.6 g sample; grams converted to kg}}
+    exposed_area_m2: {state: {tag: unknown, reason: not_reported}, locator: {table: '8.1', published_page: 203}}
+    printed_composition: {state: {tag: value, value: Ilmenite (CSIRO)}, locator: {table: '8.1', published_page: 203}}
+    form: {state: {tag: value, value: Pressed Tablets}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227}}
+    holder: {state: {tag: value, value: Alumina sample boat}, locator: {published_page: 202, pdf_page_index: 226, section: '8.2'}}
+  conditions:
+    temperature_K: {state: {tag: value, value: {kind: point, point: '1389.15'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High 1116 C converted with T_K = T_C + 273.15}}
+    pressure_low_atm: {state: {tag: value, value: {kind: point, point: '1.73e-8'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227}}
+  pressure_environment:
+    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.002776305'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Pressure Average 2.74e-8 atm converted to Pa}}
+    sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {table: '8.1', published_page: 203}}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+  thermal_schedule:
+    total_duration_s: {state: {tag: value, value: {kind: point, point: '25560'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High Duration 7.1 h converted to seconds}}
+- experiment_id: td4-lms1-atmosphere
+  bench_id: solar-simulator-high-vacuum-reactor
+  method: solar_thermal_dissociation_atmospheric_pressure
+  locator: {table: '8.1', published_page: 203, pdf_page_index: 227}
+  sample:
+    mass_kg: {state: {tag: value, value: {kind: point, point: '0.0026', approximate: true}}, locator: {published_page: 152, pdf_page_index: 176, section: '5.4.4', note: Approximately 2.6 g sample; grams converted to kg}}
+    exposed_area_m2: {state: {tag: unknown, reason: not_reported}, locator: {table: '8.1', published_page: 203}}
+    printed_composition: {state: {tag: value, value: LMS-1}, locator: {table: '8.1', published_page: 203}}
+    form: {state: {tag: value, value: Pressed Tablets}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227}}
+    holder: {state: {tag: value, value: Alumina sample boat}, locator: {published_page: 202, pdf_page_index: 226, section: '8.2'}}
+  conditions:
+    temperature_K: {state: {tag: value, value: {kind: point, point: '1426.15'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High 1153 C converted with T_K = T_C + 273.15}}
+    pressure_low_atm: {state: {tag: value, value: {kind: point, point: '1'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227}}
+  pressure_environment:
+    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '101325'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Printed 1 atm converted to Pa}}
+    sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {table: '8.1', published_page: 203}}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+  thermal_schedule:
+    total_duration_s: {state: {tag: value, value: {kind: point, point: '7560'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High Duration 2.1 h converted to seconds}}
+- experiment_id: td5-lms1
+  bench_id: solar-simulator-high-vacuum-reactor
+  method: vacuum_solar_thermal_dissociation
+  locator: {table: '8.1', published_page: 203, pdf_page_index: 227}
+  sample:
+    mass_kg: {state: {tag: value, value: {kind: point, point: '0.0026', approximate: true}}, locator: {published_page: 152, pdf_page_index: 176, section: '5.4.4', note: Approximately 2.6 g sample; grams converted to kg}}
+    exposed_area_m2: {state: {tag: unknown, reason: not_reported}, locator: {table: '8.1', published_page: 203}}
+    printed_composition: {state: {tag: value, value: LMS-1}, locator: {table: '8.1', published_page: 203}}
+    form: {state: {tag: value, value: Pressed Tablets}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227}}
+    holder: {state: {tag: value, value: Alumina sample boat}, locator: {published_page: 202, pdf_page_index: 226, section: '8.2'}}
+  conditions:
+    temperature_K: {state: {tag: value, value: {kind: point, point: '1394.15'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High 1121 C converted with T_K = T_C + 273.15}}
+    pressure_low_atm: {state: {tag: value, value: {kind: point, point: '1.55e-8'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227}}
+  pressure_environment:
+    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0050763825'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Pressure Average 5.01e-8 atm converted to Pa}}
+    sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {table: '8.1', published_page: 203}}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+  thermal_schedule:
+    total_duration_s: {state: {tag: value, value: {kind: point, point: '14760'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High Duration 4.1 h converted to seconds}}
+- experiment_id: td6-lms1
+  bench_id: solar-simulator-high-vacuum-reactor
+  method: vacuum_solar_thermal_dissociation
+  locator: {table: '8.1', published_page: 203, pdf_page_index: 227}
+  sample:
+    mass_kg: {state: {tag: value, value: {kind: point, point: '0.0026', approximate: true}}, locator: {published_page: 152, pdf_page_index: 176, section: '5.4.4', note: Approximately 2.6 g sample; grams converted to kg}}
+    exposed_area_m2: {state: {tag: unknown, reason: not_reported}, locator: {table: '8.1', published_page: 203}}
+    printed_composition: {state: {tag: value, value: LMS-1}, locator: {table: '8.1', published_page: 203}}
+    form: {state: {tag: value, value: Pressed Tablets}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227}}
+    holder: {state: {tag: value, value: Alumina sample boat}, locator: {published_page: 202, pdf_page_index: 226, section: '8.2'}}
+  conditions:
+    temperature_K: {state: {tag: value, value: {kind: point, point: '1420.15'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High 1147 C converted with T_K = T_C + 273.15}}
+    pressure_low_atm: {state: {tag: value, value: {kind: point, point: '6.58e-8'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227}}
+  pressure_environment:
+    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.00895713'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Pressure Average 8.84e-8 atm converted to Pa}}
+    sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {table: '8.1', published_page: 203}}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+  thermal_schedule:
+    total_duration_s: {state: {tag: value, value: {kind: point, point: '12600'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High Duration 3.5 h converted to seconds}}
+- experiment_id: td7-reacted-td6-feed
+  bench_id: solar-simulator-high-vacuum-reactor
+  method: vacuum_solar_thermal_dissociation
+  locator: {table: '8.1', published_page: 203, pdf_page_index: 227}
+  sample:
+    mass_kg: {state: {tag: value, value: {kind: point, point: '0.0026', approximate: true}}, locator: {published_page: 152, pdf_page_index: 176, section: '5.4.4', note: Approximately 2.6 g sample; grams converted to kg}}
+    exposed_area_m2: {state: {tag: unknown, reason: not_reported}, locator: {table: '8.1', published_page: 203}}
+    printed_composition: {state: {tag: value, value: Processed TD4 (as printed; Chapter 8 prose says reacted TD6 material)}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227}}
+    form: {state: {tag: value, value: Processed TD4}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227}}
+    holder: {state: {tag: value, value: Alumina sample boat}, locator: {published_page: 202, pdf_page_index: 226, section: '8.2'}}
+  conditions:
+    temperature_K: {state: {tag: value, value: {kind: point, point: '1424.15'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High 1151 C converted with T_K = T_C + 273.15}}
+    pressure_low_atm: {state: {tag: value, value: {kind: point, point: '1.29e-8'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227}}
+  pressure_environment:
+    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0038807475'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Pressure Average 3.83e-8 atm converted to Pa}}
+    sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {table: '8.1', published_page: 203}}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+  thermal_schedule:
+    total_duration_s: {state: {tag: value, value: {kind: point, point: '31680'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High Duration 8.8 h converted to seconds}}
+species:
+  Fe:
+    observations: []
+    context:
+    - observation_id: shaw_2023_table75_hkl_fe
+      type: thermodynamic_example
+      locator: {table: '7.5', published_page: 182, pdf_page_index: 206}
+      units: mol s-1 m-2
+      values:
+        quantity: author_calculated_evaporation_flux
+        method_class: calculated
+        quantity_token_needed: evaporation_flux_per_area_mol_s_m2 (no matching quantity in current schema)
+        model: Hertz-Knudsen-Langmuir vacuum evaporation equation 7.1
+        inputs: FactSage 8.2 saturated vapor pressures for Apollo sample 12022; molar mass of Fe; gas constant; absolute temperature converted from printed Celsius
+        assumptions: evaporation coefficient ae = 1; condensation term omitted for Langmuir evaporation at pressure much less than saturation pressure; best-case flux
+        equation: J_i = ae * p_i,sat / sqrt(2 * pi * R * M_i * T); the condensation term is omitted for vacuum Langmuir evaporation
+        vapor_pressure_source: FactSage 8.2 fixed-volume thermochemical model, 100 g feed in 1 L; Apollo 12022 composition from Snyder et al. 297 (Table 7.4); FACTPS, FTOxid, FSstel databases
+        rows:
+        - {temperature_C: 800, vapor_pressure_atm: 5.6e-13, evaporation_flux_mol_s_m2: 3.2e-11}
+        - {temperature_C: 900, vapor_pressure_atm: 2.5e-11, evaporation_flux_mol_s_m2: 1.4e-9}
+        - {temperature_C: 1000, vapor_pressure_atm: 6.0e-10, evaporation_flux_mol_s_m2: 3.1e-8}
+        - {temperature_C: 1050, vapor_pressure_atm: 2.5e-9, evaporation_flux_mol_s_m2: 1.3e-7}
+        - {temperature_C: 1100, vapor_pressure_atm: 9.1e-9, evaporation_flux_mol_s_m2: 4.6e-7}
+        - {temperature_C: 1150, vapor_pressure_atm: 3.0e-8, evaporation_flux_mol_s_m2: 1.5e-6}
+        - {temperature_C: 1200, vapor_pressure_atm: 9.4e-8, evaporation_flux_mol_s_m2: 4.6e-6}
+  Na:
+    observations: []
+    context:
+    - observation_id: shaw_2023_table75_hkl_na
+      type: thermodynamic_example
+      locator: {table: '7.5', published_page: 182, pdf_page_index: 206}
+      units: mol s-1 m-2
+      values:
+        quantity: author_calculated_evaporation_flux
+        method_class: calculated
+        quantity_token_needed: evaporation_flux_per_area_mol_s_m2 (no matching quantity in current schema)
+        model: Hertz-Knudsen-Langmuir vacuum evaporation equation 7.1
+        inputs: FactSage 8.2 saturated vapor pressures for the selected Al2O3-CaO-Na2O system; molar mass of Na; gas constant; absolute temperature converted from printed Celsius
+        assumptions: evaporation coefficient ae = 1; condensation term omitted for Langmuir evaporation at pressure much less than saturation pressure; best-case flux
+        equation: J_i = ae * p_i,sat / sqrt(2 * pi * R * M_i * T); the condensation term is omitted for vacuum Langmuir evaporation
+        vapor_pressure_source: FactSage 8.2 fixed-volume thermochemical model, 100 g feed in 1 L, selected oxide system; FACTPS, FTOxid, FSstel databases
+        rows:
+        - {temperature_C: 800, vapor_pressure_atm: 3.8e-11, evaporation_flux_mol_s_m2: 3.4e-9}
+        - {temperature_C: 900, vapor_pressure_atm: 9.6e-10, evaporation_flux_mol_s_m2: 8.2e-8}
+        - {temperature_C: 1000, vapor_pressure_atm: 1.9e-8, evaporation_flux_mol_s_m2: 1.6e-6}
+        - {temperature_C: 1050, vapor_pressure_atm: 7.3e-8, evaporation_flux_mol_s_m2: 5.9e-6}
+        - {temperature_C: 1100, vapor_pressure_atm: 2.6e-7, evaporation_flux_mol_s_m2: 2.0e-5}
+        - {temperature_C: 1150, vapor_pressure_atm: 8.1e-7, evaporation_flux_mol_s_m2: 6.3e-5}
+        - {temperature_C: 1200, vapor_pressure_atm: 2.4e-6, evaporation_flux_mol_s_m2: 1.8e-4}
+  K:
+    observations: []
+    context:
+    - observation_id: shaw_2023_table75_hkl_k
+      type: thermodynamic_example
+      locator: {table: '7.5', published_page: 182, pdf_page_index: 206}
+      units: mol s-1 m-2
+      values:
+        quantity: author_calculated_evaporation_flux
+        method_class: calculated
+        quantity_token_needed: evaporation_flux_per_area_mol_s_m2 (no matching quantity in current schema)
+        model: Hertz-Knudsen-Langmuir vacuum evaporation equation 7.1
+        inputs: FactSage 8.2 saturated vapor pressures for the selected Al2O3-K2O system; molar mass of K; gas constant; absolute temperature converted from printed Celsius
+        assumptions: evaporation coefficient ae = 1; condensation term omitted for Langmuir evaporation at pressure much less than saturation pressure; best-case flux
+        equation: J_i = ae * p_i,sat / sqrt(2 * pi * R * M_i * T); the condensation term is omitted for vacuum Langmuir evaporation
+        vapor_pressure_source: FactSage 8.2 fixed-volume thermochemical model, 100 g feed in 1 L, selected oxide system; FACTPS, FTOxid, FSstel databases
+        rows:
+        - {temperature_C: 800, vapor_pressure_atm: 3.1e-11, evaporation_flux_mol_s_m2: 2.1e-9}
+        - {temperature_C: 900, vapor_pressure_atm: 9.1e-10, evaporation_flux_mol_s_m2: 6.0e-8}
+        - {temperature_C: 1000, vapor_pressure_atm: 1.5e-8, evaporation_flux_mol_s_m2: 9.7e-7}
+        - {temperature_C: 1050, vapor_pressure_atm: 5.4e-8, evaporation_flux_mol_s_m2: 3.3e-6}
+        - {temperature_C: 1100, vapor_pressure_atm: 1.7e-7, evaporation_flux_mol_s_m2: 1.0e-5}
+        - {temperature_C: 1150, vapor_pressure_atm: 5.0e-7, evaporation_flux_mol_s_m2: 3.0e-5}
+        - {temperature_C: 1200, vapor_pressure_atm: 1.4e-6, evaporation_flux_mol_s_m2: 8.0e-5}
+  vacuum_reactor_blank:
+    observations: []
+    context:
+    - observation_id: shaw_2023_blank_results
+      experiment: blank-high-vacuum
+      type: composition
+      locator: {table: '8.2', published_page: 218, pdf_page_index: 242, section: '8.2'}
+      units: qualitative EDS elemental findings
+      values:
+        record_kind: deposit_findings_as_printed
+        quantity_token_needed: elemental_deposit_composition_by_surface
+        phase_token_needed: deposit_phase_by_element
+        method_class: measured_direct
+        elements_in_distinct_deposit_as_printed: None
+        deposit_location: Reactor tube glass; general frosting
+        deposit_phase_by_element: {state: unknown, reason: EDS elemental summary does not identify phases}
+        identification: Table 8.2 reports no elements in deposit bands; Chapter 8 prose describes light white Si/O frosting on the reactor glass
+        oxygen_gas: {state: unknown, reason: no molecular O2 collection or measurement reported}
+        saw_air_before_analysis: {state: unknown, reason: not_reported}
+        collector_or_shield_deposit: {state: unknown, reason: no separate collector or shield reported}
+        mass_loss: {semantics: bound_not_point, result: below estimated error, numeric_error_bound: {state: unknown, reason: not_reported}, balance_resolution: {state: unknown, reason: not_reported_for_chapter_8_test}}
+    context:
+    - observation_id: shaw_2023_ch8_mass_measurement_limits
+      type: method
+      locator: {published_page: 203, pdf_page_index: 227, section: '8.2'}
+      units: as printed; mass difference bound
+      values:
+        quantity: mass_loss_and_condensate_measurement_limits
+        method_class: method_only
+        mass_loss_semantics: Each sample's calculated mass loss was smaller than estimated error and was deemed insignificant
+        mass_loss_bound: {semantics: bound_not_point, upper_bound: {state: unknown, reason: estimated error magnitude not numerically reported}}
+        balance_resolution: {state: unknown, reason: not_reported_for_chapter_8_test}
+        condensate_mass_semantics: Reactor tube was weighed in an early test; mass difference was below estimated error; condensate bands were thin films
+        condensate_mass_bound: {semantics: bound_not_point, upper_bound: {state: unknown, reason: estimated error magnitude not numerically reported}}
+        condensate_balance_resolution: {state: unknown, reason: not_reported_for_chapter_8_test}
+        run_assignment: {state: unknown, reason: early weighed reactor tube not assigned to a specific test}
+    - observation_id: shaw_2023_ch8_sample_preparation
+      type: method
+      locator: {published_page: 152, pdf_page_index: 176, section: '5.4.4'}
+      units: as printed
+      values:
+        quantity: vacuum_test_sample_preparation
+        method_class: method_only
+        applies_to: Chapter 8 vacuum solar-thermal testwork
+        approximate_feed_mass_g: 2.6
+        printed_sample_form: Sample was pressed in a 13 mm diameter steel die for 5 minutes at 9 tons; feed dried in an alumina boat at 150 C for at least 2 hours
+        common_heating_schedule: Electrical furnace heated to 900 C; in most tests the apparatus then degassed/pumped overnight for about 18 hours before solar-simulator heating; Table 8.1 gives each run's Temp High and Temp High Duration
+        solar_temperature_range_as_general_method: about 1000 to 1150 C for 2 to 6 hours in most experiments; each test's printed value is retained on its own result row
+        total_O2_collected: {state: unknown, reason: no molecular O2 collection or measurement reported}
+        oxygen_measurement_calibration: {state: unknown, reason: no O2 measurement or calibration reported; deposit oxygen was qualitative EDS/EDX only}
+        table_8_1_form_difference: TD1 is printed as Loose material in Table 8.1, while §8.2 says it was pressed into a pellet and that pressed pellets were used for all tests
+        pellet_height_or_exposed_area: {state: unknown, reason: not_reported}
+  FeO/Fe2O3:
+    observations: []
+    context:
+    - observation_id: shaw_2023_td1_results
+      experiment: td1-nanophase-iron-oxide
+      type: composition
+      locator: {table: '8.2', published_page: 218, pdf_page_index: 242, section: '8.2', figure: '8.4-8.5'}
+      units: qualitative EDS elemental findings
+      values:
+        record_kind: deposit_findings_as_printed
+        quantity_token_needed: elemental_deposit_composition_by_surface
+        phase_token_needed: deposit_phase_by_element
+        method_class: measured_direct
+        elements_in_distinct_deposit_as_printed: [Fe, O]
+        deposit_location: Distinct brown/deep red band on the reactor tube; sample taken by smear/swab from inside tube
+        deposit_phase_by_element: {state: unknown, reason: Qualitative EDS establishes elements, not phase}
+        identification: SEM and qualitative EDS/EDX of a carbon-microdot smear sample
+        oxygen_gas: {state: unknown, reason: no molecular O2 collection or measurement reported}
+        saw_air_before_analysis: {state: unknown, reason: not_reported}
+        collector_or_shield_deposit: {state: unknown, reason: not_reported}
+        mass_loss: {semantics: bound_not_point, result: below estimated error, numeric_error_bound: {state: unknown, reason: not_reported}, balance_resolution: {state: unknown, reason: not_reported_for_chapter_8_test}}
+        mass_vaporized_by_element: {state: unknown, reason: not_reported}
+        residue_composition: {state: unknown, reason: not_reported}
+    - observation_id: shaw_2023_td2_results
+      experiment: td2-nanophase-iron-oxide
+      type: composition
+      locator: {table: '8.2', published_page: 218, pdf_page_index: 242, section: '8.2', figure: '8.6-8.8'}
+      units: qualitative EDS elemental findings
+      values:
+        record_kind: deposit_findings_as_printed
+        quantity_token_needed: elemental_deposit_composition_by_surface
+        phase_token_needed: deposit_phase_by_element
+        method_class: measured_direct
+        elements_in_distinct_deposit_as_printed: None
+        deposit_location: No significant Fe-related deposition band; general white frosting on reactor glass
+        deposit_phase_by_element: {state: unknown, reason: No distinct deposit elements reported}
+        identification: SEM and EDS/EDX of selected reactor fragments
+        oxygen_gas: {state: unknown, reason: no molecular O2 collection or measurement reported}
+        saw_air_before_analysis: {state: unknown, reason: not_reported}
+        collector_or_shield_deposit: {state: unknown, reason: not_reported}
+        mass_loss: {semantics: bound_not_point, result: below estimated error, numeric_error_bound: {state: unknown, reason: not_reported}, balance_resolution: {state: unknown, reason: not_reported_for_chapter_8_test}}
+        mass_vaporized_by_element: {state: unknown, reason: not_reported}
+        residue_composition: {state: unknown, reason: not_reported}
+  Ilmenite:
+    observations: []
+    context:
+    - observation_id: shaw_2023_td3_results
+      experiment: td3-ilmenite-concentrate
+      type: composition
+      locator: {table: '8.2', published_page: 218, pdf_page_index: 242, section: '8.2', figure: '8.9-8.11'}
+      units: qualitative EDS elemental findings
+      values:
+        record_kind: deposit_findings_as_printed
+        quantity_token_needed: elemental_deposit_composition_by_surface
+        phase_token_needed: deposit_phase_by_element
+        method_class: measured_direct
+        elements_in_distinct_deposit_as_printed: [Zn, O]
+        deposit_location: Dark brown reactor-tube deposition band; ZnO nanorods reported in clusters in analyzed regions
+        phase_as_named_by_author: ZnO nanorods
+        phase_identification_method: SEM and EDS/EDX show morphology and elemental Zn/O; no XRD or other phase-specific analysis reported
+        deposit_phase_by_element: {state: unknown, reason: EDS identifies elements; no phase-specific identification method is reported}
+        identification: SEM imaging and qualitative EDS/EDX; feed and residue also analyzed by XRF
+        oxygen_gas: {state: unknown, reason: no molecular O2 collection or measurement reported}
+        saw_air_before_analysis: {state: unknown, reason: not_reported}
+        collector_or_shield_deposit: {state: unknown, reason: not_reported}
+        mass_loss: {semantics: bound_not_point, result: below estimated error, numeric_error_bound: {state: unknown, reason: not_reported}, balance_resolution: {state: unknown, reason: not_reported_for_chapter_8_test}}
+        Zn_fraction_sublimated_pct: {value_as_printed: '~82%', method_class: calculated, method: XRF analysis of post-test residue; calculation details not reported}
+        residue_composition: {Zn_wt_pct: 0.028, basis: feed-material XRF after test; impurity present as gangue mineral phases}
+  LMS-1:
+    observations: []
+    context:
+    - observation_id: shaw_2023_td4_results
+      experiment: td4-lms1-atmosphere
+      type: composition
+      locator: {table: '8.2', published_page: 218, pdf_page_index: 242, section: '8.2', figure: '8.12'}
+      units: qualitative EDS elemental findings
+      values:
+        record_kind: deposit_findings_as_printed
+        quantity_token_needed: elemental_deposit_composition_by_surface
+        phase_token_needed: deposit_phase_by_element
+        method_class: measured_direct
+        elements_in_distinct_deposit_as_printed: None
+        deposit_location: No deposition band in reactor tube; minor white discoloration on the reactor flange
+        deposit_phase_by_element: {state: unknown, reason: no deposit composition reported}
+        identification: Visual observation; reactor-tube SEM/EDS not performed
+        oxygen_gas: {state: unknown, reason: no molecular O2 collection or measurement reported}
+        saw_air_before_analysis: {state: unknown, reason: not_reported}
+        collector_or_shield_deposit: {state: unknown, reason: not_reported}
+        mass_loss: {semantics: bound_not_point, result: below estimated error, numeric_error_bound: {state: unknown, reason: not_reported}, balance_resolution: {state: unknown, reason: not_reported_for_chapter_8_test}}
+        mass_vaporized_by_element: {state: unknown, reason: not_reported}
+        residue_composition: {state: unknown, reason: not_reported}
+    - observation_id: shaw_2023_td5_results
+      experiment: td5-lms1
+      type: composition
+      locator: {table: '8.2', published_page: 218, pdf_page_index: 242, section: '8.2', figure: '8.13-8.15'}
+      units: qualitative EDS elemental findings
+      values:
+        record_kind: deposit_findings_as_printed
+        quantity_token_needed: elemental_deposit_composition_by_surface
+        phase_token_needed: deposit_phase_by_element
+        method_class: measured_direct
+        deposit_location: Multiple faint bands on reactor tube; initial pink line, secondary faint band, and brown band after reactor frosting
+        distinct_crystal_or_layer_elements_as_printed: [Na, Cl, K, S, O]
+        trace_elements_as_printed: [F, P, Pb, Cu]
+        figure_8_14_crystal: [K, Cl]
+        figure_8_14_background: [Na, Cl, K, Pb_trace]
+        figure_8_15_area: [O, Na, P, Cu, K_trace]
+        deposit_phase_by_element: {state: unknown, reason: EDS gives elemental composition; no phase-specific identification reported}
+        identification: SEM and qualitative EDS/EDX; selected tube fragments analyzed
+        oxygen_gas: {state: unknown, reason: no molecular O2 collection or measurement reported}
+        saw_air_before_analysis: {state: unknown, reason: not_reported}
+        collector_or_shield_deposit: {state: unknown, reason: not_reported}
+        mass_loss: {semantics: bound_not_point, result: below estimated error, numeric_error_bound: {state: unknown, reason: not_reported}, balance_resolution: {state: unknown, reason: not_reported_for_chapter_8_test}}
+        mass_vaporized_by_element: {state: unknown, reason: not_reported}
+        residue_composition: {state: unknown, reason: not_reported}
+    - observation_id: shaw_2023_td6_results
+      experiment: td6-lms1
+      type: composition
+      locator: {table: '8.2', published_page: 218, pdf_page_index: 242, section: '8.2', figure: '8.16-8.18'}
+      units: qualitative EDS elemental findings
+      values:
+        record_kind: deposit_findings_as_printed
+        quantity_token_needed: elemental_deposit_composition_by_surface
+        phase_token_needed: deposit_phase_by_element
+        method_class: measured_direct
+        deposit_location: Multiple faint reactor-tube bands; initial white band and faint brown band with visible crystals
+        distinct_crystal_or_layer_elements_as_printed: [Na, Cl, K, O, Mo]
+        trace_elements_as_printed: [S, P, Pb, Cu]
+        figure_8_17_crystal: [Na, O, P, Cu_trace]
+        figure_8_17_background: [Na_trace, Cu_trace]
+        deposit_phase_by_element: {state: unknown, reason: EDS gives elemental composition; no phase-specific identification reported}
+        identification: SEM and qualitative EDS/EDX; selected tube fragments analyzed
+        oxygen_gas: {state: unknown, reason: no molecular O2 collection or measurement reported}
+        saw_air_before_analysis: {state: unknown, reason: not_reported}
+        collector_or_shield_deposit: {state: unknown, reason: not_reported}
+        mass_loss: {semantics: bound_not_point, result: below estimated error, numeric_error_bound: {state: unknown, reason: not_reported}, balance_resolution: {state: unknown, reason: not_reported_for_chapter_8_test}}
+        mass_vaporized_by_element: {state: unknown, reason: not_reported}
+        residue_composition: {state: unknown, reason: not_reported}
+    - observation_id: shaw_2023_td7_results
+      experiment: td7-reacted-td6-feed
+      type: composition
+      locator: {table: '8.2', published_page: 218, pdf_page_index: 242, section: '8.2', figure: '8.19-8.21'}
+      units: qualitative EDS elemental findings
+      values:
+        record_kind: deposit_findings_as_printed
+        quantity_token_needed: elemental_deposit_composition_by_surface
+        phase_token_needed: deposit_phase_by_element
+        method_class: measured_direct
+        deposit_location: Thick faint pink band on reactor tube
+        elements_in_distinct_deposit_as_printed: [Na, Cu]
+        EDS_note: Almost below detection limit of EDX scan; predominant reading was Si and O background
+        deposit_phase_by_element: {state: unknown, reason: EDS gives elements near detection limit; no phase-specific identification reported}
+        identification: SEM imaging and qualitative EDS/EDX
+        oxygen_gas: {state: unknown, reason: no molecular O2 collection or measurement reported}
+        saw_air_before_analysis: {state: unknown, reason: not_reported}
+        collector_or_shield_deposit: {state: unknown, reason: not_reported}
+        mass_loss: {semantics: bound_not_point, result: below estimated error, numeric_error_bound: {state: unknown, reason: not_reported}, balance_resolution: {state: unknown, reason: not_reported_for_chapter_8_test}}
+        mass_vaporized_by_element: {state: unknown, reason: not_reported}
+        residue_composition: {state: unknown, reason: not_reported}
+    - observation_id: shaw_2023_unextracted_ch7_ch8_visual_data_index
+      type: method
+      locator: {section: Table of Contents, note: List of Figures and List of Tables, printed pages xii-xxii}
+      units: table/figure number, printed page, and data not extracted
+      values:
+        quantity: other_chapter_7_8_tables_and_figures_with_unextracted_data
+        method_class: method_only
+        tables:
+        - {id: '7.1', page: 168, note: First-stage sintering test IDs and conditions}
+        - {id: '7.2', page: 171, note: Vacuum sintering parameters}
+        - {id: '7.3', page: 174, note: Sintered-sample quantitative phase analysis}
+        - {id: '7.4', page: 177, note: Apollo 12022 composition used in vapour-pressure calculations}
+        - {id: '7.6', page: 186, note: Operational notes for vertical sintering run}
+        - {id: '7.7', page: 187, note: Thermocouple coordinates and locations}
+        - {id: '7.8', page: 188, note: Equilibrium temperatures in heated simulant bed}
+        - {id: '7.9', page: 189, note: EPMA device parameters}
+        figures:
+        - {id: '7.1', page: 168, note: Feed and sintered-sample micrographs}
+        - {id: '7.2', page: 169, note: Micrographs comparing sintering hold/form}
+        - {id: '7.3', page: 170, note: Sintering mass loss and shrinkage}
+        - {id: '7.4', page: 172, note: EPMA maps of V3/V4 sinter samples}
+        - {id: '7.5', page: 172, note: EPMA maps of V9/V6 sinter samples}
+        - {id: '7.6', page: 172, note: EPMA maps of V11/V12; Fe along pores}
+        - {id: '7.7', page: 173, note: V12 sinter assembly after test}
+        - {id: '7.8', page: 175, note: BET pressure data and linear fit}
+        - {id: '7.9', page: 176, note: Calculated surface-area change during sintering}
+        - {id: '7.10', page: 178, note: Measured and FactSage saturated vapour-pressure curves}
+        - {id: '7.11', page: 180, note: Measured, pure-oxide, and selected-system vapour-pressure curves}
+        - {id: '7.12', page: 182, note: Predicted evaporation flux/rate and surface area}
+        - {id: '7.13', page: 186, note: Simulant container measurement locations}
+        - {id: '7.14', page: 187, note: Vertical sintering thermal profile}
+        - {id: '7.15', page: 188, note: Sintered zone and recovered puck}
+        - {id: '7.16', page: 189, note: SEM images of sintered surface and necking}
+        - {id: '7.17', page: 190, note: Backscatter map of LHS-1 puck}
+        - {id: '7.18', page: 190, note: Magnified sintered surface region}
+        - {id: '7.19', page: 191, note: Three-element map of LHS-1 puck}
+        - {id: '7.20', page: 191, note: Phase map of LHS-1 puck}
+        - {id: '7.21', page: 192, note: Phase spectra used for mapping}
+        - {id: '8.1', page: 199, note: Solar simulator arrangement}
+        - {id: '8.2', page: 200, note: High-vacuum reactor design schematic}
+        - {id: '8.3', page: 201, note: Reactor components}
+        - {id: '8.4', page: 204, note: TD1 reactor tube and smear-sampling location}
+        - {id: '8.5', page: 205, note: TD1 BSE image and EDS results}
+        - {id: '8.6', page: 206, note: TD2 reactor tube and deposition zone}
+        - {id: '8.7', page: 207, note: TD2 sample SEM images and EDS scan}
+        - {id: '8.8', page: 207, note: TD2 EDS spectrum}
+        - {id: '8.9', page: 208, note: TD3 reactor tube deposition zones}
+        - {id: '8.10', page: 209, note: TD3 condensate image and ZnO nanorods}
+        - {id: '8.11', page: 209, note: TD3 BSE image and EDS spectrum}
+        - {id: '8.12', page: 210, note: TD4 tube with no coating}
+        - {id: '8.13', page: 210, note: TD5 tube and sampled deposition zones}
+        - {id: '8.14', page: 211, note: TD5 crystal/background elemental findings}
+        - {id: '8.15', page: 212, note: TD5 BSE image and EDS spectrum}
+        - {id: '8.16', page: 213, note: TD6 reactor-tube deposition zones}
+        - {id: '8.17', page: 214, note: TD6 crystal and background findings}
+        - {id: '8.18', page: 214, note: TD6 EDS spectrum}
+        - {id: '8.19', page: 215, note: TD7 reactor-tube deposition zone}
+        - {id: '8.20', page: 216, note: TD7 deposit image}
+        - {id: '8.21', page: 217, note: TD7 EDS with trace Na and Cu}
+    - observation_id: shaw_2023_lms1_trace_composition_as_cited
+      type: composition
+      locator: {published_page: 218, pdf_page_index: 242, section: '8.2', table: '8.2', note: 'Text below Table 8.2 quotes LMS-1 material specification sheet [53]'}
+      units: as cited in material specification sheet
+      values:
+        record_kind: quoted_feedstock_trace_composition
+        method_class: quoted_source
+        basis: LMS-1 material specification sheet cited as reference 53; not a post-test residue assay
+        Na2O_wt_pct: 1.7
+        K2O_wt_pct: 0.7
+        Cl_wt_pct: {kind: bound, bound_operator: '>', bound_value: '0.008'}
+        P2O5_wt_pct: 0.2
+        SO3_wt_pct: {kind: bound, bound_operator: '>', bound_value: '0.01'}
+        Pb_ppm: 15
+        Cu_ppm: 26
+        Mo_ppm: 8
