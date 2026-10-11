@@ -3354,6 +3354,11 @@ species:
     - observation_id: holzheid_1997_table2_page23_feo
       type: activity_coefficient
       locator: {page: 23, table: '2'}
+      derived_from: [holzheid_1997_equilibrium_free_energy_fits]
+      derivation:
+        relation: authors' equilibrium-constant calculation from measured oxide mole fractions and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
       phase: silicate_melt
       standard_state:
         state:
@@ -3637,6 +3642,11 @@ species:
     - observation_id: holzheid_1997_table2_page24_feo
       type: activity_coefficient
       locator: {page: 24, table: '2'}
+      derived_from: [holzheid_1997_equilibrium_free_energy_fits]
+      derivation:
+        relation: authors' equilibrium-constant calculation from measured oxide mole fractions and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
       phase: silicate_melt
       standard_state:
         state:
@@ -3753,6 +3763,11 @@ species:
     - observation_id: holzheid_1997_table2_page25_feo
       type: activity_coefficient
       locator: {page: 25, table: '2'}
+      derived_from: [holzheid_1997_equilibrium_free_energy_fits]
+      derivation:
+        relation: authors' equilibrium-constant calculation from measured oxide mole fractions and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
       phase: silicate_melt
       standard_state:
         state:
@@ -3799,6 +3814,11 @@ species:
     - observation_id: holzheid_1997_table3_pages27_bk_feo
       type: activity_coefficient
       locator: {page: 27, table: '3'}
+      derived_from: [holzheid_1997_equilibrium_free_energy_fits]
+      derivation:
+        relation: authors' equilibrium-constant calculation from measured oxide concentrations and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
       phase: komatiitic_basalt_silicate_melt
       standard_state:
         state:
@@ -3988,6 +4008,10 @@ species:
     - observation_id: holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_1
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' equilibrium-constant calculation from measured oxide concentrations and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
       experiment: variable-mgo-v-69-27
       type: activity_coefficient
       locator:
@@ -4063,6 +4087,10 @@ species:
     - observation_id: holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_2
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' equilibrium-constant calculation from measured oxide concentrations and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
       experiment: variable-mgo-v-69-28
       type: activity_coefficient
       locator:
@@ -4138,6 +4166,10 @@ species:
     - observation_id: holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_3
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' equilibrium-constant calculation from measured oxide concentrations and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
       experiment: variable-mgo-ad-10-29
       type: activity_coefficient
       locator:
@@ -4213,6 +4245,10 @@ species:
     - observation_id: holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_4
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' equilibrium-constant calculation from measured oxide concentrations and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
       experiment: variable-mgo-v-64-30
       type: activity_coefficient
       locator:
@@ -4288,6 +4324,10 @@ species:
     - observation_id: holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_5
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' equilibrium-constant calculation from measured oxide concentrations and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
       experiment: variable-mgo-v-68-31
       type: activity_coefficient
       locator:
@@ -4363,6 +4403,10 @@ species:
     - observation_id: holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_6
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' equilibrium-constant calculation from measured oxide concentrations and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
       experiment: variable-mgo-v-66-32
       type: activity_coefficient
       locator:
@@ -4438,6 +4482,10 @@ species:
     - observation_id: holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_7
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' equilibrium-constant calculation from measured oxide concentrations and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
       experiment: variable-mgo-v-66-33
       type: activity_coefficient
       locator:
