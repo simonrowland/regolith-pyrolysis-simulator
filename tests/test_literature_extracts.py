@@ -148,6 +148,10 @@ def test_sato_1976_migrates_all_numeric_table_cells() -> None:
     assert len(source_cells) == 55
     for key, (row, point, expected_log) in source_cells.items():
         sample, temperature, condition = key
+        fugacity_pa = Decimal(point["fugacity_Pa"])
+        expected_pa = Decimal("101325") * (Decimal(10) ** expected_log)
+        relative_error = abs(fugacity_pa / expected_pa - Decimal(1))
+        assert relative_error <= Decimal("1e-6"), (sample, temperature, condition)
         matches = [
             obs
             for obs in observations
@@ -158,6 +162,7 @@ def test_sato_1976_migrates_all_numeric_table_cells() -> None:
         observation = matches[0]
         assert observation.experiment_id.endswith(f"::{row['experiment']}")
         assert f"row={sample}" in observation.locator.note
+        assert observation.value.point == fugacity_pa
         located_log = observation.point_conditions["fO2_log"]
         assert located_log.state.value == expected_log
         route = oxygen_condition(
