@@ -247,7 +247,7 @@ species:
       units: log10(gamma_SiO2) as plotted; no numeric points transcribed
       values:
         quantity: activity_coefficient_gamma_SiO2
-        method_class: model_derived
+        method_class: quoted_attributed
         admission_status: figure_only
         semantics: bound_not_point_ordering
         standard_state_as_printed: gamma_SiO2 relative to solid SiO2
@@ -282,7 +282,7 @@ species:
       units: log10(gamma_SiO2) as plotted; no numeric points transcribed
       values:
         quantity: activity_coefficient_gamma_SiO2
-        method_class: model_derived
+        method_class: quoted_attributed
         admission_status: rejected_model_output_not_measurement
         semantics: bound_not_point_ordering
         standard_state_as_printed: gamma_SiO2 relative to solid SiO2
@@ -313,7 +313,7 @@ species:
       units: log10(gamma_SiO2) as plotted; no numeric points transcribed
       values:
         quantity: activity_coefficient_gamma_SiO2
-        method_class: model_derived
+        method_class: quoted_attributed
         admission_status: rejected_model_output_not_measurement
         semantics: bound_not_point_ordering
         standard_state_as_printed: gamma_SiO2 relative to solid SiO2
@@ -373,7 +373,7 @@ species:
       units: log10(gamma_SiO2) as plotted; no numeric points transcribed
       values:
         quantity: activity_coefficient_gamma_SiO2
-        method_class: model_derived
+        method_class: quoted_attributed
         admission_status: rejected_model_output_not_measurement
         semantics: bound_not_point_ordering
         standard_state_as_printed: gamma_SiO2 relative to solid SiO2
@@ -395,7 +395,8 @@ species:
       units: log10(gamma_SiO2) as plotted; no numeric points transcribed
       values:
         quantity: activity_coefficient_gamma_SiO2
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: Fujisawa and Sakao (1977, ref. 13)
         admission_status: rejected_model_output_not_measurement
         semantics: bound_not_point_ordering
         axis_as_printed: OX = 0.8 x_MnO; log10(gamma_SiO2)
@@ -412,7 +413,8 @@ species:
       units: log10(gamma_SiO2) as plotted; no numeric points transcribed
       values:
         quantity: activity_coefficient_gamma_SiO2
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: Fujisawa and Sakao (1977, ref. 13)
         admission_status: rejected_model_output_not_measurement
         semantics: bound_not_point_ordering
         axis_as_printed: OX = 0.8(x_MnO + x_Al2O3); log10(gamma_SiO2)
@@ -429,7 +431,8 @@ species:
       units: log10(gamma_SiO2) as plotted; no numeric points transcribed
       values:
         quantity: activity_coefficient_gamma_SiO2
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: Fujisawa and Sakao (1977, ref. 13)
         admission_status: rejected_model_output_not_measurement
         semantics: bound_not_point_ordering
         axis_as_printed: OX = 0.8(x_MnO + x_Al2O3); log10(gamma_SiO2)
@@ -501,7 +504,8 @@ species:
       units: log10(gamma_SiO2) as printed
       values:
         quantity: activity_coefficient_gamma_SiO2
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: Elliott et al. (1963, ref. 10); Timucin and Morris (1970, ref. 11)
         log10_gamma_SiO2_as_printed: about -2.5
         standard_state_as_printed: with respect to liquid SiO2
       uncertainty:
@@ -529,7 +533,8 @@ species:
       units: log10(gamma_P2O5) as printed
       values:
         quantity: activity_coefficient_gamma_P2O5
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: Turkdogan (2000, ref. 2; cited in footnote 1)
         log10_gamma_P2O5: -17.35
         T_K: 1873.15
         T_C_as_printed: 1600.0
@@ -556,7 +561,7 @@ species:
       units: log10(gamma_P2O5) as printed
       values:
         quantity: activity_coefficient_gamma_P2O5
-        method_class: model_derived
+        method_class: quoted_attributed
         log10_gamma_P2O5_at_30pct_CaO_as_printed: about -15
         log10_gamma_P2O5_at_55pct_CaO_as_printed: about -18
         attribution: 'E. T. Turkdogan: ISIJ Int., 40 (2000), 964 (ref 2; the author''s recent publication)'
