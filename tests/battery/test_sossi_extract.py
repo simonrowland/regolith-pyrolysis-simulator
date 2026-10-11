@@ -291,10 +291,26 @@ def _assert_collector_facts(facts: dict) -> None:
             "tag": "value", "value": "not_printed",
         }
 
-    ag_note = facts["collector_ag_to_pt_ratio"]["value"]["locator"]["note"]
-    assert "1M-PS4 (1400 degC, 15 min, logfO2=-8.00)" in ag_note
-    assert "1M-PS5 (1400 degC, 15 min, logfO2=-10.01)" in ag_note
-    assert "2M-15-07-16f (1550 degC, 15 min, logfO2=-0.68)" in ag_note
+    expected_run_conditions = (
+        "1M-PS4 (1400 degC, 15 min, logfO2=-8.00)",
+        "1M-PS5 (1400 degC, 15 min, logfO2=-10.01)",
+        "2M-15-07-16f (1300 degC, 15 min, logfO2=-10.10)",
+    )
+    for name in ("collector_ag_to_pt_ratio", "collector_pb_to_pt_ratio"):
+        note = facts[name]["value"]["locator"]["note"]
+        assert all(condition in note for condition in expected_run_conditions)
+
+    exceptional_ga_note = facts["collector_ga_to_pt_ratio_2m_17_07_16c"]["value"]["locator"]["note"]
+    assert "2M-17-07-16c (1500 degC, 60 min, logfO2=-7.97; Pt loop)" in exceptional_ga_note
+
+    expected_glass_run_conditions = {
+        "P09/06/18b": "1400 degC, 15 min, logfO2=-9.23",
+        "P09/06/18a": "1400 degC, 15 min, logfO2=-9.23",
+    }
+    for name in glass:
+        note = facts[name]["value"]["locator"]["note"]
+        run = next(run for run in expected_glass_run_conditions if run in note)
+        assert expected_glass_run_conditions[run] in note
 
 
 def test_sossi_table2_gas_values_and_mutation_gate() -> None:
