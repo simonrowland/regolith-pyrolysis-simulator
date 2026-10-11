@@ -2988,6 +2988,52 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
     assert errs == [], "\n".join(errs)
 
 
+def test_matzen_run_2_3_duration_seconds_matches_table_2():
+    """Table 2 prints 41.2 h; pin its seconds conversion against unit drift."""
+    path = EXTRACTS / "matzen-2022-martian-basalt-redox.yaml"
+    doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+    run = next(
+        row for row in doc["experiments"]
+        if row["experiment_id"] == "matzen-run-2-3"
+    )
+    assert run["conditions"]["duration_h"]["state"]["value"] == "41.2"
+    assert run["thermal_schedule"]["total_duration_s"]["state"]["value"] == "148320"
+
+
+def test_matzen_observations_resolve_printed_log_fo2():
+    """Each Table 2 log fO2 lands on its observation and routes as printed."""
+    from decimal import Decimal
+
+    from simulator.battery.migrate import Migrator
+    from simulator.battery.waypoints import oxygen_condition
+
+    path = EXTRACTS / "matzen-2022-martian-basalt-redox.yaml"
+    doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+    expected = {
+        f"{doc['source_id']}::{row['observation_id']}": Decimal(
+            row["values"]["log_fO2"]
+        )
+        for row in doc["species"]["Fe"]["observations"]
+    }
+    migrator = Migrator(root=REPO_ROOT, index={}, aliases={})
+    migrator._migrate_extract(path)
+    migrator.finalize()
+    result = migrator.result
+    observation_ids = result.observations_by_source[path.relative_to(REPO_ROOT).as_posix()]
+
+    assert len(observation_ids) == len(expected) == 24
+    for observation_id in observation_ids:
+        observation = result.observations[observation_id]
+        experiment = result.experiments[observation.experiment_id]
+        bench = result.benches[experiment.bench_id]
+        resolved = oxygen_condition(experiment, bench, observation).selected
+        assert resolved is not None, observation_id
+        assert resolved.route == "observation_fO2_log", observation_id
+        assert resolved.value.point == expected[observation.observation_id], observation_id
+        located = observation.point_conditions["fO2_log"]
+        assert located.locator.page == 39 and located.locator.table == 2
+
+
 def test_fidelity_sample_mutation_reds():
     """Prove the gate: mutate one extract value in memory → match test REDS.
 
