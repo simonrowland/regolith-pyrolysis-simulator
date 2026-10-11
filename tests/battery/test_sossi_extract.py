@@ -5,10 +5,9 @@ from math import isclose, pi, sqrt
 from pathlib import Path
 
 import pytest
-import yaml
 
 from tests.battery.test_migrate import _migrate_real_extract
-from tests.battery.test_t1199type_hashimoto import _UniqueKeyLoader
+from tools.lineage_wave_check import _load_source_extract
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -269,8 +268,7 @@ def _assert_collector_facts(facts: dict) -> None:
 
 
 def test_sossi_table2_gas_values_and_mutation_gate() -> None:
-    text = EXTRACT.read_text(encoding="utf-8")
-    document = yaml.load(text, Loader=_UniqueKeyLoader)
+    document = _load_source_extract(EXTRACT)
     _assert_sossi_gas(document)
 
     mutated = deepcopy(document)
@@ -282,8 +280,7 @@ def test_sossi_table2_gas_values_and_mutation_gate() -> None:
 
 
 def test_sossi_area_arithmetic_and_mutation_gate() -> None:
-    text = EXTRACT.read_text(encoding="utf-8")
-    document = yaml.load(text, Loader=_UniqueKeyLoader)
+    document = _load_source_extract(EXTRACT)
     _assert_derived_area(document)
 
     mutated = deepcopy(document)
@@ -294,12 +291,12 @@ def test_sossi_area_arithmetic_and_mutation_gate() -> None:
 
 def test_sossi_root_context_and_analysis_basis_are_pinned() -> None:
     text = EXTRACT.read_text(encoding="utf-8")
-    document = yaml.load(text, Loader=_UniqueKeyLoader)
+    document = _load_source_extract(EXTRACT)
     _assert_source_root_context(document, text)
 
 
 def test_sossi_collector_numbers_reject_mutation() -> None:
-    document = yaml.load(EXTRACT.read_text(encoding="utf-8"), Loader=_UniqueKeyLoader)
+    document = _load_source_extract(EXTRACT)
     facts = {item["name"]: item for item in document["benches"][0]["other_facts"]}
     _assert_collector_facts(facts)
 

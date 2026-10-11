@@ -4,9 +4,9 @@ from copy import deepcopy
 from pathlib import Path
 
 import pytest
-import yaml
 
 from tests.battery.test_migrate import _migrate_real_extract
+from tools.lineage_wave_check import _load_source_extract
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -16,25 +16,6 @@ EXPECTED_LOADED_GEOMETRY = (
     "As loaded: tubular pellet pressed from powder; outer diameter 4 mm; length "
     "4 mm; straight hole 1.2 mm diameter."
 )
-
-
-class _UniqueKeyLoader(yaml.SafeLoader):
-    def construct_mapping(self, node, deep=False):
-        seen = set()
-        for key_node, _ in node.value:
-            if key_node.tag == "tag:yaml.org,2002:merge":
-                continue
-            key = self.construct_object(key_node, deep=deep)
-            if key in seen:
-                raise yaml.constructor.ConstructorError(
-                    "while constructing a mapping",
-                    node.start_mark,
-                    f"found duplicate key {key!r}",
-                    key_node.start_mark,
-                )
-            seen.add(key)
-        self.flatten_mapping(node)
-        return yaml.SafeLoader.construct_mapping(self, node, deep=deep)
 
 
 def _assert_hashimoto_run_geometry(document: dict) -> None:
@@ -58,7 +39,7 @@ def _assert_hashimoto_run_geometry(document: dict) -> None:
 
 
 def test_hashimoto_experiment_geometry_is_page_pinned_and_rejects_mutation() -> None:
-    document = yaml.load(EXTRACT.read_text(), Loader=_UniqueKeyLoader)
+    document = _load_source_extract(EXTRACT)
     _assert_hashimoto_run_geometry(document)
 
     mutated = deepcopy(document)
