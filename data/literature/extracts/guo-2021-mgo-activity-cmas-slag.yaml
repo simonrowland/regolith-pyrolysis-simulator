@@ -434,6 +434,28 @@ species:
         phase: l
         standard_state: pure liquid Mg endmember; inferred phase for the printed standard
         units: dimensionless activity coefficient
+        derived_from:
+          - 'guo-2021-mgo-activity-cmas-slag::guo_2021_table5_mgo_activities_1873k::T=1873:h=d44037e4a1a7'
+          - 'guo-2021-mgo-activity-cmas-slag::guo_2021_table5_mgo_activities_1873k::T=1873:h=4cac59bdf171'
+          - 'guo-2021-mgo-activity-cmas-slag::guo_2021_table5_mgo_activities_1873k::T=1873:h=b5d6673b3c17'
+          - 'guo-2021-mgo-activity-cmas-slag::guo_2021_table5_mgo_activities_1873k::T=1873:h=32bc4d012e2d'
+          - 'guo-2021-mgo-activity-cmas-slag::guo_2021_table5_mgo_activities_1873k::T=1873:h=bb4b7eb5081e'
+          - 'guo-2021-mgo-activity-cmas-slag::guo_2021_table5_mgo_activities_1873k::T=1873:h=3c1cc249e132'
+          - 'guo-2021-mgo-activity-cmas-slag::guo_2021_table5_mgo_activities_1873k::T=1873:h=ac3a4d6ec1a1'
+          - 'guo-2021-mgo-activity-cmas-slag::guo_2021_table5_mgo_activities_1873k::T=1873:h=71068406e155'
+        derivation:
+          relation: Calculate a[Mg] from a(MgO) using equation (22), then calculate gamma[Mg] from a[Mg]/x[Mg] as tabulated in Table 6.
+          inputs:
+            - 'guo-2021-mgo-activity-cmas-slag::guo_2021_table5_mgo_activities_1873k::T=1873:h=d44037e4a1a7'
+            - 'guo-2021-mgo-activity-cmas-slag::guo_2021_table5_mgo_activities_1873k::T=1873:h=4cac59bdf171'
+            - 'guo-2021-mgo-activity-cmas-slag::guo_2021_table5_mgo_activities_1873k::T=1873:h=b5d6673b3c17'
+            - 'guo-2021-mgo-activity-cmas-slag::guo_2021_table5_mgo_activities_1873k::T=1873:h=32bc4d012e2d'
+            - 'guo-2021-mgo-activity-cmas-slag::guo_2021_table5_mgo_activities_1873k::T=1873:h=bb4b7eb5081e'
+            - 'guo-2021-mgo-activity-cmas-slag::guo_2021_table5_mgo_activities_1873k::T=1873:h=3c1cc249e132'
+            - 'guo-2021-mgo-activity-cmas-slag::guo_2021_table5_mgo_activities_1873k::T=1873:h=ac3a4d6ec1a1'
+            - 'guo-2021-mgo-activity-cmas-slag::guo_2021_table5_mgo_activities_1873k::T=1873:h=71068406e155'
+          output_unit: dimensionless activity coefficient
+          locator: {published_page: 2730, pdf_page_index: 6, table: '6', equation: '22'}
         uncertainty:
           note: No numeric uncertainty is printed for the Table 6 coefficients.
         values:
