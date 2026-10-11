@@ -96,7 +96,8 @@ def _forbidden_internal_kg_mutation_hits(root: Path) -> list[str]:
                 path = Path(entry.path)
                 scanned += 1
                 try:
-                    content = path.read_text(encoding="utf-8")
+                    with path.open(encoding="utf-8", newline="") as source:
+                        content = source.read()
                 except (OSError, UnicodeError) as exc:
                     raise AssertionError(
                         f"could not read {path} after scanning {scanned} files: {exc}"
@@ -217,6 +218,16 @@ def test_forbidden_internal_kg_mutation_scanner_matches_crlf_lines(tmp_path):
     )
 
     assert _forbidden_internal_kg_mutation_hits(root) == ["planted.py:2"]
+
+
+def test_forbidden_internal_kg_mutation_scanner_matches_lone_cr_in_assignment(tmp_path):
+    root = tmp_path / "simulator"
+    root.mkdir()
+    (root / "planted.py").write_bytes(
+        b"(train.stages[6].\rcollected_kg['O2']) = 0\n"
+    )
+
+    assert _forbidden_internal_kg_mutation_hits(root) == ["planted.py:1"]
 
 
 def test_forbidden_internal_kg_mutation_patterns_match_samples():
