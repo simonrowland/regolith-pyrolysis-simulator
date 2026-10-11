@@ -14336,7 +14336,12 @@ class Migrator:
                             atmosphere_state = State.of(gas.species)
                         elif gas.components:
                             atmosphere_state = State.of(
-                                "/".join(component.species for component in gas.components)
+                                "/".join(
+                                    sorted(
+                                        component.species
+                                        for component in gas.components
+                                    )
+                                )
                             )
                         else:
                             atmosphere_state = State.unknown(

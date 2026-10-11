@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+import simulator.battery.migrate as battery_migrate
 from tests.battery.test_migrate import _migrate_real_extract
 from tools.lineage_wave_check import _load_source_extract
 
@@ -339,6 +340,46 @@ def test_sossi_table2_gas_values_and_mutation_gate() -> None:
     ]
     with pytest.raises(AssertionError):
         _assert_sossi_gas(mutated_air)
+
+
+def test_sossi_atmosphere_is_invariant_to_component_order(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    original = _load_source_extract(EXTRACT)
+    _assert_sossi_gas(original)
+    reordered = deepcopy(original)
+    for experiment in reordered["experiments"]:
+        gas = experiment["pressure_environment"]["sweep_gas"]["state"]["value"]
+        if gas.get("components"):
+            gas["components"].reverse()
+    _assert_sossi_gas(reordered)
+
+    def migrated_atmospheres(document: dict) -> dict[str, str]:
+        monkeypatch.setattr(
+            battery_migrate,
+            "load_yaml",
+            lambda path: (
+                document
+                if Path(path) == EXTRACT
+                else _original_loader(path)
+            ),
+        )
+        migrator = battery_migrate.Migrator(REPO_ROOT, index={}, aliases={})
+        migrator._migrate_extract(EXTRACT)
+        migrator.finalize()
+        return {
+            observation_id: observation.point_conditions["atmosphere"].state.value
+            for observation_id, observation in migrator.result.observations.items()
+            if observation.point_conditions
+            and "atmosphere" in observation.point_conditions
+            and observation.point_conditions["atmosphere"].state.is_value
+        }
+
+    _original_loader = battery_migrate.load_yaml
+    before = migrated_atmospheres(original)
+    after = migrated_atmospheres(reordered)
+    assert before == after
+    assert len(before) == 516
 
 
 def test_sossi_area_arithmetic_and_mutation_gate() -> None:
