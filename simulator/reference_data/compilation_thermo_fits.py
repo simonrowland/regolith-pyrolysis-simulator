@@ -1057,6 +1057,7 @@ def _fit_piecewise_candidate(
         not failed_cells
         and ring_pass
         and positive_cp
+        and join_continuity
         and formation_t1_pass
     )
     t2_pass = (
@@ -1106,6 +1107,9 @@ def _fit_piecewise_candidate(
         if not positive_cp:
             reason_code = "cp_nonpositive"
             reason = "fitted Cp is not strictly positive over the declared positive interval"
+        elif not join_continuity:
+            reason_code = "join_continuity_failed"
+            reason = "fitted Cp, H, and S are discontinuous at a segment join"
         elif ring_failures:
             reason_code = "interpolation_ringing"
             reason = "NASA-9 Cp leaves the widened range of adjacent printed cells between nodes"
