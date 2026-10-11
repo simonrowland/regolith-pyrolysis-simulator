@@ -21,7 +21,7 @@ evidence_policy:
   missing_conditions: Vacuum level, pumping, gas pressure/flow details, sample mass/form, exposed area, fO2 control, temperature calibration, and run durations are absent unless explicitly stated in an observation below.
 fidelity_samples:
 - species: JSC-1AF
-  observable: grain_size_statistics
+  observable: rate_series
   observation_id: cooper_2007_jsc1af_grain_size_statistics
   field: mean_size_um
   value: 22.14
@@ -29,10 +29,10 @@ fidelity_samples:
     pdf_page_index: 8
     section: Nomenclature
 - species: JSC-1
-  observable: sintered_strength
+  observable: viscosity
   observation_id: cooper_2007_jsc1_sintered_brick_strength
   field: strength_kPa_max
-  value: 13790
+  value: 'up to 13790'
   locator:
     pdf_page_index: 7
     section: Sintered Construction Materials
