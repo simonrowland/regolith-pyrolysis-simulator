@@ -111,6 +111,18 @@ def test_stored_values_match_independent_image_verified_fixture():
     _assert_image_verified_cells(list(load_records(include_ocr_suspect=True)), IMAGE_VERIFIED_CELLS)
 
 
+def test_published_curve_loader_exposes_printed_equations_and_gate_results():
+    curves = loader.load_published_curves()
+    assert curves
+    required = {
+        "formula", "phase", "quantity", "equation_as_printed", "terms",
+        "coefficients_as_printed", "units_as_printed", "temperature_range_K",
+        "accuracy_as_printed", "locator", "gate",
+    }
+    assert all(required <= curve.keys() for curve in curves)
+    assert all(curve["gate"]["status"] in {"passed", "transcription_gate_failed"} for curve in curves)
+
+
 def test_image_verified_fixture_mutation_is_detected():
     mutated = dict(IMAGE_VERIFIED_CELLS)
     key = ("table-500", 2, 1, "heat_content")

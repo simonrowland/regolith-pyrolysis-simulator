@@ -99,6 +99,10 @@ def test_image_verified_fixture_matches_records():
     _assert_fixture(_records(), fixture)
 
 
+def test_published_equation_loader_reports_no_equations_when_source_has_none():
+    assert b592_loader.load_published_curves() == ()
+
+
 def test_image_verified_fixture_mutation_is_detected():
     fixture = json.loads((COMPILATION_ROOT / "source/image-verified-fixture.json").read_text())
     mutated = copy.deepcopy(_records())

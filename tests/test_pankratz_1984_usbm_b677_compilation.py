@@ -8,6 +8,7 @@ from html.parser import HTMLParser
 import pytest
 import yaml
 
+from simulator.reference_data import pankratz_1984_usbm_b677_loader as loader
 from simulator.reference_data.pankratz_1984_usbm_b677_loader import (
     COMPILATION_ROOT,
     PrintedTemperatureUnavailable,
@@ -18,6 +19,12 @@ from simulator.reference_data.pankratz_1984_usbm_b677_loader import (
 
 
 STANDARD_HEADINGS = ("T", "$Cp^o$", "$S^o$", "$H^o-H_{298}^o$", "$\\Delta Hf^o$", "$\\Delta Gf^o$")
+
+
+def test_published_curve_loader_keeps_failed_transcriptions_typed():
+    curves = loader.load_published_curves()
+    assert all("gate" in curve for curve in curves)
+    assert all(curve["gate"]["status"] in {"passed", "transcription_gate_failed"} for curve in curves)
 IMAGE_VERIFIED_IDENTITIES = {
     "table-0007": ("Ag", "Silver", "(c,1)", STANDARD_HEADINGS[:4]),
     "table-0039": ("C4", "Carbon (ideal tetratomic gas)", "(g)", STANDARD_HEADINGS),

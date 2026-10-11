@@ -21,6 +21,17 @@ from tools import ingest_pankratz_1987_usbm_b689 as harvest
 ROOT = loader.COMPILATION_ROOT
 
 
+def test_published_curves_keep_equation_records_separate_from_source_cells():
+    curves = loader.load_published_curves()
+    assert curves
+    assert all(curve["record_kind"] == "published_curve_fit" for curve in curves)
+    assert any(
+        curve["formula"] in {"Fe", "Si", "Mg", "Ca", "Na", "K", "Al", "Ti", "Mn", "Cr"}
+        and curve["quantity"] == "heat_capacity"
+        for curve in curves
+    )
+
+
 def _jsonl_union(*names):
     """Read a base JSONL plus any sibling `-pNNNN-pNNNN` shards.
 
