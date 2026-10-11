@@ -40,6 +40,7 @@ if str(TOOLS) not in sys.path:
 import extract_merge as em  # noqa: E402
 import migrate_pilot_extracts as mig  # noqa: E402
 import validate_literature_extracts as vle  # noqa: E402
+from simulator.battery import migrate as battery_migrate  # noqa: E402
 
 
 def test_norris_starting_composition_is_pinned_to_online_extended_table() -> None:
@@ -79,6 +80,125 @@ def test_norris_split_runs_retain_shared_sample_and_quench_facts() -> None:
             experiment["thermal_schedule"]["cooling_or_quench"]
             == baseline["thermal_schedule"]["cooling_or_quench"]
         )
+
+
+def test_sato_1976_migrates_all_numeric_table_cells() -> None:
+    """Every printed numeric cell in the three tables becomes a numeric observation."""
+    source = EXTRACTS / "sato-1976-lunar-fo2-apollo-17.yaml"
+    extract = yaml.safe_load(source.read_text())
+    table1 = extract["species"]["O2"]["observations"]
+    assert len(table1) == 11
+    assert all("condition_as_published" in row["values"] for row in table1)
+
+    migrator = battery_migrate.Migrator(root=REPO_ROOT)
+    migrator._migrate_extract(source)
+    migrator.finalize()
+    observations = list(migrator.result.observations.values())
+    counts = {}
+    for table in ("table1", "table2", "table3"):
+        table_observations = [obs for obs in observations if table in obs.observation_id]
+        counts[table] = sum(obs.value.kind.value == "point" for obs in table_observations)
+    assert counts == {"table1": 55, "table2": 25, "table3": 29}
+    assert sum(counts.values()) == 109
+    assert len([obs for obs in observations if "table3" in obs.observation_id]) == 35
+    activity_rows = (
+        extract["species"]["FeO"]["observations"]
+        + extract["species"]["Fe"]["observations"]
+    )
+    assert len(activity_rows) == 10
+    assert all("phase" not in row for row in activity_rows)
+    activity_observations = [
+        obs
+        for obs in observations
+        if "table2" in obs.observation_id or "table3" in obs.observation_id
+    ]
+    assert all(
+        obs.identity.species.phase.is_unknown
+        and obs.identity.species.phase.reason == "source does not state phase"
+        for obs in activity_observations
+    )
+    table2_70017 = next(
+        row for row in extract["species"]["FeO"]["observations"]
+        if row["observation_id"] == "sato_1976_table2_70017"
+    )
+    assert "subsolidus" in table2_70017["phase_context_as_published"]
+    assert "phase_context_locator" in table2_70017
+
+    natural = next(
+        obs for obs in observations if "table1_70017_31::T=1273.15" in obs.observation_id
+    )
+    added_fe = next(
+        obs for obs in observations if "table1_added_fe_70017_31::T=1273.15" in obs.observation_id
+    )
+    assert natural.identity.temperature_K == added_fe.identity.temperature_K
+    assert "row=70017,31" in natural.locator.note
+    assert "row=70017,31" in added_fe.locator.note
+    assert natural.experiment_id != added_fe.experiment_id
+    assert migrator.result.experiments[natural.experiment_id].method.value.value == "emf_cell"
+    assert migrator.result.experiments[added_fe.experiment_id].method.value.value == "emf_cell"
+
+    from decimal import Decimal
+
+    from simulator.battery.waypoints import oxygen_condition
+    from tests.battery.test_waypoints import _bench
+
+    source_cells = {}
+    bench = _bench()
+    for row in table1:
+        condition = "added_Fe" if "added_fe" in row["observation_id"] else "natural"
+        printed_key = (
+            "minus_log_fO2_atm_with_added_Fe"
+            if condition == "added_Fe"
+            else "minus_log_fO2_atm"
+        )
+        sample = row["values"]["sample_number_as_printed"]
+        for point in row["values"]["series"]:
+            printed_minus_log = Decimal(point[printed_key])
+            expected_log = -printed_minus_log
+            assert point["log_fO2"] == {
+                "value": str(expected_log),
+                "units": "log10(atm)",
+            }
+            key = (
+                sample,
+                Decimal(str(point["T_C"])) + Decimal("273.15"),
+                condition,
+            )
+            assert key not in source_cells
+            source_cells[key] = (row, point, expected_log)
+
+    assert len(source_cells) == 55
+    for key, (row, point, expected_log) in source_cells.items():
+        sample, temperature, condition = key
+        fugacity_pa = Decimal(point["fugacity_Pa"])
+        expected_pa = Decimal("101325") * (Decimal(10) ** expected_log)
+        relative_error = abs(fugacity_pa / expected_pa - Decimal(1))
+        assert relative_error <= Decimal("1e-6"), (sample, temperature, condition)
+        matches = [
+            obs
+            for obs in observations
+            if row["observation_id"] in obs.observation_id
+            and obs.identity.temperature_K.value == temperature
+        ]
+        assert len(matches) == 1, (sample, temperature, condition)
+        observation = matches[0]
+        assert observation.experiment_id.endswith(f"::{row['experiment']}")
+        assert f"row={sample}" in observation.locator.note
+        experiment = migrator.result.experiments[observation.experiment_id]
+        assert experiment.sample.form is not None
+        assert experiment.sample.form.state.value == "bulk rock"
+        phase = observation.identity.species.phase
+        assert phase.is_unknown
+        assert phase.reason == "source does not state phase"
+        assert observation.value.point == fugacity_pa
+        located_log = observation.point_conditions["fO2_log"]
+        assert located_log.state.value == expected_log
+        route = oxygen_condition(
+            experiment, bench, observation
+        )
+        assert route.selected is not None
+        assert route.selected.route == "observation_fO2_log"
+        assert route.selected.value.point == expected_log
 
 
 def test_van_limpt_k2o_series_uses_section_and_figure_provenance() -> None:
