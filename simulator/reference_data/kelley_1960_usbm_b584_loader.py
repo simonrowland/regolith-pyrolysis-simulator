@@ -205,8 +205,9 @@ def _gate_derivative_cp(curve: dict[str, Any], curves: list[dict[str, Any]],
     actual = tuple(map(_decimal, curve["coefficients_as_printed"]))
     expected = tuple(expected_by_term[term] for term in curve["terms"])
     residuals = tuple(got - want for got, want in zip(actual, expected))
+    # A coefficient printed to a given final place is rounded by at most half that place.
     matches = len(actual) == len(expected) and all(
-        abs(delta) <= Decimal(str(_last_digit_unit(token)))
+        abs(delta) <= Decimal(str(_last_digit_unit(token) / 2))
         for delta, token in zip(residuals, curve["coefficients_as_printed"])
     )
     return {**curve, "gate": {"status": "passed" if matches else "transcription_gate_failed",

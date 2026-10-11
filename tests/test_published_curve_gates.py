@@ -61,3 +61,15 @@ def test_enthalpy_gates_report_all_in_range_table_cells():
     b677_heat = [curve for curve in b677.load_published_curves()
                  if curve["quantity"] == "heat_content_increment"]
     assert b677_heat and all(curve["full_range_check"]["n_cells"] >= 3 for curve in b677_heat)
+
+
+def test_b584_derivative_gate_rejects_a_one_unit_last_digit_change():
+    curves = list(b584.load_published_curves())
+    records = {record["record_id"]: record for record in b584.load_records(include_ocr_suspect=True)}
+    index = next(i for i, curve in enumerate(curves)
+                 if curve["formula"] == "CaO" and curve["quantity"] == "heat_capacity")
+    curve = curves[index]
+    changed = {**curve, "coefficients_as_printed": [*curve["coefficients_as_printed"][:2], "-1.55×10^5"]}
+    result = b584._gate_derivative_cp(changed, curves, records)
+    assert result["gate"]["status"] == "transcription_gate_failed"
+    assert result["gate"]["reason"] == "derivative_mismatch"
