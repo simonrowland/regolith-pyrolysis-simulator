@@ -302,6 +302,13 @@ def test_chromium_elemental_phases_keep_their_independent_table_gates():
     assert by_key[("g", "heat_capacity")]["gate"]["reason"] == "no_independent_check"
 
 
+def test_calcium_elemental_phases_pass_their_table_and_derivative_gates():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "Ca"]
+    assert len(curves) == 8
+    assert {curve["phase"] for curve in curves} == {"c", "l", "g"}
+    assert all(curve["gate"]["status"] == "passed" for curve in curves)
+
+
 def test_heat_content_gate_detects_a_coefficient_mutation():
     heat = loader.load_published_curves()[0]
     changed = {**heat, "coefficients_as_printed": ["11.77", *heat["coefficients_as_printed"][1:]]}
