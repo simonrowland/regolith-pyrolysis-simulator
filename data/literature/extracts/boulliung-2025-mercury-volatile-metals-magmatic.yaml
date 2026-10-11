@@ -241,7 +241,9 @@ species:
       units: qualitative species assignments as printed
       values:
         quantity: dominant_gas_species_assignments
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Boulliung et al. (2025), HSC Chemistry software and databases, GEM free-energy-minimization equilibrium speciation calculation
         admission_status: model_output_not_measurement
         model_generator: HSC_Chemistry_GEM_free_energy_minimization
         derived_from: [boulliung_2025_starting_material_hg_and_trace_doping, boulliung_2025_ssas_apparatus_and_run_conditions]
