@@ -1,12 +1,40 @@
 from dataclasses import replace
 from decimal import Decimal
+from pathlib import Path
 
 import pytest
 
 from simulator.battery.enums import AmountBasis, BenchIdentityBasis, ValueKind
 from simulator.battery.records import Bench, BenchIdentity, Composition, Located, Sample, State, Value
-from simulator.battery.waypoints import ReadinessStatus, WaypointAuthority, consumer_readiness, pressure_boundary, thermal_path
+from simulator.battery.migrate import Migrator
+from simulator.battery.waypoints import ReadinessStatus, WaypointAuthority, consumer_readiness, oxygen_condition, pressure_boundary, thermal_path
 from tests.battery import factories
+
+
+def test_sossi_2020_table_s4_oxygen_values_migrate_to_all_observation_waypoints():
+    extract = Path(__file__).resolve().parents[2] / "data/literature/extracts/sossi-2020-magma-ocean-redox.yaml"
+    migrator = Migrator()
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+    result = migrator.result
+
+    assert len(result.observations) == 12
+    assert len(result.validation.hard_issues) == 12  # unresolved measured-reduction lineage is item 2
+    selected = []
+    for observation in result.observations.values():
+        experiment = result.experiments[observation.experiment_id]
+        bench = result.benches[experiment.bench_id]
+        waypoint = oxygen_condition(experiment, bench, observation)
+        assert waypoint.selected is not None, observation.id
+        assert waypoint.selected.authority is WaypointAuthority.PRINTED
+        assert observation.point_conditions["fO2_log"].locator.table == "S4"
+        selected.append(str(waypoint.selected.value.point))
+    assert len(selected) == 12
+    assert sorted(selected, key=Decimal) == sorted(
+        ["0.00", "-2.49", "-2.53", "-2.58", "-2.72", "-2.72", "-2.72",
+         "-3.00", "-3.92", "-5.32", "-6.74", "-7.86"],
+        key=Decimal,
+    )
 
 
 @pytest.mark.parametrize("key,route", [("temperature_K", thermal_path), ("total_pressure_Pa", pressure_boundary)])
