@@ -374,7 +374,12 @@ def test_silicon_and_titanium_elemental_equations_keep_their_printed_gates():
 
     # Kelley gives no Cp column; compare its printed Si(s) equation at 298.15 K
     # with JANAF's independent 20.000 J/(mol K) value after exact conversion.
-    cp_cal_mol_k = 5.70 + 0.70e-3 * 298.15 - 1.04e5 * 298.15**-2
+    silicon_cp = next(curve for curve in curves
+                      if curve["formula"] == "Si" and curve["phase"] == "c"
+                      and curve["quantity"] == "heat_capacity")
+    powers = {"a": 0, "b*T": 1, "c*T^-2": -2}
+    cp_cal_mol_k = sum(float(loader._decimal(coefficient)) * 298.15**powers[term]
+                       for coefficient, term in zip(silicon_cp["coefficients_as_printed"], silicon_cp["terms"]))
     janaf = yaml.safe_load((COMPILATION_ROOT.parent / "janaf/tables/Si-002.yaml").read_text())
     janaf_cp = next(row["heat_capacity"]["value"] for row in janaf["table"]["values"]
                     if row["temperature"]["value"] == 298.15)
