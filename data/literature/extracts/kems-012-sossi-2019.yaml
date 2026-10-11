@@ -57,7 +57,7 @@ benches:
     unit: qualitative
     value:
       state: {tag: value, value: {kind: categorical, categorical: "Analyzed Ir loop C18/12/15 and Re loops 1M-1/3/16, 1M-1/3/16b, and C17/12/15c contained no detected elements other than loop metal. Pt loops had Ga and Cu dissolved into Pt metal; minor Ag and Pb were found in 1M-PS4, 1M-PS5, and 2M-15-07-16f."}}
-      locator: {page: 12, section: '4.3 Collector analyses', note: "Evidence class: measured_tabulated; qualitative analyses of collected wire contents."}
+      locator: {page: 12, section: '4.3 Metal Loops', note: "Evidence class: measured_tabulated; qualitative analyses of collected wire contents. The Ga/Cu ppm values from paired Pt/Re runs are quenched-glass analyses in Table 2."}
   - name: collector_ag_to_pt_ratio
     unit: dimensionless Ag/Pt ratio
     value:
@@ -73,11 +73,11 @@ benches:
     value:
       state: {tag: value, value: {kind: categorical, categorical: "Typically Ga/Pt < 7e-4; 2M-17-07-16c had 2.4(±0.1)e-3."}}
       locator: {page: 12, section: '4.3 Collector analyses', note: "Evidence class: measured_tabulated; ratios as printed."}
-  - name: collector_ga_ppm
-    unit: ppm Ga
+  - name: glass_residue_loop_material_comparison
+    unit: qualitative
     value:
-      state: {tag: value, value: {kind: categorical, categorical: "439.9 ppm in Pt loop P09-06-18b; 409.4 ppm in Re loop P09-06-18a."}}
-      locator: {page: 12, section: '4.3 Collector analyses', note: "Evidence class: measured_tabulated; concentrations as printed."}
+      state: {tag: value, value: {kind: categorical, categorical: 'Table 2 quenched-glass analyses: P09/06/18b (Pt loop) has 439.9 ppm Ga and 40.5 ppm Cu; P09/06/18a (Re loop) has 409.4 ppm Ga and 11.2 ppm Cu. Section 4.3 compares these similar glass concentrations to argue that partitioning into the wire has no resolvable effect on melt depletion.'}}
+      locator: {page: 54, table: '2', section: 'Results — Run conditions and LA-ICP-MS trace element data', note: 'Evidence class: measured_tabulated; ppm values are from quenched glass in the paired runs, not from wire analyses. Section 4.3, printed pp. 12–13, uses the comparison to argue that loss into the wire does not appreciably affect melt measurements.'}
   - name: collector_cu_to_pt_ratio
     unit: dimensionless Cu/Pt ratio
     value:
@@ -108,11 +108,6 @@ benches:
     value:
       state: {tag: value, value: {kind: categorical, categorical: "9% assuming 4000 ppm Cu in the affected zone."}}
       locator: {page: 12, section: '4.3 Collector analyses', note: "Evidence class: author calculation; value and assumption as printed."}
-  - name: collector_cu_ppm
-    unit: ppm Cu
-    value:
-      state: {tag: value, value: {kind: categorical, categorical: "40.5 ppm in Pt loop P09-06-18b; 11.2 ppm in Re loop P09-06-18a."}}
-      locator: {page: 12, section: '4.3 Collector analyses', note: "Evidence class: measured_tabulated; concentrations as printed."}
   - name: collector_oxidation_state
     unit: not reported
     value:

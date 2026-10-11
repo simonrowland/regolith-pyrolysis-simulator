@@ -173,11 +173,7 @@ def _assert_source_root_context(document: dict, extract_text: str) -> None:
 
     facts = {item["name"]: item for item in document["benches"][0]["other_facts"]}
     assert "Ga and Cu dissolved into Pt metal" in facts["collector_loop_metal_content"]["value"]["state"]["value"]["categorical"]
-    for name in ("collector_fe_loss", "collector_ag_to_pt_ratio", "collector_pb_to_pt_ratio", "collector_ga_to_pt_ratio", "collector_ga_ppm", "collector_cu_to_pt_ratio", "collector_cu_diffusion_depth", "collector_wire_diameter", "collector_wire_segment_mass", "collector_wire_mass_fraction", "collector_cu_budget", "collector_cu_ppm"):
-        fact = facts[name]
-        assert fact["unit"]
-        assert fact["value"]["state"]["tag"] == "value"
-        assert fact["value"]["locator"]["page"] == 11 or fact["value"]["locator"]["page"] == 12
+    _assert_glass_loop_comparison(facts)
     assert facts["collector_oxidation_state"]["value"]["state"] == {
         "tag": "unknown",
         "reason": "not_published",
@@ -186,6 +182,25 @@ def _assert_source_root_context(document: dict, extract_text: str) -> None:
         "tag": "unknown",
         "reason": "not_published",
     }
+
+
+def _assert_glass_loop_comparison(facts: dict) -> None:
+    glass = facts["glass_residue_loop_material_comparison"]
+    assert glass["unit"] == "qualitative"
+    assert glass["value"]["state"]["value"]["categorical"] == (
+        "Table 2 quenched-glass analyses: P09/06/18b (Pt loop) has 439.9 ppm Ga "
+        "and 40.5 ppm Cu; P09/06/18a (Re loop) has 409.4 ppm Ga and 11.2 ppm Cu. "
+        "Section 4.3 compares these similar glass concentrations to argue that "
+        "partitioning into the wire has no resolvable effect on melt depletion."
+    )
+    locator = glass["value"]["locator"]
+    assert locator["page"] == 54
+    assert locator["table"] == "2"
+    assert "quenched glass" in locator["note"]
+    assert "not from wire analyses" in locator["note"]
+    assert "Section 4.3" in locator["note"]
+    assert "collector_ga_ppm" not in facts
+    assert "collector_cu_ppm" not in facts
 
 
 def test_sossi_table2_gas_values_and_mutation_gate() -> None:
@@ -216,6 +231,18 @@ def test_sossi_root_context_and_analysis_basis_are_pinned() -> None:
     text = EXTRACT.read_text(encoding="utf-8")
     document = yaml.load(text, Loader=_UniqueKeyLoader)
     _assert_source_root_context(document, text)
+
+
+def test_sossi_glass_loop_attribution_rejects_mutation() -> None:
+    document = yaml.load(EXTRACT.read_text(encoding="utf-8"), Loader=_UniqueKeyLoader)
+    facts = {item["name"]: item for item in document["benches"][0]["other_facts"]}
+    _assert_glass_loop_comparison(facts)
+
+    mutated = deepcopy(facts)
+    categorical = mutated["glass_residue_loop_material_comparison"]["value"]["state"]["value"]["categorical"]
+    mutated["glass_residue_loop_material_comparison"]["value"]["state"]["value"]["categorical"] = categorical.replace("439.9", "999999")
+    with pytest.raises(AssertionError):
+        _assert_glass_loop_comparison(mutated)
 
 
 def test_sossi_fields_survive_isolated_migration(tmp_path: Path) -> None:
