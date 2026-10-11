@@ -809,6 +809,73 @@ def test_janaf_o029_formation_gibbs_zero_pin() -> None:
     assert oxygen["fit_statistics"]["smooth_fit_checks"]["maximum_relative_Cp_residual"] <= 1e-3
     assert oxygen["fit_statistics"]["derived_formation_G_kJ_per_mol"]["max_abs"] == 0.0
 
+
+@pytest.mark.parametrize(
+    ("table_id", "phase", "temperature_K", "printed_identity"),
+    [
+        (
+            "Al-008",
+            "g",
+            2700.0,
+            Decimal("-541.410") + Decimal("183.881") - Decimal("84.782")
+            - Decimal("113.667") - Decimal("86.141"),
+        ),
+        (
+            "Al-033",
+            "g",
+            2000.0,
+            Decimal("-265.684") + Decimal("62.368") - Decimal("62.557")
+            - Decimal("0.5") * Decimal("62.745"),
+        ),
+        (
+            "Al-043",
+            "l",
+            2700.0,
+            Decimal("-1510.424") + Decimal("352.843") - Decimal("84.782")
+            - Decimal("1.5") * Decimal("89.876"),
+        ),
+    ],
+)
+def test_janaf_printed_formation_h_uses_exact_elemental_h298_gauge(
+    table_id: str,
+    phase: str,
+    temperature_K: float,
+    printed_identity: Decimal,
+) -> None:
+    records = generate_janaf_sidecar(table_ids=[table_id])
+    record = next(
+        item for item in records
+        if item["source_record_id"] == table_id and item["phase"] == phase
+    )
+
+    assert record["status"] == "accepted", record
+    assert record["formation_capable"] is True, record
+    assert record["validity"]["T_min_K"] <= temperature_K <= record["validity"]["T_max_K"]
+    if table_id == "Al-033":
+        assert abs(printed_identity - Decimal("-297.245")) <= Decimal("0.0005")
+    else:
+        assert printed_identity == {
+            "Al-008": Decimal("-642.119"),
+            "Al-043": Decimal("-1377.177"),
+        }[table_id]
+    assert record["fit_statistics"]["derived_formation_H_kJ_per_mol"]["cell_count"] > 0
+
+
+def test_janaf_formation_anchor_does_not_require_element_fit_at_298_15_k() -> None:
+    table_ids = [
+        "Al-009", "Al-011", "Al-013", "Al-029", "Al-031",
+        "Al-032", "Al-046", "Al-047", "Al-048", "Al-049",
+    ]
+    records = [
+        record for record in generate_janaf_sidecar(table_ids=table_ids)
+        if record["source_record_id"] in table_ids
+    ]
+    by_id = {record["source_record_id"]: record for record in records}
+
+    assert set(by_id) == set(table_ids)
+    assert all(record["status"] == "accepted" for record in by_id.values())
+    assert all(record["formation_capable"] is True for record in by_id.values())
+
     segments = [
         Nasa9Segment(
             T_min_K=item["T_min_K"],
