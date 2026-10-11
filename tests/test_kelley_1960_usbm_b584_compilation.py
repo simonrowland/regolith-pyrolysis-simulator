@@ -227,6 +227,10 @@ def test_aluminum_phases_keep_the_source_transition_and_equation_mismatch():
     assert by_key[("c", "heat_capacity")]["gate"]["status"] == "passed"
     assert by_key[("l", "heat_content_increment")]["gate"]["reason"] == "transcription_gate_failed"
     assert by_key[("l", "heat_capacity")]["gate"]["reason"] == "no_independent_check"
+    # Rendered 150-dpi PDF page 26 (printed p. 10) reads "7.00 + 330"; it has no T after 7.00.
+    liquid_h = by_key[("l", "heat_content_increment")]
+    assert liquid_h["equation_as_printed"] == "H_T - H_298.15 = 7.00 + 330"
+    assert [row["predicted"] for row in liquid_h["gate"]["residuals"]] == [337.0, 337.0, 337.0]
     assert by_key[("g", "heat_content_increment")]["gate"]["status"] == "passed"
     assert by_key[("g", "heat_capacity")]["gate"]["status"] == "passed"
 
