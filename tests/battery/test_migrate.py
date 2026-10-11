@@ -10695,8 +10695,13 @@ def test_residue_cells_keep_run_identity_and_printed_conditions(
             assert conditions[key].locator is not None
         atmosphere = conditions["atmosphere"]
         assert atmosphere.state.is_value
-        assert atmosphere.state.value == "CO/CO2"
-        assert "CO" in atmosphere.locator.note and "CO2" in atmosphere.locator.note
+        source_sweep_gas = source_experiment["pressure_environment"]["sweep_gas"]["state"]["value"]
+        expected_atmosphere = source_sweep_gas["species"] or "CO/CO2"
+        assert atmosphere.state.value == expected_atmosphere
+        if expected_atmosphere == "air":
+            assert "log fO2=-0.68 as air" in atmosphere.locator.note
+        else:
+            assert "CO" in atmosphere.locator.note and "CO2" in atmosphere.locator.note
     assert actual_sossi == expected_sossi
     assert len(sossi_rows) == 344
 
@@ -10909,9 +10914,9 @@ def test_residue_series_emits_numeric_component_cells_with_component_identity(
     assert sossi_mn.point_conditions["total_pressure_Pa"].state.value.point == Decimal("101325")
     atmosphere = sossi_mn.point_conditions["atmosphere"]
     assert atmosphere.state.is_value
-    assert atmosphere.state.value == "CO/CO2"
+    assert atmosphere.state.value == "air"
     assert atmosphere.locator is not None
-    assert "CO" in atmosphere.locator.note and "CO2" in atmosphere.locator.note
+    assert "log fO2=-0.68 as air" in atmosphere.locator.note
 
     hashimoto_id = "kems-015-hashimoto-1983"
     hashimoto = _migrate_real_extract(
