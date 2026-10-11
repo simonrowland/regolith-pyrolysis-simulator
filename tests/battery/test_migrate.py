@@ -8317,6 +8317,67 @@ def test_areal_mass_loss_routes_delta_q_to_kg_per_m2(tmp_path: Path) -> None:
     assert obs.derivation.output_unit == "kg_per_m2"
 
 
+def test_hayakawa_1982_areal_flux_rows_migrate_without_losing_fidelity(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.score import ScoreContext, score_store
+
+    result = _migrate_real_extract(
+        tmp_path,
+        "hayakawa-1982-fe-cu-evaporation-dissolved-oxygen.yaml",
+    )
+    rows = [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == "hayakawa-1982-fe-cu-evaporation-dissolved-oxygen"
+    ]
+    assert len(rows) == 40
+    assert result.validation is not None
+    assert result.validation.hard_issues == ()
+    assert all(
+        quantity_token(observation.identity) is Quantity.MASS_LOSS_AREAL_FLUX
+        for observation in rows
+    )
+    assert all(
+        observation.identity.temperature_K is not None
+        and observation.identity.temperature_K.is_value
+        and observation.point_conditions
+        for observation in rows
+    )
+
+    fe_rows = [
+        observation
+        for observation in rows
+        if "hayakawa_1982_table_1_fe_oxygen_evaporation" in observation.observation_id
+    ]
+    assert len(fe_rows) == 22
+    first = fe_rows[0]
+    assert first.value.kind is ValueKind.POINT
+    assert first.value.point == Decimal("0.00148")
+    assert first.derivation is not None
+    assert first.derivation.output_unit == "kg_per_m2_per_s"
+    assert first.derivation.relation == (
+        "printed_x10^4_header_scale_then_g_per_cm2_per_s_to_kg_per_m2_per_s"
+    )
+    assert first.identity.temperature_K.value == Decimal("1823.15")
+    assert first.point_conditions["initial_oxygen_wt_pct"].state.value == Decimal("0.0087")
+    assert first.point_conditions["final_oxygen_wt_pct"].state.value == Decimal("0.0086")
+    assert first.point_conditions["holding_time_min"].state.value == Decimal("12")
+
+    context = ScoreContext(
+        works=result.works,
+        experiments=result.experiments,
+        observations={observation.observation_id: observation for observation in rows},
+    )
+    residuals, _candidates = score_store(
+        context,
+        engines=(Engine.OPENIMCC,),
+        include_diagnostics=False,
+    )
+    assert len(residuals) == 40
+    assert all(row.numeric is None and row.refusal is not None for row in residuals)
+
+
 @pytest.mark.parametrize(
     ("units", "expected", "relation"),
     [

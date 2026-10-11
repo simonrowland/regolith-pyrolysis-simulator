@@ -270,6 +270,7 @@ def _is_langmuir_pressure_or_alpha(method: MethodToken, quantity: Quantity) -> b
         Quantity.EVAPORATION_COEFFICIENT_ALPHA,
         Quantity.EVAPORATION_RATE,
         Quantity.MASS_LOSS_RATE,
+        Quantity.MASS_LOSS_AREAL_FLUX,
     }
 
 
@@ -278,6 +279,7 @@ def _is_kinetic_or_yield(quantity: Quantity) -> bool:
         Quantity.EVAPORATION_COEFFICIENT_ALPHA,
         Quantity.EVAPORATION_RATE,
         Quantity.MASS_LOSS_RATE,
+        Quantity.MASS_LOSS_AREAL_FLUX,
         Quantity.MASS_LOSS_FRACTION,
         Quantity.MASS_LOSS_FRACTION_VS_T,
         Quantity.YIELD_FRACTION,
@@ -335,6 +337,7 @@ _METHOD_SCOPED_APPARATUS_QUANTITIES = frozenset(
         Quantity.EVAPORATION_COEFFICIENT_ALPHA,
         Quantity.EVAPORATION_RATE,
         Quantity.MASS_LOSS_RATE,
+        Quantity.MASS_LOSS_AREAL_FLUX,
         Quantity.MASS_LOSS_FRACTION,
         Quantity.MASS_LOSS_FRACTION_VS_T,
         Quantity.YIELD_FRACTION,

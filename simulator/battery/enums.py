@@ -66,6 +66,7 @@ class Quantity(StrEnum):
     MASS_LOSS_FRACTION = "mass_loss_fraction"
     MASS_LOSS_FRACTION_VS_T = "mass_loss_fraction_vs_T"
     MASS_LOSS_AREAL_DENSITY = "mass_loss_areal_density"
+    MASS_LOSS_AREAL_FLUX = "mass_loss_areal_flux"
     YIELD_FRACTION = "yield_fraction"
     O2_YIELD = "o2_yield"
     FE3_FE2_RATIO = "fe3_fe2_ratio"
@@ -472,6 +473,7 @@ QUANTITY_UNITS: dict[Quantity, str] = {
     Quantity.MASS_LOSS_FRACTION: "dimensionless",
     Quantity.MASS_LOSS_FRACTION_VS_T: "dimensionless",
     Quantity.MASS_LOSS_AREAL_DENSITY: "kg_per_m2",
+    Quantity.MASS_LOSS_AREAL_FLUX: "kg_per_m2_per_s",
     Quantity.YIELD_FRACTION: "dimensionless",
     Quantity.O2_YIELD: "dimensionless",
     Quantity.FE3_FE2_RATIO: "dimensionless",
@@ -533,6 +535,7 @@ KINETIC_YIELD_QUANTITIES = frozenset(
         Quantity.EVAPORATION_COEFFICIENT_ALPHA,
         Quantity.EVAPORATION_RATE,
         Quantity.MASS_LOSS_RATE,
+        Quantity.MASS_LOSS_AREAL_FLUX,
         Quantity.MASS_LOSS_FRACTION,
         Quantity.MASS_LOSS_FRACTION_VS_T,
         Quantity.YIELD_FRACTION,

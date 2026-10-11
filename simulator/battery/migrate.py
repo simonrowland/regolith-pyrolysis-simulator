@@ -438,6 +438,7 @@ QUANTITY_ALIASES = {
     "total_gas_evolution_mass_loss": Quantity.MASS_LOSS_FRACTION,
     "isothermal_hold_mass_loss": Quantity.MASS_LOSS_FRACTION,
     "water_released_during_drying": Quantity.MASS_LOSS_FRACTION,
+    "mass_loss_areal_flux": Quantity.MASS_LOSS_AREAL_FLUX,
     "dta_transition_temperatures": Quantity.TRANSITION_TEMPERATURE,
     "invariant_transformation_temperature": Quantity.TRANSITION_TEMPERATURE,
     "invariant_transformation_temperature_range": Quantity.TRANSITION_TEMPERATURE,
@@ -2652,6 +2653,56 @@ def convert_areal_mass_to_kg_per_m2(
     return None, f"unmapped areal mass unit {units!r}"
 
 
+def convert_mass_flux_to_kg_per_m2_per_s(
+    value: object, units: str | None
+) -> tuple[Decimal | None, str | None]:
+    """Normalize printed areal mass fluxes, including a printed header scale."""
+
+    amount = _as_dec_or_none(value)
+    if amount is None:
+        return None, "areal mass flux value is not numeric"
+    if units is None or not str(units).strip():
+        return None, "missing areal mass flux unit"
+    printed = str(units).strip().split(";", 1)[0]
+    header_scale = re.search(r"(?:x|×)\s*10\s*\^\s*(\d+)", printed, re.I)
+    header_exponent = int(header_scale.group(1)) if header_scale else None
+    unit_text = printed[: header_scale.start()] if header_scale else printed
+    mass = re.search(r"\b(?P<mass>kg|mg|g)\s*/", unit_text, re.I)
+    if mass is None:
+        return None, f"unmapped areal mass flux unit {units!r}"
+    denominator = unit_text[mass.end() :]
+    if not re.search(r"(?:\bsec(?:ond)?s?\.?|\bs)(?:\s*\^?\s*-?1)?", denominator, re.I):
+        return None, f"unmapped areal mass flux unit {units!r}"
+    area = re.search(r"\b(?P<area>cm|m)\s*(?:\^?\s*-?2|²)", denominator, re.I)
+    if area is None:
+        return None, f"unmapped areal mass flux unit {units!r}"
+
+    mass_unit = mass.group("mass").lower()
+    area_unit = area.group("area").lower()
+    # 1 g/(cm² s) = 1e-3 kg / 1e-4 m² / s = 10 kg/(m² s); 1 mg/(cm² s)
+    # = 1e-6 kg / 1e-4 m² / s = 0.01 kg/(m² s). Hayakawa's x 10^4 header
+    # means each printed cell is 10^4 times the physical g/(cm² s) value, so
+    # its first Fe cell 1.48 is 1.48e-4 g/(cm² s) = 1.48e-3 kg/(m² s).
+    if area_unit == "cm" and mass_unit == "g":
+        factor = Decimal("10")
+        relation = "g_per_cm2_per_s_to_kg_per_m2_per_s"
+    elif area_unit == "cm" and mass_unit == "mg":
+        factor = Decimal("0.01")
+        relation = "mg_per_cm2_per_s_to_kg_per_m2_per_s"
+    elif area_unit == "m" and mass_unit == "kg":
+        factor = Decimal("1")
+        relation = "kg_per_m2_per_s_identity"
+    else:
+        return None, f"unmapped areal mass flux unit {units!r}"
+
+    if header_exponent is not None:
+        if header_exponent != 4 or mass_unit != "g" or area_unit != "cm":
+            return None, f"unmapped areal mass flux header scale in {units!r}"
+        factor /= Decimal("10000")
+        relation = "printed_x10^4_header_scale_then_g_per_cm2_per_s_to_kg_per_m2_per_s"
+    return amount * factor, relation
+
+
 def convert_mass_to_kg(
     value: object, units: str | None
 ) -> tuple[Decimal | None, str | None]:
@@ -2792,6 +2843,30 @@ _CONVERSION_META: dict[str, tuple[Decimal, str, str, str]] = {
         "kg_per_m2",
         "mg_per_cm2",
     ),
+    "g_per_cm2_per_s_to_kg_per_m2_per_s": (
+        Decimal("10"),
+        "flux_kg_per_m2_per_s = flux_g_per_cm2_per_s × 10",
+        "kg_per_m2_per_s",
+        "g_per_cm2_per_s",
+    ),
+    "mg_per_cm2_per_s_to_kg_per_m2_per_s": (
+        Decimal("0.01"),
+        "flux_kg_per_m2_per_s = flux_mg_per_cm2_per_s × 0.01",
+        "kg_per_m2_per_s",
+        "mg_per_cm2_per_s",
+    ),
+    "kg_per_m2_per_s_identity": (
+        Decimal("1"),
+        "flux_kg_per_m2_per_s = flux_kg_per_m2_per_s × 1",
+        "kg_per_m2_per_s",
+        "kg_per_m2_per_s",
+    ),
+    "printed_x10^4_header_scale_then_g_per_cm2_per_s_to_kg_per_m2_per_s": (
+        Decimal("0.001"),
+        "flux_kg_per_m2_per_s = (cell / 10^4) × 10",
+        "kg_per_m2_per_s",
+        "g_per_cm2_per_s; printed x 10^4 header",
+    ),
     "g_to_kg": (Decimal("1000"), "m_kg = m_g / 1000", "kg", "g"),
     "mg_to_kg": (Decimal("1000000"), "m_kg = m_mg / 1e6", "kg", "mg"),
     "cm_to_m": (Decimal("100"), "L_m = L_cm / 100", "m", "cm"),
@@ -2894,6 +2969,7 @@ _BULK_PROPERTY_QUANTITIES = frozenset(
         Quantity.O2_YIELD,
         Quantity.EVOLVED_GAS_YIELD,
         Quantity.MASS_LOSS_RATE,
+        Quantity.MASS_LOSS_AREAL_FLUX,
     }
 )
 _COMPOSITION_LOOKED_FOR = (
@@ -4418,6 +4494,18 @@ def _quantity_contradiction(
         if converted is None:
             return f"source units {units!r} do not denote areal mass loss"
 
+    if candidate is Quantity.MASS_LOSS_AREAL_FLUX:
+        printed_units = (
+            values.get("rate_units_as_printed")
+            if isinstance(values, Mapping)
+            else None
+        ) or units
+        converted, _trail = convert_mass_flux_to_kg_per_m2_per_s(
+            "1", str(printed_units) if printed_units is not None else None
+        )
+        if converted is None:
+            return f"source units {printed_units!r} do not denote areal mass flux"
+
     if candidate is Quantity.FUGACITY:
         if isinstance(values, Mapping):
             if any(key in values for key in QUANTITY_SOURCE_FIELDS[candidate]):
@@ -4500,6 +4588,8 @@ def _quantity_corroborated(
         return values.get("quantity_as_printed") == "delta_q" or any(
             key in values for key in QUANTITY_SOURCE_FIELDS[candidate]
         )
+    if candidate is Quantity.MASS_LOSS_AREAL_FLUX:
+        return any(key in values for key in QUANTITY_SOURCE_FIELDS[candidate])
     if candidate is Quantity.FUGACITY:
         series = values.get("series") or values.get("points")
         return any(key in values for key in QUANTITY_SOURCE_FIELDS[candidate]) or (
@@ -7272,6 +7362,7 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
     + ("P", "p")
     + _PARTIAL_PRESSURE_FIELDS,
     Quantity.MASS_LOSS_RATE: ("mass_loss_rate",),
+    Quantity.MASS_LOSS_AREAL_FLUX: ("mass_loss_areal_flux",),
     Quantity.MASS_LOSS_AREAL_DENSITY: (
         "mass_loss_areal_density",
         "delta_q",
@@ -8069,6 +8160,22 @@ def _selection_from_named_field(
             return _point_selection(
                 amount, key, trail or "identity:kg_per_m2", payload, condition_ranges
             )
+        if q_token is Quantity.MASS_LOSS_AREAL_FLUX:
+            printed_units = payload.get("rate_units_as_printed") or units
+            amount, trail = convert_mass_flux_to_kg_per_m2_per_s(
+                amount, str(printed_units) if printed_units is not None else None
+            )
+            if amount is None:
+                return _unavailable_selection(
+                    trail or f"{key} is not a grounded areal mass flux",
+                    condition_ranges=condition_ranges,
+                    unused_ancillary=_unused_ancillary(payload, key),
+                    field_name=key,
+                    unit_trail=trail or "identity",
+                )
+            return _point_selection(
+                amount, key, trail, payload, condition_ranges
+            )
         converted = _convert_compilation_amount(
             amount, q_token, _printed_unit_for_field(payload, key) or units
         )
@@ -8119,6 +8226,22 @@ def _selection_from_named_field(
                 )
             return _point_selection(
                 amount, key, trail or "identity:kg_per_m2", payload, condition_ranges
+            )
+        if q_token is Quantity.MASS_LOSS_AREAL_FLUX:
+            printed_units = payload.get("rate_units_as_printed") or units
+            amount, trail = convert_mass_flux_to_kg_per_m2_per_s(
+                amount, str(printed_units) if printed_units is not None else None
+            )
+            if amount is None:
+                return _unavailable_selection(
+                    trail or f"{key} is not a grounded areal mass flux",
+                    condition_ranges=condition_ranges,
+                    unused_ancillary=_unused_ancillary(payload, key),
+                    field_name=key,
+                    unit_trail=trail or "identity",
+                )
+            return _point_selection(
+                amount, key, trail, payload, condition_ranges
             )
         converted = _convert_compilation_amount(
             amount, q_token, _printed_unit_for_field(payload, key) or units
@@ -12518,7 +12641,12 @@ class Migrator:
         value_derivation = source_derivation
         value_conversion: Derivation | None = None
         if (
-            q_token in {Quantity.MASS_LOSS_AREAL_DENSITY, Quantity.FUGACITY}
+            q_token
+            in {
+                Quantity.MASS_LOSS_AREAL_DENSITY,
+                Quantity.MASS_LOSS_AREAL_FLUX,
+                Quantity.FUGACITY,
+            }
             and value_sel.available
             and value_sel.field_name
         ):

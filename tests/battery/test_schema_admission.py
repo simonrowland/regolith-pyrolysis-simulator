@@ -740,6 +740,33 @@ def test_areal_unit_routes_agree(unit, factor):
         assert quantity.value is Quantity.MASS_LOSS_AREAL_DENSITY and issue is None
 
 
+@pytest.mark.parametrize(
+    ("units", "expected"),
+    [
+        ("g/(cm2 s)", Decimal("10")),
+        ("mg/(cm2 s)", Decimal("0.01")),
+        ("kg/(m2 s)", Decimal("1")),
+    ],
+)
+def test_areal_mass_flux_unit_conversions(units, expected):
+    converted, _ = M.convert_mass_flux_to_kg_per_m2_per_s("1", units)
+    assert converted == expected
+
+
+def test_areal_mass_flux_records_printed_header_multiplier():
+    converted, relation = M.convert_mass_flux_to_kg_per_m2_per_s(
+        "1.48", "(g/(sec. cm^2)) x 10^4"
+    )
+    assert converted == Decimal("0.00148")
+    assert relation == (
+        "printed_x10^4_header_scale_then_g_per_cm2_per_s_to_kg_per_m2_per_s"
+    )
+    derivation = M.conversion_derivation(relation, "1.48", None)
+    assert derivation is not None
+    assert derivation.output_unit == "kg_per_m2_per_s"
+    assert "cell / 10^4" in derivation.inputs[0]
+
+
 @pytest.mark.parametrize("source,recipes", [
     ("yam1983", 7), ("kems-118-yamamoto-1983", 10),
     ("deguzman-2026-simulant-physicochemical", 0), ("kems-020-hastie-1981-nbsir", 0),

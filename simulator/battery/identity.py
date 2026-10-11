@@ -758,7 +758,10 @@ def profile_for(identity: Identity) -> QuantityProfile:
     return QuantityProfile(
         required=frozenset(required),
         permitted_not_applicable=frozenset(permitted_na),
-        exposure_area_required=q in KINETIC_YIELD_QUANTITIES,
+        exposure_area_required=(
+            q in KINETIC_YIELD_QUANTITIES
+            and q is not Quantity.MASS_LOSS_AREAL_FLUX
+        ),
     )
 
 
