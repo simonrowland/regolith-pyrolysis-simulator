@@ -697,5 +697,107 @@
     "locator": {"printed_page": 169, "label": "Table 710, Na2O(c)"},
     "source_record_id": "table-710", "derivation": "Differentiate the printed heat-content equation term by term; cal/mol differentiated by kelvin gives cal/(mol·K), and the constant drops out.",
     "derivative_of_equation_index": 78
+  },
+  {
+    "formula": "Fe2O3", "phase": "c", "polymorph": "alpha", "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 23.49T + 9.30×10^-3T^2 + 3.55×10^5T^-1 - 9,021",
+    "terms": ["a*T", "b*T^2", "c*T^-1", "d"], "coefficients_as_printed": ["23.49", "9.30×10^-3", "3.55×10^5", "-9,021"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [298, 950], "accuracy_as_printed": "0.1 percent",
+    "locator": {"printed_page": 95, "label": "Table 398, Fe2O3(alpha)"},
+    "source_record_id": "table-398", "gate_cells": [{"temperature_K": 400}, {"temperature_K": 600}, {"temperature_K": 900}]
+  },
+  {
+    "formula": "Fe2O3", "phase": "c", "polymorph": "alpha", "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 23.49 + 18.60×10^-3T - 3.55×10^5T^-2",
+    "terms": ["a", "b*T", "c*T^-2"], "coefficients_as_printed": ["23.49", "18.60×10^-3", "-3.55×10^5"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [298, 950], "accuracy_as_printed": null,
+    "locator": {"printed_page": 95, "label": "Table 398, Fe2O3(alpha)"},
+    "source_record_id": "table-398", "derivation": "Differentiate the printed heat-content equation term by term; cal/mol differentiated by kelvin gives cal/(mol·K), and the constant drops out.",
+    "derivative_of_equation_index": 80
+  },
+  {
+    "formula": "Fe2O3", "phase": "c", "polymorph": "beta", "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 36.00T - 11,980",
+    "terms": ["a*T", "d"], "coefficients_as_printed": ["36.00", "-11,980"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [950, 1050], "accuracy_as_printed": "0.1 percent",
+    "locator": {"printed_page": 95, "label": "Table 398, Fe2O3(beta)"},
+    "source_record_id": "table-398", "gate_cells": [{"temperature_K": 950, "source_row_index": 14}, {"temperature_K": 1000}, {"temperature_K": 1050}]
+  },
+  {
+    "formula": "Fe2O3", "phase": "c", "polymorph": "beta", "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 36.00",
+    "terms": ["a"], "coefficients_as_printed": ["36.00"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [950, 1050], "accuracy_as_printed": null,
+    "locator": {"printed_page": 95, "label": "Table 398, Fe2O3(beta)"},
+    "source_record_id": "table-398", "derivation": "The derivative of the linear heat-content term is the constant 36.00; cal/mol differentiated by kelvin gives cal/(mol·K).",
+    "derivative_of_equation_index": 82
+  },
+  {
+    "formula": "Fe2O3", "phase": "c", "polymorph": "gamma", "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 31.71T + 0.88×10^-3T^2 - 8,446",
+    "terms": ["a*T", "b*T^2", "d"], "coefficients_as_printed": ["31.71", "0.88×10^-3", "-8,446"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [1050, 1800], "accuracy_as_printed": "0.1 percent",
+    "locator": {"printed_page": 95, "label": "Table 398, Fe2O3(gamma)"},
+    "source_record_id": "table-398", "gate_cells": [{"temperature_K": 1100}, {"temperature_K": 1300}, {"temperature_K": 1600}]
+  },
+  {
+    "formula": "Fe2O3", "phase": "c", "polymorph": "gamma", "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 31.71 + 1.76×10^-3T",
+    "terms": ["a", "b*T"], "coefficients_as_printed": ["31.71", "1.76×10^-3"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [1050, 1800], "accuracy_as_printed": null,
+    "locator": {"printed_page": 95, "label": "Table 398, Fe2O3(gamma)"},
+    "source_record_id": "table-398", "derivation": "Differentiate the printed heat-content equation term by term; cal/mol differentiated by kelvin gives cal/(mol·K), and the constant drops out.",
+    "derivative_of_equation_index": 84
+  },
+  {
+    "formula": "Fe3O4", "phase": "c", "polymorph": "alpha", "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 21.88T + 24.10×10^-3T^2 - 8,666",
+    "terms": ["a*T", "b*T^2", "d"], "coefficients_as_printed": ["21.88", "24.10×10^-3", "-8,666"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [298, 900], "accuracy_as_printed": "0.5 percent",
+    "locator": {"printed_page": 95, "label": "Table 399, Fe3O4(alpha)"},
+    "source_record_id": "table-399", "gate_cells": [{"temperature_K": 500}, {"temperature_K": 800}, {"temperature_K": 900}]
+  },
+  {
+    "formula": "Fe3O4", "phase": "c", "polymorph": "alpha", "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 21.88 + 48.20×10^-3T",
+    "terms": ["a", "b*T"], "coefficients_as_printed": ["21.88", "48.20×10^-3"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [298, 900], "accuracy_as_printed": null,
+    "locator": {"printed_page": 95, "label": "Table 399, Fe3O4(alpha)"},
+    "source_record_id": "table-399", "derivation": "Differentiate the printed heat-content equation term by term; cal/mol differentiated by kelvin gives cal/(mol·K), and the constant drops out.",
+    "derivative_of_equation_index": 86
+  },
+  {
+    "formula": "Fe3O4", "phase": "c", "polymorph": "beta", "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 48.00T - 12,650",
+    "terms": ["a*T", "d"], "coefficients_as_printed": ["48.00", "-12,650"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [900, 1800], "accuracy_as_printed": "0.1 percent",
+    "locator": {"printed_page": 95, "label": "Table 399, Fe3O4(beta)"},
+    "source_record_id": "table-399", "gate_cells": [{"temperature_K": 1000}, {"temperature_K": 1300}, {"temperature_K": 1700}]
+  },
+  {
+    "formula": "Fe3O4", "phase": "c", "polymorph": "beta", "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 48.00",
+    "terms": ["a"], "coefficients_as_printed": ["48.00"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [900, 1800], "accuracy_as_printed": null,
+    "locator": {"printed_page": 95, "label": "Table 399, Fe3O4(beta)"},
+    "source_record_id": "table-399", "derivation": "The derivative of the linear heat-content term is the constant 48.00; cal/mol differentiated by kelvin gives cal/(mol·K).",
+    "derivative_of_equation_index": 88
+  },
+  {
+    "formula": "Mg", "phase": "c", "polymorph": null, "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 4.97T + 1.52×10^-3T^2 - 0.04×10^5T^-1 - 1,604",
+    "terms": ["a*T", "b*T^2", "c*T^-1", "d"], "coefficients_as_printed": ["4.97", "1.52×10^-3", "-0.04×10^5", "-1,604"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [298, 923], "accuracy_as_printed": "0.2 percent",
+    "locator": {"printed_page": 110, "label": "Table 459, Mg(c)"},
+    "source_record_id": "table-459", "gate_cells": [{"temperature_K": 500}, {"temperature_K": 700}, {"temperature_K": 900}]
+  },
+  {
+    "formula": "Mg", "phase": "c", "polymorph": null, "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 4.97 + 3.04×10^-3T + 0.04×10^5T^-2",
+    "terms": ["a", "b*T", "c*T^-2"], "coefficients_as_printed": ["4.97", "3.04×10^-3", "0.04×10^5"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [298, 923], "accuracy_as_printed": null,
+    "locator": {"printed_page": 110, "label": "Table 459, Mg(c)"},
+    "source_record_id": "table-459", "derivation": "Differentiate the printed heat-content equation term by term: the negative T^-1 term gives a positive T^-2 term; cal/mol differentiated by kelvin gives cal/(mol·K).",
+    "derivative_of_equation_index": 90
   }
 ]
