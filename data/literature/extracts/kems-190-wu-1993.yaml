@@ -169,8 +169,9 @@ species:
         units: cal_mol_and_cal_mol_K_as_published
         values:
           quantity: thermodynamic_function_coefficients
-          method_class: review_compilation
-          evidence_class: compiled_pure_component_thermochemistry
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          attribution: 'Berman et al. [9]; Barin et al. [10,11], as cited by Wu et al. (1993)'
           equations_as_published:
             H: H(cal mol^-1) = A + integral_298.15^T Cp dT
             S: S(cal mol^-1 K^-1) = B + integral_298.15^T (Cp/T) dT
@@ -220,6 +221,11 @@ species:
           quantity: RT_ln_gamma
           method_class: model_derived
           admission_status: model_output_not_measurement
+          derived_from: [kems-190-wu-1993::wu_1993_optimized_binary_model_parameters::rows:h=c181daa2e648, kems-190-wu-1993::wu_1993_optimized_binary_model_parameters::rows:h=0f8bd35e2a1f]
+          derivation:
+            inputs: [kems-190-wu-1993::wu_1993_optimized_binary_model_parameters::rows:h=c181daa2e648, kems-190-wu-1993::wu_1993_optimized_binary_model_parameters::rows:h=0f8bd35e2a1f]
+            relation: Calculated with the modified quasichemical model using the fitted MgO-SiO2 liquid omega and eta parameters (equations 7 and 8).
+            output_unit: J_mol^-1
           system: MgO-SiO2
           component: MgO
           temperature_headers_C_as_published: [1800, 2000, 2200]
@@ -277,9 +283,10 @@ species:
         units: cal_mol_and_cal_mol_K_as_published
         values:
           quantity: thermodynamic_function_coefficients
-          method_class: model_derived
+          method_class: quoted_attributed
           admission_status: model_output_not_measurement
-          evidence_class: thermodynamic_model_parameter
+          evidence_class: quoted_attributed
+          attribution: 'Robie et al. [13]; Barin et al. [10]; Kubaschewski et al. [14]; Coughlin et al. [15], as cited by Wu et al. (1993)'
           source_basis_as_published: 'Robie et al. [13] for Fe0.947O, Barin et al. [10] for Fe, Kubaschewski et al. [14] for the adopted melting point, and Coughlin et al. [15] for liquid Cp'
           construction_as_published: 'Hypothetical stoichiometric FeO was constructed by adding Fe0.947O and 0.053 moles of Fe, curve-fitting the Cp expressions, and assuming the fusion entropy equal to that of Fe0.947O.'
           rows:
@@ -334,6 +341,11 @@ species:
           quantity: RT_ln_gamma
           method_class: model_derived
           admission_status: model_output_not_measurement
+          derived_from: [kems-190-wu-1993::wu_1993_optimized_binary_model_parameters::rows:h=7ad181bff4cc, kems-190-wu-1993::wu_1993_optimized_binary_model_parameters::rows:h=32988fb6e68a]
+          derivation:
+            inputs: [kems-190-wu-1993::wu_1993_optimized_binary_model_parameters::rows:h=7ad181bff4cc, kems-190-wu-1993::wu_1993_optimized_binary_model_parameters::rows:h=32988fb6e68a]
+            relation: Calculated with the modified quasichemical model using the fitted FeO-SiO2 liquid omega and eta parameters (equations 9 and 10).
+            output_unit: J_mol^-1
           system: FeO-SiO2
           component: FeO
           temperature_headers_C_as_published: [1400, 1600, 1800]
@@ -402,6 +414,11 @@ species:
           property_kind: ternary_peritectic
           method_class: model_derived
           admission_status: model_output_not_measurement
+          derived_from: [kems-190-wu-1993::wu_1993_optimized_binary_model_parameters::rows:h=430f274e64be, kems-190-wu-1993::wu_1993_optimized_binary_model_parameters::rows:h=e028354edca9, kems-190-wu-1993::wu_1993_optimized_binary_model_parameters::rows:h=c181daa2e648, kems-190-wu-1993::wu_1993_optimized_binary_model_parameters::rows:h=0f8bd35e2a1f, kems-190-wu-1993::wu_1993_optimized_binary_model_parameters::rows:h=7ad181bff4cc, kems-190-wu-1993::wu_1993_optimized_binary_model_parameters::rows:h=32988fb6e68a, kems-190-wu-1993::wu_1993_optimized_binary_model_parameters::rows:row=resulting-liquid-properties:h=5c5f47a1a796]
+          derivation:
+            inputs: [kems-190-wu-1993::wu_1993_optimized_binary_model_parameters::rows:h=430f274e64be, kems-190-wu-1993::wu_1993_optimized_binary_model_parameters::rows:h=e028354edca9, kems-190-wu-1993::wu_1993_optimized_binary_model_parameters::rows:h=c181daa2e648, kems-190-wu-1993::wu_1993_optimized_binary_model_parameters::rows:h=0f8bd35e2a1f, kems-190-wu-1993::wu_1993_optimized_binary_model_parameters::rows:h=7ad181bff4cc, kems-190-wu-1993::wu_1993_optimized_binary_model_parameters::rows:h=32988fb6e68a, kems-190-wu-1993::wu_1993_optimized_binary_model_parameters::rows:row=resulting-liquid-properties:h=5c5f47a1a796]
+            relation: Calculated with the modified quasichemical model and asymmetric combining rule using the fitted binary parameters (equations 6–10; pp. 28–31).
+            output_unit: °C and wt_percent
           fidelity_temperature_C: 1310
           temperature_C_as_published: 1310
           composition_wt_pct: {MgO: 10.5, FeO: 45, SiO2: 44.5}
@@ -493,8 +510,9 @@ species:
         units: cal_mol_and_cal_mol_K_as_published
         values:
           quantity: thermodynamic_function_coefficients
-          method_class: review_compilation
-          evidence_class: compiled_pure_component_thermochemistry
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          attribution: 'Berman et al. [9]; JANAF [12], as cited by Wu et al. (1993)'
           source_basis_as_published: Berman et al. [9] and JANAF [12]
           rows:
             - phase_as_published: SiO2(l)
@@ -552,6 +570,11 @@ species:
           quantity: RT_ln_gamma
           method_class: model_derived
           admission_status: model_output_not_measurement
+          derived_from: [kems-190-wu-1993::wu_1993_optimized_binary_model_parameters::rows:h=c181daa2e648, kems-190-wu-1993::wu_1993_optimized_binary_model_parameters::rows:h=0f8bd35e2a1f]
+          derivation:
+            inputs: [kems-190-wu-1993::wu_1993_optimized_binary_model_parameters::rows:h=c181daa2e648, kems-190-wu-1993::wu_1993_optimized_binary_model_parameters::rows:h=0f8bd35e2a1f]
+            relation: Calculated with the modified quasichemical model using the fitted MgO-SiO2 liquid omega and eta parameters (equations 7 and 8).
+            output_unit: J_mol^-1
           system: MgO-SiO2
           component: SiO2
           temperature_headers_C_as_published: [1800, 2000, 2200]
@@ -607,6 +630,11 @@ species:
           quantity: RT_ln_gamma
           method_class: model_derived
           admission_status: model_output_not_measurement
+          derived_from: [kems-190-wu-1993::wu_1993_optimized_binary_model_parameters::rows:h=7ad181bff4cc, kems-190-wu-1993::wu_1993_optimized_binary_model_parameters::rows:h=32988fb6e68a]
+          derivation:
+            inputs: [kems-190-wu-1993::wu_1993_optimized_binary_model_parameters::rows:h=7ad181bff4cc, kems-190-wu-1993::wu_1993_optimized_binary_model_parameters::rows:h=32988fb6e68a]
+            relation: Calculated with the modified quasichemical model using the fitted FeO-SiO2 liquid omega and eta parameters (equations 9 and 10).
+            output_unit: J_mol^-1
           system: FeO-SiO2
           component: SiO2
           temperature_headers_C_as_published: [1400, 1600, 1800]
@@ -797,6 +825,11 @@ species:
           property_kind: solidus_composition_series
           method_class: model_derived
           admission_status: model_output_not_measurement
+          derived_from: [kems-190-wu-1993::wu_1993_table1_mg2sio4_optimized_thermochemistry::rows:row=mg2sio4(s):h=823e9e856ae4, kems-190-wu-1993::wu_1993_table1_fe2sio4_optimized_thermochemistry::rows:row=fe2sio4(s):h=38f38f1fd33f]
+          derivation:
+            inputs: [kems-190-wu-1993::wu_1993_table1_mg2sio4_optimized_thermochemistry::rows:row=mg2sio4(s):h=823e9e856ae4, kems-190-wu-1993::wu_1993_table1_fe2sio4_optimized_thermochemistry::rows:row=fe2sio4(s):h=38f38f1fd33f]
+            relation: Calculated solidus points from the optimized Mg2SiO4-Fe2SiO4 thermochemistry with the solid-solution model (Table 3, p. 33).
+            output_unit: °C and wt_percent
           fidelity_first_calculated_wt_pct: 40.5
           fidelity_quote: '1 495 | Exp. 41 | Calc. 40.5'
           rows:
