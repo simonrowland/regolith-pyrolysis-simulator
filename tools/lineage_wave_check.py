@@ -10,9 +10,59 @@ from collections import Counter
 from pathlib import Path
 from typing import Any, Mapping
 
+import yaml
+from yaml.nodes import MappingNode
+
 from simulator.battery.enums import QUANTITY_UNITS
-from simulator.battery.migrate import Migrator, iter_extract_observations, load_yaml, to_plain
+from simulator.battery.migrate import (
+    Migrator,
+    iter_extract_observations,
+    to_plain,
+)
 from simulator.battery.score import ScoreContext, comparison_candidates
+from simulator.yaml_cache import YAML12SafeLoader
+
+
+class _UniqueKeyLoader(YAML12SafeLoader):
+    def __init__(self, stream):
+        super().__init__(stream)
+        self.duplicate_keys: list[tuple[str, int, int]] = []
+
+    def get_single_data(self):
+        data = super().get_single_data()
+        if self.duplicate_keys:
+            details = "; ".join(
+                f"{key!r} on lines {first} and {duplicate}"
+                for key, first, duplicate in self.duplicate_keys
+            )
+            raise ValueError(f"duplicate mapping keys: {details}")
+        return data
+
+    def construct_mapping(self, node, deep=False):
+        if isinstance(node, MappingNode):
+            first_lines = {}
+            for key_node, _value_node in node.value:
+                key = self.construct_object(key_node, deep=deep)
+                try:
+                    first_line = first_lines.get(key)
+                except TypeError:
+                    continue
+                line = key_node.start_mark.line + 1
+                if first_line is not None:
+                    self.duplicate_keys.append(
+                        (str(key), first_line, line)
+                    )
+                else:
+                    first_lines[key] = line
+        return super().construct_mapping(node, deep=deep)
+
+
+def _load_source_extract(path: Path) -> dict[str, Any]:
+    with path.open(encoding="utf-8") as stream:
+        payload = yaml.load(stream, Loader=_UniqueKeyLoader)
+    if not isinstance(payload, dict):
+        raise ValueError(f"source extract must be a mapping: {path}")
+    return payload
 
 
 def _source_extract(root: Path, source_id: str) -> Path:
@@ -26,7 +76,7 @@ def _source_extract(root: Path, source_id: str) -> Path:
 
 def snapshot(source_id: str, root: Path) -> dict[str, Any]:
     path = _source_extract(root, source_id)
-    source_doc = load_yaml(path)
+    source_doc = _load_source_extract(path)
     migrator = Migrator(root)
     migrator._migrate_extract(path)
     migrator.finalize()
@@ -45,20 +95,58 @@ def snapshot(source_id: str, root: Path) -> dict[str, Any]:
             observations={o.observation_id: o for o in observations},
         )
     )
+    source_units_by_id: dict[str, dict[str, object]] = {}
+    for _formula, source_observation in iter_extract_observations(source_doc):
+        raw_id = source_observation.get("observation_id")
+        if raw_id is None:
+            continue
+        values = source_observation.get("values")
+        raw_units = {
+            "row_units": source_observation.get("units"),
+            "row_unit": source_observation.get("unit"),
+            "values_units": values.get("units") if isinstance(values, Mapping) else None,
+            "values_units_as_published": (
+                values.get("units_as_published")
+                if isinstance(values, Mapping)
+                else None
+            ),
+            "row_units_as_published": source_observation.get("units_as_published"),
+        }
+        source_units_by_id[str(raw_id)] = {
+            key: to_plain(value) for key, value in raw_units.items()
+        }
     rows = []
     for observation in sorted(observations, key=lambda row: row.observation_id):
         quantity = observation.identity.quantity
         quantity_value = quantity.value if quantity.is_value else None
+        raw_id = observation.observation_id.removeprefix(f"{source_id}::")
+        source_units = source_units_by_id.get(raw_id)
+        if source_units is None:
+            parent_ids = [
+                parent_id
+                for parent_id in source_units_by_id
+                if raw_id.startswith(f"{parent_id}::")
+            ]
+            if parent_ids:
+                source_units = source_units_by_id[max(parent_ids, key=len)]
         rows.append(
             {
                 "observation_id": observation.observation_id,
                 "quantity": to_plain(quantity),
                 "value": to_plain(observation.value),
-                "units": QUANTITY_UNITS.get(quantity_value) if quantity_value else None,
+                "value_units": (
+                    QUANTITY_UNITS.get(quantity_value) if quantity_value else None
+                ),
+                "source_units": source_units,
                 "evidence_class": to_plain(observation.evidence.class_),
                 "admission_status": observation.admission.status.value,
                 "derived_from": to_plain(observation.derived_from),
                 "derivation": to_plain(observation.derivation),
+                "derivation_output_unit": (
+                    observation.derivation.output_unit
+                    if observation.derivation is not None
+                    else None
+                ),
             }
         )
     issues = [
@@ -107,7 +195,10 @@ def _lineage_field(issue: Mapping[str, Any]) -> str | None:
 
 def _measurement_signature(row: Mapping[str, Any]) -> str:
     return json.dumps(
-        {key: row.get(key) for key in ("quantity", "value", "units")},
+        {
+            key: row.get(key)
+            for key in ("quantity", "value", "value_units", "source_units")
+        },
         sort_keys=True,
         separators=(",", ":"),
     )
@@ -148,6 +239,14 @@ def compare(before: Mapping[str, Any], after: Mapping[str, Any], *, allow_rekey:
     for old_id, new_id in id_map.items():
         if _measurement_signature(before_rows[old_id]) != _measurement_signature(after_rows[new_id]):
             failures.append(f"measurement changed: {old_id} -> {new_id}")
+        old_unit = before_rows[old_id].get("derivation_output_unit")
+        new_unit = after_rows[new_id].get("derivation_output_unit")
+        if old_unit is None and new_unit is not None:
+            print(f"new derivation unit: {new_unit} ({new_id})")
+        elif old_unit != new_unit:
+            failures.append(
+                f"derivation unit changed: {old_unit!r} -> {new_unit!r} ({new_id})"
+            )
 
     mapped_before_candidates = {
         id_map.get(observation_id, observation_id)

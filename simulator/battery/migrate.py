@@ -873,6 +873,35 @@ def _state_from_plain(payload: object, cast) -> State:
     return State.unknown(reason)  # type: ignore[arg-type]
 
 
+class _InvalidDerivationAnnotation(ValueError):
+    """A malformed author annotation that should become an INVALID_SOURCE issue."""
+
+
+def _raw_inputs_from_plain(payload: object) -> Located[RawInputStatus]:
+    if not isinstance(payload, Mapping) or "state" not in payload:
+        raise _InvalidDerivationAnnotation(
+            "raw_inputs declaration must contain a state"
+        )
+    state = payload["state"]
+    if isinstance(state, Mapping) and str(state.get("tag") or "value") == "value":
+        value = state.get("value")
+        if not isinstance(value, str):
+            raise _InvalidDerivationAnnotation(
+                f"raw_inputs state has invalid value {value!r}"
+            )
+        try:
+            _enum(RawInputStatus, value)
+        except (TypeError, ValueError) as exc:
+            raise _InvalidDerivationAnnotation(
+                f"raw_inputs state has invalid value {value!r}"
+            ) from exc
+    elif not isinstance(state, Mapping) and not isinstance(state, State):
+        raise _InvalidDerivationAnnotation("raw_inputs state must be an object")
+    return _located_from_plain(
+        payload, lambda value: _enum(RawInputStatus, value)
+    )
+
+
 def _locator_from_plain(payload: object) -> Locator | None:
     if payload is None:
         return None
@@ -887,7 +916,10 @@ def _locator_from_plain(payload: object) -> Locator | None:
 
 
 def _derivation_from_plain(
-    payload: object, *, require_sequence_inputs: bool = False
+    payload: object,
+    *,
+    require_sequence_inputs: bool = False,
+    allow_mapping_inputs: bool = False,
 ) -> Derivation | None:
     if not isinstance(payload, Mapping):
         return None
@@ -903,23 +935,41 @@ def _derivation_from_plain(
     )
     if isinstance(inputs, str) and not require_sequence_inputs:
         inputs = (inputs,)
+    if allow_mapping_inputs and isinstance(inputs, (list, tuple)):
+        inputs = tuple(str(item) for item in inputs)
     if not isinstance(inputs, (list, tuple)) or any(
         not isinstance(item, str) for item in inputs
     ):
-        raise ValueError("Derivation.inputs must contain only strings")
+        raise _InvalidDerivationAnnotation(
+            "Derivation.inputs must contain only strings"
+        )
     raw_marker = payload.get("pure_substance_reference")
     raw_inputs = payload.get("raw_inputs")
+    parsed_raw_inputs = (
+        _raw_inputs_from_plain(raw_inputs) if raw_inputs is not None else None
+    )
+    if not inputs and not (
+        parsed_raw_inputs is not None
+        and parsed_raw_inputs.state.is_value
+        and parsed_raw_inputs.state.value is RawInputStatus.NOT_PRINTED
+        and parsed_raw_inputs.locator is not None
+    ):
+        detail = "Derivation.inputs is required unless raw_inputs is located not_printed"
+        if (
+            parsed_raw_inputs is not None
+            and parsed_raw_inputs.state.is_value
+            and parsed_raw_inputs.state.value is RawInputStatus.NOT_PRINTED
+            and parsed_raw_inputs.locator is None
+        ):
+            detail += "; raw_inputs not_printed declaration requires a locator"
+        raise _InvalidDerivationAnnotation(detail)
     return Derivation(
         relation=str(payload.get("relation") or "identity"),
         inputs=tuple(str(x) for x in inputs),
         parameters=tuple(parameters),
         output_unit=str(payload.get("output_unit") or "as_published"),
         pure_substance_reference=raw_marker if isinstance(raw_marker, bool) else None,
-        raw_inputs=(
-            _located_from_plain(raw_inputs, lambda value: _enum(RawInputStatus, value))
-            if raw_inputs is not None
-            else None
-        ),
+        raw_inputs=parsed_raw_inputs,
     )
 
 
@@ -1132,7 +1182,9 @@ def _located_from_plain(payload: object, cast) -> Located:
     inference = None
     raw_inference = payload.get("inference")
     if isinstance(raw_inference, Mapping):
-        inference = _derivation_from_plain(raw_inference)
+        inference = _derivation_from_plain(
+            raw_inference, allow_mapping_inputs=True
+        )
     elif payload.get("inferred") is True:
         inference = _inferred_derivation_from_plain(payload)
     else:
@@ -1658,7 +1710,12 @@ def work_from_plain(payload: object) -> Work:
     )
 
 
-def _sample_from_plain(payload: object) -> Sample:
+def _sample_from_plain(
+    payload: object,
+    *,
+    experiment_id: str | None = None,
+    registry_issues: list[ValidationIssue] | None = None,
+) -> Sample:
     if not isinstance(payload, Mapping) or not payload:
         return Sample()
     mass = payload.get("mass_kg")
@@ -1671,14 +1728,37 @@ def _sample_from_plain(payload: object) -> Sample:
     characterization = payload.get("characterization")
     surface_area = payload.get("surface_area_m2")
     pretreatment = payload.get("pretreatment")
-    printed_located = (
-        None
-        if printed is None
-        else _mass_percent_printed_from_plain(printed)
-        or _located_from_plain(printed, lambda value: value)
-    )
+    issues = registry_issues if registry_issues is not None else []
+
+    def parse_registry_value(field: str, raw: object, parse):
+        try:
+            return parse(raw)
+        except (ArithmeticError, TypeError, ValueError) as exc:
+            issues.append(
+                ValidationIssue(
+                    path=f"experiment[{experiment_id}].sample.{field}",
+                    reason=RefusalReason.INVALID_SOURCE,
+                    detail=f"invalid registry inference: {exc}",
+                )
+            )
+            if isinstance(raw, Mapping) and "inference" in raw:
+                return parse({k: v for k, v in raw.items() if k != "inference"})
+            raise
+
+    printed_located = None
+    if printed is not None:
+        printed_located = parse_registry_value(
+            "printed_composition",
+            printed,
+            lambda value: _mass_percent_printed_from_plain(value)
+            or _located_from_plain(value, lambda item: item),
+        )
     initial_located = (
-        None if initial is None else _composition_located_from_plain(initial)
+        None
+        if initial is None
+        else parse_registry_value(
+            "initial_composition", initial, _composition_located_from_plain
+        )
     )
     if printed_located is None and initial is not None:
         printed_located = _mass_percent_printed_from_plain(initial)
@@ -2040,6 +2120,12 @@ def _thermal_schedule_from_plain(payload: object) -> ThermalSchedule | None:
 
 
 def experiment_from_plain(payload: object) -> Experiment:
+    return _experiment_from_plain(payload, registry_issues=None)
+
+
+def _experiment_from_plain(
+    payload: object, *, registry_issues: list[ValidationIssue] | None
+) -> Experiment:
     assert isinstance(payload, Mapping)
     conditions = {}
     for key, value in (payload.get("conditions") or {}).items():
@@ -2077,7 +2163,11 @@ def experiment_from_plain(payload: object) -> Experiment:
         experiment_id=str(payload["experiment_id"]),
         kind=ExperimentKind(str(payload.get("kind") or "literature")),
         method=_state_from_plain(payload["method"], lambda v: MethodToken(str(v))),
-        sample=_sample_from_plain(payload.get("sample")),
+        sample=_sample_from_plain(
+            payload.get("sample"),
+            experiment_id=str(payload["experiment_id"]),
+            registry_issues=registry_issues,
+        ),
         conditions=conditions,
         pressure_environment=_pressure_env_from_plain(payload["pressure_environment"]),
         work_id=payload.get("work_id"),
@@ -5579,9 +5669,7 @@ def source_derivation_from_source(
         relation_missing = not isinstance(relation, str) or not relation.strip()
         try:
             parsed = _derivation_from_plain(raw)
-        except ValueError as exc:
-            if not str(exc).startswith("Derivation.inputs"):
-                raise
+        except _InvalidDerivationAnnotation as exc:
             invalid.append((field, str(exc)))
             if relation_missing:
                 invalid.append(
@@ -11633,7 +11721,9 @@ class Migrator:
                     "locator": to_plain(locator),
                 }
             )
-            experiment = experiment_from_plain(payload)
+            experiment = _experiment_from_plain(
+                payload, registry_issues=self.result.registry_issues
+            )
             existing_experiment = self.result.experiments.get(
                 experiment.experiment_id
             )
@@ -12403,8 +12493,6 @@ class Migrator:
                 source_derivation = replace(
                     source_derivation, inputs=derivation_parents
                 )
-            elif source_derivation.has_located_unprinted_raw_inputs:
-                source_derivation = replace(source_derivation, inputs=())
             elif source_derivation.raw_inputs is None:
                 source_derivation = None
             # Invalid declarations stay attached for validate_corpus to report.
@@ -12449,9 +12537,7 @@ class Migrator:
                 extractor_derivation = _derivation_from_plain(
                     inference_payload, require_sequence_inputs=True
                 )
-            except ValueError as exc:
-                if not str(exc).startswith("Derivation.inputs"):
-                    raise
+            except _InvalidDerivationAnnotation as exc:
                 field_path = "values.inference" if payload is values else "inference"
                 self.result.registry_issues.append(
                     ValidationIssue(

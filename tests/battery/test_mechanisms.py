@@ -1245,7 +1245,9 @@ def test_r08_consumed_table_via_read_from_refuses_independence() -> None:
     assert validate_corpus([w], [exp], [ref, disjoint], [control]).ok
 
 
-def _reduced_without_raw_parent(*, declaration: Located | None = None) -> Observation:
+def _reduced_without_raw_parent(
+    *, declaration: Located | None = None, inputs: tuple[str, ...] = ("pdf-1",)
+) -> Observation:
     experiment = F.tabulation_experiment()
     observation = F.observation(
         "reduced-without-raw-parent",
@@ -1259,7 +1261,7 @@ def _reduced_without_raw_parent(*, declaration: Located | None = None) -> Observ
         observation,
         derived_from=None,
         derivation=replace(
-            observation.derivation, inputs=("pdf-1",), raw_inputs=declaration
+            observation.derivation, inputs=inputs, raw_inputs=declaration
         ),
     )
 
@@ -1268,7 +1270,8 @@ def test_measured_reduced_raw_inputs_not_printed_satisfies_parent_requirement() 
     observation = _reduced_without_raw_parent(
         declaration=Located(
             State.of(RawInputStatus.NOT_PRINTED), locator=F.loc(page=164, section="3.3")
-        )
+        ),
+        inputs=(),
     )
     issues = validate_corpus(
         [F.work()], [F.tabulation_experiment()], [observation]
@@ -1315,6 +1318,41 @@ def test_model_derived_rejects_raw_inputs_not_printed() -> None:
     assert any(
         issue.path.endswith(".derivation.raw_inputs")
         and "invalid for model_derived" in issue.detail
+        for issue in issues
+    )
+
+
+@pytest.mark.parametrize(
+    "evidence_class",
+    [item for item in EvidenceClass if item is not EvidenceClass.MEASURED_REDUCED],
+)
+def test_raw_inputs_declaration_is_rejected_for_every_non_reduced_class(
+    evidence_class: EvidenceClass,
+) -> None:
+    observation = _reduced_without_raw_parent(
+        declaration=Located(
+            State.of(RawInputStatus.NOT_PRINTED), locator=F.loc(page=164)
+        ),
+        inputs=(),
+    )
+    observation = replace(
+        observation,
+        evidence=replace(
+            observation.evidence, class_=State.of(evidence_class)
+        ),
+    )
+
+    issues = validate_corpus(
+        [F.work()], [F.tabulation_experiment()], [observation]
+    ).hard_issues
+
+    assert any(
+        issue.path.endswith(".derivation.raw_inputs")
+        and (
+            "invalid for model_derived" in issue.detail
+            if evidence_class is EvidenceClass.MODEL_DERIVED
+            else "only for measured_reduced" in issue.detail
+        )
         for issue in issues
     )
 
