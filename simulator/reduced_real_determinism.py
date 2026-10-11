@@ -741,9 +741,13 @@ class PT0DeterminismStore:
         sim: Any,
         curve: Mapping[str, Any],
     ) -> bool:
-        from simulator.engine_binding_admission import gate_curve_memo_eligibility
-
-        return gate_curve_memo_eligibility(sim, curve)
+        if not _is_cacheable_gate_curve(curve):
+            return False
+        return self._cached_real_binding_eligible(
+            sim,
+            provider_role=_gate_curve_provider_role(curve),
+            artifact="freeze_gate_curve",
+        )
 
     def _authorize_cached_real_replay(
         self,

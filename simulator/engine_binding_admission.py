@@ -653,11 +653,12 @@ def gate_curve_memo_eligibility(sim: Any, curve: Mapping[str, Any]) -> bool:
     if not _is_cacheable_gate_curve(curve):
         return False
     provider_role = _gate_curve_provider_role(curve)
-    return live_binding_cache_eligibility(
+    live_binding_cache_eligibility(
         sim,
         provider_role=provider_role,
         artifact="freeze_gate_curve",
     )
+    return True
 
 
 def authorize_cached_real_replay(
