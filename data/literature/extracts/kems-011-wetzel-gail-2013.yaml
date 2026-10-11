@@ -438,7 +438,9 @@ species:
       units: as printed; see per-column names and table provenance
       values:
         quantity: brendel_oscillator_model_parameters
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Wetzel et al. (2012a), as quoted in Wetzel et al. (2013), Table 2.
         semantics: bound_not_point_ordering
         table_file: tables/kems-011-wetzel-gail-2013/t2.csv
         note: Tabular model payload in the existing rate_series container; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
@@ -853,7 +855,9 @@ species:
       units: as printed; see per-column names and table provenance
       values:
         quantity: brendel_oscillator_model_parameters
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Wetzel et al. (2012a), as quoted in Wetzel et al. (2013), Table 2.
         admission_status: model_output_not_measurement
         semantics: bound_not_point_ordering
         table_file: tables/kems-011-wetzel-gail-2013/t2.csv
@@ -1262,6 +1266,14 @@ species:
       locator:
         page: 5
         table: '3'
+      derived_from:
+      - kems-011-wetzel-gail-2013::wetzel_gail_2013_table1_quoted_model
+      - kems-011-wetzel-gail-2013::wetzel_gail_2013_table2_quoted_model
+      derivation:
+        relation: Linear least-squares fit of the oscillator parameters in Tables 1 and 2 to Eq. (3), as described in Section 2.4 (PDF page 4); coefficients are printed in Table 3.
+        inputs:
+        - kems-011-wetzel-gail-2013::wetzel_gail_2013_table1_quoted_model
+        - kems-011-wetzel-gail-2013::wetzel_gail_2013_table2_quoted_model
       quote: Fit coefficients for the temperature dependent oscillator parameters of the Brendel model for the dielectric function.
       phase: amorphous_SiO
       regime: published_model_parameters
@@ -1357,6 +1369,14 @@ species:
       locator:
         page: 5
         table: '3'
+      derived_from:
+      - kems-011-wetzel-gail-2013::wetzel_gail_2013_table1_quoted_model
+      - kems-011-wetzel-gail-2013::wetzel_gail_2013_table2_quoted_model
+      derivation:
+        relation: Linear least-squares fit of the oscillator parameters in Tables 1 and 2 to Eq. (3), as described in Section 2.4 (PDF page 4); coefficients are printed in Table 3.
+        inputs:
+        - kems-011-wetzel-gail-2013::wetzel_gail_2013_table1_quoted_model
+        - kems-011-wetzel-gail-2013::wetzel_gail_2013_table2_quoted_model
       quote: Fit coefficients for the temperature dependent oscillator parameters of the Brendel model for the dielectric function.
       phase: amorphous_SiO
       regime: published_model_parameters
