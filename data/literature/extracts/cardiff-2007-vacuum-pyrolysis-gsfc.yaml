@@ -45,7 +45,7 @@ benches:
   temperature_measurement:
     sensor:
       state: {tag: unknown, reason: not_published}
-      locator: {pdf_page_index: 3, table: '1', note: Max Temp is tabulated, but the sensor and measurement target are not stated}
+      locator: {pdf_page_index: 3, table: '1', note: 'Max Temp is tabulated, but the sensor and measurement target are not stated'}
   pumping_type:
     state: {tag: value, value: Turbopump downstream of leak valve}
     locator: {pdf_page_index: 4, section: RESULTS}
@@ -68,7 +68,7 @@ experiments:
       locator: {pdf_page_index: 3, section: RESULTS, note: 'Approximately one net gram is stated for material vaporized by the small prototype, but not assigned per test'}
     form:
       state: {tag: unknown, reason: not_published}
-      locator: {pdf_page_index: 3, table: '1', note: Samples are named, but their form is not stated}
+      locator: {pdf_page_index: 3, table: '1', note: 'Samples are named, but their form is not stated'}
     surface_area_m2:
       state: {tag: unknown, reason: not_published}
       locator: {pdf_page_index: 3, table: '1', note: No per-run exposed area or sample geometry is stated}
@@ -128,19 +128,19 @@ fidelity_samples:
     note: Figure 5 printed Fe/O = 6.3/6.8 = 0.93 (unvaporized)
 - path: species.MLS-1A.observations[cardiff_2007_table1_fresnel_pyrolysis_log].values.tests[0].duration_min
   value: 5.0
-  locator: {table: '1', pdf_page_index: 3, note: Test 1 approximate duration, 5 minutes}
+  locator: {table: '1', pdf_page_index: 3, note: 'Test 1 approximate duration, 5 minutes'}
 - path: species.MLS-1A.observations[cardiff_2007_table1_fresnel_pyrolysis_log].values.tests[1].flux_W_m2
   value: 800.0
-  locator: {table: '1', pdf_page_index: 3, note: Test 2a flux, 800 W/m^2}
+  locator: {table: '1', pdf_page_index: 3, note: 'Test 2a flux, 800 W/m^2'}
 - path: species.MLS-1A.observations[cardiff_2007_table1_fresnel_pyrolysis_log].values.tests[3].P_test_Torr
   value: 0.8
-  locator: {table: '1', pdf_page_index: 3, note: Test 3 testing pressure, printed 8x10^-1 Torr}
+  locator: {table: '1', pdf_page_index: 3, note: 'Test 3 testing pressure, printed 8x10^-1 Torr'}
 - path: species.MLS-1A.observations[cardiff_2007_table1_fresnel_pyrolysis_log].values.tests[8].Tmax_C
   value: 1100.0
-  locator: {table: '1', pdf_page_index: 3, note: Test 8 maximum temperature, 1100 C}
+  locator: {table: '1', pdf_page_index: 3, note: 'Test 8 maximum temperature, 1100 C'}
 - path: species.MLS-1A.observations[cardiff_2007_table1_fresnel_pyrolysis_log].values.tests[10].Tmax_C
   value: 1436.0
-  locator: {table: '1', pdf_page_index: 3, note: Test 10 maximum temperature, 1436 C}
+  locator: {table: '1', pdf_page_index: 3, note: 'Test 10 maximum temperature, 1436 C'}
 species:
   MLS-1A:
     observations:
@@ -536,7 +536,7 @@ species:
           locator: {pdf_page_index: 4, section: RESULTS, note: No deposit phases by element are identified}
         deposit_identification_method:
           state: {tag: unknown, reason: not_published}
-          locator: {pdf_page_index: 4, section: RESULTS, note: SEM is reported for the remaining slag surface, not for witness deposits}
+          locator: {pdf_page_index: 4, section: RESULTS, note: 'SEM is reported for the remaining slag surface, not for witness deposits'}
         deposit_air_exposure_before_analysis:
           state: {tag: unknown, reason: not_published}
           locator: {pdf_page_index: 4, section: RESULTS, note: No air-exposure history before analysis is stated}
