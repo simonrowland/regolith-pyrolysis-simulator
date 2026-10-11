@@ -381,6 +381,26 @@ def test_silicon_and_titanium_elemental_equations_keep_their_printed_gates():
     assert cp_cal_mol_k * 4.184 == pytest.approx(janaf_cp, abs=0.25)
 
 
+def test_wustite_equations_keep_the_printed_nonstoichiometric_formula_unit():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "Fe0.947O"]
+    assert len(curves) == 4
+    assert {curve["phase"] for curve in curves} == {"c", "l"}
+    assert all(curve["note"] == "printed formula unit Fe0.947O (wustite); not stoichiometric FeO"
+               for curve in curves)
+    solid_h = next(curve for curve in curves if curve["phase"] == "c" and curve["quantity"] == "heat_content_increment")
+    solid_cp = next(curve for curve in curves if curve["phase"] == "c" and curve["quantity"] == "heat_capacity")
+    assert solid_h["coefficients_as_printed"] == ["11.66", "1.00×10^-3", "0.67×10^5", "-3,790"]
+    assert solid_h["gate"]["status"] == "transcription_gate_failed"
+    assert [row["residual"] for row in solid_h["gate"]["residuals"]] == pytest.approx([-8.5, -16.0, -22.3333333333])
+    # Printed H(T)-H(298.15) differentiates term by term to Cp; cal/mol per K
+    # is cal/(mol·K), and its 298.15 K sanity value is 11.50 cal/(mol·K).
+    cp_298 = 11.66 + 2.00e-3 * 298.15 - 0.67e5 * 298.15**-2
+    assert cp_298 == pytest.approx(11.50, abs=0.01)
+    assert solid_cp["gate"]["reason"] == "no_independent_check"
+    liquid_h = next(curve for curve in curves if curve["phase"] == "l" and curve["quantity"] == "heat_content_increment")
+    assert liquid_h["gate"]["status"] == "passed"
+
+
 def test_heat_content_gate_detects_a_coefficient_mutation():
     heat = loader.load_published_curves()[0]
     changed = {**heat, "coefficients_as_printed": ["11.77", *heat["coefficients_as_printed"][1:]]}

@@ -1462,5 +1462,43 @@
     "locator": {"printed_page": 118, "label": "Table 493, Mn(g)"},
     "source_record_id": "table-493", "derivation": "Differentiate the printed linear heat-content equation; its derivative is the constant 4.97, and cal/mol differentiated by kelvin gives cal/(mol·K).",
     "derivative_of_equation_index": 168
+  },
+  {
+    "formula": "Fe0.947O", "phase": "c", "polymorph": null, "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 11.66T + 1.00×10^-3T^2 + 0.67×10^5T^-1 - 3,790",
+    "terms": ["a*T", "b*T^2", "c*T^-1", "d"], "coefficients_as_printed": ["11.66", "1.00×10^-3", "0.67×10^5", "-3,790"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [298, 1650], "accuracy_as_printed": "0.3 percent",
+    "locator": {"printed_page": 95, "label": "Fe0.947O(c), equation; rendered image b584-pdf111.png"},
+    "source_record_id": "table-397", "note": "printed formula unit Fe0.947O (wustite); not stoichiometric FeO",
+    "gate_cells": [{"temperature_K": 400}, {"temperature_K": 500}, {"temperature_K": 600}]
+  },
+  {
+    "formula": "Fe0.947O", "phase": "c", "polymorph": null, "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 11.66 + 2.00×10^-3T - 0.67×10^5T^-2",
+    "terms": ["a", "b*T", "c*T^-2"], "coefficients_as_printed": ["11.66", "2.00×10^-3", "-0.67×10^5"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [298, 1650], "accuracy_as_printed": null,
+    "locator": {"printed_page": 95, "label": "Fe0.947O(c), equation; rendered image b584-pdf111.png"},
+    "source_record_id": "table-397", "note": "printed formula unit Fe0.947O (wustite); not stoichiometric FeO",
+    "derivation": "Differentiate the printed H_T-H_298.15 form: d/dT gives Cp = 11.66 + 2.00×10^-3T - 0.67×10^5T^-2; cal/mol differentiated by K gives cal/(mol·K). Cp at 298.15 K is 11.50 cal/(mol·K).",
+    "derivative_of_equation_index": 170
+  },
+  {
+    "formula": "Fe0.947O", "phase": "l", "polymorph": null, "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 16.30T - 1,200",
+    "terms": ["a*T", "d"], "coefficients_as_printed": ["16.30", "-1,200"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [1650, 2000], "accuracy_as_printed": "0.1 percent",
+    "locator": {"printed_page": 95, "label": "Fe0.947O(l), equation; rendered image b584-pdf111.png"},
+    "source_record_id": "table-397", "note": "printed formula unit Fe0.947O (wustite); not stoichiometric FeO",
+    "gate_cells": [{"temperature_K": 1700}, {"temperature_K": 1800}, {"temperature_K": 2000}]
+  },
+  {
+    "formula": "Fe0.947O", "phase": "l", "polymorph": null, "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 16.30",
+    "terms": ["a"], "coefficients_as_printed": ["16.30"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [1650, 2000], "accuracy_as_printed": null,
+    "locator": {"printed_page": 95, "label": "Fe0.947O(l), equation; rendered image b584-pdf111.png"},
+    "source_record_id": "table-397", "note": "printed formula unit Fe0.947O (wustite); not stoichiometric FeO",
+    "derivation": "Differentiate the printed linear H_T-H_298.15 form: d/dT gives Cp = 16.30; cal/mol differentiated by K gives cal/(mol·K). Cp at 1800 K is 16.30 cal/(mol·K).",
+    "derivative_of_equation_index": 172
   }
 ]
