@@ -101,6 +101,28 @@ def test_sato_1976_migrates_all_numeric_table_cells() -> None:
     assert counts == {"table1": 55, "table2": 25, "table3": 29}
     assert sum(counts.values()) == 109
     assert len([obs for obs in observations if "table3" in obs.observation_id]) == 35
+    activity_rows = (
+        extract["species"]["FeO"]["observations"]
+        + extract["species"]["Fe"]["observations"]
+    )
+    assert len(activity_rows) == 10
+    assert all("phase" not in row for row in activity_rows)
+    activity_observations = [
+        obs
+        for obs in observations
+        if "table2" in obs.observation_id or "table3" in obs.observation_id
+    ]
+    assert all(
+        obs.identity.species.phase.is_unknown
+        and obs.identity.species.phase.reason == "source does not state phase"
+        for obs in activity_observations
+    )
+    table2_70017 = next(
+        row for row in extract["species"]["FeO"]["observations"]
+        if row["observation_id"] == "sato_1976_table2_70017"
+    )
+    assert "subsolidus" in table2_70017["phase_context_as_published"]
+    assert "phase_context_locator" in table2_70017
 
     natural = next(
         obs for obs in observations if "table1_70017_31::T=1273.15" in obs.observation_id
@@ -162,11 +184,17 @@ def test_sato_1976_migrates_all_numeric_table_cells() -> None:
         observation = matches[0]
         assert observation.experiment_id.endswith(f"::{row['experiment']}")
         assert f"row={sample}" in observation.locator.note
+        experiment = migrator.result.experiments[observation.experiment_id]
+        assert experiment.sample.form is not None
+        assert experiment.sample.form.state.value == "bulk rock"
+        phase = observation.identity.species.phase
+        assert phase.is_unknown
+        assert phase.reason == "source does not state phase"
         assert observation.value.point == fugacity_pa
         located_log = observation.point_conditions["fO2_log"]
         assert located_log.state.value == expected_log
         route = oxygen_condition(
-            migrator.result.experiments[observation.experiment_id], bench, observation
+            experiment, bench, observation
         )
         assert route.selected is not None
         assert route.selected.route == "observation_fO2_log"

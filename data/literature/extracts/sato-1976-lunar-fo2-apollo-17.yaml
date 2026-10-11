@@ -16,14 +16,26 @@ experiments:
   - experiment_id: sato1976_natural_fO2
     method: emf_cell
     locator: {page: 1324, section: Experimental Method, note: natural-sample measurements in the silica-glass capsule}
+    sample:
+      form:
+        state: {tag: value, value: bulk rock}
+        locator: {page: 1326, table: '1', note: Table 1 reports natural-sample oxygen fugacity values for bulk-rock samples}
   - experiment_id: sato1976_added_Fe_fO2
     method: emf_cell
     locator: {page: 1324, section: Experimental Method, note: measurements after addition of pure iron in the iron capsule}
+    sample:
+      form:
+        state: {tag: value, value: bulk rock}
+        locator: {page: 1326, table: '1', note: Table 1 reports sample-plus-iron oxygen fugacity values for bulk-rock samples}
   - experiment_id: sato1976_Fe_activity_calculation
     method: emf_cell
     locator: {page: 1326, section: discussion following Table 1, note: Fe activity calculated from natural-sample and sample-plus-Fe curves}
   - experiment_id: sato1973_quoted_values
     locator: {page: 1326, table: '1', note: daggered measurements attributed to Sato et al. (1973); method not restated}
+    sample:
+      form:
+        state: {tag: value, value: bulk rock}
+        locator: {page: 1326, table: '1', note: Daggered Table 1 values report oxygen fugacity of bulk-rock samples}
 fidelity_samples:
   - path: species.O2.observations[sato_1976_table1_70017_31].values.series[0].minus_log_fO2_atm
     value: '15.65'
@@ -208,7 +220,6 @@ species:
         regime: emf_cell
         method_locator: {page: 1324, section: Experimental Method}
         locator: {page: 1326, table: '1', row: '70017,31', note: PDF p. 4; first two rows of values are natural and added-iron measurements}
-        phase: bulk_rock
         units: '-log10(fO2/atm), as printed'
         values:
           method_class: measured_direct
@@ -255,7 +266,6 @@ species:
         regime: emf_cell
         method_locator: {page: 1324, section: Experimental Method}
         locator: {page: 1326, table: '1', row: '70017,31', note: PDF p. 4; parenthesized values are with addition of a large quantity of pure iron}
-        phase: bulk_rock
         units: Pa; printed -log10(fO2/atm) retained in each point
         values:
           method_class: measured_direct
@@ -279,7 +289,6 @@ species:
         regime: emf_cell
         method_locator: {page: 1324, section: Experimental Method}
         locator: {page: 1326, table: '1', row: '74275,39', note: PDF p. 4; first two rows of values are natural and added-iron measurements}
-        phase: bulk_rock
         units: '-log10(fO2/atm), as printed'
         values:
           method_class: measured_direct
@@ -326,7 +335,6 @@ species:
         regime: emf_cell
         method_locator: {page: 1324, section: Experimental Method}
         locator: {page: 1326, table: '1', row: '74275,39', note: PDF p. 4; parenthesized values are with addition of a large quantity of pure iron}
-        phase: bulk_rock
         units: Pa; printed -log10(fO2/atm) retained in each point
         values:
           method_class: measured_direct
@@ -348,7 +356,6 @@ species:
         experiment: sato1973_quoted_values
         type: partial_pressure
         locator: {page: 1326, table: '1', row: '12009,35', note: PDF p. 4; dagger marks values taken from Sato et al. (1973)}
-        phase: bulk_rock
         units: '-log10(fO2/atm), as printed'
         values:
           method_class: quoted_attributed
@@ -375,7 +382,6 @@ species:
         experiment: sato1973_quoted_values
         type: partial_pressure
         locator: {page: 1326, table: '1', row: '12009,35', note: PDF p. 4; parenthesized values are with addition of a large quantity of pure iron}
-        phase: bulk_rock
         units: Pa; printed -log10(fO2/atm) retained in each point
         values:
           method_class: quoted_attributed
@@ -398,7 +404,6 @@ species:
         experiment: sato1973_quoted_values
         type: partial_pressure
         locator: {page: 1326, table: '1', row: '12053,89', note: PDF p. 4; dagger marks values taken from Sato et al. (1973)}
-        phase: bulk_rock
         units: '-log10(fO2/atm), as printed'
         values:
           method_class: quoted_attributed
@@ -425,7 +430,6 @@ species:
         experiment: sato1973_quoted_values
         type: partial_pressure
         locator: {page: 1326, table: '1', row: '12053,89', note: PDF p. 4; parenthesized values are with addition of a large quantity of pure iron}
-        phase: bulk_rock
         units: Pa; printed -log10(fO2/atm) retained in each point
         values:
           method_class: quoted_attributed
@@ -448,7 +452,6 @@ species:
         experiment: sato1973_quoted_values
         type: partial_pressure
         locator: {page: 1326, table: '1', row: '15595,25', note: PDF p. 4; dagger marks values taken from Sato et al. (1973)}
-        phase: bulk_rock
         units: '-log10(fO2/atm), as printed'
         values:
           method_class: quoted_attributed
@@ -475,7 +478,6 @@ species:
         experiment: sato1973_quoted_values
         type: partial_pressure
         locator: {page: 1326, table: '1', row: '15595,25', note: PDF p. 4; parenthesized values are with addition of a large quantity of pure iron}
-        phase: bulk_rock
         units: Pa; printed -log10(fO2/atm) retained in each point
         values:
           method_class: quoted_attributed
@@ -500,7 +502,6 @@ species:
         regime: emf_cell
         method_locator: {page: 1324, section: Experimental Method}
         locator: {page: 1326, table: '1', row: '15058,81', note: PDF p. 4}
-        phase: bulk_rock
         units: '-log10(fO2/atm), as printed'
         values:
           method_class: measured_direct
