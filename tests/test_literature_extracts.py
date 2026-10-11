@@ -61,60 +61,68 @@ class _DuplicateRejectingLoader(yaml.SafeLoader):
         return mapping
 
 
-# Independent pins transcribed from Table 1, published p. 1063. The table
-# labels its values "−log fO2 (atm)". Pa values use 10^(-printed) atm ×
-# 101325 Pa/atm; for example, 12009,35 bulk rock at 1000 °C is
-# 10^-15.6 atm × 101325 Pa/atm = 2.54516893e-11 Pa.
-_SATO_1973_TABLE_ENDPOINT_PINS = {
+# Independent full-matrix literals transcribed from Table 1's page image,
+# published p. 1063. Each tuple is sample number, material, then printed
+# −log fO2 (atm) at 1000, 1050, 1100, 1150 and 1200 °C.
+_SATO_1973_TABLE_PINS = {
     "sato73_12009_35_bulk_rock": (
-        ("1000", "15.6", "2.54516893e-11"), ("1200", "12.8", "1.60589303e-8")
+        "12009,35", "bulk rock", ("15.6", "14.8", "14.0", "13.4", "12.8")
     ),
     "sato73_12009_35_olivine": (
-        ("1000", "15.5", "3.20417784e-11"), ("1200", "12.4", "4.03382091e-8")
+        "12009,35", "olivine", ("15.5", "14.6", "13.9", "13.2", "12.4")
     ),
     "sato73_12009_35_groundmass": (
-        ("1000", "16.0", "1.01325000e-11"), ("1200", "12.8", "1.60589303e-8")
+        "12009,35", "groundmass", ("16.0", "15.0", "14.3", "13.6", "12.8")
     ),
     "sato73_12009_35_bulk_plus_fe": (
-        ("1000", "16.0", "1.01325000e-11"), ("1200", "13.0", "1.01325000e-8")
+        "12009,35", "bulk + Fe", ("16.0", "15.2", "14.4", "13.7", "13.0")
     ),
     "sato73_12022_36_bulk_plus_fe": (
-        ("1000", "15.7", "2.02169954e-11"), ("1200", "12.7", "2.02169954e-8")
+        "12022,36", "bulk + Fe", ("15.7", "14.8", "14.0", "13.4", "12.7")
     ),
     "sato73_12053_89_bulk_rock": (
-        ("1000", "15.4", "4.03382091e-11"), ("1200", "12.3", "5.07827964e-8")
+        "12053,89", "bulk rock", ("15.4", "14.6", "13.8", "13.0", "12.3")
     ),
     "sato73_12053_89_pyroxenes": (
-        ("1000", "15.3", "5.07827964e-11"), ("1200", "12.1", "8.04853084e-8")
+        "12053,89", "pyroxenes", ("15.3", "14.4", "13.6", "12.8", "12.1")
     ),
     "sato73_12053_89_bulk_plus_fe": (
-        ("1000", "16.0", "1.01325000e-11"), ("1200", "13.1", "8.04853084e-9")
+        "12053,89", "bulk + Fe", ("16.0", "15.2", "14.5", "13.8", "13.1")
     ),
     "sato73_14310_195_bulk_rock": (
-        ("1000", "15.4", "4.03382091e-11"), ("1200", "11.5", "3.20417784e-7")
+        "14310,195", "bulk rock", ("15.4", "14.5", "13.8", "13.3", "11.5")
     ),
     "sato73_14310_207_bulk_rock": (
-        ("1000", "15.3", "5.07827964e-11"), ("1200", "10.9", "1.27560617e-6")
+        "14310,207", "bulk rock", ("15.3", "14.5", "13.9", "13.2", "10.9")
     ),
     "sato73_14321_105_bulk_rock": (
-        ("1000", "15.6", "2.54516893e-11"), ("1200", "12.3", "5.07827964e-8")
+        "14321,105", "bulk rock", ("15.6", "14.6", "13.9", "13.0", "12.3")
     ),
     "sato73_15058_81_bulk_rock": (
-        ("1000", "15.7", "2.02169954e-11"), ("1200", "12.6", "2.54516893e-8")
+        "15058,81", "bulk rock", ("15.7", "14.9", "14.0", "13.3", "12.6")
     ),
     "sato73_15058_88_bulk_rock": (
-        ("1000", "15.7", "2.02169954e-11"), ("1200", "12.5", "3.20417784e-8")
+        "15058,88", "bulk rock", ("15.7", "14.9", "14.0", "13.3", "12.5")
     ),
     "sato73_15595_25_bulk_rock": (
-        ("1000", "15.7", "2.02169954e-11"), ("1200", "12.4", "4.03382091e-8")
+        "15595,25", "bulk rock", ("15.7", "14.9", "14.1", "13.2", "12.4")
     ),
     "sato73_15595_25_bulk_plus_fe": (
-        ("1000", "16.0", "1.01325000e-11"), ("1200", "12.7", "2.02169954e-8")
+        "15595,25", "bulk + Fe", ("16.0", "15.1", "14.2", "13.4", "12.7")
     ),
+}
+_SATO_1973_TABLE_TEMPERATURES_C = ("1000", "1050", "1100", "1150", "1200")
+_SATO_1973_SAMPLE_FORMS = {
+    observation_id: (
+        f"Lunar sample {sample}; bulk rock plus iron foil"
+        if material == "bulk + Fe"
+        else f"Lunar sample {sample}; {material}"
+    )
+    for observation_id, (sample, material, _logs) in _SATO_1973_TABLE_PINS.items()
 }
 
 
-def _assert_sato_1973_table_endpoint_pins(extract: dict) -> None:
+def _assert_sato_1973_table_pins(extract: dict) -> None:
     bench = extract["benches"][0]
     assert bench["temperature_measurement"]["increments"]["state"]["value"] == (
         "About 20 °C during heating and about 40 °C during cooling, "
@@ -125,44 +133,93 @@ def _assert_sato_1973_table_endpoint_pins(extract: dict) -> None:
         "Furnace atmosphere was N2 diluent with about 1% CO2 and variable H2, "
         "servo-controlled to keep its fO2 within about 0.1 log fO2 unit of the sample."
     )
+    assert context["iron_wustite_buffer_relation_as_printed"] == (
+        "log fO2 = 6.824 − 27470/T"
+    )
+    assert context["iron_wustite_buffer_temperature_range_as_printed"] == "850–1300 °C"
+    assert context["iron_wustite_buffer_temperature_unit"] == "T in K (absolute temperature)"
+
     rows = {
         row["observation_id"]: row
         for row in extract["species"]["O2"]["observations"]
     }
-    assert set(rows) == set(_SATO_1973_TABLE_ENDPOINT_PINS)
-    for observation_id, endpoints in _SATO_1973_TABLE_ENDPOINT_PINS.items():
-        points = {
-            point["temperature_C_as_printed"]: point
-            for point in rows[observation_id]["values"]["points"]
-        }
-        for temperature, printed_log, expected_pa in endpoints:
-            point = points[temperature]
-            assert point["neg_log_fO2_as_printed"] == printed_log, observation_id
+    assert set(rows) == set(_SATO_1973_TABLE_PINS)
+    for observation_id, (sample, material, printed_logs) in _SATO_1973_TABLE_PINS.items():
+        row = rows[observation_id]
+        assert row["values"]["sample_no_as_printed"] == sample
+        assert row["values"]["material_as_printed"] == material
+        points = row["values"]["points"]
+        assert tuple(point["temperature_C_as_printed"] for point in points) == (
+            _SATO_1973_TABLE_TEMPERATURES_C
+        )
+        assert tuple(point["neg_log_fO2_as_printed"] for point in points) == printed_logs
+        for point, printed_log in zip(points, printed_logs, strict=True):
+            temperature = point["temperature_C_as_printed"]
+            expected_pa = Decimal("101325") * (Decimal(10) ** -Decimal(printed_log))
             relative_error = abs(
-                Decimal(point["fugacity_Pa"]) / Decimal(expected_pa) - Decimal(1)
+                Decimal(point["fugacity_Pa"]) / expected_pa - Decimal(1)
             )
-            assert relative_error <= Decimal("1e-6"), observation_id
+            assert relative_error <= Decimal("1e-6"), (observation_id, temperature)
 
 
-def test_sato_1973_independently_pins_table_1_endpoints() -> None:
+def test_sato_1973_independently_pins_all_table_1_cells_and_equation() -> None:
     source = EXTRACTS / "sato-hickling-mclane-1973-lunar-fo2.yaml"
     extract = yaml.load(source.read_text(), Loader=_DuplicateRejectingLoader)
-    _assert_sato_1973_table_endpoint_pins(extract)
+    _assert_sato_1973_table_pins(extract)
 
 
-@pytest.mark.parametrize("mutation", ["pressure_x10", "printed_log_plus_001"])
-def test_sato_1973_table_endpoint_pins_reject_mutations(mutation: str) -> None:
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "pressure_x10",
+        "printed_log_plus_001",
+        "coordinated_interior_log",
+        "coordinated_interior_temperature",
+        "coordinated_sample_identity",
+        "eq5_coefficient",
+        "eq5_range",
+    ],
+)
+def test_sato_1973_source_pins_reject_mutations(mutation: str) -> None:
     source = EXTRACTS / "sato-hickling-mclane-1973-lunar-fo2.yaml"
     extract = yaml.load(source.read_text(), Loader=_DuplicateRejectingLoader)
-    point = extract["species"]["O2"]["observations"][6]["values"]["points"][0]
+    rows = extract["species"]["O2"]["observations"]
+    row = rows[6]
+    point = row["values"]["points"][0]
     if mutation == "pressure_x10":
         point["fugacity_Pa"] = str(Decimal(point["fugacity_Pa"]) * 10)
-    else:
+    elif mutation == "printed_log_plus_001":
         point["neg_log_fO2_as_printed"] = str(
             Decimal(point["neg_log_fO2_as_printed"]) + Decimal("0.01")
         )
+    elif mutation == "coordinated_interior_log":
+        point = rows[6]["values"]["points"][1]
+        point["neg_log_fO2_as_printed"] = "14.5"
+        point["log_fO2_as_signed"] = "-14.5"
+        point["point_conditions"]["fO2_log"]["state"]["value"] = "-14.5"
+        point["fugacity_Pa"] = str(Decimal("101325") * Decimal(10) ** Decimal("-14.5"))
+    elif mutation == "coordinated_interior_temperature":
+        point = rows[6]["values"]["points"][1]
+        point["temperature_C_as_printed"] = "1060"
+        point["temperature_K"] = "1333.15"
+        point["point_conditions"]["temperature_K"]["state"]["value"] = "1333.15"
+    elif mutation == "coordinated_sample_identity":
+        row["values"]["sample_no_as_printed"] = "12053,98"
+        experiment = next(
+            item for item in extract["experiments"]
+            if item["experiment_id"] == row["observation_id"]
+        )
+        experiment["sample"]["form"]["state"]["value"] = "Lunar sample 12053,98; pyroxenes"
+    elif mutation == "eq5_coefficient":
+        extract["species"]["O2"]["context"][0]["values"][
+            "iron_wustite_buffer_relation_as_printed"
+        ] = "log fO2 = 6.824 − 27471/T"
+    else:
+        extract["species"]["O2"]["context"][0]["values"][
+            "iron_wustite_buffer_temperature_range_as_printed"
+        ] = "850–1400 °C"
     with pytest.raises(AssertionError):
-        _assert_sato_1973_table_endpoint_pins(extract)
+        _assert_sato_1973_table_pins(extract)
 
 
 def test_sato_1973_all_75_conversions_and_migration_consistency() -> None:
@@ -171,6 +228,7 @@ def test_sato_1973_all_75_conversions_and_migration_consistency() -> None:
     rows = extract["species"]["O2"]["observations"]
     assert len(rows) == 15
     assert sum(len(row["values"]["points"]) for row in rows) == 75
+    _assert_sato_1973_table_pins(extract)
 
     migrator = battery_migrate.Migrator(root=REPO_ROOT)
     migrator._migrate_extract(source)
@@ -192,7 +250,10 @@ def test_sato_1973_all_75_conversions_and_migration_consistency() -> None:
         for obs in observations
     )
     assert all(
-        "Apollo 12 first-heating" in obs.uncertainty.verbatim
+        "Apollo 12" in obs.uncertainty.verbatim
+        and "excepted from the reported within-0.2-log-unit scatter" in obs.uncertainty.verbatim
+        and "anomalously high initial first-heating readings were omitted from the fitted curves"
+        in obs.uncertainty.verbatim
         for obs in observations
         if any(sample in obs.observation_id for sample in ("12009", "12022", "12053"))
     )
@@ -200,15 +261,53 @@ def test_sato_1973_all_75_conversions_and_migration_consistency() -> None:
         result.experiments[obs.experiment_id].method.value.value == "emf_cell"
         for obs in observations
     )
-    assert all(
-        "First heating cycle" in result.experiments[obs.experiment_id]
-        .thermal_schedule.method.state.value
-        for obs in observations
-    )
+    extract_experiments = {
+        item["experiment_id"]: item for item in extract["experiments"]
+    }
+    for observation_id, (sample_no, _material, _logs) in _SATO_1973_TABLE_PINS.items():
+        method = extract_experiments[observation_id]["thermal_schedule"]["method"]
+        history_state = method["state"]
+        assert history_state["tag"] == "value"
+        history = history_state["value"]
+        locator_page = method["locator"]["published_page"]
+        if sample_no.startswith(("12009", "12022", "12053")):
+            assert "initial first-heating readings" in history
+            assert "omitted from the visually fitted curves" in history
+            assert locator_page == 1063
+        elif sample_no.startswith("14310"):
+            assert "Table 1 values for the two 14310 chips are from the first heating cycle" in history
+            assert "irreversible, reproducible abrupt rise" in history
+            assert locator_page == 1067
+        elif sample_no.startswith("14321"):
+            assert "irregular fO2 values" in history
+            assert locator_page == 1067
+        elif sample_no.startswith("15058"):
+            assert "almost identical results" in history
+            assert locator_page == 1063
+        else:
+            assert "heating and cooling results" in history
+            assert "first heating cycle" not in history.casefold()
+            assert locator_page == 1063
     resolved_count = 0
     for row in rows:
+        observation_id = row["observation_id"]
+        _sample_no, _material, expected_logs = _SATO_1973_TABLE_PINS[observation_id]
+        assert row["measurement_basis_as_printed"] == (
+            "measured_tabulated is the nearest existing method_class; no class distinguishes author-smoothed or curve-fitted measured values. Each Table 1 value is read from the authors' visually drawn best-fit curve through their measured points, not an individual reading (published p. 1063)."
+        )
+        assert row["values"]["method_class"] == "measured_tabulated"
         expected_count = 0
-        for point in row["values"]["points"]:
+        for point, expected_log, expected_temperature in zip(
+            row["values"]["points"],
+            expected_logs,
+            _SATO_1973_TABLE_TEMPERATURES_C,
+            strict=True,
+        ):
+            assert point["neg_log_fO2_as_printed"] == expected_log
+            assert point["temperature_C_as_printed"] == expected_temperature
+            assert Decimal(point["temperature_K"]) == (
+                Decimal(expected_temperature) + Decimal("273.15")
+            )
             expected_pa = Decimal("101325") * (
                 Decimal(10) ** -Decimal(point["neg_log_fO2_as_printed"])
             )
@@ -230,10 +329,7 @@ def test_sato_1973_all_75_conversions_and_migration_consistency() -> None:
             observation = matches[0]
             assert observation.value.point == consumed_pa
             experiment = result.experiments[observation.experiment_id]
-            assert (
-                row["values"]["sample_no_as_printed"]
-                in experiment.sample.form.state.value
-            )
+            assert experiment.sample.form.state.value == _SATO_1973_SAMPLE_FORMS[observation_id]
             assert experiment.sample.characterization.state.value
             bench = result.benches[experiment.bench_id]
             resolved = oxygen_condition(experiment, bench, observation)
@@ -246,16 +342,12 @@ def test_sato_1973_all_75_conversions_and_migration_consistency() -> None:
         assert expected_count == 5
         sample_form = experiment.sample.form.state.value
         sample_description = experiment.sample.characterization.state.value
-        assert row["values"]["sample_no_as_printed"] in sample_form
-        material = row["values"]["material_as_printed"]
-        if material == "bulk + Fe":
-            assert "bulk rock plus iron foil" in sample_form
-        else:
-            assert material in sample_form
-        if row["values"]["sample_no_as_printed"].startswith("14310"):
+        assert sample_form == _SATO_1973_SAMPLE_FORMS[row["observation_id"]]
+        sample_number = _SATO_1973_TABLE_PINS[row["observation_id"]][0]
+        if sample_number.startswith("14310"):
             assert "“Igneous” rock" in sample_description
-            assert "irreversible rise" in experiment.thermal_schedule.method.state.value
-        elif row["values"]["sample_no_as_printed"].startswith("14321"):
+            assert "irreversible, reproducible abrupt rise" in experiment.thermal_schedule.method.state.value
+        elif sample_number.startswith("14321"):
             assert "Microbreccia" in sample_description
         else:
             assert "Basaltic igneous rock" in sample_description
