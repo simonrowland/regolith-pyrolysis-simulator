@@ -8083,6 +8083,30 @@ def fe3_fe2_ratio_reduction(
     return evidence, derivation
 
 
+def _mass_loss_areal_flux_selection(
+    amount: Decimal,
+    key: str,
+    payload: Mapping[str, Any],
+    units: str | None,
+    condition_ranges: tuple[tuple[str, Decimal, Decimal], ...],
+) -> SourceSelection:
+    printed_units = payload.get("rate_units_as_printed") or units
+    converted, trail = convert_mass_flux_to_kg_per_m2_per_s(
+        amount, str(printed_units) if printed_units is not None else None
+    )
+    if converted is None:
+        return _unavailable_selection(
+            trail or f"{key} is not a grounded areal mass flux",
+            condition_ranges=condition_ranges,
+            unused_ancillary=_unused_ancillary(payload, key),
+            field_name=key,
+            unit_trail=trail or "identity",
+        )
+    return _point_selection(
+        converted, key, trail, payload, condition_ranges
+    )
+
+
 def _selection_from_named_field(
     payload: Mapping[str, Any],
     q_token: Quantity,
@@ -8197,20 +8221,8 @@ def _selection_from_named_field(
                 amount, key, trail or "identity:kg_per_m2", payload, condition_ranges
             )
         if q_token is Quantity.MASS_LOSS_AREAL_FLUX:
-            printed_units = payload.get("rate_units_as_printed") or units
-            amount, trail = convert_mass_flux_to_kg_per_m2_per_s(
-                amount, str(printed_units) if printed_units is not None else None
-            )
-            if amount is None:
-                return _unavailable_selection(
-                    trail or f"{key} is not a grounded areal mass flux",
-                    condition_ranges=condition_ranges,
-                    unused_ancillary=_unused_ancillary(payload, key),
-                    field_name=key,
-                    unit_trail=trail or "identity",
-                )
-            return _point_selection(
-                amount, key, trail, payload, condition_ranges
+            return _mass_loss_areal_flux_selection(
+                amount, key, payload, units, condition_ranges
             )
         converted = _convert_compilation_amount(
             amount, q_token, _printed_unit_for_field(payload, key) or units
@@ -8264,20 +8276,8 @@ def _selection_from_named_field(
                 amount, key, trail or "identity:kg_per_m2", payload, condition_ranges
             )
         if q_token is Quantity.MASS_LOSS_AREAL_FLUX:
-            printed_units = payload.get("rate_units_as_printed") or units
-            amount, trail = convert_mass_flux_to_kg_per_m2_per_s(
-                amount, str(printed_units) if printed_units is not None else None
-            )
-            if amount is None:
-                return _unavailable_selection(
-                    trail or f"{key} is not a grounded areal mass flux",
-                    condition_ranges=condition_ranges,
-                    unused_ancillary=_unused_ancillary(payload, key),
-                    field_name=key,
-                    unit_trail=trail or "identity",
-                )
-            return _point_selection(
-                amount, key, trail, payload, condition_ranges
+            return _mass_loss_areal_flux_selection(
+                amount, key, payload, units, condition_ranges
             )
         converted = _convert_compilation_amount(
             amount, q_token, _printed_unit_for_field(payload, key) or units
