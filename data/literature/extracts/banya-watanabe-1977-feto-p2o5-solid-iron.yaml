@@ -27,13 +27,13 @@ fidelity_samples:
 - path: species.FeO.observations[banya77_t3_run_6_10].values.Fe2O3_wt_percent_as_printed
   value: 2.69
   locator: {published_page: 1813, table: '3', note: 'run 6.10, last Table 3 row'}
-- path: species.FeO.observations[banya77_t4_xp2o5_0_00].values.a_FetO_as_printed
+- path: species.Fe_tO.observations[banya77_t4_xp2o5_0_00].values.a_FetO_as_printed
   value: 1
   locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.00, first Table 4 row'}
-- path: species.FeO.observations[banya77_t4_xp2o5_0_10].values.a_FetO_as_printed
+- path: species.Fe_tO.observations[banya77_t4_xp2o5_0_10].values.a_FetO_as_printed
   value: 0.853
   locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.10'}
-- path: species.FeO.observations[banya77_t4_xp2o5_0_20].values.a_P2O5_as_printed
+- path: species.Fe_tO.observations[banya77_t4_xp2o5_0_20].values.a_P2O5_as_printed
   value: 18.9
   locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.20, last Table 4 row'}
 benches:
@@ -124,6 +124,584 @@ experiments:
       state: {tag: value, value: {kind: point, point: '1400'}}
       locator: {published_page: 1816, table: '4', note: table title}
 species:
+  Fe_tO:
+    observations:
+    - observation_id: banya77_t4_xp2o5_0_00
+      experiment: banya77-table4-1400c
+      type: activity_coefficient
+      locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.00'}
+      phase: liquid FetO-P2O5 slag
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase: {tag: value, value: l}
+              polymorph: {tag: not_applicable, reason: not_applicable}
+            component_basis: Fe_tO
+        inferred: false
+        note: >-
+          Table 4 prints FetO on the Raoult law standard; equations (2-1) and
+          (2-2) identify pure liquid FeO. The P2O5 columns use a separate Henry
+          standard and are retained as printed context.
+        locator: {published_page: 1816, table: '4'}
+      units: Table 4 as printed; alpha columns are multiplied by 10^-5
+      calculation_as_printed: Authors calculate a_FetO from measured PH2O/PH2 using equation (11).
+      calculation_locator: {published_page: 1815, section: '4.3', equation: '11'}
+      derived_from: &banya77_t3_1400_gas [banya77_t3_run_3_1, banya77_t3_run_3_2, banya77_t3_run_3_3, banya77_t3_run_3_4, banya77_t3_run_3_5, banya77_t3_run_3_6, banya77_t3_run_3_7, banya77_t3_run_3_10, banya77_t3_run_3_9, banya77_t3_run_3_8, banya77_t3_run_3_11, banya77_t3_run_3_28, banya77_t3_run_3_14, banya77_t3_run_3_13, banya77_t3_run_3_12, banya77_t3_run_3_17, banya77_t3_run_3_15, banya77_t3_run_3_29, banya77_t3_run_3_30, banya77_t3_run_3_16, banya77_t3_run_3_19, banya77_t3_run_3_21, banya77_t3_run_3_23, banya77_t3_run_3_20, banya77_t3_run_3_24, banya77_t3_run_3_22, banya77_t3_run_3_27, banya77_t3_run_3_25, banya77_t3_run_3_26]
+      derivation:
+        relation: a_FetO calculated from measured PH2O/PH2 using equation (11) at 1400 C.
+        inputs: *banya77_t3_1400_gas
+        output_unit: dimensionless activity
+      point_conditions:
+        X_P2O5_as_printed:
+          state: {tag: value, value: {kind: point, point: '0.00'}}
+          locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.00'}
+      values:
+        X_P2O5_as_printed: 0.00
+        alpha_FetO_times_1e_minus_5_as_printed: -2.70
+        alpha_P2O5_times_1e_minus_5_as_printed: -2.70
+        log_gamma_FetO_as_printed: 0
+        a_FetO_as_printed: 1
+        log_gamma_P2O5_as_printed: 0
+        a_P2O5_as_printed: 0
+        T_C: 1400
+        quantity: activity
+        component: FetO
+        method_class: model_derived
+        evidence_class: model_derived
+        activity: 1
+
+    - observation_id: banya77_t4_xp2o5_0_01
+      experiment: banya77-table4-1400c
+      type: activity_coefficient
+      locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.01'}
+      phase: liquid FetO-P2O5 slag
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase: {tag: value, value: l}
+              polymorph: {tag: not_applicable, reason: not_applicable}
+            component_basis: Fe_tO
+        inferred: false
+        note: >-
+          Table 4 prints FetO on the Raoult law standard; equations (2-1) and
+          (2-2) identify pure liquid FeO. The P2O5 columns use a separate Henry
+          standard and are retained as printed context.
+        locator: {published_page: 1816, table: '4'}
+      units: Table 4 as printed; alpha columns are multiplied by 10^-5
+      calculation_as_printed: Authors calculate a_FetO from measured PH2O/PH2 using equation (11).
+      calculation_locator: {published_page: 1815, section: '4.3', equation: '11'}
+      derived_from: *banya77_t3_1400_gas
+      derivation:
+        relation: a_FetO calculated from measured PH2O/PH2 using equation (11) at 1400 C.
+        inputs: *banya77_t3_1400_gas
+        output_unit: dimensionless activity
+      point_conditions:
+        X_P2O5_as_printed:
+          state: {tag: value, value: {kind: point, point: '0.01'}}
+          locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.01'}
+      values:
+        X_P2O5_as_printed: 0.01
+        alpha_FetO_times_1e_minus_5_as_printed: -1.80
+        alpha_P2O5_times_1e_minus_5_as_printed: -2.02
+        log_gamma_FetO_as_printed: -0.0024
+        a_FetO_as_printed: 0.985
+        log_gamma_P2O5_as_printed: 0.527
+        a_P2O5_as_printed: 0.034
+        T_C: 1400
+        quantity: activity
+        component: FetO
+        method_class: model_derived
+        evidence_class: model_derived
+        activity: 0.985
+
+    - observation_id: banya77_t4_xp2o5_0_02
+      experiment: banya77-table4-1400c
+      type: activity_coefficient
+      locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.02'}
+      phase: liquid FetO-P2O5 slag
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase: {tag: value, value: l}
+              polymorph: {tag: not_applicable, reason: not_applicable}
+            component_basis: Fe_tO
+        inferred: false
+        note: >-
+          Table 4 prints FetO on the Raoult law standard; equations (2-1) and
+          (2-2) identify pure liquid FeO. The P2O5 columns use a separate Henry
+          standard and are retained as printed context.
+        locator: {published_page: 1816, table: '4'}
+      units: Table 4 as printed; alpha columns are multiplied by 10^-5
+      calculation_as_printed: Authors calculate a_FetO from measured PH2O/PH2 using equation (11).
+      calculation_locator: {published_page: 1815, section: '4.3', equation: '11'}
+      derived_from: *banya77_t3_1400_gas
+      derivation:
+        relation: a_FetO calculated from measured PH2O/PH2 using equation (11) at 1400 C.
+        inputs: *banya77_t3_1400_gas
+        output_unit: dimensionless activity
+      point_conditions:
+        X_P2O5_as_printed:
+          state: {tag: value, value: {kind: point, point: '0.02'}}
+          locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.02'}
+      values:
+        X_P2O5_as_printed: 0.02
+        alpha_FetO_times_1e_minus_5_as_printed: -0.90
+        alpha_P2O5_times_1e_minus_5_as_printed: -1.36
+        log_gamma_FetO_as_printed: -0.0047
+        a_FetO_as_printed: 0.969
+        log_gamma_P2O5_as_printed: 0.701
+        a_P2O5_as_printed: 0.100
+        T_C: 1400
+        quantity: activity
+        component: FetO
+        method_class: model_derived
+        evidence_class: model_derived
+        activity: 0.969
+
+    - observation_id: banya77_t4_xp2o5_0_04
+      experiment: banya77-table4-1400c
+      type: activity_coefficient
+      locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.04'}
+      phase: liquid FetO-P2O5 slag
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase: {tag: value, value: l}
+              polymorph: {tag: not_applicable, reason: not_applicable}
+            component_basis: Fe_tO
+        inferred: false
+        note: >-
+          Table 4 prints FetO on the Raoult law standard; equations (2-1) and
+          (2-2) identify pure liquid FeO. The P2O5 columns use a separate Henry
+          standard and are retained as printed context.
+        locator: {published_page: 1816, table: '4'}
+      units: Table 4 as printed; alpha columns are multiplied by 10^-5
+      calculation_as_printed: Authors calculate a_FetO from measured PH2O/PH2 using equation (11).
+      calculation_locator: {published_page: 1815, section: '4.3', equation: '11'}
+      derived_from: *banya77_t3_1400_gas
+      derivation:
+        relation: a_FetO calculated from measured PH2O/PH2 using equation (11) at 1400 C.
+        inputs: *banya77_t3_1400_gas
+        output_unit: dimensionless activity
+      point_conditions:
+        X_P2O5_as_printed:
+          state: {tag: value, value: {kind: point, point: '0.04'}}
+          locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.04'}
+      values:
+        X_P2O5_as_printed: 0.04
+        alpha_FetO_times_1e_minus_5_as_printed: -0.45
+        alpha_P2O5_times_1e_minus_5_as_printed: -0.84
+        log_gamma_FetO_as_printed: -0.0094
+        a_FetO_as_printed: 0.939
+        log_gamma_P2O5_as_printed: 0.860
+        a_P2O5_as_printed: 0.290
+        T_C: 1400
+        quantity: activity
+        component: FetO
+        method_class: model_derived
+        evidence_class: model_derived
+        activity: 0.939
+
+    - observation_id: banya77_t4_xp2o5_0_06
+      experiment: banya77-table4-1400c
+      type: activity_coefficient
+      locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.06'}
+      phase: liquid FetO-P2O5 slag
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase: {tag: value, value: l}
+              polymorph: {tag: not_applicable, reason: not_applicable}
+            component_basis: Fe_tO
+        inferred: false
+        note: >-
+          Table 4 prints FetO on the Raoult law standard; equations (2-1) and
+          (2-2) identify pure liquid FeO. The P2O5 columns use a separate Henry
+          standard and are retained as printed context.
+        locator: {published_page: 1816, table: '4'}
+      units: Table 4 as printed; alpha columns are multiplied by 10^-5
+      calculation_as_printed: Authors calculate a_FetO from measured PH2O/PH2 using equation (11).
+      calculation_locator: {published_page: 1815, section: '4.3', equation: '11'}
+      derived_from: *banya77_t3_1400_gas
+      derivation:
+        relation: a_FetO calculated from measured PH2O/PH2 using equation (11) at 1400 C.
+        inputs: *banya77_t3_1400_gas
+        output_unit: dimensionless activity
+      point_conditions:
+        X_P2O5_as_printed:
+          state: {tag: value, value: {kind: point, point: '0.06'}}
+          locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.06'}
+      values:
+        X_P2O5_as_printed: 0.06
+        alpha_FetO_times_1e_minus_5_as_printed: -0.30
+        alpha_P2O5_times_1e_minus_5_as_printed: -0.63
+        log_gamma_FetO_as_printed: -0.0141
+        a_FetO_as_printed: 0.910
+        log_gamma_P2O5_as_printed: 0.951
+        a_P2O5_as_printed: 0.535
+        T_C: 1400
+        quantity: activity
+        component: FetO
+        method_class: model_derived
+        evidence_class: model_derived
+        activity: 0.910
+
+    - observation_id: banya77_t4_xp2o5_0_08
+      experiment: banya77-table4-1400c
+      type: activity_coefficient
+      locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.08'}
+      phase: liquid FetO-P2O5 slag
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase: {tag: value, value: l}
+              polymorph: {tag: not_applicable, reason: not_applicable}
+            component_basis: Fe_tO
+        inferred: false
+        note: >-
+          Table 4 prints FetO on the Raoult law standard; equations (2-1) and
+          (2-2) identify pure liquid FeO. The P2O5 columns use a separate Henry
+          standard and are retained as printed context.
+        locator: {published_page: 1816, table: '4'}
+      units: Table 4 as printed; alpha columns are multiplied by 10^-5
+      calculation_as_printed: Authors calculate a_FetO from measured PH2O/PH2 using equation (11).
+      calculation_locator: {published_page: 1815, section: '4.3', equation: '11'}
+      derived_from: *banya77_t3_1400_gas
+      derivation:
+        relation: a_FetO calculated from measured PH2O/PH2 using equation (11) at 1400 C.
+        inputs: *banya77_t3_1400_gas
+        output_unit: dimensionless activity
+      point_conditions:
+        X_P2O5_as_printed:
+          state: {tag: value, value: {kind: point, point: '0.08'}}
+          locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.08'}
+      values:
+        X_P2O5_as_printed: 0.08
+        alpha_FetO_times_1e_minus_5_as_printed: -0.23
+        alpha_P2O5_times_1e_minus_5_as_printed: -0.51
+        log_gamma_FetO_as_printed: -0.0192
+        a_FetO_as_printed: 0.880
+        log_gamma_P2O5_as_printed: 1.019
+        a_P2O5_as_printed: 0.836
+        T_C: 1400
+        quantity: activity
+        component: FetO
+        method_class: model_derived
+        evidence_class: model_derived
+        activity: 0.880
+
+    - observation_id: banya77_t4_xp2o5_0_10
+      experiment: banya77-table4-1400c
+      type: activity_coefficient
+      locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.10'}
+      phase: liquid FetO-P2O5 slag
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase: {tag: value, value: l}
+              polymorph: {tag: not_applicable, reason: not_applicable}
+            component_basis: Fe_tO
+        inferred: false
+        note: >-
+          Table 4 prints FetO on the Raoult law standard; equations (2-1) and
+          (2-2) identify pure liquid FeO. The P2O5 columns use a separate Henry
+          standard and are retained as printed context.
+        locator: {published_page: 1816, table: '4'}
+      units: Table 4 as printed; alpha columns are multiplied by 10^-5
+      calculation_as_printed: Authors calculate a_FetO from measured PH2O/PH2 using equation (11).
+      calculation_locator: {published_page: 1815, section: '4.3', equation: '11'}
+      derived_from: *banya77_t3_1400_gas
+      derivation:
+        relation: a_FetO calculated from measured PH2O/PH2 using equation (11) at 1400 C.
+        inputs: *banya77_t3_1400_gas
+        output_unit: dimensionless activity
+      point_conditions:
+        X_P2O5_as_printed:
+          state: {tag: value, value: {kind: point, point: '0.10'}}
+          locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.10'}
+      values:
+        X_P2O5_as_printed: 0.10
+        alpha_FetO_times_1e_minus_5_as_printed: -0.18
+        alpha_P2O5_times_1e_minus_5_as_printed: -0.43
+        log_gamma_FetO_as_printed: -0.0235
+        a_FetO_as_printed: 0.853
+        log_gamma_P2O5_as_printed: 1.062
+        a_P2O5_as_printed: 1.15
+        T_C: 1400
+        quantity: activity
+        component: FetO
+        method_class: model_derived
+        evidence_class: model_derived
+        activity: 0.853
+
+    - observation_id: banya77_t4_xp2o5_0_12
+      experiment: banya77-table4-1400c
+      type: activity_coefficient
+      locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.12'}
+      phase: liquid FetO-P2O5 slag
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase: {tag: value, value: l}
+              polymorph: {tag: not_applicable, reason: not_applicable}
+            component_basis: Fe_tO
+        inferred: false
+        note: >-
+          Table 4 prints FetO on the Raoult law standard; equations (2-1) and
+          (2-2) identify pure liquid FeO. The P2O5 columns use a separate Henry
+          standard and are retained as printed context.
+        locator: {published_page: 1816, table: '4'}
+      units: Table 4 as printed; alpha columns are multiplied by 10^-5
+      calculation_as_printed: Authors calculate a_FetO from measured PH2O/PH2 using equation (11).
+      calculation_locator: {published_page: 1815, section: '4.3', equation: '11'}
+      derived_from: *banya77_t3_1400_gas
+      derivation:
+        relation: a_FetO calculated from measured PH2O/PH2 using equation (11) at 1400 C.
+        inputs: *banya77_t3_1400_gas
+        output_unit: dimensionless activity
+      point_conditions:
+        X_P2O5_as_printed:
+          state: {tag: value, value: {kind: point, point: '0.12'}}
+          locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.12'}
+      values:
+        X_P2O5_as_printed: 0.12
+        alpha_FetO_times_1e_minus_5_as_printed: -0.19
+        alpha_P2O5_times_1e_minus_5_as_printed: -0.39
+        log_gamma_FetO_as_printed: -0.0357
+        a_FetO_as_printed: 0.811
+        log_gamma_P2O5_as_printed: 1.160
+        a_P2O5_as_printed: 1.74
+        T_C: 1400
+        quantity: activity
+        component: FetO
+        method_class: model_derived
+        evidence_class: model_derived
+        activity: 0.811
+
+    - observation_id: banya77_t4_xp2o5_0_14
+      experiment: banya77-table4-1400c
+      type: activity_coefficient
+      locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.14'}
+      phase: liquid FetO-P2O5 slag
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase: {tag: value, value: l}
+              polymorph: {tag: not_applicable, reason: not_applicable}
+            component_basis: Fe_tO
+        inferred: false
+        note: >-
+          Table 4 prints FetO on the Raoult law standard; equations (2-1) and
+          (2-2) identify pure liquid FeO. The P2O5 columns use a separate Henry
+          standard and are retained as printed context.
+        locator: {published_page: 1816, table: '4'}
+      units: Table 4 as printed; alpha columns are multiplied by 10^-5
+      calculation_as_printed: Authors calculate a_FetO from measured PH2O/PH2 using equation (11).
+      calculation_locator: {published_page: 1815, section: '4.3', equation: '11'}
+      derived_from: *banya77_t3_1400_gas
+      derivation:
+        relation: a_FetO calculated from measured PH2O/PH2 using equation (11) at 1400 C.
+        inputs: *banya77_t3_1400_gas
+        output_unit: dimensionless activity
+      point_conditions:
+        X_P2O5_as_printed:
+          state: {tag: value, value: {kind: point, point: '0.14'}}
+          locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.14'}
+      values:
+        X_P2O5_as_printed: 0.14
+        alpha_FetO_times_1e_minus_5_as_printed: -0.22
+        alpha_P2O5_times_1e_minus_5_as_printed: -0.38
+        log_gamma_FetO_as_printed: -0.0563
+        a_FetO_as_printed: 0.755
+        log_gamma_P2O5_as_printed: 1.297
+        a_P2O5_as_printed: 2.77
+        T_C: 1400
+        quantity: activity
+        component: FetO
+        method_class: model_derived
+        evidence_class: model_derived
+        activity: 0.755
+
+    - observation_id: banya77_t4_xp2o5_0_16
+      experiment: banya77-table4-1400c
+      type: activity_coefficient
+      locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.16'}
+      phase: liquid FetO-P2O5 slag
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase: {tag: value, value: l}
+              polymorph: {tag: not_applicable, reason: not_applicable}
+            component_basis: Fe_tO
+        inferred: false
+        note: >-
+          Table 4 prints FetO on the Raoult law standard; equations (2-1) and
+          (2-2) identify pure liquid FeO. The P2O5 columns use a separate Henry
+          standard and are retained as printed context.
+        locator: {published_page: 1816, table: '4'}
+      units: Table 4 as printed; alpha columns are multiplied by 10^-5
+      calculation_as_printed: Authors calculate a_FetO from measured PH2O/PH2 using equation (11).
+      calculation_locator: {published_page: 1815, section: '4.3', equation: '11'}
+      derived_from: *banya77_t3_1400_gas
+      derivation:
+        relation: a_FetO calculated from measured PH2O/PH2 using equation (11) at 1400 C.
+        inputs: *banya77_t3_1400_gas
+        output_unit: dimensionless activity
+      point_conditions:
+        X_P2O5_as_printed:
+          state: {tag: value, value: {kind: point, point: '0.16'}}
+          locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.16'}
+      values:
+        X_P2O5_as_printed: 0.16
+        alpha_FetO_times_1e_minus_5_as_printed: -0.26
+        alpha_P2O5_times_1e_minus_5_as_printed: -0.38
+        log_gamma_FetO_as_printed: -0.0870
+        a_FetO_as_printed: 0.688
+        log_gamma_P2O5_as_printed: 1.470
+        a_P2O5_as_printed: 4.73
+        T_C: 1400
+        quantity: activity
+        component: FetO
+        method_class: model_derived
+        evidence_class: model_derived
+        activity: 0.688
+
+    - observation_id: banya77_t4_xp2o5_0_18
+      experiment: banya77-table4-1400c
+      type: activity_coefficient
+      locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.18'}
+      phase: liquid FetO-P2O5 slag
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase: {tag: value, value: l}
+              polymorph: {tag: not_applicable, reason: not_applicable}
+            component_basis: Fe_tO
+        inferred: false
+        note: >-
+          Table 4 prints FetO on the Raoult law standard; equations (2-1) and
+          (2-2) identify pure liquid FeO. The P2O5 columns use a separate Henry
+          standard and are retained as printed context.
+        locator: {published_page: 1816, table: '4'}
+      units: Table 4 as printed; alpha columns are multiplied by 10^-5
+      calculation_as_printed: Authors calculate a_FetO from measured PH2O/PH2 using equation (11).
+      calculation_locator: {published_page: 1815, section: '4.3', equation: '11'}
+      derived_from: *banya77_t3_1400_gas
+      derivation:
+        relation: a_FetO calculated from measured PH2O/PH2 using equation (11) at 1400 C.
+        inputs: *banya77_t3_1400_gas
+        output_unit: dimensionless activity
+      point_conditions:
+        X_P2O5_as_printed:
+          state: {tag: value, value: {kind: point, point: '0.18'}}
+          locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.18'}
+      values:
+        X_P2O5_as_printed: 0.18
+        alpha_FetO_times_1e_minus_5_as_printed: -0.32
+        alpha_P2O5_times_1e_minus_5_as_printed: -0.40
+        log_gamma_FetO_as_printed: -0.136
+        a_FetO_as_printed: 0.600
+        log_gamma_P2O5_as_printed: 1.706
+        a_P2O5_as_printed: 9.15
+        T_C: 1400
+        quantity: activity
+        component: FetO
+        method_class: model_derived
+        evidence_class: model_derived
+        activity: 0.600
+
+    - observation_id: banya77_t4_xp2o5_0_20
+      experiment: banya77-table4-1400c
+      type: activity_coefficient
+      locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.20'}
+      phase: liquid FetO-P2O5 slag
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase: {tag: value, value: l}
+              polymorph: {tag: not_applicable, reason: not_applicable}
+            component_basis: Fe_tO
+        inferred: false
+        note: >-
+          Table 4 prints FetO on the Raoult law standard; equations (2-1) and
+          (2-2) identify pure liquid FeO. The P2O5 columns use a separate Henry
+          standard and are retained as printed context.
+        locator: {published_page: 1816, table: '4'}
+      units: Table 4 as printed; alpha columns are multiplied by 10^-5
+      calculation_as_printed: Authors calculate a_FetO from measured PH2O/PH2 using equation (11).
+      calculation_locator: {published_page: 1815, section: '4.3', equation: '11'}
+      derived_from: *banya77_t3_1400_gas
+      derivation:
+        relation: a_FetO calculated from measured PH2O/PH2 using equation (11) at 1400 C.
+        inputs: *banya77_t3_1400_gas
+        output_unit: dimensionless activity
+      point_conditions:
+        X_P2O5_as_printed:
+          state: {tag: value, value: {kind: point, point: '0.20'}}
+          locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.20'}
+      values:
+        X_P2O5_as_printed: 0.20
+        alpha_FetO_times_1e_minus_5_as_printed: -0.38
+        alpha_P2O5_times_1e_minus_5_as_printed: -0.42
+        log_gamma_FetO_as_printed: -0.199
+        a_FetO_as_printed: 0.506
+        log_gamma_P2O5_as_printed: 1.975
+        a_P2O5_as_printed: 18.9
+        T_C: 1400
+        quantity: activity
+        component: FetO
+        method_class: model_derived
+        evidence_class: model_derived
+        activity: 0.506
+
   FeO:
     observations:
     - observation_id: banya77_t3_run_1_8
@@ -145,7 +723,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 1.8'}
-      values: {method_class: measured_direct, run_no_as_printed: '1.8', PH2O_over_PH2_as_printed: 0.818, FeO_wt_percent_as_printed: 85.27, Fe2O3_wt_percent_as_printed: 12.70, P2O5_wt_percent_as_printed: 2.03}
+      values: {method_class: measured_direct, run_no_as_printed: '1.8', PH2O_over_PH2_as_printed: 0.818, FeO_wt_percent_as_printed: 85.27, Fe2O3_wt_percent_as_printed: 12.70, P2O5_wt_percent_as_printed: 2.03, T_C: 1450, composition_wt_pct: {FeO: 85.27, Fe2O3: 12.70, P2O5: 2.03}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_1_10
       experiment: banya77-table3-1450c
       type: composition_series
@@ -165,7 +743,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 1.10'}
-      values: {method_class: measured_direct, run_no_as_printed: '1.10', PH2O_over_PH2_as_printed: 0.808, FeO_wt_percent_as_printed: 85.88, Fe2O3_wt_percent_as_printed: 10.75, P2O5_wt_percent_as_printed: 3.29}
+      values: {method_class: measured_direct, run_no_as_printed: '1.10', PH2O_over_PH2_as_printed: 0.808, FeO_wt_percent_as_printed: 85.88, Fe2O3_wt_percent_as_printed: 10.75, P2O5_wt_percent_as_printed: 3.29, T_C: 1450, composition_wt_pct: {FeO: 85.88, Fe2O3: 10.75, P2O5: 3.29}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_1_1
       experiment: banya77-table3-1450c
       type: composition_series
@@ -185,7 +763,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 1.1'}
-      values: {method_class: measured_direct, run_no_as_printed: '1.1', PH2O_over_PH2_as_printed: 0.795, FeO_wt_percent_as_printed: 87.58, Fe2O3_wt_percent_as_printed: 9.32, P2O5_wt_percent_as_printed: 2.85}
+      values: {method_class: measured_direct, run_no_as_printed: '1.1', PH2O_over_PH2_as_printed: 0.795, FeO_wt_percent_as_printed: 87.58, Fe2O3_wt_percent_as_printed: 9.32, P2O5_wt_percent_as_printed: 2.85, T_C: 1450, composition_wt_pct: {FeO: 87.58, Fe2O3: 9.32, P2O5: 2.85}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_1_2
       experiment: banya77-table3-1450c
       type: composition_series
@@ -205,7 +783,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 1.2'}
-      values: {method_class: measured_direct, run_no_as_printed: '1.2', PH2O_over_PH2_as_printed: 0.791, FeO_wt_percent_as_printed: 85.38, Fe2O3_wt_percent_as_printed: 11.05, P2O5_wt_percent_as_printed: 3.21}
+      values: {method_class: measured_direct, run_no_as_printed: '1.2', PH2O_over_PH2_as_printed: 0.791, FeO_wt_percent_as_printed: 85.38, Fe2O3_wt_percent_as_printed: 11.05, P2O5_wt_percent_as_printed: 3.21, T_C: 1450, composition_wt_pct: {FeO: 85.38, Fe2O3: 11.05, P2O5: 3.21}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_1_4
       experiment: banya77-table3-1450c
       type: composition_series
@@ -225,7 +803,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 1.4'}
-      values: {method_class: measured_direct, run_no_as_printed: '1.4', PH2O_over_PH2_as_printed: 0.783, FeO_wt_percent_as_printed: 84.24, Fe2O3_wt_percent_as_printed: 10.24, P2O5_wt_percent_as_printed: 5.21}
+      values: {method_class: measured_direct, run_no_as_printed: '1.4', PH2O_over_PH2_as_printed: 0.783, FeO_wt_percent_as_printed: 84.24, Fe2O3_wt_percent_as_printed: 10.24, P2O5_wt_percent_as_printed: 5.21, T_C: 1450, composition_wt_pct: {FeO: 84.24, Fe2O3: 10.24, P2O5: 5.21}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_1_7
       experiment: banya77-table3-1450c
       type: composition_series
@@ -245,7 +823,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 1.7'}
-      values: {method_class: measured_direct, run_no_as_printed: '1.7', PH2O_over_PH2_as_printed: 0.779, FeO_wt_percent_as_printed: 83.93, Fe2O3_wt_percent_as_printed: 10.24, P2O5_wt_percent_as_printed: 4.62}
+      values: {method_class: measured_direct, run_no_as_printed: '1.7', PH2O_over_PH2_as_printed: 0.779, FeO_wt_percent_as_printed: 83.93, Fe2O3_wt_percent_as_printed: 10.24, P2O5_wt_percent_as_printed: 4.62, T_C: 1450, composition_wt_pct: {FeO: 83.93, Fe2O3: 10.24, P2O5: 4.62}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_2_7
       experiment: banya77-table3-1425c
       type: composition_series
@@ -265,7 +843,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 2.7'}
-      values: {method_class: measured_direct, run_no_as_printed: '2.7', PH2O_over_PH2_as_printed: 0.823, FeO_wt_percent_as_printed: 85.47, Fe2O3_wt_percent_as_printed: 11.04, P2O5_wt_percent_as_printed: 3.36}
+      values: {method_class: measured_direct, run_no_as_printed: '2.7', PH2O_over_PH2_as_printed: 0.823, FeO_wt_percent_as_printed: 85.47, Fe2O3_wt_percent_as_printed: 11.04, P2O5_wt_percent_as_printed: 3.36, T_C: 1425, composition_wt_pct: {FeO: 85.47, Fe2O3: 11.04, P2O5: 3.36}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_2_1
       experiment: banya77-table3-1425c
       type: composition_series
@@ -285,7 +863,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 2.1'}
-      values: {method_class: measured_direct, run_no_as_printed: '2.1', PH2O_over_PH2_as_printed: 0.819, FeO_wt_percent_as_printed: 85.94, Fe2O3_wt_percent_as_printed: 10.16, P2O5_wt_percent_as_printed: 3.81}
+      values: {method_class: measured_direct, run_no_as_printed: '2.1', PH2O_over_PH2_as_printed: 0.819, FeO_wt_percent_as_printed: 85.94, Fe2O3_wt_percent_as_printed: 10.16, P2O5_wt_percent_as_printed: 3.81, T_C: 1425, composition_wt_pct: {FeO: 85.94, Fe2O3: 10.16, P2O5: 3.81}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_2_2
       experiment: banya77-table3-1425c
       type: composition_series
@@ -305,7 +883,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 2.2'}
-      values: {method_class: measured_direct, run_no_as_printed: '2.2', PH2O_over_PH2_as_printed: 0.793, FeO_wt_percent_as_printed: 83.00, Fe2O3_wt_percent_as_printed: 9.64, P2O5_wt_percent_as_printed: 7.35}
+      values: {method_class: measured_direct, run_no_as_printed: '2.2', PH2O_over_PH2_as_printed: 0.793, FeO_wt_percent_as_printed: 83.00, Fe2O3_wt_percent_as_printed: 9.64, P2O5_wt_percent_as_printed: 7.35, T_C: 1425, composition_wt_pct: {FeO: 83.00, Fe2O3: 9.64, P2O5: 7.35}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_2_3
       experiment: banya77-table3-1425c
       type: composition_series
@@ -325,7 +903,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 2.3'}
-      values: {method_class: measured_direct, run_no_as_printed: '2.3', PH2O_over_PH2_as_printed: 0.786, FeO_wt_percent_as_printed: 81.39, Fe2O3_wt_percent_as_printed: 7.90, P2O5_wt_percent_as_printed: 10.59}
+      values: {method_class: measured_direct, run_no_as_printed: '2.3', PH2O_over_PH2_as_printed: 0.786, FeO_wt_percent_as_printed: 81.39, Fe2O3_wt_percent_as_printed: 7.90, P2O5_wt_percent_as_printed: 10.59, T_C: 1425, composition_wt_pct: {FeO: 81.39, Fe2O3: 7.90, P2O5: 10.59}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_2_4
       experiment: banya77-table3-1425c
       type: composition_series
@@ -345,7 +923,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 2.4'}
-      values: {method_class: measured_direct, run_no_as_printed: '2.4', PH2O_over_PH2_as_printed: 0.767, FeO_wt_percent_as_printed: 81.90, Fe2O3_wt_percent_as_printed: 8.13, P2O5_wt_percent_as_printed: 10.10}
+      values: {method_class: measured_direct, run_no_as_printed: '2.4', PH2O_over_PH2_as_printed: 0.767, FeO_wt_percent_as_printed: 81.90, Fe2O3_wt_percent_as_printed: 8.13, P2O5_wt_percent_as_printed: 10.10, T_C: 1425, composition_wt_pct: {FeO: 81.90, Fe2O3: 8.13, P2O5: 10.10}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_2_5
       experiment: banya77-table3-1425c
       type: composition_series
@@ -365,7 +943,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 2.5'}
-      values: {method_class: measured_direct, run_no_as_printed: '2.5', PH2O_over_PH2_as_printed: 0.736, FeO_wt_percent_as_printed: 77.03, Fe2O3_wt_percent_as_printed: 6.86, P2O5_wt_percent_as_printed: 15.89}
+      values: {method_class: measured_direct, run_no_as_printed: '2.5', PH2O_over_PH2_as_printed: 0.736, FeO_wt_percent_as_printed: 77.03, Fe2O3_wt_percent_as_printed: 6.86, P2O5_wt_percent_as_printed: 15.89, T_C: 1425, composition_wt_pct: {FeO: 77.03, Fe2O3: 6.86, P2O5: 15.89}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_2_6
       experiment: banya77-table3-1425c
       type: composition_series
@@ -385,7 +963,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 2.6'}
-      values: {method_class: measured_direct, run_no_as_printed: '2.6', PH2O_over_PH2_as_printed: 0.725, FeO_wt_percent_as_printed: 77.30, Fe2O3_wt_percent_as_printed: 6.60, P2O5_wt_percent_as_printed: 16.10}
+      values: {method_class: measured_direct, run_no_as_printed: '2.6', PH2O_over_PH2_as_printed: 0.725, FeO_wt_percent_as_printed: 77.30, Fe2O3_wt_percent_as_printed: 6.60, P2O5_wt_percent_as_printed: 16.10, T_C: 1425, composition_wt_pct: {FeO: 77.30, Fe2O3: 6.60, P2O5: 16.10}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_3_1
       experiment: banya77-table3-1400c
       type: composition_series
@@ -405,7 +983,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 3.1'}
-      values: {method_class: measured_direct, run_no_as_printed: '3.1', PH2O_over_PH2_as_printed: 0.864, FeO_wt_percent_as_printed: 86.50, Fe2O3_wt_percent_as_printed: 10.80, P2O5_wt_percent_as_printed: 2.60}
+      values: {method_class: measured_direct, run_no_as_printed: '3.1', PH2O_over_PH2_as_printed: 0.864, FeO_wt_percent_as_printed: 86.50, Fe2O3_wt_percent_as_printed: 10.80, P2O5_wt_percent_as_printed: 2.60, T_C: 1400, composition_wt_pct: {FeO: 86.50, Fe2O3: 10.80, P2O5: 2.60}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_3_2
       experiment: banya77-table3-1400c
       type: composition_series
@@ -425,7 +1003,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 3.2'}
-      values: {method_class: measured_direct, run_no_as_printed: '3.2', PH2O_over_PH2_as_printed: 0.856, FeO_wt_percent_as_printed: 86.30, Fe2O3_wt_percent_as_printed: 10.84, P2O5_wt_percent_as_printed: 2.91}
+      values: {method_class: measured_direct, run_no_as_printed: '3.2', PH2O_over_PH2_as_printed: 0.856, FeO_wt_percent_as_printed: 86.30, Fe2O3_wt_percent_as_printed: 10.84, P2O5_wt_percent_as_printed: 2.91, T_C: 1400, composition_wt_pct: {FeO: 86.30, Fe2O3: 10.84, P2O5: 2.91}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_3_3
       experiment: banya77-table3-1400c
       type: composition_series
@@ -445,7 +1023,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 3.3'}
-      values: {method_class: measured_direct, run_no_as_printed: '3.3', PH2O_over_PH2_as_printed: 0.854, FeO_wt_percent_as_printed: 86.04, Fe2O3_wt_percent_as_printed: 10.91, P2O5_wt_percent_as_printed: 2.97}
+      values: {method_class: measured_direct, run_no_as_printed: '3.3', PH2O_over_PH2_as_printed: 0.854, FeO_wt_percent_as_printed: 86.04, Fe2O3_wt_percent_as_printed: 10.91, P2O5_wt_percent_as_printed: 2.97, T_C: 1400, composition_wt_pct: {FeO: 86.04, Fe2O3: 10.91, P2O5: 2.97}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_3_4
       experiment: banya77-table3-1400c
       type: composition_series
@@ -465,7 +1043,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 3.4'}
-      values: {method_class: measured_direct, run_no_as_printed: '3.4', PH2O_over_PH2_as_printed: 0.852, FeO_wt_percent_as_printed: 85.22, Fe2O3_wt_percent_as_printed: 10.48, P2O5_wt_percent_as_printed: 4.40}
+      values: {method_class: measured_direct, run_no_as_printed: '3.4', PH2O_over_PH2_as_printed: 0.852, FeO_wt_percent_as_printed: 85.22, Fe2O3_wt_percent_as_printed: 10.48, P2O5_wt_percent_as_printed: 4.40, T_C: 1400, composition_wt_pct: {FeO: 85.22, Fe2O3: 10.48, P2O5: 4.40}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_3_5
       experiment: banya77-table3-1400c
       type: composition_series
@@ -485,7 +1063,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 3.5'}
-      values: {method_class: measured_direct, run_no_as_printed: '3.5', PH2O_over_PH2_as_printed: 0.846, FeO_wt_percent_as_printed: 85.51, Fe2O3_wt_percent_as_printed: 10.53, P2O5_wt_percent_as_printed: 4.27}
+      values: {method_class: measured_direct, run_no_as_printed: '3.5', PH2O_over_PH2_as_printed: 0.846, FeO_wt_percent_as_printed: 85.51, Fe2O3_wt_percent_as_printed: 10.53, P2O5_wt_percent_as_printed: 4.27, T_C: 1400, composition_wt_pct: {FeO: 85.51, Fe2O3: 10.53, P2O5: 4.27}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_3_6
       experiment: banya77-table3-1400c
       type: composition_series
@@ -505,7 +1083,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 3.6'}
-      values: {method_class: measured_direct, run_no_as_printed: '3.6', PH2O_over_PH2_as_printed: 0.828, FeO_wt_percent_as_printed: 84.87, Fe2O3_wt_percent_as_printed: 10.24, P2O5_wt_percent_as_printed: 4.83}
+      values: {method_class: measured_direct, run_no_as_printed: '3.6', PH2O_over_PH2_as_printed: 0.828, FeO_wt_percent_as_printed: 84.87, Fe2O3_wt_percent_as_printed: 10.24, P2O5_wt_percent_as_printed: 4.83, T_C: 1400, composition_wt_pct: {FeO: 84.87, Fe2O3: 10.24, P2O5: 4.83}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_3_7
       experiment: banya77-table3-1400c
       type: composition_series
@@ -525,7 +1103,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 3.7'}
-      values: {method_class: measured_direct, run_no_as_printed: '3.7', PH2O_over_PH2_as_printed: 0.819, FeO_wt_percent_as_printed: 82.01, Fe2O3_wt_percent_as_printed: 9.11, P2O5_wt_percent_as_printed: 8.94}
+      values: {method_class: measured_direct, run_no_as_printed: '3.7', PH2O_over_PH2_as_printed: 0.819, FeO_wt_percent_as_printed: 82.01, Fe2O3_wt_percent_as_printed: 9.11, P2O5_wt_percent_as_printed: 8.94, T_C: 1400, composition_wt_pct: {FeO: 82.01, Fe2O3: 9.11, P2O5: 8.94}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_3_10
       experiment: banya77-table3-1400c
       type: composition_series
@@ -545,7 +1123,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 3.10'}
-      values: {method_class: measured_direct, run_no_as_printed: '3.10', PH2O_over_PH2_as_printed: 0.819, FeO_wt_percent_as_printed: 81.67, Fe2O3_wt_percent_as_printed: 9.06, P2O5_wt_percent_as_printed: 9.36}
+      values: {method_class: measured_direct, run_no_as_printed: '3.10', PH2O_over_PH2_as_printed: 0.819, FeO_wt_percent_as_printed: 81.67, Fe2O3_wt_percent_as_printed: 9.06, P2O5_wt_percent_as_printed: 9.36, T_C: 1400, composition_wt_pct: {FeO: 81.67, Fe2O3: 9.06, P2O5: 9.36}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_3_9
       experiment: banya77-table3-1400c
       type: composition_series
@@ -565,7 +1143,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 3.9'}
-      values: {method_class: measured_direct, run_no_as_printed: '3.9', PH2O_over_PH2_as_printed: 0.813, FeO_wt_percent_as_printed: 82.47, Fe2O3_wt_percent_as_printed: 9.32, P2O5_wt_percent_as_printed: 8.20}
+      values: {method_class: measured_direct, run_no_as_printed: '3.9', PH2O_over_PH2_as_printed: 0.813, FeO_wt_percent_as_printed: 82.47, Fe2O3_wt_percent_as_printed: 9.32, P2O5_wt_percent_as_printed: 8.20, T_C: 1400, composition_wt_pct: {FeO: 82.47, Fe2O3: 9.32, P2O5: 8.20}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_3_8
       experiment: banya77-table3-1400c
       type: composition_series
@@ -585,7 +1163,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 3.8'}
-      values: {method_class: measured_direct, run_no_as_printed: '3.8', PH2O_over_PH2_as_printed: 0.812, FeO_wt_percent_as_printed: 83.77, Fe2O3_wt_percent_as_printed: 9.97, P2O5_wt_percent_as_printed: 6.67}
+      values: {method_class: measured_direct, run_no_as_printed: '3.8', PH2O_over_PH2_as_printed: 0.812, FeO_wt_percent_as_printed: 83.77, Fe2O3_wt_percent_as_printed: 9.97, P2O5_wt_percent_as_printed: 6.67, T_C: 1400, composition_wt_pct: {FeO: 83.77, Fe2O3: 9.97, P2O5: 6.67}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_3_11
       experiment: banya77-table3-1400c
       type: composition_series
@@ -605,7 +1183,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 3.11'}
-      values: {method_class: measured_direct, run_no_as_printed: '3.11', PH2O_over_PH2_as_printed: 0.794, FeO_wt_percent_as_printed: 80.67, Fe2O3_wt_percent_as_printed: 8.47, P2O5_wt_percent_as_printed: 10.44}
+      values: {method_class: measured_direct, run_no_as_printed: '3.11', PH2O_over_PH2_as_printed: 0.794, FeO_wt_percent_as_printed: 80.67, Fe2O3_wt_percent_as_printed: 8.47, P2O5_wt_percent_as_printed: 10.44, T_C: 1400, composition_wt_pct: {FeO: 80.67, Fe2O3: 8.47, P2O5: 10.44}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_3_28
       experiment: banya77-table3-1400c
       type: composition_series
@@ -625,7 +1203,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 3.28'}
-      values: {method_class: measured_direct, run_no_as_printed: '3.28', PH2O_over_PH2_as_printed: 0.788, FeO_wt_percent_as_printed: 79.77, Fe2O3_wt_percent_as_printed: 7.78, P2O5_wt_percent_as_printed: 12.48}
+      values: {method_class: measured_direct, run_no_as_printed: '3.28', PH2O_over_PH2_as_printed: 0.788, FeO_wt_percent_as_printed: 79.77, Fe2O3_wt_percent_as_printed: 7.78, P2O5_wt_percent_as_printed: 12.48, T_C: 1400, composition_wt_pct: {FeO: 79.77, Fe2O3: 7.78, P2O5: 12.48}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_3_14
       experiment: banya77-table3-1400c
       type: composition_series
@@ -645,7 +1223,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 3.14'}
-      values: {method_class: measured_direct, run_no_as_printed: '3.14', PH2O_over_PH2_as_printed: 0.785, FeO_wt_percent_as_printed: 79.89, Fe2O3_wt_percent_as_printed: 7.90, P2O5_wt_percent_as_printed: 12.20}
+      values: {method_class: measured_direct, run_no_as_printed: '3.14', PH2O_over_PH2_as_printed: 0.785, FeO_wt_percent_as_printed: 79.89, Fe2O3_wt_percent_as_printed: 7.90, P2O5_wt_percent_as_printed: 12.20, T_C: 1400, composition_wt_pct: {FeO: 79.89, Fe2O3: 7.90, P2O5: 12.20}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_3_13
       experiment: banya77-table3-1400c
       type: composition_series
@@ -665,7 +1243,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 3.13'}
-      values: {method_class: measured_direct, run_no_as_printed: '3.13', PH2O_over_PH2_as_printed: 0.781, FeO_wt_percent_as_printed: 80.31, Fe2O3_wt_percent_as_printed: 8.01, P2O5_wt_percent_as_printed: 11.98}
+      values: {method_class: measured_direct, run_no_as_printed: '3.13', PH2O_over_PH2_as_printed: 0.781, FeO_wt_percent_as_printed: 80.31, Fe2O3_wt_percent_as_printed: 8.01, P2O5_wt_percent_as_printed: 11.98, T_C: 1400, composition_wt_pct: {FeO: 80.31, Fe2O3: 8.01, P2O5: 11.98}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_3_12
       experiment: banya77-table3-1400c
       type: composition_series
@@ -685,7 +1263,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 3.12'}
-      values: {method_class: measured_direct, run_no_as_printed: '3.12', PH2O_over_PH2_as_printed: 0.779, FeO_wt_percent_as_printed: 80.54, Fe2O3_wt_percent_as_printed: 7.95, P2O5_wt_percent_as_printed: 11.56}
+      values: {method_class: measured_direct, run_no_as_printed: '3.12', PH2O_over_PH2_as_printed: 0.779, FeO_wt_percent_as_printed: 80.54, Fe2O3_wt_percent_as_printed: 7.95, P2O5_wt_percent_as_printed: 11.56, T_C: 1400, composition_wt_pct: {FeO: 80.54, Fe2O3: 7.95, P2O5: 11.56}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_3_17
       experiment: banya77-table3-1400c
       type: composition_series
@@ -705,7 +1283,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 3.17'}
-      values: {method_class: measured_direct, run_no_as_printed: '3.17', PH2O_over_PH2_as_printed: 0.770, FeO_wt_percent_as_printed: 78.07, Fe2O3_wt_percent_as_printed: 7.04, P2O5_wt_percent_as_printed: 14.85}
+      values: {method_class: measured_direct, run_no_as_printed: '3.17', PH2O_over_PH2_as_printed: 0.770, FeO_wt_percent_as_printed: 78.07, Fe2O3_wt_percent_as_printed: 7.04, P2O5_wt_percent_as_printed: 14.85, T_C: 1400, composition_wt_pct: {FeO: 78.07, Fe2O3: 7.04, P2O5: 14.85}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_3_15
       experiment: banya77-table3-1400c
       type: composition_series
@@ -725,7 +1303,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 3.15'}
-      values: {method_class: measured_direct, run_no_as_printed: '3.15', PH2O_over_PH2_as_printed: 0.768, FeO_wt_percent_as_printed: 78.35, Fe2O3_wt_percent_as_printed: 7.22, P2O5_wt_percent_as_printed: 14.37}
+      values: {method_class: measured_direct, run_no_as_printed: '3.15', PH2O_over_PH2_as_printed: 0.768, FeO_wt_percent_as_printed: 78.35, Fe2O3_wt_percent_as_printed: 7.22, P2O5_wt_percent_as_printed: 14.37, T_C: 1400, composition_wt_pct: {FeO: 78.35, Fe2O3: 7.22, P2O5: 14.37}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_3_29
       experiment: banya77-table3-1400c
       type: composition_series
@@ -745,7 +1323,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 3.29'}
-      values: {method_class: measured_direct, run_no_as_printed: '3.29', PH2O_over_PH2_as_printed: 0.754, FeO_wt_percent_as_printed: 77.32, Fe2O3_wt_percent_as_printed: 6.46, P2O5_wt_percent_as_printed: 16.24}
+      values: {method_class: measured_direct, run_no_as_printed: '3.29', PH2O_over_PH2_as_printed: 0.754, FeO_wt_percent_as_printed: 77.32, Fe2O3_wt_percent_as_printed: 6.46, P2O5_wt_percent_as_printed: 16.24, T_C: 1400, composition_wt_pct: {FeO: 77.32, Fe2O3: 6.46, P2O5: 16.24}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_3_30
       experiment: banya77-table3-1400c
       type: composition_series
@@ -765,7 +1343,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 3.30'}
-      values: {method_class: measured_direct, run_no_as_printed: '3.30', PH2O_over_PH2_as_printed: 0.753, FeO_wt_percent_as_printed: 77.54, Fe2O3_wt_percent_as_printed: 6.65, P2O5_wt_percent_as_printed: 16.12}
+      values: {method_class: measured_direct, run_no_as_printed: '3.30', PH2O_over_PH2_as_printed: 0.753, FeO_wt_percent_as_printed: 77.54, Fe2O3_wt_percent_as_printed: 6.65, P2O5_wt_percent_as_printed: 16.12, T_C: 1400, composition_wt_pct: {FeO: 77.54, Fe2O3: 6.65, P2O5: 16.12}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_3_16
       experiment: banya77-table3-1400c
       type: composition_series
@@ -785,7 +1363,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 3.16'}
-      values: {method_class: measured_direct, run_no_as_printed: '3.16', PH2O_over_PH2_as_printed: 0.750, FeO_wt_percent_as_printed: 75.32, Fe2O3_wt_percent_as_printed: 6.20, P2O5_wt_percent_as_printed: 18.53}
+      values: {method_class: measured_direct, run_no_as_printed: '3.16', PH2O_over_PH2_as_printed: 0.750, FeO_wt_percent_as_printed: 75.32, Fe2O3_wt_percent_as_printed: 6.20, P2O5_wt_percent_as_printed: 18.53, T_C: 1400, composition_wt_pct: {FeO: 75.32, Fe2O3: 6.20, P2O5: 18.53}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_3_19
       experiment: banya77-table3-1400c
       type: composition_series
@@ -805,7 +1383,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 3.19'}
-      values: {method_class: measured_direct, run_no_as_printed: '3.19', PH2O_over_PH2_as_printed: 0.734, FeO_wt_percent_as_printed: 73.82, Fe2O3_wt_percent_as_printed: 5.07, P2O5_wt_percent_as_printed: 20.89}
+      values: {method_class: measured_direct, run_no_as_printed: '3.19', PH2O_over_PH2_as_printed: 0.734, FeO_wt_percent_as_printed: 73.82, Fe2O3_wt_percent_as_printed: 5.07, P2O5_wt_percent_as_printed: 20.89, T_C: 1400, composition_wt_pct: {FeO: 73.82, Fe2O3: 5.07, P2O5: 20.89}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_3_21
       experiment: banya77-table3-1400c
       type: composition_series
@@ -825,7 +1403,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 3.21'}
-      values: {method_class: measured_direct, run_no_as_printed: '3.21', PH2O_over_PH2_as_printed: 0.732, FeO_wt_percent_as_printed: 74.78, Fe2O3_wt_percent_as_printed: 6.51, P2O5_wt_percent_as_printed: 18.54}
+      values: {method_class: measured_direct, run_no_as_printed: '3.21', PH2O_over_PH2_as_printed: 0.732, FeO_wt_percent_as_printed: 74.78, Fe2O3_wt_percent_as_printed: 6.51, P2O5_wt_percent_as_printed: 18.54, T_C: 1400, composition_wt_pct: {FeO: 74.78, Fe2O3: 6.51, P2O5: 18.54}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_3_23
       experiment: banya77-table3-1400c
       type: composition_series
@@ -845,7 +1423,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 3.23'}
-      values: {method_class: measured_direct, run_no_as_printed: '3.23', PH2O_over_PH2_as_printed: 0.727, FeO_wt_percent_as_printed: 74.09, Fe2O3_wt_percent_as_printed: 5.19, P2O5_wt_percent_as_printed: 20.88}
+      values: {method_class: measured_direct, run_no_as_printed: '3.23', PH2O_over_PH2_as_printed: 0.727, FeO_wt_percent_as_printed: 74.09, Fe2O3_wt_percent_as_printed: 5.19, P2O5_wt_percent_as_printed: 20.88, T_C: 1400, composition_wt_pct: {FeO: 74.09, Fe2O3: 5.19, P2O5: 20.88}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_3_20
       experiment: banya77-table3-1400c
       type: composition_series
@@ -865,7 +1443,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 3.20'}
-      values: {method_class: measured_direct, run_no_as_printed: '3.20', PH2O_over_PH2_as_printed: 0.711, FeO_wt_percent_as_printed: 74.35, Fe2O3_wt_percent_as_printed: 5.26, P2O5_wt_percent_as_printed: 20.17}
+      values: {method_class: measured_direct, run_no_as_printed: '3.20', PH2O_over_PH2_as_printed: 0.711, FeO_wt_percent_as_printed: 74.35, Fe2O3_wt_percent_as_printed: 5.26, P2O5_wt_percent_as_printed: 20.17, T_C: 1400, composition_wt_pct: {FeO: 74.35, Fe2O3: 5.26, P2O5: 20.17}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_3_24
       experiment: banya77-table3-1400c
       type: composition_series
@@ -885,7 +1463,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 3.24'}
-      values: {method_class: measured_direct, run_no_as_printed: '3.24', PH2O_over_PH2_as_printed: 0.710, FeO_wt_percent_as_printed: 73.15, Fe2O3_wt_percent_as_printed: 5.20, P2O5_wt_percent_as_printed: 21.07}
+      values: {method_class: measured_direct, run_no_as_printed: '3.24', PH2O_over_PH2_as_printed: 0.710, FeO_wt_percent_as_printed: 73.15, Fe2O3_wt_percent_as_printed: 5.20, P2O5_wt_percent_as_printed: 21.07, T_C: 1400, composition_wt_pct: {FeO: 73.15, Fe2O3: 5.20, P2O5: 21.07}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_3_22
       experiment: banya77-table3-1400c
       type: composition_series
@@ -905,7 +1483,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 3.22'}
-      values: {method_class: measured_direct, run_no_as_printed: '3.22', PH2O_over_PH2_as_printed: 0.707, FeO_wt_percent_as_printed: 72.39, Fe2O3_wt_percent_as_printed: 5.22, P2O5_wt_percent_as_printed: 22.50}
+      values: {method_class: measured_direct, run_no_as_printed: '3.22', PH2O_over_PH2_as_printed: 0.707, FeO_wt_percent_as_printed: 72.39, Fe2O3_wt_percent_as_printed: 5.22, P2O5_wt_percent_as_printed: 22.50, T_C: 1400, composition_wt_pct: {FeO: 72.39, Fe2O3: 5.22, P2O5: 22.50}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_3_27
       experiment: banya77-table3-1400c
       type: composition_series
@@ -925,7 +1503,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 3.27'}
-      values: {method_class: measured_direct, run_no_as_printed: '3.27', PH2O_over_PH2_as_printed: 0.699, FeO_wt_percent_as_printed: 72.12, Fe2O3_wt_percent_as_printed: 4.89, P2O5_wt_percent_as_printed: 23.17}
+      values: {method_class: measured_direct, run_no_as_printed: '3.27', PH2O_over_PH2_as_printed: 0.699, FeO_wt_percent_as_printed: 72.12, Fe2O3_wt_percent_as_printed: 4.89, P2O5_wt_percent_as_printed: 23.17, T_C: 1400, composition_wt_pct: {FeO: 72.12, Fe2O3: 4.89, P2O5: 23.17}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_3_25
       experiment: banya77-table3-1400c
       type: composition_series
@@ -945,7 +1523,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 3.25'}
-      values: {method_class: measured_direct, run_no_as_printed: '3.25', PH2O_over_PH2_as_printed: 0.697, FeO_wt_percent_as_printed: 73.13, Fe2O3_wt_percent_as_printed: 4.66, P2O5_wt_percent_as_printed: 21.77}
+      values: {method_class: measured_direct, run_no_as_printed: '3.25', PH2O_over_PH2_as_printed: 0.697, FeO_wt_percent_as_printed: 73.13, Fe2O3_wt_percent_as_printed: 4.66, P2O5_wt_percent_as_printed: 21.77, T_C: 1400, composition_wt_pct: {FeO: 73.13, Fe2O3: 4.66, P2O5: 21.77}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_3_26
       experiment: banya77-table3-1400c
       type: composition_series
@@ -965,7 +1543,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 3.26'}
-      values: {method_class: measured_direct, run_no_as_printed: '3.26', PH2O_over_PH2_as_printed: 0.697, FeO_wt_percent_as_printed: 72.64, Fe2O3_wt_percent_as_printed: 4.77, P2O5_wt_percent_as_printed: 22.74}
+      values: {method_class: measured_direct, run_no_as_printed: '3.26', PH2O_over_PH2_as_printed: 0.697, FeO_wt_percent_as_printed: 72.64, Fe2O3_wt_percent_as_printed: 4.77, P2O5_wt_percent_as_printed: 22.74, T_C: 1400, composition_wt_pct: {FeO: 72.64, Fe2O3: 4.77, P2O5: 22.74}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_4_1
       experiment: banya77-table3-1350c
       type: composition_series
@@ -985,7 +1563,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 4.1'}
-      values: {method_class: measured_direct, run_no_as_printed: '4.1', PH2O_over_PH2_as_printed: 0.900, FeO_wt_percent_as_printed: 85.20, Fe2O3_wt_percent_as_printed: 10.34, P2O5_wt_percent_as_printed: 4.65}
+      values: {method_class: measured_direct, run_no_as_printed: '4.1', PH2O_over_PH2_as_printed: 0.900, FeO_wt_percent_as_printed: 85.20, Fe2O3_wt_percent_as_printed: 10.34, P2O5_wt_percent_as_printed: 4.65, T_C: 1350, composition_wt_pct: {FeO: 85.20, Fe2O3: 10.34, P2O5: 4.65}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_4_2
       experiment: banya77-table3-1350c
       type: composition_series
@@ -1005,7 +1583,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 4.2'}
-      values: {method_class: measured_direct, run_no_as_printed: '4.2', PH2O_over_PH2_as_printed: 0.889, FeO_wt_percent_as_printed: 83.71, Fe2O3_wt_percent_as_printed: 9.73, P2O5_wt_percent_as_printed: 6.58}
+      values: {method_class: measured_direct, run_no_as_printed: '4.2', PH2O_over_PH2_as_printed: 0.889, FeO_wt_percent_as_printed: 83.71, Fe2O3_wt_percent_as_printed: 9.73, P2O5_wt_percent_as_printed: 6.58, T_C: 1350, composition_wt_pct: {FeO: 83.71, Fe2O3: 9.73, P2O5: 6.58}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_4_3
       experiment: banya77-table3-1350c
       type: composition_series
@@ -1025,7 +1603,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 4.3'}
-      values: {method_class: measured_direct, run_no_as_printed: '4.3', PH2O_over_PH2_as_printed: 0.864, FeO_wt_percent_as_printed: 82.76, Fe2O3_wt_percent_as_printed: 8.87, P2O5_wt_percent_as_printed: 8.65}
+      values: {method_class: measured_direct, run_no_as_printed: '4.3', PH2O_over_PH2_as_printed: 0.864, FeO_wt_percent_as_printed: 82.76, Fe2O3_wt_percent_as_printed: 8.87, P2O5_wt_percent_as_printed: 8.65, T_C: 1350, composition_wt_pct: {FeO: 82.76, Fe2O3: 8.87, P2O5: 8.65}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_4_5
       experiment: banya77-table3-1350c
       type: composition_series
@@ -1045,7 +1623,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 4.5'}
-      values: {method_class: measured_direct, run_no_as_printed: '4.5', PH2O_over_PH2_as_printed: 0.834, FeO_wt_percent_as_printed: 78.68, Fe2O3_wt_percent_as_printed: 7.66, P2O5_wt_percent_as_printed: 13.72}
+      values: {method_class: measured_direct, run_no_as_printed: '4.5', PH2O_over_PH2_as_printed: 0.834, FeO_wt_percent_as_printed: 78.68, Fe2O3_wt_percent_as_printed: 7.66, P2O5_wt_percent_as_printed: 13.72, T_C: 1350, composition_wt_pct: {FeO: 78.68, Fe2O3: 7.66, P2O5: 13.72}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_4_6
       experiment: banya77-table3-1350c
       type: composition_series
@@ -1065,7 +1643,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 4.6'}
-      values: {method_class: measured_direct, run_no_as_printed: '4.6', PH2O_over_PH2_as_printed: 0.829, FeO_wt_percent_as_printed: 78.96, Fe2O3_wt_percent_as_printed: 7.48, P2O5_wt_percent_as_printed: 13.93}
+      values: {method_class: measured_direct, run_no_as_printed: '4.6', PH2O_over_PH2_as_printed: 0.829, FeO_wt_percent_as_printed: 78.96, Fe2O3_wt_percent_as_printed: 7.48, P2O5_wt_percent_as_printed: 13.93, T_C: 1350, composition_wt_pct: {FeO: 78.96, Fe2O3: 7.48, P2O5: 13.93}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_4_7
       experiment: banya77-table3-1350c
       type: composition_series
@@ -1085,7 +1663,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 4.7'}
-      values: {method_class: measured_direct, run_no_as_printed: '4.7', PH2O_over_PH2_as_printed: 0.802, FeO_wt_percent_as_printed: 75.82, Fe2O3_wt_percent_as_printed: 6.81, P2O5_wt_percent_as_printed: 17.34}
+      values: {method_class: measured_direct, run_no_as_printed: '4.7', PH2O_over_PH2_as_printed: 0.802, FeO_wt_percent_as_printed: 75.82, Fe2O3_wt_percent_as_printed: 6.81, P2O5_wt_percent_as_printed: 17.34, T_C: 1350, composition_wt_pct: {FeO: 75.82, Fe2O3: 6.81, P2O5: 17.34}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_4_8
       experiment: banya77-table3-1350c
       type: composition_series
@@ -1105,7 +1683,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 4.8'}
-      values: {method_class: measured_direct, run_no_as_printed: '4.8', PH2O_over_PH2_as_printed: 0.760, FeO_wt_percent_as_printed: 72.72, Fe2O3_wt_percent_as_printed: 5.40, P2O5_wt_percent_as_printed: 21.90}
+      values: {method_class: measured_direct, run_no_as_printed: '4.8', PH2O_over_PH2_as_printed: 0.760, FeO_wt_percent_as_printed: 72.72, Fe2O3_wt_percent_as_printed: 5.40, P2O5_wt_percent_as_printed: 21.90, T_C: 1350, composition_wt_pct: {FeO: 72.72, Fe2O3: 5.40, P2O5: 21.90}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_4_9
       experiment: banya77-table3-1350c
       type: composition_series
@@ -1125,7 +1703,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 4.9'}
-      values: {method_class: measured_direct, run_no_as_printed: '4.9', PH2O_over_PH2_as_printed: 0.696, FeO_wt_percent_as_printed: 70.19, Fe2O3_wt_percent_as_printed: 4.42, P2O5_wt_percent_as_printed: 24.86}
+      values: {method_class: measured_direct, run_no_as_printed: '4.9', PH2O_over_PH2_as_printed: 0.696, FeO_wt_percent_as_printed: 70.19, Fe2O3_wt_percent_as_printed: 4.42, P2O5_wt_percent_as_printed: 24.86, T_C: 1350, composition_wt_pct: {FeO: 70.19, Fe2O3: 4.42, P2O5: 24.86}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_4_10
       experiment: banya77-table3-1350c
       type: composition_series
@@ -1145,7 +1723,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 4.10'}
-      values: {method_class: measured_direct, run_no_as_printed: '4.10', PH2O_over_PH2_as_printed: 0.646, FeO_wt_percent_as_printed: 68.69, Fe2O3_wt_percent_as_printed: 3.68, P2O5_wt_percent_as_printed: 27.39}
+      values: {method_class: measured_direct, run_no_as_printed: '4.10', PH2O_over_PH2_as_printed: 0.646, FeO_wt_percent_as_printed: 68.69, Fe2O3_wt_percent_as_printed: 3.68, P2O5_wt_percent_as_printed: 27.39, T_C: 1350, composition_wt_pct: {FeO: 68.69, Fe2O3: 3.68, P2O5: 27.39}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_4_11
       experiment: banya77-table3-1350c
       type: composition_series
@@ -1165,7 +1743,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 4.11'}
-      values: {method_class: measured_direct, run_no_as_printed: '4.11', PH2O_over_PH2_as_printed: 0.616, FeO_wt_percent_as_printed: 68.17, Fe2O3_wt_percent_as_printed: 3.75, P2O5_wt_percent_as_printed: 27.86}
+      values: {method_class: measured_direct, run_no_as_printed: '4.11', PH2O_over_PH2_as_printed: 0.616, FeO_wt_percent_as_printed: 68.17, Fe2O3_wt_percent_as_printed: 3.75, P2O5_wt_percent_as_printed: 27.86, T_C: 1350, composition_wt_pct: {FeO: 68.17, Fe2O3: 3.75, P2O5: 27.86}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_5_2
       experiment: banya77-table3-1300c
       type: composition_series
@@ -1185,7 +1763,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 5.2'}
-      values: {method_class: measured_direct, run_no_as_printed: '5.2', PH2O_over_PH2_as_printed: 0.854, FeO_wt_percent_as_printed: 75.29, Fe2O3_wt_percent_as_printed: 5.99, P2O5_wt_percent_as_printed: 18.52}
+      values: {method_class: measured_direct, run_no_as_printed: '5.2', PH2O_over_PH2_as_printed: 0.854, FeO_wt_percent_as_printed: 75.29, Fe2O3_wt_percent_as_printed: 5.99, P2O5_wt_percent_as_printed: 18.52, T_C: 1300, composition_wt_pct: {FeO: 75.29, Fe2O3: 5.99, P2O5: 18.52}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_5_3
       experiment: banya77-table3-1300c
       type: composition_series
@@ -1205,7 +1783,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 5.3'}
-      values: {method_class: measured_direct, run_no_as_printed: '5.3', PH2O_over_PH2_as_printed: 0.833, FeO_wt_percent_as_printed: 74.80, Fe2O3_wt_percent_as_printed: 6.16, P2O5_wt_percent_as_printed: 18.64}
+      values: {method_class: measured_direct, run_no_as_printed: '5.3', PH2O_over_PH2_as_printed: 0.833, FeO_wt_percent_as_printed: 74.80, Fe2O3_wt_percent_as_printed: 6.16, P2O5_wt_percent_as_printed: 18.64, T_C: 1300, composition_wt_pct: {FeO: 74.80, Fe2O3: 6.16, P2O5: 18.64}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_5_4
       experiment: banya77-table3-1300c
       type: composition_series
@@ -1225,7 +1803,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 5.4'}
-      values: {method_class: measured_direct, run_no_as_printed: '5.4', PH2O_over_PH2_as_printed: 0.826, FeO_wt_percent_as_printed: 74.84, Fe2O3_wt_percent_as_printed: 6.39, P2O5_wt_percent_as_printed: 18.65}
+      values: {method_class: measured_direct, run_no_as_printed: '5.4', PH2O_over_PH2_as_printed: 0.826, FeO_wt_percent_as_printed: 74.84, Fe2O3_wt_percent_as_printed: 6.39, P2O5_wt_percent_as_printed: 18.65, T_C: 1300, composition_wt_pct: {FeO: 74.84, Fe2O3: 6.39, P2O5: 18.65}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_5_5
       experiment: banya77-table3-1300c
       type: composition_series
@@ -1245,7 +1823,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 5.5'}
-      values: {method_class: measured_direct, run_no_as_printed: '5.5', PH2O_over_PH2_as_printed: 0.795, FeO_wt_percent_as_printed: 73.34, Fe2O3_wt_percent_as_printed: 5.57, P2O5_wt_percent_as_printed: 21.00}
+      values: {method_class: measured_direct, run_no_as_printed: '5.5', PH2O_over_PH2_as_printed: 0.795, FeO_wt_percent_as_printed: 73.34, Fe2O3_wt_percent_as_printed: 5.57, P2O5_wt_percent_as_printed: 21.00, T_C: 1300, composition_wt_pct: {FeO: 73.34, Fe2O3: 5.57, P2O5: 21.00}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_5_6
       experiment: banya77-table3-1300c
       type: composition_series
@@ -1265,7 +1843,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 5.6'}
-      values: {method_class: measured_direct, run_no_as_printed: '5.6', PH2O_over_PH2_as_printed: 0.778, FeO_wt_percent_as_printed: 73.73, Fe2O3_wt_percent_as_printed: 5.19, P2O5_wt_percent_as_printed: 21.99}
+      values: {method_class: measured_direct, run_no_as_printed: '5.6', PH2O_over_PH2_as_printed: 0.778, FeO_wt_percent_as_printed: 73.73, Fe2O3_wt_percent_as_printed: 5.19, P2O5_wt_percent_as_printed: 21.99, T_C: 1300, composition_wt_pct: {FeO: 73.73, Fe2O3: 5.19, P2O5: 21.99}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_5_7
       experiment: banya77-table3-1300c
       type: composition_series
@@ -1285,7 +1863,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 5.7'}
-      values: {method_class: measured_direct, run_no_as_printed: '5.7', PH2O_over_PH2_as_printed: 0.769, FeO_wt_percent_as_printed: 71.58, Fe2O3_wt_percent_as_printed: 5.17, P2O5_wt_percent_as_printed: 23.05}
+      values: {method_class: measured_direct, run_no_as_printed: '5.7', PH2O_over_PH2_as_printed: 0.769, FeO_wt_percent_as_printed: 71.58, Fe2O3_wt_percent_as_printed: 5.17, P2O5_wt_percent_as_printed: 23.05, T_C: 1300, composition_wt_pct: {FeO: 71.58, Fe2O3: 5.17, P2O5: 23.05}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_5_8
       experiment: banya77-table3-1300c
       type: composition_series
@@ -1305,7 +1883,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 5.8'}
-      values: {method_class: measured_direct, run_no_as_printed: '5.8', PH2O_over_PH2_as_printed: 0.760, FeO_wt_percent_as_printed: 71.90, Fe2O3_wt_percent_as_printed: 5.16, P2O5_wt_percent_as_printed: 22.93}
+      values: {method_class: measured_direct, run_no_as_printed: '5.8', PH2O_over_PH2_as_printed: 0.760, FeO_wt_percent_as_printed: 71.90, Fe2O3_wt_percent_as_printed: 5.16, P2O5_wt_percent_as_printed: 22.93, T_C: 1300, composition_wt_pct: {FeO: 71.90, Fe2O3: 5.16, P2O5: 22.93}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_5_9
       experiment: banya77-table3-1300c
       type: composition_series
@@ -1325,7 +1903,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 5.9'}
-      values: {method_class: measured_direct, run_no_as_printed: '5.9', PH2O_over_PH2_as_printed: 0.730, FeO_wt_percent_as_printed: 71.30, Fe2O3_wt_percent_as_printed: 4.57, P2O5_wt_percent_as_printed: 24.09}
+      values: {method_class: measured_direct, run_no_as_printed: '5.9', PH2O_over_PH2_as_printed: 0.730, FeO_wt_percent_as_printed: 71.30, Fe2O3_wt_percent_as_printed: 4.57, P2O5_wt_percent_as_printed: 24.09, T_C: 1300, composition_wt_pct: {FeO: 71.30, Fe2O3: 4.57, P2O5: 24.09}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_5_10
       experiment: banya77-table3-1300c
       type: composition_series
@@ -1345,7 +1923,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 5.10'}
-      values: {method_class: measured_direct, run_no_as_printed: '5.10', PH2O_over_PH2_as_printed: 0.705, FeO_wt_percent_as_printed: 70.30, Fe2O3_wt_percent_as_printed: 4.29, P2O5_wt_percent_as_printed: 25.36}
+      values: {method_class: measured_direct, run_no_as_printed: '5.10', PH2O_over_PH2_as_printed: 0.705, FeO_wt_percent_as_printed: 70.30, Fe2O3_wt_percent_as_printed: 4.29, P2O5_wt_percent_as_printed: 25.36, T_C: 1300, composition_wt_pct: {FeO: 70.30, Fe2O3: 4.29, P2O5: 25.36}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_5_11
       experiment: banya77-table3-1300c
       type: composition_series
@@ -1365,7 +1943,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 5.11'}
-      values: {method_class: measured_direct, run_no_as_printed: '5.11', PH2O_over_PH2_as_printed: 0.694, FeO_wt_percent_as_printed: 69.86, Fe2O3_wt_percent_as_printed: 4.37, P2O5_wt_percent_as_printed: 25.80}
+      values: {method_class: measured_direct, run_no_as_printed: '5.11', PH2O_over_PH2_as_printed: 0.694, FeO_wt_percent_as_printed: 69.86, Fe2O3_wt_percent_as_printed: 4.37, P2O5_wt_percent_as_printed: 25.80, T_C: 1300, composition_wt_pct: {FeO: 69.86, Fe2O3: 4.37, P2O5: 25.80}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_5_12
       experiment: banya77-table3-1300c
       type: composition_series
@@ -1385,7 +1963,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 5.12'}
-      values: {method_class: measured_direct, run_no_as_printed: '5.12', PH2O_over_PH2_as_printed: 0.675, FeO_wt_percent_as_printed: 69.41, Fe2O3_wt_percent_as_printed: 4.16, P2O5_wt_percent_as_printed: 26.37}
+      values: {method_class: measured_direct, run_no_as_printed: '5.12', PH2O_over_PH2_as_printed: 0.675, FeO_wt_percent_as_printed: 69.41, Fe2O3_wt_percent_as_printed: 4.16, P2O5_wt_percent_as_printed: 26.37, T_C: 1300, composition_wt_pct: {FeO: 69.41, Fe2O3: 4.16, P2O5: 26.37}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_5_13
       experiment: banya77-table3-1300c
       type: composition_series
@@ -1405,7 +1983,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 5.13'}
-      values: {method_class: measured_direct, run_no_as_printed: '5.13', PH2O_over_PH2_as_printed: 0.649, FeO_wt_percent_as_printed: 68.07, Fe2O3_wt_percent_as_printed: 3.71, P2O5_wt_percent_as_printed: 27.85}
+      values: {method_class: measured_direct, run_no_as_printed: '5.13', PH2O_over_PH2_as_printed: 0.649, FeO_wt_percent_as_printed: 68.07, Fe2O3_wt_percent_as_printed: 3.71, P2O5_wt_percent_as_printed: 27.85, T_C: 1300, composition_wt_pct: {FeO: 68.07, Fe2O3: 3.71, P2O5: 27.85}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_5_14
       experiment: banya77-table3-1300c
       type: composition_series
@@ -1425,7 +2003,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 5.14'}
-      values: {method_class: measured_direct, run_no_as_printed: '5.14', PH2O_over_PH2_as_printed: 0.636, FeO_wt_percent_as_printed: 67.65, Fe2O3_wt_percent_as_printed: 3.53, P2O5_wt_percent_as_printed: 28.58}
+      values: {method_class: measured_direct, run_no_as_printed: '5.14', PH2O_over_PH2_as_printed: 0.636, FeO_wt_percent_as_printed: 67.65, Fe2O3_wt_percent_as_printed: 3.53, P2O5_wt_percent_as_printed: 28.58, T_C: 1300, composition_wt_pct: {FeO: 67.65, Fe2O3: 3.53, P2O5: 28.58}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_5_15
       experiment: banya77-table3-1300c
       type: composition_series
@@ -1445,7 +2023,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 5.15'}
-      values: {method_class: measured_direct, run_no_as_printed: '5.15', PH2O_over_PH2_as_printed: 0.631, FeO_wt_percent_as_printed: 67.31, Fe2O3_wt_percent_as_printed: 3.40, P2O5_wt_percent_as_printed: 29.34}
+      values: {method_class: measured_direct, run_no_as_printed: '5.15', PH2O_over_PH2_as_printed: 0.631, FeO_wt_percent_as_printed: 67.31, Fe2O3_wt_percent_as_printed: 3.40, P2O5_wt_percent_as_printed: 29.34, T_C: 1300, composition_wt_pct: {FeO: 67.31, Fe2O3: 3.40, P2O5: 29.34}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_5_16
       experiment: banya77-table3-1300c
       type: composition_series
@@ -1465,7 +2043,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 5.16'}
-      values: {method_class: measured_direct, run_no_as_printed: '5.16', PH2O_over_PH2_as_printed: 0.612, FeO_wt_percent_as_printed: 66.90, Fe2O3_wt_percent_as_printed: 3.72, P2O5_wt_percent_as_printed: 29.40}
+      values: {method_class: measured_direct, run_no_as_printed: '5.16', PH2O_over_PH2_as_printed: 0.612, FeO_wt_percent_as_printed: 66.90, Fe2O3_wt_percent_as_printed: 3.72, P2O5_wt_percent_as_printed: 29.40, T_C: 1300, composition_wt_pct: {FeO: 66.90, Fe2O3: 3.72, P2O5: 29.40}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_6_1
       experiment: banya77-table3-1200c
       type: composition_series
@@ -1485,7 +2063,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 6.1'}
-      values: {method_class: measured_direct, run_no_as_printed: '6.1', PH2O_over_PH2_as_printed: 0.741, FeO_wt_percent_as_printed: 68.69, Fe2O3_wt_percent_as_printed: 2.99, P2O5_wt_percent_as_printed: 27.93}
+      values: {method_class: measured_direct, run_no_as_printed: '6.1', PH2O_over_PH2_as_printed: 0.741, FeO_wt_percent_as_printed: 68.69, Fe2O3_wt_percent_as_printed: 2.99, P2O5_wt_percent_as_printed: 27.93, T_C: 1200, composition_wt_pct: {FeO: 68.69, Fe2O3: 2.99, P2O5: 27.93}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_6_3
       experiment: banya77-table3-1200c
       type: composition_series
@@ -1505,7 +2083,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 6.3'}
-      values: {method_class: measured_direct, run_no_as_printed: '6.3', PH2O_over_PH2_as_printed: 0.711, FeO_wt_percent_as_printed: 67.43, Fe2O3_wt_percent_as_printed: 3.07, P2O5_wt_percent_as_printed: 28.78}
+      values: {method_class: measured_direct, run_no_as_printed: '6.3', PH2O_over_PH2_as_printed: 0.711, FeO_wt_percent_as_printed: 67.43, Fe2O3_wt_percent_as_printed: 3.07, P2O5_wt_percent_as_printed: 28.78, T_C: 1200, composition_wt_pct: {FeO: 67.43, Fe2O3: 3.07, P2O5: 28.78}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_6_2
       experiment: banya77-table3-1200c
       type: composition_series
@@ -1525,7 +2103,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 6.2'}
-      values: {method_class: measured_direct, run_no_as_printed: '6.2', PH2O_over_PH2_as_printed: 0.706, FeO_wt_percent_as_printed: 69.06, Fe2O3_wt_percent_as_printed: 3.10, P2O5_wt_percent_as_printed: 27.80}
+      values: {method_class: measured_direct, run_no_as_printed: '6.2', PH2O_over_PH2_as_printed: 0.706, FeO_wt_percent_as_printed: 69.06, Fe2O3_wt_percent_as_printed: 3.10, P2O5_wt_percent_as_printed: 27.80, T_C: 1200, composition_wt_pct: {FeO: 69.06, Fe2O3: 3.10, P2O5: 27.80}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_6_4
       experiment: banya77-table3-1200c
       type: composition_series
@@ -1545,7 +2123,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 6.4'}
-      values: {method_class: measured_direct, run_no_as_printed: '6.4', PH2O_over_PH2_as_printed: 0.675, FeO_wt_percent_as_printed: 67.28, Fe2O3_wt_percent_as_printed: 3.11, P2O5_wt_percent_as_printed: 29.47}
+      values: {method_class: measured_direct, run_no_as_printed: '6.4', PH2O_over_PH2_as_printed: 0.675, FeO_wt_percent_as_printed: 67.28, Fe2O3_wt_percent_as_printed: 3.11, P2O5_wt_percent_as_printed: 29.47, T_C: 1200, composition_wt_pct: {FeO: 67.28, Fe2O3: 3.11, P2O5: 29.47}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_6_5
       experiment: banya77-table3-1200c
       type: composition_series
@@ -1565,7 +2143,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 6.5'}
-      values: {method_class: measured_direct, run_no_as_printed: '6.5', PH2O_over_PH2_as_printed: 0.652, FeO_wt_percent_as_printed: 66.44, Fe2O3_wt_percent_as_printed: 2.69, P2O5_wt_percent_as_printed: 30.86}
+      values: {method_class: measured_direct, run_no_as_printed: '6.5', PH2O_over_PH2_as_printed: 0.652, FeO_wt_percent_as_printed: 66.44, Fe2O3_wt_percent_as_printed: 2.69, P2O5_wt_percent_as_printed: 30.86, T_C: 1200, composition_wt_pct: {FeO: 66.44, Fe2O3: 2.69, P2O5: 30.86}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_6_6
       experiment: banya77-table3-1200c
       type: composition_series
@@ -1585,7 +2163,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 6.6'}
-      values: {method_class: measured_direct, run_no_as_printed: '6.6', PH2O_over_PH2_as_printed: 0.637, FeO_wt_percent_as_printed: 66.16, Fe2O3_wt_percent_as_printed: 2.80, P2O5_wt_percent_as_printed: 30.40}
+      values: {method_class: measured_direct, run_no_as_printed: '6.6', PH2O_over_PH2_as_printed: 0.637, FeO_wt_percent_as_printed: 66.16, Fe2O3_wt_percent_as_printed: 2.80, P2O5_wt_percent_as_printed: 30.40, T_C: 1200, composition_wt_pct: {FeO: 66.16, Fe2O3: 2.80, P2O5: 30.40}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_6_7
       experiment: banya77-table3-1200c
       type: composition_series
@@ -1605,7 +2183,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 6.7'}
-      values: {method_class: measured_direct, run_no_as_printed: '6.7', PH2O_over_PH2_as_printed: 0.616, FeO_wt_percent_as_printed: 65.70, Fe2O3_wt_percent_as_printed: 2.73, P2O5_wt_percent_as_printed: 31.13}
+      values: {method_class: measured_direct, run_no_as_printed: '6.7', PH2O_over_PH2_as_printed: 0.616, FeO_wt_percent_as_printed: 65.70, Fe2O3_wt_percent_as_printed: 2.73, P2O5_wt_percent_as_printed: 31.13, T_C: 1200, composition_wt_pct: {FeO: 65.70, Fe2O3: 2.73, P2O5: 31.13}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     - observation_id: banya77_t3_run_6_10
       experiment: banya77-table3-1200c
       type: composition_series
@@ -1625,151 +2203,7 @@ species:
         Fe3_over_Fe2:
           state: {tag: unknown, reason: not_printed_per_run}
           locator: {published_page: 1813, table: '3', note: 'run 6.10'}
-      values: {method_class: measured_direct, run_no_as_printed: '6.10', PH2O_over_PH2_as_printed: 0.602, FeO_wt_percent_as_printed: 65.88, Fe2O3_wt_percent_as_printed: 2.69, P2O5_wt_percent_as_printed: 31.06}
-    - observation_id: banya77_t4_xp2o5_0_00
-      experiment: banya77-table4-1400c
-      type: activity_coefficient
-      locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.00'}
-      phase: liquid FetO-P2O5 slag
-      standard_state: 'Table 4: Raoult law standard for FetO; Henry law standard for P2O5'
-      units: Table 4 as printed; alpha columns are multiplied by 10^-5
-      point_conditions:
-        X_P2O5_as_printed:
-          state: {tag: value, value: {kind: point, point: '0.00'}}
-          locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.00'}
-      values: {method_class: author_calculated, X_P2O5_as_printed: 0.00, alpha_FetO_times_1e_minus_5_as_printed: -2.70, alpha_P2O5_times_1e_minus_5_as_printed: -2.70, log_gamma_FetO_as_printed: 0, a_FetO_as_printed: 1, log_gamma_P2O5_as_printed: 0, a_P2O5_as_printed: 0}
-    - observation_id: banya77_t4_xp2o5_0_01
-      experiment: banya77-table4-1400c
-      type: activity_coefficient
-      locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.01'}
-      phase: liquid FetO-P2O5 slag
-      standard_state: 'Table 4: Raoult law standard for FetO; Henry law standard for P2O5'
-      units: Table 4 as printed; alpha columns are multiplied by 10^-5
-      point_conditions:
-        X_P2O5_as_printed:
-          state: {tag: value, value: {kind: point, point: '0.01'}}
-          locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.01'}
-      values: {method_class: author_calculated, X_P2O5_as_printed: 0.01, alpha_FetO_times_1e_minus_5_as_printed: -1.80, alpha_P2O5_times_1e_minus_5_as_printed: -2.02, log_gamma_FetO_as_printed: -0.0024, a_FetO_as_printed: 0.985, log_gamma_P2O5_as_printed: 0.527, a_P2O5_as_printed: 0.034}
-    - observation_id: banya77_t4_xp2o5_0_02
-      experiment: banya77-table4-1400c
-      type: activity_coefficient
-      locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.02'}
-      phase: liquid FetO-P2O5 slag
-      standard_state: 'Table 4: Raoult law standard for FetO; Henry law standard for P2O5'
-      units: Table 4 as printed; alpha columns are multiplied by 10^-5
-      point_conditions:
-        X_P2O5_as_printed:
-          state: {tag: value, value: {kind: point, point: '0.02'}}
-          locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.02'}
-      values: {method_class: author_calculated, X_P2O5_as_printed: 0.02, alpha_FetO_times_1e_minus_5_as_printed: -0.90, alpha_P2O5_times_1e_minus_5_as_printed: -1.36, log_gamma_FetO_as_printed: -0.0047, a_FetO_as_printed: 0.969, log_gamma_P2O5_as_printed: 0.701, a_P2O5_as_printed: 0.100}
-    - observation_id: banya77_t4_xp2o5_0_04
-      experiment: banya77-table4-1400c
-      type: activity_coefficient
-      locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.04'}
-      phase: liquid FetO-P2O5 slag
-      standard_state: 'Table 4: Raoult law standard for FetO; Henry law standard for P2O5'
-      units: Table 4 as printed; alpha columns are multiplied by 10^-5
-      point_conditions:
-        X_P2O5_as_printed:
-          state: {tag: value, value: {kind: point, point: '0.04'}}
-          locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.04'}
-      values: {method_class: author_calculated, X_P2O5_as_printed: 0.04, alpha_FetO_times_1e_minus_5_as_printed: -0.45, alpha_P2O5_times_1e_minus_5_as_printed: -0.84, log_gamma_FetO_as_printed: -0.0094, a_FetO_as_printed: 0.939, log_gamma_P2O5_as_printed: 0.860, a_P2O5_as_printed: 0.290}
-    - observation_id: banya77_t4_xp2o5_0_06
-      experiment: banya77-table4-1400c
-      type: activity_coefficient
-      locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.06'}
-      phase: liquid FetO-P2O5 slag
-      standard_state: 'Table 4: Raoult law standard for FetO; Henry law standard for P2O5'
-      units: Table 4 as printed; alpha columns are multiplied by 10^-5
-      point_conditions:
-        X_P2O5_as_printed:
-          state: {tag: value, value: {kind: point, point: '0.06'}}
-          locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.06'}
-      values: {method_class: author_calculated, X_P2O5_as_printed: 0.06, alpha_FetO_times_1e_minus_5_as_printed: -0.30, alpha_P2O5_times_1e_minus_5_as_printed: -0.63, log_gamma_FetO_as_printed: -0.0141, a_FetO_as_printed: 0.910, log_gamma_P2O5_as_printed: 0.951, a_P2O5_as_printed: 0.535}
-    - observation_id: banya77_t4_xp2o5_0_08
-      experiment: banya77-table4-1400c
-      type: activity_coefficient
-      locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.08'}
-      phase: liquid FetO-P2O5 slag
-      standard_state: 'Table 4: Raoult law standard for FetO; Henry law standard for P2O5'
-      units: Table 4 as printed; alpha columns are multiplied by 10^-5
-      point_conditions:
-        X_P2O5_as_printed:
-          state: {tag: value, value: {kind: point, point: '0.08'}}
-          locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.08'}
-      values: {method_class: author_calculated, X_P2O5_as_printed: 0.08, alpha_FetO_times_1e_minus_5_as_printed: -0.23, alpha_P2O5_times_1e_minus_5_as_printed: -0.51, log_gamma_FetO_as_printed: -0.0192, a_FetO_as_printed: 0.880, log_gamma_P2O5_as_printed: 1.019, a_P2O5_as_printed: 0.836}
-    - observation_id: banya77_t4_xp2o5_0_10
-      experiment: banya77-table4-1400c
-      type: activity_coefficient
-      locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.10'}
-      phase: liquid FetO-P2O5 slag
-      standard_state: 'Table 4: Raoult law standard for FetO; Henry law standard for P2O5'
-      units: Table 4 as printed; alpha columns are multiplied by 10^-5
-      point_conditions:
-        X_P2O5_as_printed:
-          state: {tag: value, value: {kind: point, point: '0.10'}}
-          locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.10'}
-      values: {method_class: author_calculated, X_P2O5_as_printed: 0.10, alpha_FetO_times_1e_minus_5_as_printed: -0.18, alpha_P2O5_times_1e_minus_5_as_printed: -0.43, log_gamma_FetO_as_printed: -0.0235, a_FetO_as_printed: 0.853, log_gamma_P2O5_as_printed: 1.062, a_P2O5_as_printed: 1.15}
-    - observation_id: banya77_t4_xp2o5_0_12
-      experiment: banya77-table4-1400c
-      type: activity_coefficient
-      locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.12'}
-      phase: liquid FetO-P2O5 slag
-      standard_state: 'Table 4: Raoult law standard for FetO; Henry law standard for P2O5'
-      units: Table 4 as printed; alpha columns are multiplied by 10^-5
-      point_conditions:
-        X_P2O5_as_printed:
-          state: {tag: value, value: {kind: point, point: '0.12'}}
-          locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.12'}
-      values: {method_class: author_calculated, X_P2O5_as_printed: 0.12, alpha_FetO_times_1e_minus_5_as_printed: -0.19, alpha_P2O5_times_1e_minus_5_as_printed: -0.39, log_gamma_FetO_as_printed: -0.0357, a_FetO_as_printed: 0.811, log_gamma_P2O5_as_printed: 1.160, a_P2O5_as_printed: 1.74}
-    - observation_id: banya77_t4_xp2o5_0_14
-      experiment: banya77-table4-1400c
-      type: activity_coefficient
-      locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.14'}
-      phase: liquid FetO-P2O5 slag
-      standard_state: 'Table 4: Raoult law standard for FetO; Henry law standard for P2O5'
-      units: Table 4 as printed; alpha columns are multiplied by 10^-5
-      point_conditions:
-        X_P2O5_as_printed:
-          state: {tag: value, value: {kind: point, point: '0.14'}}
-          locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.14'}
-      values: {method_class: author_calculated, X_P2O5_as_printed: 0.14, alpha_FetO_times_1e_minus_5_as_printed: -0.22, alpha_P2O5_times_1e_minus_5_as_printed: -0.38, log_gamma_FetO_as_printed: -0.0563, a_FetO_as_printed: 0.755, log_gamma_P2O5_as_printed: 1.297, a_P2O5_as_printed: 2.77}
-    - observation_id: banya77_t4_xp2o5_0_16
-      experiment: banya77-table4-1400c
-      type: activity_coefficient
-      locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.16'}
-      phase: liquid FetO-P2O5 slag
-      standard_state: 'Table 4: Raoult law standard for FetO; Henry law standard for P2O5'
-      units: Table 4 as printed; alpha columns are multiplied by 10^-5
-      point_conditions:
-        X_P2O5_as_printed:
-          state: {tag: value, value: {kind: point, point: '0.16'}}
-          locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.16'}
-      values: {method_class: author_calculated, X_P2O5_as_printed: 0.16, alpha_FetO_times_1e_minus_5_as_printed: -0.26, alpha_P2O5_times_1e_minus_5_as_printed: -0.38, log_gamma_FetO_as_printed: -0.0870, a_FetO_as_printed: 0.688, log_gamma_P2O5_as_printed: 1.470, a_P2O5_as_printed: 4.73}
-    - observation_id: banya77_t4_xp2o5_0_18
-      experiment: banya77-table4-1400c
-      type: activity_coefficient
-      locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.18'}
-      phase: liquid FetO-P2O5 slag
-      standard_state: 'Table 4: Raoult law standard for FetO; Henry law standard for P2O5'
-      units: Table 4 as printed; alpha columns are multiplied by 10^-5
-      point_conditions:
-        X_P2O5_as_printed:
-          state: {tag: value, value: {kind: point, point: '0.18'}}
-          locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.18'}
-      values: {method_class: author_calculated, X_P2O5_as_printed: 0.18, alpha_FetO_times_1e_minus_5_as_printed: -0.32, alpha_P2O5_times_1e_minus_5_as_printed: -0.40, log_gamma_FetO_as_printed: -0.136, a_FetO_as_printed: 0.600, log_gamma_P2O5_as_printed: 1.706, a_P2O5_as_printed: 9.15}
-    - observation_id: banya77_t4_xp2o5_0_20
-      experiment: banya77-table4-1400c
-      type: activity_coefficient
-      locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.20'}
-      phase: liquid FetO-P2O5 slag
-      standard_state: 'Table 4: Raoult law standard for FetO; Henry law standard for P2O5'
-      units: Table 4 as printed; alpha columns are multiplied by 10^-5
-      point_conditions:
-        X_P2O5_as_printed:
-          state: {tag: value, value: {kind: point, point: '0.20'}}
-          locator: {published_page: 1816, table: '4', note: 'X_P2O5 0.20'}
-      values: {method_class: author_calculated, X_P2O5_as_printed: 0.20, alpha_FetO_times_1e_minus_5_as_printed: -0.38, alpha_P2O5_times_1e_minus_5_as_printed: -0.42, log_gamma_FetO_as_printed: -0.199, a_FetO_as_printed: 0.506, log_gamma_P2O5_as_printed: 1.975, a_P2O5_as_printed: 18.9}
+      values: {method_class: measured_direct, run_no_as_printed: '6.10', PH2O_over_PH2_as_printed: 0.602, FeO_wt_percent_as_printed: 65.88, Fe2O3_wt_percent_as_printed: 2.69, P2O5_wt_percent_as_printed: 31.06, T_C: 1200, composition_wt_pct: {FeO: 65.88, Fe2O3: 2.69, P2O5: 31.06}, composition_derivation: 'Table 3 reports the three oxide mass percentages as printed; retained on the printed wt% basis.'}
     context:
     - observation_id: banya77_equations_pure_liquid_iron_saturation
       type: equation_summary
@@ -1779,7 +2213,9 @@ species:
         delta_iron_equation_as_printed: 'FeO(pure liquid) + H2(g) = Fe(delta) + H2O(g), 1536-1392 C; log K1 (= PH2O/PH2) = 1588/T - 1.007; ΔG°1 = -7265 + 4.607 T; equation (2-1).'
         gamma_iron_equation_as_printed: 'FeO(pure liquid) + H2(g) = Fe(gamma) + H2O(g), 1392-911 C; log K2 (= PH2O/PH2) = 1645/T - 1.042; ΔG°2 = -7525 + 4.767 T; equation (2-2).'
         FetO_activity_delta_equation_as_printed: 'log a_FetO = log(PH2O/PH2) - 1588/T + 1.007, 1536-1392 C; equation (11).'
+        FetO_activity_delta_equation_locator: {published_page: 1815, section: '4.3', equation: '11'}
         FetO_activity_gamma_equation_as_printed: 'log a_FetO = log(PH2O/PH2) - 1645/T + 1.042, 1392-911 C; equation (12).'
+        FetO_activity_gamma_equation_locator: {published_page: 1815, section: '4.3', equation: '12'}
         FetO_reference_state_as_printed: 'Table 4 labels the FetO activity as Raoult law standard and gives a_FetO = 1 at X_P2O5 = 0.00; equations (2-1) and (2-2) name pure liquid FeO.'
         thermodynamic_sources_cited_for_H2_H2O_equilibrium:
         - 'Reference 12: Contributions to the Data on Theoretical Metallurgy, Bureau of Mines Bulletin 584 (1960).'
@@ -1789,7 +2225,7 @@ species:
       locator: {published_page: 1814, section: Fig. 6 discussion}
       units: Fe3+/Fe2+ dimensionless; X_P2O5 as printed
       values:
-        equation_as_printed: 'Δ (= Fe3+/Fe2+) = 0.120 - 0.438 X_P2O5 (equation (8)); 1200-1450 C.'
+        equation_as_printed: 'Λ = 0.120 - 0.438 X_P2O5 (equation (8)); 1200-1450 C.'
         information_only_zero_phosphate_intercept: 0.120
         temperature_specificity: 'No temperature-specific values are tabulated; equation (8) states the 1200-1450 C range and has no temperature term.'
         lowest_P2O5_run_as_printed: 'Table 3 run 1.8: 1450 C, 2.03 wt% P2O5; no Fe3+/Fe2+ value is printed on that run row.'
