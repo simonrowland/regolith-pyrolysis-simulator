@@ -173,7 +173,7 @@ def _assert_source_root_context(document: dict, extract_text: str) -> None:
 
     facts = {item["name"]: item for item in document["benches"][0]["other_facts"]}
     assert "Ga and Cu dissolved into Pt metal" in facts["collector_loop_metal_content"]["value"]["state"]["value"]["categorical"]
-    _assert_glass_loop_comparison(facts)
+    _assert_collector_facts(facts)
     assert facts["collector_oxidation_state"]["value"]["state"] == {
         "tag": "unknown",
         "reason": "not_published",
@@ -184,23 +184,88 @@ def _assert_source_root_context(document: dict, extract_text: str) -> None:
     }
 
 
-def _assert_glass_loop_comparison(facts: dict) -> None:
-    glass = facts["glass_residue_loop_material_comparison"]
-    assert glass["unit"] == "qualitative"
-    assert glass["value"]["state"]["value"]["categorical"] == (
-        "Table 2 quenched-glass analyses: P09/06/18b (Pt loop) has 439.9 ppm Ga "
-        "and 40.5 ppm Cu; P09/06/18a (Re loop) has 409.4 ppm Ga and 11.2 ppm Cu. "
-        "Section 4.3 compares these similar glass concentrations to argue that "
-        "partitioning into the wire has no resolvable effect on melt depletion."
-    )
-    locator = glass["value"]["locator"]
-    assert locator["page"] == 54
-    assert locator["table"] == "2"
-    assert "quenched glass" in locator["note"]
-    assert "not from wire analyses" in locator["note"]
-    assert "Section 4.3" in locator["note"]
+def _assert_collector_facts(facts: dict) -> None:
+    numeric = {
+        "collector_fe_loss": ("percent Fe loss", 11, {
+            "kind": "point", "point": "5", "approximate": True,
+        }),
+        "collector_ag_to_pt_ratio": ("dimensionless Ag/Pt ratio", 12, {
+            "kind": "bound", "bound_operator": "<", "bound_value": "2e-4",
+        }),
+        "collector_pb_to_pt_ratio": ("dimensionless Pb/Pt ratio", 12, {
+            "kind": "bound", "bound_operator": "<", "bound_value": "7e-4",
+        }),
+        "collector_ga_to_pt_ratio": ("dimensionless Ga/Pt ratio", 12, {
+            "kind": "bound", "bound_operator": "<", "bound_value": "7e-4",
+        }),
+        "collector_ga_to_pt_ratio_2m_17_07_16c": (
+            "dimensionless Ga/Pt ratio", 12,
+            {"kind": "interval", "interval_low": "2.3e-3", "interval_high": "2.5e-3"},
+        ),
+        "collector_cu_to_pt_ratio": ("dimensionless Cu/Pt ratio", 12, {
+            "kind": "interval", "interval_low": "1.8e-3", "interval_high": "7.6e-3",
+        }),
+        "collector_cu_diffusion_depth": ("μm", 12, {
+            "kind": "point", "point": "9", "approximate": True,
+        }),
+        "collector_wire_diameter": ("mm", 12, {
+            "kind": "point", "point": "0.1",
+        }),
+        "collector_wire_segment_mass": ("mg", 12, {
+            "kind": "point", "point": "0.84", "approximate": True,
+        }),
+        "collector_wire_mass_fraction": ("percent of sample mass", 12, {
+            "kind": "point", "point": "7", "approximate": True,
+        }),
+        "collector_cu_budget": ("percent Cu budget", 12, {
+            "kind": "point", "point": "9", "approximate": True,
+        }),
+    }
+    for name, (unit, page, expected) in numeric.items():
+        fact = facts[name]
+        assert fact["unit"] == unit
+        assert fact["value"]["state"] == {"tag": "value", "value": expected}
+        assert fact["value"]["locator"]["page"] == page
+
+    glass = {
+        "glass_ga_concentration_p09_06_18b": ("ppm Ga", "439.9", "P09/06/18b", "Pt-loop"),
+        "glass_ga_concentration_p09_06_18a": ("ppm Ga", "409.4", "P09/06/18a", "Re-loop"),
+        "glass_cu_concentration_p09_06_18b": ("ppm Cu", "40.5", "P09/06/18b", "Pt-loop"),
+        "glass_cu_concentration_p09_06_18a": ("ppm Cu", "11.2", "P09/06/18a", "Re-loop"),
+    }
+    for name, (unit, point, run, loop) in glass.items():
+        fact = facts[name]
+        assert fact["unit"] == unit
+        assert fact["value"]["state"] == {
+            "tag": "value", "value": {"kind": "point", "point": point},
+        }
+        locator = fact["value"]["locator"]
+        assert locator["page"] == 54 and locator["table"] == "2"
+        assert run in locator["note"] and loop in locator["note"]
+        assert "quenched-glass" in locator["note"]
+        assert "no resolvable effect" in locator["note"]
     assert "collector_ga_ppm" not in facts
     assert "collector_cu_ppm" not in facts
+
+    for name, relation, output_unit in (
+        ("collector_cu_diffusion_depth", "diffusion_depth_from_coefficient_and_duration", "μm"),
+        ("collector_wire_segment_mass", "author_calculated_wire_segment_mass_from_geometry", "mg"),
+        ("collector_wire_mass_fraction", "wire_segment_mass_fraction_of_sample", "percent of sample mass"),
+        ("collector_cu_budget", "wire_cu_budget_from_affected_zone_assumption", "percent Cu budget"),
+    ):
+        located = facts[name]["value"]
+        assert located["inference"]["relation"] == relation
+        assert located["inference"]["output_unit"] == output_unit
+        assert "Evidence class: author_estimate" in located["locator"]["note"]
+    for name in ("collector_wire_segment_mass", "collector_wire_mass_fraction"):
+        assert facts[name]["value"]["inference"]["raw_inputs"]["state"] == {
+            "tag": "value", "value": "not_printed",
+        }
+
+    ag_note = facts["collector_ag_to_pt_ratio"]["value"]["locator"]["note"]
+    assert "1M-PS4 (1400 degC, 15 min, logfO2=-8.00)" in ag_note
+    assert "1M-PS5 (1400 degC, 15 min, logfO2=-10.01)" in ag_note
+    assert "2M-15-07-16f (1550 degC, 15 min, logfO2=-0.68)" in ag_note
 
 
 def test_sossi_table2_gas_values_and_mutation_gate() -> None:
@@ -233,16 +298,17 @@ def test_sossi_root_context_and_analysis_basis_are_pinned() -> None:
     _assert_source_root_context(document, text)
 
 
-def test_sossi_glass_loop_attribution_rejects_mutation() -> None:
+def test_sossi_collector_numbers_reject_mutation() -> None:
     document = yaml.load(EXTRACT.read_text(encoding="utf-8"), Loader=_UniqueKeyLoader)
     facts = {item["name"]: item for item in document["benches"][0]["other_facts"]}
-    _assert_glass_loop_comparison(facts)
+    _assert_collector_facts(facts)
 
-    mutated = deepcopy(facts)
-    categorical = mutated["glass_residue_loop_material_comparison"]["value"]["state"]["value"]["categorical"]
-    mutated["glass_residue_loop_material_comparison"]["value"]["state"]["value"]["categorical"] = categorical.replace("439.9", "999999")
-    with pytest.raises(AssertionError):
-        _assert_glass_loop_comparison(mutated)
+    for name in ("glass_ga_concentration_p09_06_18b", "collector_cu_diffusion_depth"):
+        mutated = deepcopy(facts)
+        value = mutated[name]["value"]["state"]["value"]
+        value["point"] = "999999"
+        with pytest.raises(AssertionError):
+            _assert_collector_facts(mutated)
 
 
 def test_sossi_fields_survive_isolated_migration(tmp_path: Path) -> None:

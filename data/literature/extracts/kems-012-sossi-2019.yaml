@@ -51,63 +51,213 @@ benches:
   - name: collector_fe_loss
     unit: percent Fe loss
     value:
-      state: {tag: value, value: {kind: categorical, categorical: "Low-fO2 Pt-loop samples lost about 5% Fe to the wire."}}
-      locator: {page: 11, section: '4.3 Collector analyses', note: "Evidence class: measured_tabulated; source-reported collector-side observation."}
+      state: {tag: value, value: {kind: point, point: '5', approximate: true}}
+      locator:
+        page: 11
+        section: '4.0 Results'
+        note: >-
+          Evidence class: measured_tabulated; low-fO2 Pt-loop samples experienced
+          minor approximately 5% Fe loss to the wire (Electronic Annex C).
   - name: collector_loop_metal_content
     unit: qualitative
     value:
       state: {tag: value, value: {kind: categorical, categorical: "Analyzed Ir loop C18/12/15 and Re loops 1M-1/3/16, 1M-1/3/16b, and C17/12/15c contained no detected elements other than loop metal. Pt loops had Ga and Cu dissolved into Pt metal; minor Ag and Pb were found in 1M-PS4, 1M-PS5, and 2M-15-07-16f."}}
-      locator: {page: 12, section: '4.3 Metal Loops', note: "Evidence class: measured_tabulated; qualitative analyses of collected wire contents. The Ga/Cu ppm values from paired Pt/Re runs are quenched-glass analyses in Table 2."}
+      locator:
+        page: 12
+        section: '4.3 Metal Loops'
+        note: >-
+          Evidence class: measured_tabulated; qualitative analyses of wire
+          contents. Table 2 ppm values from paired Pt/Re runs are quenched-glass
+          analyses, not wire concentrations.
   - name: collector_ag_to_pt_ratio
     unit: dimensionless Ag/Pt ratio
     value:
-      state: {tag: value, value: {kind: categorical, categorical: "Ag/Pt < 2e-4 in Pt loops 1M-PS4, 1M-PS5, and 2M-15-07-16f."}}
-      locator: {page: 12, section: '4.3 Collector analyses', note: "Evidence class: measured_tabulated; ratio as printed."}
+      state: {tag: value, value: {kind: bound, bound_operator: '<', bound_value: '2e-4'}}
+      locator:
+        page: 12
+        section: '4.3 Metal Loops'
+        note: >-
+          Evidence class: measured_tabulated; wire Ag/Pt ratio for Pt-loop runs
+          1M-PS4 (1400 degC, 15 min, logfO2=-8.00), 1M-PS5 (1400 degC, 15 min,
+          logfO2=-10.01), and 2M-15-07-16f (1550 degC, 15 min, logfO2=-0.68).
   - name: collector_pb_to_pt_ratio
     unit: dimensionless Pb/Pt ratio
     value:
-      state: {tag: value, value: {kind: categorical, categorical: "Pb/Pt < 7e-4 in Pt loops 1M-PS4, 1M-PS5, and 2M-15-07-16f."}}
-      locator: {page: 12, section: '4.3 Collector analyses', note: "Evidence class: measured_tabulated; ratio as printed."}
+      state: {tag: value, value: {kind: bound, bound_operator: '<', bound_value: '7e-4'}}
+      locator:
+        page: 12
+        section: '4.3 Metal Loops'
+        note: >-
+          Evidence class: measured_tabulated; wire Pb/Pt ratio for Pt-loop runs
+          1M-PS4 (1400 degC, 15 min, logfO2=-8.00), 1M-PS5 (1400 degC, 15 min,
+          logfO2=-10.01), and 2M-15-07-16f (1550 degC, 15 min, logfO2=-0.68).
   - name: collector_ga_to_pt_ratio
     unit: dimensionless Ga/Pt ratio
     value:
-      state: {tag: value, value: {kind: categorical, categorical: "Typically Ga/Pt < 7e-4; 2M-17-07-16c had 2.4(±0.1)e-3."}}
-      locator: {page: 12, section: '4.3 Collector analyses', note: "Evidence class: measured_tabulated; ratios as printed."}
-  - name: glass_residue_loop_material_comparison
-    unit: qualitative
+      state: {tag: value, value: {kind: bound, bound_operator: '<', bound_value: '7e-4'}}
+      locator:
+        page: 12
+        section: '4.3 Metal Loops'
+        note: >-
+          Evidence class: measured_tabulated; typical wire Ga/Pt ratio as reported
+          for Pt-loop samples. The paper does not enumerate the typical subset;
+          the separately reported exception is recorded by run below.
+  - name: collector_ga_to_pt_ratio_2m_17_07_16c
+    unit: dimensionless Ga/Pt ratio
     value:
-      state: {tag: value, value: {kind: categorical, categorical: 'Table 2 quenched-glass analyses: P09/06/18b (Pt loop) has 439.9 ppm Ga and 40.5 ppm Cu; P09/06/18a (Re loop) has 409.4 ppm Ga and 11.2 ppm Cu. Section 4.3 compares these similar glass concentrations to argue that partitioning into the wire has no resolvable effect on melt depletion.'}}
-      locator: {page: 54, table: '2', section: 'Results — Run conditions and LA-ICP-MS trace element data', note: 'Evidence class: measured_tabulated; ppm values are from quenched glass in the paired runs, not from wire analyses. Section 4.3, printed pp. 12–13, uses the comparison to argue that loss into the wire does not appreciably affect melt measurements.'}
+      state: {tag: value, value: {kind: interval, interval_low: '2.3e-3', interval_high: '2.5e-3'}}
+      locator:
+        page: 12
+        section: '4.3 Metal Loops'
+        note: >-
+          Evidence class: measured_tabulated; wire Ga/Pt ratio in run
+          2M-17-07-16c (1500 degC, 60 min, logfO2=-8.00; Pt loop), reported as
+          2.4(±0.1)e-3.
   - name: collector_cu_to_pt_ratio
     unit: dimensionless Cu/Pt ratio
     value:
-      state: {tag: value, value: {kind: categorical, categorical: "Cu/Pt = 4.7±2.9e-3."}}
-      locator: {page: 12, section: '4.3 Collector analyses', note: "Evidence class: measured_tabulated; ratio as printed."}
+      state: {tag: value, value: {kind: interval, interval_low: '1.8e-3', interval_high: '7.6e-3'}}
+      locator:
+        page: 12
+        section: '4.3 Metal Loops'
+        note: >-
+          Evidence class: measured_tabulated; highly heterogeneous Cu/Pt ratios
+          measured in Pt wire, reported as 4.7±2.9e-3; the source does not assign
+          this summary ratio to an individual run.
   - name: collector_cu_diffusion_depth
     unit: μm
     value:
-      state: {tag: value, value: {kind: categorical, categorical: "9 μm for a 15-minute experiment."}}
-      locator: {page: 12, section: '4.3 Collector analyses', note: "Evidence class: measured_tabulated; penetration depth as printed."}
+      state: {tag: value, value: {kind: point, point: '9', approximate: true}}
+      locator:
+        page: 12
+        section: '4.3 Metal Loops'
+        note: >-
+          Evidence class: author_estimate; author-calculated diffusion depth for
+          Cu in Pt from the cited coefficient and a 15-minute experiment.
+      inference:
+        relation: diffusion_depth_from_coefficient_and_duration
+        inputs:
+        - 'Cu diffusion coefficient in Pt: 1e-13 m2/s at 1673 K (Liu et al. 2009)'
+        - 'experiment duration: 15 min'
+        output_unit: μm
   - name: collector_wire_diameter
     unit: mm
     value:
-      state: {tag: value, value: {kind: categorical, categorical: "0.1 mm wire."}}
-      locator: {page: 12, section: '4.3 Collector analyses', note: "Evidence class: measured_tabulated; diameter as printed."}
+      state: {tag: value, value: {kind: point, point: '0.1'}}
+      locator:
+        page: 12
+        section: '4.3 Metal Loops'
+        note: >-
+          Evidence class: measured_tabulated; 0.1 mm diameter Pt wire used in
+          the diffusion-depth estimate and wire-budget discussion.
   - name: collector_wire_segment_mass
     unit: mg
     value:
-      state: {tag: value, value: {kind: categorical, categorical: "0.84 mg for a 0.5 cm segment."}}
-      locator: {page: 12, section: '4.3 Collector analyses', note: "Evidence class: measured_tabulated; segment mass as printed."}
+      state: {tag: value, value: {kind: point, point: '0.84', approximate: true}}
+      locator:
+        page: 12
+        section: '4.3 Metal Loops'
+        note: >-
+          Evidence class: author_estimate; source reports 0.84 mg for a 0.5 cm
+          Pt-wire segment; density basis is not specified in this passage.
+      inference:
+        relation: author_calculated_wire_segment_mass_from_geometry
+        inputs:
+        - 'Pt-wire segment length: 0.5 cm'
+        - 'Pt-wire diameter: 0.1 mm'
+        output_unit: mg
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {page: 12, section: '4.3 Metal Loops', note: 'Density basis for the reported segment mass is not specified in this passage.'}
   - name: collector_wire_mass_fraction
     unit: percent of sample mass
     value:
-      state: {tag: value, value: {kind: categorical, categorical: "About 7% of sample mass."}}
-      locator: {page: 12, section: '4.3 Collector analyses', note: "Evidence class: measured_tabulated; percentage as printed."}
+      state: {tag: value, value: {kind: point, point: '7', approximate: true}}
+      locator:
+        page: 12
+        section: '4.3 Metal Loops'
+        note: >-
+          Evidence class: author_estimate; source states that the 0.84 mg wire
+          segment is approximately 7% of sample mass.
+      inference:
+        relation: wire_segment_mass_fraction_of_sample
+        inputs:
+        - 'wire segment mass: 0.84 mg'
+        - 'sample mass basis used by the source'
+        output_unit: percent of sample mass
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {page: 12, section: '4.3 Metal Loops', note: 'The passage does not identify the sample-mass value or run used for this approximate fraction.'}
   - name: collector_cu_budget
     unit: percent Cu budget
     value:
-      state: {tag: value, value: {kind: categorical, categorical: "9% assuming 4000 ppm Cu in the affected zone."}}
-      locator: {page: 12, section: '4.3 Collector analyses', note: "Evidence class: author calculation; value and assumption as printed."}
+      state: {tag: value, value: {kind: point, point: '9', approximate: true}}
+      locator:
+        page: 12
+        section: '4.3 Metal Loops'
+        note: >-
+          Evidence class: author_estimate; author-calculated wire Cu budget
+          assuming 4000 ppm Cu in the affected zone; not a measured wire
+          concentration.
+      inference:
+        relation: wire_cu_budget_from_affected_zone_assumption
+        inputs:
+        - 'affected-zone Cu concentration assumption: 4000 ppm'
+        - 'wire segment mass: 0.84 mg'
+        - 'wire segment mass fraction: approximately 7% of sample mass'
+        output_unit: percent Cu budget
+  - name: glass_ga_concentration_p09_06_18b
+    unit: ppm Ga
+    value:
+      state: {tag: value, value: {kind: point, point: '439.9'}}
+      locator:
+        page: 54
+        table: '2'
+        section: Results — Run conditions and LA-ICP-MS trace element data
+        note: >-
+          Evidence class: measured_tabulated; quenched-glass Ga concentration in
+          Pt-loop run P09/06/18b (1400 degC, 15 min, logfO2=-9.23). Section 4.3
+          compares this glass value with the paired Re-loop glass to argue that
+          partitioning into the wire has no resolvable effect on melt depletion.
+  - name: glass_ga_concentration_p09_06_18a
+    unit: ppm Ga
+    value:
+      state: {tag: value, value: {kind: point, point: '409.4'}}
+      locator:
+        page: 54
+        table: '2'
+        section: Results — Run conditions and LA-ICP-MS trace element data
+        note: >-
+          Evidence class: measured_tabulated; quenched-glass Ga concentration in
+          Re-loop run P09/06/18a (1400 degC, 15 min, logfO2=-9.23). Section 4.3
+          compares this glass value with the paired Pt-loop glass to argue that
+          partitioning into the wire has no resolvable effect on melt depletion.
+  - name: glass_cu_concentration_p09_06_18b
+    unit: ppm Cu
+    value:
+      state: {tag: value, value: {kind: point, point: '40.5'}}
+      locator:
+        page: 54
+        table: '2'
+        section: Results — Run conditions and LA-ICP-MS trace element data
+        note: >-
+          Evidence class: measured_tabulated; quenched-glass Cu concentration in
+          Pt-loop run P09/06/18b (1400 degC, 15 min, logfO2=-9.23). Section 4.3
+          compares this glass value with the paired Re-loop glass to argue that
+          partitioning into the wire has no resolvable effect on melt depletion.
+  - name: glass_cu_concentration_p09_06_18a
+    unit: ppm Cu
+    value:
+      state: {tag: value, value: {kind: point, point: '11.2'}}
+      locator:
+        page: 54
+        table: '2'
+        section: Results — Run conditions and LA-ICP-MS trace element data
+        note: >-
+          Evidence class: measured_tabulated; quenched-glass Cu concentration in
+          Re-loop run P09/06/18a (1400 degC, 15 min, logfO2=-9.23). Section 4.3
+          compares this glass value with the paired Pt-loop glass to argue that
+          partitioning into the wire has no resolvable effect on melt depletion.
   - name: collector_oxidation_state
     unit: not reported
     value:
