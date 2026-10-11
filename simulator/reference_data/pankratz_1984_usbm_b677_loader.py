@@ -8,6 +8,7 @@ from decimal import Decimal
 from pathlib import Path
 
 from simulator.yaml_cache import load_cached_safe_yaml
+from simulator.reference_data.published_curve_gates import three_cell_gate_passes
 
 
 COMPILATION_ROOT = Path(__file__).resolve().parents[2] / "data/literature/compilations/pankratz-1984-usbm-b677"
@@ -59,7 +60,7 @@ def load_published_curves(root: Path = COMPILATION_ROOT) -> tuple[dict, ...]:
                 "residual": float(predicted - observed),
                 "tolerance": float(tolerance),
             })
-        passed = len(residuals) >= 3 and all(abs(row["residual"]) <= row["tolerance"] for row in residuals)
+        passed = three_cell_gate_passes(residuals)
         results.append({
             **curve,
             "record_kind": "published_curve_fit",

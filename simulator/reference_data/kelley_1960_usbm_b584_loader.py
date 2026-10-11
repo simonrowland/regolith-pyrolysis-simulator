@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, Iterable
 
 from simulator.yaml_cache import load_cached_safe_yaml
+from simulator.reference_data.published_curve_gates import three_cell_gate_passes
 
 
 COMPILATION_ROOT = Path(__file__).resolve().parents[2] / "data/literature/compilations/kelley-1960-usbm-b584"
@@ -121,7 +122,7 @@ def _gate_heat_content(curve: dict[str, Any], record: dict[str, Any]) -> dict[st
         residuals.append({"temperature_K": cell["temperature_K"], "predicted": predicted,
                           "observed": observed, "residual": predicted - observed,
                           "tolerance": tolerance})
-    passed = len(residuals) >= 3 and all(abs(row["residual"]) <= row["tolerance"] for row in residuals)
+    passed = three_cell_gate_passes(residuals)
     return {**curve, "gate": {"status": "passed" if passed else "transcription_gate_failed",
                               "kind": "printed_heat_content_cells",
                               "reason": None if passed else "transcription_gate_failed" if len(residuals) >= 3 else "no_independent_check",
