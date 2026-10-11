@@ -518,6 +518,7 @@ def test_openimcc_producer_emits_activity_and_vapour_rails() -> None:
     gas_digest = handle.identity["engine_binding_identity"]["gas_table_digest"]
     assert cell.vapor_pressures_source["K"] == f"openimcc-gas-table:sha256:{gas_digest}"
     assert cell.model_id == "IMCC-SF04"
+    assert handle.identity["pack"] == handle.backend._pack_name
 
 
 def test_missing_binding_digest_refuses_without_residual_identity_or_cache_key(
@@ -1308,7 +1309,7 @@ def test_openimcc_ti_gas_matches_direct_calculation() -> None:
     melt = evaluate(
         composition_mol,
         2200.0,
-        pack=openimcc_bridge._load_pack("v1.0.2"),
+        pack=openimcc_bridge._load_pack("default"),
         basis_type="mol",
         allow_extrapolation=True,
         allow_out_of_envelope=True,

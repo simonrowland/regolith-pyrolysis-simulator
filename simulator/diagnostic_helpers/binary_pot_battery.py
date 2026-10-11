@@ -1760,7 +1760,7 @@ class _OpenImccBatteryBackend:
 
         self._bridge = openimcc_bridge
         self._package = openimcc_bridge._require_openimcc()
-        self._pack_name = "v1.0.2"
+        self._pack_name = "default"
         self._pack = openimcc_bridge._load_pack(self._pack_name)
         self._gas: Any = None
         self._gas_error: str | None = None
