@@ -5,6 +5,47 @@ source:
     Geology 139, 21-38.
   doi: 10.1016/S0009-2541(97)00030-2
   year: 1997
+source_tables:
+  table_1:
+    locator: {page: 22, table: '1'}
+    title: Silicate starting compositions (electron microprobe analysis)
+    columns: [oxide, wt.%, AD (anorthite-diopside), BK (komatiitic basalt)]
+    footnotes: none printed
+  table_2:
+    locator: {pages: [23, 24, 25], table: '2'}
+    title: Mole fraction and activity coefficients (γ) of metal oxides
+    columns: [run, T (K), log fO2, XCoO, XFeO, XNiO, XFeO, γCoO, γNiO, "γ of ‘FeO’"]
+    footnotes: no explanatory footnote is printed; the body prints the run label AD 14* without explanation
+    scope_note: 57 FeO activity-coefficient experiments, identified by a printed γ of quoted FeO value
+  table_3:
+    locator: {pages: [26, 27], table: '3'}
+    title: Equilibration of metal and silicate melts with variable MgO-content
+    columns:
+      table_3a: [run, T (K), duration (h), log fO2, CoO (wt.%), CoO s.d. (%), MgO (wt.%), MgO s.d. (%), γCoO,
+        run, T (K), duration (h), log fO2, NiO (wt.%), NiO s.d. (%), MgO (wt.%), MgO s.d. (%), γNiO]
+      table_3b: [run, T (K), duration (h), log fO2, CoO (wt.%), CoO s.d. (%), NiO (wt.%), NiO s.d. (%), FeO (wt.%),
+        FeO s.d. (%), MgO (wt.%), MgO s.d. (%), Co (wt.%), Co s.d. (%), Ni (wt.%), Ni s.d. (%), Fe (wt.%), Fe s.d. (%),
+        γCoO, γNiO, "γ of ‘FeO’"]
+      table_3c: [run, T (K), duration (h), log fO2, CoO (wt.%), CoO s.d. (%), FeO (wt.%), FeO s.d. (%), MgO (wt.%),
+        MgO s.d. (%), Co (wt.%), Co s.d. (%), Fe (wt.%), Fe s.d. (%), γCoO, "γ of ‘FeO’"]
+      table_3d: [run, T (K), duration (h), log fO2, NiO (wt.%), NiO s.d. (%), FeO (wt.%), FeO s.d. (%), MgO (wt.%),
+        MgO s.d. (%), Ni (wt.%), Ni s.d. (%), Fe (wt.%), Fe s.d. (%), γNiO, "γ of ‘FeO’"]
+    footnotes: none printed
+  activity_calculation:
+    locator: {page: 30, equation: '9'}
+    reference_state_text: >-
+      pure liquid Fe(1-x)O (the source's wüstite(l)); reference reaction Fe(s) + 1/2 O2(g) = "FeO"(l), corresponding Fe reaction in section 3;
+      deltaG0 source O'Neill and Pownceby (1993) and Barin (1989)
+    source_wording: The paper identifies the liquid "FeO" reference as wüstite(l); it contrasts this with stoichiometric
+      FeO(l), whose activity coefficients are higher.
+    calculation: >-
+      The paper says the corresponding reaction for Fe was calculated from free energies of formation using thermodynamic
+      data from O'Neill and Pownceby (1993) and Barin (1989). The Fe free-energy expression is ΔG("FeO"(l)) [J/mol] =
+      -244118 + 115.559·T - 8.474·T·ln T (Eq. 9, T in K); it is used in Eq. 4 with log γFeO = log K - log XFeO +
+      1/2·log fO2. The text states the oxide activity coefficients are relative to pure liquid oxide at 1 atm.
+    typed_structure_limit: >-
+      Typed standard_state can encode a Raoultian pure endmember and liquid phase, but it has no field for the liquid
+      wüstite nonstoichiometry Fe(1-x)O; each FeO activity row also records that identity in standard_state text.
 extraction:
   method: layout-preserving pdftotext manual transcription; source tables and prose reviewed
   date: '2026-09-20'
