@@ -273,7 +273,7 @@ species:
       locator:
         page: 825
         published_page: 825
-        pdf_page_index: 5
+        pdf_page_index: 4
         table: I
         source_path: tables/kems-031-halwax-2024/t1.csv
       quote: '1st measurement | 53.67 | 49.25
@@ -298,12 +298,12 @@ species:
           initial_mass_mg: 53.67
           mass_after_experiment_mg: 49.25
           quote: '1st measurement | Initial Mass MgO [mg] 53.67 | Mass After Experiment CaO [mg] 49.25'
-          locator: {page: 825, table: I, pdf_page_index: 5}
+          locator: {page: 825, table: I, pdf_page_index: 4}
         - measurement: 2nd measurement
           initial_mass_mg: 51.58
           mass_after_experiment_mg: 48.28
           quote: '2nd measurement | Initial Mass MgO [mg] 51.58 | Mass After Experiment CaO [mg] 48.28'
-          locator: {page: 825, table: I, pdf_page_index: 5}
+          locator: {page: 825, table: I, pdf_page_index: 4}
         T_range_as_published: ~ 1675 K to ~ 2075 K for MgO
         T_range_quote: from ~ 1825 K to ~ 2125 K for CaO and ~ 1675 K to ~ 2075 K for MgO
         T_range_locator: {page: 826, published_page: 826, paragraph: experimental temperature ranges}
@@ -519,7 +519,7 @@ species:
       locator:
         page: 825
         published_page: 825
-        pdf_page_index: 5
+        pdf_page_index: 4
         paragraph: experimental
         quote: To prevent reactions between the Knudsen cell and the sample, an iridium cell was used. The orifice in the lid of the cell had a diameter of 0.3 mm.
       phase: pure_MgO_CaO
@@ -536,12 +536,12 @@ species:
         numeric_psat_transcription_status: figure_only
         figs_8_13_quote: The determined pressures of the respective species are shown as an Arrhenius plot in Figures 8, 9, 10, 11, 12, and 13.
         polythermal_pressure_figures:
-        - {oxide: CaO, gas_species: Ca(g), figure: '8', locator: {page: 827, pdf_page_index: 7}}
-        - {oxide: CaO, gas_species: O(g), figure: '9', locator: {page: 827, pdf_page_index: 7}}
-        - {oxide: CaO, gas_species: O2(g), figure: '10', locator: {page: 827, pdf_page_index: 7}}
-        - {oxide: MgO, gas_species: Mg(g), figure: '11', locator: {page: 827, pdf_page_index: 7}}
-        - {oxide: MgO, gas_species: O(g), figure: '12', locator: {page: 828, pdf_page_index: 8}}
-        - {oxide: MgO, gas_species: O2(g), figure: '13', locator: {page: 828, pdf_page_index: 8}}
+        - {oxide: CaO, gas_species: Ca(g), figure: '8', locator: {page: 827, pdf_page_index: 6}}
+        - {oxide: CaO, gas_species: O(g), figure: '9', locator: {page: 827, pdf_page_index: 6}}
+        - {oxide: CaO, gas_species: O2(g), figure: '10', locator: {page: 827, pdf_page_index: 6}}
+        - {oxide: MgO, gas_species: Mg(g), figure: '11', locator: {page: 827, pdf_page_index: 6}}
+        - {oxide: MgO, gas_species: O(g), figure: '12', locator: {page: 828, pdf_page_index: 7}}
+        - {oxide: MgO, gas_species: O2(g), figure: '13', locator: {page: 828, pdf_page_index: 7}}
         figs_14_15_quote: In Figure 14 and Figure 15, the results were obtained in this way, using the FactPS database
       uncertainty:
         temperature_systematic_K: 5.0
@@ -621,7 +621,7 @@ species:
       locator:
         page: 825
         published_page: 825
-        pdf_page_index: 5
+        pdf_page_index: 4
         table: I
         source_path: tables/kems-031-halwax-2024/t1.csv
       quote: '1st measurement | 53.93 | 45.06
@@ -645,12 +645,12 @@ species:
           initial_mass_mg: 53.93
           mass_after_experiment_mg: 45.06
           quote: '1st measurement | Initial Mass CaO [mg] 53.93 | Mass After Experiment CaO [mg] 45.06'
-          locator: {page: 825, table: I, pdf_page_index: 5}
+          locator: {page: 825, table: I, pdf_page_index: 4}
         - measurement: 2nd measurement
           initial_mass_mg: 49.51
           mass_after_experiment_mg: 45.72
           quote: '2nd measurement | Initial Mass CaO [mg] 49.51 | Mass After Experiment CaO [mg] 45.72'
-          locator: {page: 825, table: I, pdf_page_index: 5}
+          locator: {page: 825, table: I, pdf_page_index: 4}
         T_range_as_published: ~ 1825 K to ~ 2125 K for CaO
         T_range_quote: from ~ 1825 K to ~ 2125 K for CaO and ~ 1675 K to ~ 2075 K for MgO
         T_range_locator: {page: 826, published_page: 826, paragraph: experimental temperature ranges}
@@ -667,7 +667,7 @@ species:
       locator:
         page: 826
         published_page: 826
-        pdf_page_index: 6
+        pdf_page_index: 5
         table: III
         source_path: tables/kems-031-halwax-2024/t3.csv
       quote: 'Species/Isotope | σi [10^-16 cm2] | ni
@@ -693,11 +693,11 @@ species:
         electron_energy_quote: at an electron ionization energy of 70 eV
         taken_from_quote: The used ionization cross sections (σi) at an electron ionization energy of 70 eV as well as the isotopic abundance (ni) of the different elements were taken from References 38 and 39, respectively.
         pressure_equation_as_printed: p_i = (k I_i T f_i) / (n_i gamma_i sigma_i)
-        pressure_equation_locator: {page: 823, equation: '1'}
-        intensity_note: Measured ion intensities I_i enter Eq. 1, but no numerical ion intensities for the isothermal rows are printed; the resulting partial pressures are shown only in Fig. 7.
+        pressure_equation_locator: {page: 824, pdf_page_index: 3, equation: '1'}
+        intensity_note: Measured ion intensities I_i enter Eq. 1, but no numerical ion intensities for these isothermal rows are printed; the resulting pressures are shown in Fig. 7. The paper also quotes Altman's historical Mg-pressure equation (published p. 832) and measured/FactSage pressure ratios; neither supplies these six observations.
         calibration_factor_reference: halwax_2024_table_ii_ni_sublimation_this_study
         oxygen_molecular_cross_section_equation_as_printed: sigma_mol = 0.75 sum_i sigma_at(i)
-        oxygen_molecular_cross_section_equation_locator: {page: 826, equation: '12'}
+        oxygen_molecular_cross_section_equation_locator: {page: 826, pdf_page_index: 5, equation: '12'}
         calibration_references_as_printed: [38, 39]
         cells:
         - {species_isotope: 40Ca, sigma_i: 9.0534, n_i: 0.96941, quote: '40Ca | 9.0534 | 0.96941'}
@@ -1113,7 +1113,7 @@ species:
       locator:
         page: 826
         published_page: 826
-        pdf_page_index: 6
+        pdf_page_index: 5
         table: II
         row: This Study
         source_path: tables/kems-031-halwax-2024/t2.csv
@@ -1144,7 +1144,7 @@ species:
       uncertainty:
         delta_H_sub_kJ_mol: 4.0
         quote: 422 ± 4
-        locator: {page: 826, table: II}
+        locator: {page: 826, pdf_page_index: 5, table: II}
         basis: author_reported
     - observation_id: halwax_2024_table_ii_ni_sublimation_literature
       type: gibbs_table
@@ -1152,7 +1152,7 @@ species:
       locator:
         page: 826
         published_page: 826
-        pdf_page_index: 6
+        pdf_page_index: 5
         table: II
         source_path: tables/kems-031-halwax-2024/t2.csv
       quote: 'NIST-JANAF Tables[1] | 418 ± 8.4
@@ -1221,7 +1221,7 @@ fidelity_samples:
   locator:
     page: 825
     table: I
-    pdf_page_index: 5
+    pdf_page_index: 4
     note: Table I 1st measurement CaO initial mass 53.93 mg
 - species: MgO
   observable: rate_series
@@ -1231,7 +1231,7 @@ fidelity_samples:
   locator:
     page: 825
     table: I
-    pdf_page_index: 5
+    pdf_page_index: 4
     note: Table I 1st measurement MgO initial mass 53.67 mg
 - species: MgO
   observable: gibbs_table
@@ -1281,11 +1281,12 @@ fidelity_samples:
   locator:
     page: 826
     table: II
-    pdf_page_index: 6
+    pdf_page_index: 5
     note: 'Table II This Study ΔHsub 422 ± 4 kJ/mol'
 - path: species.Ni.observations[halwax_2024_table_ii_ni_sublimation_this_study].values.pressure_calibration_factor_as_printed
   value: '7.6414·10⁻⁹'
   locator:
     page: 826
+    pdf_page_index: 5
     section: A. Calibration
     note: 'Printed pressure calibration factor; units not stated'
