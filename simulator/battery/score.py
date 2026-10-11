@@ -244,6 +244,7 @@ QUANTITY_METRIC: dict[Quantity, MetricOperation] = {
     Quantity.O2_YIELD: MetricOperation.RELATIVE,
     Quantity.EVAPORATION_RATE: MetricOperation.RELATIVE,
     Quantity.MASS_LOSS_RATE: MetricOperation.RELATIVE,
+    Quantity.MASS_LOSS_AREAL_FLUX: MetricOperation.RELATIVE,
     Quantity.WALL_DEPOSIT_MASS: MetricOperation.RELATIVE,
     Quantity.TRANSITION_TEMPERATURE: MetricOperation.ABSOLUTE,
     Quantity.FE3_FE2_RATIO: MetricOperation.RELATIVE,

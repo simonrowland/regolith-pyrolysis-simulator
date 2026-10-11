@@ -41,6 +41,7 @@ from typing import Any, Iterable, Mapping, Sequence
 from simulator.battery.enums import (
     AdmissionStatus,
     EvidenceClass,
+    KINETIC_YIELD_QUANTITIES,
     MEASURED_EVIDENCE,
     MethodToken,
     Quantity,
@@ -270,22 +271,12 @@ def _is_langmuir_pressure_or_alpha(method: MethodToken, quantity: Quantity) -> b
         Quantity.EVAPORATION_COEFFICIENT_ALPHA,
         Quantity.EVAPORATION_RATE,
         Quantity.MASS_LOSS_RATE,
+        Quantity.MASS_LOSS_AREAL_FLUX,
     }
 
 
 def _is_kinetic_or_yield(quantity: Quantity) -> bool:
-    return quantity in {
-        Quantity.EVAPORATION_COEFFICIENT_ALPHA,
-        Quantity.EVAPORATION_RATE,
-        Quantity.MASS_LOSS_RATE,
-        Quantity.MASS_LOSS_FRACTION,
-        Quantity.MASS_LOSS_FRACTION_VS_T,
-        Quantity.YIELD_FRACTION,
-        Quantity.EVOLVED_GAS_YIELD,
-        Quantity.O2_YIELD,
-        Quantity.CONDENSATE_COMPOSITION,
-        Quantity.WALL_DEPOSIT_MASS,
-    }
+    return quantity in KINETIC_YIELD_QUANTITIES
 
 
 COMPARISON_RATIO_KINDS = frozenset({"ratio", "comparison_ratio"})
@@ -335,6 +326,7 @@ _METHOD_SCOPED_APPARATUS_QUANTITIES = frozenset(
         Quantity.EVAPORATION_COEFFICIENT_ALPHA,
         Quantity.EVAPORATION_RATE,
         Quantity.MASS_LOSS_RATE,
+        Quantity.MASS_LOSS_AREAL_FLUX,
         Quantity.MASS_LOSS_FRACTION,
         Quantity.MASS_LOSS_FRACTION_VS_T,
         Quantity.YIELD_FRACTION,

@@ -740,6 +740,103 @@ def test_areal_unit_routes_agree(unit, factor):
         assert quantity.value is Quantity.MASS_LOSS_AREAL_DENSITY and issue is None
 
 
+@pytest.mark.parametrize(
+    ("units", "value", "expected"),
+    [
+        ("g/(cm2 s)", "1", Decimal("10")),
+        ("g/(cm^2 s)", "1", Decimal("10")),
+        ("g/(cm² s)", "1", Decimal("10")),
+        ("g/(sec. cm^2)", "1", Decimal("10")),
+        ("g cm^-2 s^-1", "1", Decimal("10")),
+        ("g cm-2 sec-1", "1", Decimal("10")),
+        ("mg/(cm2 s)", "1", Decimal("0.01")),
+        ("mg/(cm² sec)", "1", Decimal("0.01")),
+        ("mg cm-2 second-1", "1", Decimal("0.01")),
+        ("kg/(cm^2 second)", "1", Decimal("10000")),
+        ("g/(m2 sec)", "1", Decimal("0.001")),
+        ("g/(m² s^1)", "1", Decimal("0.001")),
+        ("mg/(m^2 second)", "1", Decimal("0.000001")),
+        ("mg m^-2 sec^-1", "1", Decimal("0.000001")),
+        ("kg/(m2 s)", "1", Decimal("1")),
+        ("kg m-2 second-1", "1", Decimal("1")),
+        ("g/(cm2 s) x 10^+4", "1.48", Decimal("0.00148")),
+    ],
+)
+def test_areal_mass_flux_unit_conversions(units, value, expected):
+    converted, relation = M.convert_mass_flux_to_kg_per_m2_per_s(value, units)
+    assert converted == expected
+    if relation != "kg_per_m2_per_s_identity":
+        derivation = M.conversion_derivation(relation, value, None)
+        assert derivation is not None
+        assert derivation.output_unit == "kg_per_m2_per_s"
+
+
+@pytest.mark.parametrize(
+    "units",
+    [
+        "g/(cm2 s^2)",
+        "g/(cm2 s^-2)",
+        "g/(cm2 second^2)",
+        "g/(cm2 min)",
+        "g/(cm2 h)",
+        "g/(mm2 s)",
+        "g/(km2 s)",
+        "oz/(cm2 s)",
+        "g/(cm2)",
+        "g/(cm2 s) x 10^5",
+        "g/(cm2 s) x 10^-4",
+        "g/(cm2 s) x 10^",
+        "g/(cm2 s) x 10^4.5",
+        "g/(cm2 s) x 10^4 trailing",
+        "g/(cm2 s); extra units",
+    ],
+)
+def test_areal_mass_flux_refuses_unsupported_full_unit_strings(units):
+    converted, reason = M.convert_mass_flux_to_kg_per_m2_per_s("1", units)
+    assert converted is None
+    assert reason is not None and units in reason
+
+    selection = M.select_declared_source(
+        Quantity.MASS_LOSS_AREAL_FLUX,
+        units,
+        {"mass_loss_areal_flux": "1"},
+    )
+    assert not selection.available
+    assert selection.reason is not None and units in selection.reason
+
+
+def test_areal_mass_flux_records_printed_header_multiplier():
+    converted, relation = M.convert_mass_flux_to_kg_per_m2_per_s(
+        "1.48", "(g/(sec. cm^2)) x 10^4"
+    )
+    assert converted == Decimal("0.00148")
+    assert relation == (
+        "printed_x10^4_header_scale_then_g_per_cm2_per_s_to_kg_per_m2_per_s"
+    )
+    derivation = M.conversion_derivation(relation, "1.48", None)
+    assert derivation is not None
+    assert derivation.output_unit == "kg_per_m2_per_s"
+    assert "cell / 10^4" in derivation.inputs[0]
+
+
+@pytest.mark.parametrize(
+    "field",
+    ["mass_loss_areal_flux", "mass_loss_areal_flux_decorated"],
+)
+def test_named_and_decorated_areal_flux_fields_keep_the_numeric_pin(field):
+    selection = M.select_declared_source(
+        Quantity.MASS_LOSS_AREAL_FLUX,
+        "(g/(sec. cm^2)) x 10^4",
+        {field: "1.48"},
+    )
+    assert selection.value.kind is M.ValueKind.POINT
+    assert selection.amount == Decimal("0.00148")
+    assert selection.field_name == field
+    assert selection.unit_trail == (
+        "printed_x10^4_header_scale_then_g_per_cm2_per_s_to_kg_per_m2_per_s"
+    )
+
+
 @pytest.mark.parametrize("source,recipes", [
     ("yam1983", 7), ("kems-118-yamamoto-1983", 10),
     ("deguzman-2026-simulant-physicochemical", 0), ("kems-020-hastie-1981-nbsir", 0),

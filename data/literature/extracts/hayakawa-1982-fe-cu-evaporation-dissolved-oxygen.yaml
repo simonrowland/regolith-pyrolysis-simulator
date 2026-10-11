@@ -1,0 +1,314 @@
+schema_version: literature_extract.v1
+source_id: hayakawa-1982-fe-cu-evaporation-dissolved-oxygen
+source:
+  citation: Hayakawa, Shizunori, Takao Choh, and Michio Inouye (1982), “Effect of Dissolved Oxygen on the Rates of Evaporation of Molten Iron and Copper,” Transactions of the Iron and Steel Institute of Japan 22(8), 637–645.
+  doi: 10.2355/isijinternational1966.22.637
+  url: https://doi.org/10.2355/isijinternational1966.22.637
+  year: 1982
+extraction:
+  method: Manual transcription from 250 dpi pdftoppm page renders of the scanned publisher PDF. Tables 1 and 2 were independently read row-wise and column-wise from published page 639 (PDF page 3); no usable text layer was used for table cells. The images were checked again for fidelity pins. Other printed equations and prose were read from the page renders. Fig. 3 is recorded as figure_only and was not digitised.
+  table_transcription_audit:
+    independent_passes: [row_wise, column_wise]
+    differing_cells: []
+    blank_cells: 8
+    blank_cell_location: Final oxygen column only; retained as printed_blank_cell with typed unknown, not zero
+    printed_dash_cells: 0
+  date: '2026-10-11'
+  worker: hayakawa82
+review_status: draft
+fidelity_samples:
+- path: species.Fe.observations[hayakawa_1982_table_1_fe_oxygen_evaporation].values.rows[0].mass_loss_areal_flux
+  value: 1.48
+  locator: {published_page: 639, pdf_page_index: 3, table: '1', note: 'Row-wise and column-wise image reread: Fe, 1550 °C, initial [O] 0.0087 wt%, evaporation-rate cell 1.48'}
+- path: species.Fe.observations[hayakawa_1982_table_1_fe_oxygen_evaporation].values.rows[8].mass_loss_areal_flux
+  value: 2.35
+  locator: {published_page: 639, pdf_page_index: 3, table: '1', note: 'Row-wise and column-wise image reread: Fe, 1580 °C, initial [O] 0.014 wt%, evaporation-rate cell 2.35'}
+- path: species.Fe.observations[hayakawa_1982_table_1_fe_oxygen_evaporation].values.rows[14].mass_loss_areal_flux
+  value: 3.43
+  locator: {published_page: 639, pdf_page_index: 3, table: '1', note: 'Row-wise and column-wise image reread: Fe, 1610 °C, initial [O] 0.021 wt%, evaporation-rate cell 3.43'}
+- path: species.Cu.observations[hayakawa_1982_table_2_cu_oxygen_evaporation].values.rows[0].mass_loss_areal_flux
+  value: 0.04
+  locator: {published_page: 639, pdf_page_index: 3, table: '2', note: 'Row-wise and column-wise image reread: Cu, 1100 °C, initial [O] 0.011 wt%, evaporation-rate cell 0.04'}
+- path: species.Cu.observations[hayakawa_1982_table_2_cu_oxygen_evaporation].values.rows[4].mass_loss_areal_flux
+  value: 0.67
+  locator: {published_page: 639, pdf_page_index: 3, table: '2', note: 'Row-wise and column-wise image reread: Cu, 1230 °C, initial [O] 0.003 wt%, evaporation-rate cell 0.67'}
+- path: species.Cu.observations[hayakawa_1982_table_2_cu_oxygen_evaporation].values.rows[11].mass_loss_areal_flux
+  value: 2.12
+  locator: {published_page: 639, pdf_page_index: 3, table: '2', note: 'Row-wise and column-wise image reread: Cu, 1300 °C, initial [O] 0.003 wt%, evaporation-rate cell 2.12'}
+benches:
+- id: hayakawa-microbalance-furnace
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Reduced-pressure liquid-metal evaporation apparatus with resistance furnace and recording microbalance}
+    locator: {published_page: 637, pdf_page_index: 1, figure: '1', section: 'II. Experimental Apparatus and Procedure'}
+  heating_method:
+    state: {tag: value, value: Resistance furnace with cylindrical molybdenum heater}
+    locator: {published_page: 637, pdf_page_index: 1, figure: '1', section: 'II. Experimental Apparatus and Procedure'}
+  cell_material_and_liner:
+    state: {tag: value, value: Magnesia crucible inside an alumina reaction tube; molybdenum wire suspension; heater protected by Ar + 5% H2}
+    locator: {published_page: 637, pdf_page_index: 1, figure: '1', section: 'II. Experimental Apparatus and Procedure'}
+  detector:
+    state: {tag: value, value: Recording microbalance measuring sample weight change; strip-chart recorder}
+    locator: {published_page: 637, pdf_page_index: 1, figure: '1', section: 'II. Experimental Apparatus and Procedure'}
+  pumping_type:
+    state: {tag: value, value: Rotary vacuum pump and oil diffusion pump}
+    locator: {published_page: 637, pdf_page_index: 1, section: 'II. Experimental Apparatus and Procedure'}
+  gauges:
+    vacuum_system:
+      state: {tag: value, value: Pirani and Philips gauges}
+      locator: {published_page: 637, pdf_page_index: 1, section: 'II. Experimental Apparatus and Procedure'}
+  temperature_measurement:
+    sensor:
+      state: {tag: value, value: PtRh (6%)–PtRh (30%) thermocouple}
+      locator: {published_page: 637, pdf_page_index: 1, section: 'II. Experimental Apparatus and Procedure'}
+  temperature_calibration:
+    reference_thermocouple_check:
+      state: {tag: value, value: Calibrated by another thermocouple placed at the liquid-iron sample position in the reaction tube}
+      locator: {published_page: 637, pdf_page_index: 1, section: 'II. Experimental Apparatus and Procedure'}
+experiments:
+- experiment_id: fe-cu-molten-metal-evaporation
+  bench_id: hayakawa-microbalance-furnace
+  method: langmuir_free_evaporation
+  locator: {published_page: 638, pdf_page_index: 2, section: 'II. Experimental Apparatus and Procedure'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.001', approximate: true}}
+      locator: {published_page: 638, pdf_page_index: 2, section: 'II. Experimental Apparatus and Procedure', note: About 1 g sample; unit conversion only}
+    form:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 638, pdf_page_index: 2, section: 'II. Experimental Apparatus and Procedure', note: Starting sample form is not specified}
+    printed_composition:
+      state: {tag: value, value: Electrolytic iron or low-oxygen copper; dissolved oxygen adjusted with oxide additions}
+      locator: {published_page: 637, pdf_page_index: 1, section: 'II. Experimental Apparatus and Procedure'}
+    surface_area_m2:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 638, pdf_page_index: 2, section: 'II. Experimental Apparatus and Procedure', table: '1', note: 'Crucible inner diameter is given, and table rate is area-normalized, but no exposed area or area-conversion procedure is stated'}
+  apparatus:
+    holder_material:
+      state: {tag: value, value: Magnesia crucible}
+      locator: {published_page: 638, pdf_page_index: 2, section: 'II. Experimental Apparatus and Procedure'}
+    geometry:
+      crucible_inner_diameter_mm:
+        state: {tag: value, value: {kind: point, point: '6'}}
+        locator: {published_page: 638, pdf_page_index: 2, section: 'II. Experimental Apparatus and Procedure', note: 'Printed as I.D.: 6 phi'}
+      crucible_height_mm:
+        state: {tag: value, value: {kind: point, point: '8'}}
+        locator: {published_page: 638, pdf_page_index: 2, section: 'II. Experimental Apparatus and Procedure', note: Printed as 8 mm h}
+      exposed_surface_area_m2:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 638, pdf_page_index: 2, section: 'II. Experimental Apparatus and Procedure', note: The paper gives crucible dimensions but does not state the area used to form the tabulated rate}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: interval, interval_low: '0.266644', interval_high: '13.3322'}}
+      locator: {published_page: 640, pdf_page_index: 4, section: 'IV. Discussion', note: 'For the present Fe–O and Cu–O systems the printed argon pressure range is 0.002–0.1 mmHg Ar; converted to Pa using 1 mmHg = 133.322 Pa. This is a range, not a row-specific pressure.'}
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: argon
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {published_page: 638, pdf_page_index: 2, section: 'II. Experimental Apparatus and Procedure', note: Measurements are described under argon / residual argon pressure; no gas flow is stated}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+    pumping:
+      base_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 637, pdf_page_index: 1, section: 'II. Experimental Apparatus and Procedure', note: Evacuated with rotary and oil-diffusion pumps; no numeric base pressure is stated}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 639, pdf_page_index: 3, table: '1', note: Temperature is row-specific and retained on each table row observation}
+  thermal_schedule:
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 639, pdf_page_index: 3, table: '1', note: Table holding times vary; rates are reported for the initial 10 min even when measurement continued longer}
+    method:
+      state: {tag: value, value: 'Heated under argon, evacuated near the melting point, melted in vacuo, then measured at a constant stated temperature'}
+      locator: {published_page: 638, pdf_page_index: 2, section: 'II. Experimental Apparatus and Procedure'}
+  oxygen_control_and_analysis:
+    state: {tag: value, value: Fe oxygen set by hematite pellet addition; Cu oxygen set by Cu2O–CuO mixture addition; oxygen and carbon contents determined by coulometric method}
+    locator: {published_page: 637, pdf_page_index: 1, section: 'II. Experimental Apparatus and Procedure'}
+  starting_material_residual_carbon_content_wt_pct:
+    state: {tag: value, value: {kind: interval, interval_low: '0.0017', interval_high: '0.0025'}}
+    locator: {published_page: 638, pdf_page_index: 2, section: 'II. Experimental Apparatus and Procedure', note: Both samples had residual carbon content in the printed range}
+  collector_and_products:
+    collector_temperature_C:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 637, pdf_page_index: 1, note: No collector or condenser temperature is reported}
+    collector_distance_mm:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 637, pdf_page_index: 1, note: No collector or condenser distance is reported}
+    deposit_location_phase_and_identification:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 637, pdf_page_index: 1, note: No collected or analyzed deposit is reported}
+    deposit_air_exposure_before_analysis:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 637, pdf_page_index: 1, note: No deposit analysis is reported}
+  oxygen_collection:
+    total_O2_collected_mol:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 637, pdf_page_index: 1, note: No oxygen collection measurement is reported}
+    measurement_and_calibration:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {published_page: 637, pdf_page_index: 1, note: 'This is a dissolved-oxygen evaporation study, not an O2 collection experiment'}
+  mass_vaporized_by_element:
+    state: {tag: unknown, reason: not_published}
+    locator: {published_page: 638, pdf_page_index: 2, section: 'II. Experimental Apparatus and Procedure', note: 'Sample weight change was continuously measured, but no integrated vaporized mass is tabulated'}
+  residue_composition:
+    state: {tag: unknown, reason: not_published}
+    locator: {published_page: 638, pdf_page_index: 2, section: 'II. Experimental Apparatus and Procedure', note: No residue composition is reported}
+  quench_or_staged_collector:
+    state: {tag: unknown, reason: not_published}
+    locator: {published_page: 637, pdf_page_index: 1, note: No quench or staged collector arrangement is reported}
+species:
+  Fe:
+    observations:
+    - observation_id: hayakawa_1982_table_1_fe_oxygen_evaporation
+      experiment: fe-cu-molten-metal-evaporation
+      type: rate_series
+      locator: &fe_table_locator {published_page: 639, pdf_page_index: 3, table: '1', note: Effect of oxygen on rate of evaporation of liquid iron; data as printed}
+      phase: l
+      regime: langmuir_free_evaporation
+      units: 'Evap. rate: (g/(sec. cm^2)) x 10^4; initial/final [O]: wt%; holding time: min; temperature: °C'
+      uncertainty:
+        note: No uncertainty or instrument resolution for the coulometric oxygen measurement is stated. Blank final oxygen cells remain typed unknown; they are not zero.
+      values:
+        quantity: mass_loss_areal_flux
+        method_class: measured_direct
+        rate_units_as_printed: '(g/(sec. cm^2)) x 10^4'
+        initial_oxygen_units_as_printed: wt%
+        final_oxygen_units_as_printed: wt%
+        holding_time_units_as_printed: min
+        temperature_units_as_printed: °C
+        rate_window: Initial 10 min of evaporation, including runs held longer
+        rows:
+        - {temperature_C: 1550, T_C: 1550, initial_oxygen_wt_pct: 0.0087, final_oxygen_wt_pct: 0.0086, holding_time_min: 12, mass_loss_areal_flux: 1.48, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.0087}, locator: *fe_table_locator}, final_oxygen_wt_pct: {state: {tag: value, value: 0.0086}, locator: *fe_table_locator}, holding_time_min: {state: {tag: value, value: 12}, locator: *fe_table_locator}}}
+        - {temperature_C: 1550, T_C: 1550, initial_oxygen_wt_pct: 0.021, final_oxygen_wt_pct: {tag: unknown, reason: not_published}, final_oxygen_as_printed: printed_blank_cell, holding_time_min: 54, mass_loss_areal_flux: 1.32, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.021}, locator: *fe_table_locator}, final_oxygen_wt_pct: {state: {tag: unknown, reason: not_published}, locator: *fe_table_locator}, holding_time_min: {state: {tag: value, value: 54}, locator: *fe_table_locator}}}
+        - {temperature_C: 1550, T_C: 1550, initial_oxygen_wt_pct: 0.030, final_oxygen_wt_pct: 0.026, holding_time_min: 50, mass_loss_areal_flux: 1.17, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.030}, locator: *fe_table_locator}, final_oxygen_wt_pct: {state: {tag: value, value: 0.026}, locator: *fe_table_locator}, holding_time_min: {state: {tag: value, value: 50}, locator: *fe_table_locator}}}
+        - {temperature_C: 1550, T_C: 1550, initial_oxygen_wt_pct: 0.043, final_oxygen_wt_pct: 0.023, holding_time_min: 47, mass_loss_areal_flux: 1.13, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.043}, locator: *fe_table_locator}, final_oxygen_wt_pct: {state: {tag: value, value: 0.023}, locator: *fe_table_locator}, holding_time_min: {state: {tag: value, value: 47}, locator: *fe_table_locator}}}
+        - {temperature_C: 1550, T_C: 1550, initial_oxygen_wt_pct: 0.074, final_oxygen_wt_pct: 0.040, holding_time_min: 44, mass_loss_areal_flux: 1.13, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.074}, locator: *fe_table_locator}, final_oxygen_wt_pct: {state: {tag: value, value: 0.040}, locator: *fe_table_locator}, holding_time_min: {state: {tag: value, value: 44}, locator: *fe_table_locator}}}
+        - {temperature_C: 1550, T_C: 1550, initial_oxygen_wt_pct: 0.092, final_oxygen_wt_pct: 0.047, holding_time_min: 45, mass_loss_areal_flux: 1.16, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.092}, locator: *fe_table_locator}, final_oxygen_wt_pct: {state: {tag: value, value: 0.047}, locator: *fe_table_locator}, holding_time_min: {state: {tag: value, value: 45}, locator: *fe_table_locator}}}
+        - {temperature_C: 1550, T_C: 1550, initial_oxygen_wt_pct: 0.150, final_oxygen_wt_pct: 0.049, holding_time_min: 48, mass_loss_areal_flux: 1.14, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.150}, locator: *fe_table_locator}, final_oxygen_wt_pct: {state: {tag: value, value: 0.049}, locator: *fe_table_locator}, holding_time_min: {state: {tag: value, value: 48}, locator: *fe_table_locator}}}
+        - {temperature_C: 1550, T_C: 1550, initial_oxygen_wt_pct: 0.160, final_oxygen_wt_pct: 0.049, holding_time_min: 51, mass_loss_areal_flux: 1.12, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.160}, locator: *fe_table_locator}, final_oxygen_wt_pct: {state: {tag: value, value: 0.049}, locator: *fe_table_locator}, holding_time_min: {state: {tag: value, value: 51}, locator: *fe_table_locator}}}
+        - {temperature_C: 1580, T_C: 1580, initial_oxygen_wt_pct: 0.014, final_oxygen_wt_pct: {tag: unknown, reason: not_published}, final_oxygen_as_printed: printed_blank_cell, holding_time_min: 12, mass_loss_areal_flux: 2.35, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.014}, locator: *fe_table_locator}, final_oxygen_wt_pct: {state: {tag: unknown, reason: not_published}, locator: *fe_table_locator}, holding_time_min: {state: {tag: value, value: 12}, locator: *fe_table_locator}}}
+        - {temperature_C: 1580, T_C: 1580, initial_oxygen_wt_pct: 0.027, final_oxygen_wt_pct: 0.023, holding_time_min: 11, mass_loss_areal_flux: 1.99, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.027}, locator: *fe_table_locator}, final_oxygen_wt_pct: {state: {tag: value, value: 0.023}, locator: *fe_table_locator}, holding_time_min: {state: {tag: value, value: 11}, locator: *fe_table_locator}}}
+        - {temperature_C: 1580, T_C: 1580, initial_oxygen_wt_pct: 0.046, final_oxygen_wt_pct: {tag: unknown, reason: not_published}, final_oxygen_as_printed: printed_blank_cell, holding_time_min: 11, mass_loss_areal_flux: 1.70, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.046}, locator: *fe_table_locator}, final_oxygen_wt_pct: {state: {tag: unknown, reason: not_published}, locator: *fe_table_locator}, holding_time_min: {state: {tag: value, value: 11}, locator: *fe_table_locator}}}
+        - {temperature_C: 1580, T_C: 1580, initial_oxygen_wt_pct: 0.082, final_oxygen_wt_pct: {tag: unknown, reason: not_published}, final_oxygen_as_printed: printed_blank_cell, holding_time_min: 15, mass_loss_areal_flux: 1.59, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.082}, locator: *fe_table_locator}, final_oxygen_wt_pct: {state: {tag: unknown, reason: not_published}, locator: *fe_table_locator}, holding_time_min: {state: {tag: value, value: 15}, locator: *fe_table_locator}}}
+        - {temperature_C: 1580, T_C: 1580, initial_oxygen_wt_pct: 0.113, final_oxygen_wt_pct: 0.095, holding_time_min: 13, mass_loss_areal_flux: 1.71, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.113}, locator: *fe_table_locator}, final_oxygen_wt_pct: {state: {tag: value, value: 0.095}, locator: *fe_table_locator}, holding_time_min: {state: {tag: value, value: 13}, locator: *fe_table_locator}}}
+        - {temperature_C: 1580, T_C: 1580, initial_oxygen_wt_pct: 0.153, final_oxygen_wt_pct: 0.146, holding_time_min: 11, mass_loss_areal_flux: 1.70, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.153}, locator: *fe_table_locator}, final_oxygen_wt_pct: {state: {tag: value, value: 0.146}, locator: *fe_table_locator}, holding_time_min: {state: {tag: value, value: 11}, locator: *fe_table_locator}}}
+        - {temperature_C: 1610, T_C: 1610, initial_oxygen_wt_pct: 0.021, final_oxygen_wt_pct: 0.032, holding_time_min: 15, mass_loss_areal_flux: 3.43, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.021}, locator: *fe_table_locator}, final_oxygen_wt_pct: {state: {tag: value, value: 0.032}, locator: *fe_table_locator}, holding_time_min: {state: {tag: value, value: 15}, locator: *fe_table_locator}}}
+        - {temperature_C: 1610, T_C: 1610, initial_oxygen_wt_pct: 0.027, final_oxygen_wt_pct: 0.034, holding_time_min: 13, mass_loss_areal_flux: 3.13, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.027}, locator: *fe_table_locator}, final_oxygen_wt_pct: {state: {tag: value, value: 0.034}, locator: *fe_table_locator}, holding_time_min: {state: {tag: value, value: 13}, locator: *fe_table_locator}}}
+        - {temperature_C: 1610, T_C: 1610, initial_oxygen_wt_pct: 0.043, final_oxygen_wt_pct: 0.034, holding_time_min: 18, mass_loss_areal_flux: 2.76, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.043}, locator: *fe_table_locator}, final_oxygen_wt_pct: {state: {tag: value, value: 0.034}, locator: *fe_table_locator}, holding_time_min: {state: {tag: value, value: 18}, locator: *fe_table_locator}}}
+        - {temperature_C: 1610, T_C: 1610, initial_oxygen_wt_pct: 0.056, final_oxygen_wt_pct: {tag: unknown, reason: not_published}, final_oxygen_as_printed: printed_blank_cell, holding_time_min: 15, mass_loss_areal_flux: 2.64, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.056}, locator: *fe_table_locator}, final_oxygen_wt_pct: {state: {tag: unknown, reason: not_published}, locator: *fe_table_locator}, holding_time_min: {state: {tag: value, value: 15}, locator: *fe_table_locator}}}
+        - {temperature_C: 1610, T_C: 1610, initial_oxygen_wt_pct: 0.074, final_oxygen_wt_pct: 0.070, holding_time_min: 18, mass_loss_areal_flux: 2.56, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.074}, locator: *fe_table_locator}, final_oxygen_wt_pct: {state: {tag: value, value: 0.070}, locator: *fe_table_locator}, holding_time_min: {state: {tag: value, value: 18}, locator: *fe_table_locator}}}
+        - {temperature_C: 1610, T_C: 1610, initial_oxygen_wt_pct: 0.102, final_oxygen_wt_pct: 0.070, holding_time_min: 20, mass_loss_areal_flux: 2.42, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.102}, locator: *fe_table_locator}, final_oxygen_wt_pct: {state: {tag: value, value: 0.070}, locator: *fe_table_locator}, holding_time_min: {state: {tag: value, value: 20}, locator: *fe_table_locator}}}
+        - {temperature_C: 1610, T_C: 1610, initial_oxygen_wt_pct: 0.153, final_oxygen_wt_pct: 0.168, holding_time_min: 17, mass_loss_areal_flux: 2.38, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.153}, locator: *fe_table_locator}, final_oxygen_wt_pct: {state: {tag: value, value: 0.168}, locator: *fe_table_locator}, holding_time_min: {state: {tag: value, value: 17}, locator: *fe_table_locator}}}
+        - {temperature_C: 1610, T_C: 1610, initial_oxygen_wt_pct: 0.160, final_oxygen_wt_pct: 0.108, holding_time_min: 17, mass_loss_areal_flux: 2.23, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.160}, locator: *fe_table_locator}, final_oxygen_wt_pct: {state: {tag: value, value: 0.108}, locator: *fe_table_locator}, holding_time_min: {state: {tag: value, value: 17}, locator: *fe_table_locator}}}
+    context:
+    - observation_id: hayakawa_1982_fe_oxygen_rate_equations
+      type: method
+      locator: {published_page: 640, pdf_page_index: 4, equations: '1, 4-8'}
+      units: as printed
+      values:
+        quantity: printed_rate_model_correlations
+        method_class: model_derived
+        model: Langmuir adsorption isotherm applied to evaporation from oxygen-free and oxygen-occupied liquid-metal surface sites; fitted by least squares where stated
+        assumptions: {adsorption_equilibrium: Langmuir isotherm, evaporation_sites: both oxygen-free and oxygen-occupied sites, oxygen_activity_approximation: '[%O] used for aO in Eqs. (5)-(7)', pressure_resistance: gas-phase mass-transfer resistance neglected for the stated low-pressure runs}
+        equations_as_printed:
+          equation_1: 'w = α P sqrt(M/(2πRT)); for pure liquid-metal comparison the authors use α = 1'
+          equation_4: 'w_N = w_1(1 − θ_o) + w_2 θ_o'
+          equation_5: 'θ_o = k′_ad a_O/(1 + k′_ad a_O) ≈ k_ad [%O]/(1 + k_ad [%O])'
+          equation_6: 'w_N = w_1 − (w_1 − w_2){k_ad [%O]/(1 + k_ad [%O])}'
+          equation_7: '1/(w_1 − w_N) = 1/((w_1 − w_2) k_ad [%O]) + 1/(w_1 − w_2)'
+          equation_8_Fe: '1610 °C: w_N = 4.4 − 2.4{48[%O]/(1 + 48[%O])}; 1580 °C: w_N = 3.1 − 1.8{63[%O]/(1 + 63[%O])}; 1550 °C: w_N = 2.1 − 1.2{89[%O]/(1 + 89[%O])}'
+          equation_10_Fe: 'log k_ad = 15000/T − 6.41'
+          equation_12_Fe: 'w_N = P sqrt(M/(2πRT)){1 − 0.57[k_ad [%O]/(1 + k_ad [%O])]}'
+          conclusion_restatement: 'log k_ad = 15000/T − 6.4; w_N uses the Eq. (12) Fe expression with factor 0.57'
+          equation_20: 'w_0 = w_1(1 − θ_o) = w_1/(1 + k_ad[%O])'
+          equation_21: 'w_0 = C_1 exp{−(E + ΠΔS)/(kT)}'
+          equation_22: 'ln w_0 = ln C_1 − (E + ΠΔS)/(kT)'
+        equation_locators:
+          equation_10_Fe: {published_page: 641, pdf_page_index: 5, equation: '10'}
+          equation_12_Fe: {published_page: 641, pdf_page_index: 5, equation: '12'}
+          equation_20: {published_page: 643, pdf_page_index: 7, equation: '20'}
+          equation_21: {published_page: 643, pdf_page_index: 7, equation: '21'}
+          equation_22: {published_page: 643, pdf_page_index: 7, equation: '22'}
+          conclusion_restatement: {published_page: 644, pdf_page_index: 8, section: 'V. Conclusion'}
+        ranges_and_units: Temperatures in Eqs. (8) are 1550–1610 °C for liquid Fe; Eq. (10) is the Fe–O relation plotted over the paper's experimental temperature span. Eq. (8) uses the rate scale of Table 1 and oxygen in wt%; Eq. (10) uses absolute T in K and k_ad in (wt%)^-1. Eq. (12) gives mass rate per area. Eqs. (20)–(22) relate the apparent oxygen-bearing rate to surface pressure Π and temperature T; the paper presents those as a model for both liquid-metal systems.
+        assumptions_and_scope: Coefficients in Eq. (8) were obtained from least-squares line fits to inverse-rate plots; Eq. (10) is a linear fit of log k_ad against 1/T. The Eq. (12) factor is rounded to 0.57 in the authors' final Fe expression. Eqs. (20)–(22) assume a monomolecular adsorption film and use the assumptions stated in the paper's Section IV.4.
+    - observation_id: hayakawa_1982_fig_3_argon_pressure_scan
+      type: method
+      locator: {published_page: 638, pdf_page_index: 2, figure: '3', note: Figure recorded as figure_only; no points digitised}
+      units: 'As printed: pressure (mmHg); rate of evaporative loss (mg cm^-2 sec^-1)'
+      values:
+        quantity: argon_pressure_dependence_of_iron_evaporation
+        method_class: figure_only
+        temperature_C: 1550
+        comparison_temperature_C: 1930
+        comparison_attribution: 'W. A. Fischer, D. Janke, and K. Stahlschmidt [3], quoted in this paper; open comparison points'
+        sample_initial_oxygen_wt_pct: 0.0052
+        x_axis: {quantity: residual argon pressure, units: mmHg, scale: logarithmic, plotted_range_as_axes: '10^-2 to 10^3', stated_study_scan_range: '0.001 to 600'}
+        y_axis: {quantity: rate of evaporative loss, units: 'mg cm^-2 sec^-1', scale: logarithmic, plotted_range_as_axes: '6 x 10^-3 to 2 x 10^1'}
+        figure_only_summary: 'Figure 3 shows present-work Fe data as black points at 1550 °C and W. A. Fischer, D. Janke, and K. Stahlschmidt [3] as open comparison points at 1930 °C (their data are quoted in this paper). The present-work rate is nearly independent of argon pressure below about 0.1 mmHg Ar and decreases as Ar pressure increases above about 0.1 mmHg; the paper identifies about 0.1 mmHg as the critical pressure where gas-phase mass-transfer resistance starts to affect the rate. No points are digitised.'
+        no_digitisation: true
+  Cu:
+    observations:
+    - observation_id: hayakawa_1982_table_2_cu_oxygen_evaporation
+      experiment: fe-cu-molten-metal-evaporation
+      type: rate_series
+      locator: &cu_table_locator {published_page: 639, pdf_page_index: 3, table: '2', note: Effect of oxygen on rate of evaporation of liquid copper; data as printed}
+      phase: l
+      regime: langmuir_free_evaporation
+      units: 'Evap. rate: (g/(sec. cm^2)) x 10^4; initial/final [O]: wt%; holding time: min; temperature: °C'
+      uncertainty:
+        note: No uncertainty or instrument resolution for the coulometric oxygen measurement is stated. Blank final oxygen cells remain typed unknown; they are not zero.
+      values:
+        quantity: mass_loss_areal_flux
+        method_class: measured_direct
+        rate_units_as_printed: '(g/(sec. cm^2)) x 10^4'
+        initial_oxygen_units_as_printed: wt%
+        final_oxygen_units_as_printed: wt%
+        holding_time_units_as_printed: min
+        temperature_units_as_printed: °C
+        rate_window: Initial 10 min of evaporation, including runs held longer
+        rows:
+        - {temperature_C: 1100, T_C: 1100, initial_oxygen_wt_pct: 0.011, final_oxygen_wt_pct: 0.003, holding_time_min: 60, mass_loss_areal_flux: 0.04, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.011}, locator: *cu_table_locator}, final_oxygen_wt_pct: {state: {tag: value, value: 0.003}, locator: *cu_table_locator}, holding_time_min: {state: {tag: value, value: 60}, locator: *cu_table_locator}}}
+        - {temperature_C: 1100, T_C: 1100, initial_oxygen_wt_pct: 0.025, final_oxygen_wt_pct: {tag: unknown, reason: not_published}, final_oxygen_as_printed: printed_blank_cell, holding_time_min: 35, mass_loss_areal_flux: 0.034, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.025}, locator: *cu_table_locator}, final_oxygen_wt_pct: {state: {tag: unknown, reason: not_published}, locator: *cu_table_locator}, holding_time_min: {state: {tag: value, value: 35}, locator: *cu_table_locator}}}
+        - {temperature_C: 1100, T_C: 1100, initial_oxygen_wt_pct: 0.055, final_oxygen_wt_pct: 0.038, holding_time_min: 34, mass_loss_areal_flux: 0.034, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.055}, locator: *cu_table_locator}, final_oxygen_wt_pct: {state: {tag: value, value: 0.038}, locator: *cu_table_locator}, holding_time_min: {state: {tag: value, value: 34}, locator: *cu_table_locator}}}
+        - {temperature_C: 1100, T_C: 1100, initial_oxygen_wt_pct: 0.126, final_oxygen_wt_pct: 0.093, holding_time_min: 34, mass_loss_areal_flux: 0.033, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.126}, locator: *cu_table_locator}, final_oxygen_wt_pct: {state: {tag: value, value: 0.093}, locator: *cu_table_locator}, holding_time_min: {state: {tag: value, value: 34}, locator: *cu_table_locator}}}
+        - {temperature_C: 1230, T_C: 1230, initial_oxygen_wt_pct: 0.003, final_oxygen_wt_pct: 0.006, holding_time_min: 29, mass_loss_areal_flux: 0.67, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.003}, locator: *cu_table_locator}, final_oxygen_wt_pct: {state: {tag: value, value: 0.006}, locator: *cu_table_locator}, holding_time_min: {state: {tag: value, value: 29}, locator: *cu_table_locator}}}
+        - {temperature_C: 1230, T_C: 1230, initial_oxygen_wt_pct: 0.011, final_oxygen_wt_pct: 0.004, holding_time_min: 64, mass_loss_areal_flux: 0.50, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.011}, locator: *cu_table_locator}, final_oxygen_wt_pct: {state: {tag: value, value: 0.004}, locator: *cu_table_locator}, holding_time_min: {state: {tag: value, value: 64}, locator: *cu_table_locator}}}
+        - {temperature_C: 1230, T_C: 1230, initial_oxygen_wt_pct: 0.025, final_oxygen_wt_pct: {tag: unknown, reason: not_published}, final_oxygen_as_printed: printed_blank_cell, holding_time_min: 44, mass_loss_areal_flux: 0.43, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.025}, locator: *cu_table_locator}, final_oxygen_wt_pct: {state: {tag: unknown, reason: not_published}, locator: *cu_table_locator}, holding_time_min: {state: {tag: value, value: 44}, locator: *cu_table_locator}}}
+        - {temperature_C: 1230, T_C: 1230, initial_oxygen_wt_pct: 0.037, final_oxygen_wt_pct: 0.029, holding_time_min: 9, mass_loss_areal_flux: 0.36, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.037}, locator: *cu_table_locator}, final_oxygen_wt_pct: {state: {tag: value, value: 0.029}, locator: *cu_table_locator}, holding_time_min: {state: {tag: value, value: 9}, locator: *cu_table_locator}}}
+        - {temperature_C: 1230, T_C: 1230, initial_oxygen_wt_pct: 0.055, final_oxygen_wt_pct: 0.042, holding_time_min: 10, mass_loss_areal_flux: 0.40, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.055}, locator: *cu_table_locator}, final_oxygen_wt_pct: {state: {tag: value, value: 0.042}, locator: *cu_table_locator}, holding_time_min: {state: {tag: value, value: 10}, locator: *cu_table_locator}}}
+        - {temperature_C: 1230, T_C: 1230, initial_oxygen_wt_pct: 0.080, final_oxygen_wt_pct: 0.054, holding_time_min: 46, mass_loss_areal_flux: 0.36, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.080}, locator: *cu_table_locator}, final_oxygen_wt_pct: {state: {tag: value, value: 0.054}, locator: *cu_table_locator}, holding_time_min: {state: {tag: value, value: 46}, locator: *cu_table_locator}}}
+        - {temperature_C: 1230, T_C: 1230, initial_oxygen_wt_pct: 0.126, final_oxygen_wt_pct: 0.063, holding_time_min: 44, mass_loss_areal_flux: 0.35, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.126}, locator: *cu_table_locator}, final_oxygen_wt_pct: {state: {tag: value, value: 0.063}, locator: *cu_table_locator}, holding_time_min: {state: {tag: value, value: 44}, locator: *cu_table_locator}}}
+        - {temperature_C: 1300, T_C: 1300, initial_oxygen_wt_pct: 0.003, final_oxygen_wt_pct: 0.005, holding_time_min: 24, mass_loss_areal_flux: 2.12, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.003}, locator: *cu_table_locator}, final_oxygen_wt_pct: {state: {tag: value, value: 0.005}, locator: *cu_table_locator}, holding_time_min: {state: {tag: value, value: 24}, locator: *cu_table_locator}}}
+        - {temperature_C: 1300, T_C: 1300, initial_oxygen_wt_pct: 0.011, final_oxygen_wt_pct: 0.005, holding_time_min: 27, mass_loss_areal_flux: 1.69, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.011}, locator: *cu_table_locator}, final_oxygen_wt_pct: {state: {tag: value, value: 0.005}, locator: *cu_table_locator}, holding_time_min: {state: {tag: value, value: 27}, locator: *cu_table_locator}}}
+        - {temperature_C: 1300, T_C: 1300, initial_oxygen_wt_pct: 0.025, final_oxygen_wt_pct: 0.021, holding_time_min: 8, mass_loss_areal_flux: 1.36, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.025}, locator: *cu_table_locator}, final_oxygen_wt_pct: {state: {tag: value, value: 0.021}, locator: *cu_table_locator}, holding_time_min: {state: {tag: value, value: 8}, locator: *cu_table_locator}}}
+        - {temperature_C: 1300, T_C: 1300, initial_oxygen_wt_pct: 0.037, final_oxygen_wt_pct: 0.027, holding_time_min: 10, mass_loss_areal_flux: 1.06, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.037}, locator: *cu_table_locator}, final_oxygen_wt_pct: {state: {tag: value, value: 0.027}, locator: *cu_table_locator}, holding_time_min: {state: {tag: value, value: 10}, locator: *cu_table_locator}}}
+        - {temperature_C: 1300, T_C: 1300, initial_oxygen_wt_pct: 0.055, final_oxygen_wt_pct: 0.039, holding_time_min: 12, mass_loss_areal_flux: 1.00, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.055}, locator: *cu_table_locator}, final_oxygen_wt_pct: {state: {tag: value, value: 0.039}, locator: *cu_table_locator}, holding_time_min: {state: {tag: value, value: 12}, locator: *cu_table_locator}}}
+        - {temperature_C: 1300, T_C: 1300, initial_oxygen_wt_pct: 0.080, final_oxygen_wt_pct: {tag: unknown, reason: not_published}, final_oxygen_as_printed: printed_blank_cell, holding_time_min: 10, mass_loss_areal_flux: 1.03, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.080}, locator: *cu_table_locator}, final_oxygen_wt_pct: {state: {tag: unknown, reason: not_published}, locator: *cu_table_locator}, holding_time_min: {state: {tag: value, value: 10}, locator: *cu_table_locator}}}
+        - {temperature_C: 1300, T_C: 1300, initial_oxygen_wt_pct: 0.252, final_oxygen_wt_pct: 0.137, holding_time_min: 42, mass_loss_areal_flux: 1.04, point_conditions: {initial_oxygen_wt_pct: {state: {tag: value, value: 0.252}, locator: *cu_table_locator}, final_oxygen_wt_pct: {state: {tag: value, value: 0.137}, locator: *cu_table_locator}, holding_time_min: {state: {tag: value, value: 42}, locator: *cu_table_locator}}}
+    context:
+    - observation_id: hayakawa_1982_cu_oxygen_rate_equations
+      type: method
+      locator: {published_page: 640, pdf_page_index: 4, equations: '9'}
+      units: as printed
+      values:
+        quantity: printed_rate_model_correlations
+        method_class: model_derived
+        model: Langmuir adsorption isotherm applied to evaporation from oxygen-free and oxygen-occupied liquid-metal surface sites; fitted by least squares where stated
+        assumptions: {adsorption_equilibrium: Langmuir isotherm, evaporation_sites: both oxygen-free and oxygen-occupied sites, oxygen_activity_approximation: '[%O] used for aO in Eqs. (5)-(7)', pressure_resistance: gas-phase mass-transfer resistance neglected for the stated low-pressure runs}
+        equations_as_printed:
+          equation_9_Cu: '1300 °C: w_N = 2.4 − 1.6{92[%O]/(1 + 92[%O])}; 1230 °C: w_N = 0.82 − 0.51{160[%O]/(1 + 160[%O])}; 1100 °C: w_N = 0.08 − 0.05{310[%O]/(1 + 310[%O])}'
+          equation_11_Cu: 'log k_ad = 5500/T − 1.49'
+          equation_13_Cu: 'w_N = P sqrt(M/(2πRT)){1 − 0.64[k_ad [%O]/(1 + k_ad [%O])]}'
+          conclusion_restatement: 'log k_ad = 5500/T − 1.5; w_N uses the Eq. (13) Cu expression with factor 0.64'
+        equation_locators:
+          equation_11_Cu: {published_page: 641, pdf_page_index: 5, equation: '11'}
+          equation_13_Cu: {published_page: 641, pdf_page_index: 5, equation: '13'}
+          conclusion_restatement: {published_page: 644, pdf_page_index: 8, section: 'V. Conclusion'}
+        ranges_and_units: Temperatures in Eq. (9) are 1100–1300 °C for liquid Cu; Eq. (11) is the Cu–O relation plotted over the paper's experimental temperature span. Eq. (9) uses the rate scale of Table 2 and oxygen in wt%; Eq. (11) uses absolute T in K and k_ad in (wt%)^-1. Eq. (13) gives mass rate per area.
+        assumptions_and_scope: Coefficients in Eq. (9) were obtained from least-squares line fits to inverse-rate plots; Eq. (11) is a linear fit of log k_ad against 1/T. The Eq. (13) factor is rounded to 0.64 in the authors' final Cu expression.

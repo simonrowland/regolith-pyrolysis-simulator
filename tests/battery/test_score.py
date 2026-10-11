@@ -3772,6 +3772,74 @@ def test_residue_composition_has_its_own_rail_and_typed_engine_refusal() -> None
         assert prediction.refusal_detail["quantity"] == "residue_component_composition"
 
 
+def test_areal_mass_flux_identity_is_intensive_and_score_refuses(monkeypatch) -> None:
+    from simulator.battery.score import ENGINE_CHANNELS, metric_operation
+
+    quantity = Quantity.MASS_LOSS_AREAL_FLUX
+    identity = replace(
+        F.psat_identity("Fe"),
+        quantity=quantity,
+        per=State.of(PerBasis.MOL_SPECIES),
+        composition=State.unknown("composition not printed"),
+        fO2_Pa=State.unknown("oxygen potential not printed"),
+        total_pressure_Pa=State.unknown("total pressure not printed"),
+        sweep_gas=State.unknown("sweep gas not printed"),
+        exposure=State.of(
+            Exposure(
+                area_m2=State.unknown("evaporating area not printed"),
+                duration_s=State.unknown("exposure duration not printed"),
+            )
+        ),
+    )
+    profile = profile_for(identity)
+    assert "sample_mass_kg" not in profile.required
+    assert not profile.exposure_area_required
+    assert validate_quantity_profile(identity).kind is IdentityEqualKind.EQUAL
+    assert metric_operation(quantity) is MetricOperation.RELATIVE
+
+    experiment = F.tabulation_experiment(T_K=Decimal("1823.15"))
+    reference = F.observation(
+        "hayakawa-areal-flux",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.00148"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="hayakawa-1982-fe-cu-evaporation-dissolved-oxygen",
+    )
+    context = ScoreContext(
+        works={"work-1": F.work()},
+        experiments={experiment.experiment_id: experiment},
+        observations={reference.observation_id: reference},
+    )
+
+    def no_engine(*_args, **_kwargs):
+        pytest.fail("areal flux opened an engine without a predictor")
+
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.open_battery_engine",
+        no_engine,
+    )
+    for engine in ENGINE_CHANNELS:
+        prediction = predict_with_engine(engine, reference)
+        assert prediction.value is None
+        assert prediction.unit is None
+        assert prediction.execution.state is ExecutionState.UNSUPPORTED
+        assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+        assert prediction.refusal_detail == {
+            "reason": "quantity_not_predicted",
+            "quantity": quantity.value,
+        }
+
+    residuals, _ = score_store(
+        context,
+        engines=(Engine.OPENIMCC,),
+        include_diagnostics=False,
+    )
+    assert residuals
+    assert all(row.numeric is None for row in residuals)
+    assert all(row.refusal is not None for row in residuals)
+
+
 def test_residue_metric_uses_dex_for_element_ppm_and_absolute_for_oxide() -> None:
     from simulator.battery.score import (
         metric_operation_for_identity,
