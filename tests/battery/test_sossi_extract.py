@@ -57,6 +57,27 @@ EXPECTED_FLOWS = {
     "2m-16-07-16h": ("42", "158"),
     "2m-16-07-16d": ("188", "12"),
 }
+AIR_RUNS = {
+    "2m-15-07-16c",
+    "2m-16-07-16e",
+    "2m-16-07-16f",
+    "3m-1-3-16",
+    "3m-18-07-16b",
+    "3m-2-3-16",
+    "3m-29-2-16",
+    "3m-29-2-16b",
+    "p08-02-17b",
+}
+MIXTURE_PAGE_PINS = {
+    "2m-15-07-16d": (None, "200"),
+    "2m-15-07-16g": ("1.8", "200"),
+    "2m-15-07-16h": ("24", "175"),
+    "1m-ps6": ("25", "180"),
+    "2m-18-07-16c": ("12", "188"),
+    "1m-ps3": (None, "180"),
+    "1m-ps2": ("5", "180"),
+    "1m-ps4": ("66", "133"),
+}
 AREA_BASIS = (
     "unit read as m2; corroborated by the printed sample mass "
     "(about 25 mg, p. 5) under a sphere assumption"
@@ -78,6 +99,9 @@ def _assert_sossi_gas(document: dict) -> None:
     assert len(experiments) == 43
     assert {_run_slug(experiment) for experiment in experiments} == set(EXPECTED_FLOWS)
 
+    assert len(AIR_RUNS) == 9
+    assert all(EXPECTED_FLOWS[slug] == flows for slug, flows in MIXTURE_PAGE_PINS.items())
+
     for experiment in experiments:
         slug = _run_slug(experiment)
         gas_located = experiment["pressure_environment"]["sweep_gas"]
@@ -85,12 +109,18 @@ def _assert_sossi_gas(document: dict) -> None:
         assert gas_located["locator"]["page"] in (54, 55)
         assert "Evidence class: measured_tabulated" in gas_located["locator"]["note"]
         gas = gas_located["state"]["value"]
-        assert gas["species"] is None
         assert gas["flow_sccm"] == {"tag": "unknown", "reason": "not_published"}
         assert gas["partial_pressure_Pa"] == {
             "tag": "unknown",
             "reason": "not_published",
         }
+        if slug in AIR_RUNS:
+            assert gas["species"] == "air"
+            assert "components" not in gas
+            assert "p. 5" in gas_located["locator"]["note"]
+            continue
+
+        assert gas["species"] is None
         components = {item["species"]: item for item in gas["components"]}
         assert set(components) == {"CO", "CO2"}
         for species, expected in zip(("CO", "CO2"), EXPECTED_FLOWS[slug]):
@@ -278,6 +308,22 @@ def test_sossi_table2_gas_values_and_mutation_gate() -> None:
     with pytest.raises(AssertionError):
         _assert_sossi_gas(mutated)
 
+    mutated_air = deepcopy(document)
+    air_experiment = next(e for e in mutated_air["experiments"] if _run_slug(e) == "2m-15-07-16c")
+    air_gas = air_experiment["pressure_environment"]["sweep_gas"]["state"]["value"]
+    air_gas["species"] = None
+    air_gas["components"] = [
+        {
+            "species": species,
+            "mole_fraction": {"tag": "unknown", "reason": "not_published"},
+            "flow_sccm": {"tag": "unknown", "reason": "not_published"},
+            "partial_pressure_Pa": {"tag": "unknown", "reason": "not_published"},
+        }
+        for species in ("CO", "CO2")
+    ]
+    with pytest.raises(AssertionError):
+        _assert_sossi_gas(mutated_air)
+
 
 def test_sossi_area_arithmetic_and_mutation_gate() -> None:
     document = _load_source_extract(EXTRACT)
@@ -315,6 +361,19 @@ def test_sossi_fields_survive_isolated_migration(tmp_path: Path) -> None:
     assert len(result.benches) == 1
     assert result.validation is not None
     assert len(result.validation.hard_issues) == 154
+
+    atmosphere_counts: dict[str, int] = {}
+    for observation in result.observations.values():
+        experiment_slug = observation.experiment_id.rsplit("sossi-2019-run-", 1)[-1]
+        if experiment_slug not in EXPECTED_FLOWS or not observation.point_conditions:
+            continue
+        atmosphere = observation.point_conditions.get("atmosphere")
+        if atmosphere is None or not atmosphere.state.is_value:
+            continue
+        expected_atmosphere = "air" if experiment_slug in AIR_RUNS else "CO/CO2"
+        assert atmosphere.state.value == expected_atmosphere
+        atmosphere_counts[expected_atmosphere] = atmosphere_counts.get(expected_atmosphere, 0) + 1
+    assert atmosphere_counts == {"air": 108, "CO/CO2": 408}
 
     experiment = result.experiments[
         "10.1016/j.gca.2019.06.021::experiment::sossi-2019-run-2m-15-07-16d"

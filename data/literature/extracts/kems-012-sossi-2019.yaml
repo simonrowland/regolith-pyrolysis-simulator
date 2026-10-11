@@ -390,8 +390,8 @@ experiments:
         section: Abstract
         note: Printed one-atmosphere furnace; SI definition conversion only
     sweep_gas: &sossi_gas_run_2m_15_07_16c
-      state: {tag: value, value: {species: null, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}, components: [{species: CO, mole_fraction: {tag: unknown, reason: not_published}, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}, {species: CO2, mole_fraction: {tag: unknown, reason: not_published}, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}]}}
-      locator: &sossi_gas_locator_2m_15_07_16c {page: 54, table: '2', section: 'Results — Run conditions and LA-ICP-MS trace element data', note: "Evidence class: measured_tabulated; Table 2 prints CO and CO2 flows in sccm; mole fractions and partial pressures are not printed; a dash is unknown, not zero. The experiment locator identifies this run row."}
+      state: {tag: value, value: {species: air, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
+      locator: &sossi_gas_locator_2m_15_07_16c {page: 54, table: '2', section: 'Results — Run conditions and LA-ICP-MS trace element data', note: "Evidence class: measured_tabulated; Table 2 prints dashes for CO and CO2 flows, which are unknown rather than zero. Printed p. 5 identifies log fO2=-0.68 as air; no CO/CO2 flow or partial pressure is assigned."}
     regime:
       regime_class:
         tag: value
@@ -1334,8 +1334,8 @@ experiments:
         section: Abstract
         note: Printed one-atmosphere furnace; SI definition conversion only
     sweep_gas: &sossi_gas_run_3m_18_07_16b
-      state: {tag: value, value: {species: null, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}, components: [{species: CO, mole_fraction: {tag: unknown, reason: not_published}, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}, {species: CO2, mole_fraction: {tag: unknown, reason: not_published}, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}]}}
-      locator: &sossi_gas_locator_3m_18_07_16b {page: 54, table: '2', section: 'Results — Run conditions and LA-ICP-MS trace element data', note: "Evidence class: measured_tabulated; Table 2 prints CO and CO2 flows in sccm; mole fractions and partial pressures are not printed; a dash is unknown, not zero. The experiment locator identifies this run row."}
+      state: {tag: value, value: {species: air, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
+      locator: &sossi_gas_locator_3m_18_07_16b {page: 54, table: '2', section: 'Results — Run conditions and LA-ICP-MS trace element data', note: "Evidence class: measured_tabulated; Table 2 prints dashes for CO and CO2 flows, which are unknown rather than zero. Printed p. 5 identifies log fO2=-0.68 as air; no CO/CO2 flow or partial pressure is assigned."}
     regime:
       regime_class:
         tag: value
@@ -2396,8 +2396,8 @@ experiments:
         section: Abstract
         note: Printed one-atmosphere furnace; SI definition conversion only
     sweep_gas: &sossi_gas_run_p08_02_17b
-      state: {tag: value, value: {species: null, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}, components: [{species: CO, mole_fraction: {tag: unknown, reason: not_published}, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}, {species: CO2, mole_fraction: {tag: unknown, reason: not_published}, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}]}}
-      locator: &sossi_gas_locator_p08_02_17b {page: 54, table: '2', section: 'Results — Run conditions and LA-ICP-MS trace element data', note: "Evidence class: measured_tabulated; Table 2 prints CO and CO2 flows in sccm; mole fractions and partial pressures are not printed; a dash is unknown, not zero. The experiment locator identifies this run row."}
+      state: {tag: value, value: {species: air, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
+      locator: &sossi_gas_locator_p08_02_17b {page: 54, table: '2', section: 'Results — Run conditions and LA-ICP-MS trace element data', note: "Evidence class: measured_tabulated; Table 2 prints dashes for CO and CO2 flows, which are unknown rather than zero. Printed p. 5 identifies log fO2=-0.68 as air; no CO/CO2 flow or partial pressure is assigned."}
     regime:
       regime_class:
         tag: value
@@ -2514,8 +2514,8 @@ experiments:
         section: Abstract
         note: Printed one-atmosphere furnace; SI definition conversion only
     sweep_gas: &sossi_gas_run_3m_29_2_16
-      state: {tag: value, value: {species: null, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}, components: [{species: CO, mole_fraction: {tag: unknown, reason: not_published}, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}, {species: CO2, mole_fraction: {tag: unknown, reason: not_published}, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}]}}
-      locator: &sossi_gas_locator_3m_29_2_16 {page: 54, table: '2', section: 'Results — Run conditions and LA-ICP-MS trace element data', note: "Evidence class: measured_tabulated; Table 2 prints CO and CO2 flows in sccm; mole fractions and partial pressures are not printed; a dash is unknown, not zero. The experiment locator identifies this run row."}
+      state: {tag: value, value: {species: air, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
+      locator: &sossi_gas_locator_3m_29_2_16 {page: 54, table: '2', section: 'Results — Run conditions and LA-ICP-MS trace element data', note: "Evidence class: measured_tabulated; Table 2 prints dashes for CO and CO2 flows, which are unknown rather than zero. Printed p. 5 identifies log fO2=-0.68 as air; no CO/CO2 flow or partial pressure is assigned."}
     regime:
       regime_class:
         tag: value
@@ -3340,8 +3340,8 @@ experiments:
         section: Abstract
         note: Printed one-atmosphere furnace; SI definition conversion only
     sweep_gas: &sossi_gas_run_3m_1_3_16
-      state: {tag: value, value: {species: null, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}, components: [{species: CO, mole_fraction: {tag: unknown, reason: not_published}, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}, {species: CO2, mole_fraction: {tag: unknown, reason: not_published}, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}]}}
-      locator: &sossi_gas_locator_3m_1_3_16 {page: 54, table: '2', section: 'Results — Run conditions and LA-ICP-MS trace element data', note: "Evidence class: measured_tabulated; Table 2 prints CO and CO2 flows in sccm; mole fractions and partial pressures are not printed; a dash is unknown, not zero. The experiment locator identifies this run row."}
+      state: {tag: value, value: {species: air, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
+      locator: &sossi_gas_locator_3m_1_3_16 {page: 54, table: '2', section: 'Results — Run conditions and LA-ICP-MS trace element data', note: "Evidence class: measured_tabulated; Table 2 prints dashes for CO and CO2 flows, which are unknown rather than zero. Printed p. 5 identifies log fO2=-0.68 as air; no CO/CO2 flow or partial pressure is assigned."}
     regime:
       regime_class:
         tag: value
@@ -3694,8 +3694,8 @@ experiments:
         section: Abstract
         note: Printed one-atmosphere furnace; SI definition conversion only
     sweep_gas: &sossi_gas_run_3m_29_2_16b
-      state: {tag: value, value: {species: null, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}, components: [{species: CO, mole_fraction: {tag: unknown, reason: not_published}, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}, {species: CO2, mole_fraction: {tag: unknown, reason: not_published}, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}]}}
-      locator: &sossi_gas_locator_3m_29_2_16b {page: 55, table: '2', section: 'Results — Run conditions and LA-ICP-MS trace element data', note: "Evidence class: measured_tabulated; Table 2 prints CO and CO2 flows in sccm; mole fractions and partial pressures are not printed; a dash is unknown, not zero. The experiment locator identifies this run row."}
+      state: {tag: value, value: {species: air, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
+      locator: &sossi_gas_locator_3m_29_2_16b {page: 55, table: '2', section: 'Results — Run conditions and LA-ICP-MS trace element data', note: "Evidence class: measured_tabulated; Table 2 prints dashes for CO and CO2 flows, which are unknown rather than zero. Printed p. 5 identifies log fO2=-0.68 as air; no CO/CO2 flow or partial pressure is assigned."}
     regime:
       regime_class:
         tag: value
@@ -3930,8 +3930,8 @@ experiments:
         section: Abstract
         note: Printed one-atmosphere furnace; SI definition conversion only
     sweep_gas: &sossi_gas_run_2m_16_07_16e
-      state: {tag: value, value: {species: null, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}, components: [{species: CO, mole_fraction: {tag: unknown, reason: not_published}, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}, {species: CO2, mole_fraction: {tag: unknown, reason: not_published}, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}]}}
-      locator: &sossi_gas_locator_2m_16_07_16e {page: 55, table: '2', section: 'Results — Run conditions and LA-ICP-MS trace element data', note: "Evidence class: measured_tabulated; Table 2 prints CO and CO2 flows in sccm; mole fractions and partial pressures are not printed; a dash is unknown, not zero. The experiment locator identifies this run row."}
+      state: {tag: value, value: {species: air, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
+      locator: &sossi_gas_locator_2m_16_07_16e {page: 55, table: '2', section: 'Results — Run conditions and LA-ICP-MS trace element data', note: "Evidence class: measured_tabulated; Table 2 prints dashes for CO and CO2 flows, which are unknown rather than zero. Printed p. 5 identifies log fO2=-0.68 as air; no CO/CO2 flow or partial pressure is assigned."}
     regime:
       regime_class:
         tag: value
@@ -4402,8 +4402,8 @@ experiments:
         section: Abstract
         note: Printed one-atmosphere furnace; SI definition conversion only
     sweep_gas: &sossi_gas_run_3m_2_3_16
-      state: {tag: value, value: {species: null, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}, components: [{species: CO, mole_fraction: {tag: unknown, reason: not_published}, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}, {species: CO2, mole_fraction: {tag: unknown, reason: not_published}, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}]}}
-      locator: &sossi_gas_locator_3m_2_3_16 {page: 55, table: '2', section: 'Results — Run conditions and LA-ICP-MS trace element data', note: "Evidence class: measured_tabulated; Table 2 prints CO and CO2 flows in sccm; mole fractions and partial pressures are not printed; a dash is unknown, not zero. The experiment locator identifies this run row."}
+      state: {tag: value, value: {species: air, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
+      locator: &sossi_gas_locator_3m_2_3_16 {page: 55, table: '2', section: 'Results — Run conditions and LA-ICP-MS trace element data', note: "Evidence class: measured_tabulated; Table 2 prints dashes for CO and CO2 flows, which are unknown rather than zero. Printed p. 5 identifies log fO2=-0.68 as air; no CO/CO2 flow or partial pressure is assigned."}
     regime:
       regime_class:
         tag: value
@@ -4874,8 +4874,8 @@ experiments:
         section: Abstract
         note: Printed one-atmosphere furnace; SI definition conversion only
     sweep_gas: &sossi_gas_run_2m_16_07_16f
-      state: {tag: value, value: {species: null, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}, components: [{species: CO, mole_fraction: {tag: unknown, reason: not_published}, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}, {species: CO2, mole_fraction: {tag: unknown, reason: not_published}, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}]}}
-      locator: &sossi_gas_locator_2m_16_07_16f {page: 55, table: '2', section: 'Results — Run conditions and LA-ICP-MS trace element data', note: "Evidence class: measured_tabulated; Table 2 prints CO and CO2 flows in sccm; mole fractions and partial pressures are not printed; a dash is unknown, not zero. The experiment locator identifies this run row."}
+      state: {tag: value, value: {species: air, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
+      locator: &sossi_gas_locator_2m_16_07_16f {page: 55, table: '2', section: 'Results — Run conditions and LA-ICP-MS trace element data', note: "Evidence class: measured_tabulated; Table 2 prints dashes for CO and CO2 flows, which are unknown rather than zero. Printed p. 5 identifies log fO2=-0.68 as air; no CO/CO2 flow or partial pressure is assigned."}
     regime:
       regime_class:
         tag: value
