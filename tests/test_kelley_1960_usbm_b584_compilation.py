@@ -121,6 +121,33 @@ def test_published_curve_loader_exposes_printed_equations_and_gate_results():
     }
     assert all(required <= curve.keys() for curve in curves)
     assert all(curve["gate"]["status"] in {"passed", "transcription_gate_failed"} for curve in curves)
+    heat, cp = curves[:2]
+    assert heat["gate"]["status"] == "passed"
+    assert cp["gate"]["kind"] == "analytic_derivative_of_gated_H"
+    assert cp["gate"]["status"] == "passed"
+    # Printed CaO(c) Cp equation evaluated at the source reference temperature.
+    a, b, c = (float(value.replace("×10^", "e")) for value in cp["coefficients_as_printed"])
+    assert a + b * 298.15 + c / 298.15**2 == pytest.approx(10.238, abs=0.002)
+
+
+def test_silica_polymorph_curves_keep_failed_table_gates_typed():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "SiO2"]
+    assert len(curves) == 14
+    assert {curve["polymorph"] for curve in curves} == {
+        "quartz-alpha", "quartz-beta", "cristobalite-alpha", "cristobalite-beta",
+        "tridymite-alpha", "tridymite-beta", None,
+    }
+    by_key = {(curve["polymorph"], curve["quantity"]): curve for curve in curves}
+    assert by_key[("cristobalite-alpha", "heat_content_increment")]["gate"]["reason"] == "transcription_gate_failed"
+    assert by_key[("tridymite-alpha", "heat_content_increment")]["gate"]["reason"] == "no_independent_check"
+    assert by_key[("tridymite-alpha", "heat_capacity")]["gate"]["reason"] == "no_independent_check"
+
+
+def test_heat_content_gate_detects_a_coefficient_mutation():
+    heat = loader.load_published_curves()[0]
+    changed = {**heat, "coefficients_as_printed": ["11.77", *heat["coefficients_as_printed"][1:]]}
+    source = next(record for record in load_records(include_ocr_suspect=True) if record["record_id"] == "table-134")
+    assert loader._gate_heat_content(changed, source)["gate"]["status"] == "transcription_gate_failed"
 
 
 def test_image_verified_fixture_mutation_is_detected():

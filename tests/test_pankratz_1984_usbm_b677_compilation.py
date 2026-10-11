@@ -21,10 +21,25 @@ from simulator.reference_data.pankratz_1984_usbm_b677_loader import (
 STANDARD_HEADINGS = ("T", "$Cp^o$", "$S^o$", "$H^o-H_{298}^o$", "$\\Delta Hf^o$", "$\\Delta Gf^o$")
 
 
-def test_published_curve_loader_keeps_failed_transcriptions_typed():
+def test_published_curve_loader_gates_mg_equations_against_table_cells():
     curves = loader.load_published_curves()
-    assert all("gate" in curve for curve in curves)
-    assert all(curve["gate"]["status"] in {"passed", "transcription_gate_failed"} for curve in curves)
+    assert len(curves) == 4
+    assert {curve["quantity"] for curve in curves} == {"heat_capacity", "heat_content_increment"}
+    assert all(curve["record_kind"] == "published_curve_fit" for curve in curves)
+    assert all(curve["gate"]["status"] == "passed" for curve in curves)
+    enthalpy = next(curve for curve in curves if curve["quantity"] == "heat_content_increment")
+    assert enthalpy["gate"]["kind"] == "printed_heat_content_cells"
+    assert [row["temperature_K"] for row in enthalpy["gate"]["residuals"]] == [400, 600, 800]
+    assert [row["observed"] for row in enthalpy["gate"]["residuals"]] == [621, 1926, 3342]
+
+
+def test_mg_solid_cp_298_sanity_value_matches_source_table():
+    solid = next(
+        curve for curve in loader.load_published_curves()
+        if curve["quantity"] == "heat_capacity" and curve["phase"] == "c"
+    )
+    a, b = map(float, solid["coefficients_as_printed"])
+    assert a + b * 298.15 == pytest.approx(5.950, rel=0.001)
 IMAGE_VERIFIED_IDENTITIES = {
     "table-0007": ("Ag", "Silver", "(c,1)", STANDARD_HEADINGS[:4]),
     "table-0039": ("C4", "Carbon (ideal tetratomic gas)", "(g)", STANDARD_HEADINGS),

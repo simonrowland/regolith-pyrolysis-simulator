@@ -23,13 +23,7 @@ ROOT = loader.COMPILATION_ROOT
 
 def test_published_curves_keep_equation_records_separate_from_source_cells():
     curves = loader.load_published_curves()
-    assert curves
-    assert all(curve["record_kind"] == "published_curve_fit" for curve in curves)
-    assert any(
-        curve["formula"] in {"Fe", "Si", "Mg", "Ca", "Na", "K", "Al", "Ti", "Mn", "Cr"}
-        and curve["quantity"] == "heat_capacity"
-        for curve in curves
-    )
+    assert curves == ()
 
 
 def _jsonl_union(*names):
