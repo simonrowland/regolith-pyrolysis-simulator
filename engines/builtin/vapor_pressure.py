@@ -823,7 +823,7 @@ def _high_t_activity_for_parent(
         gamma=effective_gamma,
         activity=activity,
         citation=(
-            "openimcc SF04 pack "
+            f"openimcc {authority.get('openimcc_pack_model_id', '')} pack "
             f"{authority.get('openimcc_pack_version', '')} "
             f"digest={authority.get('openimcc_pack_digest', '')}"
         ),

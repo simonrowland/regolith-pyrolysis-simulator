@@ -267,6 +267,47 @@ def test_above_cap_openimcc_route_feeds_flux_with_provenance() -> None:
     assert all(row["activity_basis"] != "kress91_ferrous" for row in fe_provenance)
 
 
+def test_high_t_activity_citation_uses_loaded_pack_identity() -> None:
+    model_ids = []
+    for pack_name in ("default", "published-core"):
+        bridge = openimcc_bridge_module.evaluate(
+            composition_mol=BASE_MELT_MOL,
+            temperature_K=2200.0,
+            pack=pack_name,
+            allow_extrapolation=True,
+            allow_out_of_envelope=True,
+        )
+        single_activity, _fraction = (
+            openimcc_bridge_module.single_cation_activity_and_fraction(
+                "SiO2",
+                bridge.parent_oxide_activities["SiO2"],
+                BASE_MELT_MOL,
+            )
+        )
+        authority = {
+            "provider": "openimcc",
+            "activities_by_oxide": {"SiO2": single_activity},
+            "openimcc_pack_model_id": bridge.pack_model_id,
+            "openimcc_pack_version": bridge.pack_version,
+            "openimcc_pack_digest": bridge.pack_digest,
+        }
+        activity = vapor_pressure_module._high_t_activity_for_parent(
+            "SiO2",
+            BASE_MELT_MOL,
+            temperature_K=2200.0,
+            authority=authority,
+        )
+
+        assert activity is not None
+        assert activity.citation == (
+            f"openimcc {bridge.pack_model_id} pack {bridge.pack_version} "
+            f"digest={bridge.pack_digest}"
+        )
+        model_ids.append(bridge.pack_model_id)
+
+    assert model_ids[0] != model_ids[1]
+
+
 def test_above_cap_openimcc_provenance_carries_complex_saturation_notice() -> None:
     result = vapor_pressure_module._build_high_t_melt_activity_authority(
         composition_mol={"K2O": 0.497, "SiO2": 0.503},
