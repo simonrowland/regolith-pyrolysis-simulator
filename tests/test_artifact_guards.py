@@ -1,12 +1,24 @@
 import ast
 import re
-import shutil
-import subprocess
 from pathlib import Path
 
 import pytest
 
 from simulator.accounting import load_species_formulas
+
+
+FORBIDDEN_INTERNAL_KG_MUTATION_PATTERNS = [
+    r"oxygen_cumulative_kg \+=",
+    r"O2_vented_cumulative_kg \+=",
+    r"train\.stages\[6\].*O2",
+    r"stages\[6\]\.collected_kg\['O2'\]",
+    r"composition_kg\[[^\]]+\]\s*=",
+    r"collected_kg\[[^\]]+\]\s*=",
+    r"shuttle_.*inventory_kg\s*-=",
+    r"thermite_Mg_inventory_kg\s*-=",
+    r"terminal\.oxygen_stored",
+    r"terminal\.oxygen_vented_to_vacuum",
+]
 
 
 def test_internal_analytical_implementation_has_no_legacy_stub_symbols():
@@ -49,43 +61,50 @@ def test_internal_analytical_implementation_has_no_legacy_stub_symbols():
     assert not violations, "\n".join(violations)
 
 
-@pytest.mark.skipif(shutil.which("rg") is None, reason="requires ripgrep (rg)")
 def test_simulator_has_no_forbidden_internal_kg_mutations():
     repo = Path(__file__).parent.parent
-    forbidden = [
-        r"oxygen_cumulative_kg \+=",
-        r"O2_vented_cumulative_kg \+=",
-        r"train\.stages\[6\].*O2",
-        r"stages\[6\]\.collected_kg\['O2'\]",
-        r"composition_kg\[[^\]]+\]\s*=",
-        r"collected_kg\[[^\]]+\]\s*=",
-        r"shuttle_.*inventory_kg\s*-=",
-        r"thermite_Mg_inventory_kg\s*-=",
-        r"terminal\.oxygen_stored",
-        r"terminal\.oxygen_vented_to_vacuum",
-    ]
+    violations = _forbidden_internal_kg_mutation_hits(repo / "simulator")
+    assert not violations, "\n".join(violations)
 
-    result = subprocess.run(
-        ["rg", "-n", "|".join(forbidden), "simulator"],
-        cwd=repo,
-        check=False,
-        text=True,
-        capture_output=True,
-    )
 
-    assert result.returncode == 1, result.stdout
+def _forbidden_internal_kg_mutation_hits(root: Path) -> list[str]:
+    hits = []
+    for path in root.rglob("*"):
+        relative_path = path.relative_to(root)
+        if not path.is_file() or any(part.startswith(".") for part in relative_path.parts):
+            continue
+        try:
+            content = path.read_bytes()
+        except OSError:
+            continue
+        if b"\0" in content:
+            continue
+        lines = content.decode("latin-1").splitlines()
+        for line_number, line in enumerate(lines, start=1):
+            if any(
+                re.search(pattern, line)
+                for pattern in FORBIDDEN_INTERNAL_KG_MUTATION_PATTERNS
+            ):
+                hits.append(f"{relative_path.as_posix()}:{line_number}")
+    return hits
 
 
 def test_forbidden_internal_kg_mutation_patterns_match_samples():
     samples = {
-        r"oxygen_cumulative_kg \+=": "self.oxygen_cumulative_kg += 1.0",
-        r"O2_vented_cumulative_kg \+=": "self.O2_vented_cumulative_kg += vented",
-        r"composition_kg\[[^\]]+\]\s*=": "self.melt.composition_kg['FeO'] = 0",
-        r"collected_kg\[[^\]]+\]\s*=": "stage.collected_kg['O2'] = 1",
-        r"terminal\.oxygen_stored": "terminal.oxygen_stored",
+        FORBIDDEN_INTERNAL_KG_MUTATION_PATTERNS[0]: "self.oxygen_cumulative_kg += 1.0",
+        FORBIDDEN_INTERNAL_KG_MUTATION_PATTERNS[1]: "self.O2_vented_cumulative_kg += vented",
+        FORBIDDEN_INTERNAL_KG_MUTATION_PATTERNS[2]: "train.stages[6].available_O2",
+        FORBIDDEN_INTERNAL_KG_MUTATION_PATTERNS[3]: "stage.stages[6].collected_kg['O2'] = 1",
+        FORBIDDEN_INTERNAL_KG_MUTATION_PATTERNS[4]: "self.melt.composition_kg['FeO'] = 0",
+        FORBIDDEN_INTERNAL_KG_MUTATION_PATTERNS[5]: "stage.collected_kg['O2'] = 1",
+        FORBIDDEN_INTERNAL_KG_MUTATION_PATTERNS[6]: "self.shuttle_main_inventory_kg -= moved",
+        FORBIDDEN_INTERNAL_KG_MUTATION_PATTERNS[7]: "self.thermite_Mg_inventory_kg -= reacted",
+        FORBIDDEN_INTERNAL_KG_MUTATION_PATTERNS[8]: "terminal.oxygen_stored",
+        FORBIDDEN_INTERNAL_KG_MUTATION_PATTERNS[9]: "terminal.oxygen_vented_to_vacuum",
     }
 
-    for pattern, sample in samples.items():
+    for pattern in FORBIDDEN_INTERNAL_KG_MUTATION_PATTERNS:
+        sample = samples[pattern]
         assert re.search(pattern, sample), pattern
 
 
