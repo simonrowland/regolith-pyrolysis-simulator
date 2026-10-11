@@ -192,6 +192,12 @@ species:
       phase: aluminoborosilicate_melt
       regime: open_system_constant_CO_CO2_flow
       units: dimensionless ratios as printed
+      derivation:
+        relation: "Al2O3-normalized B2O3 ratio and natural-log transform, Eq. (1)"
+        output_unit: dimensionless
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {page: 175, section: '3 Results', equation: '1'}
       values:
         quantity: normalized_boron_retention_and_log_loss
         method_class: measured_reduced
@@ -273,6 +279,15 @@ species:
       phase: aluminoborosilicate_melt
       regime: open_system_rate_model
       units: radius r in cm; duration d in min; values are model-derived
+      derived_from:
+      - ta-flemetakis-2024::flemetakis_2024_evaporation_rate_constants::rows:h=2e78aff879b4
+      - ta-flemetakis-2024::flemetakis_2024_evaporation_rate_constants::rows:h=bee9045597dd
+      derivation:
+        inputs:
+        - ta-flemetakis-2024::flemetakis_2024_evaporation_rate_constants::rows:h=2e78aff879b4
+        - ta-flemetakis-2024::flemetakis_2024_evaporation_rate_constants::rows:h=bee9045597dd
+        relation: Authors applied Eq. (2) to the Table 3 rate constants at 1350 C in air and FMQ-4, assuming spherical samples, to calculate the times for 5% and 50% B loss (Table 4).
+        output_unit: min
       values:
         quantity: time_to_boron_loss
         T_C: 1350
