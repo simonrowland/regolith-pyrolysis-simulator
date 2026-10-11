@@ -123,7 +123,8 @@ species:
         note: none printed; values are calculated from JANAF free energies
       values:
         quantity: partial_pressure
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: Steurer (1985), Table 1; authors' JANAF equilibrium calculations using JANAF thermochemical data (Ref. 5), Eqs. (1)-(12)
         evidence_class: authors_janaf_equilibrium_not_measured
         T_K:
         - 2000.0
@@ -260,7 +261,8 @@ species:
         note: none printed
       values:
         quantity: oxygen_yield_wt_pct
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: Steurer (1985), Table 3; authors' calculated oxygen mass fractions from equilibrium vapor pressures, Eq. (15)
         evidence_class: authors_janaf_equilibrium_not_measured
         definition_as_printed: Weight of Gaseous Oxygen / Weight of Total Gas
         rows:
@@ -418,7 +420,8 @@ species:
         note: authors call these tentative calculations
       values:
         quantity: metal_yield_wt_pct_of_oxide
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: Steurer (1985), unnumbered metal-yield table; authors' tentative rapid-cooling disproportionation calculation, Eq. (18)
         metal: Si
         reaction_as_printed: 2 SiO(g) -> SiO2(s) + Si(s)
         points:
@@ -454,7 +457,8 @@ species:
         note: none printed
       values:
         quantity: partial_pressure
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: Steurer (1985), Table 2; authors' JANAF-based computer solution of the oxide-mixture equilibrium equations (Ref. 4, pp. 4-13 to 4-18)
         evidence_class: authors_janaf_equilibrium_not_measured
         O2_3000K_P_atm: 0.081
         T_K:
@@ -574,7 +578,8 @@ species:
         note: none printed
       values:
         quantity: partial_pressure_O2
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: Steurer (1985), Table 4; authors' calculated oxygen vapor pressures for the model mixture
         printed_format_note: Without/With columns print mantissa and exponent as separate cells (e.g.
           5.43  10^{-20}), no multiplication sign.
         rows:
@@ -634,7 +639,8 @@ species:
         note: figure-only; scatter not digitised
       values:
         quantity: partial_pressure
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: Steurer (1985), Fig. 2; authors' calculated JANAF equilibrium vapor pressures (Ref. 5)
         admission_status: figure_only
         semantics: bound_not_point_ordering
         panels:
@@ -676,7 +682,8 @@ species:
         note: authors call these tentative calculations
       values:
         quantity: metal_yield_wt_pct_of_oxide
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: Steurer (1985), unnumbered metal-yield table; authors' tentative rapid-cooling disproportionation calculation, Eq. (19)
         metal: Al
         reaction_as_printed: AlO, AlO2, Al2O -> Al2O3(s) + Al(s)
         points:
