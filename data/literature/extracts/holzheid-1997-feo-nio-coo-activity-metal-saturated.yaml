@@ -5,6 +5,71 @@ source:
     Geology 139, 21-38.
   doi: 10.1016/S0009-2541(97)00030-2
   year: 1997
+source_tables:
+  table_1:
+    locator: {page: 22, table: '1'}
+    title: Silicate starting compositions (electron microprobe analysis)
+    columns: [oxide, wt.%, AD (anorthite-diopside), BK (komatiitic basalt)]
+    footnotes: none printed
+  table_2:
+    locator: {pages: [23, 24, 25], table: '2'}
+    title: Mole fraction and activity coefficients (γ) of metal oxides
+    columns: [run, T (K), log fO2, XCoO, XFeO, XNiO, XFeO, γCoO, γNiO, "γ of ‘FeO’"]
+    footnotes: no explanatory footnote is printed; the body prints the run label AD 14* without explanation
+    scope_note: 57 FeO activity-coefficient experiments, identified by a printed γ of quoted FeO value
+    FeO_row_counts_by_page: {23: 26, 24: 25, 25: 6}
+    FeO_row_total: 57
+  table_3:
+    locator: {pages: [26, 27], table: '3'}
+    title: Equilibration of metal and silicate melts with variable MgO-content
+    columns:
+      table_3a: [run, T (K), duration (h), log fO2, CoO (wt.%), CoO s.d. (%), MgO (wt.%), MgO s.d. (%), γCoO,
+        run, T (K), duration (h), log fO2, NiO (wt.%), NiO s.d. (%), MgO (wt.%), MgO s.d. (%), γNiO]
+      table_3b: [run, T (K), duration (h), log fO2, CoO (wt.%), CoO s.d. (%), NiO (wt.%), NiO s.d. (%), FeO (wt.%),
+        FeO s.d. (%), MgO (wt.%), MgO s.d. (%), Co (wt.%), Co s.d. (%), Ni (wt.%), Ni s.d. (%), Fe (wt.%), Fe s.d. (%),
+        γCoO, γNiO, "γ of ‘FeO’"]
+      table_3c: [run, T (K), duration (h), log fO2, CoO (wt.%), CoO s.d. (%), FeO (wt.%), FeO s.d. (%), MgO (wt.%),
+        MgO s.d. (%), Co (wt.%), Co s.d. (%), Fe (wt.%), Fe s.d. (%), γCoO, "γ of ‘FeO’"]
+      table_3d: [run, T (K), duration (h), log fO2, NiO (wt.%), NiO s.d. (%), FeO (wt.%), FeO s.d. (%), MgO (wt.%),
+        MgO s.d. (%), Ni (wt.%), Ni s.d. (%), Fe (wt.%), Fe s.d. (%), γNiO, "γ of ‘FeO’"]
+    footnotes: none printed
+    FeO_row_counts_by_page: {26: 7, 27: 8}
+    FeO_row_total: 15
+  FeO_activity_row_total: 72
+  activity_calculation:
+    locator: {page: 30, equation: '9'}
+    reference_state_text: >-
+      pure liquid Fe(1-x)O (the source's wüstite(l)); reference reaction Fe(s) + 1/2 O2(g) = "FeO"(l), corresponding Fe reaction in section 3;
+      deltaG0 source O'Neill and Pownceby (1993) and Barin (1989)
+    source_wording: The paper identifies the liquid "FeO" reference as wüstite(l); it contrasts this with stoichiometric
+      FeO(l), whose activity coefficients are higher.
+    calculation: >-
+      The paper says the corresponding reaction for Fe was calculated from free energies of formation using thermodynamic
+      data from O'Neill and Pownceby (1993) and Barin (1989). The Fe free-energy expression is ΔG("FeO"(l)) [J/mol] =
+      -244118 + 115.559·T - 8.474·T·ln T (Eq. 9, T in K); it is used in Eq. 4 with log γFeO = log K - log XFeO +
+      1/2·log fO2. The text states the oxide activity coefficients are relative to pure liquid oxide at 1 atm.
+    typed_structure_limit: >-
+      Typed standard_state can encode a Raoultian pure endmember and liquid phase, but it has no field for the liquid
+      wüstite nonstoichiometry Fe(1-x)O; each FeO activity row also records that identity in standard_state text.
+    conversion_factors_as_printed:
+    - factor: 2.02
+      temperature_C: 1300
+      direction_and_wording: >-
+        γFeO/γ"FeO" is the activity coefficient relative to stoichiometric FeO divided by the activity coefficient
+        relative to wüstite; the ratio is 2.02 at 1300°C.
+      locator: {page: 30, section: '4.1 Activity coefficients'}
+    - factor: 1.94
+      temperature_C: 1400
+      direction_and_wording: >-
+        Activity coefficients using a stoichiometric FeO(l) standard state are higher by a factor of 1.94 relative to
+        the activity coefficients based on wüstite(l).
+      locator: {page: 31, section: '4.1 Activity coefficients'}
+    - factor: 1.66
+      temperature_C: 1600
+      direction_and_wording: >-
+        γFeO/γ"FeO" is the activity coefficient relative to stoichiometric FeO divided by the activity coefficient
+        relative to wüstite; the ratio is 1.66 at 1600°C.
+      locator: {page: 30, section: '4.1 Activity coefficients'}
 extraction:
   method: layout-preserving pdftotext manual transcription; source tables and prose reviewed
   date: '2026-09-20'
@@ -2127,6 +2192,18 @@ fidelity_samples:
     page: 26
     table: 3b
     row: V 69
+- path: species.FeO.observations[holzheid_1997_table2_page23_feo].values.series[0].gamma
+  value: 1.62
+  locator: {page: 23, table: '2', row: AD 10}
+- path: species.FeO.observations[holzheid_1997_table2_page24_feo].values.series[0].gamma
+  value: 2.00
+  locator: {page: 24, table: '2', row: BK 59 a}
+- path: species.FeO.observations[holzheid_1997_table2_page25_feo].values.series[0].gamma
+  value: 1.39
+  locator: {page: 25, table: '2', row: BK 50 a}
+- path: species.FeO.observations[holzheid_1997_table3_pages27_bk_feo].values.series[0].gamma
+  value: 2.33
+  locator: {page: 27, table: 3, row: BK 57 (c)}
 species:
   SiO2:
     observations:
@@ -3310,9 +3387,647 @@ species:
       equipment: {}
   FeO:
     observations:
+    - observation_id: holzheid_1997_table2_page23_feo
+      type: activity_coefficient
+      locator: {page: 23, table: '2'}
+      derived_from: [holzheid_1997_equilibrium_free_energy_fits]
+      derivation:
+        relation: authors' equilibrium-constant calculation from measured oxide mole fractions and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
+      phase: silicate_melt
+      standard_state:
+        state:
+          tag: unknown
+          reason: schema cannot represent the paper's nonstoichiometric liquid wüstite "FeO" standard state
+        note: >-
+          pure liquid Fe(1-x)O; reference reaction Fe(s) + 1/2 O2(g) = "FeO"(l); deltaG0 source O'Neill and Pownceby
+          (1993) and Barin (1989). The typed endmember encodes Raoultian FeO(l) at 1 atm but cannot encode the source's
+          wüstite nonstoichiometry Fe(1-x)O; see the source-specific calculation record above.
+        locator: {published_page: 30, equation: '9'}
+      regime: experimental_melt_equilibration
+      units: mole percent and dimensionless activity coefficient as printed
+      values:
+        method_class: model_derived
+        quantity: activity_coefficient
+        source_table_description: >-
+          Table 2(a) AD FeNiCo-alloy subset and Table 2(b) BK Co,Ni subset. The paper says alloy experiments were
+          recalculated to equilibria with 100% pure metals using literature alloy activity coefficients.
+        composition_rule:
+          AD: use the Table 1 AD starting composition (SiO2 50.9, CaO 24.9, MgO 10.4, Al2O3 13.8, FeO 0.0 wt.%);
+            Table 2 labels the silicate anorthite-diopside and does not print additional oxide additions for these rows.
+          BK: use the Table 1 BK starting composition (SiO2 49.1, CaO 19.2, MgO 10.6, Al2O3 14.1, FeO 7.0 wt.%);
+            Table 2 labels the silicate komatiitic basalt and does not print additional oxide additions for these rows.
+          locator: {page: 22, table: '1'}
+        log_fO2_scale_and_control:
+          state: unknown
+          reason: not_published; pages 22-25 and 29-30 searched, log fO2 scale and imposition/measurement not specified
+        FeO_calculation_metal_standard: pure Fe reference metal in the section 3 equilibrium calculation, page 30
+        series:
+        - run: AD 10
+          system: AD
+          T_K: 1677
+          log_fO2: -10.31
+          XCoO_mol_pct: 0.25
+          XNiO_mol_pct: 0.027
+          XFeO_mol_pct: 5.56
+          metal_phase: FeNiCo alloy; alloy composition not printed in Table 2; recalculated to pure-metal equilibria
+          gamma: 1.62
+          gamma_FeO_uncertainty: not_reported per experiment
+        - run: AD 6
+          system: AD
+          T_K: 1677
+          log_fO2: -10.60
+          XCoO_mol_pct: 0.13
+          XNiO_mol_pct: 0.025
+          XFeO_mol_pct: 8.77
+          metal_phase: FeNiCo alloy; alloy composition not printed in Table 2; recalculated to pure-metal equilibria
+          gamma: 1.64
+          gamma_FeO_uncertainty: not_reported per experiment
+        - run: AD 1
+          system: AD
+          T_K: 1679
+          log_fO2: -10.63
+          XCoO_mol_pct: 0.12
+          XNiO_mol_pct: 0.013
+          XFeO_mol_pct: 8.13
+          metal_phase: FeNiCo alloy; alloy composition not printed in Table 2; recalculated to pure-metal equilibria
+          gamma: 1.74
+          gamma_FeO_uncertainty: not_reported per experiment
+        - run: AD 8
+          system: AD
+          T_K: 1682
+          log_fO2: -10.80
+          XCoO_mol_pct: 0.095
+          XNiO_mol_pct: 0.013
+          XFeO_mol_pct: 6.66
+          metal_phase: FeNiCo alloy; alloy composition not printed in Table 2; recalculated to pure-metal equilibria
+          gamma: 1.61
+          gamma_FeO_uncertainty: not_reported per experiment
+        - run: AD 5
+          system: AD
+          T_K: 1677
+          log_fO2: -11.10
+          XCoO_mol_pct: 0.085
+          XNiO_mol_pct: 0.0085
+          XFeO_mol_pct: 4.61
+          metal_phase: FeNiCo alloy; alloy composition not printed in Table 2; recalculated to pure-metal equilibria
+          gamma: 1.56
+          gamma_FeO_uncertainty: not_reported per experiment
+        - run: AD 9
+          system: AD
+          T_K: 1679
+          log_fO2: -11.29
+          XCoO_mol_pct: 0.065
+          XNiO_mol_pct: 0.0071
+          XFeO_mol_pct: 4.16
+          metal_phase: FeNiCo alloy; alloy composition not printed in Table 2; recalculated to pure-metal equilibria
+          gamma: 1.63
+          gamma_FeO_uncertainty: not_reported per experiment
+        - run: AD 2
+          system: AD
+          T_K: 1680
+          log_fO2: -11.62
+          XCoO_mol_pct: 0.044
+          XNiO_mol_pct: 0.0066
+          XFeO_mol_pct: 2.60
+          metal_phase: FeNiCo alloy; alloy composition not printed in Table 2; recalculated to pure-metal equilibria
+          gamma: 1.52
+          gamma_FeO_uncertainty: not_reported per experiment
+        - run: AD 3
+          system: AD
+          T_K: 1680
+          log_fO2: -11.72
+          XCoO_mol_pct: 0.037
+          XNiO_mol_pct: 0.0043
+          XFeO_mol_pct: 2.66
+          metal_phase: FeNiCo alloy; alloy composition not printed in Table 2; recalculated to pure-metal equilibria
+          gamma: 1.39
+          gamma_FeO_uncertainty: not_reported per experiment
+        - run: BK 60 a
+          system: BK
+          T_K: 1672
+          log_fO2: -8.08
+          XCoO_mol_pct: 10.8
+          XFeO_mol_pct: 3.86
+          metal_phase: Co and Ni, as printed in the Table 2(b) group heading
+          gamma: 2.27
+          gamma_FeO_uncertainty: not_reported per experiment
+        - run: BK 60 b
+          system: BK
+          T_K: 1672
+          log_fO2: -8.08
+          XNiO_mol_pct: 0.85
+          XFeO_mol_pct: 4.72
+          metal_phase: Co and Ni, as printed in the Table 2(b) group heading
+          gamma: 1.78
+          gamma_FeO_uncertainty: not_reported per experiment
+        - run: BK 59 a
+          system: BK
+          T_K: 1672
+          log_fO2: -8.53
+          XCoO_mol_pct: 6.12
+          XFeO_mol_pct: 4.37
+          metal_phase: Co and Ni, as printed in the Table 2(b) group heading
+          gamma: 2.47
+          gamma_FeO_uncertainty: not_reported per experiment
+        - run: BK 59 b
+          system: BK
+          T_K: 1672
+          log_fO2: -8.53
+          XNiO_mol_pct: 0.62
+          XFeO_mol_pct: 4.07
+          metal_phase: Co and Ni, as printed in the Table 2(b) group heading
+          gamma: 1.78
+          gamma_FeO_uncertainty: not_reported per experiment
+        - run: BK 58 a
+          system: BK
+          T_K: 1675
+          log_fO2: -9.05
+          XCoO_mol_pct: 3.38
+          XFeO_mol_pct: 4.23
+          metal_phase: Co and Ni, as printed in the Table 2(b) group heading
+          gamma: 1.82
+          gamma_FeO_uncertainty: not_reported per experiment
+        - run: BK 58 b
+          system: BK
+          T_K: 1675
+          log_fO2: -9.05
+          XNiO_mol_pct: 0.37
+          XFeO_mol_pct: 2.69
+          metal_phase: Co and Ni, as printed in the Table 2(b) group heading
+          gamma: 1.72
+          gamma_FeO_uncertainty: not_reported per experiment
+        - run: BK 57 a
+          system: BK
+          T_K: 1673
+          log_fO2: -9.58
+          XCoO_mol_pct: 1.89
+          XFeO_mol_pct: 3.69
+          metal_phase: Co and Ni, as printed in the Table 2(b) group heading
+          gamma: 1.69
+          gamma_FeO_uncertainty: not_reported per experiment
+        - run: BK 57 b
+          system: BK
+          T_K: 1673
+          log_fO2: -9.58
+          XNiO_mol_pct: 0.19
+          XFeO_mol_pct: 1.80
+          metal_phase: Co and Ni, as printed in the Table 2(b) group heading
+          gamma: 1.65
+          gamma_FeO_uncertainty: not_reported per experiment
+        - run: BK 56 a
+          system: BK
+          T_K: 1674
+          log_fO2: -10.06
+          XCoO_mol_pct: 0.99
+          XFeO_mol_pct: 3.01
+          metal_phase: Co and Ni, as printed in the Table 2(b) group heading
+          gamma: 1.93
+          gamma_FeO_uncertainty: not_reported per experiment
+        - run: BK 56 b
+          system: BK
+          T_K: 1674
+          log_fO2: -10.06
+          XNiO_mol_pct: 0.087
+          XFeO_mol_pct: 1.37
+          metal_phase: Co and Ni, as printed in the Table 2(b) group heading
+          gamma: 1.73
+          gamma_FeO_uncertainty: not_reported per experiment
+        - run: BK 54 a
+          system: BK
+          T_K: 1674
+          log_fO2: -10.61
+          XCoO_mol_pct: 0.68
+          XFeO_mol_pct: 1.74
+          metal_phase: Co and Ni, as printed in the Table 2(b) group heading
+          gamma: 1.49
+          gamma_FeO_uncertainty: not_reported per experiment
+        - run: BK 54 b
+          system: BK
+          T_K: 1674
+          log_fO2: -10.61
+          XNiO_mol_pct: 0.042
+          XFeO_mol_pct: 0.91
+          metal_phase: Co and Ni, as printed in the Table 2(b) group heading
+          gamma: 1.70
+          gamma_FeO_uncertainty: not_reported per experiment
+        - run: BK 55 a
+          system: BK
+          T_K: 1675
+          log_fO2: -11.05
+          XCoO_mol_pct: 0.34
+          XFeO_mol_pct: 1.11
+          metal_phase: Co and Ni, as printed in the Table 2(b) group heading
+          gamma: 1.12
+          gamma_FeO_uncertainty: not_reported per experiment
+        - run: BK 55 b
+          system: BK
+          T_K: 1675
+          log_fO2: -11.05
+          XNiO_mol_pct: 0.025
+          XFeO_mol_pct: 0.65
+          metal_phase: Co and Ni, as printed in the Table 2(b) group heading
+          gamma: 1.59
+          gamma_FeO_uncertainty: not_reported per experiment
+        - run: BK 49 a
+          system: BK
+          T_K: 1673
+          log_fO2: -11.57
+          XCoO_mol_pct: 0.20
+          XFeO_mol_pct: 1.08
+          metal_phase: Co and Ni, as printed in the Table 2(b) group heading
+          gamma: 1.57
+          gamma_FeO_uncertainty: not_reported per experiment
+        - run: BK 49 b
+          system: BK
+          T_K: 1673
+          log_fO2: -11.57
+          XNiO_mol_pct: 0.015
+          XFeO_mol_pct: 0.63
+          metal_phase: Co and Ni, as printed in the Table 2(b) group heading
+          gamma: 1.48
+          gamma_FeO_uncertainty: not_reported per experiment
+        - run: BK 53 a
+          system: BK
+          T_K: 1675
+          log_fO2: -11.89
+          XCoO_mol_pct: 0.43
+          XFeO_mol_pct: 0.34
+          metal_phase: Co and Ni, as printed in the Table 2(b) group heading
+          gamma: 1.59
+          gamma_FeO_uncertainty: not_reported per experiment
+        - run: BK 53 b
+          system: BK
+          T_K: 1675
+          log_fO2: -11.89
+          XNiO_mol_pct: 0.012
+          XFeO_mol_pct: 0.30
+          metal_phase: Co and Ni, as printed in the Table 2(b) group heading
+          gamma: 1.71
+          gamma_FeO_uncertainty: not_reported per experiment
+        alloy_note: The source warns that alloy composition and alloy activity-coefficient uncertainty add uncertainty after recalculation to pure metals.
+      uncertainty:
+        reported_status: no individual γFeO uncertainty printed for these Table 2 rows
+      equipment: {}
+    - observation_id: holzheid_1997_table2_page24_feo
+      type: activity_coefficient
+      locator: {page: 24, table: '2'}
+      derived_from: [holzheid_1997_equilibrium_free_energy_fits]
+      derivation:
+        relation: authors' equilibrium-constant calculation from measured oxide mole fractions and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
+      phase: silicate_melt
+      standard_state:
+        state:
+          tag: unknown
+          reason: schema cannot represent the paper's nonstoichiometric liquid wüstite "FeO" standard state
+        note: >-
+          pure liquid Fe(1-x)O; reference reaction Fe(s) + 1/2 O2(g) = "FeO"(l); deltaG0 source O'Neill and Pownceby
+          (1993) and Barin (1989). The typed endmember encodes Raoultian FeO(l) at 1 atm but cannot encode the source's
+          wüstite nonstoichiometry Fe(1-x)O.
+        locator: {published_page: 30, equation: '9'}
+      regime: experimental_melt_equilibration
+      units: mole percent and dimensionless activity coefficient as printed
+      values:
+        method_class: model_derived
+        quantity: activity_coefficient
+        source_table_description: >-
+          Table 2(b) BK FeCo,FeNi-alloy subset and Table 2(c) AD FeNiCo-alloy subset. The paper says alloy experiments
+          were recalculated to equilibria with 100% pure metals using literature alloy activity coefficients.
+        composition_rule:
+          BK: Table 1 BK starting composition (SiO2 49.1, CaO 19.2, MgO 10.6, Al2O3 14.1, FeO 7.0 wt.%); Table 2
+            labels the silicate komatiitic basalt and prints no additional oxide additions for these rows.
+          AD: Table 1 AD starting composition (SiO2 50.9, CaO 24.9, MgO 10.4, Al2O3 13.8, FeO 0.0 wt.%); Table 2
+            labels the silicate anorthite-diopside and prints no additional oxide additions for these rows.
+          locator: {page: 22, table: '1'}
+        log_fO2_scale_and_control:
+          state: unknown
+          reason: not_published; pages 22-25 and 29-30 searched, log fO2 scale and imposition/measurement not specified
+        FeO_calculation_metal_standard: pure Fe reference metal in the section 3 equilibrium calculation, page 30
+        series:
+        - {run: BK 59 a, system: BK, T_K: 1672, log_fO2: -8.58, XCoO_mol_pct: 5.15, XFeO_mol_pct: 4.24,
+          metal_phase: "FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal equilibria", gamma: 2.00,
+          gamma_FeO_uncertainty: not_reported per experiment}
+        - {run: BK 59 b, system: BK, T_K: 1672, log_fO2: -8.58, XNiO_mol_pct: 0.47, XFeO_mol_pct: 5.88,
+          metal_phase: "FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal equilibria", gamma: 1.19,
+          gamma_FeO_uncertainty: not_reported per experiment}
+        - {run: BK 58 a, system: BK, T_K: 1675, log_fO2: -9.05, XCoO_mol_pct: 2.35, XFeO_mol_pct: 3.42,
+          metal_phase: "FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal equilibria", gamma: 2.45,
+          gamma_FeO_uncertainty: not_reported per experiment}
+        - {run: BK 58 b, system: BK, T_K: 1675, log_fO2: -9.05, XNiO_mol_pct: 0.26, XFeO_mol_pct: 5.21,
+          metal_phase: "FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal equilibria", gamma: 1.85,
+          gamma_FeO_uncertainty: not_reported per experiment}
+        - {run: BK 57 a, system: BK, T_K: 1673, log_fO2: -9.58, XCoO_mol_pct: 1.69, XFeO_mol_pct: 3.64,
+          metal_phase: "FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal equilibria", gamma: 2.06,
+          gamma_FeO_uncertainty: not_reported per experiment}
+        - {run: BK 57 b, system: BK, T_K: 1673, log_fO2: -9.58, XNiO_mol_pct: 0.14, XFeO_mol_pct: 4.42,
+          metal_phase: "FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal equilibria", gamma: 1.77,
+          gamma_FeO_uncertainty: not_reported per experiment}
+        - {run: BK 56 a, system: BK, T_K: 1674, log_fO2: -10.06, XCoO_mol_pct: 1.06, XFeO_mol_pct: 3.79,
+          metal_phase: "FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal equilibria", gamma: 1.89,
+          gamma_FeO_uncertainty: not_reported per experiment}
+        - {run: BK 56 b, system: BK, T_K: 1674, log_fO2: -10.06, XNiO_mol_pct: 0.075, XFeO_mol_pct: 2.93,
+          metal_phase: "FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal equilibria", gamma: 1.76,
+          gamma_FeO_uncertainty: not_reported per experiment}
+        - {run: BK 54 a, system: BK, T_K: 1674, log_fO2: -10.61, XCoO_mol_pct: 0.54, XFeO_mol_pct: 3.75,
+          metal_phase: "FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal equilibria", gamma: 1.75,
+          gamma_FeO_uncertainty: not_reported per experiment}
+        - {run: BK 54 b, system: BK, T_K: 1674, log_fO2: -10.61, XNiO_mol_pct: 0.037, XFeO_mol_pct: 4.17,
+          metal_phase: "FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal equilibria", gamma: 1.56,
+          gamma_FeO_uncertainty: not_reported per experiment}
+        - {run: BK 55 a, system: BK, T_K: 1675, log_fO2: -11.05, XCoO_mol_pct: 0.26, XFeO_mol_pct: 3.66,
+          metal_phase: "FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal equilibria", gamma: 1.81,
+          gamma_FeO_uncertainty: not_reported per experiment}
+        - {run: BK 55 b, system: BK, T_K: 1675, log_fO2: -11.05, XNiO_mol_pct: 0.016, XFeO_mol_pct: 3.07,
+          metal_phase: "FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal equilibria", gamma: 1.68,
+          gamma_FeO_uncertainty: not_reported per experiment}
+        - {run: BK 51 a, system: BK, T_K: 1672, log_fO2: -11.58, XCoO_mol_pct: 0.093, XFeO_mol_pct: 5.01,
+          metal_phase: "FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal equilibria", gamma: 1.40,
+          gamma_FeO_uncertainty: not_reported per experiment}
+        - {run: BK 51 b, system: BK, T_K: 1672, log_fO2: -11.58, XNiO_mol_pct: 0.0052, XFeO_mol_pct: 4.46,
+          metal_phase: "FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal equilibria", gamma: 1.52,
+          gamma_FeO_uncertainty: not_reported per experiment}
+        - {run: BK 53 a, system: BK, T_K: 1675, log_fO2: -11.89, XCoO_mol_pct: 0.0072, XFeO_mol_pct: 4.35,
+          metal_phase: "FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal equilibria", gamma: 1.81,
+          gamma_FeO_uncertainty: not_reported per experiment}
+        - {run: BK 53 b, system: BK, T_K: 1675, log_fO2: -11.89, XNiO_mol_pct: 0.015, XFeO_mol_pct: 4.95,
+          metal_phase: "FeCo,FeNi alloy; composition not printed per run; recalculated to pure-metal equilibria", gamma: 1.59,
+          gamma_FeO_uncertainty: not_reported per experiment}
+        - {run: AD 50, system: AD, T_K: 1578, log_fO2: -12.54, XCoO_mol_pct: 0.030, XNiO_mol_pct: 0.0046,
+          XFeO_mol_pct: 2.99, metal_phase: FeNiCo alloy; composition not printed per run; recalculated to pure-metal equilibria,
+          gamma: 1.58, gamma_FeO_uncertainty: not_reported per experiment}
+        - {run: AD 43, system: AD, T_K: 1623, log_fO2: -12.03, XCoO_mol_pct: 0.036, XNiO_mol_pct: 0.0046,
+          XFeO_mol_pct: 2.67, metal_phase: FeNiCo alloy; composition not printed per run; recalculated to pure-metal equilibria,
+          gamma: 2.02, gamma_FeO_uncertainty: not_reported per experiment}
+        - {run: AD 49, system: AD, T_K: 1673, log_fO2: -11.57, XCoO_mol_pct: 0.056, XNiO_mol_pct: 0.0056,
+          XFeO_mol_pct: 3.05, metal_phase: FeNiCo alloy; composition not printed per run; recalculated to pure-metal equilibria,
+          gamma: 1.58, gamma_FeO_uncertainty: not_reported per experiment}
+        - {run: AD 46, system: AD, T_K: 1711, log_fO2: -11.29, XCoO_mol_pct: 0.042, XNiO_mol_pct: 0.0066,
+          XFeO_mol_pct: 3.19, metal_phase: FeNiCo alloy; composition not printed per run; recalculated to pure-metal equilibria,
+          gamma: 1.64, gamma_FeO_uncertainty: not_reported per experiment}
+        - {run: AD 47, system: AD, T_K: 1755, log_fO2: -10.79, XCoO_mol_pct: 0.037, XNiO_mol_pct: 0.0055,
+          XFeO_mol_pct: 3.05, metal_phase: FeNiCo alloy; composition not printed per run; recalculated to pure-metal equilibria,
+          gamma: 2.00, gamma_FeO_uncertainty: not_reported per experiment}
+        - {run: AD 48, system: AD, T_K: 1780, log_fO2: -10.59, XCoO_mol_pct: 0.044, XNiO_mol_pct: 0.0067,
+          XFeO_mol_pct: 3.48, metal_phase: FeNiCo alloy; composition not printed per run; recalculated to pure-metal equilibria,
+          gamma: 1.70, gamma_FeO_uncertainty: not_reported per experiment}
+        - {run: AD 44, system: AD, T_K: 1795, log_fO2: -10.46, XCoO_mol_pct: 0.044, XNiO_mol_pct: 0.0063,
+          XFeO_mol_pct: 3.27, metal_phase: FeNiCo alloy; composition not printed per run; recalculated to pure-metal equilibria,
+          gamma: 1.78, gamma_FeO_uncertainty: not_reported per experiment}
+        - {run: AD 52, system: AD, T_K: 1826, log_fO2: -10.23, XCoO_mol_pct: 0.045, XNiO_mol_pct: 0.0080,
+          XFeO_mol_pct: 3.36, metal_phase: FeNiCo alloy; composition not printed per run; recalculated to pure-metal equilibria,
+          gamma: 1.73, gamma_FeO_uncertainty: not_reported per experiment}
+        - {run: AD 45, system: AD, T_K: 1872, log_fO2: -9.73, XCoO_mol_pct: 0.049, XNiO_mol_pct: 0.0085,
+          XFeO_mol_pct: 3.34, metal_phase: FeNiCo alloy; composition not printed per run; recalculated to pure-metal equilibria,
+          gamma: 2.02, gamma_FeO_uncertainty: not_reported per experiment}
+        alloy_note: The source warns that alloy composition and alloy activity-coefficient uncertainty add uncertainty after recalculation to pure metals.
+      uncertainty:
+        reported_status: no individual γFeO uncertainty printed for these Table 2 rows
+      equipment: {}
+    - observation_id: holzheid_1997_table2_page25_feo
+      type: activity_coefficient
+      locator: {page: 25, table: '2'}
+      derived_from: [holzheid_1997_equilibrium_free_energy_fits]
+      derivation:
+        relation: authors' equilibrium-constant calculation from measured oxide mole fractions and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
+      phase: silicate_melt
+      standard_state:
+        state:
+          tag: unknown
+          reason: schema cannot represent the paper's nonstoichiometric liquid wüstite "FeO" standard state
+        note: >-
+          pure liquid Fe(1-x)O; reference reaction Fe(s) + 1/2 O2(g) = "FeO"(l); deltaG0 source O'Neill and Pownceby
+          (1993) and Barin (1989). The typed endmember encodes Raoultian FeO(l) at 1 atm but cannot encode the source's
+          wüstite nonstoichiometry Fe(1-x)O.
+        locator: {published_page: 30, equation: '9'}
+      regime: experimental_melt_equilibration
+      units: mole percent and dimensionless activity coefficient as printed
+      values:
+        method_class: model_derived
+        quantity: activity_coefficient
+        source_table_description: Table 2(c), BK komatiitic basalt, metal Co,Ni
+        composition_rule: Table 1 BK starting composition (SiO2 49.1, CaO 19.2, MgO 10.6, Al2O3 14.1, FeO 7.0 wt.%); Table 2 labels the silicate komatiitic basalt and prints no additional oxide additions for these rows
+        composition_locator: {page: 22, table: '1'}
+        log_fO2_scale_and_control:
+          state: unknown
+          reason: not_published; pages 22-25 and 29-30 searched, log fO2 scale and imposition/measurement not specified
+        FeO_calculation_metal_standard: pure Fe reference metal in the section 3 equilibrium calculation, page 30
+        series:
+        - {run: BK 50 a, system: BK, T_K: 1578, log_fO2: -12.54, XCoO_mol_pct: 0.34, XFeO_mol_pct: 0.91,
+          metal_phase: Co and Ni, gamma: 1.39, gamma_FeO_uncertainty: not_reported per experiment}
+        - {run: BK 50 b, system: BK, T_K: 1578, log_fO2: -12.54, XNiO_mol_pct: 0.024, XFeO_mol_pct: 0.25,
+          metal_phase: Co and Ni, gamma: 1.68, gamma_FeO_uncertainty: not_reported per experiment}
+        - {run: BK 49 a, system: BK, T_K: 1673, log_fO2: -11.57, XCoO_mol_pct: 0.20, XFeO_mol_pct: 1.08,
+          metal_phase: Co and Ni, gamma: 1.57, gamma_FeO_uncertainty: not_reported per experiment}
+        - {run: BK 49 b, system: BK, T_K: 1673, log_fO2: -11.57, XNiO_mol_pct: 0.015, XFeO_mol_pct: 0.63,
+          metal_phase: Co and Ni, gamma: 1.48, gamma_FeO_uncertainty: not_reported per experiment}
+        - {run: BK 46 a, system: BK, T_K: 1711, log_fO2: -11.19, XCoO_mol_pct: 0.36, XFeO_mol_pct: 0.83,
+          metal_phase: Co and Ni, gamma: 1.53, gamma_FeO_uncertainty: not_reported per experiment}
+        - {run: BK 46 b, system: BK, T_K: 1711, log_fO2: -11.19, XNiO_mol_pct: 0.018, XFeO_mol_pct: 0.45,
+          metal_phase: Co and Ni, gamma: 1.54, gamma_FeO_uncertainty: not_reported per experiment}
+      uncertainty:
+        reported_status: no individual γFeO uncertainty printed for these Table 2 rows
+      equipment: {}
+    - observation_id: holzheid_1997_table3_pages27_bk_feo
+      type: activity_coefficient
+      locator: {page: 27, table: '3'}
+      derived_from: [holzheid_1997_equilibrium_free_energy_fits]
+      derivation:
+        relation: authors' equilibrium-constant calculation from measured oxide concentrations and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
+      phase: komatiitic_basalt_silicate_melt
+      standard_state:
+        state:
+          tag: unknown
+          reason: schema cannot represent the paper's nonstoichiometric liquid wüstite "FeO" standard state
+        note: >-
+          pure liquid Fe(1-x)O; reference reaction Fe(s) + 1/2 O2(g) = "FeO"(l); deltaG0 source O'Neill and Pownceby
+          (1993) and Barin (1989). The typed endmember encodes Raoultian FeO(l) at 1 atm but cannot encode the source's
+          wüstite nonstoichiometry Fe(1-x)O.
+        locator: {published_page: 30, equation: '9'}
+      regime: experimental_melt_equilibration
+      units: wt.% and dimensionless activity coefficient as printed
+      values:
+        method_class: model_derived
+        quantity: activity_coefficient
+        full_silicate_composition_rule: >-
+          Table 1 BK starting composition (SiO2 49.1, CaO 19.2, MgO 10.6, Al2O3 14.1, FeO 7.0 wt.%) with MgO and
+          FeO varied as analyzed in Table 3(c-d); the paper does not print a recalculated full oxide wt.% mixture.
+          CoO or NiO, FeO and MgO values below are the printed row analyses.
+        composition_rule_locator: {page: 22, table: '1'}
+        log_fO2_scale_and_control:
+          state: unknown
+          reason: not_published; pages 22-27 and 29-30 searched, log fO2 scale and imposition/measurement not specified
+        FeO_calculation_metal_standard: pure Fe reference metal in the section 3 equilibrium calculation, page 30
+        series:
+        - run: BK 57
+          system: BK, Table 3(c), metal Co-Fe alloy
+          T_K: 1673
+          duration_h: 66
+          log_fO2: -9.58
+          CoO_wt_pct: 2.40
+          CoO_sd_pct: 5
+          FeO_wt_pct: 4.48
+          FeO_sd_pct: 5
+          MgO_wt_pct: 10.6
+          MgO_sd_pct: 1
+          metal_Co_wt_pct: 91.3
+          metal_Co_sd_pct: 1
+          metal_Fe_wt_pct: 6.38
+          metal_Fe_sd_pct: 1
+          gamma_CoO: 1.21
+          gamma: 2.33
+          gamma_FeO_uncertainty: not_reported per experiment
+          metal_note: FeCo alloy recalculated to pure-metal equilibrium as stated on page 25
+        - run: V 68
+          system: BK, Table 3(c), metal Co-Fe alloy
+          T_K: 1667
+          duration_h: 49
+          log_fO2: -9.70
+          CoO_wt_pct: 1.78
+          CoO_sd_pct: 5
+          FeO_wt_pct: 2.65
+          FeO_sd_pct: 6
+          MgO_wt_pct: 17.7
+          MgO_sd_pct: 6
+          metal_Co_wt_pct: 91.4
+          metal_Co_sd_pct: 2
+          metal_Fe_wt_pct: 8.06
+          metal_Fe_sd_pct: 5
+          gamma_CoO: 2.08
+          gamma: 3.44
+          gamma_FeO_uncertainty: not_reported per experiment
+          metal_note: FeCo alloy recalculated to pure-metal equilibrium as stated on page 25
+        - run: V 64
+          system: BK, Table 3(c), metal Co-Fe alloy
+          T_K: 1675
+          duration_h: 49
+          log_fO2: -9.79
+          CoO_wt_pct: 2.13
+          CoO_sd_pct: 5
+          FeO_wt_pct: 2.20
+          FeO_sd_pct: 10
+          MgO_wt_pct: 17.9
+          MgO_sd_pct: 1
+          metal_Co_wt_pct: 90.8
+          metal_Co_sd_pct: 1
+          metal_Fe_wt_pct: 7.12
+          metal_Fe_sd_pct: 1
+          gamma_CoO: 1.48
+          gamma: 3.24
+          gamma_FeO_uncertainty: not_reported per experiment
+          metal_note: FeCo alloy recalculated to pure-metal equilibrium as stated on page 25
+        - run: V 68
+          system: BK, Table 3(c), metal Co-Fe alloy
+          T_K: 1667
+          duration_h: 49
+          log_fO2: -9.79
+          CoO_wt_pct: 1.86
+          CoO_sd_pct: 5
+          FeO_wt_pct: 1.94
+          FeO_sd_pct: 10
+          MgO_wt_pct: 30.5
+          MgO_sd_pct: 1
+          metal_Co_wt_pct: 92.8
+          metal_Co_sd_pct: 1
+          metal_Fe_wt_pct: 7.28
+          metal_Fe_sd_pct: 1
+          gamma_CoO: 1.89
+          gamma: 4.01
+          gamma_FeO_uncertainty: not_reported per experiment
+          metal_note: FeCo alloy recalculated to pure-metal equilibrium as stated on page 25
+        - run: BK 57
+          system: BK, Table 3(d), metal Ni-Fe alloy
+          T_K: 1673
+          duration_h: 66
+          log_fO2: -9.58
+          NiO_wt_pct: 0.219
+          NiO_sd_pct: 5
+          FeO_wt_pct: 2.01
+          FeO_sd_pct: 12
+          MgO_wt_pct: 11.1
+          MgO_sd_pct: 1
+          metal_Ni_wt_pct: 91.1
+          metal_Ni_sd_pct: 1
+          metal_Fe_wt_pct: 5.65
+          metal_Fe_sd_pct: 6
+          gamma_NiO: 2.33
+          gamma: 1.65
+          gamma_FeO_uncertainty: not_reported per experiment
+          metal_note: FeNi alloy recalculated to pure-metal equilibrium as stated on page 25
+        - run: V 68
+          system: BK, Table 3(d), metal Ni-Fe alloy
+          T_K: 1667
+          duration_h: 49
+          log_fO2: -9.70
+          NiO_wt_pct: 0.167
+          NiO_sd_pct: 5
+          FeO_wt_pct: 2.19
+          FeO_sd_pct: 5
+          MgO_wt_pct: 17.4
+          MgO_sd_pct: 6
+          metal_Ni_wt_pct: 89.5
+          metal_Ni_sd_pct: 1
+          metal_Fe_wt_pct: 9.50
+          metal_Fe_sd_pct: 6
+          gamma_NiO: 2.84
+          gamma: 2.79
+          gamma_FeO_uncertainty: not_reported per experiment
+          metal_note: FeNi alloy recalculated to pure-metal equilibrium as stated on page 25
+        - run: V 64
+          system: BK, Table 3(d), metal Ni-Fe alloy
+          T_K: 1675
+          duration_h: 49
+          log_fO2: -9.79
+          NiO_wt_pct: 0.130
+          NiO_sd_pct: 10
+          FeO_wt_pct: 1.72
+          FeO_sd_pct: 5
+          MgO_wt_pct: 17.5
+          MgO_sd_pct: 1
+          metal_Ni_wt_pct: 90.5
+          metal_Ni_sd_pct: 1
+          metal_Fe_wt_pct: 8.52
+          metal_Fe_sd_pct: 3
+          gamma_NiO: 3.15
+          gamma: 2.59
+          gamma_FeO_uncertainty: not_reported per experiment
+          metal_note: FeNi alloy recalculated to pure-metal equilibrium as stated on page 25
+        - run: V 67
+          system: BK, Table 3(d), metal Ni-Fe alloy
+          T_K: 1667
+          duration_h: 75.3
+          log_fO2: -9.79
+          NiO_wt_pct: 0.171
+          NiO_sd_pct: 5
+          FeO_wt_pct: 0.975
+          FeO_sd_pct: 5
+          MgO_wt_pct: 30.0
+          MgO_sd_pct: 1
+          metal_Ni_wt_pct: 92.5
+          metal_Ni_sd_pct: 1
+          metal_Fe_wt_pct: 6.84
+          metal_Fe_sd_pct: 3
+          gamma_NiO: 2.74
+          gamma: 3.99
+          gamma_FeO_uncertainty: not_reported per experiment
+          metal_note: FeNi alloy recalculated to pure-metal equilibrium as stated on page 25
+      uncertainty:
+        concentration_uncertainty: Table 3 analytical s.d. values retained per composition entry
+        reported_status: no individual γFeO uncertainty printed for these rows
+      equipment: {}
     - observation_id: holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_1
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' equilibrium-constant calculation from measured oxide concentrations and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
       experiment: variable-mgo-v-69-27
       type: activity_coefficient
       locator:
@@ -3326,24 +4041,25 @@ species:
       phase: anorthite-diopside_silicate_melt
       standard_state:
         state:
-          tag: value
-          value:
-            convention: raoultian_pure_endmember
-            endmember: {formula: FeO, phase: {tag: value, value: l}}
-            component_basis: FeO
-            reference_pressure_bar: '1.01325'
-        inferred: false
+          tag: unknown
+          reason: schema cannot represent the paper's nonstoichiometric liquid wüstite "FeO" standard state
         note: >-
-          The source treats Co and Fe analogously to Ni and defines the oxide
-          activity coefficients against pure liquid oxide at 1 atm. Its FeO
-          notation names FeO(l), not a nonstoichiometric Fe1-xO endmember.
-        locator: {published_page: 29, table: '4'}
+          pure liquid Fe(1-x)O; reference reaction Fe(s) + 1/2 O2(g) = "FeO"(l); deltaG0 source O'Neill and Pownceby
+          (1993) and Barin (1989). The typed endmember encodes Raoultian FeO(l) at 1 atm but cannot encode the source's
+          wüstite nonstoichiometry Fe(1-x)O.
+        locator: {published_page: 30, equation: '9'}
       regime: experimental_melt_equilibration
       units: wt.% and dimensionless activity coefficient as printed
       values:
         method_class: model_derived
         quantity: activity_coefficient
         fidelity_pin_FeO_wt_pct: 26.0
+        full_silicate_composition_rule: >-
+          Table 1 AD base (SiO2 50.9, CaO 24.9, MgO 10.4, Al2O3 13.8, FeO 0.0 wt.%) with MgO and FeO varied as
+          analyzed in Table 3(b); the paper does not print a recalculated full oxide wt.% mixture. CoO, NiO, FeO and
+          MgO values below are the printed row analyses.
+        composition_rule_locator: {page: 22, table: '1'}
+        log_fO2_scale_and_control: unknown; reason not_published; pages 22-27 and 29-30 searched
         series:
         - run: V 69
           T_K: 1673
@@ -3360,6 +4076,13 @@ species:
           gamma_CoO: 1.65
           gamma_NiO: 3.68
           gamma: 1.72
+          alloy_Co_wt_pct: 20.1
+          alloy_Co_sd_pct: 1
+          alloy_Ni_wt_pct: 37.7
+          alloy_Ni_sd_pct: 1
+          alloy_Fe_wt_pct: 41.9
+          alloy_Fe_sd_pct: 1
+          gamma_FeO_uncertainty: not_reported per experiment
         analysis_method: electron microprobe for silicate composition; instrumental neutron activation analysis for Ni and
           Co
         derived_fields:
@@ -3375,6 +4098,10 @@ species:
     - observation_id: holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_2
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' equilibrium-constant calculation from measured oxide concentrations and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
       experiment: variable-mgo-v-69-28
       type: activity_coefficient
       locator:
@@ -3388,24 +4115,25 @@ species:
       phase: anorthite-diopside_silicate_melt
       standard_state:
         state:
-          tag: value
-          value:
-            convention: raoultian_pure_endmember
-            endmember: {formula: FeO, phase: {tag: value, value: l}}
-            component_basis: FeO
-            reference_pressure_bar: '1.01325'
-        inferred: false
+          tag: unknown
+          reason: schema cannot represent the paper's nonstoichiometric liquid wüstite "FeO" standard state
         note: >-
-          The source treats Co and Fe analogously to Ni and defines the oxide
-          activity coefficients against pure liquid oxide at 1 atm. Its FeO
-          notation names FeO(l), not a nonstoichiometric Fe1-xO endmember.
-        locator: {published_page: 29, table: '4'}
+          pure liquid Fe(1-x)O; reference reaction Fe(s) + 1/2 O2(g) = "FeO"(l); deltaG0 source O'Neill and Pownceby
+          (1993) and Barin (1989). The typed endmember encodes Raoultian FeO(l) at 1 atm but cannot encode the source's
+          wüstite nonstoichiometry Fe(1-x)O.
+        locator: {published_page: 30, equation: '9'}
       regime: experimental_melt_equilibration
       units: wt.% and dimensionless activity coefficient as printed
       values:
         method_class: model_derived
         quantity: activity_coefficient
         fidelity_pin_FeO_wt_pct: 26.0
+        full_silicate_composition_rule: >-
+          Table 1 AD base (SiO2 50.9, CaO 24.9, MgO 10.4, Al2O3 13.8, FeO 0.0 wt.%) with MgO and FeO varied as
+          analyzed in Table 3(b); the paper does not print a recalculated full oxide wt.% mixture. CoO, NiO, FeO and
+          MgO values below are the printed row analyses.
+        composition_rule_locator: {page: 22, table: '1'}
+        log_fO2_scale_and_control: unknown; reason not_published; pages 22-27 and 29-30 searched
         series:
         - run: V 69
           T_K: 1673
@@ -3422,6 +4150,13 @@ species:
           gamma_CoO: 1.75
           gamma_NiO: 4.35
           gamma: 1.83
+          alloy_Co_wt_pct: 22.6
+          alloy_Co_sd_pct: 3
+          alloy_Ni_wt_pct: 41.2
+          alloy_Ni_sd_pct: 2
+          alloy_Fe_wt_pct: 36.0
+          alloy_Fe_sd_pct: 1
+          gamma_FeO_uncertainty: not_reported per experiment
         analysis_method: electron microprobe for silicate composition; instrumental neutron activation analysis for Ni and
           Co
         derived_fields:
@@ -3437,6 +4172,10 @@ species:
     - observation_id: holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_3
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' equilibrium-constant calculation from measured oxide concentrations and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
       experiment: variable-mgo-ad-10-29
       type: activity_coefficient
       locator:
@@ -3450,24 +4189,25 @@ species:
       phase: anorthite-diopside_silicate_melt
       standard_state:
         state:
-          tag: value
-          value:
-            convention: raoultian_pure_endmember
-            endmember: {formula: FeO, phase: {tag: value, value: l}}
-            component_basis: FeO
-            reference_pressure_bar: '1.01325'
-        inferred: false
+          tag: unknown
+          reason: schema cannot represent the paper's nonstoichiometric liquid wüstite "FeO" standard state
         note: >-
-          The source treats Co and Fe analogously to Ni and defines the oxide
-          activity coefficients against pure liquid oxide at 1 atm. Its FeO
-          notation names FeO(l), not a nonstoichiometric Fe1-xO endmember.
-        locator: {published_page: 29, table: '4'}
+          pure liquid Fe(1-x)O; reference reaction Fe(s) + 1/2 O2(g) = "FeO"(l); deltaG0 source O'Neill and Pownceby
+          (1993) and Barin (1989). The typed endmember encodes Raoultian FeO(l) at 1 atm but cannot encode the source's
+          wüstite nonstoichiometry Fe(1-x)O.
+        locator: {published_page: 30, equation: '9'}
       regime: experimental_melt_equilibration
       units: wt.% and dimensionless activity coefficient as printed
       values:
         method_class: model_derived
         quantity: activity_coefficient
         fidelity_pin_FeO_wt_pct: 26.0
+        full_silicate_composition_rule: >-
+          Table 1 AD base (SiO2 50.9, CaO 24.9, MgO 10.4, Al2O3 13.8, FeO 0.0 wt.%) with MgO and FeO varied as
+          analyzed in Table 3(b); the paper does not print a recalculated full oxide wt.% mixture. CoO, NiO, FeO and
+          MgO values below are the printed row analyses.
+        composition_rule_locator: {page: 22, table: '1'}
+        log_fO2_scale_and_control: unknown; reason not_published; pages 22-27 and 29-30 searched
         series:
         - run: AD 10
           T_K: 1677
@@ -3484,6 +4224,13 @@ species:
           gamma_CoO: 1.51
           gamma_NiO: 3.82
           gamma: 1.62
+          alloy_Co_wt_pct: 18.7
+          alloy_Co_sd_pct: 5
+          alloy_Ni_wt_pct: 48.2
+          alloy_Ni_sd_pct: 5
+          alloy_Fe_wt_pct: 22.1
+          alloy_Fe_sd_pct: 14
+          gamma_FeO_uncertainty: not_reported per experiment
         analysis_method: electron microprobe for silicate composition; instrumental neutron activation analysis for Ni and
           Co
         derived_fields:
@@ -3499,6 +4246,10 @@ species:
     - observation_id: holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_4
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' equilibrium-constant calculation from measured oxide concentrations and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
       experiment: variable-mgo-v-64-30
       type: activity_coefficient
       locator:
@@ -3512,24 +4263,25 @@ species:
       phase: anorthite-diopside_silicate_melt
       standard_state:
         state:
-          tag: value
-          value:
-            convention: raoultian_pure_endmember
-            endmember: {formula: FeO, phase: {tag: value, value: l}}
-            component_basis: FeO
-            reference_pressure_bar: '1.01325'
-        inferred: false
+          tag: unknown
+          reason: schema cannot represent the paper's nonstoichiometric liquid wüstite "FeO" standard state
         note: >-
-          The source treats Co and Fe analogously to Ni and defines the oxide
-          activity coefficients against pure liquid oxide at 1 atm. Its FeO
-          notation names FeO(l), not a nonstoichiometric Fe1-xO endmember.
-        locator: {published_page: 29, table: '4'}
+          pure liquid Fe(1-x)O; reference reaction Fe(s) + 1/2 O2(g) = "FeO"(l); deltaG0 source O'Neill and Pownceby
+          (1993) and Barin (1989). The typed endmember encodes Raoultian FeO(l) at 1 atm but cannot encode the source's
+          wüstite nonstoichiometry Fe(1-x)O.
+        locator: {published_page: 30, equation: '9'}
       regime: experimental_melt_equilibration
       units: wt.% and dimensionless activity coefficient as printed
       values:
         method_class: model_derived
         quantity: activity_coefficient
         fidelity_pin_FeO_wt_pct: 26.0
+        full_silicate_composition_rule: >-
+          Table 1 AD base (SiO2 50.9, CaO 24.9, MgO 10.4, Al2O3 13.8, FeO 0.0 wt.%) with MgO and FeO varied as
+          analyzed in Table 3(b); the paper does not print a recalculated full oxide wt.% mixture. CoO, NiO, FeO and
+          MgO values below are the printed row analyses.
+        composition_rule_locator: {page: 22, table: '1'}
+        log_fO2_scale_and_control: unknown; reason not_published; pages 22-27 and 29-30 searched
         series:
         - run: V 64
           T_K: 1677
@@ -3546,6 +4298,13 @@ species:
           gamma_CoO: 2.68
           gamma_NiO: 4.87
           gamma: 2.47
+          alloy_Co_wt_pct: 20.3
+          alloy_Co_sd_pct: 2
+          alloy_Ni_wt_pct: 39.2
+          alloy_Ni_sd_pct: 1
+          alloy_Fe_wt_pct: 39.1
+          alloy_Fe_sd_pct: 1
+          gamma_FeO_uncertainty: not_reported per experiment
         analysis_method: electron microprobe for silicate composition; instrumental neutron activation analysis for Ni and
           Co
         derived_fields:
@@ -3561,6 +4320,10 @@ species:
     - observation_id: holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_5
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' equilibrium-constant calculation from measured oxide concentrations and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
       experiment: variable-mgo-v-68-31
       type: activity_coefficient
       locator:
@@ -3574,24 +4337,25 @@ species:
       phase: anorthite-diopside_silicate_melt
       standard_state:
         state:
-          tag: value
-          value:
-            convention: raoultian_pure_endmember
-            endmember: {formula: FeO, phase: {tag: value, value: l}}
-            component_basis: FeO
-            reference_pressure_bar: '1.01325'
-        inferred: false
+          tag: unknown
+          reason: schema cannot represent the paper's nonstoichiometric liquid wüstite "FeO" standard state
         note: >-
-          The source treats Co and Fe analogously to Ni and defines the oxide
-          activity coefficients against pure liquid oxide at 1 atm. Its FeO
-          notation names FeO(l), not a nonstoichiometric Fe1-xO endmember.
-        locator: {published_page: 29, table: '4'}
+          pure liquid Fe(1-x)O; reference reaction Fe(s) + 1/2 O2(g) = "FeO"(l); deltaG0 source O'Neill and Pownceby
+          (1993) and Barin (1989). The typed endmember encodes Raoultian FeO(l) at 1 atm but cannot encode the source's
+          wüstite nonstoichiometry Fe(1-x)O.
+        locator: {published_page: 30, equation: '9'}
       regime: experimental_melt_equilibration
       units: wt.% and dimensionless activity coefficient as printed
       values:
         method_class: model_derived
         quantity: activity_coefficient
         fidelity_pin_FeO_wt_pct: 26.0
+        full_silicate_composition_rule: >-
+          Table 1 AD base (SiO2 50.9, CaO 24.9, MgO 10.4, Al2O3 13.8, FeO 0.0 wt.%) with MgO and FeO varied as
+          analyzed in Table 3(b); the paper does not print a recalculated full oxide wt.% mixture. CoO, NiO, FeO and
+          MgO values below are the printed row analyses.
+        composition_rule_locator: {page: 22, table: '1'}
+        log_fO2_scale_and_control: unknown; reason not_published; pages 22-27 and 29-30 searched
         series:
         - run: V 68
           T_K: 1667
@@ -3608,6 +4372,13 @@ species:
           gamma_CoO: 2.89
           gamma_NiO: 4.34
           gamma: 3.44
+          alloy_Co_wt_pct: 19.4
+          alloy_Co_sd_pct: 2
+          alloy_Ni_wt_pct: 35.6
+          alloy_Ni_sd_pct: 1
+          alloy_Fe_wt_pct: 44.3
+          alloy_Fe_sd_pct: 1
+          gamma_FeO_uncertainty: not_reported per experiment
         analysis_method: electron microprobe for silicate composition; instrumental neutron activation analysis for Ni and
           Co
         derived_fields:
@@ -3623,6 +4394,10 @@ species:
     - observation_id: holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_6
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' equilibrium-constant calculation from measured oxide concentrations and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
       experiment: variable-mgo-v-66-32
       type: activity_coefficient
       locator:
@@ -3636,24 +4411,25 @@ species:
       phase: anorthite-diopside_silicate_melt
       standard_state:
         state:
-          tag: value
-          value:
-            convention: raoultian_pure_endmember
-            endmember: {formula: FeO, phase: {tag: value, value: l}}
-            component_basis: FeO
-            reference_pressure_bar: '1.01325'
-        inferred: false
+          tag: unknown
+          reason: schema cannot represent the paper's nonstoichiometric liquid wüstite "FeO" standard state
         note: >-
-          The source treats Co and Fe analogously to Ni and defines the oxide
-          activity coefficients against pure liquid oxide at 1 atm. Its FeO
-          notation names FeO(l), not a nonstoichiometric Fe1-xO endmember.
-        locator: {published_page: 29, table: '4'}
+          pure liquid Fe(1-x)O; reference reaction Fe(s) + 1/2 O2(g) = "FeO"(l); deltaG0 source O'Neill and Pownceby
+          (1993) and Barin (1989). The typed endmember encodes Raoultian FeO(l) at 1 atm but cannot encode the source's
+          wüstite nonstoichiometry Fe(1-x)O.
+        locator: {published_page: 30, equation: '9'}
       regime: experimental_melt_equilibration
       units: wt.% and dimensionless activity coefficient as printed
       values:
         method_class: model_derived
         quantity: activity_coefficient
         fidelity_pin_FeO_wt_pct: 26.0
+        full_silicate_composition_rule: >-
+          Table 1 AD base (SiO2 50.9, CaO 24.9, MgO 10.4, Al2O3 13.8, FeO 0.0 wt.%) with MgO and FeO varied as
+          analyzed in Table 3(b); the paper does not print a recalculated full oxide wt.% mixture. CoO, NiO, FeO and
+          MgO values below are the printed row analyses.
+        composition_rule_locator: {page: 22, table: '1'}
+        log_fO2_scale_and_control: unknown; reason not_published; pages 22-27 and 29-30 searched
         series:
         - run: V 66
           T_K: 1671
@@ -3670,6 +4446,13 @@ species:
           gamma_CoO: 3.53
           gamma_NiO: 5.99
           gamma: 4.41
+          alloy_Co_wt_pct: 21.0
+          alloy_Co_sd_pct: 2
+          alloy_Ni_wt_pct: 38.7
+          alloy_Ni_sd_pct: 1
+          alloy_Fe_wt_pct: 39.8
+          alloy_Fe_sd_pct: 1
+          gamma_FeO_uncertainty: not_reported per experiment
         analysis_method: electron microprobe for silicate composition; instrumental neutron activation analysis for Ni and
           Co
         derived_fields:
@@ -3685,6 +4468,10 @@ species:
     - observation_id: holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_7
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' equilibrium-constant calculation from measured oxide concentrations and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
       experiment: variable-mgo-v-66-33
       type: activity_coefficient
       locator:
@@ -3698,24 +4485,25 @@ species:
       phase: anorthite-diopside_silicate_melt
       standard_state:
         state:
-          tag: value
-          value:
-            convention: raoultian_pure_endmember
-            endmember: {formula: FeO, phase: {tag: value, value: l}}
-            component_basis: FeO
-            reference_pressure_bar: '1.01325'
-        inferred: false
+          tag: unknown
+          reason: schema cannot represent the paper's nonstoichiometric liquid wüstite "FeO" standard state
         note: >-
-          The source treats Co and Fe analogously to Ni and defines the oxide
-          activity coefficients against pure liquid oxide at 1 atm. Its FeO
-          notation names FeO(l), not a nonstoichiometric Fe1-xO endmember.
-        locator: {published_page: 29, table: '4'}
+          pure liquid Fe(1-x)O; reference reaction Fe(s) + 1/2 O2(g) = "FeO"(l); deltaG0 source O'Neill and Pownceby
+          (1993) and Barin (1989). The typed endmember encodes Raoultian FeO(l) at 1 atm but cannot encode the source's
+          wüstite nonstoichiometry Fe(1-x)O.
+        locator: {published_page: 30, equation: '9'}
       regime: experimental_melt_equilibration
       units: wt.% and dimensionless activity coefficient as printed
       values:
         method_class: model_derived
         quantity: activity_coefficient
         fidelity_pin_FeO_wt_pct: 26.0
+        full_silicate_composition_rule: >-
+          Table 1 AD base (SiO2 50.9, CaO 24.9, MgO 10.4, Al2O3 13.8, FeO 0.0 wt.%) with MgO and FeO varied as
+          analyzed in Table 3(b); the paper does not print a recalculated full oxide wt.% mixture. CoO, NiO, FeO and
+          MgO values below are the printed row analyses.
+        composition_rule_locator: {page: 22, table: '1'}
+        log_fO2_scale_and_control: unknown; reason not_published; pages 22-27 and 29-30 searched
         series:
         - run: V 66
           T_K: 1671
@@ -3732,6 +4520,13 @@ species:
           gamma_CoO: 3.06
           gamma_NiO: 3.33
           gamma: 5.22
+          alloy_Co_wt_pct: 20.9
+          alloy_Co_sd_pct: 1
+          alloy_Ni_wt_pct: 38.4
+          alloy_Ni_sd_pct: 1
+          alloy_Fe_wt_pct: 40.0
+          alloy_Fe_sd_pct: 1
+          gamma_FeO_uncertainty: not_reported per experiment
         analysis_method: electron microprobe for silicate composition; instrumental neutron activation analysis for Ni and
           Co
         derived_fields:
@@ -3764,6 +4559,9 @@ species:
           FeO_wustite_liquid_deltaG_J_per_mol: -244118 + 115.559*T - 8.474*T*ln(T)
         reaction_form: metal(s) + 1/2 O2(g) = oxide(liquid)
         standard_state: pure liquid oxide at 1 atm; FeO uses wustite(liquid) notation
+        located_note:
+          text: "Applying Eq. 9 with a(Fe) = 1 to the printed log fO2 and X(FeO) does not reproduce the printed gamma (e.g. AD 10); the printed values are stated to be recalculated to equilibrium with pure metals from alloy experiments. The printed gamma is the datum; do not recompute it from Eq. 9."
+          locator: {page: 23, table: '2', row: AD 10, note: 'Eq. 9 is on page 30'}
       uncertainty:
         reported_status: source discusses uncertainties in thermodynamic data but gives no uncertainty for these fitted expressions
       equipment: {}
