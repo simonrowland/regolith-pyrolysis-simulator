@@ -577,6 +577,12 @@ def _fit_piecewise_candidate(
             "unsupported_standard_state",
             f"source phase {phase_label!r} has no closed NASA-9 standard-state mapping",
         )
+    if not h_cells:
+        return _rejected(
+            base,
+            "missing_in_range_h_cell",
+            "no printed H-H298 cell lies within the declared phase fit range",
+        )
     missing = [
         name
         for name, cells in (("Cp", cp_cells), ("H-H298", h_cells), ("S", s_cells))
@@ -696,7 +702,8 @@ def _fit_piecewise_candidate(
         weights.append(R_J_PER_MOL_K / uncertainty_in_target_unit)
 
     bounds = tuple(segment_bounds)
-    anchor_index = _segment_index(REFERENCE_T_K, bounds)
+    h_anchor_cell = h_cells[0]
+    h_anchor_index = _segment_index(h_anchor_cell.temperature_K, bounds)
     s_anchor_index = _segment_index(s_anchor.temperature_K, bounds)
     try:
         for index in range(segment_count):
@@ -718,12 +725,13 @@ def _fit_piecewise_candidate(
                         "h_increment_anchor_nonzero",
                         "printed H-H298 cell disagrees with the required zero anchor",
                     )
+            if cell is h_anchor_cell:
                 continue
             index = _segment_index(cell.temperature_K, bounds)
-            row = h_row(index, cell.temperature_K) - h_row(anchor_index, REFERENCE_T_K)
+            row = h_row(index, cell.temperature_K)
             add_observation(
                 row,
-                cell.value * 1000.0 / R_J_PER_MOL_K,
+                (h_anchor_J + cell.value * 1000.0) / R_J_PER_MOL_K,
                 cell.uncertainty * 1000.0,
             )
 
@@ -740,15 +748,26 @@ def _fit_piecewise_candidate(
                 cell.uncertainty + s_anchor.uncertainty,
             )
 
+        # Printed H is H_phase(T) - H_ref(298.15 K), so the phase's own Cp
+        # cannot be extrapolated down to force its H to the reference baseline.
+        # At an in-range printed cell T0, H_phase(T) = H_phase(T0) +
+        # integral(T0..T) Cp dT; constrain H(T0) to h_anchor_J + printed
+        # H-H298. Cp [J/mol/K] x T [K] is J/mol, and table H is kJ/mol x
+        # 1000. As a sanity check, JANAF Al(l) has Cp=31.751 J/mol/K and
+        # H-H298=30.806 kJ/mol at 1000 K: extrapolation to 298.15 K gives
+        # 30806 - 31.751 x (1000 - 298.15) = 8521.56 J/mol, not zero.
+        h_anchor = h_row(h_anchor_index, h_anchor_cell.temperature_K)
+        constraints.append(h_anchor)
+        constraint_targets.append(
+            (h_anchor_J + h_anchor_cell.value * 1000.0) / R_J_PER_MOL_K
+        )
+
         # At join Tj, the Cp/R row is [phi_cp(Tj), -phi_cp(Tj)] = 0;
         # H/(RT) is [phi_h(Tj), a8, -phi_h(Tj), -a8]/Tj = 0; and
         # S/R is [phi_s(Tj), a9, -phi_s(Tj), -a9] = 0. These expressions
         # are dimensionless (Cp/R, H/(RT), S/R); equality of H/(RT) at the
         # same positive Tj is equality of H. The first a8/a9 are fixed by the
         # printed H and S anchors, and each later pair follows from these rows.
-        h_anchor = h_row(anchor_index, REFERENCE_T_K)
-        constraints.append(h_anchor)
-        constraint_targets.append(h_anchor_J / R_J_PER_MOL_K)
         s_anchor_row = s_row(s_anchor_index, s_anchor.temperature_K)
         constraints.append(s_anchor_row)
         constraint_targets.append(s_anchor.value / R_J_PER_MOL_K)
@@ -819,9 +838,10 @@ def _fit_piecewise_candidate(
                 "quantity": "cp", "T_K": cell.temperature_K,
                 "residual": residual, "allowance": cell.uncertainty,
             })
-    h_at_298 = _piecewise_evaluate(segments, REFERENCE_T_K)[1]
     for cell in h_cells:
-        residual = (_piecewise_evaluate(segments, cell.temperature_K)[1] - h_at_298) / 1000.0 - cell.value
+        residual = (
+            _piecewise_evaluate(segments, cell.temperature_K)[1] - h_anchor_J
+        ) / 1000.0 - cell.value
         h_residuals.append(residual)
         if abs(residual) > cell.uncertainty:
             over_precision.append({
