@@ -559,7 +559,7 @@ species:
         quantity: NaO0.5_activity_polynomial
         method_class: model_derived
         evidence_class: author_converted_activity_fit
-        derivation: 'Authors state that activities from reference [6] were converted to a_NaO0.5; polynomial reproduced verbatim from Eq. (5).'
+        derivation_note: 'Authors state that activities from reference [6] were converted to a_NaO0.5; polynomial reproduced verbatim from Eq. (5).'
         temperature_C_as_printed: 1300
         X_Na2O_unit_as_printed: mol%
         formula_as_printed: log a_NaO0.5 = -4.93 + 3.11 X_Na2O + 3.38 (X_Na2O)^2
@@ -582,7 +582,7 @@ species:
         quantity: NaO0.5_activity_polynomial
         method_class: model_derived
         evidence_class: author_converted_activity_fit
-        derivation: 'Authors state that activities from reference [6] were converted to a_NaO0.5; polynomial reproduced verbatim from Eq. (6).'
+        derivation_note: 'Authors state that activities from reference [6] were converted to a_NaO0.5; polynomial reproduced verbatim from Eq. (6).'
         temperature_C_as_printed: 1400
         X_Na2O_unit_as_printed: mol%
         formula_as_printed: log a_NaO0.5 = -4.51 + 1.22 X_Na2O + 5.90 (X_Na2O)^2
@@ -692,7 +692,7 @@ species:
         quantity: alpha
         method_class: model_derived
         evidence_class: author_least_squares_fit
-        derivation: 'Least-squares comparison of concentration-time curves calculated from Eq. (4) with the Fig. 1a experimental series; value is apparent alpha* including 1-atm recondensation.'
+        derivation_note: 'Least-squares comparison of concentration-time curves calculated from Eq. (4) with the Fig. 1a experimental series; value is apparent alpha* including 1-atm recondensation.'
         temperature_C_as_printed: 1300
         pO2_bar_as_printed: '10^-8'
         composition_as_printed: Na2O-SiO2 melt
@@ -708,7 +708,7 @@ species:
       phase: Na2O-SiO2_silicate_melt
       regime: open_furnace_apparent_evaporation
       units: dimensionless alpha* as printed
-      values: {quantity: alpha, method_class: model_derived, evidence_class: author_least_squares_fit, derivation: 'Least-squares comparison of concentration-time curves calculated from Eq. (4) with the Fig. 1a experimental series; value is apparent alpha* including 1-atm recondensation.', temperature_C_as_printed: 1300, pO2_bar_as_printed: '10^-9', composition_as_printed: Na2O-SiO2 melt, series: [{alpha: 0.095, locator: {page: 2, figure: '1a', paragraph: Estimation of alpha*, note: 'Printed alpha*=0.095 at p(O2)=10^-9 bar'}}]}
+      values: {quantity: alpha, method_class: model_derived, evidence_class: author_least_squares_fit, derivation_note: 'Least-squares comparison of concentration-time curves calculated from Eq. (4) with the Fig. 1a experimental series; value is apparent alpha* including 1-atm recondensation.', temperature_C_as_printed: 1300, pO2_bar_as_printed: '10^-9', composition_as_printed: Na2O-SiO2 melt, series: [{alpha: 0.095, locator: {page: 2, figure: '1a', paragraph: Estimation of alpha*, note: 'Printed alpha*=0.095 at p(O2)=10^-9 bar'}}]}
     - observation_id: shirai_2000_alpha_star_1300_pO2_1e-10
       experiment: shirai-fig1a-1300-pO2-1e-10
       type: alpha
@@ -719,7 +719,7 @@ species:
       phase: Na2O-SiO2_silicate_melt
       regime: open_furnace_apparent_evaporation
       units: dimensionless alpha* as printed
-      values: {quantity: alpha, method_class: model_derived, evidence_class: author_least_squares_fit, derivation: 'Least-squares comparison of concentration-time curves calculated from Eq. (4) with the Fig. 1a experimental series; value is apparent alpha* including 1-atm recondensation.', temperature_C_as_printed: 1300, pO2_bar_as_printed: '10^-10', composition_as_printed: Na2O-SiO2 melt, series: [{alpha: 0.08, locator: {page: 2, figure: '1a', paragraph: Estimation of alpha*, note: 'Printed alpha*=0.08 at p(O2)=10^-10 bar'}}]}
+      values: {quantity: alpha, method_class: model_derived, evidence_class: author_least_squares_fit, derivation_note: 'Least-squares comparison of concentration-time curves calculated from Eq. (4) with the Fig. 1a experimental series; value is apparent alpha* including 1-atm recondensation.', temperature_C_as_printed: 1300, pO2_bar_as_printed: '10^-10', composition_as_printed: Na2O-SiO2 melt, series: [{alpha: 0.08, locator: {page: 2, figure: '1a', paragraph: Estimation of alpha*, note: 'Printed alpha*=0.08 at p(O2)=10^-10 bar'}}]}
     - observation_id: shirai_2000_alpha_star_1400_pO2_1e-8
       experiment: shirai-fig1b-1400-pO2-1e-8
       type: alpha
@@ -742,7 +742,7 @@ species:
       phase: Na2O-SiO2_silicate_melt
       regime: open_furnace_apparent_evaporation
       units: dimensionless alpha* as printed
-      values: {quantity: alpha, method_class: model_derived, evidence_class: author_least_squares_fit, derivation: 'Least-squares comparison of concentration-time curves calculated from Eq. (4) with the Fig. 1b experimental series; value is apparent alpha* including 1-atm recondensation.', temperature_C_as_printed: 1400, pO2_bar_as_printed: '10^-8', composition_as_printed: Na2O-SiO2 melt, series: [{alpha: 0.048, locator: {page: 2, figure: '1b', paragraph: Estimation of alpha*, note: 'Printed alpha*=0.048 at p(O2)=10^-8 bar'}}]}
+      values: {quantity: alpha, method_class: model_derived, evidence_class: author_least_squares_fit, derivation_note: 'Least-squares comparison of concentration-time curves calculated from Eq. (4) with the Fig. 1b experimental series; value is apparent alpha* including 1-atm recondensation.', temperature_C_as_printed: 1400, pO2_bar_as_printed: '10^-8', composition_as_printed: Na2O-SiO2 melt, series: [{alpha: 0.048, locator: {page: 2, figure: '1b', paragraph: Estimation of alpha*, note: 'Printed alpha*=0.048 at p(O2)=10^-8 bar'}}]}
     - observation_id: shirai_2000_alpha_star_1400_pO2_1e-9
       experiment: shirai-fig1b-1400-pO2-1e-9
       type: alpha
@@ -753,7 +753,7 @@ species:
       phase: Na2O-SiO2_silicate_melt
       regime: open_furnace_apparent_evaporation
       units: dimensionless alpha* as printed
-      values: {quantity: alpha, method_class: model_derived, evidence_class: author_least_squares_fit, derivation: 'Least-squares comparison of concentration-time curves calculated from Eq. (4) with the Fig. 1b experimental series; value is apparent alpha* including 1-atm recondensation.', temperature_C_as_printed: 1400, pO2_bar_as_printed: '10^-9', composition_as_printed: Na2O-SiO2 melt, series: [{alpha: 0.043, locator: {page: 2, figure: '1b', paragraph: Estimation of alpha*, note: 'Printed alpha*=0.043 at p(O2)=10^-9 bar'}}]}
+      values: {quantity: alpha, method_class: model_derived, evidence_class: author_least_squares_fit, derivation_note: 'Least-squares comparison of concentration-time curves calculated from Eq. (4) with the Fig. 1b experimental series; value is apparent alpha* including 1-atm recondensation.', temperature_C_as_printed: 1400, pO2_bar_as_printed: '10^-9', composition_as_printed: Na2O-SiO2 melt, series: [{alpha: 0.043, locator: {page: 2, figure: '1b', paragraph: Estimation of alpha*, note: 'Printed alpha*=0.043 at p(O2)=10^-9 bar'}}]}
     - observation_id: shirai_2000_alpha_star_1400_pO2_1e-10
       experiment: shirai-fig1b-1400-pO2-1e-10
       type: alpha
@@ -764,7 +764,7 @@ species:
       phase: Na2O-SiO2_silicate_melt
       regime: open_furnace_apparent_evaporation
       units: dimensionless alpha* as printed
-      values: {quantity: alpha, method_class: model_derived, evidence_class: author_least_squares_fit, derivation: 'Least-squares comparison of concentration-time curves calculated from Eq. (4) with the Fig. 1b experimental series; value is apparent alpha* including 1-atm recondensation.', temperature_C_as_printed: 1400, pO2_bar_as_printed: '10^-10', composition_as_printed: Na2O-SiO2 melt, series: [{alpha: 0.05, locator: {page: 2, figure: '1b', paragraph: Estimation of alpha*, note: 'Printed alpha*=0.05 at p(O2)=10^-10 bar'}}]}
+      values: {quantity: alpha, method_class: model_derived, evidence_class: author_least_squares_fit, derivation_note: 'Least-squares comparison of concentration-time curves calculated from Eq. (4) with the Fig. 1b experimental series; value is apparent alpha* including 1-atm recondensation.', temperature_C_as_printed: 1400, pO2_bar_as_printed: '10^-10', composition_as_printed: Na2O-SiO2 melt, series: [{alpha: 0.05, locator: {page: 2, figure: '1b', paragraph: Estimation of alpha*, note: 'Printed alpha*=0.05 at p(O2)=10^-10 bar'}}]}
     - observation_id: shirai_2000_jna_fig2_1300
       type: rate_series
       locator: {page: 2, figure: '2', note: 'Dotted 1300 C series at Na2O=20 wt%; points digitized from the PDF plot'}
@@ -823,7 +823,7 @@ species:
         quantity: sodium_evaporation_rate_power_law_fit
         method_class: model_derived
         evidence_class: author_power_law_fit
-        derivation: 'Author fit printed on Fig. 2 for the 1300 C dotted series; exponent is also reported as the log jNa-log p(O2) slope in the text.'
+        derivation_note: 'Author fit printed on Fig. 2 for the 1300 C dotted series; exponent is also reported as the log jNa-log p(O2) slope in the text.'
         temperature_C_as_printed: 1300
         Na2O_wt_pct: 20
         equation_as_printed: jNa = 6.70 x 10^13 x^-0.153
@@ -853,7 +853,7 @@ species:
         quantity: sodium_evaporation_rate_power_law_fit
         method_class: model_derived
         evidence_class: author_power_law_fit
-        derivation: 'Author fit printed on Fig. 2 for the 1400 C solid series; exponent is also reported as the log jNa-log p(O2) slope in the text.'
+        derivation_note: 'Author fit printed on Fig. 2 for the 1400 C solid series; exponent is also reported as the log jNa-log p(O2) slope in the text.'
         temperature_C_as_printed: 1400
         Na2O_wt_pct: 20
         equation_as_printed: jNa = 5.22 x 10^13 x^-0.26
