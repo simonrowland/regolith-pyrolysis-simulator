@@ -320,6 +320,15 @@ species:
     - observation_id: sephton_2004_table1_h2_total_pyrolysate_mass_balance
       experiment: murchison-h2-pyrolysis-series
       type: rate_series
+      derived_from:
+      - sephton_2004_table1_h2_pyrolysis_carbon_wt_percent
+      - sephton_2004_table1_h2_pyrolysis_isotopes
+      derivation:
+        relation: Simple isotope mass balance from the starting-material and H2-pyrolysis-residue elemental abundances and isotope compositions (p. 1390, Table 1).
+        inputs:
+        - sephton_2004_table1_h2_pyrolysis_carbon_wt_percent
+        - sephton_2004_table1_h2_pyrolysis_isotopes
+        output_unit: permil
       locator:
         published_page: 1389
         pdf_page_index: 5
