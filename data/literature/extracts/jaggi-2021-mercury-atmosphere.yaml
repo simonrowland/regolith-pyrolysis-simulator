@@ -158,7 +158,7 @@ species:
         quantity: magma_ocean_case_parameters_and_surface_gas_pressures
         method_class: model_derived
         evidence_class: model_derived
-        derivation: >-
+        derivation_note: >-
           Values are the authors' SPIDER/VapoRock model case inputs and outputs,
           transcribed from the printed table; no laboratory measurement is claimed.
         temperature_K: '2000'
@@ -239,7 +239,7 @@ species:
         - Weisberg et al. (1990)
         - Nittler & Weider (2019)
         - Namur et al. (2016)
-        derivation: >-
+        derivation_note: >-
           Printed compositions compiled from the cited EH4, CB and NSP
           literature sources (Wiik 1956; Lauretta et al. 2007; Weisberg et al.
           2000, 1990; Nittler & Weider 2019; Namur et al. 2016) and used as
@@ -320,7 +320,7 @@ species:
         quantity: surface_element_to_hydrogen_ratios
         method_class: model_derived
         evidence_class: model_derived
-        derivation: >-
+        derivation_note: >-
           SPIDER and VapoRock model outputs for the Table 2 compositions; Al and
           Ca are omitted because their vapor pressure is below 10^-9 bar at 2000 K.
         cases:
@@ -414,7 +414,7 @@ species:
         quantity: exospheric_escape_parameters
         method_class: model_derived
         evidence_class: model_derived
-        derivation: >-
+        derivation_note: >-
           SPIDER/VULCAN atmospheric structure coupled to the authors' escape
           calculation; table values are printed model outputs.
         Tsurf_K: '2000'
@@ -477,7 +477,7 @@ species:
         quantity: log10_mass_loss_rate
         method_class: model_derived
         evidence_class: model_derived
-        derivation: >-
+        derivation_note: >-
           Time-averaged outputs of the authors' plasma-heating, photoionization
           and photoevaporation escape models; table cells are log10 rates, not
           rates converted to linear units.
@@ -537,7 +537,7 @@ species:
       values:
         quantity: model_chain_and_global_conditions
         method_class: model_derived
-        derivation: Printed model definitions and global conditions; no values inferred from absent apparatus data.
+        derivation_note: Printed model definitions and global conditions; no values inferred from absent apparatus data.
         model_chain:
         - {name: SPIDER, role: coupled interior-atmosphere cooling, locator: {published_page: 2, pdf_page_index: 2, section: 2.1}}
         - {name: VapoRock, role: equilibrium partial pressures of metal-bearing gas species, locator: {published_page: 2, pdf_page_index: 2, section: 2.1}}
@@ -569,7 +569,7 @@ species:
       values:
         quantity: standard_magma_ocean_model_parameters
         method_class: model_derived
-        derivation: Printed SPIDER model parameters; Table 1 references remain references, not substituted values.
+        derivation_note: Printed SPIDER model parameters; Table 1 references remain references, not substituted values.
         rows:
         - {parameter: Core heat capacity, value_as_printed: '850', units_as_printed: 'J kg^-1 K^-1', locator: {published_page: 21, pdf_page_index: 21, table: A1, record: 'Core heat capacity'}}
         - {parameter: Core density, value_as_printed: '7200', units_as_printed: 'kg m^-3', locator: {published_page: 21, pdf_page_index: 21, table: A1, record: 'Core density'}}
@@ -607,7 +607,7 @@ species:
         - Ruedas (2017)
         - Bhatia & Sahijpal (2017)
         - EH4 and NSP source (Table 2)
-        derivation: >-
+        derivation_note: >-
           Table A1 dagger and double-dagger values are retained as quoted
           literature inputs; the Al abundance is the printed average based on
           the EH4 and NSP source (Table 2); no replacement or recalculation is supplied.
@@ -632,7 +632,7 @@ species:
         quantity: vaporock_species_inventory
         method_class: compilation_derived
         evidence_class: compilation_assessed
-        derivation: Printed list of species included in the cited VapoRock model.
+        derivation_note: Printed list of species included in the cited VapoRock model.
         rows:
         - {element: Al, species: [Al, AlO, AlO2, Al2, Al2O, Al2O2], locator: {published_page: 21, pdf_page_index: 21, table: B2, record: Al row}}
         - {element: Si, species: [Si, SiO, SiO2, Si2, Si2O2, Si3], locator: {published_page: 21, pdf_page_index: 21, table: B2, record: Si row}}
@@ -649,7 +649,7 @@ species:
       values:
         quantity: modified_vulcan_reaction_inventory
         method_class: model_derived
-        derivation: >-
+        derivation_note: >-
           Printed reactions added to VULCAN; the authors state that the listed
           network affects speciation between 2000 and 873 K and 11.7 and 10^-7 bar.
         rows:
@@ -682,7 +682,7 @@ species:
         - Pyykkö & Atsumi (2009a)
         - Pyykkö & Atsumi (2009b)
         - Pyykkö et al. (2005)
-        derivation: >-
+        derivation_note: >-
           Source-printed cross sections are approximated as circular areas with
           radius equal to atom or bond length; all bonds are treated as covalent,
           using Clementi et al. (1967), Pyykkö & Atsumi (2009a,b), and Pyykkö et
@@ -706,7 +706,7 @@ species:
       values:
         quantity: printed_model_governing_equations
         method_class: model_derived
-        derivation: Source-printed equations transcribed verbatim in symbolic form; no arithmetic values computed here.
+        derivation_note: Source-printed equations transcribed verbatim in symbolic form; no arithmetic values computed here.
         equations:
         - {number: 1, expression: 'M^(x+n) O_((x+n)/2)(l) = M^x O_(x/2)(g) + (n/4) O2(g)', locator: {published_page: 4, pdf_page_index: 4, equation: '1'}}
         - {number: 2, expression: 'p(M^x O_(x/2)) = K_(1) X(M^(x+n) O_((x+n)/2)) gamma(M^(x+n) O_((x+n)/2)) / (fO2)^(n/4)', locator: {published_page: 4, pdf_page_index: 4, equation: '2'}}
@@ -729,7 +729,7 @@ species:
         quantity: surface_temperature_cooling_curve
         method_class: figure_only
         evidence_class: figure_only
-        derivation: Approximate values read from the plotted curves; the source does not tabulate these coordinates.
+        derivation_note: Approximate values read from the plotted curves; the source does not tabulate these coordinates.
         digitized: true
         series:
         - {time_years: '10^1', LV_surface_temperature_K: '~2400', SV_surface_temperature_K: '~2400', locator: {published_page: 9, pdf_page_index: 9, figure: '1', record: '10^1 years; LV and SV curves'}}
@@ -744,7 +744,7 @@ species:
         quantity: oxide_partial_vapor_pressure_curves
         method_class: figure_only
         evidence_class: figure_only
-        derivation: Plotted curves retained as qualitative evidence; no coordinates digitized.
+        derivation_note: Plotted curves retained as qualitative evidence; no coordinates digitized.
         digitized: false
         panels: [CB, EH4, NSP source, NSP melt]
         species_plotted: [SiO, Na, Fe, Mg, K, O, AlO, Ca]
@@ -757,7 +757,7 @@ species:
         quantity: sodium_homopause_altitude_curves
         method_class: figure_only
         evidence_class: figure_only
-        derivation: Plotted curves retained as qualitative evidence; no coordinates digitized.
+        derivation_note: Plotted curves retained as qualitative evidence; no coordinates digitized.
         digitized: false
         panels: [CB, NSP melt]
         cases: [SN5, SN3, LN5, LN3]
@@ -771,7 +771,7 @@ species:
         quantity: volatile_atmosphere_speciation
         method_class: figure_only
         evidence_class: figure_only
-        derivation: Caption values are printed; plotted mixing-ratio curves were not digitized.
+        derivation_note: Caption values are printed; plotted mixing-ratio curves were not digitized.
         digitized: false
         surface_temperature_K: '2000'
         surface_pressure_SV_bar: '5.0'
@@ -788,7 +788,7 @@ species:
         quantity: integrated_photoevaporation_loss
         method_class: figure_only
         evidence_class: figure_only
-        derivation: >-
+        derivation_note: >-
           Caption conditions and endpoint range are printed; shaded curves and
           uncertainty bands were not digitized.
         digitized: false
@@ -806,7 +806,7 @@ species:
         quantity: exobase_mass_loss_rate
         method_class: figure_only
         evidence_class: figure_only
-        derivation: >-
+        derivation_note: >-
           Exact endpoint values are retained from the printed results prose;
           intermediate plotted points were not digitized.
         digitized: false
@@ -832,7 +832,7 @@ species:
         quantity: integrated_photoionization_loss
         method_class: figure_only
         evidence_class: figure_only
-        derivation: Printed prose values and caption conditions retained; curves were not digitized.
+        derivation_note: Printed prose values and caption conditions retained; curves were not digitized.
         digitized: false
         surface_temperature_range_K: '2400-1500'
         condensation_temperature_SiO_K: '1900'
@@ -850,7 +850,7 @@ species:
         quantity: atmospheric_escape_layer_rates_and_altitudes
         method_class: figure_only
         evidence_class: figure_only
-        derivation: Printed schematic labels transcribed; arrows and unlabeled geometry not digitized.
+        derivation_note: Printed schematic labels transcribed; arrows and unlabeled geometry not digitized.
         digitized: false
         labels:
         - {name: Mdot_P, value_as_printed: '10^3 kg/s', locator: {published_page: 16, pdf_page_index: 16, figure: '8', record: 'plasma heating label'}}
@@ -869,7 +869,7 @@ species:
         quantity: atmospheric_pressure_temperature_profiles
         method_class: figure_only
         evidence_class: figure_only
-        derivation: Plotted P-T curves retained as qualitative evidence; no coordinates digitized.
+        derivation_note: Plotted P-T curves retained as qualitative evidence; no coordinates digitized.
         digitized: false
         surface_temperature_for_profiles_K: '2000'
         profiles: [SV, LV, S/LN3, S/LN5]
@@ -885,7 +885,7 @@ species:
       values:
         quantity: printed_model_result_statements
         method_class: model_derived
-        derivation: Selected numerical results transcribed from printed prose; no values inferred or back-calculated.
+        derivation_note: Selected numerical results transcribed from printed prose; no values inferred or back-calculated.
         results:
         - {name: surface_cooling_time_range_years, value_as_printed: '400-9000', locator: {published_page: 8, pdf_page_index: 8, section: 3.1}}
         - {name: N5_minimum_cooling_time_years, value_as_printed: '470', locator: {published_page: 9, pdf_page_index: 9, section: 3.1.1}}
