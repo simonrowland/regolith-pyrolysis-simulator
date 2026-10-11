@@ -1474,13 +1474,15 @@ def install_provenance(
         runtime_artifacts["openimcc_module"] = module_record("openimcc")
         try:
             from simulator.melt_backend.openimcc_bridge import (
+                DEFAULT_BACKEND_PACK_NAME,
                 _load_pack,
                 _pack_digest,
             )
 
+            pack = _load_pack(DEFAULT_BACKEND_PACK_NAME)
             sources["openimcc_pack"] = {
-                "model_id": identity.model_id,
-                "sha256": _pack_digest(_load_pack("v1.0.2")),
+                "model_id": pack.model_id,
+                "sha256": _pack_digest(pack),
             }
         except Exception as exc:  # noqa: BLE001 - optional producer is fail-closed
             sources["openimcc_pack"] = {

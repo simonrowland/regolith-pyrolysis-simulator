@@ -57,6 +57,7 @@ OPENIMCC_RECORDED_PIN = (
     "openimcc @ git+https://github.com/simonrowland/openimcc"
     "@1f3c82d885bfd2906fed285752b188eaf5ded6e7"
 )
+DEFAULT_BACKEND_PACK_NAME = "default"
 
 _PACK_RESOURCE_NAMES = {
     "default": None,
@@ -561,7 +562,7 @@ def evaluate_cleaned_melt(
     bridge = evaluate(
         composition_mol=cleaned_composition_mol,
         temperature_K=temperature_K,
-        pack="default",
+        pack=DEFAULT_BACKEND_PACK_NAME,
         allow_extrapolation=allow_extrapolation,
         allow_out_of_envelope=False,
     )
@@ -809,7 +810,7 @@ class OpenImccMeltBackend(MeltBackend):
         self._pack = None
         self._last_error = None
         try:
-            self._pack = _load_pack("default")
+            self._pack = _load_pack(DEFAULT_BACKEND_PACK_NAME)
         except OpenImccUnavailableError as exc:
             self._last_error = str(exc)
             return False
@@ -871,7 +872,7 @@ class OpenImccMeltBackend(MeltBackend):
                 composition_mol=composition_mol,
                 composition_kg=None if composition_mol else composition_kg,
                 temperature_K=float(temperature_C) + 273.15,
-                pack="default",
+                pack=DEFAULT_BACKEND_PACK_NAME,
             )
         except ImccNonconvergenceError as exc:
             return EquilibriumResult(

@@ -39,6 +39,56 @@ SYNTHETIC_CURVE = {
 }
 
 
+def test_openimcc_admission_records_production_default_pack() -> None:
+    from simulator.melt_backend import openimcc_bridge as bridge
+
+    backend = bridge.OpenImccMeltBackend()
+    assert backend.initialize({})
+    provenance = install_provenance(
+        admission._SELECTED_PRODUCER_IDENTITIES["openimcc"]
+    )
+    pack_record = provenance["selected_source_digests"]["openimcc_pack"]
+
+    assert pack_record["sha256"] is not None
+    assert pack_record["sha256"] == bridge._pack_digest(backend._pack)
+    assert pack_record["model_id"] == backend._pack.model_id
+
+
+def test_openimcc_admission_digest_tracks_bridge_default_pack(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.melt_backend import openimcc_bridge as bridge
+
+    monkeypatch.setattr(bridge, "DEFAULT_BACKEND_PACK_NAME", "published-core")
+    backend = bridge.OpenImccMeltBackend()
+    assert backend.initialize({})
+    provenance = install_provenance(
+        admission._SELECTED_PRODUCER_IDENTITIES["openimcc"]
+    )
+
+    pack_record = provenance["selected_source_digests"]["openimcc_pack"]
+    assert pack_record["sha256"] == bridge._pack_digest(backend._pack)
+    assert pack_record["model_id"] == backend._pack.model_id
+
+
+def test_openimcc_admission_fails_closed_when_pack_cannot_load(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.melt_backend import openimcc_bridge as bridge
+
+    def unavailable(_pack_name: str):
+        raise ValueError("pack unavailable")
+
+    monkeypatch.setattr(bridge, "_load_pack", unavailable)
+    provenance = install_provenance(
+        admission._SELECTED_PRODUCER_IDENTITIES["openimcc"]
+    )
+
+    pack_record = provenance["selected_source_digests"]["openimcc_pack"]
+    assert pack_record["sha256"] is None
+    assert pack_record["error"] == "ValueError"
+
+
 def _candidate(
     identity: BindingIdentity = SYNTHETIC_IDENTITY,
     *,
