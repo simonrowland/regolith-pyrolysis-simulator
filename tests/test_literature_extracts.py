@@ -3028,12 +3028,31 @@ def test_fidelity_sample_mutation_reds():
 
 
 def test_shaw_surface_fidelity_mutation_reds():
-    """Pin restored Shaw deposit evidence and prove its fidelity gate catches loss."""
+    """Pin Shaw run and source claims; each reviewed reversal must turn red."""
     path = EXTRACTS / "shaw-2023-vacuum-thermal-sublimation-thesis.yaml"
     assert path.is_file()
 
     def assert_pins(candidate):
         assert vle.check_all_fidelity_samples_match(candidate, label="shaw-2023") == []
+        expected_runs = [
+            "blank-high-vacuum",
+            "td1-nanophase-iron-oxide",
+            "td2-nanophase-iron-oxide",
+            "td3-ilmenite-concentrate",
+            "td4-lms1-atmosphere",
+            "td5-lms1",
+            "td6-lms1",
+            "td7-reacted-td6-feed",
+        ]
+        assert len(candidate["experiments"]) == 8
+        assert [run["experiment_id"] for run in candidate["experiments"]] == expected_runs
+        for run in candidate["experiments"]:
+            schedule = run["thermal_schedule"]
+            assert schedule["total_duration_s"]["state"]["tag"] == "unknown"
+            hold = schedule["setpoints_and_holds"][0]
+            assert hold["hold_duration_s"]["state"]["tag"] == "value"
+            assert hold["temperature_K"]["state"]["tag"] == "unknown"
+
         context = candidate["species"]["vacuum_reactor_blank"]["context"]
         blank_rows = [
             row for row in context
@@ -3042,6 +3061,11 @@ def test_shaw_surface_fidelity_mutation_reds():
         assert blank_rows, "blank control context must survive YAML loading"
         blank = blank_rows[0]
         assert blank["values"]["deposit_location"] == "Reactor tube glass; general frosting"
+        assert blank["values"]["sample_mass_loss"] == {
+            "state": "unknown",
+            "reason": "blank_test_had_no_sample",
+        }
+        assert "mass_loss" not in blank["values"]
         handling = next(
             row for row in context
             if row.get("observation_id") == "shaw_2023_ch8_sample_preparation"
@@ -3052,6 +3076,18 @@ def test_shaw_surface_fidelity_mutation_reds():
             row for row in context
             if row.get("observation_id") == "shaw_2023_ch8_deposit_surface_inventory"
         )["values"]["runs"]
+        assert list(inventory) == ["blank", *expected_runs[1:]]
+        assert all("exposure_and_handling" in run for run in inventory.values())
+        td4_handling = inventory["td4-lms1-atmosphere"]["exposure_and_handling"]
+        assert "pump was detached" in td4_handling["apparatus"]
+        assert "flange was left open" in td4_handling["apparatus"]
+        assert td4_handling["vacuum_pump_venting"]["state"] == "unknown"
+        analysis_limits = next(
+            row for row in context
+            if row.get("observation_id") == "shaw_2023_ch8_deposit_surface_inventory"
+        )["values"]["common_analysis_limitations"]
+        assert "TD1 used a smear" in analysis_limits
+        assert "TD4 had no SEM/EDS analysis" in analysis_limits
         assert inventory["td1-nanophase-iron-oxide"]["wall"]["qualification"] == (
             "Minor Zn, Ca, and P are presumed by the author to be outside contamination "
             "associated with the smear sampling; the swab method caused significantly more "
@@ -3063,13 +3099,79 @@ def test_shaw_surface_fidelity_mutation_reds():
         assert inventory["td5-lms1"]["wall"]["zone_findings"]["b"].startswith(
             "Consistent Na and Cl layer"
         )
+        td5_a = inventory["td5-lms1"]["wall"]
+        assert td5_a["band_level_composition"] == (
+            "The initial deposition band (a) was composed predominantly of Na, P, and Cu."
+        )
+        assert td5_a["distinct_crystals"] == "Distinct crystals were composed of Na, P, and Mo."
+        assert td5_a["band_level_composition_locator"]["published_page"] == 212
+        assert td5_a["distinct_crystals_locator"]["published_page"] == 212
         assert inventory["td6-lms1"]["wall"]["zone_findings"]["a"] == (
             "Additional crystals were reported as composed of Na and O according to EDS."
         )
         assert inventory["td7-reacted-td6-feed"]["wall"]["scan_duration_min"] == 5
 
+        for species in ("Fe", "Na", "K"):
+            feed = candidate["species"][species]["context"][0]["values"]
+            assert "Apollo #12022 feed system named in Table 7.5" in feed["inputs"]
+            assert "selected Al2O3" not in feed["inputs"]
+            assert "Apollo #12022" in feed["vapor_pressure_source"]
+
+        zn = candidate["species"]["Ilmenite"]["context"][0]["values"]
+        feed_assay = zn.get("feed_composition", {})
+        assert feed_assay.get("Zn_wt_pct") == 0.028
+        assert feed_assay.get("basis", "").startswith("feed-material XRF")
+        assert zn.get("residue_composition", {}).get("state") == "unknown"
+
+        visual_index = next(
+            row for row in candidate["species"]["LMS-1"]["context"]
+            if row.get("observation_id") == "shaw_2023_unextracted_ch7_ch8_visual_data_index"
+        )
+        assert "only material not extracted" in visual_index["units"]
+        fig814 = next(
+            fig for fig in visual_index["values"]["figures"] if fig["id"] == "8.14"
+        )
+        assert "Full SEM image not extracted" in fig814["note"]
+        assert "summarized in the extract" in fig814["note"]
+
     doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
     assert_pins(doc)
+
+    # Four independent source-backed mutations requested by the confirm review.
+    mutations = []
+
+    candidate = copy.deepcopy(doc)
+    candidate["experiments"] = [
+        run for run in candidate["experiments"]
+        if run["experiment_id"] != "td2-nanophase-iron-oxide"
+    ]
+    mutations.append(("TD2 deleted", candidate))
+
+    candidate = copy.deepcopy(doc)
+    candidate["experiments"][1]["thermal_schedule"]["total_duration_s"]["state"] = {
+        "tag": "value",
+        "value": {"kind": "point", "point": "6480"},
+    }
+    mutations.append(("numeric total duration restored", candidate))
+
+    candidate = copy.deepcopy(doc)
+    candidate["species"]["Na"]["context"][0]["values"]["inputs"] = (
+        "FactSage pressure from the selected Al2O3-CaO-Na2O system"
+    )
+    mutations.append(("Na attributed to wrong feed system", candidate))
+
+    candidate = copy.deepcopy(doc)
+    zn = candidate["species"]["Ilmenite"]["context"][0]["values"]
+    zn["residue_composition"] = zn.pop("feed_composition")
+    mutations.append(("Zn feed assay moved to residue", candidate))
+
+    for label, candidate in mutations:
+        try:
+            assert_pins(candidate)
+        except AssertionError:
+            continue
+        raise AssertionError(f"{label} mutation survived the Shaw regression pins")
+
     inventory_record = next(
         row for row in doc["species"]["vacuum_reactor_blank"]["context"]
         if row.get("observation_id") == "shaw_2023_ch8_deposit_surface_inventory"

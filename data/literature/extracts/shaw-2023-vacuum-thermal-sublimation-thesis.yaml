@@ -304,10 +304,10 @@ species:
         method_class: calculated
         quantity_token_needed: evaporation_flux_per_area_mol_s_m2 (no matching quantity in current schema)
         model: Hertz-Knudsen-Langmuir vacuum evaporation equation 7.1
-        inputs: FactSage 8.2 saturated vapor pressures for Apollo sample 12022; molar mass of Fe; gas constant; absolute temperature converted from printed Celsius
+        inputs: 'FactSage 8.2 saturated vapor pressures for the Apollo #12022 feed system named in Table 7.5; molar mass of Fe; gas constant; absolute temperature converted from printed Celsius'
         assumptions: evaporation coefficient ae = 1; condensation term omitted for Langmuir evaporation at pressure much less than saturation pressure; best-case flux
         equation: J_i = ae * p_i,sat / sqrt(2 * pi * R * M_i * T); the condensation term is omitted for vacuum Langmuir evaporation
-        vapor_pressure_source: FactSage 8.2 fixed-volume thermochemical model, 100 g feed in 1 L; Apollo 12022 composition from Snyder et al. 297 (Table 7.4); FACTPS, FTOxid, FSstel databases
+        vapor_pressure_source: 'FactSage 8.2 fixed-volume thermochemical model, 100 g Apollo #12022 feed system in 1 L as described with Tables 7.4–7.5; FACTPS, FTOxid, FSstel databases'
         rows:
         - {temperature_C: 800, vapor_pressure_atm: 5.6e-13, evaporation_flux_mol_s_m2: 3.2e-11}
         - {temperature_C: 900, vapor_pressure_atm: 2.5e-11, evaporation_flux_mol_s_m2: 1.4e-9}
@@ -328,10 +328,10 @@ species:
         method_class: calculated
         quantity_token_needed: evaporation_flux_per_area_mol_s_m2 (no matching quantity in current schema)
         model: Hertz-Knudsen-Langmuir vacuum evaporation equation 7.1
-        inputs: FactSage 8.2 saturated vapor pressures for the Apollo #12022 feed system named in Table 7.5; molar mass of Na; gas constant; absolute temperature converted from printed Celsius
+        inputs: 'FactSage 8.2 saturated vapor pressures for the Apollo #12022 feed system named in Table 7.5; molar mass of Na; gas constant; absolute temperature converted from printed Celsius'
         assumptions: evaporation coefficient ae = 1; condensation term omitted for Langmuir evaporation at pressure much less than saturation pressure; best-case flux
         equation: J_i = ae * p_i,sat / sqrt(2 * pi * R * M_i * T); the condensation term is omitted for vacuum Langmuir evaporation
-        vapor_pressure_source: FactSage 8.2 fixed-volume thermochemical model, 100 g Apollo #12022 feed in 1 L as described with Tables 7.4–7.5; FACTPS, FTOxid, FSstel databases
+        vapor_pressure_source: 'FactSage 8.2 fixed-volume thermochemical model, 100 g Apollo #12022 feed in 1 L as described with Tables 7.4–7.5; FACTPS, FTOxid, FSstel databases'
         rows:
         - {temperature_C: 800, vapor_pressure_atm: 3.8e-11, evaporation_flux_mol_s_m2: 3.4e-9}
         - {temperature_C: 900, vapor_pressure_atm: 9.6e-10, evaporation_flux_mol_s_m2: 8.2e-8}
@@ -352,10 +352,10 @@ species:
         method_class: calculated
         quantity_token_needed: evaporation_flux_per_area_mol_s_m2 (no matching quantity in current schema)
         model: Hertz-Knudsen-Langmuir vacuum evaporation equation 7.1
-        inputs: FactSage 8.2 saturated vapor pressures for the Apollo #12022 feed system named in Table 7.5; molar mass of K; gas constant; absolute temperature converted from printed Celsius
+        inputs: 'FactSage 8.2 saturated vapor pressures for the Apollo #12022 feed system named in Table 7.5; molar mass of K; gas constant; absolute temperature converted from printed Celsius'
         assumptions: evaporation coefficient ae = 1; condensation term omitted for Langmuir evaporation at pressure much less than saturation pressure; best-case flux
         equation: J_i = ae * p_i,sat / sqrt(2 * pi * R * M_i * T); the condensation term is omitted for vacuum Langmuir evaporation
-        vapor_pressure_source: FactSage 8.2 fixed-volume thermochemical model, 100 g Apollo #12022 feed in 1 L as described with Tables 7.4–7.5; FACTPS, FTOxid, FSstel databases
+        vapor_pressure_source: 'FactSage 8.2 fixed-volume thermochemical model, 100 g Apollo #12022 feed in 1 L as described with Tables 7.4–7.5; FACTPS, FTOxid, FSstel databases'
         rows:
         - {temperature_C: 800, vapor_pressure_atm: 3.1e-11, evaporation_flux_mol_s_m2: 2.1e-9}
         - {temperature_C: 900, vapor_pressure_atm: 9.1e-10, evaporation_flux_mol_s_m2: 6.0e-8}
@@ -384,7 +384,7 @@ species:
         oxygen_gas: {state: unknown, reason: no molecular O2 collection or measurement reported}
         saw_air_before_analysis: {state: unknown, reason: reactor_was_vented_to_atmospheric_pressure_before_removal_but_vent_gas_air_contact_and_duration_are_not_stated}
         collector_or_shield_deposit: {state: unknown, reason: no separate collector or shield reported}
-        mass_loss: {semantics: bound_not_point, result: below estimated error, numeric_error_bound: {state: unknown, reason: not_reported}, balance_resolution: {state: unknown, reason: not_reported_for_chapter_8_test}}
+        sample_mass_loss: {state: unknown, reason: blank_test_had_no_sample}
     - observation_id: shaw_2023_ch8_mass_measurement_limits
       type: method
       locator: {published_page: 203, pdf_page_index: 227, section: '8.2'}
@@ -406,7 +406,7 @@ species:
       values:
         quantity: vacuum_test_sample_preparation
         method_class: method_only
-        applies_to: Chapter 8 vacuum solar-thermal testwork
+        applies_to: 'Sample preparation applies to nonblank Chapter 8 tests; the vacuum venting procedure applies only to high-vacuum runs and excludes atmospheric TD4'
         approximate_feed_mass_g: 2.6
         printed_sample_form: Sample was pressed in a 13 mm diameter steel die for 5 minutes at 9 tons; feed dried in an alumina boat at 150 C for at least 2 hours
         common_heating_schedule: Electrical furnace heated to 900 C; in most tests the apparatus then degassed/pumped overnight for about 18 hours before solar-simulator heating; Table 8.1 gives each run's Temp High and Temp High Duration
@@ -415,16 +415,18 @@ species:
         oxygen_measurement_calibration: {state: unknown, reason: no O2 measurement or calibration reported; deposit oxygen was qualitative EDS/EDX only}
         table_8_1_form_difference: TD1 is printed as Loose material in Table 8.1, while §8.2 says it was pressed into a pellet and that pressed pellets were used for all tests
         pellet_height_or_exposed_area: {state: unknown, reason: not_reported}
-        exposure_before_removal: {state: value, value: 'Reactor was vented slowly to atmospheric pressure using the vacuum-pump vent before sample removal; pressure reached, but not vent-gas identity, is stated'}
+        exposure_before_removal: {state: value, value: 'For the high-vacuum tests, the reactor was vented slowly to atmospheric pressure using the vacuum-pump vent before sample removal'}
         air_contact_before_analysis: {state: unknown, reason: thesis_does_not_identify_vent_gas_or_state_that_the_deposit_was_exposed_to_air}
         exposure_duration: {state: unknown, reason: not_reported}
-        reactor_handling: Reactor cooled naturally under vacuum; once below 300 C, reactor was moved from furnace and allowed to air cool; before sample removal it was slowly vented to atmospheric pressure, the vacuum extension pipe disconnected, boat removed, cooling collar undone, and reactor tube with deposits preserved for analysis
-        deposit_analysis_handling: Reactor photographed and deposition bands marked; tube placed in a thick plastic bag and carefully shattered, selected glass fragments mounted on aluminium with conductive carbon/graphite dag, then carbon coated before SEM/EDX
+        vent_gas_identity: {state: unknown, reason: not_reported}
+        reactor_handling: 'For high-vacuum tests: reactor cooled naturally under vacuum; once below 300 C, it was moved from the furnace and allowed to air cool; before sample removal it was slowly vented to atmospheric pressure, the vacuum extension pipe disconnected, boat removed, cooling collar undone, and reactor tube with deposits preserved for analysis'
+        deposit_analysis_handling: 'For runs subjected to SEM/EDX, the standard fragment procedure photographed and marked the reactor, carefully shattered it in a thick plastic bag, mounted selected glass fragments on aluminium with conductive carbon/graphite dag, then carbon coated the fragments. TD1 is the stated exception and used a smear sample; TD4 had no SEM/EDS analysis.'
         reactor_moved_from_furnace_below_C: 300
         high_temperature_definition: reactor temperature greater than 1000 C; low-temperature duration covered bake-out and time between solar-simulator pulses
         high_temperature_definition_locator: {published_page: 154, pdf_page_index: 178, section: '5.4'}
         reactor_cooling_locator: {published_page: 153, pdf_page_index: 177, section: '5.4'}
         exposure_protocol_locators:
+          vacuum_test_scope: {published_page: 202, pdf_page_index: 226, section: '8.2'}
           venting_and_removal: {published_page: 153, pdf_page_index: 177, section: '5.4'}
           tube_preservation_and_removal: {published_page: 154, pdf_page_index: 178, section: '5.4'}
           fracture_mounting_and_coating: {published_page: 141, pdf_page_index: 165, section: '5.1.4'}
@@ -436,12 +438,20 @@ species:
         quantity: deposit_findings_by_run_and_surface
         method_class: method_only
         phase_vocabulary: metal, suboxide, oxide, salt, silicate, not_identified; do not infer a phase from an EDS elemental pair
-        common_analysis_limitations: 'Thin deposits leave reactor-glass Si and O in every EDS analysis; carbon coating adds a strong C peak. An O peak above the expected glass signal only indicates the possible presence of an oxygen-containing phase. The thesis did not quantitatively separate deposit oxygen from glass oxygen.'
+        common_analysis_limitations: 'In fragment EDS analyses, thin deposits leave reactor-glass Si and O signals; carbon coating adds a strong C peak. An O peak above the expected glass signal only indicates the possible presence of an oxygen-containing phase. The thesis did not quantitatively separate deposit oxygen from glass oxygen. TD1 used a smear and had no significant glass Si/O peak; TD4 had no SEM/EDS analysis.'
+        common_analysis_scope: 'Fragment EDS analyses for TD2, TD3, TD5, TD6 and TD7; TD1 smear is the stated glass-signal exception and TD4 was not analysed by SEM/EDS.'
         common_analysis_locator: {published_page: 202, pdf_page_index: 226, section: '8.2'}
-        common_frosting_interpretation: 'White fractured Si/O frosting is treated as reactor-related; Na, K, and Cl in some areas may be trace glass constituents. Na, K, and Cl listed for the runs refer to visually distinct bands separate from that frosting.'
+        common_frosting_interpretation: 'For vacuum runs, white fractured Si/O frosting is treated as reactor-related; Na, K, and Cl in some areas may be trace glass constituents. Na, K, and Cl listed for the runs refer to visually distinct bands separate from that frosting. TD4 was the atmospheric test and is excluded.'
         common_frosting_locator: {published_page: 218, pdf_page_index: 242, section: '8.2'}
         runs:
           blank:
+            exposure_and_handling:
+              report: 'Blank was run under vacuum with no sample. The shared high-vacuum method reports slow venting to atmospheric pressure before removal and preservation of the reactor tube for analysis.'
+              locator: {published_pages: [202, 153, 154], pdf_page_indices: [226, 177, 178]}
+              sample_removal: {state: unknown, reason: no_sample_was_present}
+              vent_gas_identity: {state: unknown, reason: not_reported}
+              air_contact_before_analysis: {state: unknown, reason: thesis_does_not_identify_vent_gas_or_state_that_the_deposit_was_exposed_to_air}
+              exposure_duration: {state: unknown, reason: not_reported}
             wall:
               observation: 'A light white deposit consisting of Si and O formed on the reactor tube in the vacuum blank; similar white frosting occurred in the other vacuum tests.'
               phase_by_element: {Si: not_identified, O: not_identified}
@@ -454,6 +464,13 @@ species:
               crucible: {state: unknown, reason: blank_has_no_feed_and_no_boat_deposit_is_reported, locator: {published_page: 203, pdf_page_index: 227}}
               heater: {state: unknown, reason: no_heater_deposit_reported; described_findings_are_from_the_reactor_tube, locator: {published_page: 202, pdf_page_index: 226}}
           td1-nanophase-iron-oxide:
+            exposure_and_handling:
+              report: 'TD1 was a high-vacuum test. The general fragment method was not used: TD1 deposit was collected as a smear from inside the tube with a swab and transferred to a carbon microdot.'
+              locator: {published_pages: [202, 204, 205], pdf_page_indices: [226, 228, 229]}
+              venting: {state: value, value: 'Shared high-vacuum method: slow vent to atmospheric pressure using the vacuum-pump vent before removal.'}
+              vent_gas_identity: {state: unknown, reason: not_reported}
+              air_contact_before_analysis: {state: unknown, reason: thesis_does_not_identify_vent_gas_or_state_that_the_deposit_was_exposed_to_air}
+              exposure_duration: {state: unknown, reason: not_reported}
             wall:
               observation: Distinct brown/deep-red band at the end of the tube, angled where an external fan cooled the tube; strong Fe and O with minor Zn, Ca, and P signals
               phase_by_element: {Fe: not_identified, O: not_identified, Zn: not_identified, Ca: not_identified, P: not_identified}
@@ -466,6 +483,15 @@ species:
               crucible: {state: unknown, reason: alumina_sample_boat_was_used_but_no_boat_deposit_is_reported, locator: {published_page: 202, pdf_page_index: 226}}
               heater: {state: unknown, reason: no_heater_deposit_reported; described_findings_are_from_the_reactor_tube, locator: {published_page: 205, pdf_page_index: 229}}
           td2-nanophase-iron-oxide:
+            exposure_and_handling:
+              report: 'TD2 was a high-vacuum test and used the updated reactor-fragment analysis procedure.'
+              locator: {published_pages: [202, 206], pdf_page_indices: [226, 230]}
+              venting: {state: value, value: 'Shared high-vacuum method: slow vent to atmospheric pressure using the vacuum-pump vent before removal.'}
+              vent_gas_identity: {state: unknown, reason: not_reported}
+              air_contact_before_analysis: {state: unknown, reason: thesis_does_not_identify_vent_gas_or_state_that_the_deposit_was_exposed_to_air}
+              exposure_duration: {state: unknown, reason: not_reported}
+            deposit_fragment_method: {state: value, value: 'Reactor photographed and marked; tube carefully shattered in a plastic bag; selected glass fragments mounted on aluminium and carbon coated before SEM/EDS.'}
+            deposit_fragment_method_locator: {published_page: 141, pdf_page_index: 165}
             wall:
               observation: 'No significant Fe-related deposition band; common white fractured/frosted glass was present. A thin layer containing trace Na and Cl occurred in some frosted areas.'
               phase_by_element: {Si: not_identified, O: not_identified, C: not_identified, Na: not_identified, Cl: not_identified}
@@ -478,6 +504,15 @@ species:
               crucible: {state: unknown, reason: alumina_sample_boat_was_used_but_no_boat_deposit_is_reported, locator: {published_page: 202, pdf_page_index: 226}}
               heater: {state: unknown, reason: no_heater_deposit_reported; described_findings_are_from_the_reactor_tube, locator: {published_page: 207, pdf_page_index: 231}}
           td3-ilmenite-concentrate:
+            exposure_and_handling:
+              report: 'TD3 was a high-vacuum test and followed the shared reactor handling method.'
+              locator: {published_pages: [202, 153, 154], pdf_page_indices: [226, 177, 178]}
+              venting: {state: value, value: 'Shared high-vacuum method: slow vent to atmospheric pressure using the vacuum-pump vent before removal.'}
+              vent_gas_identity: {state: unknown, reason: not_reported}
+              air_contact_before_analysis: {state: unknown, reason: thesis_does_not_identify_vent_gas_or_state_that_the_deposit_was_exposed_to_air}
+              exposure_duration: {state: unknown, reason: not_reported}
+            deposit_fragment_method: {state: value, value: 'Standard reactor-fragment analysis; the TD1 smear technique was not used.'}
+            deposit_fragment_method_locator: {published_pages: [141, 204, 205], pdf_page_indices: [165, 228, 229]}
             wall:
               observation: Dark band at the tube end, with an initial faint band and intervening white frosting; strong Zn also occurred outside the nanorod regions, with trace Pb, Cl, and K
               phase_by_element: {Zn: oxide, O: oxide, Pb: not_identified, Cl: not_identified, K: not_identified}
@@ -491,6 +526,15 @@ species:
               crucible: {state: unknown, reason: alumina_sample_boat_was_used_but_no_boat_deposit_is_reported, locator: {published_page: 202, pdf_page_index: 226}}
               heater: {state: unknown, reason: no_heater_deposit_reported; described_findings_are_from_the_reactor_tube, locator: {published_page: 209, pdf_page_index: 233}}
           td4-lms1-atmosphere:
+            exposure_and_handling:
+              apparatus: 'For atmospheric testwork, the connector stayed attached to the cooling collar, the vacuum pump was detached, and the reactor flange was left open.'
+              locator: {published_page: 200, pdf_page_index: 224}
+              vacuum_pump_venting: {state: unknown, reason: atmospheric_test_used_a_detached_pump_and_open_flange_not_the_vacuum_pump_vent_protocol}
+              post_test_handling: {state: unknown, reason: not_reported_for_td4}
+              air_contact_before_analysis: {state: unknown, reason: post_test_air_contact_not_reported_for_td4}
+              exposure_duration: {state: unknown, reason: not_reported_for_td4}
+              deposit_analysis: 'SEM and EDS analysis of this reactor tube was not conducted due to lack of condensate.'
+              deposit_analysis_locator: {published_page: 210, pdf_page_index: 234}
             wall:
               observation: No deposition band visible in the reactor tube; minor white discoloration on the reactor flange
               phase_by_element: {state: unknown, reason: no composition analysis or phase identification was reported}
@@ -502,6 +546,13 @@ species:
               crucible: {state: unknown, reason: alumina_sample_boat_was_used_but_no_boat_deposit_is_reported, locator: {published_page: 210, pdf_page_index: 234}}
               heater: {state: unknown, reason: no_heater_deposit_reported; described_findings_are_from_the_reactor_tube, locator: {published_page: 210, pdf_page_index: 234}}
           td5-lms1:
+            exposure_and_handling:
+              report: 'TD5 was a high-vacuum test and followed the shared reactor handling and standard fragment analysis methods.'
+              locator: {published_pages: [202, 153, 154, 141], pdf_page_indices: [226, 177, 178, 165]}
+              venting: {state: value, value: 'Shared high-vacuum method: slow vent to atmospheric pressure using the vacuum-pump vent before removal.'}
+              vent_gas_identity: {state: unknown, reason: not_reported}
+              air_contact_before_analysis: {state: unknown, reason: thesis_does_not_identify_vent_gas_or_state_that_the_deposit_was_exposed_to_air}
+              exposure_duration: {state: unknown, reason: not_reported}
             wall:
               observation: 'Multiple faint bands: initial pink-hued (a), secondary faint (b), and brown after frosting (c).'
               phase_by_element: {Na: not_identified, Cl: not_identified, K: not_identified, S: not_identified, O: not_identified, F: not_identified, P: not_identified, Pb: not_identified, Cu: not_identified, Mo: not_identified, Fe: not_identified}
@@ -510,6 +561,11 @@ species:
                 a: 'Crystal described as composed of O, Na, P, and Cu, with trace K; background was a very thin trace-Na layer dominated by substrate Si and O. Small crystal clumps were reported as Na, Mo, O with trace P.'
                 b: 'Consistent Na and Cl layer with trace F, Pb, and P; non-geometric zones had Na, K, and S or K, Cl, and Na.'
                 c: 'Complex background of Na, Cl, Pb, and K with trace F and Fe; distinct crystals were described as composed of K, Na, and Cl.'
+              band_level_composition: 'The initial deposition band (a) was composed predominantly of Na, P, and Cu.'
+              band_level_composition_locator: {published_page: 212, pdf_page_index: 236}
+              distinct_crystals: 'Distinct crystals were composed of Na, P, and Mo.'
+              distinct_crystals_locator: {published_page: 212, pdf_page_index: 236}
+              band_level_method: SEM and EDS/EDX analysis of deposition zone (a)
               qualification: 'The thesis reports elemental EDS findings; it does not identify these elemental combinations as salts, oxides, or other compounds. Trace Fe may be background noise.'
               locator: {published_pages: [210, 211, 212, 213, 220], pdf_page_indices: [234, 235, 236, 237, 244]}
             other_surfaces:
@@ -518,6 +574,13 @@ species:
               crucible: {state: unknown, reason: alumina_sample_boat_was_used_but_no_boat_deposit_is_reported, locator: {published_page: 202, pdf_page_index: 226}}
               heater: {state: unknown, reason: no_heater_deposit_reported; described_findings_are_from_the_reactor_tube, locator: {published_page: 212, pdf_page_index: 236}}
           td6-lms1:
+            exposure_and_handling:
+              report: 'TD6 was a high-vacuum test and followed the shared reactor handling and standard fragment analysis methods.'
+              locator: {published_pages: [202, 153, 154, 141], pdf_page_indices: [226, 177, 178, 165]}
+              venting: {state: value, value: 'Shared high-vacuum method: slow vent to atmospheric pressure using the vacuum-pump vent before removal.'}
+              vent_gas_identity: {state: unknown, reason: not_reported}
+              air_contact_before_analysis: {state: unknown, reason: thesis_does_not_identify_vent_gas_or_state_that_the_deposit_was_exposed_to_air}
+              exposure_duration: {state: unknown, reason: not_reported}
             wall:
               observation: White initial band (a) and faint brown band (b) with visible crystals
               phase_by_element: {Na: not_identified, O: not_identified, P: not_identified, Cu: not_identified, Cl: not_identified, K: not_identified, Mo: not_identified, S: not_identified, Pb: not_identified}
@@ -533,6 +596,13 @@ species:
               crucible: {state: unknown, reason: alumina_sample_boat_was_used_but_no_boat_deposit_is_reported, locator: {published_page: 202, pdf_page_index: 226}}
               heater: {state: unknown, reason: no_heater_deposit_reported; described_findings_are_from_the_reactor_tube, locator: {published_page: 214, pdf_page_index: 238}}
           td7-reacted-td6-feed:
+            exposure_and_handling:
+              report: 'TD7 was a high-vacuum test and followed the shared reactor handling and standard fragment analysis methods.'
+              locator: {published_pages: [202, 153, 154, 141], pdf_page_indices: [226, 177, 178, 165]}
+              venting: {state: value, value: 'Shared high-vacuum method: slow vent to atmospheric pressure using the vacuum-pump vent before removal.'}
+              vent_gas_identity: {state: unknown, reason: not_reported}
+              air_contact_before_analysis: {state: unknown, reason: thesis_does_not_identify_vent_gas_or_state_that_the_deposit_was_exposed_to_air}
+              exposure_duration: {state: unknown, reason: not_reported}
             wall:
               observation: Wide, faint pink, very thin band; deposit appeared lumpy rather than clean reactor glass, with no significant crystal structures
               phase_by_element: {Na: not_identified, Cu: not_identified, Si: not_identified, O: not_identified}
@@ -563,7 +633,7 @@ species:
         deposit_phase_by_element: {state: unknown, reason: 'Qualitative EDS establishes elements, not phase'}
         identification: SEM and qualitative EDS/EDX of a carbon-microdot smear sample
         oxygen_gas: {state: unknown, reason: no molecular O2 collection or measurement reported}
-        saw_air_before_analysis: {state: unknown, reason: reactor_was_vented_to_atmospheric_pressure_before_removal_but_vent_gas_air_contact_and_duration_are_not_stated}
+        saw_air_before_analysis: {state: unknown, reason: atmospheric_TD4_used_detached_pump_and_open_flange; post_test_air_contact_and_duration_not_reported}
         collector_or_shield_deposit: {state: unknown, reason: not_reported}
         mass_loss: {semantics: bound_not_point, result: below estimated error, numeric_error_bound: {state: unknown, reason: not_reported}, balance_resolution: {state: unknown, reason: not_reported_for_chapter_8_test}}
         mass_vaporized_by_element: {state: unknown, reason: not_reported}
@@ -708,7 +778,7 @@ species:
     - observation_id: shaw_2023_unextracted_ch7_ch8_visual_data_index
       type: method
       locator: {section: 'Table of Contents', note: 'List of Figures and List of Tables, printed pages xii-xxii'}
-      units: table/figure number, printed page, and data not extracted
+      units: 'Table/figure ID and printed page; this index lists only material not extracted. Full images and spectra are not reproduced; findings already described in the extract are identified in the notes.'
       values:
         quantity: other_chapter_7_8_tables_and_figures_with_unextracted_data
         method_class: method_only
@@ -756,11 +826,11 @@ species:
         - {id: '8.11', page: 209, note: TD3 BSE image and EDS spectrum}
         - {id: '8.12', page: 210, note: TD4 tube with no coating}
         - {id: '8.13', page: 210, note: TD5 tube and sampled deposition zones}
-        - {id: '8.14', page: 211, note: TD5 crystal/background elemental findings}
-        - {id: '8.15', page: 212, note: TD5 BSE image and EDS spectrum}
+        - {id: '8.14', page: 211, note: 'Full SEM image not extracted; TD5 crystal/background findings are summarized in the extract'}
+        - {id: '8.15', page: 212, note: 'Full BSE image and EDS spectrum not extracted; TD5 band findings are summarized in the extract'}
         - {id: '8.16', page: 213, note: TD6 reactor-tube deposition zones}
-        - {id: '8.17', page: 214, note: TD6 crystal and background findings}
-        - {id: '8.18', page: 214, note: TD6 EDS spectrum}
+        - {id: '8.17', page: 214, note: 'Full SE image not extracted; TD6 crystal and background findings are summarized in the extract'}
+        - {id: '8.18', page: 214, note: 'Full EDS spectrum not extracted; TD6 crystal findings are summarized in the extract'}
         - {id: '8.19', page: 215, note: TD7 reactor-tube deposition zone}
         - {id: '8.20', page: 216, note: TD7 deposit image}
         - {id: '8.21', page: 217, note: TD7 EDS with trace Na and Cu}
