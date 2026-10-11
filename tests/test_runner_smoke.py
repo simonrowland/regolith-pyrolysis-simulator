@@ -1534,7 +1534,7 @@ def test_vpr_p6a_p0_gated_fields_are_explicit_sentinels():
 
 
 @pytest.mark.parametrize("scenario", SCENARIOS, ids=lambda s: s["name"])
-def test_runner_golden_fixture_matches(scenario):
+def test_runner_golden_fixture_matches(scenario, isolated_engine_config):
     """A live run must reproduce the committed golden fixture exactly."""
 
     # lunar_mare_low_ti_C0_24h.json + mars_basalt_C2A_12h.json: regenerated
@@ -1556,6 +1556,47 @@ def test_runner_golden_fixture_matches(scenario):
         "`python3 scripts/regenerate_runner_goldens.py` if the change is "
         "intentional; the bare simulator.runner CLI omits scenario inputs."
     )
+
+
+def test_runner_golden_output_ignores_host_binding_receipts(
+    monkeypatch,
+    isolated_engine_config,
+):
+    from simulator import engine_binding_admission, engine_local_config
+
+    host_config_path = isolated_engine_config
+    host_config_path.parent.mkdir(parents=True, exist_ok=True)
+    if not host_config_path.exists():
+        host_config_path.write_text("", encoding="utf-8")
+    monkeypatch.setattr(
+        engine_local_config,
+        "repo_root",
+        lambda: host_config_path.parent.parent,
+    )
+    host_receipt_path = host_config_path.with_name(
+        engine_binding_admission.RECEIPT_FILENAME
+    )
+    host_receipt_path.unlink(missing_ok=True)
+
+    scenario = {**SCENARIOS[0], "hours": 1}
+    without_host_receipt = _run_scenario(scenario)
+    host_receipt_path.write_text(
+        json.dumps(
+            {
+                "schema_version": engine_binding_admission.RECEIPT_SCHEMA_VERSION,
+                "assessed_at": "test-only",
+                "entries": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+    with_valid_host_receipt = _run_scenario(scenario)
+    assert without_host_receipt == with_valid_host_receipt
+
+    host_receipt_path.write_text("not json", encoding="utf-8")
+    with_garbage_host_receipt = _run_scenario(scenario)
+
+    assert without_host_receipt == with_garbage_host_receipt
 
 
 @pytest.mark.parametrize("scenario", SCENARIOS, ids=lambda s: s["name"])

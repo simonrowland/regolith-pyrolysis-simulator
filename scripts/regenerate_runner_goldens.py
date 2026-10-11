@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from tests.test_runner_smoke import FIXTURES_DIR, SCENARIOS, _run_scenario
+from tests.binding_admission_fixtures import isolate_engine_local_config
 
 
 def _atomic_write_json(path: Path, payload: dict) -> None:
@@ -40,7 +41,19 @@ def _atomic_write_json(path: Path, payload: dict) -> None:
 
 
 def main() -> int:
-    generated = [(scenario, _run_scenario(scenario)) for scenario in SCENARIOS]
+    from simulator import engine_local_config
+
+    source_path = engine_local_config.config_path()
+    with tempfile.TemporaryDirectory(
+        prefix="runner-golden-engine-config-"
+    ) as directory:
+        with isolate_engine_local_config(
+            Path(directory) / "engines",
+            source_path=source_path,
+        ):
+            generated = [
+                (scenario, _run_scenario(scenario)) for scenario in SCENARIOS
+            ]
     failures = [
         (scenario["name"], payload.get("status"), payload.get("reason", ""))
         for scenario, payload in generated
