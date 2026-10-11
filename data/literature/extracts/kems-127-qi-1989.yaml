@@ -208,6 +208,15 @@ species:
         pdf_page_index: 1
         equation: 12-13
         note: 'Abstract and eqs (12)(13): log gamma0_Ag in In and in Ga'
+      derived_from:
+      - qi_1989_table3_ag_in_ion_ratio_fits
+      - qi_1989_table4_ag_ga_ion_ratio_fits
+      derivation:
+        relation: Belton-Fruehan and Neckel-Wagner Gibbs-Duhem integrations of the measured ion-current ratios over the composition ranges
+        inputs:
+        - qi_1989_table3_ag_in_ion_ratio_fits
+        - qi_1989_table4_ag_ga_ion_ratio_fits
+        locator: {equation: '12-13', published_page: 575}
       T_range_K:
       - 1100.0
       - 1400.0
@@ -321,6 +330,11 @@ species:
         pdf_page_index: 1
         equation: '10'
         note: 'Abstract and eq (10): (log gamma0_In)_in Ag = 0.514 - 1790 T^-1'
+      derived_from: [qi_1989_table3_ag_in_ion_ratio_fits]
+      derivation:
+        relation: Gibbs-Duhem integration of the measured Ag-In ion-current ratios over the composition range
+        inputs: [qi_1989_table3_ag_in_ion_ratio_fits]
+        locator: {equation: '9-10', published_page: 575}
       T_range_K:
       - 1100.0
       - 1400.0
@@ -414,6 +428,11 @@ species:
         pdf_page_index: 1
         equation: '11'
         note: (log gamma0_Ga)_in Ag = -0.124 - 1450 T^-1
+      derived_from: [qi_1989_table4_ag_ga_ion_ratio_fits]
+      derivation:
+        relation: Gibbs-Duhem integration of the measured Ag-Ga ion-current ratios over the composition range
+        inputs: [qi_1989_table4_ag_ga_ion_ratio_fits]
+        locator: {equation: '11', published_page: 575}
       T_range_K:
       - 1100.0
       - 1400.0
