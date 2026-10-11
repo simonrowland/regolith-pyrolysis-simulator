@@ -329,6 +329,32 @@ def test_potassium_elemental_phases_preserve_the_short_solid_gate():
                for phase in ("l", "g") for quantity in ("heat_content_increment", "heat_capacity"))
 
 
+def test_silicon_and_titanium_elemental_equations_keep_their_printed_gates():
+    curves = loader.load_published_curves()
+    silicon = [curve for curve in curves if curve["formula"] == "Si"]
+    assert len(silicon) == 6
+    silicon_by_phase = {(curve["phase"], curve["quantity"]): curve for curve in silicon}
+    assert silicon_by_phase[("c", "heat_content_increment")]["gate"]["status"] == "passed"
+    assert silicon_by_phase[("c", "heat_capacity")]["gate"]["status"] == "passed"
+    assert silicon_by_phase[("l", "heat_content_increment")]["gate"]["status"] == "passed"
+    assert silicon_by_phase[("l", "heat_capacity")]["gate"]["status"] == "passed"
+    assert silicon_by_phase[("g", "heat_content_increment")]["gate"]["reason"] == "transcription_gate_failed"
+    assert silicon_by_phase[("g", "heat_capacity")]["gate"]["reason"] == "no_independent_check"
+
+    titanium = [curve for curve in curves if curve["formula"] == "Ti"]
+    assert len(titanium) == 10
+    assert all(curve["gate"]["status"] == "passed" for curve in titanium)
+    assert {curve["polymorph"] for curve in titanium if curve["phase"] == "c"} == {"alpha", "beta"}
+
+    # Kelley gives no Cp column; compare its printed Si(s) equation at 298.15 K
+    # with JANAF's independent 20.000 J/(mol K) value after exact conversion.
+    cp_cal_mol_k = 5.70 + 0.70e-3 * 298.15 - 1.04e5 * 298.15**-2
+    janaf = yaml.safe_load((COMPILATION_ROOT.parent / "janaf/tables/Si-002.yaml").read_text())
+    janaf_cp = next(row["heat_capacity"]["value"] for row in janaf["table"]["values"]
+                    if row["temperature"]["value"] == 298.15)
+    assert cp_cal_mol_k * 4.184 == pytest.approx(janaf_cp, abs=0.25)
+
+
 def test_heat_content_gate_detects_a_coefficient_mutation():
     heat = loader.load_published_curves()[0]
     changed = {**heat, "coefficients_as_printed": ["11.77", *heat["coefficients_as_printed"][1:]]}
@@ -476,7 +502,9 @@ def test_no_public_loader_entry_point_returns_a_suspect_cell_bare():
         for name, value in inspect.getmembers(loader, inspect.isfunction)
         if not name.startswith("_") and value.__module__ == loader.__name__
     }
-    assert public_entry_points == {"load_manifest", "load_records", "lookup_temperature"}
+    assert public_entry_points == {
+        "load_manifest", "load_published_curves", "load_records", "lookup_temperature"
+    }
 
     manifest = load_manifest()
     assert all("rows" not in entry for entry in manifest["entries"])

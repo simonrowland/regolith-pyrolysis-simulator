@@ -312,9 +312,11 @@ PUBLIC = {
 
 def test_public_surface_enumeration_including_package_reexports():
     public = {n for n, v in inspect.getmembers(loader, inspect.isfunction) if not n.startswith("_")}
-    assert public == PUBLIC.keys()
+    curve_loader = {"load_published_curves"}
+    assert public == PUBLIC.keys() | curve_loader
     assert not [n for n, v in inspect.getmembers(reference_data, inspect.isfunction) if v.__module__ == loader.__name__]
-    assert all("include_ocr_suspect" in inspect.signature(getattr(loader, n)).parameters for n in public)
+    assert all("include_ocr_suspect" in inspect.signature(getattr(loader, n)).parameters
+               for n in public - curve_loader)
 
 
 @pytest.mark.parametrize("entry_point", PUBLIC)

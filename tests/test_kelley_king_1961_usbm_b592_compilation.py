@@ -731,7 +731,9 @@ def test_all_public_loader_entry_points_preserve_suspect_safety(tmp_path):
         for name, value in inspect.getmembers(b592_loader, inspect.isfunction)
         if value.__module__ == b592_loader.__name__ and not name.startswith("_")
     }
-    assert public_functions == {"load_manifest", "load_records", "lookup_temperature"}
+    assert public_functions == {
+        "load_manifest", "load_published_curves", "load_records", "lookup_temperature"
+    }
     with pytest.raises(OCRSuspectRow):
         load_manifest()
     manifest = load_manifest(include_ocr_suspect=True)
