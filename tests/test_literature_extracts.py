@@ -3027,6 +3027,66 @@ def test_fidelity_sample_mutation_reds():
     assert any("mismatch" in e for e in errs), errs
 
 
+def test_shaw_surface_fidelity_mutation_reds():
+    """Pin restored Shaw deposit evidence and prove its fidelity gate catches loss."""
+    path = EXTRACTS / "shaw-2023-vacuum-thermal-sublimation-thesis.yaml"
+    assert path.is_file()
+
+    def assert_pins(candidate):
+        assert vle.check_all_fidelity_samples_match(candidate, label="shaw-2023") == []
+        context = candidate["species"]["vacuum_reactor_blank"]["context"]
+        blank_rows = [
+            row for row in context
+            if row.get("observation_id") == "shaw_2023_blank_results"
+        ]
+        assert blank_rows, "blank control context must survive YAML loading"
+        blank = blank_rows[0]
+        assert blank["values"]["deposit_location"] == "Reactor tube glass; general frosting"
+        handling = next(
+            row for row in context
+            if row.get("observation_id") == "shaw_2023_ch8_sample_preparation"
+        )["values"]
+        assert handling["reactor_moved_from_furnace_below_C"] == 300
+        assert "greater than 1000 C" in handling["high_temperature_definition"]
+        inventory = next(
+            row for row in context
+            if row.get("observation_id") == "shaw_2023_ch8_deposit_surface_inventory"
+        )["values"]["runs"]
+        assert inventory["td1-nanophase-iron-oxide"]["wall"]["qualification"] == (
+            "Minor Zn, Ca, and P are presumed by the author to be outside contamination "
+            "associated with the smear sampling; the swab method caused significantly more "
+            "contamination than later fractured-glass analysis"
+        )
+        assert inventory["td3-ilmenite-concentrate"]["wall"]["author_identification"].startswith(
+            "The thesis calls the structures “ZnO nano-rods”"
+        )
+        assert inventory["td5-lms1"]["wall"]["zone_findings"]["b"].startswith(
+            "Consistent Na and Cl layer"
+        )
+        assert inventory["td6-lms1"]["wall"]["zone_findings"]["a"] == (
+            "Additional crystals were reported as composed of Na and O according to EDS."
+        )
+        assert inventory["td7-reacted-td6-feed"]["wall"]["scan_duration_min"] == 5
+
+    doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+    assert_pins(doc)
+    inventory_record = next(
+        row for row in doc["species"]["vacuum_reactor_blank"]["context"]
+        if row.get("observation_id") == "shaw_2023_ch8_deposit_surface_inventory"
+    )
+    inventory_record["values"]["runs"]["td7-reacted-td6-feed"]["wall"]["scan_duration_min"] = 4
+    with pytest.raises(AssertionError):
+        assert_pins(doc)
+
+    doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+    doc["species"]["vacuum_reactor_blank"]["context"] = [
+        row for row in doc["species"]["vacuum_reactor_blank"]["context"]
+        if row.get("observation_id") != "shaw_2023_blank_results"
+    ]
+    with pytest.raises(AssertionError):
+        assert_pins(doc)
+
+
 def test_costa_fe_summary_key_is_retired_to_owner_series():
     secondary = load_cached_safe_yaml(
         (EXTRACTS / "costa-jacobson-2015.yaml").read_text(encoding="utf-8")

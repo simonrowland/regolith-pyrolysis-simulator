@@ -91,7 +91,7 @@ benches:
     locator: {published_page: 199, pdf_page_index: 223, section: The Hybrid Solar Furnace}
   temperature_measurement:
     method:
-      state: {tag: value, value: Table 8.1 reports Temp High; reactor temperature readings were used in heating profiles, while the calibration thermocouple was not used during active runs}
+      state: {tag: value, value: 'Table 8.1 reports Temp High; reactor temperature readings were used in heating profiles, while the calibration thermocouple was not used during active runs'}
       locator: {published_page: 200, pdf_page_index: 224, section: Reactor Design, note: The preceding chapter page describes temperature readings used in heating profiles}
     sensor:
       state: {tag: unknown, reason: not_published}
@@ -100,20 +100,20 @@ benches:
     state: {tag: value, value: No separate collector or staged collector is reported for these runs; deposits were sampled from the reactor tube and flange}
     locator: {published_page: 203, pdf_page_index: 227, table: '8.1', note: Chapter 8 deposit findings describe reactor-tube bands; the cold finger belongs to an unused second setup}
   quench_or_staged_collector:
-    state: {tag: unknown, reason: not_published}
-    locator: {published_page: 203, pdf_page_index: 227, table: '8.1'}
+    state: {tag: unknown, reason: not_applicable}
+    locator: {published_page: 198, pdf_page_index: 222, section: '8.1', note: Higher-temperature copper cold finger belonged to a second setup not used for this chapter's CST experiments}
   collector_temperature_C:
-    state: {tag: unknown, reason: not_published}
-    locator: {published_page: 203, pdf_page_index: 227, table: '8.1'}
+    state: {tag: unknown, reason: not_applicable}
+    locator: {published_page: 203, pdf_page_index: 227, table: '8.1', note: No separate collector was used; collector temperature therefore does not apply and is not reported}
   collector_distance_from_sample_mm:
-    state: {tag: unknown, reason: not_published}
-    locator: {published_page: 203, pdf_page_index: 227, table: '8.1'}
+    state: {tag: unknown, reason: not_applicable}
+    locator: {published_page: 203, pdf_page_index: 227, table: '8.1', note: No separate collector was used; collector distance therefore does not apply and is not reported}
   radiation_shield_temperature_C:
-    state: {tag: unknown, reason: not_published}
-    locator: {published_page: 203, pdf_page_index: 227, table: '8.1'}
+    state: {tag: unknown, reason: not_applicable}
+    locator: {published_page: 203, pdf_page_index: 227, table: '8.1', note: No separate radiation shield is described as used; shield temperature is not reported}
   radiation_shield_distance_from_sample_mm:
-    state: {tag: unknown, reason: not_published}
-    locator: {published_page: 203, pdf_page_index: 227, table: '8.1'}
+    state: {tag: unknown, reason: not_applicable}
+    locator: {published_page: 203, pdf_page_index: 227, table: '8.1', note: No separate radiation shield is described as used; shield distance is not reported}
 experiments:
 - experiment_id: blank-high-vacuum
   bench_id: solar-simulator-high-vacuum-reactor
@@ -131,7 +131,10 @@ experiments:
     sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {table: '8.1', published_page: 203}}
     regime: {regime_class: {tag: unknown, reason: not_published}}
   thermal_schedule:
-    total_duration_s: {state: {tag: value, value: {kind: point, point: '14040'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High Duration 3.9 h converted to seconds}}
+    total_duration_s: {state: {tag: unknown, reason: not_published}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Table 8.1 prints high-temperature duration; total time including low-temperature bake-out and inter-pulse intervals is not separately reported}}
+    setpoints_and_holds:
+    - temperature_K: {state: {tag: unknown, reason: not_applicable}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: 'Reported duration is accumulated reactor time above 1000 C, not a single isothermal hold temperature'}}
+      hold_duration_s: {state: {tag: value, value: {kind: point, point: '14040'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High Duration 3.9 h; high temperature means reactor temperature above 1000 C per §5.4; converted to seconds}}
   species:
     state: {tag: unknown, reason: no_feed_in_blank}
 - experiment_id: td1-nanophase-iron-oxide
@@ -152,7 +155,10 @@ experiments:
     sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {table: '8.1', published_page: 203}}
     regime: {regime_class: {tag: unknown, reason: not_published}}
   thermal_schedule:
-    total_duration_s: {state: {tag: value, value: {kind: point, point: '6480'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High Duration 1.8 h converted to seconds}}
+    total_duration_s: {state: {tag: unknown, reason: not_published}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Table 8.1 prints high-temperature duration; total time including low-temperature bake-out and inter-pulse intervals is not separately reported}}
+    setpoints_and_holds:
+    - temperature_K: {state: {tag: unknown, reason: not_applicable}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: 'Reported duration is accumulated reactor time above 1000 C, not a single isothermal hold temperature'}}
+      hold_duration_s: {state: {tag: value, value: {kind: point, point: '6480'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High Duration 1.8 h; high temperature means reactor temperature above 1000 C per §5.4; converted to seconds}}
 - experiment_id: td2-nanophase-iron-oxide
   bench_id: solar-simulator-high-vacuum-reactor
   method: vacuum_solar_thermal_dissociation
@@ -171,7 +177,10 @@ experiments:
     sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {table: '8.1', published_page: 203}}
     regime: {regime_class: {tag: unknown, reason: not_published}}
   thermal_schedule:
-    total_duration_s: {state: {tag: value, value: {kind: point, point: '15480'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High Duration 4.3 h converted to seconds}}
+    total_duration_s: {state: {tag: unknown, reason: not_published}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Table 8.1 prints high-temperature duration; total time including low-temperature bake-out and inter-pulse intervals is not separately reported}}
+    setpoints_and_holds:
+    - temperature_K: {state: {tag: unknown, reason: not_applicable}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: 'Reported duration is accumulated reactor time above 1000 C, not a single isothermal hold temperature'}}
+      hold_duration_s: {state: {tag: value, value: {kind: point, point: '15480'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High Duration 4.3 h; high temperature means reactor temperature above 1000 C per §5.4; converted to seconds}}
 - experiment_id: td3-ilmenite-concentrate
   bench_id: solar-simulator-high-vacuum-reactor
   method: vacuum_solar_thermal_dissociation
@@ -190,7 +199,10 @@ experiments:
     sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {table: '8.1', published_page: 203}}
     regime: {regime_class: {tag: unknown, reason: not_published}}
   thermal_schedule:
-    total_duration_s: {state: {tag: value, value: {kind: point, point: '25560'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High Duration 7.1 h converted to seconds}}
+    total_duration_s: {state: {tag: unknown, reason: not_published}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Table 8.1 prints high-temperature duration; total time including low-temperature bake-out and inter-pulse intervals is not separately reported}}
+    setpoints_and_holds:
+    - temperature_K: {state: {tag: unknown, reason: not_applicable}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: 'Reported duration is accumulated reactor time above 1000 C, not a single isothermal hold temperature'}}
+      hold_duration_s: {state: {tag: value, value: {kind: point, point: '25560'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High Duration 7.1 h; high temperature means reactor temperature above 1000 C per §5.4; converted to seconds}}
 - experiment_id: td4-lms1-atmosphere
   bench_id: solar-simulator-high-vacuum-reactor
   method: solar_thermal_dissociation_atmospheric_pressure
@@ -209,7 +221,10 @@ experiments:
     sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {table: '8.1', published_page: 203}}
     regime: {regime_class: {tag: unknown, reason: not_published}}
   thermal_schedule:
-    total_duration_s: {state: {tag: value, value: {kind: point, point: '7560'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High Duration 2.1 h converted to seconds}}
+    total_duration_s: {state: {tag: unknown, reason: not_published}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Table 8.1 prints high-temperature duration; total time including low-temperature bake-out and inter-pulse intervals is not separately reported}}
+    setpoints_and_holds:
+    - temperature_K: {state: {tag: unknown, reason: not_applicable}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: 'Reported duration is accumulated reactor time above 1000 C, not a single isothermal hold temperature'}}
+      hold_duration_s: {state: {tag: value, value: {kind: point, point: '7560'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High Duration 2.1 h; high temperature means reactor temperature above 1000 C per §5.4; converted to seconds}}
 - experiment_id: td5-lms1
   bench_id: solar-simulator-high-vacuum-reactor
   method: vacuum_solar_thermal_dissociation
@@ -228,7 +243,10 @@ experiments:
     sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {table: '8.1', published_page: 203}}
     regime: {regime_class: {tag: unknown, reason: not_published}}
   thermal_schedule:
-    total_duration_s: {state: {tag: value, value: {kind: point, point: '14760'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High Duration 4.1 h converted to seconds}}
+    total_duration_s: {state: {tag: unknown, reason: not_published}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Table 8.1 prints high-temperature duration; total time including low-temperature bake-out and inter-pulse intervals is not separately reported}}
+    setpoints_and_holds:
+    - temperature_K: {state: {tag: unknown, reason: not_applicable}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: 'Reported duration is accumulated reactor time above 1000 C, not a single isothermal hold temperature'}}
+      hold_duration_s: {state: {tag: value, value: {kind: point, point: '14760'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High Duration 4.1 h; high temperature means reactor temperature above 1000 C per §5.4; converted to seconds}}
 - experiment_id: td6-lms1
   bench_id: solar-simulator-high-vacuum-reactor
   method: vacuum_solar_thermal_dissociation
@@ -247,7 +265,10 @@ experiments:
     sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {table: '8.1', published_page: 203}}
     regime: {regime_class: {tag: unknown, reason: not_published}}
   thermal_schedule:
-    total_duration_s: {state: {tag: value, value: {kind: point, point: '12600'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High Duration 3.5 h converted to seconds}}
+    total_duration_s: {state: {tag: unknown, reason: not_published}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Table 8.1 prints high-temperature duration; total time including low-temperature bake-out and inter-pulse intervals is not separately reported}}
+    setpoints_and_holds:
+    - temperature_K: {state: {tag: unknown, reason: not_applicable}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: 'Reported duration is accumulated reactor time above 1000 C, not a single isothermal hold temperature'}}
+      hold_duration_s: {state: {tag: value, value: {kind: point, point: '12600'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High Duration 3.5 h; high temperature means reactor temperature above 1000 C per §5.4; converted to seconds}}
 - experiment_id: td7-reacted-td6-feed
   bench_id: solar-simulator-high-vacuum-reactor
   method: vacuum_solar_thermal_dissociation
@@ -255,8 +276,8 @@ experiments:
   sample:
     mass_kg: {state: {tag: value, value: {kind: point, point: '0.0026', approximate: true}}, locator: {published_page: 152, pdf_page_index: 176, section: '5.4.4', note: Approximately 2.6 g sample; grams converted to kg}}
     exposed_area_m2: {state: {tag: unknown, reason: not_reported}, locator: {table: '8.1', published_page: 203}}
-    printed_composition: {state: {tag: value, value: Processed TD4 (as printed; Chapter 8 prose says reacted TD6 material)}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227}}
-    form: {state: {tag: value, value: Processed TD4}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227}}
+    printed_composition: {state: {tag: value, value: LMS-1}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Feed Material column kept separate from Feed Form}}
+    form: {state: {tag: value, value: Processed TD4}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Printed Feed Form; §8.2 p. 215 instead says reacted LMS-1 material from TD6 was re-tested}}
     holder: {state: {tag: value, value: Alumina sample boat}, locator: {published_page: 202, pdf_page_index: 226, section: '8.2'}}
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '1424.15'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High 1151 C converted with T_K = T_C + 273.15}}
@@ -266,7 +287,10 @@ experiments:
     sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {table: '8.1', published_page: 203}}
     regime: {regime_class: {tag: unknown, reason: not_published}}
   thermal_schedule:
-    total_duration_s: {state: {tag: value, value: {kind: point, point: '31680'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High Duration 8.8 h converted to seconds}}
+    total_duration_s: {state: {tag: unknown, reason: not_published}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Table 8.1 prints high-temperature duration; total time including low-temperature bake-out and inter-pulse intervals is not separately reported}}
+    setpoints_and_holds:
+    - temperature_K: {state: {tag: unknown, reason: not_applicable}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: 'Reported duration is accumulated reactor time above 1000 C, not a single isothermal hold temperature'}}
+      hold_duration_s: {state: {tag: value, value: {kind: point, point: '31680'}}, locator: {table: '8.1', published_page: 203, pdf_page_index: 227, note: Temp High Duration 8.8 h; high temperature means reactor temperature above 1000 C per §5.4; converted to seconds}}
 species:
   Fe:
     observations: []
@@ -304,10 +328,10 @@ species:
         method_class: calculated
         quantity_token_needed: evaporation_flux_per_area_mol_s_m2 (no matching quantity in current schema)
         model: Hertz-Knudsen-Langmuir vacuum evaporation equation 7.1
-        inputs: FactSage 8.2 saturated vapor pressures for the selected Al2O3-CaO-Na2O system; molar mass of Na; gas constant; absolute temperature converted from printed Celsius
+        inputs: FactSage 8.2 saturated vapor pressures for the Apollo #12022 feed system named in Table 7.5; molar mass of Na; gas constant; absolute temperature converted from printed Celsius
         assumptions: evaporation coefficient ae = 1; condensation term omitted for Langmuir evaporation at pressure much less than saturation pressure; best-case flux
         equation: J_i = ae * p_i,sat / sqrt(2 * pi * R * M_i * T); the condensation term is omitted for vacuum Langmuir evaporation
-        vapor_pressure_source: FactSage 8.2 fixed-volume thermochemical model, 100 g feed in 1 L, selected oxide system; FACTPS, FTOxid, FSstel databases
+        vapor_pressure_source: FactSage 8.2 fixed-volume thermochemical model, 100 g Apollo #12022 feed in 1 L as described with Tables 7.4–7.5; FACTPS, FTOxid, FSstel databases
         rows:
         - {temperature_C: 800, vapor_pressure_atm: 3.8e-11, evaporation_flux_mol_s_m2: 3.4e-9}
         - {temperature_C: 900, vapor_pressure_atm: 9.6e-10, evaporation_flux_mol_s_m2: 8.2e-8}
@@ -328,10 +352,10 @@ species:
         method_class: calculated
         quantity_token_needed: evaporation_flux_per_area_mol_s_m2 (no matching quantity in current schema)
         model: Hertz-Knudsen-Langmuir vacuum evaporation equation 7.1
-        inputs: FactSage 8.2 saturated vapor pressures for the selected Al2O3-K2O system; molar mass of K; gas constant; absolute temperature converted from printed Celsius
+        inputs: FactSage 8.2 saturated vapor pressures for the Apollo #12022 feed system named in Table 7.5; molar mass of K; gas constant; absolute temperature converted from printed Celsius
         assumptions: evaporation coefficient ae = 1; condensation term omitted for Langmuir evaporation at pressure much less than saturation pressure; best-case flux
         equation: J_i = ae * p_i,sat / sqrt(2 * pi * R * M_i * T); the condensation term is omitted for vacuum Langmuir evaporation
-        vapor_pressure_source: FactSage 8.2 fixed-volume thermochemical model, 100 g feed in 1 L, selected oxide system; FACTPS, FTOxid, FSstel databases
+        vapor_pressure_source: FactSage 8.2 fixed-volume thermochemical model, 100 g Apollo #12022 feed in 1 L as described with Tables 7.4–7.5; FACTPS, FTOxid, FSstel databases
         rows:
         - {temperature_C: 800, vapor_pressure_atm: 3.1e-11, evaporation_flux_mol_s_m2: 2.1e-9}
         - {temperature_C: 900, vapor_pressure_atm: 9.1e-10, evaporation_flux_mol_s_m2: 6.0e-8}
@@ -356,12 +380,11 @@ species:
         elements_in_distinct_deposit_as_printed: None
         deposit_location: Reactor tube glass; general frosting
         deposit_phase_by_element: {state: unknown, reason: EDS elemental summary does not identify phases}
-        identification: Table 8.2 reports no elements in deposit bands; Chapter 8 prose describes light white Si/O frosting on the reactor glass
+        identification: 'Table 8.2 reports no elements in deposit bands; Chapter 8 prose describes light white Si/O frosting on the reactor glass'
         oxygen_gas: {state: unknown, reason: no molecular O2 collection or measurement reported}
-        saw_air_before_analysis: {state: unknown, reason: not_reported}
+        saw_air_before_analysis: {state: unknown, reason: reactor_was_vented_to_atmospheric_pressure_before_removal_but_vent_gas_air_contact_and_duration_are_not_stated}
         collector_or_shield_deposit: {state: unknown, reason: no separate collector or shield reported}
         mass_loss: {semantics: bound_not_point, result: below estimated error, numeric_error_bound: {state: unknown, reason: not_reported}, balance_resolution: {state: unknown, reason: not_reported_for_chapter_8_test}}
-    context:
     - observation_id: shaw_2023_ch8_mass_measurement_limits
       type: method
       locator: {published_page: 203, pdf_page_index: 227, section: '8.2'}
@@ -392,6 +415,136 @@ species:
         oxygen_measurement_calibration: {state: unknown, reason: no O2 measurement or calibration reported; deposit oxygen was qualitative EDS/EDX only}
         table_8_1_form_difference: TD1 is printed as Loose material in Table 8.1, while §8.2 says it was pressed into a pellet and that pressed pellets were used for all tests
         pellet_height_or_exposed_area: {state: unknown, reason: not_reported}
+        exposure_before_removal: {state: value, value: 'Reactor was vented slowly to atmospheric pressure using the vacuum-pump vent before sample removal; pressure reached, but not vent-gas identity, is stated'}
+        air_contact_before_analysis: {state: unknown, reason: thesis_does_not_identify_vent_gas_or_state_that_the_deposit_was_exposed_to_air}
+        exposure_duration: {state: unknown, reason: not_reported}
+        reactor_handling: Reactor cooled naturally under vacuum; once below 300 C, reactor was moved from furnace and allowed to air cool; before sample removal it was slowly vented to atmospheric pressure, the vacuum extension pipe disconnected, boat removed, cooling collar undone, and reactor tube with deposits preserved for analysis
+        deposit_analysis_handling: Reactor photographed and deposition bands marked; tube placed in a thick plastic bag and carefully shattered, selected glass fragments mounted on aluminium with conductive carbon/graphite dag, then carbon coated before SEM/EDX
+        reactor_moved_from_furnace_below_C: 300
+        high_temperature_definition: reactor temperature greater than 1000 C; low-temperature duration covered bake-out and time between solar-simulator pulses
+        high_temperature_definition_locator: {published_page: 154, pdf_page_index: 178, section: '5.4'}
+        reactor_cooling_locator: {published_page: 153, pdf_page_index: 177, section: '5.4'}
+        exposure_protocol_locators:
+          venting_and_removal: {published_page: 153, pdf_page_index: 177, section: '5.4'}
+          tube_preservation_and_removal: {published_page: 154, pdf_page_index: 178, section: '5.4'}
+          fracture_mounting_and_coating: {published_page: 141, pdf_page_index: 165, section: '5.1.4'}
+    - observation_id: shaw_2023_ch8_deposit_surface_inventory
+      type: method
+      locator: {section: '8.2', published_page: 202, pdf_page_index: 226, note: Run-specific prose locators are recorded for each wall finding below}
+      units: as described; elemental presence is not a compound or phase identification
+      values:
+        quantity: deposit_findings_by_run_and_surface
+        method_class: method_only
+        phase_vocabulary: metal, suboxide, oxide, salt, silicate, not_identified; do not infer a phase from an EDS elemental pair
+        common_analysis_limitations: 'Thin deposits leave reactor-glass Si and O in every EDS analysis; carbon coating adds a strong C peak. An O peak above the expected glass signal only indicates the possible presence of an oxygen-containing phase. The thesis did not quantitatively separate deposit oxygen from glass oxygen.'
+        common_analysis_locator: {published_page: 202, pdf_page_index: 226, section: '8.2'}
+        common_frosting_interpretation: 'White fractured Si/O frosting is treated as reactor-related; Na, K, and Cl in some areas may be trace glass constituents. Na, K, and Cl listed for the runs refer to visually distinct bands separate from that frosting.'
+        common_frosting_locator: {published_page: 218, pdf_page_index: 242, section: '8.2'}
+        runs:
+          blank:
+            wall:
+              observation: 'A light white deposit consisting of Si and O formed on the reactor tube in the vacuum blank; similar white frosting occurred in the other vacuum tests.'
+              phase_by_element: {Si: not_identified, O: not_identified}
+              method: visual white frosting; EDS of common fractured/frosted areas identified Si, O, and C, without phase analysis
+              attribution: author says the predominantly fractured Si/O frosting is reasonably assumed to form from the reactor itself under vacuum and high-temperature conditions; trace Na, K, and Cl in some areas suggest trace quantities in the glass
+              locator: {published_pages: [202, 206, 207, 218], pdf_page_indices: [226, 230, 231, 242]}
+            other_surfaces:
+              collector: {state: unknown, reason: no_separate_collector_used; copper_cold_finger_was_in_an_unused_setup, locator: {published_page: 198, pdf_page_index: 222}}
+              shield: {state: unknown, reason: no_separate_shield_or_shield_deposit_reported, locator: {published_page: 200, pdf_page_index: 224}}
+              crucible: {state: unknown, reason: blank_has_no_feed_and_no_boat_deposit_is_reported, locator: {published_page: 203, pdf_page_index: 227}}
+              heater: {state: unknown, reason: no_heater_deposit_reported; described_findings_are_from_the_reactor_tube, locator: {published_page: 202, pdf_page_index: 226}}
+          td1-nanophase-iron-oxide:
+            wall:
+              observation: Distinct brown/deep-red band at the end of the tube, angled where an external fan cooled the tube; strong Fe and O with minor Zn, Ca, and P signals
+              phase_by_element: {Fe: not_identified, O: not_identified, Zn: not_identified, Ca: not_identified, P: not_identified}
+              method: visual colour; BSE imaging and qualitative EDS/EDX on a smear/swab transferred to a carbon microdot
+              qualification: Minor Zn, Ca, and P are presumed by the author to be outside contamination associated with the smear sampling; the swab method caused significantly more contamination than later fractured-glass analysis
+              locator: {published_pages: [204, 205], pdf_page_indices: [228, 229]}
+            other_surfaces:
+              collector: {state: unknown, reason: no_separate_collector_used; copper_cold_finger_was_in_an_unused_setup, locator: {published_page: 198, pdf_page_index: 222}}
+              shield: {state: unknown, reason: no_separate_shield_or_shield_deposit_reported, locator: {published_page: 200, pdf_page_index: 224}}
+              crucible: {state: unknown, reason: alumina_sample_boat_was_used_but_no_boat_deposit_is_reported, locator: {published_page: 202, pdf_page_index: 226}}
+              heater: {state: unknown, reason: no_heater_deposit_reported; described_findings_are_from_the_reactor_tube, locator: {published_page: 205, pdf_page_index: 229}}
+          td2-nanophase-iron-oxide:
+            wall:
+              observation: 'No significant Fe-related deposition band; common white fractured/frosted glass was present. A thin layer containing trace Na and Cl occurred in some frosted areas.'
+              phase_by_element: {Si: not_identified, O: not_identified, C: not_identified, Na: not_identified, Cl: not_identified}
+              method: SEM imaging and EDS/EDX on reactor fragments
+              qualification: Na and Cl may have been concentrated from trace quantities in the glass; mechanism is unresolved and the thesis says blank standard tests are needed to characterize reactor-related deposits
+              locator: {published_pages: [206, 207, 218], pdf_page_indices: [230, 231, 242]}
+            other_surfaces:
+              collector: {state: unknown, reason: no_separate_collector_used; copper_cold_finger_was_in_an_unused_setup, locator: {published_page: 198, pdf_page_index: 222}}
+              shield: {state: unknown, reason: no_separate_shield_or_shield_deposit_reported, locator: {published_page: 200, pdf_page_index: 224}}
+              crucible: {state: unknown, reason: alumina_sample_boat_was_used_but_no_boat_deposit_is_reported, locator: {published_page: 202, pdf_page_index: 226}}
+              heater: {state: unknown, reason: no_heater_deposit_reported; described_findings_are_from_the_reactor_tube, locator: {published_page: 207, pdf_page_index: 231}}
+          td3-ilmenite-concentrate:
+            wall:
+              observation: Dark band at the tube end, with an initial faint band and intervening white frosting; strong Zn also occurred outside the nanorod regions, with trace Pb, Cl, and K
+              phase_by_element: {Zn: oxide, O: oxide, Pb: not_identified, Cl: not_identified, K: not_identified}
+              author_identification: 'The thesis calls the structures “ZnO nano-rods” and “nano-sized rods or filaments”; EDS indicated Zn and O, but no XRD or other phase-specific method is reported.'
+              method: visual dark band; SEM/SE and BSE imaging; qualitative EDS/EDX
+              qualification: Rods moved under the electron beam, displacing slightly and making high-resolution scans difficult
+              locator: {published_pages: [208, 209, 210], pdf_page_indices: [232, 233, 234]}
+            other_surfaces:
+              collector: {state: unknown, reason: no_separate_collector_used; copper_cold_finger_was_in_an_unused_setup, locator: {published_page: 198, pdf_page_index: 222}}
+              shield: {state: unknown, reason: no_separate_shield_or_shield_deposit_reported, locator: {published_page: 200, pdf_page_index: 224}}
+              crucible: {state: unknown, reason: alumina_sample_boat_was_used_but_no_boat_deposit_is_reported, locator: {published_page: 202, pdf_page_index: 226}}
+              heater: {state: unknown, reason: no_heater_deposit_reported; described_findings_are_from_the_reactor_tube, locator: {published_page: 209, pdf_page_index: 233}}
+          td4-lms1-atmosphere:
+            wall:
+              observation: No deposition band visible in the reactor tube; minor white discoloration on the reactor flange
+              phase_by_element: {state: unknown, reason: no composition analysis or phase identification was reported}
+              method: colour/visual inspection only; SEM and EDS were not conducted due to lack of condensate
+              locator: {published_page: 210, pdf_page_index: 234}
+            other_surfaces:
+              collector: {state: unknown, reason: no_separate_collector_used; copper_cold_finger_was_in_an_unused_setup, locator: {published_page: 198, pdf_page_index: 222}}
+              shield: {state: unknown, reason: no_separate_shield_or_shield_deposit_reported, locator: {published_page: 200, pdf_page_index: 224}}
+              crucible: {state: unknown, reason: alumina_sample_boat_was_used_but_no_boat_deposit_is_reported, locator: {published_page: 210, pdf_page_index: 234}}
+              heater: {state: unknown, reason: no_heater_deposit_reported; described_findings_are_from_the_reactor_tube, locator: {published_page: 210, pdf_page_index: 234}}
+          td5-lms1:
+            wall:
+              observation: 'Multiple faint bands: initial pink-hued (a), secondary faint (b), and brown after frosting (c).'
+              phase_by_element: {Na: not_identified, Cl: not_identified, K: not_identified, S: not_identified, O: not_identified, F: not_identified, P: not_identified, Pb: not_identified, Cu: not_identified, Mo: not_identified, Fe: not_identified}
+              method: visual colour; SEM/SE and BSE imaging with qualitative EDS/EDX on selected fragments
+              zone_findings:
+                a: 'Crystal described as composed of O, Na, P, and Cu, with trace K; background was a very thin trace-Na layer dominated by substrate Si and O. Small crystal clumps were reported as Na, Mo, O with trace P.'
+                b: 'Consistent Na and Cl layer with trace F, Pb, and P; non-geometric zones had Na, K, and S or K, Cl, and Na.'
+                c: 'Complex background of Na, Cl, Pb, and K with trace F and Fe; distinct crystals were described as composed of K, Na, and Cl.'
+              qualification: 'The thesis reports elemental EDS findings; it does not identify these elemental combinations as salts, oxides, or other compounds. Trace Fe may be background noise.'
+              locator: {published_pages: [210, 211, 212, 213, 220], pdf_page_indices: [234, 235, 236, 237, 244]}
+            other_surfaces:
+              collector: {state: unknown, reason: no_separate_collector_used; copper_cold_finger_was_in_an_unused_setup, locator: {published_page: 198, pdf_page_index: 222}}
+              shield: {state: unknown, reason: no_separate_shield_or_shield_deposit_reported, locator: {published_page: 200, pdf_page_index: 224}}
+              crucible: {state: unknown, reason: alumina_sample_boat_was_used_but_no_boat_deposit_is_reported, locator: {published_page: 202, pdf_page_index: 226}}
+              heater: {state: unknown, reason: no_heater_deposit_reported; described_findings_are_from_the_reactor_tube, locator: {published_page: 212, pdf_page_index: 236}}
+          td6-lms1:
+            wall:
+              observation: White initial band (a) and faint brown band (b) with visible crystals
+              phase_by_element: {Na: not_identified, O: not_identified, P: not_identified, Cu: not_identified, Cl: not_identified, K: not_identified, Mo: not_identified, S: not_identified, Pb: not_identified}
+              method: visual colour; SEM/SE and qualitative EDS/EDX
+              zone_findings:
+                b: 'Crystals were described as composed of Na, O, and P with trace Cu; background had trace Na and Cu and was very thin, with substrate Si and O signals predominant.'
+                a: 'Additional crystals were reported as composed of Na and O according to EDS.'
+              qualification: 'No phase-specific identification is reported; Na/O and Na/O/P are elemental results, not confirmed oxide or phosphate phases.'
+              locator: {published_pages: [213, 214], pdf_page_indices: [237, 238]}
+            other_surfaces:
+              collector: {state: unknown, reason: no_separate_collector_used; copper_cold_finger_was_in_an_unused_setup, locator: {published_page: 198, pdf_page_index: 222}}
+              shield: {state: unknown, reason: no_separate_shield_or_shield_deposit_reported, locator: {published_page: 200, pdf_page_index: 224}}
+              crucible: {state: unknown, reason: alumina_sample_boat_was_used_but_no_boat_deposit_is_reported, locator: {published_page: 202, pdf_page_index: 226}}
+              heater: {state: unknown, reason: no_heater_deposit_reported; described_findings_are_from_the_reactor_tube, locator: {published_page: 214, pdf_page_index: 238}}
+          td7-reacted-td6-feed:
+            wall:
+              observation: Wide, faint pink, very thin band; deposit appeared lumpy rather than clean reactor glass, with no significant crystal structures
+              phase_by_element: {Na: not_identified, Cu: not_identified, Si: not_identified, O: not_identified}
+              method: visual colour; SEM/SE and BSE imaging; EDS/EDX scans targeted a large lump at high magnification
+              scan_duration_min: 5
+              findings: 'EDS signal was predominantly substrate Si and O; trace Na and potentially Cu were detected consistently across multiple regions and sizes. The author considers Na may have been present along the whole deposition area; duration and nucleation are discussed as possible explanations.'
+              locator: {published_pages: [215, 216, 217, 220], pdf_page_indices: [239, 240, 241, 244]}
+            other_surfaces:
+              collector: {state: unknown, reason: no_separate_collector_used; copper_cold_finger_was_in_an_unused_setup, locator: {published_page: 198, pdf_page_index: 222}}
+              shield: {state: unknown, reason: no_separate_shield_or_shield_deposit_reported, locator: {published_page: 200, pdf_page_index: 224}}
+              crucible: {state: unknown, reason: alumina_sample_boat_was_used_but_no_boat_deposit_is_reported, locator: {published_page: 202, pdf_page_index: 226}}
+              heater: {state: unknown, reason: no_heater_deposit_reported; described_findings_are_from_the_reactor_tube, locator: {published_page: 216, pdf_page_index: 240}}
   FeO/Fe2O3:
     observations: []
     context:
@@ -407,10 +560,10 @@ species:
         method_class: measured_direct
         elements_in_distinct_deposit_as_printed: [Fe, O]
         deposit_location: Distinct brown/deep red band on the reactor tube; sample taken by smear/swab from inside tube
-        deposit_phase_by_element: {state: unknown, reason: Qualitative EDS establishes elements, not phase}
+        deposit_phase_by_element: {state: unknown, reason: 'Qualitative EDS establishes elements, not phase'}
         identification: SEM and qualitative EDS/EDX of a carbon-microdot smear sample
         oxygen_gas: {state: unknown, reason: no molecular O2 collection or measurement reported}
-        saw_air_before_analysis: {state: unknown, reason: not_reported}
+        saw_air_before_analysis: {state: unknown, reason: reactor_was_vented_to_atmospheric_pressure_before_removal_but_vent_gas_air_contact_and_duration_are_not_stated}
         collector_or_shield_deposit: {state: unknown, reason: not_reported}
         mass_loss: {semantics: bound_not_point, result: below estimated error, numeric_error_bound: {state: unknown, reason: not_reported}, balance_resolution: {state: unknown, reason: not_reported_for_chapter_8_test}}
         mass_vaporized_by_element: {state: unknown, reason: not_reported}
@@ -430,7 +583,7 @@ species:
         deposit_phase_by_element: {state: unknown, reason: No distinct deposit elements reported}
         identification: SEM and EDS/EDX of selected reactor fragments
         oxygen_gas: {state: unknown, reason: no molecular O2 collection or measurement reported}
-        saw_air_before_analysis: {state: unknown, reason: not_reported}
+        saw_air_before_analysis: {state: unknown, reason: reactor_was_vented_to_atmospheric_pressure_before_removal_but_vent_gas_air_contact_and_duration_are_not_stated}
         collector_or_shield_deposit: {state: unknown, reason: not_reported}
         mass_loss: {semantics: bound_not_point, result: below estimated error, numeric_error_bound: {state: unknown, reason: not_reported}, balance_resolution: {state: unknown, reason: not_reported_for_chapter_8_test}}
         mass_vaporized_by_element: {state: unknown, reason: not_reported}
@@ -455,11 +608,12 @@ species:
         deposit_phase_by_element: {state: unknown, reason: EDS identifies elements; no phase-specific identification method is reported}
         identification: SEM imaging and qualitative EDS/EDX; feed and residue also analyzed by XRF
         oxygen_gas: {state: unknown, reason: no molecular O2 collection or measurement reported}
-        saw_air_before_analysis: {state: unknown, reason: not_reported}
+        saw_air_before_analysis: {state: unknown, reason: reactor_was_vented_to_atmospheric_pressure_before_removal_but_vent_gas_air_contact_and_duration_are_not_stated}
         collector_or_shield_deposit: {state: unknown, reason: not_reported}
         mass_loss: {semantics: bound_not_point, result: below estimated error, numeric_error_bound: {state: unknown, reason: not_reported}, balance_resolution: {state: unknown, reason: not_reported_for_chapter_8_test}}
         Zn_fraction_sublimated_pct: {value_as_printed: '~82%', method_class: calculated, method: XRF analysis of post-test residue; calculation details not reported}
-        residue_composition: {Zn_wt_pct: 0.028, basis: feed-material XRF after test; impurity present as gangue mineral phases}
+        feed_composition: {Zn_wt_pct: 0.028, basis: feed-material XRF after test; impurity present as gangue mineral phases}
+        residue_composition: {state: unknown, reason: post_test_residue_Zn_concentration_not_reported}
   LMS-1:
     observations: []
     context:
@@ -478,7 +632,7 @@ species:
         deposit_phase_by_element: {state: unknown, reason: no deposit composition reported}
         identification: Visual observation; reactor-tube SEM/EDS not performed
         oxygen_gas: {state: unknown, reason: no molecular O2 collection or measurement reported}
-        saw_air_before_analysis: {state: unknown, reason: not_reported}
+        saw_air_before_analysis: {state: unknown, reason: reactor_was_vented_to_atmospheric_pressure_before_removal_but_vent_gas_air_contact_and_duration_are_not_stated}
         collector_or_shield_deposit: {state: unknown, reason: not_reported}
         mass_loss: {semantics: bound_not_point, result: below estimated error, numeric_error_bound: {state: unknown, reason: not_reported}, balance_resolution: {state: unknown, reason: not_reported_for_chapter_8_test}}
         mass_vaporized_by_element: {state: unknown, reason: not_reported}
@@ -502,7 +656,7 @@ species:
         deposit_phase_by_element: {state: unknown, reason: EDS gives elemental composition; no phase-specific identification reported}
         identification: SEM and qualitative EDS/EDX; selected tube fragments analyzed
         oxygen_gas: {state: unknown, reason: no molecular O2 collection or measurement reported}
-        saw_air_before_analysis: {state: unknown, reason: not_reported}
+        saw_air_before_analysis: {state: unknown, reason: reactor_was_vented_to_atmospheric_pressure_before_removal_but_vent_gas_air_contact_and_duration_are_not_stated}
         collector_or_shield_deposit: {state: unknown, reason: not_reported}
         mass_loss: {semantics: bound_not_point, result: below estimated error, numeric_error_bound: {state: unknown, reason: not_reported}, balance_resolution: {state: unknown, reason: not_reported_for_chapter_8_test}}
         mass_vaporized_by_element: {state: unknown, reason: not_reported}
@@ -525,7 +679,7 @@ species:
         deposit_phase_by_element: {state: unknown, reason: EDS gives elemental composition; no phase-specific identification reported}
         identification: SEM and qualitative EDS/EDX; selected tube fragments analyzed
         oxygen_gas: {state: unknown, reason: no molecular O2 collection or measurement reported}
-        saw_air_before_analysis: {state: unknown, reason: not_reported}
+        saw_air_before_analysis: {state: unknown, reason: reactor_was_vented_to_atmospheric_pressure_before_removal_but_vent_gas_air_contact_and_duration_are_not_stated}
         collector_or_shield_deposit: {state: unknown, reason: not_reported}
         mass_loss: {semantics: bound_not_point, result: below estimated error, numeric_error_bound: {state: unknown, reason: not_reported}, balance_resolution: {state: unknown, reason: not_reported_for_chapter_8_test}}
         mass_vaporized_by_element: {state: unknown, reason: not_reported}
@@ -546,14 +700,14 @@ species:
         deposit_phase_by_element: {state: unknown, reason: EDS gives elements near detection limit; no phase-specific identification reported}
         identification: SEM imaging and qualitative EDS/EDX
         oxygen_gas: {state: unknown, reason: no molecular O2 collection or measurement reported}
-        saw_air_before_analysis: {state: unknown, reason: not_reported}
+        saw_air_before_analysis: {state: unknown, reason: reactor_was_vented_to_atmospheric_pressure_before_removal_but_vent_gas_air_contact_and_duration_are_not_stated}
         collector_or_shield_deposit: {state: unknown, reason: not_reported}
         mass_loss: {semantics: bound_not_point, result: below estimated error, numeric_error_bound: {state: unknown, reason: not_reported}, balance_resolution: {state: unknown, reason: not_reported_for_chapter_8_test}}
         mass_vaporized_by_element: {state: unknown, reason: not_reported}
         residue_composition: {state: unknown, reason: not_reported}
     - observation_id: shaw_2023_unextracted_ch7_ch8_visual_data_index
       type: method
-      locator: {section: Table of Contents, note: List of Figures and List of Tables, printed pages xii-xxii}
+      locator: {section: 'Table of Contents', note: 'List of Figures and List of Tables, printed pages xii-xxii'}
       units: table/figure number, printed page, and data not extracted
       values:
         quantity: other_chapter_7_8_tables_and_figures_with_unextracted_data
@@ -578,7 +732,7 @@ species:
         - {id: '7.8', page: 175, note: BET pressure data and linear fit}
         - {id: '7.9', page: 176, note: Calculated surface-area change during sintering}
         - {id: '7.10', page: 178, note: Measured and FactSage saturated vapour-pressure curves}
-        - {id: '7.11', page: 180, note: Measured, pure-oxide, and selected-system vapour-pressure curves}
+        - {id: '7.11', page: 180, note: 'Measured, pure-oxide, and selected-system vapour-pressure curves'}
         - {id: '7.12', page: 182, note: Predicted evaporation flux/rate and surface area}
         - {id: '7.13', page: 186, note: Simulant container measurement locations}
         - {id: '7.14', page: 187, note: Vertical sintering thermal profile}
@@ -595,7 +749,7 @@ species:
         - {id: '8.4', page: 204, note: TD1 reactor tube and smear-sampling location}
         - {id: '8.5', page: 205, note: TD1 BSE image and EDS results}
         - {id: '8.6', page: 206, note: TD2 reactor tube and deposition zone}
-        - {id: '8.7', page: 207, note: TD2 sample SEM images and EDS scan}
+        - {id: '8.7', page: 206, note: TD2 sample SEM images and EDS scan}
         - {id: '8.8', page: 207, note: TD2 EDS spectrum}
         - {id: '8.9', page: 208, note: TD3 reactor tube deposition zones}
         - {id: '8.10', page: 209, note: TD3 condensate image and ZnO nanorods}
