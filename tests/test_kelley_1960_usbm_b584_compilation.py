@@ -267,6 +267,16 @@ def test_magnesium_elemental_equations_pass_their_table_and_derivative_gates():
     assert curves[1]["gate"]["kind"] == "analytic_derivative_of_gated_H"
 
 
+def test_magnesium_and_manganese_oxide_equation_mismatches_stay_typed():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] in {"MgO", "MnO"}]
+    assert len(curves) == 4
+    for formula in ("MgO", "MnO"):
+        by_quantity = {curve["quantity"]: curve for curve in curves if curve["formula"] == formula}
+        assert by_quantity["heat_content_increment"]["gate"]["reason"] == "transcription_gate_failed"
+        assert len(by_quantity["heat_content_increment"]["gate"]["residuals"]) == 3
+        assert by_quantity["heat_capacity"]["gate"]["reason"] == "no_independent_check"
+
+
 def test_heat_content_gate_detects_a_coefficient_mutation():
     heat = loader.load_published_curves()[0]
     changed = {**heat, "coefficients_as_printed": ["11.77", *heat["coefficients_as_printed"][1:]]}
