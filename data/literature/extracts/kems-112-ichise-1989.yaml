@@ -6158,6 +6158,40 @@ species:
         a_Ta_method_class: model_derived
         method_class: model_derived
         model_or_data_source: a_Fe from Table 1 two-phase averages / Raoult liquid; a_Ta Gibbs-Duhem
+        derived_from: &ichise_1989_fe_ta_gibbs_duhem_inputs
+        - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_9
+        - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_34
+        - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_12
+        - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_32
+        - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_21
+        - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_31
+        - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_25
+        - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_22
+        - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_27
+        - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_33
+        - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_17
+        - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_50
+        - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_49
+        - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_47
+        - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_51
+        - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_48
+        - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_53
+        - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_54
+        - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_55
+        - kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_56
+        - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=2018e5dad9a5
+        - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=41eb903ef8aa
+        - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=61f53aac665a
+        - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=8147091ebbb1
+        - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=9e24915b5cb0
+        - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=a54565fb2725
+        - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=c62b781acc4f
+        - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=e92ee209405b
+        - kems-112-ichise-1989::ichise_1989_table3_phase_boundaries::rows:h=fc8545752421
+        derivation:
+          inputs: *ichise_1989_fe_ta_gibbs_duhem_inputs
+          relation: Activity data from Table 1 are averaged within two-phase regions, connected across single-phase regions using the Table 3 phase boundaries, and integrated with the Gibbs-Duhem equation to obtain Ta activity (section 3.1, p. 847).
+          output_unit: activity, dimensionless activity coefficient, J mol^-1
         T_K: 1873.0
         composition_basis: X_Ta mole fraction
         rows:
@@ -7613,6 +7647,31 @@ species:
         method_class: model_derived
         model_or_data_source: a_Fe from Table 5 two-phase averages; a_Nb Gibbs-Duhem; Fe-Nb boundaries
           from Kubaschewski
+        derived_from: &ichise_1989_fe_nb_gibbs_duhem_inputs
+        - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_8
+        - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_4
+        - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_31
+        - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_59
+        - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_58
+        - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_11
+        - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_14
+        - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_12
+        - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_32
+        - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_15
+        - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_30
+        - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_29
+        - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_20
+        - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_19
+        - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_16
+        - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_26
+        - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_23
+        - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_24
+        - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_25
+        - kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_27
+        derivation:
+          inputs: *ichise_1989_fe_nb_gibbs_duhem_inputs
+          relation: Fe activity values from Table 5 are averaged by phase and integrated with the Gibbs-Duhem equation to obtain Nb activity; phase boundaries follow Kubaschewski (section 3.2, pp. 849–850).
+          output_unit: activity, dimensionless activity coefficient, J mol^-1
         T_K: 1873.0
         eq8_as_printed: ln gamma_Fe = -0.71(1-x_Fe)^2
         rows:
@@ -8051,6 +8110,32 @@ species:
       values:
         quantity: infinite_dilution_activity_coefficient
         method_class: model_derived
+        derived_from: &ichise_1989_infinite_dilution_inputs
+        - kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=1e8ba29b1b34
+        - kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=1ee33138691e
+        - kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=4a4e18cae179
+        - kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=53ea7b6ff00e
+        - kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=6036a9693dd5
+        - kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=754814d05e4b
+        - kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=8758d9ed7e57
+        - kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=b1ae03f9128f
+        - kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K::rows:h=cb81bedabbcc
+        - kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=03387327ec49
+        - kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=29827268987e
+        - kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=32a283b44ca3
+        - kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=389c4144c554
+        - kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=53d2e2290dc0
+        - kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=57afa890296a
+        - kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=66419c04fab0
+        - kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=8546bcbe96b2
+        - kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=9041569d4ba2
+        - kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=a6a48e08c04c
+        - kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=b10fa59f0a57
+        - kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K::rows:h=fbab9e204f7b
+        derivation:
+          inputs: *ichise_1989_infinite_dilution_inputs
+          relation: Infinite-dilution activity coefficients are derived from the Table 4 and Table 6 activity curves; Ta liquid and Nb liquid standards use the printed fusion entropy and melting-point conversions (pp. 847, 850–851).
+          output_unit: dimensionless activity coefficient
         T_K: 1873.0
         gamma0_Ta_s: 0.75
         gamma0_Ta_s_as_printed: 0.75±0.15
