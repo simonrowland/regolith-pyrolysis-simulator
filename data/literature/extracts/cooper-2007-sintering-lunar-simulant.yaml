@@ -114,6 +114,12 @@ species:
         mean_size_um: 22.14
         standard_deviation_um: 9.99
         distribution_type: well-graded / poorly-sorted
+      derivation:
+        relation: Mean and standard deviation reduced from the measured JSC-1AF grain-size distribution; laser diffraction method described by Plantz (2004)
+        locator: {pdf_page_index: 8, section: Acknowledgments; Nomenclature}
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {pdf_page_index: 8, section: Acknowledgments; Nomenclature}
       uncertainty: {note: printed standard deviation is retained; no other uncertainty printed}
       equipment: {instrument: Microtrac S3500 laser diffraction instrument, note: measurement courtesy of Microtrac Incorporated}
     - observation_id: cooper_2007_jsc1af_figure1_sintering_threshold
