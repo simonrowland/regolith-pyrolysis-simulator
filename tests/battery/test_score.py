@@ -4312,9 +4312,11 @@ def test_openimcc_candidate_alias_has_complete_lineage_mapping() -> None:
         expand_coefficient_sources,
         lineage_complete_for,
     )
+    from simulator.battery.source_lineage import openimcc_pack_coefficient_sources
 
     candidate_sources = (
         *ENGINE_COEFFICIENT_SOURCES[Engine.OPENIMCC],
+        *openimcc_pack_coefficient_sources("1.0.2"),
         "openimcc-pack-version:1.0.2",
         "openimcc-pack-digest:sha256:test",
         "openimcc-engine-binding:sha256:test",
@@ -4326,6 +4328,11 @@ def test_openimcc_candidate_alias_has_complete_lineage_mapping() -> None:
     assert "openimcc-v1.0.2" in candidate_sources
     assert "sf04-magma-companion-workbook" in expanded
     assert lineage_complete_for(candidate_sources) is True
+    d066_source = openimcc_pack_coefficient_sources("1.0.3-d066-v1")
+    assert d066_source == ("openimcc-v1.0.3-d066-v1",)
+    assert "sf04-magma-companion-workbook" in expand_coefficient_sources(
+        d066_source
+    )
 
 
 @pytest.mark.parametrize(
@@ -8970,6 +8977,7 @@ def test_transition_temperature_refuses_before_generic_engine_pot(
     prediction = predictions[Engine.OPENIMCC]
     assert prediction.value is None
     assert prediction.unit is None
+    assert prediction.coefficient_sources == ()
     assert prediction.execution.state is ExecutionState.UNSUPPORTED
     assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
     assert prediction.refusal_detail == {

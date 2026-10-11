@@ -36,6 +36,14 @@ def openimcc_engine_identity_sources(
     )
 
 
+def openimcc_pack_coefficient_sources(pack_version: object) -> tuple[str, ...]:
+    """Resolve coefficient ancestry from the version of the loaded pack."""
+
+    if not isinstance(pack_version, str) or not pack_version:
+        return ()
+    return (f"openimcc-v{pack_version}",)
+
+
 def coefficient_lineage_sources(sources: Sequence[str]) -> tuple[str, ...]:
     """Return store-resolvable coefficient ancestors, excluding run metadata."""
 
