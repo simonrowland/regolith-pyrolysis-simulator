@@ -168,8 +168,9 @@ species:
       units: kJ/mol and % as printed
       values:
         quantity: second_and_third_law_sublimation_enthalpy
-        method_class: model_derived
-        evidence_class: second_third_law_fit_of_literature_psat
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Biswas and Mukerji (ref. 18); Cordfunke et al. (ref. 19)
         table_csv: tables/kems-132-nakajima-2016/t1.csv
         not_this_work: literature_not_this_experiment
         points:
