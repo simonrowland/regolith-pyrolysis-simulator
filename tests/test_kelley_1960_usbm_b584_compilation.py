@@ -245,6 +245,13 @@ def test_chromia_equation_passes_its_printed_table_gate():
     assert all(curve["gate"]["status"] == "passed" for curve in curves)
 
 
+def test_soda_equations_pass_their_printed_table_and_derivative_gates():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "Na2O"]
+    assert len(curves) == 2
+    assert all(curve["gate"]["status"] == "passed" for curve in curves)
+    assert curves[1]["gate"]["kind"] == "analytic_derivative_of_gated_H"
+
+
 def test_heat_content_gate_detects_a_coefficient_mutation():
     heat = loader.load_published_curves()[0]
     changed = {**heat, "coefficients_as_printed": ["11.77", *heat["coefficients_as_printed"][1:]]}
