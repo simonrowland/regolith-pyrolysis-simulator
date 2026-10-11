@@ -1102,9 +1102,14 @@ experiments:
         value: fO2=5.5e-11; fCl2=5.11e-06
       locator: *id020
 fidelity_samples:
-- observation_id: rusiecka_wood_2025_table2_experiments
-  field: experiments
-  value: 10
+- path: experiments[1].sample.printed_composition.state.value.Cl
+  value: 1.6
+  locator:
+    source_path: corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf
+    published_page: 212
+    table: '2'
+- path: experiments[2].sample.printed_composition.state.value.Cl
+  value: 2.0
   locator:
     source_path: corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf
     published_page: 212
