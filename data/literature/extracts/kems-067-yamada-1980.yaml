@@ -467,6 +467,15 @@ species:
           N_Si=0.5 log gamma_Si assignment error yields +/- 0.2. epsilon error assigned by
           the same method. Authors: log gamma_Si^o is more reliable than epsilon because the
           integration area to N_Si=1 is large.'
+      derived_from:
+      - yamada_1980_ion_current_ratio_table1_1600C
+      - yamada_1980_quoted_gamma_Si_NSi_0p5
+      derivation:
+        relation: Belton-Fruehan integration of Table 1 ion-current ratios using the quoted log gamma_Si at N_Si=0.5 as the integration constant
+        inputs:
+        - yamada_1980_ion_current_ratio_table1_1600C
+        - yamada_1980_quoted_gamma_Si_NSi_0p5
+        locator: {equation: '8', table: '2', published_page: 492}
       values:
         quantity: henrian_activity_coefficient_and_self_interaction_parameter
         method_class: model_derived
@@ -968,6 +977,15 @@ species:
         published_page: 491
         pdf_page_index: 4
         note: Fig. 6. Integration curve for the Fe-Si system at 1600 C.
+      derived_from:
+      - yamada_1980_ion_current_ratio_table1_1600C
+      - yamada_1980_quoted_gamma_Si_NSi_0p5
+      derivation:
+        relation: Belton-Fruehan integration of Table 1 ion-current ratios using the quoted log gamma_Si at N_Si=0.5 as the integration constant
+        inputs:
+        - yamada_1980_ion_current_ratio_table1_1600C
+        - yamada_1980_quoted_gamma_Si_NSi_0p5
+        locator: {figure: '6', published_page: 491}
       T_range_K:
       - 1873.15
       - 1873.15
@@ -977,6 +995,15 @@ species:
       units: as published on the figure
       uncertainty:
         note: figure-only; axes not digitised
+      derived_from:
+      - yamada_1980_ion_current_ratio_table1_1600C
+      - yamada_1980_quoted_gamma_Si_NSi_0p5
+      derivation:
+        relation: Belton-Fruehan integration of Table 1 ion-current ratios using the quoted log gamma_Si at N_Si=0.5 as the integration constant
+        inputs:
+        - yamada_1980_ion_current_ratio_table1_1600C
+        - yamada_1980_quoted_gamma_Si_NSi_0p5
+        locator: {figure: '6', published_page: 491}
       values:
         quantity: Fig. 6. Integration curve for the Fe-Si system at 1600 C.
         method_class: model_derived
@@ -1051,6 +1078,15 @@ species:
       units: as published on the figure
       uncertainty:
         note: figure-only; axes not digitised
+      derived_from:
+      - yamada_1980_ion_current_ratio_table1_1600C
+      - yamada_1980_quoted_gamma_Si_NSi_0p5
+      derivation:
+        relation: Activities obtained by Belton-Fruehan integration of Table 1 ion-current ratios using the quoted log gamma_Si at N_Si=0.5 as the integration constant
+        inputs:
+        - yamada_1980_ion_current_ratio_table1_1600C
+        - yamada_1980_quoted_gamma_Si_NSi_0p5
+        locator: {equation: '8', figure: '8', published_page: 492}
       values:
         quantity: Fig. 8. Activities for the Fe-Si system at 1600 C.
         method_class: model_derived
@@ -1138,6 +1174,15 @@ species:
       units: as plotted on Fig. 8; no numeric a_Fe table
       uncertainty:
         note: No tabulated a_Fe series; Fig. 8 not digitised.
+      derived_from:
+      - yamada_1980_ion_current_ratio_table1_1600C
+      - yamada_1980_quoted_gamma_Si_NSi_0p5
+      derivation:
+        relation: Fe activity obtained by Belton-Fruehan integration of Table 1 ion-current ratios using the quoted log gamma_Si at N_Si=0.5 as the integration constant
+        inputs:
+        - yamada_1980_ion_current_ratio_table1_1600C
+        - yamada_1980_quoted_gamma_Si_NSi_0p5
+        locator: {equation: '8', figure: '8', published_page: 492}
       values:
         quantity: activity
         method_class: model_derived
