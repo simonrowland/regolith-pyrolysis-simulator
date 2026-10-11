@@ -1,4 +1,5 @@
 import ast
+import os
 import re
 from pathlib import Path
 
@@ -68,25 +69,154 @@ def test_simulator_has_no_forbidden_internal_kg_mutations():
 
 
 def _forbidden_internal_kg_mutation_hits(root: Path) -> list[str]:
+    # Scan regular files under the old roots and extensions, skipping only
+    # __pycache__ and hidden directories. This intentionally does not emulate
+    # ripgrep ignore files: ignored source must not hide from this guard, and
+    # selection must not depend on Git metadata. File symlinks are excluded.
     hits = []
-    for path in root.rglob("*"):
-        relative_path = path.relative_to(root)
-        if not path.is_file() or any(part.startswith(".") for part in relative_path.parts):
-            continue
+    scanned = 0
+
+    def scan_directory(directory: Path) -> None:
+        nonlocal scanned
         try:
-            content = path.read_bytes()
-        except OSError:
-            continue
-        if b"\0" in content:
-            continue
-        lines = content.decode("latin-1").splitlines()
-        for line_number, line in enumerate(lines, start=1):
-            if any(
-                re.search(pattern, line)
-                for pattern in FORBIDDEN_INTERNAL_KG_MUTATION_PATTERNS
-            ):
-                hits.append(f"{relative_path.as_posix()}:{line_number}")
-    return hits
+            entries = os.scandir(directory)
+        except OSError as exc:
+            raise AssertionError(
+                f"could not scan {directory} after {scanned} files: {exc}"
+            ) from exc
+        with entries:
+            for entry in entries:
+                if entry.is_dir(follow_symlinks=False):
+                    if entry.name == "__pycache__" or entry.name.startswith("."):
+                        continue
+                    scan_directory(Path(entry.path))
+                    continue
+                if not entry.is_file(follow_symlinks=False):
+                    continue
+                path = Path(entry.path)
+                scanned += 1
+                try:
+                    content = path.read_text(encoding="utf-8")
+                except (OSError, UnicodeError) as exc:
+                    raise AssertionError(
+                        f"could not read {path} after scanning {scanned} files: {exc}"
+                    ) from exc
+                for line_number, line in enumerate(content.split("\n"), start=1):
+                    if line.endswith("\r"):
+                        line = line[:-1]
+                    if any(
+                        re.search(pattern, line)
+                        for pattern in FORBIDDEN_INTERNAL_KG_MUTATION_PATTERNS
+                    ):
+                        hits.append(
+                            f"{path.relative_to(root).as_posix()}:{line_number}"
+                        )
+
+    try:
+        scan_directory(root)
+    except OSError as exc:
+        raise AssertionError(
+            f"could not inspect entries under {root} after {scanned} files: {exc}"
+        ) from exc
+    assert scanned > 0, f"scanned 0 files under {root}; guard cannot certify an empty scan"
+    return sorted(hits)
+
+
+@pytest.mark.parametrize(
+    "source",
+    (
+        "self.melt.composition_kg['FeO']\f= 0\n",
+        "# self.melt.composition_kg['FeO']\u00a0= 0\n",
+    ),
+    ids=("form-feed", "unicode-space"),
+)
+def test_forbidden_internal_kg_mutation_scanner_preserves_line_matching(tmp_path, source):
+    if "\f" in source:
+        compile(source, "planted.py", "exec")
+    root = tmp_path / "simulator"
+    root.mkdir()
+    (root / "planted.py").write_text(source, encoding="utf-8")
+
+    assert _forbidden_internal_kg_mutation_hits(root) == ["planted.py:1"]
+
+
+def test_forbidden_internal_kg_mutation_scanner_fails_on_missing_root(tmp_path):
+    with pytest.raises(AssertionError, match=r"could not scan .* after 0 files"):
+        _forbidden_internal_kg_mutation_hits(tmp_path / "missing")
+
+
+def test_forbidden_internal_kg_mutation_scanner_fails_on_zero_files(tmp_path):
+    root = tmp_path / "simulator"
+    root.mkdir()
+    (root / ".hidden").mkdir()
+    (root / "__pycache__").mkdir()
+
+    with pytest.raises(AssertionError, match=r"scanned 0 files"):
+        _forbidden_internal_kg_mutation_hits(root)
+
+
+def test_forbidden_internal_kg_mutation_scanner_reports_unreadable_file(tmp_path):
+    if os.geteuid() == 0:
+        pytest.skip("chmod 000 is readable when running as root")
+    root = tmp_path / "simulator"
+    root.mkdir()
+    unreadable = root / "unreadable.py"
+    unreadable.write_text("safe = True\n", encoding="utf-8")
+    unreadable.chmod(0)
+
+    try:
+        with pytest.raises(AssertionError, match=r"unreadable\.py.*scanning 1 files"):
+            _forbidden_internal_kg_mutation_hits(root)
+    finally:
+        unreadable.chmod(0o600)
+
+
+def test_forbidden_internal_kg_mutation_scanner_scans_ignored_regular_files(tmp_path):
+    root = tmp_path / "simulator"
+    root.mkdir()
+    (root / ".ignore").write_text("excluded.py\n", encoding="utf-8")
+    (root / ".gitignore").write_text("*.log\n", encoding="utf-8")
+    (root / "excluded.py").write_text(
+        "self.melt.composition_kg['FeO'] = 0\n", encoding="utf-8"
+    )
+    (root / "ignored.log").write_text(
+        "self.melt.composition_kg['FeO'] = 0\n", encoding="utf-8"
+    )
+
+    assert _forbidden_internal_kg_mutation_hits(root) == [
+        "excluded.py:1",
+        "ignored.log:1",
+    ]
+
+
+def test_forbidden_internal_kg_mutation_scanner_skips_file_symlinks(tmp_path):
+    root = tmp_path / "simulator"
+    root.mkdir()
+    target = tmp_path / "outside.py"
+    target.write_text("self.melt.composition_kg['FeO'] = 0\n", encoding="utf-8")
+    (root / "linked.py").symlink_to(target)
+    (root / "safe.py").write_text("safe = True\n", encoding="utf-8")
+
+    assert _forbidden_internal_kg_mutation_hits(root) == []
+
+
+def test_forbidden_internal_kg_mutation_scanner_fails_on_invalid_utf8(tmp_path):
+    root = tmp_path / "simulator"
+    root.mkdir()
+    (root / "invalid.py").write_bytes(b"\xff")
+
+    with pytest.raises(AssertionError, match=r"invalid\.py.*scanning 1 files"):
+        _forbidden_internal_kg_mutation_hits(root)
+
+
+def test_forbidden_internal_kg_mutation_scanner_matches_crlf_lines(tmp_path):
+    root = tmp_path / "simulator"
+    root.mkdir()
+    (root / "planted.py").write_bytes(
+        b"safe = True\r\nself.melt.composition_kg['FeO'] = 0\r\n"
+    )
+
+    assert _forbidden_internal_kg_mutation_hits(root) == ["planted.py:2"]
 
 
 def test_forbidden_internal_kg_mutation_patterns_match_samples():
