@@ -11,15 +11,17 @@ import pytest
 
 from simulator.yaml_cache import load_cached_safe_yaml
 
-from simulator.battery.enums import Quantity, RefusalReason
+from simulator.battery.enums import Engine, Quantity, Rail, RefusalReason
 from simulator.battery.migrate import (
     Migrator,
     _pressure_total_from_extract,
     _sweep_gas_from_plain,
     experiment_from_plain,
+    load_migrated_store,
     to_plain,
 )
 from simulator.battery.records import State, SweepGas, SweepGasComponent, ValueKind
+from simulator.battery.score import load_score_context, score_store
 from simulator.battery.validate import validate_experiment, validate_sweep_gas
 from tests.battery import factories
 from tests.battery.test_migrate import _migrate_real_extract, _write_min_tree
@@ -127,6 +129,65 @@ def test_component_quantities_round_trip() -> None:
     assert validate_sweep_gas(gas, "gas") == []
     assert to_plain(gas) == plain
     assert gas.components[0].mole_fraction.value == Decimal("0.25")
+
+
+@pytest.mark.parametrize(
+    ("filename", "source_id", "observation_count"),
+    (
+        ("kems-012-sossi-2019.yaml", "kems-012-sossi-2019", 612),
+        ("ts1985.yaml", "ts1985", 19),
+    ),
+)
+def test_valued_mixture_gas_fresh_store_round_trips(
+    tmp_path: Path, filename: str, source_id: str, observation_count: int
+) -> None:
+    result = _migrate_real_extract(tmp_path, filename, write=True)
+    assert len(result.observations) == observation_count
+
+    root = tmp_path / "tree"
+    _, experiments, observations = load_migrated_store(
+        root, sources=(source_id,)
+    )
+    assert len(observations) == observation_count
+    mixture_experiments = [
+        experiment
+        for experiment in experiments.values()
+        if experiment.pressure_environment.sweep_gas.state.is_value
+        and isinstance(
+            experiment.pressure_environment.sweep_gas.state.value, SweepGas
+        )
+        and experiment.pressure_environment.sweep_gas.state.value.components
+        and len(experiment.pressure_environment.sweep_gas.state.value.components) >= 2
+    ]
+    assert mixture_experiments
+
+    if source_id == "kems-012-sossi-2019":
+        row_observations = [
+            observation
+            for observation in observations.values()
+            if observation.identity.temperature_K is not None
+            and observation.identity.temperature_K.is_value
+        ]
+        assert len(row_observations) == 559
+        for observation in observations.values():
+            if observation.point_conditions is not None:
+                for condition in observation.point_conditions.values():
+                    assert condition.locator is not None
+        for observation in row_observations:
+            temperature = observation.identity.temperature_K
+            assert observation.point_conditions is not None
+            located_temperature = observation.point_conditions["temperature_K"]
+            assert located_temperature.state == temperature
+
+        context = load_score_context(root, sources=(source_id,))
+        assert len(context.observations) == observation_count
+        residuals, _ = score_store(
+            context,
+            engines=(Engine.INTERNAL_ANALYTICAL,),
+            rail=Rail.MELT_ACTIVITY,
+            limit=1,
+        )
+        assert residuals
 
 
 def test_ts1985_keeps_printed_alternatives_and_absences(tmp_path) -> None:

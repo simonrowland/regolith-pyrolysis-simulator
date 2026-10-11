@@ -10694,7 +10694,8 @@ def test_residue_cells_keep_run_identity_and_printed_conditions(
             assert key in conditions
             assert conditions[key].locator is not None
         atmosphere = conditions["atmosphere"]
-        assert atmosphere.state.is_unknown
+        assert atmosphere.state.is_value
+        assert atmosphere.state.value == "CO/CO2"
         assert "CO" in atmosphere.locator.note and "CO2" in atmosphere.locator.note
     assert actual_sossi == expected_sossi
     assert len(sossi_rows) == 344
@@ -10907,7 +10908,8 @@ def test_residue_series_emits_numeric_component_cells_with_component_identity(
     assert sossi_mn.point_conditions is not None
     assert sossi_mn.point_conditions["total_pressure_Pa"].state.value.point == Decimal("101325")
     atmosphere = sossi_mn.point_conditions["atmosphere"]
-    assert atmosphere.state.is_unknown
+    assert atmosphere.state.is_value
+    assert atmosphere.state.value == "CO/CO2"
     assert atmosphere.locator is not None
     assert "CO" in atmosphere.locator.note and "CO2" in atmosphere.locator.note
 

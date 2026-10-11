@@ -14326,10 +14326,26 @@ class Migrator:
                 if parent_atmosphere is not None and parent_atmosphere.state.is_value:
                     condition_updates["atmosphere"] = parent_atmosphere
                 elif point_atmosphere is None or not point_atmosphere.state.is_value:
+                    sweep_gas = pressure_environment.sweep_gas
+                    atmosphere_state = sweep_gas.state
+                    if atmosphere_state.is_value and isinstance(
+                        atmosphere_state.value, SweepGas
+                    ):
+                        gas = atmosphere_state.value
+                        if gas.species is not None:
+                            atmosphere_state = State.of(gas.species)
+                        elif gas.components:
+                            atmosphere_state = State.of(
+                                "/".join(component.species for component in gas.components)
+                            )
+                        else:
+                            atmosphere_state = State.unknown(
+                                "sweep-gas alternatives have no single atmosphere label"
+                            )
                     condition_updates["atmosphere"] = Located(
-                        pressure_environment.sweep_gas.state,
+                        atmosphere_state,
                         locator=(
-                            pressure_environment.sweep_gas.locator
+                            sweep_gas.locator
                             or run_experiment.locator
                             or point_locator
                         ),
