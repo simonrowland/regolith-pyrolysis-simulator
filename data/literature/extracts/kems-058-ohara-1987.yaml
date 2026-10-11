@@ -2056,7 +2056,9 @@ species:
       units: L_P as plotted; not digitised
       values:
         quantity: phosphorus_distribution_ratio
-        method_class: model_derived
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Ohara et al. (1987), Kambayashi, Awaka & Kato (1985), FetO-P2O5 slag-metal distribution model curve in Fig. 3
         admission_status: figure_only
         semantics: bound_not_point_ordering
         curve: Kambayashi FetO-P2O5 L_P
@@ -3607,9 +3609,9 @@ species:
       units: atm as published
       values:
         quantity: saturation_pressure
-        method_class: model_derived
-        model_or_data_source: JANAF Thermochemical Tables NSRDS-NBS (1971), Suppl. (1974); P4O10(s) free
-          energy to 1500 K extrapolated to 1643 K
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Ohara et al. (1987), JANAF Thermochemical Tables NSRDS-NBS (1971), Supplement (1974), extrapolated P4O10(s) free energy from 1500 K to 1643 K
         T_K: 1643.0
         P_sat_atm: 700
       uncertainty:
