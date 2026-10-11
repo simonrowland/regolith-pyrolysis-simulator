@@ -11197,27 +11197,9 @@ def test_literature_store_has_no_duplicate_values_across_extracts() -> None:
             if isinstance(stored, dict):
                 observations.extend(stored.get("observations") or [])
     duplicates = _same_work_observation_duplicate_pairs(observations)
-    expected_fedkin_duplicates = [
-        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series::T=1973.0:h=1d21a3ff1eab", "kems-005-fedkin-2006::fedkin_2006_fe_hashimoto_langmuir_table3::T=1973.0:h=1d21a3ff1eab"),
-        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series::T=2073.0:h=d46e4f3675db", "kems-005-fedkin-2006::fedkin_2006_fe_hashimoto_langmuir_table3::T=2073.0:h=d46e4f3675db"),
-        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series::T=2173.0:h=8c30d44267dc", "kems-005-fedkin-2006::fedkin_2006_fe_hashimoto_langmuir_table3::T=2173.0:h=8c30d44267dc"),
-        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series::T=2273.0:h=1d21a3ff1eab", "kems-005-fedkin-2006::fedkin_2006_fe_hashimoto_langmuir_table3::T=2273.0:h=1d21a3ff1eab"),
-        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series::T=1973.0:h=54b5fe718864", "kems-005-fedkin-2006::fedkin_2006_mg_hashimoto_langmuir_table3::T=1973.0:h=54b5fe718864"),
-        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series::T=2073.0:h=dc4d8a196fbc", "kems-005-fedkin-2006::fedkin_2006_mg_hashimoto_langmuir_table3::T=2073.0:h=dc4d8a196fbc"),
-        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series::T=2173.0:h=dc4d8a196fbc", "kems-005-fedkin-2006::fedkin_2006_mg_hashimoto_langmuir_table3::T=2173.0:h=dc4d8a196fbc"),
-        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series::T=2273.0:h=c383b1787018", "kems-005-fedkin-2006::fedkin_2006_mg_hashimoto_langmuir_table3::T=2273.0:h=c383b1787018"),
-        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series::T=1973.0:h=c900cec45e7a", "kems-005-fedkin-2006::fedkin_2006_sio_hashimoto_table3_complete_b1::T=1973.0:h=c900cec45e7a"),
-        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series::T=2073.0:h=eb12d425d670", "kems-005-fedkin-2006::fedkin_2006_sio_hashimoto_table3_complete_b1::T=2073.0:h=eb12d425d670"),
-        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series::T=2173.0:h=efeb2f418fbe", "kems-005-fedkin-2006::fedkin_2006_sio_hashimoto_table3_complete_b1::T=2173.0:h=efeb2f418fbe"),
-        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series::T=2273.0:h=707e960142f9", "kems-005-fedkin-2006::fedkin_2006_sio_hashimoto_table3_complete_b1::T=2273.0:h=707e960142f9"),
-        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_yu_k_vacuum_langmuir", "kems-005-fedkin-2006::fedkin_2006_k_class_b1"),
-        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_yu_k_vacuum_langmuir", "kems-005-fedkin-2006::fedkin_2006_k_yu_langmuir"),
-        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_yu_k_vacuum_langmuir", "potassium_silicate_vacuum"),
-        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_yu_na_vacuum_langmuir", "kems-005-fedkin-2006::fedkin_2006_na_class_b1"),
-        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_yu_na_vacuum_langmuir", "kems-005-fedkin-2006::fedkin_2006_na_yu_langmuir"),
-        ("10.1016/j.gca.2005.08.014", "kems-005-fedkin-2006::fedkin_2006_k_class_b1", "potassium_silicate_vacuum"),
-        ("10.1016/j.gca.2005.08.014", "kems-005-fedkin-2006::fedkin_2006_k_yu_langmuir", "potassium_silicate_vacuum"),
-    ]
+    # b-677 retired the 17-row secondary extract and linked its two remaining
+    # KEMS/REF-014 overlaps as derived, so no independent duplicate pairs remain.
+    expected_fedkin_duplicates = []
     assert duplicates == expected_fedkin_duplicates, duplicates
 
 
