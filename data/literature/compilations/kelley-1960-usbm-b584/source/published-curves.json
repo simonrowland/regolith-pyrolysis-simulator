@@ -578,5 +578,56 @@
     "locator": {"printed_page": 10, "label": "Table 5, Al2O3(c)"},
     "source_record_id": "table-005", "derivation": "Term-by-term derivative of the printed heat-content equation; cal/mol differentiated by kelvin gives cal/(mol·K), and the constant drops out.",
     "derivative_of_equation_index": 64
+  },
+  {
+    "formula": "Al", "phase": "c", "polymorph": null, "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 4.94T + 1.48×10^-3T^2 - 1,604",
+    "terms": ["a*T", "b*T^2", "d"], "coefficients_as_printed": ["4.94", "1.48×10^-3", "-1,604"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [298, 932], "accuracy_as_printed": "0.6 percent",
+    "locator": {"printed_page": 10, "label": "Table 2, Al(c)"},
+    "source_record_id": "table-002", "gate_cells": [{"temperature_K": 600}, {"temperature_K": 700}, {"temperature_K": 900}]
+  },
+  {
+    "formula": "Al", "phase": "c", "polymorph": null, "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 4.94 + 2.96×10^-3T",
+    "terms": ["a", "b*T"], "coefficients_as_printed": ["4.94", "2.96×10^-3"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [298, 932], "accuracy_as_printed": null,
+    "locator": {"printed_page": 10, "label": "Table 2, Al(c)"},
+    "source_record_id": "table-002", "derivation": "Term-by-term derivative of the printed heat-content equation; cal/mol differentiated by kelvin gives cal/(mol·K), and the constant drops out.",
+    "derivative_of_equation_index": 66
+  },
+  {
+    "formula": "Al", "phase": "l", "polymorph": null, "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 7.00 + 330",
+    "terms": ["d", "d"], "coefficients_as_printed": ["7.00", "330"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [932, 2700], "accuracy_as_printed": "0.1 percent",
+    "locator": {"printed_page": 10, "label": "Table 2, Al(l)"},
+    "source_record_id": "table-002", "gate_cells": [{"temperature_K": 1500}, {"temperature_K": 2000}, {"temperature_K": 2700}]
+  },
+  {
+    "formula": "Al", "phase": "l", "polymorph": null, "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 7.00",
+    "terms": ["a"], "coefficients_as_printed": ["7.00"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [932, 2700], "accuracy_as_printed": null,
+    "locator": {"printed_page": 10, "label": "Table 2, Al(l)"},
+    "source_record_id": "table-002", "derivation": "The printed constant Cp corresponds to a linear heat-content term, with cal/mol differentiated by kelvin giving cal/(mol·K); the adjacent printed heat-content expression is retained as printed and fails the table gate.",
+    "derivative_of_equation_index": 68
+  },
+  {
+    "formula": "Al", "phase": "g", "polymorph": null, "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 4.97T - 0.12×10^5T^-1 - 1,442",
+    "terms": ["a*T", "c*T^-1", "d"], "coefficients_as_printed": ["4.97", "-0.12×10^5", "-1,442"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [298, 5000], "accuracy_as_printed": "0.1 percent",
+    "locator": {"printed_page": 10, "label": "Table 3, Al(g)"},
+    "source_record_id": "table-003", "gate_cells": [{"temperature_K": 600}, {"temperature_K": 1000}, {"temperature_K": 2000}]
+  },
+  {
+    "formula": "Al", "phase": "g", "polymorph": null, "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 4.97 + 0.12×10^5T^-2",
+    "terms": ["a", "c*T^-2"], "coefficients_as_printed": ["4.97", "0.12×10^5"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [298, 5000], "accuracy_as_printed": null,
+    "locator": {"printed_page": 10, "label": "Table 3, Al(g)"},
+    "source_record_id": "table-003", "derivation": "Differentiate 4.97T - 0.12×10^5T^-1 - 1,442: the inverse-temperature term gives +0.12×10^5T^-2; cal/mol differentiated by kelvin gives cal/(mol·K).",
+    "derivative_of_equation_index": 70
   }
 ]
