@@ -3546,6 +3546,15 @@ species:
       uncertainty:
         note: Authors estimate ±0.15 in log a_SiO2, inherited from a_Na2O error.
         log10_a_SiO2: 0.15
+      derived_from:
+      - ts1985_gamma_Na_in_Pb_table1
+      - ts1985_na2o_table2_log10_a_AT_B
+      derivation:
+        relation: Gibbs-Duhem integration of the Figure 4 Na2O activity curve, anchored by the Table 1 result at X_Na2O=0.500
+        inputs:
+        - ts1985_gamma_Na_in_Pb_table1
+        - ts1985_na2o_table2_log10_a_AT_B
+        locator: {equations: '17-18', figure: '8', published_page: 821}
       values:
         quantity: activity_gibbs_duhem_from_Na2O
         oxide_formula_as_published: SiO2
