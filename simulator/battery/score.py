@@ -120,6 +120,7 @@ from simulator.battery.oxygen_balance import (
 from simulator.battery.source_lineage import (
     coefficient_lineage_sources,
     openimcc_engine_identity_sources,
+    openimcc_pack_coefficient_sources,
 )
 from simulator.battery.validate import (
     _observation_lineage,
@@ -335,7 +336,7 @@ ENGINE_COEFFICIENT_SOURCES: dict[Engine, tuple[str, ...]] = {
     Engine.ALPHAMELTS: ("alphamelts",),
     Engine.THERMOENGINE: ("thermoengine",),
     Engine.MAGEMIN: ("magemin",),
-    Engine.OPENIMCC: ("openimcc-v1.0.2",),
+    Engine.OPENIMCC: (),
     Engine.INTERNAL_ANALYTICAL: ("antoine_sidecar", "ellingham"),
 }
 # Engine-facing aliases → work/source/table identities in the v2.1 store.
@@ -354,6 +355,10 @@ COEFFICIENT_SOURCE_STORE_IDS: dict[str, tuple[str, ...]] = {
     "imcc-sf04-v1.0.2": ("sf04-magma-companion-workbook",),
     "imcc-sf04-ext-v4": ("sf04-magma-companion-workbook",),
     "openimcc-v1.0.2": ("sf04-magma-companion-workbook",),
+    "openimcc-v1.0.2-ext-sp-2": ("sf04-magma-companion-workbook",),
+    "openimcc-v1.0.3-d066-v1": ("sf04-magma-companion-workbook",),
+    "openimcc-v1.0.3-d066-ext-v1": ("sf04-magma-companion-workbook",),
+    "openimcc-v1.0.3-d066-v1-kcaalsi2o7": ("sf04-magma-companion-workbook",),
 }
 _ENGINE_SOURCE_ALIASES: frozenset[str] = frozenset(
     alias for aliases in ENGINE_COEFFICIENT_SOURCES.values() for alias in aliases
@@ -3980,6 +3985,9 @@ def predict_with_engine(
                 dict.fromkeys(
                     [
                         *sources,
+                        *openimcc_pack_coefficient_sources(
+                            identity_block.get("pack_version")
+                        ),
                         *openimcc_engine_identity_sources(
                             identity_block.get("engine_binding_identity")
                         ),
@@ -4580,6 +4588,9 @@ def _hashimoto_residue_prediction(
         primary_provenance = dict(primary.provenance)
         sources = (
             *sources,
+            *openimcc_pack_coefficient_sources(
+                primary_provenance.get("datapack_version")
+            ),
             *openimcc_engine_identity_sources(
                 primary_provenance.get("engine_binding_identity")
             ),
@@ -4818,6 +4829,9 @@ def _sossi_residue_prediction(
         provenance = dict(prediction.provenance)
         sources = (
             *sources,
+            *openimcc_pack_coefficient_sources(
+                provenance.get("datapack_version")
+            ),
             *openimcc_engine_identity_sources(
                 provenance.get("engine_binding_identity")
             ),

@@ -161,9 +161,9 @@ _PROVENANCE_CLASSES = {
     "Al": "janaf_fitted", "Al2": "janaf_fitted", "Al2O": "janaf_fitted",
     "Al2O2": "janaf_fitted", "AlO": "janaf_fitted", "AlO2": "janaf_fitted",
     "Ca": "janaf_fitted", "CaO": "janaf_fitted", "Fe": "janaf_transcribed",
-    "FeO": "janaf_transcribed", "K": "secondary_transcription_unverified_primary",
-    "K2": "secondary_transcription_unverified_primary", "K2O": "secondary_transcription_unverified_primary",
-    "KO": "secondary_transcription_unverified_primary", "Mg": "janaf_fitted",
+    "FeO": "janaf_transcribed", "K": "estimated_systematic",
+    "K2": "estimated_systematic", "K2O": "estimated_systematic",
+    "KO": "estimated_systematic", "Mg": "janaf_fitted",
     "MgO": "janaf_fitted", "Na": "janaf_fitted", "Na2": "janaf_fitted",
     "Na2O": "nasa_glenn_fitted", "NaO": "janaf_fitted", "O": "janaf_fitted",
     "O2": "janaf_fitted", "Si": "janaf_fitted", "Si2": "janaf_fitted",
@@ -254,8 +254,8 @@ def test_binary_pot_gas_records_engine_binding_identity_and_hex_pins() -> None:
             "condensate_table_digest": package_identity.condensate_table_digest,
             "gas_table_digest": package_identity.gas_table_digest,
         },
-        "pack": "1.0.2",
-        "pack_digest": "f2b479cd54e3c82704a5863fcc06836f72045375d9a8c7f8d2fad19e98f75d05",
+        "pack": "1.0.3-d066-v1",
+        "pack_digest": "d894f4e5ce79ba393f7068ec7d9032336eda8276293c4f46cafb18944a8b247e",
         "package_version": "0.1.0.dev0",
     }
 

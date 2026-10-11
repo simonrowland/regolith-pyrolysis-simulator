@@ -505,9 +505,12 @@ def test_openimcc_producer_emits_activity_and_vapour_rails() -> None:
     _require_openimcc()
     handle = open_battery_engine("openimcc")
     assert handle.available, handle.unavailable_reason
+    backend = handle.backend
+    assert backend is not None
     assert handle.identity["pack_digest"] == (
-        "f2b479cd54e3c82704a5863fcc06836f72045375d9a8c7f8d2fad19e98f75d05"
+        "d894f4e5ce79ba393f7068ec7d9032336eda8276293c4f46cafb18944a8b247e"
     )
+    assert handle.identity["model_id"] == backend.model_id
     cell = equilibrate_cell(
         handle,
         _binary_probe(),
@@ -520,7 +523,8 @@ def test_openimcc_producer_emits_activity_and_vapour_rails() -> None:
     assert cell.gas_partial_pressures_Pa["K"] > 0.0
     gas_digest = handle.identity["engine_binding_identity"]["gas_table_digest"]
     assert cell.vapor_pressures_source["K"] == f"openimcc-gas-table:sha256:{gas_digest}"
-    assert cell.model_id == "IMCC-SF04"
+    assert cell.model_id == backend.model_id
+    assert handle.identity["pack"] == backend._pack_name
 
 
 def test_missing_binding_digest_refuses_without_residual_identity_or_cache_key(
@@ -573,7 +577,7 @@ def test_openimcc_battery_solves_plante_oxygen_balance_anchor() -> None:
         if row.get("kind") == "fo2_oxygen_balance_effusion_solved"
     )
     ratio = notice["pO2_bar"] * 1.0e5 / cell.gas_partial_pressures_Pa["K"]
-    assert ratio == pytest.approx(0.22489, abs=1e-5)
+    assert ratio == pytest.approx(0.22444037883428292, abs=1e-8)
     assert notice["relative_residual"] < 1.0e-8
     assert notice["bracket_log10_bar"] == [-30.0, 0.0]
     assert notice["cell_material"] is None
@@ -1188,7 +1192,7 @@ assert {
     if candidate.engine is not None
 } == {(True, "independent")}
 assert any(
-    "openimcc-pack-digest:f2b479cd54e3c82704a5863fcc06836f72045375d9a8c7f8d2fad19e98f75d05"
+    "openimcc-pack-digest:d894f4e5ce79ba393f7068ec7d9032336eda8276293c4f46cafb18944a8b247e"
     in candidate.engine.coefficient_sources
     for _, candidate in engine_rows
     if candidate.engine is not None
@@ -1199,9 +1203,9 @@ summary = next(
 )
 # b-728: two Plante rows flagged source_internally_inconsistent (printed misprints) leave the headline
 assert summary["n_score_eligible"] == 160
-assert summary["n_inside_band"] == 111
-assert abs(float(summary["median_dex"]) - 0.0748) < 0.00005
-assert abs(float(summary["rms_dex"]) - 0.1405) < 0.00005
+assert summary["n_inside_band"] == 56
+assert abs(float(summary["median_dex"]) - (-0.193144973432544415)) < 0.00000001
+assert abs(float(summary["rms_dex"]) - 0.2097386994979764836) < 0.00000001
 print(json.dumps({"headline": summary, "lineage": "independent"}))
 '''
     env = {
@@ -1223,9 +1227,13 @@ print(json.dumps({"headline": summary, "lineage": "independent"}))
     result = json.loads(completed.stdout.strip().splitlines()[-1])
     # b-728: two Plante rows flagged source_internally_inconsistent (printed misprints) leave the headline
     assert result["headline"]["n_score_eligible"] == 160
-    assert result["headline"]["n_inside_band"] == 111
-    assert float(result["headline"]["median_dex"]) == pytest.approx(0.0748, abs=0.00005)
-    assert float(result["headline"]["rms_dex"]) == pytest.approx(0.1405, abs=0.00005)
+    assert result["headline"]["n_inside_band"] == 56
+    assert float(result["headline"]["median_dex"]) == pytest.approx(
+        -0.193144973432544415, abs=1e-8
+    )
+    assert float(result["headline"]["rms_dex"]) == pytest.approx(
+        0.2097386994979764836, abs=1e-8
+    )
     assert result["lineage"] == "independent"
 
 
@@ -1311,7 +1319,7 @@ def test_openimcc_ti_gas_matches_direct_calculation() -> None:
     melt = evaluate(
         composition_mol,
         2200.0,
-        pack=openimcc_bridge._load_pack("v1.0.2"),
+        pack=openimcc_bridge._load_pack("default"),
         basis_type="mol",
         allow_extrapolation=True,
         allow_out_of_envelope=True,
@@ -1454,7 +1462,9 @@ def test_openimcc_plante_candidates_match_mole_basis_package() -> None:
             math.log10(predicted / float(row["measured_P_K_Pa"]))
         )
     assert len(deltas) == 162
-    assert statistics_median(measured_residuals) == pytest.approx(0.093, abs=0.01)
+    assert statistics_median(measured_residuals) == pytest.approx(
+        -0.24152433249838257, abs=0.01
+    )
 
 
 def test_plante_solved_effusion_uses_the_prediction_engine_notice() -> None:
@@ -1511,10 +1521,16 @@ def test_plante_solved_effusion_uses_the_prediction_engine_notice() -> None:
     openimcc = summary[Engine.OPENIMCC.value]
     # b-728: two Plante rows flagged source_internally_inconsistent (printed misprints) leave the headline
     assert openimcc["n_score_eligible"] == 160
-    assert openimcc["n_inside_band"] == 111
-    assert float(openimcc["band_width_dex"]) == pytest.approx(0.1461, abs=0.00005)
-    assert float(openimcc["median_dex"]) == pytest.approx(0.0748, abs=0.00005)
-    assert float(openimcc["rms_dex"]) == pytest.approx(0.1405, abs=0.00005)
+    assert openimcc["n_inside_band"] == 56
+    assert float(openimcc["band_width_dex"]) == pytest.approx(
+        0.14612803567823803, abs=1e-12
+    )
+    assert float(openimcc["median_dex"]) == pytest.approx(
+        -0.193144973432544415, abs=1e-8
+    )
+    assert float(openimcc["rms_dex"]) == pytest.approx(
+        0.209738699497976484, abs=1e-8
+    )
 
     solved_openimcc_notice = next(
         notice

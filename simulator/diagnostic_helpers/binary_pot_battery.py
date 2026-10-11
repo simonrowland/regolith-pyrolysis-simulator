@@ -67,8 +67,6 @@ BATTERY_ENGINE_NAMES: tuple[str, ...] = (
 )
 OPENIMCC_ENGINE_NAMES: tuple[str, ...] = ("openimcc",)
 IMCC_ENGINE_NAMES: tuple[str, ...] = OPENIMCC_ENGINE_NAMES
-OPENIMCC_MODEL_IDS: dict[str, str] = {"openimcc": "IMCC-SF04"}
-ALL_IMCC_MODEL_IDS: dict[str, str] = OPENIMCC_MODEL_IDS
 MELTS_FAMILY_ENGINES: tuple[str, ...] = ("alphamelts", "thermoengine")
 
 
@@ -257,6 +255,16 @@ class EngineHandle:
     takes_fo2: bool
     supports_intrinsic_fo2: bool
     identity: Mapping[str, Any] = field(default_factory=dict)
+
+
+def _handle_model_id(handle: EngineHandle) -> str | None:
+    """Return the loaded OpenIMCC backend's model id, if one is available."""
+
+    backend = handle.backend
+    if backend is None or handle.name not in IMCC_ENGINE_NAMES:
+        return None
+    model_id = getattr(backend, "model_id", None)
+    return None if model_id is None else str(model_id)
 
 
 @dataclass
@@ -1764,16 +1772,16 @@ class _OpenImccBatteryBackend:
     supports_intrinsic_fO2 = False
 
     def __init__(self, engine_name: str) -> None:
-        if engine_name not in OPENIMCC_MODEL_IDS:
+        if engine_name not in OPENIMCC_ENGINE_NAMES:
             raise BinaryPotBatteryError(f"unknown openimcc engine {engine_name!r}")
         self.engine_name = engine_name
-        self.model_id = OPENIMCC_MODEL_IDS[engine_name]
         from simulator.melt_backend import openimcc_bridge
 
         self._bridge = openimcc_bridge
         self._package = openimcc_bridge._require_openimcc()
-        self._pack_name = "v1.0.2"
+        self._pack_name = "default"
         self._pack = openimcc_bridge._load_pack(self._pack_name)
+        self.model_id = str(getattr(self._pack, "model_id", "openimcc"))
         self._gas: Any = None
         self._gas_error: str | None = None
         self._identity: dict[str, Any] = {
@@ -1781,7 +1789,7 @@ class _OpenImccBatteryBackend:
             "model_id": self.model_id,
             "version": str(getattr(self._package, "__version__", "0+unknown")),
             "pack": self._pack_name,
-            "pack_version": str(getattr(self._pack, "version", self._pack_name)),
+            "pack_version": str(getattr(self._pack, "version", "unknown")),
             "pack_digest": str(openimcc_bridge._pack_digest(self._pack)),
         }
         self._load_gas()
@@ -1828,6 +1836,9 @@ class _OpenImccBatteryBackend:
         else:
             bridge_kwargs["composition_mol"] = composition_mol
         result = self._bridge.evaluate(**bridge_kwargs)
+        self.model_id = result.pack_model_id
+        self._identity["model_id"] = self.model_id
+        self._identity["name"] = self.model_id
         self._identity["pack_version"] = result.pack_version
         self._identity["pack_digest"] = result.pack_digest
 
@@ -2908,7 +2919,7 @@ def _crash_cell_from_returncode(
         certified_band=None if certified_band is None else dict(certified_band),
         exit_signal=exit_signal,
         exit_code=exit_code,
-        model_id=ALL_IMCC_MODEL_IDS.get(handle.name),
+        model_id=_handle_model_id(handle),
     )
 
 
@@ -3425,7 +3436,7 @@ def equilibrate_cell(
             notices=[*notices, *extra_notices],
             authority=kwargs.pop("authority", None) or authority,
             certified_band=kwargs.pop("certified_band", None) or certified_band,
-            model_id=kwargs.pop("model_id", None) or ALL_IMCC_MODEL_IDS.get(handle.name),
+            model_id=kwargs.pop("model_id", None) or _handle_model_id(handle),
             **kwargs,
         )
 

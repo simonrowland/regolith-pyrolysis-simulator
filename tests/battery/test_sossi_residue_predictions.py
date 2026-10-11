@@ -105,7 +105,7 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
 
     gas_pack = openimcc.load_gas_datapack()
     package_identity = openimcc.engine_binding_identity(
-        openimcc_bridge._load_pack("v1.0.2"), gas_pack
+        openimcc_bridge._load_pack("default"), gas_pack
     )
     expected_identity = {
         "engine_binding_digest": package_identity.digest,

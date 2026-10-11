@@ -539,18 +539,6 @@ _HIGH_T_ACTIVITY_AUTHORITY_EXCLUSIONS: dict[str, dict[str, str]] = {
     "K2O": {
         "authority": "constant_gamma",
         "ruling": "owner 2026-09-26",
-        "reason": (
-            "SF04 KCaAlSi2O7 (log K = 4.30 + 17037/T; Hastie & Bonnell "
-            "1985) is an empirical correction complex with no known pure "
-            "solid (Bonnell & Hastie 1990, High Temp. Sci. 26, 313-334, "
-            "p.316), fitted to K pressures in dolomitic limestones (ibid. "
-            "p.327); it holds nearly all K in Ca-Al melts. Zhang et al. "
-            "(2021, ACS Earth Space Chem.) measured alpha*Gamma(KO0.5) = "
-            "6.9e-8 (1473 K) and 1.11e-6 (1673 K) for a synthetic N-MORB-"
-            "like basalt; since alpha <= 1, openimcc Gamma(KO0.5) "
-            "(3.5e-9, 2.4e-8) is 1.3-1.7 dex below that floor. "
-            "Constant-gamma K is also uncertified (t-999)."
-        ),
         "citation": (
             "c3-owner-ruling-B-spec.md; "
             "../2026-09-26-k-activity-triangulation/"
@@ -559,6 +547,99 @@ _HIGH_T_ACTIVITY_AUTHORITY_EXCLUSIONS: dict[str, dict[str, str]] = {
         "tracking_id": "t-999",
     },
 }
+
+# Gamma(KO0.5) is read from the production bridge's activity_coefficients row.
+# Its activity is the square root of the K2O parent activity, and its x is the
+# single-cation mole fraction: K cation moles divided by all cation moles.
+# The Zhang anchor passes composition_kg in oxide wt% (the eight supported
+# oxides from the bridge test); the bridge converts that mass basis to moles.
+# Activity and mole fraction are both dimensionless, so their ratio Gamma is
+# dimensionless too. This reproduces the wording-file sanity values: D066 is
+# 1.67e-6 / 9.44e-6 and published-core is 3.5e-9 / 2.4e-8 at 1473 / 1673 K.
+# The content digest keys each evaluation so packs sharing a model id cannot
+# reuse one another's numbers.
+_K2O_PACK_EVALUATIONS_BY_DIGEST: dict[str, dict[str, Any]] = {
+    "f2b479cd54e3c82704a5863fcc06836f72045375d9a8c7f8d2fad19e98f75d05": {
+        "pack_alias": "published-core",
+        "model_id": "IMCC-SF04",
+        "pack_version": "1.0.2",
+        "gamma_ko0_5_by_temperature_K": {
+            1473.15: "3.5e-9",
+            1673.15: "2.4e-8",
+        },
+        "kcaal_si2o7_active_by_temperature_K": {
+            1473.15: True,
+            1673.15: True,
+        },
+    },
+    "d894f4e5ce79ba393f7068ec7d9032336eda8276293c4f46cafb18944a8b247e": {
+        "pack_alias": "default",
+        "model_id": "IMCC-SF04-D066",
+        "pack_version": "1.0.3-d066-v1",
+        "gamma_ko0_5_by_temperature_K": {
+            1473.15: "1.67e-6",
+            1673.15: "9.44e-6",
+        },
+        "kcaal_si2o7_active_by_temperature_K": {
+            1473.15: False,
+            1673.15: False,
+        },
+    },
+}
+
+
+def _k2o_authority_exclusion_for_pack_digest(
+    pack_digest: str | None,
+    model_id: str | None,
+    pack_version: str | None,
+    *,
+    activity_step_dex: float | None = None,
+) -> dict[str, str]:
+    """Build the retained K2O ruling notice from the loaded pack evaluation."""
+
+    exclusion = dict(_HIGH_T_ACTIVITY_AUTHORITY_EXCLUSIONS["K2O"])
+    evaluation = _K2O_PACK_EVALUATIONS_BY_DIGEST.get(str(pack_digest or ""))
+    if evaluation is None:
+        reason = (
+            "K2O remains excluded from the openimcc activity authority above "
+            "the cap by owner ruling of 2026-09-26, retained pending "
+            "re-evaluation under the D066 pack (t-1194); no evaluation exists "
+            f"for this pack (model id {model_id!r}, version {pack_version!r}, "
+            f"digest {pack_digest!r}). Constant-gamma K is also uncertified "
+            "(t-999)."
+        )
+    else:
+        loaded_gamma = evaluation["gamma_ko0_5_by_temperature_K"]
+        loaded_active = evaluation["kcaal_si2o7_active_by_temperature_K"]
+
+        def complex_state(active: bool) -> str:
+            return "active" if active else "inactive"
+
+        reason = (
+            "K2O remains excluded from the openimcc activity authority above "
+            "the cap by owner ruling of 2026-09-26, retained pending "
+            "re-evaluation under the D066 pack (t-1194). The original ruling "
+            "was established using published-core. For loaded pack "
+            f"{evaluation['pack_alias']} ({model_id}, version {pack_version}, "
+            f"digest {pack_digest}), "
+            "KCaAlSi2O7 is "
+            f"{complex_state(loaded_active[1473.15])} at 1473 K and "
+            f"{complex_state(loaded_active[1673.15])} at 1673 K, with "
+            "Gamma(KO0.5) values "
+            f"{loaded_gamma[1473.15]} and {loaded_gamma[1673.15]}. "
+            "Zhang et al. (2021, ACS Earth Space Chem.) measured "
+            "alpha*Gamma(KO0.5) = 6.9e-8 at 1473 K and 1.11e-6 at "
+            "1673 K for the cited N-MORB-like basalt."
+        )
+        if activity_step_dex is not None:
+            reason += (
+                " At this evaluated above-cap input, the OpenIMCC over "
+                "constant-gamma K2O activity step is "
+                f"{activity_step_dex:+.2f} dex."
+            )
+        reason += " Constant-gamma K is also uncertified (t-999)."
+    exclusion["reason"] = reason
+    return exclusion
 
 
 def _build_high_t_melt_activity_authority(
@@ -724,7 +805,16 @@ def _build_high_t_melt_activity_authority(
             and openimcc_activity > 0.0
         ):
             ratio_dex = math.log10(openimcc_activity / legacy_activity)
-        exclusion = _HIGH_T_ACTIVITY_AUTHORITY_EXCLUSIONS.get(oxide)
+        exclusion = (
+            _k2o_authority_exclusion_for_pack_digest(
+                bridge.pack_digest,
+                bridge.pack_model_id,
+                bridge.pack_version,
+                activity_step_dex=ratio_dex,
+            )
+            if oxide == "K2O"
+            else _HIGH_T_ACTIVITY_AUTHORITY_EXCLUSIONS.get(oxide)
+        )
         selected_activity = openimcc_activity
         selected_activity_basis = "openimcc_single_cation"
         selected_ratio_dex = ratio_dex
@@ -823,7 +913,7 @@ def _high_t_activity_for_parent(
         gamma=effective_gamma,
         activity=activity,
         citation=(
-            "openimcc SF04 pack "
+            f"openimcc {authority.get('openimcc_pack_model_id', '')} pack "
             f"{authority.get('openimcc_pack_version', '')} "
             f"digest={authority.get('openimcc_pack_digest', '')}"
         ),
@@ -867,7 +957,19 @@ def _attach_high_t_activity_provenance(
             else None
         )
         if exclusion is None and provider == "openimcc":
-            exclusion = _HIGH_T_ACTIVITY_AUTHORITY_EXCLUSIONS.get(parent_oxide)
+            if parent_oxide == "K2O":
+                exclusion = _k2o_authority_exclusion_for_pack_digest(
+                    authority.get("openimcc_pack_digest"),
+                    authority.get("openimcc_pack_model_id"),
+                    authority.get("openimcc_pack_version"),
+                    activity_step_dex=seam.get(
+                        "would_be_openimcc_step_dex"
+                    ),
+                )
+            else:
+                exclusion = _HIGH_T_ACTIVITY_AUTHORITY_EXCLUSIONS.get(
+                    parent_oxide
+                )
         if exclusion is not None:
             provenance["melt_activity_authority"] = exclusion["authority"]
             exclusion_payload = dict(exclusion)
