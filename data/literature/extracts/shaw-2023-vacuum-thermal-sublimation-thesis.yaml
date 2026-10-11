@@ -633,7 +633,7 @@ species:
         deposit_phase_by_element: {state: unknown, reason: 'Qualitative EDS establishes elements, not phase'}
         identification: SEM and qualitative EDS/EDX of a carbon-microdot smear sample
         oxygen_gas: {state: unknown, reason: no molecular O2 collection or measurement reported}
-        saw_air_before_analysis: {state: unknown, reason: atmospheric_TD4_used_detached_pump_and_open_flange; post_test_air_contact_and_duration_not_reported}
+        saw_air_before_analysis: {state: unknown, reason: reactor_was_vented_slowly_to_atmospheric_pressure_via_vacuum_pump_before_sample_removal; post_test_air_contact_and_duration_not_reported}
         collector_or_shield_deposit: {state: unknown, reason: not_reported}
         mass_loss: {semantics: bound_not_point, result: below estimated error, numeric_error_bound: {state: unknown, reason: not_reported}, balance_resolution: {state: unknown, reason: not_reported_for_chapter_8_test}}
         mass_vaporized_by_element: {state: unknown, reason: not_reported}
@@ -702,7 +702,7 @@ species:
         deposit_phase_by_element: {state: unknown, reason: no deposit composition reported}
         identification: Visual observation; reactor-tube SEM/EDS not performed
         oxygen_gas: {state: unknown, reason: no molecular O2 collection or measurement reported}
-        saw_air_before_analysis: {state: unknown, reason: reactor_was_vented_to_atmospheric_pressure_before_removal_but_vent_gas_air_contact_and_duration_are_not_stated}
+        saw_air_before_analysis: {state: unknown, reason: TD4_ran_at_atmospheric_pressure_with_pump_detached_and_reactor_flange_open; post_test_air_contact_and_duration_not_reported}
         collector_or_shield_deposit: {state: unknown, reason: not_reported}
         mass_loss: {semantics: bound_not_point, result: below estimated error, numeric_error_bound: {state: unknown, reason: not_reported}, balance_resolution: {state: unknown, reason: not_reported_for_chapter_8_test}}
         mass_vaporized_by_element: {state: unknown, reason: not_reported}

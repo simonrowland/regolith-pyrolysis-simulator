@@ -3046,6 +3046,63 @@ def test_shaw_surface_fidelity_mutation_reds():
         ]
         assert len(candidate["experiments"]) == 8
         assert [run["experiment_id"] for run in candidate["experiments"]] == expected_runs
+        expected_result_runs = [
+            ("shaw_2023_blank_results", "blank-high-vacuum"),
+            ("shaw_2023_td1_results", "td1-nanophase-iron-oxide"),
+            ("shaw_2023_td2_results", "td2-nanophase-iron-oxide"),
+            ("shaw_2023_td3_results", "td3-ilmenite-concentrate"),
+            ("shaw_2023_td4_results", "td4-lms1-atmosphere"),
+            ("shaw_2023_td5_results", "td5-lms1"),
+            ("shaw_2023_td6_results", "td6-lms1"),
+            ("shaw_2023_td7_results", "td7-reacted-td6-feed"),
+        ]
+        results = [
+            (row["observation_id"], row["experiment"])
+            for species in candidate["species"].values()
+            for row in species.get("context", [])
+            if row.get("observation_id", "").endswith("_results")
+        ]
+        assert len(results) == 8
+        assert sorted(results) == sorted(expected_result_runs)
+        result_rows = {
+            row["observation_id"]: row
+            for species in candidate["species"].values()
+            for row in species.get("context", [])
+            if row.get("observation_id", "").endswith("_results")
+        }
+        vacuum_vent_reason = (
+            "reactor_was_vented_to_atmospheric_pressure_before_removal_but_"
+            "vent_gas_air_contact_and_duration_are_not_stated"
+        )
+        for result_id in (
+            "shaw_2023_blank_results",
+            "shaw_2023_td2_results",
+            "shaw_2023_td3_results",
+            "shaw_2023_td5_results",
+            "shaw_2023_td6_results",
+            "shaw_2023_td7_results",
+        ):
+            assert (
+                result_rows[result_id]["values"]["saw_air_before_analysis"]["reason"]
+                == vacuum_vent_reason
+            )
+        assert result_rows["shaw_2023_td1_results"]["values"]["saw_air_before_analysis"] == {
+            "state": "unknown",
+            "reason": "reactor_was_vented_slowly_to_atmospheric_pressure_via_vacuum_pump_before_sample_removal; post_test_air_contact_and_duration_not_reported",
+        }
+        assert result_rows["shaw_2023_td4_results"]["values"]["saw_air_before_analysis"] == {
+            "state": "unknown",
+            "reason": "TD4_ran_at_atmospheric_pressure_with_pump_detached_and_reactor_flange_open; post_test_air_contact_and_duration_not_reported",
+        }
+        td7_sample = candidate["experiments"][-1]["sample"]
+        assert td7_sample["printed_composition"]["state"] == {
+            "tag": "value",
+            "value": "LMS-1",
+        }
+        assert td7_sample["form"]["state"] == {
+            "tag": "value",
+            "value": "Processed TD4",
+        }
         for run in candidate["experiments"]:
             schedule = run["thermal_schedule"]
             assert schedule["total_duration_s"]["state"]["tag"] == "unknown"
@@ -3146,6 +3203,14 @@ def test_shaw_surface_fidelity_mutation_reds():
         if run["experiment_id"] != "td2-nanophase-iron-oxide"
     ]
     mutations.append(("TD2 deleted", candidate))
+
+    candidate = copy.deepcopy(doc)
+    candidate["species"]["FeO/Fe2O3"]["context"].pop(1)
+    mutations.append(("TD2 results context deleted", candidate))
+
+    candidate = copy.deepcopy(doc)
+    candidate["experiments"][-1]["sample"]["printed_composition"]["state"]["value"] = "Processed TD4"
+    mutations.append(("TD7 feed material merged into feed form", candidate))
 
     candidate = copy.deepcopy(doc)
     candidate["experiments"][1]["thermal_schedule"]["total_duration_s"]["state"] = {
