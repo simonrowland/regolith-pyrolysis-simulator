@@ -2663,43 +2663,61 @@ def convert_mass_flux_to_kg_per_m2_per_s(
         return None, "areal mass flux value is not numeric"
     if units is None or not str(units).strip():
         return None, "missing areal mass flux unit"
-    printed = str(units).strip().split(";", 1)[0]
-    header_scale = re.search(r"(?:x|×)\s*10\s*\^\s*(\d+)", printed, re.I)
-    header_exponent = int(header_scale.group(1)) if header_scale else None
-    unit_text = printed[: header_scale.start()] if header_scale else printed
-    mass = re.search(r"\b(?P<mass>kg|mg|g)\s*/", unit_text, re.I)
-    if mass is None:
-        return None, f"unmapped areal mass flux unit {units!r}"
-    denominator = unit_text[mass.end() :]
-    if not re.search(r"(?:\bsec(?:ond)?s?\.?|\bs)(?:\s*\^?\s*-?1)?", denominator, re.I):
-        return None, f"unmapped areal mass flux unit {units!r}"
-    area = re.search(r"\b(?P<area>cm|m)\s*(?:\^?\s*-?2|²)", denominator, re.I)
-    if area is None:
+    printed = str(units).strip()
+    header_scale = re.fullmatch(
+        r"(?P<unit>.+?)\s*[x×]\s*10\s*\^\s*(?P<exponent>[+-]?\d+)",
+        printed,
+        re.IGNORECASE,
+    )
+    header_exponent = int(header_scale.group("exponent")) if header_scale else None
+    unit_text = header_scale.group("unit").strip() if header_scale else printed
+    if header_scale is None and re.fullmatch(
+        r".+\s*[x×]\s*10\s*\^.+", printed, re.IGNORECASE
+    ):
+        return None, f"malformed areal mass flux header scale in {units!r}"
+
+    if unit_text.startswith("(") and unit_text.endswith(")"):
+        unit_text = unit_text[1:-1].strip()
+
+    area_power_2 = r"(?P<area>cm|m)(?:\s*\^?\s*2|²)"
+    time_power_1 = r"(?P<time>second|sec|s)\.?(?:\s*\^\s*\+?1)?"
+    patterns = (
+        rf"(?P<mass>kg|mg|g)\s*/\s*\(\s*{area_power_2}\s+{time_power_1}\s*\)",
+        rf"(?P<mass>kg|mg|g)\s*/\s*\(\s*(?P<time>second|sec|s)\s*\.\s*(?P<area>cm|m)(?:\s*\^?\s*2|²)\s*\)",
+        rf"(?P<mass>kg|mg|g)\s*/\s*{area_power_2}\s+{time_power_1}",
+        rf"(?P<mass>kg|mg|g)\s*/\s*{area_power_2}\s*/\s*{time_power_1}",
+        r"(?P<mass>kg|mg|g)\s+(?P<area>cm|m)\s*(?:\^\s*-2|-2)\s+(?P<time>second|sec|s)\.?(?:\s*\^\s*-1|-1)",
+    )
+    parsed_units = None
+    for pattern in patterns:
+        parsed_units = re.fullmatch(pattern, unit_text, re.IGNORECASE)
+        if parsed_units is not None:
+            break
+    if parsed_units is None:
         return None, f"unmapped areal mass flux unit {units!r}"
 
-    mass_unit = mass.group("mass").lower()
-    area_unit = area.group("area").lower()
-    # 1 g/(cm² s) = 1e-3 kg / 1e-4 m² / s = 10 kg/(m² s); 1 mg/(cm² s)
-    # = 1e-6 kg / 1e-4 m² / s = 0.01 kg/(m² s). Hayakawa's x 10^4 header
-    # means each printed cell is 10^4 times the physical g/(cm² s) value, so
-    # its first Fe cell 1.48 is 1.48e-4 g/(cm² s) = 1.48e-3 kg/(m² s).
-    if area_unit == "cm" and mass_unit == "g":
-        factor = Decimal("10")
-        relation = "g_per_cm2_per_s_to_kg_per_m2_per_s"
-    elif area_unit == "cm" and mass_unit == "mg":
-        factor = Decimal("0.01")
-        relation = "mg_per_cm2_per_s_to_kg_per_m2_per_s"
-    elif area_unit == "m" and mass_unit == "kg":
-        factor = Decimal("1")
-        relation = "kg_per_m2_per_s_identity"
-    else:
-        return None, f"unmapped areal mass flux unit {units!r}"
+    mass_unit = parsed_units.group("mass").lower()
+    area_unit = parsed_units.group("area").lower()
+    # SI checks: 1 g/(cm² s) = 10 kg/(m² s), 1 mg/(cm² s) = 0.01,
+    # 1 kg/(cm² s) = 10⁴, 1 g/(m² s) = 0.001, 1 mg/(m² s) = 10⁻⁶,
+    # and 1 kg/(m² s) = 1, all in kg/(m² s). Hayakawa prints the rate as
+    # flux × 10⁴, so the physical first Fe cell is 1.48 × 10⁻⁴ g/(cm² s);
+    # multiplying by 10 gives 0.00148 kg/(m² s).
+    conversion_relations = {
+        ("g", "cm"): "g_per_cm2_per_s_to_kg_per_m2_per_s",
+        ("mg", "cm"): "mg_per_cm2_per_s_to_kg_per_m2_per_s",
+        ("kg", "cm"): "kg_per_cm2_per_s_to_kg_per_m2_per_s",
+        ("g", "m"): "g_per_m2_per_s_to_kg_per_m2_per_s",
+        ("mg", "m"): "mg_per_m2_per_s_to_kg_per_m2_per_s",
+        ("kg", "m"): "kg_per_m2_per_s_identity",
+    }
+    relation = conversion_relations[(mass_unit, area_unit)]
 
     if header_exponent is not None:
         if header_exponent != 4 or mass_unit != "g" or area_unit != "cm":
-            return None, f"unmapped areal mass flux header scale in {units!r}"
-        factor /= Decimal("10000")
+            return None, f"unsupported areal mass flux header scale in {units!r}"
         relation = "printed_x10^4_header_scale_then_g_per_cm2_per_s_to_kg_per_m2_per_s"
+    factor = _CONVERSION_META[relation][0]
     return amount * factor, relation
 
 
@@ -2854,6 +2872,24 @@ _CONVERSION_META: dict[str, tuple[Decimal, str, str, str]] = {
         "flux_kg_per_m2_per_s = flux_mg_per_cm2_per_s × 0.01",
         "kg_per_m2_per_s",
         "mg_per_cm2_per_s",
+    ),
+    "kg_per_cm2_per_s_to_kg_per_m2_per_s": (
+        Decimal("10000"),
+        "flux_kg_per_m2_per_s = flux_kg_per_cm2_per_s × 10000",
+        "kg_per_m2_per_s",
+        "kg_per_cm2_per_s",
+    ),
+    "g_per_m2_per_s_to_kg_per_m2_per_s": (
+        Decimal("0.001"),
+        "flux_kg_per_m2_per_s = flux_g_per_m2_per_s × 0.001",
+        "kg_per_m2_per_s",
+        "g_per_m2_per_s",
+    ),
+    "mg_per_m2_per_s_to_kg_per_m2_per_s": (
+        Decimal("0.000001"),
+        "flux_kg_per_m2_per_s = flux_mg_per_m2_per_s × 0.000001",
+        "kg_per_m2_per_s",
+        "mg_per_m2_per_s",
     ),
     "kg_per_m2_per_s_identity": (
         Decimal("1"),
@@ -13734,7 +13770,18 @@ class Migrator:
             q_token = quantity.value if isinstance(quantity, State) and quantity.is_value else (
                 quantity if isinstance(quantity, Quantity) else None
             )
-            value_sel = select_declared_source(q_token, units, raw_item)
+            printed_rate_units = (
+                parent_values.get("rate_units_as_printed")
+                if q_token is Quantity.MASS_LOSS_AREAL_FLUX
+                and isinstance(parent_values, Mapping)
+                else None
+            )
+            value_units = (
+                str(printed_rate_units)
+                if printed_rate_units not in (None, "")
+                else units
+            )
+            value_sel = select_declared_source(q_token, value_units, raw_item)
             val = value_sel.amount
             trail = value_sel.unit_trail
             if not value_sel.available and value_sel.field_name in {"P", "p"}:
