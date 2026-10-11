@@ -209,6 +209,16 @@ def test_fayalite_crystal_and_liquid_curves_are_separate():
     assert all(curve["gate"]["status"] == "passed" for curve in curves)
 
 
+def test_corundum_equations_keep_the_printed_table_mismatch_typed():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "Al2O3"]
+    assert len(curves) == 2
+    heat, cp = curves
+    assert heat["gate"]["status"] == "transcription_gate_failed"
+    assert heat["gate"]["reason"] == "transcription_gate_failed"
+    assert len(heat["gate"]["residuals"]) == 3
+    assert cp["gate"]["reason"] == "no_independent_check"
+
+
 def test_heat_content_gate_detects_a_coefficient_mutation():
     heat = loader.load_published_curves()[0]
     changed = {**heat, "coefficients_as_printed": ["11.77", *heat["coefficients_as_printed"][1:]]}
