@@ -313,6 +313,10 @@ species:
         equation_as_printed: log gamma_Zn(l) = (1.35/2) X_Cd^2
         log10_gamma_coeff_alpha: 1.35
         T_K: 667.0
+      derived_from: [nakazawa_1976_gamma_regular_667k]
+      derivation:
+        relation: Eq. (9) uses the fitted 1.35 coefficient represented in the gamma observation; PDF p. 531.
+        inputs: [nakazawa_1976_gamma_regular_667k]
       uncertainty:
         note: same 1.35 slope as Cd; see Cd observation
 deepening:
