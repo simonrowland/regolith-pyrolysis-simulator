@@ -262,9 +262,10 @@ def test_ferric_and_magnetite_polymorphs_pass_their_own_table_gates():
 
 def test_magnesium_elemental_equations_pass_their_table_and_derivative_gates():
     curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "Mg"]
-    assert len(curves) == 2
+    assert len(curves) == 6
     assert all(curve["gate"]["status"] == "passed" for curve in curves)
-    assert curves[1]["gate"]["kind"] == "analytic_derivative_of_gated_H"
+    assert {curve["phase"] for curve in curves} == {"c", "l", "g"}
+    assert all(curve["gate"]["kind"] == "analytic_derivative_of_gated_H" for curve in curves if curve["quantity"] == "heat_capacity")
 
 
 def test_magnesium_and_manganese_oxide_equation_mismatches_stay_typed():
