@@ -3,6 +3,8 @@ from __future__ import annotations
 from copy import deepcopy
 from pathlib import Path
 
+import pytest
+
 from tools.lineage_wave_check import compare, snapshot
 from tests.battery.test_migrate import _write_min_tree
 
@@ -36,6 +38,24 @@ def test_identical_single_source_snapshot_passes(tmp_path: Path) -> None:
     result = snapshot("fixture-source", root)
     assert result["observations"]
     assert _compare(result, deepcopy(result))
+
+
+def test_snapshot_fails_when_only_v2_extract_exists(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path / "tree")
+    legacy = root / "data" / "literature" / "extracts" / "fixture-source.yaml"
+    v2 = root / "data" / "literature" / "extracts-v2"
+    v2.mkdir()
+    legacy.rename(v2 / legacy.name)
+
+    with pytest.raises(FileNotFoundError, match="legacy extract.*missing"):
+        snapshot("fixture-source", root)
+
+
+def test_compare_empty_snapshot_fails() -> None:
+    before, after = _snapshot(), _snapshot()
+    before["observations"] = []
+    after["observations"] = []
+    assert not _compare(before, after)
 
 
 def test_changed_measurement_fails() -> None:
