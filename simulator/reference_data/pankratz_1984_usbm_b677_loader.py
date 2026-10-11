@@ -50,14 +50,11 @@ def load_published_curves(root: Path = COMPILATION_ROOT) -> tuple[dict, ...]:
                 results.append({**curve, "record_kind": "published_curve_fit", "gate": {
                     "status": "transcription_gate_failed", "reason": "gate_row_temperature_mismatch", "residuals": []}})
                 break
-            duplicate_rows = [row for row in record["rows"] if row["cells"][0]["value"] == temperature]
-            if len(duplicate_rows) > 1:
-                phase_by_position = ("c", "l")
-                phase = phase_by_position[duplicate_rows.index(bound_row)] if duplicate_rows.index(bound_row) < 2 else None
-                if phase != curve["phase"]:
-                    results.append({**curve, "record_kind": "published_curve_fit", "gate": {
-                        "status": "transcription_gate_failed", "reason": "gate_row_phase_mismatch", "residuals": []}})
-                    break
+            is_duplicate, phase = _duplicate_temperature_phase(record, temperature, bound_row)
+            if is_duplicate and phase != curve["phase"]:
+                results.append({**curve, "record_kind": "published_curve_fit", "gate": {
+                    "status": "transcription_gate_failed", "reason": "gate_row_phase_mismatch", "residuals": []}})
+                break
             predicted = _evaluate(curve, temperature)
             observed = Decimal(str(cells[curve["source_cell_column"]]["value"]))
             if curve["quantity"] == "heat_content_increment":
@@ -106,6 +103,14 @@ def _last_digit(token: str) -> Decimal:
     return Decimal(1).scaleb(-len(token.partition(".")[2]))
 
 
+def _duplicate_temperature_phase(record: dict, temperature: int, row: dict) -> tuple[bool, str | None]:
+    duplicates = [item for item in record["rows"] if item["cells"][0]["value"] == temperature]
+    if len(duplicates) <= 1:
+        return False, None
+    position = duplicates.index(row)
+    return True, ("c", "l")[position] if position < 2 else None
+
+
 def _full_range_heat_check(curve: dict, record: dict) -> dict:
     low, high = curve["temperature_range_K"]
     column = curve["source_cell_column"]
@@ -116,11 +121,9 @@ def _full_range_heat_check(curve: dict, record: dict) -> dict:
         temperature = int(cells[0]["value"])
         if temperature is None or not low <= temperature <= high:
             continue
-        duplicates = [item for item in record["rows"] if item["cells"][0]["value"] == temperature]
-        if len(duplicates) > 1:
-            phase = ("c", "l")[duplicates.index(row)] if duplicates.index(row) < 2 else None
-            if phase != curve["phase"]:
-                continue
+        is_duplicate, phase = _duplicate_temperature_phase(record, temperature, row)
+        if is_duplicate and phase != curve["phase"]:
+            continue
         observed = Decimal(str(cells[column]["value"]))
         if curve["quantity"] == "heat_content_increment":
             observed *= 1000
