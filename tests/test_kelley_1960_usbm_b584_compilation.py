@@ -231,6 +231,20 @@ def test_aluminum_phases_keep_the_source_transition_and_equation_mismatch():
     assert by_key[("g", "heat_capacity")]["gate"]["status"] == "passed"
 
 
+def test_titania_polymorphs_are_gated_as_separate_curves():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "TiO2"]
+    assert len(curves) == 4
+    assert {curve["polymorph"] for curve in curves} == {"rutile", "anatase"}
+    assert all(curve["gate"]["status"] == "passed" for curve in curves)
+
+
+def test_chromia_equation_passes_its_printed_table_gate():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "Cr2O3"]
+    assert len(curves) == 2
+    assert {curve["polymorph"] for curve in curves} == {"beta"}
+    assert all(curve["gate"]["status"] == "passed" for curve in curves)
+
+
 def test_heat_content_gate_detects_a_coefficient_mutation():
     heat = loader.load_published_curves()[0]
     changed = {**heat, "coefficients_as_printed": ["11.77", *heat["coefficients_as_printed"][1:]]}

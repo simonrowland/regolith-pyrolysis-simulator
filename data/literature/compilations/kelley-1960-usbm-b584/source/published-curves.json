@@ -629,5 +629,56 @@
     "locator": {"printed_page": 10, "label": "Table 3, Al(g)"},
     "source_record_id": "table-003", "derivation": "Differentiate 4.97T - 0.12×10^5T^-1 - 1,442: the inverse-temperature term gives +0.12×10^5T^-2; cal/mol differentiated by kelvin gives cal/(mol·K).",
     "derivative_of_equation_index": 70
+  },
+  {
+    "formula": "TiO2", "phase": "c", "polymorph": "rutile", "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 17.97T + 0.14×10^-3T^2 + 4.35×10^5T^-1 - 6,829",
+    "terms": ["a*T", "b*T^2", "c*T^-1", "d"], "coefficients_as_printed": ["17.97", "0.14×10^-3", "4.35×10^5", "-6,829"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [298, 1800], "accuracy_as_printed": "0.8 percent",
+    "locator": {"printed_page": 195, "label": "Table 823, TiO2(rutile)"},
+    "source_record_id": "table-823", "gate_cells": [{"temperature_K": 600}, {"temperature_K": 900}, {"temperature_K": 1300}]
+  },
+  {
+    "formula": "TiO2", "phase": "c", "polymorph": "rutile", "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 17.97 + 0.28×10^-3T - 4.35×10^5T^-2",
+    "terms": ["a", "b*T", "c*T^-2"], "coefficients_as_printed": ["17.97", "0.28×10^-3", "-4.35×10^5"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [298, 1800], "accuracy_as_printed": null,
+    "locator": {"printed_page": 195, "label": "Table 823, TiO2(rutile)"},
+    "source_record_id": "table-823", "derivation": "Differentiate the printed heat-content equation term by term; cal/mol differentiated by kelvin gives cal/(mol·K), and the constant drops out.",
+    "derivative_of_equation_index": 72
+  },
+  {
+    "formula": "TiO2", "phase": "c", "polymorph": "anatase", "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 17.83T + 0.25×10^-3T^2 + 4.23×10^5T^-1 - 6,757",
+    "terms": ["a*T", "b*T^2", "c*T^-1", "d"], "coefficients_as_printed": ["17.83", "0.25×10^-3", "4.23×10^5", "-6,757"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [298, 1300], "accuracy_as_printed": "0.7 percent",
+    "locator": {"printed_page": 195, "label": "Table 824, TiO2(anatase)"},
+    "source_record_id": "table-824", "gate_cells": [{"temperature_K": 600}, {"temperature_K": 900}, {"temperature_K": 1300}]
+  },
+  {
+    "formula": "TiO2", "phase": "c", "polymorph": "anatase", "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 17.83 + 0.50×10^-3T - 4.23×10^5T^-2",
+    "terms": ["a", "b*T", "c*T^-2"], "coefficients_as_printed": ["17.83", "0.50×10^-3", "-4.23×10^5"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [298, 1300], "accuracy_as_printed": null,
+    "locator": {"printed_page": 195, "label": "Table 824, TiO2(anatase)"},
+    "source_record_id": "table-824", "derivation": "Differentiate the printed heat-content equation term by term; cal/mol differentiated by kelvin gives cal/(mol·K), and the constant drops out.",
+    "derivative_of_equation_index": 74
+  },
+  {
+    "formula": "Cr2O3", "phase": "c", "polymorph": "beta", "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 28.53T + 1.10×10^-3T^2 + 3.74×10^5T^-1 - 9,758",
+    "terms": ["a*T", "b*T^2", "c*T^-1", "d"], "coefficients_as_printed": ["28.53", "1.10×10^-3", "3.74×10^5", "-9,758"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [298, 1800], "accuracy_as_printed": "0.2 percent",
+    "locator": {"printed_page": 58, "label": "Table 229, Cr2O3(beta)"},
+    "source_record_id": "table-229", "gate_cells": [{"temperature_K": 500}, {"temperature_K": 800}, {"temperature_K": 1100}]
+  },
+  {
+    "formula": "Cr2O3", "phase": "c", "polymorph": "beta", "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 28.53 + 2.20×10^-3T - 3.74×10^5T^-2",
+    "terms": ["a", "b*T", "c*T^-2"], "coefficients_as_printed": ["28.53", "2.20×10^-3", "-3.74×10^5"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [298, 1800], "accuracy_as_printed": null,
+    "locator": {"printed_page": 58, "label": "Table 229, Cr2O3(beta)"},
+    "source_record_id": "table-229", "derivation": "Differentiate the printed heat-content equation term by term; cal/mol differentiated by kelvin gives cal/(mol·K), and the constant drops out.",
+    "derivative_of_equation_index": 76
   }
 ]
