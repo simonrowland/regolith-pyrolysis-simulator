@@ -12,6 +12,18 @@ extraction:
   date: '2026-10-10'
   worker: sato76
 review_status: draft
+experiments:
+  - experiment_id: sato1976_natural_fO2
+    method: emf_cell
+    locator: {page: 1324, section: Experimental Method, note: natural-sample measurements in the silica-glass capsule}
+  - experiment_id: sato1976_added_Fe_fO2
+    method: emf_cell
+    locator: {page: 1324, section: Experimental Method, note: measurements after addition of pure iron in the iron capsule}
+  - experiment_id: sato1976_Fe_activity_calculation
+    method: emf_cell
+    locator: {page: 1326, section: discussion following Table 1, note: Fe activity calculated from natural-sample and sample-plus-Fe curves}
+  - experiment_id: sato1973_quoted_values
+    locator: {page: 1326, table: '1', note: daggered measurements attributed to Sato et al. (1973); method not restated}
 fidelity_samples:
   - path: species.O2.observations[sato_1976_table1_70017_31].values.series[0].minus_log_fO2_atm
     value: '15.65'
@@ -27,6 +39,9 @@ species:
     observations:
       - observation_id: sato_1976_table1_70017_31
         type: partial_pressure
+        experiment: sato1976_natural_fO2
+        regime: emf_cell
+        method_locator: {page: 1324, section: Experimental Method}
         locator: {page: 1326, table: '1', row: '70017,31', note: PDF p. 4; first two rows of values are natural and added-iron measurements}
         phase: bulk_rock
         units: '-log10(fO2/atm), as printed'
@@ -44,6 +59,7 @@ species:
           method_locator: {page: 1324, section: Experimental Method}
           composition_pointer_locator: {page: 1324, section: Results of Oxygen Fugacity Measurements}
           condition_as_published: natural basalt fO2 measured in a silica-glass capsule; Table 1 values are printed as -log10(fO2/atm).
+          gas_conditions_as_published: {state: {tag: unknown, reason: not_published}, locator: {page: 1324, section: Experimental Method, note: no cell gas composition or gas condition is specified}}
           fugacity_conversion: 'Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-minus_log_fO2_atm); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa. The printed -log fO2 and atm basis are retained above.'
           series:
             - T_C: 1000
@@ -65,6 +81,9 @@ species:
         equipment: {}
       - observation_id: sato_1976_table1_added_fe_70017_31
         type: partial_pressure
+        experiment: sato1976_added_Fe_fO2
+        regime: emf_cell
+        method_locator: {page: 1324, section: Experimental Method}
         locator: {page: 1326, table: '1', row: '70017,31', note: PDF p. 4; parenthesized values are with addition of a large quantity of pure iron}
         phase: bulk_rock
         units: Pa; printed -log10(fO2/atm) retained in each point
@@ -74,6 +93,7 @@ species:
           sample_number_as_printed: '70017,31'
           rock_type_as_printed: High-Ti microgabbro
           condition_as_published: basalt with addition of a large quantity of pure iron, measured in an iron capsule
+          gas_conditions_as_published: {state: {tag: unknown, reason: not_published}, locator: {page: 1324, section: Experimental Method, note: no cell gas composition or gas condition is specified}}
           fugacity_conversion: 'Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-minus_log_fO2_atm_with_added_Fe); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa. Parenthesized source values are retained.'
           series:
             - {T_C: 1000, minus_log_fO2_atm_with_added_Fe: '15.82', fugacity_Pa: '1.5336159E-11'}
@@ -85,6 +105,9 @@ species:
         equipment: {}
       - observation_id: sato_1976_table1_74275_39
         type: partial_pressure
+        experiment: sato1976_natural_fO2
+        regime: emf_cell
+        method_locator: {page: 1324, section: Experimental Method}
         locator: {page: 1326, table: '1', row: '74275,39', note: PDF p. 4; first two rows of values are natural and added-iron measurements}
         phase: bulk_rock
         units: '-log10(fO2/atm), as printed'
@@ -102,6 +125,7 @@ species:
           method_locator: {page: 1324, section: Experimental Method}
           composition_pointer_locator: {page: 1326, section: Basalt 74275,39}
           condition_as_published: natural basalt fO2 measured in a silica-glass capsule; Table 1 values are printed as -log10(fO2/atm).
+          gas_conditions_as_published: {state: {tag: unknown, reason: not_published}, locator: {page: 1324, section: Experimental Method, note: no cell gas composition or gas condition is specified}}
           fugacity_conversion: 'Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-minus_log_fO2_atm); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa. The printed -log fO2 and atm basis are retained above.'
           series:
             - T_C: 1000
@@ -123,6 +147,9 @@ species:
         equipment: {}
       - observation_id: sato_1976_table1_added_fe_74275_39
         type: partial_pressure
+        experiment: sato1976_added_Fe_fO2
+        regime: emf_cell
+        method_locator: {page: 1324, section: Experimental Method}
         locator: {page: 1326, table: '1', row: '74275,39', note: PDF p. 4; parenthesized values are with addition of a large quantity of pure iron}
         phase: bulk_rock
         units: Pa; printed -log10(fO2/atm) retained in each point
@@ -132,6 +159,7 @@ species:
           sample_number_as_printed: '74275,39'
           rock_type_as_printed: High-Ti porphyritic fine-grained basalt
           condition_as_published: basalt with addition of a large quantity of pure iron, measured in an iron capsule
+          gas_conditions_as_published: {state: {tag: unknown, reason: not_published}, locator: {page: 1324, section: Experimental Method, note: no cell gas composition or gas condition is specified}}
           fugacity_conversion: 'Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-minus_log_fO2_atm_with_added_Fe); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa. Parenthesized source values are retained.'
           series:
             - {T_C: 1000, minus_log_fO2_atm_with_added_Fe: '15.58', fugacity_Pa: '2.6651190E-11'}
@@ -142,6 +170,7 @@ species:
         uncertainty: 'The accuracy of the values is probably +/- 0.1 log fO2 unit.'
         equipment: {}
       - observation_id: sato_1976_table1_12009_35
+        experiment: sato1973_quoted_values
         type: partial_pressure
         locator: {page: 1326, table: '1', row: '12009,35', note: PDF p. 4; dagger marks values taken from Sato et al. (1973)}
         phase: bulk_rock
@@ -153,6 +182,7 @@ species:
           sample_number_as_printed: '12009,35'
           rock_type_as_printed: Fine-grained basalt
           condition_as_published: natural basalt fO2 from the daggered series; the paper attributes these values to Sato et al. (1973).
+          gas_conditions_as_published: {state: {tag: unknown, reason: not_published}, locator: {page: 1326, table: '1', note: earlier measurements are attributed to Sato et al. (1973); gas condition is not stated here}}
           fugacity_conversion: 'Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-minus_log_fO2_atm); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa. Printed -log fO2 retained.'
           bulk_composition:
             state: not_published
@@ -167,6 +197,7 @@ species:
         uncertainty: 'The accuracy of the values is probably +/- 0.1 log fO2 unit.'
         equipment: {}
       - observation_id: sato_1976_table1_added_fe_12009_35
+        experiment: sato1973_quoted_values
         type: partial_pressure
         locator: {page: 1326, table: '1', row: '12009,35', note: PDF p. 4; parenthesized values are with addition of a large quantity of pure iron}
         phase: bulk_rock
@@ -178,6 +209,7 @@ species:
           sample_number_as_printed: '12009,35'
           rock_type_as_printed: Fine-grained basalt
           condition_as_published: basalt with addition of a large quantity of pure iron; parenthesized Table 1 values
+          gas_conditions_as_published: {state: {tag: unknown, reason: not_published}, locator: {page: 1326, table: '1', note: earlier measurements are attributed to Sato et al. (1973); gas condition is not stated here}}
           fugacity_conversion: 'Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-minus_log_fO2_atm_with_added_Fe); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa.'
           series:
             - {T_C: 1000, minus_log_fO2_atm_with_added_Fe: '16.0', fugacity_Pa: '1.0132500E-11'}
@@ -188,6 +220,7 @@ species:
         uncertainty: 'The accuracy of the values is probably +/- 0.1 log fO2 unit.'
         equipment: {}
       - observation_id: sato_1976_table1_12053_89
+        experiment: sato1973_quoted_values
         type: partial_pressure
         locator: {page: 1326, table: '1', row: '12053,89', note: PDF p. 4; dagger marks values taken from Sato et al. (1973)}
         phase: bulk_rock
@@ -199,6 +232,7 @@ species:
           sample_number_as_printed: '12053,89'
           rock_type_as_printed: Holocrystalline basalt
           condition_as_published: natural basalt fO2 from the daggered series; the paper attributes these values to Sato et al. (1973).
+          gas_conditions_as_published: {state: {tag: unknown, reason: not_published}, locator: {page: 1326, table: '1', note: earlier measurements are attributed to Sato et al. (1973); gas condition is not stated here}}
           fugacity_conversion: 'Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-minus_log_fO2_atm); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa. Printed -log fO2 retained.'
           bulk_composition:
             state: not_published
@@ -213,6 +247,7 @@ species:
         uncertainty: 'The accuracy of the values is probably +/- 0.1 log fO2 unit.'
         equipment: {}
       - observation_id: sato_1976_table1_added_fe_12053_89
+        experiment: sato1973_quoted_values
         type: partial_pressure
         locator: {page: 1326, table: '1', row: '12053,89', note: PDF p. 4; parenthesized values are with addition of a large quantity of pure iron}
         phase: bulk_rock
@@ -224,6 +259,7 @@ species:
           sample_number_as_printed: '12053,89'
           rock_type_as_printed: Holocrystalline basalt
           condition_as_published: basalt with addition of a large quantity of pure iron; parenthesized Table 1 values
+          gas_conditions_as_published: {state: {tag: unknown, reason: not_published}, locator: {page: 1326, table: '1', note: earlier measurements are attributed to Sato et al. (1973); gas condition is not stated here}}
           fugacity_conversion: 'Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-minus_log_fO2_atm_with_added_Fe); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa.'
           series:
             - {T_C: 1000, minus_log_fO2_atm_with_added_Fe: '16.0', fugacity_Pa: '1.0132500E-11'}
@@ -234,6 +270,7 @@ species:
         uncertainty: 'The accuracy of the values is probably +/- 0.1 log fO2 unit.'
         equipment: {}
       - observation_id: sato_1976_table1_15595_25
+        experiment: sato1973_quoted_values
         type: partial_pressure
         locator: {page: 1326, table: '1', row: '15595,25', note: PDF p. 4; dagger marks values taken from Sato et al. (1973)}
         phase: bulk_rock
@@ -245,6 +282,7 @@ species:
           sample_number_as_printed: '15595,25'
           rock_type_as_printed: Porphyritic basalt
           condition_as_published: natural basalt fO2 from the daggered series; the paper attributes these values to Sato et al. (1973).
+          gas_conditions_as_published: {state: {tag: unknown, reason: not_published}, locator: {page: 1326, table: '1', note: earlier measurements are attributed to Sato et al. (1973); gas condition is not stated here}}
           fugacity_conversion: 'Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-minus_log_fO2_atm); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa. Printed -log fO2 retained.'
           bulk_composition:
             state: not_published
@@ -259,6 +297,7 @@ species:
         uncertainty: 'The accuracy of the values is probably +/- 0.1 log fO2 unit.'
         equipment: {}
       - observation_id: sato_1976_table1_added_fe_15595_25
+        experiment: sato1973_quoted_values
         type: partial_pressure
         locator: {page: 1326, table: '1', row: '15595,25', note: PDF p. 4; parenthesized values are with addition of a large quantity of pure iron}
         phase: bulk_rock
@@ -270,6 +309,7 @@ species:
           sample_number_as_printed: '15595,25'
           rock_type_as_printed: Porphyritic basalt
           condition_as_published: basalt with addition of a large quantity of pure iron; parenthesized Table 1 values
+          gas_conditions_as_published: {state: {tag: unknown, reason: not_published}, locator: {page: 1326, table: '1', note: earlier measurements are attributed to Sato et al. (1973); gas condition is not stated here}}
           fugacity_conversion: 'Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-minus_log_fO2_atm_with_added_Fe); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa.'
           series:
             - {T_C: 1000, minus_log_fO2_atm_with_added_Fe: '16.0', fugacity_Pa: '1.0132500E-11'}
@@ -281,6 +321,9 @@ species:
         equipment: {}
       - observation_id: sato_1976_table1_15058_81
         type: partial_pressure
+        experiment: sato1976_natural_fO2
+        regime: emf_cell
+        method_locator: {page: 1324, section: Experimental Method}
         locator: {page: 1326, table: '1', row: '15058,81', note: PDF p. 4}
         phase: bulk_rock
         units: '-log10(fO2/atm), as printed'
@@ -294,6 +337,7 @@ species:
             reason: not_published
             pointer: not_published; no bulk-composition source for 15058,81 is identified in the pages located with Table 1 (1324-1326)
           condition_as_published: natural basalt fO2 measured in a silica-glass capsule.
+          gas_conditions_as_published: {state: {tag: unknown, reason: not_published}, locator: {page: 1324, section: Experimental Method, note: no cell gas composition or gas condition is specified}}
           fugacity_conversion: 'Derived numeric value: fO2_Pa = 101325 Pa/atm × 10^(-minus_log_fO2_atm); 1 atm = 101325 Pa. For x=0, fO2=101325 Pa. Printed -log fO2 retained.'
           series:
             - {T_C: 1000, minus_log_fO2_atm: '15.7', fugacity_Pa: '2.0216995E-11'}
@@ -307,10 +351,14 @@ species:
     observations:
       - observation_id: sato_1976_table2_70017
         type: activity_coefficient
+        experiment: sato1976_added_Fe_fO2
+        regime: emf_cell
+        method_locator: {page: 1324, section: Experimental Method, note: fO2 measurements used for the activity calculation}
         locator: {page: 1328, table: '2', row: '70017', note: PDF p. 6}
-        derived_from: [sato_1976_table1_70017_31]
-        derivation: {relation: 'Computed from the oxygen-fugacity curve relative to the iron-wüstite buffer curve, as described on page 1326; the equation is not printed here.', inputs: [sato_1976_table1_70017_31], output_unit: dimensionless}
-        phase: silicate_melt
+        derived_from: [sato_1976_table1_added_fe_70017_31]
+        derivation: {relation: 'Computed from the sample-plus-Fe oxygen-fugacity curve relative to the iron-wüstite buffer curve, as described on page 1326; the equation is not printed here.', inputs: [sato_1976_table1_added_fe_70017_31], output_unit: dimensionless}
+        phase_context_as_published: FeO activities of 70017 below its approximately 1105 C high-Ti solidus are discussed as subsolidus; the paper says their control is not established. It separately compares values above 1100 C with low-Ti mare-basalt melt values. Table 2 points are not individually assigned a phase.
+        phase_context_locator: {page: 1327, section: Discussion of Results, note: high-Ti solidus near 1105 C and subsolidus FeO activity discussion continued on p. 1328}
         standard_state:
           convention: raoultian_pure_endmember
           endmember: {formula: FeO, phase: cr, polymorph: {tag: unknown, reason: "source calls FeO wüstite but names no polymorph"}, charge: 0}
@@ -340,10 +388,14 @@ species:
         equipment: {}
       - observation_id: sato_1976_table2_74275
         type: activity_coefficient
+        experiment: sato1976_added_Fe_fO2
+        regime: emf_cell
+        method_locator: {page: 1324, section: Experimental Method, note: fO2 measurements used for the activity calculation}
         locator: {page: 1328, table: '2', row: '74275', note: PDF p. 6}
-        derived_from: [sato_1976_table1_74275_39]
-        derivation: {relation: 'Computed from the oxygen-fugacity curve relative to the iron-wüstite buffer curve, as described on page 1326; the equation is not printed here.', inputs: [sato_1976_table1_74275_39], output_unit: dimensionless}
-        phase: silicate_melt
+        derived_from: [sato_1976_table1_added_fe_74275_39]
+        derivation: {relation: 'Computed from the sample-plus-Fe oxygen-fugacity curve relative to the iron-wüstite buffer curve, as described on page 1326; the equation is not printed here.', inputs: [sato_1976_table1_added_fe_74275_39], output_unit: dimensionless}
+        phase_context_as_published: The paper discusses subsolidus FeO activity and high-Ti solidus temperatures near 1105 C in its discussion of 70017; it does not assign a phase to each 74275 point.
+        phase_context_locator: {page: 1327, section: Discussion of Results}
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: FeO, phase: cr, polymorph: {tag: unknown, reason: "source calls FeO wüstite but names no polymorph"}, charge: 0}, component_basis: FeO}
         standard_state_text: 'pure solid FeO; reference reaction "iron-wüstite buffer" (as named; no equation printed); deltaG0 source not_published in Sato (1976); wüstite stoichiometry and polymorph not_published.'
         standard_state_locator: {page: 1328, table: '2', note: reference-basis discussion on page 1326}
@@ -364,11 +416,13 @@ species:
           calculation_locator: {page: 1326, section: discussion of activity calculation}
         equipment: {}
       - observation_id: sato_1976_table2_12009
+        experiment: sato1973_quoted_values
         type: activity_coefficient
         locator: {page: 1328, table: '2', row: '12009', note: PDF p. 6}
         derived_from: [sato_1976_table1_12009_35]
         derivation: {relation: 'Table 2 activity is presented with the corresponding Table 1 fO2 values; exact calculation inputs and equation are not restated here.', inputs: [sato_1976_table1_12009_35], output_unit: dimensionless}
-        phase: silicate_melt
+        phase_context_as_published: The paper discusses subsolidus FeO activity and high-Ti solidus temperatures near 1105 C in its discussion of 70017; it does not assign a phase to each 12009 point.
+        phase_context_locator: {page: 1327, section: Discussion of Results}
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: FeO, phase: cr, polymorph: {tag: unknown, reason: "source calls FeO wüstite but names no polymorph"}, charge: 0}, component_basis: FeO}
         standard_state_text: 'pure solid FeO; reference reaction "iron-wüstite buffer" (as named; no equation printed); deltaG0 source not_published in Sato (1976); wüstite stoichiometry and polymorph not_published.'
         standard_state_locator: {page: 1328, table: '2', note: reference-basis discussion on page 1326}
@@ -389,11 +443,13 @@ species:
           calculation_locator: {page: 1328, table: '2', note: 'Table 1 dagger pointer and calculation discussion on page 1326'}
         equipment: {}
       - observation_id: sato_1976_table2_12053
+        experiment: sato1973_quoted_values
         type: activity_coefficient
         locator: {page: 1328, table: '2', row: '12053', note: PDF p. 6}
         derived_from: [sato_1976_table1_12053_89]
         derivation: {relation: 'Table 2 activity is presented with the corresponding Table 1 fO2 values; exact calculation inputs and equation are not restated here.', inputs: [sato_1976_table1_12053_89], output_unit: dimensionless}
-        phase: silicate_melt
+        phase_context_as_published: The paper discusses subsolidus FeO activity and high-Ti solidus temperatures near 1105 C in its discussion of 70017; it does not assign a phase to each 12053 point.
+        phase_context_locator: {page: 1327, section: Discussion of Results}
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: FeO, phase: cr, polymorph: {tag: unknown, reason: "source calls FeO wüstite but names no polymorph"}, charge: 0}, component_basis: FeO}
         standard_state_text: 'pure solid FeO; reference reaction "iron-wüstite buffer" (as named; no equation printed); deltaG0 source not_published in Sato (1976); wüstite stoichiometry and polymorph not_published.'
         standard_state_locator: {page: 1328, table: '2', note: reference-basis discussion on page 1326}
@@ -414,11 +470,13 @@ species:
           calculation_locator: {page: 1328, table: '2', note: 'Table 1 dagger pointer and calculation discussion on page 1326'}
         equipment: {}
       - observation_id: sato_1976_table2_15595
+        experiment: sato1973_quoted_values
         type: activity_coefficient
         locator: {page: 1328, table: '2', row: '15595', note: PDF p. 6}
         derived_from: [sato_1976_table1_15595_25]
         derivation: {relation: 'Table 2 activity is presented with the corresponding Table 1 fO2 values; exact calculation inputs and equation are not restated here.', inputs: [sato_1976_table1_15595_25], output_unit: dimensionless}
-        phase: silicate_melt
+        phase_context_as_published: The paper discusses subsolidus FeO activity and high-Ti solidus temperatures near 1105 C in its discussion of 70017; it does not assign a phase to each 15595 point.
+        phase_context_locator: {page: 1327, section: Discussion of Results}
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: FeO, phase: cr, polymorph: {tag: unknown, reason: "source calls FeO wüstite but names no polymorph"}, charge: 0}, component_basis: FeO}
         standard_state_text: 'pure solid FeO; reference reaction "iron-wüstite buffer" (as named; no equation printed); deltaG0 source not_published in Sato (1976); wüstite stoichiometry and polymorph not_published.'
         standard_state_locator: {page: 1328, table: '2', note: reference-basis discussion on page 1326}
@@ -442,9 +500,12 @@ species:
     observations:
       - observation_id: sato_1976_table3_70017
         type: activity_coefficient
+        experiment: sato1976_Fe_activity_calculation
+        regime: emf_cell
+        method_locator: {page: 1324, section: Experimental Method, note: fO2 measurements used for the activity calculation}
         locator: {page: 1328, table: '3', row: '70017', note: PDF p. 6}
-        derived_from: [sato_1976_table1_70017_31]
-        derivation: {relation: 'Computed from measured fO2; the cited Sato et al. (1973) calculation is not printed as an equation in this paper.', inputs: [sato_1976_table1_70017_31], output_unit: dimensionless}
+        derived_from: [sato_1976_table1_70017_31, sato_1976_table1_added_fe_70017_31]
+        derivation: {relation: 'Computed from the difference between natural-sample and sample-plus-Fe fO2 curves, as discussed on page 1326; the cited Sato et al. (1973) calculation is not printed as an equation here.', inputs: [sato_1976_table1_70017_31, sato_1976_table1_added_fe_70017_31], output_unit: dimensionless}
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: Fe, phase: cr, polymorph: {tag: unknown, reason: 'the paper does not state the Fe polymorph'}, charge: 0}, component_basis: Fe}
         standard_state_text: 'pure solid Fe; reference reaction not printed; deltaG0 source not_published in Sato (1976); Fe polymorph not_published.'
         standard_state_locator: {page: 1328, table: '3', section: discussion of Fe activity}
@@ -459,6 +520,8 @@ species:
           Fe_capsule_reference_locator: {page: 1326, section: discussion following Table 1}
           natural_Fe_activity_reference: The difference between natural-sample and sample-plus-Fe curves at a given temperature gives the natural rock Fe activity.
           natural_Fe_activity_reference_locator: {page: 1326, section: discussion following Table 1}
+          phase_context_as_published: The paper discusses natural Fe^0 in the metallic phase and says Fe-FeS liquid formation may explain the temperature trend; it does not classify each Table 3 point's metal phase.
+          phase_context_locator: {page: 1328, table: '3', section: discussion of Fe activity}
           bulk_composition: {state: not_published, reason: not_published, pointer: Hodges and Kushiro (1974), cited for 70017 petrology (pp. 1324, 1326; reference p. 1343)}
           measurement_method: Activities computed from fO2 measurements; for the iron-capsule measurements the capsule Fe activity was virtually unity, while Table 3 reports Fe activity in the natural metallic phase.
           calculation_basis: The paper states the values are computed from measured fO2 and refers to the Sato et al. (1973) procedure; no Fe-FeO equation is printed here.
@@ -466,9 +529,12 @@ species:
         equipment: {}
       - observation_id: sato_1976_table3_74275
         type: activity_coefficient
+        experiment: sato1976_Fe_activity_calculation
+        regime: emf_cell
+        method_locator: {page: 1324, section: Experimental Method, note: fO2 measurements used for the activity calculation}
         locator: {page: 1328, table: '3', row: '74275', note: PDF p. 6}
-        derived_from: [sato_1976_table1_74275_39]
-        derivation: {relation: 'Computed from measured fO2; the cited Sato et al. (1973) calculation is not printed as an equation in this paper.', inputs: [sato_1976_table1_74275_39], output_unit: dimensionless}
+        derived_from: [sato_1976_table1_74275_39, sato_1976_table1_added_fe_74275_39]
+        derivation: {relation: 'Computed from the difference between natural-sample and sample-plus-Fe fO2 curves, as discussed on page 1326; the cited Sato et al. (1973) calculation is not printed as an equation here.', inputs: [sato_1976_table1_74275_39, sato_1976_table1_added_fe_74275_39], output_unit: dimensionless}
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: Fe, phase: cr, polymorph: {tag: unknown, reason: 'the paper does not state the Fe polymorph'}, charge: 0}, component_basis: Fe}
         standard_state_text: 'pure solid Fe; reference reaction not printed; deltaG0 source not_published in Sato (1976); Fe polymorph not_published.'
         standard_state_locator: {page: 1328, table: '3', section: discussion of Fe activity}
@@ -483,12 +549,15 @@ species:
           Fe_capsule_reference_locator: {page: 1326, section: discussion following Table 1}
           natural_Fe_activity_reference: The difference between natural-sample and sample-plus-Fe curves at a given temperature gives the natural rock Fe activity.
           natural_Fe_activity_reference_locator: {page: 1326, section: discussion following Table 1}
+          phase_context_as_published: The paper discusses natural Fe^0 in the metallic phase and says Fe-FeS liquid formation may explain the temperature trend; it does not classify each Table 3 point's metal phase.
+          phase_context_locator: {page: 1328, table: '3', section: discussion of Fe activity}
           bulk_composition: {state: not_published, reason: not_published, pointer: Hodges and Kushiro (1974), cited for 74275 petrology (p. 1326; reference p. 1343)}
           measurement_method: Activities computed from fO2 measurements; for the iron-capsule measurements the capsule Fe activity was virtually unity, while Table 3 reports Fe activity in the natural metallic phase.
           calculation_basis: The paper states the values are computed from measured fO2 and refers to the Sato et al. (1973) procedure; no Fe-FeO equation is printed here.
           calculation_locator: {page: 1328, table: '3', note: 'calculation discussion following Table 1 on page 1326'}
         equipment: {}
       - observation_id: sato_1976_table3_12009
+        experiment: sato1973_quoted_values
         type: activity_coefficient
         locator: {page: 1328, table: '3', row: '12009', note: PDF p. 6}
         derived_from: [sato_1976_table1_12009_35]
@@ -509,6 +578,7 @@ species:
           calculation_locator: {page: 1328, table: '3', note: 'Table 1 dagger pointer on page 1326'}
         equipment: {}
       - observation_id: sato_1976_table3_12053
+        experiment: sato1973_quoted_values
         type: activity_coefficient
         locator: {page: 1328, table: '3', row: '12053', note: PDF p. 6}
         derived_from: [sato_1976_table1_12053_89]
@@ -529,6 +599,7 @@ species:
           calculation_locator: {page: 1328, table: '3', note: 'Table 1 dagger pointer on page 1326'}
         equipment: {}
       - observation_id: sato_1976_table3_15595
+        experiment: sato1973_quoted_values
         type: activity_coefficient
         locator: {page: 1328, table: '3', row: '15595', note: PDF p. 6}
         derived_from: [sato_1976_table1_15595_25]

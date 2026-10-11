@@ -103,6 +103,19 @@ def test_sato_1976_migrates_all_numeric_table_cells() -> None:
     assert sum(counts.values()) == 109
     assert len([obs for obs in observations if "table3" in obs.observation_id]) == 35
 
+    natural = next(
+        obs for obs in observations if "table1_70017_31::T=1273.15" in obs.observation_id
+    )
+    added_fe = next(
+        obs for obs in observations if "table1_added_fe_70017_31::T=1273.15" in obs.observation_id
+    )
+    assert natural.identity.temperature_K == added_fe.identity.temperature_K
+    assert "row=70017,31" in natural.locator.note
+    assert "row=70017,31" in added_fe.locator.note
+    assert natural.experiment_id != added_fe.experiment_id
+    assert migrator.result.experiments[natural.experiment_id].method.value.value == "emf_cell"
+    assert migrator.result.experiments[added_fe.experiment_id].method.value.value == "emf_cell"
+
 
 def test_van_limpt_k2o_series_uses_section_and_figure_provenance() -> None:
     doc = yaml.safe_load((EXTRACTS / "kems-046-van-limpt-2007.yaml").read_text())
