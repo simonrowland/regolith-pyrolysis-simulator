@@ -808,6 +808,22 @@ def test_janaf_o029_formation_gibbs_zero_pin() -> None:
     )
     assert oxygen["fit_statistics"]["smooth_fit_checks"]["maximum_relative_Cp_residual"] <= 1e-3
     assert oxygen["fit_statistics"]["derived_formation_G_kJ_per_mol"]["max_abs"] == 0.0
+    segments = [
+        Nasa9Segment(
+            T_min_K=item["T_min_K"],
+            T_max_K=item["T_max_K"],
+            coefficients=tuple(item["a_coefficients"]),
+            b1=item["b1"],
+            b2=item["b2"],
+        )
+        for item in oxygen["thermo_record"]["segments"]
+    ]
+    for left, right in zip(segments, segments[1:]):
+        join = left.T_max_K
+        cp_left, h_left, s_left, _g_left = _evaluate(left, join)
+        cp_right, h_right, s_right, _g_right = _evaluate(right, join)
+        for a, b in ((cp_left, cp_right), (h_left, h_right), (s_left, s_right)):
+            assert abs(a - b) <= 1e-9 * max(abs(a), abs(b), 1.0)
 
 
 @pytest.mark.parametrize(
@@ -850,7 +866,11 @@ def test_janaf_printed_formation_h_uses_exact_elemental_h298_gauge(
 
     assert record["status"] == "accepted", record
     assert record["formation_capable"] is True, record
-    assert record["validity"]["T_min_K"] <= temperature_K <= record["validity"]["T_max_K"]
+    assert (
+        record["validity"]["T_min_K"]
+        <= temperature_K
+        <= record["validity"]["T_max_K"]
+    )
     if table_id == "Al-033":
         assert abs(printed_identity - Decimal("-297.245")) <= Decimal("0.0005")
     else:
@@ -862,36 +882,37 @@ def test_janaf_printed_formation_h_uses_exact_elemental_h298_gauge(
 
 
 def test_janaf_formation_anchor_does_not_require_element_fit_at_298_15_k() -> None:
-    table_ids = [
-        "Al-009", "Al-011", "Al-013", "Al-029", "Al-031",
-        "Al-032", "Al-046", "Al-047", "Al-048", "Al-049",
-    ]
+    expected_missing_comparison_reference = {
+        "Al-009": ("g", "Br, none, no accepted reference fit covers 200 K"),
+        "Al-011": ("l", "Br, none, no accepted reference fit covers 298.15 K"),
+        "Al-013": ("g", "Br, none, no accepted reference fit covers 200 K"),
+        "Al-029": ("cr", "K, none, no accepted reference fit covers 298.15 K"),
+        "Al-031": ("cr", "K, none, no accepted reference fit covers 298.15 K"),
+        "Al-032": ("cr", "Na, none, no accepted reference fit covers 298.15 K"),
+        "Al-046": ("g", "Li, none, no accepted reference fit covers 200 K"),
+        "Al-047": ("g", "Na, none, no accepted reference fit covers 200 K"),
+        "Al-048": ("cr", "K, none, no accepted reference fit covers 298.15 K"),
+        "Al-049": ("cr:beta", "Li, none, no accepted reference fit covers 200 K"),
+    }
+    table_ids = list(expected_missing_comparison_reference)
     records = [
         record for record in generate_janaf_sidecar(table_ids=table_ids)
         if record["source_record_id"] in table_ids
+        and record["phase"] == expected_missing_comparison_reference[
+            record["source_record_id"]
+        ][0]
     ]
     by_id = {record["source_record_id"]: record for record in records}
 
     assert set(by_id) == set(table_ids)
     assert all(record["status"] == "accepted" for record in by_id.values())
-    assert all(record["formation_capable"] is True for record in by_id.values())
-
-    segments = [
-        Nasa9Segment(
-            T_min_K=item["T_min_K"],
-            T_max_K=item["T_max_K"],
-            coefficients=tuple(item["a_coefficients"]),
-            b1=item["b1"],
-            b2=item["b2"],
-        )
-        for item in oxygen["thermo_record"]["segments"]
-    ]
-    for left, right in zip(segments, segments[1:]):
-        join = left.T_max_K
-        cp_left, h_left, s_left, _g_left = _evaluate(left, join)
-        cp_right, h_right, s_right, _g_right = _evaluate(right, join)
-        for a, b in ((cp_left, cp_right), (h_left, h_right), (s_left, s_right)):
-            assert abs(a - b) <= 1e-9 * max(abs(a), abs(b), 1.0)
+    for table_id, (_phase, expected_reason) in (
+        expected_missing_comparison_reference.items()
+    ):
+        record = by_id[table_id]
+        assert record["formation_capable"] is False
+        assert record["formation_reason_code"] == "missing_element_reference_phase"
+        assert expected_reason in record["formation_reason"]
 
 
 def test_janaf_na_cr_uses_reduced_basis_and_keeps_typed_rejection() -> None:

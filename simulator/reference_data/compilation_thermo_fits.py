@@ -750,9 +750,15 @@ def _fit_piecewise_candidate(
     h_anchor_J = 0.0
     charge = metadata["charge"]
     if not is_element_reference and delta_fh_anchor is not None:
-        # ΔfH°(298.15 K) is the species' H anchor relative to elemental
-        # reference enthalpies, which are zero at their standard reference T.
-        # Keep this anchor even when formation derivation is unavailable.
+        # The printed table defines ΔfH(T) = ΔfH(298.15) +
+        # [H-H298]_species(T) - Σν[H-H298]_element(T), with every bracket
+        # referenced to that table's own 298.15 K and therefore zero there.
+        # Algebraically the elemental H298 terms cancel, so no fitted element
+        # H(298.15) belongs in this anchor. The brackets and ΔfH are kJ/mol;
+        # the fitted integrals use J/mol, hence the 1000 conversion below.
+        # Al-008 checks the gauge: -541.410 + 183.881 - 84.782 - 113.667
+        # - 86.141 = -642.119 kJ/mol from its printed 2700 K cells.
+        # Keep the printed anchor even when formation derivation is unavailable.
         h_anchor_J = float(delta_fh_anchor.value) * 1000.0
 
     if charge is None:
@@ -777,17 +783,7 @@ def _fit_piecewise_candidate(
         formation_reason_code = "missing_formation_h_anchor"
         formation_reason = "source has no printed ΔfH°(298.15 K) anchor"
     else:
-        resolved, error = _element_reference_terms(formula, REFERENCE_T_K, pressure, reference_curves)
-        if error:
-            formation_reason_code, _separator, _detail = error.partition(":")
-            formation_reason = error
-        else:
-            assert resolved is not None
-            formation_capable = True
-            h_anchor_J += sum(
-                coefficient * h_ref
-                for coefficient, h_ref, _g_ref, _curve in resolved
-            )
+        formation_capable = True
 
     segment_count = len(segment_bounds)
     scale_K = tuple(math.sqrt(lower * upper) for lower, upper in segment_bounds)
