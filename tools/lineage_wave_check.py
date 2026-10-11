@@ -16,11 +16,12 @@ from simulator.battery.score import ScoreContext, comparison_candidates
 
 
 def _source_extract(root: Path, source_id: str) -> Path:
-    for directory in ("extracts", "extracts-v2"):
-        path = root / "data" / "literature" / directory / f"{source_id}.yaml"
-        if path.is_file():
-            return path
-    raise FileNotFoundError(f"no extract found for source {source_id!r} under {root}")
+    path = root / "data" / "literature" / "extracts" / f"{source_id}.yaml"
+    if not path.is_file():
+        raise FileNotFoundError(
+            f"legacy extract for source {source_id!r} is missing: {path}"
+        )
+    return path
 
 
 def snapshot(source_id: str, root: Path) -> dict[str, Any]:
@@ -35,6 +36,8 @@ def snapshot(source_id: str, root: Path) -> dict[str, Any]:
         for observation in result.observations.values()
         if observation.source_id == source_id
     ]
+    if not observations:
+        raise ValueError(f"source {source_id!r} produced zero observations")
     candidates = comparison_candidates(
         ScoreContext(
             works=result.works,
@@ -112,6 +115,8 @@ def _measurement_signature(row: Mapping[str, Any]) -> str:
 
 def compare(before: Mapping[str, Any], after: Mapping[str, Any], *, allow_rekey: bool = False) -> tuple[bool, str]:
     failures: list[str] = []
+    if not before["observations"] or not after["observations"]:
+        failures.append("cannot compare snapshots with zero observations on either side")
     before_rows = {row["observation_id"]: row for row in before["observations"]}
     after_rows = {row["observation_id"]: row for row in after["observations"]}
     before_ids, after_ids = set(before_rows), set(after_rows)
