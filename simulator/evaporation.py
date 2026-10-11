@@ -18,10 +18,9 @@ from simulator.chemistry.kernel import (
     ProviderUnavailableError,
 )
 from simulator.fe_redox import (
-    KRESS91_FO2_KEY_REFERENCE_T_K,
     KRESS91_LIQUID_CALIBRATION_MAX_T_C,
     KRESS91_LIQUID_CALIBRATION_MIN_T_C,
-    kress91_referenced_log_fO2,
+    _kress91_gate_key_referenced_log_fO2,
     kress91_temperature_band_case,
 )
 from simulator.melt_backend.base import MeltCompositionError
@@ -2029,7 +2028,7 @@ class EvaporationMixin:
         store_getter = getattr(self, '_pt0_store', None)
         store = store_getter() if callable(store_getter) else None
         if store is not None and getattr(store, 'replay_enabled', False):
-            curve = store.replay_gate_curve(self, fO2_log=redox_key_fO2_log)
+            curve = store.replay_gate_curve(self, fO2_log=fO2_log)
             self._record_composition_projected_liquidus_notice_from_curve(curve)
             return curve
         cache = getattr(self, '_freeze_gate_liquid_fraction_cache', None)
@@ -2044,7 +2043,7 @@ class EvaporationMixin:
             if store is not None and getattr(store, 'capture_enabled', False):
                 store.capture_gate_curve(
                     self,
-                    fO2_log=redox_key_fO2_log,
+                    fO2_log=fO2_log,
                     curve=curve,
                 )
             return curve
@@ -2069,7 +2068,7 @@ class EvaporationMixin:
                 if store is not None and getattr(store, 'capture_enabled', False):
                     store.capture_gate_curve(
                         self,
-                        fO2_log=redox_key_fO2_log,
+                        fO2_log=fO2_log,
                         curve=curve,
                     )
                 return curve
@@ -2201,7 +2200,7 @@ class EvaporationMixin:
         if store is not None and getattr(store, 'capture_enabled', False):
             store.capture_gate_curve(
                 self,
-                fO2_log=redox_key_fO2_log,
+                fO2_log=fO2_log,
                 curve=curve,
             )
         return curve
@@ -2235,19 +2234,10 @@ class EvaporationMixin:
             if reference_T_K is not None
             else self._current_melt_redox_reference_T_K()
         )
-        if (
-            redox_reference_T_K is not None
-            and float(redox_reference_T_K) <= 273.15
-        ):
-            return redox_fO2_log
-        # Boundary by design: before the first liquid seed, reference_T_K is None
-        # and the key uses live fO2; after seeding, the key is T_STD-referenced.
-        # Capture/replay cross this one re-key boundary at the same tick.
         return self._freeze_gate_liquidus_fO2_log(
-            kress91_referenced_log_fO2(
+            _kress91_gate_key_referenced_log_fO2(
                 redox_fO2_log,
                 reference_T_K=redox_reference_T_K,
-                target_T_K=KRESS91_FO2_KEY_REFERENCE_T_K,
             )
         )
 

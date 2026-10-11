@@ -257,6 +257,31 @@ def kress91_referenced_log_fO2(
     return (redox_fO2_log * math.log(10.0) + delta_ln_fO2) / math.log(10.0)
 
 
+def _kress91_gate_key_referenced_log_fO2(
+    fO2_log: float,
+    *,
+    reference_T_K: float | None,
+) -> float:
+    # This is the single reference boundary for local and PT0 gate keys.
+    # Referenced fO2 is re-expressed at the Fe-redox reference temperature
+    # 1673.15 K (KRESS91_FO2_KEY_REFERENCE_T_K, fe_redox.py:68) at fixed melt
+    # redox state. Gate control T_K=298.15 K is a schema sentinel, not that T.
+    # Production-function sanity check: raw -9.0 at 1450 C and -7.859211790826262
+    # at 1600 C each reference to -9.438391...; a second conversion gives
+    # -9.876783... and -11.017571..., key-quantized to -9.877 and -11.018.
+    redox_fO2_log = float(fO2_log)
+    if reference_T_K is None:
+        return redox_fO2_log
+    redox_reference_T_K = float(reference_T_K)
+    if redox_reference_T_K <= 273.15:
+        return redox_fO2_log
+    return kress91_referenced_log_fO2(
+        redox_fO2_log,
+        reference_T_K=redox_reference_T_K,
+        target_T_K=KRESS91_FO2_KEY_REFERENCE_T_K,
+    )
+
+
 # Holzheid, Palme & Chakraborty 1997, DOI 10.1016/S0009-2541(97)00030-2:
 # gamma_FeO(wustite(l)) = 1.70 +/- 0.22; stoich-FeO(l) multipliers below.
 HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL = 1.70

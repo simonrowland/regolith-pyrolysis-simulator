@@ -40,8 +40,7 @@ from simulator.grind_preflight import (
     assert_strict_vapor_pt1_row,
 )
 from simulator.fe_redox import (
-    KRESS91_FO2_KEY_REFERENCE_T_K,
-    kress91_referenced_log_fO2,
+    _kress91_gate_key_referenced_log_fO2,
 )
 from simulator.fidelity_vocabulary import EvidenceClass
 from simulator.scalar_boundary import is_declared_real_scalar
@@ -311,10 +310,9 @@ def _authoritative_melt_fO2_log(sim: Any) -> float:
 def _melt_fO2_log_at_gate_key_reference_T(sim: Any, fO2_log: float) -> float:
     reference_reader = getattr(sim, "_current_melt_redox_reference_T_K", None)
     reference_T_K = reference_reader() if callable(reference_reader) else None
-    return kress91_referenced_log_fO2(
+    return _kress91_gate_key_referenced_log_fO2(
         fO2_log,
         reference_T_K=reference_T_K,
-        target_T_K=KRESS91_FO2_KEY_REFERENCE_T_K,
     )
 
 
