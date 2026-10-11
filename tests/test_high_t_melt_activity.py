@@ -50,6 +50,16 @@ BASE_MELT_MOL = {
     "Al2O3": 1.00,
     "TiO2": 0.10,
 }
+ZHANG_KO0_5_COMPOSITION_WT_PCT = {
+    "SiO2": 45.94,
+    "Al2O3": 16.0,
+    "FeO": 10.67,
+    "MgO": 7.09,
+    "CaO": 11.21,
+    "TiO2": 1.79,
+    "Na2O": 2.27,
+    "K2O": 2.49,
+}
 
 
 def _provider() -> BuiltinVaporPressureProvider:
@@ -391,6 +401,44 @@ def test_above_cap_k2o_keeps_constant_gamma_with_exclusion_provenance() -> None:
         -0.24814525336393226
     )
     assert high_t["authority_exclusions"]["K2O"]["tracking_id"] == "t-999"
+    reason = high_t["authority_exclusions"]["K2O"]["reason"]
+    assert "owner ruling of 2026-09-26" in reason
+    assert "t-1194" in reason
+    evaluations = vapor_pressure_module._K2O_PACK_EVALUATIONS_BY_DIGEST
+    digest = high_t["openimcc_pack_digest"]
+    row = evaluations[digest]
+    present = set(row["gamma_ko0_5_by_temperature_K"].values())
+    absent = {
+        gamma
+        for other_digest, other_row in evaluations.items()
+        if other_digest != digest
+        for gamma in other_row["gamma_ko0_5_by_temperature_K"].values()
+    }
+    assert present and absent and present.isdisjoint(absent)
+    for printed_value in present:
+        assert printed_value in reason
+    for printed_value in absent:
+        assert printed_value not in reason
+
+    # Keep the table-derived text expectations tied to the loaded pack's
+    # bridge values, so a changed table value cannot validate itself.
+    for temperature_K, printed_value in row[
+        "gamma_ko0_5_by_temperature_K"
+    ].items():
+        bridge = openimcc_bridge_module.evaluate(
+            composition_kg=ZHANG_KO0_5_COMPOSITION_WT_PCT,
+            temperature_K=temperature_K,
+            pack=row["pack_alias"],
+            allow_extrapolation=True,
+            allow_out_of_envelope=True,
+        )
+        assert bridge.pack_digest == digest
+        significant_figures = sum(
+            character.isdigit() for character in printed_value.split("e", 1)[0]
+        )
+        assert float(
+            f"{bridge.activity_coefficients['KO0.5']['value']:.{significant_figures}g}"
+        ) == float(printed_value)
 
     provenance = result.diagnostic["vapor_pressure_numerator_provenance"]
     k_rows = [provenance[species] for species in ("K", "K2", "K2O_gas")]
@@ -404,6 +452,104 @@ def test_above_cap_k2o_keeps_constant_gamma_with_exclusion_provenance() -> None:
     assert high_t["activities_by_oxide"]["Na2O"] == high_t[
         "openimcc_activities_by_oxide"
     ]["Na2O"]
+
+
+def test_k2o_pack_evaluation_table_matches_zhang_gamma_from_bridge() -> None:
+    evaluations = vapor_pressure_module._K2O_PACK_EVALUATIONS_BY_DIGEST
+    loaded_digests = set()
+    results = []
+    # The widest printed-value rounding is 2.4e-8 +/- 0.05e-8 = 2.083%;
+    # 2.1% covers that half-last-digit interval and the more precise rows.
+    for pack_name in ("default", "published-core"):
+        for temperature_K in (1473.15, 1673.15):
+            bridge = openimcc_bridge_module.evaluate(
+                composition_kg=ZHANG_KO0_5_COMPOSITION_WT_PCT,
+                temperature_K=temperature_K,
+                pack=pack_name,
+                allow_extrapolation=True,
+                allow_out_of_envelope=True,
+            )
+            loaded_digests.add(bridge.pack_digest)
+            results.append((bridge, temperature_K))
+
+    for bridge, temperature_K in results:
+        assert bridge.pack_digest in evaluations, (
+            f"K2O evaluation is missing digest {bridge.pack_digest}; the table "
+            "must be re-evaluated after a pack change"
+        )
+        row = evaluations[bridge.pack_digest]
+        assert row["model_id"] == bridge.pack_model_id
+        assert row["pack_version"] == bridge.pack_version
+        expected = float(row["gamma_ko0_5_by_temperature_K"][temperature_K])
+        assert bridge.activity_coefficients["KO0.5"]["value"] == pytest.approx(
+            expected, rel=0.021
+        )
+    for digest in evaluations:
+        assert digest in loaded_digests, (
+            f"K2O evaluation digest {digest} is not loadable; the table must be "
+            "re-evaluated after a pack change"
+        )
+
+
+def test_k2o_sensitivity_pack_collision_gets_no_evaluation() -> None:
+    from importlib import resources
+
+    sensitivity_pack = resources.files("openimcc").joinpath(
+        "data", "packs", "imcc-sf04-d066-v1-kcaalsi2o7.json"
+    )
+    if not sensitivity_pack.is_file():
+        pytest.skip("the loaded OpenIMCC pin does not include the sensitivity pack")
+
+    evaluations = vapor_pressure_module._K2O_PACK_EVALUATIONS_BY_DIGEST
+    default = openimcc_bridge_module.evaluate(
+        composition_kg=ZHANG_KO0_5_COMPOSITION_WT_PCT,
+        temperature_K=1473.15,
+        pack="default",
+        allow_extrapolation=True,
+        allow_out_of_envelope=True,
+    )
+    sensitivity = openimcc_bridge_module.evaluate(
+        composition_kg=ZHANG_KO0_5_COMPOSITION_WT_PCT,
+        temperature_K=1473.15,
+        pack="d066-kca-sensitivity",
+        allow_extrapolation=True,
+        allow_out_of_envelope=True,
+    )
+    assert sensitivity.pack_model_id == default.pack_model_id
+    assert sensitivity.pack_digest != default.pack_digest
+
+    exclusion = vapor_pressure_module._k2o_authority_exclusion_for_pack_digest(
+        sensitivity.pack_digest,
+        model_id=sensitivity.pack_model_id,
+        pack_version=sensitivity.pack_version,
+    )
+    reason = exclusion["reason"]
+    assert "no evaluation exists for this pack" in reason
+    for row in evaluations.values():
+        for gamma in row["gamma_ko0_5_by_temperature_K"].values():
+            assert gamma not in reason
+
+
+def test_k2o_unknown_pack_notice_has_no_other_pack_evaluation() -> None:
+    evaluations = vapor_pressure_module._K2O_PACK_EVALUATIONS_BY_DIGEST
+    exclusion = vapor_pressure_module._k2o_authority_exclusion_for_pack_digest(
+        "unlisted-digest",
+        model_id="unlisted-model",
+        pack_version="unlisted-version",
+    )
+    reason = exclusion["reason"]
+
+    assert "owner ruling of 2026-09-26" in reason
+    assert "t-1194" in reason
+    assert "no evaluation exists for this pack" in reason
+    absent = {
+        gamma
+        for row in evaluations.values()
+        for gamma in row["gamma_ko0_5_by_temperature_K"].values()
+    }
+    assert absent
+    for printed_value in absent:
+        assert printed_value not in reason
 
 
 def test_missing_present_parent_refuses_and_labels_provider_fallback(
