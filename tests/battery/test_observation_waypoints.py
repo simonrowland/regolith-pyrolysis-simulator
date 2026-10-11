@@ -20,21 +20,34 @@ def test_sossi_2020_table_s4_oxygen_values_migrate_to_all_observation_waypoints(
 
     assert len(result.observations) == 12
     assert len(result.validation.hard_issues) == 12  # unresolved measured-reduction lineage is item 2
-    selected = []
+    expected_by_observation = {
+        "sossi_2020_per_f_o2_1_xanes": "0.00",
+        "sossi_2020_per_f_o2_2_xanes": "-2.49",
+        "sossi_2020_per_f_o2_3_xanes": "-2.53",
+        "sossi_2020_per_f_o2_6_xanes": "-2.58",
+        "sossi_2020_per_ts1_xanes": "-2.72",
+        "sossi_2020_per_f_o2_7_xanes": "-2.72",
+        "sossi_2020_per_ts2_xanes": "-2.72",
+        "sossi_2020_per_f_o2_8_xanes": "-3.00",
+        "sossi_2020_per_f_o2_9_xanes": "-3.92",
+        "sossi_2020_per_f_o2_10_xanes": "-5.32",
+        "sossi_2020_per_f_o2_11_xanes": "-6.74",
+        "sossi_2020_per_f_o2_12_xanes": "-7.86",
+    }
+    expected_by_observation = {
+        f"sossi-2020-magma-ocean-redox::{observation_id}": value
+        for observation_id, value in expected_by_observation.items()
+    }
+    selected_by_observation = {}
     for observation in result.observations.values():
         experiment = result.experiments[observation.experiment_id]
         bench = result.benches[experiment.bench_id]
         waypoint = oxygen_condition(experiment, bench, observation)
-        assert waypoint.selected is not None, observation.id
+        assert waypoint.selected is not None, observation.observation_id
         assert waypoint.selected.authority is WaypointAuthority.PRINTED
         assert observation.point_conditions["fO2_log"].locator.table == "S4"
-        selected.append(str(waypoint.selected.value.point))
-    assert len(selected) == 12
-    assert sorted(selected, key=Decimal) == sorted(
-        ["0.00", "-2.49", "-2.53", "-2.58", "-2.72", "-2.72", "-2.72",
-         "-3.00", "-3.92", "-5.32", "-6.74", "-7.86"],
-        key=Decimal,
-    )
+        selected_by_observation[observation.observation_id] = str(waypoint.selected.value.point)
+    assert selected_by_observation == expected_by_observation
 
 
 @pytest.mark.parametrize("key,route", [("temperature_K", thermal_path), ("total_pressure_Pa", pressure_boundary)])
