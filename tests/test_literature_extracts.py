@@ -40,6 +40,7 @@ if str(TOOLS) not in sys.path:
 import extract_merge as em  # noqa: E402
 import migrate_pilot_extracts as mig  # noqa: E402
 import validate_literature_extracts as vle  # noqa: E402
+from simulator.battery import migrate as battery_migrate  # noqa: E402
 
 
 def test_norris_starting_composition_is_pinned_to_online_extended_table() -> None:
@@ -79,6 +80,28 @@ def test_norris_split_runs_retain_shared_sample_and_quench_facts() -> None:
             experiment["thermal_schedule"]["cooling_or_quench"]
             == baseline["thermal_schedule"]["cooling_or_quench"]
         )
+
+
+def test_sato_1976_migrates_all_numeric_table_cells() -> None:
+    """Every printed numeric cell in the three tables becomes a numeric observation."""
+    source = EXTRACTS / "sato-1976-lunar-fo2-apollo-17.yaml"
+    extract = yaml.safe_load(source.read_text())
+    table1 = extract["species"]["O2"]["observations"]
+    assert len(table1) == 11
+    assert all("condition_as_published" in row["values"] for row in table1)
+    assert all("log_fO2" not in point for row in table1 for point in row["values"]["series"])
+
+    migrator = battery_migrate.Migrator(root=REPO_ROOT)
+    migrator._migrate_extract(source)
+    migrator.finalize()
+    observations = list(migrator.result.observations.values())
+    counts = {}
+    for table in ("table1", "table2", "table3"):
+        table_observations = [obs for obs in observations if table in obs.observation_id]
+        counts[table] = sum(obs.value.kind.value == "point" for obs in table_observations)
+    assert counts == {"table1": 55, "table2": 25, "table3": 29}
+    assert sum(counts.values()) == 109
+    assert len([obs for obs in observations if "table3" in obs.observation_id]) == 35
 
 
 def test_van_limpt_k2o_series_uses_section_and_figure_provenance() -> None:
