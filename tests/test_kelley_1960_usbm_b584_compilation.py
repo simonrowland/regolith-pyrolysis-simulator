@@ -309,6 +309,16 @@ def test_calcium_elemental_phases_pass_their_table_and_derivative_gates():
     assert all(curve["gate"]["status"] == "passed" for curve in curves)
 
 
+def test_sodium_elemental_phases_preserve_the_short_solid_gate():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "Na"]
+    assert len(curves) == 6
+    by_key = {(curve["phase"], curve["quantity"]): curve for curve in curves}
+    assert by_key[("c", "heat_content_increment")]["gate"]["reason"] == "no_independent_check"
+    assert by_key[("c", "heat_capacity")]["gate"]["reason"] == "no_independent_check"
+    assert all(by_key[(phase, quantity)]["gate"]["status"] == "passed"
+               for phase in ("l", "g") for quantity in ("heat_content_increment", "heat_capacity"))
+
+
 def test_heat_content_gate_detects_a_coefficient_mutation():
     heat = loader.load_published_curves()[0]
     changed = {**heat, "coefficients_as_printed": ["11.77", *heat["coefficients_as_printed"][1:]]}
