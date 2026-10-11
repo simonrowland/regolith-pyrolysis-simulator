@@ -51,6 +51,25 @@ source_tables:
     typed_structure_limit: >-
       Typed standard_state can encode a Raoultian pure endmember and liquid phase, but it has no field for the liquid
       wüstite nonstoichiometry Fe(1-x)O; each FeO activity row also records that identity in standard_state text.
+    conversion_factors_as_printed:
+    - factor: 2.02
+      temperature_C: 1300
+      direction_and_wording: >-
+        γFeO/γ"FeO" is the activity coefficient relative to stoichiometric FeO divided by the activity coefficient
+        relative to wüstite; the ratio is 2.02 at 1300°C.
+      locator: {page: 30, section: '4.1 Activity coefficients'}
+    - factor: 1.94
+      temperature_C: 1400
+      direction_and_wording: >-
+        Activity coefficients using a stoichiometric FeO(l) standard state are higher by a factor of 1.94 relative to
+        the activity coefficients based on wüstite(l).
+      locator: {page: 31, section: '4.1 Activity coefficients'}
+    - factor: 1.66
+      temperature_C: 1600
+      direction_and_wording: >-
+        γFeO/γ"FeO" is the activity coefficient relative to stoichiometric FeO divided by the activity coefficient
+        relative to wüstite; the ratio is 1.66 at 1600°C.
+      locator: {page: 30, section: '4.1 Activity coefficients'}
 extraction:
   method: layout-preserving pdftotext manual transcription; source tables and prose reviewed
   date: '2026-09-20'
@@ -3367,13 +3386,8 @@ species:
       phase: silicate_melt
       standard_state:
         state:
-          tag: value
-          value:
-            convention: raoultian_pure_endmember
-            endmember: {formula: FeO, phase: {tag: value, value: l}}
-            component_basis: FeO
-            reference_pressure_bar: '1.01325'
-        inferred: false
+          tag: unknown
+          reason: schema cannot represent the paper's nonstoichiometric liquid wüstite "FeO" standard state
         note: >-
           pure liquid Fe(1-x)O; reference reaction Fe(s) + 1/2 O2(g) = "FeO"(l); deltaG0 source O'Neill and Pownceby
           (1993) and Barin (1989). The typed endmember encodes Raoultian FeO(l) at 1 atm but cannot encode the source's
@@ -3655,13 +3669,8 @@ species:
       phase: silicate_melt
       standard_state:
         state:
-          tag: value
-          value:
-            convention: raoultian_pure_endmember
-            endmember: {formula: FeO, phase: {tag: value, value: l}}
-            component_basis: FeO
-            reference_pressure_bar: '1.01325'
-        inferred: false
+          tag: unknown
+          reason: schema cannot represent the paper's nonstoichiometric liquid wüstite "FeO" standard state
         note: >-
           pure liquid Fe(1-x)O; reference reaction Fe(s) + 1/2 O2(g) = "FeO"(l); deltaG0 source O'Neill and Pownceby
           (1993) and Barin (1989). The typed endmember encodes Raoultian FeO(l) at 1 atm but cannot encode the source's
@@ -3776,13 +3785,8 @@ species:
       phase: silicate_melt
       standard_state:
         state:
-          tag: value
-          value:
-            convention: raoultian_pure_endmember
-            endmember: {formula: FeO, phase: {tag: value, value: l}}
-            component_basis: FeO
-            reference_pressure_bar: '1.01325'
-        inferred: false
+          tag: unknown
+          reason: schema cannot represent the paper's nonstoichiometric liquid wüstite "FeO" standard state
         note: >-
           pure liquid Fe(1-x)O; reference reaction Fe(s) + 1/2 O2(g) = "FeO"(l); deltaG0 source O'Neill and Pownceby
           (1993) and Barin (1989). The typed endmember encodes Raoultian FeO(l) at 1 atm but cannot encode the source's
@@ -3827,13 +3831,8 @@ species:
       phase: komatiitic_basalt_silicate_melt
       standard_state:
         state:
-          tag: value
-          value:
-            convention: raoultian_pure_endmember
-            endmember: {formula: FeO, phase: {tag: value, value: l}}
-            component_basis: FeO
-            reference_pressure_bar: '1.01325'
-        inferred: false
+          tag: unknown
+          reason: schema cannot represent the paper's nonstoichiometric liquid wüstite "FeO" standard state
         note: >-
           pure liquid Fe(1-x)O; reference reaction Fe(s) + 1/2 O2(g) = "FeO"(l); deltaG0 source O'Neill and Pownceby
           (1993) and Barin (1989). The typed endmember encodes Raoultian FeO(l) at 1 atm but cannot encode the source's
@@ -4030,13 +4029,8 @@ species:
       phase: anorthite-diopside_silicate_melt
       standard_state:
         state:
-          tag: value
-          value:
-            convention: raoultian_pure_endmember
-            endmember: {formula: FeO, phase: {tag: value, value: l}}
-            component_basis: FeO
-            reference_pressure_bar: '1.01325'
-        inferred: false
+          tag: unknown
+          reason: schema cannot represent the paper's nonstoichiometric liquid wüstite "FeO" standard state
         note: >-
           pure liquid Fe(1-x)O; reference reaction Fe(s) + 1/2 O2(g) = "FeO"(l); deltaG0 source O'Neill and Pownceby
           (1993) and Barin (1989). The typed endmember encodes Raoultian FeO(l) at 1 atm but cannot encode the source's
@@ -4109,13 +4103,8 @@ species:
       phase: anorthite-diopside_silicate_melt
       standard_state:
         state:
-          tag: value
-          value:
-            convention: raoultian_pure_endmember
-            endmember: {formula: FeO, phase: {tag: value, value: l}}
-            component_basis: FeO
-            reference_pressure_bar: '1.01325'
-        inferred: false
+          tag: unknown
+          reason: schema cannot represent the paper's nonstoichiometric liquid wüstite "FeO" standard state
         note: >-
           pure liquid Fe(1-x)O; reference reaction Fe(s) + 1/2 O2(g) = "FeO"(l); deltaG0 source O'Neill and Pownceby
           (1993) and Barin (1989). The typed endmember encodes Raoultian FeO(l) at 1 atm but cannot encode the source's
@@ -4188,13 +4177,8 @@ species:
       phase: anorthite-diopside_silicate_melt
       standard_state:
         state:
-          tag: value
-          value:
-            convention: raoultian_pure_endmember
-            endmember: {formula: FeO, phase: {tag: value, value: l}}
-            component_basis: FeO
-            reference_pressure_bar: '1.01325'
-        inferred: false
+          tag: unknown
+          reason: schema cannot represent the paper's nonstoichiometric liquid wüstite "FeO" standard state
         note: >-
           pure liquid Fe(1-x)O; reference reaction Fe(s) + 1/2 O2(g) = "FeO"(l); deltaG0 source O'Neill and Pownceby
           (1993) and Barin (1989). The typed endmember encodes Raoultian FeO(l) at 1 atm but cannot encode the source's
@@ -4267,13 +4251,8 @@ species:
       phase: anorthite-diopside_silicate_melt
       standard_state:
         state:
-          tag: value
-          value:
-            convention: raoultian_pure_endmember
-            endmember: {formula: FeO, phase: {tag: value, value: l}}
-            component_basis: FeO
-            reference_pressure_bar: '1.01325'
-        inferred: false
+          tag: unknown
+          reason: schema cannot represent the paper's nonstoichiometric liquid wüstite "FeO" standard state
         note: >-
           pure liquid Fe(1-x)O; reference reaction Fe(s) + 1/2 O2(g) = "FeO"(l); deltaG0 source O'Neill and Pownceby
           (1993) and Barin (1989). The typed endmember encodes Raoultian FeO(l) at 1 atm but cannot encode the source's
@@ -4346,13 +4325,8 @@ species:
       phase: anorthite-diopside_silicate_melt
       standard_state:
         state:
-          tag: value
-          value:
-            convention: raoultian_pure_endmember
-            endmember: {formula: FeO, phase: {tag: value, value: l}}
-            component_basis: FeO
-            reference_pressure_bar: '1.01325'
-        inferred: false
+          tag: unknown
+          reason: schema cannot represent the paper's nonstoichiometric liquid wüstite "FeO" standard state
         note: >-
           pure liquid Fe(1-x)O; reference reaction Fe(s) + 1/2 O2(g) = "FeO"(l); deltaG0 source O'Neill and Pownceby
           (1993) and Barin (1989). The typed endmember encodes Raoultian FeO(l) at 1 atm but cannot encode the source's
@@ -4425,13 +4399,8 @@ species:
       phase: anorthite-diopside_silicate_melt
       standard_state:
         state:
-          tag: value
-          value:
-            convention: raoultian_pure_endmember
-            endmember: {formula: FeO, phase: {tag: value, value: l}}
-            component_basis: FeO
-            reference_pressure_bar: '1.01325'
-        inferred: false
+          tag: unknown
+          reason: schema cannot represent the paper's nonstoichiometric liquid wüstite "FeO" standard state
         note: >-
           pure liquid Fe(1-x)O; reference reaction Fe(s) + 1/2 O2(g) = "FeO"(l); deltaG0 source O'Neill and Pownceby
           (1993) and Barin (1989). The typed endmember encodes Raoultian FeO(l) at 1 atm but cannot encode the source's
@@ -4504,13 +4473,8 @@ species:
       phase: anorthite-diopside_silicate_melt
       standard_state:
         state:
-          tag: value
-          value:
-            convention: raoultian_pure_endmember
-            endmember: {formula: FeO, phase: {tag: value, value: l}}
-            component_basis: FeO
-            reference_pressure_bar: '1.01325'
-        inferred: false
+          tag: unknown
+          reason: schema cannot represent the paper's nonstoichiometric liquid wüstite "FeO" standard state
         note: >-
           pure liquid Fe(1-x)O; reference reaction Fe(s) + 1/2 O2(g) = "FeO"(l); deltaG0 source O'Neill and Pownceby
           (1993) and Barin (1989). The typed endmember encodes Raoultian FeO(l) at 1 atm but cannot encode the source's
@@ -4583,6 +4547,9 @@ species:
           FeO_wustite_liquid_deltaG_J_per_mol: -244118 + 115.559*T - 8.474*T*ln(T)
         reaction_form: metal(s) + 1/2 O2(g) = oxide(liquid)
         standard_state: pure liquid oxide at 1 atm; FeO uses wustite(liquid) notation
+        located_note:
+          text: "Applying Eq. 9 with a(Fe) = 1 to the printed log fO2 and X(FeO) does not reproduce the printed gamma (e.g. AD 10); the printed values are stated to be recalculated to equilibrium with pure metals from alloy experiments. The printed gamma is the datum; do not recompute it from Eq. 9."
+          locator: {page: 23, table: '2', row: AD 10, note: 'Eq. 9 is on page 30'}
       uncertainty:
         reported_status: source discusses uncertainties in thermodynamic data but gives no uncertainty for these fitted expressions
       equipment: {}
