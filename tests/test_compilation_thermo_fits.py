@@ -533,9 +533,11 @@ def test_broken_piecewise_join_is_typed_rejection_even_when_cells_round(
     original_solver = compilation_thermo_fits._constrained_weighted_lstsq
 
     def break_right_enthalpy_anchor(matrix, target, constraints, constraint_target):
-        values, rank = original_solver(matrix, target, constraints, constraint_target)
+        values, rank, residuals = original_solver(
+            matrix, target, constraints, constraint_target
+        )
         values[9 + 7] += 1e-5
-        return values, rank
+        return values, rank, residuals
 
     monkeypatch.setattr(
         compilation_thermo_fits,
@@ -554,11 +556,38 @@ def test_broken_piecewise_join_is_typed_rejection_even_when_cells_round(
         fit_hi=1200.0,
     )
 
-    assert result.record["fit_statistics"]["smooth_fit_checks"][
-        "join_continuity_max_relative"
-    ] > 1e-9
+    smooth_checks = result.record["fit_statistics"]["smooth_fit_checks"]
+    assert smooth_checks["join_continuity_passed"] is False
+    join = smooth_checks["join_evaluation_errors"][0]
+    assert join["H_absolute_mismatch_J_per_mol"] > join[
+        "H_total_bound_J_per_mol"
+    ]
+    assert join["H_solve_constraint_passed"] is False
     assert result.record["status"] == "rejected", result.record
     assert result.record["reason_code"] == "join_continuity_failed"
+
+
+def test_k001_g_roundoff_join_refines_before_interpolation_ringing_refusal() -> None:
+    records = generate_janaf_sidecar(table_ids=["K-001"])
+    gas = next(
+        record
+        for record in records
+        if record.get("source_record_id") == "K-001" and record.get("phase") == "g"
+    )
+
+    assert gas["status"] == "rejected"
+    assert gas["reason_code"] == "interpolation_ringing"
+    smooth_checks = gas["fit_statistics"]["smooth_fit_checks"]
+    assert smooth_checks["join_continuity_passed"] is True
+    join = next(
+        item
+        for item in smooth_checks["join_evaluation_errors"]
+        if item["T_K"] == 4300.0
+    )
+    assert join["Cp_term_magnitude_sum_J_per_mol_K"] > 0.0
+    assert join["Cp_absolute_mismatch_J_per_mol_K"] < join[
+        "Cp_evaluation_bound_J_per_mol_K"
+    ]
 
 
 @pytest.mark.parametrize("table_id", ["Al-001", "Al-004"])

@@ -360,6 +360,47 @@ def _evaluate(segment: Nasa9Segment, temperature_K: float) -> tuple[float, float
     )
 
 
+def _evaluation_term_magnitude_sums(
+    segment: Nasa9Segment, temperature_K: float
+) -> tuple[float, float, float]:
+    """Return absolute Cp/H/S term sums in the evaluator's physical units."""
+
+    a1, a2, a3, a4, a5, a6, a7 = segment.coefficients
+    T = temperature_K
+    T2 = T * T
+    T3 = T2 * T
+    T4 = T3 * T
+    invT = 1.0 / T
+    invT2 = invT * invT
+    lnT = math.log(T)
+    cp_terms = (a1 * invT2, a2 * invT, a3, a4 * T, a5 * T2, a6 * T3, a7 * T4)
+    h_terms = (
+        -a1 * invT2,
+        a2 * lnT * invT,
+        a3,
+        a4 * T / 2.0,
+        a5 * T2 / 3.0,
+        a6 * T3 / 4.0,
+        a7 * T4 / 5.0,
+        segment.b1 * invT,
+    )
+    s_terms = (
+        -a1 * invT2 / 2.0,
+        -a2 * invT,
+        a3 * lnT,
+        a4 * T,
+        a5 * T2 / 2.0,
+        a6 * T3 / 3.0,
+        a7 * T4 / 4.0,
+        segment.b2,
+    )
+    return (
+        math.fsum(abs(term) for term in cp_terms) * R_J_PER_MOL_K,
+        math.fsum(abs(term) for term in h_terms) * R_J_PER_MOL_K * T,
+        math.fsum(abs(term) for term in s_terms) * R_J_PER_MOL_K,
+    )
+
+
 def _element_reference_terms(
     formula: str,
     temperature_K: float,
@@ -553,7 +594,7 @@ def _constrained_weighted_lstsq(
     target: np.ndarray,
     constraints: np.ndarray,
     constraint_target: np.ndarray,
-) -> tuple[np.ndarray, int]:
+) -> tuple[np.ndarray, int, np.ndarray]:
     """Solve weighted least squares in the equality-constraint null space."""
 
     row_norms = np.linalg.norm(constraints, axis=1)
@@ -596,7 +637,8 @@ def _constrained_weighted_lstsq(
             f"(scaled residual {constraint_error:.3g})"
         )
     if null_space.shape[1] == 0:
-        return particular / column_norms, 0
+        solution = particular / column_norms
+        return solution, 0, constraints @ solution - constraint_target
     reduced = scaled_matrix @ null_space
     reduced_target = target - scaled_matrix @ particular
     correction, _residuals, reduced_rank, reduced_singular = np.linalg.lstsq(
@@ -606,7 +648,7 @@ def _constrained_weighted_lstsq(
         rank_tolerance = 1e-15 * reduced_singular[0]
         reduced_rank = int(np.count_nonzero(reduced_singular > rank_tolerance))
     solution = (particular + null_space @ correction) / column_norms
-    return solution, int(reduced_rank)
+    return solution, int(reduced_rank), constraints @ solution - constraint_target
 
 
 def _fit_piecewise_candidate(
@@ -755,6 +797,7 @@ def _fit_piecewise_candidate(
     weights: list[float] = []
     constraints: list[np.ndarray] = []
     constraint_targets: list[float] = []
+    join_constraint_rows: list[tuple[np.ndarray, float, int]] = []
 
     def coefficient_row(index: int, values: Sequence[float], *, offset: int = 0) -> np.ndarray:
         row = np.zeros(variable_count, dtype=float)
@@ -874,8 +917,16 @@ def _fit_piecewise_candidate(
                 h_row(index, join_K) - h_row(index + 1, join_K)
             ) / join_K
             s_continuity = s_row(index, join_K) - s_row(index + 1, join_K)
+            constraint_start = len(constraints)
             constraints.extend((cp_continuity, h_continuity, s_continuity))
             constraint_targets.extend((0.0, 0.0, 0.0))
+            join_constraint_rows.extend(
+                (
+                    (cp_continuity, R_J_PER_MOL_K, constraint_start),
+                    (h_continuity, R_J_PER_MOL_K * join_K, constraint_start + 1),
+                    (s_continuity, R_J_PER_MOL_K, constraint_start + 2),
+                )
+            )
     except ValueError as exc:
         return _rejected(base, "missing_printed_precision", str(exc))
 
@@ -887,8 +938,10 @@ def _fit_piecewise_candidate(
     constraint_matrix = np.asarray(constraints, dtype=float)
     constraint_target = np.asarray(constraint_targets, dtype=float)
     try:
-        scaled, reduced_rank = _constrained_weighted_lstsq(
-            weighted, weighted_target, constraint_matrix, constraint_target
+        scaled, reduced_rank, solver_constraint_residuals = (
+            _constrained_weighted_lstsq(
+                weighted, weighted_target, constraint_matrix, constraint_target
+            )
         )
     except (ValueError, np.linalg.LinAlgError) as exc:
         return _rejected(base, "insufficient_cells", f"constrained NASA-9 system is singular: {exc}")
@@ -1155,7 +1208,44 @@ def _fit_piecewise_candidate(
         worst_relative_cp_cell[2] if worst_relative_cp_cell is not None else None
     )
 
-    join_errors: list[dict[str, float]] = []
+    # In Nasa9Segment.evaluate_ratios, T²/T³/T⁴, 1/T, and 1/T² take 5
+    # operations. Cp adds 6 products and 6 sums, then _evaluate scales by R:
+    # m=18. H adds one log, 12 products/divisions, 7 sums, then R·T: m=27.
+    # S adds one log, 11 products/divisions, 7 sums, then R: m=25. With
+    # binary64 u=2⁻⁵³, gamma_m=m·u/(1-m·u) times the two absolute term sums
+    # bounds evaluator roundoff in J/mol/K (Cp,S) or J/mol (H). Coefficient
+    # conversion in this module uses scale**2 twice, scale**3,
+    # and scale**4 (budgeted as 7 repeated multiplies), then 6 coefficient
+    # multiplies/divisions: a separate gamma_13 term-sum bound. The review's
+    # K-001/g 4300 K Cp sum 2.85954995e8 J/mol/K gives 5.713e-7 J/mol/K for
+    # evaluator m=18 plus 4.127e-7 for conversion, total 9.840e-7; its
+    # 1.66444025e-7 mismatch is below both this and the reviewer's conservative
+    # m=40 evaluation-only check of 1.26989528e-6 J/mol/K.
+    #
+    # The coefficient fit also solves equality rows in scaled NASA basis.
+    # The solver returns its residual certificate before any later caller can
+    # alter the coefficients. Check the componentwise backward error of that
+    # certificate against the existing 1e-10 equality-solver residual ceiling
+    # plus gamma_(2n-1) for the n-product/n-1-sum row dot product. Recompute
+    # each join residual and require it to agree with the certificate within
+    # the dot-product bound; convert the certified residual to Cp, H, or S
+    # units and add it to (never substitute it for) evaluator roundoff.
+    unit_roundoff = 2.0**-53
+    join_operations = (18, 27, 25)
+    coefficient_conversion_operations = 13
+    conversion_gamma = (
+        coefficient_conversion_operations * unit_roundoff
+        / (1.0 - coefficient_conversion_operations * unit_roundoff)
+    )
+    solve_constraint_rtol = 1e-10
+    solve_dot_operations = 2 * variable_count - 1
+    solve_dot_gamma = (
+        solve_dot_operations * unit_roundoff
+        / (1.0 - solve_dot_operations * unit_roundoff)
+    )
+    join_errors: list[dict[str, Any]] = []
+    join_continuity = True
+    solve_constraint_backward_error_passed = True
     for left, right in zip(segments, segments[1:]):
         join_K = left.T_max_K
         left_values = _evaluate(left, join_K)[:3]
@@ -1164,20 +1254,75 @@ def _fit_piecewise_candidate(
             abs(left_value - right_value) / max(abs(left_value), abs(right_value), 1.0)
             for left_value, right_value in zip(left_values, right_values)
         ]
-        join_errors.append(
-            {
-                "T_K": join_K,
-                "Cp_relative": relative[0],
-                "H_relative": relative[1],
-                "S_relative": relative[2],
-            }
+        left_magnitudes = _evaluation_term_magnitude_sums(left, join_K)
+        right_magnitudes = _evaluation_term_magnitude_sums(right, join_K)
+        property_names = (
+            ("Cp", "J_per_mol_K"),
+            ("H", "J_per_mol"),
+            ("S", "J_per_mol_K"),
         )
+        error = {
+            "T_K": join_K,
+            "Cp_relative": relative[0],
+            "H_relative": relative[1],
+            "S_relative": relative[2],
+        }
+        constraint_solve_bounds: list[float] = []
+        constraint_solve_passed: list[bool] = []
+        for row, physical_scale, constraint_index in join_constraint_rows[
+            len(join_errors) * 3 : len(join_errors) * 3 + 3
+        ]:
+            residual = float(row @ scaled)
+            certified_residual = float(solver_constraint_residuals[constraint_index])
+            term_sum = math.fsum(
+                abs(float(coefficient * value))
+                for coefficient, value in zip(row, scaled)
+            )
+            dot_roundoff_bound = solve_dot_gamma * term_sum
+            backward_error_bound = (
+                solve_constraint_rtol + solve_dot_gamma
+            ) * term_sum
+            certificate_matches = (
+                abs(residual - certified_residual) <= dot_roundoff_bound
+            )
+            constraint_solve_bounds.append(
+                (abs(certified_residual) + dot_roundoff_bound) * physical_scale
+            )
+            passed = (
+                abs(certified_residual) <= backward_error_bound
+                and certificate_matches
+            )
+            constraint_solve_passed.append(passed)
+            solve_constraint_backward_error_passed &= passed
+        for index, (name, unit) in enumerate(property_names):
+            term_magnitude_sum = math.fsum(
+                (left_magnitudes[index], right_magnitudes[index])
+            )
+            operations = join_operations[index]
+            gamma = operations * unit_roundoff / (1.0 - operations * unit_roundoff)
+            evaluation_bound = gamma * term_magnitude_sum
+            coefficient_conversion_bound = conversion_gamma * term_magnitude_sum
+            solve_bound = constraint_solve_bounds[index]
+            mismatch = abs(left_values[index] - right_values[index])
+            error[f"{name}_absolute_mismatch_{unit}"] = mismatch
+            error[f"{name}_term_magnitude_sum_{unit}"] = term_magnitude_sum
+            error[f"{name}_evaluation_bound_{unit}"] = evaluation_bound
+            error[f"{name}_solve_constraint_bound_{unit}"] = solve_bound
+            error[f"{name}_coefficient_conversion_bound_{unit}"] = (
+                coefficient_conversion_bound
+            )
+            total_bound = evaluation_bound + coefficient_conversion_bound + solve_bound
+            error[f"{name}_total_bound_{unit}"] = total_bound
+            error[f"{name}_solve_constraint_passed"] = constraint_solve_passed[index]
+            join_continuity = join_continuity and (
+                constraint_solve_passed[index]
+                and mismatch <= total_bound
+            )
+        join_errors.append(error)
     join_continuity_max_relative = max(
         (max(item["Cp_relative"], item["H_relative"], item["S_relative"]) for item in join_errors),
         default=0.0,
     )
-    join_continuity = join_continuity_max_relative <= 1e-9
-
     # If |dCp| <= 1e-3 Cp, then dH=int(dCp)dT is bounded by
     # 1e-3 mean(Cp) ΔT (J/mol), and dS=int(dCp/T)dT by
     # 1e-3 mean(Cp) ln(T2/T1) (J/mol/K). For O2, mean Cp≈32 J/mol/K
@@ -1249,6 +1394,9 @@ def _fit_piecewise_candidate(
             (value for value in s_integral_ratios if value is not None), default=None
         ),
         "join_continuity_max_relative": join_continuity_max_relative,
+        "join_continuity_passed": join_continuity,
+        "join_solve_constraint_backward_error_passed": solve_constraint_backward_error_passed,
+        "join_evaluation_errors": join_errors,
         "anti_ringing_passed": ring_pass,
         "positive_Cp": positive_cp,
         "source_Cp_positive": cp_source_positive,
@@ -1478,6 +1626,7 @@ def fit_compilation_thermo_range(
             "smooth_fit_tolerance_exceeded",
             "interpolation_ringing",
             "cp_nonpositive",
+            "join_continuity_failed",
         }:
             return with_exclusions(candidate)
         if reason == "cp_nonpositive" and not any(
