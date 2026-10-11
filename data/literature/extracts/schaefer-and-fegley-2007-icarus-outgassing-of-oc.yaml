@@ -347,7 +347,11 @@ species:
       units: log mole fraction / fO2 as plotted; no numeric table
       values:
         quantity: equilibrium_outgassed_gas_composition_vs_T
-        method_class: model_derived
+        evidence_class: quoted_attributed
+        method_class: quoted_attributed
+        attribution: >-
+          Schaefer and Fegley (2007), Gibbs energy minimization calculations using a code of the type
+          described by Van Zeggern and Storey (1970) and IVTANTHERMO (Belov et al., 1999).
         admission_status: figure_only
         status: typed_refusal
         reason: Gas speciation, elemental distribution, fO2, mineralogy, and sensitivity panels exist
@@ -946,8 +950,11 @@ species:
       units: dimensionless identity claim as printed
       values:
         quantity: identity_of_major_C_bearing_gas
-        method_class: model_derived
-        admission_status: model_output_not_measurement
+        evidence_class: quoted_attributed
+        method_class: quoted_attributed
+        attribution: >-
+          Schaefer and Fegley (2007), Gibbs energy minimization calculations using a code of the type
+          described by Van Zeggern and Storey (1970) and IVTANTHERMO (Belov et al., 1999).
         major_C_bearing_gas_during_metamorphism: CH4
         CO_never_major_during_ordinary_chondrite_metamorphism: true
         numeric_mole_fractions: figure_only
