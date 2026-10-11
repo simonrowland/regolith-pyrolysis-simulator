@@ -696,6 +696,33 @@ species:
       equipment: *id002
       observation_id: ichise_1982_table4_partial_molar_1823K
       experiment: fe-mo-low-mo-in-situ
+      derived_from: &ichise_1982_table2_activity_inputs
+      - kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=0db5db1d881a
+      - kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=10938853ab5a
+      - kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=1387f56114bf
+      - kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=138b6ffd4683
+      - kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=158c2abe0513
+      - kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=1f11cc5c1a46
+      - kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=2b170346d4f2
+      - kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=2b58e7565a8e
+      - kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=319ad0894bb7
+      - kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=32210278b9ad
+      - kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=383727daf076
+      - kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=488a505c3938
+      - kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=4cff1b4c9da7
+      - kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=50c95f1a93c9
+      - kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=56d5e90c7d7b
+      - kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=605b8e3ecb90
+      - kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=8e86187e641d
+      - kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=a5939ff12093
+      - kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=aa4ccd8d2335
+      - kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=b2b28dee590c
+      - kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=be5800499252
+      - kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=c74133439782
+      - kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=edb2af0837ea
+      derivation:
+        relation: a_Mo and the partial molar quantities were calculated from measured a_Fe using the Gibbs-Duhem equation and the authors' Eqs. (11)-(15), as stated in the Table 4 footnote (published pp. 555-557).
+        inputs: *ichise_1982_table2_activity_inputs
       type: activity_coefficient
       locator:
         table: '4'
@@ -1108,6 +1135,10 @@ species:
       equipment: *id002
       observation_id: ichise_1982_fig5_ln_gamma_Fe_figure_only
       experiment: fe-mo-low-mo-in-situ
+      derived_from: *ichise_1982_table2_activity_inputs
+      derivation:
+        relation: The authors' multiple-regression fit of ln gamma_Fe against x_Mo from the measured Fe activities, shown in Fig. 5 and stated as Eq. (11) (published pp. 555-556).
+        inputs: *ichise_1982_table2_activity_inputs
       type: activity_coefficient
       locator:
         figure: '5'
@@ -1133,6 +1164,10 @@ species:
       equipment: *id002
       observation_id: ichise_1982_fig6_error_estimate_figure_only
       experiment: fe-mo-low-mo-in-situ
+      derived_from: *ichise_1982_table2_activity_inputs
+      derivation:
+        relation: The authors' confidence limits were calculated from Eq. (11) and the coefficient of variation in Eqs. (27)-(30), then combined with composition error to draw Fig. 6 (published pp. 558-559).
+        inputs: *ichise_1982_table2_activity_inputs
       type: activity_coefficient
       locator:
         figure: '6'
@@ -1189,6 +1224,10 @@ species:
       equipment: *id002
       observation_id: ichise_1982_infinite_dilution_gamma
       experiment: fe-mo-low-mo-in-situ
+      derived_from: *ichise_1982_table2_activity_inputs
+      derivation:
+        relation: gamma_Mo(s) at infinite dilution is the x_Mo=0 Table 4 result calculated by Gibbs-Duhem from measured a_Fe (Table 4 footnote, published pp. 556-558).
+        inputs: *ichise_1982_table2_activity_inputs
       type: activity_coefficient
       locator:
         published_page: 558
@@ -1228,6 +1267,10 @@ species:
       equipment: *id002
       observation_id: ichise_1982_interaction_parameters_liquid
       experiment: fe-mo-low-mo-in-situ
+      derived_from: *ichise_1982_table2_activity_inputs
+      derivation:
+        relation: The interaction parameters were calculated from the authors' Gibbs-Duhem activity-coefficient expression, Eqs. (16) and (21)-(23) (published pp. 556-557).
+        inputs: *ichise_1982_table2_activity_inputs
       type: activity_coefficient
       locator:
         published_page: 559
@@ -1264,6 +1307,10 @@ species:
       equipment: *id002
       observation_id: ichise_1982_deltaG_henrian_1wt_pct
       experiment: fe-mo-low-mo-in-situ
+      derived_from: [ichise_1982_infinite_dilution_gamma]
+      derivation:
+        relation: The standard-state conversion free energy was calculated using the reported infinite-dilution gamma_Mo(s), Eq. (24), and its temperature form in Eq. (25) (published p. 557).
+        inputs: [ichise_1982_infinite_dilution_gamma]
       type: gibbs_table
       locator:
         published_page: 559
