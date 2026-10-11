@@ -42,7 +42,10 @@ class _UniqueKeyLoader(YAML12SafeLoader):
         if isinstance(node, MappingNode):
             first_lines = {}
             for key_node, _value_node in node.value:
-                key = self.construct_object(key_node, deep=deep)
+                if key_node.tag == "tag:yaml.org,2002:merge":
+                    key = "<<"
+                else:
+                    key = self.construct_object(key_node, deep=deep)
                 try:
                     first_line = first_lines.get(key)
                 except TypeError:
