@@ -31,6 +31,10 @@ def test_published_curve_loader_gates_mg_equations_against_table_cells():
     assert enthalpy["gate"]["kind"] == "printed_heat_content_cells"
     assert [row["temperature_K"] for row in enthalpy["gate"]["residuals"]] == [400, 600, 800]
     assert [row["observed"] for row in enthalpy["gate"]["residuals"]] == [621, 1926, 3342]
+    liquid_cp = next(curve for curve in curves if curve["quantity"] == "heat_capacity" and curve["phase"] == "l")
+    assert liquid_cp["source_cell_rows"][0] == 5
+    assert liquid_cp["gate"]["residuals"][0]["temperature_K"] == 922
+    assert liquid_cp["gate"]["residuals"][0]["observed"] == 7.680
 
 
 def test_mg_solid_cp_298_sanity_value_matches_source_table():
