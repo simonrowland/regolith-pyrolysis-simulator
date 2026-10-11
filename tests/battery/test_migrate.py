@@ -9,6 +9,7 @@ import re
 import subprocess
 import sys
 import unicodedata
+from copy import deepcopy
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
@@ -604,7 +605,7 @@ def test_invalid_raw_input_declarations_return_typed_issues(
         ),
         (
             {"state": {"tag": "value", "value": 7}, "locator": {"page": 2}},
-            "invalid value",
+            "RawInputStatus",
         ),
         ({"locator": {"page": 2}}, "contain a state"),
     ],
@@ -629,6 +630,339 @@ def test_invalid_raw_input_parse_is_a_typed_issue_at_each_annotation_location(
         and issue.path.endswith(f".{location}")
         and detail in issue.detail
         for issue in result.registry_issues
+    )
+
+
+def _malformed_derivation_annotation(shape: str) -> object:
+    annotation: dict = {
+        "relation": "author_calculation",
+        "inputs": ["pdf:fixture-source"],
+        "output_unit": "Pa",
+    }
+    valid_raw_inputs = {
+        "state": {"tag": "value", "value": "not_printed"},
+        "locator": {"page": 2},
+    }
+    malformed_raw_inputs = {
+        "state-tag": {
+            "state": {"tag": "printed", "value": "not_printed"},
+            "locator": {"page": 2},
+        },
+        "empty-locator": {
+            "state": {"tag": "value", "value": "not_printed"},
+            "locator": {"page": ""},
+        },
+        "enum-literal": {
+            "state": {"tag": "value", "value": "printed"},
+            "locator": {"page": 2},
+        },
+        "missing-state": {"locator": {"page": 2}},
+        "missing-value": {
+            "state": {"tag": "value"},
+            "locator": {"page": 2},
+        },
+        "missing-reason": {
+            "state": {"tag": "unknown"},
+            "locator": {"page": 2},
+        },
+    }
+    if shape in malformed_raw_inputs:
+        annotation["raw_inputs"] = malformed_raw_inputs[shape]
+        if shape == "empty-locator":
+            annotation["inputs"] = []
+        return annotation
+    if shape.startswith("state-type-"):
+        annotation["raw_inputs"] = {
+            "state": {"int": 7, "list": [], "none": None}[shape.removeprefix("state-type-")],
+            "locator": {"page": 2},
+        }
+        return annotation
+    if shape.startswith("locator-type-"):
+        annotation["raw_inputs"] = {
+            "state": valid_raw_inputs["state"],
+            "locator": {"int": 7, "list": [], "none": None}[shape.removeprefix("locator-type-")],
+        }
+        return annotation
+    if shape.startswith("value-type-"):
+        annotation["raw_inputs"] = {
+            "state": {
+                "tag": "value",
+                "value": {"int": 7, "list": [], "none": None}[shape.removeprefix("value-type-")],
+            },
+            "locator": {"page": 2},
+        }
+        return annotation
+    if shape.startswith("tag-type-"):
+        annotation["raw_inputs"] = {
+            "state": {
+                "tag": {"int": 7, "list": [], "none": None}[shape.removeprefix("tag-type-")],
+                "value": "not_printed",
+            },
+            "locator": {"page": 2},
+        }
+        return annotation
+    if shape.startswith("reason-type-"):
+        annotation["raw_inputs"] = {
+            "state": {
+                "tag": "unknown",
+                "reason": {"int": 7, "list": [], "none": None}[shape.removeprefix("reason-type-")],
+            },
+            "locator": {"page": 2},
+        }
+        return annotation
+    if shape in {"inputs-int", "inputs-list", "inputs-none", "inputs-mapping"}:
+        annotation["inputs"] = {
+            "inputs-int": 7,
+            "inputs-list": [7],
+            "inputs-none": None,
+            "inputs-mapping": {"source": "pdf:fixture-source"},
+        }[shape]
+        return annotation
+    if shape in {"parameters-int", "parameters-list", "parameters-none"}:
+        annotation["parameters"] = {
+            "parameters-int": 7,
+            "parameters-list": ["not-a-pair"],
+            "parameters-none": None,
+        }[shape]
+        return annotation
+    if shape in {"relation-int", "relation-list", "relation-none"}:
+        annotation["relation"] = {
+            "relation-int": 7,
+            "relation-list": [],
+            "relation-none": None,
+        }[shape]
+        return annotation
+    if shape in {"output-unit-int", "output-unit-list", "output-unit-none"}:
+        annotation["output_unit"] = {
+            "output-unit-int": 7,
+            "output-unit-list": [],
+            "output-unit-none": None,
+        }[shape]
+        return annotation
+    if shape in {"pure-reference-int", "pure-reference-list"}:
+        annotation["pure_substance_reference"] = {
+            "pure-reference-int": 7,
+            "pure-reference-list": [],
+        }[shape]
+        return annotation
+    if shape == "missing-inputs":
+        annotation.pop("inputs")
+        return annotation
+    if shape in {"annotation-int", "annotation-list", "annotation-none", "annotation-string"}:
+        return {
+            "annotation-int": 7,
+            "annotation-list": [],
+            "annotation-none": None,
+            "annotation-string": "not a mapping",
+        }[shape]
+    raise AssertionError(shape)
+
+
+def _fixture_registry_experiment(inference: object) -> dict:
+    return {
+        "experiment_id": "fixture-experiment",
+        "sample": {
+            "initial_composition": {
+                "state": {
+                    "tag": "value",
+                    "value": {
+                        "basis": "printed_oxides",
+                        "amount_basis": "mole_fraction",
+                        "components": [["SiO2", "1"]],
+                    },
+                },
+                "locator": {"page": 2},
+                "inference": inference,
+            }
+        },
+    }
+
+
+_MALFORMED_ANNOTATION_SHAPES = [
+    "state-tag",
+    "empty-locator",
+    "enum-literal",
+    "state-type-int",
+    "state-type-list",
+    "state-type-none",
+    "locator-type-int",
+    "locator-type-list",
+    "locator-type-none",
+    "tag-type-int",
+    "tag-type-list",
+    "tag-type-none",
+    "value-type-int",
+    "value-type-list",
+    "value-type-none",
+    "reason-type-int",
+    "reason-type-list",
+    "reason-type-none",
+    "missing-state",
+    "missing-value",
+    "missing-reason",
+    "inputs-int",
+    "inputs-list",
+    "inputs-none",
+    "inputs-mapping",
+    "parameters-int",
+    "parameters-list",
+    "parameters-none",
+    "relation-int",
+    "relation-list",
+    "relation-none",
+    "output-unit-int",
+    "output-unit-list",
+    "output-unit-none",
+    "pure-reference-int",
+    "pure-reference-list",
+    "missing-inputs",
+    "annotation-int",
+    "annotation-list",
+    "annotation-none",
+    "annotation-string",
+]
+
+
+def test_production_annotation_boundary_reports_malformed_shapes(
+    tmp_path: Path,
+) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row_template = extract["species"]["Na"]["observations"][0]
+    locations = (
+        "values.derivation",
+        "derivation",
+        "values.inference",
+        "inference",
+        "registry.inference",
+    )
+    expected_paths = []
+    observation_rows = []
+    registry_experiments = []
+    ordinal = 0
+    for location in locations:
+        for shape in _MALFORMED_ANNOTATION_SHAPES:
+            annotation = _malformed_derivation_annotation(shape)
+            if location == "registry.inference":
+                experiment = _fixture_registry_experiment(annotation)
+                local_experiment_id = f"fixture-experiment-{ordinal}"
+                experiment["experiment_id"] = local_experiment_id
+                expected_paths.append(
+                    (
+                        location,
+                        shape,
+                        f"::experiment::{local_experiment_id}].sample.initial_composition",
+                    )
+                )
+                registry_experiments.append(experiment)
+            else:
+                row = deepcopy(row_template)
+                observation_id = f"annotation-{ordinal}"
+                row["observation_id"] = observation_id
+                field = location.rsplit(".", 1)[-1]
+                target = row["values"] if location.startswith("values.") else row
+                target[field] = annotation
+                expected_paths.append(
+                    (
+                        location,
+                        shape,
+                        f"observations.fixture-source::{observation_id}.{location}",
+                    )
+                )
+                observation_rows.append(row)
+            ordinal += 1
+
+    extract["species"]["Na"]["observations"] = observation_rows
+    extract["experiments"] = registry_experiments
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    issues = [*result.registry_issues, *result.validation.hard_issues]
+    for location, shape, expected_path in expected_paths:
+        matching = [
+            issue
+            for issue in issues
+            if (
+                issue.path.endswith(expected_path)
+                if location == "registry.inference"
+                else issue.path == expected_path
+            )
+            and issue.reason is RefusalReason.INVALID_SOURCE
+        ]
+        assert matching, (location, shape)
+        if shape == "state-tag":
+            assert any("not a valid StateTag" in issue.detail for issue in matching)
+        if shape == "empty-locator":
+            assert any(
+                "Locator requires at least one nonempty location key" in issue.detail
+                for issue in matching
+            )
+        if shape == "enum-literal":
+            assert any(
+                "not a valid RawInputStatus" in issue.detail for issue in matching
+            )
+        if location == "registry.inference":
+            local_experiment_id = expected_path.split("::experiment::", 1)[1].split("]", 1)[0]
+            experiment_id = next(
+                identifier
+                for identifier in result.experiments
+                if identifier.endswith(f"::experiment::{local_experiment_id}")
+            )
+            sample = result.experiments[experiment_id].sample
+            assert sample.initial_composition is not None
+            assert sample.initial_composition.state.is_value
+        else:
+            assert result.observations
+
+
+def test_derivation_input_requirement_message_comes_from_record_owner(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from simulator.battery.records import Derivation as RecordDerivation
+
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"][0]["values"]["derivation"] = {
+        "relation": "owner-validation-probe",
+        "output_unit": "Pa",
+    }
+    original_post_init = RecordDerivation.__post_init__
+
+    def owner_post_init(self) -> None:
+        if self.relation == "owner-validation-probe":
+            raise ValueError("owner-only Derivation input requirement")
+        original_post_init(self)
+
+    monkeypatch.setattr(RecordDerivation, "__post_init__", owner_post_init)
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    assert any(
+        issue.path.endswith(".values.derivation")
+        and "owner-only Derivation input requirement" in issue.detail
+        for issue in result.registry_issues
+    )
+
+
+@pytest.mark.parametrize("location", ["values.derivation", "registry.inference"])
+def test_string_derivation_inputs_keep_their_existing_meaning(
+    tmp_path: Path, location: str
+) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    annotation = {
+        "relation": "author_calculation",
+        "inputs": "pdf:fixture-source",
+        "output_unit": "Pa",
+    }
+    if location == "registry.inference":
+        extract["experiments"] = [_fixture_registry_experiment(annotation)]
+        expected_path = "experiment[fixture-experiment].sample.initial_composition"
+    else:
+        extract["species"]["Na"]["observations"][0]["values"]["derivation"] = annotation
+        expected_path = "observations.fixture-source::na_psat.values.derivation"
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    assert not any(
+        issue.path == expected_path and issue.reason is RefusalReason.INVALID_SOURCE
+        for issue in [*result.registry_issues, *result.validation.hard_issues]
     )
 
 

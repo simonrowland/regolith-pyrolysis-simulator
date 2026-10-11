@@ -1,12 +1,18 @@
 from __future__ import annotations
 
+import subprocess
 from copy import deepcopy
 from pathlib import Path
 
 import pytest
 import yaml
 
-from tools.lineage_wave_check import _load_source_extract, compare, snapshot
+from tools.lineage_wave_check import (
+    _UniqueKeyLoader,
+    _load_source_extract,
+    compare,
+    snapshot,
+)
 from tests.battery.test_migrate import _write_min_tree
 
 
@@ -132,6 +138,53 @@ def test_source_extract_without_duplicate_keys_loads(tmp_path: Path) -> None:
     assert _load_source_extract(path) == {
         "row": {"evidence_class": "measured_direct", "quantity": "p_sat"}
     }
+
+
+def test_historical_schaefer_six_duplicate_reproduction_still_fails() -> None:
+    source = subprocess.check_output(
+        [
+            "git",
+            "show",
+            "9bc2a90e0:data/literature/extracts/kems-008-schaefer-fegley-2004.yaml",
+        ],
+        text=True,
+    )
+
+    with pytest.raises(ValueError, match="duplicate mapping keys") as exc_info:
+        yaml.load(source, Loader=_UniqueKeyLoader)
+
+    assert str(exc_info.value).count("'evidence_class'") == 6
+
+
+@pytest.mark.parametrize(
+    "filename",
+    [
+        "kems-012-sossi-2019.yaml",
+        "ta-dacko-conradt-low-p-transpiration.yaml",
+        "itoh-hino-banya-1998-spinel.yaml",
+    ],
+)
+def test_existing_merge_extracts_load(filename: str) -> None:
+    root = Path(__file__).parents[2]
+
+    payload = _load_source_extract(
+        root / "data" / "literature" / "extracts" / filename
+    )
+
+    assert payload
+
+
+def test_merge_key_override_is_not_an_explicit_duplicate(tmp_path: Path) -> None:
+    path = tmp_path / "merge-override.yaml"
+    path.write_text(
+        "defaults: &defaults\n"
+        "  quantity: inherited\n"
+        "row:\n"
+        "  <<: *defaults\n"
+        "  quantity: explicit\n"
+    )
+
+    assert _load_source_extract(path)["row"]["quantity"] == "explicit"
 
 
 def test_removed_observation_fails() -> None:

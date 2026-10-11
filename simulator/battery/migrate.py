@@ -48,7 +48,7 @@ from enum import Enum
 from fractions import Fraction
 from pathlib import Path
 from types import UnionType
-from typing import Any, Iterable, Iterator, Mapping, Sequence, Union, get_args, get_origin, get_type_hints
+from typing import Any, Callable, Iterable, Iterator, Mapping, Sequence, Union, get_args, get_origin, get_type_hints
 
 import yaml
 
@@ -877,26 +877,32 @@ class _InvalidDerivationAnnotation(ValueError):
     """A malformed author annotation that should become an INVALID_SOURCE issue."""
 
 
+def _decode_author_annotation(
+    payload: object, decoder: Callable[[object], Any]
+) -> tuple[Any | None, str | None]:
+    try:
+        return decoder(payload), None
+    except (TypeError, ValueError) as exc:
+        return None, str(exc)
+
+
 def _raw_inputs_from_plain(payload: object) -> Located[RawInputStatus]:
     if not isinstance(payload, Mapping) or "state" not in payload:
         raise _InvalidDerivationAnnotation(
             "raw_inputs declaration must contain a state"
         )
     state = payload["state"]
-    if isinstance(state, Mapping) and str(state.get("tag") or "value") == "value":
-        value = state.get("value")
-        if not isinstance(value, str):
-            raise _InvalidDerivationAnnotation(
-                f"raw_inputs state has invalid value {value!r}"
-            )
-        try:
-            _enum(RawInputStatus, value)
-        except (TypeError, ValueError) as exc:
-            raise _InvalidDerivationAnnotation(
-                f"raw_inputs state has invalid value {value!r}"
-            ) from exc
-    elif not isinstance(state, Mapping) and not isinstance(state, State):
+    if not isinstance(state, (Mapping, State)):
         raise _InvalidDerivationAnnotation("raw_inputs state must be an object")
+    if (
+        isinstance(state, Mapping)
+        and "tag" in state
+        and not isinstance(state["tag"], str)
+    ):
+        raise _InvalidDerivationAnnotation("raw_inputs state tag must be a string")
+    locator = payload.get("locator")
+    if "locator" in payload and not isinstance(locator, (Mapping, Locator)):
+        raise _InvalidDerivationAnnotation("raw_inputs locator must be an object")
     return _located_from_plain(
         payload, lambda value: _enum(RawInputStatus, value)
     )
@@ -919,23 +925,35 @@ def _derivation_from_plain(
     payload: object,
     *,
     require_sequence_inputs: bool = False,
+    require_relation: bool = False,
     allow_mapping_inputs: bool = False,
 ) -> Derivation | None:
     if not isinstance(payload, Mapping):
-        return None
-    params_raw = payload.get("parameters") or ()
+        raise _InvalidDerivationAnnotation("Derivation annotation must be a mapping")
+    params_raw = payload.get("parameters", ())
+    if not isinstance(params_raw, (list, tuple)):
+        raise _InvalidDerivationAnnotation(
+            "Derivation.parameters must be a sequence of name/value pairs"
+        )
     parameters: list[tuple[str, Located[Decimal]]] = []
     for item in params_raw:
-        if isinstance(item, (list, tuple)) and len(item) == 2:
-            parameters.append((str(item[0]), _located_from_plain(item[1], as_decimal)))
-    inputs = (
-        payload["inputs"]
-        if "inputs" in payload
-        else (() if "raw_inputs" in payload else None)
-    )
+        if not isinstance(item, (list, tuple)) or len(item) != 2:
+            raise _InvalidDerivationAnnotation(
+                "Derivation.parameters must contain name/value pairs"
+            )
+        if not isinstance(item[0], str):
+            raise _InvalidDerivationAnnotation(
+                "Derivation parameter names must be strings"
+            )
+        parameters.append((item[0], _located_from_plain(item[1], as_decimal)))
+    inputs = payload.get("inputs", ())
     if isinstance(inputs, str) and not require_sequence_inputs:
         inputs = (inputs,)
     if allow_mapping_inputs and isinstance(inputs, (list, tuple)):
+        if any(not isinstance(item, (str, Mapping)) for item in inputs):
+            raise _InvalidDerivationAnnotation(
+                "Derivation.inputs must contain only strings or mappings"
+            )
         inputs = tuple(str(item) for item in inputs)
     if not isinstance(inputs, (list, tuple)) or any(
         not isinstance(item, str) for item in inputs
@@ -948,27 +966,24 @@ def _derivation_from_plain(
     parsed_raw_inputs = (
         _raw_inputs_from_plain(raw_inputs) if raw_inputs is not None else None
     )
-    if not inputs and not (
-        parsed_raw_inputs is not None
-        and parsed_raw_inputs.state.is_value
-        and parsed_raw_inputs.state.value is RawInputStatus.NOT_PRINTED
-        and parsed_raw_inputs.locator is not None
-    ):
-        detail = "Derivation.inputs is required unless raw_inputs is located not_printed"
-        if (
-            parsed_raw_inputs is not None
-            and parsed_raw_inputs.state.is_value
-            and parsed_raw_inputs.state.value is RawInputStatus.NOT_PRINTED
-            and parsed_raw_inputs.locator is None
-        ):
-            detail += "; raw_inputs not_printed declaration requires a locator"
-        raise _InvalidDerivationAnnotation(detail)
+    relation = payload.get("relation", "identity")
+    if relation is None or relation == "":
+        if require_relation:
+            raise _InvalidDerivationAnnotation(
+                "Derivation.relation must be a nonempty string"
+            )
+        relation = "identity"
+    if not isinstance(relation, str):
+        raise _InvalidDerivationAnnotation("Derivation.relation must be a string")
+    output_unit = payload.get("output_unit", "as_published")
+    if not isinstance(output_unit, str):
+        raise _InvalidDerivationAnnotation("Derivation.output_unit must be a string")
     return Derivation(
-        relation=str(payload.get("relation") or "identity"),
-        inputs=tuple(str(x) for x in inputs),
+        relation=relation,
+        inputs=tuple(inputs),
         parameters=tuple(parameters),
-        output_unit=str(payload.get("output_unit") or "as_published"),
-        pure_substance_reference=raw_marker if isinstance(raw_marker, bool) else None,
+        output_unit=output_unit,
+        pure_substance_reference=raw_marker,
         raw_inputs=parsed_raw_inputs,
     )
 
@@ -1741,13 +1756,37 @@ def _sample_from_plain(
                     detail=f"invalid registry inference: {exc}",
                 )
             )
-            if isinstance(raw, Mapping) and "inference" in raw:
-                return parse({k: v for k, v in raw.items() if k != "inference"})
             raise
+
+    def parse_registry_located(field: str, raw: object, parse):
+        if not isinstance(raw, Mapping) or "inference" not in raw:
+            return parse_registry_value(field, raw, parse)
+        inference, error = _decode_author_annotation(
+            raw["inference"],
+            lambda value: _derivation_from_plain(
+                value, allow_mapping_inputs=True, require_relation=True
+            ),
+        )
+        if error is not None:
+            issues.append(
+                ValidationIssue(
+                    path=f"experiment[{experiment_id}].sample.{field}",
+                    reason=RefusalReason.INVALID_SOURCE,
+                    detail=f"invalid registry inference: {error}",
+                )
+            )
+        value = parse_registry_value(
+            field,
+            {key: item for key, item in raw.items() if key != "inference"},
+            parse,
+        )
+        if value is not None and value.inference is None and inference is not None:
+            return replace(value, inference=inference)
+        return value
 
     printed_located = None
     if printed is not None:
-        printed_located = parse_registry_value(
+        printed_located = parse_registry_located(
             "printed_composition",
             printed,
             lambda value: _mass_percent_printed_from_plain(value)
@@ -1756,7 +1795,7 @@ def _sample_from_plain(
     initial_located = (
         None
         if initial is None
-        else parse_registry_value(
+        else parse_registry_located(
             "initial_composition", initial, _composition_located_from_plain
         )
     )
@@ -5661,27 +5700,24 @@ def source_derivation_from_source(
     derivation: Derivation | None = None
     invalid: list[tuple[str, str]] = []
     for payload in (values, obs):
-        raw = payload.get("derivation")
-        if not isinstance(raw, Mapping):
+        if "derivation" not in payload:
             continue
+        raw = payload["derivation"]
         field = "values.derivation" if payload is values else "derivation"
-        relation = raw.get("relation")
-        relation_missing = not isinstance(relation, str) or not relation.strip()
-        try:
-            parsed = _derivation_from_plain(raw)
-        except _InvalidDerivationAnnotation as exc:
-            invalid.append((field, str(exc)))
-            if relation_missing:
-                invalid.append(
-                    (field, "derivation relation (author method) is required")
-                )
+        relation = raw.get("relation") if isinstance(raw, Mapping) else None
+        relation_missing = isinstance(raw, Mapping) and (
+            not isinstance(relation, str) or not relation.strip()
+        )
+        parsed, error = _decode_author_annotation(raw, _derivation_from_plain)
+        if error is not None:
+            invalid.append((field, error))
             continue
         if relation_missing:
             invalid.append(
                 (field, "derivation relation (author method) is required")
             )
             continue
-        if derivation is None:
+        if derivation is None and parsed is not None:
             derivation = parsed
     return derivation, tuple(invalid)
 
@@ -12530,22 +12566,25 @@ class Migrator:
         }:
             source_derivation = None
         for payload in (values, obs):
-            if not isinstance(payload.get("inference"), Mapping):
+            if "inference" not in payload:
                 continue
-            try:
-                inference_payload = payload["inference"]
-                extractor_derivation = _derivation_from_plain(
-                    inference_payload, require_sequence_inputs=True
-                )
-            except _InvalidDerivationAnnotation as exc:
-                field_path = "values.inference" if payload is values else "inference"
+            field_path = "values.inference" if payload is values else "inference"
+            extractor_derivation, error = _decode_author_annotation(
+                payload["inference"],
+                lambda value: _derivation_from_plain(
+                    value, require_sequence_inputs=True, require_relation=True
+                ),
+            )
+            if error is not None:
                 self.result.registry_issues.append(
                     ValidationIssue(
                         path=f"observations.{obs_id}.{field_path}",
                         reason=RefusalReason.INVALID_SOURCE,
-                        detail=str(exc),
+                        detail=error,
                     )
                 )
+                continue
+            if extractor_derivation is None:
                 continue
             if source_derivation is None:
                 source_derivation = _merge_source_conversion_derivation(
