@@ -1411,7 +1411,10 @@ def test_pt0_gate_curve_key_is_tstd_aligned_across_isochemical_ramp(
     replay_sim.melt.oxygen_reservoir.reference_T_K = 1450.0 + 273.15
     replay_sim._sync_oxygen_reservoir_mirror()
     replay_sim.melt.temperature_C = 1600.0
-    replay_sim._re_reference_melt_fO2_to_temperature(1600.0 + 273.15)
+    replay_sim._re_reference_melt_fO2_to_temperature(
+        1600.0 + 273.15,
+        gate_authority=curve,
+    )
 
     assert replay.replay_gate_curve(
         replay_sim,
@@ -1427,6 +1430,7 @@ def test_pt0_gate_curve_key_is_tstd_aligned_across_isochemical_ramp(
     replay_sim._apply_oxygen_reservoir_redox_source_terms(
         {"pt0_real_redox_step": capacity * math.log(10.0) * 0.25},
         temperature_K=1600.0 + 273.15,
+        gate_authority=curve,
     )
     redox_key = canonical_replay_key(
         replay_sim,
@@ -1438,6 +1442,8 @@ def test_pt0_gate_curve_key_is_tstd_aligned_across_isochemical_ramp(
 
     assert redox_key != capture_key
     assert redox_key["controls"]["log_fO2"] != capture_key["controls"]["log_fO2"]
+    assert len(replay.replay_sequence) == len(capture.capture_sequence)
+    assert replay.key_drift_histogram() == {}
 
 
 def test_pt2_equilibrium_provider_id_is_namespace_metadata_only() -> None:
