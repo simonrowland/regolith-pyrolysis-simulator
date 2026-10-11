@@ -682,6 +682,10 @@ species:
             pdf_page_index: 2
             section: '4'
     - observation_id: ichise_1975_epsilon_e_table3
+      derived_from: [ichise_1975_fig7_log_gamma_S_figure_only]
+      derivation:
+        relation: The interaction parameters were obtained by differentiating the integrated sulfur activity coefficients (Eq. 10), converting c_S^(S) to e_S^(S) (Eq. 11), and fitting the temperature dependence (Eq. 12), as reported with Table 3 (published pp. 117-118).
+        inputs: [ichise_1975_fig7_log_gamma_S_figure_only]
       type: activity_coefficient
       locator:
         table: '3'
@@ -773,6 +777,18 @@ species:
             pdf_page_index: 2
             section: '4'
     - observation_id: ichise_1975_ls_integrand_equations_7_to_9
+      derived_from: &ichise_1975_table2_inputs
+      - kems-088-ichise-1975::ichise_1975_ion_ratio_table2::points:h=1025327dd720
+      - kems-088-ichise-1975::ichise_1975_ion_ratio_table2::points:h=37cf613629ad
+      - kems-088-ichise-1975::ichise_1975_ion_ratio_table2::points:h=39742dcd109b
+      - kems-088-ichise-1975::ichise_1975_ion_ratio_table2::points:h=5cf5e8b0c795
+      - kems-088-ichise-1975::ichise_1975_ion_ratio_table2::points:h=896fb761cc0c
+      - kems-088-ichise-1975::ichise_1975_ion_ratio_table2::points:h=a5f781710581
+      - kems-088-ichise-1975::ichise_1975_ion_ratio_table2::points:h=f1c8b6d32a02
+      - kems-088-ichise-1975::ichise_1975_ion_ratio_table2::points:h=f4d5b6ef7756
+      derivation:
+        relation: The authors fitted Eqs. (7)-(9) by least squares to their Table 2 ion-intensity ratios at 1550, 1600, and 1650 C (published p. 117).
+        inputs: *ichise_1975_table2_inputs
       type: activity_coefficient
       locator:
         published_page: 117
@@ -832,6 +848,10 @@ species:
         caption: Fig. 3. Experimental values of the ion current ratio for the Fe-S system
         note: ln(I_Fe+/I_S2+) vs 1/T; %S labels 0.31 to 4.32. Numerics in Table 2.
     - observation_id: ichise_1975_fig4_integration_1550C_figure_only
+      derived_from: [ichise_1975_ls_integrand_equations_7_to_9]
+      derivation:
+        relation: This is the 1550 C integration curve from the least-squares line in Eq. (7), integrated according to Eq. (6) (published pp. 115, 117).
+        inputs: [ichise_1975_ls_integrand_equations_7_to_9]
       type: activity_coefficient
       locator:
         figure: '4'
@@ -861,6 +881,10 @@ species:
         caption: Fig. 4. Integration curve for the Fe-S system at 1550 C
         note: LS line is eq (7). Not digitised.
     - observation_id: ichise_1975_fig5_integration_1600C_figure_only
+      derived_from: [ichise_1975_ls_integrand_equations_7_to_9]
+      derivation:
+        relation: This is the 1600 C integration curve from the least-squares line in Eq. (8), integrated according to Eq. (6) (published pp. 115, 117).
+        inputs: [ichise_1975_ls_integrand_equations_7_to_9]
       type: activity_coefficient
       locator:
         figure: '5'
@@ -890,6 +914,10 @@ species:
         caption: Fig. 5. Integration curve for the Fe-S system at 1600 C
         note: LS line is eq (8). Not digitised.
     - observation_id: ichise_1975_fig6_integration_1650C_figure_only
+      derived_from: [ichise_1975_ls_integrand_equations_7_to_9]
+      derivation:
+        relation: This is the 1650 C integration curve from the least-squares line in Eq. (9), integrated according to Eq. (6) (published pp. 115, 117).
+        inputs: [ichise_1975_ls_integrand_equations_7_to_9]
       type: activity_coefficient
       locator:
         figure: '6'
@@ -919,6 +947,16 @@ species:
         caption: Fig. 6. Integration curve for the Fe-S system at 1650 C
         note: LS line is eq (9). Not digitised.
     - observation_id: ichise_1975_fig7_log_gamma_S_figure_only
+      derived_from:
+      - ichise_1975_fig4_integration_1550C_figure_only
+      - ichise_1975_fig5_integration_1600C_figure_only
+      - ichise_1975_fig6_integration_1650C_figure_only
+      derivation:
+        relation: The sulfur activity-coefficient curves were obtained by integrating the temperature-specific curves using Eq. (6) (published pp. 115-117).
+        inputs:
+        - ichise_1975_fig4_integration_1550C_figure_only
+        - ichise_1975_fig5_integration_1600C_figure_only
+        - ichise_1975_fig6_integration_1650C_figure_only
       type: activity_coefficient
       locator:
         figure: '7'
@@ -1098,6 +1136,10 @@ species:
   Fe:
     observations:
     - observation_id: ichise_1975_fe_heat_of_vaporization_fig8
+      derived_from: [ichise_1975_fig8_pure_iron_figure_only]
+      derivation:
+        relation: The Fe heat of vaporization is the slope of the fitted ln(I_Fe+ T) versus 1/T line in Fig. 8, with no inflection at the Fe melting point (published p. 118).
+        inputs: [ichise_1975_fig8_pure_iron_figure_only]
       type: gibbs_table
       locator:
         figure: '8'
