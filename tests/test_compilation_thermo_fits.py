@@ -26,8 +26,9 @@ from simulator.reference_data.compilation_thermo_fits import (
     main as fit_cli_main,
     render_sidecar,
 )
-from simulator.reference_data.janaf import TABLES_DIR
+from simulator.reference_data.janaf import TABLES_DIR, load_table_document
 from simulator.vapour_rail.nasa_cea import Nasa9Segment, R_J_PER_MOL_K
+import simulator.reference_data.compilation_thermo_fits as compilation_thermo_fits
 
 
 PRESSURE_PA = 101325.0
@@ -393,6 +394,157 @@ def test_missing_formation_h_anchor_keeps_species_fit() -> None:
     assert result.record["formation_capable"] is False
     assert result.record["formation_reason_code"] == "missing_formation_h_anchor"
     assert not any(key.startswith("delta_f") for key in result.record["fit_error"])
+
+
+def test_formation_precision_failure_keeps_species_fit_at_t2() -> None:
+    references = _transition_reference_curves()
+    terms, error = _element_reference_terms("FeO", 298.15, PRESSURE_PA, references)
+    assert error is None and terms is not None
+    elemental_H298 = sum(coefficient * h for coefficient, h, _g in terms)
+    temperatures = [298.15, 400, 600, 800, 1000, 1200, 1500, 1900, 2200]
+    species = _constant_cp_segment(
+        90.0,
+        temperatures[0],
+        temperatures[-1],
+        H_at_anchor_J_per_mol=12500.0 + elemental_H298,
+        S_at_anchor_J_per_mol_K=58.0,
+    )
+    series = list(_source_series(
+        species,
+        temperatures,
+        reference_curves=references,
+        formula="FeO",
+        is_reference=False,
+    ))
+    formation_g = next(index for index, column in enumerate(series)
+                       if column.quantity is Quantity.DELTA_FG)
+    series[formation_g] = _series(
+        Quantity.DELTA_FG,
+        [
+            (float(temperature), float(value) + 100.0)
+            for temperature, value in series[formation_g].value.series
+        ],
+        "kJ mol^-1",
+    )
+
+    result = fit_compilation_thermo_range(
+        record=_record("FeO"),
+        series=series,
+        phase_label="cr",
+        standard_state="condensed_solid",
+        T_min_K=temperatures[0],
+        T_max_K=temperatures[-1],
+        reference_curves=references,
+    )
+
+    assert result.record["status"] == "accepted", result.record
+    assert result.record["acceptance_tier"] == "smooth_fit"
+    assert result.record["formation_capable"] is True
+    assert result.record["fit_error"]["delta_fG_kJ_per_mol"] == pytest.approx(100.0)
+
+
+def test_broken_piecewise_join_is_typed_rejection_even_when_cells_round(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    temperatures = [298.15, 350, 400, 450, 500, 550, 600, 650, 700,
+                    750, 800, 900, 1000, 1100, 1200]
+    source = _constant_cp_segment(30.0, temperatures[0], temperatures[-1])
+    original_solver = compilation_thermo_fits._constrained_weighted_lstsq
+
+    def break_right_enthalpy_anchor(matrix, target, constraints, constraint_target):
+        values, rank = original_solver(matrix, target, constraints, constraint_target)
+        values[9 + 7] += 1e-8
+        return values, rank
+
+    monkeypatch.setattr(
+        compilation_thermo_fits,
+        "_constrained_weighted_lstsq",
+        break_right_enthalpy_anchor,
+    )
+    result = _fit_piecewise_candidate(
+        record=_record("Fe", state="ref"),
+        series=_source_series(source, temperatures, places=0),
+        phase_label="cr:broken-join",
+        standard_state="condensed_solid",
+        is_element_reference=True,
+        reference_curves={},
+        segment_bounds=[(298.15, 700.0), (700.0, 1200.0)],
+        fit_lo=298.15,
+        fit_hi=1200.0,
+    )
+
+    assert result.record["status"] == "rejected", result.record
+    assert result.record["reason_code"] == "join_continuity_failed"
+    assert result.record["fit_statistics"]["smooth_fit_checks"][
+        "join_continuity_max_relative"
+    ] > 1e-9
+
+
+@pytest.mark.parametrize("table_id", ["Al-001", "Al-004"])
+def test_janaf_high_temperature_liquid_uses_printed_h298_baseline(table_id: str) -> None:
+    document = load_table_document(TABLES_DIR / f"{table_id}.yaml")
+    columns = compilation_column_series_from_record(document)
+    cells = {
+        column.quantity: {
+            float(temperature): float(value)
+            for temperature, value in column.value.series
+            if 1000.0 <= float(temperature) <= 2500.0
+        }
+        for column in columns
+        if column.quantity in {Quantity.CP, Quantity.H_MINUS_H298, Quantity.S}
+    }
+    fit = _fit_piecewise_candidate(
+        record=document,
+        series=columns,
+        phase_label="l",
+        standard_state="condensed_liquid",
+        is_element_reference=True,
+        reference_curves={},
+        segment_bounds=[(1000.0, 2700.0)],
+        fit_lo=1000.0,
+        fit_hi=2700.0,
+    )
+
+    assert fit.record["status"] == "accepted", fit.record
+    assert fit.record["acceptance_tier"] == "smooth_fit"
+    assert fit.record["fit_statistics"]["segment_count"] == 1
+    assert fit.record["fit_statistics"]["smooth_fit_checks"][
+        "maximum_relative_Cp_residual"
+    ] <= 3e-5
+    segment_data = fit.record["thermo_record"]["segments"][0]
+    segment = Nasa9Segment(
+        segment_data["T_min_K"],
+        segment_data["T_max_K"],
+        tuple(segment_data["a_coefficients"]),
+        segment_data["b1"],
+        segment_data["b2"],
+    )
+    for temperature in (1000.0, 1500.0):
+        _cp, enthalpy, entropy, _gibbs = _evaluate(segment, temperature)
+        assert abs(enthalpy / 1000.0 - cells[Quantity.H_MINUS_H298][temperature]) <= 0.0011
+        assert abs(entropy - cells[Quantity.S][temperature]) <= 0.0011
+
+
+def test_missing_in_range_h_cell_is_typed_rejection() -> None:
+    temperatures = [298.15, 400, 500, 600, 700]
+    species = _constant_cp_segment(30.0, temperatures[0], temperatures[-1])
+    series = tuple(
+        column for column in _source_series(species, temperatures, places=0)
+        if column.quantity is not Quantity.H_MINUS_H298
+    )
+
+    result = fit_compilation_thermo_range(
+        record=_record("Fe", state="ref"),
+        series=series,
+        phase_label="cr",
+        standard_state="condensed_solid",
+        T_min_K=temperatures[0],
+        T_max_K=temperatures[-1],
+        is_element_reference=True,
+    )
+
+    assert result.record["status"] == "rejected"
+    assert result.record["reason_code"] == "missing_in_range_h_cell"
 
 
 @pytest.mark.parametrize("cp", [0.0, -5.0])
