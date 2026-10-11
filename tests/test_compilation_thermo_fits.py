@@ -15,9 +15,12 @@ from simulator.battery.migrate import (
 from simulator.battery.records import State, Value
 from simulator.diagnostic_helpers.gibbs_battery import formation_subtraction_kJ_mol
 from simulator.reference_data.compilation_thermo_fits import (
+    _Cell,
     FittedCurve,
     _element_reference_terms,
     _evaluate,
+    _fit_piecewise_candidate,
+    _interpolation_ringing,
     fit_compilation_thermo_range,
     generate_janaf_sidecar,
     render_sidecar,
@@ -41,16 +44,22 @@ def _record(formula: str, *, state: str = "cr") -> dict:
     }
 
 
-def _series(quantity: Quantity, pairs: list[tuple[float, float]], unit: str):
-    tokens = tuple(f"{value:.9f}" for _temperature, value in pairs)
+def _series(quantity: Quantity, pairs: list[tuple[float, float]], unit: str, *, places: int = 9):
+    tokens = tuple(f"{value:.{places}f}" for _temperature, value in pairs)
     values = tuple(
         (Decimal(str(temperature)), Decimal(token))
         for (temperature, _value), token in zip(pairs, tokens)
     )
-    return _column_series(quantity, tokens, values, unit)
+    return _column_series(
+        quantity,
+        tokens,
+        values,
+        unit,
+        precision=Decimal(5).scaleb(-(places + 1)),
+    )
 
 
-def _column_series(quantity, tokens, values, unit):
+def _column_series(quantity, tokens, values, unit, *, precision=PRECISION):
     from simulator.battery.migrate import CompilationColumnSeries
 
     return CompilationColumnSeries(
@@ -60,7 +69,7 @@ def _column_series(quantity, tokens, values, unit):
         temperature_K=State.unknown("temperature is a series coordinate"),
         raw_tokens=tokens,
         source_units=(unit,) * len(values),
-        cell_uncertainties=(PRECISION,) * len(values),
+        cell_uncertainties=(precision,) * len(values),
     )
 
 
@@ -94,7 +103,15 @@ def _curve(formula, phase, record_id, segment, t_min, t_max):
     )
 
 
-def _source_series(segment, temperatures, *, reference_curves=None, formula="Fe", is_reference=True):
+def _source_series(
+    segment,
+    temperatures,
+    *,
+    reference_curves=None,
+    formula="Fe",
+    is_reference=True,
+    places=9,
+):
     cp_pairs = []
     h_pairs = []
     s_pairs = []
@@ -125,11 +142,11 @@ def _source_series(segment, temperatures, *, reference_curves=None, formula="Fe"
         fh_pairs.append((temperature, fh))
         fg_pairs.append((temperature, fg))
     return (
-        _series(Quantity.CP, cp_pairs, "J mol^-1 K^-1"),
-        _series(Quantity.H_MINUS_H298, h_pairs, "kJ mol^-1"),
-        _series(Quantity.S, s_pairs, "J mol^-1 K^-1"),
-        _series(Quantity.DELTA_FH, fh_pairs, "kJ mol^-1"),
-        _series(Quantity.DELTA_FG, fg_pairs, "kJ mol^-1"),
+        _series(Quantity.CP, cp_pairs, "J mol^-1 K^-1", places=places),
+        _series(Quantity.H_MINUS_H298, h_pairs, "kJ mol^-1", places=places),
+        _series(Quantity.S, s_pairs, "J mol^-1 K^-1", places=places),
+        _series(Quantity.DELTA_FH, fh_pairs, "kJ mol^-1", places=places),
+        _series(Quantity.DELTA_FG, fg_pairs, "kJ mol^-1", places=places),
     )
 
 
@@ -197,13 +214,13 @@ def test_nested_compilation_projection_keeps_aligned_raw_metadata() -> None:
 
 
 def test_sidecar_rendering_is_deterministic_and_sorted() -> None:
-    temperatures = [298.15, 400.0, 550.0, 700.0, 850.0, 1000.0]
+    temperatures = [298.15, 350.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0, 1000.0]
     segment = _constant_cp_segment(30.0, 298.15, 1000.0)
 
     def generate_record():
         result = fit_compilation_thermo_range(
             record=_record("Fe", state="ref"),
-            series=_source_series(segment, temperatures),
+            series=_source_series(segment, temperatures, places=0),
             phase_label="cr",
             standard_state="condensed_solid",
             T_min_K=298.15,
@@ -211,6 +228,7 @@ def test_sidecar_rendering_is_deterministic_and_sorted() -> None:
             is_element_reference=True,
         )
         assert result.record["status"] == "accepted"
+        assert result.record["acceptance_tier"] == "table_equivalent"
         return result.record
 
     first = [generate_record(), {"record_id": "zz", "status": "rejected"}]
@@ -239,6 +257,13 @@ def test_compound_fit_anchors_and_formation_acceptance_across_fe_reference_trans
         reference_curves=references,
     )
     assert result.record["status"] == "accepted", result.record
+    assert result.record["acceptance_tier"] == "table_equivalent"
+    assert set(result.record["fit_error"]) == {
+        "Cp_J_per_mol_K",
+        "H_minus_H298_kJ_per_mol",
+        "S_J_per_mol_K",
+        "delta_fG_kJ_per_mol",
+    }
     assert result.curve is not None
     _cp, h_rt, s_r, _g = result.curve.segment.evaluate_ratios(298.15)
     assert abs(h_rt * R_J_PER_MOL_K * 298.15 - (12500.0 + elemental_H298)) < 1e-6
@@ -310,7 +335,7 @@ def test_positive_cp_gate_rejects_nonpositive_fitted_cp(cp: float) -> None:
     )
     result = fit_compilation_thermo_range(
         record=_record("Fe", state="ref"),
-        series=_source_series(segment, [298.15, 400, 500, 600, 700, 800, 900, 1000]),
+        series=_source_series(segment, [298.15, 350, 400, 500, 600, 700, 800, 900, 1000]),
         phase_label="cr",
         standard_state="condensed_solid",
         T_min_K=298.15,
@@ -320,11 +345,33 @@ def test_positive_cp_gate_rejects_nonpositive_fitted_cp(cp: float) -> None:
     assert result.record["reason_code"] == "cp_nonpositive"
 
 
+def test_phase_range_with_fewer_than_nine_cp_cells_is_insufficient() -> None:
+    temperatures = [298.15, 400, 600, 800, 1000]
+    segment = _constant_cp_segment(30.0, temperatures[0], temperatures[-1])
+    result = fit_compilation_thermo_range(
+        record=_record("Fe", state="ref"),
+        series=_source_series(segment, temperatures),
+        phase_label="cr:too-few-cells",
+        standard_state="condensed_solid",
+        T_min_K=temperatures[0],
+        T_max_K=temperatures[-1],
+        is_element_reference=True,
+    )
+    assert result.record["status"] == "rejected"
+    assert result.record["reason_code"] == "insufficient_cells"
+    assert result.record["acceptance_tier"] is None
+    assert result.record["cell_count"] == 5
+
+
 def test_zero_and_below_minimum_cells_have_typed_exclusions() -> None:
     segment = _constant_cp_segment(30.0, 100.0, 1000.0)
     result = fit_compilation_thermo_range(
         record=_record("Fe", state="ref"),
-        series=_source_series(segment, [0.0, 50.0, 100, 200, 298.15, 400, 600, 800, 1000]),
+        series=_source_series(
+            segment,
+            [0.0, 50.0, 100, 200, 298.15, 400, 500, 600, 700, 800, 1000],
+            places=3,
+        ),
         phase_label="cr",
         standard_state="condensed_solid",
         T_min_K=100.0,
@@ -337,8 +384,175 @@ def test_zero_and_below_minimum_cells_have_typed_exclusions() -> None:
     assert result.record["status"] == "accepted", result.record
 
 
+def test_piecewise_constraints_keep_cp_h_s_continuous_at_join() -> None:
+    temperatures = [298.15, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 900, 1000, 1100, 1200]
+    segment = _constant_cp_segment(30.0, temperatures[0], temperatures[-1])
+    series = list(_source_series(segment, temperatures, places=0))
+    entropy_pairs = [
+        (temperature, value + (Decimal("0.1") if temperature > 700 else Decimal(0)))
+        for temperature, value in series[2].value.series
+    ]
+    entropy_tokens = tuple(f"{value:.1f}" for _temperature, value in entropy_pairs)
+    entropy_values = tuple(
+        (Decimal(str(temperature)), Decimal(token))
+        for (temperature, _value), token in zip(entropy_pairs, entropy_tokens)
+    )
+    series[2] = _column_series(
+        Quantity.S,
+        entropy_tokens,
+        entropy_values,
+        "J mol^-1 K^-1",
+        precision=Decimal("0.5"),
+    )
+    result = _fit_piecewise_candidate(
+        record=_record("Fe", state="ref"),
+        series=series,
+        phase_label="cr:synthetic",
+        standard_state="condensed_solid",
+        is_element_reference=True,
+        reference_curves={},
+        segment_bounds=[(298.15, 700.0), (700.0, 1200.0)],
+        fit_lo=298.15,
+        fit_hi=1200.0,
+        rejected_template={"validity": {"T_min_K": 298.15, "T_max_K": 1200.0}},
+    )
+    assert result.record["status"] == "accepted", result.record
+    segments = [
+        Nasa9Segment(
+            item["T_min_K"], item["T_max_K"], tuple(item["a_coefficients"]), item["b1"], item["b2"]
+        )
+        for item in result.record["thermo_record"]["segments"]
+    ]
+    at_join = [_evaluate(item, 700.0)[:3] for item in segments]
+    for left, right in zip(*at_join):
+        assert abs(left - right) <= 1e-9 * max(abs(left), abs(right), 1.0)
+
+
+def test_smooth_fit_rejects_cp_relative_error_above_one_per_thousand() -> None:
+    temperatures = [298.15, 350, 400, 450, 500, 550, 600, 650, 700, 800, 900, 1000]
+    source = _constant_cp_segment(30.0, temperatures[0], temperatures[-1])
+    series = list(_source_series(source, temperatures, places=6))
+    cp_pairs = [
+        (temperature, value * (Decimal("1.05") if temperature == 550 else Decimal(1)))
+        for temperature, value in series[0].value.series
+    ]
+    series[0] = _series(Quantity.CP, cp_pairs, "J mol^-1 K^-1", places=6)
+    result = _fit_piecewise_candidate(
+        record=_record("Fe", state="ref"),
+        series=series,
+        phase_label="cr:synthetic",
+        standard_state="condensed_solid",
+        is_element_reference=True,
+        reference_curves={},
+        segment_bounds=[(temperatures[0], temperatures[-1])],
+        fit_lo=temperatures[0],
+        fit_hi=temperatures[-1],
+        rejected_template={"validity": {"T_min_K": temperatures[0], "T_max_K": temperatures[-1]}},
+    )
+    assert result.record["status"] == "rejected"
+    assert result.record["reason_code"] in {
+        "smooth_fit_tolerance_exceeded",
+        "interpolation_ringing",
+    }
+    assert result.record["fit_statistics"]["smooth_fit_checks"][
+        "maximum_relative_Cp_residual"
+    ] > 1e-3
+
+
 def test_janaf_o029_formation_gibbs_zero_pin() -> None:
     assert (TABLES_DIR / "O-029.yaml").is_file()
     records = generate_janaf_sidecar(table_ids=["O-029"])
     oxygen = next(record for record in records if record["source_record_id"] == "O-029")
+    assert oxygen["status"] == "accepted", oxygen
+    assert oxygen["acceptance_tier"] == "smooth_fit"
+    assert oxygen["fit_statistics"]["segment_count"] >= 2
+    assert oxygen["fit_error"]["Cp_J_per_mol_K"] > 0.0
+    assert oxygen["fit_error"]["delta_fG_kJ_per_mol"] == 0.0
+    assert oxygen["fit_statistics"]["smooth_fit_checks"]["maximum_relative_Cp_residual"] <= 1e-3
     assert oxygen["fit_statistics"]["derived_formation_G_kJ_per_mol"]["max_abs"] == 0.0
+
+    segments = [
+        Nasa9Segment(
+            T_min_K=item["T_min_K"],
+            T_max_K=item["T_max_K"],
+            coefficients=tuple(item["a_coefficients"]),
+            b1=item["b1"],
+            b2=item["b2"],
+        )
+        for item in oxygen["thermo_record"]["segments"]
+    ]
+    for left, right in zip(segments, segments[1:]):
+        join = left.T_max_K
+        cp_left, h_left, s_left, _g_left = _evaluate(left, join)
+        cp_right, h_right, s_right, _g_right = _evaluate(right, join)
+        for a, b in ((cp_left, cp_right), (h_left, h_right), (s_left, s_right)):
+            assert abs(a - b) <= 1e-9 * max(abs(a), abs(b), 1.0)
+
+
+def test_fe_alpha_curie_cusp_is_split_or_typed_as_unresolved() -> None:
+    assert (TABLES_DIR / "Fe-003.yaml").is_file()
+    records = generate_janaf_sidecar(table_ids=["Fe-003"])
+    alpha = next(
+        record
+        for record in records
+        if record["source_record_id"] == "Fe-003" and record["phase"] == "cr:alpha"
+    )
+    if alpha["status"] == "accepted":
+        assert alpha["fit_statistics"]["segment_count"] >= 2
+        assert any(
+            segment["T_max_K"] == 1000.0
+            for segment in alpha["thermo_record"]["segments"][:-1]
+        )
+    else:
+        assert alpha["reason_code"] == "lambda_anomaly_unresolved", alpha
+        assert alpha.get("fit_statistics", {}).get("segment_count", 0) >= 1
+        assert alpha.get("failed_cells") or alpha.get("fit_statistics")
+
+
+def test_interpolation_ringing_detects_synthetic_midpoint_oscillation() -> None:
+    oscillating = Nasa9Segment(
+        T_min_K=100.0,
+        T_max_K=200.0,
+        coefficients=(0.0, 0.0, 2.0, 0.03, -0.0001, 0.0, 0.0),
+        b1=0.0,
+        b2=0.0,
+    )
+    cells = (
+        _Cell(100.0, _evaluate(oscillating, 100.0)[0], "left", "J mol^-1 K^-1", 0.0),
+        _Cell(200.0, _evaluate(oscillating, 200.0)[0], "right", "J mol^-1 K^-1", 0.0),
+    )
+    assert _interpolation_ringing(oscillating, cells)
+
+
+def test_oscillating_candidate_is_rejected_by_anti_ringing() -> None:
+    temperatures = [298.15, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 900, 1000]
+    oscillating = Nasa9Segment(
+        min(temperatures),
+        max(temperatures),
+        (
+            0.0,
+            0.0,
+            3.5,
+            -0.0044041635341935444,
+            -9.764832415001191e-06,
+            1.9615401928782244e-08,
+            3.705751826049212e-11,
+        ),
+        b1=0.0,
+        b2=0.0,
+    )
+    result = _fit_piecewise_candidate(
+        record=_record("Fe", state="ref"),
+        series=_source_series(oscillating, temperatures, places=9),
+        phase_label="cr:synthetic",
+        standard_state="condensed_solid",
+        is_element_reference=True,
+        reference_curves={},
+        segment_bounds=[(temperatures[0], temperatures[-1])],
+        fit_lo=temperatures[0],
+        fit_hi=temperatures[-1],
+        rejected_template={"validity": {"T_min_K": temperatures[0], "T_max_K": temperatures[-1]}},
+    )
+    assert result.record["status"] == "rejected"
+    assert result.record["reason_code"] == "interpolation_ringing"
+    assert result.record["ring_failures"]

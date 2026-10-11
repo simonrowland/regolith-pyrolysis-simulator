@@ -69,6 +69,18 @@ class FittedCurve:
     reference_pressure_Pa: float
     segment: Nasa9Segment
     is_element_reference: bool
+    segments: tuple[Nasa9Segment, ...] = ()
+
+    def segment_at(self, temperature_K: float) -> Nasa9Segment:
+        """Return the right-hand segment at a shared endpoint."""
+
+        segments = self.segments or (self.segment,)
+        for segment in reversed(segments):
+            if segment.T_min_K <= temperature_K <= segment.T_max_K:
+                return segment
+        raise ValueError(
+            f"{self.formula} reference curve does not cover {temperature_K:g} K"
+        )
 
 
 @dataclass(frozen=True)
@@ -241,6 +253,7 @@ def _rejected(
         {
             **dict(base),
             "status": "rejected",
+            "acceptance_tier": None,
             "reason_code": reason_code,
             "reason": reason,
             **details,
@@ -256,7 +269,7 @@ def _fit_basis_cp(x: float) -> tuple[float, ...]:
 def _fit_basis_h_over_R(x: float, scale_K: float) -> tuple[float, ...]:
     return (
         scale_K * -1.0 / x,
-        scale_K * math.log(x),
+        scale_K * (math.log(x) + math.log(scale_K)),
         scale_K * x,
         scale_K * x**2 / 2.0,
         scale_K * x**3 / 3.0,
@@ -265,8 +278,16 @@ def _fit_basis_h_over_R(x: float, scale_K: float) -> tuple[float, ...]:
     )
 
 
-def _fit_basis_s_over_R(x: float) -> tuple[float, ...]:
-    return (-0.5 / x**2, -1.0 / x, math.log(x), x, x**2 / 2.0, x**3 / 3.0, x**4 / 4.0)
+def _fit_basis_s_over_R(x: float, scale_K: float = 1.0) -> tuple[float, ...]:
+    return (
+        -0.5 / x**2,
+        -1.0 / x,
+        math.log(x) + math.log(scale_K),
+        x,
+        x**2 / 2.0,
+        x**3 / 3.0,
+        x**4 / 4.0,
+    )
 
 
 def _evaluate(segment: Nasa9Segment, temperature_K: float) -> tuple[float, float, float, float]:
@@ -325,7 +346,7 @@ def _element_reference_terms(
         ):
             return None, "missing_element_reference_phase"
         coefficient = float(atom_count / reference_composition[0][1])
-        _cp, h, _s, g = _evaluate(curve.segment, temperature_K)
+        _cp, h, _s, g = _evaluate(curve.segment_at(temperature_K), temperature_K)
         terms.append((coefficient, h, g))
     return terms, None
 
@@ -363,44 +384,180 @@ def _residual_stats(residuals: Sequence[float]) -> dict[str, float | int]:
     }
 
 
-def fit_compilation_thermo_range(
+def _segment_index(temperature_K: float, bounds: Sequence[tuple[float, float]]) -> int:
+    """Choose the right-hand segment at a shared endpoint."""
+
+    for index in range(len(bounds) - 1, -1, -1):
+        lower, upper = bounds[index]
+        if lower <= temperature_K <= upper:
+            return index
+    return min(
+        range(len(bounds)),
+        key=lambda index: min(
+            abs(temperature_K - bounds[index][0]), abs(temperature_K - bounds[index][1])
+        ),
+    )
+
+
+def _piecewise_evaluate(
+    segments: Sequence[Nasa9Segment], temperature_K: float
+) -> tuple[float, float, float, float]:
+    for segment in reversed(segments):
+        if segment.T_min_K <= temperature_K <= segment.T_max_K:
+            return _evaluate(segment, temperature_K)
+    bounds = [(segment.T_min_K, segment.T_max_K) for segment in segments]
+    return _evaluate(segments[_segment_index(temperature_K, bounds)], temperature_K)
+
+
+def _printed_cp_extrema(cells: Sequence[_Cell]) -> set[float]:
+    values = sorted(cells, key=lambda cell: cell.temperature_K)
+    return {
+        values[index].temperature_K
+        for index in range(1, len(values) - 1)
+        if (values[index].value - values[index - 1].value)
+        * (values[index + 1].value - values[index].value)
+        <= 0.0
+        and (
+            values[index].value != values[index - 1].value
+            or values[index].value != values[index + 1].value
+        )
+    }
+
+
+def _interpolation_ringing(
+    segment: Nasa9Segment, cp_cells: Sequence[_Cell]
+) -> list[dict[str, float]]:
+    """Find midpoint Cp values outside adjacent printed values and their precision."""
+
+    cells = sorted(
+        (cell for cell in cp_cells if segment.T_min_K <= cell.temperature_K <= segment.T_max_K),
+        key=lambda cell: cell.temperature_K,
+    )
+    extrema = _printed_cp_extrema(cells)
+    failures: list[dict[str, float]] = []
+    for left, right in zip(cells, cells[1:]):
+        if any(left.temperature_K <= peak <= right.temperature_K for peak in extrema):
+            continue
+        midpoint = (left.temperature_K + right.temperature_K) / 2.0
+        cp_mid = _evaluate(segment, midpoint)[0]
+        allowance = max(left.uncertainty or 0.0, right.uncertainty or 0.0)
+        lower = min(left.value, right.value) - allowance
+        upper = max(left.value, right.value) + allowance
+        if cp_mid < lower or cp_mid > upper:
+            failures.append(
+                {
+                    "T_left_K": left.temperature_K,
+                    "T_mid_K": midpoint,
+                    "T_right_K": right.temperature_K,
+                    "Cp_mid_J_per_mol_K": cp_mid,
+                    "allowed_min_J_per_mol_K": lower,
+                    "allowed_max_J_per_mol_K": upper,
+                }
+            )
+    return failures
+
+
+def _constrained_weighted_lstsq(
+    matrix: np.ndarray,
+    target: np.ndarray,
+    constraints: np.ndarray,
+    constraint_target: np.ndarray,
+) -> tuple[np.ndarray, int]:
+    """Solve weighted least squares in the equality-constraint null space."""
+
+    row_norms = np.linalg.norm(constraints, axis=1)
+    normalized = constraints / row_norms[:, None]
+    normalized_target = constraint_target / row_norms
+    column_norms = np.linalg.norm(
+        np.vstack((matrix, normalized)), axis=0
+    )
+    column_norms = np.where(column_norms > 0.0, column_norms, 1.0)
+    scaled_constraints = normalized / column_norms[None, :]
+    scaled_matrix = matrix / column_norms[None, :]
+    scaled_row_norms = np.linalg.norm(scaled_constraints, axis=1)
+    scaled_constraints = scaled_constraints / scaled_row_norms[:, None]
+    scaled_target = normalized_target / scaled_row_norms
+    # A complete QR of C.T gives both the minimum-norm constrained solution
+    # and an orthonormal basis for null(C), without repeatedly taking a full
+    # SVD as adaptive segmentation adds variables.
+    orthogonal, upper = np.linalg.qr(scaled_constraints.T, mode="complete")
+    constraint_count = scaled_constraints.shape[0]
+    triangular = upper[:constraint_count, :]
+    diagonal = np.abs(np.diag(triangular))
+    tolerance = np.finfo(float).eps * max(scaled_constraints.shape) * diagonal.max()
+    rank = int(np.count_nonzero(diagonal > tolerance))
+    if rank != constraint_count:
+        # This is unusual for the open-chain anchor/join constraints, but the
+        # SVD fallback keeps a clear typed failure if a future shape is rank poor.
+        _u, singular, vh = np.linalg.svd(scaled_constraints, full_matrices=True)
+        tolerance = np.finfo(float).eps * max(scaled_constraints.shape) * singular[0]
+        rank = int(np.count_nonzero(singular > tolerance))
+        particular, *_ = np.linalg.lstsq(scaled_constraints, scaled_target, rcond=None)
+        null_space = vh[rank:].T
+    else:
+        particular_coordinates = np.linalg.solve(triangular.T, scaled_target)
+        particular = orthogonal[:, :constraint_count] @ particular_coordinates
+        null_space = orthogonal[:, constraint_count:]
+    constraint_error = np.max(np.abs(scaled_constraints @ particular - scaled_target))
+    if constraint_error > 1e-10 * max(1.0, float(np.max(np.abs(scaled_target)))):
+        raise ValueError(
+            "NASA-9 continuity and anchor constraints are inconsistent "
+            f"(scaled residual {constraint_error:.3g})"
+        )
+    if null_space.shape[1] == 0:
+        return particular / column_norms, 0
+    reduced = scaled_matrix @ null_space
+    reduced_target = target - scaled_matrix @ particular
+    correction, _residuals, reduced_rank, reduced_singular = np.linalg.lstsq(
+        reduced, reduced_target, rcond=1e-15
+    )
+    if reduced_singular.size:
+        rank_tolerance = 1e-15 * reduced_singular[0]
+        reduced_rank = int(np.count_nonzero(reduced_singular > rank_tolerance))
+    solution = (particular + null_space @ correction) / column_norms
+    return solution, int(reduced_rank)
+
+
+def _fit_piecewise_candidate(
     *,
     record: Mapping[str, Any],
     series: Sequence[object],
     phase_label: str,
     standard_state: str,
-    T_min_K: float | None,
-    T_max_K: float | None,
-    is_element_reference: bool = False,
-    reference_curves: Mapping[str, Sequence[FittedCurve]] | None = None,
+    is_element_reference: bool,
+    reference_curves: Mapping[str, Sequence[FittedCurve]],
+    segment_bounds: Sequence[tuple[float, float]],
+    fit_lo: float,
+    fit_hi: float,
+    rejected_template: Mapping[str, Any],
 ) -> FitResult:
-    """Fit one source species phase/range and reject it unless every gate passes."""
+    """Jointly fit bounded NASA-9 segments with exact anchor and join constraints."""
 
     metadata = source_metadata(record)
     base = _record_base(
         metadata=metadata,
         phase_label=phase_label,
-        T_min_K=T_min_K,
-        T_max_K=T_max_K,
+        T_min_K=rejected_template.get("validity", {}).get("T_min_K"),
+        T_max_K=rejected_template.get("validity", {}).get("T_max_K"),
     )
-    reference_curves = reference_curves or {}
-    pressure = metadata["reference_pressure_Pa"]
-    if pressure is None:
-        return _rejected(
-            base,
-            "missing_pressure_convention",
-            "source does not declare a standard pressure convention",
-        )
+    channels = _channel_cells(series)
+    cp_cells = tuple(
+        cell for cell in channels.get(Quantity.CP, ()) if fit_lo <= cell.temperature_K <= fit_hi
+    )
+    h_cells = tuple(
+        cell
+        for cell in channels.get(Quantity.H_MINUS_H298, ())
+        if fit_lo <= cell.temperature_K <= fit_hi
+    )
+    s_cells = tuple(
+        cell for cell in channels.get(Quantity.S, ()) if fit_lo <= cell.temperature_K <= fit_hi
+    )
     if standard_state not in {"gas", "condensed_solid", "condensed_liquid", "condensed"}:
         return _rejected(
             base,
             "missing_element_reference_phase",
             f"source phase {phase_label!r} has no closed NASA-9 standard-state mapping",
         )
-    channels = _channel_cells(series)
-    cp_cells = channels.get(Quantity.CP, ())
-    h_cells = channels.get(Quantity.H_MINUS_H298, ())
-    s_cells = channels.get(Quantity.S, ())
     missing = [
         name
         for name, cells in (("Cp", cp_cells), ("H-H298", h_cells), ("S", s_cells))
@@ -412,90 +569,27 @@ def fit_compilation_thermo_range(
             "missing_fit_channel",
             "required printed channels are absent: " + ", ".join(missing),
         )
-
-    excluded: list[dict[str, Any]] = []
-    fit_cells = {
-        Quantity.CP: cp_cells,
-        Quantity.H_MINUS_H298: h_cells,
-        Quantity.S: s_cells,
-    }
-    all_cells = {
-        **fit_cells,
-        Quantity.DELTA_FH: channels.get(Quantity.DELTA_FH, ()),
-        Quantity.DELTA_FG: channels.get(Quantity.DELTA_FG, ()),
-    }
-    positive_temperatures: list[float] = []
-    for quantity, cells in all_cells.items():
-        for cell in cells:
-            reason = None
-            if cell.temperature_K <= 0.0:
-                reason = "nonpositive_fit_temperature"
-            elif T_min_K is not None and T_min_K > 0 and cell.temperature_K < T_min_K:
-                reason = "below_fit_T_min"
-            elif T_max_K is not None and cell.temperature_K > T_max_K:
-                reason = "above_fit_T_max"
-            if reason:
-                excluded.append(
-                    {
-                        "quantity": quantity.value,
-                        "T_K": cell.temperature_K,
-                        "raw_token": cell.raw_token,
-                        "reason_code": reason,
-                    }
-                )
-            elif quantity in fit_cells:
-                positive_temperatures.append(cell.temperature_K)
-    if not positive_temperatures:
-        return _rejected(
-            base,
-            "no_positive_fit_cells",
-            "no printed cell lies in the positive declared fit range",
-            excluded_cells=excluded,
-        )
-
-    fit_lo = max(T_min_K or min(positive_temperatures), min(positive_temperatures))
-    fit_hi = min(T_max_K or max(positive_temperatures), max(positive_temperatures))
-    if fit_lo <= 0.0 or fit_hi <= fit_lo:
-        return _rejected(
-            base,
-            "insufficient_fit_range",
-            f"no positive interval remains after exclusions: [{fit_lo}, {fit_hi}] K",
-            excluded_cells=excluded,
-        )
-
-    def in_range(cells: Sequence[_Cell]) -> list[_Cell]:
-        return [cell for cell in cells if fit_lo <= cell.temperature_K <= fit_hi]
-
-    cp_fit = in_range(cp_cells)
-    h_fit = in_range(h_cells)
-    s_fit = in_range(s_cells)
-    used_cells = [("cp", cp_fit), ("H-H298", h_fit), ("S", s_fit)]
-    missing_precision = [
-        name
-        for name, cells in used_cells
-        if any(cell.raw_token is None or cell.uncertainty is None for cell in cells)
-    ]
-    if missing_precision:
+    all_fit_cells = (*cp_cells, *h_cells, *s_cells)
+    if any(cell.raw_token is None or cell.uncertainty is None for cell in all_fit_cells):
         return _rejected(
             base,
             "missing_printed_precision",
             "one or more fit cells lack a raw token or converted rounding allowance",
-            channels=missing_precision,
-            excluded_cells=excluded,
+        )
+    # The nine-cell floor applies to the Cp curve's sampled temperatures;
+    # H and S are additional coupled observations, not extra Cp basis rows.
+    if len(cp_cells) < 9:
+        return _rejected(
+            base,
+            "insufficient_cells",
+            f"phase range has {len(cp_cells)} printed Cp cells; at least 9 are required",
+            cell_count=len(cp_cells),
         )
 
     s_anchor = next(
-        (cell for cell in s_fit if cell.temperature_K == REFERENCE_T_K),
-        s_fit[0] if s_fit else None,
+        (cell for cell in s_cells if cell.temperature_K == REFERENCE_T_K),
+        s_cells[0] if s_cells else None,
     )
-    if s_anchor is None:
-        return _rejected(
-            base,
-            "missing_absolute_entropy_anchor",
-            "no absolute entropy cell is available in the fitted phase range",
-            excluded_cells=excluded,
-        )
-
     delta_fh_anchor = next(
         (
             cell
@@ -504,208 +598,245 @@ def fit_compilation_thermo_range(
         ),
         None,
     )
+    if s_anchor is None:
+        return _rejected(base, "missing_absolute_entropy_anchor", "no absolute entropy cell is available")
     if delta_fh_anchor is None or delta_fh_anchor.raw_token is None:
-        return _rejected(
-            base,
-            "missing_formation_h_anchor",
-            "source has no printed ΔfH°(298.15 K) anchor",
-            excluded_cells=excluded,
-        )
+        return _rejected(base, "missing_formation_h_anchor", "source has no printed ΔfH°(298.15 K) anchor")
 
     formula = str(metadata["formula"])
     composition = formula_composition(formula)
     if not composition:
-        return _rejected(
-            base,
-            "unsupported_formula",
-            f"cannot resolve elemental composition for {formula!r}",
-            excluded_cells=excluded,
-        )
+        return _rejected(base, "unsupported_formula", f"cannot resolve elemental composition for {formula!r}")
+    pressure = metadata["reference_pressure_Pa"]
+    if pressure is None:
+        return _rejected(base, "missing_pressure_convention", "source does not declare a standard pressure convention")
+    anchor_terms: list[tuple[float, float, float]] = []
     anchor_error = None
     if is_element_reference:
         h_anchor_J = 0.0
     else:
-        anchor_terms, anchor_error = _element_reference_terms(
-            formula, REFERENCE_T_K, pressure, reference_curves
-        )
-        if anchor_error:
-            # H-H298 residuals do not depend on the absolute integration
-            # constant. Solve their common basis to report fit quality, then
-            # reject before producing an absolute-H/G-capable curve.
+        resolved, error = _element_reference_terms(formula, REFERENCE_T_K, pressure, reference_curves)
+        if error:
+            anchor_error = error
             h_anchor_J = 0.0
         else:
-            assert anchor_terms is not None
+            assert resolved is not None
+            anchor_terms = resolved
             h_anchor_J = float(delta_fh_anchor.value) * 1000.0 + sum(
                 coefficient * h_ref for coefficient, h_ref, _g_ref in anchor_terms
             )
 
-    scale_K = math.sqrt(fit_lo * fit_hi)
-    s_anchor_value = s_anchor.value
-    s_anchor_unc = s_anchor.uncertainty
-    assert s_anchor_unc is not None
-    design_rows: list[tuple[float, ...]] = []
+    segment_count = len(segment_bounds)
+    scale_K = tuple(math.sqrt(lower * upper) for lower, upper in segment_bounds)
+    variable_count = 9 * segment_count
+    rows: list[np.ndarray] = []
     targets: list[float] = []
     weights: list[float] = []
+    constraints: list[np.ndarray] = []
+    constraint_targets: list[float] = []
 
-    def add_row(row: Sequence[float], target: float, uncertainty: float) -> None:
-        if not math.isfinite(uncertainty) or uncertainty <= 0.0:
+    def coefficient_row(index: int, values: Sequence[float], *, offset: int = 0) -> np.ndarray:
+        row = np.zeros(variable_count, dtype=float)
+        start = 9 * index + offset
+        row[start : start + len(values)] = values
+        return row
+
+    def cp_row(index: int, temperature_K: float) -> np.ndarray:
+        return coefficient_row(index, _fit_basis_cp(temperature_K / scale_K[index]))
+
+    def h_row(index: int, temperature_K: float) -> np.ndarray:
+        row = coefficient_row(
+            index,
+            _fit_basis_h_over_R(temperature_K / scale_K[index], scale_K[index]),
+        )
+        row[9 * index + 7] = 1.0
+        return row
+
+    def s_row(index: int, temperature_K: float) -> np.ndarray:
+        row = coefficient_row(
+            index,
+            _fit_basis_s_over_R(temperature_K / scale_K[index], scale_K[index]),
+        )
+        row[9 * index + 8] = 1.0
+        return row
+
+    def add_observation(row: np.ndarray, target: float, uncertainty_in_target_unit: float) -> None:
+        if not math.isfinite(uncertainty_in_target_unit) or uncertainty_in_target_unit <= 0.0:
             raise ValueError("fit uncertainty must be finite and positive")
-        design_rows.append(tuple(row))
+        rows.append(row)
         targets.append(target)
-        weights.append(1.0 / (uncertainty / R_J_PER_MOL_K))
+        weights.append(R_J_PER_MOL_K / uncertainty_in_target_unit)
 
+    bounds = tuple(segment_bounds)
+    anchor_index = _segment_index(REFERENCE_T_K, bounds)
+    s_anchor_index = _segment_index(s_anchor.temperature_K, bounds)
     try:
-        for cell in cp_fit:
-            assert cell.uncertainty is not None
-            x = cell.temperature_K / scale_K
-            add_row(_fit_basis_cp(x), cell.value / R_J_PER_MOL_K, cell.uncertainty)
-        for cell in h_fit:
-            assert cell.uncertainty is not None
+        for cell in cp_cells:
+            index = _segment_index(cell.temperature_K, bounds)
+            add_observation(cp_row(index, cell.temperature_K), cell.value / R_J_PER_MOL_K, cell.uncertainty)
+
+        for cell in h_cells:
             if cell.temperature_K == REFERENCE_T_K:
                 if abs(cell.value) > cell.uncertainty:
                     return _rejected(
                         base,
                         "h_increment_anchor_nonzero",
                         "printed H-H298 cell disagrees with the required zero anchor",
-                        excluded_cells=excluded,
                     )
                 continue
-            x = cell.temperature_K / scale_K
-            x_ref = REFERENCE_T_K / scale_K
-            row = np.subtract(
-                _fit_basis_h_over_R(x, scale_K),
-                _fit_basis_h_over_R(x_ref, scale_K),
+            index = _segment_index(cell.temperature_K, bounds)
+            row = h_row(index, cell.temperature_K) - h_row(anchor_index, REFERENCE_T_K)
+            add_observation(
+                row,
+                cell.value * 1000.0 / R_J_PER_MOL_K,
+                cell.uncertainty * 1000.0,
             )
-            add_row(row, cell.value * 1000.0 / R_J_PER_MOL_K, cell.uncertainty * 1000.0)
-        for cell in s_fit:
-            assert cell.uncertainty is not None
+
+        for cell in s_cells:
             if cell is s_anchor:
                 continue
-            x = cell.temperature_K / scale_K
-            x_anchor = s_anchor.temperature_K / scale_K
-            row = np.subtract(_fit_basis_s_over_R(x), _fit_basis_s_over_R(x_anchor))
-            add_row(
-                row,
-                (cell.value - s_anchor_value) / R_J_PER_MOL_K,
-                cell.uncertainty + s_anchor_unc,
+            index = _segment_index(cell.temperature_K, bounds)
+            row = s_row(index, cell.temperature_K) - s_row(
+                s_anchor_index, s_anchor.temperature_K
             )
-    except ValueError as exc:
-        return _rejected(
-            base,
-            "missing_printed_precision",
-            str(exc),
-            excluded_cells=excluded,
-        )
+            add_observation(
+                row,
+                (cell.value - s_anchor.value) / R_J_PER_MOL_K,
+                cell.uncertainty + s_anchor.uncertainty,
+            )
 
-    matrix = np.asarray(design_rows, dtype=float)
+        # At join Tj, the Cp/R row is [phi_cp(Tj), -phi_cp(Tj)] = 0;
+        # H/(RT) is [phi_h(Tj), a8, -phi_h(Tj), -a8]/Tj = 0; and
+        # S/R is [phi_s(Tj), a9, -phi_s(Tj), -a9] = 0. These expressions
+        # are dimensionless (Cp/R, H/(RT), S/R); equality of H/(RT) at the
+        # same positive Tj is equality of H. The first a8/a9 are fixed by the
+        # printed H and S anchors, and each later pair follows from these rows.
+        h_anchor = h_row(anchor_index, REFERENCE_T_K)
+        constraints.append(h_anchor)
+        constraint_targets.append(h_anchor_J / R_J_PER_MOL_K)
+        s_anchor_row = s_row(s_anchor_index, s_anchor.temperature_K)
+        constraints.append(s_anchor_row)
+        constraint_targets.append(s_anchor.value / R_J_PER_MOL_K)
+
+        for index in range(segment_count - 1):
+            join_K = segment_bounds[index][1]
+            cp_continuity = cp_row(index, join_K) - cp_row(index + 1, join_K)
+            # H/(RT) equality is equivalent to H equality because both sides
+            # are evaluated at the same positive T. The row is divided by T
+            # to match the displayed NASA-9 H/(RT) form and is dimensionless.
+            h_continuity = (
+                h_row(index, join_K) - h_row(index + 1, join_K)
+            ) / join_K
+            s_continuity = s_row(index, join_K) - s_row(index + 1, join_K)
+            constraints.extend((cp_continuity, h_continuity, s_continuity))
+            constraint_targets.extend((0.0, 0.0, 0.0))
+    except ValueError as exc:
+        return _rejected(base, "missing_printed_precision", str(exc))
+
+    matrix = np.asarray(rows, dtype=float)
     target = np.asarray(targets, dtype=float)
     weight = np.asarray(weights, dtype=float)
     weighted = matrix * weight[:, None]
     weighted_target = target * weight
-    if matrix.shape[0] < 7 or np.linalg.matrix_rank(weighted) < 7:
-        return _rejected(
-            base,
-            "insufficient_cells",
-            f"NASA-9 basis rank is {np.linalg.matrix_rank(weighted)}; seven are required",
-            cell_count=int(matrix.shape[0]),
-            excluded_cells=excluded,
+    constraint_matrix = np.asarray(constraints, dtype=float)
+    constraint_target = np.asarray(constraint_targets, dtype=float)
+    try:
+        scaled, reduced_rank = _constrained_weighted_lstsq(
+            weighted, weighted_target, constraint_matrix, constraint_target
         )
-    scaled_coefficients, *_ = np.linalg.lstsq(weighted, weighted_target, rcond=None)
-    A1, A2, A3, A4, A5, A6, A7 = (float(value) for value in scaled_coefficients)
-    # Convert x=T/Tscale coefficients back to the evaluator's kelvin basis.
-    coefficients = (
-        A1 * scale_K**2,
-        A2 * scale_K,
-        A3,
-        A4 / scale_K,
-        A5 / scale_K**2,
-        A6 / scale_K**3,
-        A7 / scale_K**4,
-    )
-    # Evaluate the zero-constant polynomial through the existing NASA-9 owner.
-    # H/R is in kelvin and S/R is dimensionless, so each anchor subtracts its
-    # corresponding ratio value before setting b1 and b2.
-    unanchored = Nasa9Segment(
-        T_min_K=fit_lo,
-        T_max_K=fit_hi,
-        coefficients=coefficients,
-        b1=0.0,
-        b2=0.0,
-    )
-    _cp_R, h_RT_without_b1, _s_R, _g_RT = unanchored.evaluate_ratios(
-        REFERENCE_T_K
-    )
-    b1 = h_anchor_J / R_J_PER_MOL_K - h_RT_without_b1 * REFERENCE_T_K
-    _cp_R, _h_RT, s_R_without_b2, _g_RT = unanchored.evaluate_ratios(
-        s_anchor.temperature_K
-    )
-    b2 = s_anchor_value / R_J_PER_MOL_K - s_R_without_b2
-    segment = Nasa9Segment(fit_lo, fit_hi, coefficients, b1, b2)
-    if not _check_positive_cp(segment):
-        return _rejected(
-            base,
-            "cp_nonpositive",
-            "fitted Cp is not strictly positive over the declared positive interval",
-            excluded_cells=excluded,
+    except (ValueError, np.linalg.LinAlgError) as exc:
+        return _rejected(base, "insufficient_cells", f"constrained NASA-9 system is singular: {exc}")
+    segments: list[Nasa9Segment] = []
+    for index, (lower_K, upper_K) in enumerate(segment_bounds):
+        local_scale_K = scale_K[index]
+        values = scaled[9 * index : 9 * index + 9]
+        A1, A2, A3, A4, A5, A6, A7 = (float(value) for value in values[:7])
+        coefficients = (
+            A1 * local_scale_K**2,
+            A2 * local_scale_K,
+            A3,
+            A4 / local_scale_K,
+            A5 / local_scale_K**2,
+            A6 / local_scale_K**3,
+            A7 / local_scale_K**4,
         )
+        segments.append(
+            Nasa9Segment(
+                lower_K,
+                upper_K,
+                coefficients,
+                float(values[7]),
+                float(values[8]),
+            )
+        )
+
+    positive_cp = all(_check_positive_cp(segment) for segment in segments)
 
     cp_residuals: list[float] = []
     h_residuals: list[float] = []
     s_residuals: list[float] = []
     over_precision: list[dict[str, Any]] = []
-    for cell in cp_fit:
-        residual = _evaluate(segment, cell.temperature_K)[0] - cell.value
+    for cell in cp_cells:
+        residual = _piecewise_evaluate(segments, cell.temperature_K)[0] - cell.value
         cp_residuals.append(residual)
-        if cell.uncertainty is None or abs(residual) > cell.uncertainty:
-            over_precision.append({"quantity": "cp", "T_K": cell.temperature_K, "residual": residual})
-    for cell in h_fit:
-        _cp, h, _s, _g = _evaluate(segment, cell.temperature_K)
-        h_ref = _evaluate(segment, REFERENCE_T_K)[1]
-        residual = (h - h_ref) / 1000.0 - cell.value
+        if abs(residual) > cell.uncertainty:
+            over_precision.append({
+                "quantity": "cp", "T_K": cell.temperature_K,
+                "residual": residual, "allowance": cell.uncertainty,
+            })
+    h_at_298 = _piecewise_evaluate(segments, REFERENCE_T_K)[1]
+    for cell in h_cells:
+        residual = (_piecewise_evaluate(segments, cell.temperature_K)[1] - h_at_298) / 1000.0 - cell.value
         h_residuals.append(residual)
-        if cell.uncertainty is None or abs(residual) > cell.uncertainty:
-            over_precision.append({"quantity": "H-H298", "T_K": cell.temperature_K, "residual": residual})
-    for cell in s_fit:
-        residual = _evaluate(segment, cell.temperature_K)[2] - cell.value
+        if abs(residual) > cell.uncertainty:
+            over_precision.append({
+                "quantity": "H-H298", "T_K": cell.temperature_K,
+                "residual": residual, "allowance": cell.uncertainty,
+            })
+    for cell in s_cells:
+        residual = _piecewise_evaluate(segments, cell.temperature_K)[2] - cell.value
         s_residuals.append(residual)
-        if cell.uncertainty is None or abs(residual) > cell.uncertainty:
-            over_precision.append({"quantity": "S", "T_K": cell.temperature_K, "residual": residual})
+        if abs(residual) > cell.uncertainty:
+            over_precision.append({
+                "quantity": "S", "T_K": cell.temperature_K,
+                "residual": residual, "allowance": cell.uncertainty,
+            })
+
     rounding_allowances = {
         name: max((cell.uncertainty or 0.0 for cell in cells), default=0.0)
         for name, cells in (
-            ("Cp_J_per_mol_K", cp_fit),
-            ("H_minus_H298_kJ_per_mol", h_fit),
-            ("S_J_per_mol_K", s_fit),
-            (
-                "delta_fH_kJ_per_mol",
-                in_range(channels.get(Quantity.DELTA_FH, ())),
-            ),
-            (
-                "delta_fG_kJ_per_mol",
-                in_range(channels.get(Quantity.DELTA_FG, ())),
-            ),
+            ("Cp_J_per_mol_K", cp_cells),
+            ("H_minus_H298_kJ_per_mol", h_cells),
+            ("S_J_per_mol_K", s_cells),
+            ("delta_fH_kJ_per_mol", channels.get(Quantity.DELTA_FH, ())),
+            ("delta_fG_kJ_per_mol", channels.get(Quantity.DELTA_FG, ())),
         )
     }
-    fit_statistics = {
+    fit_statistics: dict[str, Any] = {
         "cp_J_per_mol_K": _residual_stats(cp_residuals),
         "H_minus_H298_kJ_per_mol": _residual_stats(h_residuals),
         "S_J_per_mol_K": _residual_stats(s_residuals),
         "maximum_printed_rounding_allowance": rounding_allowances,
+        "segment_count": segment_count,
+        "constrained_basis_rank": reduced_rank,
     }
+
     if anchor_error:
         return _rejected(
             base,
             anchor_error,
             f"cannot resolve source elemental references at {REFERENCE_T_K:g} K",
             fit_statistics=fit_statistics,
-            excluded_cells=excluded,
         )
 
-    formation_residuals: dict[str, list[float]] = {"delta_fH_kJ_mol": [], "delta_fG_kJ_mol": []}
+    formation_residuals: dict[str, list[float]] = {
+        "delta_fH_kJ_per_mol": [],
+        "delta_fG_kJ_per_mol": [],
+    }
     formation_over_precision: list[dict[str, Any]] = []
     for quantity, result_key in (
-        (Quantity.DELTA_FH, "delta_fH_kJ_mol"),
-        (Quantity.DELTA_FG, "delta_fG_kJ_mol"),
+        (Quantity.DELTA_FH, "delta_fH_kJ_per_mol"),
+        (Quantity.DELTA_FG, "delta_fG_kJ_per_mol"),
     ):
         for cell in channels.get(quantity, ()):
             if not fit_lo <= cell.temperature_K <= fit_hi:
@@ -716,14 +847,13 @@ def fit_compilation_thermo_range(
                     "missing_printed_precision",
                     f"{quantity.value} check cell at {cell.temperature_K:g} K lacks precision metadata",
                     fit_statistics=fit_statistics,
-                    excluded_cells=excluded,
                 )
-            _cp, h, _s, g = _evaluate(segment, cell.temperature_K)
+            _cp, enthalpy, _entropy, gibbs = _piecewise_evaluate(segments, cell.temperature_K)
+            species_property = enthalpy if quantity is Quantity.DELTA_FH else gibbs
             if is_element_reference:
-                species_property = h if quantity is Quantity.DELTA_FH else g
                 references = [(1.0, species_property)]
             else:
-                terms, error = _element_reference_terms(
+                resolved, error = _element_reference_terms(
                     formula, cell.temperature_K, pressure, reference_curves
                 )
                 if error:
@@ -732,38 +862,202 @@ def fit_compilation_thermo_range(
                         error,
                         f"cannot resolve source elemental references at {cell.temperature_K:g} K",
                         fit_statistics=fit_statistics,
-                        excluded_cells=excluded,
                     )
-                assert terms is not None
+                assert resolved is not None
                 references = [
                     (coefficient, h_ref if quantity is Quantity.DELTA_FH else g_ref)
-                    for coefficient, h_ref, g_ref in terms
+                    for coefficient, h_ref, g_ref in resolved
                 ]
-                species_property = h if quantity is Quantity.DELTA_FH else g
             derived = formation_subtraction_kJ_mol(species_property, references)
             residual = derived - cell.value
             formation_residuals[result_key].append(residual)
             if abs(residual) > cell.uncertainty:
                 formation_over_precision.append(
-                    {"quantity": quantity.value, "T_K": cell.temperature_K, "residual": residual}
+                    {
+                        "quantity": quantity.value,
+                        "T_K": cell.temperature_K,
+                        "residual": residual,
+                        "allowance": cell.uncertainty,
+                    }
                 )
 
     fit_statistics["derived_formation_H_kJ_per_mol"] = _residual_stats(
-        formation_residuals["delta_fH_kJ_mol"]
+        formation_residuals["delta_fH_kJ_per_mol"]
     )
     fit_statistics["derived_formation_G_kJ_per_mol"] = _residual_stats(
-        formation_residuals["delta_fG_kJ_mol"]
+        formation_residuals["delta_fG_kJ_per_mol"]
     )
-    if over_precision or formation_over_precision:
+    cp_node_residuals = [
+        {
+            "T_K": cell.temperature_K,
+            "residual": _piecewise_evaluate(segments, cell.temperature_K)[0] - cell.value,
+        }
+        for cell in cp_cells
+    ]
+    failed_cells = over_precision + formation_over_precision
+    ring_failures = [
+        failure
+        for segment in segments
+        for failure in _interpolation_ringing(segment, cp_cells)
+    ]
+    fit_error = {
+        "Cp_J_per_mol_K": fit_statistics["cp_J_per_mol_K"]["max_abs"],
+        "H_minus_H298_kJ_per_mol": fit_statistics["H_minus_H298_kJ_per_mol"]["max_abs"],
+        "S_J_per_mol_K": fit_statistics["S_J_per_mol_K"]["max_abs"],
+        "delta_fG_kJ_per_mol": fit_statistics[
+            "derived_formation_G_kJ_per_mol"
+        ]["max_abs"] if formation_residuals["delta_fG_kJ_per_mol"] else None,
+    }
+    cp_source_positive = all(cell.value > 0.0 for cell in cp_cells)
+    cp_relative_residuals = [
+        abs(residual) / abs(cell.value)
+        for cell, residual in zip(cp_cells, cp_residuals)
+        if cell.value > 0.0
+    ]
+    max_relative_cp = max(cp_relative_residuals, default=None)
+
+    join_errors: list[dict[str, float]] = []
+    for left, right in zip(segments, segments[1:]):
+        join_K = left.T_max_K
+        left_values = _evaluate(left, join_K)[:3]
+        right_values = _evaluate(right, join_K)[:3]
+        relative = [
+            abs(left_value - right_value) / max(abs(left_value), abs(right_value), 1.0)
+            for left_value, right_value in zip(left_values, right_values)
+        ]
+        join_errors.append(
+            {
+                "T_K": join_K,
+                "Cp_relative": relative[0],
+                "H_relative": relative[1],
+                "S_relative": relative[2],
+            }
+        )
+    join_continuity_max_relative = max(
+        (max(item["Cp_relative"], item["H_relative"], item["S_relative"]) for item in join_errors),
+        default=0.0,
+    )
+    join_continuity = join_continuity_max_relative <= 1e-9
+
+    # If |dCp| <= 1e-3 Cp, then dH=int(dCp)dT is bounded by
+    # 1e-3 mean(Cp) ΔT (J/mol), and dS=int(dCp/T)dT by
+    # 1e-3 mean(Cp) ln(T2/T1) (J/mol/K). For O2, mean Cp≈32 J/mol/K
+    # over 300–1000 K gives bounds ≈22.4 J/mol and 0.0386 J/mol/K.
+    h_integral_ratios: list[float | None] = []
+    s_integral_ratios: list[float | None] = []
+    for segment in segments:
+        local_cp = [
+            cell.value for cell in cp_cells
+            if segment.T_min_K <= cell.temperature_K <= segment.T_max_K
+        ]
+        local_h_errors = [
+            residual for cell, residual in zip(h_cells, h_residuals)
+            if segment.T_min_K <= cell.temperature_K <= segment.T_max_K
+        ]
+        local_s_errors = [
+            residual for cell, residual in zip(s_cells, s_residuals)
+            if segment.T_min_K <= cell.temperature_K <= segment.T_max_K
+        ]
+        if not local_cp or not local_h_errors or not local_s_errors:
+            h_integral_ratios.append(None)
+            s_integral_ratios.append(None)
+            continue
+        mean_cp = float(np.mean(local_cp))
+        h_bound_J_per_mol = 1e-3 * mean_cp * (segment.T_max_K - segment.T_min_K)
+        s_bound_J_per_mol_K = 1e-3 * mean_cp * math.log(
+            segment.T_max_K / segment.T_min_K
+        )
+        # The residual span is the largest observed integrated dCp over this
+        # segment: H residual differences are kJ/mol, S residual differences
+        # are J/(mol K), so convert only the H span to J/mol.
+        h_error_span_J_per_mol = (max(local_h_errors) - min(local_h_errors)) * 1000.0
+        s_error_span_J_per_mol_K = max(local_s_errors) - min(local_s_errors)
+        h_integral_ratios.append(h_error_span_J_per_mol / max(h_bound_J_per_mol, 1e-300))
+        s_integral_ratios.append(s_error_span_J_per_mol_K / max(s_bound_J_per_mol_K, 1e-300))
+    h_integrals_pass = bool(h_integral_ratios) and all(
+        ratio is not None and ratio <= 1.0 for ratio in h_integral_ratios
+    )
+    s_integrals_pass = bool(s_integral_ratios) and all(
+        ratio is not None and ratio <= 1.0 for ratio in s_integral_ratios
+    )
+    ring_pass = not ring_failures
+    t1_pass = not failed_cells and ring_pass and positive_cp
+    t2_pass = (
+        ring_pass
+        and positive_cp
+        and join_continuity
+        and cp_source_positive
+        and max_relative_cp is not None
+        and max_relative_cp <= 1e-3
+        and h_integrals_pass
+        and s_integrals_pass
+    )
+    fit_statistics["smooth_fit_checks"] = {
+        "maximum_relative_Cp_residual": max_relative_cp,
+        "maximum_H_integral_bound_ratio": max(
+            (value for value in h_integral_ratios if value is not None), default=None
+        ),
+        "maximum_S_integral_bound_ratio": max(
+            (value for value in s_integral_ratios if value is not None), default=None
+        ),
+        "join_continuity_max_relative": join_continuity_max_relative,
+        "anti_ringing_passed": ring_pass,
+        "positive_Cp": positive_cp,
+    }
+
+    if not t1_pass and not t2_pass:
+        if not positive_cp:
+            reason_code = "cp_nonpositive"
+            reason = "fitted Cp is not strictly positive over the declared positive interval"
+        elif ring_failures:
+            reason_code = "interpolation_ringing"
+            reason = "NASA-9 Cp leaves the widened range of adjacent printed cells between nodes"
+        else:
+            reason_code = "smooth_fit_tolerance_exceeded"
+            reason = "fit exceeds the smooth-fit Cp or implied integral error bounds"
         return _rejected(
             base,
-            "residual_exceeds_printed_precision",
-            "one or more fitted or derived cells exceed their printed rounding allowance",
+            reason_code,
+            reason,
             fit_statistics=fit_statistics,
-            failed_cells=over_precision + formation_over_precision,
-            excluded_cells=excluded,
+            fit_error=fit_error,
+            failed_cells=failed_cells,
+            ring_failures=ring_failures,
+            _cp_node_residuals=cp_node_residuals,
         )
 
+    thermo_segments = [
+        {
+            "T_min_K": segment.T_min_K,
+            "T_max_K": segment.T_max_K,
+            "a_coefficients": list(segment.coefficients),
+            "b1": segment.b1,
+            "b2": segment.b2,
+        }
+        for segment in segments
+    ]
+    record_out = {
+        **base,
+        "status": "accepted",
+        "acceptance_tier": "table_equivalent" if t1_pass else "smooth_fit",
+        "fit_error": fit_error,
+        "fit_method": "weighted_constrained_linear_least_squares_on_scaled_temperature",
+        "quantity_convention": {
+            "Cp": "J_per_mol_K",
+            "H": "J_per_mol",
+            "S": "J_per_mol_K",
+            "formation_H_G": "kJ_per_mol",
+        },
+        "fit_statistics": fit_statistics,
+        "thermo_record": {
+            "evaluator_family": "nasa_cea_9",
+            "standard_state": standard_state,
+            "standard_state_convention": metadata["standard_state_convention"],
+            "formula": formula,
+            "reference_pressure_Pa": pressure,
+            "segments": thermo_segments,
+        },
+    }
     curve = FittedCurve(
         formula=formula,
         phase_label=phase_label,
@@ -772,42 +1066,221 @@ def fit_compilation_thermo_range(
         T_min_K=fit_lo,
         T_max_K=fit_hi,
         reference_pressure_Pa=pressure,
-        segment=segment,
+        segment=segments[0],
         is_element_reference=is_element_reference,
+        segments=tuple(segments),
     )
-    thermo_record = {
-        "evaluator_family": "nasa_cea_9",
-        "standard_state": standard_state,
-        "standard_state_convention": metadata["standard_state_convention"],
-        "formula": formula,
-        "reference_pressure_Pa": pressure,
-        "segments": [
-            {
-                "T_min_K": fit_lo,
-                "T_max_K": fit_hi,
-                "a_coefficients": list(coefficients),
-                "b1": b1,
-                "b2": b2,
-            }
-        ],
-    }
-    record_out = {
-        **base,
-        "record_id": base["record_id"],
-        "status": "accepted",
-        "fit_method": "weighted_linear_least_squares_on_scaled_temperature",
-        "quantity_convention": {
-            "Cp": "J_per_mol_K",
-            "H": "J_per_mol",
-            "S": "J_per_mol_K",
-            "formation_H_G": "kJ_per_mol",
-        },
-        "fit_statistics": fit_statistics,
-        "excluded_cells": excluded,
-        "thermo_record": thermo_record,
-    }
     return FitResult(record_out, curve)
 
+
+def fit_compilation_thermo_range(
+    *,
+    record: Mapping[str, Any],
+    series: Sequence[object],
+    phase_label: str,
+    standard_state: str,
+    T_min_K: float | None,
+    T_max_K: float | None,
+    is_element_reference: bool = False,
+    reference_curves: Mapping[str, Sequence[FittedCurve]] | None = None,
+) -> FitResult:
+    """Fit a source phase, refining its segmentation only until T2 passes."""
+
+    references = reference_curves or {}
+    channels = _channel_cells(series)
+    metadata = source_metadata(record)
+    base = _record_base(
+        metadata=metadata,
+        phase_label=phase_label,
+        T_min_K=T_min_K,
+        T_max_K=T_max_K,
+    )
+    excluded: list[dict[str, Any]] = []
+    in_range_temperatures: list[float] = []
+    for quantity, cells in channels.items():
+        for cell in cells:
+            reason = None
+            if cell.temperature_K <= 0.0:
+                reason = "nonpositive_fit_temperature"
+            elif T_min_K is not None and T_min_K > 0.0 and cell.temperature_K < T_min_K:
+                reason = "below_fit_T_min"
+            elif T_max_K is not None and cell.temperature_K > T_max_K:
+                reason = "above_fit_T_max"
+            if reason:
+                excluded.append({
+                    "quantity": quantity.value,
+                    "T_K": cell.temperature_K,
+                    "raw_token": cell.raw_token,
+                    "reason_code": reason,
+                })
+            elif quantity in {Quantity.CP, Quantity.H_MINUS_H298, Quantity.S}:
+                in_range_temperatures.append(cell.temperature_K)
+
+    def with_exclusions(result: FitResult) -> FitResult:
+        if not excluded:
+            return result
+        output = dict(result.record)
+        output["excluded_cells"] = excluded
+        return FitResult(output, result.curve)
+
+    if not in_range_temperatures:
+        return with_exclusions(_rejected(
+            base,
+            "no_positive_fit_cells",
+            "no printed cell lies in the positive declared fit range",
+        ))
+    fit_lo = max(T_min_K or min(in_range_temperatures), min(in_range_temperatures))
+    fit_hi = min(T_max_K or max(in_range_temperatures), max(in_range_temperatures))
+    if fit_lo <= 0.0 or fit_hi <= fit_lo:
+        return with_exclusions(_rejected(
+            base,
+            "insufficient_fit_range",
+            f"no positive interval remains after exclusions: [{fit_lo}, {fit_hi}] K",
+        ))
+
+    cp_fit = tuple(
+        cell for cell in channels.get(Quantity.CP, ())
+        if fit_lo <= cell.temperature_K <= fit_hi
+    )
+    cp_nodes = tuple(sorted(cp_fit, key=lambda cell: cell.temperature_K))
+    peaks = {
+        cp_nodes[index].temperature_K
+        for index in range(1, len(cp_nodes) - 1)
+        if cp_nodes[index].value >= cp_nodes[index - 1].value
+        and cp_nodes[index].value >= cp_nodes[index + 1].value
+        and (cp_nodes[index].value > cp_nodes[index - 1].value
+             or cp_nodes[index].value > cp_nodes[index + 1].value)
+    }
+    near_peaks = set(peaks)
+    for index, cell in enumerate(cp_nodes):
+        if cell.temperature_K in peaks:
+            near_peaks.update(
+                cp_nodes[neighbor].temperature_K
+                for neighbor in (index - 1, index + 1)
+                if 0 <= neighbor < len(cp_nodes)
+            )
+
+    bounds = [(fit_lo, fit_hi)]
+    best: FitResult | None = None
+    best_score = math.inf
+    any_peak_split = False
+    while True:
+        candidate = _fit_piecewise_candidate(
+            record=record,
+            series=series,
+            phase_label=phase_label,
+            standard_state=standard_state,
+            is_element_reference=is_element_reference,
+            reference_curves=references,
+            segment_bounds=bounds,
+            fit_lo=fit_lo,
+            fit_hi=fit_hi,
+            rejected_template=base,
+        )
+        if candidate.record.get("status") == "accepted":
+            return with_exclusions(candidate)
+
+        stats = candidate.record.get("fit_statistics", {})
+        smooth = stats.get("smooth_fit_checks", {})
+        score = smooth.get("maximum_relative_Cp_residual")
+        if score is None:
+            score = stats.get("cp_J_per_mol_K", {}).get("max_abs", math.inf)
+        try:
+            score = float(score)
+        except (TypeError, ValueError):
+            score = math.inf
+        if best is None or score < best_score:
+            best, best_score = candidate, score
+
+        reason = candidate.record.get("reason_code")
+        if reason == "insufficient_cells":
+            return with_exclusions(candidate)
+        if reason not in {
+            "smooth_fit_tolerance_exceeded",
+            "interpolation_ringing",
+            "cp_nonpositive",
+        }:
+            return with_exclusions(candidate)
+        if reason == "cp_nonpositive" and not any(
+            lower <= peak <= upper for peak in peaks for lower, upper in bounds
+        ):
+            return with_exclusions(candidate)
+
+        eligible: list[tuple[float, int, float, bool]] = []
+        residual_by_temperature = {
+            float(item["T_K"]): abs(float(item["residual"]))
+            for item in candidate.record.get("_cp_node_residuals", ())
+        }
+        split_nodes = tuple(
+            cell for cell in cp_nodes
+            if not any(cell.temperature_K == lower for lower, _upper in bounds[1:])
+        )
+        for index, (lower, upper) in enumerate(bounds):
+            for cell in split_nodes:
+                join = cell.temperature_K
+                if not lower < join < upper:
+                    continue
+                left_count = sum(
+                    lower <= item.temperature_K <= join
+                    for item in channels.get(Quantity.CP, ())
+                )
+                right_count = sum(
+                    join <= item.temperature_K <= upper
+                    for item in channels.get(Quantity.CP, ())
+                )
+                if left_count >= 9 and right_count >= 9:
+                    eligible.append((
+                        residual_by_temperature.get(join, 0.0),
+                        index,
+                        join,
+                        join in peaks,
+                    ))
+
+        gas_1000 = [
+            item for item in eligible
+            if standard_state == "gas" and item[2] == 1000.0
+        ]
+        if gas_1000:
+            _score, split_index, join_K, is_peak = gas_1000[0]
+        elif eligible:
+            _score, split_index, join_K, is_peak = max(
+                eligible, key=lambda item: (item[0], -item[2])
+            )
+        else:
+            assert best is not None
+            result = dict(best.record)
+            result.pop("_cp_node_residuals", None)
+            best_stats = result.get("fit_statistics", {})
+            near_peak_failure = any(
+                float(item.get("T_K", -1.0)) in near_peaks
+                for item in result.get("failed_cells", ())
+            ) or any(
+                item.get("T_left_K") in near_peaks or item.get("T_right_K") in near_peaks
+                for item in result.get("ring_failures", ())
+            )
+            if any_peak_split or near_peak_failure:
+                code = "lambda_anomaly_unresolved"
+                message = "smooth-fit or anti-ringing gate remains unresolved at a printed Cp peak"
+            elif best.record.get("ring_failures"):
+                code = "interpolation_ringing"
+                message = "NASA-9 Cp leaves the widened range of adjacent printed cells between nodes"
+            else:
+                code = "segmentation_exhausted"
+                message = "no printed-node split leaves at least 9 fitted cells in each child segment"
+            return with_exclusions(_rejected(
+                result,
+                code,
+                message,
+                fit_statistics=best_stats,
+                fit_error=result.get("fit_error"),
+                failed_cells=result.get("failed_cells", []),
+                ring_failures=result.get("ring_failures", []),
+                segment_count=best_stats.get("segment_count", len(bounds)),
+            ))
+
+        any_peak_split = any_peak_split or is_peak
+        start, end = bounds[split_index]
+        bounds[split_index : split_index + 1] = [(start, join_K), (join_K, end)]
 
 def render_sidecar(records: Sequence[Mapping[str, Any]]) -> str:
     ordered = sorted(records, key=lambda record: str(record.get("record_id", "")))
@@ -1004,9 +1477,39 @@ def main(argv: Sequence[str] | None = None) -> int:
     records = generate_janaf_sidecar(table_ids=args.table_id)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(render_sidecar(records), encoding="utf-8")
-    accepted = sum(record.get("status") == "accepted" for record in records)
-    rejected = len(records) - accepted
-    print(f"wrote {len(records)} fit records ({accepted} accepted, {rejected} rejected) to {args.output}")
+    accepted = [record for record in records if record.get("status") == "accepted"]
+    tier_counts = {
+        tier: sum(record.get("acceptance_tier") == tier for record in accepted)
+        for tier in ("table_equivalent", "smooth_fit")
+    }
+    rejected = [record for record in records if record.get("status") == "rejected"]
+    reasons: dict[str, int] = {}
+    for record in rejected:
+        reason = str(record.get("reason_code", "unknown"))
+        reasons[reason] = reasons.get(reason, 0) + 1
+    error_keys = (
+        "Cp_J_per_mol_K",
+        "H_minus_H298_kJ_per_mol",
+        "S_J_per_mol_K",
+        "delta_fG_kJ_per_mol",
+    )
+    maximum_errors = {
+        key: max(
+            (
+                value
+                for record in records
+                if (value := record.get("fit_error", {}).get(key)) is not None
+            ),
+            default=0.0,
+        )
+        for key in error_keys
+    }
+    print(
+        f"wrote {len(records)} fit records "
+        f"({tier_counts['table_equivalent']} T1, {tier_counts['smooth_fit']} T2, "
+        f"{len(rejected)} rejected; reasons={reasons}; max_fit_error={maximum_errors}) "
+        f"to {args.output}"
+    )
     return 0
 
 
