@@ -447,7 +447,7 @@ def test_green_fixture_detects_an_in_memory_coefficient_mutation() -> None:
     _openimcc_or_skip()
     from dataclasses import replace
     import openimcc
-    from openimcc import label_research_datapack, load_datapack
+    from openimcc import label_research_datapack
 
     fixture = json.loads("\n".join(
         line for line in GREEN_ACTIVITY_FIXTURE.read_text().splitlines()
@@ -455,7 +455,8 @@ def test_green_fixture_detects_an_in_memory_coefficient_mutation() -> None:
     ))
     row = fixture["rows"][0]
     composition, basis_type = COMPOSITIONS[row["composition"]]
-    pack = load_datapack()
+    # This fixture is a frozen published-SF04 oracle, not a default-model pin.
+    pack = _load_pack("published-core")
     baseline = openimcc.evaluate(
         composition, row["temperature_K"], pack, basis_type=basis_type
     )
@@ -483,26 +484,6 @@ def test_pack_digest_preserves_the_published_binding_value() -> None:
     _openimcc_or_skip()
     expected = "f2b479cd54e3c82704a5863fcc06836f72045375d9a8c7f8d2fad19e98f75d05"
     assert _pack_digest(_load_pack("published-core")) == expected
-
-
-def test_legacy_default_pack_matches_explicit_published_core() -> None:
-    _openimcc_or_skip()
-    import openimcc
-
-    composition = COMPOSITIONS["lunar_mare_low_ti"][0]
-    default_pack = _load_pack("default")
-    published_pack = _load_pack("published-core")
-    assert default_pack.binding_digest == published_pack.binding_digest
-    default_result = openimcc.evaluate(
-        composition, 2200.0, default_pack, basis_type="wt"
-    )
-    published_result = openimcc.evaluate(
-        composition, 2200.0, published_pack, basis_type="wt"
-    )
-    assert default_result.parent_oxides == published_result.parent_oxides
-    assert tuple(default_result.parent_activity) == tuple(
-        published_result.parent_activity
-    )
 
 
 def test_pack_digest_uses_ext_binding_digest() -> None:
