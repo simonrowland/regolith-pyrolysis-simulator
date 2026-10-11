@@ -416,6 +416,7 @@ species:
           ilmenite reduction for pressures below ~10^{-5} Torr. A vacuum pyrolysis processing plant on
           the lunar surface would operate around 10^{-7} Torr.
     - observation_id: cardiff_2007_fig6_hsc_1e-1_Torr_figure_only
+      quote: Cardiff et al. (2007), HSC Gibbs free-energy minimization output
       type: psat_series
       locator:
         figure: '6'
@@ -432,7 +433,7 @@ species:
         note: figure-only; not digitised
       values:
         quantity: equilibrium_composition
-        method_class: model_derived
+        method_class: quoted_attributed
         admission_status: figure_only
         semantics: bound_not_point_ordering
         axis_T_as_printed: 0 to 3000 (same numeric labels as Fig. 7; treated as C and converted T_K =
@@ -440,6 +441,7 @@ species:
         P_Torr_as_printed: 10^{-1}
         software: HSC analysis package; minimization of the Gibbs free energy
     - observation_id: cardiff_2007_fig7_hsc_1e-7_Torr_figure_only
+      quote: Cardiff et al. (2007), HSC Gibbs free-energy minimization output
       type: psat_series
       locator:
         figure: '7'
@@ -456,7 +458,7 @@ species:
         note: figure-only; not digitised
       values:
         quantity: equilibrium_composition
-        method_class: model_derived
+        method_class: quoted_attributed
         admission_status: figure_only
         semantics: bound_not_point_ordering
         axis_T_as_printed: 0 to 3000 (same numeric labels as Fig. 6; treated as C and converted T_K =
