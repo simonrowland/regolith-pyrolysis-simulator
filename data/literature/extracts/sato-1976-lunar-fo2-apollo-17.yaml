@@ -315,8 +315,10 @@ species:
           convention: raoultian_pure_endmember
           endmember: {formula: FeO, phase: cr, polymorph: {tag: unknown, reason: "source calls FeO wüstite but names no polymorph"}, charge: 0}
           component_basis: FeO
-        standard_state_text: 'pure solid FeO; reference reaction "iron-wüstite buffer curve" (as printed; equation not given); deltaG0 source not_published (reason: not_published; pages searched: 1324, 1326-1328); wüstite stoichiometry not_published (the paper prints FeO/wüstite but gives no x)'
+        standard_state_text: 'pure solid FeO; reference reaction "iron-wüstite buffer" (as named; no equation printed); deltaG0 source not_published in Sato (1976); wüstite stoichiometry and polymorph not_published.'
         standard_state_locator: {page: 1328, table: '2', note: reference-basis discussion on page 1326}
+        buffer_reference_as_published: Iron-wüstite buffer measurements of Sato and Hickling (1973), compared with Eugster and Wones (1962).
+        buffer_reference_locator: {page: 1324, section: Experimental Method, note: comparison of the iron-wüstite buffer fO2 measurements}
         units: dimensionless
         values:
           method_class: model_derived
@@ -327,7 +329,7 @@ species:
             - {T_C: 1100, activity: '.29'}
             - {T_C: 1150, activity: '.28'}
             - {T_C: 1200, activity: '.25'}
-          calculation_basis: Difference between sample-plus-Fe and iron-wüstite buffer fO2 curves, as discussed by Sato et al. (1973); paper does not print the equilibrium equation, coefficients, or units for its free-energy expression (pp. 1326-1328).
+          calculation_basis: Difference between the sample-plus-Fe and iron-wüstite buffer fO2 curves gives the FeO activity; Sato and Hickling (1973) buffer measurements are compared with Eugster and Wones (1962) (pp. 1324, 1326). The equilibrium equation and coefficients are not printed here.
           Fe_FeO_equilibrium_as_printed: '"iron-wüstite buffer curve"; Sato et al. (1973)'
           Fe_FeO_equilibrium_details: {state: unknown, reason: not_published, pages_searched: '1324, 1326-1328'}
           Fe_FeO_equilibrium_locator: {page: 1326, section: discussion of activity calculation}
@@ -343,8 +345,10 @@ species:
         derivation: {relation: 'Computed from the oxygen-fugacity curve relative to the iron-wüstite buffer curve, as described on page 1326; the equation is not printed here.', inputs: [sato_1976_table1_74275_39], output_unit: dimensionless}
         phase: silicate_melt
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: FeO, phase: cr, polymorph: {tag: unknown, reason: "source calls FeO wüstite but names no polymorph"}, charge: 0}, component_basis: FeO}
-        standard_state_text: 'pure solid FeO; reference reaction "iron-wüstite buffer curve" (as printed; equation not given); deltaG0 source not_published (reason: not_published; pages searched: 1324, 1326-1328); wüstite stoichiometry not_published (the paper prints FeO/wüstite but gives no x)'
+        standard_state_text: 'pure solid FeO; reference reaction "iron-wüstite buffer" (as named; no equation printed); deltaG0 source not_published in Sato (1976); wüstite stoichiometry and polymorph not_published.'
         standard_state_locator: {page: 1328, table: '2', note: reference-basis discussion on page 1326}
+        buffer_reference_as_published: Iron-wüstite buffer measurements of Sato and Hickling (1973), compared with Eugster and Wones (1962).
+        buffer_reference_locator: {page: 1324, section: Experimental Method, note: comparison of the iron-wüstite buffer fO2 measurements}
         units: dimensionless
         values:
           method_class: model_derived
@@ -366,8 +370,10 @@ species:
         derivation: {relation: 'Table 2 activity is presented with the corresponding Table 1 fO2 values; exact calculation inputs and equation are not restated here.', inputs: [sato_1976_table1_12009_35], output_unit: dimensionless}
         phase: silicate_melt
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: FeO, phase: cr, polymorph: {tag: unknown, reason: "source calls FeO wüstite but names no polymorph"}, charge: 0}, component_basis: FeO}
-        standard_state_text: 'pure solid FeO; reference reaction "iron-wüstite buffer curve" (as printed; equation not given); deltaG0 source not_published (reason: not_published; pages searched: 1324, 1326-1328); wüstite stoichiometry not_published (the paper prints FeO/wüstite but gives no x)'
+        standard_state_text: 'pure solid FeO; reference reaction "iron-wüstite buffer" (as named; no equation printed); deltaG0 source not_published in Sato (1976); wüstite stoichiometry and polymorph not_published.'
         standard_state_locator: {page: 1328, table: '2', note: reference-basis discussion on page 1326}
+        buffer_reference_as_published: Iron-wüstite buffer measurements of Sato and Hickling (1973), compared with Eugster and Wones (1962).
+        buffer_reference_locator: {page: 1324, section: Experimental Method, note: comparison of the iron-wüstite buffer fO2 measurements}
         units: dimensionless
         values:
           method_class: model_derived
@@ -389,8 +395,10 @@ species:
         derivation: {relation: 'Table 2 activity is presented with the corresponding Table 1 fO2 values; exact calculation inputs and equation are not restated here.', inputs: [sato_1976_table1_12053_89], output_unit: dimensionless}
         phase: silicate_melt
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: FeO, phase: cr, polymorph: {tag: unknown, reason: "source calls FeO wüstite but names no polymorph"}, charge: 0}, component_basis: FeO}
-        standard_state_text: 'pure solid FeO; reference reaction "iron-wüstite buffer curve" (as printed; equation not given); deltaG0 source not_published (reason: not_published; pages searched: 1324, 1326-1328); wüstite stoichiometry not_published (the paper prints FeO/wüstite but gives no x)'
+        standard_state_text: 'pure solid FeO; reference reaction "iron-wüstite buffer" (as named; no equation printed); deltaG0 source not_published in Sato (1976); wüstite stoichiometry and polymorph not_published.'
         standard_state_locator: {page: 1328, table: '2', note: reference-basis discussion on page 1326}
+        buffer_reference_as_published: Iron-wüstite buffer measurements of Sato and Hickling (1973), compared with Eugster and Wones (1962).
+        buffer_reference_locator: {page: 1324, section: Experimental Method, note: comparison of the iron-wüstite buffer fO2 measurements}
         units: dimensionless
         values:
           method_class: model_derived
@@ -412,8 +420,10 @@ species:
         derivation: {relation: 'Table 2 activity is presented with the corresponding Table 1 fO2 values; exact calculation inputs and equation are not restated here.', inputs: [sato_1976_table1_15595_25], output_unit: dimensionless}
         phase: silicate_melt
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: FeO, phase: cr, polymorph: {tag: unknown, reason: "source calls FeO wüstite but names no polymorph"}, charge: 0}, component_basis: FeO}
-        standard_state_text: 'pure solid FeO; reference reaction "iron-wüstite buffer curve" (as printed; equation not given); deltaG0 source not_published (reason: not_published; pages searched: 1324, 1326-1328); wüstite stoichiometry not_published (the paper prints FeO/wüstite but gives no x)'
+        standard_state_text: 'pure solid FeO; reference reaction "iron-wüstite buffer" (as named; no equation printed); deltaG0 source not_published in Sato (1976); wüstite stoichiometry and polymorph not_published.'
         standard_state_locator: {page: 1328, table: '2', note: reference-basis discussion on page 1326}
+        buffer_reference_as_published: Iron-wüstite buffer measurements of Sato and Hickling (1973), compared with Eugster and Wones (1962).
+        buffer_reference_locator: {page: 1324, section: Experimental Method, note: comparison of the iron-wüstite buffer fO2 measurements}
         units: dimensionless
         values:
           method_class: model_derived
@@ -435,15 +445,20 @@ species:
         locator: {page: 1328, table: '3', row: '70017', note: PDF p. 6}
         derived_from: [sato_1976_table1_70017_31]
         derivation: {relation: 'Computed from measured fO2; the cited Sato et al. (1973) calculation is not printed as an equation in this paper.', inputs: [sato_1976_table1_70017_31], output_unit: dimensionless}
-        standard_state: 'unknown; reason: not_published; pages searched: 1326-1328 (the paper names Fe activity and discusses Raoult''s Law, but does not specify the reference metal phase)'
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: Fe, phase: cr, polymorph: {tag: unknown, reason: 'the paper does not state the Fe polymorph'}, charge: 0}, component_basis: Fe}
+        standard_state_text: 'pure solid Fe; reference reaction not printed; deltaG0 source not_published in Sato (1976); Fe polymorph not_published.'
         standard_state_locator: {page: 1328, table: '3', section: discussion of Fe activity}
         units: dimensionless
         values:
           method_class: model_derived
           quantity: activity
           series: [{T_C: 975, activity: '.90'}, {T_C: 1000, activity: '.82'}, {T_C: 1025, activity: '.72'}, {T_C: 1050, activity: '.64'}, {T_C: 1100, activity: '.63'}, {T_C: 1150, activity: '.60'}, {T_C: 1200, activity: '.55'}]
-          metal_side_as_published: 'alloy with a(Fe) as printed in Table 3; the paper describes Fe^0 in the natural metallic phase and does not state that values were recalculated to pure metal.'
+          metal_side_as_published: Fe^0 activity in the natural metallic phase, computed from the natural-sample and sample-plus-Fe curves; the paper describes Raoult's Law behavior at the high-Fe end of the solution.
           metal_side_locator: {page: 1328, table: '3', section: discussion of Fe activity}
+          Fe_capsule_reference_as_published: The 940 mg pure-iron capsule relative to less than 0.2 mg natural metallic grains makes capsule Fe activity virtually unity.
+          Fe_capsule_reference_locator: {page: 1326, section: discussion following Table 1}
+          natural_Fe_activity_reference: The difference between natural-sample and sample-plus-Fe curves at a given temperature gives the natural rock Fe activity.
+          natural_Fe_activity_reference_locator: {page: 1326, section: discussion following Table 1}
           bulk_composition: {state: not_published, reason: not_published, pointer: Hodges and Kushiro (1974), cited for 70017 petrology (pp. 1324, 1326; reference p. 1343)}
           measurement_method: Activities computed from fO2 measurements; for the iron-capsule measurements the capsule Fe activity was virtually unity, while Table 3 reports Fe activity in the natural metallic phase.
           calculation_basis: The paper states the values are computed from measured fO2 and refers to the Sato et al. (1973) procedure; no Fe-FeO equation is printed here.
@@ -454,15 +469,20 @@ species:
         locator: {page: 1328, table: '3', row: '74275', note: PDF p. 6}
         derived_from: [sato_1976_table1_74275_39]
         derivation: {relation: 'Computed from measured fO2; the cited Sato et al. (1973) calculation is not printed as an equation in this paper.', inputs: [sato_1976_table1_74275_39], output_unit: dimensionless}
-        standard_state: 'unknown; reason: not_published; pages searched: 1326-1328 (the paper names Fe activity and discusses Raoult''s Law, but does not specify the reference metal phase)'
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: Fe, phase: cr, polymorph: {tag: unknown, reason: 'the paper does not state the Fe polymorph'}, charge: 0}, component_basis: Fe}
+        standard_state_text: 'pure solid Fe; reference reaction not printed; deltaG0 source not_published in Sato (1976); Fe polymorph not_published.'
         standard_state_locator: {page: 1328, table: '3', section: discussion of Fe activity}
         units: dimensionless
         values:
           method_class: model_derived
           quantity: activity
           series: [{T_C: 975, activity: '.93'}, {T_C: 1000, activity: '.68'}, {T_C: 1025, activity: '.59'}, {T_C: 1050, activity: '.56'}, {T_C: 1100, activity: '.58'}, {T_C: 1150, activity: '.62'}, {T_C: 1200, activity: '.60'}]
-          metal_side_as_published: 'alloy with a(Fe) as printed in Table 3; the paper describes Fe^0 in the natural metallic phase and does not state that values were recalculated to pure metal.'
+          metal_side_as_published: Fe^0 activity in the natural metallic phase, computed from the natural-sample and sample-plus-Fe curves; the paper describes Raoult's Law behavior at the high-Fe end of the solution.
           metal_side_locator: {page: 1328, table: '3', section: discussion of Fe activity}
+          Fe_capsule_reference_as_published: The 940 mg pure-iron capsule relative to less than 0.2 mg natural metallic grains makes capsule Fe activity virtually unity.
+          Fe_capsule_reference_locator: {page: 1326, section: discussion following Table 1}
+          natural_Fe_activity_reference: The difference between natural-sample and sample-plus-Fe curves at a given temperature gives the natural rock Fe activity.
+          natural_Fe_activity_reference_locator: {page: 1326, section: discussion following Table 1}
           bulk_composition: {state: not_published, reason: not_published, pointer: Hodges and Kushiro (1974), cited for 74275 petrology (p. 1326; reference p. 1343)}
           measurement_method: Activities computed from fO2 measurements; for the iron-capsule measurements the capsule Fe activity was virtually unity, while Table 3 reports Fe activity in the natural metallic phase.
           calculation_basis: The paper states the values are computed from measured fO2 and refers to the Sato et al. (1973) procedure; no Fe-FeO equation is printed here.
@@ -473,14 +493,15 @@ species:
         locator: {page: 1328, table: '3', row: '12009', note: PDF p. 6}
         derived_from: [sato_1976_table1_12009_35]
         derivation: {relation: 'Table 3 metal activity is presented with the corresponding Table 1 fO2 values; exact calculation inputs and equation are not restated here.', inputs: [sato_1976_table1_12009_35], output_unit: dimensionless}
-        standard_state: 'unknown; reason: not_published; pages searched: 1326-1328 (the paper names Fe activity and discusses Raoult''s Law, but does not specify the reference metal phase)'
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: Fe, phase: cr, polymorph: {tag: unknown, reason: 'the paper does not state the Fe polymorph'}, charge: 0}, component_basis: Fe}
+        standard_state_text: 'pure solid Fe; reference reaction not printed; deltaG0 source not_published in Sato (1976); Fe polymorph not_published.'
         standard_state_locator: {page: 1328, table: '3', section: discussion of Fe activity}
         units: dimensionless
         values:
           method_class: model_derived
           quantity: activity
           series: [{T_C: 975, a_Fe: '—', activity: null}, {T_C: 1000, activity: '.63'}, {T_C: 1025, a_Fe: '—', activity: null}, {T_C: 1050, activity: '.63'}, {T_C: 1100, activity: '.63'}, {T_C: 1150, activity: '.71'}, {T_C: 1200, activity: '.79'}]
-          metal_side_as_published: 'alloy with a(Fe) as printed in Table 3; the paper describes Fe^0 in the natural metallic phase and does not state that values were recalculated to pure metal.'
+          metal_side_as_published: Table 3 lists available Fe^0 activities for the earlier basalt; the paper does not restate the metal composition or calculation procedure for this source.
           metal_side_locator: {page: 1328, table: '3', section: discussion of Fe activity}
           bulk_composition: {state: not_published, reason: not_published, pointer: Sato, Hickling, and McLane (1973), cited as the source of Table 1 values for sample 12009,35 (pp. 1326, 1343)}
           measurement_method: Values appear in Table 3 with available mare-basalt metal activities; capsule and measurement details for this earlier sample are not restated here.
@@ -492,14 +513,15 @@ species:
         locator: {page: 1328, table: '3', row: '12053', note: PDF p. 6}
         derived_from: [sato_1976_table1_12053_89]
         derivation: {relation: 'Table 3 metal activity is presented with the corresponding Table 1 fO2 values; exact calculation inputs and equation are not restated here.', inputs: [sato_1976_table1_12053_89], output_unit: dimensionless}
-        standard_state: 'unknown; reason: not_published; pages searched: 1326-1328 (the paper names Fe activity and discusses Raoult''s Law, but does not specify the reference metal phase)'
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: Fe, phase: cr, polymorph: {tag: unknown, reason: 'the paper does not state the Fe polymorph'}, charge: 0}, component_basis: Fe}
+        standard_state_text: 'pure solid Fe; reference reaction not printed; deltaG0 source not_published in Sato (1976); Fe polymorph not_published.'
         standard_state_locator: {page: 1328, table: '3', section: discussion of Fe activity}
         units: dimensionless
         values:
           method_class: model_derived
           quantity: activity
           series: [{T_C: 975, a_Fe: '—', activity: null}, {T_C: 1000, activity: '.50'}, {T_C: 1025, a_Fe: '—', activity: null}, {T_C: 1050, activity: '.50'}, {T_C: 1100, activity: '.45'}, {T_C: 1150, activity: '.40'}, {T_C: 1200, activity: '.40'}]
-          metal_side_as_published: 'alloy with a(Fe) as printed in Table 3; the paper describes Fe^0 in the natural metallic phase and does not state that values were recalculated to pure metal.'
+          metal_side_as_published: Table 3 lists available Fe^0 activities for the earlier basalt; the paper does not restate the metal composition or calculation procedure for this source.
           metal_side_locator: {page: 1328, table: '3', section: discussion of Fe activity}
           bulk_composition: {state: not_published, reason: not_published, pointer: Sato, Hickling, and McLane (1973), cited as the source of Table 1 values for sample 12053,89 (pp. 1326, 1343)}
           measurement_method: Values appear in Table 3 with available mare-basalt metal activities; capsule and measurement details for this earlier sample are not restated here.
@@ -511,14 +533,15 @@ species:
         locator: {page: 1328, table: '3', row: '15595', note: PDF p. 6}
         derived_from: [sato_1976_table1_15595_25]
         derivation: {relation: 'Table 3 metal activity is presented with the corresponding Table 1 fO2 values; exact calculation inputs and equation are not restated here.', inputs: [sato_1976_table1_15595_25], output_unit: dimensionless}
-        standard_state: 'unknown; reason: not_published; pages searched: 1326-1328 (the paper names Fe activity and discusses Raoult''s Law, but does not specify the reference metal phase)'
+        standard_state: {convention: raoultian_pure_endmember, endmember: {formula: Fe, phase: cr, polymorph: {tag: unknown, reason: 'the paper does not state the Fe polymorph'}, charge: 0}, component_basis: Fe}
+        standard_state_text: 'pure solid Fe; reference reaction not printed; deltaG0 source not_published in Sato (1976); Fe polymorph not_published.'
         standard_state_locator: {page: 1328, table: '3', section: discussion of Fe activity}
         units: dimensionless
         values:
           method_class: model_derived
           quantity: activity
           series: [{T_C: 975, a_Fe: '—', activity: null}, {T_C: 1000, activity: '.71'}, {T_C: 1025, a_Fe: '—', activity: null}, {T_C: 1050, activity: '.80'}, {T_C: 1100, activity: '.89'}, {T_C: 1150, activity: '.80'}, {T_C: 1200, activity: '.71'}]
-          metal_side_as_published: 'alloy with a(Fe) as printed in Table 3; the paper describes Fe^0 in the natural metallic phase and does not state that values were recalculated to pure metal.'
+          metal_side_as_published: Table 3 lists available Fe^0 activities for the earlier basalt; the paper does not restate the metal composition or calculation procedure for this source.
           metal_side_locator: {page: 1328, table: '3', section: discussion of Fe activity}
           bulk_composition: {state: not_published, reason: not_published, pointer: Sato, Hickling, and McLane (1973), cited as the source of Table 1 values for sample 15595,25 (pp. 1326, 1343)}
           measurement_method: Values appear in Table 3 with available mare-basalt metal activities; capsule and measurement details for this earlier sample are not restated here.
