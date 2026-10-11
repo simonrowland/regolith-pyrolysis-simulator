@@ -25,7 +25,7 @@ import hashlib
 import json
 import math
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any, Mapping, Sequence
@@ -74,6 +74,7 @@ class FittedCurve:
     segment: Nasa9Segment
     is_element_reference: bool
     segments: tuple[Nasa9Segment, ...] = ()
+    fit_error: Mapping[str, float | None] = field(default_factory=dict)
 
     def segment_at(self, temperature_K: float) -> Nasa9Segment:
         """Return the right-hand segment at a shared endpoint."""
@@ -364,11 +365,11 @@ def _element_reference_terms(
     temperature_K: float,
     pressure_Pa: float,
     reference_curves: Mapping[str, Sequence[FittedCurve]],
-) -> tuple[list[tuple[float, float, float]] | None, str | None]:
+) -> tuple[list[tuple[float, float, float, FittedCurve]] | None, str | None]:
     composition = formula_composition(formula)
     if not composition:
         return None, f"unsupported_formula: formula {formula!r} has no elemental composition"
-    terms: list[tuple[float, float, float]] = []
+    terms: list[tuple[float, float, float, FittedCurve]] = []
     for element, atom_count in composition:
         candidates = list(reference_curves.get(element, ()))
         in_range = [
@@ -422,7 +423,7 @@ def _element_reference_terms(
             )
         coefficient = float(atom_count / reference_composition[0][1])
         _cp, h, _s, g = _evaluate(curve.segment_at(temperature_K), temperature_K)
-        terms.append((coefficient, h, g))
+        terms.append((coefficient, h, g, curve))
     return terms, None
 
 
@@ -457,6 +458,21 @@ def _residual_stats(residuals: Sequence[float]) -> dict[str, float | int]:
         "max_abs": float(np.max(np.abs(values))),
         "rms": float(np.sqrt(np.mean(values**2))),
     }
+
+
+def _formation_curve_error_bound_kJ(
+    fit_error: Mapping[str, float | None], quantity: Quantity, temperature_K: float
+) -> float | None:
+    enthalpy_error = fit_error.get("H_minus_H298_kJ_per_mol")
+    if enthalpy_error is None:
+        return None
+    if quantity is Quantity.DELTA_FH:
+        return enthalpy_error
+    entropy_error = fit_error.get("S_J_per_mol_K")
+    if entropy_error is None:
+        return None
+    # H error is kJ/mol; T·S error is J/mol. Convert the latter once.
+    return enthalpy_error + temperature_K * entropy_error / 1000.0
 
 
 def _segment_index(temperature_K: float, bounds: Sequence[tuple[float, float]]) -> int:
@@ -727,7 +743,8 @@ def _fit_piecewise_candidate(
             assert resolved is not None
             formation_capable = True
             h_anchor_J += sum(
-                coefficient * h_ref for coefficient, h_ref, _g_ref in resolved
+                coefficient * h_ref
+                for coefficient, h_ref, _g_ref, _curve in resolved
             )
 
     segment_count = len(segment_bounds)
@@ -950,13 +967,22 @@ def _fit_piecewise_candidate(
         "segment_count": segment_count,
         "constrained_basis_rank": reduced_rank,
     }
+    fit_error: dict[str, float | None] = {
+        "Cp_J_per_mol_K": fit_statistics["cp_J_per_mol_K"]["max_abs"],
+        "H_minus_H298_kJ_per_mol": fit_statistics[
+            "H_minus_H298_kJ_per_mol"
+        ]["max_abs"],
+        "S_J_per_mol_K": fit_statistics["S_J_per_mol_K"]["max_abs"],
+    }
 
     formation_residuals: dict[str, list[float]] = {
         "delta_fH_kJ_per_mol": [],
         "delta_fG_kJ_per_mol": [],
     }
     formation_precision_failures: list[dict[str, Any]] = []
+    formation_consistency_failures: list[dict[str, Any]] = []
     formation_precision_complete = True
+    formation_diagnostics_available = formation_capable
     formation_cells = tuple(
         cell
         for quantity in (Quantity.DELTA_FH, Quantity.DELTA_FG)
@@ -977,6 +1003,7 @@ def _fit_piecewise_candidate(
                 species_property = enthalpy if quantity is Quantity.DELTA_FH else gibbs
                 if is_element_reference:
                     references = [(1.0, species_property)]
+                    reference_fit_errors = [(1.0, fit_error)]
                 else:
                     resolved, error = _element_reference_terms(
                         formula, cell.temperature_K, pressure, reference_curves
@@ -985,11 +1012,16 @@ def _fit_piecewise_candidate(
                         formation_reason_code, _separator, _detail = error.partition(":")
                         formation_reason = error
                         formation_capable = False
+                        formation_diagnostics_available = False
                         break
                     assert resolved is not None
                     references = [
                         (coefficient, h_ref if quantity is Quantity.DELTA_FH else g_ref)
-                        for coefficient, h_ref, g_ref in resolved
+                        for coefficient, h_ref, g_ref, _curve in resolved
+                    ]
+                    reference_fit_errors = [
+                        (coefficient, curve.fit_error)
+                        for coefficient, _h_ref, _g_ref, curve in resolved
                     ]
                 derived = formation_subtraction_kJ_mol(species_property, references)
                 residual = derived - cell.value
@@ -1003,16 +1035,95 @@ def _fit_piecewise_candidate(
                         "residual": residual,
                         "allowance": cell.uncertainty,
                     })
+                # Premise: ΔfX = X_species - Σν_i X_element. Propagate the
+                # recorded maximum fit error of the species curve and each
+                # selected element curve with |ν_i|, then add rounding of the
+                # compared cell and the ΔfH°(298.15 K) anchor. For G, each
+                # curve contributes E_H + T·E_S: E_H is kJ/mol and T·E_S is
+                # J/mol, so divide the latter by 1000 once. Sanity from this
+                # 50-table sample: Al-008(g), ΔfH at 2700 K has 0.000944 kJ/mol
+                # species error + 0.003947 element error + 0.000500 for each
+                # printed rounding allowance = 0.005891 kJ/mol; its 0.006607
+                # kJ/mol residual therefore disables formation.
+                species_bound = _formation_curve_error_bound_kJ(
+                    fit_error, quantity, cell.temperature_K
+                )
+                reference_bounds = [
+                    (
+                        coefficient,
+                        _formation_curve_error_bound_kJ(
+                            error_by_property, quantity, cell.temperature_K
+                        ),
+                    )
+                    for coefficient, error_by_property in reference_fit_errors
+                ]
+                if (
+                    species_bound is None
+                    or delta_fh_anchor is None
+                    or delta_fh_anchor.uncertainty is None
+                    or cell.uncertainty is None
+                    or any(bound is None for _coefficient, bound in reference_bounds)
+                ):
+                    formation_reason_code = "formation_fit_error_unavailable"
+                    formation_reason = (
+                        "a fitted-property error or printed rounding allowance is unavailable"
+                    )
+                    formation_capable = False
+                    formation_diagnostics_available = False
+                    break
+                reference_bound = sum(
+                    abs(coefficient) * float(bound)
+                    for coefficient, bound in reference_bounds
+                    if bound is not None
+                )
+                propagated_bound = (
+                    species_bound
+                    + reference_bound
+                    + cell.uncertainty
+                    + delta_fh_anchor.uncertainty
+                )
+                if abs(residual) > propagated_bound:
+                    formation_consistency_failures.append({
+                        "quantity": quantity.value,
+                        "T_K": cell.temperature_K,
+                        "residual_kJ_per_mol": residual,
+                        "species_fit_error_bound_kJ_per_mol": species_bound,
+                        "element_reference_fit_error_bound_kJ_per_mol": reference_bound,
+                        "compared_cell_rounding_kJ_per_mol": cell.uncertainty,
+                        "delta_fH298_anchor_rounding_kJ_per_mol": (
+                            delta_fh_anchor.uncertainty
+                        ),
+                        "propagated_bound_kJ_per_mol": propagated_bound,
+                    })
             if not formation_capable:
                 break
 
-    if formation_capable:
+    if formation_diagnostics_available:
         over_precision.extend(formation_precision_failures)
         fit_statistics["derived_formation_H_kJ_per_mol"] = _residual_stats(
             formation_residuals["delta_fH_kJ_per_mol"]
         )
         fit_statistics["derived_formation_G_kJ_per_mol"] = _residual_stats(
             formation_residuals["delta_fG_kJ_per_mol"]
+        )
+        if formation_consistency_failures:
+            formation_capable = False
+            formation_reason_code = "formation_inconsistent"
+            formation_reason = (
+                "derived formation residual exceeds its propagated fit and rounding bound"
+            )
+            fit_statistics["formation_consistency_failures"] = (
+                formation_consistency_failures
+            )
+        fit_error["delta_fH_kJ_per_mol"] = (
+            fit_statistics["derived_formation_H_kJ_per_mol"]["max_abs"]
+            if formation_residuals["delta_fH_kJ_per_mol"]
+            else None
+        )
+        fit_error["delta_fG_kJ_per_mol"] = (
+            fit_statistics["derived_formation_G_kJ_per_mol"]["max_abs"]
+            if formation_residuals["delta_fG_kJ_per_mol"]
+            else None
         )
     else:
         formation_precision_complete = False
@@ -1031,22 +1142,6 @@ def _fit_piecewise_candidate(
         for segment in segments
         for failure in _interpolation_ringing(segment, cp_cells)
     ]
-    fit_error = {
-        "Cp_J_per_mol_K": fit_statistics["cp_J_per_mol_K"]["max_abs"],
-        "H_minus_H298_kJ_per_mol": fit_statistics["H_minus_H298_kJ_per_mol"]["max_abs"],
-        "S_J_per_mol_K": fit_statistics["S_J_per_mol_K"]["max_abs"],
-    }
-    if formation_capable:
-        fit_error["delta_fH_kJ_per_mol"] = (
-            fit_statistics["derived_formation_H_kJ_per_mol"]["max_abs"]
-            if formation_residuals["delta_fH_kJ_per_mol"]
-            else None
-        )
-        fit_error["delta_fG_kJ_per_mol"] = (
-            fit_statistics["derived_formation_G_kJ_per_mol"]["max_abs"]
-            if formation_residuals["delta_fG_kJ_per_mol"]
-            else None
-        )
     cp_source_positive = all(cell.value > 0.0 for cell in cp_cells)
     cp_relative_residuals = [
         (cell, residual, abs(residual) / abs(cell.value))
@@ -1252,6 +1347,7 @@ def _fit_piecewise_candidate(
             segment=segments[0],
             is_element_reference=is_element_reference,
             segments=tuple(segments),
+            fit_error=fit_error,
         )
     return FitResult(record_out, curve)
 

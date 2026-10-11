@@ -103,6 +103,10 @@ def _curve(formula, phase, record_id, segment, t_min, t_max):
         reference_pressure_Pa=PRESSURE_PA,
         segment=segment,
         is_element_reference=True,
+        fit_error={
+            "H_minus_H298_kJ_per_mol": 0.0,
+            "S_J_per_mol_K": 0.0,
+        },
     )
 
 
@@ -137,10 +141,18 @@ def _source_series(
             )
             assert error is None and terms is not None
             fh = formation_subtraction_kJ_mol(
-                h, [(coefficient, h_ref) for coefficient, h_ref, _g_ref in terms]
+                h,
+                [
+                    (coefficient, h_ref)
+                    for coefficient, h_ref, _g_ref, _curve in terms
+                ],
             )
             fg = formation_subtraction_kJ_mol(
-                gibbs, [(coefficient, g_ref) for coefficient, _h_ref, g_ref in terms]
+                gibbs,
+                [
+                    (coefficient, g_ref)
+                    for coefficient, _h_ref, g_ref, _curve in terms
+                ],
             )
         fh_pairs.append((temperature, fh))
         fg_pairs.append((temperature, fg))
@@ -243,7 +255,9 @@ def test_compound_fit_anchors_and_formation_acceptance_across_fe_reference_trans
     references = _transition_reference_curves()
     terms_at_anchor, error = _element_reference_terms("FeO", 298.15, PRESSURE_PA, references)
     assert error is None and terms_at_anchor is not None
-    elemental_H298 = sum(coefficient * h for coefficient, h, _g in terms_at_anchor)
+    elemental_H298 = sum(
+        coefficient * h for coefficient, h, _g, _curve in terms_at_anchor
+    )
     species = _constant_cp_segment(
         90.0, 298.15, 2200.0,
         H_at_anchor_J_per_mol=12500.0 + elemental_H298,
@@ -298,7 +312,8 @@ def test_pressure_convention_mismatch_disables_formation_without_rejecting_fit()
         90.0,
         298.15,
         2200.0,
-        H_at_anchor_J_per_mol=12500.0 + sum(c * h for c, h, _g in terms),
+        H_at_anchor_J_per_mol=12500.0
+        + sum(c * h for c, h, _g, _curve in terms),
         S_at_anchor_J_per_mol_K=58.0,
     )
     series = _source_series(
@@ -320,6 +335,7 @@ def test_pressure_convention_mismatch_disables_formation_without_rejecting_fit()
                 100000.0,
                 curve.segment,
                 curve.is_element_reference,
+                fit_error=curve.fit_error,
             )
             for curve in curves
         ]
@@ -459,7 +475,9 @@ def test_formation_precision_failure_keeps_species_fit_at_t2() -> None:
     references = _transition_reference_curves()
     terms, error = _element_reference_terms("FeO", 298.15, PRESSURE_PA, references)
     assert error is None and terms is not None
-    elemental_H298 = sum(coefficient * h for coefficient, h, _g in terms)
+    elemental_H298 = sum(
+        coefficient * h for coefficient, h, _g, _curve in terms
+    )
     temperatures = [298.15, 400, 600, 800, 1000, 1200, 1500, 1900, 2200]
     species = _constant_cp_segment(
         90.0,
@@ -498,8 +516,12 @@ def test_formation_precision_failure_keeps_species_fit_at_t2() -> None:
 
     assert result.record["status"] == "accepted", result.record
     assert result.record["acceptance_tier"] == "smooth_fit"
-    assert result.record["formation_capable"] is True
+    assert result.record["formation_capable"] is False
+    assert result.record["formation_reason_code"] == "formation_inconsistent"
     assert result.record["fit_error"]["delta_fG_kJ_per_mol"] == pytest.approx(100.0)
+    assert result.record["fit_statistics"]["derived_formation_G_kJ_per_mol"][
+        "max_abs"
+    ] == pytest.approx(100.0)
 
 
 def test_broken_piecewise_join_is_typed_rejection_even_when_cells_round(
