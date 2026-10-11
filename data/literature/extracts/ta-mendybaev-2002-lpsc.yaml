@@ -311,6 +311,17 @@ species:
         approximate: true
         lost_species_as_printed: Mg and Si (not Ca or Al)
     - observation_id: mendybaev_2002_apparent_Ea_1mm_multi_T
+      derived_from:
+      - ta-mendybaev-2002-lpsc::mendybaev_2002_weight_loss_rate_1800C_1mm_loops
+      - ta-mendybaev-2002-lpsc::mendybaev_2002_weight_loss_rate_1700C_1mm_loops
+      - ta-mendybaev-2002-lpsc::mendybaev_2002_weight_loss_rate_1600C_1mm_loops
+      derivation:
+        relation: Apparent evaporation activation energy corresponding to the printed 1.0 mm loop weight-loss rates at 1800, 1700, and 1600 C; p. 2, Results and discussion
+        inputs:
+        - ta-mendybaev-2002-lpsc::mendybaev_2002_weight_loss_rate_1800C_1mm_loops
+        - ta-mendybaev-2002-lpsc::mendybaev_2002_weight_loss_rate_1700C_1mm_loops
+        - ta-mendybaev-2002-lpsc::mendybaev_2002_weight_loss_rate_1600C_1mm_loops
+        output_unit: kJ/mol
       experiment: b133-vacuum-multi-T-campaign
       type: rate_series
       locator:
