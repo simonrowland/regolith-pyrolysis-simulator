@@ -244,6 +244,14 @@ species:
         paragraph: The calculation of complimentary vapor composition have showed that at the relatively
           low temperature (up to 1300 C) the K2O contents reached 5–10 wt. % and the Na2O contents up
           to ~70 wt. %
+      derivation:
+        relation: Partial pressures measured by KEMS were converted to evaporation rates with the Hertz–Knudsen equation; the authors state these rates were used to determine residual-melt and vapor compositions (PDF page 1 methods).
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            published_page: 1
+            pdf_page_index: 1
+            paragraph: Partial pressures were used to calculate evaporation rates and then residual-melt and vapor compositions.
       T_range_K:
       - 1173.15
       - 2273.15
