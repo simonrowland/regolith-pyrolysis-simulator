@@ -25,6 +25,7 @@ from simulator.reference_data.compilation_thermo_fits import (
     generate_janaf_sidecar,
     main as fit_cli_main,
     render_sidecar,
+    source_metadata,
 )
 from simulator.reference_data.janaf import TABLES_DIR, load_table_document
 from simulator.vapour_rail.nasa_cea import Nasa9Segment, R_J_PER_MOL_K
@@ -402,6 +403,56 @@ def test_missing_formation_h_anchor_keeps_species_fit() -> None:
     assert result.record["formation_capable"] is False
     assert result.record["formation_reason_code"] == "missing_formation_h_anchor"
     assert not any(key.startswith("delta_f") for key in result.record["fit_error"])
+
+
+@pytest.mark.parametrize(("table_id", "expected_charge"), [("Al-006", 1), ("Al-038", -1)])
+def test_charged_janaf_species_keep_fit_but_disable_formation(
+    table_id: str, expected_charge: int
+) -> None:
+    records = generate_janaf_sidecar(table_ids=[table_id])
+    fit = next(
+        record
+        for record in records
+        if record.get("source_record_id") == table_id and record.get("status") == "accepted"
+    )
+
+    assert fit["charge"] == expected_charge
+    assert fit["charge_source"] == "index_entry"
+    assert fit["formation_capable"] is False
+    assert fit["formation_reason_code"] == "electron_reference_unsupported"
+    assert fit["acceptance_tier"] in {"table_equivalent", "smooth_fit"}
+
+
+def test_charge_is_parsed_from_printed_formula_when_index_charge_is_missing() -> None:
+    record = _record("Al")
+    record["table"]["index_entry"]["formula_as_published"] = "Al+"
+
+    metadata = source_metadata(record)
+
+    assert metadata["charge"] == 1
+    assert metadata["charge_source"] == "formula_as_published"
+
+
+def test_ambiguous_printed_formula_charge_disables_formation() -> None:
+    record = _record("Al")
+    record["table"]["index_entry"]["formula_as_published"] = "Al^{?}+"
+    temperatures = [298.15, 400, 600, 800, 1000, 1200, 1500, 1900, 2200]
+    species = _constant_cp_segment(30.0, temperatures[0], temperatures[-1])
+
+    result = fit_compilation_thermo_range(
+        record=record,
+        series=_source_series(species, temperatures, formula="Al", is_reference=True),
+        phase_label="g",
+        standard_state="gas",
+        T_min_K=temperatures[0],
+        T_max_K=temperatures[-1],
+        reference_curves={},
+    )
+
+    assert result.record["status"] == "accepted", result.record
+    assert result.record["charge"] is None
+    assert result.record["formation_capable"] is False
+    assert result.record["formation_reason_code"] == "charge_unknown"
 
 
 def test_formation_precision_failure_keeps_species_fit_at_t2() -> None:

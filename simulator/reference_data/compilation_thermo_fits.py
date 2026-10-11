@@ -131,6 +131,56 @@ def source_pressure_Pa(record: Mapping[str, Any]) -> float | None:
     return float(amount * scale)
 
 
+def _source_charge(entry: Mapping[str, Any]) -> tuple[int | None, str]:
+    explicit = entry.get("charge")
+    if explicit is not None:
+        parsed = _decimal(explicit)
+        if parsed is not None and parsed.is_finite() and parsed == parsed.to_integral_value():
+            return int(parsed), "index_entry"
+
+    printed = str(entry.get("formula_as_published") or entry.get("formula") or "").strip()
+    normalized = str(entry.get("formula_normalised") or "").strip()
+    if not printed:
+        printed = normalized
+    if not printed:
+        return None, "charge_unknown"
+
+    sign_match = re.search(r"([+\-−⁺⁻])$", printed)
+    if sign_match is None:
+        if formula_composition(normalized or printed):
+            return 0, "formula_as_published_no_charge"
+        return None, "charge_unknown"
+
+    sign = -1 if sign_match.group(1) in {"-", "−", "⁻"} else 1
+    body = printed[: sign_match.start()].rstrip()
+    expected = formula_composition(normalized) if normalized else None
+
+    def matches_expected(candidate: str) -> bool:
+        candidate_composition = formula_composition(candidate)
+        if candidate_composition is None:
+            return False
+        if expected is None:
+            return True
+        return dict(candidate_composition) == dict(expected)
+
+    # A terminal digit can be either a formula subscript (AlF2-) or a
+    # charge magnitude (Al3+). Use the charge-stripped index formula to tell;
+    # when it cannot, fail closed instead of guessing.
+    magnitude = re.search(r"(\d+)$", body)
+    if magnitude is not None:
+        formula_candidate_matches = matches_expected(body)
+        charge_candidate_matches = matches_expected(body[: magnitude.start()])
+        if formula_candidate_matches == charge_candidate_matches:
+            return None, "formula_as_published_ambiguous"
+        if formula_candidate_matches:
+            return sign, "formula_as_published"
+        return sign * int(magnitude.group(1)), "formula_as_published"
+
+    if matches_expected(body):
+        return sign, "formula_as_published"
+    return None, "formula_as_published_ambiguous"
+
+
 def source_metadata(record: Mapping[str, Any]) -> dict[str, Any]:
     table = record.get("table")
     table = table if isinstance(table, Mapping) else record
@@ -147,10 +197,13 @@ def source_metadata(record: Mapping[str, Any]) -> dict[str, Any]:
         or record.get("formula_as_published")
         or ""
     )
+    charge, charge_source = _source_charge(entry)
     return {
         "source_id": source_id,
         "source_record_id": source_record_id,
         "formula": formula,
+        "charge": charge,
+        "charge_source": charge_source,
         "source_state": str(entry.get("state") or record.get("phase") or ""),
         "source_name": str(entry.get("name") or ""),
         "source_title": str(table.get("title_as_published") or ""),
@@ -238,6 +291,8 @@ def _record_base(
         "source_locator": metadata["source_locator"],
         "input_digest": metadata["input_digest"],
         "formula": metadata["formula"],
+        "charge": metadata["charge"],
+        "charge_source": metadata["charge_source"],
         "phase": phase_label,
         "source_standard_state": metadata["source_state"],
         "source_standard_state_convention": metadata[
@@ -635,7 +690,22 @@ def _fit_piecewise_candidate(
     formation_reason_code: str | None = None
     formation_reason: str | None = None
     h_anchor_J = 0.0
-    if is_element_reference and pressure is not None:
+    charge = metadata["charge"]
+    if not is_element_reference and delta_fh_anchor is not None:
+        # ΔfH°(298.15 K) is the species' H anchor relative to elemental
+        # reference enthalpies, which are zero at their standard reference T.
+        # Keep this anchor even when formation derivation is unavailable.
+        h_anchor_J = float(delta_fh_anchor.value) * 1000.0
+
+    if charge is None:
+        formation_reason_code = "charge_unknown"
+        formation_reason = "source charge could not be resolved unambiguously"
+    elif charge != 0:
+        formation_reason_code = "electron_reference_unsupported"
+        formation_reason = (
+            f"source charge {charge:+d} requires an unsupported electron-gas reference"
+        )
+    elif is_element_reference and pressure is not None:
         formation_capable = True
     elif pressure is None:
         formation_reason_code = "missing_pressure_convention"
@@ -656,7 +726,7 @@ def _fit_piecewise_candidate(
         else:
             assert resolved is not None
             formation_capable = True
-            h_anchor_J = float(delta_fh_anchor.value) * 1000.0 + sum(
+            h_anchor_J += sum(
                 coefficient * h_ref for coefficient, h_ref, _g_ref in resolved
             )
 
