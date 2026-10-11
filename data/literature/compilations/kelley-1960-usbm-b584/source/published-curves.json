@@ -1500,5 +1500,43 @@
     "source_record_id": "table-397", "note": "printed formula unit Fe0.947O (wustite); not stoichiometric FeO",
     "derivation": "Differentiate the printed linear H_T-H_298.15 form: d/dT gives Cp = 16.30; cal/mol differentiated by K gives cal/(mol·K). Cp at 1800 K is 16.30 cal/(mol·K).",
     "derivative_of_equation_index": 172
+  },
+  {
+    "formula": "P4O10", "phase": "c", "polymorph": null, "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 16.75T + 54.00×10^-3T^2 - 9,794",
+    "terms": ["a*T", "b*T^2", "d"], "coefficients_as_printed": ["16.75", "54.00×10^-3", "-9,794"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [298, 631], "accuracy_as_printed": "0.1 percent",
+    "locator": {"printed_page": 140, "label": "Table 585, P4O10(c) equation; rendered image b584-pdf156.png"},
+    "source_record_id": "table-585", "note": "printed formula unit P4O10 = 2 P2O5 per formula; values are per mole P4O10",
+    "gate_cells": [{"temperature_K": 400}, {"temperature_K": 500}, {"temperature_K": 600}]
+  },
+  {
+    "formula": "P4O10", "phase": "c", "polymorph": null, "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 16.75 + 108×10^-3T",
+    "terms": ["a", "b*T"], "coefficients_as_printed": ["16.75", "108×10^-3"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [298, 631], "accuracy_as_printed": null,
+    "locator": {"printed_page": 140, "label": "Table 585, P4O10(c) equation; rendered image b584-pdf156.png"},
+    "source_record_id": "table-585", "note": "printed formula unit P4O10 = 2 P2O5 per formula; values are per mole P4O10",
+    "derivation": "Differentiate the printed H_T-H_298.15 form: d/dT gives Cp = 16.75 + 108×10^-3T; cal/mol differentiated by K gives cal/(mol·K). Cp at 500 K is 70.75 cal/(mol·K).",
+    "derivative_of_equation_index": 174
+  },
+  {
+    "formula": "P4O10", "phase": "g", "polymorph": null, "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 73.60T - 6,570",
+    "terms": ["a*T", "d"], "coefficients_as_printed": ["73.60", "-6,570"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [631, 1500], "accuracy_as_printed": "0.1 percent",
+    "locator": {"printed_page": 140, "label": "Table 585, P4O10(g) equation; rendered image b584-pdf156.png"},
+    "source_record_id": "table-585", "note": "printed formula unit P4O10 = 2 P2O5 per formula; values are per mole P4O10",
+    "gate_cells": [{"temperature_K": 700}, {"temperature_K": 900}, {"temperature_K": 1400}]
+  },
+  {
+    "formula": "P4O10", "phase": "g", "polymorph": null, "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 73.60",
+    "terms": ["a"], "coefficients_as_printed": ["73.60"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [631, 1500], "accuracy_as_printed": null,
+    "locator": {"printed_page": 140, "label": "Table 585, P4O10(g) equation; rendered image b584-pdf156.png"},
+    "source_record_id": "table-585", "note": "printed formula unit P4O10 = 2 P2O5 per formula; values are per mole P4O10",
+    "derivation": "Differentiate the printed linear H_T-H_298.15 form: d/dT gives Cp = 73.60; cal/mol differentiated by K gives cal/(mol·K). Cp at 900 K is 73.60 cal/(mol·K).",
+    "derivative_of_equation_index": 176
   }
 ]

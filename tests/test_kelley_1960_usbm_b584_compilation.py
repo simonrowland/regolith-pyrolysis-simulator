@@ -401,6 +401,20 @@ def test_wustite_equations_keep_the_printed_nonstoichiometric_formula_unit():
     assert liquid_h["gate"]["status"] == "passed"
 
 
+def test_phosphorus_oxide_equations_keep_the_printed_polymer_formula_unit():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "P4O10"]
+    assert len(curves) == 4
+    assert all(curve["note"] == "printed formula unit P4O10 = 2 P2O5 per formula; values are per mole P4O10"
+               for curve in curves)
+    assert all(curve["gate"]["status"] == "passed" for curve in curves)
+    heat = next(curve for curve in curves if curve["phase"] == "c" and curve["quantity"] == "heat_content_increment")
+    assert heat["coefficients_as_printed"] == ["16.75", "54.00×10^-3", "-9,794"]
+    cp = next(curve for curve in curves if curve["phase"] == "c" and curve["quantity"] == "heat_capacity")
+    # Printed H(T)-H(298.15) differentiated by T gives cal/(mol·K), on the P4O10 basis.
+    assert 16.75 + 108e-3 * 500 == pytest.approx(70.75)
+    assert cp["coefficients_as_printed"] == ["16.75", "108×10^-3"]
+
+
 def test_heat_content_gate_detects_a_coefficient_mutation():
     heat = loader.load_published_curves()[0]
     changed = {**heat, "coefficients_as_printed": ["11.77", *heat["coefficients_as_printed"][1:]]}
