@@ -189,7 +189,7 @@ species:
           evidence_class: model_derived
           value_status: derived
           generator: authors Gibbs-energy-minimization equilibrium calculation
-          derivation: Authors report the model output in prose; no value was recomputed.
+          derivation_note: Authors report the model output in prose; no value was recomputed.
           conditions:
             total_pressure_bar_as_printed: '100 bars'
             composition: continental_crust
@@ -245,7 +245,7 @@ species:
           evidence_class: model_derived
           value_status: derived
           generator: authors Gibbs-energy-minimization equilibrium calculation
-          derivation: Authors report the model output in prose; no value was recomputed.
+          derivation_note: Authors report the model output in prose; no value was recomputed.
           conditions: {total_pressure_bar_as_printed: '100 bars', composition: continental_crust, fO2: {tag: unknown, reason: not_published}}
           rows:
             - {variation: '0.1× nominal H', species: CO2, temperature_as_printed: '500-2600 K', result_as_printed: first major gas, locator: {pdf_page_index: 12, figure: '3', section: '3.2.1 Hydrogen', row: low-H continental crust, column: first major gas}}
@@ -277,7 +277,7 @@ species:
           evidence_class: model_derived
           value_status: derived
           generator: authors Gibbs-energy-minimization equilibrium calculation
-          derivation: Authors report the model output in prose; no value was recomputed.
+          derivation_note: Authors report the model output in prose; no value was recomputed.
           conditions: {total_pressure_bar_as_printed: '100 bars', fO2: {tag: unknown, reason: not_published}}
           rows:
             - {composition: continental_crust, variation: '0.1× nominal C', species: CO2, temperature_as_printed: studied range, result_as_printed: drops from ~30% to 3%, locator: {pdf_page_index: 13, figure: '4', section: '3.2.2 Carbon', row: low-C continental crust, column: CO2 abundance}}
@@ -306,7 +306,7 @@ species:
           evidence_class: model_derived
           value_status: derived
           generator: authors Gibbs-energy-minimization equilibrium calculation
-          derivation: Authors report the model output in prose; no value was recomputed.
+          derivation_note: Authors report the model output in prose; no value was recomputed.
           conditions: {total_pressure_bar_as_printed: '100 bars', fO2: {tag: unknown, reason: not_published}}
           rows:
             - {composition: continental_crust, variation: 'O = 43 wt%', species: H2, temperature_as_printed: '500-2800 K', result_as_printed: most abundant gas, locator: {pdf_page_index: 14, figure: '5', section: '3.2.3 Oxygen', row: low-O continental crust, column: major gas}}
@@ -341,7 +341,7 @@ species:
           evidence_class: model_derived
           value_status: derived
           generator: authors Gibbs-energy-minimization equilibrium calculation
-          derivation: Table values are transcribed model output; no arithmetic was performed.
+          derivation_note: Table values are transcribed model output; no arithmetic was performed.
           fO2: {tag: unknown, reason: not_published}
           rows:
             - {composition: continental_crust, temperature_K_as_printed: 1000, total_pressure_bar_as_printed: '10^-6', gas: H2O, abundance_as_printed: '49%', locator: {pdf_page_index: 33, table: '3', row: 'low P / low T / continental crust', column: H2O}}
@@ -370,7 +370,7 @@ species:
           evidence_class: model_derived
           value_status: derived
           generator: authors Gibbs-energy-minimization equilibrium calculation
-          derivation: Authors report the model output in prose; no value was recomputed.
+          derivation_note: Authors report the model output in prose; no value was recomputed.
           composition: continental_crust
           fO2: {tag: unknown, reason: not_published}
           rows:
@@ -396,7 +396,7 @@ species:
           evidence_class: model_derived
           value_status: derived
           generator: authors equilibrium calculation along dry-adiabatic CoRoT-7b profile
-          derivation: Profile and condensation values are transcribed from the authors' model discussion; no interpolation was performed.
+          derivation_note: Profile and condensation values are transcribed from the authors' model discussion; no interpolation was performed.
           composition: continental_crust
           fO2: {tag: unknown, reason: not_published}
           rows:
@@ -478,7 +478,7 @@ species:
           evidence_class: model_derived
           value_status: derived
           generator: authors Gibbs-energy-minimization equilibrium calculation
-          derivation: Authors report the model output in prose; no value was recomputed.
+          derivation_note: Authors report the model output in prose; no value was recomputed.
           conditions: {total_pressure_bar_as_printed: '100 bars', composition: bulk_silicate_earth, fO2: {tag: unknown, reason: not_published}}
           rows:
             - {species: CO2, temperature_as_printed: broad range, result_as_printed: '~16%', locator: {pdf_page_index: 10, figure: '2', section: '3.1.2 Bulk Silicate Earth', row: CO2, column: relative abundance}}
@@ -512,7 +512,7 @@ species:
           evidence_class: model_derived
           value_status: derived
           generator: authors Gibbs-energy-minimization equilibrium calculation
-          derivation: Table values are transcribed model output; no arithmetic was performed.
+          derivation_note: Table values are transcribed model output; no arithmetic was performed.
           fO2: {tag: unknown, reason: not_published}
           rows:
             - {composition: bulk_silicate_earth, temperature_K_as_printed: 1000, total_pressure_bar_as_printed: '10^-6', gas: H2O, abundance_as_printed: '61%', locator: {pdf_page_index: 33, table: '3', row: 'low P / low T / BSE', column: H2O}}
@@ -541,7 +541,7 @@ species:
           evidence_class: model_derived
           value_status: derived
           generator: authors Gibbs-energy-minimization equilibrium calculation
-          derivation: Authors report the model output in prose; no value was recomputed.
+          derivation_note: Authors report the model output in prose; no value was recomputed.
           conditions: {total_pressure_bar_as_printed: '100 bars', composition: bulk_silicate_earth, fO2: {tag: unknown, reason: not_published}}
           rows:
             - {variation: '10× nominal H', species: H2, temperature_as_printed: studied range, result_as_printed: '~28%', locator: {pdf_page_index: 12, figure: '3', section: '3.2.1 Hydrogen', row: high-H BSE, column: H2 abundance}}
@@ -564,7 +564,7 @@ species:
           evidence_class: model_derived
           value_status: derived
           generator: authors Gibbs-energy-minimization equilibrium calculation
-          derivation: Authors report the model output in prose; no value was recomputed.
+          derivation_note: Authors report the model output in prose; no value was recomputed.
           conditions: {total_pressure_bar_as_printed: '100 bars', composition: bulk_silicate_earth, fO2: {tag: unknown, reason: not_published}}
           rows:
             - {variation: '10× nominal C', species: CO2, temperature_as_printed: studied range, result_as_printed: '~44%', locator: {pdf_page_index: 13, figure: '4', section: '3.2.2 Carbon', row: high-C BSE, column: CO2 abundance}}
@@ -586,7 +586,7 @@ species:
           evidence_class: model_derived
           value_status: derived
           generator: authors Gibbs-energy-minimization equilibrium calculation
-          derivation: Authors report the model output in prose; no value was recomputed.
+          derivation_note: Authors report the model output in prose; no value was recomputed.
           conditions: {total_pressure_bar_as_printed: '100 bars', composition: bulk_silicate_earth, fO2: {tag: unknown, reason: not_published}}
           rows:
             - {variation: 'O = 39-42 wt%', species: H2, temperature_as_printed: '500-2000 K', result_as_printed: dominant gas, locator: {pdf_page_index: 14, figure: '5', section: '3.2.3 Oxygen', row: low-O BSE, column: major gas}}
@@ -612,7 +612,7 @@ species:
           evidence_class: model_derived
           value_status: derived
           generator: authors equilibrium calculation along dry-adiabatic CoRoT-7b profile
-          derivation: Profile and condensation values are transcribed from the authors' model discussion; no interpolation was performed.
+          derivation_note: Profile and condensation values are transcribed from the authors' model discussion; no interpolation was performed.
           composition: bulk_silicate_earth
           fO2: {tag: unknown, reason: not_published}
           rows:
@@ -652,7 +652,7 @@ species:
           evidence_class: model_derived
           value_status: derived
           generator: authors chemical-lifetime calculation from printed photodissociation rates; SiO rate estimated from Matveev (1986)
-          derivation: Chemical lifetimes are transcribed from the authors' calculation; no orbital scaling or lifetime recomputation was performed.
+          derivation_note: Chemical lifetimes are transcribed from the authors' calculation; no orbital scaling or lifetime recomputation was performed.
           conditions:
             temperature: {tag: unknown, reason: not_published}
             composition: Earth-like atmospheric model
@@ -746,7 +746,7 @@ species:
           value_status: figure
           digitization_method: 'Approximate read-off of the labeled log-pressure ticks and boundary curves from the PDF figure; all values retain ~.'
           generator: authors Gibbs-energy-minimization equilibrium calculation
-          derivation: Digitized from plotted boundaries; no interpolation or curve fitting.
+          derivation_note: Digitized from plotted boundaries; no interpolation or curve fitting.
           conditions:
             composition: 'continental crust solid / BSE dashed; curves nearly identical'
             fO2: {tag: unknown, reason: not_published}
@@ -818,7 +818,7 @@ species:
           evidence_class: figure-only / digitized
           value_status: figure
           digitization_method: 'Approximate read-off of profile bends and labeled pressure ticks from PDF Figure 9; no interpolation.'
-          derivation: Digitized from plotted profiles; values are not printed table entries.
+          derivation_note: Digitized from plotted profiles; values are not printed table entries.
           fO2: {tag: unknown, reason: not_published}
           rows:
             - {profile: a, composition: '50% H2O + 50% CO2', temperature_K_as_plotted: '~500', total_pressure_bar_as_plotted: '10^-2', locator: {pdf_page_index: 48, figure: '9', row: a, column: 'T≈500 K / P≈10^-2 bar'}}
@@ -843,7 +843,7 @@ species:
           evidence_class: model_derived
           value_status: derived
           generator: authors equilibrium and atmospheric chemistry calculations
-          derivation: Authors report thresholds and peaks in prose; no abundance was recomputed.
+          derivation_note: Authors report thresholds and peaks in prose; no abundance was recomputed.
           fO2: {tag: unknown, reason: not_published}
           rows:
             - {composition: continental_crust, species: CH4, condition_as_printed: 'T >600 K, P >10 bar', result_as_printed: '>1 ppb', locator: {pdf_page_index: 25, section: '4.4 Spectroscopically Observable Gases', row: CH4 continental crust threshold, column: abundance}}
@@ -875,7 +875,7 @@ species:
           method_class: model_derived
           evidence_class: model_derived
           value_status: derived
-          derivation: Conditions are transcribed from the paper's application discussion; no atmospheric profile was recomputed.
+          derivation_note: Conditions are transcribed from the paper's application discussion; no atmospheric profile was recomputed.
           rows:
             - {field: starting_composition, value_as_printed: '50% H2O + 50% CO2', locator: {pdf_page_index: 19, figure: '9', section: '4.2 Application to Exoplanets', row: profile a, column: starting composition}}
             - {field: surface_temperature, value_as_printed: '1330 K', locator: {pdf_page_index: 20, figure: '10', section: '4.2.1 Cool Super-Earths', row: GJ 1214 b, column: surface temperature}}
@@ -895,7 +895,7 @@ species:
           method_class: model_derived
           evidence_class: model_derived
           value_status: derived
-          derivation: Conditions are transcribed from the paper's application discussion; no atmospheric profile was recomputed.
+          derivation_note: Conditions are transcribed from the paper's application discussion; no atmospheric profile was recomputed.
           rows:
             - {field: gravity, value_as_printed: '35.2 m s^-2', locator: {pdf_page_index: 19, figure: '9', section: '4.2 Application to Exoplanets', row: CoRoT-7 b, column: gravity}}
             - {field: surface_temperature, value_as_printed: '2500 K', locator: {pdf_page_index: 19, figure: '9', section: '4.2 Application to Exoplanets', row: CoRoT-7 b, column: surface temperature}}
