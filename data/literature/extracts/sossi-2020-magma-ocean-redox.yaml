@@ -25,20 +25,20 @@ benches:
   identity: {basis: described_in_this_work}
   apparatus_family:
     state: {tag: value, value: Aerodynamic laser levitation furnace}
-    locator: {page: 5, published_page: 5, section: Materials and Methods}
+    locator: {page: 6, published_page: 6, section: Materials and Methods}
   heating_method:
     state: {tag: value, value: Continuous-wave 125-W CO2 laser focused to an approximately 5-mm spot}
-    locator: {page: 5, published_page: 5, section: Materials and Methods}
+    locator: {page: 6, published_page: 6, section: Materials and Methods}
   temperature_measurement:
     instrument:
       state: {tag: value, value: Optical pyrometer; instrument model and wavelength not stated}
-      locator: {page: 5, published_page: 5, section: Materials and Methods}
+      locator: {page: 6, published_page: 6, section: Materials and Methods}
     precision_during_stable_levitation:
       state: {tag: value, value: Within ±15 °C; Table S1 gives run-specific temperature and uncertainty}
-      locator: {page: 2, table: S1, note: Stable levitation temperature control within ±15 °C is stated below Table S1}
+      locator: {page: 6, published_page: Supplementary Materials PDF p. 6, figure: S1, note: Stable levitation temperature control within ±15 °C is stated in the Fig. S1 discussion}
     temperature_variability_note:
       state: {tag: value, value: The main-text ±50 °C describes variability among samples synthesized, not inherent run precision}
-      locator: {page: 5, published_page: 5, section: Materials and Methods}
+      locator: {page: 6, published_page: Supplementary Materials PDF p. 6, figure: S1, note: The ±50 °C temperature uncertainty discussed here represents variability among samples, not inherent run precision}
 experiments:
 - experiment_id: sossi-per-f-o2-1
   series: Peridotite glass redox series
@@ -48,206 +48,206 @@ experiments:
   sample:
     characterization:
       state: {tag: value, value: Synthetic peridotite composition modeled after KLB-1; oxide powders were mixed, ground, decarbonated, and pressed into pellets}
-      locator: {page: 5, published_page: 5, section: Materials and Methods}
+      locator: {page: 6, published_page: 6, section: Materials and Methods}
     initial_composition:
       state: {tag: unknown, reason: not_published}
-      locator: {page: 5, published_page: 5, section: Materials and Methods, note: Starting powders and KLB-1 model are described, but no starting-charge oxide analysis is tabulated; Table S2 analyzes experimental glasses}
+      locator: {page: 6, published_page: 6, section: Materials and Methods, note: Starting powders and KLB-1 model are described, but no starting-charge oxide analysis is tabulated; Table S2 analyzes experimental glasses}
     form:
       state: {tag: value, value: Approximately 20-mg pellet pieces melted as levitated silicate beads}
-      locator: {page: 5, published_page: 5, section: Materials and Methods}
+      locator: {page: 6, published_page: 6, section: Materials and Methods}
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '2173.15'}}, locator: {page: 2, table: S1, note: '1900 °C as printed; converted by K = °C + 273.15'}}
     temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '21'}}, locator: {page: 2, table: S1, note: '±21 °C as printed; uncertainty magnitude unchanged in kelvins'}}
-    log_fO2: {state: {tag: value, value: {kind: point, point: '0.00'}}, locator: {page: 14, table: S4, note: 'Table S4 prints log fO2; this is absolute log10 fugacity relative to pure ideal O2 at 1 bar, not ΔIW. Section 4 defines the gas standard state; the imposed value was calculated by Gibbs free-energy minimization (article p. 5).'}}
+    log_fO2: {state: {tag: value, value: {kind: point, point: '0.00'}}, locator: {page: 14, published_page: Supplementary Materials PDF p. 14, table: S4, note: 'Absolute log10 fO2 relative to ideal O2 at 1 bar; tabulated gas log fO2 values were calculated at 1900 °C (2173.15 K; above Table S4, Supplementary Materials PDF p. 14), while run temperatures span 1839–1924 °C. Imposed-fO2 precision is ±0.05 log units; Gibbs free-energy minimization is described on article PDF p. 6 and Supplementary Materials section 4.'}}
     log_fO2_as_printed: {state: {tag: value, value: '0.00'}, locator: {page: 14, table: S4}}
     gas_mixture_as_printed: {state: {tag: value, value: O2}, locator: {page: 2, table: S1}}
   pressure_environment:
-    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '100000'}}, locator: {page: 5, published_page: 5, section: Materials and Methods, note: 1 bar as printed; SI conversion}}
+    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '100000'}}, locator: {page: 2, published_page: 2, section: Results, note: 1 bar as printed; SI conversion}}
     sweep_gas: {state: {tag: value, value: {species: 100% O2, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}, locator: {page: 2, table: S1}}
     regime: {regime_class: {tag: unknown, reason: not_published}}
   fO2_control:
     channel: {tag: value, value: gas_mix}
-    buffer: {state: {tag: value, value: Gas mixture; reported log fO2 is absolute, relative to ideal O2 at 1 bar}}
+    buffer: {state: {tag: value, value: Gas mixture; reported log fO2 is absolute, relative to ideal O2 at 1 bar}, locator: {page: 6, published_page: 6, section: Materials and Methods}}
   thermal_schedule:
-    method: {state: {tag: value, value: Re-melted in pure O2 at 1900 ± 50 °C for 30 s, then equilibrated in the listed gas mixture and quenched by switching off the laser}}
+    method: {state: {tag: value, value: Re-melted in pure O2 at 1900 ± 50 °C for 30 s, then equilibrated in the listed gas mixture and quenched by switching off the laser}, locator: {page: 6, published_page: 6, section: Materials and Methods}}
     total_duration_s: {state: {tag: value, value: {kind: point, point: '30'}}, locator: {page: 2, table: S1}}
-    cooling_or_quench: {state: {tag: value, value: Laser switched off; reported cooling rate approximately 800 °C/s}}
+    cooling_or_quench: {state: {tag: value, value: Laser switched off; reported cooling rate approximately 800 °C/s}, locator: {page: 6, published_page: 6, section: Materials and Methods}}
 - experiment_id: sossi-per-f-o2-2
   series: Peridotite glass redox series
   bench_id: sossi-aerodynamic-laser-levitation
   method: aerodynamic_levitation_laser_heating_then_quench
   locator: {page: 2, table: S1, published_page: Supplementary Materials PDF p. 2}
-  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: Table S2 reports experimental glass analyses, not starting charge composition}}}
+  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: Table S2 reports experimental glass analyses, not starting charge composition}}}
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '2166.15'}}, locator: {page: 2, table: S1, note: '1893 °C + 273.15'}}
     temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '40'}}, locator: {page: 2, table: S1, note: '±40 °C'}}
-    log_fO2: {state: {tag: value, value: {kind: point, point: '-2.49'}}, locator: {page: 14, table: S4, note: Absolute log10 fO2 relative to ideal O2 at 1 bar; computed by Gibbs free-energy minimization for the gas mixture, not ΔIW (article p. 5; supplementary section 4).'}}
+    log_fO2: {state: {tag: value, value: {kind: point, point: '-2.49'}}, locator: {page: 14, published_page: Supplementary Materials PDF p. 14, table: S4, note: 'Absolute log10 fO2 relative to ideal O2 at 1 bar; tabulated gas log fO2 values were calculated at 1900 °C (2173.15 K; above Table S4, Supplementary Materials PDF p. 14), while run temperatures span 1839–1924 °C. Imposed-fO2 precision is ±0.05 log units; Gibbs free-energy minimization is described on article PDF p. 6 and Supplementary Materials section 4.'}}
     log_fO2_as_printed: {state: {tag: value, value: '-2.49'}, locator: {page: 14, table: S4}}
     gas_mixture_as_printed: {state: {tag: value, value: CO2}, locator: {page: 2, table: S1}}
     gas_components_volume_percent: {Ar: 92, CO2: 8, H2: 0}
-  pressure_environment: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '100000'}}, locator: {page: 5, published_page: 5, section: Materials and Methods}}, sweep_gas: {state: {tag: value, value: {species: '92% Ar + 8% CO2', flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}, locator: {page: 2, table: S1}}, regime: {regime_class: {tag: unknown, reason: not_published}}}
-  fO2_control: {channel: {tag: value, value: gas_mix}, buffer: {state: {tag: value, value: Absolute log10 fO2 relative to ideal O2 at 1 bar; Gibbs free-energy minimization}}}
-  thermal_schedule: {method: {state: {tag: value, value: Listed gas mixture after pure-O2 pre-melt; laser-off quench at approximately 800 °C/s}}, total_duration_s: {state: {tag: value, value: {kind: point, point: '40'}}, locator: {page: 2, table: S1}}, cooling_or_quench: {state: {tag: value, value: Laser switched off; approximately 800 °C/s}}}
+  pressure_environment: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '100000'}}, locator: {page: 2, published_page: 2, section: Results}}, sweep_gas: {state: {tag: value, value: {species: '92% Ar + 8% CO2', flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}, locator: {page: 2, table: S1}}, regime: {regime_class: {tag: unknown, reason: not_published}}}
+  fO2_control: {channel: {tag: value, value: gas_mix}, buffer: {state: {tag: value, value: Absolute log10 fO2 relative to ideal O2 at 1 bar; Gibbs free-energy minimization}, locator: {page: 6, published_page: 6, section: Materials and Methods}}}
+  thermal_schedule: {method: {state: {tag: value, value: Listed gas mixture after pure-O2 pre-melt; laser-off quench at approximately 800 °C/s}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, total_duration_s: {state: {tag: value, value: {kind: point, point: '40'}}, locator: {page: 2, table: S1}}, cooling_or_quench: {state: {tag: value, value: Laser switched off; approximately 800 °C/s}, locator: {page: 6, published_page: 6, section: Materials and Methods}}}
 - experiment_id: sossi-per-f-o2-3
   series: Peridotite glass redox series
   bench_id: sossi-aerodynamic-laser-levitation
   method: aerodynamic_levitation_laser_heating_then_quench
   locator: {page: 2, table: S1}
-  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: Table S2 reports experimental glass analyses, not starting charge composition}}}
+  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: Table S2 reports experimental glass analyses, not starting charge composition}}}
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '2134.15'}}, locator: {page: 2, table: S1, note: '1861 °C + 273.15'}}
     temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '29'}}, locator: {page: 2, table: S1, note: '±29 °C'}}
-    log_fO2: {state: {tag: value, value: {kind: point, point: '-2.53'}}, locator: {page: 14, table: S4, note: Absolute log10 fO2 relative to ideal O2 at 1 bar; Gibbs free-energy minimization (article p. 5; supplementary section 4).'}}
+    log_fO2: {state: {tag: value, value: {kind: point, point: '-2.53'}}, locator: {page: 14, published_page: Supplementary Materials PDF p. 14, table: S4, note: 'Absolute log10 fO2 relative to ideal O2 at 1 bar; tabulated gas log fO2 values were calculated at 1900 °C (2173.15 K; above Table S4, Supplementary Materials PDF p. 14), while run temperatures span 1839–1924 °C. Imposed-fO2 precision is ±0.05 log units; Gibbs free-energy minimization is described on article PDF p. 6 and Supplementary Materials section 4.'}}
     log_fO2_as_printed: {state: {tag: value, value: '-2.53'}, locator: {page: 14, table: S4}}
     gas_mixture_as_printed: {state: {tag: value, value: '99CO2:1H2'}, locator: {page: 2, table: S1}}
     gas_components_volume_percent: {Ar: 92, CO2: 7.92, H2: 0.08}
-  pressure_environment: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '100000'}}, locator: {page: 5, published_page: 5, section: Materials and Methods}}, sweep_gas: {state: {tag: value, value: {species: '92% Ar + 7.92% CO2 + 0.08% H2', flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}, locator: {page: 2, table: S1}}, regime: {regime_class: {tag: unknown, reason: not_published}}}
-  fO2_control: {channel: {tag: value, value: gas_mix}, buffer: {state: {tag: value, value: Absolute log10 fO2 relative to ideal O2 at 1 bar; Gibbs free-energy minimization}}}
-  thermal_schedule: {method: {state: {tag: value, value: Listed gas mixture after pure-O2 pre-melt; laser-off quench at approximately 800 °C/s}}, total_duration_s: {state: {tag: value, value: {kind: point, point: '32'}}, locator: {page: 2, table: S1}}, cooling_or_quench: {state: {tag: value, value: Laser switched off; approximately 800 °C/s}}}
+  pressure_environment: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '100000'}}, locator: {page: 2, published_page: 2, section: Results}}, sweep_gas: {state: {tag: value, value: {species: '92% Ar + 7.92% CO2 + 0.08% H2', flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}, locator: {page: 2, table: S1}}, regime: {regime_class: {tag: unknown, reason: not_published}}}
+  fO2_control: {channel: {tag: value, value: gas_mix}, buffer: {state: {tag: value, value: Absolute log10 fO2 relative to ideal O2 at 1 bar; Gibbs free-energy minimization}, locator: {page: 6, published_page: 6, section: Materials and Methods}}}
+  thermal_schedule: {method: {state: {tag: value, value: Listed gas mixture after pure-O2 pre-melt; laser-off quench at approximately 800 °C/s}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, total_duration_s: {state: {tag: value, value: {kind: point, point: '32'}}, locator: {page: 2, table: S1}}, cooling_or_quench: {state: {tag: value, value: Laser switched off; approximately 800 °C/s}, locator: {page: 6, published_page: 6, section: Materials and Methods}}}
 - experiment_id: sossi-per-f-o2-6
   series: Peridotite glass redox series
   bench_id: sossi-aerodynamic-laser-levitation
   method: aerodynamic_levitation_laser_heating_then_quench
   locator: {page: 2, table: S1}
-  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: Table S2 reports experimental glass analyses, not starting charge composition}}}
+  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: Table S2 reports experimental glass analyses, not starting charge composition}}}
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '2151.15'}}, locator: {page: 2, table: S1, note: '1878 °C + 273.15'}}
     temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '23'}}, locator: {page: 2, table: S1, note: '±23 °C'}}
-    log_fO2: {state: {tag: value, value: {kind: point, point: '-2.58'}}, locator: {page: 14, table: S4, note: Absolute log10 fO2 relative to ideal O2 at 1 bar; Gibbs free-energy minimization (article p. 5; supplementary section 4).'}}
+    log_fO2: {state: {tag: value, value: {kind: point, point: '-2.58'}}, locator: {page: 14, published_page: Supplementary Materials PDF p. 14, table: S4, note: 'Absolute log10 fO2 relative to ideal O2 at 1 bar; tabulated gas log fO2 values were calculated at 1900 °C (2173.15 K; above Table S4, Supplementary Materials PDF p. 14), while run temperatures span 1839–1924 °C. Imposed-fO2 precision is ±0.05 log units; Gibbs free-energy minimization is described on article PDF p. 6 and Supplementary Materials section 4.'}}
     log_fO2_as_printed: {state: {tag: value, value: '-2.58'}, locator: {page: 14, table: S4}}
     gas_mixture_as_printed: {state: {tag: value, value: '98CO2:2H2'}, locator: {page: 2, table: S1}}
     gas_components_volume_percent: {Ar: 92, CO2: 7.84, H2: 0.16}
-  pressure_environment: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '100000'}}, locator: {page: 5, published_page: 5, section: Materials and Methods}}, sweep_gas: {state: {tag: value, value: {species: '92% Ar + 7.84% CO2 + 0.16% H2', flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}, locator: {page: 2, table: S1}}, regime: {regime_class: {tag: unknown, reason: not_published}}}
-  fO2_control: {channel: {tag: value, value: gas_mix}, buffer: {state: {tag: value, value: Absolute log10 fO2 relative to ideal O2 at 1 bar; Gibbs free-energy minimization}}}
-  thermal_schedule: {method: {state: {tag: value, value: Listed gas mixture after pure-O2 pre-melt; laser-off quench at approximately 800 °C/s}}, total_duration_s: {state: {tag: value, value: {kind: point, point: '25'}}, locator: {page: 2, table: S1}}, cooling_or_quench: {state: {tag: value, value: Laser switched off; approximately 800 °C/s}}}
+  pressure_environment: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '100000'}}, locator: {page: 2, published_page: 2, section: Results}}, sweep_gas: {state: {tag: value, value: {species: '92% Ar + 7.84% CO2 + 0.16% H2', flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}, locator: {page: 2, table: S1}}, regime: {regime_class: {tag: unknown, reason: not_published}}}
+  fO2_control: {channel: {tag: value, value: gas_mix}, buffer: {state: {tag: value, value: Absolute log10 fO2 relative to ideal O2 at 1 bar; Gibbs free-energy minimization}, locator: {page: 6, published_page: 6, section: Materials and Methods}}}
+  thermal_schedule: {method: {state: {tag: value, value: Listed gas mixture after pure-O2 pre-melt; laser-off quench at approximately 800 °C/s}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, total_duration_s: {state: {tag: value, value: {kind: point, point: '25'}}, locator: {page: 2, table: S1}}, cooling_or_quench: {state: {tag: value, value: Laser switched off; approximately 800 °C/s}, locator: {page: 6, published_page: 6, section: Materials and Methods}}}
 - experiment_id: sossi-per-ts1
   series: Peridotite glass redox time series
   bench_id: sossi-aerodynamic-laser-levitation
   method: aerodynamic_levitation_laser_heating_then_quench
   locator: {page: 2, table: S1}
-  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: Table S2 reports experimental glass analyses, not starting charge composition}}}
+  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: Table S2 reports experimental glass analyses, not starting charge composition}}}
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '2124.15'}}, locator: {page: 2, table: S1, note: '1851 °C + 273.15'}}
     temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '13'}}, locator: {page: 2, table: S1, note: '±13 °C'}}
-    log_fO2: {state: {tag: value, value: {kind: point, point: '-2.72'}}, locator: {page: 14, table: S4, note: Absolute log10 fO2 relative to ideal O2 at 1 bar; Gibbs free-energy minimization (article p. 5; supplementary section 4).'}}
+    log_fO2: {state: {tag: value, value: {kind: point, point: '-2.72'}}, locator: {page: 14, published_page: Supplementary Materials PDF p. 14, table: S4, note: 'Absolute log10 fO2 relative to ideal O2 at 1 bar; tabulated gas log fO2 values were calculated at 1900 °C (2173.15 K; above Table S4, Supplementary Materials PDF p. 14), while run temperatures span 1839–1924 °C. Imposed-fO2 precision is ±0.05 log units; Gibbs free-energy minimization is described on article PDF p. 6 and Supplementary Materials section 4.'}}
     log_fO2_as_printed: {state: {tag: value, value: '-2.72'}, locator: {page: 14, table: S4}}
     gas_mixture_as_printed: {state: {tag: value, value: '95CO2:5H2'}, locator: {page: 2, table: S1}}
     gas_components_volume_percent: {Ar: 92, CO2: 7.6, H2: 0.4}
-  pressure_environment: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '100000'}}, locator: {page: 5, published_page: 5, section: Materials and Methods}}, sweep_gas: {state: {tag: value, value: {species: '92% Ar + 7.6% CO2 + 0.4% H2', flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}, locator: {page: 2, table: S1}}, regime: {regime_class: {tag: unknown, reason: not_published}}}
-  fO2_control: {channel: {tag: value, value: gas_mix}, buffer: {state: {tag: value, value: Absolute log10 fO2 relative to ideal O2 at 1 bar; Gibbs free-energy minimization}}}
-  thermal_schedule: {method: {state: {tag: value, value: Listed gas mixture after pure-O2 pre-melt; laser-off quench at approximately 800 °C/s}}, total_duration_s: {state: {tag: value, value: {kind: point, point: '10'}}, locator: {page: 2, table: S1}}, cooling_or_quench: {state: {tag: value, value: Laser switched off; approximately 800 °C/s}}}
+  pressure_environment: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '100000'}}, locator: {page: 2, published_page: 2, section: Results}}, sweep_gas: {state: {tag: value, value: {species: '92% Ar + 7.6% CO2 + 0.4% H2', flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}, locator: {page: 2, table: S1}}, regime: {regime_class: {tag: unknown, reason: not_published}}}
+  fO2_control: {channel: {tag: value, value: gas_mix}, buffer: {state: {tag: value, value: Absolute log10 fO2 relative to ideal O2 at 1 bar; Gibbs free-energy minimization}, locator: {page: 6, published_page: 6, section: Materials and Methods}}}
+  thermal_schedule: {method: {state: {tag: value, value: Listed gas mixture after pure-O2 pre-melt; laser-off quench at approximately 800 °C/s}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, total_duration_s: {state: {tag: value, value: {kind: point, point: '10'}}, locator: {page: 2, table: S1}}, cooling_or_quench: {state: {tag: value, value: Laser switched off; approximately 800 °C/s}, locator: {page: 6, published_page: 6, section: Materials and Methods}}}
 - experiment_id: sossi-per-f-o2-7
   series: Peridotite glass redox time series
   bench_id: sossi-aerodynamic-laser-levitation
   method: aerodynamic_levitation_laser_heating_then_quench
   locator: {page: 2, table: S1}
-  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: Table S2 reports experimental glass analyses, not starting charge composition}}}
+  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: Table S2 reports experimental glass analyses, not starting charge composition}}}
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '2139.15'}}, locator: {page: 2, table: S1, note: '1866 °C + 273.15'}}
     temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '13'}}, locator: {page: 2, table: S1, note: '±13 °C'}}
-    log_fO2: {state: {tag: value, value: {kind: point, point: '-2.72'}}, locator: {page: 14, table: S4, note: Absolute log10 fO2 relative to ideal O2 at 1 bar; Gibbs free-energy minimization (article p. 5; supplementary section 4).'}}
+    log_fO2: {state: {tag: value, value: {kind: point, point: '-2.72'}}, locator: {page: 14, published_page: Supplementary Materials PDF p. 14, table: S4, note: 'Absolute log10 fO2 relative to ideal O2 at 1 bar; tabulated gas log fO2 values were calculated at 1900 °C (2173.15 K; above Table S4, Supplementary Materials PDF p. 14), while run temperatures span 1839–1924 °C. Imposed-fO2 precision is ±0.05 log units; Gibbs free-energy minimization is described on article PDF p. 6 and Supplementary Materials section 4.'}}
     log_fO2_as_printed: {state: {tag: value, value: '-2.72'}, locator: {page: 14, table: S4}}
     gas_mixture_as_printed: {state: {tag: value, value: '95CO2:5H2'}, locator: {page: 2, table: S1}}
     gas_components_volume_percent: {Ar: 92, CO2: 7.6, H2: 0.4}
-  pressure_environment: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '100000'}}, locator: {page: 5, published_page: 5, section: Materials and Methods}}, sweep_gas: {state: {tag: value, value: {species: '92% Ar + 7.6% CO2 + 0.4% H2', flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}, locator: {page: 2, table: S1}}, regime: {regime_class: {tag: unknown, reason: not_published}}}
-  fO2_control: {channel: {tag: value, value: gas_mix}, buffer: {state: {tag: value, value: Absolute log10 fO2 relative to ideal O2 at 1 bar; Gibbs free-energy minimization}}}
-  thermal_schedule: {method: {state: {tag: value, value: Listed gas mixture after pure-O2 pre-melt; laser-off quench at approximately 800 °C/s}}, total_duration_s: {state: {tag: value, value: {kind: point, point: '27'}}, locator: {page: 2, table: S1}}, cooling_or_quench: {state: {tag: value, value: Laser switched off; approximately 800 °C/s}}}
+  pressure_environment: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '100000'}}, locator: {page: 2, published_page: 2, section: Results}}, sweep_gas: {state: {tag: value, value: {species: '92% Ar + 7.6% CO2 + 0.4% H2', flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}, locator: {page: 2, table: S1}}, regime: {regime_class: {tag: unknown, reason: not_published}}}
+  fO2_control: {channel: {tag: value, value: gas_mix}, buffer: {state: {tag: value, value: Absolute log10 fO2 relative to ideal O2 at 1 bar; Gibbs free-energy minimization}, locator: {page: 6, published_page: 6, section: Materials and Methods}}}
+  thermal_schedule: {method: {state: {tag: value, value: Listed gas mixture after pure-O2 pre-melt; laser-off quench at approximately 800 °C/s}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, total_duration_s: {state: {tag: value, value: {kind: point, point: '27'}}, locator: {page: 2, table: S1}}, cooling_or_quench: {state: {tag: value, value: Laser switched off; approximately 800 °C/s}, locator: {page: 6, published_page: 6, section: Materials and Methods}}}
 - experiment_id: sossi-per-ts2
   series: Peridotite glass redox time series
   bench_id: sossi-aerodynamic-laser-levitation
   method: aerodynamic_levitation_laser_heating_then_quench
   locator: {page: 2, table: S1}
-  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: Table S2 reports experimental glass analyses, not starting charge composition}}}
+  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: Table S2 reports experimental glass analyses, not starting charge composition}}}
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '2148.15'}}, locator: {page: 2, table: S1, note: '1875 °C + 273.15'}}
     temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '41'}}, locator: {page: 2, table: S1, note: '±41 °C'}}
-    log_fO2: {state: {tag: value, value: {kind: point, point: '-2.72'}}, locator: {page: 14, table: S4, note: Absolute log10 fO2 relative to ideal O2 at 1 bar; Gibbs free-energy minimization (article p. 5; supplementary section 4).'}}
+    log_fO2: {state: {tag: value, value: {kind: point, point: '-2.72'}}, locator: {page: 14, published_page: Supplementary Materials PDF p. 14, table: S4, note: 'Absolute log10 fO2 relative to ideal O2 at 1 bar; tabulated gas log fO2 values were calculated at 1900 °C (2173.15 K; above Table S4, Supplementary Materials PDF p. 14), while run temperatures span 1839–1924 °C. Imposed-fO2 precision is ±0.05 log units; Gibbs free-energy minimization is described on article PDF p. 6 and Supplementary Materials section 4.'}}
     log_fO2_as_printed: {state: {tag: value, value: '-2.72'}, locator: {page: 14, table: S4}}
     gas_mixture_as_printed: {state: {tag: value, value: '95CO2:5H2'}, locator: {page: 2, table: S1}}
     gas_components_volume_percent: {Ar: 92, CO2: 7.6, H2: 0.4}
-  pressure_environment: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '100000'}}, locator: {page: 5, published_page: 5, section: Materials and Methods}}, sweep_gas: {state: {tag: value, value: {species: '92% Ar + 7.2% CO2 + 0.8% H2', flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}, locator: {page: 2, table: S1}}, regime: {regime_class: {tag: unknown, reason: not_published}}}
-  fO2_control: {channel: {tag: value, value: gas_mix}, buffer: {state: {tag: value, value: Absolute log10 fO2 relative to ideal O2 at 1 bar; Gibbs free-energy minimization}}}
-  thermal_schedule: {method: {state: {tag: value, value: Listed gas mixture after pure-O2 pre-melt; laser-off quench at approximately 800 °C/s}}, total_duration_s: {state: {tag: value, value: {kind: point, point: '120'}}, locator: {page: 2, table: S1}}, cooling_or_quench: {state: {tag: value, value: Laser switched off; approximately 800 °C/s}}}
+  pressure_environment: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '100000'}}, locator: {page: 2, published_page: 2, section: Results}}, sweep_gas: {state: {tag: value, value: {species: '92% Ar + 7.6% CO2 + 0.4% H2', flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}, locator: {page: 2, table: S1}}, regime: {regime_class: {tag: unknown, reason: not_published}}}
+  fO2_control: {channel: {tag: value, value: gas_mix}, buffer: {state: {tag: value, value: Absolute log10 fO2 relative to ideal O2 at 1 bar; Gibbs free-energy minimization}, locator: {page: 6, published_page: 6, section: Materials and Methods}}}
+  thermal_schedule: {method: {state: {tag: value, value: Listed gas mixture after pure-O2 pre-melt; laser-off quench at approximately 800 °C/s}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, total_duration_s: {state: {tag: value, value: {kind: point, point: '120'}}, locator: {page: 2, table: S1}}, cooling_or_quench: {state: {tag: value, value: Laser switched off; approximately 800 °C/s}, locator: {page: 6, published_page: 6, section: Materials and Methods}}}
 - experiment_id: sossi-per-f-o2-8
   series: Peridotite glass redox series
   bench_id: sossi-aerodynamic-laser-levitation
   method: aerodynamic_levitation_laser_heating_then_quench
   locator: {page: 2, table: S1}
-  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: Table S2 reports experimental glass analyses, not starting charge composition}}}
+  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: Table S2 reports experimental glass analyses, not starting charge composition}}}
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '2197.15'}}, locator: {page: 2, table: S1, note: '1924 °C + 273.15'}}
     temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '13'}}, locator: {page: 2, table: S1, note: '±13 °C'}}
-    log_fO2: {state: {tag: value, value: {kind: point, point: '-3.00'}}, locator: {page: 14, table: S4, note: Absolute log10 fO2 relative to ideal O2 at 1 bar; Gibbs free-energy minimization (article p. 5; supplementary section 4).'}}
+    log_fO2: {state: {tag: value, value: {kind: point, point: '-3.00'}}, locator: {page: 14, published_page: Supplementary Materials PDF p. 14, table: S4, note: 'Absolute log10 fO2 relative to ideal O2 at 1 bar; tabulated gas log fO2 values were calculated at 1900 °C (2173.15 K; above Table S4, Supplementary Materials PDF p. 14), while run temperatures span 1839–1924 °C. Imposed-fO2 precision is ±0.05 log units; Gibbs free-energy minimization is described on article PDF p. 6 and Supplementary Materials section 4.'}}
     log_fO2_as_printed: {state: {tag: value, value: '-3.00'}, locator: {page: 14, table: S4}}
     gas_mixture_as_printed: {state: {tag: value, value: '90CO2:10H2'}, locator: {page: 2, table: S1}}
     gas_components_volume_percent: {Ar: 92, CO2: 7.2, H2: 0.8}
-  pressure_environment: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '100000'}}, locator: {page: 5, published_page: 5, section: Materials and Methods}}, sweep_gas: {state: {tag: value, value: {species: '92% Ar + 6% CO2 + 2% H2', flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}, locator: {page: 2, table: S1}}, regime: {regime_class: {tag: unknown, reason: not_published}}}
-  fO2_control: {channel: {tag: value, value: gas_mix}, buffer: {state: {tag: value, value: Absolute log10 fO2 relative to ideal O2 at 1 bar; Gibbs free-energy minimization}}}
-  thermal_schedule: {method: {state: {tag: value, value: Listed gas mixture after pure-O2 pre-melt; laser-off quench at approximately 800 °C/s}}, total_duration_s: {state: {tag: value, value: {kind: point, point: '31'}}, locator: {page: 2, table: S1}}, cooling_or_quench: {state: {tag: value, value: Laser switched off; approximately 800 °C/s}}}
+  pressure_environment: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '100000'}}, locator: {page: 2, published_page: 2, section: Results}}, sweep_gas: {state: {tag: value, value: {species: '92% Ar + 7.2% CO2 + 0.8% H2', flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}, locator: {page: 2, table: S1}}, regime: {regime_class: {tag: unknown, reason: not_published}}}
+  fO2_control: {channel: {tag: value, value: gas_mix}, buffer: {state: {tag: value, value: Absolute log10 fO2 relative to ideal O2 at 1 bar; Gibbs free-energy minimization}, locator: {page: 6, published_page: 6, section: Materials and Methods}}}
+  thermal_schedule: {method: {state: {tag: value, value: Listed gas mixture after pure-O2 pre-melt; laser-off quench at approximately 800 °C/s}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, total_duration_s: {state: {tag: value, value: {kind: point, point: '31'}}, locator: {page: 2, table: S1}}, cooling_or_quench: {state: {tag: value, value: Laser switched off; approximately 800 °C/s}, locator: {page: 6, published_page: 6, section: Materials and Methods}}}
 - experiment_id: sossi-per-f-o2-9
   series: Peridotite glass redox series
   bench_id: sossi-aerodynamic-laser-levitation
   method: aerodynamic_levitation_laser_heating_then_quench
   locator: {page: 2, table: S1}
-  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: Table S2 reports experimental glass analyses, not starting charge composition}}}
+  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: Table S2 reports experimental glass analyses, not starting charge composition}}}
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '2175.15'}}, locator: {page: 2, table: S1, note: '1902 °C + 273.15'}}
     temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '15'}}, locator: {page: 2, table: S1, note: '±15 °C'}}
-    log_fO2: {state: {tag: value, value: {kind: point, point: '-3.92'}}, locator: {page: 14, table: S4, note: Absolute log10 fO2 relative to ideal O2 at 1 bar; Gibbs free-energy minimization (article p. 5; supplementary section 4).'}}
+    log_fO2: {state: {tag: value, value: {kind: point, point: '-3.92'}}, locator: {page: 14, published_page: Supplementary Materials PDF p. 14, table: S4, note: 'Absolute log10 fO2 relative to ideal O2 at 1 bar; tabulated gas log fO2 values were calculated at 1900 °C (2173.15 K; above Table S4, Supplementary Materials PDF p. 14), while run temperatures span 1839–1924 °C. Imposed-fO2 precision is ±0.05 log units; Gibbs free-energy minimization is described on article PDF p. 6 and Supplementary Materials section 4.'}}
     log_fO2_as_printed: {state: {tag: value, value: '-3.92'}, locator: {page: 14, table: S4}}
     gas_mixture_as_printed: {state: {tag: value, value: '75CO2:25H2'}, locator: {page: 2, table: S1}}
     gas_components_volume_percent: {Ar: 92, CO2: 6, H2: 2}
-  pressure_environment: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '100000'}}, locator: {page: 5, published_page: 5, section: Materials and Methods}}, sweep_gas: {state: {tag: value, value: {species: '92% Ar + 4% CO2 + 4% H2', flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}, locator: {page: 2, table: S1}}, regime: {regime_class: {tag: unknown, reason: not_published}}}
-  fO2_control: {channel: {tag: value, value: gas_mix}, buffer: {state: {tag: value, value: Absolute log10 fO2 relative to ideal O2 at 1 bar; Gibbs free-energy minimization}}}
-  thermal_schedule: {method: {state: {tag: value, value: Listed gas mixture after pure-O2 pre-melt; laser-off quench at approximately 800 °C/s}}, total_duration_s: {state: {tag: value, value: {kind: point, point: '30'}}, locator: {page: 2, table: S1}}, cooling_or_quench: {state: {tag: value, value: Laser switched off; approximately 800 °C/s}}}
+  pressure_environment: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '100000'}}, locator: {page: 2, published_page: 2, section: Results}}, sweep_gas: {state: {tag: value, value: {species: '92% Ar + 6% CO2 + 2% H2', flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}, locator: {page: 2, table: S1}}, regime: {regime_class: {tag: unknown, reason: not_published}}}
+  fO2_control: {channel: {tag: value, value: gas_mix}, buffer: {state: {tag: value, value: Absolute log10 fO2 relative to ideal O2 at 1 bar; Gibbs free-energy minimization}, locator: {page: 6, published_page: 6, section: Materials and Methods}}}
+  thermal_schedule: {method: {state: {tag: value, value: Listed gas mixture after pure-O2 pre-melt; laser-off quench at approximately 800 °C/s}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, total_duration_s: {state: {tag: value, value: {kind: point, point: '30'}}, locator: {page: 2, table: S1}}, cooling_or_quench: {state: {tag: value, value: Laser switched off; approximately 800 °C/s}, locator: {page: 6, published_page: 6, section: Materials and Methods}}}
 - experiment_id: sossi-per-f-o2-10
   series: Peridotite glass redox series
   bench_id: sossi-aerodynamic-laser-levitation
   method: aerodynamic_levitation_laser_heating_then_quench
   locator: {page: 2, table: S1}
-  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: Table S2 reports experimental glass analyses, not starting charge composition}}}
+  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: Table S2 reports experimental glass analyses, not starting charge composition}}}
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '2173.15'}}, locator: {page: 2, table: S1, note: '1900 °C + 273.15'}}
     temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '21'}}, locator: {page: 2, table: S1, note: '±21 °C'}}
-    log_fO2: {state: {tag: value, value: {kind: point, point: '-5.32'}}, locator: {page: 14, table: S4, note: Absolute log10 fO2 relative to ideal O2 at 1 bar; Gibbs free-energy minimization (article p. 5; supplementary section 4).'}}
+    log_fO2: {state: {tag: value, value: {kind: point, point: '-5.32'}}, locator: {page: 14, published_page: Supplementary Materials PDF p. 14, table: S4, note: 'Absolute log10 fO2 relative to ideal O2 at 1 bar; tabulated gas log fO2 values were calculated at 1900 °C (2173.15 K; above Table S4, Supplementary Materials PDF p. 14), while run temperatures span 1839–1924 °C. Imposed-fO2 precision is ±0.05 log units; Gibbs free-energy minimization is described on article PDF p. 6 and Supplementary Materials section 4.'}}
     log_fO2_as_printed: {state: {tag: value, value: '-5.32'}, locator: {page: 14, table: S4}}
     gas_mixture_as_printed: {state: {tag: value, value: '50CO2:50H2'}, locator: {page: 2, table: S1}}
     gas_components_volume_percent: {Ar: 92, CO2: 4, H2: 4}
-  pressure_environment: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '100000'}}, locator: {page: 5, published_page: 5, section: Materials and Methods}}, sweep_gas: {state: {tag: value, value: {species: '92% Ar + 2% CO2 + 6% H2', flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}, locator: {page: 2, table: S1}}, regime: {regime_class: {tag: unknown, reason: not_published}}}
-  fO2_control: {channel: {tag: value, value: gas_mix}, buffer: {state: {tag: value, value: Absolute log10 fO2 relative to ideal O2 at 1 bar; Gibbs free-energy minimization}}}
-  thermal_schedule: {method: {state: {tag: value, value: Listed gas mixture after pure-O2 pre-melt; laser-off quench at approximately 800 °C/s}}, total_duration_s: {state: {tag: value, value: {kind: point, point: '30'}}, locator: {page: 2, table: S1}}, cooling_or_quench: {state: {tag: value, value: Laser switched off; approximately 800 °C/s}}}
+  pressure_environment: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '100000'}}, locator: {page: 2, published_page: 2, section: Results}}, sweep_gas: {state: {tag: value, value: {species: '92% Ar + 4% CO2 + 4% H2', flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}, locator: {page: 2, table: S1}}, regime: {regime_class: {tag: unknown, reason: not_published}}}
+  fO2_control: {channel: {tag: value, value: gas_mix}, buffer: {state: {tag: value, value: Absolute log10 fO2 relative to ideal O2 at 1 bar; Gibbs free-energy minimization}, locator: {page: 6, published_page: 6, section: Materials and Methods}}}
+  thermal_schedule: {method: {state: {tag: value, value: Listed gas mixture after pure-O2 pre-melt; laser-off quench at approximately 800 °C/s}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, total_duration_s: {state: {tag: value, value: {kind: point, point: '30'}}, locator: {page: 2, table: S1}}, cooling_or_quench: {state: {tag: value, value: Laser switched off; approximately 800 °C/s}, locator: {page: 6, published_page: 6, section: Materials and Methods}}}
 - experiment_id: sossi-per-f-o2-11
   series: Peridotite glass redox series
   bench_id: sossi-aerodynamic-laser-levitation
   method: aerodynamic_levitation_laser_heating_then_quench
   locator: {page: 2, table: S1}
-  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: Table S2 reports experimental glass analyses, not starting charge composition}}}
+  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: Table S2 reports experimental glass analyses, not starting charge composition}}}
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '2169.15'}}, locator: {page: 2, table: S1, note: '1896 °C + 273.15'}}
     temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '16'}}, locator: {page: 2, table: S1, note: '±16 °C'}}
-    log_fO2: {state: {tag: value, value: {kind: point, point: '-6.74'}}, locator: {page: 14, table: S4, note: Absolute log10 fO2 relative to ideal O2 at 1 bar; Gibbs free-energy minimization (article p. 5; supplementary section 4).'}}
+    log_fO2: {state: {tag: value, value: {kind: point, point: '-6.74'}}, locator: {page: 14, published_page: Supplementary Materials PDF p. 14, table: S4, note: 'Absolute log10 fO2 relative to ideal O2 at 1 bar; tabulated gas log fO2 values were calculated at 1900 °C (2173.15 K; above Table S4, Supplementary Materials PDF p. 14), while run temperatures span 1839–1924 °C. Imposed-fO2 precision is ±0.05 log units; Gibbs free-energy minimization is described on article PDF p. 6 and Supplementary Materials section 4.'}}
     log_fO2_as_printed: {state: {tag: value, value: '-6.74'}, locator: {page: 14, table: S4}}
     gas_mixture_as_printed: {state: {tag: value, value: '25CO2:75H2'}, locator: {page: 2, table: S1}}
     gas_components_volume_percent: {Ar: 92, CO2: 2, H2: 6}
-  pressure_environment: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '100000'}}, locator: {page: 5, published_page: 5, section: Materials and Methods}}, sweep_gas: {state: {tag: value, value: {species: '92% Ar + 0.8% CO2 + 7.2% H2', flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}, locator: {page: 2, table: S1}}, regime: {regime_class: {tag: unknown, reason: not_published}}}
-  fO2_control: {channel: {tag: value, value: gas_mix}, buffer: {state: {tag: value, value: Absolute log10 fO2 relative to ideal O2 at 1 bar; Gibbs free-energy minimization}}}
-  thermal_schedule: {method: {state: {tag: value, value: Listed gas mixture after pure-O2 pre-melt; laser-off quench at approximately 800 °C/s}}, total_duration_s: {state: {tag: value, value: {kind: point, point: '28'}}, locator: {page: 2, table: S1}}, cooling_or_quench: {state: {tag: value, value: Laser switched off; approximately 800 °C/s}}}
+  pressure_environment: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '100000'}}, locator: {page: 2, published_page: 2, section: Results}}, sweep_gas: {state: {tag: value, value: {species: '92% Ar + 2% CO2 + 6% H2', flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}, locator: {page: 2, table: S1}}, regime: {regime_class: {tag: unknown, reason: not_published}}}
+  fO2_control: {channel: {tag: value, value: gas_mix}, buffer: {state: {tag: value, value: Absolute log10 fO2 relative to ideal O2 at 1 bar; Gibbs free-energy minimization}, locator: {page: 6, published_page: 6, section: Materials and Methods}}}
+  thermal_schedule: {method: {state: {tag: value, value: Listed gas mixture after pure-O2 pre-melt; laser-off quench at approximately 800 °C/s}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, total_duration_s: {state: {tag: value, value: {kind: point, point: '28'}}, locator: {page: 2, table: S1}}, cooling_or_quench: {state: {tag: value, value: Laser switched off; approximately 800 °C/s}, locator: {page: 6, published_page: 6, section: Materials and Methods}}}
 - experiment_id: sossi-per-f-o2-12
   series: Peridotite glass redox series
   bench_id: sossi-aerodynamic-laser-levitation
   method: aerodynamic_levitation_laser_heating_then_quench
   locator: {page: 2, table: S1}
-  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: Table S2 reports experimental glass analyses, not starting charge composition}}}
+  sample: {characterization: {state: {tag: value, value: Synthetic KLB-1-modeled peridotite glass}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 7, table: S2, note: Table S2 reports experimental glass analyses, not starting charge composition}}}
   conditions:
     temperature_K: {state: {tag: value, value: {kind: point, point: '2112.15'}}, locator: {page: 2, table: S1, note: '1839 °C + 273.15'}}
     temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '17'}}, locator: {page: 2, table: S1, note: '±17 °C'}}
-    log_fO2: {state: {tag: value, value: {kind: point, point: '-7.86'}}, locator: {page: 14, table: S4, note: Absolute log10 fO2 relative to ideal O2 at 1 bar; Gibbs free-energy minimization (article p. 5; supplementary section 4).'}}
+    log_fO2: {state: {tag: value, value: {kind: point, point: '-7.86'}}, locator: {page: 14, published_page: Supplementary Materials PDF p. 14, table: S4, note: 'Absolute log10 fO2 relative to ideal O2 at 1 bar; tabulated gas log fO2 values were calculated at 1900 °C (2173.15 K; above Table S4, Supplementary Materials PDF p. 14), while run temperatures span 1839–1924 °C. Imposed-fO2 precision is ±0.05 log units; Gibbs free-energy minimization is described on article PDF p. 6 and Supplementary Materials section 4.'}}
     log_fO2_as_printed: {state: {tag: value, value: '-7.86'}, locator: {page: 14, table: S4}}
     gas_mixture_as_printed: {state: {tag: value, value: '10CO2:90H2'}, locator: {page: 2, table: S1}}
     gas_components_volume_percent: {Ar: 92, CO2: 0.8, H2: 7.2}
-  pressure_environment: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '100000'}}, locator: {page: 5, published_page: 5, section: Materials and Methods}}, sweep_gas: {state: {tag: value, value: {species: '92% Ar + 0.8% CO2 + 7.2% H2', flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}, locator: {page: 2, table: S1}}, regime: {regime_class: {tag: unknown, reason: not_published}}}
-  fO2_control: {channel: {tag: value, value: gas_mix}, buffer: {state: {tag: value, value: Absolute log10 fO2 relative to ideal O2 at 1 bar; Gibbs free-energy minimization}}}
-  thermal_schedule: {method: {state: {tag: value, value: Listed gas mixture after pure-O2 pre-melt; laser-off quench at approximately 800 °C/s}}, total_duration_s: {state: {tag: value, value: {kind: point, point: '33'}}, locator: {page: 2, table: S1}}, cooling_or_quench: {state: {tag: value, value: Laser switched off; approximately 800 °C/s}}}
+  pressure_environment: {total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '100000'}}, locator: {page: 2, published_page: 2, section: Results}}, sweep_gas: {state: {tag: value, value: {species: '92% Ar + 0.8% CO2 + 7.2% H2', flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}, locator: {page: 2, table: S1}}, regime: {regime_class: {tag: unknown, reason: not_published}}}
+  fO2_control: {channel: {tag: value, value: gas_mix}, buffer: {state: {tag: value, value: Absolute log10 fO2 relative to ideal O2 at 1 bar; Gibbs free-energy minimization}, locator: {page: 6, published_page: 6, section: Materials and Methods}}}
+  thermal_schedule: {method: {state: {tag: value, value: Listed gas mixture after pure-O2 pre-melt; laser-off quench at approximately 800 °C/s}, locator: {page: 6, published_page: 6, section: Materials and Methods}}, total_duration_s: {state: {tag: value, value: {kind: point, point: '33'}}, locator: {page: 2, table: S1}}, cooling_or_quench: {state: {tag: value, value: Laser switched off; approximately 800 °C/s}, locator: {page: 6, published_page: 6, section: Materials and Methods}}}
 species:
   Fe:
     observations:
