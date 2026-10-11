@@ -1618,6 +1618,150 @@ def test_halwax_pure_solid_formation_enthalpies_are_symmetric():
         assert observation["values"]["activity_pin_eligible"] is False
 
 
+def _assert_halwax_figure_only_pressure_transcription(doc: dict) -> None:
+    """Pin Halwax's six isothermal observations and their source locators."""
+    expected = {
+        "Ca": ("cao-series", "Ca(g)", "pure CaO(s)", 2077.0),
+        "O": ("cao-series", "O(g)", "pure CaO(s)", 2077.0),
+        "O2": ("cao-series", "O2(g)", "pure CaO(s)", 2077.0),
+        "Mg": ("mgo-series", "Mg(g)", "pure MgO(s)", 1926.0),
+    }
+    pressure_rows = [
+        (species, row)
+        for species in ("Ca", "Mg")
+        for row in doc["species"][species]["observations"]
+        if row["type"] == "partial_pressure"
+    ]
+    assert len(pressure_rows) == 6
+    rows = {(species, row["values"]["gas_species"]): row for species, row in pressure_rows}
+    assert len(rows) == 6
+    expected_rows = {
+        ("Ca", "Ca(g)"): expected["Ca"],
+        ("Ca", "O(g)"): expected["O"],
+        ("Ca", "O2(g)"): expected["O2"],
+        ("Mg", "Mg(g)"): expected["Mg"],
+        ("Mg", "O(g)"): ("mgo-series", "O(g)", "pure MgO(s)", 1926.0),
+        ("Mg", "O2(g)"): ("mgo-series", "O2(g)", "pure MgO(s)", 1926.0),
+    }
+    assert set(rows) == set(expected_rows)
+    for (species, gas_species), (
+        experiment, gas, oxide, temperature
+    ) in expected_rows.items():
+        row = rows[(species, gas_species)]
+        values = row["values"]
+        assert row["experiment"] == experiment
+        assert gas == gas_species
+        assert values["condensed_phase"] == oxide
+        assert values["temperature_K"] == temperature
+        assert row["T_range_K"] == [temperature, temperature]
+        assert values["partial_pressure_pa"] is None
+        assert values["evidence_class"] == "figure_only"
+        assert row["locator"] == {
+            "page": 826,
+            "published_page": 826,
+            "pdf_page_index": 5,
+            "figure": "7",
+            "note": row["locator"]["note"],
+        }
+
+    geometry = next(
+        row["values"]
+        for species in doc["species"].values()
+        for row in species["observations"]
+        if "polythermal_pressure_figures" in row.get("values", {})
+    )
+    assert [
+        (figure["figure"], figure["locator"])
+        for figure in geometry["polythermal_pressure_figures"]
+    ] == [
+        ("8", {"page": 827, "pdf_page_index": 6}),
+        ("9", {"page": 827, "pdf_page_index": 6}),
+        ("10", {"page": 827, "pdf_page_index": 6}),
+        ("11", {"page": 827, "pdf_page_index": 6}),
+        ("12", {"page": 828, "pdf_page_index": 7}),
+        ("13", {"page": 828, "pdf_page_index": 7}),
+    ]
+
+    cross_sections = next(
+        row for row in doc["species"]["CaO"]["observations"]
+        if row["observation_id"] == "halwax_2024_table_iii_ionization_cross_sections"
+    )
+    assert cross_sections["locator"]["page"] == 826
+    assert cross_sections["locator"]["pdf_page_index"] == 5
+    cross_sections = cross_sections["values"]
+    assert cross_sections["pressure_equation_locator"] == {
+        "page": 824, "pdf_page_index": 3, "equation": "1"
+    }
+    assert cross_sections["oxygen_molecular_cross_section_equation_locator"] == {
+        "page": 826, "pdf_page_index": 5, "equation": "12"
+    }
+    for species in ("CaO", "MgO"):
+        table_i = next(
+            row for row in doc["species"][species]["observations"]
+            if row["observation_id"].endswith(
+                "table_i_" + species.lower() + "_sample_masses"
+            )
+        )
+        assert table_i["locator"]["page"] == 825
+        assert table_i["locator"]["pdf_page_index"] == 4
+        assert all(
+            item["locator"] == {"page": 825, "table": "I", "pdf_page_index": 4}
+            for item in table_i["values"]["series"]
+        )
+    ni = next(
+        row for row in doc["species"]["Ni"]["observations"]
+        if row["observation_id"] == "halwax_2024_table_ii_ni_sublimation_this_study"
+    )
+    assert ni["locator"]["page"] == 826
+    assert ni["locator"]["pdf_page_index"] == 5
+    assert ni["uncertainty"]["locator"] == {
+        "page": 826, "pdf_page_index": 5, "table": "II"
+    }
+    assert ni["values"]["pressure_calibration_factor"] == 7.6414e-9
+    factor_pin = next(
+        sample for sample in doc["fidelity_samples"]
+        if sample.get("path", "").endswith("pressure_calibration_factor_as_printed")
+    )
+    assert factor_pin["value"] == "7.6414·10⁻⁹"
+    assert factor_pin["locator"]["page"] == 826
+    assert factor_pin["locator"]["pdf_page_index"] == 5
+
+
+def test_halwax_isothermal_pressures_are_pinned_to_pdf_figures_and_typed_absent():
+    """Page 826 Fig. 7 and pages 827–828 figures 8–13; no point values inferred."""
+    path = EXTRACTS / "kems-031-halwax-2024.yaml"
+    doc = yaml.safe_load(path.read_text())
+    _assert_halwax_figure_only_pressure_transcription(doc)
+
+    # Prove the primary row set, Ca temperature, and numeric calibration are guarded.
+    deleted = copy.deepcopy(doc)
+    for species in ("Ca", "Mg"):
+        deleted["species"][species]["observations"] = [
+            row for row in deleted["species"][species]["observations"]
+            if row["type"] != "partial_pressure"
+        ]
+    with pytest.raises(AssertionError):
+        _assert_halwax_figure_only_pressure_transcription(deleted)
+
+    wrong_temperature = copy.deepcopy(doc)
+    ca_row = next(
+        row for row in wrong_temperature["species"]["Ca"]["observations"]
+        if row["type"] == "partial_pressure"
+    )
+    ca_row["values"]["temperature_K"] = 1926.0
+    with pytest.raises(AssertionError):
+        _assert_halwax_figure_only_pressure_transcription(wrong_temperature)
+
+    wrong_factor = copy.deepcopy(doc)
+    ni_row = next(
+        row for row in wrong_factor["species"]["Ni"]["observations"]
+        if row["observation_id"] == "halwax_2024_table_ii_ni_sublimation_this_study"
+    )
+    ni_row["values"]["pressure_calibration_factor"] = 7.6414e-8
+    with pytest.raises(AssertionError):
+        _assert_halwax_figure_only_pressure_transcription(wrong_factor)
+
+
 def test_source_priority_file_present_and_valid():
     errs = vle.validate_source_priority_file()
     assert errs == []
