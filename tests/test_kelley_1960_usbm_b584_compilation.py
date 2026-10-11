@@ -143,6 +143,72 @@ def test_silica_polymorph_curves_keep_failed_table_gates_typed():
     assert by_key[("tridymite-alpha", "heat_capacity")]["gate"]["reason"] == "no_independent_check"
 
 
+def test_calcium_silicate_curves_gate_and_keep_table_mismatch():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "CaSiO3"]
+    assert len(curves) == 6
+    by_key = {(curve["polymorph"], curve["quantity"]): curve for curve in curves}
+    assert by_key[("wollastonite", "heat_content_increment")]["gate"]["reason"] == "transcription_gate_failed"
+    assert by_key[("wollastonite", "heat_capacity")]["gate"]["reason"] == "no_independent_check"
+    assert by_key[("pseudowollastonite", "heat_capacity")]["gate"]["kind"] == "analytic_derivative_of_gated_H"
+    assert by_key[(None, "heat_content_increment")]["gate"]["status"] == "passed"
+
+
+def test_anorthite_crystal_and_glass_curves_are_separate():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "CaAl2Si2O8"]
+    assert len(curves) == 4
+    assert {curve["phase"] for curve in curves} == {"c", "gl"}
+    assert all(curve["gate"]["status"] == "passed" for curve in curves)
+
+
+def test_calcium_orthosilicate_polymorphs_use_their_own_transition_cells():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "Ca2SiO4"]
+    assert len(curves) == 6
+    by_key = {(curve["polymorph"], curve["quantity"]): curve for curve in curves}
+    assert all(curve["gate"]["status"] == "passed" for curve in curves)
+    assert by_key[("alpha-prime", "heat_content_increment")]["gate"]["residuals"][0]["observed"] == 26560
+    assert by_key[("alpha", "heat_content_increment")]["gate"]["residuals"][0]["observed"] == 64680
+
+
+def test_magnesium_silicate_equations_retain_each_polymorph_and_glass():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] in {"MgSiO3", "Mg2SiO4"}]
+    assert len(curves) == 10
+    assert {curve["polymorph"] for curve in curves if curve["formula"] == "MgSiO3"} == {
+        "clinoenstatite", "amphibole-type", "pyroxene-type", None,
+    }
+    assert all(curve["gate"]["status"] == "passed" for curve in curves)
+
+
+def test_potassium_feldspar_crystal_and_glass_curves_remain_distinct():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "KAlSi3O8"]
+    assert len(curves) == 4
+    assert {curve["phase"] for curve in curves} == {"c", "gl"}
+    assert all(curve["gate"]["status"] == "passed" for curve in curves)
+
+
+def test_albite_crystal_and_glass_curves_remain_distinct():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "NaAlSi3O8"]
+    assert len(curves) == 4
+    assert {curve["phase"] for curve in curves} == {"c", "gl"}
+    assert all(curve["gate"]["status"] == "passed" for curve in curves)
+
+
+def test_nephelite_and_carnegieite_ranges_retain_gate_failures():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "NaAlSiO4"]
+    assert len(curves) == 10
+    by_key = {(curve["polymorph"], curve["quantity"]): curve for curve in curves}
+    assert by_key[("alpha-nephelite", "heat_content_increment")]["gate"]["reason"] == "transcription_gate_failed"
+    assert by_key[("alpha-nephelite", "heat_capacity")]["gate"]["reason"] == "no_independent_check"
+    assert by_key[("beta-nephelite", "heat_capacity")]["gate"]["reason"] == "no_independent_check"
+    assert by_key[("gamma-nephelite", "heat_capacity")]["gate"]["kind"] == "analytic_derivative_of_gated_H"
+
+
+def test_fayalite_crystal_and_liquid_curves_are_separate():
+    curves = [curve for curve in loader.load_published_curves() if curve["formula"] == "Fe2SiO4"]
+    assert len(curves) == 4
+    assert {curve["phase"] for curve in curves} == {"c", "l"}
+    assert all(curve["gate"]["status"] == "passed" for curve in curves)
+
+
 def test_heat_content_gate_detects_a_coefficient_mutation():
     heat = loader.load_published_curves()[0]
     changed = {**heat, "coefficients_as_printed": ["11.77", *heat["coefficients_as_printed"][1:]]}

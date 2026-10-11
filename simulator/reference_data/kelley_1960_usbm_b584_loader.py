@@ -100,11 +100,16 @@ def _gate_heat_content(curve: dict[str, Any], record: dict[str, Any]) -> dict[st
     residuals = []
     for cell in curve["gate_cells"]:
         predicted = _evaluate_heat_content(curve, cell["temperature_K"])
-        printed = next(
-            row["cells"]
-            for row in record["rows"]
-            if row["cells"]["temperature"]["value"] == cell["temperature_K"]
-        )
+        if "source_row_index" in cell:
+            printed = record["rows"][cell["source_row_index"]]["cells"]
+            if printed["temperature"]["value"] != cell["temperature_K"]:
+                raise ValueError("published-curve gate row does not match its temperature")
+        else:
+            printed = next(
+                row["cells"]
+                for row in record["rows"]
+                if row["cells"]["temperature"]["value"] == cell["temperature_K"]
+            )
         observed = printed["heat_content"]["value"]
         accuracy_percent = (
             float(curve["accuracy_as_printed"].split()[0]) / 100

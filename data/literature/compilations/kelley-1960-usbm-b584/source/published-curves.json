@@ -153,5 +153,413 @@
     "locator": {"printed_page": 160, "label": "Table 669, SiO2(gl) equation"},
     "source_record_id": "table-669", "derivation": "Term-by-term derivative of the printed heat-content equation; cal/mol differentiated by kelvin gives cal/(mol·K), and the constant drops out.",
     "derivative_of_equation_index": 14
+  },
+  {
+    "formula": "CaSiO3", "phase": "c", "polymorph": "wollastonite", "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 26.64 T + 1.80×10^-3 T^2 + 6.52×10^5 T^-1 - 10,290",
+    "terms": ["a*T", "b*T^2", "c*T^-1", "d"], "coefficients_as_printed": ["26.64", "1.80×10^-3", "6.52×10^5", "-10,290"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [298, 1450], "accuracy_as_printed": "0.2 percent",
+    "locator": {"printed_page": 45, "label": "Table 169, CaSiO3 (wollastonite)"},
+    "source_record_id": "table-169", "gate_cells": [{"temperature_K": 400}, {"temperature_K": 600}, {"temperature_K": 900}]
+  },
+  {
+    "formula": "CaSiO3", "phase": "c", "polymorph": "wollastonite", "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 26.64 + 3.60×10^-3 T - 6.52×10^5 T^-2",
+    "terms": ["a", "b*T", "c*T^-2"], "coefficients_as_printed": ["26.64", "3.60×10^-3", "-6.52×10^5"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [298, 1450], "accuracy_as_printed": null,
+    "locator": {"printed_page": 45, "label": "Table 169, CaSiO3 (wollastonite)"},
+    "source_record_id": "table-169", "derivation": "Term-by-term derivative of the printed heat-content equation; cal/mol differentiated by kelvin gives cal/(mol·K), and the constant drops out.",
+    "derivative_of_equation_index": 16
+  },
+  {
+    "formula": "CaSiO3", "phase": "c", "polymorph": "pseudowollastonite", "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 25.85 T + 1.97×10^-3 T^2 + 5.65×10^5 T^-1 - 9,777",
+    "terms": ["a*T", "b*T^2", "c*T^-1", "d"], "coefficients_as_printed": ["25.85", "1.97×10^-3", "5.65×10^5", "-9,777"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [298, 1700], "accuracy_as_printed": "0.3 percent",
+    "locator": {"printed_page": 45, "label": "Table 170, CaSiO3 (pseudowollastonite)"},
+    "source_record_id": "table-170", "gate_cells": [{"temperature_K": 400}, {"temperature_K": 900}, {"temperature_K": 1200}]
+  },
+  {
+    "formula": "CaSiO3", "phase": "c", "polymorph": "pseudowollastonite", "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 25.85 + 3.94×10^-3 T - 5.65×10^5 T^-2",
+    "terms": ["a", "b*T", "c*T^-2"], "coefficients_as_printed": ["25.85", "3.94×10^-3", "-5.65×10^5"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [298, 1700], "accuracy_as_printed": null,
+    "locator": {"printed_page": 45, "label": "Table 170, CaSiO3 (pseudowollastonite)"},
+    "source_record_id": "table-170", "derivation": "Term-by-term derivative of the printed heat-content equation; cal/mol differentiated by kelvin gives cal/(mol·K), and the constant drops out.",
+    "derivative_of_equation_index": 18
+  },
+  {
+    "formula": "CaSiO3", "phase": "gl", "polymorph": null, "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 21.59 T + 5.87×10^-3 T^2 + 4.08×10^5 T^-1 - 8,327",
+    "terms": ["a*T", "b*T^2", "c*T^-1", "d"], "coefficients_as_printed": ["21.59", "5.87×10^-3", "4.08×10^5", "-8,327"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [298, 1000], "accuracy_as_printed": "0.3 percent",
+    "locator": {"printed_page": 45, "label": "Table 171, CaSiO3(gl)"},
+    "source_record_id": "table-171", "gate_cells": [{"temperature_K": 400}, {"temperature_K": 600}, {"temperature_K": 1000}]
+  },
+  {
+    "formula": "CaSiO3", "phase": "gl", "polymorph": null, "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 21.59 + 11.74×10^-3 T - 4.08×10^5 T^-2",
+    "terms": ["a", "b*T", "c*T^-2"], "coefficients_as_printed": ["21.59", "11.74×10^-3", "-4.08×10^5"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [298, 1000], "accuracy_as_printed": null,
+    "locator": {"printed_page": 45, "label": "Table 171, CaSiO3(gl)"},
+    "source_record_id": "table-171", "derivation": "Term-by-term derivative of the printed heat-content equation; cal/mol differentiated by kelvin gives cal/(mol·K), and the constant drops out.",
+    "derivative_of_equation_index": 20
+  },
+  {
+    "formula": "CaAl2Si2O8", "phase": "c", "polymorph": "anorthite", "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 64.42 T + 6.85×10^-3 T^2 + 16.89×10^5 T^-1 - 25,481",
+    "terms": ["a*T", "b*T^2", "c*T^-1", "d"], "coefficients_as_printed": ["64.42", "6.85×10^-3", "16.89×10^5", "-25,481"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [298, 1700], "accuracy_as_printed": "0.3 percent",
+    "locator": {"printed_page": 45, "label": "Table 173, CaAl2Si2O8 (anorthite)"},
+    "source_record_id": "table-173", "gate_cells": [{"temperature_K": 600}, {"temperature_K": 1000}, {"temperature_K": 1600}]
+  },
+  {
+    "formula": "CaAl2Si2O8", "phase": "c", "polymorph": "anorthite", "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 64.42 + 13.70×10^-3 T - 16.89×10^5 T^-2",
+    "terms": ["a", "b*T", "c*T^-2"], "coefficients_as_printed": ["64.42", "13.70×10^-3", "-16.89×10^5"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [298, 1700], "accuracy_as_printed": null,
+    "locator": {"printed_page": 45, "label": "Table 173, CaAl2Si2O8 (anorthite)"},
+    "source_record_id": "table-173", "derivation": "Term-by-term derivative of the printed heat-content equation; cal/mol differentiated by kelvin gives cal/(mol·K), and the constant drops out.",
+    "derivative_of_equation_index": 22
+  },
+  {
+    "formula": "CaAl2Si2O8", "phase": "gl", "polymorph": null, "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 66.46 T + 5.92×10^-3 T^2 + 18.22×10^5 T^-1 - 26,452",
+    "terms": ["a*T", "b*T^2", "c*T^-1", "d"], "coefficients_as_printed": ["66.46", "5.92×10^-3", "18.22×10^5", "-26,452"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [298, 1000], "accuracy_as_printed": "0.4 percent",
+    "locator": {"printed_page": 46, "label": "Table 174, CaAl2Si2O8(gl)"},
+    "source_record_id": "table-174", "gate_cells": [{"temperature_K": 600}, {"temperature_K": 800}, {"temperature_K": 1000}]
+  },
+  {
+    "formula": "CaAl2Si2O8", "phase": "gl", "polymorph": null, "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 66.46 + 11.84×10^-3 T - 18.22×10^5 T^-2",
+    "terms": ["a", "b*T", "c*T^-2"], "coefficients_as_printed": ["66.46", "11.84×10^-3", "-18.22×10^5"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [298, 1000], "accuracy_as_printed": null,
+    "locator": {"printed_page": 46, "label": "Table 174, CaAl2Si2O8(gl)"},
+    "source_record_id": "table-174", "derivation": "Term-by-term derivative of the printed heat-content equation; cal/mol differentiated by kelvin gives cal/(mol·K), and the constant drops out.",
+    "derivative_of_equation_index": 24
+  },
+  {
+    "formula": "Ca2SiO4", "phase": "c", "polymorph": "beta", "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 34.87 T + 4.87×10^-3 T^2 + 6.26×10^5 T^-1 - 12,929",
+    "terms": ["a*T", "b*T^2", "c*T^-1", "d"], "coefficients_as_printed": ["34.87", "4.87×10^-3", "6.26×10^5", "-12,929"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [298, 970], "accuracy_as_printed": "0.4 percent",
+    "locator": {"printed_page": 44, "label": "Table 167, Ca2SiO4(beta)"},
+    "source_record_id": "table-167", "gate_cells": [{"temperature_K": 600}, {"temperature_K": 800}, {"temperature_K": 900}]
+  },
+  {
+    "formula": "Ca2SiO4", "phase": "c", "polymorph": "beta", "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 34.87 + 9.74×10^-3 T - 6.26×10^5 T^-2",
+    "terms": ["a", "b*T", "c*T^-2"], "coefficients_as_printed": ["34.87", "9.74×10^-3", "-6.26×10^5"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [298, 970], "accuracy_as_printed": null,
+    "locator": {"printed_page": 44, "label": "Table 167, Ca2SiO4(beta)"},
+    "source_record_id": "table-167", "derivation": "Term-by-term derivative of the printed heat-content equation; cal/mol differentiated by kelvin gives cal/(mol·K), and the constant drops out.",
+    "derivative_of_equation_index": 26
+  },
+  {
+    "formula": "Ca2SiO4", "phase": "c", "polymorph": "alpha-prime", "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 32.16 T + 5.51×10^-3 T^2 - 9,814",
+    "terms": ["a*T", "b*T^2", "d"], "coefficients_as_printed": ["32.16", "5.51×10^-3", "-9,814"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [970, 1710], "accuracy_as_printed": "0.1 percent",
+    "locator": {"printed_page": 44, "label": "Table 167, Ca2SiO4(alpha-prime)"},
+    "source_record_id": "table-167", "gate_cells": [{"temperature_K": 970, "source_row_index": 14}, {"temperature_K": 1300}, {"temperature_K": 1700}]
+  },
+  {
+    "formula": "Ca2SiO4", "phase": "c", "polymorph": "alpha-prime", "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 32.16 + 11.02×10^-3 T",
+    "terms": ["a", "b*T"], "coefficients_as_printed": ["32.16", "11.02×10^-3"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [970, 1710], "accuracy_as_printed": null,
+    "locator": {"printed_page": 44, "label": "Table 167, Ca2SiO4(alpha-prime)"},
+    "source_record_id": "table-167", "derivation": "Term-by-term derivative of the printed heat-content equation; cal/mol differentiated by kelvin gives cal/(mol·K), and the constant drops out.",
+    "derivative_of_equation_index": 28
+  },
+  {
+    "formula": "Ca2SiO4", "phase": "c", "polymorph": "alpha", "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 49.00 T - 19,110",
+    "terms": ["a*T", "d"], "coefficients_as_printed": ["49.00", "-19,110"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [1710, 2000], "accuracy_as_printed": "0.1 percent",
+    "locator": {"printed_page": 44, "label": "Table 167, Ca2SiO4(alpha)"},
+    "source_record_id": "table-167", "gate_cells": [{"temperature_K": 1710, "source_row_index": 13}, {"temperature_K": 1800}, {"temperature_K": 2000}]
+  },
+  {
+    "formula": "Ca2SiO4", "phase": "c", "polymorph": "alpha", "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 49.00",
+    "terms": ["a"], "coefficients_as_printed": ["49.00"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [1710, 2000], "accuracy_as_printed": null,
+    "locator": {"printed_page": 44, "label": "Table 167, Ca2SiO4(alpha)"},
+    "source_record_id": "table-167", "derivation": "The constant heat capacity is the derivative of the linear heat-content term; cal/mol differentiated by kelvin gives cal/(mol·K).",
+    "derivative_of_equation_index": 30
+  },
+  {
+    "formula": "MgSiO3", "phase": "c", "polymorph": "clinoenstatite", "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 24.55 T + 2.37×10^-3 T^2 + 6.28×10^5 T^-1 - 9,637",
+    "terms": ["a*T", "b*T^2", "c*T^-1", "d"], "coefficients_as_printed": ["24.55", "2.37×10^-3", "6.28×10^5", "-9,637"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [298, 1600], "accuracy_as_printed": "0.3 percent",
+    "locator": {"printed_page": 115, "label": "Table 478, MgSiO3 (clinoenstatite)"},
+    "source_record_id": "table-478", "gate_cells": [{"temperature_K": 500}, {"temperature_K": 900}, {"temperature_K": 1500}]
+  },
+  {
+    "formula": "MgSiO3", "phase": "c", "polymorph": "clinoenstatite", "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 24.55 + 4.74×10^-3 T - 6.28×10^5 T^-2",
+    "terms": ["a", "b*T", "c*T^-2"], "coefficients_as_printed": ["24.55", "4.74×10^-3", "-6.28×10^5"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [298, 1600], "accuracy_as_printed": null,
+    "locator": {"printed_page": 115, "label": "Table 478, MgSiO3 (clinoenstatite)"},
+    "source_record_id": "table-478", "derivation": "Term-by-term derivative of the printed heat-content equation; cal/mol differentiated by kelvin gives cal/(mol·K), and the constant drops out.",
+    "derivative_of_equation_index": 32
+  },
+  {
+    "formula": "MgSiO3", "phase": "c", "polymorph": "amphibole-type", "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 24.54 T + 2.72×10^-3 T^2 + 5.87×10^5 T^-1 - 9,527",
+    "terms": ["a*T", "b*T^2", "c*T^-1", "d"], "coefficients_as_printed": ["24.54", "2.72×10^-3", "5.87×10^5", "-9,527"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [298, 1400], "accuracy_as_printed": "0.3 percent",
+    "locator": {"printed_page": 115, "label": "Table 479, MgSiO3 (amphibole-type)"},
+    "source_record_id": "table-479", "gate_cells": [{"temperature_K": 400}, {"temperature_K": 1100}, {"temperature_K": 1400}]
+  },
+  {
+    "formula": "MgSiO3", "phase": "c", "polymorph": "amphibole-type", "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 24.54 + 5.44×10^-3 T - 5.87×10^5 T^-2",
+    "terms": ["a", "b*T", "c*T^-2"], "coefficients_as_printed": ["24.54", "5.44×10^-3", "-5.87×10^5"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [298, 1400], "accuracy_as_printed": null,
+    "locator": {"printed_page": 115, "label": "Table 479, MgSiO3 (amphibole-type)"},
+    "source_record_id": "table-479", "derivation": "Term-by-term derivative of the printed heat-content equation; cal/mol differentiated by kelvin gives cal/(mol·K), and the constant drops out.",
+    "derivative_of_equation_index": 34
+  },
+  {
+    "formula": "MgSiO3", "phase": "c", "polymorph": "pyroxene-type", "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 20.59 T + 6.00×10^-3 T^2 + 4.06×10^5 T^-1 - 8,034",
+    "terms": ["a*T", "b*T^2", "c*T^-1", "d"], "coefficients_as_printed": ["20.59", "6.00×10^-3", "4.06×10^5", "-8,034"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [298, 800], "accuracy_as_printed": "0.2 percent",
+    "locator": {"printed_page": 115, "label": "Table 480, MgSiO3 (pyroxene-type)"},
+    "source_record_id": "table-480", "gate_cells": [{"temperature_K": 500}, {"temperature_K": 700}, {"temperature_K": 800}]
+  },
+  {
+    "formula": "MgSiO3", "phase": "c", "polymorph": "pyroxene-type", "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 20.59 + 12.00×10^-3 T - 4.06×10^5 T^-2",
+    "terms": ["a", "b*T", "c*T^-2"], "coefficients_as_printed": ["20.59", "12.00×10^-3", "-4.06×10^5"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [298, 800], "accuracy_as_printed": null,
+    "locator": {"printed_page": 115, "label": "Table 480, MgSiO3 (pyroxene-type)"},
+    "source_record_id": "table-480", "derivation": "Term-by-term derivative of the printed heat-content equation; cal/mol differentiated by kelvin gives cal/(mol·K), and the constant drops out.",
+    "derivative_of_equation_index": 36
+  },
+  {
+    "formula": "MgSiO3", "phase": "gl", "polymorph": null, "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 21.89 T + 4.77×10^-3 T^2 + 4.43×10^5 T^-1 - 8,436",
+    "terms": ["a*T", "b*T^2", "c*T^-1", "d"], "coefficients_as_printed": ["21.89", "4.77×10^-3", "4.43×10^5", "-8,436"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [298, 1000], "accuracy_as_printed": "0.3 percent",
+    "locator": {"printed_page": 115, "label": "Table 481, MgSiO3(gl)"},
+    "source_record_id": "table-481", "gate_cells": [{"temperature_K": 600}, {"temperature_K": 800}, {"temperature_K": 900}]
+  },
+  {
+    "formula": "MgSiO3", "phase": "gl", "polymorph": null, "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 21.89 + 9.54×10^-3 T - 4.43×10^5 T^-2",
+    "terms": ["a", "b*T", "c*T^-2"], "coefficients_as_printed": ["21.89", "9.54×10^-3", "-4.43×10^5"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [298, 1000], "accuracy_as_printed": null,
+    "locator": {"printed_page": 115, "label": "Table 481, MgSiO3(gl)"},
+    "source_record_id": "table-481", "derivation": "Term-by-term derivative of the printed heat-content equation; cal/mol differentiated by kelvin gives cal/(mol·K), and the constant drops out.",
+    "derivative_of_equation_index": 38
+  },
+  {
+    "formula": "Mg2SiO4", "phase": "c", "polymorph": null, "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 35.81 T + 3.27×10^-3 T^2 + 8.52×10^5 T^-1 - 13,825",
+    "terms": ["a*T", "b*T^2", "c*T^-1", "d"], "coefficients_as_printed": ["35.81", "3.27×10^-3", "8.52×10^5", "-13,825"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [298, 1800], "accuracy_as_printed": "0.4 percent",
+    "locator": {"printed_page": 115, "label": "Table 482, Mg2SiO4(c)"},
+    "source_record_id": "table-482", "gate_cells": [{"temperature_K": 900}, {"temperature_K": 1300}, {"temperature_K": 1700}]
+  },
+  {
+    "formula": "Mg2SiO4", "phase": "c", "polymorph": null, "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 35.81 + 6.54×10^-3 T - 8.52×10^5 T^-2",
+    "terms": ["a", "b*T", "c*T^-2"], "coefficients_as_printed": ["35.81", "6.54×10^-3", "-8.52×10^5"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [298, 1800], "accuracy_as_printed": null,
+    "locator": {"printed_page": 115, "label": "Table 482, Mg2SiO4(c)"},
+    "source_record_id": "table-482", "derivation": "Term-by-term derivative of the printed heat-content equation; cal/mol differentiated by kelvin gives cal/(mol·K), and the constant drops out.",
+    "derivative_of_equation_index": 40
+  },
+  {
+    "formula": "KAlSi3O8", "phase": "c", "polymorph": "microcline-or-orthoclase", "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 63.83 T + 6.45×10^-3 T^2 + 17.05×10^5 T^-1 - 25,323",
+    "terms": ["a*T", "b*T^2", "c*T^-1", "d"], "coefficients_as_printed": ["63.83", "6.45×10^-3", "17.05×10^5", "-25,323"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [298, 1400], "accuracy_as_printed": "0.4 percent",
+    "locator": {"printed_page": 149, "label": "Table 625, KAlSi3O8(c), microcline and orthoclase"},
+    "source_record_id": "table-625", "gate_cells": [{"temperature_K": 400}, {"temperature_K": 800}, {"temperature_K": 1400}]
+  },
+  {
+    "formula": "KAlSi3O8", "phase": "c", "polymorph": "microcline-or-orthoclase", "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 63.83 + 12.90×10^-3 T - 17.05×10^5 T^-2",
+    "terms": ["a", "b*T", "c*T^-2"], "coefficients_as_printed": ["63.83", "12.90×10^-3", "-17.05×10^5"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [298, 1400], "accuracy_as_printed": null,
+    "locator": {"printed_page": 149, "label": "Table 625, KAlSi3O8(c), microcline and orthoclase"},
+    "source_record_id": "table-625", "derivation": "Term-by-term derivative of the printed heat-content equation; cal/mol differentiated by kelvin gives cal/(mol·K), and the constant drops out.",
+    "derivative_of_equation_index": 42
+  },
+  {
+    "formula": "KAlSi3O8", "phase": "gl", "polymorph": null, "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 61.96 T + 8.58×10^-3 T^2 + 14.29×10^5 T^-1 - 24,029",
+    "terms": ["a*T", "b*T^2", "c*T^-1", "d"], "coefficients_as_printed": ["61.96", "8.58×10^-3", "14.29×10^5", "-24,029"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [298, 1400], "accuracy_as_printed": "0.2 percent",
+    "locator": {"printed_page": 149, "label": "Table 626, KAlSi3O8(gl)"},
+    "source_record_id": "table-626", "gate_cells": [{"temperature_K": 400}, {"temperature_K": 600}, {"temperature_K": 1200}]
+  },
+  {
+    "formula": "KAlSi3O8", "phase": "gl", "polymorph": null, "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 61.96 + 17.16×10^-3 T - 14.29×10^5 T^-2",
+    "terms": ["a", "b*T", "c*T^-2"], "coefficients_as_printed": ["61.96", "17.16×10^-3", "-14.29×10^5"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [298, 1400], "accuracy_as_printed": null,
+    "locator": {"printed_page": 149, "label": "Table 626, KAlSi3O8(gl)"},
+    "source_record_id": "table-626", "derivation": "Term-by-term derivative of the printed heat-content equation; cal/mol differentiated by kelvin gives cal/(mol·K), and the constant drops out.",
+    "derivative_of_equation_index": 44
+  },
+  {
+    "formula": "NaAlSi3O8", "phase": "c", "polymorph": "albite", "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 61.70 T + 6.95×10^-3 T^2 + 15.01×10^5 T^-1 - 24,048",
+    "terms": ["a*T", "b*T^2", "c*T^-1", "d"], "coefficients_as_printed": ["61.70", "6.95×10^-3", "15.01×10^5", "-24,048"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [298, 1400], "accuracy_as_printed": "0.4 percent",
+    "locator": {"printed_page": 177, "label": "Table 742, NaAlSi3O8(albite)"},
+    "source_record_id": "table-742", "gate_cells": [{"temperature_K": 700}, {"temperature_K": 1000}, {"temperature_K": 1400}]
+  },
+  {
+    "formula": "NaAlSi3O8", "phase": "c", "polymorph": "albite", "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 61.70 + 13.90×10^-3 T - 15.01×10^5 T^-2",
+    "terms": ["a", "b*T", "c*T^-2"], "coefficients_as_printed": ["61.70", "13.90×10^-3", "-15.01×10^5"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [298, 1400], "accuracy_as_printed": null,
+    "locator": {"printed_page": 177, "label": "Table 742, NaAlSi3O8(albite)"},
+    "source_record_id": "table-742", "derivation": "Term-by-term derivative of the printed heat-content equation; cal/mol differentiated by kelvin gives cal/(mol·K), and the constant drops out.",
+    "derivative_of_equation_index": 46
+  },
+  {
+    "formula": "NaAlSi3O8", "phase": "gl", "polymorph": null, "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 61.31 T + 9.00×10^-3 T^2 + 16.16×10^5 T^-1 - 24,500",
+    "terms": ["a*T", "b*T^2", "c*T^-1", "d"], "coefficients_as_printed": ["61.31", "9.00×10^-3", "16.16×10^5", "-24,500"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [298, 1200], "accuracy_as_printed": "0.3 percent",
+    "locator": {"printed_page": 177, "label": "Table 743, NaAlSi3O8(gl)"},
+    "source_record_id": "table-743", "gate_cells": [{"temperature_K": 600}, {"temperature_K": 800}, {"temperature_K": 1200}]
+  },
+  {
+    "formula": "NaAlSi3O8", "phase": "gl", "polymorph": null, "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 61.31 + 18.00×10^-3 T - 16.16×10^5 T^-2",
+    "terms": ["a", "b*T", "c*T^-2"], "coefficients_as_printed": ["61.31", "18.00×10^-3", "-16.16×10^5"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [298, 1200], "accuracy_as_printed": null,
+    "locator": {"printed_page": 177, "label": "Table 743, NaAlSi3O8(gl)"},
+    "source_record_id": "table-743", "derivation": "Term-by-term derivative of the printed heat-content equation; cal/mol differentiated by kelvin gives cal/(mol·K), and the constant drops out.",
+    "derivative_of_equation_index": 48
+  },
+  {
+    "formula": "NaAlSiO4", "phase": "c", "polymorph": "alpha-nephelite", "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 6.63 T + 35.30×10^-3 T^2 - 5,115",
+    "terms": ["a*T", "b*T^2", "d"], "coefficients_as_printed": ["6.63", "35.30×10^-3", "-5,115"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [298, 467], "accuracy_as_printed": "1.5 percent",
+    "locator": {"printed_page": 176, "label": "Table 739, NaAlSiO4(alpha-nephelite)"},
+    "source_record_id": "table-739", "gate_cells": [{"temperature_K": 350}, {"temperature_K": 400}, {"temperature_K": 450}]
+  },
+  {
+    "formula": "NaAlSiO4", "phase": "c", "polymorph": "alpha-nephelite", "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 6.63 + 70.60×10^-8 T",
+    "terms": ["a", "b*T"], "coefficients_as_printed": ["6.63", "70.60×10^-8"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [298, 467], "accuracy_as_printed": null,
+    "locator": {"printed_page": 176, "label": "Table 739, NaAlSiO4(alpha-nephelite)"},
+    "source_record_id": "table-739", "derivation": "Term-by-term derivative of the printed heat-content equation; cal/mol differentiated by kelvin gives cal/(mol·K), and the constant drops out.",
+    "derivative_of_equation_index": 50
+  },
+  {
+    "formula": "NaAlSiO4", "phase": "c", "polymorph": "beta-nephelite", "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 26.79 T + 8.02×10^-3 T^2 - 8,580",
+    "terms": ["a*T", "b*T^2", "d"], "coefficients_as_printed": ["26.79", "8.02×10^-3", "-8,580"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [467, 1180], "accuracy_as_printed": "0.3 percent",
+    "locator": {"printed_page": 176, "label": "Table 739, NaAlSiO4(beta-nephelite)"},
+    "source_record_id": "table-739", "gate_cells": [{"temperature_K": 500}, {"temperature_K": 700}, {"temperature_K": 1000}]
+  },
+  {
+    "formula": "NaAlSiO4", "phase": "c", "polymorph": "beta-nephelite", "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 26.79 + 16.04×10^-3 T",
+    "terms": ["a", "b*T"], "coefficients_as_printed": ["26.79", "16.04×10^-3"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [467, 1180], "accuracy_as_printed": null,
+    "locator": {"printed_page": 176, "label": "Table 739, NaAlSiO4(beta-nephelite)"},
+    "source_record_id": "table-739", "derivation": "Term-by-term derivative of the printed heat-content equation; cal/mol differentiated by kelvin gives cal/(mol·K), and the constant drops out.",
+    "derivative_of_equation_index": 52
+  },
+  {
+    "formula": "NaAlSiO4", "phase": "c", "polymorph": "gamma-nephelite", "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 41.11 T + 0.66×10^-3 T^2 - 15,229",
+    "terms": ["a*T", "b*T^2", "d"], "coefficients_as_printed": ["41.11", "0.66×10^-3", "-15,229"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [1180, 1525], "accuracy_as_printed": "0.1 percent",
+    "locator": {"printed_page": 176, "label": "Table 739, NaAlSiO4(gamma-nephelite)"},
+    "source_record_id": "table-739", "gate_cells": [{"temperature_K": 1200}, {"temperature_K": 1300}, {"temperature_K": 1500}]
+  },
+  {
+    "formula": "NaAlSiO4", "phase": "c", "polymorph": "gamma-nephelite", "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 41.11 + 1.32×10^-3 T",
+    "terms": ["a", "b*T"], "coefficients_as_printed": ["41.11", "1.32×10^-3"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [1180, 1525], "accuracy_as_printed": null,
+    "locator": {"printed_page": 176, "label": "Table 739, NaAlSiO4(gamma-nephelite)"},
+    "source_record_id": "table-739", "derivation": "Term-by-term derivative of the printed heat-content equation; cal/mol differentiated by kelvin gives cal/(mol·K), and the constant drops out.",
+    "derivative_of_equation_index": 54
+  },
+  {
+    "formula": "NaAlSiO4", "phase": "c", "polymorph": "alpha-carnegieite", "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 29.54 T + 8.58×10^-3 T^2 + 5.83×10^5 T^-1 - 11,525",
+    "terms": ["a*T", "b*T^2", "c*T^-1", "d"], "coefficients_as_printed": ["29.54", "8.58×10^-3", "5.83×10^5", "-11,525"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [298, 980], "accuracy_as_printed": "0.2 percent",
+    "locator": {"printed_page": 177, "label": "Table 740, NaAlSiO4(alpha-carnegieite)"},
+    "source_record_id": "table-740", "gate_cells": [{"temperature_K": 600}, {"temperature_K": 900}, {"temperature_K": 980}]
+  },
+  {
+    "formula": "NaAlSiO4", "phase": "c", "polymorph": "alpha-carnegieite", "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 29.54 + 17.16×10^-3 T - 5.83×10^5 T^-2",
+    "terms": ["a", "b*T", "c*T^-2"], "coefficients_as_printed": ["29.54", "17.16×10^-3", "-5.83×10^5"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [298, 980], "accuracy_as_printed": null,
+    "locator": {"printed_page": 177, "label": "Table 740, NaAlSiO4(alpha-carnegieite)"},
+    "source_record_id": "table-740", "derivation": "Term-by-term derivative of the printed heat-content equation; cal/mol differentiated by kelvin gives cal/(mol·K), and the constant drops out.",
+    "derivative_of_equation_index": 56
+  },
+  {
+    "formula": "NaAlSiO4", "phase": "c", "polymorph": "beta-carnegieite", "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 43.44 T + 0.53×10^-3 T^2 - 14,780",
+    "terms": ["a*T", "b*T^2", "d"], "coefficients_as_printed": ["43.44", "0.53×10^-3", "-14,780"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [980, 1700], "accuracy_as_printed": "0.1 percent",
+    "locator": {"printed_page": 177, "label": "Table 740, NaAlSiO4(beta-carnegieite)"},
+    "source_record_id": "table-740", "gate_cells": [{"temperature_K": 1000}, {"temperature_K": 1300}, {"temperature_K": 1700}]
+  },
+  {
+    "formula": "NaAlSiO4", "phase": "c", "polymorph": "beta-carnegieite", "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 43.44 + 1.06×10^-3 T",
+    "terms": ["a", "b*T"], "coefficients_as_printed": ["43.44", "1.06×10^-3"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [980, 1700], "accuracy_as_printed": null,
+    "locator": {"printed_page": 177, "label": "Table 740, NaAlSiO4(beta-carnegieite)"},
+    "source_record_id": "table-740", "derivation": "Term-by-term derivative of the printed heat-content equation; cal/mol differentiated by kelvin gives cal/(mol·K), and the constant drops out.",
+    "derivative_of_equation_index": 58
+  },
+  {
+    "formula": "Fe2SiO4", "phase": "c", "polymorph": null, "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 36.51 T + 4.68×10^-3 T^2 + 6.70×10^5 T^-1 - 13,549",
+    "terms": ["a*T", "b*T^2", "c*T^-1", "d"], "coefficients_as_printed": ["36.51", "4.68×10^-3", "6.70×10^5", "-13,549"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [298, 1490], "accuracy_as_printed": "0.3 percent",
+    "locator": {"printed_page": 98, "label": "Table 408, Fe2SiO4(c)"},
+    "source_record_id": "table-408", "gate_cells": [{"temperature_K": 500}, {"temperature_K": 600}, {"temperature_K": 900}]
+  },
+  {
+    "formula": "Fe2SiO4", "phase": "c", "polymorph": null, "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 36.51 + 9.36×10^-3 T - 6.70×10^5 T^-2",
+    "terms": ["a", "b*T", "c*T^-2"], "coefficients_as_printed": ["36.51", "9.36×10^-3", "-6.70×10^5"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [298, 1490], "accuracy_as_printed": null,
+    "locator": {"printed_page": 98, "label": "Table 408, Fe2SiO4(c)"},
+    "source_record_id": "table-408", "derivation": "Term-by-term derivative of the printed heat-content equation; cal/mol differentiated by kelvin gives cal/(mol·K), and the constant drops out.",
+    "derivative_of_equation_index": 60
+  },
+  {
+    "formula": "Fe2SiO4", "phase": "l", "polymorph": null, "quantity": "heat_content_increment",
+    "equation_as_printed": "H_T - H_298.15 = 57.50 T - 11,950",
+    "terms": ["a*T", "d"], "coefficients_as_printed": ["57.50", "-11,950"],
+    "units_as_printed": "cal/mol", "temperature_range_K": [1490, 2000], "accuracy_as_printed": "0.1 percent",
+    "locator": {"printed_page": 98, "label": "Table 408, Fe2SiO4(l)"},
+    "source_record_id": "table-408", "gate_cells": [{"temperature_K": 1600}, {"temperature_K": 1800}, {"temperature_K": 2000}]
+  },
+  {
+    "formula": "Fe2SiO4", "phase": "l", "polymorph": null, "quantity": "heat_capacity",
+    "equation_as_printed": "Cp = 57.50",
+    "terms": ["a"], "coefficients_as_printed": ["57.50"],
+    "units_as_printed": "cal/(mol·K)", "temperature_range_K": [1490, 2000], "accuracy_as_printed": null,
+    "locator": {"printed_page": 98, "label": "Table 408, Fe2SiO4(l)"},
+    "source_record_id": "table-408", "derivation": "The constant heat capacity is the derivative of the linear heat-content term; cal/mol differentiated by kelvin gives cal/(mol·K).",
+    "derivative_of_equation_index": 62
   }
 ]
