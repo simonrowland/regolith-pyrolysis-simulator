@@ -1039,6 +1039,31 @@ def validate_observation(
                 issues,
             )
     ev = observation.evidence.class_
+    derivation = observation.derivation
+    raw_inputs = derivation.raw_inputs if derivation is not None else None
+    if raw_inputs is not None and not (
+        ev.is_value and ev.value is EvidenceClass.MEASURED_REDUCED
+    ):
+        detail = (
+            "raw_inputs not_printed declaration is invalid for model_derived evidence"
+            if ev.is_value and ev.value is EvidenceClass.MODEL_DERIVED
+            else "raw_inputs declaration is valid only for measured_reduced evidence"
+        )
+        issues.append(
+            _issue(
+                f"{path}.derivation.raw_inputs",
+                RefusalReason.CONDITIONAL_FIELD,
+                detail,
+            )
+        )
+    if raw_inputs is not None and derivation is not None and derivation.inputs:
+        issues.append(
+            _issue(
+                f"{path}.derivation.raw_inputs",
+                RefusalReason.CONDITIONAL_FIELD,
+                "raw_inputs declaration conflicts with listed derivation inputs",
+            )
+        )
     if ev.is_value and ev.value is EvidenceClass.ENGINE_PREDICTION:
         if observation.engine is None:
             issues.append(
@@ -1070,8 +1095,6 @@ def validate_observation(
         EvidenceClass.MODEL_DERIVED,
         EvidenceClass.MEASURED_REDUCED,
     }:
-        derivation = observation.derivation
-        raw_inputs = derivation.raw_inputs if derivation is not None else None
         declares_unprinted_raw_inputs = (
             derivation is not None and derivation.declares_unprinted_raw_inputs
         )
@@ -1092,14 +1115,6 @@ def validate_observation(
                         "raw_inputs not_printed declaration requires a locator",
                     )
                 )
-        if ev.value is EvidenceClass.MODEL_DERIVED and raw_inputs is not None:
-            issues.append(
-                _issue(
-                    f"{path}.derivation.raw_inputs",
-                    RefusalReason.CONDITIONAL_FIELD,
-                    "raw_inputs not_printed declaration is invalid for model_derived evidence",
-                )
-            )
         if (
             ev.value is EvidenceClass.MEASURED_REDUCED
             and declares_unprinted_raw_inputs

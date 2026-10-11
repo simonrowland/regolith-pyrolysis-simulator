@@ -594,6 +594,111 @@ def test_invalid_raw_input_declarations_return_typed_issues(
     )
 
 
+@pytest.mark.parametrize("location", ["values.derivation", "derivation"])
+@pytest.mark.parametrize(
+    ("raw_inputs", "detail"),
+    [
+        (
+            {"state": {"tag": "value", "value": "printed"}, "locator": {"page": 2}},
+            "printed",
+        ),
+        (
+            {"state": {"tag": "value", "value": 7}, "locator": {"page": 2}},
+            "invalid value",
+        ),
+        ({"locator": {"page": 2}}, "contain a state"),
+    ],
+    ids=["unknown-literal", "wrong-type", "missing-state"],
+)
+def test_invalid_raw_input_parse_is_a_typed_issue_at_each_annotation_location(
+    tmp_path: Path, location: str, raw_inputs: dict, detail: str
+) -> None:
+    extract = _raw_inputs_extract("measured_reduced")
+    observation = extract["species"]["Na"]["observations"][0]
+    if location == "values.derivation":
+        annotation = observation["values"]["derivation"]
+    else:
+        annotation = dict(observation["values"]["derivation"])
+        observation["derivation"] = annotation
+    annotation["raw_inputs"] = raw_inputs
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and issue.path.endswith(f".{location}")
+        and detail in issue.detail
+        for issue in result.registry_issues
+    )
+
+
+def test_not_printed_declaration_conflicts_with_listed_inputs_and_preserves_them(
+    tmp_path: Path,
+) -> None:
+    extract = _raw_inputs_extract("measured_reduced")
+    row = extract["species"]["Na"]["observations"][0]
+    row["values"]["derivation"]["inputs"] = ["pdf:fixture-source"]
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    observation = next(iter(result.observations.values()))
+    assert observation.derivation is not None
+    assert observation.derivation.inputs == ("pdf:fixture-source",)
+    assert any(
+        issue.path.endswith(".derivation.raw_inputs")
+        and "conflicts with listed derivation inputs" in issue.detail
+        for issue in result.validation.hard_issues
+    )
+
+
+def test_registry_composition_accepts_existing_mapping_inference_inputs() -> None:
+    from simulator.battery.migrate import _experiment_from_plain
+
+    extract_path = (
+        Path(__file__).parents[2]
+        / "data/literature/extracts/ta-badro-2021.yaml"
+    )
+    extract = yaml.safe_load(extract_path.read_text(encoding="utf-8"))
+    registry_experiment = extract["experiments"][0]
+    experiment = _experiment_from_plain(
+        registry_experiment, registry_issues=[]
+    )
+
+    assert experiment.sample.initial_composition is not None
+    assert experiment.sample.initial_composition.inference is not None
+    assert experiment.sample.initial_composition.inference.inputs[0] == str(
+        extract["experiments"][0]["sample"]["initial_composition"]["inference"][
+            "inputs"
+        ][0]
+    )
+
+
+def test_malformed_registry_inference_records_issue_without_dropping_value() -> None:
+    from simulator.battery.migrate import _experiment_from_plain
+
+    extract_path = (
+        Path(__file__).parents[2]
+        / "data/literature/extracts/ta-badro-2021.yaml"
+    )
+    extract = yaml.safe_load(extract_path.read_text(encoding="utf-8"))
+    registry_experiment = extract["experiments"][0]
+    registry_experiment["sample"]["initial_composition"]["inference"][
+        "inputs"
+    ] = 42
+    issues = []
+    experiment = _experiment_from_plain(
+        registry_experiment, registry_issues=issues
+    )
+
+    assert experiment.sample.initial_composition is not None
+    assert experiment.sample.initial_composition.state.is_value
+    assert len(issues) == 1
+    assert issues[0].reason is RefusalReason.INVALID_SOURCE
+    assert issues[0].path == (
+        "experiment[vp-series].sample.initial_composition"
+    )
+
+
 def test_production_migration_rejects_model_derived_raw_input_declaration(
     tmp_path: Path,
 ) -> None:
