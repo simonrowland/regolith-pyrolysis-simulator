@@ -124,6 +124,14 @@ species:
         integration_time_s_per_cycle: 4
     - observation_id: ryerson_2022_fractionation_factors_table2
       experiment: cai-aerodynamic-levitation-series
+      derived_from:
+      - ryerson_2022_CAI_starting_and_evaporated_composition_table1
+      - ryerson_2022_isotope_ratios_table1
+      derivation:
+        relation: The advective isotope fractionation factors were obtained as 1 minus the Rayleigh-fit slope per mil using Eqs. (17)-(18) and Fig. 6; the evaporative fractions and residue isotope ratios are printed in Table 1 (PDF pp. 5, 13-14).
+        inputs:
+        - ryerson_2022_CAI_starting_and_evaporated_composition_table1
+        - ryerson_2022_isotope_ratios_table1
       type: alpha
       class_tag: measured_reduced
       locator:
@@ -144,6 +152,18 @@ species:
         - {isotope_pair: d25Mg, alpha_advective: 0.9950, uncertainty_2SD: 0.0006, comparison_vacuum: 0.9798, comparison_1_atm_diffusive: 0.9918}
     - observation_id: ryerson_2022_modified_HKL_saturation_factor
       experiment: cai-aerodynamic-levitation-series
+      derived_from:
+      - llnl-2021-cai-aerodynamic-levitation::ryerson_2022_fractionation_factors_table2::rows:h=3449c34e85e3
+      - llnl-2021-cai-aerodynamic-levitation::ryerson_2022_fractionation_factors_table2::rows:h=37c913db6e7b
+      - llnl-2021-cai-aerodynamic-levitation::ryerson_2022_fractionation_factors_table2::rows:h=93ba22baeed9
+      - llnl-2021-cai-aerodynamic-levitation::ryerson_2022_fractionation_factors_table2::rows:h=e710ee1b2aba
+      derivation:
+        relation: The Mg and Si vapour-to-saturation pressure ratios were solved from the measured isotope fractionation factors using the modified Hertz-Knudsen-Langmuir relation in Eq. (19) (PDF p. 14).
+        inputs:
+        - llnl-2021-cai-aerodynamic-levitation::ryerson_2022_fractionation_factors_table2::rows:h=3449c34e85e3
+        - llnl-2021-cai-aerodynamic-levitation::ryerson_2022_fractionation_factors_table2::rows:h=37c913db6e7b
+        - llnl-2021-cai-aerodynamic-levitation::ryerson_2022_fractionation_factors_table2::rows:h=93ba22baeed9
+        - llnl-2021-cai-aerodynamic-levitation::ryerson_2022_fractionation_factors_table2::rows:h=e710ee1b2aba
       type: rate_series
       class_tag: model_derived
       locator:
