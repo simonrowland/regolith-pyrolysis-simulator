@@ -3796,6 +3796,195 @@ species:
       uncertainty:
         reported_status: no individual γFeO uncertainty printed for these Table 2 rows
       equipment: {}
+    - observation_id: holzheid_1997_table3_pages27_bk_feo
+      type: activity_coefficient
+      locator: {page: 27, table: '3'}
+      phase: komatiitic_basalt_silicate_melt
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember: {formula: FeO, phase: {tag: value, value: l}}
+            component_basis: FeO
+            reference_pressure_bar: '1.01325'
+        inferred: false
+        note: >-
+          pure liquid Fe(1-x)O; reference reaction Fe(s) + 1/2 O2(g) = "FeO"(l); deltaG0 source O'Neill and Pownceby
+          (1993) and Barin (1989). The typed endmember encodes Raoultian FeO(l) at 1 atm but cannot encode the source's
+          wüstite nonstoichiometry Fe(1-x)O.
+        locator: {published_page: 30, equation: '9'}
+      regime: experimental_melt_equilibration
+      units: wt.% and dimensionless activity coefficient as printed
+      values:
+        method_class: model_derived
+        quantity: activity_coefficient
+        full_silicate_composition_rule: >-
+          Table 1 BK starting composition (SiO2 49.1, CaO 19.2, MgO 10.6, Al2O3 14.1, FeO 7.0 wt.%) with MgO and
+          FeO varied as analyzed in Table 3(c-d); the paper does not print a recalculated full oxide wt.% mixture.
+          CoO or NiO, FeO and MgO values below are the printed row analyses.
+        composition_rule_locator: {page: 22, table: '1'}
+        log_fO2_scale_and_control:
+          state: unknown
+          reason: not_published; pages 22-27 and 29-30 searched, log fO2 scale and imposition/measurement not specified
+        FeO_calculation_metal_standard: pure Fe reference metal in the section 3 equilibrium calculation, page 30
+        series:
+        - run: BK 57
+          system: BK, Table 3(c), metal Co-Fe alloy
+          T_K: 1673
+          duration_h: 66
+          log_fO2: -9.58
+          CoO_wt_pct: 2.40
+          CoO_sd_pct: 5
+          FeO_wt_pct: 4.48
+          FeO_sd_pct: 5
+          MgO_wt_pct: 10.6
+          MgO_sd_pct: 1
+          metal_Co_wt_pct: 91.3
+          metal_Co_sd_pct: 1
+          metal_Fe_wt_pct: 6.38
+          metal_Fe_sd_pct: 1
+          gamma_CoO: 1.21
+          gamma_FeO: 2.33
+          gamma_FeO_uncertainty: not_reported per experiment
+          metal_note: FeCo alloy recalculated to pure-metal equilibrium as stated on page 25
+        - run: V 68
+          system: BK, Table 3(c), metal Co-Fe alloy
+          T_K: 1667
+          duration_h: 49
+          log_fO2: -9.70
+          CoO_wt_pct: 1.78
+          CoO_sd_pct: 5
+          FeO_wt_pct: 2.65
+          FeO_sd_pct: 6
+          MgO_wt_pct: 17.7
+          MgO_sd_pct: 6
+          metal_Co_wt_pct: 91.4
+          metal_Co_sd_pct: 2
+          metal_Fe_wt_pct: 8.06
+          metal_Fe_sd_pct: 5
+          gamma_CoO: 2.08
+          gamma_FeO: 3.44
+          gamma_FeO_uncertainty: not_reported per experiment
+          metal_note: FeCo alloy recalculated to pure-metal equilibrium as stated on page 25
+        - run: V 64
+          system: BK, Table 3(c), metal Co-Fe alloy
+          T_K: 1675
+          duration_h: 49
+          log_fO2: -9.79
+          CoO_wt_pct: 2.13
+          CoO_sd_pct: 5
+          FeO_wt_pct: 2.20
+          FeO_sd_pct: 10
+          MgO_wt_pct: 17.9
+          MgO_sd_pct: 1
+          metal_Co_wt_pct: 90.8
+          metal_Co_sd_pct: 1
+          metal_Fe_wt_pct: 7.12
+          metal_Fe_sd_pct: 1
+          gamma_CoO: 1.48
+          gamma_FeO: 3.24
+          gamma_FeO_uncertainty: not_reported per experiment
+          metal_note: FeCo alloy recalculated to pure-metal equilibrium as stated on page 25
+        - run: V 68
+          system: BK, Table 3(c), metal Co-Fe alloy
+          T_K: 1667
+          duration_h: 49
+          log_fO2: -9.79
+          CoO_wt_pct: 1.86
+          CoO_sd_pct: 5
+          FeO_wt_pct: 1.94
+          FeO_sd_pct: 10
+          MgO_wt_pct: 30.5
+          MgO_sd_pct: 10
+          metal_Co_wt_pct: 92.8
+          metal_Co_sd_pct: 1
+          metal_Fe_wt_pct: 7.28
+          metal_Fe_sd_pct: 1
+          gamma_CoO: 1.89
+          gamma_FeO: 4.01
+          gamma_FeO_uncertainty: not_reported per experiment
+          metal_note: FeCo alloy recalculated to pure-metal equilibrium as stated on page 25
+        - run: BK 57
+          system: BK, Table 3(d), metal Ni-Fe alloy
+          T_K: 1673
+          duration_h: 66
+          log_fO2: -9.58
+          NiO_wt_pct: 0.219
+          NiO_sd_pct: 5
+          FeO_wt_pct: 2.01
+          FeO_sd_pct: 12
+          MgO_wt_pct: 11.1
+          MgO_sd_pct: 5
+          metal_Ni_wt_pct: 91.1
+          metal_Ni_sd_pct: 1
+          metal_Fe_wt_pct: 5.65
+          metal_Fe_sd_pct: 6
+          gamma_NiO: 2.33
+          gamma_FeO: 1.65
+          gamma_FeO_uncertainty: not_reported per experiment
+          metal_note: FeNi alloy recalculated to pure-metal equilibrium as stated on page 25
+        - run: V 68
+          system: BK, Table 3(d), metal Ni-Fe alloy
+          T_K: 1667
+          duration_h: 49
+          log_fO2: -9.70
+          NiO_wt_pct: 0.167
+          NiO_sd_pct: 5
+          FeO_wt_pct: 2.19
+          FeO_sd_pct: 5
+          MgO_wt_pct: 17.4
+          MgO_sd_pct: 6
+          metal_Ni_wt_pct: 89.5
+          metal_Ni_sd_pct: 1
+          metal_Fe_wt_pct: 9.50
+          metal_Fe_sd_pct: 6
+          gamma_NiO: 2.84
+          gamma_FeO: 2.79
+          gamma_FeO_uncertainty: not_reported per experiment
+          metal_note: FeNi alloy recalculated to pure-metal equilibrium as stated on page 25
+        - run: V 64
+          system: BK, Table 3(d), metal Ni-Fe alloy
+          T_K: 1675
+          duration_h: 49
+          log_fO2: -9.79
+          NiO_wt_pct: 0.130
+          NiO_sd_pct: 10
+          FeO_wt_pct: 1.72
+          FeO_sd_pct: 5
+          MgO_wt_pct: 17.5
+          MgO_sd_pct: 5
+          metal_Ni_wt_pct: 90.5
+          metal_Ni_sd_pct: 1
+          metal_Fe_wt_pct: 8.52
+          metal_Fe_sd_pct: 3
+          gamma_NiO: 3.15
+          gamma_FeO: 2.59
+          gamma_FeO_uncertainty: not_reported per experiment
+          metal_note: FeNi alloy recalculated to pure-metal equilibrium as stated on page 25
+        - run: V 67
+          system: BK, Table 3(d), metal Ni-Fe alloy
+          T_K: 1667
+          duration_h: 75.3
+          log_fO2: -9.79
+          NiO_wt_pct: 0.171
+          NiO_sd_pct: 5
+          FeO_wt_pct: 0.975
+          FeO_sd_pct: 5
+          MgO_wt_pct: 30.0
+          MgO_sd_pct: 5
+          metal_Ni_wt_pct: 92.5
+          metal_Ni_sd_pct: 1
+          metal_Fe_wt_pct: 6.84
+          metal_Fe_sd_pct: 3
+          gamma_NiO: 2.74
+          gamma_FeO: 3.99
+          gamma_FeO_uncertainty: not_reported per experiment
+          metal_note: FeNi alloy recalculated to pure-metal equilibrium as stated on page 25
+      uncertainty:
+        concentration_uncertainty: Table 3 analytical s.d. values retained per composition entry
+        reported_status: no individual γFeO uncertainty printed for these rows
+      equipment: {}
     - observation_id: holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_1
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
