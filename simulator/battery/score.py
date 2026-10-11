@@ -27,6 +27,8 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Callable, Iterable, Mapping, Sequence
 
+import yaml
+
 from simulator.battery.enums import (
     QUANTITY_UNITS,
     AdmissionStatus,
@@ -77,6 +79,9 @@ from simulator.battery.migrate import (
     load_migrated_benches,
     load_migrated_store,
     load_yaml,
+    _convert_compilation_amount,
+    convert_areal_mass_to_kg_per_m2,
+    convert_pressure_to_pa,
     observation_matches_source_tokens,
     path_matches_source_tokens,
     source_filter_tokens,
@@ -259,51 +264,33 @@ QUANTITY_METRIC: dict[Quantity, MetricOperation] = {
     Quantity.RESIDUE_COMPONENT_COMPOSITION: MetricOperation.ABSOLUTE,
 }
 
-# Legacy ΔfG bands from the residual ledger, retained as labeled fallbacks for
-# comparisons without a compilation-derived band. The independent value is
-# used for every relation: lineage labels do not select a decision threshold.
-# Printed cell uncertainty and family residual bands supersede these values.
-# Searched and not used as decision bands (do not invent a tolerance):
-# - data/vapour_rail_validation_pins.yaml policy.margin_dex 0.01 is a pin /
-#   regression envelope; SCHEMA-PROPOSAL-v2.1 forbids using a pin as the
-#   agreement threshold.
-# - validation-data/vapour_rail_sf04_high_t_DECISION.md 0.5 dex is an SF04
-#   high-T species-disagreement check, "NOT evidence for a physical or
-#   numerical ceiling".
-# - openimcc's published-pack SHA-256 pins the package data, not an accuracy band.
-# - engines/builtin/melt_effect_adjustment.py ±0.3 dex is a mixed-matte
-#   error estimate, not an activity agreement band.
-# - evaporation-α envelopes and the Robinot O2 error budget are value
-#   ranges / lab diagnostics, not residual decision bands.
-# - docs/lab-validation-whitepaper.md ~11% exp.1/exp.2 O2 floor
-#   (|1.17−1.05|/1.11) is two runs of one apparatus at different heating
-#   rates, not a sourced agreement band for o2_yield, yield_fraction, or
-#   mass_loss_fraction. Using it would invent a yield tolerance.
-THERMOCHEMISTRY_DECISION_BANDS: dict[SourceRelation, DecisionBand] = {
-    SourceRelation.INDEPENDENT: DecisionBand(
-        Decimal("1.0"),
-        "kJ_per_declared_mol_basis",
-        "LEGACY fallback: gibbs_battery_residual_ledger.yaml agreement_bands_kJ_mol.independent_tabulation",
-    ),
-    SourceRelation.SAME_INPUT: DecisionBand(
-        Decimal("0.05"),
-        "kJ_per_declared_mol_basis",
-        "LEGACY historical only: gibbs_battery_residual_ledger.yaml agreement_bands_kJ_mol.engine_own_input",
-    ),
-    SourceRelation.TRAINING: DecisionBand(
-        Decimal("0.05"),
-        "kJ_per_declared_mol_basis",
-        "LEGACY historical only: gibbs_battery_residual_ledger.yaml agreement_bands_kJ_mol.engine_own_input",
-    ),
-}
-
-# Statistical floor for estimating a MAD, not a physics threshold.
-MIN_DERIVED_BAND_N = 10
-
-# Formation Gibbs energies stored in kJ/mol. Not log10_Kf (dimensionless), not
-# cp/S (J/mol/K), not delta_fH or H-H298 (not sourced by this band).
-GIBBS_BAND_QUANTITIES: frozenset[Quantity] = frozenset(
-    {Quantity.DELTA_FG}
+# The ticket line uses the two-sided normal percentile p=95. 1.95996398454 is
+# Φ⁻¹((1 + .95) / 2); evaluating Φ(1.95996398454) gives 0.975, the upper
+# endpoint of the central 95% interval. MAD(N(0,1)) = Φ⁻¹(.75), so the
+# consistency scale is 1/Φ⁻¹(.75) = 1.482602218505602.
+DECISION_BAND_PERCENTILE = 95
+NORMAL_95_TICKET_MULTIPLIER = Decimal("1.959963984540054")
+MAD_NORMAL_SCALE = Decimal("1.482602218505602")
+DECISION_BAND_POLICY_VERSION = "q6-v1"
+DECISION_BAND_RATCHET_RELATIVE_PATH = Path("data/battery/decision-band-ratchet.yaml")
+# Minimum n for a descriptive residual bias/scatter ratio; it does not gate bands.
+MIN_RESIDUAL_SUMMARY_N = 10
+_ALIGNMENT_AXES = (
+    "subtype",
+    "per",
+    "temperature_K",
+    "standard_pressure_Pa",
+    "reaction",
+    "formation_elements",
+    "reference_state",
+    "reservoir",
+    "composition",
+    "fO2_Pa",
+    "total_pressure_Pa",
+    "sweep_gas",
+    "exposure",
+    "sample_mass_kg",
+    "wall",
 )
 _UNIT_DIMENSION: dict[str, str] = {
     "kJ_per_declared_mol_basis": "energy_per_mol",
@@ -421,6 +408,14 @@ class ScoreContext:
     extract_review: Mapping[str, str | None] = field(default_factory=dict)
     hostname: str = ""
     benches: Mapping[str, Bench] = field(default_factory=dict)
+    root: Path = REPO_ROOT
+
+
+@dataclass(frozen=True)
+class _PrintedBandResolution:
+    band: DecisionBand | None = None
+    refusal: Mapping[str, object] | None = None
+    notice: Notice | None = None
 
 
 @dataclass(frozen=True)
@@ -1938,353 +1933,383 @@ def band_dimension_matches(
     return quantity_dim is not None and quantity_dim == band_dim
 
 
-def pooled_log_pressure_sd(
-    replicate_log_pressures: Sequence[Sequence[Decimal | int | float]],
-) -> Decimal | None:
-    """Return the pooled sample SD of replicate ``log10(p)`` values.
-
-    Premise: rows in one replicate group share composition, temperature, and
-    method, so their log-pressure spread estimates measurement scatter.
-    Algebra: for group g, s²_g = Σ(x_g−x̄_g)²/(n_g−1); pool with
-    s² = Σ(n_g−1)s²_g / Σ(n_g−1). Unit check: x = log10(p), so s is dex;
-    no pressure unit remains. Sanity: groups ``(−1, 0, 1)`` and ``(9, 10,
-    11)`` both have SD 1, hence the pooled result is 1 dex.
-    """
-
-    sum_squares = Decimal(0)
-    degrees_of_freedom = 0
-    for raw_group in replicate_log_pressures:
-        group: list[Decimal] = []
-        for raw_value in raw_group:
-            try:
-                value = as_decimal(raw_value)
-            except (TypeError, ValueError, ArithmeticError):
-                continue
-            if value.is_finite():
-                group.append(value)
-        if len(group) < 2:
-            continue
-        mean = sum(group, Decimal(0)) / Decimal(len(group))
-        sum_squares += sum((value - mean) ** 2 for value in group)
-        degrees_of_freedom += len(group) - 1
-    if degrees_of_freedom == 0:
-        return None
-    return (sum_squares / Decimal(degrees_of_freedom)).sqrt()
-
-
-def _printed_pressure_uncertainty_dex(observation: Observation) -> Decimal | None:
-    uncertainty = observation.uncertainty
-    if uncertainty.kind is not UncertaintyKind.PRINTED:
-        return None
-    if uncertainty.value is not None and uncertainty.basis in {
-        "relative",
-        "fraction",
-    }:
-        raw = uncertainty.value
-        if isinstance(raw, tuple):
-            fraction = max(abs(raw[0]), abs(raw[1]))
-        else:
-            fraction = abs(raw)
-        if fraction.is_finite() and fraction > 0:
-            return (Decimal(1) + fraction).ln() / Decimal(10).ln()
-    try:
-        text = json.dumps(to_plain(uncertainty.verbatim), sort_keys=True)
-    except (TypeError, ValueError):
-        text = str(uncertainty.verbatim)
-    for match in re.finditer(r"(\d+(?:\.\d+)?)\s*(?:%|percent)", text, re.IGNORECASE):
-        window = text[max(0, match.start() - 80) : min(len(text), match.end() + 80)]
-        if not re.search(r"\b(?:k\s+)?pressure\b|\bp[_\s]?k\b", window, re.IGNORECASE):
-            continue
-        fraction = Decimal(match.group(1)) / Decimal(100)
-        if fraction > 0:
-            # The source prints a relative pressure envelope. Convert its
-            # upper multiplicative edge to the dex residual metric; this is
-            # the same ~0.15 dex reading used by the source's ±40% statement.
-            return (Decimal(1) + fraction).ln() / Decimal(10).ln()
-    return None
-
-
-def _observation_flagged_strata(
-    observation: Observation,
-    experiments: Mapping[str, Experiment],
-    point_observations_by_experiment: Mapping[str, tuple[Observation, ...]],
-    benches: Mapping[str, Bench] | None = None,
-) -> tuple[str, ...]:
-    existing = flagged_strata(observation.notices)
-    experiment = experiments.get(observation.experiment_id)
-    if experiment is None:
-        return existing
-    gates = run_validity_gates(
-        experiment,
-        observation,
-        point_observations=point_observations_by_experiment.get(
-            observation.experiment_id, ()
-        ),
-    )
-    bench = (
-        None
-        if experiment.bench_id is None or benches is None
-        else benches.get(experiment.bench_id)
-    )
-    return tuple(
-        dict.fromkeys(
-            (
-                *existing,
-                *flagged_strata(
-                    _flagged_stratum_notices(observation, experiment, gates, bench)
-                ),
-            )
-        )
-    )
-
-
-def _kems_replicate_groups(
-    observations: Mapping[str, Observation],
-    experiments: Mapping[str, Experiment],
-    benches: Mapping[str, Bench],
-) -> tuple[tuple[Decimal, ...], ...]:
-    groups: dict[tuple[object, ...], list[Decimal]] = {}
-    point_observations_by_experiment = _partial_pressure_observations_by_experiment(
-        observations.values()
-    )
-    for observation in observations.values():
-        identity = observation.identity
-        quantity = quantity_token(identity) if isinstance(identity, Identity) else None
-        if quantity is not Quantity.P_PARTIAL or not isinstance(identity, Identity):
-            continue
-        if _observation_flagged_strata(
-            observation, experiments, point_observations_by_experiment, benches
-        ):
-            continue
-        evidence = observation.evidence.class_
-        if not evidence.is_value or evidence.value not in MEASURED_EVIDENCE:
-            continue
-        experiment = experiments.get(observation.experiment_id)
-        if (
-            experiment is None
-            or not experiment.method.is_value
-            or experiment.method.value is not MethodToken.KNUDSEN_EFFUSION
-            or observation.admission.status is not AdmissionStatus.ADMITTED
-        ):
-            continue
-        temperature = temperature_of(identity)
-        composition = identity.composition
-        point = point_magnitude(observation.value)
-        if (
-            temperature is None
-            or composition is None
-            or not composition.is_value
-            or composition.value is None
-            or point is None
-            or point <= 0
-        ):
-            continue
-        key = (
-            observation.experiment_id,
-            identity.species.formula,
-            str(temperature),
-            tuple((name, str(amount)) for name, amount in composition.value.components),
-        )
-        groups.setdefault(key, []).append(
-            point.ln() / Decimal(10).ln()
-        )
-    return tuple(tuple(values) for values in groups.values() if len(values) >= 2)
-
-
-def derive_kems_partial_pressure_band(
-    observations: Mapping[str, Observation],
-    experiments: Mapping[str, Experiment],
-    *,
-    benches: Mapping[str, Bench] | None = None,
-) -> DecisionBand | None:
-    """Derive a band from measured rows and their optional bench context.
-
-    Pass the bench map when a row's cell material is stored on its Bench. The
-    private scorer path supplies the same map directly; a missing band never
-    falls back to this helper from ``decision_band_for``.
-    """
-    return _derive_kems_partial_pressure_band(observations, experiments, benches or {})
-
-
-def _derive_kems_partial_pressure_band(
-    observations: Mapping[str, Observation],
-    experiments: Mapping[str, Experiment],
-    benches: Mapping[str, Bench],
-) -> DecisionBand | None:
-    """Derive one KEMS p_partial band from admitted measured observations.
-
-    Printed pressure uncertainty is preferred. If a row has no usable printed
-    pressure uncertainty, exact composition/T replicate groups supply the
-    pooled log-pressure scatter; no engine residual enters this calculation.
-    """
-
-    candidates = []
-    point_observations_by_experiment = _partial_pressure_observations_by_experiment(
-        observations.values()
-    )
-    for observation in observations.values():
-        identity = observation.identity
-        quantity = quantity_token(identity) if isinstance(identity, Identity) else None
-        if quantity is not Quantity.P_PARTIAL or not isinstance(identity, Identity):
-            continue
-        if _observation_flagged_strata(
-            observation, experiments, point_observations_by_experiment, benches
-        ):
-            continue
-        evidence = observation.evidence.class_
-        if not evidence.is_value or evidence.value not in MEASURED_EVIDENCE:
-            continue
-        experiment = experiments.get(observation.experiment_id)
-        if (
-            experiment is None
-            or not experiment.method.is_value
-            or experiment.method.value is not MethodToken.KNUDSEN_EFFUSION
-            or observation.admission.status is not AdmissionStatus.ADMITTED
-            or rail_for_quantity(quantity, species_formula=identity.species.formula)
-            is not Rail.VAPOUR
-        ):
-            continue
-        candidates.append(observation)
-    if not candidates:
-        return None
-
-    printed_observations = [
-        (observation, width)
-        for observation in candidates
-        if (width := _printed_pressure_uncertainty_dex(observation)) is not None
-    ]
-    printed = [width for _, width in printed_observations]
-    if printed:
-        width = _rms(printed)
-        if width is None or not width.is_finite() or width <= 0:
-            return None
-        if any(
-            observation.source_id == "kems-042-plante-1979"
-            for observation, _ in printed_observations
-        ):
-            rule = (
-                "KEMS p_partial measured uncertainty: source-printed pressure "
-                "envelope (RMS of admitted printed log10 pressure envelopes only); "
-                "Plante width log10(1.40) from the printed page-280 1500 K "
-                "sentence, using the upper multiplicative edge and accepting "
-                "pressure ratios [1/1.40, 1.40] (-28.6%..+40%), not a symmetric "
-                "+/-40% relative band; NOTICE: the single 1500 K figure is "
-                "applied across the tabulated T range"
-            )
-        else:
-            rule = (
-                "KEMS p_partial measured uncertainty: source-printed pressure "
-                "envelope (RMS of admitted printed log10 pressure envelopes only)"
-            )
-        return DecisionBand(width, "dimensionless", rule)
-
-    replicate_scatter = pooled_log_pressure_sd(
-        _kems_replicate_groups(observations, experiments, benches)
-    )
-    if replicate_scatter is None:
-        return None
-    width = replicate_scatter
-    if width is None or not width.is_finite() or width <= 0:
-        return None
-    rule = (
-        "KEMS p_partial measured uncertainty: replicate scatter (pooled replicate "
-        "log10 pressure SD; used because no admitted printed pressure envelope "
-        "exists)"
-    )
-    return DecisionBand(width, "dimensionless", rule)
+def _decision_band_kind(
+    band: DecisionBand | Mapping[str, object] | str | None,
+) -> str:
+    """Return the policy kind encoded by the owning rule's stable token."""
+    if band is None:
+        return "no_band"
+    if isinstance(band, DecisionBand):
+        rule = band.rule
+    elif isinstance(band, Mapping):
+        rule = str(band.get("rule") or "")
+    else:
+        rule = band or ""
+    kind = str(rule).split(":", 1)[0]
+    return kind if kind in {
+        "printed_1sigma", "printed_2sigma", "printed_range",
+        "printed_unstated", "derived_scatter",
+    } else "other"
 
 
 def decision_band_for(
     quantity: Quantity | None,
     source_relation: SourceRelation,
     *,
-    rail: Rail | None = None,
-    method: MethodToken | None = None,
-    observations: Mapping[str, Observation] | None = None,
-    experiments: Mapping[str, Experiment] | None = None,
+    printed_band: DecisionBand | None = None,
+    printed_refusal: Mapping[str, object] | None = None,
     derived_band: DecisionBand | None = None,
     operation: MetricOperation | None = None,
 ) -> DecisionBand | None:
-    if (
-        quantity is Quantity.P_PARTIAL
-        and rail is Rail.VAPOUR
-        and method is MethodToken.KNUDSEN_EFFUSION
-        and observations is not None
-        and experiments is not None
+    """Choose the one owner-supplied band: printed, then source scatter, else none.
+
+    ``source_relation`` labels lineage only. An unparseable printed uncertainty
+    refuses the band's verdict and cannot fall through to a derived threshold.
+    """
+    del source_relation
+    if printed_refusal is not None:
+        return None
+    band = printed_band if printed_band is not None else derived_band
+    if band is None or not band_dimension_matches(
+        quantity, band, operation=operation
     ):
-        # A None band is meaningful: the bench-aware scoring derivation found
-        # no unflagged candidates.  Do not refill it with the public helper,
-        # whose inputs cannot include the bench map.
-        band = derived_band
-        if band is not None and band_dimension_matches(
-            quantity, band, operation=operation
-        ):
-            return band
-    if derived_band is not None:
-        if band_dimension_matches(quantity, derived_band, operation=operation):
-            return derived_band
-        return None
-    if quantity not in GIBBS_BAND_QUANTITIES:
-        return None
-    band = THERMOCHEMISTRY_DECISION_BANDS[SourceRelation.INDEPENDENT]
-    if band is None:
-        return None
-    if not band_dimension_matches(quantity, band):
         return None
     return band
 
 
-def _mapped_reading_uncertainty_dex(
-    uncertainty: Uncertainty,
-) -> Decimal | None:
-    """Dex width from mapped PRINTED verbatim or typed value/basis=dex.
+_UNCERTAINTY_NUMBER = r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?"
+_UNCERTAINTY_RANGE_RE = re.compile(
+    rf"[\[(]\s*({_UNCERTAINTY_NUMBER})\s*[,;–—]\s*({_UNCERTAINTY_NUMBER})\s*[\])]"
+)
+_UNCERTAINTY_PAIR_RE = re.compile(
+    rf"({_UNCERTAINTY_NUMBER})\s+(?:–|—|to)\s+({_UNCERTAINTY_NUMBER})",
+    re.IGNORECASE,
+)
+_UNCERTAINTY_SCALAR_RE = re.compile(_UNCERTAINTY_NUMBER)
 
-    Extracts store reading uncertainty as a verbatim mapping with keys such as
-    ``dex``, ``sigma_log10P_dex_per_point``, or nested
-    ``figure_reading_estimate.log10_p_atm_absolute_uncertainty_dex``. A typed
-    ``value`` with a dex ``basis`` is accepted the same way. Scalar PRINTED
-    strings remain handled by ``_printed_uncertainty_band``.
-    """
 
-    if uncertainty.value is not None and uncertainty.basis:
-        basis = uncertainty.basis.casefold()
-        if "dex" in basis:
-            raw = uncertainty.value
-            if isinstance(raw, tuple):
-                raw = abs(raw[1] - raw[0])
+def _uncertainty_original(uncertainty: Uncertainty) -> str:
+    value = uncertainty.verbatim
+    if value is None:
+        value = uncertainty.value
+    if isinstance(value, Mapping):
+        return json.dumps(to_plain(value), ensure_ascii=False, sort_keys=True)
+    return str(value)
+
+
+def _uncertainty_scope_covers_cell(uncertainty: Uncertainty, observation: object) -> bool:
+    parent = getattr(observation, "parent", None)
+    if parent is None or parent.value.kind is not ValueKind.SERIES:
+        return True
+    raw = uncertainty.verbatim
+    if isinstance(raw, Mapping):
+        for key, value in raw.items():
+            name = str(key).casefold()
+            if name in {"covers_series", "applies_to_series"} and value is True:
+                return True
+            if name in {"scope", "applies_to", "coverage", "series_coverage"}:
+                if value is True:
+                    return True
+                if isinstance(value, str) and re.search(
+                    r"\b(series|all cells?|each cell|every cell|each point|every point)\b",
+                    value,
+                    re.IGNORECASE,
+                ):
+                    return True
+    if isinstance(raw, str) and re.search(
+        r"\b(all|each|every)\s+(cell|point|value)\b|\bseries\s+(uncertainty|error)\b",
+        raw,
+        re.IGNORECASE,
+    ):
+        return True
+    return False
+
+
+def _uncertainty_kind(uncertainty: Uncertainty, raw_text: str) -> str:
+    text = f"{uncertainty.basis or ''} {raw_text}".casefold().replace("_", " ")
+    if re.search(r"\b95\s*%?\s*(?:ci|confidence interval)\b|\b2\s*(?:-?sigma|σ)\b", text):
+        return "printed_2sigma"
+    if re.search(r"\b(?:range|limits?|maximum error|maximum deviation|bounding)\b", text):
+        return "printed_range"
+    if re.search(r"\b1\s*(?:-?sigma|σ)\b|\bstandard error\b|\bstandard deviation\b|sigma_", text):
+        return "printed_1sigma"
+    return "printed_unstated"
+
+
+def _mapping_uncertainty_value(
+    mapping: Mapping[str, object],
+) -> tuple[object | None, str | None]:
+    for key, value in mapping.items():
+        if str(key).casefold() in {"value", "amount", "error_value", "uncertainty_value"}:
+            if isinstance(value, (tuple, list)) and len(value) == 2:
+                return value, "range"
             try:
-                width = abs(as_decimal(raw))
+                as_decimal(value)
             except (TypeError, ValueError, ArithmeticError, InvalidOperation):
-                width = None
-            if width is not None and width.is_finite() and width > 0:
-                return width
+                if isinstance(value, str):
+                    scalar = _uncertainty_scalar_from_text(value)
+                    if scalar is not None:
+                        unit = "%" if re.search(r"%|percent", value, re.IGNORECASE) else None
+                        return scalar, unit
+            else:
+                return value, None
+    for key, value in mapping.items():
+        name = str(key).casefold()
+        if name in {"range", "bounds", "interval", "limits"} and isinstance(value, (tuple, list)) and len(value) == 2:
+            return value, "range"
+        if isinstance(value, Mapping):
+            nested, unit = _mapping_uncertainty_value(value)
+            if nested is not None:
+                return nested, unit or ("dex" if "dex" in name else None)
+        if isinstance(value, (tuple, list)) and len(value) == 2:
+            try:
+                as_decimal(value[0]); as_decimal(value[1])
+            except (TypeError, ValueError, ArithmeticError, InvalidOperation):
+                continue
+            return value, "range"
+        if any(token in name for token in ("uncert", "error", "sigma", "std", "dex", "width", "range")):
+            try:
+                as_decimal(value)
+            except (TypeError, ValueError, ArithmeticError, InvalidOperation):
+                if isinstance(value, str):
+                    scalar = _uncertainty_scalar_from_text(value)
+                    if scalar is not None:
+                        unit = "%" if re.search(r"%|percent", value, re.IGNORECASE) else None
+                        return scalar, "dex" if "dex" in name else unit
+                continue
+            return value, "dex" if "dex" in name else None
+    return None, None
 
-    verbatim = uncertainty.verbatim
-    if isinstance(verbatim, Mapping):
-        return _dex_width_from_mapping(verbatim)
+
+def _mapping_uncertainty_unit(mapping: Mapping[str, object]) -> str | None:
+    for key, value in mapping.items():
+        if str(key).casefold() in {"unit", "units", "basis_unit"} and isinstance(value, str):
+            return value
     return None
 
 
-def _dex_width_from_mapping(mapping: Mapping[str, object]) -> Decimal | None:
-    keys = (
-        "dex",
-        "sigma_log10P_dex_per_point",
-        "sigma_log10p_dex_per_point",
-        "log10_p_atm_absolute_uncertainty_dex",
+def _uncertainty_scalar_from_text(raw: str) -> str | None:
+    # Prefer the number attached to ±. Otherwise remove numeric kind labels
+    # (1-sigma, 2-sigma, 95% CI) before selecting the printed width.
+    match = re.search(rf"(?:±|\+/-)\s*({_UNCERTAINTY_NUMBER})", raw)
+    if match is not None:
+        return match.group(1)
+    match = re.search(
+        rf"(?:standard\s+error|standard\s+deviation|\bsigma\b|\berror\b|\buncertainty\b)\s*[:=]?\s*({_UNCERTAINTY_NUMBER})",
+        raw,
+        re.IGNORECASE,
     )
-    lower = {str(key).casefold(): value for key, value in mapping.items()}
-    for key in keys:
-        if key.casefold() not in lower:
-            continue
+    if match is not None:
+        return match.group(1)
+    without_kind = re.sub(
+        r"\b95\s*%\s*(?:ci|confidence interval)\b", " ", raw,
+        flags=re.IGNORECASE,
+    )
+    without_kind = re.sub(
+        r"\b95\s*(?:ci|confidence interval)\b|\b[12]\s*-?\s*(?:sigma|σ)\b",
+        " ",
+        without_kind,
+        flags=re.IGNORECASE,
+    )
+    match = _UNCERTAINTY_SCALAR_RE.search(without_kind)
+    return None if match is None else match.group(0)
+
+
+def _printed_uncertainty_source(
+    uncertainty: Uncertainty,
+) -> tuple[Decimal | tuple[Decimal, Decimal] | None, str, str | None]:
+    raw = uncertainty.verbatim
+    basis = uncertainty.basis or ""
+    unit = (
+        "dex" if "dex" in basis.casefold()
+        else "fraction" if basis.casefold() in {"relative", "fraction"}
+        else None
+    )
+    value: object | None = uncertainty.value
+    shape = "scalar"
+    if isinstance(value, tuple):
+        shape = "range"
+    if value is None and isinstance(raw, Mapping):
+        value, mapped_unit = _mapping_uncertainty_value(raw)
+        if mapped_unit == "range":
+            shape = "range"
+        elif mapped_unit is not None:
+            unit = unit or mapped_unit
+        unit = unit or _mapping_uncertainty_unit(raw)
+    elif value is None and isinstance(raw, str):
+        match = _UNCERTAINTY_RANGE_RE.search(raw) or _UNCERTAINTY_PAIR_RE.search(raw)
+        if match is not None:
+            value = (match.group(1), match.group(2))
+            shape = "range"
+        else:
+            value = _uncertainty_scalar_from_text(raw)
+    if isinstance(raw, Mapping):
+        unit = unit or _mapping_uncertainty_unit(raw)
+    if unit is None and isinstance(raw, str):
+        raw_values = value if isinstance(value, (tuple, list)) else (value,)
+        reported: set[Decimal] = set()
+        for part in raw_values:
+            if part is None:
+                continue
+            try:
+                reported.add(as_decimal(part))
+            except (TypeError, ValueError, ArithmeticError, InvalidOperation):
+                continue
+        for match in re.finditer(
+            rf"({_UNCERTAINTY_NUMBER})\s*(?:%|percent)(?![A-Za-z])", raw,
+            re.IGNORECASE,
+        ):
+            try:
+                percent_value = as_decimal(match.group(1))
+            except (TypeError, ValueError, ArithmeticError, InvalidOperation):
+                continue
+            if percent_value in reported:
+                unit = "%"
+                break
+    if value is None:
+        return None, shape, unit
+    try:
+        if isinstance(value, (tuple, list)) and len(value) == 2:
+            lower, upper = as_decimal(value[0]), as_decimal(value[1])
+            if not lower.is_finite() or not upper.is_finite() or upper < lower:
+                return None, "range", unit
+            return (lower, upper), "range", unit
+        parsed = abs(as_decimal(value))
+    except (TypeError, ValueError, ArithmeticError, InvalidOperation):
+        return None, shape, unit
+    if not parsed.is_finite():
+        return None, shape, unit
+    return parsed, shape, unit
+
+
+def _uncertainty_unit(
+    quantity: Quantity,
+    uncertainty: Uncertainty,
+    observation: Observation | None,
+    mapped_unit: str | None,
+    source_value: Decimal | tuple[Decimal, Decimal],
+    raw_text: str,
+) -> str:
+    if mapped_unit:
+        return mapped_unit
+    basis = uncertainty.basis or ""
+    if basis:
+        basis = basis.replace("_", " ")
+        unit_basis = re.sub(
+            r"\b(?:95\s*%?\s*(?:ci|confidence interval)|[12]\s*-?\s*sigma|standard error|standard deviation|range|limits?|maximum error|maximum deviation)\b",
+            " ",
+            basis,
+            flags=re.IGNORECASE,
+        ).strip(" ,;()")
+        if unit_basis and unit_basis.casefold() not in {"relative", "fraction"}:
+            return unit_basis
+        if basis.casefold() in {"relative", "fraction"}:
+            return basis
+    source_values = (
+        set(source_value)
+        if isinstance(source_value, tuple)
+        else {source_value}
+    )
+    if isinstance(source_value, tuple):
+        range_match = _UNCERTAINTY_RANGE_RE.search(raw_text) or _UNCERTAINTY_PAIR_RE.search(raw_text)
+        if range_match is not None:
+            unit = raw_text[range_match.end() :].strip().strip(" ,;[]()")
+            unit = re.sub(
+                r"\s*\(?\s*(?:95\s*%?\s*(?:ci|confidence interval)|[12]\s*-?\s*(?:sigma|σ)|range|limits?|maximum error|maximum deviation)\s*\)?\s*$",
+                "",
+                unit,
+                flags=re.IGNORECASE,
+            ).strip()
+            if unit and re.search(r"[A-Za-z°µμ%]", unit):
+                return unit
+    suffix_re = re.compile(r"(" + _UNCERTAINTY_NUMBER + r")\s*([^\d\s].*)$")
+    for suffix in reversed(tuple(suffix_re.finditer(raw_text))):
         try:
-            width = abs(as_decimal(lower[key.casefold()]))
+            suffix_value = abs(as_decimal(suffix.group(1)))
         except (TypeError, ValueError, ArithmeticError, InvalidOperation):
             continue
-        if width.is_finite() and width > 0:
-            return width
-    nested = mapping.get("figure_reading_estimate")
-    if isinstance(nested, Mapping):
-        return _dex_width_from_mapping(nested)
+        if suffix_value not in source_values:
+            continue
+        unit = suffix.group(2).strip().strip(" ,;[]()")
+        unit = re.sub(
+            r"\s*\(?\s*(?:95\s*%?\s*(?:ci|confidence interval)|[12]\s*-?\s*(?:sigma|σ)|range|limits?|maximum error|maximum deviation)\s*\)?\s*$",
+            "",
+            unit,
+            flags=re.IGNORECASE,
+        ).strip()
+        if unit and re.search(r"[A-Za-z°µμ%]", unit):
+            return unit
+    if observation is not None:
+        locator = observation.locator
+        note = None if locator is None else locator.note
+        unit_match = None if note is None else re.search(r"\bunit=['\"]([^'\"]+)['\"]", note)
+        if unit_match is not None:
+            return unit_match.group(1)
+        if observation.derivation is not None:
+            return observation.derivation.output_unit
+    return QUANTITY_UNITS[quantity]
+
+
+def _convert_uncertainty_width(
+    quantity: Quantity,
+    width: Decimal,
+    source_unit: str,
+) -> tuple[Decimal | None, str | None]:
+    unit = re.sub(r"\s+", "", source_unit).casefold()
+    expected = QUANTITY_UNITS[quantity]
+    if unit in {expected.casefold(), "1", "fraction", "relative"}:
+        return width, "fraction" if unit in {"fraction", "relative"} else expected
+    if unit in {"%", "percent", "percentage"}:
+        return width / Decimal(100), "fraction"
+    if unit == "dex":
+        return width, "dex"
+    if quantity in {Quantity.P_SAT, Quantity.P_PARTIAL, Quantity.P_REFERENCE, Quantity.FUGACITY}:
+        converted, _ = convert_pressure_to_pa(width, source_unit)
+        return converted, expected
+    if quantity is Quantity.TRANSITION_TEMPERATURE and unit in {"c", "°c", "degc", "kelvin", "k"}:
+        return width, expected  # temperature increments have the same K and °C size
+    if quantity is Quantity.MASS_LOSS_AREAL_DENSITY:
+        converted, _ = convert_areal_mass_to_kg_per_m2(width, source_unit)
+        return converted, expected
+    if quantity in {
+        Quantity.DELTA_FG, Quantity.DELTA_FH, Quantity.H_MINUS_H298,
+        Quantity.CP, Quantity.S,
+    }:
+        converted = _convert_compilation_amount(width, quantity, source_unit)
+        return (None, expected) if converted is None else (converted[0], expected)
+    return None, expected
+
+
+def _metric_uncertainty_width(
+    operation: MetricOperation,
+    quantity: Quantity,
+    reference: Decimal,
+    amount: Decimal,
+    amount_unit: str,
+) -> Decimal | None:
+    if amount_unit == "dex":
+        return amount if operation is MetricOperation.DEX else None
+    if amount_unit == "fraction":
+        if operation is MetricOperation.ABSOLUTE:
+            amount = abs(reference) * amount
+    if operation is MetricOperation.ABSOLUTE:
+        return abs(amount)
+    if amount_unit == "fraction":
+        fraction = abs(amount)
+    else:
+        if reference == 0:
+            return None
+        fraction = abs(amount) / abs(reference)
+    if operation is MetricOperation.RELATIVE:
+        return fraction
+    if operation is MetricOperation.DEX:
+        if fraction >= 1:
+            return None
+        ln10 = Decimal(10).ln()
+        return max(
+            abs((Decimal(1) + fraction).ln() / ln10),
+            abs((Decimal(1) - fraction).ln() / ln10),
+        )
     return None
 
 
@@ -2294,132 +2319,340 @@ def _printed_uncertainty_band(
     reference: Decimal,
     *,
     source_observation: Observation | None = None,
-) -> DecisionBand | None:
-    """Convert a printed cell uncertainty to the scorer's metric unit.
-
-    Accepts scalar PRINTED strings (``±30%``) and the mapped reading forms
-    extracts actually store (``dex`` / ``sigma_log10P_dex_per_point`` / nested
-    figure-reading dex), plus typed dex value+basis.
-    """
-
+) -> _PrintedBandResolution:
     if uncertainty is None or uncertainty.kind is not UncertaintyKind.PRINTED:
-        return None
-    # The band must be in the residual's own metric: the same identity-aware
-    # selector populate_numeric uses (residue element ppm is DEX, oxide wt%
-    # ABSOLUTE), not the quantity default (b-693/b-691 r2 finding 4).
+        return _PrintedBandResolution()
+    if not _uncertainty_scope_covers_cell(uncertainty, source_observation):
+        return _PrintedBandResolution()
+    raw_text = _uncertainty_original(uncertainty)
+    source_value, shape, mapped_unit = _printed_uncertainty_source(uncertainty)
+    if source_value is None:
+        return _PrintedBandResolution(
+            refusal={
+                "reason": "unparseable_printed_uncertainty",
+                "quantity": quantity.value,
+                "original": raw_text,
+            }
+        )
     operation = _residual_metric_operation(quantity, source_observation)
-    mapped = _mapped_reading_uncertainty_dex(uncertainty)
-    if mapped is not None:
-        if operation is MetricOperation.DEX:
-            return DecisionBand(
-                mapped, "dimensionless", "source-printed per-cell uncertainty"
-            )
-        # Mapped dex widths are already in log10 space; only attach on DEX rails.
-        return None
-    if not isinstance(uncertainty.verbatim, str):
-        return None
-    match = re.fullmatch(
-        r"\s*(?:(?:±|\+/-)\s*)?\(?([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)\)?\s*(%)?\s*",
-        uncertainty.verbatim,
-    )
-    if match is None:
-        return None
-    try:
-        width = abs(Decimal(match.group(1)))
-    except InvalidOperation:
-        return None
-    if not width.is_finite():
-        return None
-
     if operation is None:
-        return None
-    percent = match.group(2) is not None
-    if operation is MetricOperation.RELATIVE:
-        if percent:
-            width /= Decimal(100)
-        elif reference != 0:
-            width /= abs(reference)
-        else:
-            return None
-        unit = "dimensionless"
-    elif operation is MetricOperation.DEX:
-        if reference <= 0:
-            return None
-        fraction = width / Decimal(100) if percent else width / reference
-        if fraction >= 1:
-            return None
-        ln10 = Decimal(10).ln()
-        width = max(
-            abs((Decimal(1) + fraction).ln() / ln10),
-            abs((Decimal(1) - fraction).ln() / ln10),
+        return _PrintedBandResolution(
+            refusal={"reason": "uncertainty_metric_missing", "original": raw_text}
         )
-        unit = "dimensionless"
-    else:
-        if percent:
-            return None
-        if source_observation is None:
-            return None
-        locator = source_observation.locator
-        derivation = source_observation.derivation
-        source_unit_match = (
-            re.search(r"\bunit='([^']+)'", locator.note)
-            if locator is not None and locator.note is not None
-            else None
-        )
-        if (
-            source_unit_match is None
-            or derivation is None
-            or derivation.output_unit != QUANTITY_UNITS[quantity]
-        ):
-            return None
-        source_unit = source_unit_match.group(1)
-        if quantity in {Quantity.DELTA_FG, Quantity.H_MINUS_H298}:
-            source_scale = {
-                "J/mol": Decimal("0.001"),
-                "kJ/mol": Decimal(1),
-                "kJ/mol at 298.15 K": Decimal(1),
-                "kcal gfw^-1": Decimal("4.184"),
-            }.get(source_unit)
-        elif quantity in {Quantity.CP, Quantity.S}:
-            source_scale = {
-                "J/mol·K": Decimal(1),
-                "cal deg^-1 gfw^-1": Decimal("4.184"),
-            }.get(source_unit)
-        elif quantity in {Quantity.LOG10_KF, Quantity.LOG10_K_STAR}:
-            source_scale = Decimal(1) if source_unit == "dimensionless" else None
-        else:
-            source_scale = None
-        if source_scale is None:
-            return None
-        width *= source_scale
-        unit = QUANTITY_UNITS[quantity]
-    return DecisionBand(width, unit, "source-printed per-cell uncertainty")
-
-
-def _residual_distribution_band(
-    values: Sequence[Decimal], *, unit: str, family: str, quantity: Quantity
-) -> DecisionBand | None:
-    """Twice the median absolute deviation for one family and quantity.
-
-    Center at the sample median, then estimate MAD as the sample median of
-    absolute deviations from that center (no normal-consistency multiplier).
-    The band's width is twice that estimator; membership is tested against
-    zero using ``abs(residual) <= width``.
-    """
-
-    if len(values) < MIN_DERIVED_BAND_N:
-        return None
-    center = _median(values)
-    if center is None:
-        return None
-    mad = _median([abs(value - center) for value in values])
-    if mad is None:
-        return None
-    return DecisionBand(
-        Decimal(2) * mad,
-        unit,
-        f"{family}/{quantity.value} residual distribution: 2x median absolute deviation; derived_n={len(values)}",
+    source_unit = _uncertainty_unit(
+        quantity, uncertainty, source_observation, mapped_unit, source_value, raw_text
     )
+    kind = "printed_range" if shape == "range" else _uncertainty_kind(uncertainty, raw_text)
+    if isinstance(source_value, tuple):
+        lower, upper = source_value
+        width = (upper - lower) / Decimal(2)
+    else:
+        width = source_value
+    converted, converted_unit = _convert_uncertainty_width(
+        quantity, width, source_unit
+    )
+    if converted is None:
+        return _PrintedBandResolution(
+            refusal={
+                "reason": "printed_uncertainty_unit_unmapped",
+                "quantity": quantity.value,
+                "source_unit": source_unit,
+                "original": raw_text,
+            }
+        )
+    ticket = _metric_uncertainty_width(
+        operation,
+        quantity,
+        reference,
+        converted,
+        converted_unit or QUANTITY_UNITS[quantity],
+    )
+    if ticket is None or ticket < 0 or not ticket.is_finite():
+        return _PrintedBandResolution(
+            refusal={
+                "reason": "printed_uncertainty_outside_metric_domain",
+                "quantity": quantity.value,
+                "original": raw_text,
+            }
+        )
+    if shape == "range" or kind == "printed_range":
+        kind = "printed_range"
+    elif kind in {"printed_1sigma", "printed_unstated"}:
+        ticket *= NORMAL_95_TICKET_MULTIPLIER
+    unit = "dimensionless" if operation in {MetricOperation.RELATIVE, MetricOperation.DEX} else QUANTITY_UNITS[quantity]
+    rule = f"{kind}: source-printed uncertainty; original={raw_text}"
+    notice = None
+    if kind == "printed_unstated":
+        notice = Notice(
+            kind=NoticeKind.INPUT_OMITTED,
+            affected_quantities=(quantity,),
+            reason="uncertainty_kind_unstated",
+            origin="decision-band",
+            band=raw_text,
+        )
+    return _PrintedBandResolution(DecisionBand(ticket, unit, rule), notice=notice)
+
+
+def _axis_alignment_value(identity: Identity, name: str, profile: object) -> object | None:
+    state = getattr(identity, name)
+    required = name in profile.required
+    permitted_na = name in profile.permitted_not_applicable
+    if state is None:
+        return {"state": "not_applicable"} if not required else None
+    if state.is_value:
+        if not required and not permitted_na:
+            return None
+        return to_plain(state.value)
+    if state.is_not_applicable and permitted_na and not required:
+        return {"state": "not_applicable"}
+    return None
+
+
+def _source_alignment_group_key(
+    observation: Observation,
+    *,
+    tier: str,
+) -> dict[str, object] | None:
+    identity = observation.identity
+    if not isinstance(identity, Identity):
+        return None
+    quantity = quantity_token(identity)
+    if quantity is None:
+        return None
+    phase = phase_token(identity.species)
+    charge = identity.species.charge
+    if phase is None or not isinstance(charge, State) or not charge.is_value:
+        return None
+    polymorph = polymorph_token(identity.species)
+    if phase is Phase.CR and polymorph is None:
+        return None
+    unit = QUANTITY_UNITS.get(quantity)
+    if not unit or (
+        observation.derivation is not None
+        and observation.derivation.output_unit != unit
+    ):
+        return None
+    profile = profile_for(identity)
+    axes: dict[str, object] = {}
+    for name in _ALIGNMENT_AXES:
+        value = _axis_alignment_value(identity, name, profile)
+        if value is None:
+            return None
+        axes[name] = value
+    if isinstance(identity.temperature_K, State) and identity.temperature_K.is_value:
+        aligned_temperature = to_plain(identity.temperature_K.value)
+    else:
+        aligned_temperature = None
+    return {
+        "comparison_set": tier,
+        "formula": identity.species.formula,
+        "charge": str(charge.value),
+        "phase": phase.value,
+        "polymorph": None if polymorph is None else polymorph.value,
+        "quantity": quantity.value,
+        "unit": unit,
+        "axes": axes,
+        "aligned_T_K": aligned_temperature,
+    }
+
+
+def _group_token(group_key: Mapping[str, object]) -> str:
+    return json.dumps(group_key, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+
+
+def _read_decision_band_ratchet(
+    root: Path,
+) -> tuple[dict[str, dict[str, object]], bool, list[dict[str, object]]]:
+    path = root / DECISION_BAND_RATCHET_RELATIVE_PATH
+    if not path.is_file():
+        return {}, True, []
+    payload = load_yaml(path)
+    if not isinstance(payload, Mapping) or not isinstance(payload.get("groups", []), list):
+        raise ValueError(f"invalid decision-band ratchet: {path}")
+    raw_history = payload.get("history", [])
+    if not isinstance(raw_history, list) or any(
+        not isinstance(row, Mapping) for row in raw_history
+    ):
+        raise ValueError(f"invalid decision-band ratchet history: {path}")
+    history = [dict(row) for row in raw_history]
+    if payload.get("policy_version") != DECISION_BAND_POLICY_VERSION:
+        return {}, False, history
+    entries: dict[str, dict[str, object]] = {}
+    for raw in payload.get("groups", []):
+        if not isinstance(raw, Mapping) or raw.get("policy_version") != DECISION_BAND_POLICY_VERSION:
+            continue
+        group_key = raw.get("group_key")
+        if not isinstance(group_key, Mapping):
+            continue
+        try:
+            line = as_decimal(raw.get("ticket_line"))
+        except (TypeError, ValueError, ArithmeticError, InvalidOperation):
+            continue
+        if line.is_finite() and line > 0:
+            entries[_group_token(group_key)] = dict(raw)
+    return entries, False, history
+
+
+def _source_band_catalog(
+    context: ScoreContext,
+    ratchet_entries: Mapping[str, Mapping[str, object]],
+) -> tuple[dict[str, DecisionBand], list[dict[str, object]], dict[str, str]]:
+    from simulator.battery.compilation_tier import (
+        _iter_compilation_series_cells,
+        is_compilation_evidence,
+    )
+
+    comparison_ids = {row.observation_id for row in comparison_candidates(context)}
+    sources: dict[str, dict[str, dict[str, object]]] = defaultdict(dict)
+    identities: dict[str, Identity] = {}
+    group_keys: dict[str, dict[str, object]] = {}
+    for parent in context.observations.values():
+        origin = context.origins.get(parent.observation_id)
+        if is_internal_consistency(origin) or is_sf04_workbook(parent):
+            continue
+        compilation = is_compilation_evidence(parent) or is_compilation_source(parent.source_id, origin)
+        if compilation:
+            tier = "compilation"
+        elif parent.observation_id in comparison_ids:
+            tier = "empirical"
+        else:
+            continue
+        if not parent.source_id:
+            continue
+        for cell in _iter_compilation_series_cells(parent, origin):
+            if not isinstance(cell.identity, Identity):
+                continue
+            quantity = quantity_token(cell.identity)
+            if quantity is None:
+                continue
+            magnitude = point_magnitude(cell.value)
+            if magnitude is None or not magnitude.is_finite():
+                continue
+            key_doc = _source_alignment_group_key(cell, tier=tier)
+            if key_doc is None:
+                continue
+            key = _group_token(key_doc)
+            group_keys[key] = key_doc
+            identities[key] = cell.identity
+            source = sources[key].setdefault(
+                parent.source_id,
+                {"values": set()},
+            )
+            source["values"].add(magnitude)
+
+    bands: dict[str, DecisionBand] = {}
+    records: list[dict[str, object]] = []
+    no_band_reasons: dict[str, str] = {}
+    for key, by_source in sources.items():
+        if len(by_source) < 2 or any(len(row["values"]) != 1 for row in by_source.values()):
+            continue
+        source_ids = sorted(by_source)
+        source_values = [next(iter(by_source[source]["values"])) for source in source_ids]
+        center = _median(source_values)
+        identity = identities[key]
+        quantity = quantity_token(identity)
+        if center is None or quantity is None:
+            continue
+        operation = _residual_metric_operation(quantity, identity)
+        if operation is None:
+            continue
+        deviations = [compute_metric(operation, value, center) for value in source_values]
+        if any(value is None for value in deviations):
+            continue
+        mad = _median([abs(value) for value in deviations if value is not None])
+        if mad is None:
+            continue
+        if mad == 0:
+            no_band_reasons[key] = "zero_scatter_aligned_group"
+            continue
+        sigma = MAD_NORMAL_SCALE * mad
+        unit = "dimensionless" if operation in {MetricOperation.RELATIVE, MetricOperation.DEX} else QUANTITY_UNITS[quantity]
+        ticket = NORMAL_95_TICKET_MULTIPLIER * sigma
+        if not ticket.is_finite() or ticket <= 0:
+            continue
+        old = ratchet_entries.get(key)
+        old_line = None
+        if old is not None and old.get("unit") == unit:
+            try:
+                old_line = as_decimal(old.get("ticket_line"))
+            except (TypeError, ValueError, ArithmeticError, InvalidOperation):
+                old_line = None
+        effective = min(ticket, old_line) if old_line is not None and old_line > 0 else ticket
+        action = (
+            "new"
+            if old_line is None or old_line <= 0
+            else "down"
+            if ticket < old_line
+            else "held"
+        )
+        rule = (
+            f"derived_scatter: source-only sigma=1.482602218505602×MAD; n_sources={len(source_ids)}; "
+            f"mad={mad}; sigma={sigma}; percentile={DECISION_BAND_PERCENTILE}; "
+            f"ticket_line={effective}; ratchet_action={action}"
+        )
+        bands[key] = DecisionBand(effective, unit, rule)
+        records.append({
+            "group_key": group_keys[key],
+            "policy_version": DECISION_BAND_POLICY_VERSION,
+            "ticket_line": str(effective),
+            "old_line": None if old_line is None else str(old_line),
+            "new_line": str(ticket),
+            "effective_line": str(effective),
+            "ratchet_action": action,
+            "unit": unit,
+            "band_kind": "derived_scatter",
+            "sigma": str(sigma),
+            "mad": str(mad),
+            "n_sources": len(source_ids),
+            "source_ids": source_ids,
+            "aligned_T_K": group_keys[key]["aligned_T_K"],
+            "percentile": DECISION_BAND_PERCENTILE,
+        })
+    records.sort(key=lambda row: _group_token(row["group_key"]))
+    return bands, records, no_band_reasons
+
+
+def update_decision_band_ratchet(context: ScoreContext) -> int:
+    """Explicitly accept current source-derived minima into the YAML ratchet."""
+    existing, _missing, history = _read_decision_band_ratchet(context.root)
+    _bands, current, no_band_reasons = _source_band_catalog(context, existing)
+    merged = dict(existing)
+    for key, reason in no_band_reasons.items():
+        if reason == "zero_scatter_aligned_group":
+            merged.pop(key, None)
+    for row in current:
+        key = _group_token(row["group_key"])
+        merged[key] = row
+        history.append({
+            "group_key": row["group_key"],
+            "policy_version": row["policy_version"],
+            "old_line": row["old_line"],
+            "new_line": row["new_line"],
+            "effective_line": row["effective_line"],
+            "action": row["ratchet_action"],
+        })
+    # Preserve accepted groups that temporarily have no current aligned source;
+    # a later reappearance of the same exact group remains ratchet-down-only.
+    ordered = [merged[key] for key in sorted(merged)]
+    path = context.root / DECISION_BAND_RATCHET_RELATIVE_PATH
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(path.name + ".partial")
+    temporary.write_text(
+        yaml.safe_dump(
+            {
+                "policy_version": DECISION_BAND_POLICY_VERSION,
+                "percentile": DECISION_BAND_PERCENTILE,
+                "groups": ordered,
+                "history": history,
+            },
+            sort_keys=False,
+            allow_unicode=True,
+            width=120,
+        ),
+        encoding="utf-8",
+    )
+    os.replace(temporary, path)
+    return len(current)
 
 
 def populate_numeric(
@@ -2433,6 +2666,8 @@ def populate_numeric(
     method: MethodToken | None = None,
     observations: Mapping[str, Observation] | None = None,
     experiments: Mapping[str, Experiment] | None = None,
+    printed_band: DecisionBand | None = None,
+    printed_refusal: Mapping[str, object] | None = None,
     derived_band: DecisionBand | None = None,
     operation_override: MetricOperation | None = None,
     band_operation: MetricOperation | None = None,
@@ -2454,26 +2689,14 @@ def populate_numeric(
             "candidate": str(candidate),
             "reference": str(reference),
         }
-    if (
-        rail is None
-        and method is None
-        and observations is None
-        and experiments is None
-    ):
-        # Keep the narrow two-argument call for existing focused callers that
-        # replace the band resolver while testing the dimension guard.
-        band = decision_band_for(quantity, source_relation)
-    else:
-        band = decision_band_for(
-            quantity,
-            source_relation,
-            rail=rail,
-            method=method,
-            observations=observations,
-            experiments=experiments,
-            derived_band=derived_band,
-            operation=band_operation,
-        )
+    band = decision_band_for(
+        quantity,
+        source_relation,
+        printed_band=printed_band,
+        printed_refusal=printed_refusal,
+        derived_band=derived_band,
+        operation=band_operation,
+    )
     # Dimension guard. decision_band_for normally filters mismatched bands;
     # keep this check for callers that replace it in a focused test.
     if band is not None and not band_dimension_matches(
@@ -4761,6 +4984,8 @@ def compile_residual(
     lineage_observation_id: str | None = None,
     table_index: Mapping[tuple[str, Quantity], tuple[Observation, ...]] | None = None,
     derived_band: DecisionBand | None = None,
+    derived_band_reason: str | None = None,
+    ratchet_missing: bool = False,
     point_observations: Sequence[Observation] | None = None,
 ) -> tuple[Residual, Observation | None]:
     _require_score_engine(engine)
@@ -5188,43 +5413,52 @@ def compile_residual(
 
     ref_point = point_magnitude(reference.value)
     assert ref_point is not None
+    printed = _PrintedBandResolution()
     if implied_alpha:
         numeric, metric_reason, metric_detail = _implied_alpha_numeric(prediction.value)
     else:
-        cell_band = derived_band
-        if (
-            cell_band is None
-            and quantity is Quantity.P_PARTIAL
-            and rail is Rail.VAPOUR
-            and experiment is not None
-            and experiment.method.is_value
-            and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
-        ):
-            cell_band = _derive_kems_partial_pressure_band(
-                context.observations, context.experiments, context.benches
-            )
-        if compilation and quantity is not Quantity.P_PARTIAL:
-            cell_band = _printed_uncertainty_band(
-                quantity,
-                reference.uncertainty,
-                ref_point,
-                source_observation=reference,
-            ) or cell_band
         row_operation = _residual_metric_operation(quantity, reference)
-        own_band_operation: MetricOperation | None = None
-        if figure_only:
-            # Figure reading band comes only from this row's stored uncertainty.
-            # Never fall back to the global measured KEMS cell band (that
-            # borrows another source's envelope). Being the row's own band, it
-            # is dimension-checked in the row's identity-aware metric (r2 F4).
-            cell_band = _printed_uncertainty_band(
-                quantity,
-                reference.uncertainty,
-                ref_point,
-                source_observation=reference,
+        printed = _printed_uncertainty_band(
+            quantity,
+            reference.uncertainty,
+            ref_point,
+            source_observation=reference,
+        )
+        if printed.notice is not None:
+            notices = union_notices(notices, (printed.notice,))
+        if (
+            derived_band_reason is not None
+            and printed.band is None
+            and printed.refusal is None
+        ):
+            notices = union_notices(
+                notices,
+                (
+                    Notice(
+                        kind=NoticeKind.FALLBACK,
+                        affected_quantities=(quantity,),
+                        reason=derived_band_reason,
+                        origin="decision-band",
+                    ),
+                ),
             )
-            if cell_band is not None:
-                own_band_operation = row_operation
+        if printed.band is None and printed.refusal is None and derived_band is not None and ratchet_missing:
+            notices = union_notices(
+                notices,
+                (
+                    Notice(
+                        kind=NoticeKind.FALLBACK,
+                        affected_quantities=(quantity,),
+                        reason="decision_band_ratchet_missing_first_run",
+                        origin="decision-band-ratchet",
+                        band=DECISION_BAND_RATCHET_RELATIVE_PATH.as_posix(),
+                    ),
+                ),
+            )
+        printed_applies = (
+            reference.uncertainty.kind is UncertaintyKind.PRINTED
+            and _uncertainty_scope_covers_cell(reference.uncertainty, reference)
+        )
         numeric, metric_reason, metric_detail = populate_numeric(
             quantity=quantity,
             candidate=prediction.value,
@@ -5232,20 +5466,14 @@ def compile_residual(
             source_relation=source_relation,
             metric_uncertainty=(
                 reference.uncertainty
-                if reference.uncertainty.kind is UncertaintyKind.PRINTED
+                if printed_applies
                 else None
             ),
-            rail=rail,
-            method=(
-                experiment.method.value
-                if experiment is not None and experiment.method.is_value
-                else None
-            ),
-            observations=context.observations,
-            experiments=context.experiments,
-            derived_band=cell_band,
+            printed_band=printed.band,
+            printed_refusal=printed.refusal,
+            derived_band=derived_band,
             operation_override=row_operation,
-            band_operation=own_band_operation,
+            band_operation=row_operation,
         )
     if numeric is None:
         return _refused(
@@ -5322,7 +5550,14 @@ def compile_residual(
             candidate=candidate.observation_id,
             candidate_request=None,
             numeric=numeric,
-            refusal=None,
+            refusal=(
+                None
+                if printed.refusal is None
+                else ResidualRefusal(
+                    RefusalReason.DECISION_RULE_MISSING,
+                    dict(printed.refusal),
+                )
+            ),
         ),
         candidate,
     )
@@ -5413,6 +5648,7 @@ def load_score_context(
         extract_review=extract_review,
         hostname=socket.gethostname(),
         benches=benches,
+        root=root,
     )
 
 
@@ -5556,7 +5792,6 @@ def _score_store_with_decisions(
     if limit is not None:
         refs = refs[: int(limit)]
     from simulator.battery.compilation_tier import (
-        compilation_family,
         _compilation_series_point_count,
         _iter_compilation_series_cells,
         is_compilation_evidence,
@@ -5565,7 +5800,6 @@ def _score_store_with_decisions(
     comparison_ids = {o.observation_id for o in comparison_candidates(context)}
     residuals: list[Residual] | None = [] if _stream is None else None
     candidates: dict[str, Observation] = {}
-    compilation_family_by_reference: dict[str, tuple[str, Quantity]] = {}
     # Snapshot. Engine candidates are returned separately and are not
     # lineage inputs. The work-input index is this snapshot.
     observations = dict(context.observations)
@@ -5582,12 +5816,14 @@ def _score_store_with_decisions(
         _compilation_series_point_count(obs, origins.get(obs.observation_id))
         for obs in refs
     ) * max(len(engine_set), 1)
-    family_residuals: dict[tuple[str, Quantity, str, str], list[Decimal]] = {}
     from simulator.battery.validate import bound_work_inputs, build_printed_thermo_index
 
     table_index = build_printed_thermo_index(observations)
-    kems_band = _derive_kems_partial_pressure_band(
-        observations, context.experiments, context.benches
+    ratchet_entries, ratchet_missing, _ratchet_history = _read_decision_band_ratchet(
+        context.root
+    )
+    source_bands, _source_band_records, source_band_reasons = _source_band_catalog(
+        context, ratchet_entries
     )
     residue_prediction_cache: dict[tuple[str, Engine], Mapping[str, object]] = {}
     try:
@@ -5595,7 +5831,6 @@ def _score_store_with_decisions(
             for obs in refs:
                 origin = origins.get(obs.observation_id)
                 for point in _iter_compilation_series_cells(obs, origin):
-                    family_quantity: tuple[str, Quantity] | None = None
                     point_origin = origins.get(point.observation_id, origin or "")
                     diagnostic = (
                         obs.observation_id not in empirical_ids
@@ -5619,13 +5854,28 @@ def _score_store_with_decisions(
                         and not is_internal_consistency(point_origin)
                         and not is_sf04_workbook(point)
                     )
-                    if compilation_thermo and quantity is not None:
-                        family_quantity = (
-                            compilation_family(point.source_id, point_origin),
-                            quantity,
+                    source_tier = (
+                        "compilation"
+                        if is_compilation_evidence(point)
+                        or is_compilation_source(point.source_id, point_origin)
+                        else "empirical"
+                        if obs.observation_id in comparison_ids
+                        else None
+                    )
+                    source_band = None
+                    source_band_reason = None
+                    if (
+                        source_tier is not None
+                        and not is_internal_consistency(point_origin)
+                        and not is_sf04_workbook(point)
+                    ):
+                        group_key = _source_alignment_group_key(
+                            point, tier=source_tier
                         )
-                        if _stream is None:
-                            compilation_family_by_reference[point.observation_id] = family_quantity
+                        if group_key is not None:
+                            source_key = _group_token(group_key)
+                            source_band = source_bands.get(source_key)
+                            source_band_reason = source_band_reasons.get(source_key)
                     for engine in engine_set:
                         prediction = None
                         if (
@@ -5685,7 +5935,9 @@ def _score_store_with_decisions(
                                 else None
                             ),
                             table_index=table_index,
-                            derived_band=kems_band,
+                            derived_band=source_band,
+                            derived_band_reason=source_band_reason,
+                            ratchet_missing=ratchet_missing,
                             point_observations=point_observations_by_experiment.get(
                                 point.experiment_id, ()
                             ),
@@ -5694,12 +5946,7 @@ def _score_store_with_decisions(
                             assert residuals is not None
                             residuals.append(residual)
                         else:
-                            _stream.append(residual, candidate, family_quantity)
-                        family_key = _family_pool_key(residual, family_quantity)
-                        if family_key is not None:
-                            family_residuals.setdefault(family_key, []).append(
-                                residual.numeric.value  # type: ignore[union-attr]
-                            )
+                            _stream.append(residual, candidate)
                         if candidate is not None and _stream is None:
                             candidates[candidate.observation_id] = candidate
                         done += 1
@@ -5745,66 +5992,14 @@ def _score_store_with_decisions(
                         add_note(f"additional engine handle cleanup failure: {error!r}")
                 raise first_error
 
-    family_bands = {
-        key: _residual_distribution_band(
-            values, unit=key[2], family=key[0], quantity=key[1]
-        )
-        for key, values in family_residuals.items()
-    }
-    family_pool_sizes = {
-        key: len(values)
-        for key, values in family_residuals.items()
-        if len(values) < MIN_DERIVED_BAND_N
-    }
-    family_residuals.clear()
     if _stream is not None:
         _stream.finalize(
-            family_pool_sizes=family_pool_sizes,
-            family_bands=family_bands,
             context=context,
             engines=engine_set,
         )
         return (), {}, []
 
     assert residuals is not None
-    banded_residuals: list[Residual] = []
-    for residual in residuals:
-        family_quantity = compilation_family_by_reference.get(residual.reference)
-        numeric = residual.numeric
-        apply, band, no_band = _family_band_update(
-            numeric=numeric,
-            status=residual.status,
-            key=residual.key,
-            source_relation=residual.source_relation,
-            family_quantity=family_quantity,
-            flagged=_has_flagged_decision_notice(residual),
-            family_pool_sizes=family_pool_sizes,
-            family_bands=family_bands,
-        )
-        if not apply:
-            banded_residuals.append(residual)
-            continue
-        assert numeric is not None
-        if no_band:
-            updated_numeric = replace(numeric, decision_band=None)
-            banded_residuals.append(
-                replace(
-                    residual,
-                    numeric=updated_numeric,
-                    status=ResidualStatus.NO_BAND,
-                )
-            )
-            continue
-        assert band is not None
-        updated_numeric = replace(numeric, decision_band=band)
-        banded_residuals.append(
-            replace(
-                residual,
-                numeric=updated_numeric,
-                status=match_status(updated_numeric),
-            )
-        )
-    residuals = banded_residuals
     residuals.sort(
         key=lambda r: (
             "" if r.rail is None else r.rail.value,
@@ -6148,7 +6343,7 @@ def _median(values: Sequence[Decimal]) -> Decimal | None:
 def _bias_to_scatter_ratio(
     signed_median: Decimal | None, mad: Decimal | None, n: int
 ) -> Decimal | None:
-    if signed_median is None or mad is None or mad == 0 or n < MIN_DERIVED_BAND_N:
+    if signed_median is None or mad is None or mad == 0 or n < MIN_RESIDUAL_SUMMARY_N:
         return None
     return abs(signed_median) / mad
 
@@ -6241,7 +6436,6 @@ def _compilation_decision_strata(
     )
 
     strata: dict[tuple[str, str, str, str], list[Residual]] = defaultdict(list)
-    derived_n: dict[tuple[str, str, str], int] = defaultdict(int)
     for residual in residuals:
         if residual.numeric is None or residual.status is ResidualStatus.REFUSED or any(
             _is_flagged_stratum_notice(notice)
@@ -6263,17 +6457,6 @@ def _compilation_decision_strata(
         )
         engine = _engine_of(residual)
         key = (family, quantity.value, engine)
-        band = None if residual.numeric is None else residual.numeric.decision_band
-        if (
-            residual.numeric is not None
-            and band is None
-            and not any(
-                _is_flagged_stratum_notice(notice)
-                or _is_fusion_conversion_notice(notice)
-                for notice in residual.notices
-            )
-        ):
-            derived_n[key] += 1
         strata[(*key, residual.source_relation.value)].append(residual)
 
     rendered = []
@@ -6282,28 +6465,13 @@ def _compilation_decision_strata(
         center = _median(values)
         mad = None if center is None else _median([abs(value - center) for value in values])
         bands = [r.numeric.decision_band for r in bucket if r.numeric is not None and r.numeric.decision_band is not None]
-        kinds = sorted({
-            "printed" if band.rule == "source-printed per-cell uncertainty"
-            else "derived_2xMAD" if "residual distribution" in band.rule
-            else "legacy_fallback"
-            for band in bands
-        }) or ["no_band"]
+        kinds = sorted({_decision_band_kind(band) for band in bands}) or ["no_band"]
         widths = sorted({str(band.value) for band in bands})
         units = sorted({band.unit for band in bands})
         band_n = sorted({
-            int(band.rule.rsplit("derived_n=", 1)[1])
-            for band in bands if "derived_n=" in band.rule
+            int(band.rule.rsplit("n_sources=", 1)[1].split(";", 1)[0])
+            for band in bands if "n_sources=" in band.rule
         })
-        if not band_n and not bands and derived_n[(family, quantity, engine)] > 0:
-            band_n = [derived_n[(family, quantity, engine)]]
-        derived_rows = [
-            r for r in bucket
-            if r.numeric is not None
-            and r.numeric.decision_band is not None
-            and "residual distribution" in r.numeric.decision_band.rule
-        ]
-        tail_in = sum(1 for r in derived_rows if r.status is ResidualStatus.MATCH) if "derived_2xMAD" in kinds else None
-        tail_out = sum(1 for r in derived_rows if r.status is ResidualStatus.MISMATCH) if "derived_2xMAD" in kinds else None
         rendered.append({
             "family": family,
             "quantity": quantity,
@@ -6318,16 +6486,16 @@ def _compilation_decision_strata(
                 else str(ratio)
             ),
             "max_abs_residual": None if not values else str(max(abs(value) for value in values)),
-            "band_value": widths[0] if len(widths) == 1 else widths,
+            "band_value": widths[0] if len(widths) == 1 else widths or None,
             "unit": units[0] if len(units) == 1 else units or QUANTITY_UNITS[Quantity(quantity)],
             "band_kind": kinds[0] if len(kinds) == 1 else kinds,
-            "band_derived_n": band_n[0] if len(band_n) == 1 else band_n,
+            "band_derived_n": band_n[0] if len(band_n) == 1 else band_n or None,
             "match_count": sum(1 for r in bucket if r.status is ResidualStatus.MATCH),
             "mismatch_count": sum(1 for r in bucket if r.status is ResidualStatus.MISMATCH),
             "no_band_count": sum(1 for r in bucket if r.status is ResidualStatus.NO_BAND),
-            "tail_in_count": tail_in,
-            "tail_out_count": tail_out,
-            "no_band_reason": "derived_band_insufficient_n" if not bands and 0 < derived_n[(family, quantity, engine)] < MIN_DERIVED_BAND_N else None,
+            "tail_in_count": None,
+            "tail_out_count": None,
+            "no_band_reason": None,
         })
     return rendered
 
@@ -6966,11 +7134,7 @@ def _headline_metric_row(
         "n_inside_band": len(matches),
         "n_match": len(matches),
         "match_rate": match_rate,
-        "match_rate_label": (
-            "band membership; derived_2xMAD means tail membership, not accuracy"
-            if tier == "compilation"
-            else "band membership"
-        ),
+        "match_rate_label": "band membership",
         "rms_dex": None if rms is None else str(rms),
         "median_dex": None if signed_median is None else str(signed_median),
         "median_abs_dex": None if median is None else str(median),
@@ -8124,11 +8288,7 @@ def _headline_payload_record(
             if not stats["n_banded"]
             else int(stats["n_inside_band"]) / int(stats["n_banded"])
         ),
-        "match_rate_label": (
-            "band membership; derived_2xMAD means tail membership, not accuracy"
-            if tier == "compilation"
-            else "band membership"
-        ),
+        "match_rate_label": "band membership",
         "rms_dex": None if rms is None else str(rms),
         "median_dex": None if signed_median is None else str(signed_median),
         "median_abs_dex": None if not dex_values else str(_median_abs(dex_values)),
@@ -8253,66 +8413,6 @@ def _has_flagged_decision_notice(residual: Residual) -> bool:
     )
 
 
-def _family_pool_key(
-    residual: Residual,
-    family_quantity: tuple[str, Quantity] | None,
-) -> tuple[str, Quantity, str, str] | None:
-    numeric = residual.numeric
-    if (
-        numeric is None
-        or residual.status is ResidualStatus.REFUSED
-        or family_quantity is None
-        or (
-            numeric.decision_band is not None
-            and numeric.decision_band.rule == "source-printed per-cell uncertainty"
-        )
-        or _has_flagged_decision_notice(residual)
-    ):
-        return None
-    family, quantity = family_quantity
-    engine = residual.key.rsplit("::", 1)[-1]
-    return (family, quantity, numeric.unit, engine)
-
-
-def _family_band_update(
-    *,
-    numeric: ResidualNumeric | None,
-    status: ResidualStatus,
-    key: str,
-    source_relation: SourceRelation,
-    family_quantity: tuple[str, Quantity] | None,
-    flagged: bool,
-    family_pool_sizes: Mapping[tuple[str, Quantity, str, str], int],
-    family_bands: Mapping[tuple[str, Quantity, str, str], DecisionBand],
-) -> tuple[bool, DecisionBand | None, bool]:
-    if (
-        numeric is None
-        or status is ResidualStatus.REFUSED
-        or family_quantity is None
-        or (
-            numeric.decision_band is not None
-            and numeric.decision_band.rule == "source-printed per-cell uncertainty"
-        )
-        or flagged
-    ):
-        return False, None, False
-    family, quantity = family_quantity
-    engine = key.rsplit("::", 1)[-1]
-    band_key = (family, quantity, numeric.unit, engine)
-    band = family_bands.get(band_key)
-    has_insufficient_pool = (
-        band is None
-        and 0 < family_pool_sizes.get(band_key, 0) < MIN_DERIVED_BAND_N
-    )
-    if band is None and not has_insufficient_pool:
-        band = decision_band_for(quantity, source_relation)
-    if has_insufficient_pool:
-        return True, None, True
-    if band is None or not band_dimension_matches(quantity, band):
-        return False, None, False
-    return True, band, False
-
-
 class _ResidualJsonlStream:
     """Keep the in-flight JSONL on disk and sort rows without retaining them."""
 
@@ -8345,17 +8445,10 @@ class _ResidualJsonlStream:
         self._database.execute(
             "CREATE TABLE residual_order ("
             "seq INTEGER PRIMARY KEY, rail TEXT NOT NULL, reference TEXT NOT NULL, "
-            "key TEXT NOT NULL, offset INTEGER NOT NULL, family TEXT, quantity TEXT, "
-            "engine TEXT NOT NULL, relation TEXT NOT NULL, band_value TEXT, "
-            "band_rule TEXT, status TEXT NOT NULL, flagged INTEGER NOT NULL, "
-            "has_numeric INTEGER NOT NULL, numeric_value TEXT)"
+            "key TEXT NOT NULL, offset INTEGER NOT NULL, band_value TEXT, "
+            "numeric_value TEXT)"
         )
-        self._pending: list[
-            tuple[
-                str, str, str, int, str | None, str | None, str, str,
-                str | None, str | None, str, int, int, str | None
-            ]
-        ] = []
+        self._pending: list[tuple[str, str, str, int, str | None, str | None]] = []
         self.band_values: dict[tuple[str, str, str, str], set[str]] = defaultdict(set)
         self.headline_band_values: dict[tuple[str, str, str], set[str]] = defaultdict(set)
         self.tier_band_values: dict[
@@ -8369,14 +8462,12 @@ class _ResidualJsonlStream:
         self,
         residual: Residual,
         candidate: Observation | None,
-        family_quantity: tuple[str, Quantity] | None,
     ) -> None:
         offset = self.file.tell()
         line = dumps_residual_line(residual, candidate).encode("utf-8")
         self.file.write(line + b"\n")
         numeric = residual.numeric
         decision_band = None if numeric is None else numeric.decision_band
-        flagged = _has_flagged_decision_notice(residual)
         band_value = None if decision_band is None else str(decision_band.value)
         numeric_value = None if numeric is None else str(numeric.value)
         self._pending.append(
@@ -8385,15 +8476,7 @@ class _ResidualJsonlStream:
                 residual.reference,
                 residual.key,
                 offset,
-                None if family_quantity is None else family_quantity[0],
-                None if family_quantity is None else family_quantity[1].value,
-                residual.key.rsplit("::", 1)[-1],
-                residual.source_relation.value,
                 band_value,
-                None if decision_band is None else decision_band.rule,
-                residual.status.value,
-                int(flagged),
-                int(numeric is not None),
                 numeric_value,
             )
         )
@@ -8408,9 +8491,8 @@ class _ResidualJsonlStream:
         if not self._pending:
             return
         self._database.executemany(
-            "INSERT INTO residual_order (rail, reference, key, offset, family, quantity, "
-            "engine, relation, band_value, band_rule, status, flagged, has_numeric, "
-            "numeric_value) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO residual_order (rail, reference, key, offset, band_value, "
+            "numeric_value) VALUES (?, ?, ?, ?, ?, ?)",
             self._pending,
         )
         self._database.commit()
@@ -8423,8 +8505,6 @@ class _ResidualJsonlStream:
     def finalize(
         self,
         *,
-        family_pool_sizes: Mapping[tuple[str, Quantity, str, str], int],
-        family_bands: Mapping[tuple[str, Quantity, str, str], DecisionBand],
         context: ScoreContext,
         engines: Sequence[Engine],
     ) -> None:
@@ -8451,52 +8531,15 @@ class _ResidualJsonlStream:
                 with self.partial_path.open("rb") as source:
                     output.write(source.readline())
                     rows = self._database.execute(
-                        "SELECT offset, reference, family, quantity, engine, relation, "
-                        "band_value, band_rule, status, flagged, has_numeric, "
-                        "numeric_value "
+                        "SELECT offset, band_value, numeric_value "
                         "FROM residual_order "
                         "ORDER BY rail COLLATE BINARY, reference COLLATE BINARY, "
                         "key COLLATE BINARY, seq"
                     )
-                    for (
-                        offset,
-                        reference,
-                        family,
-                        quantity,
-                        engine,
-                        relation,
-                        band_value,
-                        band_rule,
-                        status,
-                        flagged,
-                        has_numeric,
-                        numeric_value,
-                    ) in rows:
+                    for offset, band_value, numeric_value in rows:
                         source.seek(offset)
                         raw_line = source.readline()
-                        can_apply_family_band = (
-                            family is not None
-                            and quantity is not None
-                            and status != ResidualStatus.REFUSED.value
-                            and band_rule != "source-printed per-cell uncertainty"
-                            and not flagged
-                            and has_numeric
-                        )
                         payload = json.loads(raw_line)
-                        applied = False
-                        typed_band_value = None
-                        if can_apply_family_band:
-                            applied, typed_band_value = _apply_family_band_to_payload(
-                                payload,
-                                family_pool_sizes=family_pool_sizes,
-                                family_bands=family_bands,
-                                family_quantity=(
-                                    None
-                                    if family is None or quantity is None
-                                    else (family, Quantity(quantity))
-                                ),
-                            )
-                        band_value = typed_band_value if applied else band_value
                         numeric_payload = payload.get("numeric")
                         report_payload = payload
                         if (
@@ -8515,13 +8558,6 @@ class _ResidualJsonlStream:
                                 typed_value=str(band_value),
                                 row_metadata=row_metadata,
                             )
-                        if applied:
-                            raw_line = json.dumps(
-                                payload,
-                                sort_keys=True,
-                                ensure_ascii=False,
-                                separators=(",", ":"),
-                            ).encode("utf-8") + b"\n"
                         output.write(raw_line)
                 output.flush()
             self.report_aggregate = report_aggregate
@@ -8614,58 +8650,6 @@ class _ResidualJsonlStream:
             self.file.close()
         self._database.close()
         self._temporary.cleanup()
-
-
-def _apply_family_band_to_payload(
-    payload: dict[str, object],
-    *,
-    family_pool_sizes: Mapping[tuple[str, Quantity, str, str], int],
-    family_bands: Mapping[tuple[str, Quantity, str, str], DecisionBand],
-    family_quantity: tuple[str, Quantity] | None,
-) -> tuple[bool, str | None]:
-    numeric_payload = payload.get("numeric")
-    if not isinstance(numeric_payload, dict):
-        return False, None
-    raw_band = numeric_payload.get("decision_band")
-    band = (
-        DecisionBand(
-            as_decimal(raw_band["value"]),
-            str(raw_band["unit"]),
-            str(raw_band["rule"]),
-        )
-        if isinstance(raw_band, Mapping)
-        else None
-    )
-    numeric = ResidualNumeric(
-        operation=MetricOperation(str(numeric_payload["operation"])),
-        unit=str(numeric_payload["unit"]),
-        value=as_decimal(numeric_payload["value"]),
-        decision_band=band,
-    )
-    status = ResidualStatus(str(payload["status"]))
-    source_relation = SourceRelation(str(payload["source_relation"]))
-    apply, updated_band, no_band = _family_band_update(
-        numeric=numeric,
-        status=status,
-        key=str(payload.get("key") or ""),
-        source_relation=source_relation,
-        family_quantity=family_quantity,
-        flagged=bool(_flagged_payload_strata(payload)),
-        family_pool_sizes=family_pool_sizes,
-        family_bands=family_bands,
-    )
-    if not apply:
-        return False, None
-    if no_band:
-        numeric_payload.pop("decision_band", None)
-        payload["status"] = ResidualStatus.NO_BAND.value
-    else:
-        assert updated_band is not None
-        plain_band = to_plain(updated_band)
-        numeric_payload["decision_band"] = plain_band
-        updated_numeric = replace(numeric, decision_band=updated_band)
-        payload["status"] = match_status(updated_numeric).value
-    return True, None if no_band else str(updated_band.value)
 
 
 def flagged_stratum_payloads(
@@ -8762,7 +8746,6 @@ def headline_payload_records(
         )
 
         payload_groups: dict[tuple[str, str, str, str, str], dict[str, object]] = {}
-        derived_ns: dict[tuple[str, str, str], int] = defaultdict(int)
         for row in compilation_rows:
             reference = str(row.get("reference") or "")
             observation = compilation_row_observation(reference, observations, origins)
@@ -8788,8 +8771,6 @@ def headline_payload_records(
             flagged = bool(_flagged_payload_strata(row))
             if flagged:
                 continue
-            if band is None and not flagged:
-                derived_ns[key] += 1
             rail = str(row.get("rail") or "")
             group = payload_groups.setdefault(
                 (*key, relation, rail),
@@ -8802,8 +8783,6 @@ def headline_payload_records(
                     "match_count": 0,
                     "mismatch_count": 0,
                     "no_band_count": 0,
-                    "tail_in_count": 0,
-                    "tail_out_count": 0,
                 },
             )
             value = as_decimal(numeric["value"])
@@ -8817,21 +8796,13 @@ def headline_payload_records(
                 group["no_band_count"] = int(group["no_band_count"]) + 1
             if band is None:
                 continue
-            if band.rule == "source-printed per-cell uncertainty":
-                group["kinds"].add("printed")  # type: ignore[union-attr]
-            elif "residual distribution" in band.rule:
-                group["kinds"].add("derived_2xMAD")  # type: ignore[union-attr]
-                if status == ResidualStatus.MATCH.value:
-                    group["tail_in_count"] = int(group["tail_in_count"]) + 1
-                elif status == ResidualStatus.MISMATCH.value:
-                    group["tail_out_count"] = int(group["tail_out_count"]) + 1
-            else:
-                group["kinds"].add("legacy_fallback")  # type: ignore[union-attr]
+            band_kind = _decision_band_kind(band)
+            group["kinds"].add(band_kind)  # type: ignore[union-attr]
             group["widths"].add(str(band_data["value"]))  # type: ignore[union-attr]
             group["units"].add(band.unit)  # type: ignore[union-attr]
-            if "derived_n=" in band.rule:
+            if "n_sources=" in band.rule:
                 group["band_derived_n"].add(  # type: ignore[union-attr]
-                    int(band.rule.rsplit("derived_n=", 1)[1])
+                    int(band.rule.rsplit("n_sources=", 1)[1].split(";", 1)[0])
                 )
         typed_band_values = getattr(rows, "_typed_family_band_values", {})
         for (family, quantity, engine, relation, _rail), group in payload_groups.items():
@@ -8857,11 +8828,8 @@ def headline_payload_records(
                 mad = None if center is None else _median([abs(value - center) for value in values])
                 kinds = sorted(group["kinds"]) or ["no_band"]
                 derived_n = sorted(group["band_derived_n"])
-                if not derived_n and not group["widths"] and derived_ns[(family, quantity, engine)] > 0:
-                    derived_n = [derived_ns[(family, quantity, engine)]]
                 widths = sorted(group["widths"])
                 units = sorted(group["units"])
-                derived = "derived_2xMAD" in kinds
                 strata.append({
                     "family": family, "quantity": quantity, "engine": engine, "relation": relation,
                     "n": len(values),
@@ -8873,16 +8841,16 @@ def headline_payload_records(
                         else str(ratio)
                     ),
                     "max_abs_residual": None if not values else str(max(abs(value) for value in values)),
-                    "band_value": widths[0] if len(widths) == 1 else widths,
+                    "band_value": widths[0] if len(widths) == 1 else widths or None,
                     "unit": units[0] if len(units) == 1 else units or QUANTITY_UNITS[Quantity(quantity)],
                     "band_kind": kinds[0] if len(kinds) == 1 else kinds,
-                    "band_derived_n": derived_n[0] if len(derived_n) == 1 else derived_n,
+                    "band_derived_n": derived_n[0] if len(derived_n) == 1 else derived_n or None,
                     "match_count": group["match_count"],
                     "mismatch_count": group["mismatch_count"],
                     "no_band_count": group["no_band_count"],
-                    "tail_in_count": group["tail_in_count"] if derived else None,
-                    "tail_out_count": group["tail_out_count"] if derived else None,
-                    "no_band_reason": "derived_band_insufficient_n" if not group["widths"] and 0 < derived_ns[(family, quantity, engine)] < MIN_DERIVED_BAND_N else None,
+                    "tail_in_count": None,
+                    "tail_out_count": None,
+                    "no_band_reason": None,
                 })
             record["decision_strata"] = strata
     return records
@@ -8962,7 +8930,6 @@ class _ScorePayloadAccumulator:
         self.compilation_groups: dict[
             tuple[str, str, str, str, str], dict[str, object]
         ] = {}
-        self.derived_ns: dict[tuple[str, str, str], int] = defaultdict(int)
         self.refusal_counts: dict[str, int] = defaultdict(int)
         self.admission_with = 0
         self.admission_alone = 0
@@ -9073,8 +9040,6 @@ class _ScorePayloadAccumulator:
         if flagged:
             return
         key = (family, quantity.value, engine)
-        if not isinstance(band_data, Mapping):
-            self.derived_ns[key] += 1
         relation = str(row.get("source_relation") or SourceRelation.UNKNOWN.value)
         rail = str(row.get("rail") or "")
         group_key = (*key, relation, rail)
@@ -9089,8 +9054,6 @@ class _ScorePayloadAccumulator:
                 "match_count": 0,
                 "mismatch_count": 0,
                 "no_band_count": 0,
-                "tail_in_count": 0,
-                "tail_out_count": 0,
             },
         )
         value = numeric_value
@@ -9105,21 +9068,15 @@ class _ScorePayloadAccumulator:
             group["no_band_count"] = int(group["no_band_count"]) + 1
         if not isinstance(band_data, Mapping):
             return
-        band_rule = str(band_data["rule"])
-        if band_rule == "source-printed per-cell uncertainty":
-            group["kinds"].add("printed")
-        elif "residual distribution" in band_rule:
-            group["kinds"].add("derived_2xMAD")
-            if status == ResidualStatus.MATCH.value:
-                group["tail_in_count"] = int(group["tail_in_count"]) + 1
-            elif status == ResidualStatus.MISMATCH.value:
-                group["tail_out_count"] = int(group["tail_out_count"]) + 1
-        else:
-            group["kinds"].add("legacy_fallback")
+        band_kind = _decision_band_kind(band_data)
+        band_rule = str(band_data.get("rule") or "")
+        group["kinds"].add(band_kind)
         group["widths"].add(str(band_data["value"]))
         group["units"].add(str(band_data["unit"]))
-        if "derived_n=" in band_rule:
-            group["band_derived_n"].add(int(band_rule.rsplit("derived_n=", 1)[1]))
+        if "n_sources=" in band_rule:
+            group["band_derived_n"].add(
+                int(band_rule.rsplit("n_sources=", 1)[1].split(";", 1)[0])
+            )
 
     def _row_metadata(
         self, row: Mapping[str, object]
@@ -9425,15 +9382,8 @@ class _ScorePayloadAccumulator:
                 )
                 kinds = sorted(group["kinds"]) or ["no_band"]
                 derived_n = sorted(group["band_derived_n"])
-                if (
-                    not derived_n
-                    and not group["widths"]
-                    and self.derived_ns[(family, quantity, engine)] > 0
-                ):
-                    derived_n = [self.derived_ns[(family, quantity, engine)]]
                 widths = sorted(group["widths"])
                 units = sorted(group["units"])
-                derived = "derived_2xMAD" in kinds
                 strata.append(
                     {
                         "family": family,
@@ -9449,21 +9399,16 @@ class _ScorePayloadAccumulator:
                             else str(ratio)
                         ),
                         "max_abs_residual": None if not values else str(max(abs(value) for value in values)),
-                        "band_value": widths[0] if len(widths) == 1 else widths,
+                        "band_value": widths[0] if len(widths) == 1 else widths or None,
                         "unit": units[0] if len(units) == 1 else units or QUANTITY_UNITS[Quantity(quantity)],
                         "band_kind": kinds[0] if len(kinds) == 1 else kinds,
-                        "band_derived_n": derived_n[0] if len(derived_n) == 1 else derived_n,
+                        "band_derived_n": derived_n[0] if len(derived_n) == 1 else derived_n or None,
                         "match_count": group["match_count"],
                         "mismatch_count": group["mismatch_count"],
                         "no_band_count": group["no_band_count"],
-                        "tail_in_count": group["tail_in_count"] if derived else None,
-                        "tail_out_count": group["tail_out_count"] if derived else None,
-                        "no_band_reason": (
-                            "derived_band_insufficient_n"
-                            if not group["widths"]
-                            and 0 < self.derived_ns[(family, quantity, engine)] < MIN_DERIVED_BAND_N
-                            else None
-                        ),
+                        "tail_in_count": None,
+                        "tail_out_count": None,
+                        "no_band_reason": None,
                     }
                 )
             record["decision_strata"] = strata

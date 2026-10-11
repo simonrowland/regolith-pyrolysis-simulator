@@ -1373,7 +1373,6 @@ class _TierMarkdownAccumulator:
         self.by_family_rail_engine_quantity: dict[
             tuple[str, str, str, str, str, str], _TierAggregate
         ] = defaultdict(_TierAggregate)
-        self.derived_pool_n: dict[tuple[str, str, str, str], int] = defaultdict(int)
 
     def add(self, cell: _TierCell) -> None:
         self.by_engine[cell.engine].add(cell, keep_values=False)
@@ -1392,8 +1391,6 @@ class _TierMarkdownAccumulator:
                 cell.unit,
             )
             self.by_family_rail_engine_quantity[key].add(cell, keep_values=True)
-            if cell.band_value is None:
-                self.derived_pool_n[(cell.family, cell.quantity, cell.engine, cell.unit)] += 1
 
 
 def _tier_markdown(
@@ -1403,7 +1400,6 @@ def _tier_markdown(
     accumulator: _TierMarkdownAccumulator | None = None,
 ) -> list[str]:
     from simulator.battery.score import (
-        MIN_DERIVED_BAND_N,
         _bias_to_scatter_ratio,
         _median,
     )
@@ -1415,7 +1411,6 @@ def _tier_markdown(
     by_engine = accumulator.by_engine
     by_source = accumulator.by_source
     by_family_rail_engine_quantity = accumulator.by_family_rail_engine_quantity
-    derived_pool_n = accumulator.derived_pool_n
     typed_band_values = accumulator.typed_band_values
     lines = [
         "## Compilation tier",
@@ -1427,13 +1422,12 @@ def _tier_markdown(
         "compilation (JANAF-4th refit versus JANAF; NASA CEA thermo.inp",
         "versus the Glenn coefficient database). Pending admission is",
         "unchanged. Printed uncertainty is the reference observation's",
-        "uncertainty (often none on a grid). The derived 2×MAD width measures",
-        "scatter about the median, while membership is tested around zero:",
-        "|residual| ≤ band width.",
+        "uncertainty (often none on a grid). Otherwise, exact-alignment",
+        "source scatter sets a 95% ticket line; membership is tested around",
+        "zero: |residual| ≤ ticket line.",
         "",
         "| compilation | rail | engine | relation | quantity | unit | n | signed median residual | MAD | bias-to-scatter ratio | max |residual| | median abs residual | "
-        "RMS residual | band value | band kind | band derived n | no-band reason | band-kind-specific matches / tail-in | "
-        "band-kind-specific mismatches / tail-out | n no band | n same-source |",
+        "RMS residual | band value | band kind | band source n | no-band reason | in-band | out-of-band | n no band | n same-source |",
         "|---|---|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|---:|---:|---:|---:|",
     ]
     if not by_family_rail_engine_quantity:
@@ -1462,29 +1456,21 @@ def _tier_markdown(
             )
         )
         band_kinds = sorted(bucket.band_kinds)
-        derived_ns = sorted(bucket.derived_ns)
-        pool_n = derived_pool_n[(family, quantity, engine, unit)]
-        if not derived_ns and bucket.no_band:
-            derived_ns = [pool_n]
+        source_counts = sorted(bucket.derived_ns)
         match_display = "; ".join(
-            f"{kind} {'tail-in' if kind == 'derived_2xMAD' else 'match'}={bucket.matches_by_kind[kind]}"
+            f"{kind} in-band={bucket.matches_by_kind[kind]}"
             for kind in band_kinds
         ) or "—"
         mismatch_display = "; ".join(
-            f"{kind} {'tail-out' if kind == 'derived_2xMAD' else 'mismatch'}={bucket.mismatches_by_kind[kind]}"
+            f"{kind} out-of-band={bucket.mismatches_by_kind[kind]}"
             for kind in band_kinds
         ) or "—"
-        no_band_reason = (
-            "derived_band_insufficient_n"
-            if 0 < pool_n < MIN_DERIVED_BAND_N
-            and bucket.no_band
-            else "—"
-        )
+        no_band_reason = "—"
         lines.append(
             f"| {family} | {rail} | {engine} | {relation} | {quantity} | {display_unit} | "
             f"{len(values)} | {center} | {mad} | {ratio if ratio is not None else '—'} | "
             f"{max((abs(value) for value in values), default=None)} | "
-            f"{_median_abs(values)} | {rms} | {','.join(band_values) or '—'} | {','.join(band_kinds)} | {','.join(str(value) for value in derived_ns) or '—'} | {no_band_reason} | "
+            f"{_median_abs(values)} | {rms} | {','.join(band_values) or '—'} | {','.join(band_kinds)} | {','.join(str(value) for value in source_counts) or '—'} | {no_band_reason} | "
             f"{match_display} | {mismatch_display} | "
             f"{bucket.no_band} | "
             f"{bucket.same_source_count} |"
@@ -1537,6 +1523,8 @@ def _cell_from_observation(
     decision_band=None,
     derive_eligible: bool = True,
 ) -> _TierCell:
+    from simulator.battery.score import _decision_band_kind
+
     quantity = "unknown"
     rail = "none"
     if isinstance(observation.identity, Identity):
@@ -1562,15 +1550,10 @@ def _cell_from_observation(
         quantity=quantity,
         uncertainty=uncertainty_text(observation.uncertainty),
         band_value=None if decision_band is None else decision_band.value,
-        band_kind=(
-            "no_band" if decision_band is None
-            else "printed" if decision_band.rule == "source-printed per-cell uncertainty"
-            else "derived_2xMAD" if "residual distribution" in decision_band.rule
-            else "legacy_fallback"
-        ),
+        band_kind=_decision_band_kind(decision_band),
         band_derived_n=(
-            int(decision_band.rule.rsplit("derived_n=", 1)[1])
-            if decision_band is not None and "derived_n=" in decision_band.rule
+            int(decision_band.rule.rsplit("n_sources=", 1)[1].split(";", 1)[0])
+            if decision_band is not None and "n_sources=" in decision_band.rule
             else None
         ),
         derive_eligible=derive_eligible,
@@ -1617,6 +1600,8 @@ def _tier_cell_from_payload_fields(
     derive_eligible: bool,
     numeric_value: Decimal | None = None,
 ) -> _TierCell:
+    from simulator.battery.score import _decision_band_kind
+
     request = row.get("candidate_request")
     engine = (
         str(request["engine"])
@@ -1661,15 +1646,10 @@ def _tier_cell_from_payload_fields(
         quantity=quantity,
         uncertainty=uncertainty,
         band_value=band_value,
-        band_kind=(
-            "no_band" if band is None
-            else "printed" if band_rule == "source-printed per-cell uncertainty"
-            else "derived_2xMAD" if "residual distribution" in band_rule
-            else "legacy_fallback"
-        ),
+        band_kind=_decision_band_kind(band),
         band_derived_n=(
-            int(band_rule.rsplit("derived_n=", 1)[1])
-            if "derived_n=" in band_rule
+            int(band_rule.rsplit("n_sources=", 1)[1].split(";", 1)[0])
+            if "n_sources=" in band_rule
             else None
         ),
         derive_eligible=derive_eligible,
