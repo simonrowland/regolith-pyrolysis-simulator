@@ -1446,8 +1446,8 @@ def _predict_hashimoto_residue_cohort(
                 "liquid_rows_used": tuple(active_liquid_rows[row_key]),
                 "d060_pending": True,
                 "openimcc_version": str(getattr(openimcc, "__version__", "unknown")),
-                "datapack_version": melt_pack_identity.get("datapack_version", "IMCC-SF04"),
-                "openimcc_model_id": melt_pack_identity.get("model_id", "IMCC-SF04"),
+                "datapack_version": melt_pack_identity.get("datapack_version"),
+                "openimcc_model_id": melt_pack_identity.get("model_id"),
                 "pack_digest": {
                     "melt_datapack": melt_pack_identity.get("pack_digest", ""),
                 },

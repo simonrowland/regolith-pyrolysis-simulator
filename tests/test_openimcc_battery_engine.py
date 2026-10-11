@@ -502,9 +502,12 @@ def test_openimcc_producer_emits_activity_and_vapour_rails() -> None:
     _require_openimcc()
     handle = open_battery_engine("openimcc")
     assert handle.available, handle.unavailable_reason
+    backend = handle.backend
+    assert backend is not None
     assert handle.identity["pack_digest"] == (
         "f2b479cd54e3c82704a5863fcc06836f72045375d9a8c7f8d2fad19e98f75d05"
     )
+    assert handle.identity["model_id"] == backend.model_id
     cell = equilibrate_cell(
         handle,
         _binary_probe(),
@@ -517,8 +520,8 @@ def test_openimcc_producer_emits_activity_and_vapour_rails() -> None:
     assert cell.gas_partial_pressures_Pa["K"] > 0.0
     gas_digest = handle.identity["engine_binding_identity"]["gas_table_digest"]
     assert cell.vapor_pressures_source["K"] == f"openimcc-gas-table:sha256:{gas_digest}"
-    assert cell.model_id == "IMCC-SF04"
-    assert handle.identity["pack"] == handle.backend._pack_name
+    assert cell.model_id == backend.model_id
+    assert handle.identity["pack"] == backend._pack_name
 
 
 def test_missing_binding_digest_refuses_without_residual_identity_or_cache_key(
