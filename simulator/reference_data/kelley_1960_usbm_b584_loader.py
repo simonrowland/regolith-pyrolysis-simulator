@@ -129,10 +129,38 @@ def _gate_heat_content(curve: dict[str, Any], record: dict[str, Any]) -> dict[st
                           "observed": observed, "residual": predicted - observed,
                           "tolerance": tolerance})
     passed = three_cell_gate_passes(residuals)
+    full_range = _full_range_heat_check(curve, record)
     return {**curve, "gate": {"status": "passed" if passed else "transcription_gate_failed",
                               "kind": "printed_heat_content_cells",
                               "reason": None if passed else "transcription_gate_failed" if len(residuals) >= 3 else "no_independent_check",
-                              "residuals": residuals}}
+                              "residuals": residuals}, "full_range_check": full_range}
+
+
+def _full_range_heat_check(curve: dict[str, Any], record: dict[str, Any]) -> dict[str, Any]:
+    low, high = curve["temperature_range_K"]
+    accuracy_percent = (float(curve["accuracy_as_printed"].split()[0]) / 100
+                        if curve["accuracy_as_printed"] else 0.005)
+    residuals = []
+    for row in record["rows"]:
+        cells = row["cells"]
+        temperature = cells["temperature"]["value"]
+        if temperature is None or not low <= temperature <= high or cells["heat_content"]["value"] is None:
+            continue
+        at_temperature = [item for item in record["rows"]
+                          if item["cells"]["temperature"]["value"] == temperature]
+        phase = _b584_row_phase(row)
+        if len(at_temperature) > 1 and phase is not None and phase != curve["phase"]:
+            continue
+        observed = cells["heat_content"]["value"]
+        residual = _evaluate_heat_content(curve, temperature) - observed
+        tolerance = max(accuracy_percent * abs(observed),
+                        2 * _last_digit_unit(cells["heat_content"]["raw"]))
+        residuals.append((temperature, residual, tolerance))
+    worst = max(residuals, key=lambda item: abs(item[1]), default=None)
+    return {"n_cells": len(residuals),
+            "n_outside_tolerance": sum(abs(residual) > tolerance for _, residual, tolerance in residuals),
+            "worst_residual": None if worst is None else worst[1],
+            "worst_T": None if worst is None else worst[0]}
 
 
 def _b584_row_phase(row: dict[str, Any]) -> str | None:

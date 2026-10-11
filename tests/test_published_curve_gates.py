@@ -49,3 +49,15 @@ def test_b677_gate_reports_duplicate_phase_binding_failure(monkeypatch):
     monkeypatch.setattr(b677.json, "loads", lambda value: curves)
     result = next(item for item in b677.load_published_curves() if item["phase"] == "l")
     assert result["gate"].get("reason") == "gate_row_phase_mismatch", result["gate"]
+
+
+def test_enthalpy_gates_report_all_in_range_table_cells():
+    b584_curves = b584.load_published_curves()
+    b584_heat = [curve for curve in b584_curves if curve["quantity"] == "heat_content_increment"]
+    assert b584_heat and all("full_range_check" in curve for curve in b584_heat)
+    glass = next(curve for curve in b584_heat if curve["formula"] == "SiO2" and curve["phase"] == "gl")
+    assert glass["full_range_check"]["n_cells"] > 3
+    assert glass["full_range_check"]["n_outside_tolerance"] > 0
+    b677_heat = [curve for curve in b677.load_published_curves()
+                 if curve["quantity"] == "heat_content_increment"]
+    assert b677_heat and all(curve["full_range_check"]["n_cells"] >= 3 for curve in b677_heat)

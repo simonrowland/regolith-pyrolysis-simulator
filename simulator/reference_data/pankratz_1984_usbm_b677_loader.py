@@ -76,6 +76,8 @@ def load_published_curves(root: Path = COMPILATION_ROOT) -> tuple[dict, ...]:
         passed = three_cell_gate_passes(residuals)
         if len(residuals) != len(curve["source_cell_rows"]):
             continue
+        full_range = (_full_range_heat_check(curve, record)
+                      if curve["quantity"] == "heat_content_increment" else None)
         results.append({
             **curve,
             "record_kind": "published_curve_fit",
@@ -84,6 +86,7 @@ def load_published_curves(root: Path = COMPILATION_ROOT) -> tuple[dict, ...]:
                 "kind": "printed_heat_content_cells" if curve["quantity"] == "heat_content_increment" else "printed_heat_capacity_cells",
                 "residuals": residuals,
             },
+            **({"full_range_check": full_range} if full_range is not None else {}),
         })
     return tuple(results)
 
@@ -101,6 +104,36 @@ def _evaluate(curve: dict, temperature: int) -> Decimal:
 
 def _last_digit(token: str) -> Decimal:
     return Decimal(1).scaleb(-len(token.partition(".")[2]))
+
+
+def _full_range_heat_check(curve: dict, record: dict) -> dict:
+    low, high = curve["temperature_range_K"]
+    column = curve["source_cell_column"]
+    accuracy_percent = Decimal(str(float(curve["accuracy_as_printed"].split()[0]) / 100)) if curve["accuracy_as_printed"] else Decimal("0.005")
+    rows = []
+    for row in record["rows"]:
+        cells = row["cells"]
+        temperature = int(cells[0]["value"])
+        if temperature is None or not low <= temperature <= high:
+            continue
+        duplicates = [item for item in record["rows"] if item["cells"][0]["value"] == temperature]
+        if len(duplicates) > 1:
+            phase = ("c", "l")[duplicates.index(row)] if duplicates.index(row) < 2 else None
+            if phase != curve["phase"]:
+                continue
+        observed = Decimal(str(cells[column]["value"]))
+        if curve["quantity"] == "heat_content_increment":
+            observed *= 1000
+        predicted = _evaluate(curve, temperature)
+        tolerance = max(abs(observed) * accuracy_percent,
+                        Decimal(2) * _last_digit(cells[column]["raw"]) *
+                        (1000 if curve["quantity"] == "heat_content_increment" else 1))
+        rows.append((temperature, predicted - observed, tolerance))
+    worst = max(rows, key=lambda item: abs(item[1]), default=None)
+    return {"n_cells": len(rows),
+            "n_outside_tolerance": sum(abs(residual) > tolerance for _, residual, tolerance in rows),
+            "worst_residual": None if worst is None else float(worst[1]),
+            "worst_T": None if worst is None else worst[0]}
 
 
 def lookup_temperature(record_id: str, temperature: float, root: Path = COMPILATION_ROOT) -> tuple[dict, ...]:
