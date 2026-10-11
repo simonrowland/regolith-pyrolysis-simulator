@@ -16,6 +16,7 @@ import hashlib
 import math
 import sys
 from collections import Counter
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
@@ -40,6 +41,62 @@ if str(TOOLS) not in sys.path:
 import extract_merge as em  # noqa: E402
 import migrate_pilot_extracts as mig  # noqa: E402
 import validate_literature_extracts as vle  # noqa: E402
+from simulator.battery import migrate as battery_migrate  # noqa: E402
+from simulator.battery.waypoints import oxygen_condition  # noqa: E402
+
+
+def test_sato_1973_migrates_and_pins_all_numeric_fugacity_cells() -> None:
+    source = EXTRACTS / "sato-hickling-mclane-1973-lunar-fo2.yaml"
+    extract = yaml.safe_load(source.read_text())
+    rows = extract["species"]["O2"]["observations"]
+    assert len(rows) == 15
+    assert sum(len(row["values"]["points"]) for row in rows) == 75
+
+    migrator = battery_migrate.Migrator(root=REPO_ROOT)
+    migrator._migrate_extract(source)
+    migrator.finalize()
+    result = migrator.result
+    observations = [
+        obs for obs in result.observations.values()
+        if "sato73_" in obs.observation_id
+    ]
+    assert len(observations) == 75
+    assert len([obs for obs in observations if obs.value.kind.value == "point"]) == 75
+    assert not result.validation.hard_issues
+
+    migrated = {obs.observation_id: obs for obs in observations}
+    for row in rows:
+        expected_count = 0
+        for point in row["values"]["points"]:
+            expected_pa = Decimal("101325") * (
+                Decimal(10) ** -Decimal(point["neg_log_fO2_as_printed"])
+            )
+            consumed_pa = Decimal(point["fugacity_Pa"])
+            relative_error = abs(consumed_pa / expected_pa - Decimal(1))
+            assert relative_error <= Decimal("1e-6"), (
+                row["observation_id"], point["temperature_C_as_printed"]
+            )
+            matches = [
+                obs for observation_id, obs in migrated.items()
+                if row["observation_id"] in observation_id
+                and obs.point_conditions.get("temperature_K") is not None
+                and obs.point_conditions["temperature_K"].state.value
+                == Decimal(point["temperature_K"])
+            ]
+            assert len(matches) == 1, (
+                row["observation_id"], point["temperature_C_as_printed"]
+            )
+            observation = matches[0]
+            assert observation.value.point == consumed_pa
+            experiment = result.experiments[observation.experiment_id]
+            bench = result.benches[experiment.bench_id]
+            resolved = oxygen_condition(experiment, bench, observation)
+            assert resolved.selected is not None
+            assert resolved.selected.value.point == Decimal(
+                point["log_fO2_as_signed"]
+            )
+            expected_count += 1
+        assert expected_count == 5
 
 
 def test_norris_starting_composition_is_pinned_to_online_extended_table() -> None:
