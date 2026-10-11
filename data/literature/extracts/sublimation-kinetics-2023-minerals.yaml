@@ -753,7 +753,8 @@ species:
       units: atm as printed
       values:
         quantity: p_sat
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: Shaw et al. (2023), FactSage 8.2
         admission_status: model_output_not_measurement
         gas_species: Fe(g)
         factsage_version: '8.2'
@@ -819,7 +820,8 @@ species:
       units: mol/s/m2 as printed
       values:
         quantity: evaporation_rate
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: Shaw et al. (2023), FactSage 8.2 and Hertz-Knudsen-Langmuir calculation
         admission_status: model_output_not_measurement
         gas_species: Fe(g)
         alpha_e_assumed: 1.0
@@ -883,7 +885,8 @@ species:
       units: g/h/g of regolith as printed
       values:
         quantity: evaporation_rate
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: Shaw et al. (2023), FactSage 8.2 and Hertz-Knudsen-Langmuir calculation
         admission_status: model_output_not_measurement
         gas_species: Fe(g)
         T_C: 1200.0
@@ -948,7 +951,8 @@ species:
       units: atm as printed
       values:
         quantity: p_sat
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: Shaw et al. (2023), FactSage 8.2
         admission_status: model_output_not_measurement
         gas_species: Na(g)
         proxy_system_as_printed: Al2O3-CaO-Na2O
@@ -994,7 +998,8 @@ species:
       units: mol/s/m2 as printed
       values:
         quantity: evaporation_rate
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: Shaw et al. (2023), FactSage 8.2 and Hertz-Knudsen-Langmuir calculation
         admission_status: model_output_not_measurement
         gas_species: Na(g)
         alpha_e_assumed: 1.0
@@ -1050,7 +1055,8 @@ species:
       units: g/h/g of regolith as printed
       values:
         quantity: evaporation_rate
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: Shaw et al. (2023), FactSage 8.2 and Hertz-Knudsen-Langmuir calculation
         admission_status: model_output_not_measurement
         gas_species: Na(g)
         T_C: 1200.0
@@ -1083,7 +1089,8 @@ species:
       units: atm as printed
       values:
         quantity: p_sat
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: Shaw et al. (2023), FactSage 8.2
         admission_status: model_output_not_measurement
         gas_species: K(g)
         proxy_system_as_printed: Al2O3-K2O
@@ -1129,7 +1136,8 @@ species:
       units: mol/s/m2 as printed
       values:
         quantity: evaporation_rate
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: Shaw et al. (2023), FactSage 8.2 and Hertz-Knudsen-Langmuir calculation
         admission_status: model_output_not_measurement
         gas_species: K(g)
         alpha_e_assumed: 1.0
@@ -1185,7 +1193,8 @@ species:
       units: g/h/g of regolith as printed
       values:
         quantity: evaporation_rate
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: Shaw et al. (2023), FactSage 8.2 and Hertz-Knudsen-Langmuir calculation
         admission_status: model_output_not_measurement
         gas_species: K(g)
         T_C: 1200.0
