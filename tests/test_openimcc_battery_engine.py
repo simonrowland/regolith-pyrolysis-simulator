@@ -405,7 +405,7 @@ def _assert_zhang_rb2o_refused(residual, reference) -> None:
 
 
 @pytest.mark.parametrize("temperature", ["1473.15", "1673.15"])
-def test_openimcc_zhang_implied_alpha_uses_coefficient_details(
+def test_openimcc_zhang_implied_alpha_refuses_unsupported_rb2o(
     tmp_path: Path,
     temperature: str,
 ) -> None:
@@ -435,6 +435,28 @@ def test_openimcc_zhang_implied_alpha_refuses_bad_coefficient_details(
 ) -> None:
     _require_openimcc()
     context, reference = _zhang_k_case(tmp_path, "1673.15")
+    # Use the existing supported binary test fixture so production emits KO0.5
+    # details. This composition is synthetic and is not Zhang's printed row.
+    supported_test_composition = Composition(
+        basis="supported_openimcc_test_fixture",
+        components=(
+            ("K2O", Decimal("0.3333333333333333")),
+            ("SiO2", Decimal("0.6666666666666667")),
+        ),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    supported_test_printed_composition = {"K2O": "43.94", "SiO2": "56.06"}
+    reference = replace(
+        reference,
+        identity=replace(
+            reference.identity,
+            composition=State.of(supported_test_composition),
+        ),
+        point_conditions={
+            **(reference.point_conditions or {}),
+            "printed_composition": F.located(supported_test_printed_composition),
+        },
+    )
     handle = open_battery_engine("openimcc")
 
     from simulator.diagnostic_helpers import binary_pot_battery
@@ -443,11 +465,10 @@ def test_openimcc_zhang_implied_alpha_refuses_bad_coefficient_details(
 
     def altered_equilibrate_cell(*args, **kwargs):
         cell = real_equilibrate_cell(*args, **kwargs)
-        # Rb2O is refused before a KO0.5 coefficient detail exists. Leave
-        # that cell unchanged; the modes below still apply when a detail exists.
         raw_details = cell.melt_activity_coefficient_details or {}
-        if "KO0.5" not in raw_details:
-            return cell
+        assert "KO0.5" in raw_details, (
+            "supported test fixture must produce KO0.5 details before corruption"
+        )
         details = dict(raw_details)
         if details_mode == "absent":
             details.pop("KO0.5", None)
@@ -490,7 +511,9 @@ def test_openimcc_zhang_implied_alpha_refuses_bad_coefficient_details(
         handles={"openimcc": handle},
     )
     assert candidate is None
-    _assert_zhang_rb2o_refused(residual, reference)
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.COEFFICIENT_BASIS_MISMATCH
 
 
 def test_openimcc_engine_is_registered() -> None:
