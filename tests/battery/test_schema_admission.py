@@ -819,6 +819,24 @@ def test_areal_mass_flux_records_printed_header_multiplier():
     assert "cell / 10^4" in derivation.inputs[0]
 
 
+@pytest.mark.parametrize(
+    "field",
+    ["mass_loss_areal_flux", "mass_loss_areal_flux_decorated"],
+)
+def test_named_and_decorated_areal_flux_fields_keep_the_numeric_pin(field):
+    selection = M.select_declared_source(
+        Quantity.MASS_LOSS_AREAL_FLUX,
+        "(g/(sec. cm^2)) x 10^4",
+        {field: "1.48"},
+    )
+    assert selection.value.kind is M.ValueKind.POINT
+    assert selection.amount == Decimal("0.00148")
+    assert selection.field_name == field
+    assert selection.unit_trail == (
+        "printed_x10^4_header_scale_then_g_per_cm2_per_s_to_kg_per_m2_per_s"
+    )
+
+
 @pytest.mark.parametrize("source,recipes", [
     ("yam1983", 7), ("kems-118-yamamoto-1983", 10),
     ("deguzman-2026-simulant-physicochemical", 0), ("kems-020-hastie-1981-nbsir", 0),
