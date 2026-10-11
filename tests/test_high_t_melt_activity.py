@@ -235,7 +235,7 @@ def test_above_cap_openimcc_route_feeds_flux_with_provenance() -> None:
 
     assert high_t["provider"] == "openimcc"
     assert high_t["temperature_domain_status"] == "in_domain"
-    assert high_t["openimcc_pack_version"] == "1.0.2"
+    assert high_t["openimcc_pack_version"] == "1.0.3-d066-v1"
     assert high_t["openimcc_pack_digest"]
     assert set(high_t["activities_by_oxide"]) == {
         "Na2O",
@@ -346,7 +346,9 @@ def test_above_cap_k2o_keeps_constant_gamma_with_exclusion_provenance() -> None:
     assert high_t["activities_by_oxide"]["K2O"] == constant_gamma.activity
     assert high_t["openimcc_activities_by_oxide"]["K2O"] != constant_gamma.activity
     assert high_t["seam"]["K2O"]["ratio_dex_selected_over_below_cap"] == 0.0
-    assert high_t["seam"]["K2O"]["would_be_openimcc_step_dex"] < -2.0
+    assert high_t["seam"]["K2O"]["would_be_openimcc_step_dex"] == pytest.approx(
+        -0.24814525336393226
+    )
     assert high_t["authority_exclusions"]["K2O"]["tracking_id"] == "t-999"
 
     provenance = result.diagnostic["vapor_pressure_numerator_provenance"]

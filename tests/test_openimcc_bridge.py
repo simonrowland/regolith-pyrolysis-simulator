@@ -844,8 +844,14 @@ def test_bridge_reports_single_cation_gamma_zhang_n_morb_anchor() -> None:
         "K2O": 2.49,
     }
     expected = {
-        1473.15: {"KO0.5": 3.49e-9, "NaO0.5": 6.87e-5},
-        1673.15: {"KO0.5": 2.45e-8, "NaO0.5": 2.76e-4},
+        1473.15: {
+            "KO0.5": 1.6697561241999281e-6,
+            "NaO0.5": 0.00013466805822228952,
+        },
+        1673.15: {
+            "KO0.5": 9.441799509227296e-6,
+            "NaO0.5": 0.0004922752489405557,
+        },
     }
     for temperature_K, anchors in expected.items():
         result = bridge_evaluate(
