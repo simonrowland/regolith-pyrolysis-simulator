@@ -415,6 +415,10 @@ species:
             section: '3.2'
             note: sample mass, chamber pressure, ionizing voltage, ion species
     - observation_id: furukawa_1975_gamma_fe_binary_fit
+      derived_from: [furukawa_1975_table2_fe_v_ion_current_ratios, furukawa_1975_fig4_ion_ratio_vs_1T_figure_only]
+      derivation:
+        inputs: [furukawa_1975_table2_fe_v_ion_current_ratios, furukawa_1975_fig4_ion_ratio_vs_1T_figure_only]
+        relation: Fe activity-coefficient fit from the printed Fe-V ion-current data and activity curve; Gibbs-Duhem relation, equation (10), page 3057.
       experiment: fe-v-series
       type: activity_coefficient
       locator:
@@ -455,6 +459,10 @@ species:
       uncertainty:
         note: fit to the Fig. 5(b) integral of Table 2 ion ratios; no +/- on the coefficients
     - observation_id: furukawa_1975_gamma0_fe_1600c
+      derived_from: [furukawa_1975_gamma_fe_binary_fit]
+      derivation:
+        inputs: [furukawa_1975_gamma_fe_binary_fit]
+        relation: Infinite-dilution Fe activity coefficient from the Fe-V fit at 1600 C, page 3056.
       experiment: fe-v-series
       type: activity_coefficient
       locator:
@@ -484,6 +492,10 @@ species:
       uncertainty:
         note: no +/- printed on gamma0_Fe
     - observation_id: furukawa_1975_HM_fe_infinite_dilution
+      derived_from: [furukawa_1975_fig4_ion_ratio_vs_1T_figure_only]
+      derivation:
+        inputs: [furukawa_1975_fig4_ion_ratio_vs_1T_figure_only]
+        relation: Partial molar heat of solution from the Figure 4 slope using equation (2), page 3057.
       experiment: fe-v-series
       type: gibbs_table
       locator:
@@ -558,6 +570,10 @@ species:
       uncertainty:
         note: figure-only; tabulated 1600 C intercepts and slopes are in Table 2
     - observation_id: furukawa_1975_fig6_fe_v_activities_figure_only
+      derived_from: [furukawa_1975_gamma_fe_binary_fit, furukawa_1975_gamma_v_fe_binary_fit]
+      derivation:
+        inputs: [furukawa_1975_gamma_fe_binary_fit, furukawa_1975_gamma_v_fe_binary_fit]
+        relation: Fe and V activities plotted from the fitted Fe-V activity-coefficient equations in Figure 6, page 3055.
       experiment: fe-v-series
       type: activity_coefficient
       locator:
@@ -690,6 +706,10 @@ species:
             section: '3.2'
             note: sample mass, chamber pressure, ionizing voltage, ion species
     - observation_id: furukawa_1975_gamma_v_fe_binary_fit
+      derived_from: [furukawa_1975_table2_fe_v_ion_current_ratios, furukawa_1975_fig4_ion_ratio_vs_1T_figure_only]
+      derivation:
+        inputs: [furukawa_1975_table2_fe_v_ion_current_ratios, furukawa_1975_fig4_ion_ratio_vs_1T_figure_only]
+        relation: V activity-coefficient fit from the printed Fe-V ion-current data and activity curve; Gibbs-Duhem relation, equation (9), page 3057.
       experiment: fe-v-series
       type: activity_coefficient
       locator:
@@ -724,6 +744,10 @@ species:
       uncertainty:
         note: no +/- on the fitted coefficients
     - observation_id: furukawa_1975_gamma0_v_1600c
+      derived_from: [furukawa_1975_gamma_v_fe_binary_fit]
+      derivation:
+        inputs: [furukawa_1975_gamma_v_fe_binary_fit]
+        relation: Infinite-dilution V activity coefficient from the Fe-V fit at 1600 C, page 3056.
       experiment: fe-v-series
       type: activity_coefficient
       locator:
@@ -754,6 +778,10 @@ species:
         note: Al at 1 at% of V is estimated to shift gamma_V by at most ~3% for N_V<0.2 (using epsilon_V^Al=12
           from the literature); authors treat the Al effect as negligible.
     - observation_id: furukawa_1975_HM_v_infinite_dilution
+      derived_from: [furukawa_1975_fig4_ion_ratio_vs_1T_figure_only]
+      derivation:
+        inputs: [furukawa_1975_fig4_ion_ratio_vs_1T_figure_only]
+        relation: Partial molar heat of solution from the Figure 4 slope using equation (2), page 3057.
       experiment: fe-v-series
       type: gibbs_table
       locator:
@@ -1025,6 +1053,10 @@ species:
             section: '3.2'
             note: sample mass, chamber pressure, ionizing voltage, ion species
     - observation_id: furukawa_1975_gamma_ternary_nv02_fits
+      derived_from: [furukawa_1975_table3_fe_v_cr_ion_current_ratios, furukawa_1975_fig10_fe_v_cr_ion_ratio_figure_only]
+      derivation:
+        inputs: [furukawa_1975_table3_fe_v_cr_ion_current_ratios, furukawa_1975_fig10_fe_v_cr_ion_ratio_figure_only]
+        relation: Ternary activity-coefficient fits at N_V=0.2 from the printed Fe-V-Cr ion-current ratios, equations (14)-(15), page 3058.
       experiment: fe-v-cr-series
       type: activity_coefficient
       locator:
@@ -1066,6 +1098,10 @@ species:
       uncertainty:
         note: no +/- on the ternary coefficients
     - observation_id: furukawa_1975_gamma_ternary_nv03_fits
+      derived_from: [furukawa_1975_table3_fe_v_cr_ion_current_ratios, furukawa_1975_fig10_fe_v_cr_ion_ratio_figure_only]
+      derivation:
+        inputs: [furukawa_1975_table3_fe_v_cr_ion_current_ratios, furukawa_1975_fig10_fe_v_cr_ion_ratio_figure_only]
+        relation: Ternary activity-coefficient fits at N_V=0.3 from the printed Fe-V-Cr ion-current ratios, equations (16)-(17), page 3058.
       experiment: fe-v-cr-series
       type: activity_coefficient
       locator:
@@ -1134,6 +1170,10 @@ species:
       uncertainty:
         note: figure-only; 1600 C intercepts are Table 3
     - observation_id: furukawa_1975_fig12_ternary_activities_figure_only
+      derived_from: [furukawa_1975_gamma_ternary_nv02_fits, furukawa_1975_gamma_ternary_nv03_fits]
+      derivation:
+        inputs: [furukawa_1975_gamma_ternary_nv02_fits, furukawa_1975_gamma_ternary_nv03_fits]
+        relation: Fe and V ternary activities plotted from the fitted activity-coefficient equations in Figure 12, page 3058.
       experiment: fe-v-cr-series
       type: activity_coefficient
       locator:
