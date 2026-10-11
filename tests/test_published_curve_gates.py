@@ -73,3 +73,7 @@ def test_b584_derivative_gate_rejects_a_one_unit_last_digit_change():
     result = b584._gate_derivative_cp(changed, curves, records)
     assert result["gate"]["status"] == "transcription_gate_failed"
     assert result["gate"]["reason"] == "derivative_mismatch"
+
+
+def test_uncalled_printed_decimal_helper_is_removed():
+    assert not hasattr(b584, "_printed_decimals")

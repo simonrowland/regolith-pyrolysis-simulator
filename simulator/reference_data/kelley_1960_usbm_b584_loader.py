@@ -176,10 +176,6 @@ def _gate_binding_failure(curve: dict[str, Any], reason: str) -> dict[str, Any]:
                               "reason": reason, "residuals": []}}
 
 
-def _printed_decimals(token: str) -> int:
-    return len(token.replace(",", "").partition(".")[2])
-
-
 def _last_digit_unit(token: str) -> float:
     normalized = token.replace(",", "").replace(" ", "")
     mantissa, marker, exponent = normalized.partition("×10^")
