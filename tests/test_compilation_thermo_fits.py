@@ -23,6 +23,7 @@ from simulator.reference_data.compilation_thermo_fits import (
     _interpolation_ringing,
     fit_compilation_thermo_range,
     generate_janaf_sidecar,
+    main as fit_cli_main,
     render_sidecar,
 )
 from simulator.reference_data.janaf import TABLES_DIR
@@ -258,10 +259,12 @@ def test_compound_fit_anchors_and_formation_acceptance_across_fe_reference_trans
     )
     assert result.record["status"] == "accepted", result.record
     assert result.record["acceptance_tier"] == "table_equivalent"
+    assert result.record["formation_capable"] is True
     assert set(result.record["fit_error"]) == {
         "Cp_J_per_mol_K",
         "H_minus_H298_kJ_per_mol",
         "S_J_per_mol_K",
+        "delta_fH_kJ_per_mol",
         "delta_fG_kJ_per_mol",
     }
     assert result.curve is not None
@@ -279,7 +282,7 @@ def test_compound_fit_anchors_and_formation_acceptance_across_fe_reference_trans
     assert fe_at_transition[0][1] == _evaluate(references["Fe"][1].segment, 1000.0)[1]
 
 
-def test_pressure_convention_mismatch_rejects_compound_fit() -> None:
+def test_pressure_convention_mismatch_disables_formation_without_rejecting_fit() -> None:
     references = _transition_reference_curves()
     terms, error = _element_reference_terms("FeO", 298.15, PRESSURE_PA, references)
     assert error is None and terms is not None
@@ -323,8 +326,73 @@ def test_pressure_convention_mismatch_rejects_compound_fit() -> None:
         T_max_K=2200.0,
         reference_curves=wrong_pressure,
     )
-    assert result.record["reason_code"] == "pressure_convention_mismatch"
+    assert result.record["status"] == "accepted", result.record
+    assert result.record["formation_capable"] is False
+    assert result.record["formation_reason_code"] == "pressure_convention_mismatch"
+    assert "Fe" in result.record["formation_reason"]
+    assert not any(key.startswith("delta_f") for key in result.record["fit_error"])
     assert result.record["fit_statistics"]["cp_J_per_mol_K"]["cell_count"] > 0
+
+
+def test_missing_element_reference_keeps_compound_fit_without_formation() -> None:
+    temperatures = [298.15, 400, 600, 800, 1000, 1200, 1500, 1900, 2200]
+    species = _constant_cp_segment(
+        90.0,
+        temperatures[0],
+        temperatures[-1],
+        H_at_anchor_J_per_mol=12500.0,
+        S_at_anchor_J_per_mol_K=58.0,
+    )
+    result = fit_compilation_thermo_range(
+        record=_record("FeO"),
+        series=_source_series(
+            species, temperatures, formula="FeO", is_reference=True
+        ),
+        phase_label="cr",
+        standard_state="condensed_solid",
+        T_min_K=temperatures[0],
+        T_max_K=temperatures[-1],
+        reference_curves={},
+    )
+
+    assert result.record["status"] == "accepted", result.record
+    assert result.record["acceptance_tier"] == "table_equivalent"
+    assert result.record["formation_capable"] is False
+    assert result.record["formation_reason_code"] == "missing_element_reference_phase"
+    assert "Fe, none" in result.record["formation_reason"]
+    assert not any(key.startswith("delta_f") for key in result.record["fit_error"])
+
+
+def test_missing_formation_h_anchor_keeps_species_fit() -> None:
+    temperatures = [298.15, 400, 600, 800, 1000, 1200, 1500, 1900, 2200]
+    species = _constant_cp_segment(
+        90.0,
+        temperatures[0],
+        temperatures[-1],
+        H_at_anchor_J_per_mol=12500.0,
+        S_at_anchor_J_per_mol_K=58.0,
+    )
+    series = tuple(
+        column
+        for column in _source_series(
+            species, temperatures, formula="FeO", is_reference=True
+        )
+        if column.quantity is not Quantity.DELTA_FH
+    )
+    result = fit_compilation_thermo_range(
+        record=_record("FeO"),
+        series=series,
+        phase_label="cr",
+        standard_state="condensed_solid",
+        T_min_K=temperatures[0],
+        T_max_K=temperatures[-1],
+        reference_curves={},
+    )
+
+    assert result.record["status"] == "accepted", result.record
+    assert result.record["formation_capable"] is False
+    assert result.record["formation_reason_code"] == "missing_formation_h_anchor"
+    assert not any(key.startswith("delta_f") for key in result.record["fit_error"])
 
 
 @pytest.mark.parametrize("cp", [0.0, -5.0])
@@ -345,8 +413,8 @@ def test_positive_cp_gate_rejects_nonpositive_fitted_cp(cp: float) -> None:
     assert result.record["reason_code"] == "cp_nonpositive"
 
 
-def test_phase_range_with_fewer_than_nine_cp_cells_is_insufficient() -> None:
-    temperatures = [298.15, 400, 600, 800, 1000]
+def test_phase_range_with_fewer_than_four_cp_cells_is_insufficient() -> None:
+    temperatures = [298.15, 600, 1000]
     segment = _constant_cp_segment(30.0, temperatures[0], temperatures[-1])
     result = fit_compilation_thermo_range(
         record=_record("Fe", state="ref"),
@@ -360,7 +428,7 @@ def test_phase_range_with_fewer_than_nine_cp_cells_is_insufficient() -> None:
     assert result.record["status"] == "rejected"
     assert result.record["reason_code"] == "insufficient_cells"
     assert result.record["acceptance_tier"] is None
-    assert result.record["cell_count"] == 5
+    assert result.record["cell_count"] == 3
 
 
 def test_zero_and_below_minimum_cells_have_typed_exclusions() -> None:
@@ -369,7 +437,7 @@ def test_zero_and_below_minimum_cells_have_typed_exclusions() -> None:
         record=_record("Fe", state="ref"),
         series=_source_series(
             segment,
-            [0.0, 50.0, 100, 200, 298.15, 400, 500, 600, 700, 800, 1000],
+            [0.0, 50.0, 100, 150, 200, 298.15, 400, 500, 600, 700, 800, 1000],
             places=3,
         ),
         phase_label="cr",
@@ -381,7 +449,10 @@ def test_zero_and_below_minimum_cells_have_typed_exclusions() -> None:
     codes = {(cell["T_K"], cell["reason_code"]) for cell in result.record["excluded_cells"]}
     assert (0.0, "nonpositive_fit_temperature") in codes
     assert (50.0, "below_fit_T_min") in codes
+    assert (100.0, "below_fit_T_min") in codes
+    assert (150.0, "below_fit_T_min") in codes
     assert result.record["status"] == "accepted", result.record
+    assert result.record["validity"]["T_min_K"] == 200.0
 
 
 def test_piecewise_constraints_keep_cp_h_s_continuous_at_join() -> None:
@@ -414,7 +485,6 @@ def test_piecewise_constraints_keep_cp_h_s_continuous_at_join() -> None:
         segment_bounds=[(298.15, 700.0), (700.0, 1200.0)],
         fit_lo=298.15,
         fit_hi=1200.0,
-        rejected_template={"validity": {"T_min_K": 298.15, "T_max_K": 1200.0}},
     )
     assert result.record["status"] == "accepted", result.record
     segments = [
@@ -447,7 +517,6 @@ def test_smooth_fit_rejects_cp_relative_error_above_one_per_thousand() -> None:
         segment_bounds=[(temperatures[0], temperatures[-1])],
         fit_lo=temperatures[0],
         fit_hi=temperatures[-1],
-        rejected_template={"validity": {"T_min_K": temperatures[0], "T_max_K": temperatures[-1]}},
     )
     assert result.record["status"] == "rejected"
     assert result.record["reason_code"] in {
@@ -465,9 +534,16 @@ def test_janaf_o029_formation_gibbs_zero_pin() -> None:
     oxygen = next(record for record in records if record["source_record_id"] == "O-029")
     assert oxygen["status"] == "accepted", oxygen
     assert oxygen["acceptance_tier"] == "smooth_fit"
+    assert oxygen["formation_capable"] is True
+    assert oxygen["validity"]["T_min_K"] == 200.0
     assert oxygen["fit_statistics"]["segment_count"] >= 2
     assert oxygen["fit_error"]["Cp_J_per_mol_K"] > 0.0
+    assert oxygen["fit_error"]["delta_fH_kJ_per_mol"] == 0.0
     assert oxygen["fit_error"]["delta_fG_kJ_per_mol"] == 0.0
+    assert any(
+        cell["T_K"] == 100.0 and cell["reason_code"] == "below_fit_T_min"
+        for cell in oxygen["excluded_cells"]
+    )
     assert oxygen["fit_statistics"]["smooth_fit_checks"]["maximum_relative_Cp_residual"] <= 1e-3
     assert oxygen["fit_statistics"]["derived_formation_G_kJ_per_mol"]["max_abs"] == 0.0
 
@@ -487,6 +563,114 @@ def test_janaf_o029_formation_gibbs_zero_pin() -> None:
         cp_right, h_right, s_right, _g_right = _evaluate(right, join)
         for a, b in ((cp_left, cp_right), (h_left, h_right), (s_left, s_right)):
             assert abs(a - b) <= 1e-9 * max(abs(a), abs(b), 1.0)
+
+
+def test_janaf_na_cr_uses_reduced_basis_and_keeps_typed_rejection() -> None:
+    assert (TABLES_DIR / "Na-001.yaml").is_file()
+    records = generate_janaf_sidecar(table_ids=["Na-001"])
+    sodium = next(record for record in records if record["phase"] == "cr")
+
+    assert sodium["status"] == "rejected", sodium
+    assert sodium["reason_code"] == "segmentation_exhausted"
+    cp_count = sodium["fit_statistics"]["cp_J_per_mol_K"]["cell_count"]
+    assert 4 <= cp_count <= 8
+    assert sodium["basis_terms"] == cp_count - 2
+    assert 2 <= sodium["basis_terms"] <= 6
+
+
+def test_reduced_basis_record_evaluates_through_existing_nasa9_owner() -> None:
+    temperatures = [298.15, 400, 600, 800, 1000]
+    source = _constant_cp_segment(30.0, temperatures[0], temperatures[-1])
+    result = fit_compilation_thermo_range(
+        record=_record("Fe", state="ref"),
+        series=_source_series(source, temperatures),
+        phase_label="cr:short-range",
+        standard_state="condensed_solid",
+        T_min_K=temperatures[0],
+        T_max_K=temperatures[-1],
+        is_element_reference=True,
+    )
+
+    assert result.record["status"] == "accepted", result.record
+    assert result.record["basis_terms"] == 3
+    fit_segment = result.record["thermo_record"]["segments"][0]
+    nasa9 = Nasa9Segment(
+        fit_segment["T_min_K"],
+        fit_segment["T_max_K"],
+        tuple(fit_segment["a_coefficients"]),
+        fit_segment["b1"],
+        fit_segment["b2"],
+    )
+    selected_terms = set((2, 3, 4, 1, 0, 5, 6)[: result.record["basis_terms"]])
+    assert all(
+        coefficient == 0.0
+        for index, coefficient in enumerate(nasa9.coefficients)
+        if index not in selected_terms
+    )
+    ratios = nasa9.evaluate_ratios(nasa9.T_min_K)
+    assert all(math.isfinite(value) for value in ratios)
+    assert ratios[0] > 0.0
+
+
+def test_fit_cli_accepts_sampling_options_and_reports_summary(
+    tmp_path, monkeypatch, capsys
+) -> None:
+    selected: dict[str, object] = {}
+
+    def fake_generate(*, table_ids=None, limit=None):
+        selected["table_ids"] = table_ids
+        selected["limit"] = limit
+        return [
+            {
+                "record_id": "accepted",
+                "status": "accepted",
+                "acceptance_tier": "table_equivalent",
+                "formation_capable": True,
+                "fit_error": {
+                    "Cp_J_per_mol_K": 0.25,
+                    "H_minus_H298_kJ_per_mol": 0.01,
+                    "S_J_per_mol_K": 0.02,
+                    "delta_fH_kJ_per_mol": 0.0,
+                    "delta_fG_kJ_per_mol": 0.0,
+                },
+            },
+            {
+                "record_id": "rejected",
+                "status": "rejected",
+                "reason_code": "segmentation_exhausted",
+                "fit_statistics": {
+                    "smooth_fit_checks": {
+                        "only_relative_Cp_residual_failed": True,
+                        "maximum_relative_Cp_residual": 0.003,
+                        "worst_relative_Cp_cell": {
+                            "T_K": 550.0,
+                            "residual_J_per_mol_K": 0.09,
+                            "relative_residual": 0.003,
+                        },
+                    }
+                },
+            },
+        ]
+
+    monkeypatch.setattr(
+        "simulator.reference_data.compilation_thermo_fits.generate_janaf_sidecar",
+        fake_generate,
+    )
+    output = tmp_path / "fits.json"
+    assert fit_cli_main(
+        ["--tables", "O-029", "Na-001", "--limit", "2", "--output", str(output)]
+    ) == 0
+
+    assert selected == {"table_ids": ["O-029", "Na-001"], "limit": 2}
+    summary = capsys.readouterr().out
+    assert "1 T1, 0 T2, 1 rejected" in summary
+    assert "formation_capable=1" in summary
+    assert "reasons={'segmentation_exhausted': 1}" in summary
+    assert "max_fit_error=" in summary
+    assert "Cp_tolerance_only=1" in summary
+    assert "'5e-3': 1" in summary
+    assert "'T_K': 550.0" in summary
+    assert output.is_file()
 
 
 def test_fe_alpha_curie_cusp_is_split_or_typed_as_unresolved() -> None:
@@ -551,7 +735,6 @@ def test_oscillating_candidate_is_rejected_by_anti_ringing() -> None:
         segment_bounds=[(temperatures[0], temperatures[-1])],
         fit_lo=temperatures[0],
         fit_hi=temperatures[-1],
-        rejected_template={"validity": {"T_min_K": temperatures[0], "T_max_K": temperatures[-1]}},
     )
     assert result.record["status"] == "rejected"
     assert result.record["reason_code"] == "interpolation_ringing"

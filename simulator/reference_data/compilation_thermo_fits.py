@@ -41,6 +41,10 @@ from simulator.reference_data.janaf import formula_composition
 from simulator.vapour_rail.nasa_cea import Nasa9Segment, R_J_PER_MOL_K
 
 REFERENCE_T_K = 298.15
+# NASA Glenn NASA-9 fits start at 200 K; lower printed cells remain available
+# for cellwise scoring.
+FIT_T_MIN_K = 200.0
+NASA9_CP_TERM_ORDER = (2, 3, 4, 1, 0, 5, 6)
 DEFAULT_SIDECAR_PATH = (
     Path(__file__).resolve().parents[2]
     / "data"
@@ -308,7 +312,7 @@ def _element_reference_terms(
 ) -> tuple[list[tuple[float, float, float]] | None, str | None]:
     composition = formula_composition(formula)
     if not composition:
-        return None, "unsupported_formula"
+        return None, f"unsupported_formula: formula {formula!r} has no elemental composition"
     terms: list[tuple[float, float, float]] = []
     for element, atom_count in composition:
         candidates = list(reference_curves.get(element, ()))
@@ -324,8 +328,15 @@ def _element_reference_terms(
         ]
         if not pressure_matches:
             if in_range:
-                return None, "pressure_convention_mismatch"
-            return None, "missing_element_reference_phase"
+                phases = ", ".join(sorted({curve.phase_label for curve in in_range}))
+                return None, (
+                    f"pressure_convention_mismatch: {element}, {phases}, "
+                    f"no fit matches {pressure_Pa:g} Pa"
+                )
+            return None, (
+                f"missing_element_reference_phase: {element}, none, "
+                f"no accepted reference fit covers {temperature_K:g} K"
+            )
         if len(pressure_matches) > 1:
             # At a shared phase boundary the right-hand source interval is the
             # JANAF reference schedule's phase at T; otherwise fail closed.
@@ -335,7 +346,13 @@ def _element_reference_terms(
             if len(starts_at_T) == 1:
                 pressure_matches = starts_at_T
             else:
-                return None, "ambiguous_element_reference_phase"
+                phases = ", ".join(
+                    sorted({curve.phase_label for curve in pressure_matches})
+                )
+                return None, (
+                    f"ambiguous_element_reference_phase: {element}, {phases}, "
+                    f"multiple fits cover {temperature_K:g} K"
+                )
         curve = pressure_matches[0]
         reference_composition = formula_composition(curve.formula)
         if (
@@ -344,7 +361,10 @@ def _element_reference_terms(
             or reference_composition[0][0] != element
             or reference_composition[0][1] <= 0
         ):
-            return None, "missing_element_reference_phase"
+            return None, (
+                f"missing_element_reference_phase: {element}, {curve.phase_label}, "
+                f"candidate formula {curve.formula!r} is not an elemental reference"
+            )
         coefficient = float(atom_count / reference_composition[0][1])
         _cp, h, _s, g = _evaluate(curve.segment_at(temperature_K), temperature_K)
         terms.append((coefficient, h, g))
@@ -529,7 +549,6 @@ def _fit_piecewise_candidate(
     segment_bounds: Sequence[tuple[float, float]],
     fit_lo: float,
     fit_hi: float,
-    rejected_template: Mapping[str, Any],
 ) -> FitResult:
     """Jointly fit bounded NASA-9 segments with exact anchor and join constraints."""
 
@@ -537,8 +556,8 @@ def _fit_piecewise_candidate(
     base = _record_base(
         metadata=metadata,
         phase_label=phase_label,
-        T_min_K=rejected_template.get("validity", {}).get("T_min_K"),
-        T_max_K=rejected_template.get("validity", {}).get("T_max_K"),
+        T_min_K=fit_lo,
+        T_max_K=fit_hi,
     )
     channels = _channel_cells(series)
     cp_cells = tuple(
@@ -555,7 +574,7 @@ def _fit_piecewise_candidate(
     if standard_state not in {"gas", "condensed_solid", "condensed_liquid", "condensed"}:
         return _rejected(
             base,
-            "missing_element_reference_phase",
+            "unsupported_standard_state",
             f"source phase {phase_label!r} has no closed NASA-9 standard-state mapping",
         )
     missing = [
@@ -576,15 +595,17 @@ def _fit_piecewise_candidate(
             "missing_printed_precision",
             "one or more fit cells lack a raw token or converted rounding allowance",
         )
-    # The nine-cell floor applies to the Cp curve's sampled temperatures;
-    # H and S are additional coupled observations, not extra Cp basis rows.
-    if len(cp_cells) < 9:
+    # H and S are coupled observations, not extra Cp-basis rows. Four Cp cells
+    # support two reduced-basis terms plus the two residual degrees of freedom.
+    basis_terms = min(7, len(cp_cells) - 2)
+    if len(cp_cells) < 4:
         return _rejected(
             base,
             "insufficient_cells",
-            f"phase range has {len(cp_cells)} printed Cp cells; at least 9 are required",
+            f"phase range has {len(cp_cells)} printed Cp cells; at least 4 are required",
             cell_count=len(cp_cells),
         )
+    base["basis_terms"] = basis_terms
 
     s_anchor = next(
         (cell for cell in s_cells if cell.temperature_K == REFERENCE_T_K),
@@ -600,30 +621,37 @@ def _fit_piecewise_candidate(
     )
     if s_anchor is None:
         return _rejected(base, "missing_absolute_entropy_anchor", "no absolute entropy cell is available")
-    if delta_fh_anchor is None or delta_fh_anchor.raw_token is None:
-        return _rejected(base, "missing_formation_h_anchor", "source has no printed ΔfH°(298.15 K) anchor")
 
     formula = str(metadata["formula"])
     composition = formula_composition(formula)
-    if not composition:
-        return _rejected(base, "unsupported_formula", f"cannot resolve elemental composition for {formula!r}")
     pressure = metadata["reference_pressure_Pa"]
-    if pressure is None:
-        return _rejected(base, "missing_pressure_convention", "source does not declare a standard pressure convention")
-    anchor_terms: list[tuple[float, float, float]] = []
-    anchor_error = None
-    if is_element_reference:
-        h_anchor_J = 0.0
+    formation_capable = False
+    formation_reason_code: str | None = None
+    formation_reason: str | None = None
+    h_anchor_J = 0.0
+    if is_element_reference and pressure is not None:
+        formation_capable = True
+    elif pressure is None:
+        formation_reason_code = "missing_pressure_convention"
+        formation_reason = "source does not declare a standard pressure convention"
+    elif not composition:
+        formation_reason_code = "unsupported_formula"
+        formation_reason = f"formula {formula!r} has no elemental composition"
+    elif not is_element_reference and (
+        delta_fh_anchor is None or delta_fh_anchor.raw_token is None
+    ):
+        formation_reason_code = "missing_formation_h_anchor"
+        formation_reason = "source has no printed ΔfH°(298.15 K) anchor"
     else:
         resolved, error = _element_reference_terms(formula, REFERENCE_T_K, pressure, reference_curves)
         if error:
-            anchor_error = error
-            h_anchor_J = 0.0
+            formation_reason_code, _separator, _detail = error.partition(":")
+            formation_reason = error
         else:
             assert resolved is not None
-            anchor_terms = resolved
+            formation_capable = True
             h_anchor_J = float(delta_fh_anchor.value) * 1000.0 + sum(
-                coefficient * h_ref for coefficient, h_ref, _g_ref in anchor_terms
+                coefficient * h_ref for coefficient, h_ref, _g_ref in resolved
             )
 
     segment_count = len(segment_bounds)
@@ -671,6 +699,13 @@ def _fit_piecewise_candidate(
     anchor_index = _segment_index(REFERENCE_T_K, bounds)
     s_anchor_index = _segment_index(s_anchor.temperature_K, bounds)
     try:
+        for index in range(segment_count):
+            for coefficient_index in NASA9_CP_TERM_ORDER[basis_terms:]:
+                zero_coefficient = np.zeros(variable_count, dtype=float)
+                zero_coefficient[9 * index + coefficient_index] = 1.0
+                constraints.append(zero_coefficient)
+                constraint_targets.append(0.0)
+
         for cell in cp_cells:
             index = _segment_index(cell.temperature_K, bounds)
             add_observation(cp_row(index, cell.temperature_K), cell.value / R_J_PER_MOL_K, cell.uncertainty)
@@ -821,72 +856,53 @@ def _fit_piecewise_candidate(
         "constrained_basis_rank": reduced_rank,
     }
 
-    if anchor_error:
-        return _rejected(
-            base,
-            anchor_error,
-            f"cannot resolve source elemental references at {REFERENCE_T_K:g} K",
-            fit_statistics=fit_statistics,
-        )
-
     formation_residuals: dict[str, list[float]] = {
         "delta_fH_kJ_per_mol": [],
         "delta_fG_kJ_per_mol": [],
     }
-    formation_over_precision: list[dict[str, Any]] = []
-    for quantity, result_key in (
-        (Quantity.DELTA_FH, "delta_fH_kJ_per_mol"),
-        (Quantity.DELTA_FG, "delta_fG_kJ_per_mol"),
-    ):
-        for cell in channels.get(quantity, ()):
-            if not fit_lo <= cell.temperature_K <= fit_hi:
-                continue
-            if cell.raw_token is None or cell.uncertainty is None:
-                return _rejected(
-                    base,
-                    "missing_printed_precision",
-                    f"{quantity.value} check cell at {cell.temperature_K:g} K lacks precision metadata",
-                    fit_statistics=fit_statistics,
+    if formation_capable:
+        for quantity, result_key in (
+            (Quantity.DELTA_FH, "delta_fH_kJ_per_mol"),
+            (Quantity.DELTA_FG, "delta_fG_kJ_per_mol"),
+        ):
+            for cell in channels.get(quantity, ()):
+                if not fit_lo <= cell.temperature_K <= fit_hi:
+                    continue
+                _cp, enthalpy, _entropy, gibbs = _piecewise_evaluate(
+                    segments, cell.temperature_K
                 )
-            _cp, enthalpy, _entropy, gibbs = _piecewise_evaluate(segments, cell.temperature_K)
-            species_property = enthalpy if quantity is Quantity.DELTA_FH else gibbs
-            if is_element_reference:
-                references = [(1.0, species_property)]
-            else:
-                resolved, error = _element_reference_terms(
-                    formula, cell.temperature_K, pressure, reference_curves
-                )
-                if error:
-                    return _rejected(
-                        base,
-                        error,
-                        f"cannot resolve source elemental references at {cell.temperature_K:g} K",
-                        fit_statistics=fit_statistics,
+                species_property = enthalpy if quantity is Quantity.DELTA_FH else gibbs
+                if is_element_reference:
+                    references = [(1.0, species_property)]
+                else:
+                    resolved, error = _element_reference_terms(
+                        formula, cell.temperature_K, pressure, reference_curves
                     )
-                assert resolved is not None
-                references = [
-                    (coefficient, h_ref if quantity is Quantity.DELTA_FH else g_ref)
-                    for coefficient, h_ref, g_ref in resolved
-                ]
-            derived = formation_subtraction_kJ_mol(species_property, references)
-            residual = derived - cell.value
-            formation_residuals[result_key].append(residual)
-            if abs(residual) > cell.uncertainty:
-                formation_over_precision.append(
-                    {
-                        "quantity": quantity.value,
-                        "T_K": cell.temperature_K,
-                        "residual": residual,
-                        "allowance": cell.uncertainty,
-                    }
-                )
+                    if error:
+                        formation_reason_code, _separator, _detail = error.partition(":")
+                        formation_reason = error
+                        formation_capable = False
+                        break
+                    assert resolved is not None
+                    references = [
+                        (coefficient, h_ref if quantity is Quantity.DELTA_FH else g_ref)
+                        for coefficient, h_ref, g_ref in resolved
+                    ]
+                derived = formation_subtraction_kJ_mol(species_property, references)
+                formation_residuals[result_key].append(derived - cell.value)
+            if not formation_capable:
+                break
 
-    fit_statistics["derived_formation_H_kJ_per_mol"] = _residual_stats(
-        formation_residuals["delta_fH_kJ_per_mol"]
-    )
-    fit_statistics["derived_formation_G_kJ_per_mol"] = _residual_stats(
-        formation_residuals["delta_fG_kJ_per_mol"]
-    )
+    if formation_capable:
+        fit_statistics["derived_formation_H_kJ_per_mol"] = _residual_stats(
+            formation_residuals["delta_fH_kJ_per_mol"]
+        )
+        fit_statistics["derived_formation_G_kJ_per_mol"] = _residual_stats(
+            formation_residuals["delta_fG_kJ_per_mol"]
+        )
+    else:
+        formation_residuals["delta_fH_kJ_per_mol"].clear()
+        formation_residuals["delta_fG_kJ_per_mol"].clear()
     cp_node_residuals = [
         {
             "T_K": cell.temperature_K,
@@ -894,7 +910,7 @@ def _fit_piecewise_candidate(
         }
         for cell in cp_cells
     ]
-    failed_cells = over_precision + formation_over_precision
+    failed_cells = over_precision
     ring_failures = [
         failure
         for segment in segments
@@ -904,17 +920,30 @@ def _fit_piecewise_candidate(
         "Cp_J_per_mol_K": fit_statistics["cp_J_per_mol_K"]["max_abs"],
         "H_minus_H298_kJ_per_mol": fit_statistics["H_minus_H298_kJ_per_mol"]["max_abs"],
         "S_J_per_mol_K": fit_statistics["S_J_per_mol_K"]["max_abs"],
-        "delta_fG_kJ_per_mol": fit_statistics[
-            "derived_formation_G_kJ_per_mol"
-        ]["max_abs"] if formation_residuals["delta_fG_kJ_per_mol"] else None,
     }
+    if formation_capable:
+        fit_error["delta_fH_kJ_per_mol"] = (
+            fit_statistics["derived_formation_H_kJ_per_mol"]["max_abs"]
+            if formation_residuals["delta_fH_kJ_per_mol"]
+            else None
+        )
+        fit_error["delta_fG_kJ_per_mol"] = (
+            fit_statistics["derived_formation_G_kJ_per_mol"]["max_abs"]
+            if formation_residuals["delta_fG_kJ_per_mol"]
+            else None
+        )
     cp_source_positive = all(cell.value > 0.0 for cell in cp_cells)
     cp_relative_residuals = [
-        abs(residual) / abs(cell.value)
+        (cell, residual, abs(residual) / abs(cell.value))
         for cell, residual in zip(cp_cells, cp_residuals)
         if cell.value > 0.0
     ]
-    max_relative_cp = max(cp_relative_residuals, default=None)
+    worst_relative_cp_cell = max(
+        cp_relative_residuals, key=lambda item: item[2], default=None
+    )
+    max_relative_cp = (
+        worst_relative_cp_cell[2] if worst_relative_cp_cell is not None else None
+    )
 
     join_errors: list[dict[str, float]] = []
     for left, right in zip(segments, segments[1:]):
@@ -1003,6 +1032,26 @@ def _fit_piecewise_candidate(
         "join_continuity_max_relative": join_continuity_max_relative,
         "anti_ringing_passed": ring_pass,
         "positive_Cp": positive_cp,
+        "source_Cp_positive": cp_source_positive,
+        "only_relative_Cp_residual_failed": (
+            max_relative_cp is not None
+            and max_relative_cp > 1e-3
+            and ring_pass
+            and positive_cp
+            and cp_source_positive
+            and join_continuity
+            and h_integrals_pass
+            and s_integrals_pass
+        ),
+        "worst_relative_Cp_cell": (
+            {
+                "T_K": worst_relative_cp_cell[0].temperature_K,
+                "residual_J_per_mol_K": worst_relative_cp_cell[1],
+                "relative_residual": worst_relative_cp_cell[2],
+            }
+            if worst_relative_cp_cell is not None
+            else None
+        ),
     }
 
     if not t1_pass and not t2_pass:
@@ -1040,6 +1089,8 @@ def _fit_piecewise_candidate(
         **base,
         "status": "accepted",
         "acceptance_tier": "table_equivalent" if t1_pass else "smooth_fit",
+        "basis_terms": basis_terms,
+        "formation_capable": formation_capable,
         "fit_error": fit_error,
         "fit_method": "weighted_constrained_linear_least_squares_on_scaled_temperature",
         "quantity_convention": {
@@ -1058,18 +1109,23 @@ def _fit_piecewise_candidate(
             "segments": thermo_segments,
         },
     }
-    curve = FittedCurve(
-        formula=formula,
-        phase_label=phase_label,
-        source_id=str(metadata["source_id"]),
-        source_record_id=str(metadata["source_record_id"]),
-        T_min_K=fit_lo,
-        T_max_K=fit_hi,
-        reference_pressure_Pa=pressure,
-        segment=segments[0],
-        is_element_reference=is_element_reference,
-        segments=tuple(segments),
-    )
+    if not formation_capable:
+        record_out["formation_reason_code"] = formation_reason_code or "formation_unavailable"
+        record_out["formation_reason"] = formation_reason or "formation references are unavailable"
+    curve = None
+    if pressure is not None:
+        curve = FittedCurve(
+            formula=formula,
+            phase_label=phase_label,
+            source_id=str(metadata["source_id"]),
+            source_record_id=str(metadata["source_record_id"]),
+            T_min_K=fit_lo,
+            T_max_K=fit_hi,
+            reference_pressure_Pa=pressure,
+            segment=segments[0],
+            is_element_reference=is_element_reference,
+            segments=tuple(segments),
+        )
     return FitResult(record_out, curve)
 
 
@@ -1097,12 +1153,13 @@ def fit_compilation_thermo_range(
     )
     excluded: list[dict[str, Any]] = []
     in_range_temperatures: list[float] = []
+    fit_T_min = max(FIT_T_MIN_K, T_min_K or FIT_T_MIN_K)
     for quantity, cells in channels.items():
         for cell in cells:
             reason = None
             if cell.temperature_K <= 0.0:
                 reason = "nonpositive_fit_temperature"
-            elif T_min_K is not None and T_min_K > 0.0 and cell.temperature_K < T_min_K:
+            elif cell.temperature_K < fit_T_min:
                 reason = "below_fit_T_min"
             elif T_max_K is not None and cell.temperature_K > T_max_K:
                 reason = "above_fit_T_max"
@@ -1129,7 +1186,7 @@ def fit_compilation_thermo_range(
             "no_positive_fit_cells",
             "no printed cell lies in the positive declared fit range",
         ))
-    fit_lo = max(T_min_K or min(in_range_temperatures), min(in_range_temperatures))
+    fit_lo = max(fit_T_min, min(in_range_temperatures))
     fit_hi = min(T_max_K or max(in_range_temperatures), max(in_range_temperatures))
     if fit_lo <= 0.0 or fit_hi <= fit_lo:
         return with_exclusions(_rejected(
@@ -1175,7 +1232,6 @@ def fit_compilation_thermo_range(
             segment_bounds=bounds,
             fit_lo=fit_lo,
             fit_hi=fit_hi,
-            rejected_template=base,
         )
         if candidate.record.get("status") == "accepted":
             return with_exclusions(candidate)
@@ -1371,21 +1427,30 @@ def _add_janaf_table(
     return records, curves
 
 
-def _janaf_documents(table_ids: set[str] | None) -> list[tuple[Path, dict[str, Any]]]:
+def _janaf_documents(
+    table_ids: set[str] | None, limit: int | None = None
+) -> list[tuple[Path, dict[str, Any]]]:
     from simulator.reference_data.janaf import iter_table_paths, load_table_document
 
     result: list[tuple[Path, dict[str, Any]]] = []
-    for path in iter_table_paths():
+    if limit is not None and limit <= 0:
+        return result
+    paths = list(iter_table_paths())
+    if table_ids is None and limit is not None:
+        paths = paths[:limit]
+    for path in paths:
         record = load_table_document(path)
         table = record.get("table") or {}
         table_id = str(table.get("table_id") or path.stem)
         if table_ids is None or table_id in table_ids:
             result.append((path, record))
+            if table_ids is not None and limit is not None and len(result) >= limit:
+                break
     return result
 
 
 def generate_janaf_sidecar(
-    *, table_ids: Sequence[str] | None = None
+    *, table_ids: Sequence[str] | None = None, limit: int | None = None
 ) -> list[dict[str, Any]]:
     """Generate selected JANAF fits and the elemental-reference curves they need."""
 
@@ -1394,13 +1459,13 @@ def generate_janaf_sidecar(
     from simulator.reference_data.janaf import TABLES_DIR
 
     selected_ids = set(table_ids) if table_ids else None
-    selected = _janaf_documents(selected_ids)
+    selected = _janaf_documents(selected_ids, limit)
     by_id = {
         str((record.get("table") or {}).get("table_id") or path.stem): (path, record)
         for path, record in selected
     }
     support_ids: set[str] = set()
-    if selected_ids is not None:
+    if selected_ids is not None or limit is not None:
         for _path, record in selected:
             metadata = source_metadata(record)
             composition = formula_composition(str(metadata["formula"]))
@@ -1468,13 +1533,21 @@ def generate_janaf_sidecar(
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
+        "--tables",
         "--table-id",
-        action="append",
-        help="JANAF table id to fit (may be repeated); default selects the whole JANAF compilation",
+        dest="table_ids",
+        nargs="+",
+        action="extend",
+        help="JANAF table ids to fit; reference tables are added as needed",
+    )
+    parser.add_argument(
+        "--limit", type=int, help="fit at most N selected tables in sorted table-id order"
     )
     parser.add_argument("--output", type=Path, default=DEFAULT_SIDECAR_PATH)
     args = parser.parse_args(argv)
-    records = generate_janaf_sidecar(table_ids=args.table_id)
+    if args.limit is not None and args.limit < 0:
+        parser.error("--limit must be nonnegative")
+    records = generate_janaf_sidecar(table_ids=args.table_ids, limit=args.limit)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(render_sidecar(records), encoding="utf-8")
     accepted = [record for record in records if record.get("status") == "accepted"]
@@ -1487,27 +1560,69 @@ def main(argv: Sequence[str] | None = None) -> int:
     for record in rejected:
         reason = str(record.get("reason_code", "unknown"))
         reasons[reason] = reasons.get(reason, 0) + 1
+    cp_only_rejections = [
+        record
+        for record in rejected
+        if record.get("fit_statistics", {}).get("smooth_fit_checks", {}).get(
+            "only_relative_Cp_residual_failed"
+        ) is True
+    ]
+    relaxed_cp_counts = {
+        label: sum(
+            float(record["fit_statistics"]["smooth_fit_checks"][
+                "maximum_relative_Cp_residual"
+            ]) <= threshold
+            for record in cp_only_rejections
+        )
+        for label, threshold in (("2e-3", 2e-3), ("5e-3", 5e-3), ("1e-2", 1e-2))
+    }
+    worst_cp_only = sorted(
+        cp_only_rejections,
+        key=lambda record: float(
+            record["fit_statistics"]["smooth_fit_checks"][
+                "maximum_relative_Cp_residual"
+            ]
+        ),
+        reverse=True,
+    )[:10]
+    worst_cp_only_report = [
+        {
+            "formula": record.get("formula"),
+            "phase": record.get("phase"),
+            **record["fit_statistics"]["smooth_fit_checks"][
+                "worst_relative_Cp_cell"
+            ],
+        }
+        for record in worst_cp_only
+    ]
     error_keys = (
         "Cp_J_per_mol_K",
         "H_minus_H298_kJ_per_mol",
         "S_J_per_mol_K",
+        "delta_fH_kJ_per_mol",
         "delta_fG_kJ_per_mol",
     )
     maximum_errors = {
         key: max(
             (
                 value
-                for record in records
+                for record in accepted
                 if (value := record.get("fit_error", {}).get(key)) is not None
             ),
-            default=0.0,
+            default=None,
         )
         for key in error_keys
     }
+    formation_capable_count = sum(
+        record.get("formation_capable") is True for record in accepted
+    )
     print(
         f"wrote {len(records)} fit records "
         f"({tier_counts['table_equivalent']} T1, {tier_counts['smooth_fit']} T2, "
-        f"{len(rejected)} rejected; reasons={reasons}; max_fit_error={maximum_errors}) "
+        f"{len(rejected)} rejected; formation_capable={formation_capable_count}; "
+        f"reasons={reasons}; max_fit_error={maximum_errors}; "
+        f"Cp_tolerance_only={len(cp_only_rejections)}; "
+        f"would_pass_at={relaxed_cp_counts}; worst_Cp_tolerance_only={worst_cp_only_report}) "
         f"to {args.output}"
     )
     return 0
