@@ -13,7 +13,11 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.core import OXYGEN_RESERVOIR_NOOP_MOL, PyrolysisSimulator
+from simulator.core import (
+    FERRIC_LEDGER_AGREEMENT_ABS,
+    OXYGEN_RESERVOIR_NOOP_MOL,
+    PyrolysisSimulator,
+)
 from simulator.fe_redox import (
     floor_vacuum_pressure_bar,
     kress91_fO2_log_for_fe3_fraction,
@@ -442,7 +446,7 @@ def test_exchange_then_respeciation_does_not_credit_the_same_dn() -> None:
     assert diagnostic["status"] == "ok"
     # Curvature may credit a residual. A second copy of dn would be ~dn.
     assert residual < 0.2 * dn
-    assert divergence["delta_abs"] <= 0.05
+    assert divergence["delta_abs"] <= FERRIC_LEDGER_AGREEMENT_ABS
 
 
 def test_reverse_exchange_without_inventory_stays_clamped() -> None:

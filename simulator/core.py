@@ -826,6 +826,28 @@ OXYGEN_RESERVOIR_REDOX_SOURCE_MAX_FO2_LOG10_BAR = 1.0e11
 # samples implied and ledger speciation at the same boundary.
 # TODO(SSO-R ch2 re-speciation): replace with the final respeciation gate.
 FERRIC_DIVERGENCE_WARNING_THRESHOLD = 0.05
+# Ledger Fe3+/FeT versus Kress at the current scalar. Not the warning.
+#
+# Premise: kress91_fO2_log_for_fe3_fraction is the algebraic inverse of
+# the forward ratio (the fO2 term is linear in log fO2), so a round trip
+# reproduces the fraction to a few ulps. A funded liquid respeciation
+# writes that pre-move target into the ledger. Re-evaluating Kress on
+# the post-move composition is the residual. Round-2 Mars liquid hours
+# closed to ~1e-16.
+# Units: absolute Fe3+/FeT. On 2505 mol Fe, 1e-9 is 6.3e-7 mol O2.
+# The 0.05 warning is 31.3 mol O2, about 1 kg.
+FERRIC_LEDGER_AGREEMENT_ABS = 1.0e-9
+# Partial-melt hours above the Kress floor do not run respeciation.
+# The scalar step is local, Δ ln fO2 = -dn/C_full, and the ledger
+# fraction moves by -4 dn/N_Fe. Those match to first order because
+# C_full = (N_Fe/4) * df/d ln fO2. One finite step leaves
+# (1/2)*f''*(Δln)^2, with f'' = a^2*f*(1-f)*(1-2f), a = 0.196,
+# |f''| <= 0.0037. The fixed-redox temperature endpoint holds the
+# implied fraction, so the remainders add. CI C2A hour 12 (first
+# skipped-solid hour after adoption) is 0; hour 24 is 2.30e-4.
+# Units: absolute Fe3+/FeT. On CI's ~1390 mol Fe, 5e-4 is 0.17 mol O2.
+# The C_flux divisor bug at CI hour 14 was 0.062, which this rejects.
+FERRIC_PARTIAL_MELT_AGREEMENT_ABS = 5.0e-4
 TERMINAL_RUMP_ACCOUNTS = (
     'process.cleaned_melt',
     'terminal.slag',
@@ -6105,6 +6127,87 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             diagnostic['reason'] = attribution
         return diagnostic
 
+    def _independent_ferric_fractions(self) -> Dict[str, float]:
+        """Ledger Fe3+/FeT from the oxide moles, Kress from the scalar.
+
+        Neither fraction is read from a stored diagnostic. A missing
+        scalar, a missing oxide inventory, or a missing Kress basis
+        raises. A default of zero would let that hour pass.
+        """
+        melt_mol = self.atom_ledger.project_account_mol('process.cleaned_melt')
+        _feo_mol, fe2o3_mol = iron_oxide_values(melt_mol)
+        oxidized_fe_mol = feot_equivalent_moles(melt_mol)
+        if oxidized_fe_mol <= OXYGEN_RESERVOIR_NOOP_MOL:
+            raise AccountingError(
+                'ferric agreement requires oxidized iron on process.cleaned_melt'
+            )
+        ledger = (2.0 * fe2o3_mol) / oxidized_fe_mol
+        raw_fO2 = getattr(
+            getattr(self.melt, 'oxygen_reservoir', None),
+            'melt_intrinsic_fO2_log',
+            None,
+        )
+        if raw_fO2 is None:
+            raise AccountingError(
+                'ferric agreement requires melt_intrinsic_fO2_log'
+            )
+        fO2_log = float(raw_fO2)
+        if not math.isfinite(fO2_log):
+            raise AccountingError(
+                'ferric agreement requires a finite melt_intrinsic_fO2_log; '
+                f'got {raw_fO2!r}'
+            )
+        T_K = float(self.melt.temperature_C) + 273.15
+        if not math.isfinite(T_K) or T_K <= 0.0:
+            raise AccountingError(
+                'ferric agreement requires finite positive temperature; '
+                f'temperature_C={self.melt.temperature_C!r}'
+            )
+        comp = self._melt_oxide_wt_pct()
+        mol_fractions = melt_mol_fractions_for_kress91(comp)
+        if not mol_fractions:
+            raise AccountingError(
+                'ferric agreement requires a Kress91 composition basis'
+            )
+        # Same pressure the respeciation dispatch quotes: melt p_total,
+        # floored the way BuiltinFeRedoxRespeciationProvider floors it.
+        pressure_bar = floor_vacuum_pressure_bar(
+            float(self.melt.p_total_mbar) / 1000.0
+        )
+        implied = float(kress91_split(
+            fO2_log=fO2_log,
+            mol_fractions=mol_fractions,
+            T_K=T_K,
+            pressure_bar=pressure_bar,
+        )['fe3'])
+        if not math.isfinite(implied):
+            raise AccountingError(
+                'ferric agreement Kress fraction is not finite; '
+                f'fO2_log={fO2_log!r} T_K={T_K!r}'
+            )
+        return {
+            'ledger_ferric_fraction': ledger,
+            'implied_ferric_fraction': implied,
+            'delta_abs': abs(implied - ledger),
+        }
+
+    def _require_independent_ferric_agreement(
+        self,
+        *,
+        tolerance: float,
+        context: str,
+    ) -> float:
+        fractions = self._independent_ferric_fractions()
+        delta = float(fractions['delta_abs'])
+        if delta > tolerance:
+            raise AccountingError(
+                f'{context} ferric ledger and Kress fraction diverged; '
+                f'delta_abs={delta:.6g} tolerance={tolerance:.6g} '
+                f"ledger={fractions['ledger_ferric_fraction']!r} "
+                f"implied={fractions['implied_ferric_fraction']!r}"
+            )
+        return delta
+
     def _fe_redox_respeciation_divergence_attribution(
         self,
         diagnostic: Mapping[str, Any],
@@ -6254,17 +6357,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     T_K=T_K,
                     gate_authority=gate_authority,
                 )
-                if (
-                    partial_capacity > OXYGEN_RESERVOIR_NOOP_MOL
-                    and float(divergence.get('delta_abs', 0.0) or 0.0)
-                    > FERRIC_DIVERGENCE_WARNING_THRESHOLD
-                ):
-                    raise AccountingError(
-                        'partial-melt ferric ledger and scalar-implied '
-                        'fraction diverged below the projected liquidus; '
-                        f"delta_abs={float(divergence.get('delta_abs', 0.0)):.6g} "
-                        f"ledger={divergence.get('ledger_ferric_fraction')!r} "
-                        f"implied={divergence.get('implied_ferric_fraction')!r}"
+                if partial_capacity > OXYGEN_RESERVOIR_NOOP_MOL:
+                    # Respeciation did not run, so the finite-step remainder
+                    # accumulates. The bound is that sum, not the 0.05
+                    # warning and not the post-respeciation float bound.
+                    self._require_independent_ferric_agreement(
+                        tolerance=FERRIC_PARTIAL_MELT_AGREEMENT_ABS,
+                        context=(
+                            'partial-melt below the projected liquidus'
+                        ),
                     )
             return diagnostic
         fO2_log, reference_T_K = self._melt_fO2_reference_state_at_temperature(
@@ -6372,15 +6473,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             and str(diagnostic.get('status', '') or '') != 'refused'
             and respeciation_status not in {'refused', 'skipped_solid'}
             and unfunded_o2_mol <= OXYGEN_RESERVOIR_NOOP_MOL
-            and float(divergence.get('delta_abs', 0.0) or 0.0)
-            > FERRIC_DIVERGENCE_WARNING_THRESHOLD
         ):
-            raise AccountingError(
-                'liquid ferric ledger and scalar-implied fraction diverged '
-                f'after Fe redox respeciation; '
-                f"delta_abs={float(divergence.get('delta_abs', 0.0)):.6g} "
-                f"ledger={divergence.get('ledger_ferric_fraction')!r} "
-                f"implied={divergence.get('implied_ferric_fraction')!r}"
+            # Recomputed here. divergence['delta_abs'] is the warning
+            # sample; a missing key must not pass as zero.
+            self._require_independent_ferric_agreement(
+                tolerance=FERRIC_LEDGER_AGREEMENT_ABS,
+                context='liquid Fe redox respeciation',
             )
         return diagnostic
 
