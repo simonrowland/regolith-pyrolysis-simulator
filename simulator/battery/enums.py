@@ -20,6 +20,8 @@ from __future__ import annotations
 
 from enum import StrEnum
 
+from simulator.state_types import StateTag
+
 
 class Engine(StrEnum):
     """Closed first-class engine tokens. Not derived from resolve_backend."""
@@ -187,6 +189,7 @@ class NoticeKind(StrEnum):
     OUT_OF_CERTIFIED_BAND = "out_of_certified_band"
     DERIVATION_USES_COMPILATION = "derivation_uses_compilation"
     COMPOSITION_PROJECTED = "composition_projected"
+    TOTAL_IRON_REPORTED_AS_FEO = "total_iron_reported_as_feo"
     PRESSURE_PROVENANCE_UNKNOWN = "pressure_provenance_unknown"
     SOURCE_DISAGREEMENT = "source_disagreement"
     # An input was left out because this row does not take it. The reason
@@ -329,6 +332,7 @@ class AmountBasis(StrEnum):
 
 class MethodToken(StrEnum):
     KNUDSEN_EFFUSION = "knudsen_effusion"
+    STATIC_EQUILIBRIUM = "static_equilibrium"
     LANGMUIR_FREE_EVAPORATION = "langmuir_free_evaporation"
     TRANSPIRATION = "transpiration"
     TGA = "tga"
@@ -448,12 +452,6 @@ class IdentityEqualKind(StrEnum):
     IDENTITY_MISMATCH = "identity_mismatch"
     IDENTITY_UNKNOWN = "identity_unknown"
     INVALID_IDENTITY = "invalid_identity"
-
-
-class StateTag(StrEnum):
-    VALUE = "value"
-    UNKNOWN = "unknown"
-    NOT_APPLICABLE = "not_applicable"
 
 
 # Canonical storage unit from quantity (+ per, where the unit names the basis).

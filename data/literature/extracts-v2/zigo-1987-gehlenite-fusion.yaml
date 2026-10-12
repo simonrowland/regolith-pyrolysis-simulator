@@ -263,8 +263,8 @@ observations:
   experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'negative_enthalpy_change_on_cooling'
+      tag: value
+      value: H_minus_H298
     species:
       formula: gehlenite
       phase:
@@ -276,12 +276,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1519'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '335.9'
     approximate: false
   uncertainty:
     kind: printed
@@ -312,12 +354,34 @@ observations:
         page: 174
         pdf_page_index: 4
         table: '1'
+  derivation:
+    relation: negative_cooling_enthalpy_to_H_minus_H298
+    inputs:
+    - pdf:zigo-1987-gehlenite-fusion
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '335.9'
+        locator:
+          page: 174
+          pdf_page_index: 4
+          table: '1'
+    - - factor
+      - state:
+          tag: value
+          value: '1'
+        locator:
+          page: 174
+          pdf_page_index: 4
+          table: '1'
+    output_unit: kJ/mol
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_measured::T=1567:h=685c522c3c36
   experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'negative_enthalpy_change_on_cooling'
+      tag: value
+      value: H_minus_H298
     species:
       formula: gehlenite
       phase:
@@ -329,12 +393,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1567'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '354.1'
     approximate: false
   uncertainty:
     kind: printed
@@ -365,12 +471,34 @@ observations:
         page: 174
         pdf_page_index: 4
         table: '1'
+  derivation:
+    relation: negative_cooling_enthalpy_to_H_minus_H298
+    inputs:
+    - pdf:zigo-1987-gehlenite-fusion
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '354.1'
+        locator:
+          page: 174
+          pdf_page_index: 4
+          table: '1'
+    - - factor
+      - state:
+          tag: value
+          value: '1'
+        locator:
+          page: 174
+          pdf_page_index: 4
+          table: '1'
+    output_unit: kJ/mol
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_measured::T=1582:h=85fd9bce320c
   experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'negative_enthalpy_change_on_cooling'
+      tag: value
+      value: H_minus_H298
     species:
       formula: gehlenite
       phase:
@@ -382,12 +510,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1582'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '359.5'
     approximate: false
   uncertainty:
     kind: printed
@@ -418,12 +588,34 @@ observations:
         page: 174
         pdf_page_index: 4
         table: '1'
+  derivation:
+    relation: negative_cooling_enthalpy_to_H_minus_H298
+    inputs:
+    - pdf:zigo-1987-gehlenite-fusion
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '359.5'
+        locator:
+          page: 174
+          pdf_page_index: 4
+          table: '1'
+    - - factor
+      - state:
+          tag: value
+          value: '1'
+        locator:
+          page: 174
+          pdf_page_index: 4
+          table: '1'
+    output_unit: kJ/mol
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_measured::T=1691:h=507ee2e28d59
   experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'negative_enthalpy_change_on_cooling'
+      tag: value
+      value: H_minus_H298
     species:
       formula: gehlenite
       phase:
@@ -435,12 +627,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1691'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '393.2'
     approximate: false
   uncertainty:
     kind: printed
@@ -471,12 +705,34 @@ observations:
         page: 174
         pdf_page_index: 4
         table: '1'
+  derivation:
+    relation: negative_cooling_enthalpy_to_H_minus_H298
+    inputs:
+    - pdf:zigo-1987-gehlenite-fusion
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '393.2'
+        locator:
+          page: 174
+          pdf_page_index: 4
+          table: '1'
+    - - factor
+      - state:
+          tag: value
+          value: '1'
+        locator:
+          page: 174
+          pdf_page_index: 4
+          table: '1'
+    output_unit: kJ/mol
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_measured::T=1730:h=b974bb2540a9
   experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'negative_enthalpy_change_on_cooling'
+      tag: value
+      value: H_minus_H298
     species:
       formula: gehlenite
       phase:
@@ -488,12 +744,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1730'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '407.5'
     approximate: false
   uncertainty:
     kind: printed
@@ -524,12 +822,34 @@ observations:
         page: 174
         pdf_page_index: 4
         table: '1'
+  derivation:
+    relation: negative_cooling_enthalpy_to_H_minus_H298
+    inputs:
+    - pdf:zigo-1987-gehlenite-fusion
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '407.5'
+        locator:
+          page: 174
+          pdf_page_index: 4
+          table: '1'
+    - - factor
+      - state:
+          tag: value
+          value: '1'
+        locator:
+          page: 174
+          pdf_page_index: 4
+          table: '1'
+    output_unit: kJ/mol
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_measured::T=1799:h=c263b7178823
   experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'negative_enthalpy_change_on_cooling'
+      tag: value
+      value: H_minus_H298
     species:
       formula: gehlenite
       phase:
@@ -541,12 +861,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1799'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '432.5'
     approximate: false
   uncertainty:
     kind: printed
@@ -577,6 +939,28 @@ observations:
         page: 174
         pdf_page_index: 4
         table: '1'
+  derivation:
+    relation: negative_cooling_enthalpy_to_H_minus_H298
+    inputs:
+    - pdf:zigo-1987-gehlenite-fusion
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '432.5'
+        locator:
+          page: 174
+          pdf_page_index: 4
+          table: '1'
+    - - factor
+      - state:
+          tag: value
+          value: '1'
+        locator:
+          page: 174
+          pdf_page_index: 4
+          table: '1'
+    output_unit: kJ/mol
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t2_crystal_solution_calorimetry
   experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
   identity:

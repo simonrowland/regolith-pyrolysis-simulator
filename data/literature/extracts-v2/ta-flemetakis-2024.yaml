@@ -1367,13 +1367,15 @@ observations:
         basis: printed_oxides
         components:
         - - SiO2
-          - '0.5035444240893955880757031244'
+          - '0.4569559968617644642969536782'
         - - Al2O3
-          - '0.09066153980571208613705929129'
+          - '0.08227344463968649392973033826'
         - - MgO
-          - '0.1584107226666308382693381248'
+          - '0.1437544062187287621339760261'
         - - CaO
-          - '0.2473833134382614875178994594'
+          - '0.224495165056337181916542893'
+        - - B2O3
+          - '0.09252098722348309772279706416'
         amount_basis: mole_fraction
   value:
     kind: unavailable
@@ -1424,13 +1426,15 @@ observations:
           basis: printed_oxides
           components:
           - - Al2O3
-            - '0.09066153980571208613705929129'
+            - '0.08227344463968649392973033831'
+          - - B2O3
+            - '0.09252098722348309772279706422'
           - - CaO
-            - '0.2473833134382614875178994594'
+            - '0.2244951650563371819165428931'
           - - MgO
-            - '0.1584107226666308382693381248'
+            - '0.1437544062187287621339760261'
           - - SiO2
-            - '0.5035444240893955880757031244'
+            - '0.4569559968617644642969536785'
           amount_basis: mole_fraction
       locator:
         published_page: 174
@@ -1458,6 +1462,26 @@ observations:
           - state:
               tag: value
               value: '101.960077'
+            locator:
+              published_page: 174
+              pdf_page_index: 2
+              table: '1'
+              section: 2.1 Starting material
+              source_path: corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
+        - - original_B2O3_wt_pct
+          - state:
+              tag: value
+              value: '10.55'
+            locator:
+              published_page: 174
+              pdf_page_index: 2
+              table: '1'
+              section: 2.1 Starting material
+              source_path: corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
+        - - M_B2O3_g_mol
+          - state:
+              tag: value
+              value: '69.617'
             locator:
               published_page: 174
               pdf_page_index: 2

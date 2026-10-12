@@ -12,6 +12,7 @@ from pathlib import Path
 
 import pytest
 import yaml
+from test_literature_extracts import RETIRED_DUPLICATE_RESIDUAL_KEY_ALIASES
 
 from simulator.state import OXIDE_SPECIES
 from simulator.vapour_rail.u0_manifest import (
@@ -476,7 +477,9 @@ def test_residual_baseline_validation_anchors_resolve(manifest: dict) -> None:
     )
     live_keys = {point["key"] for point in baseline["points"]}
     pinned = {
-        ref.removeprefix(prefix)
+        RETIRED_DUPLICATE_RESIDUAL_KEY_ALIASES.get(
+            ref.removeprefix(prefix), ref.removeprefix(prefix)
+        )
         for row in manifest["species"]
         for ref in row["validation_anchor_refs"]
         if ref.startswith(prefix)

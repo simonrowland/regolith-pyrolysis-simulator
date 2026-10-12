@@ -10,6 +10,7 @@ from types import SimpleNamespace
 import pytest
 
 from simulator import evaporation as evaporation_module
+from simulator import engine_binding_admission as admission_module
 from simulator.chemistry.kernel import (
     CapabilityProfile,
     ChemistryIntent,
@@ -1286,6 +1287,47 @@ def test_redox_liquidus_failure_uses_kress_floor_above_1200_default_off(
     assert sim._melt_redox_liquid_fraction_factor(1200.0 + 273.15) == 0.0
 
 
+def test_redox_gate_propagates_keyerror_from_curve_notice_recording(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=False,
+    )
+
+    def fake_dispatch(intent, *args, **kwargs):
+        assert intent is ChemistryIntent.GATE_LIQUID_FRACTION
+        return SimpleNamespace(
+            status='ok',
+            diagnostic={
+                'backend_status': 'ok',
+                'solidus_T_C': 1000.0,
+                'liquidus_T_C': 1500.0,
+            },
+        )
+
+    def fail_notice_recording(_curve):
+        raise KeyError('floor_T_C')
+
+    monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
+    monkeypatch.setattr(
+        sim,
+        '_record_composition_projected_liquidus_notice_from_curve',
+        fail_notice_recording,
+    )
+    fallback_count = sim._melt_redox_liquidus_gate_fallback_count
+
+    with pytest.raises(KeyError, match='floor_T_C'):
+        sim._melt_redox_liquidus_gate_curve()
+
+    assert sim._melt_redox_liquidus_gate_fallback_count == fallback_count == 0
+
+
 def _lunar_composition_projected_diagnostic(sim):
     """Ig-order drop notice for the lunar cleaned melt, without a binary."""
     from simulator.melt_backend.magemin import (
@@ -2001,6 +2043,13 @@ def test_nonfinite_mapping_curve_floor_falls_back_instead_of_zeroing_capacity(
     assert fallback['status'] == 'liquidus_unavailable_floor_fallback'
     assert fallback['liquidus_status'] == 'invalid'
     assert fallback['source'] == 'none:nonfinite_liquid_fraction'
+    assert fallback['repair_notice'] == {
+        'kind': 'kress_liquidus_floor_repair',
+        'repaired': 'unusable liquidus bounds or interpolation',
+        'reason': 'non-finite liquid_fraction=nan',
+        'replacement': 'deterministic Kress91 liquidus floor',
+        'floor_T_C': 1200.0,
+    }
     assert sim._melt_redox_liquid_fraction_factor(1200.0 + 273.15) == 0.0
     assert sim._last_melt_redox_liquid_fraction_diagnostic['status'] == (
         'invalid'
@@ -2101,7 +2150,7 @@ def test_not_converged_token_is_not_rewritten_to_out_of_domain(
     )
 
     def raise_both_tokens():
-        raise RuntimeError(
+        raise ProviderUnavailableError(
             'gate liquid fraction unavailable: status=not_converged; '
             'kernel liquidus unavailable: status=out_of_domain'
         )
@@ -2604,6 +2653,153 @@ def test_shared_freeze_gate_curve_cache_uses_melt_input_only(
     assert different_backend == first
     assert different_version == first
     assert len(shared_cache) == 1
+
+
+@pytest.mark.parametrize('memo_scope', ['local', 'shared'])
+def test_gate_curve_memo_reuses_without_receipt_and_emits_notice_once(
+    memo_scope,
+    monkeypatch,
+    tmp_path,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    from simulator.engine_binding_admission import binding_admission_run_notice
+
+    missing_receipt = tmp_path / 'missing-binding-admission.json'
+    identity = admission_module.BindingIdentity(
+        engine_id='synthetic-fake',
+        model_id='fixture-model-v1',
+        binding_revision='synthetic-r1',
+        transport='subprocess',
+    )
+    provenance = {
+        'binding_provenance_verifiable': True,
+        'runtime_artifact': 'test-only',
+    }
+    monkeypatch.setattr(
+        admission_module,
+        'binding_receipt_path',
+        lambda *_args, **_kwargs: missing_receipt,
+    )
+    monkeypatch.setattr(
+        admission_module,
+        'binding_identity_for_backend',
+        lambda _backend: identity,
+    )
+    monkeypatch.setattr(
+        admission_module,
+        'current_backend_provenance',
+        lambda _identity, _backend: provenance,
+    )
+    shared_cache = {}
+    sims = [
+        _build_freeze_gate_sim(
+            vapor_pressure_data,
+            feedstocks_data,
+            setpoints_data,
+            enabled=True,
+        )
+        for _ in range(2)
+    ]
+    curve = {
+        'source': 'gate_liquid_fraction:authoritative:synthetic-fake',
+        'status': 'ok',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1300.0,
+    }
+    calls = []
+    for index, sim in enumerate(sims):
+        sim._freeze_gate_shared_curve_cache = shared_cache
+        sim._freeze_gate_curve_from_gate_dispatch = (
+            lambda reasons, *, fO2_log, index=index: (
+                calls.append(index) or dict(curve)
+            )
+        )
+
+    assert not missing_receipt.exists()
+    if memo_scope == 'local':
+        first = sims[0]._freeze_gate_curve()
+        second = sims[0]._freeze_gate_curve()
+        participants = sims[:1]
+    else:
+        first = sims[0]._freeze_gate_curve()
+        second = sims[1]._freeze_gate_curve()
+        participants = sims
+
+    assert calls == [0]
+    assert second == first
+    for sim in participants:
+        notice = binding_admission_run_notice(sim)
+        assert notice is not None
+        assert len(notice['notices']) == 1
+        assert notice['notices'][0]['reason'] == 'receipt missing'
+
+
+@pytest.mark.parametrize('receipt_present', [False, True])
+@pytest.mark.parametrize('memo_scope', ['local', 'shared'])
+def test_uncacheable_gate_curve_never_enters_local_or_shared_memo(
+    receipt_present,
+    memo_scope,
+    monkeypatch,
+    tmp_path,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    if receipt_present:
+        from tests.binding_admission_fixtures import (
+            install_synthetic_binding_receipt,
+        )
+
+        install_synthetic_binding_receipt(
+            tmp_path,
+            monkeypatch,
+            bind_direct_backend=True,
+        )
+    else:
+        missing_receipt = tmp_path / 'missing-binding-admission.json'
+        monkeypatch.setattr(
+            admission_module,
+            'binding_receipt_path',
+            lambda *_args, **_kwargs: missing_receipt,
+        )
+
+    shared_cache = {}
+    sims = [
+        _build_freeze_gate_sim(
+            vapor_pressure_data,
+            feedstocks_data,
+            setpoints_data,
+            enabled=True,
+        )
+        for _ in range(2)
+    ]
+    curve = {
+        'source': 'gate_liquid_fraction:authoritative:synthetic-fake',
+        'status': 'unavailable',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1300.0,
+    }
+    calls = []
+    for index, sim in enumerate(sims):
+        sim._freeze_gate_shared_curve_cache = shared_cache
+        sim._freeze_gate_curve_from_gate_dispatch = (
+            lambda reasons, *, fO2_log, index=index: (
+                calls.append(index) or dict(curve)
+            )
+        )
+
+    if memo_scope == 'local':
+        sims[0]._freeze_gate_curve()
+        sims[0]._freeze_gate_curve()
+    else:
+        sims[0]._freeze_gate_curve()
+        sims[1]._freeze_gate_curve()
+
+    assert len(calls) == 2
+    assert shared_cache == {}
+    assert all(sim._freeze_gate_liquid_fraction_cache is None for sim in sims)
 
 
 def test_shared_freeze_gate_curve_cache_splits_validation_map_dose_states(

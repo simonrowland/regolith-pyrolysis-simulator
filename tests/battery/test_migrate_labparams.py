@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import MethodToken
+from simulator.battery.enums import Engine, MethodToken, NoticeKind, Phase
 from simulator.battery.migrate import (
     REPO_ROOT,
     Migrator,
@@ -24,6 +24,7 @@ from simulator.battery.migrate import (
     wt_pct_to_mole_fraction,
 )
 from simulator.battery.records import Located, State, Value, ValueKind, as_decimal
+from simulator.battery.score import ScoreContext, compile_residual, predict_with_engine
 from tests.battery.test_migrate import (
     FIXTURE_EXTRACT,
     _migrate_real_extract,
@@ -137,6 +138,7 @@ def test_equal_pressure_duplicates_keep_printed_approximation() -> None:
 @pytest.mark.parametrize(
     ("printed_method", "expected"),
     [
+        ("static_capsule_vapor_pressure", MethodToken.STATIC_EQUILIBRIUM),
         ("solar_furnace", MethodToken.SOLAR_FURNACE_PYROLYSIS),
         ("melt_equilibration_quench", MethodToken.QUENCH_EQUILIBRATION),
         ("kems_effusion", MethodToken.KNUDSEN_EFFUSION),
@@ -151,6 +153,87 @@ def test_printed_method_aliases_map_to_closed_tokens(
     mapped = map_method(printed_method)
     assert mapped.is_value
     assert mapped.value is expected
+
+
+def test_ntrs_static_capsule_rows_migrate_with_source_validity_flags() -> None:
+    extract = REPO_ROOT / "data/literature/extracts/ntrs-19650014783.yaml"
+    doc = yaml.safe_load(extract.read_text(encoding="utf-8"))
+    method_record = next(
+        item
+        for item in doc["species"]["Na"]["observations"]
+        if item["observation_id"] == "bowles_rosenblum_1965_na_method_and_apparatus"
+    )
+    flags = method_record["values"]["validity_flags"]
+    assert flags["temperature_uniformity"]["status"] == "intentional_gradient"
+    assert flags["outgassing"]["status"] == "not_reported"
+    assert flags["outgassing"]["locator"]["published_page"] == 4
+    assert flags["outgassing"]["locator"]["pdf_page_index"] == 6
+    assert flags["capsule_reaction"]["status"] == "not_reported"
+    assert "tantalum" in flags["impurity_note"]["note"]
+
+    migrator = Migrator(REPO_ROOT)
+    migrator._migrate_extract(extract)
+    rows = [
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.source_id == "ntrs-19650014783"
+        and observation.observation_id.startswith(
+            "ntrs-19650014783::bowles_rosenblum_1965_na_table1_static_capsule::"
+        )
+    ]
+    assert len(rows) == 49
+    assert all(
+        migrator.result.experiments[row.experiment_id].method.value
+        is MethodToken.STATIC_EQUILIBRIUM
+        for row in rows
+    )
+    assert all(row.identity.species.phase.value is Phase.L for row in rows)
+    assert all(
+        row.identity.reservoir.is_value
+        and row.identity.reservoir.value.formula == "Na"
+        and row.identity.reservoir.value.phase.value is Phase.L
+        for row in rows
+    )
+    assert all(
+        any(
+            notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+            and "temperature_uniformity: status=intentional_gradient" in notice.reason
+            for notice in row.notices
+        )
+        for row in rows
+    )
+    assert all(
+        any(
+            "outgassing: status=not_reported" in notice.reason
+            for notice in row.notices
+        )
+        and any(
+            "capsule_reaction: status=not_reported" in notice.reason
+            for notice in row.notices
+        )
+        for row in rows
+    )
+
+    reference = rows[0]
+    experiment = migrator.result.experiments[reference.experiment_id]
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL, reference, experiment=experiment
+    )
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=ScoreContext(
+            works={},
+            experiments={experiment.experiment_id: experiment},
+            observations={reference.observation_id: reference},
+        ),
+        prediction=prediction,
+    )
+    assert any(
+        notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+        and "temperature_uniformity: status=intentional_gradient" in notice.reason
+        for notice in residual.notices
+    )
 
 
 # Printed 「3. 起電力測定」 under 「II. 実験方法」. The heading is on published
@@ -564,6 +647,21 @@ def test_mendybaev_runs_use_starting_glass_and_retain_residue_printed() -> None:
         assert initial.inference.relation == "wt_pct_to_mole_fraction"
         assert "original_unit=wt_pct" in initial.inference.inputs
         if raw_id != "func-5":
+            assert initial.locator is not None
+            assert initial.locator.paragraph == "FUNC starting"
+        if raw_id == "func-10":
+            resolved_start = wt_pct_to_mole_fraction(
+                {
+                    "MgO": as_decimal("37.9"),
+                    "Al2O3": as_decimal("11.6"),
+                    "SiO2": as_decimal("42.9"),
+                    "CaO": as_decimal("7.6"),
+                }
+            )
+            assert tuple(
+                (name, value.quantize(Decimal("0.000000000001")))
+                for name, value in resolved_start.components
+            ) == starting_components
             assert initial.locator is not None
             assert initial.locator.paragraph == "FUNC starting"
 

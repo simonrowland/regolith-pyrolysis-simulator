@@ -1,7 +1,12 @@
 from __future__ import annotations
 
+import ast
+import json
 import random
 import os
+import subprocess
+import sys
+from pathlib import Path
 
 import pytest
 
@@ -328,16 +333,135 @@ def test_probe_catches_nondeterministic_eval_with_diff() -> None:
 
 
 def test_pin_worker_env_sets_single_thread_vars_idempotently(monkeypatch) -> None:
+    # Startup commit 2 will delegate this helper to the policy owner while preserving
+    # its idempotent environment assignments and None return.
     for name in THREAD_ENV_VARS:
         monkeypatch.delenv(name, raising=False)
 
-    pin_worker_env()
-    pin_worker_env()
+    assert pin_worker_env() is None
+    assert pin_worker_env() is None
 
     assert {name: "1" for name in THREAD_ENV_VARS} == {
         name: os.environ[name]
         for name in THREAD_ENV_VARS
     }
+
+
+def test_pin_worker_env_leaves_loaded_openblas_pool_unchanged() -> None:
+    # Startup commit 2 is expected to move the caller-pool assertion from four to one;
+    # the child and grandchild checks keep this pin independent of host core count.
+    code = r'''
+import json
+import os
+import subprocess
+import sys
+
+import numpy
+from threadpoolctl import threadpool_info, threadpool_limits
+
+def openblas_pool():
+    return next((pool for pool in threadpool_info() if pool["internal_api"] == "openblas"), None)
+
+limiter = threadpool_limits(limits=4, user_api="blas")
+before = openblas_pool()
+if before is None:
+    print(json.dumps({"skip_reason": "OPENBLAS_NOT_PRESENT", "pools": threadpool_info()}))
+    raise SystemExit(0)
+
+import simulator
+from simulator.optimize.determinism import THREAD_ENV_VARS, pin_worker_env
+
+pin_worker_env()
+after = openblas_pool()
+grandchild_code = r"""
+import json
+import numpy
+from threadpoolctl import threadpool_info
+pool = next((pool for pool in threadpool_info() if pool["internal_api"] == "openblas"), None)
+print(json.dumps({"pool": pool}))
+"""
+grandchild = subprocess.run(
+    [sys.executable, "-c", grandchild_code],
+    check=True,
+    capture_output=True,
+    text=True,
+    env=os.environ.copy(),
+)
+print(json.dumps({
+    "environment": {name: os.environ.get(name) for name in THREAD_ENV_VARS},
+    "before": before,
+    "after": after,
+    "grandchild": json.loads(grandchild.stdout)["pool"],
+}))
+'''
+    env = os.environ.copy()
+    for name in THREAD_ENV_VARS:
+        env.pop(name, None)
+
+    completed = subprocess.run(
+        [sys.executable, "-c", code],
+        check=True,
+        capture_output=True,
+        text=True,
+        env=env,
+    )
+    report = json.loads(completed.stdout)
+    if "skip_reason" in report:
+        pytest.skip(f"{report['skip_reason']}: OpenBLAS pool is unavailable; pools={report['pools']}")
+
+    print(f"BLAS_POLICY_POOLS {json.dumps(report, sort_keys=True)}")
+    assert report["environment"] == {name: "1" for name in THREAD_ENV_VARS}
+    assert report["before"]["num_threads"] == 4
+    assert report["after"]["num_threads"] == 4
+    assert report["grandchild"]["num_threads"] == 1
+
+
+def test_thread_env_vars_contains_exactly_the_existing_five_names() -> None:
+    # Startup commit 2 changes the loaded-pool pin; this five-name sequence remains stable.
+    assert THREAD_ENV_VARS == (
+        "OMP_NUM_THREADS",
+        "OPENBLAS_NUM_THREADS",
+        "MKL_NUM_THREADS",
+        "NUMEXPR_NUM_THREADS",
+        "VECLIB_MAXIMUM_THREADS",
+    )
+
+
+def test_thread_env_vars_have_one_production_literal_owner() -> None:
+    from simulator import _blas_policy
+    from simulator.optimize import determinism
+
+    expected = (
+        "OMP_NUM_THREADS",
+        "OPENBLAS_NUM_THREADS",
+        "MKL_NUM_THREADS",
+        "NUMEXPR_NUM_THREADS",
+        "VECLIB_MAXIMUM_THREADS",
+    )
+    assert determinism.THREAD_ENV_VARS is _blas_policy.THREAD_ENV_VARS
+
+    root = Path(__file__).resolve().parents[1]
+    production_files = [
+        *root.glob("*.py"),
+        *(path for directory in ("simulator", "engines", "scripts")
+          for path in (root / directory).rglob("*.py")),
+    ]
+    literals = []
+    for path in sorted(production_files):
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        for node in ast.walk(tree):
+            if not isinstance(node, (ast.Tuple, ast.List)):
+                continue
+            try:
+                value = ast.literal_eval(node)
+            except (ValueError, TypeError):
+                continue
+            if isinstance(value, (tuple, list)) and any(
+                isinstance(item, str) and item in expected for item in value
+            ):
+                literals.append((path.relative_to(root).as_posix(), node.lineno, tuple(value)))
+
+    assert literals == [("simulator/_blas_policy.py", 3, expected)]
 
 
 def test_pin_seeds_is_deterministic() -> None:

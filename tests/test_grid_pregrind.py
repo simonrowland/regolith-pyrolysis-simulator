@@ -16,6 +16,7 @@ import yaml
 
 import scripts.grid_pregrind as grid_pregrind
 import scripts.grid_pregrind_writer as grid_pregrind_writer
+import simulator.melt_backend.vaporock as vaporock_module
 from scripts.grid_pregrind import (
     DEFAULT_FEEDSTOCKS,
     build_grid_points,
@@ -43,6 +44,8 @@ from simulator.engine_pool import EngineWorkerTimeout
 from simulator.config import ENGINE_MODEL_UNAVAILABLE
 from scripts.grind_harvest import harvest_snapshot
 from simulator.melt_backend.thermoengine import ThermoEngineBackend
+from simulator.fe_redox import Kress91InvalidControls as _ORIGINAL_KRESS91_INVALID_CONTROLS
+from simulator.melt_backend.vaporock import VapoRockBackend as _ORIGINAL_VAPOROCK_BACKEND
 
 
 def test_feedstock_simplex_grid_sums_deduplicates_and_respects_bounds():
@@ -2788,7 +2791,7 @@ def test_drain_only_uses_prepared_queue_without_importing_fe_redox(
     status = tmp_path / "status.json"
     _prepared_drain_database(database)
     context = _ImmediateContext()
-    sys.modules.pop("simulator.fe_redox", None)
+    monkeypatch.delitem(sys.modules, "simulator.fe_redox")
 
     monkeypatch.setattr(grid_pregrind.signal, "signal", lambda *_args: None)
     monkeypatch.setattr(
@@ -2884,7 +2887,7 @@ def test_drain_only_refuses_database_without_materialized_queue(tmp_path, monkey
     database = tmp_path / "empty.db"
     with GridCacheWriter(database):
         pass
-    sys.modules.pop("simulator.fe_redox", None)
+    monkeypatch.delitem(sys.modules, "simulator.fe_redox")
     monkeypatch.setattr(grid_pregrind.signal, "signal", lambda *_args: None)
     monkeypatch.setattr(
         grid_pregrind,
@@ -2903,7 +2906,7 @@ def test_drain_only_refuses_database_without_materialized_queue(tmp_path, monkey
 def test_existing_prepared_database_requires_explicit_drain_only(tmp_path, monkeypatch):
     database = tmp_path / "prepared.db"
     _prepared_drain_database(database)
-    sys.modules.pop("simulator.fe_redox", None)
+    monkeypatch.delitem(sys.modules, "simulator.fe_redox")
     monkeypatch.setattr(grid_pregrind.signal, "signal", lambda *_args: None)
     monkeypatch.setattr(
         grid_pregrind,
@@ -4102,3 +4105,11 @@ def test_observe_hook_binds_to_real_adapter_signature():
 def test_grid_pregrind_cli_model_default_is_pinned():
     """Pin the offline grid CLI's --model default before it is sourced from simulator.config."""
     assert grid_pregrind.parser().parse_args([]).model == "MELTSv1.0.2"
+
+
+def test_grid_pregrind_drain_only_restores_imported_class_identities():
+    import simulator.fe_redox as fe_redox_module
+    import simulator.melt_backend.vaporock as vaporock_module
+
+    assert fe_redox_module.Kress91InvalidControls is _ORIGINAL_KRESS91_INVALID_CONTROLS
+    assert vaporock_module.VapoRockBackend is _ORIGINAL_VAPOROCK_BACKEND

@@ -1,0 +1,221 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae
+  citation: Kress, V. C., and Carmichael, I. S. E. (1988). Stoichiometry of the iron oxidation reaction in silicate melts.
+    American Mineralogist, 73, 1267–1274.
+  source_ids:
+  - kress-carmichael-1988-iron-oxidation-stoichiometry
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+    files:
+    - asset_id: pdf:kress-carmichael-1988-iron-oxidation-stoichiometry
+      role: pdf
+      path: raw/kress-carmichael-1988-iron-oxidation-stoichiometry/kress-carmichael-1988-iron-oxidation-stoichiometry.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:kress-carmichael-1988-iron-oxidation-stoichiometry
+      role: pdftotext
+      path: text/kress-carmichael-1988-iron-oxidation-stoichiometry
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kress-carmichael-1988-iron-oxidation-stoichiometry
+      role: table_csv
+      path: tables/kress-carmichael-1988-iron-oxidation-stoichiometry
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: unknown:kress-carmichael-1988-iron-oxidation-stoichiometry
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::experiment::kress_1988_table1_equilibration_series
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: six silicate melt compositions; individual run compositions transcribed in Table 1
+      locator:
+        published_page: 1270
+        pdf_page_index: 3
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae
+  locator:
+    published_page: 1267-1269
+    section: Abstract and Experimental Technique
+    note: pdf_page_index=0-2
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+  bench_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::bench::vertical-quench-furnace
+  thermal_schedule:
+    cooling_or_quench:
+      state:
+        tag: value
+        value: dropped into cold distilled H2O that had been previously boiled
+      locator:
+        published_page: 1269
+        pdf_page_index: 2
+        section: Experimental Technique
+benches:
+- id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::bench::vertical-quench-furnace
+  work_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: vertical quench furnace
+    locator:
+      published_page: 1269
+      pdf_page_index: 2
+      section: Experimental Technique
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: Pt-Rh thermocouple roughly 3 mm above experiment cage
+      locator:
+        published_page: 1269
+        pdf_page_index: 2
+        section: Experimental Technique
+  temperature_calibration:
+    checks:
+      state:
+        tag: value
+        value: 99.99% Au melting-point checks indicated 1063.8 °C before and 1063.1 °C after the experiments, compared with
+          the accepted 1064.43 °C (IPTS, 1969; International Practical Temperature Scale of 1968). A +2 °C correction was
+          added for measured temperature gradients inside the furnace.
+      locator:
+        published_page: 1269
+        pdf_page_index: 2
+        section: Experimental Technique
+  other_facts: []
+context:
+- observation_id: kress_1988_adopted_reaction_and_regression_model
+  type: thermodynamic_example
+  locator:
+    published_page: 1271-1272
+    pdf_page_index: 4-5
+    table: '2'
+    equation: 4, 7, 9
+  units: reaction stoichiometry as printed; ΔH in kJ; ΔS in J/K; ΔW terms in kJ; fit diagnostics as printed
+  values:
+    quantity: authors_adopted_iron_oxidation_reaction_and_regression_parameters
+    method_class: model_derived
+    evidence_class: model_derived
+    source_wording: FeO + 0.232 O2 = FeO1.464
+    associated_component_formula:
+      formula: FeO1.464
+      uncertainty: ±0.003
+      uncertainty_level: not stated in the paper
+      source_wording: FeO1.464±0.003
+    reaction:
+      reactants:
+        FeO: '1'
+        O2: '0.232'
+      products:
+        FeO1.464: '1'
+      equation_number: '4'
+      published_page: 1272
+    derivation:
+      relation: FeO + x O2 -> FeO_(1 + 2x)
+      input:
+        x: '0.232'
+        source: equation_4
+      result:
+        associate_formula: FeO1.464
+        calculation: 1 + 2 × 0.232 = 1.464
+      evidence_basis: fitted/model formulation, not a direct identification of a discrete melt species
+    component_recasting:
+      basis: FeO1.5
+      molecular_weight: '79.849'
+      equations:
+      - number: '5'
+        source_wording: X_FeO1.464 = 1.0776 X_FeO1.5
+      - number: '6'
+        source_wording: X_FeO = X_FeO - 0.0776 X_FeO1.5
+      note: In Eq. 6, the left-hand FeO is the recast component and the right-hand FeO is the analytical component before
+        association.
+    equation_9:
+      dependent_variable: ln(X^liq_FeO1.464 / X^liq_FeO)
+      source_wording: ln(X^liq_FeO1.464 / X^liq_FeO) = 0.232 ln fO2 - ΔH4/(R T) + ΔS4/R - (1/(R T)) Σ_i ΔW_i X_i
+      component_difference: ΔW_i = W_(i,FeO1.464) - W_(i,FeO)
+      variable_definitions: X_i are component mole fractions; T is in kelvins; R is the universal gas constant.
+    equation_7_and_9_composition_terms:
+    - oxide: Al2O3
+      coefficient: '49.04'
+      standard_error: '15.53'
+      unit: kJ
+    - oxide: CaO
+      coefficient: '-48.87'
+      standard_error: '6.71'
+      unit: kJ
+    - oxide: Na2O
+      coefficient: '-106.04'
+      standard_error: '20.64'
+      unit: kJ
+    - oxide: K2O
+      coefficient: '-110.46'
+      standard_error: '19.52'
+      unit: kJ
+    thermodynamic_parameters:
+    - coefficient: ΔH
+      value: '-95.93'
+      standard_error: '6.39'
+      unit: kJ
+    - coefficient: ΔS
+      value: '-46.05'
+      standard_error: '3.55'
+      unit: J/K
+    fit_diagnostics:
+      R_squared: '0.95'
+      standard_error: '0.30'
+      standard_error_unit: ln units
+    fit_data_scope:
+      sources:
+      - Table 1 experiments in this work
+      - Sack et al. (1980)
+      - Kilinc et al. (1983)
+      exclusion: Most highly reduced experiments with log10 fO2 less than -9.5 were omitted. A serious Kilinc et al. (1983)
+        outlier for composition 20424, inconsistent with this study's results for the same composition under nearly identical
+        conditions, was also omitted; the authors state that its omission substantially improved regression precision.
+    interpretation_note: The authors caution that FeO1.464 may not represent a discrete species; they interpret it as a probable
+      stoichiometry from a distribution of configurations involving other melt cations.
+  context_id: kress-carmichael-1988-iron-oxidation-stoichiometry::context::kress_1988_adopted_reaction_and_regression_model
+  work_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae
+  source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
+  species: Fe

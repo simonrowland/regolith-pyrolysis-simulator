@@ -529,7 +529,7 @@ def test_stage0_required_auto_falls_back_when_forced_alphamelts_absent():
         def initialize(self, config):
             self.init_calls.append(dict(config or {}))
             if config.get("mode") == "subprocess":
-                raise RuntimeError("AlphaMELTS subprocess executable missing")
+                raise FileNotFoundError("AlphaMELTS subprocess executable missing")
             return bool(self._init_returns)
 
     def make_alphamelts():
@@ -574,6 +574,29 @@ def test_stage0_required_auto_falls_back_when_forced_alphamelts_absent():
     assert resolution.message.startswith(
         "forced AlphaMELTS backend unavailable; substituted InternalAnalyticalBackend"
     )
+    assert "FileNotFoundError" in resolution.message
+    assert "AlphaMELTS subprocess executable missing" in resolution.message
+
+
+def test_forced_subprocess_probe_does_not_hide_local_backend_errors():
+    source_config = {"mode": "subprocess", "python_bridge": "subprocess"}
+
+    class BrokenProbe(_FakeAlphaMELTS):
+        def __init__(self):
+            super().__init__(available=True)
+
+        def initialize(self, _config):
+            raise KeyError("backend adapter bug")
+
+    with pytest.raises(KeyError, match="backend adapter bug"):
+        resolve_backend(
+            "auto",
+            BackendSelectionPolicy.WEB_AUTODETECT,
+            alphamelts_backend_cls=BrokenProbe,
+            internal_analytical_backend_cls=InternalAnalyticalBackend,
+            log_selection=lambda _selected: None,
+            backend_config=source_config,
+        )
 
 
 def test_stage0_required_rejects_reused_non_subprocess_backend():

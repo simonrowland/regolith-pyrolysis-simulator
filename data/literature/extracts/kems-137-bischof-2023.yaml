@@ -1609,6 +1609,8 @@ species:
         quantity: partial_pressure
         gas_species: Ga(g)
         method_class: measured_kems
+        composition_wt_pct: {SiO2: '50.47', Al2O3: '15.38', MgO: '10.42', CaO: '23.63'}
+        composition_derivation: "1_low start glass composition, printed in Table 6 (p. 15); trace additions excluded from oxide columns"
         points:
         - T_K: 1586.4
           p_Pa: 4.04e-05
@@ -3368,7 +3370,7 @@ species:
           K_In_SD: 3.72e-13
       equipment: *id001
     - observation_id: bischof_2023_in_psat_s1_1low_polytherm
-      experiment: an-di-series
+      experiment: an-di-1-low
       type: psat_series
       locator:
         table: S1
@@ -3384,6 +3386,8 @@ species:
         quantity: partial_pressure
         gas_species: In(g)
         method_class: measured_kems
+        composition_wt_pct: {SiO2: '50.47', Al2O3: '15.38', MgO: '10.42', CaO: '23.63'}
+        composition_derivation: "1_low start glass composition, printed in Table 6 (p. 15); trace additions excluded from oxide columns"
         points:
         - T_K: 1586.4
           p_Pa: 6.69e-05
