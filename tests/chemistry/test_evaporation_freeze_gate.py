@@ -3798,6 +3798,216 @@ def test_invalid_redox_gate_curve_does_not_poison_valid_retry(
     assert sim._freeze_gate_liquid_fraction_cache['curve'] == valid
 
 
+def test_gate_curve_memo_ignores_sulfur_input_drift_same_key(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    curve = {
+        'source': 'gate_liquid_fraction:authoritative:test',
+        'status': 'ok',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1300.0,
+    }
+    provider_calls = []
+    sulfur_input_ppm = [100.0]
+    monkeypatch.setattr(
+        sim,
+        '_stage0_sulfur_input_ppm',
+        lambda: sulfur_input_ppm[0],
+    )
+    monkeypatch.setattr(
+        admission_module,
+        'gate_curve_memo_eligibility',
+        lambda *_args, **_kwargs: True,
+    )
+    sim._freeze_gate_curve_from_gate_dispatch = (
+        lambda reasons, *, fO2_log, repair_notices=None: (
+            provider_calls.append(fO2_log) or dict(curve)
+        )
+    )
+    key = _freeze_gate_key_for_current_state(sim)
+
+    first = sim._freeze_gate_curve()
+    sulfur_input_ppm[0] = 200.0
+    assert _freeze_gate_key_for_current_state(sim) == key
+    second = sim._freeze_gate_curve()
+
+    # GREEN's local slot checks this physical key and reuses the curve:
+    # simulator/evaporation.py:2036-2044.
+    assert first == second
+    assert len(provider_calls) == 1
+
+
+def test_core_gate_curve_memo_reuses_local_slot_refused_curve(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    curve = {
+        'source': 'gate_liquid_fraction:authoritative:test',
+        'status': 'ok',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1300.0,
+    }
+    provider_calls = []
+    monkeypatch.setattr(
+        admission_module,
+        'gate_curve_memo_eligibility',
+        lambda *_args, **_kwargs: True,
+    )
+    sim._freeze_gate_curve_from_gate_dispatch = (
+        lambda reasons, *, fO2_log, repair_notices=None: (
+            provider_calls.append(fO2_log) or dict(curve)
+        )
+    )
+
+    sim._melt_redox_liquidus_gate_curve()
+    sim._freeze_gate_liquid_fraction_cache['key'] = ('wrong-key',)
+    sim._melt_redox_liquidus_gate_curve()
+    sim._melt_redox_liquidus_gate_curve()
+
+    # GREEN checks the keyed memo after a local-slot miss and stores each live
+    # normalized curve: simulator/core.py:4709-4713, 4811-4812.
+    assert len(provider_calls) == 1
+
+
+def test_core_gate_curve_memo_hit_skips_install_provenance(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    curve = {
+        'source': 'gate_liquid_fraction:authoritative:test',
+        'status': 'ok',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1300.0,
+    }
+    provider_calls = []
+    provenance_calls = []
+    original_install_provenance = admission_module.install_provenance
+    identity = admission_module.BindingIdentity(
+        engine_id='synthetic-gate',
+        model_id='fixture-model-v1',
+        binding_revision='synthetic-r1',
+        transport='test',
+    )
+
+    def count_install_provenance(*args, **kwargs):
+        provenance_calls.append(None)
+        return original_install_provenance(*args, **kwargs)
+
+    monkeypatch.setattr(
+        admission_module,
+        'binding_identity_for_backend',
+        lambda _backend: identity,
+    )
+    monkeypatch.setattr(
+        admission_module,
+        'install_provenance',
+        count_install_provenance,
+    )
+    sim._freeze_gate_curve_from_gate_dispatch = (
+        lambda reasons, *, fO2_log, repair_notices=None: (
+            provider_calls.append(fO2_log) or dict(curve)
+        )
+    )
+
+    first = sim._melt_redox_liquidus_gate_curve()
+    assert provenance_calls
+    assert len(provider_calls) == 1
+    provenance_calls.clear()
+    sim._freeze_gate_liquid_fraction_cache = None
+    second = sim._melt_redox_liquidus_gate_curve()
+
+    # GREEN returns a keyed hit before provider work or install_provenance:
+    # simulator/core.py:4709-4713.
+    assert second == first
+    assert provenance_calls == []
+    assert len(provider_calls) == 1
+
+
+def test_core_gate_curve_memo_reuses_fallback_curve_after_provider_unavailable(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    provider_calls = []
+    fallback_curve = {
+        'source': 'kress91_liquid_calibration_floor',
+        'solidus_T_C': 1200.0,
+        'liquidus_T_C': 1200.000001,
+    }
+    monkeypatch.setattr(
+        sim,
+        '_freeze_gate_curve_from_gate_dispatch',
+        lambda reasons, *, fO2_log, repair_notices=None: None,
+    )
+    monkeypatch.setattr(
+        sim.backend,
+        'find_liquidus_solidus',
+        None,
+        raising=False,
+    )
+
+    def unavailable_kernel_provider(intent, *args, **kwargs):
+        if intent is ChemistryIntent.SILICATE_LIQUIDUS:
+            provider_calls.append(intent)
+            raise ProviderUnavailableError('kernel liquidus unavailable in test')
+        raise AssertionError(f'unexpected intent: {intent}')
+
+    monkeypatch.setattr(sim, '_dispatch_only', unavailable_kernel_provider)
+    live_producer = sim._freeze_gate_curve
+
+    def produce_floor_after_kernel_unavailable():
+        try:
+            return live_producer()
+        except ProviderUnavailableError:
+            return dict(fallback_curve)
+
+    monkeypatch.setattr(
+        sim,
+        '_freeze_gate_curve',
+        produce_floor_after_kernel_unavailable,
+    )
+
+    first = sim._melt_redox_liquidus_gate_curve()
+    second = sim._melt_redox_liquidus_gate_curve()
+
+    # GREEN stores the live result in its local slot and keyed memo, including
+    # this vetoed fallback: simulator/core.py:4797-4812.
+    assert len(provider_calls) == 1
+    assert second == first
+
+
 @pytest.mark.parametrize('memo_form', ('local', 'shared'))
 def test_freeze_gate_memo_refuses_dependency_vector_mismatch(
     monkeypatch,
