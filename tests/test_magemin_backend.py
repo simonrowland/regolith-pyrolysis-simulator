@@ -84,6 +84,83 @@ def _make_available_magemin(monkeypatch, fake_module):
     )
 
 
+def _make_fake_magemin_cli_liquidus(monkeypatch):
+    calls = []
+
+    def fake_subprocess_run(args, **_kwargs):
+        args = list(args)
+        temperature_arg = next(
+            (arg for arg in args if arg.startswith("--Temp=")),
+            None,
+        )
+        if temperature_arg is None:
+            return types.SimpleNamespace(
+                returncode=0,
+                stdout="",
+                stderr="",
+            )
+        temperature_C = float(
+            temperature_arg.split("=", 1)[1]
+        )
+        calls.append(args)
+        liquid_fraction = max(
+            0.0,
+            min(1.0, (temperature_C - 1000.0) / 200.0),
+        )
+        stdout = (
+            "Phase : liq ol qfm\n"
+            f"Mode  : {liquid_fraction:.6f} "
+            f"{1.0 - liquid_fraction:.6f} 0.000000\n"
+        )
+        return types.SimpleNamespace(
+            returncode=0,
+            stdout=stdout,
+            stderr="",
+        )
+
+    _disable_configured_magemin_path(monkeypatch)
+    monkeypatch.setattr(
+        MAGEMinBackend,
+        "_locate_binary",
+        staticmethod(lambda _explicit: Path("/fake/MAGEMin")),
+    )
+    monkeypatch.setattr(
+        MAGEMinBackend,
+        "_import_magemin_bridge",
+        lambda self, *, requested: ("subprocess", None),
+    )
+    import simulator.melt_backend.magemin as magemin_module
+
+    monkeypatch.setattr(
+        magemin_module.subprocess,
+        "run",
+        fake_subprocess_run,
+    )
+    backend = MAGEMinBackend()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        assert backend.initialize({"warm_worker": False}) is True
+    return backend, calls
+
+
+def _assert_magemin_cli_absolute_targets(calls, expected_fO2_log):
+    assert len(calls) > 10, "expected coarse samples and refinement probes"
+    for args in calls:
+        assert "--buffer=qfm" in args
+        temperature_C = float(
+            next(arg.split("=", 1)[1] for arg in args if arg.startswith("--Temp="))
+        )
+        buffer_n = float(
+            next(
+                arg.split("=", 1)[1]
+                for arg in args
+                if arg.startswith("--buffer_n=")
+            )
+        )
+        recovered = MAGEMinBackend._qfm_logfo2_oneill(temperature_C) + buffer_n
+        assert recovered == pytest.approx(expected_fO2_log, abs=1.0e-6)
+
+
 def _make_absent_magemin(monkeypatch):
     """Force all MAGEMin availability probes to report absent."""
     _disable_configured_magemin_path(monkeypatch)
@@ -979,6 +1056,41 @@ def test_magemin_liquidus_finder_bisects_fake_bridge(monkeypatch):
     assert result.solidus_T_C == pytest.approx(1000.0, abs=1.0)
     assert result.liquidus_T_C == pytest.approx(1300.0, abs=1.0)
     assert result.liquidus_T_K == pytest.approx(result.liquidus_T_C + 273.15)
+
+
+def test_magemin_liquidus_scan_records_absolute_fo2_per_sample(monkeypatch):
+    backend, calls = _make_fake_magemin_cli_liquidus(monkeypatch)
+
+    result = backend.find_liquidus_solidus(
+        composition_mol={"SiO2": 1.0, "MgO": 1.0, "FeO": 1.0},
+        fO2_log=-9.0,
+        pressure_bar=1e-6,
+        min_T_C=900.0,
+        max_T_C=1300.0,
+        scan_step_C=50.0,
+        tolerance_C=1.0,
+    )
+
+    assert result.status == "ok"
+    _assert_magemin_cli_absolute_targets(calls, -9.0)
+
+
+def test_magemin_projected_retry_records_absolute_fo2_per_sample(monkeypatch):
+    backend, calls = _make_fake_magemin_cli_liquidus(monkeypatch)
+
+    result = backend.find_liquidus_solidus(
+        composition_kg={"SiO2": 50.0, "MgO": 39.0, "P2O5": 10.0, "MnO": 1.0},
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        min_T_C=900.0,
+        max_T_C=1300.0,
+        scan_step_C=50.0,
+        tolerance_C=1.0,
+    )
+
+    assert result.status == "out_of_domain"
+    assert result.diagnostics["projected_liquidus_status"] == "ok"
+    _assert_magemin_cli_absolute_targets(calls, -9.0)
 
 
 def test_magemin_liquidus_finder_honors_aggregate_budget_config(monkeypatch):
