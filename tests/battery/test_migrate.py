@@ -10325,26 +10325,27 @@ def test_deleted_index_only_survivor_reclaims_doi_in_first_pass(tmp_path: Path) 
 
 def test_shared_doi_claimant_is_independent_of_index_order(tmp_path: Path) -> None:
     doi = "10.1234/shared"
-    claimants = []
-    for order in (("a", "b"), ("b", "a")):
-        root = _write_multi_extract_tree(
-            tmp_path / "-".join(order),
-            [(source_id, _named_extract(source_id, doi)) for source_id in order],
-        )
-        aliases_path = root / "data" / "literature" / "works" / "ALIASES.yaml"
-        dump_yaml(
-            {
-                "schema_version": "battery_work_aliases.v1",
-                "aliases": {"a": "A", "b": "B", doi: "deleted-owner"},
-            },
-            aliases_path,
-        )
+    for carried_doi_owner in (None, "deleted-owner"):
+        claimants = []
+        for order in (("a", "b"), ("b", "a")):
+            root = _write_multi_extract_tree(
+                tmp_path / f"{carried_doi_owner}-{''.join(order)}",
+                [(source_id, _named_extract(source_id, doi)) for source_id in order],
+            )
+            aliases_path = root / "data" / "literature" / "works" / "ALIASES.yaml"
+            aliases = {"a": "A", "b": "B"}
+            if carried_doi_owner is not None:
+                aliases[doi] = carried_doi_owner
+            dump_yaml(
+                {"schema_version": "battery_work_aliases.v1", "aliases": aliases},
+                aliases_path,
+            )
 
-        result = migrate(root, write=False)
+            result = migrate(root, write=False)
 
-        claimants.append(result.aliases[doi])
+            claimants.append(result.aliases[doi])
 
-    assert claimants == ["A", "A"]
+        assert claimants == ["A", "A"]
 
 
 def _equipment_context_row(observation_id: str, experiment: object) -> dict:

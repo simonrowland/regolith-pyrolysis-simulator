@@ -11347,6 +11347,7 @@ class Migrator:
             self.literature / "works" / "ALIASES.yaml"
         )
         self.aliases.update(REVIEWED_ALIASES)
+        self._carried_aliases = dict(self.aliases)
         self.result = MigrationResult(aliases=dict(self.aliases))
         self._vocab = _vocab_for_root(self.root)
         self._work_citations: dict[str, str] = {}
@@ -17091,7 +17092,9 @@ class Migrator:
         self.migrate_extracts()
         self.migrate_named_sources()
         self.migrate_compilations()
-        _prune_carried_doi_aliases_to_live_works(self.result)
+        _prune_carried_doi_aliases_to_live_works(
+            self.result, self._carried_aliases
+        )
         self.aliases = dict(self.result.aliases)
         self.finalize()
         return self.result
@@ -17609,22 +17612,30 @@ def _prune_aliases_to_live_works(result: MigrationResult) -> None:
     }
 
 
-def _prune_carried_doi_aliases_to_live_works(result: MigrationResult) -> None:
+def _prune_carried_doi_aliases_to_live_works(
+    result: MigrationResult, carried_aliases: Mapping[str, str]
+) -> None:
     live_work_ids = _live_work_ids(result)
+    carried_doi_aliases = {
+        alias: work_id
+        for alias, work_id in carried_aliases.items()
+        if extract_doi(alias) is not None and work_id in live_work_ids
+    }
     result.aliases = {
         alias: work_id
         for alias, work_id in result.aliases.items()
-        if extract_doi(alias) is None or work_id in live_work_ids
+        if extract_doi(alias) is None
     }
-    # Keep any carried DOI alias that still targets a live work. Reclaim only
-    # orphaned or absent DOI aliases, in source-ID order so discovery order
-    # cannot decide which surviving work owns a shared DOI.
+    # Preserve only live carried choices. `_ensure_work` may have populated
+    # an initially absent DOI alias from whichever source was discovered first.
+    # Recompute those choices in source-ID order so discovery order cannot win.
+    result.aliases.update(carried_doi_aliases)
     works_by_source_id = sorted(
         result.works.values(),
         key=lambda work: (min(work.source_ids, default=work.work_id), work.work_id),
     )
     for work in works_by_source_id:
-        if work.doi:
+        if work.doi and work.doi not in carried_doi_aliases:
             result.aliases.setdefault(work.doi, work.work_id)
 
 
