@@ -49,7 +49,7 @@ import yaml
 
 from simulator.battery.extract_context import (
     SUPPORTED_EXTRACT_CONTEXT_PATH,
-    iter_context_key_paths,
+    iter_context_container_paths,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -1567,7 +1567,7 @@ def validate_extract_document(
     if not isinstance(doc, Mapping):
         return [f"{label}: root must be a mapping"]
 
-    for key_path in iter_context_key_paths(doc):
+    for key_path in iter_context_container_paths(doc):
         if not (
             len(key_path) == 3
             and key_path[0] == "species"

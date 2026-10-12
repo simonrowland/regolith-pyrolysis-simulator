@@ -20,14 +20,16 @@ def iter_extract_context_containers(
             yield str(formula), body["context"]
 
 
-def iter_context_key_paths(value: Any, path: tuple[str, ...] = ()) -> Iterator[tuple[str, ...]]:
-    """Yield every mapping path whose key is named ``context``."""
+def iter_context_container_paths(
+    value: Any, path: tuple[str, ...] = ()
+) -> Iterator[tuple[str, ...]]:
+    """Yield paths to context values shaped like containers, not descriptions."""
     if isinstance(value, Mapping):
         for key, child in value.items():
             child_path = (*path, str(key))
-            if str(key) == "context":
+            if str(key) == "context" and isinstance(child, (Mapping, list)):
                 yield child_path
-            yield from iter_context_key_paths(child, child_path)
+            yield from iter_context_container_paths(child, child_path)
     elif isinstance(value, list):
         for index, child in enumerate(value):
-            yield from iter_context_key_paths(child, (*path, f"[{index}]"))
+            yield from iter_context_container_paths(child, (*path, f"[{index}]"))

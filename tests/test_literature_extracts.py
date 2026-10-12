@@ -687,6 +687,19 @@ def test_refuses_context_container_outside_species_block():
     )
 
 
+def test_accepts_scalar_context_description_inside_row():
+    doc = _minimal_extract()
+    doc["species"]["Fe"]["observations"][0]["values"]["context"] = (
+        "validation comparison with another source"
+    )
+
+    errors = vle.validate_extract_document(
+        doc, expected_source_id="fixture-source"
+    )
+
+    assert not any("context container is not lifted" in error for error in errors)
+
+
 def test_species_context_validates_and_migrator_lifts_context_id(tmp_path: Path):
     from simulator.battery.migrate import migrate
 
