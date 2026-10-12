@@ -78,6 +78,22 @@ def test_norris_starting_composition_is_pinned_to_online_extended_table() -> Non
         assert "PMC6485635 online" in composition["locator"]["note"]
 
 
+def test_okazaki_container_helium_ratio_uncertainty_is_pinned() -> None:
+    doc = yaml.safe_load(
+        (EXTRACTS / "okazaki-2022-ryugu-gas-treasure-box.yaml").read_text()
+    )
+    observation = next(
+        item
+        for item in doc["species"]["He"]["observations"]
+        if item["observation_id"] == "okazaki_2022_container_helium_isotope_ratio"
+    )
+
+    # Source article p. 3, Fig. 2A (also cited to Table S1) prints ±0.010 × 10−4.
+    printed_uncertainty = "+/- 0.010 x 10^-4 (1 sigma)"
+    assert observation["uncertainty"]["ratio_3He_4He"] == printed_uncertainty
+    assert "(1 sigma)" in printed_uncertainty
+
+
 def test_norris_split_runs_retain_shared_sample_and_quench_facts() -> None:
     doc = yaml.safe_load(
         (EXTRACTS / "norris-2017-earth-volatiles-nature.yaml").read_text()
