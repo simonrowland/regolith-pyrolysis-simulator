@@ -7,6 +7,7 @@ residuals without mistaking internal self-consistency for validation.
 
 from __future__ import annotations
 
+import ast
 from copy import deepcopy
 from functools import lru_cache
 import hashlib
@@ -51,6 +52,7 @@ from simulator.vapour_rail.instrumentation import serialize_vapour_answer
 from simulator.vapour_rail.request import VapourResolveState
 from tests.chemistry.conftest import _build_sim, _load_yaml
 from tests.git_history import require_git_history
+from tests.test_import_boundary import _imports, _project_files
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -633,7 +635,11 @@ def test_harness_ledgers_are_not_simulation_runtime_inputs() -> None:
         "vapour_rail_validation_pins.yaml",
     }
     runtime_files = [
-        *sorted((ROOT / "simulator").rglob("*.py")),
+        *sorted(
+            path
+            for path in (ROOT / "simulator").rglob("*.py")
+            if "battery" not in path.relative_to(ROOT / "simulator").parts
+        ),
         *sorted((ROOT / "engines").rglob("*.py")),
         ROOT / "app.py",
         ROOT / "regolith-pyrolysis-run.py",
@@ -647,6 +653,72 @@ def test_harness_ledgers_are_not_simulation_runtime_inputs() -> None:
     assert not consumers, (
         "golden-neutrality violation: conformance ledgers entered the simulation "
         f"run path: {consumers}"
+    )
+
+    battery_allowlist = {
+        "simulator/battery/pins.py",
+        "simulator/battery/score.py",
+    }
+    battery_consumers = {
+        path.relative_to(ROOT).as_posix(): sorted(
+            name for name in forbidden if name in path.read_text(encoding="utf-8")
+        )
+        for path in sorted((ROOT / "simulator" / "battery").rglob("*.py"))
+        if any(name in path.read_text(encoding="utf-8") for name in forbidden)
+    }
+    assert set(battery_consumers) <= battery_allowlist, (
+        "unexpected conformance ledger reader under simulator/battery/: "
+        f"{battery_consumers}"
+    )
+
+    entry_modules = {
+        "app": "app.py",
+        "__regolith_entry__": "regolith-pyrolysis-run.py",
+        "simulator.__main__": "simulator/__main__.py",
+        "simulator.runner.__main__": "simulator/runner/__main__.py",
+    }
+    files = _project_files(ROOT)
+    for module, relpath in entry_modules.items():
+        files[module] = (relpath, (ROOT / relpath).read_text(encoding="utf-8"))
+    project_modules = set(files)
+    closure: set[str] = set()
+    parents: dict[str, tuple[str, int]] = {}
+    pending = list(entry_modules)
+    while pending:
+        source = pending.pop()
+        if source in closure or source not in files:
+            continue
+        closure.add(source)
+        relpath, source_text = files[source]
+        tree = ast.parse(source_text, filename=relpath)
+        package = source if Path(relpath).name == "__init__.py" else source.rpartition(".")[0]
+        imports, _dynamic_sites = _imports(
+            tree, source, relpath, package, project_modules
+        )
+        for target, line in imports:
+            parents.setdefault(target, (source, line))
+            if target not in closure:
+                pending.append(target)
+
+    battery_reachable = sorted(
+        module
+        for module in closure
+        if module == "simulator.battery" or module.startswith("simulator.battery.")
+    )
+    chains = {}
+    for target in battery_reachable:
+        chain = [target]
+        current = target
+        seen = {current}
+        while current in parents and parents[current][0] not in seen:
+            parent, line = parents[current]
+            chain.append(f"{parent}:{line}")
+            seen.add(parent)
+            current = parent
+        chains[target] = list(reversed(chain))
+    assert not battery_reachable, (
+        "simulation entry import closure reaches simulator.battery; "
+        f"entries={entry_modules}, chains={chains}"
     )
 
 
@@ -1782,4 +1854,3 @@ def test_engine_report_gate_skips_without_private_docs() -> None:
     """Mutation proof: ungated ENGINE_REPORT_PATH.read_text ERROR'd on fresh CI."""
     assert _engine_report_unavailable() is True
     assert ENGINE_REPORT_PATH.is_file() is False
-
