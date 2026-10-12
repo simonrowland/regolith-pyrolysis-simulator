@@ -120,11 +120,11 @@ from simulator.battery.migrate import (
 )
 from simulator.battery.records import (
     INITIAL_CHARGE_ONLY_PROXY_FLAG,
-    _PARTIAL_COMPOSITION_PROXY_PREFIX,
     SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX,
     Bench,
     CandidateRequest,
     Composition,
+    composition_is_partial,
     DecisionBand,
     EngineTrace,
     Evidence,
@@ -10623,10 +10623,7 @@ def compile_residual(
                 state is not None
                 and state.is_value
                 and isinstance(state.value, Composition)
-                and state.value.proxy_flag is not None
-                and state.value.proxy_flag.startswith(
-                    _PARTIAL_COMPOSITION_PROXY_PREFIX
-                )
+                and composition_is_partial(state.value)
             ):
                 partial_composition = state.value.proxy_flag
                 break

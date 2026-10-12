@@ -9,6 +9,7 @@ import pytest
 
 from simulator.battery.consumer_inputs import collect_consumer_inputs, REQUIREMENTS
 from simulator.battery.generators import engine_point_requests, kems_case, vacuum_pyrolysis_preset
+from simulator.battery.migrate import wt_pct_to_mole_fraction
 from simulator.battery.enums import AmountBasis, BenchIdentityBasis, MethodToken, ValueKind
 from simulator.battery.records import (
     Bench, BenchIdentity, BenchReference, Composition, Sample, State, Value,
@@ -128,6 +129,37 @@ def test_uncontrolled_oxygen_refuses_every_engine():
     assert len(results) == len(ENGINE_POINT_CONSUMERS)
     assert all(result.payload is None for result in results)
     assert all(any(gap.waypoint == "oxygen_condition" for gap in result.readiness.gaps) for result in results)
+
+
+@pytest.mark.parametrize("printed_only", (False, True))
+def test_partial_sample_composition_blocks_waypoint_and_engine_requests(printed_only):
+    experiment, bench, observation = case()
+    partial = wt_pct_to_mole_fraction({"Al2O3": Decimal("60"), "CaO": Decimal("20")})
+    sample = (
+        replace(
+            experiment.sample,
+            initial_composition=None,
+            printed_composition=f.located({"Al2O3": Decimal("60"), "CaO": Decimal("20")}),
+        )
+        if printed_only
+        else replace(experiment.sample, initial_composition=f.located(partial))
+    )
+    experiment = replace(experiment, sample=sample)
+
+    inputs = collect_consumer_inputs(experiment, bench, observation)
+    waypoint = inputs.waypoints["normalized_composition"]
+    assert waypoint.selected is None
+    assert waypoint.absence is not None
+    assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+    assert "partial composition requires complete constituent coverage" in waypoint.absence.missing
+    results = engine_point_requests(inputs)
+    assert len(results) == len(ENGINE_POINT_CONSUMERS)
+    assert all(result.payload is None for result in results)
+    assert all(result.readiness.status is ReadinessStatus.GAP for result in results)
+    assert all(
+        any(gap.waypoint == "normalized_composition" for gap in result.readiness.gaps)
+        for result in results
+    )
 
 
 def test_vacuum_total_pressure_supplies_flagged_oxygen_bound_to_engine():
