@@ -274,40 +274,6 @@ experiments:
         published_page: 121270
         pdf_page_index: 2
         section: 2.1 Starting compositions and experimental conditions
-- experiment_id: 10.1016/j.chemgeo.2022.121269::thomas-2022-chlorine-bonding-silicate-melts
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'author_regression' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
-          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
-          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
-          / P_test_Torr in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.chemgeo.2022.121269
-  locator:
-    published_page: 121270
-    pdf_page_index: 2
-    section: 1.1 Chlorine incorporation in silicate melts and glasses
-    equation: '3'
-    source_path: corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf
 benches:
 - id: 10.1016/j.chemgeo.2022.121269::bench::oxford-piston-cylinder
   work_id: 10.1016/j.chemgeo.2022.121269
@@ -435,6 +401,29 @@ context:
     - run duration beyond Table 2
     - thermocouple/calibration details
   context_id: thomas-2022-chlorine-bonding-silicate-melts::context::thomas_2022_apparatus_and_analytical_conditions
+  work_id: 10.1016/j.chemgeo.2022.121269
+  source_id: thomas-2022-chlorine-bonding-silicate-melts
+  species: Cl
+- observation_id: thomas_2022_author_chloride_capacity_model
+  type: model_comparison
+  locator:
+    source_path: corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf
+    published_page: 121270
+    pdf_page_index: 2
+    section: 1.1 Chlorine incorporation in silicate melts and glasses
+    equation: '3'
+  phase: silicate_melt
+  regime: author_regression
+  units: log CCl dimensionless; T K; P GPa; X terms oxide mole fractions on single-cation basis
+  values:
+    quantity: chloride_capacity_model
+    method_class: model_derived
+    evidence_class: author_multiple_linear_regression
+    generator: Thomas and Wood (2022) multiple linear regression; insignificant terms removed at alpha=0.05
+    equation: logCCl = 1.601 + (4470 XCa - 3430 XSi + 2592 XFe - 4092 XK - 849 P) / T
+    source_basis: 25 natural and synthetic silicate melt compositions from Thomas and Wood (2022); not a direct measurement
+      in this paper
+  context_id: thomas-2022-chlorine-bonding-silicate-melts::context::thomas_2022_author_chloride_capacity_model
   work_id: 10.1016/j.chemgeo.2022.121269
   source_id: thomas-2022-chlorine-bonding-silicate-melts
   species: Cl

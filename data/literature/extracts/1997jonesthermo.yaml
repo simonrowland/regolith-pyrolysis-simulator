@@ -259,3 +259,31 @@ species:
         reported_comparison: excellent agreement for CaO and MgO; reasonably good agreement for SiO2; ideal-solution assumption gives large discrepancies
       uncertainty:
         reported_status: not_reported
+fidelity_samples:
+- species: Mn
+  observable: partial_pressure
+  observation_id: jones_1997_mn_vapour_pressure_tabulation
+  field: normal_boiling_point_C_about
+  value: 2060.0
+  note: "Page 18 text states the normal boiling point is around 2060°C."
+  locator:
+    published_page: 18
+    figure: '10'
+- species: Mn
+  observable: partial_pressure
+  observation_id: jones_1997_mn_vapour_pressure_tabulation
+  field: T_C
+  value: 1700.0
+  note: "Page 18 text gives the manganese vapour-pressure point at 1700°C."
+  locator:
+    published_page: 18
+    figure: '10'
+- species: Mn
+  observable: partial_pressure
+  observation_id: jones_1997_mn_vapour_pressure_tabulation
+  field: vapor_pressure_atm
+  value: 0.113
+  note: "Page 18 text prints the manganese vapour pressure at 1700°C as 0.113 atm."
+  locator:
+    published_page: 18
+    figure: '10'

@@ -407,17 +407,17 @@ ThermoEngine coverage cells are explicitly `coverage not measured for this engin
 
 AlphaMELTS trajectory boundaries:
 
-- `sf04_alkali_basalt` / `remove_silica`: first refusal at step 11, SiO2=28.534 wt%.
-- `sf04_alkali_basalt` / `strip_modifiers`: first refusal at step 17, SiO2=81.286 wt%.
-- `sf04_dunite` / `remove_silica`: first refusal at step 8, SiO2=29.695 wt%.
-- `sf04_dunite` / `strip_modifiers`: first refusal at step 18, SiO2=82.451 wt%.
-- `sf04_komatiite` / `remove_silica`: first refusal at step 12, SiO2=28.265 wt%.
-- `sf04_komatiite` / `strip_modifiers`: first refusal at step 17, SiO2=82.640 wt%.
-- `sf04_tholeiite` / `remove_silica`: first refusal at step 13, SiO2=29.174 wt%.
-- `sf04_tholeiite` / `strip_modifiers`: first refusal at step 16, SiO2=81.775 wt%.
+- `sf04_alkali_basalt` / `remove_silica`: first out-of-domain step: step 11, SiO2=28.534 wt%.
+- `sf04_alkali_basalt` / `strip_modifiers`: first out-of-domain step: step 17, SiO2=81.286 wt%.
+- `sf04_dunite` / `remove_silica`: first out-of-domain step: step 8, SiO2=29.695 wt%.
+- `sf04_dunite` / `strip_modifiers`: first out-of-domain step: step 18, SiO2=82.451 wt%.
+- `sf04_komatiite` / `remove_silica`: first out-of-domain step: step 12, SiO2=28.265 wt%.
+- `sf04_komatiite` / `strip_modifiers`: first out-of-domain step: step 17, SiO2=82.640 wt%.
+- `sf04_tholeiite` / `remove_silica`: first out-of-domain step: step 13, SiO2=29.174 wt%.
+- `sf04_tholeiite` / `strip_modifiers`: first out-of-domain step: step 16, SiO2=81.775 wt%.
 
 The CSV preserves each composition step, engine status, and typed reason.
-It answers the rump question as a curve: AlphaMELTS rejects every normalized step below its 30 wt% SiO2 floor.
+Every normalized step below 30 wt% SiO2 is outside the AlphaMELTS certified band, and the adapter admits such melts with a notice and extrapolated authority.
 
 Paired below-30 wt% SiO2 coverage:
 

@@ -23,6 +23,8 @@ from pathlib import Path
 import pytest
 import yaml
 
+from tests.git_history import require_git_history
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 JANAF_STORE = (
     REPO_ROOT / "data" / "literature" / "observations-v2" / "compilations-janaf"
@@ -55,23 +57,6 @@ def _git(*args: str) -> str:
         text=True,
         check=True,
     ).stdout
-
-
-def _require_git_history(*revisions: str) -> None:
-    """Skip history-only mutation proofs when CI copied a shallow worktree."""
-    for revision in revisions:
-        result = subprocess.run(
-            ["git", "cat-file", "-e", f"{revision}^{{commit}}"],
-            cwd=REPO_ROOT,
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-        if result.returncode != 0:
-            pytest.skip(
-                "git_history_unavailable: required mutation revision "
-                f"{revision!r} is absent"
-            )
 
 
 def _load_freshness():
@@ -156,7 +141,7 @@ def test_committed_store_has_no_stale_migrate_input_commits() -> None:
         pytest.skip("git_history_unavailable: freshness requires a full checkout")
     freshness = _load_freshness()
     neutral = freshness.STORE_NEUTRAL_INPUT_COMMITS
-    _require_git_history(*sorted(neutral))
+    require_git_history(REPO_ROOT, *sorted(neutral))
     for revision in neutral:
         if subprocess.run(
             ["git", "merge-base", "--is-ancestor", revision, "HEAD"],
@@ -186,7 +171,7 @@ def test_mutation_pre_regen_tip_stamps_mg013_liquid() -> None:
     defect R17 P1 named. If this goes green against that tip, the census
     no longer guards the hole.
     """
-    _require_git_history(STALE_TIP)
+    require_git_history(REPO_ROOT, STALE_TIP)
     blob = _git(
         "show",
         f"{STALE_TIP}:data/literature/observations-v2/compilations-janaf/janaf-Mg.yaml",
@@ -233,7 +218,7 @@ def test_mutation_restamping_mg013_liquid_fails_unknown_pin(tmp_path: Path) -> N
 
 def test_mutation_stale_tip_is_flagged_by_freshness_stale_half() -> None:
     """Mutation proof: on ``b5b9dacc8`` the STALE half still fires."""
-    _require_git_history(FRESHNESS_STALE_TIP)
+    require_git_history(REPO_ROOT, FRESHNESS_STALE_TIP)
     freshness = _load_freshness()
     head = _git("rev-parse", FRESHNESS_STALE_TIP).strip()
     last_store = _git(

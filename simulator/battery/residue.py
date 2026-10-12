@@ -975,7 +975,10 @@ def _predict_hashimoto_residue_cohort(
 
     engine_binding_identity = (
         openimcc_bridge.engine_binding_identity(
-            openimcc_bridge._load_pack("default"), gas_pack
+            openimcc_bridge._load_pack(
+                openimcc_bridge.DEFAULT_BACKEND_PACK_NAME
+            ),
+            gas_pack,
         )
         if engine == "openimcc"
         else None
@@ -1651,7 +1654,10 @@ def _predict_sossi_residue_cohort(
             raise ResidueInventoryRefusal("openimcc_not_importable", str(exc)) from exc
         gas_pack = load_gas_datapack()
         engine_binding_identity = openimcc_bridge.engine_binding_identity(
-            openimcc_bridge._load_pack("default"), gas_pack
+            openimcc_bridge._load_pack(
+                openimcc_bridge.DEFAULT_BACKEND_PACK_NAME
+            ),
+            gas_pack,
         )
         raw_gas_channels, omissions = _openimcc_gas_channels_and_omission_notices(
             tuple(_SOSSI_TRACE_PARENTS.values()), gas_pack

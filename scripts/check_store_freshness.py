@@ -89,11 +89,21 @@ CODE_INPUTS = (
 #     and a full regen on the rebased tip produced no store diff (0 store paths
 #     changed; observations 122164, works 276, experiments 3576, queue 77761,
 #     hard issues 3631).
+#   8d90cc936: the residue binding-provenance sites in simulator/battery/
+#     residue.py load the pack named by the bridge's one production-default
+#     constant instead of the literal "default". The constant holds that same
+#     alias, and migration does not execute the residue prediction path (see
+#     the 23df83343 entry). A full regen on its tree produced no store diff
+#     (0 of 19921 files under data/ changed, sha256 manifest before and after;
+#     rows_in=47960 observations=122164 works=276 experiments=3576 queue=77761
+#     hard_issues=3631). This acknowledges STORE outputs only; the runtime tie
+#     to the constant is covered by the commit's tests.
 STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "1b78b5697", "574800443", "149df2858",
     "9bb0a22ce", "1d254d51e", "b8be6d576",
     "d47e84bec", "6c3b40660",
     "23df83343", "2bd2918e6", "34132a932",
+    "8d90cc936",
 })
 
 

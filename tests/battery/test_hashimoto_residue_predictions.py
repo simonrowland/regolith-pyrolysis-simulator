@@ -59,6 +59,12 @@ def test_hashimoto_cohort_has_complete_vectors_bands_and_value_provenance(
 ) -> None:
     pytest.importorskip("openimcc")
     import simulator.battery.residue as residue
+    from simulator.melt_backend import openimcc_bridge
+
+    monkeypatch.setattr(
+        openimcc_bridge, "DEFAULT_BACKEND_PACK_NAME", "published-core"
+    )
+    from openimcc import load_gas_datapack
 
     # Keep the 24-vector provenance/arm mapping test fast; real refined physics
     # for one vector is covered by the activity-refresh test below.
@@ -105,6 +111,13 @@ def test_hashimoto_cohort_has_complete_vectors_bands_and_value_provenance(
     )
 
     residue_identity = primary[0].provenance["engine_binding_identity"]
+    expected_pack = openimcc_bridge._load_pack("published-core")
+    expected_package_identity = openimcc_bridge.engine_binding_identity(
+        expected_pack, load_gas_datapack()
+    )
+    assert residue_identity["melt_binding_digest"] == (
+        expected_package_identity["melt_binding_digest"]
+    )
     assert set(residue_identity) == {
         "engine_binding_digest",
         "melt_binding_digest",

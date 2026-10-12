@@ -118,6 +118,11 @@ class DomainGateAssessment:
     failed_constraints: Tuple[str, ...]
     silicate_network_band_wt_pct: Tuple[float, float]
 
+    @property
+    def outside_certified_band(self) -> bool:
+        """Whether any composition constraint names a certified-band miss."""
+        return CONSTRAINT_SILICATE_NETWORK_BAND in self.failed_constraints
+
 
 def _resolve_silicate_network_band(
     silicate_network_band: Sequence[float] | None,

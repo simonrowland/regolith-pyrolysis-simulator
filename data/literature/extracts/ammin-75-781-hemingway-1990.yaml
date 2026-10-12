@@ -11,16 +11,10 @@ extraction:
   provenance_path: docs-private/research/2026-09-20-ammin-75-781/ammin-75-781.pdf
 review_status: draft
 fidelity_samples:
-- species: NiO
-  observable: rate_series
-  observation_id: hemingway_1990_nio_heat_capacity_table1
-  field: selected_source_values
+- path: species.NiO.observations[hemingway_1990_nio_heat_capacity_table1].values.selected_source_values[0]
   value: [338.5, 48.44]
   locator: {published_page: 783, table: '1'}
-- species: Fe3O4
-  observable: rate_series
-  observation_id: hemingway_1990_magnetite_heat_capacity_table3
-  field: selected_source_values
+- path: species.Fe3O4.observations[hemingway_1990_magnetite_heat_capacity_table3].values.selected_source_values[5]
   value: [845.2, 329.0]
   locator: {published_page: 786, table: '3'}
 scope_assessment:
