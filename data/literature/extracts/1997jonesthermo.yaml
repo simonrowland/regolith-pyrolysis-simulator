@@ -259,3 +259,22 @@ species:
         reported_comparison: excellent agreement for CaO and MgO; reasonably good agreement for SiO2; ideal-solution assumption gives large discrepancies
       uncertainty:
         reported_status: not_reported
+fidelity_samples:
+- path: species.Fe.context[jones_1997_fe_heating_enthalpy_example].values.enthalpy_1600_C_kJ_per_mol
+  value: 75.90
+  note: "Printed below Figure 2 on page 7; the page image shows 75.90 kJ/mol."
+  locator:
+    published_page: 7
+    figure: '2'
+- path: species.Fe.context[jones_1997_fe_energy_temperature_example].values.energy_supply_kWh_per_kg
+  value: 0.16
+  note: "Printed in the Figure 3 example on page 8; the page image shows 0.16 kWh/kg."
+  locator:
+    published_page: 8
+    figure: '3'
+- path: species.ZnS.context[jones_1997_zns_roasting_energy_balance].values.cooling_requirement_kWh_per_kg_ZnS
+  value: 0.448
+  note: "Printed in the Figure 5 example on page 10; the page image shows 0.448 kWh/kg."
+  locator:
+    published_page: 10
+    figure: '5'
