@@ -73,6 +73,35 @@ def test_suzuki_2026_emf_pressure_range_is_measured_context() -> None:
     )
 
 
+def _assert_fayalite_alumina_trace_excludes_extrapolated_zero(doc: dict) -> None:
+    rows = [
+        row
+        for row in doc["species"]["O2"]["observations"]
+        if row["observation_id"] == "suzuki_2026_fayalite_alumina_pO2_figure2"
+    ]
+    assert len(rows) == 1
+    row = rows[0]
+    assert [point["time_min"] for point in row["values"]["series"]] == [30, 60, 90]
+    assert "trace starts after zero" in row["locator"]["note"]
+    assert "no t=0 value is read" in row["locator"]["note"]
+    assert "no t=0 value is read" in row["values"]["figure_read_method"]
+
+
+def test_suzuki_fayalite_alumina_trace_does_not_store_extrapolated_zero() -> None:
+    doc = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    _assert_fayalite_alumina_trace_excludes_extrapolated_zero(doc)
+
+    mutated = deepcopy(doc)
+    row = next(
+        row
+        for row in mutated["species"]["O2"]["observations"]
+        if row["observation_id"] == "suzuki_2026_fayalite_alumina_pO2_figure2"
+    )
+    row["values"]["series"].insert(0, {"time_min": 0, "pressure_atm": 2e-10})
+    with pytest.raises(AssertionError):
+        _assert_fayalite_alumina_trace_excludes_extrapolated_zero(mutated)
+
+
 def _assert_migrated_yield(result) -> None:
     from simulator.battery.enums import EvidenceClass, Quantity
 
