@@ -669,7 +669,7 @@ def evaluate(
     temperature_K: float | None = None,
     *,
     composition_kg: Mapping[str, float] | None = None,
-    pack: str = "default",
+    pack: str | None = None,
     allow_extrapolation: bool = False,
     allow_out_of_envelope: bool = False,
 ) -> OpenImccBridgeResult:
@@ -682,9 +682,9 @@ def evaluate(
     simulator MeltBackend adapter.
 
     ``pack`` accepts ``"default"``, ``"published-core"``, ``"published-ext"``,
-    ``"d066-ext"`` or ``"d066-kca-sensitivity"``. The default resolves to
-    openimcc's packaged default. The two extrapolation switches are explicit
-    and default to refusal. Positive ``Fe2O3`` remains an openimcc typed refusal
+    ``"d066-ext"`` or ``"d066-kca-sensitivity"``. Omitting it selects the
+    simulator backend's current default pack. The two extrapolation switches
+    are explicit and default to refusal. Positive ``Fe2O3`` remains an openimcc typed refusal
     because the IMCC adapter requires the caller's
     redox model to convert it to the FeO-equivalent convention first.
     """
@@ -702,6 +702,8 @@ def evaluate(
     else:
         raise TypeError("composition_mol or composition_kg is required")
 
+    if pack is None:
+        pack = DEFAULT_BACKEND_PACK_NAME
     loaded_pack = _load_pack(pack)
     result = package.evaluate(
         composition,
