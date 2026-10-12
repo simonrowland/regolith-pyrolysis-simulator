@@ -42,7 +42,13 @@ def _series_extract(values_extra: dict | None = None) -> dict:
             {
                 "T_C": 1800.0,
                 "P": 1.0e-4,
-                "composition_wt_pct": {"SiO2": 45.4, "Al2O3": 28.63, "CaO": 16.39},
+                # This role-only fixture closes at 100 wt% so it tests role handling.
+                "composition_wt_pct": {
+                    "SiO2": 45.4,
+                    "Al2O3": 28.63,
+                    "CaO": 16.39,
+                    "MgO": 9.58,
+                },
             }
         ],
         **(values_extra or {}),

@@ -9,6 +9,7 @@ import pytest
 
 from simulator.battery.consumer_inputs import collect_consumer_inputs, REQUIREMENTS
 from simulator.battery.generators import engine_point_requests, kems_case, vacuum_pyrolysis_preset
+from simulator.battery.migrate import wt_pct_to_mole_fraction
 from simulator.battery.enums import AmountBasis, BenchIdentityBasis, MethodToken, ValueKind
 from simulator.battery.records import (
     Bench, BenchIdentity, BenchReference, Composition, Sample, State, Value,
@@ -128,6 +129,108 @@ def test_uncontrolled_oxygen_refuses_every_engine():
     assert len(results) == len(ENGINE_POINT_CONSUMERS)
     assert all(result.payload is None for result in results)
     assert all(any(gap.waypoint == "oxygen_condition" for gap in result.readiness.gaps) for result in results)
+
+
+@pytest.mark.parametrize("printed_only", (False, True))
+def test_partial_sample_composition_blocks_waypoint_and_engine_requests(printed_only):
+    experiment, bench, observation = case()
+    partial_printed = {"Al2O3": Decimal("60"), "CaO": Decimal("20")}
+    partial = wt_pct_to_mole_fraction(partial_printed)
+    sample = (
+        replace(
+            experiment.sample,
+            initial_composition=None,
+            printed_composition=f.located(partial_printed),
+        )
+        if printed_only
+        else replace(
+            experiment.sample,
+            initial_composition=f.located(partial),
+            printed_composition=f.located(partial_printed),
+        )
+    )
+    experiment = replace(experiment, sample=sample)
+
+    inputs = collect_consumer_inputs(experiment, bench, observation)
+    waypoint = inputs.waypoints["normalized_composition"]
+    assert waypoint.selected is None
+    assert waypoint.absence is not None
+    assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+    assert "partial composition requires complete constituent coverage" in waypoint.absence.missing
+    results = engine_point_requests(inputs)
+    assert len(results) == len(ENGINE_POINT_CONSUMERS)
+    assert all(result.payload is None for result in results)
+    assert all(result.readiness.status is ReadinessStatus.GAP for result in results)
+    assert all(
+        any(gap.waypoint == "normalized_composition" for gap in result.readiness.gaps)
+        for result in results
+    )
+
+
+@pytest.mark.parametrize("include_row_printed", (False, True))
+def test_complete_row_composition_overrides_partial_sample_for_all_engines(include_row_printed):
+    experiment, bench, observation = case()
+    partial_printed = {"SiO2": Decimal("60"), "MgO": Decimal("20")}
+    row_printed = {"SiO2": Decimal("60"), "MgO": Decimal("40")}
+    experiment = replace(
+        experiment,
+        sample=replace(
+            experiment.sample,
+            printed_composition=f.located(partial_printed),
+            initial_composition=f.located(wt_pct_to_mole_fraction(partial_printed)),
+        ),
+    )
+    row_conditions = {
+        **observation.point_conditions,
+        "composition": f.located(wt_pct_to_mole_fraction(row_printed)),
+    }
+    if include_row_printed:
+        row_conditions["printed_composition"] = f.located(row_printed)
+    observation = replace(observation, point_conditions=row_conditions)
+
+    inputs = collect_consumer_inputs(experiment, bench, observation)
+    waypoint = inputs.waypoints["normalized_composition"]
+    assert waypoint.selected is not None
+    assert waypoint.selected.route == "observation_normalized_initial_composition"
+    requests = engine_point_requests(inputs)
+    assert len(requests) == len(ENGINE_POINT_CONSUMERS) == 7
+    assert all(request.payload is not None for request in requests)
+    expected = wt_pct_to_mole_fraction(row_printed).as_map()
+    for request in requests:
+        assert request.payload["composition_mol"] == pytest.approx(
+            {species: float(amount) for species, amount in expected.items()}
+        )
+
+
+def test_selected_partial_row_composition_blocks_all_engines():
+    experiment, bench, observation = case()
+    partial_printed = {"SiO2": Decimal("60"), "MgO": Decimal("20")}
+    complete_printed = {"SiO2": Decimal("60"), "MgO": Decimal("40")}
+    experiment = replace(
+        experiment,
+        sample=replace(
+            experiment.sample,
+            printed_composition=f.located(complete_printed),
+            initial_composition=f.located(wt_pct_to_mole_fraction(complete_printed)),
+        ),
+    )
+    observation = replace(
+        observation,
+        point_conditions={
+            **observation.point_conditions,
+            "printed_composition": f.located(partial_printed),
+            "composition": f.located(wt_pct_to_mole_fraction(partial_printed)),
+        },
+    )
+
+    inputs = collect_consumer_inputs(experiment, bench, observation)
+    waypoint = inputs.waypoints["normalized_composition"]
+    assert waypoint.selected is None
+    assert waypoint.absence is not None
+    assert "partial composition requires complete constituent coverage" in waypoint.absence.missing
+    requests = engine_point_requests(inputs)
+    assert len(requests) == len(ENGINE_POINT_CONSUMERS) == 7
+    assert all(request.payload is None for request in requests)
 
 
 def test_vacuum_total_pressure_supplies_flagged_oxygen_bound_to_engine():

@@ -88,6 +88,7 @@ from simulator.battery.records import (
     Bench,
     CandidateRequest,
     Composition,
+    composition_is_partial,
     DecisionBand,
     EngineTrace,
     Evidence,
@@ -5083,6 +5084,33 @@ def compile_residual(
                 refusal=ResidualRefusal(reason, dict(detail), check_refs=_check_refs(gates, reason)),
             ),
             candidate,
+        )
+
+    partial_composition = None
+    if isinstance(identity, Identity):
+        states = [identity.composition]
+        point = (reference.point_conditions or {}).get("composition")
+        if isinstance(point, Located):
+            states.append(point.state)
+        for state in states:
+            if (
+                state is not None
+                and state.is_value
+                and isinstance(state.value, Composition)
+                and composition_is_partial(state.value)
+            ):
+                partial_composition = state.value.proxy_flag
+                break
+    if partial_composition is not None:
+        return _refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {
+                "reason": "partial_composition",
+                "missing_input": "complete composition",
+                "composition_proxy_flag": partial_composition,
+            },
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            exclusions=("complete_composition_present",),
         )
 
     if quantity is None:

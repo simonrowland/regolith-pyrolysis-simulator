@@ -62,6 +62,8 @@ from simulator.battery.identity import (
     quantity_token,
     validate_quantity_profile,
 )
+from simulator.battery.migrate import _composition_from_plain, wt_pct_to_mole_fraction
+from simulator.battery import migrate as migrate_module
 from simulator.battery.records import (
     Apparatus,
     ApparatusGeometry,
@@ -255,6 +257,133 @@ def test_prediction_refusal_reports_unknown_composition_component() -> None:
 
     assert prediction.refusal_detail["reason"] == "composition_incomplete"
     assert prediction.refusal_detail["detail"] == reason
+
+
+@pytest.mark.parametrize("composition_on_point", (False, True))
+def test_partial_composition_refuses_scoring_with_missing_complete_input(
+    composition_on_point: bool,
+) -> None:
+    experiment = F.tabulation_experiment()
+    partial = wt_pct_to_mole_fraction(
+        {"Al2O3": Decimal("60"), "CaO": Decimal("20")}
+    )
+    identity = replace(
+        F.activity_identity(),
+        composition=(
+            State.unknown("composition is on the printed point")
+            if composition_on_point
+            else State.of(partial)
+        ),
+    )
+    reference = F.observation(
+        f"partial-composition-refusal-{composition_on_point}",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    if composition_on_point:
+        reference = replace(
+            reference,
+            point_conditions={
+                "composition": Located(State.of(partial), locator=F.loc())
+            },
+        )
+
+    residual, candidate = _compile(
+        reference, experiment, _predict(Decimal("0.2"), identity)
+    )
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert residual.refusal.detail == {
+        "reason": "partial_composition",
+        "missing_input": "complete composition",
+        "composition_proxy_flag": "partial_vector:typed_sum=80wt%",
+    }
+    assert candidate is None
+
+
+@pytest.mark.parametrize(
+    "case",
+    ("native_binary", "published_fraction_fallback", "guo_table6", "guo_table5"),
+)
+def test_mole_composition_reader_output_reaches_numeric_scorer(case: str) -> None:
+    if case == "native_binary":
+        values = {"composition_mol": {"Na2O": "0.195", "SiO2": "0.805"}}
+    elif case == "published_fraction_fallback":
+        values = {"X_Na2O_as_published": "0.195"}
+    else:
+        extract = migrate_module.load_yaml(
+            migrate_module.REPO_ROOT
+            / "data/literature/extracts/guo-2021-mgo-activity-cmas-slag.yaml"
+        )
+        species = "Mg" if case == "guo_table6" else "MgO"
+        table = "6" if case == "guo_table6" else "5"
+        observation = next(
+            item
+            for item in extract["species"][species]["observations"]
+            if item["observation_id"].endswith(f"table{table}_mg_activity_coefficients_1873k")
+            or item["observation_id"].endswith(f"table{table}_mgo_activities_1873k")
+        )
+        values = observation["values"]["points"][0]
+
+    composition, omitted = migrate_module._mole_fraction_composition_from_values(values)
+    assert omitted == ()
+    assert composition is not None
+    assert composition.proxy_flag is None
+
+    experiment = F.tabulation_experiment()
+    identity = replace(F.activity_identity(), composition=State.of(composition))
+    reference = F.observation(
+        f"mole-composition-reader-{case}",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    residual, candidate = _compile(
+        reference, experiment, _predict(Decimal("0.2"), identity)
+    )
+
+    assert residual.numeric is not None
+    assert residual.status is not ResidualStatus.REFUSED
+    assert candidate is not None
+
+
+@pytest.mark.parametrize("metadata_flag", (None, "initial_charge_only", "composition_from_sample_catalog"))
+def test_mass_percent_identity_loader_preserves_partial_flag_through_scoring(
+    metadata_flag: str | None,
+) -> None:
+    payload = {
+        "basis": "printed_oxides",
+        "amount_basis": "mass_percent",
+        "components": [["Al2O3", "60"], ["CaO", "20"]],
+        "proxy_flag": metadata_flag,
+    }
+    composition = _composition_from_plain(payload)
+    assert composition.proxy_flag is not None
+    assert composition.proxy_flag.startswith("partial_vector:typed_sum=80wt%")
+    if metadata_flag is not None:
+        assert metadata_flag in composition.proxy_flag
+
+    identity = replace(F.activity_identity(), composition=State.of(composition))
+    experiment = F.tabulation_experiment()
+    reference = F.observation(
+        f"identity-partial-loader-{metadata_flag}",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+    )
+    residual, candidate = _compile(
+        reference, experiment, _predict(Decimal("0.2"), identity)
+    )
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert candidate is None
 
 
 def test_feot_conversion_notice_reaches_scorer_residual() -> None:

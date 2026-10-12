@@ -10,6 +10,7 @@ from collections.abc import Iterator, Mapping
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.battery.enums import AmountBasis, MethodToken, Quantity, ValueKind
 from simulator.battery.migrate import (
+    _composition_coverage_proxy_flag,
     _is_engine_oxide_component,
     _knudsen_effusion_chamber_background_not_for_identity,
 )
@@ -26,6 +27,7 @@ from simulator.battery.records import (
     ThermalSchedule,
     Value,
     as_decimal,
+    composition_is_partial,
 )
 from simulator.lab_schedule import LAB_SCHEDULE_PRESSURE_FLOOR_MBAR
 from simulator.transport_constants import COLLISION_DIAMETERS_M, FREE_MOLECULAR_KNUDSEN_MIN
@@ -775,6 +777,7 @@ def normalized_composition(
     printed_species: set[str] | None = None
     printed_path = None
     printed_basis_exempt: set[str] = set()
+    coverage_sources: dict[str, tuple[object, object]] = {}
     for field, key in (("printed_composition", "printed_composition"),
                        ("initial_composition", "composition")):
         located = point.get(key) if key in point else getattr(experiment.sample, field)
@@ -800,6 +803,11 @@ def normalized_composition(
             absent.append(path)
             continue
         raw = located.state.value
+        declared_untyped = (
+            raw.get("untyped_constituents", ())
+            if isinstance(raw, Mapping)
+            else ()
+        )
         basis_exempt: set[str] = set()
         basis_notice: str | None = None
         basis_inference: Derivation | None = None
@@ -861,6 +869,9 @@ def normalized_composition(
                             printed_path = path
                     else:
                         raw = _printed_composition_map(raw)
+            coverage_source = raw if not as_moles and isinstance(raw, Mapping) else None
+        else:
+            coverage_source = raw
         try:
             if field == "printed_composition":
                 if not isinstance(raw, Mapping):
@@ -953,6 +964,7 @@ def normalized_composition(
                 route_name,
                 WaypointAuthority.DERIVED, (path,), notice=notice,
                 inference=basis_inference))
+            coverage_sources[route_name] = (coverage_source, declared_untyped)
             if field == "printed_composition":
                 printed_basis_exempt = set(basis_exempt)
             # Rank source evidence before normalization makes every output DERIVED.
@@ -985,6 +997,35 @@ def normalized_composition(
             return WaypointResult(result.name, None, result.routes, WaypointAbsence(
                 result.name, GapReason.UNSUPPORTED_PRINT_FORM,
                 tuple(f"{printed_path}.{species}" for species in dropped)))
+    if result.selected is not None and result.selected.route in coverage_sources:
+        coverage_source, declared_untyped = coverage_sources[result.selected.route]
+        if isinstance(coverage_source, Composition):
+            coverage_flag = (
+                coverage_source.proxy_flag
+                if composition_is_partial(coverage_source)
+                else None
+            )
+        elif isinstance(coverage_source, Mapping):
+            coverage_flag = _composition_coverage_proxy_flag(
+                coverage_source, declared_untyped
+            )
+        else:
+            coverage_flag = None
+    else:
+        coverage_flag = None
+    if result.selected is not None and coverage_flag:
+        selected_path = result.selected.inputs[0]
+        _, separator, declared = coverage_flag.partition("untyped=")
+        missing = (
+            tuple(f"{selected_path}.{name}" for name in declared.split(",") if name)
+            if separator and declared
+            else (selected_path, "partial composition requires complete constituent coverage")
+        )
+        return WaypointResult(result.name, None, result.routes, WaypointAbsence(
+            result.name,
+            GapReason.UNSUPPORTED_PRINT_FORM,
+            missing,
+        ))
     if not routes and unsupported:
         return replace(result, absence=WaypointAbsence(
             result.name, GapReason.UNSUPPORTED_PRINT_FORM, tuple(missing)))

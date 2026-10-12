@@ -662,6 +662,22 @@ def test_minimal_extract_valid():
     assert errs == []
 
 
+def test_untyped_constituents_declaration_is_validated() -> None:
+    doc = _minimal_extract()
+    doc["species"]["Fe"]["observations"][0]["values"].update(
+        composition_wt_pct={"SiO2": "70", "CaO": "29"},
+        untyped_constituents=["Y2O3"],
+    )
+
+    assert vle.validate_extract_document(doc, expected_source_id="fixture-source") == []
+
+    doc["species"]["Fe"]["observations"][0]["values"]["untyped_constituents"] = "Y2O3"
+    assert any(
+        "untyped_constituents must be a non-empty list" in error
+        for error in vle.validate_extract_document(doc, expected_source_id="fixture-source")
+    )
+
+
 def test_refuses_bad_schema_version():
     doc = _minimal_extract(schema_version="v0")
     errs = vle.validate_extract_document(doc, expected_source_id="fixture-source")
