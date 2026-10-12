@@ -2539,13 +2539,28 @@ def test_live_paths_do_not_call_intrinsic_heuristic(
     tmp_path: Path,
     monkeypatch,
 ) -> None:
-    from simulator.engine_binding_admission import write_gate_curve_memo_record
-    from tests.binding_admission_fixtures import install_synthetic_binding_receipt
+    from simulator.engine_binding_admission import (
+        BindingIdentity,
+        write_gate_curve_memo_record,
+    )
+    from tests.binding_admission_fixtures import (
+        install_synthetic_binding_receipt,
+        register_synthetic_gate_curve_producer,
+    )
 
     install_synthetic_binding_receipt(
         tmp_path,
         monkeypatch,
         bind_direct_backend=True,
+        identity_override=BindingIdentity(
+            "magemin", "ig", "magemin-ig-r1", "subprocess"
+        ),
+        provenance_override={
+            "binding_provenance_verifiable": True,
+            "runtime_artifacts": {
+                "magemin_selected_binary": {"sha256": "a" * 64},
+            },
+        },
     )
     sim = _make_sim()
     sim.start_campaign(CampaignPhase.C0)
@@ -2576,6 +2591,7 @@ def test_live_paths_do_not_call_intrinsic_heuristic(
     monkeypatch.setattr(sim, "_compute_intrinsic_melt_fO2", fail_heuristic)
     monkeypatch.setattr(sim, "_stage0_sulfur_input_ppm", lambda: 100.0)
     monkeypatch.setattr(sim._sulfsat_gate, "compute_sulfur_saturation", fake_sulfsat)
+    register_synthetic_gate_curve_producer(sim)
     sim._freeze_gate_liquid_fraction_cache = {
         "key": key,
         **write_gate_curve_memo_record(sim, curve),

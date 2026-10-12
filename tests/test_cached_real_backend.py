@@ -72,8 +72,6 @@ def _synthetic_binding_receipt_for_cache_tests(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Keep cache-mechanics tests on a test-only binding, never real pins."""
-    from tests.binding_admission_fixtures import install_synthetic_binding_receipt
-
     install_synthetic_binding_receipt(
         tmp_path,
         monkeypatch,

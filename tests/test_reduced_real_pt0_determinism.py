@@ -59,7 +59,10 @@ from simulator.reduced_real_determinism import (
 from simulator.runner import _attach_composition_projected_liquidus_notice
 from simulator.state import CampaignPhase
 from tests.chemistry.conftest import _build_sim
-from tests.binding_admission_fixtures import seed_gate_curve_memo_record
+from tests.binding_admission_fixtures import (
+    register_synthetic_gate_curve_producer,
+    seed_gate_curve_memo_record,
+)
 
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
@@ -105,20 +108,31 @@ def _build_pt0_sim(store: PT0DeterminismStore | None):
 
 
 def _select_synthetic_gate_curve_binding(
+    tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     from simulator import engine_binding_admission as admission
+    from tests.binding_admission_fixtures import install_synthetic_binding_receipt
 
     identity = admission.BindingIdentity(
-        engine_id="synthetic-fake",
-        model_id="fixture-model-v1",
-        binding_revision="synthetic-r1",
+        engine_id="magemin",
+        model_id="ig",
+        binding_revision="magemin-ig-r1",
         transport="subprocess",
     )
     provenance = {
         "binding_provenance_verifiable": True,
-        "test_fixture": "binding_admission_synthetic/synthetic-fake.json",
+        "runtime_artifacts": {
+            "magemin_selected_binary": {"sha256": "a" * 64},
+        },
     }
+    install_synthetic_binding_receipt(
+        tmp_path,
+        monkeypatch,
+        bind_direct_backend=True,
+        identity_override=identity,
+        provenance_override=provenance,
+    )
     monkeypatch.setattr(
         admission,
         "selected_binding_identities",
@@ -2617,11 +2631,16 @@ def test_pt0_replay_miss_fails_loudly() -> None:
         )
 
 
-def test_pt1_persistent_store_round_trips_exact_payload(tmp_path: Path) -> None:
+def test_pt1_persistent_store_round_trips_exact_payload(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _select_synthetic_gate_curve_binding(tmp_path, monkeypatch)
     db_path = tmp_path / "pt1-reduced-real.db"
     capture = PT0DeterminismStore("capture", db_path=db_path)
     sim = _build_pt0_sim(capture)
     sim.start_campaign(CampaignPhase.C2A_STAGED)
+    register_synthetic_gate_curve_producer(sim)
     fO2_log = sim._compute_intrinsic_melt_fO2()
     curve = {
         "source": "gate_liquid_fraction:fallback:magemin-shadow",
@@ -2635,6 +2654,7 @@ def test_pt1_persistent_store_round_trips_exact_payload(tmp_path: Path) -> None:
         intent=ChemistryIntent.GATE_LIQUID_FRACTION,
         fO2_log=fO2_log,
         fe_redox_policy="intrinsic",
+        provider_role="fallback",
     )
 
     runtime_record = seed_gate_curve_memo_record(sim, curve)
@@ -2706,6 +2726,7 @@ def test_pt1_persistent_store_round_trips_exact_payload(tmp_path: Path) -> None:
     replay = PT0DeterminismStore("replay", db_path=db_path)
     replay_sim = _build_pt0_sim(replay)
     replay_sim.start_campaign(CampaignPhase.C2A_STAGED)
+    register_synthetic_gate_curve_producer(replay_sim)
     replay_fO2_log = replay_sim._compute_intrinsic_melt_fO2()
     replay_key = canonical_replay_key(
         replay_sim,
@@ -2713,6 +2734,7 @@ def test_pt1_persistent_store_round_trips_exact_payload(tmp_path: Path) -> None:
         intent=ChemistryIntent.GATE_LIQUID_FRACTION,
         fO2_log=replay_fO2_log,
         fe_redox_policy="intrinsic",
+        provider_role="fallback",
     )
 
     assert replay_key == key
@@ -3403,15 +3425,9 @@ def test_gate_capture_rechecks_receipt_after_memo_hit(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    from tests.binding_admission_fixtures import install_synthetic_binding_receipt
     from simulator.engine_binding_admission import binding_receipt_path
 
-    install_synthetic_binding_receipt(
-        tmp_path,
-        monkeypatch,
-        bind_direct_backend=True,
-    )
-    _select_synthetic_gate_curve_binding(monkeypatch)
+    _select_synthetic_gate_curve_binding(tmp_path, monkeypatch)
     receipt_path = binding_receipt_path()
     receipt_path.unlink()
 
@@ -3419,6 +3435,7 @@ def test_gate_capture_rechecks_receipt_after_memo_hit(
     capture = PT0DeterminismStore("capture", db_path=db_path)
     sim = _build_pt0_sim(capture)
     sim.start_campaign(CampaignPhase.C2A_STAGED)
+    register_synthetic_gate_curve_producer(sim)
     curve = {
         "source": "gate_liquid_fraction:fallback:synthetic-fake",
         "status": "ok",
@@ -3462,19 +3479,12 @@ def test_pt0_gate_capture_with_receipt_covers_fresh_curve_and_memo_hit(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    from tests.binding_admission_fixtures import install_synthetic_binding_receipt
-
-    install_synthetic_binding_receipt(
-        tmp_path,
-        monkeypatch,
-        bind_direct_backend=True,
-    )
-    _select_synthetic_gate_curve_binding(monkeypatch)
+    _select_synthetic_gate_curve_binding(tmp_path, monkeypatch)
     db_path = tmp_path / "pt0-gate-memo-with-receipt.db"
     capture = PT0DeterminismStore("capture", db_path=db_path)
     sim = _build_pt0_sim(capture)
     sim.start_campaign(CampaignPhase.C2A_STAGED)
-    sim._register_freeze_gate_liquid_fraction_providers()
+    register_synthetic_gate_curve_producer(sim)
     curve = {
         "source": "gate_liquid_fraction:fallback:synthetic-fake",
         "status": "ok",
@@ -3510,18 +3520,12 @@ def test_pt0_equilibrium_lookup_capture_and_replay_stay_receipt_gated(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    from tests.binding_admission_fixtures import install_synthetic_binding_receipt
     from simulator.engine_binding_admission import (
         EngineBindingAdmissionError,
         binding_receipt_path,
     )
 
-    install_synthetic_binding_receipt(
-        tmp_path,
-        monkeypatch,
-        bind_direct_backend=True,
-    )
-    _select_synthetic_gate_curve_binding(monkeypatch)
+    _select_synthetic_gate_curve_binding(tmp_path, monkeypatch)
     db_path = tmp_path / "pt0-other-artifacts-receipt-gated.db"
     capture = PT0DeterminismStore("capture", db_path=db_path)
     sim = _build_pt0_sim(capture)

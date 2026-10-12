@@ -890,12 +890,12 @@ def test_freeze_gate_enabled_reaches_magemin_gate_fallback(
         monkeypatch,
         bind_direct_backend=True,
         identity_override=BindingIdentity(
-            'magemin', 'ig', 'magemin-ig-r1', 'subprocess'
+            "magemin", "ig", "magemin-ig-r1", "subprocess"
         ),
         provenance_override={
-            'binding_provenance_verifiable': True,
-            'runtime_artifacts': {
-                'magemin_selected_binary': {'sha256': 'a' * 64},
+            "binding_provenance_verifiable": True,
+            "runtime_artifacts": {
+                "magemin_selected_binary": {"sha256": "a" * 64},
             },
         },
     )
@@ -4040,6 +4040,75 @@ def test_core_gate_curve_memo_reuses_local_slot_refused_curve(
     assert len(provider_calls) == 1
 
 
+@pytest.mark.parametrize('veto', ['uncacheable-status', 'sticky-disposition'])
+def test_core_gate_curve_memo_keeps_r15_vetoed_live_curve(
+    veto,
+    tmp_path,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    from simulator.reduced_real_determinism import (
+        mark_uncacheable_replay_disposition,
+    )
+
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    curve = {
+        'source': 'gate_liquid_fraction:authoritative:test',
+        'status': 'unavailable' if veto == 'uncacheable-status' else 'ok',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1300.0,
+    }
+    sticky_reason = (
+        'test sticky disposition'
+        if veto == 'sticky-disposition'
+        else None
+    )
+    provider_calls = []
+
+    def produce_gate_curve(
+        reasons,
+        *,
+        fO2_log,
+        repair_notices=None,
+    ):
+        provider_calls.append(fO2_log)
+        if sticky_reason is not None:
+            mark_uncacheable_replay_disposition(sim, sticky_reason)
+        return dict(curve)
+
+    sim._freeze_gate_curve_from_gate_dispatch = produce_gate_curve
+    store = PT0DeterminismStore(
+        'capture',
+        db_path=tmp_path / f'r15-{veto}.db',
+    )
+    sim.configure_pt0_determinism_store(store)
+    shared_cache = {}
+    sim._freeze_gate_shared_curve_cache = shared_cache
+    key = _freeze_gate_key_for_current_state(sim)
+
+    first = sim._melt_redox_liquidus_gate_curve()
+
+    assert first == curve
+    assert sim._freeze_gate_liquid_fraction_cache is None
+    assert shared_cache == {}
+    assert sim._freeze_gate_liquid_fraction_curve_memo[key]['curve'] == curve
+    assert store.capture_sequence == []
+
+    second = sim._melt_redox_liquidus_gate_curve()
+
+    assert second == first
+    assert len(provider_calls) == 1
+    assert sim._freeze_gate_liquid_fraction_cache is None
+    assert shared_cache == {}
+    assert store.capture_sequence == []
+
+
 def test_core_gate_curve_memo_hit_skips_install_provenance(
     monkeypatch,
     tmp_path,
@@ -4506,7 +4575,7 @@ def test_gate_memo_origin_unproven_is_miss_and_noticed(
 
 
 @pytest.mark.parametrize('evidence_case', ['provenance-raises', 'null-digest'])
-def test_gate_memo_origin_evidence_unavailable_is_a_miss(
+def test_gate_memo_evidence_unavailable_is_a_miss(
     evidence_case,
     monkeypatch,
     tmp_path,
@@ -4545,6 +4614,12 @@ def test_gate_memo_origin_evidence_unavailable_is_a_miss(
             tmp_path,
             identity,
             provenance,
+        )
+        monkeypatch.setattr(
+            sim.backend,
+            '_engine_binding_admission_fingerprint',
+            admission_module.admission_fingerprint(identity, provenance),
+            raising=False,
         )
     curve = {
         'source': 'gate_liquid_fraction:authoritative:test',
@@ -4668,6 +4743,7 @@ def test_gate_capture_rejects_foreign_origin_with_valid_consumer_receipt(
         identity,
         provenance,
     )
+    admission_module.publish_live_backend_admission(sim.backend)
     curve = {
         'source': 'gate_liquid_fraction:authoritative:test',
         'status': 'ok',

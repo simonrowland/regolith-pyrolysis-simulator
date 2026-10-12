@@ -800,6 +800,13 @@ def write_gate_curve_memo_record(
                 and not uncacheable_replay_disposition(sim)
             ),
         )
+    if evidence.producer_evidence == "unproven":
+        _record_live_cache_refusal(
+            sim,
+            None,
+            "unproven gate producer; register its adapter; in-process reuse "
+            "of this producer's gate curves is off",
+        )
     origin = write_gate_curve_memo_origin(sim, curve, evidence)
     return gate_curve_memo_record(
         curve,
@@ -1553,19 +1560,27 @@ def live_cache_eligibility(
 
 def _record_live_cache_refusal(
     sim: Any,
-    identity: BindingIdentity,
+    identity: BindingIdentity | None,
     reason: str,
 ) -> bool:
     notices = getattr(sim, "_engine_binding_admission_notices", None)
     if not isinstance(notices, list):
         notices = []
         sim._engine_binding_admission_notices = notices
-    key = identity.as_dict()
-    if not any(
-        notice.get("identity") == key
-        for notice in notices
-        if isinstance(notice, Mapping)
-    ):
+    key = identity.as_dict() if identity is not None else None
+    if identity is None:
+        duplicate = any(
+            notice.get("identity") is None and notice.get("reason") == reason
+            for notice in notices
+            if isinstance(notice, Mapping)
+        )
+    else:
+        duplicate = any(
+            notice.get("identity") == key
+            for notice in notices
+            if isinstance(notice, Mapping)
+        )
+    if not duplicate:
         notices.append(
             {
                 "type": "typed_notice",
@@ -1573,9 +1588,13 @@ def _record_live_cache_refusal(
                 "identity": key,
                 "reason": reason,
                 "message": (
-                    "binding not admitted on this host "
-                    f"({reason}); replay and capture disabled; "
-                    "run scripts/assess_engine_bindings.py"
+                    reason
+                    if identity is None
+                    else (
+                        "binding not admitted on this host "
+                        f"({reason}); replay and capture disabled; "
+                        "run scripts/assess_engine_bindings.py"
+                    )
                 ),
             }
         )
