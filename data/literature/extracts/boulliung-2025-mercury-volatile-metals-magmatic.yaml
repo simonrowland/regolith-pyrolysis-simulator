@@ -271,18 +271,26 @@ species:
         sample_container:
           value: alumina crucible
           locator: {pdf_page_index: 8, section: '2.1 Experiments'}
-        crucible_material: alumina
+        crucible_material:
+          value: alumina
+          locator: {pdf_page_index: 8, section: '2.1 Experiments'}
         chamber_pressure:
           value: '~2.7'
           units: mbar
           locator: {pdf_page_index: 9, section: '2.1 Experiments'}
-        cell_material: silica tube
-        chamber_length_cm:
+        cell_material:
+          value: silica tube
+          locator: {pdf_page_index: 8, section: '2.1 Experiments'}
+        chamber_dimensions:
           value: '~9'
           units: cm
           locator: {pdf_page_index: 9, section: '2.1 Experiments'}
-        ampoule_volume_m3:
-          value: '4.4 x 10^-6'
+        other_facts:
+          value:
+          - name: ampoule_volume_m3
+            unit: m3
+            value: '4.4 x 10^-6'
+            locator: {pdf_page_index: 9, section: '2.1 Experiments'}
           locator: {pdf_page_index: 9, section: '2.1 Experiments'}
         thermocouple:
           value: thermocouple; temperature variation not exceeding +/- 5 C over ampoule length
