@@ -50,6 +50,7 @@ from simulator.vapour_rail.engine_crosscheck import (
 from simulator.vapour_rail.instrumentation import serialize_vapour_answer
 from simulator.vapour_rail.request import VapourResolveState
 from tests.chemistry.conftest import _build_sim, _load_yaml
+from tests.git_history import require_git_history
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -609,6 +610,7 @@ def _covered_pairs(stage0_committed_carriers: set[str]) -> set[tuple[str, str]]:
 
 
 def test_demand_manifest_is_fresh() -> None:
+    require_git_history(ROOT)
     subprocess.run(
         [
             sys.executable,

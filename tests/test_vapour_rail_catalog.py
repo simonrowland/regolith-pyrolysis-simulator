@@ -33,6 +33,7 @@ from simulator.vapour_rail.catalog import (
     validate_species_catalog,
 )
 from simulator.vapour_rail.channels import CHANNEL_O2
+from tests.git_history import require_git_history
 
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
@@ -193,6 +194,11 @@ def _git_show_catalog_at_revision(root: Path, revision: str) -> bytes | None:
 
 def test_t609_cross_revision_additivity_evidence_is_reproducible() -> None:
     root = Path(__file__).resolve().parents[1]
+    require_git_history(
+        root,
+        "cf4a499dff2beee6741f1b4da6fa43b61b6ecaa2",
+        "c4a2213422eb30b6f2f38b68281d9662fc35926d",
+    )
     evidence_path = (
         root
         / "validation-data"
@@ -428,6 +434,11 @@ def test_t609_additivity_proof_ignores_a_further_catalog_addition(
 
 def test_t622_cross_revision_additivity_evidence_is_reproducible() -> None:
     root = Path(__file__).resolve().parents[1]
+    require_git_history(
+        root,
+        "97969c434cb679d149756cbfd119e40220763d7a",
+        "3a36e9bb6ff79a6a3f51ca969d3a2d41c4e800a9",
+    )
     evidence_path = (
         root
         / "validation-data"
@@ -473,6 +484,59 @@ def test_t622_cross_revision_additivity_evidence_is_reproducible() -> None:
     assert equivalence["baseline_evaluation_grid_sha256"] == equivalence[
         "candidate_evaluation_grid_sha256"
     ]
+
+
+def test_require_git_history_skips_only_missing_history(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    from tests import git_history
+
+    def completed(returncode: int = 0, stderr: str = "") -> subprocess.CompletedProcess:
+        return subprocess.CompletedProcess([], returncode, "true\n", stderr)
+
+    def run_results(results):
+        remaining = iter(results)
+
+        def fake_run(command, **kwargs):
+            result = next(remaining)
+            if kwargs.get("check") and result.returncode:
+                raise subprocess.CalledProcessError(
+                    result.returncode, command, stderr=result.stderr
+                )
+            return result
+
+        return fake_run
+
+    monkeypatch.setattr(
+        git_history.subprocess, "run", run_results((completed(), completed()))
+    )
+    require_git_history(tmp_path, "reachable")
+
+    monkeypatch.setattr(
+        git_history.subprocess,
+        "run",
+        run_results((completed(128, "fatal: not a git repository"),)),
+    )
+    with pytest.raises(pytest.skip.Exception, match="missing_git_history"):
+        require_git_history(tmp_path)
+
+    monkeypatch.setattr(
+        git_history.subprocess,
+        "run",
+        run_results((completed(), completed(128, "fatal: unknown revision"))),
+    )
+    with pytest.raises(pytest.skip.Exception, match="missing_git_history"):
+        require_git_history(tmp_path, "unreachable")
+
+    def other_error(*_args, **_kwargs):
+        raise subprocess.CalledProcessError(
+            2, ["git"], stderr="fatal: permission denied"
+        )
+
+    monkeypatch.setattr(git_history.subprocess, "run", other_error)
+    with pytest.raises(subprocess.CalledProcessError) as raised:
+        require_git_history(tmp_path)
+    assert raised.value.stderr == "fatal: permission denied"
 
 
 def test_t622_oxidative_window_envelope_evidence_is_reproducible(
