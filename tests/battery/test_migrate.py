@@ -10018,6 +10018,85 @@ def _write_multi_extract_tree(root: Path, extracts: list[tuple[str, dict]]) -> P
     return root
 
 
+def test_stale_doi_alias_is_reassigned_in_one_pass_and_then_idempotent(
+    tmp_path: Path,
+) -> None:
+    doi = "10.1234/shared"
+    owner = _named_extract("aaa-owner", doi)
+    survivor = _named_extract("bbb-survivor", doi)
+    root = _write_multi_extract_tree(
+        tmp_path, [("aaa-owner", owner), ("bbb-survivor", survivor)]
+    )
+    works_dir = root / "data" / "literature" / "works"
+    aliases_path = works_dir / "ALIASES.yaml"
+    dump_yaml(
+        {
+            "schema_version": "battery_work_aliases.v1",
+            "aliases": {
+                "aaa-owner": "owner-work",
+                "bbb-survivor": "survivor-work",
+            },
+        },
+        aliases_path,
+    )
+
+    first = migrate(root, write=True)
+    owner_work = next(
+        work for work in first.works.values() if "aaa-owner" in work.source_ids
+    )
+    survivor_work = next(
+        work for work in first.works.values() if "bbb-survivor" in work.source_ids
+    )
+    assert owner_work.work_id != survivor_work.work_id
+    assert first.aliases[doi] == owner_work.work_id
+
+    aliases_doc = yaml.safe_load(aliases_path.read_text(encoding="utf-8"))
+    aliases_doc["aliases"]["manual-fixture-alias"] = survivor_work.work_id
+    aliases_path.write_text(
+        yaml.safe_dump(aliases_doc, sort_keys=False), encoding="utf-8"
+    )
+    (root / "data" / "literature" / "extracts" / "aaa-owner.yaml").unlink()
+    index_path = root / "data" / "literature" / "INDEX.yaml"
+    index_doc = yaml.safe_load(index_path.read_text(encoding="utf-8"))
+    index_doc["sources"] = [
+        row for row in index_doc["sources"] if row["source_id"] != "aaa-owner"
+    ]
+    index_path.write_text(
+        yaml.safe_dump(index_doc, sort_keys=False), encoding="utf-8"
+    )
+
+    second = migrate(root, write=True)
+    surviving_work_id = next(
+        work.work_id
+        for work in second.works.values()
+        if "bbb-survivor" in work.source_ids
+    )
+    second_aliases = yaml.safe_load(aliases_path.read_text(encoding="utf-8"))[
+        "aliases"
+    ]
+    assert second_aliases[doi] == surviving_work_id
+    assert second_aliases["manual-fixture-alias"] == surviving_work_id
+
+    output_dirs = (
+        works_dir,
+        root / "data" / "literature" / "extracts-v2",
+        root / "data" / "literature" / "observations-v2",
+        root / "data" / "battery",
+    )
+
+    def output_bytes() -> dict[Path, bytes]:
+        return {
+            path.relative_to(root): path.read_bytes()
+            for directory in output_dirs
+            for path in directory.rglob("*")
+            if path.is_file()
+        }
+
+    second_bytes = output_bytes()
+    migrate(root, write=True)
+    assert output_bytes() == second_bytes
+
+
 def _equipment_context_row(observation_id: str, experiment: object) -> dict:
     return {
         "observation_id": observation_id,

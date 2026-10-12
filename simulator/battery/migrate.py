@@ -11333,6 +11333,26 @@ class Migrator:
             self.literature / "works" / "ALIASES.yaml"
         )
         self.aliases.update(REVIEWED_ALIASES)
+        doi_work_ids: dict[str, set[str]] = defaultdict(set)
+        for source_id, row in self.index.items():
+            work_id = self.aliases.get(source_id)
+            if work_id is None:
+                continue
+            doi = extract_doi(row.get("doi"), str(row.get("citation") or ""))
+            if doi:
+                doi_work_ids[doi].add(work_id)
+        # A carried DOI alias is authoritative only while a live source-ID
+        # alias for that DOI still resolves to its target. Drop an orphan
+        # before work_id_for can let it occupy the DOI for this run.
+        self.aliases = {
+            alias: work_id
+            for alias, work_id in self.aliases.items()
+            if (
+                canonicalize_doi(alias) not in doi_work_ids
+                or work_id in doi_work_ids[canonicalize_doi(alias)]
+            )
+        }
+        self.aliases.update(REVIEWED_ALIASES)
         self.result = MigrationResult(aliases=dict(self.aliases))
         self._vocab = _vocab_for_root(self.root)
         self._work_citations: dict[str, str] = {}
