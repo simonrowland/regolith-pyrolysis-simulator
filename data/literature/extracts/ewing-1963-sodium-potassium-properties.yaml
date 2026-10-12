@@ -1,0 +1,163 @@
+schema_version: literature_extract.v1
+source_id: ewing-1963-sodium-potassium-properties
+source:
+  citation: Ewing C.T. et al. (1963) High temperature properties of sodium and potassium. DTIC AD0405673.
+  doi: null
+  url: https://ia803106.us.archive.org/6/items/DTIC_AD0405673/DTIC_AD0405673.pdf
+  year: 1963
+  sha256: c6c704a364c2e03ae239c67eb864bcf244b530dbc4ad37446f2f64555d41b049
+extraction:
+  method: >-
+    Manual extraction from the complete 19-page report PDF. Dense Tables 1 and 3 were transcribed from rendered page images at 250 dpi, read once across rows and independently down columns, and reconciled. All 43 Figure 6 sodium vapour-pressure marker centers were located by pixel-cluster analysis on the rendered 200 dpi page and visually checked against the image. The axes were calibrated over 1/T (10^4 K) = 5 to 9 and log p (atm) = 0 to 1.4; digitized coordinates are rounded to 0.01 graph units. Figure 6 points are approximate reads, not table values, and no interpolation was added.
+  date: '2026-10-12'
+  worker: ewing63
+  provenance_path: data/literature/extracts/ewing-1963-sodium-potassium-properties.yaml
+review_status: draft
+fidelity_samples:
+  - path: species.Na.observations[ewing_1963_na_fig6_vapour_pressure].values.points[0].T_C
+    value: 1410.4
+    locator: {page: 7, pdf_page_index: 11, figure: '6'}
+  - path: species.Na.observations[ewing_1963_na_fig6_vapour_pressure].values.points[0].pressure_atm
+    value: 24
+    locator: {page: 7, pdf_page_index: 11, figure: '6'}
+species:
+  Na:
+    observations:
+      - observation_id: ewing_1963_na_fig6_vapour_pressure
+        type: psat_series
+        locator: {page: 7, pdf_page_index: 11, figure: '6'}
+        phase: liquid sodium
+        standard_state: Saturated sodium vapour over liquid sodium; Fig. 6 ordinate is log p (atm).
+        units: 'T in °C; log10(p/atm) as digitized from the plotted ordinate'
+        values:
+          quantity: pure_vapor_pressure
+          method_class: figure_only
+          read_method: >-
+            All 43 plotted marker centers were located by pixel-cluster analysis on the rendered 200 dpi Figure 6 page and visually checked against the page image. The x-axis was calibrated linearly from 1/T (10^4 K) = 5 to 9 and the y-axis from log p (atm) = 0 to 1.4. Both digitized coordinates are rounded to 0.01 graph units; T_C is converted from the rounded reciprocal-temperature coordinate, and pressure_atm is calculated as 10^(rounded log10 p/atm). These are approximate figure reads; no interpolation between markers was added.
+          conditions_as_printed: >-
+            Five sodium null-point experiments. The report describes distilled sodium charges, a closed Cb-1% Zr chamber, nominal chamber volume 57 cc, equilibrium pressure measured externally by calibrated Bourdon-tube gages, and isothermal readings. Individual charge mass is not assigned to each Figure 6 marker; reported charge masses span 28.14 mg (Experiment 4) to 307.59 mg (Experiment 7). Measurements covered at least one heating and cooling cycle of 52 to 60 h per experiment.
+          points:
+            - {point: 1, inv_T_1e4_K_as_digitized: 5.94, T_C: 1410.4, log10_p_atm_as_digitized: 1.38, pressure_atm: 24, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 1410.4}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 2, inv_T_1e4_K_as_digitized: 5.96, T_C: 1404.7, log10_p_atm_as_digitized: 1.37, pressure_atm: 23.4, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 1404.7}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 3, inv_T_1e4_K_as_digitized: 5.99, T_C: 1396.3, log10_p_atm_as_digitized: 1.36, pressure_atm: 22.9, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 1396.3}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 4, inv_T_1e4_K_as_digitized: 6.01, T_C: 1390.7, log10_p_atm_as_digitized: 1.35, pressure_atm: 22.4, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 1390.7}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 5, inv_T_1e4_K_as_digitized: 6.06, T_C: 1377.0, log10_p_atm_as_digitized: 1.32, pressure_atm: 20.9, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 1377.0}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 6, inv_T_1e4_K_as_digitized: 6.12, T_C: 1360.8, log10_p_atm_as_digitized: 1.30, pressure_atm: 20, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 1360.8}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 7, inv_T_1e4_K_as_digitized: 6.21, T_C: 1337.2, log10_p_atm_as_digitized: 1.25, pressure_atm: 17.8, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 1337.2}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 8, inv_T_1e4_K_as_digitized: 6.26, T_C: 1324.3, log10_p_atm_as_digitized: 1.23, pressure_atm: 17, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 1324.3}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 9, inv_T_1e4_K_as_digitized: 6.35, T_C: 1301.7, log10_p_atm_as_digitized: 1.18, pressure_atm: 15.1, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 1301.7}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 10, inv_T_1e4_K_as_digitized: 6.39, T_C: 1291.8, log10_p_atm_as_digitized: 1.16, pressure_atm: 14.5, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 1291.8}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 11, inv_T_1e4_K_as_digitized: 6.51, T_C: 1262.9, log10_p_atm_as_digitized: 1.10, pressure_atm: 12.6, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 1262.9}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 12, inv_T_1e4_K_as_digitized: 6.59, T_C: 1244.3, log10_p_atm_as_digitized: 1.06, pressure_atm: 11.5, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 1244.3}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 13, inv_T_1e4_K_as_digitized: 6.70, T_C: 1219.4, log10_p_atm_as_digitized: 1.01, pressure_atm: 10.2, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 1219.4}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 14, inv_T_1e4_K_as_digitized: 6.75, T_C: 1208.3, log10_p_atm_as_digitized: 0.97, pressure_atm: 9.33, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 1208.3}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 15, inv_T_1e4_K_as_digitized: 6.82, T_C: 1193.1, log10_p_atm_as_digitized: 0.94, pressure_atm: 8.71, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 1193.1}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 16, inv_T_1e4_K_as_digitized: 6.85, T_C: 1186.7, log10_p_atm_as_digitized: 0.92, pressure_atm: 8.32, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 1186.7}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 17, inv_T_1e4_K_as_digitized: 6.88, T_C: 1180.3, log10_p_atm_as_digitized: 0.91, pressure_atm: 8.13, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 1180.3}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 18, inv_T_1e4_K_as_digitized: 7.09, T_C: 1137.3, log10_p_atm_as_digitized: 0.81, pressure_atm: 6.46, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 1137.3}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 19, inv_T_1e4_K_as_digitized: 7.10, T_C: 1135.3, log10_p_atm_as_digitized: 0.79, pressure_atm: 6.17, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 1135.3}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 20, inv_T_1e4_K_as_digitized: 7.16, T_C: 1123.5, log10_p_atm_as_digitized: 0.76, pressure_atm: 5.75, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 1123.5}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 21, inv_T_1e4_K_as_digitized: 7.25, T_C: 1106.2, log10_p_atm_as_digitized: 0.72, pressure_atm: 5.25, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 1106.2}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 22, inv_T_1e4_K_as_digitized: 7.36, T_C: 1085.5, log10_p_atm_as_digitized: 0.66, pressure_atm: 4.57, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 1085.5}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 23, inv_T_1e4_K_as_digitized: 7.43, T_C: 1072.7, log10_p_atm_as_digitized: 0.63, pressure_atm: 4.27, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 1072.7}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 24, inv_T_1e4_K_as_digitized: 7.46, T_C: 1067.3, log10_p_atm_as_digitized: 0.61, pressure_atm: 4.07, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 1067.3}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 25, inv_T_1e4_K_as_digitized: 7.52, T_C: 1056.6, log10_p_atm_as_digitized: 0.58, pressure_atm: 3.8, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 1056.6}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 26, inv_T_1e4_K_as_digitized: 7.60, T_C: 1042.6, log10_p_atm_as_digitized: 0.54, pressure_atm: 3.47, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 1042.6}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 27, inv_T_1e4_K_as_digitized: 7.66, T_C: 1032.3, log10_p_atm_as_digitized: 0.50, pressure_atm: 3.16, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 1032.3}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 28, inv_T_1e4_K_as_digitized: 7.71, T_C: 1023.9, log10_p_atm_as_digitized: 0.48, pressure_atm: 3.02, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 1023.9}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 29, inv_T_1e4_K_as_digitized: 7.77, T_C: 1013.9, log10_p_atm_as_digitized: 0.45, pressure_atm: 2.82, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 1013.9}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 30, inv_T_1e4_K_as_digitized: 7.88, T_C: 995.9, log10_p_atm_as_digitized: 0.39, pressure_atm: 2.45, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 995.9}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 31, inv_T_1e4_K_as_digitized: 7.91, T_C: 991.1, log10_p_atm_as_digitized: 0.38, pressure_atm: 2.4, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 991.1}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 32, inv_T_1e4_K_as_digitized: 7.98, T_C: 980.0, log10_p_atm_as_digitized: 0.34, pressure_atm: 2.19, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 980.0}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 33, inv_T_1e4_K_as_digitized: 8.05, T_C: 969.1, log10_p_atm_as_digitized: 0.31, pressure_atm: 2.04, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 969.1}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 34, inv_T_1e4_K_as_digitized: 8.09, T_C: 962.9, log10_p_atm_as_digitized: 0.28, pressure_atm: 1.91, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 962.9}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 35, inv_T_1e4_K_as_digitized: 8.15, T_C: 953.8, log10_p_atm_as_digitized: 0.25, pressure_atm: 1.78, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 953.8}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 36, inv_T_1e4_K_as_digitized: 8.18, T_C: 949.3, log10_p_atm_as_digitized: 0.23, pressure_atm: 1.7, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 949.3}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 37, inv_T_1e4_K_as_digitized: 8.26, T_C: 937.5, log10_p_atm_as_digitized: 0.20, pressure_atm: 1.58, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 937.5}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 38, inv_T_1e4_K_as_digitized: 8.28, T_C: 934.6, log10_p_atm_as_digitized: 0.18, pressure_atm: 1.51, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 934.6}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 39, inv_T_1e4_K_as_digitized: 8.34, T_C: 925.9, log10_p_atm_as_digitized: 0.15, pressure_atm: 1.41, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 925.9}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 40, inv_T_1e4_K_as_digitized: 8.47, T_C: 907.5, log10_p_atm_as_digitized: 0.08, pressure_atm: 1.2, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 907.5}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 41, inv_T_1e4_K_as_digitized: 8.50, T_C: 903.3, log10_p_atm_as_digitized: 0.07, pressure_atm: 1.17, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 903.3}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 42, inv_T_1e4_K_as_digitized: 8.54, T_C: 897.8, log10_p_atm_as_digitized: 0.05, pressure_atm: 1.12, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 897.8}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+            - {point: 43, inv_T_1e4_K_as_digitized: 8.58, T_C: 892.4, log10_p_atm_as_digitized: 0.03, pressure_atm: 1.07, approximate: true, point_conditions: {T_C: {state: {tag: value, value: 892.4}, locator: {page: 7, pdf_page_index: 11, figure: '6'}}}}
+        uncertainty:
+          note: >-
+            The paper states that equilibrium pressures were generally reproduced to better than ±0.1 psi before, during, and after cycling. It does not state a confidence level for this width. This is not converted or combined with the graph-read resolution.
+    context:
+      - observation_id: ewing_1963_na_table1_cp_context
+        type: characterization
+        locator: {page: 8, pdf_page_index: 12, table: '1'}
+        units: 'temperature °C; specific heat cal/gm °C as printed'
+        values:
+          quantity: sodium_specific_heat_table_as_printed
+          d126_reason: No closed specific-heat observation type exists, and specific heat is outside the nine rails.
+          method_and_conditions: >-
+            Saturated liquid sodium measured by NRL high-temperature calorimetry: an Inconel bucket was equilibrated in a known-temperature furnace and dropped into a calorimeter; heat evolved on cooling to 30°C was measured, with filled and empty bucket runs used to derive sample heat capacity. The report describes the probable error of the NRL measurement as ±3%; no confidence level is stated.
+          nrl_measured_points:
+            - {T_C: 315.9, specific_heat_cal_g_C: 0.314}
+            - {T_C: 599.5, specific_heat_cal_g_C: 0.301}
+            - {T_C: 723.9, specific_heat_cal_g_C: 0.291}
+            - {T_C: 826.4, specific_heat_cal_g_C: 0.297}
+            - {T_C: 920.5, specific_heat_cal_g_C: 0.313}
+            - {T_C: 1008.9, specific_heat_cal_g_C: 0.324}
+            - {T_C: 1109.6, specific_heat_cal_g_C: 0.325}
+          exclusion: NBS comparator column is not measurement data from this work.
+      - observation_id: ewing_1963_na_table3_cp_context
+        type: characterization
+        locator: {page: 10, pdf_page_index: 14, table: '3'}
+        units: 'temperature °C; specific heat cal/gm °C as printed'
+        values:
+          quantity: sodium_specific_heat_table_as_printed
+          d126_reason: No closed specific-heat observation type exists, and specific heat is outside the nine rails.
+          method_and_conditions: >-
+            Saturated liquid sodium measured in earlier NRL low-temperature iron-bucket calorimetry. The source reports a mean deviation of ±0.5% against NBS values; this is a comparison statistic, not pointwise measurement uncertainty. No confidence level is stated.
+          nrl_measured_points:
+            - {T_C: 155.2, specific_heat_cal_g_C: 0.325}
+            - {T_C: 255.3, specific_heat_cal_g_C: 0.315}
+            - {T_C: 352.0, specific_heat_cal_g_C: 0.312}
+            - {T_C: 449.7, specific_heat_cal_g_C: 0.304}
+            - {T_C: 555.3, specific_heat_cal_g_C: 0.297}
+            - {T_C: 652.6, specific_heat_cal_g_C: 0.300}
+          exclusion: NBS comparator column is not measurement data from this work.
+      - observation_id: ewing_1963_na_method_apparatus_context
+        type: method
+        locator: {page: 2, pdf_page_index: 6, figure: '1', section: Pressure-Volume-Temperature}
+        units: as printed
+        values:
+          quantity: sodium_null_point_method_and_apparatus
+          method_class: method_only
+          method: >-
+            Closed null-point chamber of known volume with a flexible 5 mil diaphragm, electrical-continuity probe, and external calibrated Bourdon-tube pressure gauges. Sodium pressure was balanced against external pressure. The cell was heated in a pressure furnace; two calibrated Pt-6%Rh/Pt-30%Rh thermocouples measured each end, with readings taken under isothermal conditions.
+          sample_and_charge: >-
+            Distilled sodium was introduced in small tared closed-end tubes made from Cb-1% Zr alloy; filling and weighing occurred in a vacuum-inert gas box. Five null-point experiments used a nominal 57 cc chamber. The report gives a 28.14 mg charge for Experiment 4 and 307.59 mg for Experiment 7; per-point run assignments are not given in Figure 6.
+          pressure_and_gas: >-
+            Reported sodium vapour pressures span 1 to 25 atm. The chamber was checked for residual gas after each experiment with an evacuated manometer; gas pressures as low as 0.01 psi could have been detected. No carrier gas is reported during measurement.
+          duration: >-
+            Pressure-temperature measurements covered at least one complete heating and cooling cycle per experiment; each cycle required continuous equipment operation for 52 to 60 hours.
+          measurement_reproducibility: >-
+            Equilibrium pressures were generally reproduced to better than ±0.1 psi before, during, and after cycling; the paper does not state a confidence level.
+      - observation_id: ewing_1963_sodium_properties_context
+        type: characterization
+        locator: {page: 1, pdf_page_index: 5, section: Summary of Experimental Program}
+        units: as printed
+        values:
+          quantity: sodium_potassium_measurement_scope
+          sodium_density: >-
+            High-temperature sodium density had been reported previously in references 1 and 2; additional density work is described as in progress. No sodium density table or points are reported in this document.
+          potassium: >-
+            Potassium vapor-pressure and heat-capacity measurements are described as future work. No measured potassium vapour pressure, density, heat capacity, enthalpy, or vapour-composition series is reported here.
+          vapour_composition_and_thermodynamics: >-
+            The preliminary sodium PVT discussion identifies dimer and trimer molecular species but reports no measured mole fractions, equilibrium constants, or enthalpy values. The report says these thermodynamic results will be obtained after additional experiments and treatment.
+          scope: >-
+            This is the complete Ninth Progress Report for 1 October to 31 December 1962, not a fragment of that report; the work is explicitly interim and continuing.
+  K:
+    observations: []
+    context:
+      - observation_id: ewing_1963_k_properties_not_yet_measured
+        type: method
+        locator: {page: 1, pdf_page_index: 5, section: Summary of Experimental Program}
+        units: as printed
+        values:
+          quantity: potassium_measurement_status
+          status: >-
+            Potassium vapor-pressure and heat-capacity measurements were future work in this report. No potassium measurement values are included.
