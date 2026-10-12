@@ -4500,6 +4500,7 @@ _CENSUS_CLOSED_QUANTITIES = {
     "p_sat",
     "p_partial",
     "p_reference",
+    "fugacity",
     "log10_Kf",
     "log10_K_star",
     "activity",
@@ -4694,6 +4695,8 @@ def _census_expected_point(item: dict, q_token: str | None, units: str):
         if "value" in item:
             return _num(item.get("value"))
         return None
+    if q_token == "fugacity":
+        return _num(item.get("fugacity_Pa")) if "fugacity_Pa" in item else None
     if q_token in {"p_sat", "p_partial"}:
         for key, unit in _CENSUS_PRESSURE_FIELDS:
             if key not in item:
@@ -4906,7 +4909,7 @@ def _series_census(
     return census, mismatches, n_numeric, n_unavailable, per_source
 
 
-def test_j01_store_census_series_numeric_matches_declared_field() -> None:
+def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) -> None:
     extracts = REPO_ROOT / "data" / "literature" / "extracts"
     extracts_v2 = REPO_ROOT / "data" / "literature" / "extracts-v2"
     if not extracts_v2.is_dir():
@@ -4914,6 +4917,44 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     census, mismatches, n_numeric, n_unavailable, per_source = _series_census(
         extracts, extracts_v2
     )
+    sato = _migrate_real_extract(
+        tmp_path,
+        "sato-1976-lunar-fo2-apollo-17.yaml",
+        write=True,
+    )
+    sato_literature = tmp_path / "tree" / "data" / "literature"
+    (
+        sato_census,
+        sato_mismatches,
+        sato_numeric,
+        _sato_unavailable,
+        sato_per_source,
+    ) = _series_census(
+        sato_literature / "extracts",
+        sato_literature / "extracts-v2",
+    )
+    assert len(sato.observations) == 115
+    assert sato_census == {"activity": 54, "fugacity": 55}
+    assert sato_numeric == 109
+    assert _sato_unavailable == 6
+    assert sato_mismatches == []
+    assert sato_per_source == {
+        "sato-1976-lunar-fo2-apollo-17": {"activity": 54, "fugacity": 55}
+    }
+    census_before_sato = census.copy()
+    mismatches.extend(sato_mismatches)
+    for quantity, count in sato_census.items():
+        census[quantity] = census.get(quantity, 0) + count
+    per_source.update(sato_per_source)
+    n_numeric += sato_numeric
+    census_delta = {
+        quantity: census.get(quantity, 0) - census_before_sato.get(quantity, 0)
+        for quantity in census.keys() | census_before_sato.keys()
+    }
+    assert {quantity: count for quantity, count in census_delta.items() if count} == {
+        "activity": 54,
+        "fugacity": 55,
+    }
     assert not mismatches, mismatches[:20]
     assert n_numeric == sum(census.values())
     # Re-pinned for the reviewed Holzheid 1997 correction: its 33 Table 3 gamma cells
@@ -4943,6 +4984,9 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     # cells, evaporation_coefficient_alpha 30->34 and n_numeric 450->454.
     assert census.get("p_partial") == 136
     assert census.get("p_sat") == 21
+    # Sato (1976) adds 54 numeric Table 2/3 activity cells and 55 numeric Table 1
+    # oxygen-fugacity cells: activity +54, fugacity 0->55, and n_numeric 1878->1987.
+    assert census.get("fugacity") == 55
     # Twelve repeated Fedkin table cells are no longer counted through the retired
     # mirror; the KEMS owner extract retains the cells (Fedkin et al. 2006, Table 3,
     # p. 212, DOI 10.1016/j.gca.2005.08.014).
@@ -4991,7 +5035,7 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     # No check was relaxed and mismatches stay 0.
     assert census.get("H_minus_H298") == 13
     assert per_source.get("abdul-2023-cao-sio2-calphad") == {"H_minus_H298": 13}
-    assert n_numeric == 1878, (n_numeric, census, n_unavailable)
+    assert n_numeric == 1987, (n_numeric, census, n_unavailable)
 
 
 def test_residue_point_condition_values_keep_their_printed_types() -> None:

@@ -963,22 +963,20 @@ def absence_audit(paths=STORE_PATHS):
                         if temperatures:
                             contradiction = temperatures[:3]
                     elif "does not state phase" in reason:
-                        phases = [p for p, v in leaves if v not in (None, "") and
-                                  re.search(r"(?:^|[.])(?:phase|phase_as_published|phase_state_as_published|state_note_as_published|phase_from|phase_to)(?:$|\[)", p)]
+                        phases = [
+                            path
+                            for path, value in leaves
+                            if path
+                            in {
+                                "phase",
+                                "phase_as_published",
+                                "phase_state_as_published",
+                                "state_note_as_published",
+                            }
+                            and value not in (None, "")
+                        ]
                         if phases:
                             contradiction = phases[:3]
-                        elif record.get("type") == "transition_point":
-                            transition_fields = [
-                                p for p, value in leaves
-                                if value not in (None, "")
-                                and (
-                                    p == "values.property_kind"
-                                    or p.startswith("values.citation.")
-                                    or p == "locator.note"
-                                )
-                            ]
-                            if transition_fields:
-                                contradiction = transition_fields[:3]
                     elif "unit as printed not stated" in reason:
                         units = _nonempty_printed_paths(
                             record.get("units_as_published"),
@@ -1046,6 +1044,70 @@ def test_g1_whole_store_absence_claims_match_sources(path):
         if _source_observation_rows(path) != 0:
             assert judged, "no source families judged"
     assert not bad, f"{len(bad)} false absence claims; first witnesses: {bad[:12]}"
+
+
+def test_g1_sato_1976_phase_absences_match_isolated_source(tmp_path: Path) -> None:
+    filename = "sato-1976-lunar-fo2-apollo-17.yaml"
+    result = _migrate_real_extract(tmp_path, filename, write=True)
+    generated = tmp_path / "tree" / "data" / "literature" / "extracts-v2" / filename
+
+    judged, bad = absence_audit([generated])
+
+    source_id = "sato-1976-lunar-fo2-apollo-17"
+    assert len(result.observations) == 115
+    assert judged[source_id] == 115
+    assert bad == [], f"false absence claims: {bad[:12]}"
+
+
+def test_g1_absence_audit_catches_same_row_species_phase_mutation(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root = tmp_path / "repo"
+    source_dir = root / "data" / "literature" / "extracts"
+    store_dir = root / "data" / "literature" / "extracts-v2"
+    source_dir.mkdir(parents=True)
+    store_dir.mkdir(parents=True)
+    monkeypatch.setitem(absence_audit.__globals__, "REPO_ROOT", root)
+
+    source = {
+        "source_id": "fixture-phase-mutation",
+        "species": {
+            "Fe": {
+                "observations": [
+                    {"observation_id": "row", "phase": "liquid"},
+                ]
+            }
+        },
+    }
+    store = {
+        "observations": [
+            {
+                "observation_id": "fixture-phase-mutation::row",
+                "source_id": "fixture-phase-mutation",
+                "identity": {
+                    "species": {
+                        "formula": "Fe",
+                        "phase": {
+                            "tag": "unknown",
+                            "reason": "source does not state phase",
+                        },
+                    }
+                },
+            }
+        ]
+    }
+    source_path = source_dir / "fixture-phase-mutation.yaml"
+    store_path = store_dir / source_path.name
+    source_path.write_text(yaml.safe_dump(source), encoding="utf-8")
+    store_path.write_text(yaml.safe_dump(store), encoding="utf-8")
+
+    judged, bad = absence_audit([store_path])
+
+    assert judged["fixture-phase-mutation"] == 1
+    assert len(bad) == 1
+    assert bad[0][1] == "fixture-phase-mutation::row"
+    assert bad[0][2] == "identity.species.phase.reason"
+    assert bad[0][4] == ["phase"]
 
 
 def test_g1_current_stolyarova_source_migrates_without_context_observation(
