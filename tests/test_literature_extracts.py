@@ -406,6 +406,61 @@ def test_okazaki_container_helium_ratio_uncertainty_is_pinned() -> None:
     assert "(1 sigma)" in printed_uncertainty
 
 
+def test_banya_watanabe_1977_row_conditions_and_feto_reference_migrate() -> None:
+    from simulator.battery.enums import Quantity
+    from simulator.battery.migrate import Migrator
+
+    path = EXTRACTS / "banya-watanabe-1977-feto-p2o5-solid-iron.yaml"
+    source = yaml.safe_load(path.read_text(encoding="utf-8"))
+    source_table4 = next(
+        row
+        for row in source["species"]["Fe_tO"]["observations"]
+        if row["observation_id"].endswith("xp2o5_0_00")
+    )
+    assert source_table4["values"]["X_P2O5_as_printed"] == 0.00
+    assert (
+        source_table4["point_conditions"]["X_P2O5_as_printed"]["state"]["value"]["point"]
+        == "0.00"
+    )
+
+    migrator = Migrator(REPO_ROOT, index={}, aliases={})
+    migrator._migrate_extract(path)
+    migrator.finalize()
+    result = migrator.result
+
+    assert len(result.observations) == 87
+    assert not result.validation.hard_issues
+    table3 = [
+        row
+        for row in result.observations.values()
+        if "banya77_t3_run_" in row.observation_id
+    ]
+    table4 = [
+        row
+        for row in result.observations.values()
+        if "banya77_t4_xp2o5_" in row.observation_id
+    ]
+    assert len(table3) == 75
+    assert len(table4) == 12
+    assert all(
+        row.point_conditions["temperature_K"].state.is_value for row in table3 + table4
+    )
+    assert all(
+        row.point_conditions["composition"].state.is_value for row in table3
+    )
+
+    first_activity = next(
+        row for row in table4 if row.observation_id.endswith("xp2o5_0_00")
+    )
+    assert first_activity.identity.quantity.value == Quantity.ACTIVITY
+    assert first_activity.identity.species.formula == "Fe_tO"
+    reference = first_activity.identity.reference_state
+    assert reference is not None and reference.is_value
+    assert reference.value.convention.value == "raoultian_pure_endmember"
+    assert reference.value.endmember.formula == "Fe_tO"
+    assert first_activity.evidence.class_.value.value == "model_derived"
+
+
 def test_norris_split_runs_retain_shared_sample_and_quench_facts() -> None:
     doc = yaml.safe_load(
         (EXTRACTS / "norris-2017-earth-volatiles-nature.yaml").read_text()
