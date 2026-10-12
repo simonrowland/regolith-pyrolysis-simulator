@@ -2624,14 +2624,14 @@ def test_run_benchmark_passes_producer_close_marker_to_point_and_probe_detectors
     assert result["metadata"]["thermoengine_probe_latch"] is None
 
 
-def test_tracked_melt_activity_report_marks_thermoengine_narrative_stale():
+def test_tracked_melt_activity_report_excludes_retired_thermoengine_narrative():
+    # 65a8273a4 added the stale 32/110 passage; regeneration ebf488e12 removed it.
     text = (
         benchmark.DEFAULT_OUTPUT_DIR / "report.md"
     ).read_text(encoding="utf-8")
-    assert "STALE (t-681" in text
-    assert "isolated-mode ceiling" in text
-    assert "retired" in text.lower()
-    assert "adapter not available" in text
+    assert "STALE (t-681" not in text
+    assert "isolated-mode ceiling" not in text
+    assert "Combined **32/110** is an" not in text
 
 
 def test_run_benchmark_rebuilds_engines_before_probes(tmp_path, monkeypatch):
