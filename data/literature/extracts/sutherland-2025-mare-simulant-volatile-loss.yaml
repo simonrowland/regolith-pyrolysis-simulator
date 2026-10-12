@@ -226,11 +226,25 @@ fidelity_samples:
 - path: species.TUBS-M.observations[sutherland_2025_tubs_m_total_mass_loss_150_1300_c].values.points[0].mass_loss_wt_pct
   value: 0.979
   locator: {page: 5, published_page: 5, table: '1', note: '−Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature varying.'}
-- path: species.EAC-1A.observations[sutherland_2025_eac_1a_interval_mass_loss].values.points[0].mass_loss_wt_pct
-  value: 0.681
+- species: EAC-1A
+  observation_id: sutherland_2025_eac_1a_interval_mass_loss
+  field: interval_losses
+  value:
+  - {lower_temperature_C: 150, upper_temperature_C: 500, mass_loss_wt_pct: 0.681, locator: {page: 5, published_page: 5, table: '1', note: '150–500 °C; normalized to dry mass at 150 °C.'}}
+  - {lower_temperature_C: 500, upper_temperature_C: 1000, mass_loss_wt_pct: 1.042, locator: {page: 5, published_page: 5, table: '1', note: '500–1000 °C; normalized to dry mass at 150 °C.'}}
+  - {lower_temperature_C: 1000, upper_temperature_C: 1300, hold_min: 10, mass_loss_wt_pct: 0.0611, locator: {page: 5, published_page: 5, table: '1', note: '1000–1300 °C with 10 min hold; normalized to dry mass at 150 °C.'}}
+  - {lower_temperature_C: 150, upper_temperature_C: 1072, mass_loss_wt_pct: 1.743, locator: {page: 5, published_page: 5, table: '1', note: '150 °C–TAS; TAS = 1072 °C (apparent solidus, TM1); normalized to dry mass at 150 °C.'}}
+  - {lower_temperature_C: 1072, upper_temperature_C: 1300, hold_min: 10, mass_loss_wt_pct: 0.042, locator: {page: 5, published_page: 5, table: '1', note: 'TAS–1300 °C with 10 min hold; TAS = 1072 °C (apparent solidus, TM1); normalized to dry mass at 150 °C.'}}
   locator: {page: 5, published_page: 5, table: '1', note: '150–500 °C interval contribution.'}
-- path: species.JSC-1A.observations[sutherland_2025_jsc_1a_interval_mass_loss].values.points[2].mass_loss_wt_pct
-  value: 0.015
+- species: JSC-1A
+  observation_id: sutherland_2025_jsc_1a_interval_mass_loss
+  field: interval_losses
+  value:
+  - {lower_temperature_C: 150, upper_temperature_C: 500, mass_loss_wt_pct: 0.072, locator: {page: 5, published_page: 5, table: '1', note: '150–500 °C; normalized to dry mass at 150 °C.'}}
+  - {lower_temperature_C: 500, upper_temperature_C: 1000, mass_loss_wt_pct: 0.074, locator: {page: 5, published_page: 5, table: '1', note: '500–1000 °C; normalized to dry mass at 150 °C.'}}
+  - {lower_temperature_C: 1000, upper_temperature_C: 1300, hold_min: 10, mass_loss_wt_pct: 0.015, locator: {page: 5, published_page: 5, table: '1', note: '1000–1300 °C with 10 min hold; normalized to dry mass at 150 °C.'}}
+  - {lower_temperature_C: 150, upper_temperature_C: 1051, mass_loss_wt_pct: 0.150, locator: {page: 5, published_page: 5, table: '1', note: '150 °C–TAS; TAS = 1051 °C (apparent solidus, TM1); normalized to dry mass at 150 °C.'}}
+  - {lower_temperature_C: 1051, upper_temperature_C: 1300, hold_min: 10, mass_loss_wt_pct: 0.011, locator: {page: 5, published_page: 5, table: '1', note: 'TAS–1300 °C with 10 min hold; TAS = 1051 °C (apparent solidus, TM1); normalized to dry mass at 150 °C.'}}
   locator: {page: 5, published_page: 5, table: '1', note: '1000–1300 °C 10′ interval contribution.'}
 species:
   EAC-1A:
@@ -253,22 +267,22 @@ species:
             total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: *methods_loc}
             time_min: {state: {tag: value, value: 200}, locator: {page: 3, published_page: 3, section: '2.2.1', note: 'Each analysis took ca. 200 min.'}}
       uncertainty: 'Printed sample mass accuracy ±0.1 μg and temperature accuracy ±5 °C; confidence level not stated. No uncertainty is printed for the mass-loss value.'
+    context:
     - observation_id: sutherland_2025_eac_1a_interval_mass_loss
       experiment: eac-1a-tga-dsc-ega
-      type: mass_loss
-      locator: {page: 5, published_page: 5, table: '1', note: 'Direct interval mass-loss contributions, normalized to dried sample mass at 150 °C; TAS is the apparent solidus (TAS = TM1). T_C is the printed interval upper endpoint, not a cumulative mass-loss point.'}
-      phase: EAC-1A mare simulant
-      regime: tga
+      type: laboratory_conditions
+      locator: {page: 5, published_page: 5, table: '1', note: 'Measured interval mass losses, normalized to dried mass at 150 °C. TAS is the apparent solidus TM1; bounds and hold are stated per interval below.'}
       units: wt_percent
       values:
-        quantity: mass_loss_fraction
+        quantity: interval_mass_loss_contributions_as_published
         method_class: measured_direct
-        points:
-        - {T_C: 500, mass_loss_wt_pct: 0.681, locator: {page: 5, published_page: 5, table: '1', note: '150–500 °C interval; normalized to dried sample mass at 150 °C.'}}
-        - {T_C: 1000, mass_loss_wt_pct: 1.042, locator: {page: 5, published_page: 5, table: '1', note: '500–1000 °C interval; normalized to dried sample mass at 150 °C.'}}
-        - {T_C: 1300, mass_loss_wt_pct: 0.0611, locator: {page: 5, published_page: 5, table: '1', note: '1000–1300 °C 10′ interval (3.42 % of total); normalized to dried sample mass at 150 °C.'}}
-        - {T_C: 1072, mass_loss_wt_pct: 1.743, locator: {page: 5, published_page: 5, table: '1', note: '150 °C–TAS interval; TAS = 1072 °C (apparent solidus, TM1); normalized to dried sample mass at 150 °C.'}}
-        - {T_C: 1300, mass_loss_wt_pct: 0.042, locator: {page: 5, published_page: 5, table: '1', note: 'TAS–1300 °C 10′ interval; TAS = 1072 °C (apparent solidus, TM1); normalized to dried sample mass at 150 °C.'}}
+        d-126_reason: 'no typed interval mass-loss basis; t-1221'
+        interval_losses:
+        - {lower_temperature_C: 150, upper_temperature_C: 500, mass_loss_wt_pct: 0.681, locator: {page: 5, published_page: 5, table: '1', note: '150–500 °C; normalized to dry mass at 150 °C.'}}
+        - {lower_temperature_C: 500, upper_temperature_C: 1000, mass_loss_wt_pct: 1.042, locator: {page: 5, published_page: 5, table: '1', note: '500–1000 °C; normalized to dry mass at 150 °C.'}}
+        - {lower_temperature_C: 1000, upper_temperature_C: 1300, hold_min: 10, mass_loss_wt_pct: 0.0611, locator: {page: 5, published_page: 5, table: '1', note: '1000–1300 °C with 10 min hold; normalized to dry mass at 150 °C.'}}
+        - {lower_temperature_C: 150, upper_temperature_C: 1072, mass_loss_wt_pct: 1.743, locator: {page: 5, published_page: 5, table: '1', note: '150 °C–TAS; TAS = 1072 °C (apparent solidus, TM1); normalized to dry mass at 150 °C.'}}
+        - {lower_temperature_C: 1072, upper_temperature_C: 1300, hold_min: 10, mass_loss_wt_pct: 0.042, locator: {page: 5, published_page: 5, table: '1', note: 'TAS–1300 °C with 10 min hold; TAS = 1072 °C (apparent solidus, TM1); normalized to dry mass at 150 °C.'}}
   JSC-1A:
     observations:
     - observation_id: sutherland_2025_jsc_1a_total_mass_loss_150_1300_c
@@ -289,22 +303,6 @@ species:
             total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: *methods_loc}
             time_min: {state: {tag: value, value: 200}, locator: {page: 3, published_page: 3, section: '2.2.1', note: 'Each analysis took ca. 200 min.'}}
       uncertainty: 'Printed sample mass accuracy ±0.1 μg and temperature accuracy ±5 °C; confidence level not stated. No uncertainty is printed for the mass-loss value.'
-    - observation_id: sutherland_2025_jsc_1a_interval_mass_loss
-      experiment: jsc-1a-tga-dsc-ega
-      type: mass_loss
-      locator: {page: 5, published_page: 5, table: '1', note: 'Direct interval mass-loss contributions, normalized to dried sample mass at 150 °C; TAS is the apparent solidus (TAS = TM1). T_C is the printed interval upper endpoint, not a cumulative mass-loss point.'}
-      phase: JSC-1A mare simulant
-      regime: tga
-      units: wt_percent
-      values:
-        quantity: mass_loss_fraction
-        method_class: measured_direct
-        points:
-        - {T_C: 500, mass_loss_wt_pct: 0.072, locator: {page: 5, published_page: 5, table: '1', note: '150–500 °C interval; normalized to dried sample mass at 150 °C.'}}
-        - {T_C: 1000, mass_loss_wt_pct: 0.074, locator: {page: 5, published_page: 5, table: '1', note: '500–1000 °C interval; normalized to dried sample mass at 150 °C.'}}
-        - {T_C: 1300, mass_loss_wt_pct: 0.015, locator: {page: 5, published_page: 5, table: '1', note: '1000–1300 °C 10′ interval (9.32 % of total); normalized to dried sample mass at 150 °C.'}}
-        - {T_C: 1051, mass_loss_wt_pct: 0.150, locator: {page: 5, published_page: 5, table: '1', note: '150 °C–TAS interval; TAS = 1051 °C (apparent solidus, TM1); normalized to dried sample mass at 150 °C.'}}
-        - {T_C: 1300, mass_loss_wt_pct: 0.011, locator: {page: 5, published_page: 5, table: '1', note: 'TAS–1300 °C 10′ interval; TAS = 1051 °C (apparent solidus, TM1); normalized to dried sample mass at 150 °C.'}}
     context:
     - observation_id: sutherland_2025_jsc_1a_integrated_gas_releases
       experiment: jsc-1a-tga-dsc-ega
@@ -320,6 +318,21 @@ species:
         CO2_ppm_with_C_contribution_in_parentheses: ['244 (67)', '59 (16)', '67 (18)']
         SO2_ppm_with_S_contribution_in_parentheses: ['5 (3)', '29 (15)', '36 (18)']
         table_note: Integrated ppm is calculated from relative gas fractions normalized against measured mass loss; starred narrow intervals neglect O2 and assume similar gas behaviour across the full range.
+    - observation_id: sutherland_2025_jsc_1a_interval_mass_loss
+      experiment: jsc-1a-tga-dsc-ega
+      type: laboratory_conditions
+      locator: {page: 5, published_page: 5, table: '1', note: 'Measured interval mass losses, normalized to dried mass at 150 °C. TAS is the apparent solidus TM1; bounds and hold are stated per interval below.'}
+      units: wt_percent
+      values:
+        quantity: interval_mass_loss_contributions_as_published
+        method_class: measured_direct
+        d-126_reason: 'no typed interval mass-loss basis; t-1221'
+        interval_losses:
+        - {lower_temperature_C: 150, upper_temperature_C: 500, mass_loss_wt_pct: 0.072, locator: {page: 5, published_page: 5, table: '1', note: '150–500 °C; normalized to dry mass at 150 °C.'}}
+        - {lower_temperature_C: 500, upper_temperature_C: 1000, mass_loss_wt_pct: 0.074, locator: {page: 5, published_page: 5, table: '1', note: '500–1000 °C; normalized to dry mass at 150 °C.'}}
+        - {lower_temperature_C: 1000, upper_temperature_C: 1300, hold_min: 10, mass_loss_wt_pct: 0.015, locator: {page: 5, published_page: 5, table: '1', note: '1000–1300 °C with 10 min hold; normalized to dry mass at 150 °C.'}}
+        - {lower_temperature_C: 150, upper_temperature_C: 1051, mass_loss_wt_pct: 0.150, locator: {page: 5, published_page: 5, table: '1', note: '150 °C–TAS; TAS = 1051 °C (apparent solidus, TM1); normalized to dry mass at 150 °C.'}}
+        - {lower_temperature_C: 1051, upper_temperature_C: 1300, hold_min: 10, mass_loss_wt_pct: 0.011, locator: {page: 5, published_page: 5, table: '1', note: 'TAS–1300 °C with 10 min hold; TAS = 1051 °C (apparent solidus, TM1); normalized to dry mass at 150 °C.'}}
     - observation_id: sutherland_2025_supplementary_and_residue_data_pointer
       experiment: jsc-1a-tga-dsc-ega
       type: characterization
@@ -353,22 +366,22 @@ species:
             total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: *methods_loc}
             time_min: {state: {tag: value, value: 200}, locator: {page: 3, published_page: 3, section: '2.2.1', note: 'Each analysis took ca. 200 min.'}}
       uncertainty: 'Printed sample mass accuracy ±0.1 μg and temperature accuracy ±5 °C; confidence level not stated. No uncertainty is printed for the mass-loss value.'
+    context:
     - observation_id: sutherland_2025_lms_1_interval_mass_loss
       experiment: lms-1-tga-dsc-ega
-      type: mass_loss
-      locator: {page: 5, published_page: 5, table: '1', note: 'Direct interval mass-loss contributions, normalized to dried sample mass at 150 °C; TAS is the apparent solidus (TAS = TM1). T_C is the printed interval upper endpoint, not a cumulative mass-loss point.'}
-      phase: LMS-1 mare simulant
-      regime: tga
+      type: laboratory_conditions
+      locator: {page: 5, published_page: 5, table: '1', note: 'Measured interval mass losses, normalized to dried mass at 150 °C. TAS is the apparent solidus TM1; bounds and hold are stated per interval below.'}
       units: wt_percent
       values:
-        quantity: mass_loss_fraction
+        quantity: interval_mass_loss_contributions_as_published
         method_class: measured_direct
-        points:
-        - {T_C: 500, mass_loss_wt_pct: 0.315, locator: {page: 5, published_page: 5, table: '1', note: '150–500 °C interval; normalized to dried sample mass at 150 °C.'}}
-        - {T_C: 1000, mass_loss_wt_pct: 0.751, locator: {page: 5, published_page: 5, table: '1', note: '500–1000 °C interval; normalized to dried sample mass at 150 °C.'}}
-        - {T_C: 1300, mass_loss_wt_pct: 0.036, locator: {page: 5, published_page: 5, table: '1', note: '1000–1300 °C 10′ interval (3.27 % of total); normalized to dried sample mass at 150 °C.'}}
-        - {T_C: 1035, mass_loss_wt_pct: 1.074, locator: {page: 5, published_page: 5, table: '1', note: '150 °C–TAS interval; TAS = 1035 °C (apparent solidus, TM1); normalized to dried sample mass at 150 °C.'}}
-        - {T_C: 1300, mass_loss_wt_pct: 0.028, locator: {page: 5, published_page: 5, table: '1', note: 'TAS–1300 °C 10′ interval; TAS = 1035 °C (apparent solidus, TM1); normalized to dried sample mass at 150 °C.'}}
+        d-126_reason: 'no typed interval mass-loss basis; t-1221'
+        interval_losses:
+        - {lower_temperature_C: 150, upper_temperature_C: 500, mass_loss_wt_pct: 0.315, locator: {page: 5, published_page: 5, table: '1', note: '150–500 °C; normalized to dry mass at 150 °C.'}}
+        - {lower_temperature_C: 500, upper_temperature_C: 1000, mass_loss_wt_pct: 0.751, locator: {page: 5, published_page: 5, table: '1', note: '500–1000 °C; normalized to dry mass at 150 °C.'}}
+        - {lower_temperature_C: 1000, upper_temperature_C: 1300, hold_min: 10, mass_loss_wt_pct: 0.036, locator: {page: 5, published_page: 5, table: '1', note: '1000–1300 °C with 10 min hold; normalized to dry mass at 150 °C.'}}
+        - {lower_temperature_C: 150, upper_temperature_C: 1035, mass_loss_wt_pct: 1.074, locator: {page: 5, published_page: 5, table: '1', note: '150 °C–TAS; TAS = 1035 °C (apparent solidus, TM1); normalized to dry mass at 150 °C.'}}
+        - {lower_temperature_C: 1035, upper_temperature_C: 1300, hold_min: 10, mass_loss_wt_pct: 0.028, locator: {page: 5, published_page: 5, table: '1', note: 'TAS–1300 °C with 10 min hold; TAS = 1035 °C (apparent solidus, TM1); normalized to dry mass at 150 °C.'}}
   OPRL2N:
     observations:
     - observation_id: sutherland_2025_oprl2n_total_mass_loss_150_1300_c
@@ -389,22 +402,22 @@ species:
             total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: *methods_loc}
             time_min: {state: {tag: value, value: 200}, locator: {page: 3, published_page: 3, section: '2.2.1', note: 'Each analysis took ca. 200 min.'}}
       uncertainty: 'Printed sample mass accuracy ±0.1 μg and temperature accuracy ±5 °C; confidence level not stated. No uncertainty is printed for the mass-loss value.'
+    context:
     - observation_id: sutherland_2025_oprl2n_interval_mass_loss
       experiment: oprl2n-tga-dsc-ega
-      type: mass_loss
-      locator: {page: 5, published_page: 5, table: '1', note: 'Direct interval mass-loss contributions, normalized to dried sample mass at 150 °C; TAS is the apparent solidus (TAS = TM1). T_C is the printed interval upper endpoint, not a cumulative mass-loss point.'}
-      phase: OPRL2N mare simulant
-      regime: tga
+      type: laboratory_conditions
+      locator: {page: 5, published_page: 5, table: '1', note: 'Measured interval mass losses, normalized to dried mass at 150 °C. TAS is the apparent solidus TM1; bounds and hold are stated per interval below.'}
       units: wt_percent
       values:
-        quantity: mass_loss_fraction
+        quantity: interval_mass_loss_contributions_as_published
         method_class: measured_direct
-        points:
-        - {T_C: 500, mass_loss_wt_pct: 0.103, locator: {page: 5, published_page: 5, table: '1', note: '150–500 °C interval; normalized to dried sample mass at 150 °C.'}}
-        - {T_C: 1000, mass_loss_wt_pct: 0.212, locator: {page: 5, published_page: 5, table: '1', note: '500–1000 °C interval; normalized to dried sample mass at 150 °C.'}}
-        - {T_C: 1300, mass_loss_wt_pct: 0.017, locator: {page: 5, published_page: 5, table: '1', note: '1000–1300 °C 10′ interval (5.14 % of total); normalized to dried sample mass at 150 °C.'}}
-        - {T_C: 1049, mass_loss_wt_pct: 0.320, locator: {page: 5, published_page: 5, table: '1', note: '150 °C–TAS interval; TAS = 1049 °C (apparent solidus, TM1); normalized to dried sample mass at 150 °C.'}}
-        - {T_C: 1300, mass_loss_wt_pct: 0.011, locator: {page: 5, published_page: 5, table: '1', note: 'TAS–1300 °C 10′ interval; TAS = 1049 °C (apparent solidus, TM1); normalized to dried sample mass at 150 °C.'}}
+        d-126_reason: 'no typed interval mass-loss basis; t-1221'
+        interval_losses:
+        - {lower_temperature_C: 150, upper_temperature_C: 500, mass_loss_wt_pct: 0.103, locator: {page: 5, published_page: 5, table: '1', note: '150–500 °C; normalized to dry mass at 150 °C.'}}
+        - {lower_temperature_C: 500, upper_temperature_C: 1000, mass_loss_wt_pct: 0.212, locator: {page: 5, published_page: 5, table: '1', note: '500–1000 °C; normalized to dry mass at 150 °C.'}}
+        - {lower_temperature_C: 1000, upper_temperature_C: 1300, hold_min: 10, mass_loss_wt_pct: 0.017, locator: {page: 5, published_page: 5, table: '1', note: '1000–1300 °C with 10 min hold; normalized to dry mass at 150 °C.'}}
+        - {lower_temperature_C: 150, upper_temperature_C: 1049, mass_loss_wt_pct: 0.320, locator: {page: 5, published_page: 5, table: '1', note: '150 °C–TAS; TAS = 1049 °C (apparent solidus, TM1); normalized to dry mass at 150 °C.'}}
+        - {lower_temperature_C: 1049, upper_temperature_C: 1300, hold_min: 10, mass_loss_wt_pct: 0.011, locator: {page: 5, published_page: 5, table: '1', note: 'TAS–1300 °C with 10 min hold; TAS = 1049 °C (apparent solidus, TM1); normalized to dry mass at 150 °C.'}}
   OPRL2NT:
     observations:
     - observation_id: sutherland_2025_oprl2nt_total_mass_loss_150_1300_c
@@ -425,22 +438,22 @@ species:
             total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: *methods_loc}
             time_min: {state: {tag: value, value: 200}, locator: {page: 3, published_page: 3, section: '2.2.1', note: 'Each analysis took ca. 200 min.'}}
       uncertainty: 'Printed sample mass accuracy ±0.1 μg and temperature accuracy ±5 °C; confidence level not stated. No uncertainty is printed for the mass-loss value.'
+    context:
     - observation_id: sutherland_2025_oprl2nt_interval_mass_loss
       experiment: oprl2nt-tga-dsc-ega
-      type: mass_loss
-      locator: {page: 5, published_page: 5, table: '1', note: 'Direct interval mass-loss contributions, normalized to dried sample mass at 150 °C; TAS is the apparent solidus (TAS = TM1). T_C is the printed interval upper endpoint, not a cumulative mass-loss point.'}
-      phase: OPRL2NT mare simulant
-      regime: tga
+      type: laboratory_conditions
+      locator: {page: 5, published_page: 5, table: '1', note: 'Measured interval mass losses, normalized to dried mass at 150 °C. TAS is the apparent solidus TM1; bounds and hold are stated per interval below.'}
       units: wt_percent
       values:
-        quantity: mass_loss_fraction
+        quantity: interval_mass_loss_contributions_as_published
         method_class: measured_direct
-        points:
-        - {T_C: 500, mass_loss_wt_pct: 0.373, locator: {page: 5, published_page: 5, table: '1', note: '150–500 °C interval; normalized to dried sample mass at 150 °C.'}}
-        - {T_C: 1000, mass_loss_wt_pct: 0.271, locator: {page: 5, published_page: 5, table: '1', note: '500–1000 °C interval; normalized to dried sample mass at 150 °C.'}}
-        - {T_C: 1300, mass_loss_wt_pct: 0.026, locator: {page: 5, published_page: 5, table: '1', note: '1000–1300 °C 10′ interval (3.88 % of total); normalized to dried sample mass at 150 °C.'}}
-        - {T_C: 1066, mass_loss_wt_pct: 0.652, locator: {page: 5, published_page: 5, table: '1', note: '150 °C–TAS interval; TAS = 1066 °C (apparent solidus, TM1); normalized to dried sample mass at 150 °C.'}}
-        - {T_C: 1300, mass_loss_wt_pct: 0.018, locator: {page: 5, published_page: 5, table: '1', note: 'TAS–1300 °C 10′ interval; TAS = 1066 °C (apparent solidus, TM1); normalized to dried sample mass at 150 °C.'}}
+        d-126_reason: 'no typed interval mass-loss basis; t-1221'
+        interval_losses:
+        - {lower_temperature_C: 150, upper_temperature_C: 500, mass_loss_wt_pct: 0.373, locator: {page: 5, published_page: 5, table: '1', note: '150–500 °C; normalized to dry mass at 150 °C.'}}
+        - {lower_temperature_C: 500, upper_temperature_C: 1000, mass_loss_wt_pct: 0.271, locator: {page: 5, published_page: 5, table: '1', note: '500–1000 °C; normalized to dry mass at 150 °C.'}}
+        - {lower_temperature_C: 1000, upper_temperature_C: 1300, hold_min: 10, mass_loss_wt_pct: 0.026, locator: {page: 5, published_page: 5, table: '1', note: '1000–1300 °C with 10 min hold; normalized to dry mass at 150 °C.'}}
+        - {lower_temperature_C: 150, upper_temperature_C: 1066, mass_loss_wt_pct: 0.652, locator: {page: 5, published_page: 5, table: '1', note: '150 °C–TAS; TAS = 1066 °C (apparent solidus, TM1); normalized to dry mass at 150 °C.'}}
+        - {lower_temperature_C: 1066, upper_temperature_C: 1300, hold_min: 10, mass_loss_wt_pct: 0.018, locator: {page: 5, published_page: 5, table: '1', note: 'TAS–1300 °C with 10 min hold; TAS = 1066 °C (apparent solidus, TM1); normalized to dry mass at 150 °C.'}}
   TUBS-M:
     observations:
     - observation_id: sutherland_2025_tubs_m_total_mass_loss_150_1300_c
@@ -461,19 +474,19 @@ species:
             total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: *methods_loc}
             time_min: {state: {tag: value, value: 200}, locator: {page: 3, published_page: 3, section: '2.2.1', note: 'Each analysis took ca. 200 min.'}}
       uncertainty: 'Printed sample mass accuracy ±0.1 μg and temperature accuracy ±5 °C; confidence level not stated. No uncertainty is printed for the mass-loss value.'
+    context:
     - observation_id: sutherland_2025_tubs_m_interval_mass_loss
       experiment: tubs-m-tga-dsc-ega
-      type: mass_loss
-      locator: {page: 5, published_page: 5, table: '1', note: 'Direct interval mass-loss contributions, normalized to dried sample mass at 150 °C; TAS is the apparent solidus (TAS = TM1). T_C is the printed interval upper endpoint, not a cumulative mass-loss point.'}
-      phase: TUBS-M mare simulant
-      regime: tga
+      type: laboratory_conditions
+      locator: {page: 5, published_page: 5, table: '1', note: 'Measured interval mass losses, normalized to dried mass at 150 °C. TAS is the apparent solidus TM1; bounds and hold are stated per interval below.'}
       units: wt_percent
       values:
-        quantity: mass_loss_fraction
+        quantity: interval_mass_loss_contributions_as_published
         method_class: measured_direct
-        points:
-        - {T_C: 500, mass_loss_wt_pct: 0.797, locator: {page: 5, published_page: 5, table: '1', note: '150–500 °C interval; normalized to dried sample mass at 150 °C.'}}
-        - {T_C: 1000, mass_loss_wt_pct: 0.169, locator: {page: 5, published_page: 5, table: '1', note: '500–1000 °C interval; normalized to dried sample mass at 150 °C.'}}
-        - {T_C: 1300, mass_loss_wt_pct: 0.012, locator: {page: 5, published_page: 5, table: '1', note: '1000–1300 °C 10′ interval (1.23 % of total); normalized to dried sample mass at 150 °C.'}}
-        - {T_C: 1161, mass_loss_wt_pct: 0.978, locator: {page: 5, published_page: 5, table: '1', note: '150 °C–TAS interval; TAS = 1161 °C (apparent solidus, TM1); normalized to dried sample mass at 150 °C.'}}
-        - {T_C: 1300, mass_loss_wt_pct: 0.001, locator: {page: 5, published_page: 5, table: '1', note: 'TAS–1300 °C 10′ interval; TAS = 1161 °C (apparent solidus, TM1); normalized to dried sample mass at 150 °C.'}}
+        d-126_reason: 'no typed interval mass-loss basis; t-1221'
+        interval_losses:
+        - {lower_temperature_C: 150, upper_temperature_C: 500, mass_loss_wt_pct: 0.797, locator: {page: 5, published_page: 5, table: '1', note: '150–500 °C; normalized to dry mass at 150 °C.'}}
+        - {lower_temperature_C: 500, upper_temperature_C: 1000, mass_loss_wt_pct: 0.169, locator: {page: 5, published_page: 5, table: '1', note: '500–1000 °C; normalized to dry mass at 150 °C.'}}
+        - {lower_temperature_C: 1000, upper_temperature_C: 1300, hold_min: 10, mass_loss_wt_pct: 0.012, locator: {page: 5, published_page: 5, table: '1', note: '1000–1300 °C with 10 min hold; normalized to dry mass at 150 °C.'}}
+        - {lower_temperature_C: 150, upper_temperature_C: 1161, mass_loss_wt_pct: 0.978, locator: {page: 5, published_page: 5, table: '1', note: '150 °C–TAS; TAS = 1161 °C (apparent solidus, TM1); normalized to dry mass at 150 °C.'}}
+        - {lower_temperature_C: 1161, upper_temperature_C: 1300, hold_min: 10, mass_loss_wt_pct: 0.001, locator: {page: 5, published_page: 5, table: '1', note: 'TAS–1300 °C with 10 min hold; TAS = 1161 °C (apparent solidus, TM1); normalized to dry mass at 150 °C.'}}
