@@ -33,6 +33,17 @@ from _pytest_session_safety import (
 _RENDEZVOUS_TIMEOUT_S = 30.0
 
 
+def test_bare_conftest_import_resolves_to_repository_root() -> None:
+    resolved_conftest = Path(project_conftest.__file__).resolve()
+    root_conftest = Path(__file__).resolve().parents[1] / "conftest.py"
+
+    assert resolved_conftest == root_conftest, (
+        f"bare import conftest resolved to {resolved_conftest}; a conftest.py below "
+        "the repository root must not be importable by the bare name. Put shared "
+        "fixtures in the root conftest.py or a plugin module."
+    )
+
+
 class _Clock:
     def __init__(self) -> None:
         self.wall = 0.0
