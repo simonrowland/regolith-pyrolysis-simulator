@@ -769,26 +769,31 @@ def normalized_composition(
     if observation is not None and observation.experiment_id != experiment.experiment_id:
         raise ValueError("Observation belongs to a different experiment")
     point = (observation.point_conditions or {}) if observation else {}
-    for key, located in (
-        ("composition", point.get("composition")),
-        ("initial_composition", experiment.sample.initial_composition),
-    ):
+    routes = []
+    evidence_ranks = []
+    absent = []
+    missing = []
+    unsupported = False
+    printed_species: set[str] | None = None
+    printed_path = None
+    printed_basis_exempt: set[str] = set()
+    for field, key in (("printed_composition", "printed_composition"),
+                       ("initial_composition", "composition")):
+        located = point.get(key) if key in point else getattr(experiment.sample, field)
+        path = (f"observation[{observation.observation_id}].point_conditions.{key}"
+                if key in point else f"experiment.sample.{field}")
         if (
-            isinstance(located, Located)
+            field == "initial_composition"
+            and isinstance(located, Located)
             and located.state.is_value
             and isinstance(located.state.value, Composition)
             and composition_is_partial(located.state.value)
         ):
-            path = (
-                f"observation[{observation.observation_id}].point_conditions.{key}"
-                if key == "composition"
-                else "experiment.sample.initial_composition"
-            )
             missing = (
                 path,
                 "partial composition requires complete constituent coverage",
             )
-            if key == "initial_composition":
+            if key not in point:
                 printed = experiment.sample.printed_composition
                 if isinstance(printed, Located) and printed.state.is_value:
                     pairs = _printed_component_pairs(printed.state.value)
@@ -812,19 +817,6 @@ def normalized_composition(
                     missing,
                 ),
             )
-    routes = []
-    evidence_ranks = []
-    absent = []
-    missing = []
-    unsupported = False
-    printed_species: set[str] | None = None
-    printed_path = None
-    printed_basis_exempt: set[str] = set()
-    for field, key in (("printed_composition", "printed_composition"),
-                       ("initial_composition", "composition")):
-        located = point.get(key) if key in point else getattr(experiment.sample, field)
-        path = (f"observation[{observation.observation_id}].point_conditions.{key}"
-                if key in point else f"experiment.sample.{field}")
         if (
             field == "initial_composition"
             and key in point

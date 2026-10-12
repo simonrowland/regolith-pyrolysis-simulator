@@ -134,15 +134,20 @@ def test_uncontrolled_oxygen_refuses_every_engine():
 @pytest.mark.parametrize("printed_only", (False, True))
 def test_partial_sample_composition_blocks_waypoint_and_engine_requests(printed_only):
     experiment, bench, observation = case()
-    partial = wt_pct_to_mole_fraction({"Al2O3": Decimal("60"), "CaO": Decimal("20")})
+    partial_printed = {"Al2O3": Decimal("60"), "CaO": Decimal("20")}
+    partial = wt_pct_to_mole_fraction(partial_printed)
     sample = (
         replace(
             experiment.sample,
             initial_composition=None,
-            printed_composition=f.located({"Al2O3": Decimal("60"), "CaO": Decimal("20")}),
+            printed_composition=f.located(partial_printed),
         )
         if printed_only
-        else replace(experiment.sample, initial_composition=f.located(partial))
+        else replace(
+            experiment.sample,
+            initial_composition=f.located(partial),
+            printed_composition=f.located(partial_printed),
+        )
     )
     experiment = replace(experiment, sample=sample)
 
@@ -160,6 +165,66 @@ def test_partial_sample_composition_blocks_waypoint_and_engine_requests(printed_
         any(gap.waypoint == "normalized_composition" for gap in result.readiness.gaps)
         for result in results
     )
+
+
+def test_complete_row_composition_overrides_partial_sample_for_all_engines():
+    experiment, bench, observation = case()
+    partial_printed = {"SiO2": Decimal("60"), "MgO": Decimal("20")}
+    row_printed = {"SiO2": Decimal("60"), "MgO": Decimal("40")}
+    experiment = replace(
+        experiment,
+        sample=replace(
+            experiment.sample,
+            printed_composition=f.located(partial_printed),
+            initial_composition=f.located(wt_pct_to_mole_fraction(partial_printed)),
+        ),
+    )
+    observation = replace(
+        observation,
+        point_conditions={
+            **observation.point_conditions,
+            "printed_composition": f.located(row_printed),
+            "composition": f.located(wt_pct_to_mole_fraction(row_printed)),
+        },
+    )
+
+    inputs = collect_consumer_inputs(experiment, bench, observation)
+    waypoint = inputs.waypoints["normalized_composition"]
+    assert waypoint.selected is not None
+    requests = engine_point_requests(inputs)
+    assert len(requests) == len(ENGINE_POINT_CONSUMERS) == 7
+    assert all(request.payload is not None for request in requests)
+
+
+def test_selected_partial_row_composition_blocks_all_engines():
+    experiment, bench, observation = case()
+    partial_printed = {"SiO2": Decimal("60"), "MgO": Decimal("20")}
+    complete_printed = {"SiO2": Decimal("60"), "MgO": Decimal("40")}
+    experiment = replace(
+        experiment,
+        sample=replace(
+            experiment.sample,
+            printed_composition=f.located(complete_printed),
+            initial_composition=f.located(wt_pct_to_mole_fraction(complete_printed)),
+        ),
+    )
+    observation = replace(
+        observation,
+        point_conditions={
+            **observation.point_conditions,
+            "printed_composition": f.located(partial_printed),
+            "composition": f.located(wt_pct_to_mole_fraction(partial_printed)),
+        },
+    )
+
+    inputs = collect_consumer_inputs(experiment, bench, observation)
+    waypoint = inputs.waypoints["normalized_composition"]
+    assert waypoint.selected is None
+    assert waypoint.absence is not None
+    assert "partial composition requires complete constituent coverage" in waypoint.absence.missing
+    requests = engine_point_requests(inputs)
+    assert len(requests) == len(ENGINE_POINT_CONSUMERS) == 7
+    assert all(request.payload is None for request in requests)
 
 
 def test_vacuum_total_pressure_supplies_flagged_oxygen_bound_to_engine():
