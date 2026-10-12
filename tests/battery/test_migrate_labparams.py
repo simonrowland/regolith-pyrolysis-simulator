@@ -103,6 +103,117 @@ def test_synthetic_bare_extract_payload_hash(tmp_path: Path) -> None:
     assert _migration_payload_hash(result) == _SYNTHETIC_BARE_PAYLOAD_HASH
 
 
+def test_wrapped_equipment_sample_and_composition_match_bare_form(
+    tmp_path: Path,
+) -> None:
+    bare = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = bare["species"]["Na"]["observations"][0]
+    locator = {"page": 2, "section": "Sample preparation"}
+    composition_locator = {"page": 2, "table": "I"}
+    row["equipment"] = {
+        "sample": {
+            "mass_kg": {"value": 0.003, "locator": locator},
+            "form": "powder",
+            "container": "alumina crucible",
+            "locator": locator,
+        },
+        "starting_glass_wt_pct": {
+            "SiO2": 50.0,
+            "MgO": 50.0,
+            "locator": composition_locator,
+        },
+    }
+    wrapped = yaml.safe_load(yaml.safe_dump(bare))
+    equipment = wrapped["species"]["Na"]["observations"][0]["equipment"]
+    sample = equipment["sample"]
+    equipment["sample"] = {
+        "value": {key: value for key, value in sample.items() if key != "locator"},
+        "locator": sample["locator"],
+    }
+    composition = equipment["starting_glass_wt_pct"]
+    equipment["starting_glass_wt_pct"] = {
+        "value": {
+            key: value for key, value in composition.items() if key != "locator"
+        },
+        "locator": composition["locator"],
+    }
+
+    bare_result = migrate(_write_min_tree(tmp_path / "bare", bare), write=False)
+    wrapped_result = migrate(_write_min_tree(tmp_path / "wrapped", wrapped), write=False)
+    assert {
+        key: to_plain(value) for key, value in bare_result.experiments.items()
+    } == {key: to_plain(value) for key, value in wrapped_result.experiments.items()}
+    assert {
+        key: to_plain(value) for key, value in bare_result.observations.items()
+    } == {key: to_plain(value) for key, value in wrapped_result.observations.items()}
+
+
+def test_wrapped_bischof_sample_container_reaches_every_run(tmp_path: Path) -> None:
+    name = "kems-137-bischof-2023.yaml"
+    source_path = REPO_ROOT / "data" / "literature" / "extracts" / name
+    document = yaml.safe_load(source_path.read_text(encoding="utf-8"))
+    source = document.get("source") if isinstance(document.get("source"), dict) else {}
+    source_id = document.get("source_id") or source_path.stem
+    wrapped_equipment: set[int] = set()
+    for block in document["species"].values():
+        for row in block.get("observations", []):
+            equipment = row.get("equipment")
+            sample = equipment.get("sample") if isinstance(equipment, dict) else None
+            if (
+                isinstance(sample, dict)
+                and "locator" in sample
+                and id(equipment) not in wrapped_equipment
+            ):
+                wrapped_equipment.add(id(equipment))
+                equipment["sample"] = {
+                    "value": {
+                        key: value for key, value in sample.items() if key != "locator"
+                    },
+                    "locator": sample["locator"],
+                }
+
+    root = tmp_path / "tree"
+    extracts = root / "data" / "literature" / "extracts"
+    extracts.mkdir(parents=True)
+    (root / "data" / "literature" / "compilations").mkdir(parents=True)
+    index_row = {
+        "source_id": source_id,
+        "citation": source.get("citation") or source_path.stem,
+        "doi": source.get("doi"),
+    }
+    (root / "data" / "literature" / "INDEX.yaml").write_text(
+        yaml.safe_dump(
+            {"schema_version": "literature_index.v1", "sources": [index_row]},
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    (extracts / name).write_text(
+        yaml.safe_dump(document, sort_keys=False), encoding="utf-8"
+    )
+    result = migrate(root, write=False)
+    runs = {
+        key: experiment
+        for key, experiment in result.experiments.items()
+        if key.endswith(
+            (
+                "::an-di-1-low",
+                "::an-di-2-low",
+                "::an-di-3-high",
+                "::an-di-series",
+            )
+        )
+    }
+    assert len(result.observations) == 164
+    assert len(runs) == 4
+    for experiment in runs.values():
+        assert experiment.sample.container is not None
+        assert (
+            experiment.sample.container.state.value
+            == "iridium Knudsen cell (crucible and lid)"
+        )
+
+
 def test_equal_pressure_duplicates_keep_printed_approximation() -> None:
     exact = Located(State.of(Value.point_of("0.01333223684210526315789473684")))
     approximate = Located(

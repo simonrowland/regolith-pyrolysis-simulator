@@ -9393,9 +9393,12 @@ def _printed_composition_candidates(
             for key, value in obj.items():
                 name = str(key)
                 if name in names and isinstance(value, Mapping):
-                    fingerprint = _printed_fingerprint(value)
-                    if fingerprint is not None and loc is not None:
-                        found.append((fingerprint, loc, name))
+                    raw_value, value_loc, _mapping = _unwrap_located_equipment_value(
+                        value, loc
+                    )
+                    fingerprint = _printed_fingerprint(raw_value)
+                    if fingerprint is not None and value_loc is not None:
+                        found.append((fingerprint, value_loc, name))
                 if name not in _WALK_SKIP_KEYS and name != "locator":
                     walk(value, loc, depth + 1)
         elif isinstance(obj, list):
@@ -9542,22 +9545,22 @@ def _form_and_container(
     raw_sample = equipment.get("sample")
     if not isinstance(raw_sample, Mapping):
         return None, None
-    loc = locator_from_mapping(raw_sample.get("locator"))
-    form = raw_sample.get("form")
-    container = raw_sample.get("container")
+    raw_sample, sample_locator, _mapping = _unwrap_located_equipment_value(
+        raw_sample
+    )
+    if not isinstance(raw_sample, Mapping):
+        return None, None
+    loc = locator_from_mapping(raw_sample.get("locator")) or sample_locator
+    form, form_locator, _form_mapping = _unwrap_located_equipment_value(
+        raw_sample.get("form"), loc
+    )
+    container, container_locator, _container_mapping = _unwrap_located_equipment_value(
+        raw_sample.get("container"), loc
+    )
     if isinstance(form, str) and form:
-        form_located = located_value(form, loc)
-    elif isinstance(form, Mapping) and form.get("value") is not None:
-        form_located = located_value(
-            str(form["value"]), locator_from_mapping(form.get("locator")) or loc
-        )
+        form_located = located_value(form, form_locator)
     if isinstance(container, str) and container:
-        container_located = located_value(container, loc)
-    elif isinstance(container, Mapping) and container.get("value") is not None:
-        container_located = located_value(
-            str(container["value"]),
-            locator_from_mapping(container.get("locator")) or loc,
-        )
+        container_located = located_value(container, container_locator)
     return form_located, container_located
 
 
