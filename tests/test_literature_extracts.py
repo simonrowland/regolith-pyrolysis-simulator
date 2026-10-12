@@ -3545,6 +3545,233 @@ def test_fidelity_sample_mutation_reds():
         ), errors
 
 
+def test_shaw_surface_fidelity_mutation_reds():
+    """Pin Shaw run and source claims; each reviewed reversal must turn red."""
+    path = EXTRACTS / "shaw-2023-vacuum-thermal-sublimation-thesis.yaml"
+    assert path.is_file()
+
+    def assert_pins(candidate):
+        assert vle.check_all_fidelity_samples_match(candidate, label="shaw-2023") == []
+        expected_runs = [
+            "blank-high-vacuum",
+            "td1-nanophase-iron-oxide",
+            "td2-nanophase-iron-oxide",
+            "td3-ilmenite-concentrate",
+            "td4-lms1-atmosphere",
+            "td5-lms1",
+            "td6-lms1",
+            "td7-reacted-td6-feed",
+        ]
+        assert len(candidate["experiments"]) == 8
+        assert [run["experiment_id"] for run in candidate["experiments"]] == expected_runs
+        expected_result_runs = [
+            ("shaw_2023_blank_results", "blank-high-vacuum"),
+            ("shaw_2023_td1_results", "td1-nanophase-iron-oxide"),
+            ("shaw_2023_td2_results", "td2-nanophase-iron-oxide"),
+            ("shaw_2023_td3_results", "td3-ilmenite-concentrate"),
+            ("shaw_2023_td4_results", "td4-lms1-atmosphere"),
+            ("shaw_2023_td5_results", "td5-lms1"),
+            ("shaw_2023_td6_results", "td6-lms1"),
+            ("shaw_2023_td7_results", "td7-reacted-td6-feed"),
+        ]
+        results = [
+            (row["observation_id"], row["experiment"])
+            for species in candidate["species"].values()
+            for row in species.get("context", [])
+            if row.get("observation_id", "").endswith("_results")
+        ]
+        assert len(results) == 8
+        assert sorted(results) == sorted(expected_result_runs)
+        result_rows = {
+            row["observation_id"]: row
+            for species in candidate["species"].values()
+            for row in species.get("context", [])
+            if row.get("observation_id", "").endswith("_results")
+        }
+        vacuum_vent_reason = (
+            "reactor_was_vented_to_atmospheric_pressure_before_removal_but_"
+            "vent_gas_air_contact_and_duration_are_not_stated"
+        )
+        for result_id in (
+            "shaw_2023_blank_results",
+            "shaw_2023_td2_results",
+            "shaw_2023_td3_results",
+            "shaw_2023_td5_results",
+            "shaw_2023_td6_results",
+            "shaw_2023_td7_results",
+        ):
+            assert (
+                result_rows[result_id]["values"]["saw_air_before_analysis"]["reason"]
+                == vacuum_vent_reason
+            )
+        assert result_rows["shaw_2023_td1_results"]["values"]["saw_air_before_analysis"] == {
+            "state": "unknown",
+            "reason": "reactor_was_vented_slowly_to_atmospheric_pressure_via_vacuum_pump_before_sample_removal; post_test_air_contact_and_duration_not_reported",
+        }
+        assert result_rows["shaw_2023_td4_results"]["values"]["saw_air_before_analysis"] == {
+            "state": "unknown",
+            "reason": "TD4_ran_at_atmospheric_pressure_with_pump_detached_and_reactor_flange_open; post_test_air_contact_and_duration_not_reported",
+        }
+        td7_sample = candidate["experiments"][-1]["sample"]
+        assert td7_sample["printed_composition"]["state"] == {
+            "tag": "value",
+            "value": "LMS-1",
+        }
+        assert td7_sample["form"]["state"] == {
+            "tag": "value",
+            "value": "Processed TD4",
+        }
+        for run in candidate["experiments"]:
+            schedule = run["thermal_schedule"]
+            assert schedule["total_duration_s"]["state"]["tag"] == "unknown"
+            hold = schedule["setpoints_and_holds"][0]
+            assert hold["hold_duration_s"]["state"]["tag"] == "value"
+            assert hold["temperature_K"]["state"]["tag"] == "unknown"
+
+        context = candidate["species"]["vacuum_reactor_blank"]["context"]
+        blank_rows = [
+            row for row in context
+            if row.get("observation_id") == "shaw_2023_blank_results"
+        ]
+        assert blank_rows, "blank control context must survive YAML loading"
+        blank = blank_rows[0]
+        assert blank["values"]["deposit_location"] == "Reactor tube glass; general frosting"
+        assert blank["values"]["sample_mass_loss"] == {
+            "state": "unknown",
+            "reason": "blank_test_had_no_sample",
+        }
+        assert "mass_loss" not in blank["values"]
+        handling = next(
+            row for row in context
+            if row.get("observation_id") == "shaw_2023_ch8_sample_preparation"
+        )["values"]
+        assert handling["reactor_moved_from_furnace_below_C"] == 300
+        assert "greater than 1000 C" in handling["high_temperature_definition"]
+        inventory = next(
+            row for row in context
+            if row.get("observation_id") == "shaw_2023_ch8_deposit_surface_inventory"
+        )["values"]["runs"]
+        assert list(inventory) == ["blank", *expected_runs[1:]]
+        assert all("exposure_and_handling" in run for run in inventory.values())
+        td4_handling = inventory["td4-lms1-atmosphere"]["exposure_and_handling"]
+        assert "pump was detached" in td4_handling["apparatus"]
+        assert "flange was left open" in td4_handling["apparatus"]
+        assert td4_handling["vacuum_pump_venting"]["state"] == "unknown"
+        analysis_limits = next(
+            row for row in context
+            if row.get("observation_id") == "shaw_2023_ch8_deposit_surface_inventory"
+        )["values"]["common_analysis_limitations"]
+        assert "TD1 used a smear" in analysis_limits
+        assert "TD4 had no SEM/EDS analysis" in analysis_limits
+        assert inventory["td1-nanophase-iron-oxide"]["wall"]["qualification"] == (
+            "Minor Zn, Ca, and P are presumed by the author to be outside contamination "
+            "associated with the smear sampling; the swab method caused significantly more "
+            "contamination than later fractured-glass analysis"
+        )
+        assert inventory["td3-ilmenite-concentrate"]["wall"]["author_identification"].startswith(
+            "The thesis calls the structures “ZnO nano-rods”"
+        )
+        assert inventory["td5-lms1"]["wall"]["zone_findings"]["b"].startswith(
+            "Consistent Na and Cl layer"
+        )
+        td5_a = inventory["td5-lms1"]["wall"]
+        assert td5_a["band_level_composition"] == (
+            "The initial deposition band (a) was composed predominantly of Na, P, and Cu."
+        )
+        assert td5_a["distinct_crystals"] == "Distinct crystals were composed of Na, P, and Mo."
+        assert td5_a["band_level_composition_locator"]["published_page"] == 212
+        assert td5_a["distinct_crystals_locator"]["published_page"] == 212
+        assert inventory["td6-lms1"]["wall"]["zone_findings"]["a"] == (
+            "Additional crystals were reported as composed of Na and O according to EDS."
+        )
+        assert inventory["td7-reacted-td6-feed"]["wall"]["scan_duration_min"] == 5
+
+        for species in ("Fe", "Na", "K"):
+            feed = candidate["species"][species]["context"][0]["values"]
+            assert "Apollo #12022 feed system named in Table 7.5" in feed["inputs"]
+            assert "selected Al2O3" not in feed["inputs"]
+            assert "Apollo #12022" in feed["vapor_pressure_source"]
+
+        zn = candidate["species"]["Ilmenite"]["context"][0]["values"]
+        feed_assay = zn.get("feed_composition", {})
+        assert feed_assay.get("Zn_wt_pct") == 0.028
+        assert feed_assay.get("basis", "").startswith("feed-material XRF")
+        assert zn.get("residue_composition", {}).get("state") == "unknown"
+
+        visual_index = next(
+            row for row in candidate["species"]["LMS-1"]["context"]
+            if row.get("observation_id") == "shaw_2023_unextracted_ch7_ch8_visual_data_index"
+        )
+        assert "only material not extracted" in visual_index["units"]
+        fig814 = next(
+            fig for fig in visual_index["values"]["figures"] if fig["id"] == "8.14"
+        )
+        assert "Full SEM image not extracted" in fig814["note"]
+        assert "summarized in the extract" in fig814["note"]
+
+    doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+    assert_pins(doc)
+
+    # Four independent source-backed mutations requested by the confirm review.
+    mutations = []
+
+    candidate = copy.deepcopy(doc)
+    candidate["experiments"] = [
+        run for run in candidate["experiments"]
+        if run["experiment_id"] != "td2-nanophase-iron-oxide"
+    ]
+    mutations.append(("TD2 deleted", candidate))
+
+    candidate = copy.deepcopy(doc)
+    candidate["species"]["FeO/Fe2O3"]["context"].pop(1)
+    mutations.append(("TD2 results context deleted", candidate))
+
+    candidate = copy.deepcopy(doc)
+    candidate["experiments"][-1]["sample"]["printed_composition"]["state"]["value"] = "Processed TD4"
+    mutations.append(("TD7 feed material merged into feed form", candidate))
+
+    candidate = copy.deepcopy(doc)
+    candidate["experiments"][1]["thermal_schedule"]["total_duration_s"]["state"] = {
+        "tag": "value",
+        "value": {"kind": "point", "point": "6480"},
+    }
+    mutations.append(("numeric total duration restored", candidate))
+
+    candidate = copy.deepcopy(doc)
+    candidate["species"]["Na"]["context"][0]["values"]["inputs"] = (
+        "FactSage pressure from the selected Al2O3-CaO-Na2O system"
+    )
+    mutations.append(("Na attributed to wrong feed system", candidate))
+
+    candidate = copy.deepcopy(doc)
+    zn = candidate["species"]["Ilmenite"]["context"][0]["values"]
+    zn["residue_composition"] = zn.pop("feed_composition")
+    mutations.append(("Zn feed assay moved to residue", candidate))
+
+    for label, candidate in mutations:
+        try:
+            assert_pins(candidate)
+        except AssertionError:
+            continue
+        raise AssertionError(f"{label} mutation survived the Shaw regression pins")
+
+    inventory_record = next(
+        row for row in doc["species"]["vacuum_reactor_blank"]["context"]
+        if row.get("observation_id") == "shaw_2023_ch8_deposit_surface_inventory"
+    )
+    inventory_record["values"]["runs"]["td7-reacted-td6-feed"]["wall"]["scan_duration_min"] = 4
+    with pytest.raises(AssertionError):
+        assert_pins(doc)
+
+    doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+    doc["species"]["vacuum_reactor_blank"]["context"] = [
+        row for row in doc["species"]["vacuum_reactor_blank"]["context"]
+        if row.get("observation_id") != "shaw_2023_blank_results"
+    ]
+    with pytest.raises(AssertionError):
+        assert_pins(doc)
+
+
 def test_costa_fe_summary_key_is_retired_to_owner_series():
     secondary = load_cached_safe_yaml(
         (EXTRACTS / "costa-jacobson-2015.yaml").read_text(encoding="utf-8")
