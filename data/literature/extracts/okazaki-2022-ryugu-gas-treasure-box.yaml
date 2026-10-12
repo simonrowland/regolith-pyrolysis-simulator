@@ -19,11 +19,17 @@ fidelity_samples:
     published_page: 3
     figure: '2'
     note: weighted arithmetic mean of measured container-gas 3He/4He ratios; printed uncertainty is 1 sigma in Fig. 2 discussion
+- path: species.He.observations[okazaki_2022_container_helium_isotope_ratio].uncertainty.ratio_3He_4He
+  value: '+/- 0.010 x 10^-4 (1 sigma)'
+  locator:
+    published_page: 3
+    figure: '2'
+    note: printed 1 sigma uncertainty for the weighted arithmetic mean of measured container-gas 3He/4He ratios
 - path: species.Ryugu_sample_container.observations[okazaki_2022_recovered_mass_density_size].values.total_recovered_mass_g
   value: 5.4
   locator:
-    published_page: 5
-    section: Mechanism liberating the SW gases from Ryugu grains
+    published_page: 4
+    section: 'Timing and contribution of the terrestrial atmosphere leakage'
     note: total weight of Ryugu samples in the container
 species:
   Ryugu_sample_container:
@@ -62,8 +68,8 @@ species:
     - observation_id: okazaki_2022_recovered_mass_density_size
       type: rate_series
       locator:
-        published_page: 5
-        section: Discussion, Mechanism liberating the SW gases from Ryugu grains
+        published_page: 4
+        section: 'Discussion, Timing and contribution of the terrestrial atmosphere leakage'
         note: recovered sample mass, bulk density, and particle-size distribution are sample provenance/characterisation values; cited size distribution and density are retained as quoted literature
       phase: Ryugu_grains
       regime: recovered_sample_characterisation
