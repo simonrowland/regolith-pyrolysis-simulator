@@ -347,9 +347,9 @@ def test_pin_worker_env_sets_single_thread_vars_idempotently(monkeypatch) -> Non
     }
 
 
-def test_pin_worker_env_leaves_loaded_openblas_pool_unchanged() -> None:
-    # Startup commit 2 is expected to move the caller-pool assertion from four to one;
-    # the child and grandchild checks keep this pin independent of host core count.
+def test_simulator_startup_limits_loaded_openblas_pool_to_one() -> None:
+    # Startup intentionally moves the caller pool from four to one; child checks
+    # keep this pin independent of host core count.
     code = r'''
 import json
 import os
@@ -412,7 +412,7 @@ print(json.dumps({
     print(f"BLAS_POLICY_POOLS {json.dumps(report, sort_keys=True)}")
     assert report["environment"] == {name: "1" for name in THREAD_ENV_VARS}
     assert report["before"]["num_threads"] == 4
-    assert report["after"]["num_threads"] == 4
+    assert report["after"]["num_threads"] == 1
     assert report["grandchild"]["num_threads"] == 1
 
 

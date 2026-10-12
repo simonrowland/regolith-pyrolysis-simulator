@@ -780,3 +780,224 @@ print("stdlib-only")
 '''
     )
     assert output == "stdlib-only"
+
+
+def test_blas_policy_simulator_first_import_has_cached_state() -> None:
+    output = _run(
+        r'''
+import simulator
+from threadpoolctl import threadpool_info
+state = simulator._blas_policy.state()
+assert state is not None
+pool = next(pool for pool in threadpool_info() if pool["internal_api"] == "openblas")
+runtime = next(runtime for runtime in state.runtimes if runtime.api == "openblas")
+assert pool["num_threads"] == 1
+assert runtime.how_obtained == "variables-before-load"
+print("state=ready pool=1")
+'''
+    )
+    assert output == "state=ready pool=1"
+
+
+def test_blas_policy_numpy_first_import_limits_loaded_pool() -> None:
+    output = _run(
+        r'''
+import os
+import numpy
+from threadpoolctl import threadpool_info, threadpool_limits
+limiter = threadpool_limits(limits=4)
+for name in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "NUMEXPR_NUM_THREADS", "VECLIB_MAXIMUM_THREADS"):
+    os.environ.pop(name, None)
+import simulator
+state = simulator._blas_policy.state()
+pool = next(pool for pool in threadpool_info() if pool["internal_api"] == "openblas")
+runtime = next(runtime for runtime in state.runtimes if runtime.api == "openblas")
+assert runtime.how_obtained == "threadpoolctl-after-load"
+assert pool["num_threads"] == 1
+print("loaded pool=1")
+'''
+    )
+    assert output == "loaded pool=1"
+
+
+def test_blas_policy_scipy_first_import_reports_unobservable_backend() -> None:
+    output = _run(
+        r'''
+import scipy.linalg
+import simulator
+state = simulator._blas_policy.state()
+build_name = scipy.show_config(mode="dicts")["Build Dependencies"]["blas"]["name"]
+runtime = next(runtime for runtime in state.runtimes if any(module == "scipy" for module, _name in runtime.build_records))
+assert ("scipy", build_name) in runtime.build_records
+if runtime.observable:
+    assert runtime.num_threads is not None
+    print("scipy=" + runtime.name + " observable")
+else:
+    assert runtime.name == build_name
+    assert runtime.num_threads is None
+    assert runtime.how_obtained == "not-in-effect"
+    assert not runtime.limit_known_to_bind
+    print("scipy=" + runtime.name + " not observable")
+'''
+    )
+    assert output.startswith("scipy=")
+
+
+def test_blas_policy_launcher_openblas_two_survives_package_startup() -> None:
+    output = _run(
+        r'''
+import os
+import simulator
+from threadpoolctl import threadpool_info
+state = simulator._blas_policy.state()
+pool = next(pool for pool in threadpool_info() if pool["internal_api"] == "openblas")
+runtime = next(runtime for runtime in state.runtimes if runtime.api == "openblas")
+assert os.environ["OPENBLAS_NUM_THREADS"] == "2"
+assert pool["num_threads"] == 2
+assert runtime.how_obtained == "explicit-launcher-value"
+print("pool=2")
+''',
+        overrides={"OPENBLAS_NUM_THREADS": "2"},
+    )
+    assert output == "pool=2"
+
+
+
+
+def test_blas_policy_package_import_survives_unavailable_threadpoolctl() -> None:
+    output = _run(
+        r'''
+import builtins
+real_import = builtins.__import__
+def blocked(name, *args, **kwargs):
+    if name == "threadpoolctl":
+        raise ImportError("blocked for test")
+    return real_import(name, *args, **kwargs)
+builtins.__import__ = blocked
+import simulator
+state = simulator._blas_policy.state()
+assert any(notice.kind == "not-in-effect" for notice in state.notices)
+assert state.runtimes
+assert all(
+    runtime.num_threads is None
+    and not runtime.observable
+    and runtime.how_obtained == "not-in-effect"
+    and runtime.reason == "start-up pool snapshot unavailable (threadpoolctl could not be imported at start-up); load order and binding are not attributed"
+    for runtime in state.runtimes
+)
+print("package import completed")
+'''
+    )
+    assert output == "package import completed"
+
+
+def test_blas_policy_conftest_and_package_share_canonical_module() -> None:
+    for conftest_first in (True, False):
+        code = (
+            r'''
+import conftest
+owner = sys.modules["simulator._blas_policy"]
+snapshot = owner._snapshot()
+import simulator
+assert owner is simulator._blas_policy
+assert owner._snapshot() is snapshot
+assert owner.state() is not None
+print("same object and snapshot")
+'''
+            if conftest_first
+            else r'''
+import simulator
+owner = simulator._blas_policy
+snapshot = owner._snapshot()
+import conftest
+assert owner is sys.modules["simulator._blas_policy"]
+assert owner is simulator._blas_policy
+assert owner._snapshot() is snapshot
+print("same object and snapshot")
+'''
+        )
+        assert _run("import sys\n" + code) == "same object and snapshot"
+
+
+def _spawn_child(queue) -> None:
+    import simulator
+    from threadpoolctl import threadpool_info
+
+    pool = next(pool for pool in threadpool_info() if pool["internal_api"] == "openblas")
+    queue.put((simulator._blas_policy.state() is not None, pool["num_threads"]))
+
+
+def test_blas_policy_spawned_child_initializes_its_own_pool() -> None:
+    env = os.environ.copy()
+    for name in THREAD_NAMES:
+        env.pop(name, None)
+    env["PYTHONPATH"] = f"/private/tmp/claude-501/oimcc-1f3c82d/src:{Path(__file__).resolve().parents[1]}"
+    completed = subprocess.run(
+        [sys.executable, str(Path(__file__).resolve()), "--spawn-parent"],
+        capture_output=True,
+        text=True,
+        env=env,
+        timeout=90,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    assert completed.stdout.strip() == "spawn_state=True pool=1"
+
+
+def _spawn_parent_main() -> None:
+    import simulator
+
+    context = multiprocessing.get_context("spawn")
+    queue = context.Queue()
+    child = context.Process(target=_spawn_child, args=(queue,))
+    child.start()
+    result = queue.get(timeout=60)
+    child.join(timeout=60)
+    assert child.exitcode == 0
+    print(f"spawn_state={result[0]} pool={result[1]}")
+
+
+def test_blas_policy_forked_child_keeps_limited_pool_when_supported() -> None:
+    output = _run(
+        r'''
+import os
+if not hasattr(os, "fork"):
+    print("fork unavailable")
+else:
+    import simulator
+    from threadpoolctl import threadpool_info
+    read_fd, write_fd = os.pipe()
+    pid = os.fork()
+    if pid == 0:
+        os.close(read_fd)
+        pool = next(pool for pool in threadpool_info() if pool["internal_api"] == "openblas")
+        os.write(write_fd, str(pool["num_threads"]).encode())
+        os._exit(0)
+    os.close(write_fd)
+    value = os.read(read_fd, 20).decode()
+    _, status = os.waitpid(pid, 0)
+    assert status == 0
+    assert value == "1"
+    print("fork pool=1")
+'''
+    )
+    assert output in {"fork pool=1", "fork unavailable"}
+
+
+def test_blas_policy_real_openimcc_path_runs_after_state_readback() -> None:
+    output = _run(
+        r'''
+import simulator
+state = simulator._blas_policy.state()
+assert state is not None
+from simulator.melt_backend.openimcc_bridge import evaluate_cleaned_melt
+result = evaluate_cleaned_melt({"Na2O": 0.5, "SiO2": 0.5}, 1800.0)
+assert result.bridge.envelope_status == "inside"
+print("state read before representative evaluation")
+'''
+    )
+    assert output == "state read before representative evaluation"
+
+
+if __name__ == "__main__" and sys.argv[1:] == ["--spawn-parent"]:
+    _spawn_parent_main()
