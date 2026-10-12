@@ -32,11 +32,14 @@ fidelity_samples:
     published_page: 'Article in Press; no printed page number'
     figure: '2'
     equation: '1'
-- species: O2
-  observable: partial_pressure
-  observation_id: suzuki_2026_fayalite_pO2_figure2
-  field: T_C
-  value: 1500
+- path: species.O2.observations[suzuki_2026_fayalite_pO2_figure2].values.series[1].pressure_atm
+  value: 2.0e-11
+  locator:
+    pdf_page_index: 3
+    published_page: 'Article in Press; no printed page number'
+    figure: '2'
+- path: species.O2.observations[suzuki_2026_hematite_pO2_run02_figure2].values.series[1].pressure_atm
+  value: 3.5e-11
   locator:
     pdf_page_index: 3
     published_page: 'Article in Press; no printed page number'
@@ -51,7 +54,7 @@ benches:
       tag: value
       value: Vacuum-heating chamber with an electric furnace
     locator: &apparatus_locator
-      pdf_page_index: 8
+      pdf_page_index: 7
       published_page: 'Article in Press; no printed page number'
       section: Vacuum heating experiment
   heating_method:
@@ -74,16 +77,16 @@ benches:
       tag: value
       value: Qulee CGM-052 quadrupole mass spectrometer
     locator:
-      pdf_page_index: 9
+      pdf_page_index: 8
       published_page: 'Article in Press; no printed page number'
       section: Oxygen gas detection
 
 experiments:
 - experiment_id: hematite-vacuum-heating-1200C
   bench_id: vacuum-heating-furnace
-  method: vacuum_heating
+  method: vacuum_chamber_pyrolysis
   locator:
-    pdf_page_index: 8
+    pdf_page_index: 7
     published_page: 'Article in Press; no printed page number'
     section: Vacuum heating experiment
   sample:
@@ -94,7 +97,7 @@ experiments:
           kind: point
           point: '0.001'
       locator:
-        pdf_page_index: 8
+        pdf_page_index: 7
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
         note: One gram of powdered sample was pressed into a pellet.
@@ -114,7 +117,7 @@ experiments:
         tag: value
         value: Pressed pellet, 10 mm diameter and 5 mm height
       locator:
-        pdf_page_index: 8
+        pdf_page_index: 7
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
     container:
@@ -122,7 +125,7 @@ experiments:
         tag: value
         value: Pure-alumina boat inside a shielding chamber with a closed-end alumina-tube heating area
       locator:
-        pdf_page_index: 8
+        pdf_page_index: 7
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
   conditions:
@@ -166,7 +169,7 @@ experiments:
           kind: point
           point: '0.00101325'
       locator:
-        pdf_page_index: 8
+        pdf_page_index: 7
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
         note: Total pressure 10^-8 atm as printed; converted using 101325 Pa per atm.
@@ -179,7 +182,7 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        pdf_page_index: 8
+        pdf_page_index: 7
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
         note: Chamber was filled with Ar before evacuation; gas composition at the stated vacuum pressure is not reported.
@@ -189,24 +192,26 @@ experiments:
         tag: value
         value: Heated in an electric furnace under vacuum
       locator:
-        pdf_page_index: 8
+        pdf_page_index: 7
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
     total_duration_s:
       state:
-        tag: unknown
-        reason: not_published
+        tag: value
+        value:
+          kind: point
+          point: '5400'
       locator:
-        pdf_page_index: 8
+        pdf_page_index: 7
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
-        note: The method says several hours; the result-specific 1.5 h duration is retained on its observation.
+        note: Printed duration 1.5 h; converted to seconds for the thermal schedule.
 
 - experiment_id: fayalite-vacuum-heating-1500C
   bench_id: vacuum-heating-furnace
-  method: vacuum_heating
+  method: vacuum_chamber_pyrolysis
   locator:
-    pdf_page_index: 8
+    pdf_page_index: 7
     published_page: 'Article in Press; no printed page number'
     section: Vacuum heating experiment
   sample:
@@ -217,7 +222,7 @@ experiments:
           kind: point
           point: '0.001'
       locator:
-        pdf_page_index: 8
+        pdf_page_index: 7
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
         note: One gram of powdered sample was pressed into a pellet.
@@ -237,7 +242,7 @@ experiments:
         tag: value
         value: Pressed pellet, 10 mm diameter and 5 mm height
       locator:
-        pdf_page_index: 8
+        pdf_page_index: 7
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
     container:
@@ -245,7 +250,7 @@ experiments:
         tag: value
         value: Pure-alumina boat inside a shielding chamber with a closed-end alumina-tube heating area
       locator:
-        pdf_page_index: 8
+        pdf_page_index: 7
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
   conditions:
@@ -289,7 +294,7 @@ experiments:
           kind: point
           point: '0.00101325'
       locator:
-        pdf_page_index: 8
+        pdf_page_index: 7
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
         note: Total pressure 10^-8 atm as printed; converted using 101325 Pa per atm.
@@ -302,7 +307,7 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        pdf_page_index: 8
+        pdf_page_index: 7
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
         note: Chamber was filled with Ar before evacuation; gas composition at the stated vacuum pressure is not reported.
@@ -312,7 +317,7 @@ experiments:
         tag: value
         value: Heated in an electric furnace under vacuum
       locator:
-        pdf_page_index: 8
+        pdf_page_index: 7
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
     total_duration_s:
@@ -320,16 +325,16 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        pdf_page_index: 8
+        pdf_page_index: 7
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
         note: The method says several hours; no exact duration is assigned to the plotted fayalite run.
 
 - experiment_id: fayalite-alumina-vacuum-heating-1500C
   bench_id: vacuum-heating-furnace
-  method: vacuum_heating
+  method: vacuum_chamber_pyrolysis
   locator:
-    pdf_page_index: 8
+    pdf_page_index: 7
     published_page: 'Article in Press; no printed page number'
     section: Vacuum heating experiment
   sample:
@@ -340,7 +345,7 @@ experiments:
           kind: point
           point: '0.001'
       locator:
-        pdf_page_index: 8
+        pdf_page_index: 7
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
         note: One gram of powdered sample was pressed into a pellet.
@@ -358,7 +363,7 @@ experiments:
         tag: value
         value: Pressed pellet, 10 mm diameter and 5 mm height
       locator:
-        pdf_page_index: 8
+        pdf_page_index: 7
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
     container:
@@ -366,7 +371,7 @@ experiments:
         tag: value
         value: Pure-alumina boat inside a shielding chamber with a closed-end alumina-tube heating area
       locator:
-        pdf_page_index: 8
+        pdf_page_index: 7
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
   conditions:
@@ -410,7 +415,7 @@ experiments:
           kind: point
           point: '0.00101325'
       locator:
-        pdf_page_index: 8
+        pdf_page_index: 7
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
         note: Total pressure 10^-8 atm as printed; converted using 101325 Pa per atm.
@@ -423,7 +428,7 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        pdf_page_index: 8
+        pdf_page_index: 7
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
         note: Chamber was filled with Ar before evacuation; gas composition at the stated vacuum pressure is not reported.
@@ -433,7 +438,7 @@ experiments:
         tag: value
         value: Heated in an electric furnace under vacuum
       locator:
-        pdf_page_index: 8
+        pdf_page_index: 7
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
     total_duration_s:
@@ -441,7 +446,7 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        pdf_page_index: 8
+        pdf_page_index: 7
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
         note: The method says several hours; no exact duration is assigned to the plotted mixture run.
@@ -458,15 +463,14 @@ species:
         figure: '2'
         equation: '1'
         section: Results
-      phase: solid pellet before heating; magnetite after heating
-      regime: vacuum_reduction
+      phase: condensed_solid
+      regime: vacuum_chamber_pyrolysis
       units: wt% as printed
       values:
         quantity: mass_loss_fraction
         method_class: measured_direct
         T_C: 1200
         mass_loss_wt_pct: 3.5
-        duration_h: 1.5
         starting_material_as_printed: hematite reagent powder, Fe2O3
         sample_form_as_printed: pressed pellet
         product_phases_as_printed:
@@ -489,22 +493,58 @@ species:
       values:
         printed_quantity: oxygen partial pressure with sample relative to blank
         printed_value: 50-100 times higher initially; gradually decreased to the value without sample
-        oxygen_yield_or_extraction_ratio: Not reported; mass loss and oxygen partial pressure are the reported measures.
+        oxygen_yield_or_extraction_ratio: Not reported for this figure result; the abstract separately reports 0.03 g oxygen removed from a 1 g initial hematite pellet.
+    - observation_id: suzuki_2026_hematite_abstract_oxygen_removed
+      experiment: hematite-vacuum-heating-1200C
+      type: laboratory_conditions
+      locator:
+        pdf_page_index: 0
+        published_page: 'Article in Press; no printed page number'
+        section: Abstract
+      units: g O as printed
+      values:
+        printed_result: 0.03 g of oxygen was removed from a 1 g hematite pellet heated at 1200 °C under 10^-8 atm total pressure.
+        initial_sample_basis_as_printed: 1 g hematite pellet before the experiment
+        method_class: measured_direct
 
   Fe2SiO4:
-    observations: []
+    observations:
+    - observation_id: suzuki_2026_fayalite_melting_point
+      experiment: fayalite-vacuum-heating-1500C
+      type: transition_point
+      locator:
+        pdf_page_index: 3
+        published_page: 'Article in Press; no printed page number'
+        figure: '2'
+        section: Results
+      phase: condensed_solid
+      regime: vacuum_chamber_pyrolysis
+      point_conditions:
+        total_pressure_Pa:
+          state: {tag: value, value: 0.00101325}
+          locator:
+            pdf_page_index: 7
+            published_page: 'Article in Press; no printed page number'
+            section: Vacuum heating experiment
+            note: Total pressure is 10^-8 atm as printed.
+      units: °C as printed
+      values:
+        quantity: transition_temperature
+        method_class: measured_direct
+        property: melting_point
+        T_C: 1330
+        observation_as_printed: The pellet of fayalite melted when heated to 1330 °C.
     context:
     - observation_id: suzuki_2026_fayalite_melting_and_oxygen_pressure
       experiment: fayalite-vacuum-heating-1500C
       type: laboratory_conditions
       locator:
-        pdf_page_index: 4
+        pdf_page_index: 3
         published_page: 'Article in Press; no printed page number'
         figure: '2'
         section: Results
       units: °C and times as printed
       values:
-        melting_observation: The pellet melted when heated to 1330 °C.
         oxygen_partial_pressure_as_printed: At 1500 °C, initially 10 times the no-sample value, then gradually decreased to the no-sample value.
         oxygen_yield_or_extraction_ratio: Not reported.
         mass_loss: Not reported for the fayalite pellet.
@@ -547,12 +587,11 @@ species:
         section: Results
         note: Figure 2a, Hematite (Run01); log-axis visual reads at t = 0 and 15 min.
       phase: gas
-      regime: vacuum_reduction
+      regime: vacuum_chamber_pyrolysis
       units: atm as plotted
       values:
         quantity: partial_pressure_O2
         method_class: figure_only
-        admission_status: figure_only
         T_C: 1200
         gas_species: O2
         figure_digitized: true
@@ -560,8 +599,18 @@ species:
         series:
         - time_min: 0
           pressure_atm: 2.8e-11
+          approximate: true
+          point_conditions:
+            time_min:
+              state: {tag: value, value: 0}
+              locator: {pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
         - time_min: 15
           pressure_atm: 3.2e-11
+          approximate: true
+          point_conditions:
+            time_min:
+              state: {tag: value, value: 15}
+              locator: {pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
       uncertainty:
         note: No uncertainty width or confidence level is stated; values are approximate figure reads.
     - observation_id: suzuki_2026_hematite_pO2_run02_figure2
@@ -574,12 +623,11 @@ species:
         section: Results
         note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
       phase: gas
-      regime: vacuum_reduction
+      regime: vacuum_chamber_pyrolysis
       units: atm as plotted
       values:
         quantity: partial_pressure_O2
         method_class: figure_only
-        admission_status: figure_only
         T_C: 1200
         gas_species: O2
         figure_digitized: true
@@ -587,12 +635,32 @@ species:
         series:
         - time_min: 0
           pressure_atm: 3.0e-10
+          approximate: true
+          point_conditions:
+            time_min:
+              state: {tag: value, value: 0}
+              locator: {pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
         - time_min: 30
-          pressure_atm: 2.0e-11
+          pressure_atm: 3.5e-11
+          approximate: true
+          point_conditions:
+            time_min:
+              state: {tag: value, value: 30}
+              locator: {pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
         - time_min: 60
           pressure_atm: 1.3e-12
+          approximate: true
+          point_conditions:
+            time_min:
+              state: {tag: value, value: 60}
+              locator: {pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
         - time_min: 90
           pressure_atm: 1.0e-12
+          approximate: true
+          point_conditions:
+            time_min:
+              state: {tag: value, value: 90}
+              locator: {pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
       uncertainty:
         note: No uncertainty width or confidence level is stated; values are approximate figure reads.
     - observation_id: suzuki_2026_fayalite_pO2_figure2
@@ -605,12 +673,11 @@ species:
         section: Results
         note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
       phase: gas
-      regime: vacuum_reduction
+      regime: vacuum_chamber_pyrolysis
       units: atm as plotted
       values:
         quantity: partial_pressure_O2
         method_class: figure_only
-        admission_status: figure_only
         T_C: 1500
         gas_species: O2
         figure_digitized: true
@@ -618,12 +685,32 @@ species:
         series:
         - time_min: 0
           pressure_atm: 1.3e-10
+          approximate: true
+          point_conditions:
+            time_min:
+              state: {tag: value, value: 0}
+              locator: {pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
         - time_min: 30
           pressure_atm: 2.0e-11
+          approximate: true
+          point_conditions:
+            time_min:
+              state: {tag: value, value: 30}
+              locator: {pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
         - time_min: 60
           pressure_atm: 1.2e-11
+          approximate: true
+          point_conditions:
+            time_min:
+              state: {tag: value, value: 60}
+              locator: {pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
         - time_min: 90
           pressure_atm: 9.5e-12
+          approximate: true
+          point_conditions:
+            time_min:
+              state: {tag: value, value: 90}
+              locator: {pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
       uncertainty:
         note: No uncertainty width or confidence level is stated; values are approximate figure reads.
     - observation_id: suzuki_2026_fayalite_alumina_pO2_figure2
@@ -636,80 +723,117 @@ species:
         section: Results
         note: Figure 2b, Fayalite and alumina mixture; log-axis visual reads at t = 0, 30, 60 and 90 min.
       phase: gas
-      regime: vacuum_reduction
+      regime: vacuum_chamber_pyrolysis
       units: atm as plotted
       values:
         quantity: partial_pressure_O2
         method_class: figure_only
-        admission_status: figure_only
         T_C: 1500
         gas_species: O2
         figure_digitized: true
-        figure_read_method: Approximate visual read at labeled time-axis positions; pressure read from the logarithmic y-axis.
+        figure_read_method: Approximate visual read at labeled time-axis positions; pressure read from the logarithmic y-axis. The visible trace starts slightly after 0 min; the t=0 value is extrapolated to the origin from the initial trace.
         series:
         - time_min: 0
           pressure_atm: 2.0e-10
+          approximate: true
+          point_conditions:
+            time_min:
+              state: {tag: value, value: 0}
+              locator: {pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
         - time_min: 30
           pressure_atm: 6.0e-11
+          approximate: true
+          point_conditions:
+            time_min:
+              state: {tag: value, value: 30}
+              locator: {pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
         - time_min: 60
           pressure_atm: 2.5e-11
+          approximate: true
+          point_conditions:
+            time_min:
+              state: {tag: value, value: 60}
+              locator: {pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
         - time_min: 90
           pressure_atm: 2.0e-11
+          approximate: true
+          point_conditions:
+            time_min:
+              state: {tag: value, value: 90}
+              locator: {pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
       uncertainty:
         note: No uncertainty width or confidence level is stated; values are approximate figure reads.
 
-context:
-- observation_id: suzuki_2026_supplementary_materials_pointer
-  type: method
-  locator:
-    pdf_page_index: 10
-    published_page: 'Article in Press; no printed page number'
-    section: Supplementary Information
-  units: file pointer
-  values:
-    quantity: supplementary_data_not_in_supplied_pdf
-    pointer: https://media.springernature.com/original/springer-static/esm/art%3A10.1038/s41598-026-70347-2/MediaObjects/41598_2026_70347_MOESM1_ESM.docx
-    file: 41598_2026_70347_MOESM1_ESM.docx
-    sha256: db0b12d537cd286b61555ee0c8915f72b590892e660cae86d75653b4f843ba70
-    referenced_items:
-    - Fig. S1 apparatus schematic
-    - Fig. S2 oxygen-sensor schematic and EMF test
-    - Table S1 average Apollo 17 regolith composition
-    - Fig. S3 predicted regolith-alumina phase results
-    - Fig. S4 sunlight-focusing apparatus and experiment
-- observation_id: suzuki_2026_replicate_count
-  type: laboratory_conditions
-  locator:
-    pdf_page_index: 7
-    published_page: 'Article in Press; no printed page number'
-    section: Vacuum heating experiment
-  units: number of repetitions
-  values:
-    printed_reproducibility_statement: The experiments with samples of hematite and fayalite were performed at least three times.
-- observation_id: suzuki_2026_weighing_uncertainty
-  type: laboratory_conditions
-  locator:
-    pdf_page_index: 8
-    published_page: 'Article in Press; no printed page number'
-    section: Vacuum heating experiment
-    equation: '3'
-  units: percent as printed
-  values:
-    printed_quantity: uncertainty of sample weight measurement
-    printed_value: within an uncertainty of 0.1%
-    note: The basis of the 0.1% figure is not specified; it is not assigned as a mass-loss result uncertainty.
-- observation_id: suzuki_2026_hematite_emf_pO2_range
-  experiment: hematite-vacuum-heating-1200C
-  type: laboratory_conditions
-  locator:
-    pdf_page_index: 7
-    published_page: 'Article in Press; no printed page number'
-    figure: 'S2'
-    equation: '2'
-    section: Oxygen detection with a solid electrolyte
-    note: Figure S2 is referenced but not included; the range is printed in article text.
-  units: atm as printed
-  values:
-    printed_quantity: oxygen partial pressure measured by EMF
-    printed_value: 1.1–1.4 × 10−12 atm
-    compared_with: Values stated to be identical to those obtained by mass spectrometry in Figure 2a.
+    - observation_id: suzuki_2026_hematite_emf_pO2_range
+      experiment: hematite-vacuum-heating-1200C
+      type: partial_pressure
+      locator:
+        pdf_page_index: 4
+        published_page: 'Article in Press; no printed page number'
+        equation: '2'
+        section: Results
+        note: Figure S2 is referenced but not included; the pressure interval is printed in the article text.
+      phase: gas
+      regime: vacuum_chamber_pyrolysis
+      units: atm
+      values:
+        quantity: partial_pressure_O2
+        method_class: measured_direct
+        gas_species: O2
+        T_C: 1200
+        range: [1.1e-12, 1.4e-12]
+        range_as_printed: 1.1–1.4 × 10−12 atm
+        measurement_method: EMF with a solid-electrolyte cell; stated identical to mass-spectrometer values in Figure 2a.
+      uncertainty:
+        note: The interval is the measured range; no confidence level is stated.
+
+    context:
+    - observation_id: suzuki_2026_supplementary_materials_pointer
+      type: method
+      locator:
+        pdf_page_index: 9
+        published_page: 'Article in Press; no printed page number'
+        section: Supplementary Information
+      units: file pointer
+      values:
+        quantity: supplementary_data_not_in_supplied_pdf
+        pointer: https://media.springernature.com/original/springer-static/esm/art%3A10.1038/s41598-026-70347-2/MediaObjects/41598_2026_70347_MOESM1_ESM.docx
+        file: 41598_2026_70347_MOESM1_ESM.docx
+        sha256: db0b12d537cd286b61555ee0c8915f72b590892e660cae86d75653b4f843ba70
+        referenced_items:
+        - Fig. S1 apparatus schematic
+        - Fig. S2 oxygen-sensor schematic and EMF test
+        - Table S1 average Apollo 17 regolith composition
+        - Fig. S3 predicted regolith-alumina phase results
+        - Fig. S4 sunlight-focusing apparatus and experiment
+    - observation_id: suzuki_2026_replicate_count
+      type: laboratory_conditions
+      locator:
+        pdf_page_index: 7
+        published_page: 'Article in Press; no printed page number'
+        section: Vacuum heating experiment
+      units: number of repetitions
+      values:
+        printed_reproducibility_statement: The experiments with samples of hematite and fayalite were performed at least three times.
+    - observation_id: suzuki_2026_weighing_uncertainty
+      type: laboratory_conditions
+      locator:
+        pdf_page_index: 8
+        published_page: 'Article in Press; no printed page number'
+        section: Vacuum heating experiment
+        equation: '3'
+      units: percent as printed
+      values:
+        printed_quantity: uncertainty of sample weight measurement
+        printed_value: within an uncertainty of 0.1%
+        note: The basis of the 0.1% figure is not specified; it is not assigned as a mass-loss result uncertainty.
+    - observation_id: suzuki_2026_predicted_regolith_o2_mass
+      type: thermodynamic_example
+      locator:
+        pdf_page_index: 5
+        published_page: 'Article in Press; no printed page number'
+        section: Discussion
+      units: g O as printed
+      values:
+        printed_prediction: About 15 g of oxygen gas could potentially be generated from 100 g of regolith when heated above 1050 °C.
+        evidence_class: model_derived
