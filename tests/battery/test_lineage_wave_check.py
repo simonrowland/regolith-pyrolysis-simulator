@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import subprocess
 from copy import deepcopy
 from pathlib import Path
 
@@ -141,14 +140,13 @@ def test_source_extract_without_duplicate_keys_loads(tmp_path: Path) -> None:
 
 
 def test_historical_schaefer_six_duplicate_reproduction_still_fails() -> None:
-    source = subprocess.check_output(
-        [
-            "git",
-            "show",
-            "9bc2a90e0:data/literature/extracts/kems-008-schaefer-fegley-2004.yaml",
-        ],
-        text=True,
+    fixture = (
+        Path(__file__).resolve().parents[1]
+        / "fixtures"
+        / "battery"
+        / "schaefer-six-duplicate-keys.yaml"
     )
+    source = fixture.read_text(encoding="utf-8")
 
     with pytest.raises(ValueError, match="duplicate mapping keys") as exc_info:
         yaml.load(source, Loader=_UniqueKeyLoader)
