@@ -2021,6 +2021,52 @@ def test_janaf_lift_is_the_generator() -> None:
     assert "generate_table" in src
 
 
+@pytest.mark.parametrize(
+    ("oxide", "temperature_K", "expected_delta_g"),
+    (
+        ("SiO2", Decimal("1800"), Decimal("0.819")),
+        ("SiO2", Decimal("1933"), Decimal("0.27784")),
+        ("SiO2", Decimal("2000"), Decimal("-0.025")),
+        ("Al2O3", Decimal("2200"), Decimal("5.872")),
+        ("Al2O3", Decimal("2400"), Decimal("-3.545")),
+        ("Al2O3", Decimal("2500"), Decimal("-8.592")),
+    ),
+)
+def test_janaf_fusion_default_pair_outputs_are_pinned(
+    oxide: str,
+    temperature_K: Decimal,
+    expected_delta_g: Decimal,
+) -> None:
+    fusion = generator.janaf_fusion_energy(oxide, temperature_K)
+    assert fusion.delta_g_fus_kJ_per_mol == expected_delta_g
+    expected_pair = {
+        "SiO2": (
+            Decimal("1994.469026548672566371681416"),
+            "O-035",
+            "O-038",
+            (
+                "b3b964ea6baf5ad47b27a212ef9192762c51fb2acf26f1cec521658fb41fb742",
+                "f1233d320c6c49aa8055a95b7e0f2d6404b47d42079f42966c5f1331f94f3f2c",
+            ),
+        ),
+        "Al2O3": (
+            Decimal("2326.528497409326424870466321"),
+            "Al-096",
+            "Al-100",
+            (
+                "2054107c6e2f7c35d0196530f1d9362981612271d82731437cc016d74f147da6",
+                "b27ae0ccebb7433b209b9dbd7f0b67448e49cf2b613625e22b05709e49c0dbe0",
+            ),
+        ),
+    }
+    assert (
+        fusion.melting_temperature_K,
+        fusion.crystal_table,
+        fusion.liquid_table,
+        fusion.source_sha256,
+    ) == expected_pair[oxide]
+
+
 def test_janaf_store_is_element_sharded() -> None:
     single = CURRENT_STORE_DIR / "compilations-janaf.yaml"
     shard_dir = CURRENT_STORE_DIR / "compilations-janaf"
