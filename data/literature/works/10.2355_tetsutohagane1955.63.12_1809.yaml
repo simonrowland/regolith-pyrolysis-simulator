@@ -1,0 +1,397 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2355/tetsutohagane1955.63.12_1809
+  citation: Ban-ya, S. and Watanabe, T. (1977), "Thermodynamics of FetO-P2O5 Slags Saturated with Solid Iron", Tetsu-to-Hagane
+    63(12), 1809-1818.
+  source_ids:
+  - banya-watanabe-1977-feto-p2o5-solid-iron
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+    files:
+    - asset_id: pdf:banya-watanabe-1977-feto-p2o5-solid-iron
+      role: pdf
+      path: raw/banya-watanabe-1977-feto-p2o5-solid-iron/banya-watanabe-1977-feto-p2o5-solid-iron.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:banya-watanabe-1977-feto-p2o5-solid-iron
+      role: pdftotext
+      path: text/banya-watanabe-1977-feto-p2o5-solid-iron
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:banya-watanabe-1977-feto-p2o5-solid-iron
+      role: table_csv
+      path: tables/banya-watanabe-1977-feto-p2o5-solid-iron
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: unknown:banya-watanabe-1977-feto-p2o5-solid-iron
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2355/tetsutohagane1955.63.12_1809
+experiments:
+- experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1200c
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with solid-iron-saturated slag' is not a closed method token (kems_effusion alone
+      is insufficient)
+  sample: {}
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1200'
+          approximate: false
+      locator:
+        published_page: 1813
+        table: '3'
+        note: temperature column
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.63.12_1809
+  locator:
+    published_page: 1813
+    table: '3'
+  bench_id: 10.2355/tetsutohagane1955.63.12_1809::bench::banya77-solid-iron-gas-equilibration
+- experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1300c
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with solid-iron-saturated slag' is not a closed method token (kems_effusion alone
+      is insufficient)
+  sample: {}
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1300'
+          approximate: false
+      locator:
+        published_page: 1813
+        table: '3'
+        note: temperature column
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.63.12_1809
+  locator:
+    published_page: 1813
+    table: '3'
+  bench_id: 10.2355/tetsutohagane1955.63.12_1809::bench::banya77-solid-iron-gas-equilibration
+- experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1350c
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with solid-iron-saturated slag' is not a closed method token (kems_effusion alone
+      is insufficient)
+  sample: {}
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1350'
+          approximate: false
+      locator:
+        published_page: 1813
+        table: '3'
+        note: temperature column
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.63.12_1809
+  locator:
+    published_page: 1813
+    table: '3'
+  bench_id: 10.2355/tetsutohagane1955.63.12_1809::bench::banya77-solid-iron-gas-equilibration
+- experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with solid-iron-saturated slag' is not a closed method token (kems_effusion alone
+      is insufficient)
+  sample: {}
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        published_page: 1813
+        table: '3'
+        note: temperature column
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.63.12_1809
+  locator:
+    published_page: 1813
+    table: '3'
+  bench_id: 10.2355/tetsutohagane1955.63.12_1809::bench::banya77-solid-iron-gas-equilibration
+- experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1425c
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with solid-iron-saturated slag' is not a closed method token (kems_effusion alone
+      is insufficient)
+  sample: {}
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1425'
+          approximate: false
+      locator:
+        published_page: 1813
+        table: '3'
+        note: temperature column
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.63.12_1809
+  locator:
+    published_page: 1813
+    table: '3'
+  bench_id: 10.2355/tetsutohagane1955.63.12_1809::bench::banya77-solid-iron-gas-equilibration
+- experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1450c
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with solid-iron-saturated slag' is not a closed method token (kems_effusion alone
+      is insufficient)
+  sample: {}
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1450'
+          approximate: false
+      locator:
+        published_page: 1813
+        table: '3'
+        note: temperature column
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.63.12_1809
+  locator:
+    published_page: 1813
+    table: '3'
+  bench_id: 10.2355/tetsutohagane1955.63.12_1809::bench::banya77-solid-iron-gas-equilibration
+- experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table4-1400c
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime "Authors' calculated activity table" is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        published_page: 1816
+        table: '4'
+        note: table title
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.63.12_1809
+  locator:
+    published_page: 1816
+    table: '4'
+  bench_id: 10.2355/tetsutohagane1955.63.12_1809::bench::banya77-solid-iron-gas-equilibration
+benches:
+- id: 10.2355/tetsutohagane1955.63.12_1809::bench::banya77-solid-iron-gas-equilibration
+  work_id: 10.2355/tetsutohagane1955.63.12_1809
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: unknown
+      reason: would_invent
+    locator:
+      published_page: 1809
+      section: Synopsis
+      note: Method details occur in Japanese prose and are not transcribed under this extraction scope
+  temperature_measurement:
+    instrument:
+      state:
+        tag: unknown
+        reason: would_invent
+      locator:
+        published_page: 1809
+        section: Synopsis
+        note: Method details occur in Japanese prose and are not transcribed under this extraction scope
+  heating_method:
+    state:
+      tag: unknown
+      reason: would_invent
+    locator:
+      published_page: 1809
+      section: Synopsis
+      note: Method details occur in Japanese prose and are not transcribed under this extraction scope
+  other_facts: []
+context:
+- observation_id: banya77_equation_iron_redox_at_saturation
+  type: redox_equation_summary
+  locator:
+    published_page: 1814
+    section: Fig. 6 discussion
+  units: Fe3+/Fe2+ dimensionless; X_P2O5 as printed
+  values:
+    equation_as_printed: Λ = 0.120 - 0.438 X_P2O5 (equation (8)); 1200-1450 C.
+    information_only_zero_phosphate_intercept: '0.12'
+    temperature_specificity: No temperature-specific values are tabulated; equation (8) states the 1200-1450 C range and has
+      no temperature term.
+    lowest_P2O5_run_as_printed: 'Table 3 run 1.8: 1450 C, 2.03 wt% P2O5; no Fe3+/Fe2+ value is printed on that run row.'
+  context_id: banya-watanabe-1977-feto-p2o5-solid-iron::context::banya77_equation_iron_redox_at_saturation
+  work_id: 10.2355/tetsutohagane1955.63.12_1809
+  source_id: banya-watanabe-1977-feto-p2o5-solid-iron
+  species: FeO
+- observation_id: banya77_equations_pure_liquid_iron_saturation
+  type: equation_summary
+  locator:
+    published_page: 1814
+    section: Fig. 5 discussion
+  units: Equilibrium equations and temperature ranges as printed
+  values:
+    delta_iron_equation_as_printed: FeO(pure liquid) + H2(g) = Fe(delta) + H2O(g), 1536-1392 C; log K1 (= PH2O/PH2) = 1588/T
+      - 1.007; ΔG°1 = -7265 + 4.607 T; equation (2-1).
+    gamma_iron_equation_as_printed: FeO(pure liquid) + H2(g) = Fe(gamma) + H2O(g), 1392-911 C; log K2 (= PH2O/PH2) = 1645/T
+      - 1.042; ΔG°2 = -7525 + 4.767 T; equation (2-2).
+    FetO_activity_delta_equation_as_printed: log a_FetO = log(PH2O/PH2) - 1588/T + 1.007, 1536-1392 C; equation (11).
+    FetO_activity_delta_equation_locator:
+      published_page: 1815
+      section: '4.3'
+      equation: '11'
+    FetO_activity_gamma_equation_as_printed: log a_FetO = log(PH2O/PH2) - 1645/T + 1.042, 1392-911 C; equation (12).
+    FetO_activity_gamma_equation_locator:
+      published_page: 1815
+      section: '4.3'
+      equation: '12'
+    FetO_reference_state_as_printed: Table 4 labels the FetO activity as Raoult law standard and gives a_FetO = 1 at X_P2O5
+      = 0.00; equations (2-1) and (2-2) name pure liquid FeO.
+    thermodynamic_sources_cited_for_H2_H2O_equilibrium:
+    - 'Reference 12: Contributions to the Data on Theoretical Metallurgy, Bureau of Mines Bulletin 584 (1960).'
+    - 'Reference 13: Selected Values of Chemical Thermodynamic Properties, National Bureau of Standards Technical Note 270-1
+      (1965).'
+  context_id: banya-watanabe-1977-feto-p2o5-solid-iron::context::banya77_equations_pure_liquid_iron_saturation
+  work_id: 10.2355/tetsutohagane1955.63.12_1809
+  source_id: banya-watanabe-1977-feto-p2o5-solid-iron
+  species: FeO

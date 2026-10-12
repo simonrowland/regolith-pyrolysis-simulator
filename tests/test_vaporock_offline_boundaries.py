@@ -1,3 +1,4 @@
+import builtins
 import importlib.util
 import json
 import sqlite3
@@ -27,6 +28,32 @@ def _load_script(name: str):
     sys.modules[spec.name] = module
     spec.loader.exec_module(module)
     return module
+
+
+def test_policy_state_exists_before_pseudo_antoine_script_numerical_imports(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator import _blas_policy
+
+    assert _blas_policy.state() is not None
+    original_import = builtins.__import__
+
+    def observe_import(name, *args, **kwargs):
+        if name == "numpy" or name.startswith("numpy.") or name == "scipy" or name.startswith("scipy."):
+            assert _blas_policy.state() is not None
+            raise _NumericalImportReached(name)
+        return original_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", observe_import)
+    try:
+        with pytest.raises(_NumericalImportReached):
+            _load_script("vaporock_pseudo_antoine_refit")
+    finally:
+        sys.modules.pop("vaporock_pseudo_antoine_refit", None)
+
+
+class _NumericalImportReached(Exception):
+    pass
 
 
 def test_shadow_matrix_consumes_and_persists_complete_melt_envelope(

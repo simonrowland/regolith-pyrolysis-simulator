@@ -69,6 +69,30 @@ experiments:
     note: Every numeric value below is in the printed 62231 row and under its named column; reference is Korotev82 and technique
       (a) is INAA.; row=62231
 context:
+- observation_id: lpi_2010_62231_figure_only_context
+  type: figure_summary
+  locator:
+    pdf_page_index: 1
+    figure: '2'
+    section: Chemistry
+    note: Figure 2 plots station 2 soil composition against Apollo soil samples; no coordinate values were printed and none
+      were digitised.
+  phase: lunar_soil
+  regime: figure_only_lunar_chemical_context
+  units: as plotted
+  values:
+    quantity: station_2_soil_composition_plot
+    method_class: figure_only
+    status: figure_only_not_digitised
+    plotted_sample: '62231'
+    plotted_comparand: 62241 and other Apollo soil samples
+    note: no apparatus details stated for the plotted source data
+  uncertainty:
+    note: plotted uncertainty or error bars are not printed in extractable text
+  context_id: lpi-compendium-62231::context::lpi_2010_62231_figure_only_context
+  work_id: 494486a12e8ebacb2880ee0a1582fc723229718da96c49248ab29e9b6eaa5321
+  source_id: lpi-compendium-62231
+  species: lunar_sample_62231
 - observation_id: lpi_2010_62231_inventory_mass
   type: characterization
   locator:
@@ -82,6 +106,7 @@ context:
   values:
     quantity: sample_mass_and_sieving_inventory
     method_class: measured_direct
+    note: no collection, weighing, sieve, or recovery apparatus details are stated
     sample: '62231'
     sample_mass_g: 87
     sample_mass_note: printed sample inventory mass; the original weighing procedure is not stated
@@ -92,8 +117,6 @@ context:
       size distribution is reported
   uncertainty:
     note: no uncertainty printed
-  equipment:
-    note: no collection, weighing, sieve, or recovery apparatus details are stated
   context_id: lpi-compendium-62231::context::lpi_2010_62231_inventory_mass
   work_id: 494486a12e8ebacb2880ee0a1582fc723229718da96c49248ab29e9b6eaa5321
   source_id: lpi-compendium-62231
@@ -109,14 +132,13 @@ context:
   values:
     quantity: maturity_and_grain_size_characterisation
     method_class: quoted_attributed
+    note: analytical apparatus for the cited maturity and particle catalogue is not stated in this entry
     maturity_index_Is_over_FeO: 91
     maturity_index_source: Morris (1978)
     grain_size_distribution: not reported
     coarse_particle_catalogue: 4-10 mm particles cataloged by Marvin (1972)
   uncertainty:
     note: no uncertainty printed
-  equipment:
-    note: analytical apparatus for the cited maturity and particle catalogue is not stated in this entry
   context_id: lpi-compendium-62231::context::lpi_2010_62231_maturity_and_grain_size
   work_id: 494486a12e8ebacb2880ee0a1582fc723229718da96c49248ab29e9b6eaa5321
   source_id: lpi-compendium-62231

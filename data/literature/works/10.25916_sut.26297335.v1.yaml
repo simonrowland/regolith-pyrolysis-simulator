@@ -1,0 +1,3379 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.25916/sut.26297335.v1
+  citation: Shaw, Matthew (2023), "Vacuum Thermal Sublimation for Metal Production from Lunar Regolith", PhD thesis, Swinburne
+    University of Technology.
+  source_ids:
+  - shaw-2023-vacuum-thermal-sublimation-thesis
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+    files:
+    - asset_id: pdf:shaw-2023-vacuum-thermal-sublimation-thesis
+      role: pdf
+      path: raw/shaw-2023-vacuum-thermal-sublimation-thesis/shaw-2023-vacuum-thermal-sublimation-thesis.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:shaw-2023-vacuum-thermal-sublimation-thesis
+      role: pdftotext
+      path: text/shaw-2023-vacuum-thermal-sublimation-thesis
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:shaw-2023-vacuum-thermal-sublimation-thesis
+      role: table_csv
+      path: tables/shaw-2023-vacuum-thermal-sublimation-thesis
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: unknown:shaw-2023-vacuum-thermal-sublimation-thesis
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.25916/sut.26297335.v1
+experiments:
+- experiment_id: 10.25916/sut.26297335.v1::experiment::blank-high-vacuum
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_solar_thermal_dissociation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: no_feed_in_blank
+      locator:
+        published_page: 203
+        table: '8.1'
+    printed_composition:
+      state:
+        tag: unknown
+        reason: no_feed_in_blank
+      locator:
+        published_page: 203
+        table: '8.1'
+    form:
+      state:
+        tag: value
+        value: N/A
+      locator:
+        published_page: 203
+        table: '8.1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1421.15'
+          approximate: false
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+        note: Temp High 1148 C converted with T_K = T_C + 273.15
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1148'
+            locator:
+              published_page: 203
+              pdf_page_index: 227
+              table: '8.1'
+              note: Temp High 1148 C converted with T_K = T_C + 273.15
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 203
+              pdf_page_index: 227
+              table: '8.1'
+              note: Temp High 1148 C converted with T_K = T_C + 273.15
+        output_unit: K
+    pressure_low_atm:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00000000713'
+          approximate: false
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0013476225'
+          approximate: false
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+        note: Pressure Average 1.33e-8 atm converted to Pa
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000133'
+            locator:
+              published_page: 203
+              pdf_page_index: 227
+              table: '8.1'
+              note: Pressure Average 1.33e-8 atm converted to Pa
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 203
+              pdf_page_index: 227
+              table: '8.1'
+              note: Pressure Average 1.33e-8 atm converted to Pa
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 203
+        table: '8.1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.25916/sut.26297335.v1
+  locator:
+    published_page: 203
+    pdf_page_index: 227
+    table: '8.1'
+  bench_id: 10.25916/sut.26297335.v1::bench::solar-simulator-high-vacuum-reactor
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: unknown
+          reason: not_applicable
+        locator:
+          published_page: 203
+          pdf_page_index: 227
+          table: '8.1'
+          note: Reported duration is accumulated reactor time above 1000 C, not a single isothermal hold temperature
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '14040'
+            approximate: false
+        locator:
+          published_page: 203
+          pdf_page_index: 227
+          table: '8.1'
+          note: Temp High Duration 3.9 h; high temperature means reactor temperature above 1000 C per §5.4; converted to seconds
+        inference:
+          relation: h_to_s
+          inputs:
+          - t_s = t_h × 3600
+          - original_unit=h
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '3.9'
+              locator:
+                published_page: 203
+                pdf_page_index: 227
+                table: '8.1'
+                note: Temp High Duration 3.9 h; high temperature means reactor temperature above 1000 C per §5.4; converted
+                  to seconds
+          - - factor
+            - state:
+                tag: value
+                value: '3600'
+              locator:
+                published_page: 203
+                pdf_page_index: 227
+                table: '8.1'
+                note: Temp High Duration 3.9 h; high temperature means reactor temperature above 1000 C per §5.4; converted
+                  to seconds
+          output_unit: s
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+        note: Table 8.1 prints high-temperature duration; total time including low-temperature bake-out and inter-pulse intervals
+          is not separately reported
+- experiment_id: 10.25916/sut.26297335.v1::experiment::td1-nanophase-iron-oxide
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_solar_thermal_dissociation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0026'
+          approximate: true
+      locator:
+        published_page: 152
+        pdf_page_index: 176
+        section: 5.4.4
+        note: Approximately 2.6 g sample; grams converted to kg
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2.6'
+            locator:
+              published_page: 152
+              pdf_page_index: 176
+              section: 5.4.4
+              note: Approximately 2.6 g sample; grams converted to kg
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 152
+              pdf_page_index: 176
+              section: 5.4.4
+              note: Approximately 2.6 g sample; grams converted to kg
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value: FeO/Fe2O3 powder
+      locator:
+        published_page: 203
+        table: '8.1'
+    form:
+      state:
+        tag: value
+        value: Loose material (as printed; Chapter 8 prose says the powder was pressed into a pellet for TD1)
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400.15'
+          approximate: false
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+        note: Temp High 1127 C converted with T_K = T_C + 273.15
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1127'
+            locator:
+              published_page: 203
+              pdf_page_index: 227
+              table: '8.1'
+              note: Temp High 1127 C converted with T_K = T_C + 273.15
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 203
+              pdf_page_index: 227
+              table: '8.1'
+              note: Temp High 1127 C converted with T_K = T_C + 273.15
+        output_unit: K
+    pressure_low_atm:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000579'
+          approximate: false
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.027661725'
+          approximate: false
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+        note: Pressure Average 2.73e-7 atm converted to Pa
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000000273'
+            locator:
+              published_page: 203
+              pdf_page_index: 227
+              table: '8.1'
+              note: Pressure Average 2.73e-7 atm converted to Pa
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 203
+              pdf_page_index: 227
+              table: '8.1'
+              note: Pressure Average 2.73e-7 atm converted to Pa
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 203
+        table: '8.1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.25916/sut.26297335.v1
+  locator:
+    published_page: 203
+    pdf_page_index: 227
+    table: '8.1'
+  bench_id: 10.25916/sut.26297335.v1::bench::solar-simulator-high-vacuum-reactor
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: unknown
+          reason: not_applicable
+        locator:
+          published_page: 203
+          pdf_page_index: 227
+          table: '8.1'
+          note: Reported duration is accumulated reactor time above 1000 C, not a single isothermal hold temperature
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '6480'
+            approximate: false
+        locator:
+          published_page: 203
+          pdf_page_index: 227
+          table: '8.1'
+          note: Temp High Duration 1.8 h; high temperature means reactor temperature above 1000 C per §5.4; converted to seconds
+        inference:
+          relation: h_to_s
+          inputs:
+          - t_s = t_h × 3600
+          - original_unit=h
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1.8'
+              locator:
+                published_page: 203
+                pdf_page_index: 227
+                table: '8.1'
+                note: Temp High Duration 1.8 h; high temperature means reactor temperature above 1000 C per §5.4; converted
+                  to seconds
+          - - factor
+            - state:
+                tag: value
+                value: '3600'
+              locator:
+                published_page: 203
+                pdf_page_index: 227
+                table: '8.1'
+                note: Temp High Duration 1.8 h; high temperature means reactor temperature above 1000 C per §5.4; converted
+                  to seconds
+          output_unit: s
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+        note: Table 8.1 prints high-temperature duration; total time including low-temperature bake-out and inter-pulse intervals
+          is not separately reported
+- experiment_id: 10.25916/sut.26297335.v1::experiment::td2-nanophase-iron-oxide
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_solar_thermal_dissociation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0026'
+          approximate: true
+      locator:
+        published_page: 152
+        pdf_page_index: 176
+        section: 5.4.4
+        note: Approximately 2.6 g sample; grams converted to kg
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2.6'
+            locator:
+              published_page: 152
+              pdf_page_index: 176
+              section: 5.4.4
+              note: Approximately 2.6 g sample; grams converted to kg
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 152
+              pdf_page_index: 176
+              section: 5.4.4
+              note: Approximately 2.6 g sample; grams converted to kg
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value: FeO/Fe2O3 powder
+      locator:
+        published_page: 203
+        table: '8.1'
+    form:
+      state:
+        tag: value
+        value: Pressed Tablets
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1298.15'
+          approximate: false
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+        note: Temp High 1025 C converted with T_K = T_C + 273.15
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1025'
+            locator:
+              published_page: 203
+              pdf_page_index: 227
+              table: '8.1'
+              note: Temp High 1025 C converted with T_K = T_C + 273.15
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 203
+              pdf_page_index: 227
+              table: '8.1'
+              note: Temp High 1025 C converted with T_K = T_C + 273.15
+        output_unit: K
+    pressure_low_atm:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000000139'
+          approximate: false
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.03465315'
+          approximate: false
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+        note: Pressure Average 3.42e-7 atm converted to Pa
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000000342'
+            locator:
+              published_page: 203
+              pdf_page_index: 227
+              table: '8.1'
+              note: Pressure Average 3.42e-7 atm converted to Pa
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 203
+              pdf_page_index: 227
+              table: '8.1'
+              note: Pressure Average 3.42e-7 atm converted to Pa
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 203
+        table: '8.1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.25916/sut.26297335.v1
+  locator:
+    published_page: 203
+    pdf_page_index: 227
+    table: '8.1'
+  bench_id: 10.25916/sut.26297335.v1::bench::solar-simulator-high-vacuum-reactor
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: unknown
+          reason: not_applicable
+        locator:
+          published_page: 203
+          pdf_page_index: 227
+          table: '8.1'
+          note: Reported duration is accumulated reactor time above 1000 C, not a single isothermal hold temperature
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '15480'
+            approximate: false
+        locator:
+          published_page: 203
+          pdf_page_index: 227
+          table: '8.1'
+          note: Temp High Duration 4.3 h; high temperature means reactor temperature above 1000 C per §5.4; converted to seconds
+        inference:
+          relation: h_to_s
+          inputs:
+          - t_s = t_h × 3600
+          - original_unit=h
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '4.3'
+              locator:
+                published_page: 203
+                pdf_page_index: 227
+                table: '8.1'
+                note: Temp High Duration 4.3 h; high temperature means reactor temperature above 1000 C per §5.4; converted
+                  to seconds
+          - - factor
+            - state:
+                tag: value
+                value: '3600'
+              locator:
+                published_page: 203
+                pdf_page_index: 227
+                table: '8.1'
+                note: Temp High Duration 4.3 h; high temperature means reactor temperature above 1000 C per §5.4; converted
+                  to seconds
+          output_unit: s
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+        note: Table 8.1 prints high-temperature duration; total time including low-temperature bake-out and inter-pulse intervals
+          is not separately reported
+- experiment_id: 10.25916/sut.26297335.v1::experiment::td3-ilmenite-concentrate
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_solar_thermal_dissociation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0026'
+          approximate: true
+      locator:
+        published_page: 152
+        pdf_page_index: 176
+        section: 5.4.4
+        note: Approximately 2.6 g sample; grams converted to kg
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2.6'
+            locator:
+              published_page: 152
+              pdf_page_index: 176
+              section: 5.4.4
+              note: Approximately 2.6 g sample; grams converted to kg
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 152
+              pdf_page_index: 176
+              section: 5.4.4
+              note: Approximately 2.6 g sample; grams converted to kg
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value: Ilmenite (CSIRO)
+      locator:
+        published_page: 203
+        table: '8.1'
+    form:
+      state:
+        tag: value
+        value: Pressed Tablets
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1389.15'
+          approximate: false
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+        note: Temp High 1116 C converted with T_K = T_C + 273.15
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1116'
+            locator:
+              published_page: 203
+              pdf_page_index: 227
+              table: '8.1'
+              note: Temp High 1116 C converted with T_K = T_C + 273.15
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 203
+              pdf_page_index: 227
+              table: '8.1'
+              note: Temp High 1116 C converted with T_K = T_C + 273.15
+        output_unit: K
+    pressure_low_atm:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000173'
+          approximate: false
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.002776305'
+          approximate: false
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+        note: Pressure Average 2.74e-8 atm converted to Pa
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000274'
+            locator:
+              published_page: 203
+              pdf_page_index: 227
+              table: '8.1'
+              note: Pressure Average 2.74e-8 atm converted to Pa
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 203
+              pdf_page_index: 227
+              table: '8.1'
+              note: Pressure Average 2.74e-8 atm converted to Pa
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 203
+        table: '8.1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.25916/sut.26297335.v1
+  locator:
+    published_page: 203
+    pdf_page_index: 227
+    table: '8.1'
+  bench_id: 10.25916/sut.26297335.v1::bench::solar-simulator-high-vacuum-reactor
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: unknown
+          reason: not_applicable
+        locator:
+          published_page: 203
+          pdf_page_index: 227
+          table: '8.1'
+          note: Reported duration is accumulated reactor time above 1000 C, not a single isothermal hold temperature
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '25560'
+            approximate: false
+        locator:
+          published_page: 203
+          pdf_page_index: 227
+          table: '8.1'
+          note: Temp High Duration 7.1 h; high temperature means reactor temperature above 1000 C per §5.4; converted to seconds
+        inference:
+          relation: h_to_s
+          inputs:
+          - t_s = t_h × 3600
+          - original_unit=h
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '7.1'
+              locator:
+                published_page: 203
+                pdf_page_index: 227
+                table: '8.1'
+                note: Temp High Duration 7.1 h; high temperature means reactor temperature above 1000 C per §5.4; converted
+                  to seconds
+          - - factor
+            - state:
+                tag: value
+                value: '3600'
+              locator:
+                published_page: 203
+                pdf_page_index: 227
+                table: '8.1'
+                note: Temp High Duration 7.1 h; high temperature means reactor temperature above 1000 C per §5.4; converted
+                  to seconds
+          output_unit: s
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+        note: Table 8.1 prints high-temperature duration; total time including low-temperature bake-out and inter-pulse intervals
+          is not separately reported
+- experiment_id: 10.25916/sut.26297335.v1::experiment::td4-lms1-atmosphere
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solar_thermal_dissociation_atmospheric_pressure' is not a closed method token (kems_effusion alone is
+      insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0026'
+          approximate: true
+      locator:
+        published_page: 152
+        pdf_page_index: 176
+        section: 5.4.4
+        note: Approximately 2.6 g sample; grams converted to kg
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2.6'
+            locator:
+              published_page: 152
+              pdf_page_index: 176
+              section: 5.4.4
+              note: Approximately 2.6 g sample; grams converted to kg
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 152
+              pdf_page_index: 176
+              section: 5.4.4
+              note: Approximately 2.6 g sample; grams converted to kg
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value: LMS-1
+      locator:
+        published_page: 203
+        table: '8.1'
+    form:
+      state:
+        tag: value
+        value: Pressed Tablets
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1426.15'
+          approximate: false
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+        note: Temp High 1153 C converted with T_K = T_C + 273.15
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1153'
+            locator:
+              published_page: 203
+              pdf_page_index: 227
+              table: '8.1'
+              note: Temp High 1153 C converted with T_K = T_C + 273.15
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 203
+              pdf_page_index: 227
+              table: '8.1'
+              note: Temp High 1153 C converted with T_K = T_C + 273.15
+        output_unit: K
+    pressure_low_atm:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1'
+          approximate: false
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+        note: Printed 1 atm converted to Pa
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              published_page: 203
+              pdf_page_index: 227
+              table: '8.1'
+              note: Printed 1 atm converted to Pa
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 203
+              pdf_page_index: 227
+              table: '8.1'
+              note: Printed 1 atm converted to Pa
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 203
+        table: '8.1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.25916/sut.26297335.v1
+  locator:
+    published_page: 203
+    pdf_page_index: 227
+    table: '8.1'
+  bench_id: 10.25916/sut.26297335.v1::bench::solar-simulator-high-vacuum-reactor
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: unknown
+          reason: not_applicable
+        locator:
+          published_page: 203
+          pdf_page_index: 227
+          table: '8.1'
+          note: Reported duration is accumulated reactor time above 1000 C, not a single isothermal hold temperature
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '7560'
+            approximate: false
+        locator:
+          published_page: 203
+          pdf_page_index: 227
+          table: '8.1'
+          note: Temp High Duration 2.1 h; high temperature means reactor temperature above 1000 C per §5.4; converted to seconds
+        inference:
+          relation: h_to_s
+          inputs:
+          - t_s = t_h × 3600
+          - original_unit=h
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '2.1'
+              locator:
+                published_page: 203
+                pdf_page_index: 227
+                table: '8.1'
+                note: Temp High Duration 2.1 h; high temperature means reactor temperature above 1000 C per §5.4; converted
+                  to seconds
+          - - factor
+            - state:
+                tag: value
+                value: '3600'
+              locator:
+                published_page: 203
+                pdf_page_index: 227
+                table: '8.1'
+                note: Temp High Duration 2.1 h; high temperature means reactor temperature above 1000 C per §5.4; converted
+                  to seconds
+          output_unit: s
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+        note: Table 8.1 prints high-temperature duration; total time including low-temperature bake-out and inter-pulse intervals
+          is not separately reported
+- experiment_id: 10.25916/sut.26297335.v1::experiment::td5-lms1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_solar_thermal_dissociation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0026'
+          approximate: true
+      locator:
+        published_page: 152
+        pdf_page_index: 176
+        section: 5.4.4
+        note: Approximately 2.6 g sample; grams converted to kg
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2.6'
+            locator:
+              published_page: 152
+              pdf_page_index: 176
+              section: 5.4.4
+              note: Approximately 2.6 g sample; grams converted to kg
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 152
+              pdf_page_index: 176
+              section: 5.4.4
+              note: Approximately 2.6 g sample; grams converted to kg
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value: LMS-1
+      locator:
+        published_page: 203
+        table: '8.1'
+    form:
+      state:
+        tag: value
+        value: Pressed Tablets
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1394.15'
+          approximate: false
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+        note: Temp High 1121 C converted with T_K = T_C + 273.15
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1121'
+            locator:
+              published_page: 203
+              pdf_page_index: 227
+              table: '8.1'
+              note: Temp High 1121 C converted with T_K = T_C + 273.15
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 203
+              pdf_page_index: 227
+              table: '8.1'
+              note: Temp High 1121 C converted with T_K = T_C + 273.15
+        output_unit: K
+    pressure_low_atm:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000155'
+          approximate: false
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0050763825'
+          approximate: false
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+        note: Pressure Average 5.01e-8 atm converted to Pa
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000501'
+            locator:
+              published_page: 203
+              pdf_page_index: 227
+              table: '8.1'
+              note: Pressure Average 5.01e-8 atm converted to Pa
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 203
+              pdf_page_index: 227
+              table: '8.1'
+              note: Pressure Average 5.01e-8 atm converted to Pa
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 203
+        table: '8.1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.25916/sut.26297335.v1
+  locator:
+    published_page: 203
+    pdf_page_index: 227
+    table: '8.1'
+  bench_id: 10.25916/sut.26297335.v1::bench::solar-simulator-high-vacuum-reactor
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: unknown
+          reason: not_applicable
+        locator:
+          published_page: 203
+          pdf_page_index: 227
+          table: '8.1'
+          note: Reported duration is accumulated reactor time above 1000 C, not a single isothermal hold temperature
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '14760'
+            approximate: false
+        locator:
+          published_page: 203
+          pdf_page_index: 227
+          table: '8.1'
+          note: Temp High Duration 4.1 h; high temperature means reactor temperature above 1000 C per §5.4; converted to seconds
+        inference:
+          relation: h_to_s
+          inputs:
+          - t_s = t_h × 3600
+          - original_unit=h
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '4.1'
+              locator:
+                published_page: 203
+                pdf_page_index: 227
+                table: '8.1'
+                note: Temp High Duration 4.1 h; high temperature means reactor temperature above 1000 C per §5.4; converted
+                  to seconds
+          - - factor
+            - state:
+                tag: value
+                value: '3600'
+              locator:
+                published_page: 203
+                pdf_page_index: 227
+                table: '8.1'
+                note: Temp High Duration 4.1 h; high temperature means reactor temperature above 1000 C per §5.4; converted
+                  to seconds
+          output_unit: s
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+        note: Table 8.1 prints high-temperature duration; total time including low-temperature bake-out and inter-pulse intervals
+          is not separately reported
+- experiment_id: 10.25916/sut.26297335.v1::experiment::td6-lms1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_solar_thermal_dissociation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0026'
+          approximate: true
+      locator:
+        published_page: 152
+        pdf_page_index: 176
+        section: 5.4.4
+        note: Approximately 2.6 g sample; grams converted to kg
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2.6'
+            locator:
+              published_page: 152
+              pdf_page_index: 176
+              section: 5.4.4
+              note: Approximately 2.6 g sample; grams converted to kg
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 152
+              pdf_page_index: 176
+              section: 5.4.4
+              note: Approximately 2.6 g sample; grams converted to kg
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value: LMS-1
+      locator:
+        published_page: 203
+        table: '8.1'
+    form:
+      state:
+        tag: value
+        value: Pressed Tablets
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1420.15'
+          approximate: false
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+        note: Temp High 1147 C converted with T_K = T_C + 273.15
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1147'
+            locator:
+              published_page: 203
+              pdf_page_index: 227
+              table: '8.1'
+              note: Temp High 1147 C converted with T_K = T_C + 273.15
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 203
+              pdf_page_index: 227
+              table: '8.1'
+              note: Temp High 1147 C converted with T_K = T_C + 273.15
+        output_unit: K
+    pressure_low_atm:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000658'
+          approximate: false
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00895713'
+          approximate: false
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+        note: Pressure Average 8.84e-8 atm converted to Pa
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000884'
+            locator:
+              published_page: 203
+              pdf_page_index: 227
+              table: '8.1'
+              note: Pressure Average 8.84e-8 atm converted to Pa
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 203
+              pdf_page_index: 227
+              table: '8.1'
+              note: Pressure Average 8.84e-8 atm converted to Pa
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 203
+        table: '8.1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.25916/sut.26297335.v1
+  locator:
+    published_page: 203
+    pdf_page_index: 227
+    table: '8.1'
+  bench_id: 10.25916/sut.26297335.v1::bench::solar-simulator-high-vacuum-reactor
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: unknown
+          reason: not_applicable
+        locator:
+          published_page: 203
+          pdf_page_index: 227
+          table: '8.1'
+          note: Reported duration is accumulated reactor time above 1000 C, not a single isothermal hold temperature
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '12600'
+            approximate: false
+        locator:
+          published_page: 203
+          pdf_page_index: 227
+          table: '8.1'
+          note: Temp High Duration 3.5 h; high temperature means reactor temperature above 1000 C per §5.4; converted to seconds
+        inference:
+          relation: h_to_s
+          inputs:
+          - t_s = t_h × 3600
+          - original_unit=h
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '3.5'
+              locator:
+                published_page: 203
+                pdf_page_index: 227
+                table: '8.1'
+                note: Temp High Duration 3.5 h; high temperature means reactor temperature above 1000 C per §5.4; converted
+                  to seconds
+          - - factor
+            - state:
+                tag: value
+                value: '3600'
+              locator:
+                published_page: 203
+                pdf_page_index: 227
+                table: '8.1'
+                note: Temp High Duration 3.5 h; high temperature means reactor temperature above 1000 C per §5.4; converted
+                  to seconds
+          output_unit: s
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+        note: Table 8.1 prints high-temperature duration; total time including low-temperature bake-out and inter-pulse intervals
+          is not separately reported
+- experiment_id: 10.25916/sut.26297335.v1::experiment::td7-reacted-td6-feed
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_solar_thermal_dissociation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0026'
+          approximate: true
+      locator:
+        published_page: 152
+        pdf_page_index: 176
+        section: 5.4.4
+        note: Approximately 2.6 g sample; grams converted to kg
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2.6'
+            locator:
+              published_page: 152
+              pdf_page_index: 176
+              section: 5.4.4
+              note: Approximately 2.6 g sample; grams converted to kg
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 152
+              pdf_page_index: 176
+              section: 5.4.4
+              note: Approximately 2.6 g sample; grams converted to kg
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value: LMS-1
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+        note: Feed Material column kept separate from Feed Form
+    form:
+      state:
+        tag: value
+        value: Processed TD4
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+        note: Printed Feed Form; §8.2 p. 215 instead says reacted LMS-1 material from TD6 was re-tested
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1424.15'
+          approximate: false
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+        note: Temp High 1151 C converted with T_K = T_C + 273.15
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1151'
+            locator:
+              published_page: 203
+              pdf_page_index: 227
+              table: '8.1'
+              note: Temp High 1151 C converted with T_K = T_C + 273.15
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 203
+              pdf_page_index: 227
+              table: '8.1'
+              note: Temp High 1151 C converted with T_K = T_C + 273.15
+        output_unit: K
+    pressure_low_atm:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000129'
+          approximate: false
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0038807475'
+          approximate: false
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+        note: Pressure Average 3.83e-8 atm converted to Pa
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000383'
+            locator:
+              published_page: 203
+              pdf_page_index: 227
+              table: '8.1'
+              note: Pressure Average 3.83e-8 atm converted to Pa
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 203
+              pdf_page_index: 227
+              table: '8.1'
+              note: Pressure Average 3.83e-8 atm converted to Pa
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 203
+        table: '8.1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.25916/sut.26297335.v1
+  locator:
+    published_page: 203
+    pdf_page_index: 227
+    table: '8.1'
+  bench_id: 10.25916/sut.26297335.v1::bench::solar-simulator-high-vacuum-reactor
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: unknown
+          reason: not_applicable
+        locator:
+          published_page: 203
+          pdf_page_index: 227
+          table: '8.1'
+          note: Reported duration is accumulated reactor time above 1000 C, not a single isothermal hold temperature
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '31680'
+            approximate: false
+        locator:
+          published_page: 203
+          pdf_page_index: 227
+          table: '8.1'
+          note: Temp High Duration 8.8 h; high temperature means reactor temperature above 1000 C per §5.4; converted to seconds
+        inference:
+          relation: h_to_s
+          inputs:
+          - t_s = t_h × 3600
+          - original_unit=h
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '8.8'
+              locator:
+                published_page: 203
+                pdf_page_index: 227
+                table: '8.1'
+                note: Temp High Duration 8.8 h; high temperature means reactor temperature above 1000 C per §5.4; converted
+                  to seconds
+          - - factor
+            - state:
+                tag: value
+                value: '3600'
+              locator:
+                published_page: 203
+                pdf_page_index: 227
+                table: '8.1'
+                note: Temp High Duration 8.8 h; high temperature means reactor temperature above 1000 C per §5.4; converted
+                  to seconds
+          output_unit: s
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+        note: Table 8.1 prints high-temperature duration; total time including low-temperature bake-out and inter-pulse intervals
+          is not separately reported
+benches:
+- id: 10.25916/sut.26297335.v1::bench::solar-simulator-high-vacuum-reactor
+  work_id: 10.25916/sut.26297335.v1
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Hybrid Swinburne Solar Simulator and high-vacuum reactor
+    locator:
+      published_page: 198
+      pdf_page_index: 222
+      section: '8.1'
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Custom closed-end fused-quartz reaction tube; sample boat is alumina
+    locator:
+      published_page: 200
+      pdf_page_index: 224
+      section: Reactor Design
+      note: Alumina sample boat described in section 5.4.4 and Chapter 8 test procedure
+  pumping_type:
+    state:
+      tag: value
+      value: ILMvac STP 1 turbomolecular pumping station with mechanical backing pump
+    locator:
+      published_page: 199
+      pdf_page_index: 223
+      section: The Hybrid Solar Furnace
+  detector:
+    state:
+      tag: value
+      value: PEN101 cold-cathode sensor connected to a multi-range vacuum gauge
+    locator:
+      published_page: 199
+      pdf_page_index: 223
+      section: The Hybrid Solar Furnace
+  temperature_measurement:
+    method:
+      state:
+        tag: value
+        value: Table 8.1 reports Temp High; reactor temperature readings were used in heating profiles, while the calibration
+          thermocouple was not used during active runs
+      locator:
+        published_page: 200
+        pdf_page_index: 224
+        section: Reactor Design
+        note: The preceding chapter page describes temperature readings used in heating profiles
+    sensor:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 203
+        pdf_page_index: 227
+        table: '8.1'
+  heating_method:
+    state:
+      tag: value
+      value: Electrical furnace preheat followed by concentrated solar thermal heating; high-vacuum tests used the solar simulator
+    locator:
+      published_page: 202
+      pdf_page_index: 226
+      section: '8.2'
+  other_facts: []
+context:
+- observation_id: shaw_2023_blank_results
+  experiment: blank-high-vacuum
+  type: composition
+  locator:
+    table: '8.2'
+    published_page: 218
+    pdf_page_index: 242
+    section: '8.2'
+  units: qualitative EDS elemental findings
+  values:
+    record_kind: deposit_findings_as_printed
+    quantity_token_needed: elemental_deposit_composition_by_surface
+    phase_token_needed: deposit_phase_by_element
+    method_class: measured_direct
+    elements_in_distinct_deposit_as_printed: None
+    deposit_location: Reactor tube glass; general frosting
+    deposit_phase_by_element:
+      state: unknown
+      reason: EDS elemental summary does not identify phases
+    identification: Table 8.2 reports no elements in deposit bands; Chapter 8 prose describes light white Si/O frosting on
+      the reactor glass
+    oxygen_gas:
+      state: unknown
+      reason: no molecular O2 collection or measurement reported
+    saw_air_before_analysis:
+      state: unknown
+      reason: reactor_was_vented_to_atmospheric_pressure_before_removal_but_vent_gas_air_contact_and_duration_are_not_stated
+    collector_or_shield_deposit:
+      state: unknown
+      reason: no separate collector or shield reported
+    sample_mass_loss:
+      state: unknown
+      reason: blank_test_had_no_sample
+  context_id: shaw-2023-vacuum-thermal-sublimation-thesis::context::shaw_2023_blank_results
+  work_id: 10.25916/sut.26297335.v1
+  source_id: shaw-2023-vacuum-thermal-sublimation-thesis
+  species: vacuum_reactor_blank
+- observation_id: shaw_2023_ch8_deposit_surface_inventory
+  type: method
+  locator:
+    section: '8.2'
+    published_page: 202
+    pdf_page_index: 226
+    note: Run-specific prose locators are recorded for each wall finding below
+  units: as described; elemental presence is not a compound or phase identification
+  values:
+    quantity: deposit_findings_by_run_and_surface
+    method_class: method_only
+    phase_vocabulary: metal, suboxide, oxide, salt, silicate, not_identified; do not infer a phase from an EDS elemental pair
+    common_analysis_limitations: In fragment EDS analyses, thin deposits leave reactor-glass Si and O signals; carbon coating
+      adds a strong C peak. An O peak above the expected glass signal only indicates the possible presence of an oxygen-containing
+      phase. The thesis did not quantitatively separate deposit oxygen from glass oxygen. TD1 used a smear and had no significant
+      glass Si/O peak; TD4 had no SEM/EDS analysis.
+    common_analysis_scope: Fragment EDS analyses for TD2, TD3, TD5, TD6 and TD7; TD1 smear is the stated glass-signal exception
+      and TD4 was not analysed by SEM/EDS.
+    common_analysis_locator:
+      published_page: 202
+      pdf_page_index: 226
+      section: '8.2'
+    common_frosting_interpretation: For vacuum runs, white fractured Si/O frosting is treated as reactor-related; Na, K, and
+      Cl in some areas may be trace glass constituents. Na, K, and Cl listed for the runs refer to visually distinct bands
+      separate from that frosting. TD4 was the atmospheric test and is excluded.
+    common_frosting_locator:
+      published_page: 218
+      pdf_page_index: 242
+      section: '8.2'
+    runs:
+      blank:
+        exposure_and_handling:
+          report: Blank was run under vacuum with no sample. The shared high-vacuum method reports slow venting to atmospheric
+            pressure before removal and preservation of the reactor tube for analysis.
+          locator:
+            published_pages:
+            - 202
+            - 153
+            - 154
+            pdf_page_indices:
+            - 226
+            - 177
+            - 178
+          sample_removal:
+            state: unknown
+            reason: no_sample_was_present
+          vent_gas_identity:
+            state: unknown
+            reason: not_reported
+          air_contact_before_analysis:
+            state: unknown
+            reason: thesis_does_not_identify_vent_gas_or_state_that_the_deposit_was_exposed_to_air
+          exposure_duration:
+            state: unknown
+            reason: not_reported
+        wall:
+          observation: A light white deposit consisting of Si and O formed on the reactor tube in the vacuum blank; similar
+            white frosting occurred in the other vacuum tests.
+          phase_by_element:
+            Si: not_identified
+            O: not_identified
+          method: visual white frosting; EDS of common fractured/frosted areas identified Si, O, and C, without phase analysis
+          attribution: author says the predominantly fractured Si/O frosting is reasonably assumed to form from the reactor
+            itself under vacuum and high-temperature conditions; trace Na, K, and Cl in some areas suggest trace quantities
+            in the glass
+          locator:
+            published_pages:
+            - 202
+            - 206
+            - 207
+            - 218
+            pdf_page_indices:
+            - 226
+            - 230
+            - 231
+            - 242
+        other_surfaces:
+          collector:
+            state: unknown
+            reason: no_separate_collector_used; copper_cold_finger_was_in_an_unused_setup
+            locator:
+              published_page: 198
+              pdf_page_index: 222
+          shield:
+            state: unknown
+            reason: no_separate_shield_or_shield_deposit_reported
+            locator:
+              published_page: 200
+              pdf_page_index: 224
+          crucible:
+            state: unknown
+            reason: blank_has_no_feed_and_no_boat_deposit_is_reported
+            locator:
+              published_page: 203
+              pdf_page_index: 227
+          heater:
+            state: unknown
+            reason: no_heater_deposit_reported; described_findings_are_from_the_reactor_tube
+            locator:
+              published_page: 202
+              pdf_page_index: 226
+      td1-nanophase-iron-oxide:
+        exposure_and_handling:
+          report: 'TD1 was a high-vacuum test. The general fragment method was not used: TD1 deposit was collected as a smear
+            from inside the tube with a swab and transferred to a carbon microdot.'
+          locator:
+            published_pages:
+            - 202
+            - 204
+            - 205
+            pdf_page_indices:
+            - 226
+            - 228
+            - 229
+          venting:
+            state: value
+            value: 'Shared high-vacuum method: slow vent to atmospheric pressure using the vacuum-pump vent before removal.'
+          vent_gas_identity:
+            state: unknown
+            reason: not_reported
+          air_contact_before_analysis:
+            state: unknown
+            reason: thesis_does_not_identify_vent_gas_or_state_that_the_deposit_was_exposed_to_air
+          exposure_duration:
+            state: unknown
+            reason: not_reported
+        wall:
+          observation: Distinct brown/deep-red band at the end of the tube, angled where an external fan cooled the tube;
+            strong Fe and O with minor Zn, Ca, and P signals
+          phase_by_element:
+            Fe: not_identified
+            O: not_identified
+            Zn: not_identified
+            Ca: not_identified
+            P: not_identified
+          method: visual colour; BSE imaging and qualitative EDS/EDX on a smear/swab transferred to a carbon microdot
+          qualification: Minor Zn, Ca, and P are presumed by the author to be outside contamination associated with the smear
+            sampling; the swab method caused significantly more contamination than later fractured-glass analysis
+          locator:
+            published_pages:
+            - 204
+            - 205
+            pdf_page_indices:
+            - 228
+            - 229
+        other_surfaces:
+          collector:
+            state: unknown
+            reason: no_separate_collector_used; copper_cold_finger_was_in_an_unused_setup
+            locator:
+              published_page: 198
+              pdf_page_index: 222
+          shield:
+            state: unknown
+            reason: no_separate_shield_or_shield_deposit_reported
+            locator:
+              published_page: 200
+              pdf_page_index: 224
+          crucible:
+            state: unknown
+            reason: alumina_sample_boat_was_used_but_no_boat_deposit_is_reported
+            locator:
+              published_page: 202
+              pdf_page_index: 226
+          heater:
+            state: unknown
+            reason: no_heater_deposit_reported; described_findings_are_from_the_reactor_tube
+            locator:
+              published_page: 205
+              pdf_page_index: 229
+      td2-nanophase-iron-oxide:
+        exposure_and_handling:
+          report: TD2 was a high-vacuum test and used the updated reactor-fragment analysis procedure.
+          locator:
+            published_pages:
+            - 202
+            - 206
+            pdf_page_indices:
+            - 226
+            - 230
+          venting:
+            state: value
+            value: 'Shared high-vacuum method: slow vent to atmospheric pressure using the vacuum-pump vent before removal.'
+          vent_gas_identity:
+            state: unknown
+            reason: not_reported
+          air_contact_before_analysis:
+            state: unknown
+            reason: thesis_does_not_identify_vent_gas_or_state_that_the_deposit_was_exposed_to_air
+          exposure_duration:
+            state: unknown
+            reason: not_reported
+        deposit_fragment_method:
+          state: value
+          value: Reactor photographed and marked; tube carefully shattered in a plastic bag; selected glass fragments mounted
+            on aluminium and carbon coated before SEM/EDS.
+        deposit_fragment_method_locator:
+          published_page: 141
+          pdf_page_index: 165
+        wall:
+          observation: No significant Fe-related deposition band; common white fractured/frosted glass was present. A thin
+            layer containing trace Na and Cl occurred in some frosted areas.
+          phase_by_element:
+            Si: not_identified
+            O: not_identified
+            C: not_identified
+            Na: not_identified
+            Cl: not_identified
+          method: SEM imaging and EDS/EDX on reactor fragments
+          qualification: Na and Cl may have been concentrated from trace quantities in the glass; mechanism is unresolved
+            and the thesis says blank standard tests are needed to characterize reactor-related deposits
+          locator:
+            published_pages:
+            - 206
+            - 207
+            - 218
+            pdf_page_indices:
+            - 230
+            - 231
+            - 242
+        other_surfaces:
+          collector:
+            state: unknown
+            reason: no_separate_collector_used; copper_cold_finger_was_in_an_unused_setup
+            locator:
+              published_page: 198
+              pdf_page_index: 222
+          shield:
+            state: unknown
+            reason: no_separate_shield_or_shield_deposit_reported
+            locator:
+              published_page: 200
+              pdf_page_index: 224
+          crucible:
+            state: unknown
+            reason: alumina_sample_boat_was_used_but_no_boat_deposit_is_reported
+            locator:
+              published_page: 202
+              pdf_page_index: 226
+          heater:
+            state: unknown
+            reason: no_heater_deposit_reported; described_findings_are_from_the_reactor_tube
+            locator:
+              published_page: 207
+              pdf_page_index: 231
+      td3-ilmenite-concentrate:
+        exposure_and_handling:
+          report: TD3 was a high-vacuum test and followed the shared reactor handling method.
+          locator:
+            published_pages:
+            - 202
+            - 153
+            - 154
+            pdf_page_indices:
+            - 226
+            - 177
+            - 178
+          venting:
+            state: value
+            value: 'Shared high-vacuum method: slow vent to atmospheric pressure using the vacuum-pump vent before removal.'
+          vent_gas_identity:
+            state: unknown
+            reason: not_reported
+          air_contact_before_analysis:
+            state: unknown
+            reason: thesis_does_not_identify_vent_gas_or_state_that_the_deposit_was_exposed_to_air
+          exposure_duration:
+            state: unknown
+            reason: not_reported
+        deposit_fragment_method:
+          state: value
+          value: Standard reactor-fragment analysis; the TD1 smear technique was not used.
+        deposit_fragment_method_locator:
+          published_pages:
+          - 141
+          - 204
+          - 205
+          pdf_page_indices:
+          - 165
+          - 228
+          - 229
+        wall:
+          observation: Dark band at the tube end, with an initial faint band and intervening white frosting; strong Zn also
+            occurred outside the nanorod regions, with trace Pb, Cl, and K
+          phase_by_element:
+            Zn: oxide
+            O: oxide
+            Pb: not_identified
+            Cl: not_identified
+            K: not_identified
+          author_identification: The thesis calls the structures “ZnO nano-rods” and “nano-sized rods or filaments”; EDS indicated
+            Zn and O, but no XRD or other phase-specific method is reported.
+          method: visual dark band; SEM/SE and BSE imaging; qualitative EDS/EDX
+          qualification: Rods moved under the electron beam, displacing slightly and making high-resolution scans difficult
+          locator:
+            published_pages:
+            - 208
+            - 209
+            - 210
+            pdf_page_indices:
+            - 232
+            - 233
+            - 234
+        other_surfaces:
+          collector:
+            state: unknown
+            reason: no_separate_collector_used; copper_cold_finger_was_in_an_unused_setup
+            locator:
+              published_page: 198
+              pdf_page_index: 222
+          shield:
+            state: unknown
+            reason: no_separate_shield_or_shield_deposit_reported
+            locator:
+              published_page: 200
+              pdf_page_index: 224
+          crucible:
+            state: unknown
+            reason: alumina_sample_boat_was_used_but_no_boat_deposit_is_reported
+            locator:
+              published_page: 202
+              pdf_page_index: 226
+          heater:
+            state: unknown
+            reason: no_heater_deposit_reported; described_findings_are_from_the_reactor_tube
+            locator:
+              published_page: 209
+              pdf_page_index: 233
+      td4-lms1-atmosphere:
+        exposure_and_handling:
+          apparatus: For atmospheric testwork, the connector stayed attached to the cooling collar, the vacuum pump was detached,
+            and the reactor flange was left open.
+          locator:
+            published_page: 200
+            pdf_page_index: 224
+          vacuum_pump_venting:
+            state: unknown
+            reason: atmospheric_test_used_a_detached_pump_and_open_flange_not_the_vacuum_pump_vent_protocol
+          post_test_handling:
+            state: unknown
+            reason: not_reported_for_td4
+          air_contact_before_analysis:
+            state: unknown
+            reason: post_test_air_contact_not_reported_for_td4
+          exposure_duration:
+            state: unknown
+            reason: not_reported_for_td4
+          deposit_analysis: SEM and EDS analysis of this reactor tube was not conducted due to lack of condensate.
+          deposit_analysis_locator:
+            published_page: 210
+            pdf_page_index: 234
+        wall:
+          observation: No deposition band visible in the reactor tube; minor white discoloration on the reactor flange
+          phase_by_element:
+            state: unknown
+            reason: no composition analysis or phase identification was reported
+          method: colour/visual inspection only; SEM and EDS were not conducted due to lack of condensate
+          locator:
+            published_page: 210
+            pdf_page_index: 234
+        other_surfaces:
+          collector:
+            state: unknown
+            reason: no_separate_collector_used; copper_cold_finger_was_in_an_unused_setup
+            locator:
+              published_page: 198
+              pdf_page_index: 222
+          shield:
+            state: unknown
+            reason: no_separate_shield_or_shield_deposit_reported
+            locator:
+              published_page: 200
+              pdf_page_index: 224
+          crucible:
+            state: unknown
+            reason: alumina_sample_boat_was_used_but_no_boat_deposit_is_reported
+            locator:
+              published_page: 210
+              pdf_page_index: 234
+          heater:
+            state: unknown
+            reason: no_heater_deposit_reported; described_findings_are_from_the_reactor_tube
+            locator:
+              published_page: 210
+              pdf_page_index: 234
+      td5-lms1:
+        exposure_and_handling:
+          report: TD5 was a high-vacuum test and followed the shared reactor handling and standard fragment analysis methods.
+          locator:
+            published_pages:
+            - 202
+            - 153
+            - 154
+            - 141
+            pdf_page_indices:
+            - 226
+            - 177
+            - 178
+            - 165
+          venting:
+            state: value
+            value: 'Shared high-vacuum method: slow vent to atmospheric pressure using the vacuum-pump vent before removal.'
+          vent_gas_identity:
+            state: unknown
+            reason: not_reported
+          air_contact_before_analysis:
+            state: unknown
+            reason: thesis_does_not_identify_vent_gas_or_state_that_the_deposit_was_exposed_to_air
+          exposure_duration:
+            state: unknown
+            reason: not_reported
+        wall:
+          observation: 'Multiple faint bands: initial pink-hued (a), secondary faint (b), and brown after frosting (c).'
+          phase_by_element:
+            Na: not_identified
+            Cl: not_identified
+            K: not_identified
+            S: not_identified
+            O: not_identified
+            F: not_identified
+            P: not_identified
+            Pb: not_identified
+            Cu: not_identified
+            Mo: not_identified
+            Fe: not_identified
+          method: visual colour; SEM/SE and BSE imaging with qualitative EDS/EDX on selected fragments
+          zone_findings:
+            a: Crystal described as composed of O, Na, P, and Cu, with trace K; background was a very thin trace-Na layer
+              dominated by substrate Si and O. Small crystal clumps were reported as Na, Mo, O with trace P.
+            b: Consistent Na and Cl layer with trace F, Pb, and P; non-geometric zones had Na, K, and S or K, Cl, and Na.
+            c: Complex background of Na, Cl, Pb, and K with trace F and Fe; distinct crystals were described as composed of
+              K, Na, and Cl.
+          band_level_composition: The initial deposition band (a) was composed predominantly of Na, P, and Cu.
+          band_level_composition_locator:
+            published_page: 212
+            pdf_page_index: 236
+          distinct_crystals: Distinct crystals were composed of Na, P, and Mo.
+          distinct_crystals_locator:
+            published_page: 212
+            pdf_page_index: 236
+          band_level_method: SEM and EDS/EDX analysis of deposition zone (a)
+          qualification: The thesis reports elemental EDS findings; it does not identify these elemental combinations as salts,
+            oxides, or other compounds. Trace Fe may be background noise.
+          locator:
+            published_pages:
+            - 210
+            - 211
+            - 212
+            - 213
+            - 220
+            pdf_page_indices:
+            - 234
+            - 235
+            - 236
+            - 237
+            - 244
+        other_surfaces:
+          collector:
+            state: unknown
+            reason: no_separate_collector_used; copper_cold_finger_was_in_an_unused_setup
+            locator:
+              published_page: 198
+              pdf_page_index: 222
+          shield:
+            state: unknown
+            reason: no_separate_shield_or_shield_deposit_reported
+            locator:
+              published_page: 200
+              pdf_page_index: 224
+          crucible:
+            state: unknown
+            reason: alumina_sample_boat_was_used_but_no_boat_deposit_is_reported
+            locator:
+              published_page: 202
+              pdf_page_index: 226
+          heater:
+            state: unknown
+            reason: no_heater_deposit_reported; described_findings_are_from_the_reactor_tube
+            locator:
+              published_page: 212
+              pdf_page_index: 236
+      td6-lms1:
+        exposure_and_handling:
+          report: TD6 was a high-vacuum test and followed the shared reactor handling and standard fragment analysis methods.
+          locator:
+            published_pages:
+            - 202
+            - 153
+            - 154
+            - 141
+            pdf_page_indices:
+            - 226
+            - 177
+            - 178
+            - 165
+          venting:
+            state: value
+            value: 'Shared high-vacuum method: slow vent to atmospheric pressure using the vacuum-pump vent before removal.'
+          vent_gas_identity:
+            state: unknown
+            reason: not_reported
+          air_contact_before_analysis:
+            state: unknown
+            reason: thesis_does_not_identify_vent_gas_or_state_that_the_deposit_was_exposed_to_air
+          exposure_duration:
+            state: unknown
+            reason: not_reported
+        wall:
+          observation: White initial band (a) and faint brown band (b) with visible crystals
+          phase_by_element:
+            Na: not_identified
+            O: not_identified
+            P: not_identified
+            Cu: not_identified
+            Cl: not_identified
+            K: not_identified
+            Mo: not_identified
+            S: not_identified
+            Pb: not_identified
+          method: visual colour; SEM/SE and qualitative EDS/EDX
+          zone_findings:
+            b: Crystals were described as composed of Na, O, and P with trace Cu; background had trace Na and Cu and was very
+              thin, with substrate Si and O signals predominant.
+            a: Additional crystals were reported as composed of Na and O according to EDS.
+          qualification: No phase-specific identification is reported; Na/O and Na/O/P are elemental results, not confirmed
+            oxide or phosphate phases.
+          locator:
+            published_pages:
+            - 213
+            - 214
+            pdf_page_indices:
+            - 237
+            - 238
+        other_surfaces:
+          collector:
+            state: unknown
+            reason: no_separate_collector_used; copper_cold_finger_was_in_an_unused_setup
+            locator:
+              published_page: 198
+              pdf_page_index: 222
+          shield:
+            state: unknown
+            reason: no_separate_shield_or_shield_deposit_reported
+            locator:
+              published_page: 200
+              pdf_page_index: 224
+          crucible:
+            state: unknown
+            reason: alumina_sample_boat_was_used_but_no_boat_deposit_is_reported
+            locator:
+              published_page: 202
+              pdf_page_index: 226
+          heater:
+            state: unknown
+            reason: no_heater_deposit_reported; described_findings_are_from_the_reactor_tube
+            locator:
+              published_page: 214
+              pdf_page_index: 238
+      td7-reacted-td6-feed:
+        exposure_and_handling:
+          report: TD7 was a high-vacuum test and followed the shared reactor handling and standard fragment analysis methods.
+          locator:
+            published_pages:
+            - 202
+            - 153
+            - 154
+            - 141
+            pdf_page_indices:
+            - 226
+            - 177
+            - 178
+            - 165
+          venting:
+            state: value
+            value: 'Shared high-vacuum method: slow vent to atmospheric pressure using the vacuum-pump vent before removal.'
+          vent_gas_identity:
+            state: unknown
+            reason: not_reported
+          air_contact_before_analysis:
+            state: unknown
+            reason: thesis_does_not_identify_vent_gas_or_state_that_the_deposit_was_exposed_to_air
+          exposure_duration:
+            state: unknown
+            reason: not_reported
+        wall:
+          observation: Wide, faint pink, very thin band; deposit appeared lumpy rather than clean reactor glass, with no significant
+            crystal structures
+          phase_by_element:
+            Na: not_identified
+            Cu: not_identified
+            Si: not_identified
+            O: not_identified
+          method: visual colour; SEM/SE and BSE imaging; EDS/EDX scans targeted a large lump at high magnification
+          scan_duration_min: 5
+          findings: EDS signal was predominantly substrate Si and O; trace Na and potentially Cu were detected consistently
+            across multiple regions and sizes. The author considers Na may have been present along the whole deposition area;
+            duration and nucleation are discussed as possible explanations.
+          locator:
+            published_pages:
+            - 215
+            - 216
+            - 217
+            - 220
+            pdf_page_indices:
+            - 239
+            - 240
+            - 241
+            - 244
+        other_surfaces:
+          collector:
+            state: unknown
+            reason: no_separate_collector_used; copper_cold_finger_was_in_an_unused_setup
+            locator:
+              published_page: 198
+              pdf_page_index: 222
+          shield:
+            state: unknown
+            reason: no_separate_shield_or_shield_deposit_reported
+            locator:
+              published_page: 200
+              pdf_page_index: 224
+          crucible:
+            state: unknown
+            reason: alumina_sample_boat_was_used_but_no_boat_deposit_is_reported
+            locator:
+              published_page: 202
+              pdf_page_index: 226
+          heater:
+            state: unknown
+            reason: no_heater_deposit_reported; described_findings_are_from_the_reactor_tube
+            locator:
+              published_page: 216
+              pdf_page_index: 240
+  context_id: shaw-2023-vacuum-thermal-sublimation-thesis::context::shaw_2023_ch8_deposit_surface_inventory
+  work_id: 10.25916/sut.26297335.v1
+  source_id: shaw-2023-vacuum-thermal-sublimation-thesis
+  species: vacuum_reactor_blank
+- observation_id: shaw_2023_ch8_mass_measurement_limits
+  type: method
+  locator:
+    published_page: 203
+    pdf_page_index: 227
+    section: '8.2'
+  units: as printed; mass difference bound
+  values:
+    quantity: mass_loss_and_condensate_measurement_limits
+    method_class: method_only
+    mass_loss_semantics: Each sample's calculated mass loss was smaller than estimated error and was deemed insignificant
+    mass_loss_bound:
+      semantics: bound_not_point
+      upper_bound:
+        state: unknown
+        reason: estimated error magnitude not numerically reported
+    balance_resolution:
+      state: unknown
+      reason: not_reported_for_chapter_8_test
+    condensate_mass_semantics: Reactor tube was weighed in an early test; mass difference was below estimated error; condensate
+      bands were thin films
+    condensate_mass_bound:
+      semantics: bound_not_point
+      upper_bound:
+        state: unknown
+        reason: estimated error magnitude not numerically reported
+    condensate_balance_resolution:
+      state: unknown
+      reason: not_reported_for_chapter_8_test
+    run_assignment:
+      state: unknown
+      reason: early weighed reactor tube not assigned to a specific test
+  context_id: shaw-2023-vacuum-thermal-sublimation-thesis::context::shaw_2023_ch8_mass_measurement_limits
+  work_id: 10.25916/sut.26297335.v1
+  source_id: shaw-2023-vacuum-thermal-sublimation-thesis
+  species: vacuum_reactor_blank
+- observation_id: shaw_2023_ch8_sample_preparation
+  type: method
+  locator:
+    published_page: 152
+    pdf_page_index: 176
+    section: 5.4.4
+  units: as printed
+  values:
+    quantity: vacuum_test_sample_preparation
+    method_class: method_only
+    applies_to: Sample preparation applies to nonblank Chapter 8 tests; the vacuum venting procedure applies only to high-vacuum
+      runs and excludes atmospheric TD4
+    approximate_feed_mass_g: '2.6'
+    printed_sample_form: Sample was pressed in a 13 mm diameter steel die for 5 minutes at 9 tons; feed dried in an alumina
+      boat at 150 C for at least 2 hours
+    common_heating_schedule: Electrical furnace heated to 900 C; in most tests the apparatus then degassed/pumped overnight
+      for about 18 hours before solar-simulator heating; Table 8.1 gives each run's Temp High and Temp High Duration
+    solar_temperature_range_as_general_method: about 1000 to 1150 C for 2 to 6 hours in most experiments; each test's printed
+      value is retained on its own result row
+    total_O2_collected:
+      state: unknown
+      reason: no molecular O2 collection or measurement reported
+    oxygen_measurement_calibration:
+      state: unknown
+      reason: no O2 measurement or calibration reported; deposit oxygen was qualitative EDS/EDX only
+    table_8_1_form_difference: TD1 is printed as Loose material in Table 8.1, while §8.2 says it was pressed into a pellet
+      and that pressed pellets were used for all tests
+    pellet_height_or_exposed_area:
+      state: unknown
+      reason: not_reported
+    exposure_before_removal:
+      state: value
+      value: For the high-vacuum tests, the reactor was vented slowly to atmospheric pressure using the vacuum-pump vent before
+        sample removal
+    air_contact_before_analysis:
+      state: unknown
+      reason: thesis_does_not_identify_vent_gas_or_state_that_the_deposit_was_exposed_to_air
+    exposure_duration:
+      state: unknown
+      reason: not_reported
+    vent_gas_identity:
+      state: unknown
+      reason: not_reported
+    reactor_handling: 'For high-vacuum tests: reactor cooled naturally under vacuum; once below 300 C, it was moved from the
+      furnace and allowed to air cool; before sample removal it was slowly vented to atmospheric pressure, the vacuum extension
+      pipe disconnected, boat removed, cooling collar undone, and reactor tube with deposits preserved for analysis'
+    deposit_analysis_handling: For runs subjected to SEM/EDX, the standard fragment procedure photographed and marked the
+      reactor, carefully shattered it in a thick plastic bag, mounted selected glass fragments on aluminium with conductive
+      carbon/graphite dag, then carbon coated the fragments. TD1 is the stated exception and used a smear sample; TD4 had
+      no SEM/EDS analysis.
+    reactor_moved_from_furnace_below_C: 300
+    high_temperature_definition: reactor temperature greater than 1000 C; low-temperature duration covered bake-out and time
+      between solar-simulator pulses
+    high_temperature_definition_locator:
+      published_page: 154
+      pdf_page_index: 178
+      section: '5.4'
+    reactor_cooling_locator:
+      published_page: 153
+      pdf_page_index: 177
+      section: '5.4'
+    exposure_protocol_locators:
+      vacuum_test_scope:
+        published_page: 202
+        pdf_page_index: 226
+        section: '8.2'
+      venting_and_removal:
+        published_page: 153
+        pdf_page_index: 177
+        section: '5.4'
+      tube_preservation_and_removal:
+        published_page: 154
+        pdf_page_index: 178
+        section: '5.4'
+      fracture_mounting_and_coating:
+        published_page: 141
+        pdf_page_index: 165
+        section: 5.1.4
+  context_id: shaw-2023-vacuum-thermal-sublimation-thesis::context::shaw_2023_ch8_sample_preparation
+  work_id: 10.25916/sut.26297335.v1
+  source_id: shaw-2023-vacuum-thermal-sublimation-thesis
+  species: vacuum_reactor_blank
+- observation_id: shaw_2023_lms1_trace_composition_as_cited
+  type: composition
+  locator:
+    published_page: 218
+    pdf_page_index: 242
+    section: '8.2'
+    table: '8.2'
+    note: Text below Table 8.2 quotes LMS-1 material specification sheet [53]
+  units: as cited in material specification sheet
+  values:
+    record_kind: quoted_feedstock_trace_composition
+    method_class: quoted_source
+    basis: LMS-1 material specification sheet cited as reference 53; not a post-test residue assay
+    Na2O_wt_pct: '1.7'
+    K2O_wt_pct: '0.7'
+    Cl_wt_pct:
+      kind: bound
+      bound_operator: '>'
+      bound_value: '0.008'
+    P2O5_wt_pct: '0.2'
+    SO3_wt_pct:
+      kind: bound
+      bound_operator: '>'
+      bound_value: '0.01'
+    Pb_ppm: 15
+    Cu_ppm: 26
+    Mo_ppm: 8
+  context_id: shaw-2023-vacuum-thermal-sublimation-thesis::context::shaw_2023_lms1_trace_composition_as_cited
+  work_id: 10.25916/sut.26297335.v1
+  source_id: shaw-2023-vacuum-thermal-sublimation-thesis
+  species: LMS-1
+- observation_id: shaw_2023_table75_hkl_fe
+  type: thermodynamic_example
+  locator:
+    table: '7.5'
+    published_page: 182
+    pdf_page_index: 206
+  units: mol s-1 m-2
+  values:
+    quantity: author_calculated_evaporation_flux
+    method_class: calculated
+    quantity_token_needed: evaporation_flux_per_area_mol_s_m2 (no matching quantity in current schema)
+    model: Hertz-Knudsen-Langmuir vacuum evaporation equation 7.1
+    inputs: 'FactSage 8.2 saturated vapor pressures for the Apollo #12022 feed system named in Table 7.5; molar mass of Fe;
+      gas constant; absolute temperature converted from printed Celsius'
+    assumptions: evaporation coefficient ae = 1; condensation term omitted for Langmuir evaporation at pressure much less
+      than saturation pressure; best-case flux
+    equation: J_i = ae * p_i,sat / sqrt(2 * pi * R * M_i * T); the condensation term is omitted for vacuum Langmuir evaporation
+    vapor_pressure_source: 'FactSage 8.2 fixed-volume thermochemical model, 100 g Apollo #12022 feed system in 1 L as described
+      with Tables 7.4–7.5; FACTPS, FTOxid, FSstel databases'
+    rows:
+    - temperature_C: 800
+      vapor_pressure_atm: '0.00000000000056'
+      evaporation_flux_mol_s_m2: '0.000000000032'
+    - temperature_C: 900
+      vapor_pressure_atm: '0.000000000025'
+      evaporation_flux_mol_s_m2: '0.0000000014'
+    - temperature_C: 1000
+      vapor_pressure_atm: '0.0000000006'
+      evaporation_flux_mol_s_m2: '0.000000031'
+    - temperature_C: 1050
+      vapor_pressure_atm: '0.0000000025'
+      evaporation_flux_mol_s_m2: '0.00000013'
+    - temperature_C: 1100
+      vapor_pressure_atm: '0.0000000091'
+      evaporation_flux_mol_s_m2: '0.00000046'
+    - temperature_C: 1150
+      vapor_pressure_atm: '0.00000003'
+      evaporation_flux_mol_s_m2: '0.0000015'
+    - temperature_C: 1200
+      vapor_pressure_atm: '0.000000094'
+      evaporation_flux_mol_s_m2: '0.0000046'
+  context_id: shaw-2023-vacuum-thermal-sublimation-thesis::context::shaw_2023_table75_hkl_fe
+  work_id: 10.25916/sut.26297335.v1
+  source_id: shaw-2023-vacuum-thermal-sublimation-thesis
+  species: Fe
+- observation_id: shaw_2023_table75_hkl_k
+  type: thermodynamic_example
+  locator:
+    table: '7.5'
+    published_page: 182
+    pdf_page_index: 206
+  units: mol s-1 m-2
+  values:
+    quantity: author_calculated_evaporation_flux
+    method_class: calculated
+    quantity_token_needed: evaporation_flux_per_area_mol_s_m2 (no matching quantity in current schema)
+    model: Hertz-Knudsen-Langmuir vacuum evaporation equation 7.1
+    inputs: 'FactSage 8.2 saturated vapor pressures for the Apollo #12022 feed system named in Table 7.5; molar mass of K;
+      gas constant; absolute temperature converted from printed Celsius'
+    assumptions: evaporation coefficient ae = 1; condensation term omitted for Langmuir evaporation at pressure much less
+      than saturation pressure; best-case flux
+    equation: J_i = ae * p_i,sat / sqrt(2 * pi * R * M_i * T); the condensation term is omitted for vacuum Langmuir evaporation
+    vapor_pressure_source: 'FactSage 8.2 fixed-volume thermochemical model, 100 g Apollo #12022 feed in 1 L as described with
+      Tables 7.4–7.5; FACTPS, FTOxid, FSstel databases'
+    rows:
+    - temperature_C: 800
+      vapor_pressure_atm: '0.000000000031'
+      evaporation_flux_mol_s_m2: '0.0000000021'
+    - temperature_C: 900
+      vapor_pressure_atm: '0.00000000091'
+      evaporation_flux_mol_s_m2: '0.00000006'
+    - temperature_C: 1000
+      vapor_pressure_atm: '0.000000015'
+      evaporation_flux_mol_s_m2: '0.00000097'
+    - temperature_C: 1050
+      vapor_pressure_atm: '0.000000054'
+      evaporation_flux_mol_s_m2: '0.0000033'
+    - temperature_C: 1100
+      vapor_pressure_atm: '0.00000017'
+      evaporation_flux_mol_s_m2: '0.00001'
+    - temperature_C: 1150
+      vapor_pressure_atm: '0.0000005'
+      evaporation_flux_mol_s_m2: '0.00003'
+    - temperature_C: 1200
+      vapor_pressure_atm: '0.0000014'
+      evaporation_flux_mol_s_m2: '0.00008'
+  context_id: shaw-2023-vacuum-thermal-sublimation-thesis::context::shaw_2023_table75_hkl_k
+  work_id: 10.25916/sut.26297335.v1
+  source_id: shaw-2023-vacuum-thermal-sublimation-thesis
+  species: K
+- observation_id: shaw_2023_table75_hkl_na
+  type: thermodynamic_example
+  locator:
+    table: '7.5'
+    published_page: 182
+    pdf_page_index: 206
+  units: mol s-1 m-2
+  values:
+    quantity: author_calculated_evaporation_flux
+    method_class: calculated
+    quantity_token_needed: evaporation_flux_per_area_mol_s_m2 (no matching quantity in current schema)
+    model: Hertz-Knudsen-Langmuir vacuum evaporation equation 7.1
+    inputs: 'FactSage 8.2 saturated vapor pressures for the Apollo #12022 feed system named in Table 7.5; molar mass of Na;
+      gas constant; absolute temperature converted from printed Celsius'
+    assumptions: evaporation coefficient ae = 1; condensation term omitted for Langmuir evaporation at pressure much less
+      than saturation pressure; best-case flux
+    equation: J_i = ae * p_i,sat / sqrt(2 * pi * R * M_i * T); the condensation term is omitted for vacuum Langmuir evaporation
+    vapor_pressure_source: 'FactSage 8.2 fixed-volume thermochemical model, 100 g Apollo #12022 feed in 1 L as described with
+      Tables 7.4–7.5; FACTPS, FTOxid, FSstel databases'
+    rows:
+    - temperature_C: 800
+      vapor_pressure_atm: '0.000000000038'
+      evaporation_flux_mol_s_m2: '0.0000000034'
+    - temperature_C: 900
+      vapor_pressure_atm: '0.00000000096'
+      evaporation_flux_mol_s_m2: '0.000000082'
+    - temperature_C: 1000
+      vapor_pressure_atm: '0.000000019'
+      evaporation_flux_mol_s_m2: '0.0000016'
+    - temperature_C: 1050
+      vapor_pressure_atm: '0.000000073'
+      evaporation_flux_mol_s_m2: '0.0000059'
+    - temperature_C: 1100
+      vapor_pressure_atm: '0.00000026'
+      evaporation_flux_mol_s_m2: '0.00002'
+    - temperature_C: 1150
+      vapor_pressure_atm: '0.00000081'
+      evaporation_flux_mol_s_m2: '0.000063'
+    - temperature_C: 1200
+      vapor_pressure_atm: '0.0000024'
+      evaporation_flux_mol_s_m2: '0.00018'
+  context_id: shaw-2023-vacuum-thermal-sublimation-thesis::context::shaw_2023_table75_hkl_na
+  work_id: 10.25916/sut.26297335.v1
+  source_id: shaw-2023-vacuum-thermal-sublimation-thesis
+  species: Na
+- observation_id: shaw_2023_td1_results
+  experiment: td1-nanophase-iron-oxide
+  type: composition
+  locator:
+    table: '8.2'
+    published_page: 218
+    pdf_page_index: 242
+    section: '8.2'
+    figure: 8.4-8.5
+  units: qualitative EDS elemental findings
+  values:
+    record_kind: deposit_findings_as_printed
+    quantity_token_needed: elemental_deposit_composition_by_surface
+    phase_token_needed: deposit_phase_by_element
+    method_class: measured_direct
+    elements_in_distinct_deposit_as_printed:
+    - Fe
+    - O
+    deposit_location: Distinct brown/deep red band on the reactor tube; sample taken by smear/swab from inside tube
+    deposit_phase_by_element:
+      state: unknown
+      reason: Qualitative EDS establishes elements, not phase
+    identification: SEM and qualitative EDS/EDX of a carbon-microdot smear sample
+    oxygen_gas:
+      state: unknown
+      reason: no molecular O2 collection or measurement reported
+    saw_air_before_analysis:
+      state: unknown
+      reason: reactor_was_vented_slowly_to_atmospheric_pressure_via_vacuum_pump_before_sample_removal; post_test_air_contact_and_duration_not_reported
+    collector_or_shield_deposit:
+      state: unknown
+      reason: not_reported
+    mass_loss:
+      semantics: bound_not_point
+      result: below estimated error
+      numeric_error_bound:
+        state: unknown
+        reason: not_reported
+      balance_resolution:
+        state: unknown
+        reason: not_reported_for_chapter_8_test
+    mass_vaporized_by_element:
+      state: unknown
+      reason: not_reported
+    residue_composition:
+      state: unknown
+      reason: not_reported
+  context_id: shaw-2023-vacuum-thermal-sublimation-thesis::context::shaw_2023_td1_results
+  work_id: 10.25916/sut.26297335.v1
+  source_id: shaw-2023-vacuum-thermal-sublimation-thesis
+  species: FeO/Fe2O3
+- observation_id: shaw_2023_td2_results
+  experiment: td2-nanophase-iron-oxide
+  type: composition
+  locator:
+    table: '8.2'
+    published_page: 218
+    pdf_page_index: 242
+    section: '8.2'
+    figure: 8.6-8.8
+  units: qualitative EDS elemental findings
+  values:
+    record_kind: deposit_findings_as_printed
+    quantity_token_needed: elemental_deposit_composition_by_surface
+    phase_token_needed: deposit_phase_by_element
+    method_class: measured_direct
+    elements_in_distinct_deposit_as_printed: None
+    deposit_location: No significant Fe-related deposition band; general white frosting on reactor glass
+    deposit_phase_by_element:
+      state: unknown
+      reason: No distinct deposit elements reported
+    identification: SEM and EDS/EDX of selected reactor fragments
+    oxygen_gas:
+      state: unknown
+      reason: no molecular O2 collection or measurement reported
+    saw_air_before_analysis:
+      state: unknown
+      reason: reactor_was_vented_to_atmospheric_pressure_before_removal_but_vent_gas_air_contact_and_duration_are_not_stated
+    collector_or_shield_deposit:
+      state: unknown
+      reason: not_reported
+    mass_loss:
+      semantics: bound_not_point
+      result: below estimated error
+      numeric_error_bound:
+        state: unknown
+        reason: not_reported
+      balance_resolution:
+        state: unknown
+        reason: not_reported_for_chapter_8_test
+    mass_vaporized_by_element:
+      state: unknown
+      reason: not_reported
+    residue_composition:
+      state: unknown
+      reason: not_reported
+  context_id: shaw-2023-vacuum-thermal-sublimation-thesis::context::shaw_2023_td2_results
+  work_id: 10.25916/sut.26297335.v1
+  source_id: shaw-2023-vacuum-thermal-sublimation-thesis
+  species: FeO/Fe2O3
+- observation_id: shaw_2023_td3_results
+  experiment: td3-ilmenite-concentrate
+  type: composition
+  locator:
+    table: '8.2'
+    published_page: 218
+    pdf_page_index: 242
+    section: '8.2'
+    figure: 8.9-8.11
+  units: qualitative EDS elemental findings
+  values:
+    record_kind: deposit_findings_as_printed
+    quantity_token_needed: elemental_deposit_composition_by_surface
+    phase_token_needed: deposit_phase_by_element
+    method_class: measured_direct
+    elements_in_distinct_deposit_as_printed:
+    - Zn
+    - O
+    deposit_location: Dark brown reactor-tube deposition band; ZnO nanorods reported in clusters in analyzed regions
+    phase_as_named_by_author: ZnO nanorods
+    phase_identification_method: SEM and EDS/EDX show morphology and elemental Zn/O; no XRD or other phase-specific analysis
+      reported
+    deposit_phase_by_element:
+      state: unknown
+      reason: EDS identifies elements; no phase-specific identification method is reported
+    identification: SEM imaging and qualitative EDS/EDX; feed and residue also analyzed by XRF
+    oxygen_gas:
+      state: unknown
+      reason: no molecular O2 collection or measurement reported
+    saw_air_before_analysis:
+      state: unknown
+      reason: reactor_was_vented_to_atmospheric_pressure_before_removal_but_vent_gas_air_contact_and_duration_are_not_stated
+    collector_or_shield_deposit:
+      state: unknown
+      reason: not_reported
+    mass_loss:
+      semantics: bound_not_point
+      result: below estimated error
+      numeric_error_bound:
+        state: unknown
+        reason: not_reported
+      balance_resolution:
+        state: unknown
+        reason: not_reported_for_chapter_8_test
+    Zn_fraction_sublimated_pct:
+      value_as_printed: ~82%
+      method_class: calculated
+      method: XRF analysis of post-test residue; calculation details not reported
+    feed_composition:
+      Zn_wt_pct: '0.028'
+      basis: feed-material XRF after test; impurity present as gangue mineral phases
+    residue_composition:
+      state: unknown
+      reason: post_test_residue_Zn_concentration_not_reported
+  context_id: shaw-2023-vacuum-thermal-sublimation-thesis::context::shaw_2023_td3_results
+  work_id: 10.25916/sut.26297335.v1
+  source_id: shaw-2023-vacuum-thermal-sublimation-thesis
+  species: Ilmenite
+- observation_id: shaw_2023_td4_results
+  experiment: td4-lms1-atmosphere
+  type: composition
+  locator:
+    table: '8.2'
+    published_page: 218
+    pdf_page_index: 242
+    section: '8.2'
+    figure: '8.12'
+  units: qualitative EDS elemental findings
+  values:
+    record_kind: deposit_findings_as_printed
+    quantity_token_needed: elemental_deposit_composition_by_surface
+    phase_token_needed: deposit_phase_by_element
+    method_class: measured_direct
+    elements_in_distinct_deposit_as_printed: None
+    deposit_location: No deposition band in reactor tube; minor white discoloration on the reactor flange
+    deposit_phase_by_element:
+      state: unknown
+      reason: no deposit composition reported
+    identification: Visual observation; reactor-tube SEM/EDS not performed
+    oxygen_gas:
+      state: unknown
+      reason: no molecular O2 collection or measurement reported
+    saw_air_before_analysis:
+      state: unknown
+      reason: TD4_ran_at_atmospheric_pressure_with_pump_detached_and_reactor_flange_open; post_test_air_contact_and_duration_not_reported
+    collector_or_shield_deposit:
+      state: unknown
+      reason: not_reported
+    mass_loss:
+      semantics: bound_not_point
+      result: below estimated error
+      numeric_error_bound:
+        state: unknown
+        reason: not_reported
+      balance_resolution:
+        state: unknown
+        reason: not_reported_for_chapter_8_test
+    mass_vaporized_by_element:
+      state: unknown
+      reason: not_reported
+    residue_composition:
+      state: unknown
+      reason: not_reported
+  context_id: shaw-2023-vacuum-thermal-sublimation-thesis::context::shaw_2023_td4_results
+  work_id: 10.25916/sut.26297335.v1
+  source_id: shaw-2023-vacuum-thermal-sublimation-thesis
+  species: LMS-1
+- observation_id: shaw_2023_td5_results
+  experiment: td5-lms1
+  type: composition
+  locator:
+    table: '8.2'
+    published_page: 218
+    pdf_page_index: 242
+    section: '8.2'
+    figure: 8.13-8.15
+  units: qualitative EDS elemental findings
+  values:
+    record_kind: deposit_findings_as_printed
+    quantity_token_needed: elemental_deposit_composition_by_surface
+    phase_token_needed: deposit_phase_by_element
+    method_class: measured_direct
+    deposit_location: Multiple faint bands on reactor tube; initial pink line, secondary faint band, and brown band after
+      reactor frosting
+    distinct_crystal_or_layer_elements_as_printed:
+    - Na
+    - Cl
+    - K
+    - S
+    - O
+    trace_elements_as_printed:
+    - F
+    - P
+    - Pb
+    - Cu
+    figure_8_14_crystal:
+    - K
+    - Cl
+    figure_8_14_background:
+    - Na
+    - Cl
+    - K
+    - Pb_trace
+    figure_8_15_area:
+    - O
+    - Na
+    - P
+    - Cu
+    - K_trace
+    deposit_phase_by_element:
+      state: unknown
+      reason: EDS gives elemental composition; no phase-specific identification reported
+    identification: SEM and qualitative EDS/EDX; selected tube fragments analyzed
+    oxygen_gas:
+      state: unknown
+      reason: no molecular O2 collection or measurement reported
+    saw_air_before_analysis:
+      state: unknown
+      reason: reactor_was_vented_to_atmospheric_pressure_before_removal_but_vent_gas_air_contact_and_duration_are_not_stated
+    collector_or_shield_deposit:
+      state: unknown
+      reason: not_reported
+    mass_loss:
+      semantics: bound_not_point
+      result: below estimated error
+      numeric_error_bound:
+        state: unknown
+        reason: not_reported
+      balance_resolution:
+        state: unknown
+        reason: not_reported_for_chapter_8_test
+    mass_vaporized_by_element:
+      state: unknown
+      reason: not_reported
+    residue_composition:
+      state: unknown
+      reason: not_reported
+  context_id: shaw-2023-vacuum-thermal-sublimation-thesis::context::shaw_2023_td5_results
+  work_id: 10.25916/sut.26297335.v1
+  source_id: shaw-2023-vacuum-thermal-sublimation-thesis
+  species: LMS-1
+- observation_id: shaw_2023_td6_results
+  experiment: td6-lms1
+  type: composition
+  locator:
+    table: '8.2'
+    published_page: 218
+    pdf_page_index: 242
+    section: '8.2'
+    figure: 8.16-8.18
+  units: qualitative EDS elemental findings
+  values:
+    record_kind: deposit_findings_as_printed
+    quantity_token_needed: elemental_deposit_composition_by_surface
+    phase_token_needed: deposit_phase_by_element
+    method_class: measured_direct
+    deposit_location: Multiple faint reactor-tube bands; initial white band and faint brown band with visible crystals
+    distinct_crystal_or_layer_elements_as_printed:
+    - Na
+    - Cl
+    - K
+    - O
+    - Mo
+    trace_elements_as_printed:
+    - S
+    - P
+    - Pb
+    - Cu
+    figure_8_17_crystal:
+    - Na
+    - O
+    - P
+    - Cu_trace
+    figure_8_17_background:
+    - Na_trace
+    - Cu_trace
+    deposit_phase_by_element:
+      state: unknown
+      reason: EDS gives elemental composition; no phase-specific identification reported
+    identification: SEM and qualitative EDS/EDX; selected tube fragments analyzed
+    oxygen_gas:
+      state: unknown
+      reason: no molecular O2 collection or measurement reported
+    saw_air_before_analysis:
+      state: unknown
+      reason: reactor_was_vented_to_atmospheric_pressure_before_removal_but_vent_gas_air_contact_and_duration_are_not_stated
+    collector_or_shield_deposit:
+      state: unknown
+      reason: not_reported
+    mass_loss:
+      semantics: bound_not_point
+      result: below estimated error
+      numeric_error_bound:
+        state: unknown
+        reason: not_reported
+      balance_resolution:
+        state: unknown
+        reason: not_reported_for_chapter_8_test
+    mass_vaporized_by_element:
+      state: unknown
+      reason: not_reported
+    residue_composition:
+      state: unknown
+      reason: not_reported
+  context_id: shaw-2023-vacuum-thermal-sublimation-thesis::context::shaw_2023_td6_results
+  work_id: 10.25916/sut.26297335.v1
+  source_id: shaw-2023-vacuum-thermal-sublimation-thesis
+  species: LMS-1
+- observation_id: shaw_2023_td7_results
+  experiment: td7-reacted-td6-feed
+  type: composition
+  locator:
+    table: '8.2'
+    published_page: 218
+    pdf_page_index: 242
+    section: '8.2'
+    figure: 8.19-8.21
+  units: qualitative EDS elemental findings
+  values:
+    record_kind: deposit_findings_as_printed
+    quantity_token_needed: elemental_deposit_composition_by_surface
+    phase_token_needed: deposit_phase_by_element
+    method_class: measured_direct
+    deposit_location: Thick faint pink band on reactor tube
+    elements_in_distinct_deposit_as_printed:
+    - Na
+    - Cu
+    EDS_note: Almost below detection limit of EDX scan; predominant reading was Si and O background
+    deposit_phase_by_element:
+      state: unknown
+      reason: EDS gives elements near detection limit; no phase-specific identification reported
+    identification: SEM imaging and qualitative EDS/EDX
+    oxygen_gas:
+      state: unknown
+      reason: no molecular O2 collection or measurement reported
+    saw_air_before_analysis:
+      state: unknown
+      reason: reactor_was_vented_to_atmospheric_pressure_before_removal_but_vent_gas_air_contact_and_duration_are_not_stated
+    collector_or_shield_deposit:
+      state: unknown
+      reason: not_reported
+    mass_loss:
+      semantics: bound_not_point
+      result: below estimated error
+      numeric_error_bound:
+        state: unknown
+        reason: not_reported
+      balance_resolution:
+        state: unknown
+        reason: not_reported_for_chapter_8_test
+    mass_vaporized_by_element:
+      state: unknown
+      reason: not_reported
+    residue_composition:
+      state: unknown
+      reason: not_reported
+  context_id: shaw-2023-vacuum-thermal-sublimation-thesis::context::shaw_2023_td7_results
+  work_id: 10.25916/sut.26297335.v1
+  source_id: shaw-2023-vacuum-thermal-sublimation-thesis
+  species: LMS-1
+- observation_id: shaw_2023_unextracted_ch7_ch8_visual_data_index
+  type: method
+  locator:
+    section: Table of Contents
+    note: List of Figures and List of Tables, printed pages xii-xxii
+  units: Table/figure ID and printed page; this index lists only material not extracted. Full images and spectra are not reproduced;
+    findings already described in the extract are identified in the notes.
+  values:
+    quantity: other_chapter_7_8_tables_and_figures_with_unextracted_data
+    method_class: method_only
+    tables:
+    - id: '7.1'
+      page: 168
+      note: First-stage sintering test IDs and conditions
+    - id: '7.2'
+      page: 171
+      note: Vacuum sintering parameters
+    - id: '7.3'
+      page: 174
+      note: Sintered-sample quantitative phase analysis
+    - id: '7.4'
+      page: 177
+      note: Apollo 12022 composition used in vapour-pressure calculations
+    - id: '7.6'
+      page: 186
+      note: Operational notes for vertical sintering run
+    - id: '7.7'
+      page: 187
+      note: Thermocouple coordinates and locations
+    - id: '7.8'
+      page: 188
+      note: Equilibrium temperatures in heated simulant bed
+    - id: '7.9'
+      page: 189
+      note: EPMA device parameters
+    figures:
+    - id: '7.1'
+      page: 168
+      note: Feed and sintered-sample micrographs
+    - id: '7.2'
+      page: 169
+      note: Micrographs comparing sintering hold/form
+    - id: '7.3'
+      page: 170
+      note: Sintering mass loss and shrinkage
+    - id: '7.4'
+      page: 172
+      note: EPMA maps of V3/V4 sinter samples
+    - id: '7.5'
+      page: 172
+      note: EPMA maps of V9/V6 sinter samples
+    - id: '7.6'
+      page: 172
+      note: EPMA maps of V11/V12; Fe along pores
+    - id: '7.7'
+      page: 173
+      note: V12 sinter assembly after test
+    - id: '7.8'
+      page: 175
+      note: BET pressure data and linear fit
+    - id: '7.9'
+      page: 176
+      note: Calculated surface-area change during sintering
+    - id: '7.10'
+      page: 178
+      note: Measured and FactSage saturated vapour-pressure curves
+    - id: '7.11'
+      page: 180
+      note: Measured, pure-oxide, and selected-system vapour-pressure curves
+    - id: '7.12'
+      page: 182
+      note: Predicted evaporation flux/rate and surface area
+    - id: '7.13'
+      page: 186
+      note: Simulant container measurement locations
+    - id: '7.14'
+      page: 187
+      note: Vertical sintering thermal profile
+    - id: '7.15'
+      page: 188
+      note: Sintered zone and recovered puck
+    - id: '7.16'
+      page: 189
+      note: SEM images of sintered surface and necking
+    - id: '7.17'
+      page: 190
+      note: Backscatter map of LHS-1 puck
+    - id: '7.18'
+      page: 190
+      note: Magnified sintered surface region
+    - id: '7.19'
+      page: 191
+      note: Three-element map of LHS-1 puck
+    - id: '7.20'
+      page: 191
+      note: Phase map of LHS-1 puck
+    - id: '7.21'
+      page: 192
+      note: Phase spectra used for mapping
+    - id: '8.1'
+      page: 199
+      note: Solar simulator arrangement
+    - id: '8.2'
+      page: 200
+      note: High-vacuum reactor design schematic
+    - id: '8.3'
+      page: 201
+      note: Reactor components
+    - id: '8.4'
+      page: 204
+      note: TD1 reactor tube and smear-sampling location
+    - id: '8.5'
+      page: 205
+      note: TD1 BSE image and EDS results
+    - id: '8.6'
+      page: 206
+      note: TD2 reactor tube and deposition zone
+    - id: '8.7'
+      page: 206
+      note: TD2 sample SEM images and EDS scan
+    - id: '8.8'
+      page: 207
+      note: TD2 EDS spectrum
+    - id: '8.9'
+      page: 208
+      note: TD3 reactor tube deposition zones
+    - id: '8.10'
+      page: 209
+      note: TD3 condensate image and ZnO nanorods
+    - id: '8.11'
+      page: 209
+      note: TD3 BSE image and EDS spectrum
+    - id: '8.12'
+      page: 210
+      note: TD4 tube with no coating
+    - id: '8.13'
+      page: 210
+      note: TD5 tube and sampled deposition zones
+    - id: '8.14'
+      page: 211
+      note: Full SEM image not extracted; TD5 crystal/background findings are summarized in the extract
+    - id: '8.15'
+      page: 212
+      note: Full BSE image and EDS spectrum not extracted; TD5 band findings are summarized in the extract
+    - id: '8.16'
+      page: 213
+      note: TD6 reactor-tube deposition zones
+    - id: '8.17'
+      page: 214
+      note: Full SE image not extracted; TD6 crystal and background findings are summarized in the extract
+    - id: '8.18'
+      page: 214
+      note: Full EDS spectrum not extracted; TD6 crystal findings are summarized in the extract
+    - id: '8.19'
+      page: 215
+      note: TD7 reactor-tube deposition zone
+    - id: '8.20'
+      page: 216
+      note: TD7 deposit image
+    - id: '8.21'
+      page: 217
+      note: TD7 EDS with trace Na and Cu
+  context_id: shaw-2023-vacuum-thermal-sublimation-thesis::context::shaw_2023_unextracted_ch7_ch8_visual_data_index
+  work_id: 10.25916/sut.26297335.v1
+  source_id: shaw-2023-vacuum-thermal-sublimation-thesis
+  species: LMS-1
