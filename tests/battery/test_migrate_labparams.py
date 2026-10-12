@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import hashlib
 import inspect
+import json
 from decimal import Decimal
 from pathlib import Path
 
@@ -24,7 +26,81 @@ from simulator.battery.migrate import (
     wt_pct_to_mole_fraction,
 )
 from simulator.battery.records import Located, State, Value, ValueKind, as_decimal
-from tests.battery.test_migrate import FIXTURE_EXTRACT, _write_min_tree
+from tests.battery.test_migrate import (
+    FIXTURE_EXTRACT,
+    _migrate_real_extract,
+    _write_min_tree,
+)
+
+
+_BARE_REAL_PAYLOAD_HASHES = (
+    (
+        "ammin-75-781-hemingway-1990.yaml",
+        "98c2a6f2ddece8f774ebb55179c398b61651b2f06be3d2a62f490a9dc45fe49a",
+    ),
+    (
+        "arxiv-1602-00658-fegley-rock-steam-solubility.yaml",
+        "034938227e90cee7530cb9525e0cb9fd608037add6409c3ab60f05a1ddd7dfbd",
+    ),
+    (
+        "deguzman-2026-simulant-physicochemical.yaml",
+        "731db003fed0596fdb42e9ed1e4a469118d1a0387f1eb2b8a7cd172d87aad4f6",
+    ),
+    (
+        "hendrix-2024-reactivity-reduced-simulants.yaml",
+        "33d733b249145a51f1cd0d061d54b02a3bb4cf2836e023253ac8818f7d7f0e3e",
+    ),
+    (
+        "itoh-hino-banya-1997-mg-deoxidation.yaml",
+        "299d236ebffd71ba500998192f8182c5009d31cf3c2f07b901039617d374d0c9",
+    ),
+)
+_SYNTHETIC_BARE_PAYLOAD_HASH = (
+    "3ec3fec3fafbdce5986d3b695233b524f1113ebceb3665c181eb11afe4a1f188"
+)
+
+
+def _migration_payload_hash(result) -> str:
+    payload = {
+        "experiments": {
+            key: to_plain(result.experiments[key])
+            for key in sorted(result.experiments)
+        },
+        "observations": {
+            key: to_plain(result.observations[key])
+            for key in sorted(result.observations)
+        },
+    }
+    encoded = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
+    return hashlib.sha256(encoded).hexdigest()
+
+
+@pytest.mark.parametrize(("name", "expected"), _BARE_REAL_PAYLOAD_HASHES)
+def test_bare_real_extract_payload_hashes(
+    tmp_path: Path, name: str, expected: str
+) -> None:
+    result = _migrate_real_extract(tmp_path, name)
+    assert _migration_payload_hash(result) == expected
+
+
+def test_synthetic_bare_extract_payload_hash(tmp_path: Path) -> None:
+    bare = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = bare["species"]["Na"]["observations"][0]
+    row["equipment"] = {
+        "sample": {
+            "mass_kg": 0.003,
+            "form": "powder",
+            "container": "alumina crucible",
+            "locator": {"page": 2, "section": "Sample preparation"},
+        },
+        "starting_glass_wt_pct": {
+            "SiO2": 50.0,
+            "MgO": 50.0,
+            "locator": {"page": 2, "table": "I"},
+        },
+    }
+    result = migrate(_write_min_tree(tmp_path / "synthetic", bare), write=False)
+    assert _migration_payload_hash(result) == _SYNTHETIC_BARE_PAYLOAD_HASH
 
 
 def test_equal_pressure_duplicates_keep_printed_approximation() -> None:
