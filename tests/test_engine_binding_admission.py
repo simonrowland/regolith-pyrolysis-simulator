@@ -207,6 +207,9 @@ def test_install_provenance_records_selected_producer_artifact(
     assert provenance["runtime_artifacts"][artifact_name]["sha256"] == (
         hashlib.sha256(artifact_bytes).hexdigest()
     )
+    assert admission._selected_producer_digest(identity, provenance) == (
+        hashlib.sha256(artifact_bytes).hexdigest()
+    )
 
 
 def test_install_provenance_distinguishes_selected_digest_from_optional_metadata(
@@ -253,6 +256,9 @@ def test_install_provenance_distinguishes_selected_digest_from_optional_metadata
         "sha256"
     ] is None
     assert provenance["binding_provenance_verifiable"] is False
+    assert admission._selected_producer_digest(identity, provenance) == (
+        hashlib.sha256(selected_bytes).hexdigest()
+    )
 
     backend._pet_module = SimpleNamespace(
         __file__=str(tmp_path / "missing-petthermotools.py")
@@ -261,6 +267,7 @@ def test_install_provenance_distinguishes_selected_digest_from_optional_metadata
     assert unavailable["runtime_artifacts"]["alphamelts_python_api_module"][
         "sha256"
     ] is None
+    assert admission._selected_producer_digest(identity, unavailable) is None
 
 
 def test_openimcc_admission_records_production_default_pack() -> None:

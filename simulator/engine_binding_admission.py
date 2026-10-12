@@ -1595,19 +1595,7 @@ def install_provenance(
         "commissioning_snapshot": commissioning,
         "catalog_manifest": catalog,
     }
-    required_artifacts = {
-        "alphamelts": (
-            "alphamelts_adapter",
-            "alphamelts_selected_binary"
-            if identity.transport == "subprocess"
-            else "alphamelts_python_api_module",
-        ),
-        "thermoengine": ("thermoengine_adapter", "thermoengine_module"),
-        "magemin": ("magemin_adapter", "magemin_selected_binary"),
-        "builtin-vapor-pressure": ("builtin_vapor_pressure_module",),
-        "openimcc": ("openimcc_module",),
-        "sulfsat": ("pysulfsat_module",),
-    }.get(identity.engine_id, ())
+    required_artifacts = _required_runtime_artifacts(identity)
     required_sources = {
         "alphamelts": ("species_catalog",),
         "thermoengine": ("species_catalog",),
@@ -1637,6 +1625,54 @@ def install_provenance(
         and catalog.get("sha256") is not None
     )
     return provenance
+
+
+def _selected_producer_artifact_name(
+    identity: BindingIdentity,
+) -> str | None:
+    if identity.engine_id == "alphamelts":
+        return (
+            "alphamelts_selected_binary"
+            if identity.transport == "subprocess"
+            else "alphamelts_python_api_module"
+        )
+    return {
+        "thermoengine": "thermoengine_module",
+        "magemin": "magemin_selected_binary",
+    }.get(identity.engine_id)
+
+
+def _selected_producer_digest(
+    identity: BindingIdentity,
+    provenance: Mapping[str, Any],
+) -> str | None:
+    artifact_name = _selected_producer_artifact_name(identity)
+    runtime_artifacts = provenance.get("runtime_artifacts")
+    artifact = (
+        runtime_artifacts.get(artifact_name)
+        if artifact_name is not None and isinstance(runtime_artifacts, Mapping)
+        else None
+    )
+    digest = artifact.get("sha256") if isinstance(artifact, Mapping) else None
+    return digest if isinstance(digest, str) and digest else None
+
+
+def _required_runtime_artifacts(
+    identity: BindingIdentity,
+) -> tuple[str, ...]:
+    if identity.engine_id in {"alphamelts", "thermoengine", "magemin"}:
+        adapter = {
+            "alphamelts": "alphamelts_adapter",
+            "thermoengine": "thermoengine_adapter",
+            "magemin": "magemin_adapter",
+        }[identity.engine_id]
+        selected_artifact = _selected_producer_artifact_name(identity)
+        return (adapter, selected_artifact) if selected_artifact is not None else ()
+    return {
+        "builtin-vapor-pressure": ("builtin_vapor_pressure_module",),
+        "openimcc": ("openimcc_module",),
+        "sulfsat": ("pysulfsat_module",),
+    }.get(identity.engine_id, ())
 
 
 def _artifact_digest(path: Path) -> str | None:
