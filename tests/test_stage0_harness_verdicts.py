@@ -948,6 +948,16 @@ def test_domain_gate_reason_for_non_oxide_residuals_is_forbidden_species(
 def test_domain_gate_reason_for_silicate_window_is_distinct(gate):
     composition = _basalt_oxide_kg(100.0)
     composition["SiO2"] = 90.0
+    if gate is AlphaMELTSDomainGate:
+        # 2026-09-13 ruling, applied by 171858b63: band misses no longer veto.
+        assessment = gate.assess(composition)
+        assert assessment.valid is True
+        assert "silicate_network_band" in assessment.failed_constraints
+        assert any(
+            "SiO2" in warning and "outside" in warning
+            for warning in assessment.warnings
+        )
+        return
     valid, warnings, reason = gate.validate_with_reason(composition)
     assert valid is False
     assert any("SiO2" in warning for warning in warnings)

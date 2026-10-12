@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from types import SimpleNamespace
 
+import csv
 import json
 import math
 
@@ -301,7 +302,14 @@ def test_coverage_map_records_melts_refusal_below_30_sio2():
 
     assert low_silica
     assert all(row["alphamelts_status"] == "out_of_domain" for row in low_silica)
-    assert all("SiO2" in row["alphamelts_reason"] for row in low_silica)
+    assert all(
+        "SiO2" in row["alphamelts_reason"]
+        for row in low_silica
+    )
+    direct = benchmark.AlphaMeltsEngine().coverage(
+        {"SiO2": 10.0, "MgO": 90.0}, 1900.0
+    )
+    assert "silicate_network_band" in direct.details["failed_constraints"]
     assert all("alphamelts_finite_prediction" not in row for row in rows)
     assert all("alphamelts_n_pressures" not in row for row in rows)
     assert {row["composition_id"] for row in rows} == {
@@ -310,6 +318,86 @@ def test_coverage_map_records_melts_refusal_below_30_sio2():
         "sf04_komatiite",
         "sf04_dunite",
     }
+
+
+def test_tracked_alphamelts_coverage_projection_matches_status_and_reason():
+    coverage_path = benchmark.DEFAULT_OUTPUT_DIR / "coverage-map.csv"
+    with coverage_path.open(newline="", encoding="utf-8") as stream:
+        rows = list(csv.DictReader(stream))
+
+    engine = benchmark.AlphaMeltsEngine()
+    mismatches = []
+    for row in rows:
+        composition = json.loads(row["composition_json"])
+        projection = engine.coverage(composition, 1900.0)
+        if (
+            projection.status != row["alphamelts_status"]
+            or projection.reason != row["alphamelts_reason"]
+        ):
+            mismatches.append(
+                (
+                    row["composition_id"],
+                    row["trajectory"],
+                    row["step"],
+                    projection.status,
+                    row["alphamelts_status"],
+                    projection.reason,
+                    row["alphamelts_reason"],
+                )
+            )
+
+    assert len(rows) == 168
+    assert not mismatches, (
+        f"coverage-map status/reason mismatches={len(mismatches)}: {mismatches}"
+    )
+
+
+def test_alphamelt_report_labels_band_misses_as_out_of_domain_not_refusal():
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+
+    def report_for(coverage_rows):
+        return benchmark.generate_report(fixture, [], [], coverage_rows)
+
+    band_miss_report = report_for(
+        [
+            {
+                "composition_id": "admitted-band-miss",
+                "trajectory": "remove_silica",
+                "step": 6,
+                "SiO2_wt_pct": 29.5,
+                "alphamelts_status": "out_of_domain",
+            }
+        ]
+    )
+    in_band_report = report_for(
+        [
+            {
+                "composition_id": "in-band",
+                "trajectory": "hold",
+                "step": 0,
+                "SiO2_wt_pct": 50.0,
+                "alphamelts_status": "ok",
+            }
+        ]
+    )
+
+    for report in (band_miss_report, in_band_report):
+        boundary_start = report.index("AlphaMELTS trajectory boundaries:")
+        boundary_end = report.index("The CSV preserves", boundary_start)
+        boundary = report[boundary_start:boundary_end]
+        closing_sentence = next(
+            line for line in report.splitlines() if "normalized step below" in line
+        )
+        assert "refus" not in (boundary + closing_sentence).lower()
+        assert "reject" not in (boundary + closing_sentence).lower()
+
+    assert "first out-of-domain step: step 6, SiO2=29.500 wt%." in band_miss_report
+    assert "no out-of-domain step in sweep." in in_band_report
+    assert (
+        "Every normalized step below 30 wt% SiO2 is outside the AlphaMELTS "
+        "certified band, and the adapter admits such melts with a notice and "
+        "extrapolated authority."
+    ) in band_miss_report
 
 
 def test_coverage_empty_pressure_dict_is_not_typed_ok():

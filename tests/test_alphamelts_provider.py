@@ -353,14 +353,19 @@ def test_domain_gate_rejects_sulfide():
 
 
 def test_domain_gate_rejects_low_sio2():
-    """SiO2 outside [30, 80] wt% must fail the silicate-network criterion."""
+    """An out-of-band silicate is admitted with its band miss reported."""
     composition = {
         'SiO2': 10.0, 'TiO2': 1.0, 'Al2O3': 30.0,
         'FeO': 20.0, 'MgO': 25.0, 'CaO': 14.0,
     }
-    valid, warnings = AlphaMELTSDomainGate.validate(composition)
-    assert valid is False
-    assert any('SiO2' in w and 'outside' in w for w in warnings)
+    # 2026-09-13 ruling, applied by 171858b63: band misses no longer veto.
+    assessment = AlphaMELTSDomainGate.assess(composition)
+    assert assessment.valid is True
+    assert 'silicate_network_band' in assessment.failed_constraints
+    assert any(
+        'SiO2' in warning and 'outside' in warning
+        for warning in assessment.warnings
+    )
 
 
 def test_domain_gate_rejects_empty_composition():
