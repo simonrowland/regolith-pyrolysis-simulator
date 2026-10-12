@@ -21,46 +21,31 @@ evidence_policy:
   numeric_encoding: Numeric cells remain as printed, including scientific notation, inequalities, ranges, and footnote qualifiers.
   apparatus_status: No new sample, apparatus, cell, crucible, or run-condition record is present in this computational paper; cited experimental apparatus was not attached to this source.
 fidelity_samples:
-- species: BSE
-  observable: gibbs_table
-  observation_id: fegley_2016_table_1_model
-  field: rows_as_printed[0].SiO_A_bar
+- path: species.BSE.observations[fegley_2016_table_1_model].values.rows_as_printed[0].SiO_A_bar
   value: 8.6 × 10-6
   locator:
     page: 120
     table: '1'
     note: Table 1, SiO row, condition A
-- species: BSE
-  observable: gibbs_table
-  observation_id: fegley_2016_table_3_compilation
-  field: rows_as_printed[0].MgO_mole_percent
+- path: species.BSE.observations[fegley_2016_table_3_compilation].values.rows_as_printed[0].MgO_mole_percent
   value: '47.67'
   locator:
     page: 122
     table: '3'
     note: Table 3, MgO mole-percent cell
-- species: BSE
-  observable: gibbs_table
-  observation_id: fegley_2016_table_4_model
-  field: rows_as_printed[1].MgOH2_1500_K_bar
+- path: species.BSE.observations[fegley_2016_table_4_model].values.rows_as_printed[1].MgOH2_1500_K_bar
   value: 2.7 × 10-5
   locator:
     page: 123
     table: '4'
     note: Table 4, Mg(OH)2 at 1500 K
-- species: BSE
-  observable: gibbs_table
-  observation_id: fegley_2016_table_5_model
-  field: rows_as_printed[0].Si_logD_2000K_BSE_270bar
+- path: species.BSE.observations[fegley_2016_table_5_model].values.rows_as_printed[0].Si_logD_2000K_BSE_270bar
   value: −5.332
   locator:
     page: 124
     table: '5'
     note: Table 5, Si row, BSE 270 bar, 2000 K
-- species: BSE
-  observable: gibbs_table
-  observation_id: fegley_2016_table_6_model
-  field: rows_as_printed[0].J_s-1
+- path: species.BSE.observations[fegley_2016_table_6_model].values.rows_as_printed[0].J_s-1
   value: 2.3 × 10-3
   locator:
     page: 125
