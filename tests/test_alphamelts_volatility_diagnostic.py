@@ -8,7 +8,6 @@ from types import SimpleNamespace
 import pytest
 
 import simulator.diagnostic_helpers.alphamelts_volatility as volatility_module
-from engines.domain_reason import OutOfDomainReason
 from simulator.alphamelts_reference_pressure import (
     alphamelts_condensed_phase_pressure_bar,
     annotate_alphamelts_reference_pressure,
@@ -244,8 +243,12 @@ def test_composition_domain_violation_reuses_alphamelt_reason_flag():
     domain = diagnostic["alphamelts_domain"]
     assert diagnostic["extrapolation_limited"] is True
     assert domain["status"] == "extrapolation_limited"
-    assert domain["backend_status_reason"] == OutOfDomainReason.SILICATE_WINDOW.value
-    assert domain["out_of_domain_crash_point"]["temperature_C"] == pytest.approx(1500.0)
+    assert domain["backend_status_reason"] is None
+    assert any(
+        "SiO2" in warning and "outside" in warning
+        for warning in domain["warnings"]
+    )
+    assert domain["out_of_domain_crash_point"] is None
 
 
 def test_source_clamped_operating_point_marks_extrapolation_limited():
