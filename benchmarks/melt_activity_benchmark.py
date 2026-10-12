@@ -1420,7 +1420,7 @@ def _liquid_standard_measured_activity(
         Uncertainty,
         Value,
     )
-    from simulator.battery.score import _fusion_comparison_reference
+    from simulator.battery.score import fusion_comparison_reference
     from simulator.state_types import State
 
     oxide = str(point["parent_oxide"])
@@ -1449,7 +1449,7 @@ def _liquid_standard_measured_activity(
         admission=Admission(status=AdmissionStatus.ADMITTED, reason="bench source row"),
         notices=(),
     )
-    liquid_reference = _fusion_comparison_reference(reference)
+    liquid_reference = fusion_comparison_reference(reference)
     conversion_notice = next(
         (
             notice

@@ -142,7 +142,7 @@ def _solid_activity_reference(point):
 
 @pytest.mark.parametrize("oxide", ("CaO", "MgO", "Al2O3", "SiO2"))
 def test_pure_solid_activity_rows_score_after_battery_conversion(oxide):
-    from simulator.battery.score import _fusion_comparison_reference
+    from simulator.battery.score import fusion_comparison_reference
 
     fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
     point = next(
@@ -153,7 +153,7 @@ def test_pure_solid_activity_rows_score_after_battery_conversion(oxide):
         and row.get("score", True)
         and benchmark.measured_activity_basis(row) == "pure_solid"
     )
-    expected = _fusion_comparison_reference(_solid_activity_reference(point))
+    expected = fusion_comparison_reference(_solid_activity_reference(point))
     assert expected.value.point is not None
 
     class _ConvertedActivityEngine:
