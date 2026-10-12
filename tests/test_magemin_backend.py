@@ -39,6 +39,11 @@ import simulator.melt_backend.liquidus as liquidus_module
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import LiquidFractionInvalidError, MeltCompositionError
 from simulator.feedstock_composition import FEOT_FROM_FE2O3
+from simulator.fe_redox import (
+    FE_FEO_BUFFER_STANDARD,
+    REDOX_STATE_REFERENCE_T_K,
+    RedoxState,
+)
 from simulator.melt_backend.magemin import (
     COMPOSITION_PROJECTED,
     MAGEMIN_MODE_VECTOR_MASS_DEFICIT,
@@ -159,6 +164,28 @@ def _assert_magemin_cli_absolute_targets(calls, expected_fO2_log):
         )
         recovered = MAGEMinBackend._qfm_logfo2_oneill(temperature_C) + buffer_n
         assert recovered == pytest.approx(expected_fO2_log, abs=1.0e-6)
+
+
+def _assert_magemin_cli_redox_state_targets(calls, state):
+    assert len(calls) > 10, "expected coarse samples and refinement probes"
+    expected_targets = set()
+    for args in calls:
+        assert "--buffer=qfm" in args
+        temperature_C = float(
+            next(arg.split("=", 1)[1] for arg in args if arg.startswith("--Temp="))
+        )
+        buffer_n = float(
+            next(
+                arg.split("=", 1)[1]
+                for arg in args
+                if arg.startswith("--buffer_n=")
+            )
+        )
+        expected = state.log_fO2_at(temperature_C + 273.15)
+        expected_targets.add(expected)
+        recovered = MAGEMinBackend._qfm_logfo2_oneill(temperature_C) + buffer_n
+        assert recovered == pytest.approx(expected, abs=1.0e-6)
+    assert len(expected_targets) > 1
 
 
 def _make_absent_magemin(monkeypatch):
@@ -1091,6 +1118,83 @@ def test_magemin_projected_retry_records_absolute_fo2_per_sample(monkeypatch):
     assert result.status == "out_of_domain"
     assert result.diagnostics["projected_liquidus_status"] == "ok"
     _assert_magemin_cli_absolute_targets(calls, -9.0)
+
+
+def test_magemin_liquidus_evaluates_redox_state_at_each_sample_temperature(
+    monkeypatch,
+):
+    backend, calls = _make_fake_magemin_cli_liquidus(monkeypatch)
+    absolute = RedoxState.absolute(-9.0)
+
+    class RecordingAbsoluteState:
+        kind = "absolute"
+
+        def __init__(self):
+            self.temperatures_K = []
+
+        def log_fO2_at(self, temperature_K):
+            self.temperatures_K.append(temperature_K)
+            return absolute.log_fO2_at(temperature_K)
+
+    state = RecordingAbsoluteState()
+    result = backend.find_liquidus_solidus(
+        composition_mol={"SiO2": 1.0, "MgO": 1.0, "FeO": 1.0},
+        fO2_log=-9.0,
+        redox_state=state,
+        pressure_bar=1e-6,
+        min_T_C=900.0,
+        max_T_C=1300.0,
+        scan_step_C=50.0,
+        tolerance_C=1.0,
+    )
+
+    assert result.status == "ok"
+    _assert_magemin_cli_absolute_targets(calls, -9.0)
+    sample_temperatures_K = [
+        float(next(arg.split("=", 1)[1] for arg in args if arg.startswith("--Temp=")))
+        + 273.15
+        for args in calls
+    ]
+    assert state.temperatures_K == [REDOX_STATE_REFERENCE_T_K, *sample_temperatures_K]
+
+
+def test_magemin_buffer_offset_is_evaluated_for_each_liquidus_sample(monkeypatch):
+    backend, calls = _make_fake_magemin_cli_liquidus(monkeypatch)
+    state = RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, -0.75)
+
+    result = backend.find_liquidus_solidus(
+        composition_mol={"SiO2": 1.0, "MgO": 1.0, "FeO": 1.0},
+        fO2_log=state.log_fO2_at(REDOX_STATE_REFERENCE_T_K),
+        redox_state=state,
+        pressure_bar=1e-6,
+        min_T_C=900.0,
+        max_T_C=1300.0,
+        scan_step_C=50.0,
+        tolerance_C=1.0,
+    )
+
+    assert result.status == "ok"
+    _assert_magemin_cli_redox_state_targets(calls, state)
+
+
+def test_magemin_projected_retry_preserves_buffer_offset_per_sample(monkeypatch):
+    backend, calls = _make_fake_magemin_cli_liquidus(monkeypatch)
+    state = RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, -0.75)
+
+    result = backend.find_liquidus_solidus(
+        composition_kg={"SiO2": 50.0, "MgO": 39.0, "P2O5": 10.0, "MnO": 1.0},
+        fO2_log=state.log_fO2_at(REDOX_STATE_REFERENCE_T_K),
+        redox_state=state,
+        pressure_bar=1.0,
+        min_T_C=900.0,
+        max_T_C=1300.0,
+        scan_step_C=50.0,
+        tolerance_C=1.0,
+    )
+
+    assert result.status == "out_of_domain"
+    assert result.diagnostics["projected_liquidus_status"] == "ok"
+    _assert_magemin_cli_redox_state_targets(calls, state)
 
 
 def test_magemin_liquidus_finder_honors_aggregate_budget_config(monkeypatch):

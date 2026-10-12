@@ -109,6 +109,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterator, List, Mapping, NoReturn, Optional, Tuple
 
 from engines.domain_reason import OutOfDomainReason
+from simulator.fe_redox import RedoxState, normalize_redox_state
 from simulator.melt_backend.base import (
     CLEANED_MELT_ACCOUNT,
     DEFAULT_BACKEND_CAPABILITIES,
@@ -1568,8 +1569,10 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         tolerance_C: float = 2.0,
         projected_retry: bool = False,
         projected_oxide_wt_pct: Optional[Mapping[str, float]] = None,
+        redox_state: RedoxState | None = None,
     ) -> LiquidusSolidusResult:
         """Find solidus/liquidus by repeated MAGEMin single-point frac_M."""
+        fO2_log, redox_state = normalize_redox_state(fO2_log, redox_state)
         if not self._available or self._bridge is None:
             return LiquidusSolidusResult(
                 status='unavailable',
@@ -1629,10 +1632,15 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             temperature_C: float,
             remaining_budget_s: Optional[float] = None,
         ) -> float:
+            sample_fO2_log = (
+                fO2_log
+                if redox_state is None
+                else redox_state.log_fO2_at(float(temperature_C) + 273.15)
+            )
             result = self.equilibrate(
                 float(temperature_C),
                 composition_kg=composition_kg,
-                fO2_log=fO2_log,
+                fO2_log=sample_fO2_log,
                 pressure_bar=pressure_bar,
                 composition_mol=composition_mol,
                 composition_mol_by_account=composition_mol_by_account,
@@ -1702,6 +1710,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             )
             projected = self.find_liquidus_solidus(
                 fO2_log=fO2_log,
+                redox_state=redox_state,
                 pressure_bar=pressure_bar,
                 species_formula_registry=species_formula_registry,
                 min_T_C=min_T_C,
