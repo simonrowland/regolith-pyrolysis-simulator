@@ -716,6 +716,287 @@ def test_harness_ledgers_are_not_simulation_runtime_inputs() -> None:
         if has_main_guard:
             entry_modules[module] = relpath
     project_modules = set(files)
+
+    # These are the only external package roots used by current static import
+    # declarations: upstream VapoRock metadata and its retained legacy probe.
+    external_package_names = {"vaporock", "thermoengine", "VapoRock"}
+
+    def resolve_literal_targets(
+        module: str, variable: str, *, mapping: bool
+    ) -> tuple[str, ...]:
+        """Resolve one literal map or candidate sequence without importing it."""
+        relpath, source_text = files[module]
+        tree = ast.parse(source_text, filename=relpath)
+        assignments = [
+            node
+            for node in ast.walk(tree)
+            if (
+                isinstance(node, ast.Assign)
+                and any(
+                    isinstance(target, ast.Name) and target.id == variable
+                    for target in node.targets
+                )
+            )
+            or (
+                isinstance(node, ast.AnnAssign)
+                and isinstance(node.target, ast.Name)
+                and node.target.id == variable
+            )
+        ]
+        assert len(assignments) == 1, (
+            f"{relpath}:{variable} must have exactly one literal assignment; "
+            f"found {len(assignments)}"
+        )
+        value_node = assignments[0].value
+        try:
+            if mapping:
+                assert isinstance(value_node, ast.Dict), (
+                    f"{relpath}:{variable} must be a direct literal mapping, "
+                    f"found {ast.unparse(value_node)}"
+                )
+                assert all(
+                    isinstance(key, ast.Name)
+                    or (
+                        isinstance(key, ast.Constant)
+                        and isinstance(key.value, str)
+                    )
+                    for key in value_node.keys
+                ), f"{relpath}:{variable} has a non-literal mapping key"
+                value = [ast.literal_eval(item) for item in value_node.values]
+            else:
+                value = ast.literal_eval(value_node)
+        except (ValueError, TypeError) as exc:
+            raise AssertionError(
+                f"{relpath}:{variable} must be a pure literal; "
+                f"could not resolve {ast.unparse(value_node)}"
+            ) from exc
+
+        if mapping:
+            values = value
+        else:
+            assert isinstance(value, (tuple, list)), (
+                f"{relpath}:{variable} must be a literal tuple or list, "
+                f"found {type(value).__name__}"
+            )
+            values = (value,)
+
+        targets: list[str] = []
+
+        def collect(item: object) -> None:
+            if isinstance(item, str):
+                targets.append(item)
+            elif isinstance(item, (tuple, list)):
+                for child in item:
+                    collect(child)
+            else:
+                raise AssertionError(
+                    f"{relpath}:{variable} contains non-string target "
+                    f"{item!r} ({type(item).__name__})"
+                )
+
+        for item in values:
+            collect(item)
+        assert targets, f"{relpath}:{variable} must contain at least one target"
+        return tuple(targets)
+
+    literal_maps = {
+        "simulator.optimize.__init__._LAZY_EXPORTS": resolve_literal_targets(
+            "simulator.optimize", "_LAZY_EXPORTS", mapping=True
+        ),
+        "simulator.optimize.strategy.__init__._LAZY_EXPORTS": resolve_literal_targets(
+            "simulator.optimize.strategy", "_LAZY_EXPORTS", mapping=True
+        ),
+        "simulator.optimize.evaluate._VAPOR_PRESSURE_PROVIDER_SOURCE_MODULES": resolve_literal_targets(
+            "simulator.optimize.evaluate",
+            "_VAPOR_PRESSURE_PROVIDER_SOURCE_MODULES",
+            mapping=True,
+        ),
+    }
+
+    mapped_project_roots: set[str] = set()
+    for source, targets in literal_maps.items():
+        for target in targets:
+            package_name = target.partition(".")[0]
+            assert target != "simulator.battery" and not target.startswith(
+                "simulator.battery."
+            ), f"{source} targets forbidden battery module {target!r}"
+            assert target in project_modules or package_name in external_package_names, (
+                f"{source} has unknown import target {target!r}; expected a project "
+                "module or an explicitly listed external package"
+            )
+            if target in project_modules:
+                mapped_project_roots.add(target)
+
+    vaporock_candidate_targets = resolve_literal_targets(
+        "simulator.melt_backend.vaporock", "_IMPORT_CANDIDATES", mapping=False
+    )
+    assert vaporock_candidate_targets == ("vaporock", "VapoRock"), (
+        "simulator/melt_backend/vaporock.py:_IMPORT_CANDIDATES changed: "
+        f"{vaporock_candidate_targets}"
+    )
+    for target in vaporock_candidate_targets:
+        assert target not in project_modules, (
+            "VapoRock import candidate must remain external, found project module "
+            f"{target!r}"
+        )
+        assert target.partition(".")[0] in external_package_names, (
+            f"VapoRock import candidate is not an allowed external package: {target!r}"
+        )
+
+    def assert_computed_import_source(
+        module: str,
+        function_name: str,
+        argument_name: str,
+        source_name: str,
+        *,
+        owner_name: str | None = None,
+        source_kind: str,
+    ) -> None:
+        """Bind one counted import call to its literal source declaration."""
+        relpath, source_text = files[module]
+        tree = ast.parse(source_text, filename=relpath)
+        function_nodes = [
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.ClassDef)
+            and owner_name is not None
+            and node.name == owner_name
+        ]
+        functions = [
+            child
+            for node in (function_nodes if owner_name else ast.walk(tree))
+            for child in (node.body if isinstance(node, ast.ClassDef) else [node])
+            if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef))
+            and child.name == function_name
+        ]
+        context = f"{relpath}:{owner_name + '.' if owner_name else ''}{function_name}"
+        assert len(functions) == 1, f"{context} must resolve to one function"
+        function = functions[0]
+        calls = [
+            node
+            for node in ast.walk(function)
+            if isinstance(node, ast.Call)
+            and (
+                isinstance(node.func, ast.Name) and node.func.id == "import_module"
+                or isinstance(node.func, ast.Attribute) and node.func.attr == "import_module"
+            )
+        ]
+        assert len(calls) == 1, (
+            f"{context} must contain exactly one import_module call; found {len(calls)}"
+        )
+        call = calls[0]
+        assert (
+            len(call.args) == 1
+            and not call.keywords
+            and isinstance(call.args[0], ast.Name)
+            and call.args[0].id == argument_name
+        ), (
+            f"{context} import_module argument must be the bound name "
+            f"{argument_name!r}; found {ast.unparse(call)}"
+        )
+        stores = [
+            node
+            for node in ast.walk(function)
+            if isinstance(node, ast.Name)
+            and node.id == argument_name
+            and isinstance(node.ctx, ast.Store)
+        ]
+        assert len(stores) == 1, (
+            f"{context} must bind {argument_name!r} exactly once; found {len(stores)} stores"
+        )
+        if source_kind == "map_lookup":
+            bindings = [
+                node
+                for node in ast.walk(function)
+                if isinstance(node, ast.Assign)
+                and any(
+                    isinstance(target, ast.Name) and target.id == argument_name
+                    for target in node.targets
+                )
+                and isinstance(node.value, ast.Subscript)
+                and isinstance(node.value.value, ast.Name)
+                and node.value.value.id == source_name
+            ]
+            assert len(bindings) == 1, f"{context} must bind its import name from {source_name}"
+            return
+
+        loops = [
+            node
+            for node in ast.walk(function)
+            if isinstance(node, ast.For)
+            and argument_name in (
+                [node.target.id]
+                if isinstance(node.target, ast.Name)
+                else [
+                    item.id for item in node.target.elts if isinstance(item, ast.Name)
+                ]
+                if isinstance(node.target, (ast.Tuple, ast.List))
+                else []
+            )
+        ]
+        assert len(loops) == 1, f"{context} must bind its import name in one {source_name} loop"
+        iterator = loops[0].iter
+        if source_kind == "registry_loop":
+            bound_source = (
+                isinstance(iterator, ast.Attribute)
+                and iterator.attr == source_name
+                and isinstance(iterator.value, ast.Name)
+                and iterator.value.id == "self"
+                and isinstance(loops[0].target, ast.Tuple)
+                and isinstance(loops[0].target.elts[0], ast.Name)
+                and loops[0].target.elts[0].id == argument_name
+            )
+        elif source_kind == "map_loop":
+            bound_source = (
+                isinstance(iterator, ast.Call)
+                and isinstance(iterator.func, ast.Attribute)
+                and iterator.func.attr == "get"
+                and isinstance(iterator.func.value, ast.Name)
+                and iterator.func.value.id == source_name
+            )
+        else:
+            bound_source = isinstance(iterator, ast.Name) and iterator.id == source_name
+        assert bound_source, f"{context} loop must use {source_name}; found {ast.unparse(iterator)}"
+
+    for module, function_name in (
+        ("simulator.optimize", "__getattr__"),
+        ("simulator.optimize.strategy", "__getattr__"),
+    ):
+        assert_computed_import_source(
+            module,
+            function_name,
+            "module_name",
+            "_LAZY_EXPORTS",
+            source_kind="map_lookup",
+        )
+    assert_computed_import_source(
+        "simulator.optimize.evaluate",
+        "_vapor_pressure_provider_code_fingerprint",
+        "module_name",
+        "_VAPOR_PRESSURE_PROVIDER_SOURCE_MODULES",
+        source_kind="map_loop",
+    )
+    assert_computed_import_source(
+        "simulator.core",
+        "_build_chemistry_kernel",
+        "module_path",
+        "_BUILTIN_PROVIDER_REGISTRATIONS",
+        owner_name="PyrolysisSimulator",
+        source_kind="registry_loop",
+    )
+    for function_name, owner_name in (
+        ("_bootstrap_vaporock_worker", None),
+        ("_import_vaporock", "VapoRockBackend"),
+    ):
+        assert_computed_import_source(
+            "simulator.melt_backend.vaporock",
+            function_name,
+            "module_name",
+            "_IMPORT_CANDIDATES",
+            owner_name=owner_name,
+            source_kind="candidate_loop",
+        )
+
     closure: set[str] = set()
     parents: dict[str, tuple[str, int]] = {}
     # Engines are loaded by name from PyrolysisSimulator's registration table,
@@ -724,7 +1005,7 @@ def test_harness_ledgers_are_not_simulation_runtime_inputs() -> None:
     engine_roots = sorted(
         module for module in files if module == "engines" or module.startswith("engines.")
     )
-    pending = [*entry_modules, *engine_roots]
+    pending = [*entry_modules, *engine_roots, *mapped_project_roots]
     dynamic_sites: dict[str, int] = {}
     while pending:
         source = pending.pop()
@@ -751,6 +1032,11 @@ def test_harness_ledgers_are_not_simulation_runtime_inputs() -> None:
             parents.setdefault(target, (source, line))
             if target not in closure:
                 pending.append(target)
+
+    assert mapped_project_roots <= closure, (
+        "literal project-module targets are missing from import closure: "
+        f"{sorted(mapped_project_roots - closure)}"
+    )
 
     # This table-driven loader is the one known computed dynamic import in the
     # runtime closure. Its module names are literals and must stay outside the
@@ -794,6 +1080,16 @@ def test_harness_ledgers_are_not_simulation_runtime_inputs() -> None:
         "simulator/optimize/evaluate.py:_vapor_pressure_provider_code_fingerprint": 1,
         "simulator/optimize/strategy/__init__.py:__getattr__": 1,
     }
+    # These scoring-side modules statically import simulator.battery and are
+    # intentionally outside the simulation runtime closure.
+    # simulator/melt_backend/pure_phase_janaf_score.py
+    # simulator/diagnostic_helpers/gibbs_battery.py
+    # simulator/diagnostic_helpers/binary_pot_battery.py
+    vaporock_candidate_sites = {
+        "simulator/melt_backend/vaporock.py:_bootstrap_vaporock_worker",
+        "simulator/melt_backend/vaporock.py:VapoRockBackend._import_vaporock",
+    }
+    assert vaporock_candidate_sites <= allowed_dynamic_sites.keys()
     assert dynamic_sites == allowed_dynamic_sites, (
         "computed dynamic-import sites changed in simulation closure: "
         f"found={dynamic_sites}, allowed={allowed_dynamic_sites}"
