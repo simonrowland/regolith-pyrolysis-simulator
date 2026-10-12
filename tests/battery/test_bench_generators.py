@@ -167,7 +167,8 @@ def test_partial_sample_composition_blocks_waypoint_and_engine_requests(printed_
     )
 
 
-def test_complete_row_composition_overrides_partial_sample_for_all_engines():
+@pytest.mark.parametrize("include_row_printed", (False, True))
+def test_complete_row_composition_overrides_partial_sample_for_all_engines(include_row_printed):
     experiment, bench, observation = case()
     partial_printed = {"SiO2": Decimal("60"), "MgO": Decimal("20")}
     row_printed = {"SiO2": Decimal("60"), "MgO": Decimal("40")}
@@ -179,21 +180,26 @@ def test_complete_row_composition_overrides_partial_sample_for_all_engines():
             initial_composition=f.located(wt_pct_to_mole_fraction(partial_printed)),
         ),
     )
-    observation = replace(
-        observation,
-        point_conditions={
-            **observation.point_conditions,
-            "printed_composition": f.located(row_printed),
-            "composition": f.located(wt_pct_to_mole_fraction(row_printed)),
-        },
-    )
+    row_conditions = {
+        **observation.point_conditions,
+        "composition": f.located(wt_pct_to_mole_fraction(row_printed)),
+    }
+    if include_row_printed:
+        row_conditions["printed_composition"] = f.located(row_printed)
+    observation = replace(observation, point_conditions=row_conditions)
 
     inputs = collect_consumer_inputs(experiment, bench, observation)
     waypoint = inputs.waypoints["normalized_composition"]
     assert waypoint.selected is not None
+    assert waypoint.selected.route == "observation_normalized_initial_composition"
     requests = engine_point_requests(inputs)
     assert len(requests) == len(ENGINE_POINT_CONSUMERS) == 7
     assert all(request.payload is not None for request in requests)
+    expected = wt_pct_to_mole_fraction(row_printed).as_map()
+    for request in requests:
+        assert request.payload["composition_mol"] == pytest.approx(
+            {species: float(amount) for species, amount in expected.items()}
+        )
 
 
 def test_selected_partial_row_composition_blocks_all_engines():
