@@ -89,6 +89,89 @@ def _run_tiny_full_benchmark(output_dir, monkeypatch, **overrides):
     return benchmark.run_benchmark(**kwargs)
 
 
+def _solid_activity_reference(point):
+    from decimal import Decimal
+
+    from simulator.battery.enums import (
+        AdmissionStatus,
+        EvidenceClass,
+        PerBasis,
+        Phase,
+        Quantity,
+        ReferenceStateConvention,
+        UncertaintyKind,
+    )
+    from simulator.battery.identity import Identity
+    from simulator.battery.records import (
+        Admission,
+        Evidence,
+        Observation,
+        Species,
+        StandardState,
+        Uncertainty,
+        Value,
+    )
+    from simulator.state_types import State
+
+    oxide = str(point["parent_oxide"])
+    identity = Identity(
+        quantity=Quantity.ACTIVITY,
+        species=Species(oxide, Phase.L),
+        temperature_K=State.of(Decimal(str(point["temperature_K"]))),
+        per=State.of(PerBasis.DIMENSIONLESS),
+        reference_state=State.of(
+            StandardState(
+                convention=ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
+                endmember=Species(oxide, Phase.CR),
+                component_basis=oxide,
+                reference_pressure_bar=Decimal("1"),
+            )
+        ),
+    )
+    return Observation(
+        observation_id=str(point["id"]),
+        experiment_id="melt-activity-benchmark-test",
+        identity=identity,
+        value=Value.point_of(point["measured"]),
+        uncertainty=Uncertainty(kind=UncertaintyKind.NONE),
+        evidence=Evidence(class_=State.of(EvidenceClass.MEASURED_DIRECT)),
+        admission=Admission(status=AdmissionStatus.ADMITTED, reason="test row"),
+        notices=(),
+    )
+
+
+@pytest.mark.parametrize("oxide", ("CaO", "MgO", "Al2O3", "SiO2"))
+def test_pure_solid_activity_rows_score_after_battery_conversion(oxide):
+    from simulator.battery.score import _fusion_comparison_reference
+
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    point = next(
+        row
+        for row in fixture["points"]
+        if row["observable"] == "activity"
+        and row["parent_oxide"] == oxide
+        and row.get("score", True)
+        and benchmark.measured_activity_basis(row) == "pure_solid"
+    )
+    expected = _fusion_comparison_reference(_solid_activity_reference(point))
+    assert expected.value.point is not None
+
+    class _ConvertedActivityEngine:
+        name = "converted-activity"
+
+        def evaluate(self, composition_wt_pct, temperature_K, fO2_bar):
+            del composition_wt_pct, temperature_K, fO2_bar
+            return benchmark.EngineResult(
+                status="ok", activities={oxide: float(expected.value.point)}
+            )
+
+    rows = benchmark.run_points(
+        {**fixture, "points": [point]}, [_ConvertedActivityEngine()]
+    )
+
+    assert rows[0]["residual_dex"] == pytest.approx(0.0, abs=1e-12)
+
+
 def test_regeneration_without_live_check_refuses_to_drop_anchor_csv(
     tmp_path, monkeypatch
 ):
