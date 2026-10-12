@@ -1,0 +1,921 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2355/isijinternational.40.554
+  citation: 'Morita, K., Kume, K. & Sano, N. (2000), "A Newly Developed Method for Determining SiO2 Activity of the Silicate
+    Slags Equilibrated with Molten Silicon Alloys," ISIJ International 40(6): 554–560.'
+  source_ids:
+  - morita-2000-sio2-activity-si-alloys
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+    files:
+    - asset_id: pdf:morita-2000-sio2-activity-si-alloys
+      role: pdf
+      path: raw/morita-2000-sio2-activity-si-alloys/morita-2000-sio2-activity-si-alloys.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:morita-2000-sio2-activity-si-alloys
+      role: pdftotext
+      path: text/morita-2000-sio2-activity-si-alloys
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:morita-2000-sio2-activity-si-alloys
+      role: table_csv
+      path: tables/morita-2000-sio2-activity-si-alloys
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: unknown:morita-2000-sio2-activity-si-alloys
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2355/isijinternational.40.554
+experiments:
+- experiment_id: 10.2355/isijinternational.40.554::experiment::alumina-1823k
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: would_invent
+      locator:
+        page: 1
+        published_page: 554
+        section: 2. Experimental Procedure
+        note: Separate 16 g slag and 8 g alloy masses are reported; no aggregate sample mass is printed.
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 554
+        section: 2. Experimental Procedure
+        note: Starting feed percentages are not reported as one composition; final compositions are transcribed by table row.
+    characterization:
+      state:
+        tag: value
+        value: Slags from reagent-grade AlO1.5, SiO2, MgO and CaO calcined from CaCO3 in air; Si-based alloys from semiconductor-grade
+          Si with small amounts of reagent-grade Ca, Al and Mg.
+      locator:
+        page: 1
+        published_page: 554
+        section: 2. Experimental Procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        page: 4
+        published_page: 557
+        table: '3'
+    system:
+      state:
+        tag: unknown
+        reason: condition system is not a scalar numeric value
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 555
+        section: 2. Experimental Procedure
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 2
+        published_page: 555
+        section: 2. Experimental Procedure
+        note: Deoxidized argon atmosphere; flow and pressure are not stated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.40.554
+  locator:
+    page: 2
+    published_page: 555
+    table: '3'
+    section: 2. Experimental Procedure
+    note: Protocol details on pp. 554-555.
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 555
+        section: 2. Experimental Procedure
+        note: No numeric oxygen partial pressure is reported.
+  bench_id: 10.2355/isijinternational.40.554::bench::morita-2000-resistance-furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Equilibrated at the listed temperature for 18 h, then quenched in flushing argon gas.
+      locator:
+        page: 2
+        published_page: 555
+        section: 2. Experimental Procedure
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '64800'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 555
+        section: 2. Experimental Procedure
+        note: 18 h as printed; SI conversion 18 × 3600 = 64800 s.
+    cooling_or_quench:
+      state:
+        tag: value
+        value: quenched in a flushing argon gas after equilibration
+      locator:
+        page: 2
+        published_page: 555
+        section: 2. Experimental Procedure
+- experiment_id: 10.2355/isijinternational.40.554::experiment::binary-1823k
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: would_invent
+      locator:
+        page: 1
+        published_page: 554
+        section: 2. Experimental Procedure
+        note: Separate 16 g slag and 8 g alloy masses are reported; no aggregate sample mass is printed.
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 554
+        section: 2. Experimental Procedure
+        note: Starting feed percentages are not reported as one composition; final compositions are transcribed by table row.
+    characterization:
+      state:
+        tag: value
+        value: Slags from reagent-grade AlO1.5, SiO2, MgO and CaO calcined from CaCO3 in air; Si-based alloys from semiconductor-grade
+          Si with small amounts of reagent-grade Ca, Al and Mg.
+      locator:
+        page: 1
+        published_page: 554
+        section: 2. Experimental Procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        page: 3
+        published_page: 556
+        table: '2'
+    system:
+      state:
+        tag: unknown
+        reason: condition system is not a scalar numeric value
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 555
+        section: 2. Experimental Procedure
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 2
+        published_page: 555
+        section: 2. Experimental Procedure
+        note: Deoxidized argon atmosphere; flow and pressure are not stated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.40.554
+  locator:
+    page: 2
+    published_page: 555
+    table: '2'
+    section: 2. Experimental Procedure
+    note: Protocol details on pp. 554-555.
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 555
+        section: 2. Experimental Procedure
+        note: No numeric oxygen partial pressure is reported.
+  bench_id: 10.2355/isijinternational.40.554::bench::morita-2000-resistance-furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Equilibrated at the listed temperature for 18 h, then quenched in flushing argon gas.
+      locator:
+        page: 2
+        published_page: 555
+        section: 2. Experimental Procedure
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '64800'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 555
+        section: 2. Experimental Procedure
+        note: 18 h as printed; SI conversion 18 × 3600 = 64800 s.
+    cooling_or_quench:
+      state:
+        tag: value
+        value: quenched in a flushing argon gas after equilibration
+      locator:
+        page: 2
+        published_page: 555
+        section: 2. Experimental Procedure
+- experiment_id: 10.2355/isijinternational.40.554::experiment::binary-1873k
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: would_invent
+      locator:
+        page: 1
+        published_page: 554
+        section: 2. Experimental Procedure
+        note: Separate 16 g slag and 8 g alloy masses are reported; no aggregate sample mass is printed.
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 554
+        section: 2. Experimental Procedure
+        note: Starting feed percentages are not reported as one composition; final compositions are transcribed by table row.
+    characterization:
+      state:
+        tag: value
+        value: Slags from reagent-grade AlO1.5, SiO2, MgO and CaO calcined from CaCO3 in air; Si-based alloys from semiconductor-grade
+          Si with small amounts of reagent-grade Ca, Al and Mg.
+      locator:
+        page: 1
+        published_page: 554
+        section: 2. Experimental Procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 556
+        table: '2'
+    system:
+      state:
+        tag: unknown
+        reason: condition system is not a scalar numeric value
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 555
+        section: 2. Experimental Procedure
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 2
+        published_page: 555
+        section: 2. Experimental Procedure
+        note: Deoxidized argon atmosphere; flow and pressure are not stated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.40.554
+  locator:
+    page: 2
+    published_page: 555
+    table: '2'
+    section: 2. Experimental Procedure
+    note: Protocol details on pp. 554-555.
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 555
+        section: 2. Experimental Procedure
+        note: No numeric oxygen partial pressure is reported.
+  bench_id: 10.2355/isijinternational.40.554::bench::morita-2000-resistance-furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Equilibrated at the listed temperature for 18 h, then quenched in flushing argon gas.
+      locator:
+        page: 2
+        published_page: 555
+        section: 2. Experimental Procedure
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '64800'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 555
+        section: 2. Experimental Procedure
+        note: 18 h as printed; SI conversion 18 × 3600 = 64800 s.
+    cooling_or_quench:
+      state:
+        tag: value
+        value: quenched in a flushing argon gas after equilibration
+      locator:
+        page: 2
+        published_page: 555
+        section: 2. Experimental Procedure
+- experiment_id: 10.2355/isijinternational.40.554::experiment::magnesia-1873k
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: would_invent
+      locator:
+        page: 1
+        published_page: 554
+        section: 2. Experimental Procedure
+        note: Separate 16 g slag and 8 g alloy masses are reported; no aggregate sample mass is printed.
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 554
+        section: 2. Experimental Procedure
+        note: Starting feed percentages are not reported as one composition; final compositions are transcribed by table row.
+    characterization:
+      state:
+        tag: value
+        value: Slags from reagent-grade AlO1.5, SiO2, MgO and CaO calcined from CaCO3 in air; Si-based alloys from semiconductor-grade
+          Si with small amounts of reagent-grade Ca, Al and Mg.
+      locator:
+        page: 1
+        published_page: 554
+        section: 2. Experimental Procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 6
+        published_page: 559
+        table: '4'
+    system:
+      state:
+        tag: unknown
+        reason: condition system is not a scalar numeric value
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 555
+        section: 2. Experimental Procedure
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 2
+        published_page: 555
+        section: 2. Experimental Procedure
+        note: Deoxidized argon atmosphere; flow and pressure are not stated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2355/isijinternational.40.554
+  locator:
+    page: 2
+    published_page: 555
+    table: '4'
+    section: 2. Experimental Procedure
+    note: Protocol details on pp. 554-555.
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 555
+        section: 2. Experimental Procedure
+        note: No numeric oxygen partial pressure is reported.
+  bench_id: 10.2355/isijinternational.40.554::bench::morita-2000-resistance-furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Equilibrated at the listed temperature for 18 h, then quenched in flushing argon gas.
+      locator:
+        page: 2
+        published_page: 555
+        section: 2. Experimental Procedure
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '64800'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 555
+        section: 2. Experimental Procedure
+        note: 18 h as printed; SI conversion 18 × 3600 = 64800 s.
+    cooling_or_quench:
+      state:
+        tag: value
+        value: quenched in a flushing argon gas after equilibration
+      locator:
+        page: 2
+        published_page: 555
+        section: 2. Experimental Procedure
+benches:
+- id: 10.2355/isijinternational.40.554::bench::morita-2000-resistance-furnace
+  work_id: 10.2355/isijinternational.40.554
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: electric resistance furnace
+    locator:
+      page: 1
+      published_page: 554
+      section: 2. Experimental Procedure
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: graphite crucible with graphite lid
+    locator:
+      page: 2
+      published_page: 555
+      section: 2. Experimental Procedure
+      note: Crucible was held in a graphite holder; the lid prevented excess evaporation of Ca and Mg.
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: Pt-6%Rh/Pt-30%Rh thermocouple
+      locator:
+        page: 1
+        published_page: 554
+        section: 2. Experimental Procedure
+  temperature_calibration:
+    calibration:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 554
+        section: 2. Experimental Procedure
+        note: Temperature control accuracy is stated, but no separate thermocouple calibration procedure is described.
+    uncertainty:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 554
+        section: 2. Experimental Procedure
+        note: The stated ±2 K is temperature control accuracy, not a reported calibration uncertainty.
+  heating_method:
+    state:
+      tag: value
+      value: electric resistance furnace
+    locator:
+      page: 1
+      published_page: 554
+      section: 2. Experimental Procedure
+  other_facts:
+  - name: temperature_control_accuracy
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2'
+          approximate: false
+      locator:
+        page: 1
+        published_page: 554
+        section: 2. Experimental Procedure
+        note: Temperature controlled within the accuracy of ±2 K; numeric payload is the printed magnitude 2.
+    unit: K
+context:
+- observation_id: morita_2000_activity_method_and_equations
+  type: thermodynamic_example
+  locator:
+    page: 2
+    published_page: 555
+    section: 3.1 Derivation of the Activity of SiO2 and 3.2 Estimation of the Activity of Si
+    note: Equations 1-16 are on published page 555; equations 17-18 are on published page 556.
+  units: as printed
+  values:
+    quantity: activity derivation
+    silica_standard_state: SiO2(s), pure-solid activity standard; polymorph not named
+    silicon_standard_state: Si(l), liquid silicon reference state
+    equation_1: X_1 d ln γ_1 + X_2 d ln γ_2 = 0
+    equation_2: X_1 d ln γ_1 + X_2 d ln(B·γ_1) = 0
+    equation_3: (X_1 + X_2)d ln γ_1 + X_2 d ln B = 0
+    equation_4: d ln γ_1 = −X_2 d ln B
+    equation_5: ln γ_1 = ∫_(X_2=X_2°)^(X_2) −X_2 d ln B + ln γ_1°(X_2=X_2°)
+    equation_6: Si_1/2O(s) + Ca(l) = CaO(s) + 1/2 Si(l)
+    equation_7: K[6] = (γ_CaO·X_CaO·a_Si^(1/2))/(γ_Si1/2O·X_Si1/2O·a_Ca)
+    equation_8: B = γ_CaO/γ_Si1/2O = (X_Si1/2O·γ_Ca·X_Ca)/(X_CaO·γ_Si^(1/2)·X_Si^(1/2))·K[6]
+    equation_9: X_1 d ln γ_1 + X_2 d ln γ_2 + X_3 d ln γ_3 = 0
+    equation_10: d ln γ_1 + X_2 d ln B + X_3 d ln C = 0; B = γ_2/γ_1, C = γ_3/γ_1
+    equation_11: d ln γ_1 = −X_2 d ln B − kX_2 d ln C
+    equation_12: ln γ_1 = ∫_(X_2=X_2°)^(X_2) −X_2 d ln(B·C^k) + ln γ_1°(X_2=X_2°); k = X_3/X_2
+    equation_13: Si_1/2O(s) + xM(l) = M_xO(s) + 1/2 Si(l); M is Al or Mg
+    equation_14: K[13] = (γ_MxO·X_MxO·a_Si^(1/2))/(γ_Si1/2O·X_Si1/2O·a_M^x)
+    equation_15: C = γ_MxO/γ_Si1/2O = (X_Si1/2O·γ_M^x·X_M^x)/(X_MxO·a_Si^(1/2))·K[13]
+    silica_conversion: a_SiO2 = a_Si1/2O^2
+    equation_16: X_1 d ln γ_1 + X_2 d ln γ_2 + kX_3 d ln γ_3 = 0
+    equation_17: d ln γ_1 = −(X_2/X_1) d ln(γ_2·γ_3^k)
+    equation_18: ln γ_1 = ∫_(X_2=0)^(X_2) −(X_2/X_1) d ln(γ_2·γ_3^k)
+    alloy_silicon_activity: The activity of Si is calculated by Gibbs-Duhem integration; in most experiments a(Si) was found
+      equal to XSi because it was nearly unity.
+    saturation_boundary: The silica-saturated composition is used as the lower integration limit.
+  context_id: morita-2000-sio2-activity-si-alloys::context::morita_2000_activity_method_and_equations
+  work_id: 10.2355/isijinternational.40.554
+  source_id: morita-2000-sio2-activity-si-alloys
+  species: SiO2
+- observation_id: morita_2000_author_estimate_alumina_integration_error
+  type: method_qualification
+  locator:
+    page: 5
+    published_page: 558
+    section: 4.2 The CaO-SiO2-AlO1.5 System
+    figure: '7'
+  units: '%'
+  quote: error in the integration was estimated so small that its effect on activity coefficient of Si1/2O was as low as 1%
+    in the present system.
+  values:
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Morita, Kume & Sano
+    error_class: author_estimate
+    affected_quantity: activity coefficient of Si1/2O
+    approximate_percent: 1
+    system: CaO-SiO2-AlO1.5
+    temperature_K: 1823
+    scope: authors estimate the effect of integration scatter for the alumina-bearing system; this is not analytical precision
+      or a general uncertainty on a(SiO2).
+  context_id: morita-2000-sio2-activity-si-alloys::context::morita_2000_author_estimate_alumina_integration_error
+  work_id: 10.2355/isijinternational.40.554
+  source_id: morita-2000-sio2-activity-si-alloys
+  species: SiO2
+- observation_id: morita_2000_auxiliary_thermodynamic_data
+  type: thermodynamic_example
+  locator:
+    page: 2
+    published_page: 555
+    table: '1'
+  units: J/mol for ΔG°; dimensionless for γ and ε expressions
+  quote: Morita, Kume & Sano list the alloy auxiliary quantities in Table 1 from T. Miki, K. Morita & N. Sano (refs. 4–5),
+    and cite R. G. Berman et al. (ref. 6), JANAF (ref. 7), and T. Wakasugi & N. Sano (ref. 8) for the standard Gibbs-energy
+    expressions.
+  values:
+    quantity: auxiliary thermodynamic inputs taken from cited work
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: T. Miki, K. Morita & N. Sano (refs. 4–5); R. G. Berman, T. H. Brown & H. J. Greenwood (ref. 6); JANAF (ref.
+      7); T. Wakasugi & N. Sano (ref. 8)
+    standard_gibbs_energy_Ca: ΔG° = 156,000 − 20.0T J/mol; refs. 6–8
+    standard_gibbs_energy_Al: ΔG° = 132,100 − 14.31T J/mol; refs. 6–7
+    standard_gibbs_energy_Mg: ΔG° = 134,700 − 16.85T J/mol; refs. 6–7
+    ln_gamma0_Ca_l: ln γ°_Ca(l) = −14300/T + 1.55; refs. 4–5
+    ln_gamma0_Al_l: ln γ°_Al(l) = −3610/T + 0.452; refs. 4–5
+    ln_gamma0_Mg_l: ln γ°_Mg(l) = −11300/T + 4.51; refs. 4–5
+    epsilon_Ca_Ca: ε_Ca^Ca = 55600/T − 22.1; refs. 4–5
+    epsilon_Al_Al: ε_Al^Al = 1.00 × 10^5/T − 40.1; refs. 4–5
+    epsilon_Mg_Mg: ε_Mg^Mg = 6.02; refs. 4–5
+    epsilon_Ca_Al: ε_Ca^Al = 6.46; refs. 4–5
+    measured_here: No alloy activity coefficient or interaction parameter is measured in this paper; the alloy inputs in Table
+      1 are cited to refs. 4–5.
+    standard_state_notes: The printed reaction species use Si(l), Ca(l), Al(l), and Mg(l); the paper gives no separate prose
+      definition of the superscript ° convention.
+    reference_4: 'T. Miki, K. Morita and N. Sano: Metall. Mater. Trans. B, 29B (1998), 1043.'
+    reference_5: 'T. Miki, K. Morita and N. Sano: Mater. Trans. JIM, 40 (1999), 1108.'
+    reference_6: 'R. G. Berman, T. H. Brown, and H. J. Greenwood: Report No. TR-377, Atomic Energy of Canada Limited, Mississauga,
+      Ontario (1985).'
+    reference_7: 'JANAF Thermochemical Tables, 3rd ed.: J. Phys. Ref. Data, 14 (1985), suppl. 1.'
+    reference_8: 'T. Wakasugi and N. Sano: Metall. Trans. B, 20B (1989), 431.'
+  context_id: morita-2000-sio2-activity-si-alloys::context::morita_2000_auxiliary_thermodynamic_data
+  work_id: 10.2355/isijinternational.40.554
+  source_id: morita-2000-sio2-activity-si-alloys
+  species: SiO2
+- observation_id: morita_2000_experimental_protocol
+  type: laboratory_conditions
+  locator:
+    page: 2
+    published_page: 555
+    section: 2. Experimental Procedure
+  units: as printed
+  quote: Equilibration time was determined to be 18 h by preliminary experiments.
+  values:
+    quantity: experimental protocol
+    equilibrated_system: silicate slags equilibrated with molten Si-based alloys
+    crucible_material: graphite
+    holder_and_lid: graphite holder; graphite lid placed on crucible to prevent excess evaporation of Ca and Mg
+    atmosphere: deoxidized argon
+    equilibration_time_h: 18
+    equilibrium_demonstration: Equilibration time was determined to be 18 h by preliminary experiments.
+    equilibrium_evidence_scope: The paper reports the 18 h duration as determined by preliminary experiments; no further in-paper
+      equilibrium convergence or reversal evidence is stated.
+    SiC_formation_in_present_runs: not stated; pages 554-560 searched
+    alloy_carbon_saturation_in_present_runs: not stated; pages 554-560 searched
+    slag_graphite_reaction_in_present_runs: not stated; pages 554-560 searched
+    quench: sample quenched in a flushing argon gas
+    slag_chemical_analysis: SiO2 by gravimetry; other slag components by ICP
+    metal_chemical_analysis: Ca, Al and Mg contents by ICP spectroscopy
+    analytical_precision: not stated
+    gas_purification: not described
+  context_id: morita-2000-sio2-activity-si-alloys::context::morita_2000_experimental_protocol
+  work_id: 10.2355/isijinternational.40.554
+  source_id: morita-2000-sio2-activity-si-alloys
+  species: SiO2
+- observation_id: morita_2000_quoted_alumina_prior_activity
+  type: literature_comparison
+  locator:
+    page: 5
+    published_page: 558
+    figure: '9'
+  units: as stated (qualitative comparison)
+  quote: Morita, Kume & Sano compare their CaO-SiO2-AlO1.5 activities with Rein and Chipman (ref. 1) and Kay and Taylor (ref.
+    2), reporting agreement when SiO2 is below 30 mol%.
+  values:
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: R. H. Rein & J. Chipman (ref. 1); D. A. R. Kay & J. Taylor (ref. 2)
+    comparison_temperature_K: 1823
+    note: The <30 mol% SiO2 qualification is in prose; prior activity points are only plotted in Figure 9(b).
+  context_id: morita-2000-sio2-activity-si-alloys::context::morita_2000_quoted_alumina_prior_activity
+  work_id: 10.2355/isijinternational.40.554
+  source_id: morita-2000-sio2-activity-si-alloys
+  species: SiO2
+- observation_id: morita_2000_quoted_fujiwara_aluminate_liquidus
+  type: literature_comparison
+  locator:
+    page: 3
+    published_page: 556
+    figures: 4-5
+  units: as stated (qualitative comparison)
+  quote: Morita, Kume & Sano cite Fujiwara et al. (ref. 20) for equilibrium distribution ratios at 1873 K for slags saturated
+    with AlO1.5, CaO·12AlO1.5, and CaO·4AlO1.5; they report reasonable agreement for present compositions adjacent to those
+    liquidus compounds.
+  values:
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: H. Fujiwara, J. Y. Liang, K. Takeuchi & E. Ichise (ref. 20)
+    comparison_temperature_K: 1873
+    note: Saturation compounds and temperature are stated; numerical comparison points are plotted, not tabulated.
+  context_id: morita-2000-sio2-activity-si-alloys::context::morita_2000_quoted_fujiwara_aluminate_liquidus
+  work_id: 10.2355/isijinternational.40.554
+  source_id: morita-2000-sio2-activity-si-alloys
+  species: SiO2
+- observation_id: morita_2000_quoted_miki_silica_saturation
+  type: literature_comparison
+  locator:
+    page: 3
+    published_page: 556
+    section: 4.1 The CaO-SiO2 System
+  units: as stated (qualitative comparison)
+  quote: Morita, Kume & Sano state that the SiO2-saturated composition reported by Miki et al. (ref. 4) at 1823 K was used
+    as the binary integration lower limit.
+  values:
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: T. Miki, K. Morita & N. Sano (ref. 4)
+    comparison_temperature_K: 1823
+    note: The table contains a numerical row at this point; the text separately attributes the saturation boundary to Miki
+      et al.
+  context_id: morita-2000-sio2-activity-si-alloys::context::morita_2000_quoted_miki_silica_saturation
+  work_id: 10.2355/isijinternational.40.554
+  source_id: morita-2000-sio2-activity-si-alloys
+  species: SiO2
+- observation_id: morita_2000_quoted_prior_binary_activity_comparison
+  type: literature_comparison
+  locator:
+    page: 3
+    published_page: 556
+    figure: '2'
+  units: as stated (qualitative comparison)
+  quote: Morita, Kume & Sano compare their CaO-SiO2 activity curves with Rein and Chipman (ref. 1), Sharma and Richardson
+    (ref. 14), Carter and Macfarlane (ref. 15), Baird and Taylor (ref. 16), Eriksson et al. (ref. 17), and Rey (ref. 18);
+    they report agreement at 1773 and 1873 K with small temperature dependence.
+  values:
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: R. H. Rein & J. Chipman (1); R. A. Sharma & F. D. Richardson (14); P. T. Carter & T. G. Macfarlane (15);
+      J. D. Baird & J. Taylor (16); G. Eriksson et al. (17); M. Rey (18)
+    comparison_temperature_K: 1773
+    note: The comparison curves are plotted; numerical values from other workers are not tabulated.
+  context_id: morita-2000-sio2-activity-si-alloys::context::morita_2000_quoted_prior_binary_activity_comparison
+  work_id: 10.2355/isijinternational.40.554
+  source_id: morita-2000-sio2-activity-si-alloys
+  species: SiO2
+- observation_id: morita_2000_quoted_rein_magnesia_activity
+  type: literature_comparison
+  locator:
+    page: 6
+    published_page: 559
+    figure: '13'
+  units: as stated (qualitative comparison)
+  quote: Morita, Kume & Sano report agreement with Rein and Chipman (ref. 1) in the low-MgO area and values almost twice as
+    large in the high-MgO area.
+  values:
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: R. H. Rein & J. Chipman (ref. 1)
+    comparison_temperature_K: 1873
+    note: Qualitative comparison; Figure 13(b) gives curves without a numeric table.
+  context_id: morita-2000-sio2-activity-si-alloys::context::morita_2000_quoted_rein_magnesia_activity
+  work_id: 10.2355/isijinternational.40.554
+  source_id: morita-2000-sio2-activity-si-alloys
+  species: SiO2
+- observation_id: morita_2000_quoted_si_ca_negative_raoult_deviation
+  type: method_qualification
+  locator:
+    page: 3
+    published_page: 556
+    section: 4.1 The CaO-SiO2 System
+    figure: '1'
+  units: as stated
+  quote: activity of Si in the molten Si–Ca binary system showed negative deviation from the Raoult’s law, when molar fraction
+    of Si is lower than 0.98.
+  values:
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Morita, Kume & Sano
+    alloy_system: Si-Ca
+    condition: X(Si) < 0.98
+    deviation_from_Raoult_law: negative
+    implication: a(Si) is not approximately equal to X(Si) below this threshold.
+  context_id: morita-2000-sio2-activity-si-alloys::context::morita_2000_quoted_si_ca_negative_raoult_deviation
+  work_id: 10.2355/isijinternational.40.554
+  source_id: morita-2000-sio2-activity-si-alloys
+  species: SiO2
+- observation_id: morita_2000_quoted_weiss_alumina_saturation
+  type: literature_comparison
+  locator:
+    page: 3
+    published_page: 556
+    section: 4.2 The CaO-SiO2-AlO1.5 System
+  units: as stated (qualitative comparison)
+  quote: Morita, Kume & Sano report that their silica-saturated results agree with Weiss and Schwerdtfeger (ref. 19) at 1773
+    K despite the temperature difference.
+  values:
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: T. Weiss & K. Schwerdtfeger (ref. 19)
+    comparison_temperature_K: 1773
+    note: Qualitative comparison in prose; no prior-work numeric rows are supplied.
+  context_id: morita-2000-sio2-activity-si-alloys::context::morita_2000_quoted_weiss_alumina_saturation
+  work_id: 10.2355/isijinternational.40.554
+  source_id: morita-2000-sio2-activity-si-alloys
+  species: SiO2
+- observation_id: morita_2000_quoted_weiss_magnesia_distribution
+  type: literature_comparison
+  locator:
+    page: 5
+    published_page: 558
+    figure: '10'
+  units: as stated (qualitative comparison)
+  quote: Morita, Kume & Sano compare Ca and Mg contents with Weiss and Schwerdtfeger (ref. 19) at 1773 K; they report values
+    about two times higher, probably because of the 100 K temperature difference, while tendencies are similar.
+  values:
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: T. Weiss & K. Schwerdtfeger (ref. 19)
+    comparison_temperature_K: 1773
+    note: Qualitative comparison; the factor and temperature difference are printed, but numeric values are not tabulated.
+  context_id: morita-2000-sio2-activity-si-alloys::context::morita_2000_quoted_weiss_magnesia_distribution
+  work_id: 10.2355/isijinternational.40.554
+  source_id: morita-2000-sio2-activity-si-alloys
+  species: SiO2
+- observation_id: morita_2000_sample_masses
+  type: method
+  locator:
+    page: 1
+    published_page: 554
+    section: 2. Experimental Procedure
+  units: g
+  values:
+    quantity: charge masses
+    slag_mass_g: 16
+    Si_based_alloy_mass_g: 8
+    note: separate masses are printed; no aggregate charge mass is reported
+  context_id: morita-2000-sio2-activity-si-alloys::context::morita_2000_sample_masses
+  work_id: 10.2355/isijinternational.40.554
+  source_id: morita-2000-sio2-activity-si-alloys
+  species: SiO2

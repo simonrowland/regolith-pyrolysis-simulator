@@ -1,0 +1,1174 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694
+  citation: T. Miki, K. Morita and N. Sano, “Thermodynamic Properties of Si–Al, –Ca, –Mg Binary and Si–Ca–Al, –Ti, –Fe Ternary
+    Alloys,” Materials Transactions, JIM 40(10) (1999), 1108–1116.
+  source_ids:
+  - miki-1999-si-alloy-thermodynamics
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+    files:
+    - asset_id: pdf:miki-1999-si-alloy-thermodynamics
+      role: pdf
+      path: raw/miki-1999-si-alloy-thermodynamics/miki-1999-si-alloy-thermodynamics.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:miki-1999-si-alloy-thermodynamics
+      role: pdftotext
+      path: text/miki-1999-si-alloy-thermodynamics
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:miki-1999-si-alloy-thermodynamics
+      role: table_csv
+      path: tables/miki-1999-si-alloy-thermodynamics
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: unknown:miki-1999-si-alloy-thermodynamics
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694::experiment::binary-pb-equilibration
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.003'
+          approximate: false
+      locator:
+        page: 1
+        published_page: 1108
+        section: Experimental
+        note: 3 g Si–M alloy; converted to kg.
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '3'
+            locator:
+              page: 1
+              published_page: 1108
+              section: Experimental
+              note: 3 g Si–M alloy; converted to kg.
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 1
+              published_page: 1108
+              section: Experimental
+              note: 3 g Si–M alloy; converted to kg.
+        output_unit: kg
+    characterization:
+      state:
+        tag: value
+        value: 'Si–M alloy (M: Al, Ca, Mg); 0.5–5 mass% M initially.'
+      locator:
+        page: 1
+        published_page: 1108
+        section: Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723'
+      locator:
+        page: 1
+        published_page: 1108
+        section: Experimental
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1108
+        section: Experimental
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 1
+        published_page: 1108
+        section: Experimental
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694
+  locator:
+    page: 1
+    published_page: 1108
+    table: 1-3
+    section: Experimental
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Equilibrated for 14.4 ks at 1723 K in Ar.
+      locator:
+        page: 1
+        published_page: 1108
+        section: Experimental
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '14400'
+          approximate: false
+      locator:
+        page: 1
+        published_page: 1108
+        section: Experimental
+        note: 14.4 ks as printed.
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Sample quenched after equilibration.
+      locator:
+        page: 1
+        published_page: 1108
+        section: Experimental
+- experiment_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694::experiment::knudsen-effusion
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0003'
+          approximate: false
+      locator:
+        page: 1
+        published_page: 1108
+        section: Experimental
+        note: 0.3 g sample, converted to kg.
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.3'
+            locator:
+              page: 1
+              published_page: 1108
+              section: Experimental
+              note: 0.3 g sample, converted to kg.
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 1
+              published_page: 1108
+              section: Experimental
+              note: 0.3 g sample, converted to kg.
+        output_unit: kg
+    characterization:
+      state:
+        tag: value
+        value: Al content 0.7–2 mass%; Ca content 0.2–0.6 mass% preliminarily.
+      locator:
+        page: 1
+        published_page: 1108
+        section: Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: would_invent
+      locator:
+        page: 4
+        published_page: 1111
+        table: 4-5
+        section: Experimental
+        note: The tables span 1723–1823 K; the scalar experiment temperature field has no range representation in the reader.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 1111
+        table: 4-5
+        section: Experimental
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 1111
+        table: 4-5
+        section: Experimental
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694
+  locator:
+    page: 4
+    published_page: 1111
+    table: 4-5
+    section: Experimental
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0005'
+            approximate: false
+        locator:
+          page: 1
+          published_page: 1108
+          section: Experimental
+          note: 0.5 mm orifice.
+  bench_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694::bench::miki-1999-knudsen-mass-spectrometer
+  thermal_schedule:
+    method:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1108
+        section: Experimental
+        note: No hold duration specified for Knudsen effusion.
+- experiment_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694::experiment::ternary-pb-equilibration
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.003'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 1109
+        section: Experimental
+        note: 3 g Si–Ca–M alloy; converted to kg.
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '3'
+            locator:
+              page: 2
+              published_page: 1109
+              section: Experimental
+              note: 3 g Si–Ca–M alloy; converted to kg.
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 2
+              published_page: 1109
+              section: Experimental
+              note: 3 g Si–Ca–M alloy; converted to kg.
+        output_unit: kg
+    characterization:
+      state:
+        tag: value
+        value: 'Si–Ca–M alloy (M: Al, Ti, Fe).'
+      locator:
+        page: 2
+        published_page: 1109
+        section: Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723'
+      locator:
+        page: 2
+        published_page: 1109
+        section: Experimental
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 1109
+        table: 6-8
+        section: Experimental
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 1109
+        table: 6-8
+        section: Experimental
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694
+  locator:
+    page: 2
+    published_page: 1109
+    table: 6-8
+    section: Experimental
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Equilibrated for 14.4 ks at 1723 K in Ar.
+      locator:
+        page: 2
+        published_page: 1109
+        section: Experimental
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '14400'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 1109
+        section: Experimental
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Sample quenched after equilibration.
+      locator:
+        page: 2
+        published_page: 1109
+        section: Experimental
+- experiment_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694::miki-1999-si-alloy-thermodynamics
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694
+  locator:
+    page: 8
+    published_page: 1115
+    table: '9'
+    note: epsilon_Mg_Mg_in_Si; mole-fraction Wagner interaction parameter, 1723 K. measured here from chemical-equilibration
+      slopes; Table 3, Fig. 3.
+benches:
+- id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694::bench::miki-1999-knudsen-mass-spectrometer
+  work_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Nuclide Corp. 12-90HT magnetic single-focusing high-temperature mass spectrometer
+    locator:
+      page: 1
+      published_page: 1108
+      section: Experimental
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: BN Knudsen cell
+    locator:
+      page: 1
+      published_page: 1108
+      section: Experimental
+  cell_materials:
+  - state:
+      tag: value
+      value: BN
+    locator:
+      page: 1
+      published_page: 1108
+      section: Experimental
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: R-type Pt–Rh thermocouple spot-welded in a hole at the bottom of a Ta cell holder
+      locator:
+        page: 1
+        published_page: 1108
+        section: Experimental
+  temperature_calibration:
+    calibration:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1108
+        section: Experimental
+        note: No calibration procedure stated.
+    uncertainty:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1108
+        section: Experimental
+        note: Temperature measurement uncertainty is not stated.
+  other_facts:
+  - name: ionizing_energy
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '30'
+          approximate: false
+      locator:
+        page: 1
+        published_page: 1108
+        section: Experimental
+    unit: eV
+  - name: ion_counting_method
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: pulse-counting method
+          approximate: false
+      locator:
+        page: 1
+        published_page: 1108
+        section: Experimental
+    unit: categorical
+context:
+- observation_id: miki_1999_activity_method_equations
+  type: method
+  locator:
+    page: 2
+    published_page: 1109
+    section: Results and Discussion
+    equation: 1-2
+  units: as printed
+  values:
+    chemical_equilibration_equation_1: ln γ_i(l) in Si + ln X_i in Si = ln γ_i(l) in Pb + ln X_i in Pb; activity equality
+      for liquid phases, each solute referenced to pure liquid i.
+    chemical_equilibration_equation_2: ln X_Pb in Pb − ln X_Pb in Si = ln γ°_Pb in Si + ε^M_Pb in Si X_M in Si; Henry-law
+      approximations, neglecting Pb self-interaction term.
+    standard_state: Pure liquid solute for γ_M; mole-fraction scale; infinite-dilution intercept γ°.
+  context_id: miki-1999-si-alloy-thermodynamics::context::miki_1999_activity_method_equations
+  work_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694
+  source_id: miki-1999-si-alloy-thermodynamics
+  species: Si
+- observation_id: miki_1999_al_knudsen_composition_range
+  type: thermodynamic_parameter
+  locator:
+    page: 4
+    published_page: 1111
+    table: '4'
+  units: mole fraction
+  paraphrase: Current-run Knudsen Al mole fractions span X(Al in Si)=0.00543–0.0195.
+  values:
+    X_Al_low: '0.00543'
+    X_Al_high: '0.0195'
+  context_id: miki-1999-si-alloy-thermodynamics::context::miki_1999_al_knudsen_composition_range
+  work_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694
+  source_id: miki-1999-si-alloy-thermodynamics
+  species: Si
+- observation_id: miki_1999_binary_composition_ranges
+  type: thermodynamic_parameter
+  locator:
+    page: 2
+    published_page: 1109
+    table: 1, 3
+  units: mole fraction
+  paraphrase: Binary distribution data ranges are X(Al in Si)=0.00199–0.0639 in Table 1 and X(Mg in Si)=0.00375–0.0700 in
+    Table 3. The Table 2 Ca range is retained in its separate table-located context.
+  values:
+    Al_in_Si_X:
+    - '0.00199'
+    - '0.0639'
+    Mg_in_Si_X:
+    - '0.00375'
+    - '0.07'
+    T_K: 1723
+  context_id: miki-1999-si-alloy-thermodynamics::context::miki_1999_binary_composition_ranges
+  work_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694
+  source_id: miki-1999-si-alloy-thermodynamics
+  species: Si
+- observation_id: miki_1999_ca_distribution_composition_range
+  type: thermodynamic_parameter
+  locator:
+    page: 2
+    published_page: 1109
+    table: '2'
+  units: mole fraction
+  values:
+    composition_range: Ca in Si distribution data reaches X_Ca=0.0538 at 1723 K.
+    upper_X_Ca: '0.0538'
+    T_K: 1723
+  context_id: miki-1999-si-alloy-thermodynamics::context::miki_1999_ca_distribution_composition_range
+  work_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694
+  source_id: miki-1999-si-alloy-thermodynamics
+  species: Si
+- observation_id: miki_1999_ca_intercept_slope_extractor_computation
+  type: thermodynamic_parameter
+  locator:
+    page: 3
+    published_page: 1110
+    equation: '6'
+    note: Extractor computation compares Eq. 6 with the temperature expression in Eq. 20 on p. 1112; arithmetic below is not
+      an author statement.
+  units: natural logarithm of activity coefficient
+  values:
+    extractor_computation_not_author_statement:
+      distribution_ln_gamma0: '-6.71'
+      temperature_expression_at_1723_K: -14300/1723 + 1.55 = -6.7494776553 (approximately -6.749)
+      intercept_difference: (-14300/1723 + 1.55) - (-6.71) = -0.0394776553, magnitude approximately 0.039 in ln gamma
+      distribution_epsilon_Ca_Ca: '9.9'
+      temperature_expression_epsilon_at_1723_K: 55600/1723 - 22.1 = 10.1692977365 (approximately 10.17)
+      slope_difference: (55600/1723 - 22.1) - 9.90 = 0.2692977365, approximately 0.27
+  context_id: miki-1999-si-alloy-thermodynamics::context::miki_1999_ca_intercept_slope_extractor_computation
+  work_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694
+  source_id: miki-1999-si-alloy-thermodynamics
+  species: Si
+- observation_id: miki_1999_ca_knudsen_composition_range
+  type: thermodynamic_parameter
+  locator:
+    page: 4
+    published_page: 1111
+    table: '5'
+  units: mole fraction
+  values:
+    composition_range: Current-run Knudsen Ca mole fractions span X_Ca=0.00111–0.00418.
+    X_Ca_low: '0.00111'
+    X_Ca_high: '0.00418'
+  context_id: miki-1999-si-alloy-thermodynamics::context::miki_1999_ca_knudsen_composition_range
+  work_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694
+  source_id: miki-1999-si-alloy-thermodynamics
+  species: Si
+- observation_id: miki_1999_ca_prior_work_comparison
+  type: quoted_comparison
+  locator:
+    page: 6
+    published_page: 1113
+    figure: '9'
+  units: as printed
+  quote: The present result agrees well with Iwahori et al. and Sudavtsova et al. but disagrees with Esin et al.
+  attribution: S. Iwahori et al. [13]; Yu. O. Esin et al. [14]; V. S. Sudavtsova and G. I. Batalin [15].
+  values:
+    comparison_only: Fig. 9 shows the Ca activity-coefficient comparison; exact comparator point values are not tabulated.
+  context_id: miki-1999-si-alloy-thermodynamics::context::miki_1999_ca_prior_work_comparison
+  work_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694
+  source_id: miki-1999-si-alloy-thermodynamics
+  species: Si
+- observation_id: miki_1999_ca_table9_temperature_and_uncertainty
+  type: thermodynamic_parameter
+  locator:
+    page: 8
+    published_page: 1115
+    table: '9'
+  units: as printed
+  values:
+    temperature_range_K:
+    - 1723
+    - 1823
+    parameter_uncertainty:
+      tag: unknown
+      reason: not_published
+    uncertainty_note: No parameter uncertainty printed.
+  context_id: miki-1999-si-alloy-thermodynamics::context::miki_1999_ca_table9_temperature_and_uncertainty
+  work_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694
+  source_id: miki-1999-si-alloy-thermodynamics
+  species: Si
+- observation_id: miki_1999_eq5_7_activity_coefficients
+  type: thermodynamic_parameter
+  locator:
+    page: 3
+    published_page: 1110
+    equation: 5-7
+  units: ln(activity_coefficient)
+  values:
+    Al: ln gamma_Al(l) in Si = -1.64 + 18.0 X_Al in Si (1723 K)
+    Ca: ln gamma_Ca(l) in Si = -6.71 + 9.90 X_Ca in Si (1723 K)
+    Mg: ln gamma_Mg(l) in Si = -2.04 + 6.02 X_Mg in Si (1723 K)
+    standard_state: Pure liquid solute; infinite-dilution Henry reference; mole-fraction scale.
+    paraphrase: The authors state the infinitely dilute Al coefficient corrected from 0.212 to 0.194 because 0.5 mass% Al
+      was not dilute enough; Ca/Mg infinite-dilution coefficients at 1723 K matched earlier work [4].
+  context_id: miki-1999-si-alloy-thermodynamics::context::miki_1999_eq5_7_activity_coefficients
+  work_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694
+  source_id: miki-1999-si-alloy-thermodynamics
+  species: Si
+- observation_id: miki_1999_equilibrium_qualification
+  type: method
+  locator:
+    page: 4
+    published_page: 1111
+    section: Knudsen effusion method
+  units: as printed
+  values:
+    quote: “Since the reproducible ion currents during the same experiment were observed, the change in composition of Si–Al
+      and Si–Ca alloys and experimental conditions such as apparatus constant and ionization cross section can be neglected.”
+    interpretation: Reproducibility of ion currents is the stated repeatability evidence for Knudsen measurements. The chemical-equilibration
+      experiments report a 14.4 ks hold and invoke equilibrium relations, but no equilibration time series or approach-from-both-sides
+      test.
+  context_id: miki-1999-si-alloy-thermodynamics::context::miki_1999_equilibrium_qualification
+  work_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694
+  source_id: miki-1999-si-alloy-thermodynamics
+  species: Si
+- observation_id: miki_1999_experiment_binary_protocol
+  type: experiment_series
+  experiment: binary-pb-equilibration
+  locator:
+    page: 1
+    published_page: 1108
+    section: Experimental
+  units: as printed
+  values:
+    what_was_equilibrated: '3 g Si–M alloy (M: Al, Ca, Mg) with 10 g Pb; two liquid phases; 14.4 ks at 1723 K in Ar. M content
+      initially 0.5–5 mass%.'
+    crucibles: Graphite or alumina; graphite lid placed on crucible to avoid Pb evaporation.
+    quench: Sample quenched after equilibration.
+    analysis: Pb and M in Si phase, Si and M in Pb phase determined by chemical analysis.
+    analysis_instrument:
+      tag: unknown
+      reason: not_published
+    analytical_precision:
+      tag: unknown
+      reason: not_published
+    equilibrium_evidence: No time series or approach-from-both-sides test reported; distribution equilibrium is treated as
+      attained after 14.4 ks. Kirkwood and Chipman phase-solubility measurements cited as background.
+    sample_mass_Si_alloy_g: 3
+    sample_mass_Pb_g: 10
+    equilibration_duration_ks: '14.4'
+    temperature_K: 1723
+    gas_purification:
+      tag: unknown
+      reason: not_published
+    furnace:
+      tag: unknown
+      reason: not_published
+    temperature_sensor:
+      tag: unknown
+      reason: not_published
+    temperature_uncertainty_K:
+      tag: unknown
+      reason: not_published
+    fO2_control:
+      tag: unknown
+      reason: Ar atmosphere stated; no oxygen-fugacity control reported
+    chemical_equilibration_reaction:
+      tag: unknown
+      reason: no net reaction or standard Gibbs-energy expression is printed for Si/Pb distribution equilibrium
+  context_id: miki-1999-si-alloy-thermodynamics::context::miki_1999_experiment_binary_protocol
+  work_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694
+  source_id: miki-1999-si-alloy-thermodynamics
+  species: Si
+- observation_id: miki_1999_experiment_ternary_protocol
+  type: experiment_series
+  experiment: ternary-pb-equilibration
+  locator:
+    page: 2
+    published_page: 1109
+    section: Experimental
+  units: as printed
+  values:
+    what_was_equilibrated: '3 g Si–Ca–M (M: Al, Ti, Fe) alloy with 10 g Pb for 14.4 ks at 1723 K in Ar.'
+    sample_mass_Si_alloy_g: 3
+    sample_mass_Pb_g: 10
+    equilibration_duration_ks: '14.4'
+    temperature_K: 1723
+    gas_purification:
+      tag: unknown
+      reason: not_published
+    furnace:
+      tag: unknown
+      reason: not_published
+    temperature_sensor:
+      tag: unknown
+      reason: not_published
+    temperature_uncertainty_K:
+      tag: unknown
+      reason: not_published
+    crucibles: Alumina for Si–Ca–Al; graphite for Si–Ca–Ti and Si–Ca–Fe.
+    composition_control: Ca in Si held constant for Si–Ca–Al to avoid excess Ca evaporation; Ti and Fe held at relatively
+      high levels to improve their chemical-analysis accuracy in Pb.
+    quench: Sample quenched; both Si-rich and Pb-rich phases chemically analyzed.
+    analysis: Pb, Ca and M in Si-rich phase; Si, Ca and M in Pb-rich phase.
+    analysis_instrument:
+      tag: unknown
+      reason: not_published
+    analytical_precision:
+      tag: unknown
+      reason: not_published
+    equilibrium_evidence: No explicit equilibrium verification series is reported.
+    fO2_control:
+      tag: unknown
+      reason: Ar atmosphere stated; no oxygen-fugacity control reported
+    chemical_equilibration_reaction:
+      tag: unknown
+      reason: no net reaction or standard Gibbs-energy expression is printed for Si/Pb distribution equilibrium
+  context_id: miki-1999-si-alloy-thermodynamics::context::miki_1999_experiment_ternary_protocol
+  work_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694
+  source_id: miki-1999-si-alloy-thermodynamics
+  species: Si
+- observation_id: miki_1999_figures_prior_work_comparison
+  type: quoted_comparison
+  locator:
+    page: 5
+    published_page: 1112
+    figure: '8'
+  units: as printed
+  paraphrase: The activity coefficient of Al from this work agrees with values calculated from Gizenko et al. assuming regular
+    solution. The comparison is shown in Fig. 8.
+  attribution: N. V. Gizenko et al. [11].
+  values:
+    comparison_only: Comparator points are plotted in Fig. 8 and are not tabulated numerically.
+  context_id: miki-1999-si-alloy-thermodynamics::context::miki_1999_figures_prior_work_comparison
+  work_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694
+  source_id: miki-1999-si-alloy-thermodynamics
+  species: Si
+- observation_id: miki_1999_gamma_infinite_dilution_qualification
+  type: thermodynamic_parameter
+  locator:
+    page: 3
+    published_page: 1110
+    equation: 5-7
+  units: dimensionless activity coefficient
+  paraphrase: The infinite-dilution activity coefficient of Al in molten Si at 1723 K was corrected from 0.212 [4] to 0.194
+    because 0.5 mass% Al was not sufficiently dilute. The Ca and Mg infinite-dilution coefficients at 1723 K were found identical
+    to previous work [4].
+  attribution: Miki, Morita and Sano, Metallurgical and Materials Transactions B 29B (1998), 1043–1049.
+  values:
+    gamma0_Al_previous: '0.212'
+    gamma0_Al_corrected_here: '0.194'
+    gamma0_Ca_previous_relation: identical to [4]
+    gamma0_Mg_previous_relation: identical to [4]
+    temperature_K: 1723
+  context_id: miki-1999-si-alloy-thermodynamics::context::miki_1999_gamma_infinite_dilution_qualification
+  work_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694
+  source_id: miki-1999-si-alloy-thermodynamics
+  species: Si
+- observation_id: miki_1999_kirkwood_solubility_context
+  type: quoted_composition
+  locator:
+    page: 1
+    published_page: 1108
+    section: Experimental
+  units: at%
+  paraphrase: Kirkwood and Chipman [5] reported that at 1693 K Pb solubility in Si-rich liquid was 2.1 at% Pb and Si solubility
+    in Pb-rich liquid was 3.2 at% Si.
+  attribution: D. H. Kirkwood and J. Chipman, Journal of Physical Chemistry 65 (1961), 1082–1084.
+  values:
+    method_class: quoted_attributed
+    Pb_in_Si_rich_at_percent: '2.1'
+    Si_in_Pb_rich_at_percent: '3.2'
+    temperature_K: 1693
+  context_id: miki-1999-si-alloy-thermodynamics::context::miki_1999_kirkwood_solubility_context
+  work_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694
+  source_id: miki-1999-si-alloy-thermodynamics
+  species: Si
+- observation_id: miki_1999_knudsen_activity_method_equations
+  type: method
+  locator:
+    page: 4
+    published_page: 1111
+    section: Knudsen effusion method
+    equation: 11-18
+  units: as printed
+  quote: When the effusion of vapor from the Knudsen cell orifice satisfies molecular flow conditions, the relation between
+    ion current and vapor pressure, P_M, can be written as follows.
+  values:
+    knudsen_reaction: M(l) = M(g), M = Al or Ca (Eq. 11).
+    knudsen_equilibrium: K = P_M/(γ_M(l) in Si(T) X_M in Si) = exp(−ΔG°vap_M(T)/(RT)) (Eq. 12).
+    current_pressure_relation: P_M = A I_M(T) T (Eq. 13), conditional on molecular-flow conditions at the Knudsen-cell orifice.
+    knudsen_gamma_equation: ln γ_M(l) in Si(T) = ln γ_M(l) in Si(1723) + ln[I_M(T)T/(I_M(1723)·1723)] + ΔG°vap_M(T)/(RT) −
+      ΔG°vap_M(1723)/(R·1723) (Eqs. 14-16).
+    deltaG_vaporization_Al: Al(l)=Al(g); ΔG°=304900−110.2T J mol−1, JANAF [9] (Eq. 17).
+    deltaG_vaporization_Ca: Ca(l)=Ca(g); ΔG°=150100−84.65T J mol−1, JANAF [9] (Eq. 18).
+  context_id: miki-1999-si-alloy-thermodynamics::context::miki_1999_knudsen_activity_method_equations
+  work_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694
+  source_id: miki-1999-si-alloy-thermodynamics
+  species: Si
+- observation_id: miki_1999_knudsen_boron_qualifier
+  type: method
+  locator:
+    page: 4
+    published_page: 1111
+    section: Knudsen effusion method
+  units: as printed
+  quote: Also, the effect of B on thermodynamic properties of Al and Ca in Si was neglected since the B content after the
+    experiment was lower than 0.05 mass%.
+  values:
+    post_experiment_B_mass_percent:
+      operator: <
+      value: '0.05'
+    author_interpretation: Effect of B on Al and Ca thermodynamic properties was neglected.
+  context_id: miki-1999-si-alloy-thermodynamics::context::miki_1999_knudsen_boron_qualifier
+  work_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694
+  source_id: miki-1999-si-alloy-thermodynamics
+  species: Si
+- observation_id: miki_1999_knudsen_results_tables
+  type: method
+  locator:
+    page: 4
+    published_page: 1111
+    section: Knudsen effusion method
+    table: 4-5
+  units: as printed
+  quote: Experimental results for the Knudsen effusion method are listed in Tables 4 and 5.
+  values:
+    method: Knudsen effusion using ion currents and alloy composition.
+    temperature_range_K:
+    - 1723
+    - 1823
+  context_id: miki-1999-si-alloy-thermodynamics::context::miki_1999_knudsen_results_tables
+  work_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694
+  source_id: miki-1999-si-alloy-thermodynamics
+  species: Si
+- observation_id: miki_1999_knudsen_setup
+  type: apparatus
+  experiment: knudsen-effusion
+  locator:
+    page: 1
+    published_page: 1108
+    section: Experimental
+  units: as printed
+  values:
+    instrument: Nuclide Corp. 12-90HT magnetic single-focusing high-temperature mass spectrometer.
+    cell: BN Knudsen cell, 8 mm O.D., 5.5 mm I.D., 12 mm high, 0.5 mm orifice diameter.
+    sample_mass: 0.3 g (alloy sample).
+    sample_composition: Al preliminarily adjusted to 0.7–2 mass%; Ca preliminarily adjusted to 0.2–0.6 mass%.
+    temperature_measurement: R-type Pt–Rh thermocouple spot-welded into a hole at the bottom of a Ta cell holder.
+    ionization_energy_eV: 30
+    ion_counting: Pulse-counting method, attributed to Yamawaki et al.
+    temperature_uncertainty: Not stated.
+    atmosphere_or_chamber_pressure:
+      tag: unknown
+      reason: not_published
+  context_id: miki-1999-si-alloy-thermodynamics::context::miki_1999_knudsen_setup
+  work_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694
+  source_id: miki-1999-si-alloy-thermodynamics
+  species: Si
+- observation_id: miki_1999_parameter_uncertainties_and_qualifications
+  type: method
+  locator:
+    page: 8
+    published_page: 1115
+    section: Conclusions
+  units: as printed
+  values:
+    parameter_uncertainty:
+      tag: unknown
+      reason: not_published
+    regression_statistics: No standard errors, confidence intervals, or regression goodness-of-fit statistics are stated;
+      least-squares fitting is specified for the temperature-dependent Al and Ca parameters in Eqs. 19–20 (p. 1112).
+  context_id: miki-1999-si-alloy-thermodynamics::context::miki_1999_parameter_uncertainties_and_qualifications
+  work_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694
+  source_id: miki-1999-si-alloy-thermodynamics
+  species: Si
+- observation_id: miki_1999_prior_intercepts_and_gamma_si_pb
+  type: thermodynamic_parameter
+  locator:
+    page: 3
+    published_page: 1110
+    equation: '3'
+    figure: '2'
+  units: as printed
+  quote: The value of 3.82 for the intercept was deduced from the average value of three regression lines. From this value,
+    γ°_Si(l) in Pb at 1723 K can be calculated as 45.6, which is larger than 30.6 at 1693 K obtained using the results of
+    Kirkwood et al. [5].
+  attribution: Present paper for 3.82 and 45.6; Kirkwood and Chipman [5] for 30.6.
+  values:
+    ln_gamma0_Si_in_Pb_intercept_here: '3.82'
+    gamma0_Si_in_Pb_at_1723_here: '45.6'
+    gamma0_Si_in_Pb_at_1693_Kirkwood_Chipman: '30.6'
+    temperature_K_present: 1723
+    temperature_K_comparator: 1693
+  context_id: miki-1999-si-alloy-thermodynamics::context::miki_1999_prior_intercepts_and_gamma_si_pb
+  work_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694
+  source_id: miki-1999-si-alloy-thermodynamics
+  species: Si
+- observation_id: miki_1999_prior_ternary_activity_log_differences
+  type: quoted_comparison
+  locator:
+    page: 6
+    published_page: 1113
+    equation: 21-22
+  units: natural logarithm difference
+  paraphrase: The present values -1.16, -6.03, and -8.49 agree with previously determined values -1.19, -5.97 [3], and -8.47
+    [3], respectively.
+  attribution: Miki, Morita and Sano, Metallurgical and Materials Transactions B 28B (1997), 861–867 [3].
+  values:
+    present_Ca_log_gamma_difference: '-1.16'
+    prior_Ca_log_gamma_difference: '-1.19'
+    present_Ti_log_gamma_difference: '-6.03'
+    prior_Ti_log_gamma_difference: '-5.97'
+    present_Fe_log_gamma_difference: '-8.49'
+    prior_Fe_log_gamma_difference: '-8.47'
+    temperature_K: 1723
+  context_id: miki-1999-si-alloy-thermodynamics::context::miki_1999_prior_ternary_activity_log_differences
+  work_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694
+  source_id: miki-1999-si-alloy-thermodynamics
+  species: Si
+- observation_id: miki_1999_prior_thermodynamic_data
+  type: thermodynamic_parameter
+  locator:
+    page: 6
+    published_page: 1113
+    equation: 21-22
+  units: dimensionless interaction parameters
+  paraphrase: The prior parameters used in the ternary equations include ε_Ti^Ti in Si=3.97, ε_Pb^Ti in Si=13.2, ε_Si^Ti in
+    Pb=−10.8, ε_Fe^Fe in Si=3.17, ε_Pb^Fe in Si=14.1, and ε_Si^Fe in Pb=−23.8.
+  attribution: Miki, Morita and Sano, Metallurgical and Materials Transactions B 28B (1997), 861–867.
+  values:
+    parameter_values_as_printed:
+      epsilon_Ti_Ti_in_Si: '3.97'
+      epsilon_Pb_Ti_in_Si: '13.2'
+      epsilon_Si_Ti_in_Pb: '-10.8'
+      epsilon_Fe_Fe_in_Si: '3.17'
+      epsilon_Pb_Fe_in_Si: '14.1'
+      epsilon_Si_Fe_in_Pb: '-23.8'
+    temperature_K: 1723
+    source_status: taken from prior paper [3]
+  context_id: miki-1999-si-alloy-thermodynamics::context::miki_1999_prior_thermodynamic_data
+  work_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694
+  source_id: miki-1999-si-alloy-thermodynamics
+  species: Si
+- observation_id: miki_1999_regular_solution_packing_assumptions
+  type: method
+  locator:
+    page: 7
+    published_page: 1114
+    section: Thermodynamic properties of Si ternary alloys
+  units: as printed
+  paraphrase: The hard-sphere interaction term depends on component diameter, atomic volume, and solvent packing fraction;
+    the discussion uses packing fraction 0.45 reported by Ashcroft and Lekner. Binary alloys in this discussion are assumed
+    to be regular solutions.
+  attribution: N. W. Ashcroft and J. Lekner [17].
+  values:
+    packing_fraction: '0.45'
+    binary_alloy_assumption: regular solution
+  context_id: miki-1999-si-alloy-thermodynamics::context::miki_1999_regular_solution_packing_assumptions
+  work_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694
+  source_id: miki-1999-si-alloy-thermodynamics
+  species: Si
+- observation_id: miki_1999_silica_scope_absence
+  type: scope
+  locator:
+    page: 1
+    published_page: 1108
+    section: Title and abstract
+  units: as printed
+  values:
+    finding: No SiO2 activity, slag composition, silica-saturation point, or slag/metal equilibration reaction appears in
+      this paper. The article concerns liquid Si solute thermodynamics using Pb alloy equilibration and Knudsen effusion.
+    requested_silica_method: Not present in this source; a(SiO2) cannot be attributed to Miki et al. (1999).
+  context_id: miki-1999-si-alloy-thermodynamics::context::miki_1999_silica_scope_absence
+  work_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694
+  source_id: miki-1999-si-alloy-thermodynamics
+  species: Si
+- observation_id: miki_1999_t9_epsilon_Al_Al_in_Si_expression
+  type: thermodynamic_parameter
+  locator:
+    page: 5
+    published_page: 1112
+    equation: '19'
+  units: mole-fraction Wagner parameter
+  values:
+    parameter: epsilon_Al_Al_in_Si
+    printed_expression: 1.00e5/T - 40.1
+    temperature_or_basis: mole-fraction Wagner interaction parameter, T=1723–1823 K
+    standard_state: Henry infinite-dilution solute activity relative to pure liquid solute; mole-fraction interaction expansion
+    source_status: measured here by least-squares fit; Table 4, Fig. 6; Eq. 19
+    uncertainty: No parameter-specific uncertainty or confidence interval stated.
+  context_id: miki-1999-si-alloy-thermodynamics::context::miki_1999_t9_epsilon_Al_Al_in_Si_expression
+  work_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694
+  source_id: miki-1999-si-alloy-thermodynamics
+  species: Si
+- observation_id: miki_1999_t9_epsilon_Ca_Ca_in_Si_expression
+  type: thermodynamic_parameter
+  locator:
+    page: 5
+    published_page: 1112
+    equation: '20'
+  units: mole-fraction Wagner parameter
+  values:
+    parameter: epsilon_Ca_Ca_in_Si
+    printed_expression: 55600/T - 22.1
+    temperature_or_basis: mole-fraction Wagner interaction parameter, T=1723–1823 K
+    standard_state: Henry infinite-dilution solute activity relative to pure liquid solute; mole-fraction interaction expansion
+    source_status: measured here by least-squares fit; Table 5, Fig. 7; Eq. 20
+    uncertainty: No parameter-specific uncertainty or confidence interval stated.
+  context_id: miki-1999-si-alloy-thermodynamics::context::miki_1999_t9_epsilon_Ca_Ca_in_Si_expression
+  work_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694
+  source_id: miki-1999-si-alloy-thermodynamics
+  species: Si
+- observation_id: miki_1999_t9_ln_gamma0_Al_in_Si
+  type: thermodynamic_parameter
+  locator:
+    page: 8
+    published_page: 1115
+    table: '9'
+    note: Infinite-dilution activity-coefficient expression, relative to pure liquid solute standard state.
+  units: ln(activity_coefficient)
+  values:
+    parameter: ln_gamma0_Al_in_Si
+    printed_expression: -3610/T + 0.452
+    temperature_or_basis: ln(gamma), T=1723–1823 K
+    source_status: measured here; KEMS baseline from Table 4 and earlier chemical-equilibration data; Eq. 19
+    uncertainty: No parameter-specific uncertainty or fit confidence interval is stated.
+    gamma0_at_1723_derived: '0.1933636201053583'
+    derived_value_note: Derived as exp(printed ln(gamma) expression) at 1723 K; this numeric conversion is not printed as
+      a separate table cell.
+  context_id: miki-1999-si-alloy-thermodynamics::context::miki_1999_t9_ln_gamma0_Al_in_Si
+  work_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694
+  source_id: miki-1999-si-alloy-thermodynamics
+  species: Al
+- observation_id: miki_1999_t9_ln_gamma0_Ca_in_Si
+  type: thermodynamic_parameter
+  locator:
+    page: 8
+    published_page: 1115
+    table: '9'
+    note: Infinite-dilution activity-coefficient expression, relative to pure liquid solute standard state.
+  units: ln(activity_coefficient)
+  values:
+    parameter: ln_gamma0_Ca_in_Si
+    printed_expression: -14300/T + 1.55
+    temperature_or_basis: ln(gamma), T=1723–1823 K
+    source_status: measured here; KEMS baseline from Table 5 and earlier chemical-equilibration data; Eq. 20
+    uncertainty: No parameter-specific uncertainty or fit confidence interval is stated.
+    gamma0_at_1723_derived: '0.001171491383372664'
+    derived_value_note: Derived as exp(printed ln(gamma) expression) at 1723 K; this numeric conversion is not printed as
+      a separate table cell.
+  context_id: miki-1999-si-alloy-thermodynamics::context::miki_1999_t9_ln_gamma0_Ca_in_Si
+  work_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694
+  source_id: miki-1999-si-alloy-thermodynamics
+  species: Ca
+- observation_id: miki_1999_t9_ln_gamma0_Mg_in_Si
+  type: thermodynamic_parameter
+  locator:
+    page: 8
+    published_page: 1115
+    table: '9'
+    note: Infinite-dilution activity-coefficient expression, relative to pure liquid solute standard state.
+  units: ln(activity_coefficient)
+  values:
+    parameter: ln_gamma0_Mg_in_Si
+    printed_expression: '-2.04'
+    temperature_or_basis: ln(gamma), 1723 K
+    source_status: taken as identical to previous work [4]; Table 3 discussion
+    uncertainty: No parameter-specific uncertainty or fit confidence interval is stated.
+    gamma0_at_1723_derived: '0.1300287108784259'
+    derived_value_note: Derived as exp(printed ln(gamma) expression) at 1723 K; this numeric conversion is not printed as
+      a separate table cell.
+  context_id: miki-1999-si-alloy-thermodynamics::context::miki_1999_t9_ln_gamma0_Mg_in_Si
+  work_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694
+  source_id: miki-1999-si-alloy-thermodynamics
+  species: Mg
+- observation_id: miki_1999_tanida_al_comparison
+  type: quoted_comparison
+  locator:
+    page: 6
+    published_page: 1113
+    figure: '8'
+  units: as printed
+  paraphrase: The present Al activity-coefficient result agrees with Tanida et al. for a dilute solution, but disagrees for
+    a relatively concentrated solution.
+  attribution: K. Tanida et al. [10].
+  values:
+    dilute_solution: agreement
+    relatively_concentrated_solution: disagreement
+    comparison_only: Comparator points are plotted in Fig. 8 and are not tabulated numerically.
+  context_id: miki-1999-si-alloy-thermodynamics::context::miki_1999_tanida_al_comparison
+  work_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694
+  source_id: miki-1999-si-alloy-thermodynamics
+  species: Si
+- observation_id: miki_1999_ueno_waseda_comparison_qualification
+  type: quoted_comparison
+  locator:
+    page: 8
+    published_page: 1115
+    figure: '13'
+  units: as printed
+  paraphrase: All signs of the interaction parameters estimated with the Ueno and Waseda model agree with the authors' values.
+    Estimated and measured absolute values agree well when the parameters are relatively small; the authors conclude that
+    Si interaction parameters can therefore be estimated approximately with that model.
+  attribution: Ueno and Waseda [16, 21, 22].
+  values:
+    sign_agreement: all interaction-parameter signs
+    magnitude_agreement_qualification: good agreement when the parameters are relatively small
+  context_id: miki-1999-si-alloy-thermodynamics::context::miki_1999_ueno_waseda_comparison_qualification
+  work_id: e6c80e36e7b90012f4dcbe0581ceb8ff0048647bbd8e0f0729cd402bece96694
+  source_id: miki-1999-si-alloy-thermodynamics
+  species: Si

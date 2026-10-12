@@ -1,0 +1,1871 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/shornikov-2024-wollastonite-evaporation.yaml
+observations:
+- observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_cao_activity_prose
+  experiment_id: 10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1751, 2087]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Pure-component CaO reference vapor pressure p_CaO° in Eq. (7); the condensed
+        reference phase is not specified.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.015'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Authors say approximately 0.015 and slightly increasing with temperature; no numeric uncertainty is stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2024-wollastonite-evaporation::shornikov_2024_cao_activity_prose
+  source_id: shornikov-2024-wollastonite-evaporation
+  locator:
+    page: 6
+    published_page: 572
+    pdf_page_index: 5
+    section: Results and Discussion
+  read_from: pdf:shornikov-2024-wollastonite-evaporation
+  derived_from:
+  - shornikov-2024-wollastonite-evaporation::shornikov_2024_figure1_p_Ca
+  - shornikov-2024-wollastonite-evaporation::shornikov_2024_figure1_p_O
+  derivation:
+    relation: a_CaO = p_CaO/p_CaO° = p_Ca p_O/(p_Ca° p_O°), Lewis Eq. (7)
+    inputs:
+    - shornikov-2024-wollastonite-evaporation::shornikov_2024_figure1_p_Ca
+    - shornikov-2024-wollastonite-evaporation::shornikov_2024_figure1_p_O
+    parameters: []
+    output_unit: dimensionless
+- observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_crystalline_formation_enthalpy
+  experiment_id: 10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline wollastonite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1751, 1818]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-38.92'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: ± 0.52 kJ/mol as printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2024-wollastonite-evaporation::shornikov_2024_crystalline_formation_enthalpy
+  source_id: shornikov-2024-wollastonite-evaporation
+  locator:
+    page: 7
+    published_page: 573
+    pdf_page_index: 6
+    section: Results and Discussion
+    equation: '10'
+  read_from: pdf:shornikov-2024-wollastonite-evaporation
+  derived_from:
+  - shornikov-2024-wollastonite-evaporation::shornikov_2024_cao_activity_prose
+  - shornikov-2024-wollastonite-evaporation::shornikov_2024_sio2_activity_prose
+  derivation:
+    relation: Least-squares fit of ΔG_T = ΔH_T − TΔS_T over the crystalline interval, Eq. (10)
+    inputs:
+    - shornikov-2024-wollastonite-evaporation::shornikov_2024_cao_activity_prose
+    - shornikov-2024-wollastonite-evaporation::shornikov_2024_sio2_activity_prose
+    parameters: []
+    output_unit: kJ/mol
+- observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_crystalline_formation_entropy
+  experiment_id: 10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline wollastonite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1751, 1818]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '2.33'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: ± 0.29 J/(mol × K) as printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2024-wollastonite-evaporation::shornikov_2024_crystalline_formation_entropy
+  source_id: shornikov-2024-wollastonite-evaporation
+  locator:
+    page: 7
+    published_page: 573
+    pdf_page_index: 6
+    section: Results and Discussion
+    equation: '10'
+  read_from: pdf:shornikov-2024-wollastonite-evaporation
+  derived_from:
+  - shornikov-2024-wollastonite-evaporation::shornikov_2024_cao_activity_prose
+  - shornikov-2024-wollastonite-evaporation::shornikov_2024_sio2_activity_prose
+  derivation:
+    relation: Least-squares fit of ΔG_T = ΔH_T − TΔS_T over the crystalline interval, Eq. (10)
+    inputs:
+    - shornikov-2024-wollastonite-evaporation::shornikov_2024_cao_activity_prose
+    - shornikov-2024-wollastonite-evaporation::shornikov_2024_sio2_activity_prose
+    parameters: []
+    output_unit: J/(mol × K)
+- observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_figure1_p_Ca
+  experiment_id: 10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Ca
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1751, 2087]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, admission_status, status,
+      reason'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numeric uncertainty is stated for the plotted curve.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: Curve has no tabulated coordinates and was not digitized.
+    decided_by:
+      worker: x-2024-wollastonite-evaporation
+      date: '2026-10-04'
+      evidence:
+        page: 6
+        published_page: 572
+        pdf_page_index: 5
+        figure: '1'
+        note: Curve 3; not digitized.
+  notices: []
+  source_id: shornikov-2024-wollastonite-evaporation
+  locator:
+    page: 6
+    published_page: 572
+    pdf_page_index: 5
+    figure: '1'
+    note: Curve 3; not digitized.
+  read_from: pdf:shornikov-2024-wollastonite-evaporation
+- observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_figure1_p_CaO
+  experiment_id: 10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1751, 2087]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, admission_status, status,
+      reason'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numeric uncertainty is stated for the plotted curve.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: Curve has no tabulated coordinates and was not digitized.
+    decided_by:
+      worker: x-2024-wollastonite-evaporation
+      date: '2026-10-04'
+      evidence:
+        page: 6
+        published_page: 572
+        pdf_page_index: 5
+        figure: '1'
+        note: Curve 4; not digitized.
+  notices: []
+  source_id: shornikov-2024-wollastonite-evaporation
+  locator:
+    page: 6
+    published_page: 572
+    pdf_page_index: 5
+    figure: '1'
+    note: Curve 4; not digitized.
+  read_from: pdf:shornikov-2024-wollastonite-evaporation
+- observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_figure1_p_O
+  experiment_id: 10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1751, 2087]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, admission_status, status,
+      reason'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numeric uncertainty is stated for the plotted curve.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: Curve has no tabulated coordinates and was not digitized.
+    decided_by:
+      worker: x-2024-wollastonite-evaporation
+      date: '2026-10-04'
+      evidence:
+        page: 6
+        published_page: 572
+        pdf_page_index: 5
+        figure: '1'
+        note: Curve 1; not digitized.
+  notices: []
+  source_id: shornikov-2024-wollastonite-evaporation
+  locator:
+    page: 6
+    published_page: 572
+    pdf_page_index: 5
+    figure: '1'
+    note: Curve 1; not digitized.
+  read_from: pdf:shornikov-2024-wollastonite-evaporation
+- observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_figure1_p_O2
+  experiment_id: 10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1751, 2087]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, admission_status, status,
+      reason'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numeric uncertainty is stated for the plotted curve.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: Curve has no tabulated coordinates and was not digitized.
+    decided_by:
+      worker: x-2024-wollastonite-evaporation
+      date: '2026-10-04'
+      evidence:
+        page: 6
+        published_page: 572
+        pdf_page_index: 5
+        figure: '1'
+        note: Curve 2; not digitized.
+  notices: []
+  source_id: shornikov-2024-wollastonite-evaporation
+  locator:
+    page: 6
+    published_page: 572
+    pdf_page_index: 5
+    figure: '1'
+    note: Curve 2; not digitized.
+  read_from: pdf:shornikov-2024-wollastonite-evaporation
+- observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_figure1_p_Si2O2
+  experiment_id: 10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Si2O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1751, 2087]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, admission_status, status,
+      reason'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numeric uncertainty is stated for the plotted curve.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: Curve has no tabulated coordinates and was not digitized.
+    decided_by:
+      worker: x-2024-wollastonite-evaporation
+      date: '2026-10-04'
+      evidence:
+        page: 6
+        published_page: 572
+        pdf_page_index: 5
+        figure: '1'
+        note: Curve 7; not digitized.
+  notices: []
+  source_id: shornikov-2024-wollastonite-evaporation
+  locator:
+    page: 6
+    published_page: 572
+    pdf_page_index: 5
+    figure: '1'
+    note: Curve 7; not digitized.
+  read_from: pdf:shornikov-2024-wollastonite-evaporation
+- observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_figure1_p_SiO
+  experiment_id: 10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1751, 2087]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, admission_status, status,
+      reason'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numeric uncertainty is stated for the plotted curve.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: Curve has no tabulated coordinates and was not digitized.
+    decided_by:
+      worker: x-2024-wollastonite-evaporation
+      date: '2026-10-04'
+      evidence:
+        page: 6
+        published_page: 572
+        pdf_page_index: 5
+        figure: '1'
+        note: Curve 5; not digitized.
+  notices: []
+  source_id: shornikov-2024-wollastonite-evaporation
+  locator:
+    page: 6
+    published_page: 572
+    pdf_page_index: 5
+    figure: '1'
+    note: Curve 5; not digitized.
+  read_from: pdf:shornikov-2024-wollastonite-evaporation
+- observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_figure1_p_SiO2
+  experiment_id: 10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1751, 2087]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, admission_status, status,
+      reason'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numeric uncertainty is stated for the plotted curve.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: Curve has no tabulated coordinates and was not digitized.
+    decided_by:
+      worker: x-2024-wollastonite-evaporation
+      date: '2026-10-04'
+      evidence:
+        page: 6
+        published_page: 572
+        pdf_page_index: 5
+        figure: '1'
+        note: Curve 6; not digitized.
+  notices: []
+  source_id: shornikov-2024-wollastonite-evaporation
+  locator:
+    page: 6
+    published_page: 572
+    pdf_page_index: 5
+    figure: '1'
+    note: Curve 6; not digitized.
+  read_from: pdf:shornikov-2024-wollastonite-evaporation
+- observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_liquid_formation_enthalpy
+  experiment_id: 10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'liquid wollastonite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1818, 2087]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-11.29'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: ± 0.24 kJ/mol as printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2024-wollastonite-evaporation::shornikov_2024_liquid_formation_enthalpy
+  source_id: shornikov-2024-wollastonite-evaporation
+  locator:
+    page: 7
+    published_page: 573
+    pdf_page_index: 6
+    section: Results and Discussion
+    equation: '10'
+  read_from: pdf:shornikov-2024-wollastonite-evaporation
+  derived_from:
+  - shornikov-2024-wollastonite-evaporation::shornikov_2024_cao_activity_prose
+  - shornikov-2024-wollastonite-evaporation::shornikov_2024_sio2_activity_prose
+  derivation:
+    relation: Least-squares fit of ΔG_T = ΔH_T − TΔS_T over the liquid interval, Eq. (10)
+    inputs:
+    - shornikov-2024-wollastonite-evaporation::shornikov_2024_cao_activity_prose
+    - shornikov-2024-wollastonite-evaporation::shornikov_2024_sio2_activity_prose
+    parameters: []
+    output_unit: kJ/mol
+- observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_liquid_formation_entropy
+  experiment_id: 10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'liquid wollastonite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1818, 2087]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '17.53'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: ± 0.12 J/(mol × K) as printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2024-wollastonite-evaporation::shornikov_2024_liquid_formation_entropy
+  source_id: shornikov-2024-wollastonite-evaporation
+  locator:
+    page: 7
+    published_page: 573
+    pdf_page_index: 6
+    section: Results and Discussion
+    equation: '10'
+  read_from: pdf:shornikov-2024-wollastonite-evaporation
+  derived_from:
+  - shornikov-2024-wollastonite-evaporation::shornikov_2024_cao_activity_prose
+  - shornikov-2024-wollastonite-evaporation::shornikov_2024_sio2_activity_prose
+  derivation:
+    relation: Least-squares fit of ΔG_T = ΔH_T − TΔS_T over the liquid interval, Eq. (10)
+    inputs:
+    - shornikov-2024-wollastonite-evaporation::shornikov_2024_cao_activity_prose
+    - shornikov-2024-wollastonite-evaporation::shornikov_2024_sio2_activity_prose
+    parameters: []
+    output_unit: J/(mol × K)
+- observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_sio2_activity_prose
+  experiment_id: 10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1751, 2087]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Pure-component SiO2 reference vapor pressure p_SiO2° in Eq. (8); the condensed
+        reference phase is not specified.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.2'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Authors say approximately 0.20 and slightly increasing with temperature; no numeric uncertainty is stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2024-wollastonite-evaporation::shornikov_2024_sio2_activity_prose
+  source_id: shornikov-2024-wollastonite-evaporation
+  locator:
+    page: 6
+    published_page: 572
+    pdf_page_index: 5
+    section: Results and Discussion
+  read_from: pdf:shornikov-2024-wollastonite-evaporation
+  derived_from:
+  - shornikov-2024-wollastonite-evaporation::shornikov_2024_figure1_p_SiO
+  - shornikov-2024-wollastonite-evaporation::shornikov_2024_figure1_p_O
+  derivation:
+    relation: a_SiO2 = p_SiO2/p_SiO2° = p_SiO p_O/(p_SiO° p_O°), Lewis Eq. (8)
+    inputs:
+    - shornikov-2024-wollastonite-evaporation::shornikov_2024_figure1_p_SiO
+    - shornikov-2024-wollastonite-evaporation::shornikov_2024_figure1_p_O
+    parameters: []
+    output_unit: dimensionless
+- observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_table1_adamcovicova_melting_temperature
+  experiment_id: 10.1007/978-3-031-50349-8_48::shornikov-2024-wollastonite-evaporation
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: source states transition property_kind 'melting_point' (solid -> liquid) in values.property_kind; v2.1 species.phase
+          has one phase axis and cannot hold a transition's phases
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1817'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 5
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Adamcovicova et al. (1980), reference [38]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2024-wollastonite-evaporation::shornikov_2024_table1_adamcovicova_melting_temperature
+  source_id: shornikov-2024-wollastonite-evaporation
+  locator:
+    page: 8
+    published_page: 574
+    pdf_page_index: 7
+    table: '1'
+    note: Table 1 row attributed to reference [38].
+  read_from: pdf:shornikov-2024-wollastonite-evaporation
+- observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_table1_barin_melting_temperature
+  experiment_id: 10.1007/978-3-031-50349-8_48::shornikov-2024-wollastonite-evaporation
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: source states transition property_kind 'melting_point' (solid -> liquid) in values.property_kind; v2.1 species.phase
+          has one phase axis and cannot hold a transition's phases
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1817'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Barin (1995), reference [35]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2024-wollastonite-evaporation::shornikov_2024_table1_barin_melting_temperature
+  source_id: shornikov-2024-wollastonite-evaporation
+  locator:
+    page: 8
+    published_page: 574
+    pdf_page_index: 7
+    table: '1'
+    note: Table 1 row attributed to reference [35].
+  read_from: pdf:shornikov-2024-wollastonite-evaporation
+- observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_table1_botvinkin_melting_temperature
+  experiment_id: 10.1007/978-3-031-50349-8_48::shornikov-2024-wollastonite-evaporation
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: source states transition property_kind 'melting_point' (solid -> liquid) in values.property_kind; v2.1 species.phase
+          has one phase axis and cannot hold a transition's phases
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1813'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 5
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Botvinkin (1955), reference [36]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2024-wollastonite-evaporation::shornikov_2024_table1_botvinkin_melting_temperature
+  source_id: shornikov-2024-wollastonite-evaporation
+  locator:
+    page: 8
+    published_page: 574
+    pdf_page_index: 7
+    table: '1'
+    note: Table 1 row attributed to reference [36].
+  read_from: pdf:shornikov-2024-wollastonite-evaporation
+- observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_table1_current_melting_temperature
+  experiment_id: 10.1007/978-3-031-50349-8_48::shornikov-2024-wollastonite-evaporation
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: source states transition property_kind 'melting_point' (solid -> liquid) in values.property_kind; v2.1 species.phase
+          has one phase axis and cannot hold a transition's phases
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1818'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 7
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2024-wollastonite-evaporation::shornikov_2024_table1_current_melting_temperature
+  source_id: shornikov-2024-wollastonite-evaporation
+  locator:
+    page: 8
+    published_page: 574
+    pdf_page_index: 7
+    table: '1'
+    note: Present-study row; melting temperature derived from crystalline/liquid enthalpy or entropy differences, Eqs. (11)–(13).
+  read_from: pdf:shornikov-2024-wollastonite-evaporation
+  derived_from:
+  - shornikov-2024-wollastonite-evaporation::shornikov_2024_crystalline_formation_enthalpy
+  - shornikov-2024-wollastonite-evaporation::shornikov_2024_crystalline_formation_entropy
+  - shornikov-2024-wollastonite-evaporation::shornikov_2024_liquid_formation_enthalpy
+  - shornikov-2024-wollastonite-evaporation::shornikov_2024_liquid_formation_entropy
+  derivation:
+    relation: T_m = (ΔH_liq − ΔH_sol)/(ΔS_liq − ΔS_sol) = ΔH_m/ΔS_m, Eqs. (11)–(13)
+    inputs:
+    - shornikov-2024-wollastonite-evaporation::shornikov_2024_crystalline_formation_enthalpy
+    - shornikov-2024-wollastonite-evaporation::shornikov_2024_crystalline_formation_entropy
+    - shornikov-2024-wollastonite-evaporation::shornikov_2024_liquid_formation_enthalpy
+    - shornikov-2024-wollastonite-evaporation::shornikov_2024_liquid_formation_entropy
+    parameters: []
+    output_unit: K
+- observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_table1_richet_melting_temperature
+  experiment_id: 10.1007/978-3-031-50349-8_48::shornikov-2024-wollastonite-evaporation
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: source states transition property_kind 'melting_point' (solid -> liquid) in values.property_kind; v2.1 species.phase
+          has one phase axis and cannot hold a transition's phases
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1821'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 3
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Richet et al. (1994), reference [40]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2024-wollastonite-evaporation::shornikov_2024_table1_richet_melting_temperature
+  source_id: shornikov-2024-wollastonite-evaporation
+  locator:
+    page: 8
+    published_page: 574
+    pdf_page_index: 7
+    table: '1'
+    note: Table 1 row attributed to reference [40].
+  read_from: pdf:shornikov-2024-wollastonite-evaporation
+- observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_table1_tarina_melting_temperature
+  experiment_id: 10.1007/978-3-031-50349-8_48::shornikov-2024-wollastonite-evaporation
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: source states transition property_kind 'melting_point' (solid -> liquid) in values.property_kind; v2.1 species.phase
+          has one phase axis and cannot hold a transition's phases
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1821'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 3
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Tarina et al. (1994), reference [39]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2024-wollastonite-evaporation::shornikov_2024_table1_tarina_melting_temperature
+  source_id: shornikov-2024-wollastonite-evaporation
+  locator:
+    page: 8
+    published_page: 574
+    pdf_page_index: 7
+    table: '1'
+    note: Table 1 row attributed to reference [39].
+  read_from: pdf:shornikov-2024-wollastonite-evaporation

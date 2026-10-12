@@ -1,0 +1,874 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1007/978-3-031-50349-8_48
+  citation: Shornikov, S. I. (2024), ‘Mass Spectrometric Investigation of Thermodynamic Properties of CaSiO3 Wollastonite’,
+    TMS 2024 153rd Annual Meeting & Exhibition Supplemental Proceedings, The Minerals, Metals & Materials Series, pp. 568–576.
+  source_ids:
+  - shornikov-2024-wollastonite-evaporation
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+    files:
+    - asset_id: pdf:shornikov-2024-wollastonite-evaporation
+      role: pdf
+      path: raw/shornikov-2024-wollastonite-evaporation/shornikov-2024-wollastonite-evaporation.pdf
+      sha256:
+        tag: value
+        value: 145eeaee821e66da05007e5efadd265fb577e707add57466a4d79ccc5fc5a34e
+    - asset_id: pdftotext:shornikov-2024-wollastonite-evaporation
+      role: pdftotext
+      path: text/shornikov-2024-wollastonite-evaporation
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:shornikov-2024-wollastonite-evaporation
+      role: table_csv
+      path: tables/shornikov-2024-wollastonite-evaporation
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: unknown:shornikov-2024-wollastonite-evaporation
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1007/978-3-031-50349-8_48
+experiments:
+- experiment_id: 10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 569
+        pdf_page_index: 2
+        section: Experimental
+        note: Wollastonite (CaSiO3) is the named starting phase; no quantitative as-prepared composition is reported.
+    form:
+      state:
+        tag: value
+        value: Synthetic wollastonite (CaSiO3)
+      locator:
+        page: 3
+        published_page: 569
+        pdf_page_index: 2
+        section: Experimental
+    characterization:
+      state:
+        tag: value
+        value: X-ray phase and chemical analyses were performed; results and sample purity are not reported.
+      locator:
+        page: 3
+        published_page: 569
+        pdf_page_index: 2
+        section: Experimental
+    pretreatment:
+      state:
+        tag: value
+        value: Synthesized by the precursor method [25]
+      locator:
+        page: 3
+        published_page: 569
+        pdf_page_index: 2
+        section: Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '1751'
+          interval_high: '2087'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 568
+        pdf_page_index: 1
+        section: Abstract
+        note: Study interval; individual run temperatures are not assigned in a tabulated series.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <=
+          bound_value: '0.0000101325'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 569
+        pdf_page_index: 2
+        section: Experimental
+        note: Residual-gas pressure did not exceed 10^-10 atm anywhere in the study range; converted using 1 atm = 101325
+          Pa. This is chamber background, not sample vapor pressure.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 569
+        pdf_page_index: 2
+        section: Experimental
+        note: No sweep gas is stated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1007/978-3-031-50349-8_48
+  locator:
+    page: 3
+    published_page: 569
+    pdf_page_index: 2
+    section: Experimental
+    note: Wollastonite evaporation studied from a molybdenum Knudsen effusion cell.
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 3
+          published_page: 569
+          pdf_page_index: 2
+          section: Experimental
+          note: The paper names the effusion cell but gives no orifice diameter.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 3
+          published_page: 569
+          pdf_page_index: 2
+          section: Experimental
+          note: The paper gives no effusion-orifice channel length.
+    calibration:
+      partial_pressure_method:
+        state:
+          tag: value
+          value: Partial pressures calculated with Hertz–Knudsen Eq. (4) and Komlev Eq. (5); q_i is based on time integrals
+            of total ion currents, with proportionality coefficients using the prevailing Ca and SiO ion currents and the
+            number of simple oxides in wollastonite.
+        locator:
+          page: 4
+          published_page: 570
+          pdf_page_index: 3
+          equation: '4'
+      ion_current_pressure_comparison:
+        state:
+          tag: value
+          value: Eq. (6) relates I_i+/I_SiO+ to p_SiO and the effective ionization cross-sections σ_i and isotope distributions
+            η_i.
+        locator:
+          page: 5
+          published_page: 571
+          pdf_page_index: 4
+          equation: '6'
+      ion_pressure_reference:
+        state:
+          tag: value
+          value: SiO vapor pressure p_SiO is the internal comparison reference in Eq. (6); the source gives no separate pressure-standard
+            substance.
+        locator:
+          page: 5
+          published_page: 571
+          pdf_page_index: 4
+          equation: '6'
+      pressure_standard_substance:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 5
+          published_page: 571
+          pdf_page_index: 4
+          equation: '6'
+          note: The source uses p_SiO as an internal comparison reference but names no separate pressure-calibration substance.
+      vaporization_coefficients:
+        state:
+          tag: value
+          value: Partial evaporation coefficients from Shornikov [32] were used; no coefficient values are printed here.
+        locator:
+          page: 5
+          published_page: 571
+          pdf_page_index: 4
+          paragraph: Results and Discussion
+      cross_section_source:
+        state:
+          tag: value
+          value: Drowart et al. [33] is cited with the ion-current pressure equation; this chapter does not print cross-section
+            values.
+        locator:
+          page: 5
+          published_page: 571
+          pdf_page_index: 4
+          equation: '6'
+      isotope_correction:
+        state:
+          tag: value
+          value: Isotope distributions η_i are included in Eq. (6); numerical correction factors are not printed.
+        locator:
+          page: 5
+          published_page: 571
+          pdf_page_index: 4
+          equation: '6'
+      multiplier_correction:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 5
+          published_page: 571
+          pdf_page_index: 4
+          equation: '6'
+          note: No multiplier correction is stated.
+      appearance_energy_standard:
+        state:
+          tag: value
+          value: Silver-ion appearance energy was used as the standard for the CaSiO3+ appearance energy, not as a vapor-pressure
+            standard.
+        locator:
+          page: 4
+          published_page: 570
+          pdf_page_index: 3
+          paragraph: Results and Discussion
+  bench_id: 10.1007/978-3-031-50349-8_48::bench::shornikov-2024-mi1201-mo
+- experiment_id: 10.1007/978-3-031-50349-8_48::shornikov-2024-wollastonite-evaporation
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/978-3-031-50349-8_48
+  locator:
+    page: 8
+    published_page: 574
+    pdf_page_index: 7
+    table: '1'
+    note: Table 1 row attributed to reference [36].
+benches:
+- id: 10.1007/978-3-031-50349-8_48::bench::shornikov-2024-mi1201-mo
+  work_id: 10.1007/978-3-031-50349-8_48
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: MI-1201 mass spectrometer with modified ion source for high-temperature studies
+    locator:
+      page: 3
+      published_page: 569
+      pdf_page_index: 2
+      section: Experimental
+  method:
+    state:
+      tag: value
+      value: Knudsen effusion mass spectrometry
+    locator:
+      page: 3
+      published_page: 569
+      pdf_page_index: 2
+      section: Experimental
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Molybdenum effusion cell; liner not stated
+    locator:
+      page: 3
+      published_page: 569
+      pdf_page_index: 2
+      section: Experimental
+  cell_materials:
+  - state:
+      tag: value
+      value: Mo
+    locator:
+      page: 3
+      published_page: 569
+      pdf_page_index: 2
+      section: Experimental
+      note: The cell is printed as molybdenum; no liner material is named.
+  ionization:
+    electron_energy_eV:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '15'
+          interval_high: '18'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 569
+        pdf_page_index: 2
+        section: Results and Discussion
+        note: Energy of ionizing electrons as printed.
+    ions_reported:
+      state:
+        tag: value
+        value: Ca+, CaO+, SiO+, SiO2+, Si2O2+, O+, O2+, CaSiO3+; fragments include CaSi+, CaSiO+, CaSiO2+; MoOi+ for i = 0–3
+      locator:
+        page: 3
+        published_page: 569
+        pdf_page_index: 2
+        section: Results and Discussion
+    ionization_cross_sections:
+      state:
+        tag: value
+        value: Effective cross-sections σ_i are used in Eq. (6); the equation cites Drowart et al. [33], but this chapter
+          prints no cross-section values.
+      locator:
+        page: 5
+        published_page: 571
+        pdf_page_index: 4
+        equation: '6'
+    isotope_distributions:
+      state:
+        tag: value
+        value: Isotope distributions η_i are included in Eq. (6); no numerical isotope correction factors are printed.
+      locator:
+        page: 5
+        published_page: 571
+        pdf_page_index: 4
+        equation: '6'
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: EOP-66 optical pyrometer
+      locator:
+        page: 3
+        published_page: 569
+        pdf_page_index: 2
+        section: Experimental
+    measurement_error_bound:
+      state:
+        tag: value
+        value: Error not exceeding 10 K at 2400 K
+      locator:
+        page: 3
+        published_page: 569
+        pdf_page_index: 2
+        section: Experimental
+  temperature_calibration:
+    calibration_procedure:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 569
+        pdf_page_index: 2
+        section: Experimental
+        note: The pyrometer is identified and an error bound is stated; no temperature calibration procedure or reference
+          is described.
+  heating_method:
+    state:
+      tag: value
+      value: Alternating electric current passed through the effusion-cell body
+    locator:
+      page: 3
+      published_page: 569
+      pdf_page_index: 2
+      section: Experimental
+  other_facts:
+  - name: ion_source_maximum_temperature
+    value:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <=
+          bound_value: '3000'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 569
+        pdf_page_index: 2
+        section: Experimental
+        note: Modified ion source described as suitable for studies up to 3000 K.
+    unit: K
+  - name: CaSiO3_positive_ion_appearance_energy
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '7.9'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 570
+        pdf_page_index: 3
+        section: Results and Discussion
+        note: Printed 7.9 ± 0.5 eV; silver-ion appearance energy is the standard. The uncertainty is preserved here because
+          BenchFact has no separate uncertainty slot.
+    unit: eV
+  - name: pyrometer_error_bound_at_2400_K
+    value:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <=
+          bound_value: '10'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 569
+        pdf_page_index: 2
+        section: Experimental
+        note: Applies at 2400 K as printed; not generalized to the full experimental range.
+    unit: K
+  - name: clausing_coefficient_bound
+    value:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <=
+          bound_value: '1'
+          approximate: false
+      locator:
+        page: 5
+        published_page: 571
+        pdf_page_index: 4
+        section: Method
+        equation: '5'
+        note: The printed text says the cell Clausing coefficient does not exceed one.
+    unit: dimensionless
+context:
+- observation_id: shornikov_2024_current_ion_current_ratios_2087k
+  type: experiment_series
+  locator:
+    page: 3
+    published_page: 569
+    pdf_page_index: 2
+    section: Results and Discussion
+    note: Ratio sentence continues on published page 570.
+  units: relative total-ion-current scale with I_SiO+ = 100
+  values:
+    quantity: relative_ion_current_intensities_as_printed
+    method_class: measured_direct
+    temperature_K: 2087
+    reference_ion: SiO+
+    ion_current_ratios:
+    - ion: SiO+
+      relative_current: 100
+    - ion: Si2O2+
+      relative_current: '0.51'
+    - ion: SiO2+
+      relative_current: '0.145'
+    - ion: CaSiO3+
+      relative_current: '0.12'
+    - ion: Ca+
+      relative_current: '0.024'
+      printed_form: 2.4 × 10^-2
+    - ion: O+
+      relative_current: '0.0032'
+      printed_form: 3.2 × 10^-3
+    - ion: O2+
+      relative_current: '0.00029'
+      printed_form: 2.9 × 10^-4
+    - ion: CaO+
+      relative_current: '0.000037'
+      printed_form: 3.7 × 10^-5
+    note: The relative values are the printed intensity ratio scale, not pressure values.
+  context_id: shornikov-2024-wollastonite-evaporation::context::shornikov_2024_current_ion_current_ratios_2087k
+  work_id: 10.1007/978-3-031-50349-8_48
+  source_id: shornikov-2024-wollastonite-evaporation
+  species: CaSiO3
+- observation_id: shornikov_2024_figure2_activity_curves
+  type: thermodynamic_example
+  locator:
+    page: 6
+    published_page: 572
+    pdf_page_index: 5
+    figure: '2'
+    note: Panels a and b; curves are not digitized.
+  units: dimensionless activity versus temperature
+  values:
+    quantity: CaO_and_SiO2_activity_comparison_curves
+    method_class: figure_only
+    plotted_series_as_captioned: 'CaO: Fulton and Chipman [11], Kalyanram et al. [12], Chou et al. [14], Rein and Chipman
+      [15], Cho and Suito [16], Tanahashi et al. [17], San(g)bongi and Omori [8], Stolyarova et al. [20], Shornikov [21],
+      Shornikov and Archakov [23], and this study. SiO2: the same captioned comparison sources and this study.'
+    note: The present-study activities are also described approximately in prose; see the measured-reduced observations.
+  context_id: shornikov-2024-wollastonite-evaporation::context::shornikov_2024_figure2_activity_curves
+  work_id: 10.1007/978-3-031-50349-8_48
+  source_id: shornikov-2024-wollastonite-evaporation
+  species: CaSiO3
+- observation_id: shornikov_2024_figure3_mixing_energy_curves
+  type: thermodynamic_example
+  locator:
+    page: 7
+    published_page: 573
+    pdf_page_index: 6
+    figure: '3'
+    note: Mixing-energy comparison curves; no curve coordinates digitized.
+  units: kJ/mol as plotted
+  values:
+    quantity: wollastonite_mixing_energy_comparison_curves
+    method_class: figure_only
+    plotted_series_as_captioned: Sawamura [9]; Sharma and Richardson [13]; Rein and Chipman [15]; Morita et al. [18]; Jacobsson
+      and Tangstad [19]; Zaitsev and Mogutnov [22]; Shornikov and Archakov [23]; this study; calculated values by Barin [35].
+    note: The figure caption spells reference [19] as Jacobsson; the reference list spells it Jakobsson.
+  context_id: shornikov-2024-wollastonite-evaporation::context::shornikov_2024_figure3_mixing_energy_curves
+  work_id: 10.1007/978-3-031-50349-8_48
+  source_id: shornikov-2024-wollastonite-evaporation
+  species: CaSiO3
+- observation_id: shornikov_2024_figures_and_polymorph_context
+  type: method
+  locator:
+    page: 2
+    published_page: 568
+    pdf_page_index: 1
+    section: Introduction
+  units: as printed
+  values:
+    quantity: figure_only_and_polymorph_notes
+    method_class: figure_only
+    figures_not_digitized:
+    - '1: partial pressures of O, O2, Ca, CaO, SiO, SiO2, Si2O2, and CaSiO3 versus temperature; logarithmic pressure axis
+      in atm'
+    - '2: CaO and SiO2 activities versus temperature, including comparison literature'
+    - '3: wollastonite melt mixing energy versus temperature, including comparison literature'
+    polymorph_notes: The introduction names high-temperature α-CaSiO3 pseudowollastonite and low-temperature β-CaSiO3, with
+      a transition at 1398 ± 10 K. The study does not identify the actual sample polymorph or report post-run phase analysis
+      results; no polymorph token is assigned.
+  context_id: shornikov-2024-wollastonite-evaporation::context::shornikov_2024_figures_and_polymorph_context
+  work_id: 10.1007/978-3-031-50349-8_48
+  source_id: shornikov-2024-wollastonite-evaporation
+  species: CaSiO3
+- observation_id: shornikov_2024_printed_method_and_thermodynamic_relations
+  type: method
+  locator:
+    page: 4
+    published_page: 570
+    pdf_page_index: 3
+    section: Experimental and Results and Discussion
+    note: Printed equations are transcribed as relations and retain each equation's page locator.
+  units: as printed
+  values:
+    quantity: printed_method_and_thermodynamic_relations
+    equations_as_printed:
+    - equation: '1'
+      relation: '[Mo] = (Mo)'
+      locator:
+        page: 4
+        published_page: 570
+        pdf_page_index: 3
+        equation: '1'
+    - equation: '2'
+      relation: (Mo) + i(O) = (MoO_i)
+      locator:
+        page: 4
+        published_page: 570
+        pdf_page_index: 3
+        equation: '2'
+    - equation: '3'
+      relation: '[CaSiO3] = (CaSiO3)'
+      locator:
+        page: 4
+        published_page: 570
+        pdf_page_index: 3
+        equation: '3'
+    - equation: '4'
+      relation: p_i = K_alpha (q_i / (s_or C_or t)) sqrt(2 pi R T / M_i)
+      locator:
+        page: 4
+        published_page: 570
+        pdf_page_index: 3
+        equation: '4'
+    - equation: '5'
+      relation: K_alpha = 1/C_or + s_or (1 - C_c alpha_i)/(S_v alpha_i C_c)
+      locator:
+        page: 5
+        published_page: 571
+        pdf_page_index: 4
+        equation: '5'
+    - equation: '6'
+      relation: p_i = (I_i+ / I_SiO+) p_SiO (sigma_SiO eta_SiO)/(sigma_i eta_i)
+      locator:
+        page: 5
+        published_page: 571
+        pdf_page_index: 4
+        equation: '6'
+    - equation: '9'
+      relation: Delta G_m_T(CaSiO3) = R T sum_i x_i ln(a_i)
+      locator:
+        page: 6
+        published_page: 572
+        pdf_page_index: 5
+        equation: '9'
+    - equation: '11'
+      relation: Delta H_melt = Delta H_liq - Delta H_sol
+      locator:
+        page: 7
+        published_page: 573
+        pdf_page_index: 6
+        equation: '11'
+    - equation: '12'
+      relation: Delta S_melt = Delta S_liq - Delta S_sol
+      locator:
+        page: 7
+        published_page: 573
+        pdf_page_index: 6
+        equation: '12'
+  context_id: shornikov-2024-wollastonite-evaporation::context::shornikov_2024_printed_method_and_thermodynamic_relations
+  work_id: 10.1007/978-3-031-50349-8_48
+  source_id: shornikov-2024-wollastonite-evaporation
+  species: CaSiO3
+- observation_id: shornikov_2024_sample_and_data_qualifications
+  type: characterization
+  locator:
+    page: 3
+    published_page: 569
+    pdf_page_index: 2
+    section: Experimental
+  units: as printed
+  values:
+    quantity: sample_characterization_and_qualifications
+    method_class: measured_direct
+    starting_materials:
+      tag: unknown
+      reason: not_published
+    sample_purity:
+      tag: unknown
+      reason: not_published
+    as_prepared_quantitative_composition:
+      tag: unknown
+      reason: not_published
+    post_run_composition_or_phase_analysis:
+      tag: unknown
+      reason: not_published
+    qualifications:
+    - CaSiO3+ fragments by about half into CaSi+, CaSiO+, and CaSiO2+ ions.
+    - MoOi+ ions (i = 0–3) are attributed to molybdenum-cell evaporation and interaction of wollastonite with the cell, producing
+      gaseous molybdenum oxides.
+    - Predominance of SiO and smaller amounts of oxygen-deficient Si2O2 and Ca are attributed to reducing processes from melt–cell
+      interaction, which lowers oxygen partial pressure.
+    - CaSiO3 gaseous-oxide content increases with temperature, which the authors interpret as decreasing dissociation.
+    - Logarithmic atomic-Ca and atomic-O partial-pressure dependences on inverse temperature coincide; the authors infer a
+      significant effect of the calcium component on evaporation.
+    - CaO and SiO2 activities are approximately 0.015 and 0.20, respectively, and increase slightly with temperature.
+    - CaO activities are close to [12] and [23] and slightly above [17]; SiO2 activities correspond to [8], [14], [20], [21],
+      and [23] and differ slightly from [11] and [15].
+    - The introduction describes earlier determinations below 1000 K as extensive but rather inaccurate; it reports spreads
+      up to 7 J/(mol × K) in heat capacity, 5 kJ/mol in enthalpy, and 3 J/(mol × K) in entropy. The authors suggest incomplete
+      matching of natural and synthetic sample phases as a possible cause.
+    - At 1873 K the introduction says CaO activities from Sakagami [7] and Sawamura [9] differ by almost 70 times, while SiO2
+      activities from Fulton and Chipman [11] and Jakobsson and Tangstad [19] differ by more than two times.
+    - Mixing energies coincide with [19] and [23] and exceed the experimental [9], [13], [18], [22] and theoretical [15],
+      [35] values by about 2 kJ/mol.
+    - Formation enthalpy and entropy were fitted by least squares over 1751–1818 K for the crystalline phase and 1818–2087
+      K for the liquid phase.
+    - Melting enthalpy and melting point were calculated from the liquid-minus- crystalline enthalpy and entropy differences.
+    - Table 1 melting results are said to agree satisfactorily with calorimetry [36]–[40] and thermochemical calculations
+      [35] within error limits.
+    citation_spelling_notes:
+    - Figure 2 caption prints “Sangbongi”; reference [8] prints “Sanbongi”.
+    - Figure 3 caption prints “Jacobsson”; reference [19] prints “Jakobsson”.
+  context_id: shornikov-2024-wollastonite-evaporation::context::shornikov_2024_sample_and_data_qualifications
+  work_id: 10.1007/978-3-031-50349-8_48
+  source_id: shornikov-2024-wollastonite-evaporation
+  species: CaSiO3
+- observation_id: shornikov_2024_table1_adamcovicova_full_row
+  type: thermodynamic_example
+  locator:
+    page: 8
+    published_page: 574
+    pdf_page_index: 7
+    table: '1'
+  units: as printed
+  values:
+    quantity: melting_temperature_and_enthalpy_table_row
+    method_class: quoted_attributed
+    attribution: Adamcovicova et al. (1980), reference [38]
+    research_method_as_printed: HF/HNO3 solution calorimetry
+    T_m_as_printed: 1817 ± 5
+    T_m_K: 1817
+    T_m_uncertainty_K: 5
+    delta_H_m_as_printed: 28.66 ± 1.50
+    delta_H_m_kJ_per_mol: '28.66'
+    delta_H_m_uncertainty_kJ_per_mol: '1.5'
+    reference_and_year_as_printed: '[38], 1980'
+  context_id: shornikov-2024-wollastonite-evaporation::context::shornikov_2024_table1_adamcovicova_full_row
+  work_id: 10.1007/978-3-031-50349-8_48
+  source_id: shornikov-2024-wollastonite-evaporation
+  species: CaSiO3
+- observation_id: shornikov_2024_table1_barany_full_row
+  type: thermodynamic_example
+  locator:
+    page: 8
+    published_page: 574
+    pdf_page_index: 7
+    table: '1'
+  units: as printed
+  values:
+    quantity: melting_temperature_and_enthalpy_table_row
+    method_class: quoted_attributed
+    attribution: Barany (1966), reference [37]
+    research_method_as_printed: HF solution calorimetry
+    T_m_as_printed: –
+    T_m_K:
+      tag: unknown
+      reason: not_published
+    delta_H_m_as_printed: 33.93 ± 0.54
+    delta_H_m_kJ_per_mol: '33.93'
+    delta_H_m_uncertainty_kJ_per_mol: '0.54'
+    reference_and_year_as_printed: '[37], 1966'
+  context_id: shornikov-2024-wollastonite-evaporation::context::shornikov_2024_table1_barany_full_row
+  work_id: 10.1007/978-3-031-50349-8_48
+  source_id: shornikov-2024-wollastonite-evaporation
+  species: CaSiO3
+- observation_id: shornikov_2024_table1_barin_full_row
+  type: thermodynamic_example
+  locator:
+    page: 8
+    published_page: 574
+    pdf_page_index: 7
+    table: '1'
+  units: as printed
+  values:
+    quantity: melting_temperature_and_enthalpy_table_row
+    method_class: quoted_attributed
+    attribution: Barin (1995), reference [35]
+    research_method_as_printed: Thermochemical calculations
+    T_m_as_printed: 1817
+    T_m_K: 1817
+    delta_H_m_as_printed: '28.03'
+    delta_H_m_kJ_per_mol: '28.03'
+    reference_and_year_as_printed: '[35], 1995'
+  context_id: shornikov-2024-wollastonite-evaporation::context::shornikov_2024_table1_barin_full_row
+  work_id: 10.1007/978-3-031-50349-8_48
+  source_id: shornikov-2024-wollastonite-evaporation
+  species: CaSiO3
+- observation_id: shornikov_2024_table1_botvinkin_full_row
+  type: thermodynamic_example
+  locator:
+    page: 8
+    published_page: 574
+    pdf_page_index: 7
+    table: '1'
+  units: as printed
+  values:
+    quantity: melting_temperature_and_enthalpy_table_row
+    method_class: quoted_attributed
+    attribution: Botvinkin (1955), reference [36]
+    research_method_as_printed: HF solution calorimetry
+    T_m_as_printed: 1813 ± 5
+    T_m_K: 1813
+    T_m_uncertainty_K: 5
+    delta_H_m_as_printed: 24.18 ± 2.50
+    delta_H_m_kJ_per_mol: '24.18'
+    delta_H_m_uncertainty_kJ_per_mol: '2.5'
+    reference_and_year_as_printed: '[36], 1955'
+  context_id: shornikov-2024-wollastonite-evaporation::context::shornikov_2024_table1_botvinkin_full_row
+  work_id: 10.1007/978-3-031-50349-8_48
+  source_id: shornikov-2024-wollastonite-evaporation
+  species: CaSiO3
+- observation_id: shornikov_2024_table1_current_full_row
+  type: thermodynamic_example
+  locator:
+    page: 8
+    published_page: 574
+    pdf_page_index: 7
+    table: '1'
+  units: as printed
+  values:
+    quantity: melting_temperature_and_enthalpy_table_row
+    method_class: model_derived
+    research_method_as_printed: Knudsen effusion mass spectrometry
+    T_m_as_printed: 1818 ± 7
+    T_m_K: 1818
+    T_m_uncertainty_K: 7
+    delta_H_m_as_printed: 27.64 ± 0.57
+    delta_H_m_kJ_per_mol: '27.64'
+    delta_H_m_uncertainty_kJ_per_mol: '0.57'
+    reference_and_year_as_printed: The present study
+  context_id: shornikov-2024-wollastonite-evaporation::context::shornikov_2024_table1_current_full_row
+  work_id: 10.1007/978-3-031-50349-8_48
+  source_id: shornikov-2024-wollastonite-evaporation
+  species: CaSiO3
+- observation_id: shornikov_2024_table1_richet_full_row
+  type: thermodynamic_example
+  locator:
+    page: 8
+    published_page: 574
+    pdf_page_index: 7
+    table: '1'
+  units: as printed
+  values:
+    quantity: melting_temperature_and_enthalpy_table_row
+    method_class: quoted_attributed
+    attribution: Richet et al. (1994), reference [40]
+    research_method_as_printed: Ice calorimetry
+    T_m_as_printed: 1821 ± 3
+    T_m_K: 1821
+    T_m_uncertainty_K: 3
+    delta_H_m_as_printed: 28.65 ± 0.15
+    delta_H_m_kJ_per_mol: '28.65'
+    delta_H_m_uncertainty_kJ_per_mol: '0.15'
+    reference_and_year_as_printed: '[40], 1994'
+  context_id: shornikov-2024-wollastonite-evaporation::context::shornikov_2024_table1_richet_full_row
+  work_id: 10.1007/978-3-031-50349-8_48
+  source_id: shornikov-2024-wollastonite-evaporation
+  species: CaSiO3
+- observation_id: shornikov_2024_table1_tarina_full_row
+  type: thermodynamic_example
+  locator:
+    page: 8
+    published_page: 574
+    pdf_page_index: 7
+    table: '1'
+  units: as printed
+  values:
+    quantity: melting_temperature_and_enthalpy_table_row
+    method_class: quoted_attributed
+    attribution: Tarina et al. (1994), reference [39]
+    research_method_as_printed: Drop calorimetry
+    T_m_as_printed: 1821 ± 3
+    T_m_K: 1821
+    T_m_uncertainty_K: 3
+    delta_H_m_as_printed: 28.50 ± 2.50
+    delta_H_m_kJ_per_mol: '28.5'
+    delta_H_m_uncertainty_kJ_per_mol: '2.5'
+    reference_and_year_as_printed: '[39], 1994'
+  context_id: shornikov-2024-wollastonite-evaporation::context::shornikov_2024_table1_tarina_full_row
+  work_id: 10.1007/978-3-031-50349-8_48
+  source_id: shornikov-2024-wollastonite-evaporation
+  species: CaSiO3

@@ -184,8 +184,19 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -230,6 +241,87 @@ observations:
     table: S1
   read_from: pdf:kems-137-bischof-2023
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 2
+        table: S1
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50.47'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.38'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '10.42'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '23.63'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -241,87 +333,6 @@ observations:
       locator:
         pdf_page_index: 2
         table: S1
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - Al2O3
-            - '0.09016222059047146822155136996'
-          - - CaO
-            - '0.2497337676677724287741937335'
-          - - MgO
-            - '0.159959352914716545092785499'
-          - - SiO2
-            - '0.5001446588270395579114693973'
-          amount_basis: mole_fraction
-      locator:
-        pdf_page_index: 2
-        table: S1
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23.46'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.8'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.34'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -391,8 +402,19 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -437,6 +459,87 @@ observations:
     table: S1
   read_from: pdf:kems-137-bischof-2023
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 2
+        table: S1
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50.47'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.38'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '10.42'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '23.63'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -448,87 +551,6 @@ observations:
       locator:
         pdf_page_index: 2
         table: S1
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - Al2O3
-            - '0.09016222059047146822155136996'
-          - - CaO
-            - '0.2497337676677724287741937335'
-          - - MgO
-            - '0.159959352914716545092785499'
-          - - SiO2
-            - '0.5001446588270395579114693973'
-          amount_basis: mole_fraction
-      locator:
-        pdf_page_index: 2
-        table: S1
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23.46'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.8'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.34'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -598,8 +620,19 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -644,6 +677,87 @@ observations:
     table: S1
   read_from: pdf:kems-137-bischof-2023
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 2
+        table: S1
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50.47'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.38'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '10.42'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '23.63'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -655,87 +769,6 @@ observations:
       locator:
         pdf_page_index: 2
         table: S1
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - Al2O3
-            - '0.09016222059047146822155136996'
-          - - CaO
-            - '0.2497337676677724287741937335'
-          - - MgO
-            - '0.159959352914716545092785499'
-          - - SiO2
-            - '0.5001446588270395579114693973'
-          amount_basis: mole_fraction
-      locator:
-        pdf_page_index: 2
-        table: S1
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23.46'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.8'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.34'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -805,8 +838,19 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -851,6 +895,87 @@ observations:
     table: S1
   read_from: pdf:kems-137-bischof-2023
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 2
+        table: S1
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50.47'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.38'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '10.42'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '23.63'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -862,87 +987,6 @@ observations:
       locator:
         pdf_page_index: 2
         table: S1
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - Al2O3
-            - '0.09016222059047146822155136996'
-          - - CaO
-            - '0.2497337676677724287741937335'
-          - - MgO
-            - '0.159959352914716545092785499'
-          - - SiO2
-            - '0.5001446588270395579114693973'
-          amount_basis: mole_fraction
-      locator:
-        pdf_page_index: 2
-        table: S1
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23.46'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.8'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.34'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -1012,8 +1056,19 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1058,6 +1113,87 @@ observations:
     table: S1
   read_from: pdf:kems-137-bischof-2023
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 2
+        table: S1
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50.47'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.38'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '10.42'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '23.63'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -1069,87 +1205,6 @@ observations:
       locator:
         pdf_page_index: 2
         table: S1
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - Al2O3
-            - '0.09016222059047146822155136996'
-          - - CaO
-            - '0.2497337676677724287741937335'
-          - - MgO
-            - '0.159959352914716545092785499'
-          - - SiO2
-            - '0.5001446588270395579114693973'
-          amount_basis: mole_fraction
-      locator:
-        pdf_page_index: 2
-        table: S1
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23.46'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.8'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.34'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -1219,8 +1274,19 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1265,6 +1331,87 @@ observations:
     table: S1
   read_from: pdf:kems-137-bischof-2023
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 2
+        table: S1
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50.47'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.38'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '10.42'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '23.63'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -1276,87 +1423,6 @@ observations:
       locator:
         pdf_page_index: 2
         table: S1
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - Al2O3
-            - '0.09016222059047146822155136996'
-          - - CaO
-            - '0.2497337676677724287741937335'
-          - - MgO
-            - '0.159959352914716545092785499'
-          - - SiO2
-            - '0.5001446588270395579114693973'
-          amount_basis: mole_fraction
-      locator:
-        pdf_page_index: 2
-        table: S1
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23.46'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.8'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.34'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -1426,8 +1492,19 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1472,6 +1549,87 @@ observations:
     table: S1
   read_from: pdf:kems-137-bischof-2023
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 2
+        table: S1
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50.47'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.38'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '10.42'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '23.63'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -1483,87 +1641,6 @@ observations:
       locator:
         pdf_page_index: 2
         table: S1
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - Al2O3
-            - '0.09016222059047146822155136996'
-          - - CaO
-            - '0.2497337676677724287741937335'
-          - - MgO
-            - '0.159959352914716545092785499'
-          - - SiO2
-            - '0.5001446588270395579114693973'
-          amount_basis: mole_fraction
-      locator:
-        pdf_page_index: 2
-        table: S1
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23.46'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.8'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.34'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -1633,8 +1710,19 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1679,6 +1767,87 @@ observations:
     table: S1
   read_from: pdf:kems-137-bischof-2023
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 2
+        table: S1
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50.47'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.38'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '10.42'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '23.63'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -1690,87 +1859,6 @@ observations:
       locator:
         pdf_page_index: 2
         table: S1
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - Al2O3
-            - '0.09016222059047146822155136996'
-          - - CaO
-            - '0.2497337676677724287741937335'
-          - - MgO
-            - '0.159959352914716545092785499'
-          - - SiO2
-            - '0.5001446588270395579114693973'
-          amount_basis: mole_fraction
-      locator:
-        pdf_page_index: 2
-        table: S1
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23.46'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.8'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.34'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -1840,8 +1928,19 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1886,6 +1985,87 @@ observations:
     table: S1
   read_from: pdf:kems-137-bischof-2023
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 2
+        table: S1
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50.47'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.38'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '10.42'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '23.63'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -1897,87 +2077,6 @@ observations:
       locator:
         pdf_page_index: 2
         table: S1
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - Al2O3
-            - '0.09016222059047146822155136996'
-          - - CaO
-            - '0.2497337676677724287741937335'
-          - - MgO
-            - '0.159959352914716545092785499'
-          - - SiO2
-            - '0.5001446588270395579114693973'
-          amount_basis: mole_fraction
-      locator:
-        pdf_page_index: 2
-        table: S1
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23.46'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.8'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.34'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -2047,8 +2146,19 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2093,6 +2203,87 @@ observations:
     table: S1
   read_from: pdf:kems-137-bischof-2023
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 2
+        table: S1
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50.47'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.38'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '10.42'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '23.63'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -2104,87 +2295,6 @@ observations:
       locator:
         pdf_page_index: 2
         table: S1
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - Al2O3
-            - '0.09016222059047146822155136996'
-          - - CaO
-            - '0.2497337676677724287741937335'
-          - - MgO
-            - '0.159959352914716545092785499'
-          - - SiO2
-            - '0.5001446588270395579114693973'
-          amount_basis: mole_fraction
-      locator:
-        pdf_page_index: 2
-        table: S1
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23.46'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.8'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.34'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -2254,8 +2364,19 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2300,6 +2421,87 @@ observations:
     table: S1
   read_from: pdf:kems-137-bischof-2023
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 2
+        table: S1
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50.47'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.38'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '10.42'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '23.63'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
@@ -2311,87 +2513,6 @@ observations:
       locator:
         pdf_page_index: 2
         table: S1
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - Al2O3
-            - '0.09016222059047146822155136996'
-          - - CaO
-            - '0.2497337676677724287741937335'
-          - - MgO
-            - '0.159959352914716545092785499'
-          - - SiO2
-            - '0.5001446588270395579114693973'
-          amount_basis: mole_fraction
-      locator:
-        pdf_page_index: 2
-        table: S1
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23.46'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.8'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.34'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 2
-              table: S1
-        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -16203,7 +16324,7 @@ observations:
     table: '4'
   read_from: pdf:kems-137-bischof-2023
 - observation_id: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1586.4:h=af73d739d4d6
-  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
     quantity:
       tag: value
@@ -16258,8 +16379,19 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -16304,6 +16436,98 @@ observations:
     table: S1
   read_from: pdf:kems-137-bischof-2023
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 2
+        table: S1
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50.47'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.38'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '10.42'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '23.63'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '15.4'
+          CaO: '23.46'
+          MgO: '10.8'
+          SiO2: '50.34'
+      locator:
+        pdf_page_index: 2
+        table: S1
     temperature_K:
       state:
         tag: value
@@ -16318,7 +16542,7 @@ observations:
     parameters: []
     output_unit: Pa
 - observation_id: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1598.0:h=973db73de518
-  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
     quantity:
       tag: value
@@ -16373,8 +16597,19 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -16419,6 +16654,98 @@ observations:
     table: S1
   read_from: pdf:kems-137-bischof-2023
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 2
+        table: S1
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50.47'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.38'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '10.42'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '23.63'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '15.4'
+          CaO: '23.46'
+          MgO: '10.8'
+          SiO2: '50.34'
+      locator:
+        pdf_page_index: 2
+        table: S1
     temperature_K:
       state:
         tag: value
@@ -16433,7 +16760,7 @@ observations:
     parameters: []
     output_unit: Pa
 - observation_id: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1608.6:h=a13ef9d20f4d
-  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
     quantity:
       tag: value
@@ -16488,8 +16815,19 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -16534,6 +16872,98 @@ observations:
     table: S1
   read_from: pdf:kems-137-bischof-2023
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 2
+        table: S1
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50.47'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.38'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '10.42'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '23.63'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '15.4'
+          CaO: '23.46'
+          MgO: '10.8'
+          SiO2: '50.34'
+      locator:
+        pdf_page_index: 2
+        table: S1
     temperature_K:
       state:
         tag: value
@@ -16548,7 +16978,7 @@ observations:
     parameters: []
     output_unit: Pa
 - observation_id: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1619.2:h=b19156e2f0a1
-  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
     quantity:
       tag: value
@@ -16603,8 +17033,19 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -16649,6 +17090,98 @@ observations:
     table: S1
   read_from: pdf:kems-137-bischof-2023
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 2
+        table: S1
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50.47'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.38'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '10.42'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '23.63'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '15.4'
+          CaO: '23.46'
+          MgO: '10.8'
+          SiO2: '50.34'
+      locator:
+        pdf_page_index: 2
+        table: S1
     temperature_K:
       state:
         tag: value
@@ -16663,7 +17196,7 @@ observations:
     parameters: []
     output_unit: Pa
 - observation_id: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1630.8:h=b900a3f72e6d
-  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
     quantity:
       tag: value
@@ -16718,8 +17251,19 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -16764,6 +17308,98 @@ observations:
     table: S1
   read_from: pdf:kems-137-bischof-2023
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 2
+        table: S1
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50.47'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.38'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '10.42'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '23.63'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '15.4'
+          CaO: '23.46'
+          MgO: '10.8'
+          SiO2: '50.34'
+      locator:
+        pdf_page_index: 2
+        table: S1
     temperature_K:
       state:
         tag: value
@@ -16778,7 +17414,7 @@ observations:
     parameters: []
     output_unit: Pa
 - observation_id: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1642.5:h=ebb53af38d3f
-  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
     quantity:
       tag: value
@@ -16833,8 +17469,19 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -16879,6 +17526,98 @@ observations:
     table: S1
   read_from: pdf:kems-137-bischof-2023
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 2
+        table: S1
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50.47'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.38'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '10.42'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '23.63'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '15.4'
+          CaO: '23.46'
+          MgO: '10.8'
+          SiO2: '50.34'
+      locator:
+        pdf_page_index: 2
+        table: S1
     temperature_K:
       state:
         tag: value
@@ -16893,7 +17632,7 @@ observations:
     parameters: []
     output_unit: Pa
 - observation_id: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1653.0:h=1c63f096aa50
-  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
     quantity:
       tag: value
@@ -16948,8 +17687,19 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -16994,6 +17744,98 @@ observations:
     table: S1
   read_from: pdf:kems-137-bischof-2023
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 2
+        table: S1
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50.47'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.38'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '10.42'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '23.63'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '15.4'
+          CaO: '23.46'
+          MgO: '10.8'
+          SiO2: '50.34'
+      locator:
+        pdf_page_index: 2
+        table: S1
     temperature_K:
       state:
         tag: value
@@ -17008,7 +17850,7 @@ observations:
     parameters: []
     output_unit: Pa
 - observation_id: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1664.7:h=0d70bcdab058
-  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
     quantity:
       tag: value
@@ -17063,8 +17905,19 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -17109,6 +17962,98 @@ observations:
     table: S1
   read_from: pdf:kems-137-bischof-2023
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 2
+        table: S1
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50.47'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.38'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '10.42'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '23.63'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '15.4'
+          CaO: '23.46'
+          MgO: '10.8'
+          SiO2: '50.34'
+      locator:
+        pdf_page_index: 2
+        table: S1
     temperature_K:
       state:
         tag: value
@@ -17123,7 +18068,7 @@ observations:
     parameters: []
     output_unit: Pa
 - observation_id: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1674.2:h=445ad36b93b3
-  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
     quantity:
       tag: value
@@ -17178,8 +18123,19 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -17224,6 +18180,98 @@ observations:
     table: S1
   read_from: pdf:kems-137-bischof-2023
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 2
+        table: S1
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50.47'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.38'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '10.42'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '23.63'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '15.4'
+          CaO: '23.46'
+          MgO: '10.8'
+          SiO2: '50.34'
+      locator:
+        pdf_page_index: 2
+        table: S1
     temperature_K:
       state:
         tag: value
@@ -17238,7 +18286,7 @@ observations:
     parameters: []
     output_unit: Pa
 - observation_id: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1684.8:h=56d20ce145ed
-  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
     quantity:
       tag: value
@@ -17293,8 +18341,19 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -17339,6 +18398,98 @@ observations:
     table: S1
   read_from: pdf:kems-137-bischof-2023
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 2
+        table: S1
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50.47'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.38'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '10.42'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '23.63'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '15.4'
+          CaO: '23.46'
+          MgO: '10.8'
+          SiO2: '50.34'
+      locator:
+        pdf_page_index: 2
+        table: S1
     temperature_K:
       state:
         tag: value
@@ -17353,7 +18504,7 @@ observations:
     parameters: []
     output_unit: Pa
 - observation_id: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1695.4:h=b02665d3b144
-  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
     quantity:
       tag: value
@@ -17408,8 +18559,19 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5027655818937908435137918246'
+        - - Al2O3
+          - '0.09028384043023104368530294097'
+        - - MgO
+          - '0.1547402922065900795099231116'
+        - - CaO
+          - '0.252210285469388033290982123'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -17454,6 +18616,98 @@ observations:
     table: S1
   read_from: pdf:kems-137-bischof-2023
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5027655818937908435137918246'
+          - - Al2O3
+            - '0.09028384043023104368530294097'
+          - - MgO
+            - '0.1547402922065900795099231116'
+          - - CaO
+            - '0.252210285469388033290982123'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 2
+        table: S1
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50.47'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.38'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '10.42'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '23.63'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 2
+              table: S1
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '15.4'
+          CaO: '23.46'
+          MgO: '10.8'
+          SiO2: '50.34'
+      locator:
+        pdf_page_index: 2
+        table: S1
     temperature_K:
       state:
         tag: value

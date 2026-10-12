@@ -17,17 +17,10 @@ import random
 from collections.abc import Callable, Mapping
 from typing import Any
 
+from simulator._blas_policy import THREAD_ENV_VARS
 from simulator.optimize.canonical import canonical_json_dumps, normalize_canonical_value
 from simulator.optimize.evalspec import canonical_evalspec_json
 from simulator.optimize.evaluate import FailureCategory, RunReference, ScoredResult
-
-THREAD_ENV_VARS: tuple[str, ...] = (
-    "OMP_NUM_THREADS",
-    "OPENBLAS_NUM_THREADS",
-    "MKL_NUM_THREADS",
-    "NUMEXPR_NUM_THREADS",
-    "VECLIB_MAXIMUM_THREADS",
-)
 
 _VOLATILE_KEYS = frozenset(
     {
