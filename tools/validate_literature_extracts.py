@@ -47,14 +47,14 @@ from typing import Any, Iterable, Mapping, Sequence
 
 import yaml
 
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 from simulator.battery.extract_context import (
     SUPPORTED_EXTRACT_CONTEXT_PATH,
     iter_unsupported_context_container_paths,
 )
 
-ROOT = Path(__file__).resolve().parents[1]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
 EXTRACTS_DIR = ROOT / "data" / "literature" / "extracts"
 SCHEMA_VERSION = "literature_extract.v1"
 U0_MANIFEST = ROOT / "data" / "vapour_rail_u0_manifest.yaml"
