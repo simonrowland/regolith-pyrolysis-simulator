@@ -131,6 +131,11 @@ def _materialize_refusal_snapshot_history(state: Mapping[str, Any]) -> None:
 
 
 _REFUSAL_MISSING = object()
+# deepcopy's atomic dispatch returns these exact built-in scalar types as-is.
+# Recursive containers can do the same without paying a helper call per leaf.
+_REFUSAL_IMMUTABLE_LEAF_TYPES = frozenset({
+    type(None), bool, int, float, complex, str, bytes,
+})
 
 
 def _mappingproxy_referent(proxy: MappingProxyType) -> Any:
@@ -152,14 +157,30 @@ def _deepcopy_refusal_list(
 ) -> list[Any]:
     copied: list[Any] = []
     memo[id(value)] = copied
-    copied.extend(_deepcopy_refusal_value(item, memo) for item in value)
+    copied.extend(
+        item
+        if (
+            type(item) in _REFUSAL_IMMUTABLE_LEAF_TYPES
+            and id(item) not in memo
+        )
+        else _deepcopy_refusal_value(item, memo)
+        for item in value
+    )
     return copied
 
 
 def _deepcopy_refusal_tuple(
     value: tuple[Any, ...], memo: Dict[int, Any],
 ) -> tuple[Any, ...]:
-    copied_items = [_deepcopy_refusal_value(item, memo) for item in value]
+    copied_items = [
+        item
+        if (
+            type(item) in _REFUSAL_IMMUTABLE_LEAF_TYPES
+            and id(item) not in memo
+        )
+        else _deepcopy_refusal_value(item, memo)
+        for item in value
+    ]
     try:
         return memo[id(value)]
     except KeyError:
@@ -178,9 +199,23 @@ def _deepcopy_refusal_dict(
     copied: dict[Any, Any] = {}
     memo[id(value)] = copied
     for key, item in value.items():
-        copied[_deepcopy_refusal_value(key, memo)] = _deepcopy_refusal_value(
-            item, memo,
+        copied_key = (
+            key
+            if (
+                type(key) in _REFUSAL_IMMUTABLE_LEAF_TYPES
+                and id(key) not in memo
+            )
+            else _deepcopy_refusal_value(key, memo)
         )
+        copied_item = (
+            item
+            if (
+                type(item) in _REFUSAL_IMMUTABLE_LEAF_TYPES
+                and id(item) not in memo
+            )
+            else _deepcopy_refusal_value(item, memo)
+        )
+        copied[copied_key] = copied_item
     return copied
 
 
@@ -229,9 +264,23 @@ def _deepcopy_refusal_mappingproxy(
     if base_backing is not None:
         copied_backing = memo[id(backing)]
         for key, item in base_backing.items():
-            copied_backing[_deepcopy_refusal_value(key, memo)] = (
-                _deepcopy_refusal_value(item, memo)
+            copied_key = (
+                key
+                if (
+                    type(key) in _REFUSAL_IMMUTABLE_LEAF_TYPES
+                    and id(key) not in memo
+                )
+                else _deepcopy_refusal_value(key, memo)
             )
+            copied_item = (
+                item
+                if (
+                    type(item) in _REFUSAL_IMMUTABLE_LEAF_TYPES
+                    and id(item) not in memo
+                )
+                else _deepcopy_refusal_value(item, memo)
+            )
+            copied_backing[copied_key] = copied_item
     return memo[id(proxy)]
 
 
