@@ -353,6 +353,27 @@ def test_refusal_snapshot_reuses_immutable_scalar_leaves_only() -> None:
     assert memoized_copy["proxy"]["scalar"] is memo_replacement
 
 
+def test_refusal_dict_copy_preserves_value_before_key_memo_order() -> None:
+    key = "scalar-key"
+
+    class MemoizesKey:
+        def __deepcopy__(self, memo):
+            memo[id(key)] = "replacement-key"
+            return "copied-value"
+
+    source = {key: MemoizesKey()}
+    expected = copy.deepcopy(source)
+
+    assert _deepcopy_refusal_state(source, {}) == expected
+    assert expected == {"replacement-key": "copied-value"}
+
+    proxy_copy = _deepcopy_refusal_state(
+        MappingProxyType({key: MemoizesKey()}),
+        {},
+    )
+    assert dict(proxy_copy) == {"replacement-key": "copied-value"}
+
+
 def test_terminal_refusal_restores_copied_roots_byte_identically() -> None:
     class ImmutableOwner:
         def __deepcopy__(self, _memo):
