@@ -98,12 +98,24 @@ CODE_INPUTS = (
 #     rows_in=47960 observations=122164 works=276 experiments=3576 queue=77761
 #     hard_issues=3631). This acknowledges STORE outputs only; the runtime tie
 #     to the constant is covered by the commit's tests.
+#   f522e152c, da3640753, e84b44277: b-837 unstated solid polymorph
+#     predict-and-flag (score.py inference of the stable solid reference and
+#     its notice; the JANAF fusion-pair owner in generators/janaf.py; the
+#     above-crossing conversion). The series changes no file under
+#     scripts/battery_migrate.py, simulator/battery/migrate.py, validate.py or
+#     data/ (git diff 2c49cd0b8 e84b44277 on those paths is empty), and the
+#     review of record's fresh migrations at base and tip gave identical
+#     observation hashes. The landing train's full regen at the merge onto
+#     green ba62a746d (3dd98193c, studio-3) changed 0 files under data/.
+#     This acknowledges STORE outputs only; the scoring change (237 residual
+#     records, 94 new numeric candidates) is covered by the commits' tests.
 STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "1b78b5697", "574800443", "149df2858",
     "9bb0a22ce", "1d254d51e", "b8be6d576",
     "d47e84bec", "6c3b40660",
     "23df83343", "2bd2918e6", "34132a932",
     "8d90cc936",
+    "f522e152c", "da3640753", "e84b44277",
 })
 
 
