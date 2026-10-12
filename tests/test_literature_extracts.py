@@ -1078,6 +1078,98 @@ def test_minimal_extract_valid():
     assert errs == []
 
 
+def test_refuses_context_container_outside_species_block():
+    doc = _minimal_extract()
+    row = {
+        "observation_id": "apparatus_note",
+        "type": "apparatus",
+        "locator": {"page": 1},
+        "values": {"apparatus": "fixture"},
+        "units": "text",
+    }
+    doc["context"] = [row]
+
+    errors = vle.validate_extract_document(
+        doc,
+        path=Path("fixture-source.yaml"),
+        expected_source_id="fixture-source",
+    )
+
+    assert any(
+        "fixture-source.yaml:context" in error
+        and "species.<formula>.context" in error
+        and "not lifted by the migrator" in error
+        for error in errors
+    )
+
+
+def test_validator_help_works_without_pythonpath():
+    import os
+    import subprocess
+
+    env = os.environ.copy()
+    env.pop("PYTHONPATH", None)
+    result = subprocess.run(
+        [sys.executable, str(TOOLS / "validate_literature_extracts.py"), "--help"],
+        cwd=REPO_ROOT,
+        env=env,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
+    assert "usage:" in result.stdout.lower()
+
+
+def test_accepts_scalar_context_description_inside_row():
+    doc = _minimal_extract()
+    doc["species"]["Fe"]["observations"][0]["values"]["context"] = (
+        "validation comparison with another source"
+    )
+
+    errors = vle.validate_extract_document(
+        doc, expected_source_id="fixture-source"
+    )
+
+    assert not any("context container is not lifted" in error for error in errors)
+
+
+def test_species_context_validates_and_migrator_lifts_context_id(tmp_path: Path):
+    from simulator.battery.migrate import migrate
+
+    doc = _minimal_extract()
+    row = {
+        "observation_id": "apparatus_note",
+        "type": "apparatus",
+        "locator": {"page": 1},
+        "values": {"apparatus": "fixture"},
+        "units": "text",
+    }
+    doc["species"]["Fe"]["context"] = [row]
+    assert vle.validate_extract_document(
+        doc, expected_source_id="fixture-source"
+    ) == []
+
+    literature = tmp_path / "data" / "literature"
+    extracts = literature / "extracts"
+    extracts.mkdir(parents=True)
+    (literature / "compilations").mkdir()
+    (literature / "INDEX.yaml").write_text(
+        "schema_version: literature_index.v1\nsources: []\n", encoding="utf-8"
+    )
+    _write_extract(extracts, doc)
+    result = migrate(tmp_path, write=False)
+
+    lifted = [
+        context
+        for rows in result.context_by_work.values()
+        for context in rows
+    ]
+    assert [context["context_id"] for context in lifted] == [
+        "fixture-source::context::apparatus_note"
+    ]
+
+
 def test_refuses_bad_schema_version():
     doc = _minimal_extract(schema_version="v0")
     errs = vle.validate_extract_document(doc, expected_source_id="fixture-source")
