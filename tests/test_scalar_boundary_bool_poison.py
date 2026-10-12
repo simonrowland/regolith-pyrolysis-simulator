@@ -1381,7 +1381,7 @@ SOFT_CASES = (
             lambda temperature: 0.5,
             min_T_C=v,
         ).status,
-        "not_converged",
+        "refused",
         (400, 400.5),
     ),
     SoftCase("stage0_accounting_positive", _stage0_positive_float, 0.0),
@@ -1540,10 +1540,9 @@ def test_liquidus_max_points_rejects_boolean_values(raw: Any) -> None:
         grid_step_C=1.0,
         max_points=raw,
     )
-    assert result.status == "not_converged"
-    assert result.warnings == (
-        "equilibrium crystallization path failed: max_points must be numeric",
-    )
+    assert result.status == "refused"
+    assert result.diagnostics["reason"] == "invalid_input"
+    assert result.warnings == ("invalid EC input: max_points must be numeric",)
 
 
 @pytest.mark.parametrize("raw", (3, 3.0, 3.7, np.int64(3), "3"))
@@ -1570,7 +1569,8 @@ def test_liquidus_bisection_limit_rejects_boolean_values(raw: Any) -> None:
         lambda _temperature_C: 0.5,
         max_bisection_iterations=raw,
     )
-    assert result.status == "not_converged"
+    assert result.status == "refused"
+    assert result.diagnostics["reason"] == "invalid_input"
     assert result.warnings == (
         "invalid finder parameter: max_bisection_iterations must be numeric",
     )

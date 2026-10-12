@@ -3296,6 +3296,22 @@ def test_mf_f01_f02_f03_f05_f06_default_free_validator() -> None:
 
 
 def test_mf_f04_f16_scoped_notices_and_explicit_apparatus_gate() -> None:
+    static = F.tabulation_experiment(method=MethodToken.STATIC_EQUILIBRIUM)
+    static_observation = F.observation(
+        "static-pressure",
+        static.experiment_id,
+        F.psat_identity("Na"),
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    static_gates = run_validity_gates(static, static_observation)
+    assert static_gates.passed
+    assert effusion_regime_unverified(static, Quantity.P_SAT).checks == ()
+    assert not {
+        "orifice_knudsen",
+        "kems_calibration",
+    } & {check.name for check in static_gates.checks}
+
     exp = F.kems_experiment(orifice_area=None, clausing=Decimal("0.9"))
     assert underdetermined_apparatus(exp, Quantity.P_SAT).passed
     complete = F.kems_experiment()

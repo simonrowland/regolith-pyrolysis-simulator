@@ -33,6 +33,18 @@ RETIRED_DUPLICATE_OBSERVATION_ALIASES = {
         "kems-007-costa-2015::costa_2015_fe_vaporization_coefficient_alpha_digitized"
     ),
 }
+RETIRED_DUPLICATE_SOURCE_IDS = {
+    "fedkin-grossman-ghiorso-2006",
+    "sossi-et-al-2019",
+    "pound-1972-cr-langmuir-knudsen",
+    "pound-1972-mccabe-cr",
+    "ref-016-sio-kems-1700-2000k",
+    "safarian-engh-2013-si-pure-langmuir",
+}
+RETIRED_DUPLICATE_RESIDUAL_KEY_ALIASES = {
+    "fedkin_2006_table3_mg_hashimoto_langmuir:T=1973":
+        "fedkin_2006_mg_hashimoto_langmuir_table3:T=1973",
+}
 
 if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
@@ -602,7 +614,9 @@ def test_run_split_observations_keep_source_species_bucket() -> None:
         species_by_id = {
             observation["observation_id"]: species
             for species, block in doc["species"].items()
-            for observation in block.get("observations", [])
+            for observation in (
+                (block.get("observations") or []) + (block.get("context") or [])
+            )
             if observation.get("observation_id")
         }
         for observation_id, species in species_by_id.items():
@@ -1257,17 +1271,13 @@ def test_sossi_na_inference_and_ceiling_never_recreate_alpha_range():
         "kems-012-sossi-2019.yaml",
         "sossi_2019_na_alpha_e_authors_adopted_unity",
     )
-    legacy = _repo_observation(
-        "sossi-et-al-2019.yaml", "sossi_2019_na_open_furnace_apparent"
-    )
 
     assert "alpha_range" not in gamma["values"]
     assert gamma["values"]["gamma_derived_alpha_e_inference_at_1400C"] == [0.3, 1.7]
     assert gamma["values"]["consumer_policy"] == "report_only_not_executable_alpha_range"
     assert adopted["values"]["alpha_authority_status"] == "analytical_upper_bound"
     assert adopted["values"]["physical_alpha_upper_bound"] == 1.0
-    assert "alpha_range" not in legacy["values"]
-    assert legacy["values"]["alpha_authority_status"] == "analytical_upper_bound"
+    assert adopted["values"]["alpha"] == 1.0
 
 
 def test_wetzel_duplicate_is_typed_as_solid_film_growth():
@@ -2350,7 +2360,8 @@ def test_pilot_extract_count_exact_and_merge_smoke():
     closed = set(policy["closed_set_source_ids"])
     present = _corpus_stems_including_aliases()
     assert len(closed) == 68  # frozen pilot census
-    assert closed <= present  # pilot files still present (or recorded as aliases)
+    assert closed - RETIRED_DUPLICATE_SOURCE_IDS <= present
+    assert RETIRED_DUPLICATE_SOURCE_IDS.isdisjoint({path.stem for path in files})
     assert len(files) >= 68  # live corpus may include t-509 OCR extracts
     extracts = em.load_extracts(require_valid=True)
     assert len(extracts) == len(files)
@@ -2717,7 +2728,8 @@ def test_fidelity_allowlist_covers_pilot_census():
     stems = {p.stem for p in vle.discover_extracts()}
     present = _corpus_stems_including_aliases()
     # Frozen pilot set still present in the live corpus (file stem or extract alias).
-    assert closed <= present, f"missing pilot extracts: {sorted(closed - present)}"
+    assert closed - RETIRED_DUPLICATE_SOURCE_IDS <= present
+    assert RETIRED_DUPLICATE_SOURCE_IDS.isdisjoint(stems)
     assert active <= closed
     # New (post-policy) stems are allowed and must not be on the active allowlist.
     new_stems = stems - closed

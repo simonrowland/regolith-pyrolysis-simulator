@@ -20,6 +20,7 @@ import pickle
 
 import pytest
 
+import simulator.chemistry.kernel.planner as planner_module
 from simulator.accounting.ledger import AtomLedger, LedgerTransition
 from simulator.accounting.lots import MaterialLot
 from simulator.chemistry.kernel import (
@@ -268,6 +269,51 @@ def _dispatch_commit_proposal(kernel: ChemistryKernel) -> LedgerTransitionPropos
     )
     assert result.transition is not None
     return result.transition
+
+
+def _commit_test_kernel():
+    ledger = AtomLedger()
+    ledger.load_external_mol(
+        "process.cleaned_melt", {"SiO2": 1.0}, material_origin="feedstock"
+    )
+    registry = ProviderRegistry()
+    registry.register(_CommitProvider(), [ChemistryIntent.EVAPORATION_TRANSITION])
+    kernel = ChemistryKernel(ledger, registry, species_formula_registry={})
+    proposal = _dispatch_commit_proposal(kernel)
+    transition = LedgerTransition(name="no_op", debits=(), credits=())
+    return kernel, proposal, transition
+
+
+@pytest.mark.parametrize(
+    "site", ("commit_batch.atom_balance", "commit_batch.apply",
+             "commit_validated.atom_balance", "commit_validated.apply"),
+)
+def test_commit_kernel_errors_propagate_instead_of_becoming_proposal_rejections(
+    monkeypatch, site,
+):
+    kernel, proposal, transition = _commit_test_kernel()
+    if site.endswith("atom_balance"):
+        monkeypatch.setattr(
+            planner_module,
+            "validate_atom_balance",
+            lambda *_args: (_ for _ in ()).throw(KeyError(f"local bug at {site}")),
+        )
+    else:
+        monkeypatch.setattr(
+            kernel._ledger,
+            "apply",
+            lambda *_args, **_kwargs: (_ for _ in ()).throw(
+                KeyError(f"local bug at {site}")
+            ),
+        )
+
+    with pytest.raises(KeyError, match=f"local bug at {site}"):
+        if site.startswith("commit_batch"):
+            kernel.commit_batch(ChemistryIntent.EVAPORATION_TRANSITION, proposal)
+        else:
+            kernel.commit_validated_transition(
+                ChemistryIntent.EVAPORATION_TRANSITION, transition
+            )
 
 
 def test_commit_batch_is_sole_writer_and_applies_transition():

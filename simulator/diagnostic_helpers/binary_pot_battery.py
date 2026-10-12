@@ -301,6 +301,7 @@ class EquilibrateCell:
     melt_activity_coefficient_details: dict[str, dict[str, Any]] = field(
         default_factory=dict
     )
+    invalid_gas_partial_pressure_components: tuple[str, ...] = ()
 
     def as_payload(self) -> dict[str, Any]:
         return {
@@ -320,6 +321,9 @@ class EquilibrateCell:
                 for name, row in self.melt_activity_coefficient_details.items()
             },
             "gas_partial_pressures_Pa": dict(self.gas_partial_pressures_Pa),
+            "invalid_gas_partial_pressure_components": list(
+                self.invalid_gas_partial_pressure_components
+            ),
             "liquid_fraction": self.liquid_fraction,
             "wall_s": self.wall_s,
             "cpu_s": self.cpu_s,
@@ -376,6 +380,11 @@ class EquilibrateCell:
             melt_activities=dict(payload.get("melt_activities") or {}),
             gas_partial_pressures_Pa=dict(
                 payload.get("gas_partial_pressures_Pa") or {}
+            ),
+            invalid_gas_partial_pressure_components=tuple(
+                str(name)
+                for name in payload.get("invalid_gas_partial_pressure_components")
+                or ()
             ),
             melt_activity_coefficients={
                 str(name): float(value)
@@ -902,7 +911,7 @@ def _optional_int(value: Any) -> int | None:
 
 def extract_reported_quantities(
     result: Any,
-) -> tuple[dict[str, float], dict[str, float]]:
+) -> tuple[dict[str, float], dict[str, float], tuple[str, ...]]:
     """Record EquilibriumResult fields the engine actually exposed.
 
     Melt activities live on the legacy field ``activity_coefficients``.
@@ -924,11 +933,14 @@ def extract_reported_quantities(
         or {}
     )
     pressures: dict[str, float] = {}
+    invalid_pressure_components: list[str] = []
     for name, value in dict(raw_pressures).items():
         number = _finite_float(value)
         if number is not None and number > 0.0:
             pressures[str(name)] = number
-    return activities, pressures
+        elif number is None or number < 0.0:
+            invalid_pressure_components.append(str(name))
+    return activities, pressures, tuple(sorted(invalid_pressure_components))
 
 
 def reported_activity_coefficients(result: Any) -> dict[str, float]:
@@ -2211,7 +2223,7 @@ def _internal_analytical_vapor_pressure_adapter(
             f"pressure_bar must be finite and non-negative; got {pressure_bar!r}",
         )
 
-    melt_composition_kg: dict[str, float] = {}
+    validated_melt_mass_kg_by_species: dict[str, float] = {}
     if composition_kg:
         for species, raw in composition_kg.items():
             value = _finite_float(raw)
@@ -2222,7 +2234,7 @@ def _internal_analytical_vapor_pressure_adapter(
                     f"oxide mass for {species!r} must be finite and non-negative; got {raw!r}",
                 )
             if value > 0.0:
-                melt_composition_kg[str(species)] = value
+                validated_melt_mass_kg_by_species[str(species)] = value
     else:
         from simulator.accounting.formulas import resolve_species_formula
 
@@ -2252,8 +2264,8 @@ def _internal_analytical_vapor_pressure_adapter(
                         "internal_analytical_invalid_composition",
                         f"oxide amount for {species!r} does not yield a positive finite mass",
                     )
-                melt_composition_kg[str(species)] = mass_kg
-    if not melt_composition_kg:
+                validated_melt_mass_kg_by_species[str(species)] = mass_kg
+    if not validated_melt_mass_kg_by_species:
         raise _InternalAnalyticalInputRefusal(
             2,
             "internal_analytical_invalid_composition",
@@ -2342,7 +2354,7 @@ def _internal_analytical_vapor_pressure_adapter(
     try:
         core._load_ledger_account(
             "process.cleaned_melt",
-            melt_composition_kg,
+            validated_melt_mass_kg_by_species,
             source="battery observation composition",
         )
     except Exception as exc:  # noqa: BLE001 - malformed oxides are category 2
@@ -2351,7 +2363,7 @@ def _internal_analytical_vapor_pressure_adapter(
             "internal_analytical_invalid_composition",
             f"oxide composition cannot seed the simulator melt: {exc}",
         ) from exc
-    core.melt.composition_kg = dict(melt_composition_kg)
+    core.melt.composition_kg = dict(validated_melt_mass_kg_by_species)
     core.melt.update_total_mass()
     core.melt.temperature_C = temperature
     core.melt.p_total_mbar = pressure * 1000.0
@@ -3541,7 +3553,9 @@ def equilibrate_cell(
             refusal = REFUSAL_GATE_REFUSED_IN_ADAPTER
             engine_reason = f"{gate_name}"
             engine_annotation = None
-        activities, pressures = extract_reported_quantities(result)
+        activities, pressures, invalid_pressure_components = (
+            extract_reported_quantities(result)
+        )
         coefficients = reported_activity_coefficients(result)
         coefficient_details = dict(
             getattr(result, "activity_coefficient_details", None) or {}
@@ -3565,6 +3579,7 @@ def equilibrate_cell(
             melt_activity_coefficients=coefficients,
             melt_activity_coefficient_details=coefficient_details,
             gas_partial_pressures_Pa=pressures,
+            invalid_gas_partial_pressure_components=invalid_pressure_components,
             liquid_fraction=_finite_float(getattr(result, "liquid_fraction", None)),
             vapor_pressures_source=dict(vapor_authority["vapor_pressures_source"]),
             vapor_pressure_backend_status=vapor_authority[
