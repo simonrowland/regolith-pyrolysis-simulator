@@ -1661,6 +1661,30 @@ def test_series_explosion_keeps_conversion_trail(tmp_path: Path) -> None:
     assert all(p.derivation.output_unit == "Pa" for p in points)
 
 
+def test_series_explosion_keeps_parent_confidence_level(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    row["uncertainty"] = {
+        "note": "Table I standard deviation",
+        "confidence_level": "one_sigma",
+    }
+    for point in row["values"]["series"]:
+        point["sigma"] = 0.1
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    points = [
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.startswith("fixture-source::na_psat")
+    ]
+
+    assert len(points) == 2
+    assert all(
+        observation.uncertainty.verbatim["confidence_level"] == "one_sigma"
+        for observation in points
+    )
+
+
 @pytest.mark.parametrize("phase", ["", "not_a_phase", "condensed_solid"])
 def test_pressure_phase_provenance_matches_resulting_phase(
     tmp_path: Path, phase: str

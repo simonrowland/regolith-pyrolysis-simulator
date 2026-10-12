@@ -1090,7 +1090,7 @@ def test_engine_prediction_mutation_cannot_create_a_source_band(
     assert printed.numeric is not None
     assert printed.numeric.decision_band is not None
     assert printed.numeric.decision_band.rule.startswith("printed_unstated:")
-    assert printed.numeric.decision_band.value > Decimal("0.1")
+    assert printed.numeric.decision_band.value == Decimal("0.1")
     assert printed.status is ResidualStatus.MISMATCH
     vaporock = by_reference[(observations[0].observation_id, Engine.VAPOROCK.value)]
     assert vaporock.numeric is not None

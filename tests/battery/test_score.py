@@ -3879,8 +3879,9 @@ def test_unstated_printed_uncertainty_sets_a_band_and_notice() -> None:
     assert residual.numeric.decision_band is not None
     assert residual.numeric.decision_band.rule.startswith("printed_unstated:")
     assert any(
-        notice.reason == "uncertainty_kind_unstated"
-        and notice.band == '{"sigma": "0.02"}'
+        notice.reason == "confidence_level_not_stated"
+        and "field=sigma" in notice.band
+        and "printed_width=0.02" in notice.band
         for notice in residual.notices
     )
 

@@ -1949,6 +1949,7 @@ species:
         epsilon_P2O5_MnO: 1
         epsilon_P2O5_SiO2: 1
         as_printed: errors are 95% confidence limits
+        confidence_level: ci95
     - observation_id: ohara_1987_turkdogan_quoted_ln_gamma_eq11
       type: activity_coefficient
       locator:
@@ -2963,6 +2964,7 @@ species:
         T_K: 1643.0
       uncertainty:
         as_printed: -23 +/- 3 (95% confidence)
+        confidence_level: ci95
   MgO:
     observations:
     - observation_id: ohara_1987_mgo_epsilon_p2o5
@@ -2987,6 +2989,7 @@ species:
         T_K: 1643.0
       uncertainty:
         as_printed: -20 +/- 2 (95% confidence)
+        confidence_level: ci95
   MnO:
     observations:
     - observation_id: ohara_1987_mno_epsilon_p2o5
@@ -3011,6 +3014,7 @@ species:
         T_K: 1643.0
       uncertainty:
         as_printed: -13 +/- 1 (95% confidence)
+        confidence_level: ci95
   SiO2:
     observations:
     - observation_id: ohara_1987_sio2_epsilon_p2o5
@@ -3036,6 +3040,7 @@ species:
         authors_note: SiO2 slightly lowers gamma_P2O5; opposite in sign to Turkdogan
       uncertainty:
         as_printed: -4 +/- 1 (95% confidence)
+        confidence_level: ci95
   PO:
     observations:
     - observation_id: ohara_1987_table1_partial_pressures_1643k

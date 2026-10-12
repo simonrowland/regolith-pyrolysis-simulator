@@ -2126,6 +2126,19 @@ def test_uncertainty_propagated_to_by_species(tmp_extracts: Path):
     assert group["uncertainties"][0]["uncertainty"]["relative"] == 0.1
 
 
+def test_confidence_level_vocabulary_is_closed_and_optional() -> None:
+    doc = _minimal_extract()
+    observation = doc["species"]["Fe"]["observations"][0]
+    assert vle.validate_extract_document(doc) == []
+
+    observation["uncertainty"]["confidence_level"] = "one_sigma"
+    assert vle.validate_extract_document(doc) == []
+
+    observation["uncertainty"]["confidence_level"] = "one standard deviation"
+    errors = vle.validate_extract_document(doc)
+    assert any("uncertainty.confidence_level" in error for error in errors)
+
+
 def test_consistency_report_auto_computes_disagreement(tmp_extracts: Path):
     """Owner 2026-08-02: computed disagreement_dex, no hand curation."""
     a = _minimal_extract()

@@ -258,7 +258,7 @@ species:
       T_range_K: [2173.15, 2173.15]
       phase: quenched peridotite glass
       units: fraction (Fe3+/sum Fe)
-      uncertainty: {Fe3_over_FeT: '±0.008 (as printed; SD per Fig. 2 caption)'}
+      uncertainty: {confidence_level: one_sigma, Fe3_over_FeT: '±0.008 (as printed; SD per Fig. 2 caption)'}
       values:
         method_class: measured_direct
         quantity: fe3_fe2_ratio

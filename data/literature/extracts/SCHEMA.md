@@ -174,6 +174,7 @@ species:
         units: dimensionless                        # required when values present
         uncertainty:                                # FIRST-CLASS (owner 2026-08-02)
           note: "high-side of measured D(Fe+) band"
+          confidence_level: one_sigma              # optional; default not_stated; source-stated level only
           alpha_range: [0.011, 0.02]                # retain stated uncertainty verbatim
         values: { alpha: 0.02 }                     # VERBATIM; no fitted coefficients
         equipment: {}                               # optional; see equipment metadata
@@ -311,6 +312,12 @@ envelopes / ranges / ± terms. `tools/extract_merge.py` **propagates** uncertain
 into the by-species view (`observation.uncertainty`, group
 `winner_uncertainty`, group `uncertainties[]`) so catalog fits inherit an error
 budget input.
+
+An uncertainty mapping may include `confidence_level`, which records only a
+level explicitly stated by the source: `one_sigma`, `two_sigma`, `ci95`, or
+`not_stated`. Omission defaults to `not_stated`; a field name such as `sigma`
+does not establish a confidence level. Keep the source locator on the enclosing
+observation.
 
 ## Locators (per observation AND per equipment field)
 
