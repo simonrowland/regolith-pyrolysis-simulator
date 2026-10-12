@@ -2517,6 +2517,22 @@ def gate_curve_memo_producer_configuration(
     }
 
 
+def gate_curve_memo_record(
+    curve: Mapping[str, Any],
+    origin: Mapping[str, Any] | None,
+    repair_notices: Sequence[Mapping[str, Any]] | None,
+    disposition: str,
+) -> dict[str, Any]:
+    """Build the runtime record shared by the producer and core reader."""
+
+    return {
+        "curve": dict(curve),
+        "origin": dict(origin) if isinstance(origin, Mapping) else None,
+        "repair_notices": [dict(notice) for notice in repair_notices or ()],
+        "disposition": disposition,
+    }
+
+
 def uncacheable_replay_disposition(sim: Any) -> bool:
     reasons = getattr(sim, "_reduced_real_uncacheable_reasons", None)
     return bool(reasons)

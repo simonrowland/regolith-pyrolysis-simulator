@@ -4695,6 +4695,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     ) -> Mapping[str, Any] | _MeltRedoxLiquidusFloorFallback | None:
         from simulator.engine_binding_admission import gate_curve_memo_eligibility
         from simulator.reduced_real_determinism import (
+            gate_curve_memo_record,
             gate_curve_memo_producer_configuration,
             record_repair_notice,
             uncacheable_replay_disposition,
@@ -4714,6 +4715,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         curve = cache.get('curve') if isinstance(cache, dict) else None
         cache_notices = cache.get('repair_notices') if isinstance(cache, dict) else None
         cache_vector = cache.get('dependency_vector') if isinstance(cache, dict) else None
+        record = None
         cache_vector_matches = (
             isinstance(curve, Mapping)
             and cache_vector == gate_curve_memo_producer_configuration(self, curve)
@@ -4728,6 +4730,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         if not cache_hit:
             curve = None
+        else:
+            record = gate_curve_memo_record(
+                curve,
+                cache.get('origin'),
+                cache_notices,
+                'memo-hit',
+            )
 
         memo = getattr(
             self,
@@ -4736,9 +4745,27 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         core_memo_hit = False
         if curve is None and isinstance(memo, dict):
-            memoized_curve = memo.get(key)
-            if isinstance(memoized_curve, Mapping):
-                curve = dict(memoized_curve)
+            memoized_record = memo.get(key)
+            if (
+                isinstance(memoized_record, Mapping)
+                and isinstance(memoized_record.get('curve'), Mapping)
+            ):
+                record = gate_curve_memo_record(
+                    memoized_record['curve'],
+                    memoized_record.get('origin'),
+                    memoized_record.get('repair_notices'),
+                    'memo-hit',
+                )
+                curve = record['curve']
+                cache_notices = record['repair_notices']
+                core_memo_hit = True
+            elif isinstance(memoized_record, Mapping):
+                # Transitional hand-seeded raw entries are migrated with the
+                # reader fixtures in the next commit.
+                curve = dict(memoized_record)
+                record = gate_curve_memo_record(
+                    curve, None, (), 'memo-hit'
+                )
                 core_memo_hit = True
 
         gate_curve_in_progress = (
@@ -4772,7 +4799,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self._freeze_gate_liquid_fraction_cache = None
                 cache = None
             try:
-                curve = self._freeze_gate_curve()
+                record = self._freeze_gate_curve_record()
+                curve = record['curve']
                 replay_notices = getattr(
                     self,
                     '_last_reduced_real_replay_notices',
@@ -4841,6 +4869,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         normalized_curve = dict(curve)
         normalized_curve['solidus_T_C'] = solidus_T_C
         normalized_curve['liquidus_T_C'] = liquidus_T_C
+        normalized_record = gate_curve_memo_record(
+            normalized_curve,
+            record.get('origin'),
+            record.get('repair_notices'),
+            record.get('disposition', 'live'),
+        )
         validated_cache = self._freeze_gate_liquid_fraction_cache
         if cache_hit:
             for notice in cache_notices or ():
@@ -4865,21 +4899,28 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             and isinstance(validated_cache.get('repair_notices'), list)
         ):
             self._freeze_gate_liquid_fraction_cache = {
+                **gate_curve_memo_record(
+                    normalized_curve,
+                    normalized_record.get('origin'),
+                    cache_notices,
+                    normalized_record.get('disposition', 'live'),
+                ),
                 'key': key,
-                'curve': dict(normalized_curve),
                 'dependency_vector': gate_curve_memo_producer_configuration(
                     self,
                     normalized_curve,
                 ),
-                'repair_notices': list(cache_notices or ()),
             }
-        replay_notices = getattr(
-            self,
-            '_last_reduced_real_replay_notices',
-            None,
-        )
-        if isinstance(memo, dict) and not isinstance(replay_notices, list):
-            memo[key] = dict(normalized_curve)
+        if (
+            isinstance(memo, dict)
+            and normalized_record.get('disposition') != 'replay'
+        ):
+            memo[key] = gate_curve_memo_record(
+                normalized_curve,
+                normalized_record.get('origin'),
+                cache_notices,
+                normalized_record.get('disposition', 'live'),
+            )
         self._record_composition_projected_liquidus_notice_from_curve(
             normalized_curve
         )

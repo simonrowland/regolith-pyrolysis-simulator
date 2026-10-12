@@ -2054,8 +2054,13 @@ class EvaporationMixin:
         )
 
     def _freeze_gate_curve(self) -> dict[str, Any]:
+        return self._freeze_gate_curve_record()['curve']
+
+    def _freeze_gate_curve_record(self) -> dict[str, Any]:
         from simulator.reduced_real_determinism import (
+            gate_curve_memo_record,
             gate_curve_memo_producer_configuration,
+            _is_cacheable_gate_curve,
             record_repair_notice,
             uncacheable_replay_disposition,
         )
@@ -2080,7 +2085,15 @@ class EvaporationMixin:
         if store is not None and getattr(store, 'replay_enabled', False):
             curve = store.replay_gate_curve(self, fO2_log=fO2_log)
             self._record_composition_projected_liquidus_notice_from_curve(curve)
-            return curve
+            replay_notices = getattr(
+                self, '_last_reduced_real_replay_notices', None
+            )
+            return gate_curve_memo_record(
+                curve,
+                None,
+                replay_notices if isinstance(replay_notices, list) else (),
+                'replay',
+            )
         cache = getattr(self, '_freeze_gate_liquid_fraction_cache', None)
         cached_curve = cache.get('curve') if isinstance(cache, dict) else None
         cached_notices = cache.get('repair_notices') if isinstance(cache, dict) else None
@@ -2108,7 +2121,12 @@ class EvaporationMixin:
                     curve=curve,
                     repair_notices=cached_notices,
                 )
-            return curve
+            return gate_curve_memo_record(
+                curve,
+                cache.get('origin'),
+                cached_notices,
+                'memo-hit',
+            )
 
         # Opt-in caller-owned memo for workflows that build fresh simulator
         # instances for equivalent rows. Reuse is based on the quantized
@@ -2121,15 +2139,29 @@ class EvaporationMixin:
         if isinstance(shared_curve_cache, dict):
             process_cached = shared_curve_cache.get(key)
             if isinstance(process_cached, Mapping):
-                shared_value = dict(process_cached)
-                shared_vector = shared_value.pop('dependency_vector', None)
-                shared_notices = shared_value.pop('repair_notices', None)
+                shared_value = process_cached.get('curve')
+                shared_origin = process_cached.get('origin')
+                shared_vector = process_cached.get('dependency_vector')
+                shared_notices = process_cached.get('repair_notices')
+                if not isinstance(shared_value, Mapping):
+                    shared_value = {
+                        name: value
+                        for name, value in process_cached.items()
+                        if name not in {
+                            'origin',
+                            'disposition',
+                            'dependency_vector',
+                            'repair_notices',
+                        }
+                    }
+                    shared_origin = None
                 current_dependency_vector = gate_curve_memo_producer_configuration(
                     self,
                     shared_value,
                 )
             else:
                 shared_value = {}
+                shared_origin = None
                 shared_vector = None
                 shared_notices = None
                 current_dependency_vector = None
@@ -2146,8 +2178,10 @@ class EvaporationMixin:
                 self._freeze_gate_liquid_fraction_cache = {
                     'key': key,
                     'curve': dict(curve),
+                    'origin': shared_origin,
                     'dependency_vector': current_dependency_vector,
                     'repair_notices': list(shared_notices),
+                    'disposition': 'memo-hit',
                 }
                 if store is not None and getattr(store, 'capture_enabled', False):
                     store.capture_gate_curve(
@@ -2156,7 +2190,12 @@ class EvaporationMixin:
                         curve=curve,
                         repair_notices=shared_notices,
                     )
-                return curve
+                return gate_curve_memo_record(
+                    curve,
+                    shared_origin,
+                    shared_notices,
+                    'memo-hit',
+                )
 
         previous_in_progress = bool(
             getattr(self, '_freeze_gate_curve_in_progress', False)
@@ -2289,10 +2328,19 @@ class EvaporationMixin:
                 )
 
             self._record_composition_projected_liquidus_notice_from_curve(curve)
-            cache_eligible = (
-                not uncacheable_replay_disposition(self)
-                and gate_curve_memo_eligibility(self, curve)
+            sticky = uncacheable_replay_disposition(self)
+            cache_eligible = not sticky and _is_cacheable_gate_curve(curve)
+            from simulator.engine_binding_admission import (
+                gate_curve_memo_evidence,
+                write_gate_curve_memo_origin,
             )
+
+            evidence = gate_curve_memo_evidence(
+                self,
+                curve,
+                include_selected_bindings=cache_eligible,
+            )
+            origin = write_gate_curve_memo_origin(self, curve, evidence)
             if cache_eligible:
                 dependency_vector = gate_curve_memo_producer_configuration(
                     self,
@@ -2301,14 +2349,18 @@ class EvaporationMixin:
                 self._freeze_gate_liquid_fraction_cache = {
                     'key': key,
                     'curve': dict(curve),
+                    'origin': origin,
                     'dependency_vector': dependency_vector,
                     'repair_notices': list(repair_notices),
+                    'disposition': 'live',
                 }
                 if isinstance(shared_curve_cache, dict):
                     # Store a copy so later sim mutations of their local cache
                     # cannot corrupt the caller-owned memo used by sibling rows.
                     shared_curve_cache[key] = {
-                        **dict(curve),
+                        'curve': dict(curve),
+                        'origin': origin,
+                        'disposition': 'live',
                         'dependency_vector': dependency_vector,
                         'repair_notices': list(repair_notices),
                     }
@@ -2336,7 +2388,12 @@ class EvaporationMixin:
                 curve=curve,
                 repair_notices=repair_notices,
             )
-        return curve
+        return gate_curve_memo_record(
+            curve,
+            origin,
+            repair_notices,
+            'live',
+        )
 
     @staticmethod
     def _freeze_gate_liquidus_fO2_log(fO2_log: float) -> float:

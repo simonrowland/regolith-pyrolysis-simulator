@@ -58,10 +58,12 @@ def _deterministic_web_run(monkeypatch):
         "liquidus_T_C": 1700.0,
         "path": ((1000.0, 0.0), (1700.0, 1.0)),
     }
+    from simulator.engine_binding_admission import write_gate_curve_memo_record
+
     monkeypatch.setattr(
         PyrolysisSimulator,
-        "_freeze_gate_curve",
-        lambda self: dict(curve),
+        "_freeze_gate_curve_record",
+        lambda self: write_gate_curve_memo_record(self, curve),
     )
     original_load_yaml = web_events._load_yaml
 

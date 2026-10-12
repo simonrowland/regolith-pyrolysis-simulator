@@ -34,6 +34,7 @@ from simulator.melt_backend.base import EquilibriumResult, MeltCompositionError
 from simulator.reduced_real_determinism import (
     PT0DeterminismStore,
     canonical_json_bytes,
+    gate_curve_memo_record,
     gate_curve_memo_producer_configuration,
     uncacheable_replay_disposition,
 )
@@ -1064,13 +1065,15 @@ def test_redox_liquid_gate_builds_outer_curve_when_cache_missing_default_off(
     assert sim._freeze_gate_enabled() is False
     assert sim._melt_redox_temperature_shift_is_liquid(1300.0 + 273.15) is True
     assert gate_calls == 1
+    stale_curve = {
+        'source': 'stale',
+        'solidus_T_C': 900.0,
+        'liquidus_T_C': 1100.0,
+    }
+    stale_record = gate_curve_memo_record(stale_curve, None, (), 'live')
     sim._freeze_gate_liquid_fraction_cache = {
         'key': ('stale-active-slot',),
-        'curve': {
-            'source': 'stale',
-            'solidus_T_C': 900.0,
-            'liquidus_T_C': 1100.0,
-        },
+        **stale_record,
     }
     memo_curve = sim._melt_redox_liquidus_gate_curve()
 
@@ -2180,7 +2183,7 @@ def test_typed_thermoengine_out_of_domain_is_not_labelled_unavailable(
             ThermoEngineRefusalCause.FO2_OUTSIDE_ATTAINABLE_BRACKET
         )
 
-    monkeypatch.setattr(sim, '_freeze_gate_curve', raise_out_of_domain)
+    monkeypatch.setattr(sim, '_freeze_gate_curve_record', raise_out_of_domain)
     curve = sim._melt_redox_liquidus_gate_curve()
     assert isinstance(curve, _MeltRedoxLiquidusFloorFallback)
     assert curve.liquidus_status == 'out_of_domain'
@@ -2213,7 +2216,7 @@ def test_typed_thermoengine_nonfinite_is_not_converged_without_substring(
             'ThermoEngine Liquid GibbsFreeEnergy is unavailable: nan'
         )
 
-    monkeypatch.setattr(sim, '_freeze_gate_curve', raise_nonfinite)
+    monkeypatch.setattr(sim, '_freeze_gate_curve_record', raise_nonfinite)
     curve = sim._melt_redox_liquidus_gate_curve()
     assert isinstance(curve, _MeltRedoxLiquidusFloorFallback)
     assert curve.liquidus_status == 'not_converged'
@@ -2245,7 +2248,7 @@ def test_not_converged_token_is_not_rewritten_to_out_of_domain(
             'kernel liquidus unavailable: status=out_of_domain'
         )
 
-    monkeypatch.setattr(sim, '_freeze_gate_curve', raise_both_tokens)
+    monkeypatch.setattr(sim, '_freeze_gate_curve_record', raise_both_tokens)
     curve = sim._melt_redox_liquidus_gate_curve()
     assert isinstance(curve, _MeltRedoxLiquidusFloorFallback)
     assert curve.liquidus_status == 'not_converged'
@@ -3088,13 +3091,18 @@ def test_redox_operation_holds_failed_authority_until_recovery_next_operation(
         curve_calls += 1
         if curve_calls == 1:
             raise ProviderUnavailableError('transient liquidus lookup failure')
-        return {
+        curve = {
             'source': 'test_recovered_real_curve',
             'solidus_T_C': 1000.0,
             'liquidus_T_C': 1700.0,
         }
+        return gate_curve_memo_record(curve, None, (), 'live')
 
-    monkeypatch.setattr(sim, '_freeze_gate_curve', fail_then_recover_curve)
+    monkeypatch.setattr(
+        sim,
+        '_freeze_gate_curve_record',
+        fail_then_recover_curve,
+    )
 
     fallback_operation = sim._apply_fe_redox_respeciation()
     fallback_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
@@ -3155,11 +3163,13 @@ def test_full_tick_pins_failed_authority_and_poisoned_retry(
         per_operation_calls += 1
         if per_operation_calls == 1:
             raise ProviderUnavailableError('transient tick liquidus failure')
-        return dict(recovered_curve)
+        return gate_curve_memo_record(
+            dict(recovered_curve), None, (), 'live'
+        )
 
     monkeypatch.setattr(
         per_operation_sim,
-        '_freeze_gate_curve',
+        '_freeze_gate_curve_record',
         per_operation_fail_then_recover,
     )
     per_operation_sim._apply_fe_redox_respeciation()
@@ -3225,7 +3235,11 @@ def test_full_tick_pins_failed_authority_and_poisoned_retry(
         resolved_authorities.append(authority)
         return authority
 
-    monkeypatch.setattr(tick_sim, '_freeze_gate_curve', tick_fail_then_recover)
+    monkeypatch.setattr(
+        tick_sim,
+        '_freeze_gate_curve_record',
+        tick_fail_then_recover,
+    )
     monkeypatch.setattr(tick_sim, '_dispatch_only', fake_dispatch)
     monkeypatch.setattr(
         tick_sim,
@@ -3308,7 +3322,7 @@ def test_abort_before_any_commit_allows_same_hour_retry_with_pinned_authority(
     def resolve_curve():
         nonlocal curve_calls
         curve_calls += 1
-        return pinned_curve
+        return gate_curve_memo_record(pinned_curve, None, (), 'live')
 
     def abort_once_before_commit():
         nonlocal exchange_calls
@@ -3329,7 +3343,7 @@ def test_abort_before_any_commit_allows_same_hour_retry_with_pinned_authority(
         resolved_authorities.append(authority)
         return authority
 
-    monkeypatch.setattr(sim, '_freeze_gate_curve', resolve_curve)
+    monkeypatch.setattr(sim, '_freeze_gate_curve_record', resolve_curve)
     monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
     monkeypatch.setattr(
         sim,
@@ -3361,7 +3375,10 @@ def test_abort_before_any_commit_allows_same_hour_retry_with_pinned_authority(
     assert exchange_calls == 2
     assert curve_calls == 1
     assert resolved_authorities
-    assert all(authority is failed_authority for authority in resolved_authorities)
+    assert all(
+        authority is failed_authority
+        for authority in resolved_authorities
+    )
     assert sim._melt_redox_gate_authority_tick_hour is None
     assert sim._poisoned_hour is None
 
@@ -3395,14 +3412,19 @@ def test_c5_partial_commit_poison_refuses_same_hour_replay(
         curve_calls += 1
         if curve_calls == 1:
             raise ProviderUnavailableError('C5 partial-commit authority probe')
-        return {
+        curve = {
             'source': 'test_recovered_real_curve',
             'solidus_T_C': 1000.0,
             'liquidus_T_C': 1700.0,
             'path': ((1000.0, 0.0), (1700.0, 1.0)),
         }
+        return gate_curve_memo_record(curve, None, (), 'live')
 
-    monkeypatch.setattr(sim, '_freeze_gate_curve', fail_to_floor_then_recover)
+    monkeypatch.setattr(
+        sim,
+        '_freeze_gate_curve_record',
+        fail_to_floor_then_recover,
+    )
     monkeypatch.setattr(sim, '_update_temperature', lambda: None)
     monkeypatch.setattr(sim, '_apply_oxygen_reservoir_exchange', lambda: None)
     monkeypatch.setattr(
@@ -3629,12 +3651,17 @@ def test_aborted_respeciation_preserves_fo2_reference_state(
     )
     monkeypatch.setattr(
         sim,
-        '_freeze_gate_curve',
-        lambda: {
-            'source': 'test_real_curve',
-            'solidus_T_C': 1000.0,
-            'liquidus_T_C': 1300.0,
-        },
+        '_freeze_gate_curve_record',
+        lambda: gate_curve_memo_record(
+            {
+                'source': 'test_real_curve',
+                'solidus_T_C': 1000.0,
+                'liquidus_T_C': 1300.0,
+            },
+            None,
+            (),
+            'live',
+        ),
     )
     original_dispatch = sim._dispatch_only
 
@@ -3683,14 +3710,19 @@ def test_source_terms_and_bubbler_share_failed_tick_authority(
         curve_calls += 1
         if curve_calls == 1:
             raise ProviderUnavailableError('source/bubbler transient failure')
-        return {
+        curve = {
             'source': 'test_recovered_real_curve',
             'solidus_T_C': 1000.0,
             'liquidus_T_C': 1700.0,
             'path': ((1000.0, 0.0), (1700.0, 1.0)),
         }
+        return gate_curve_memo_record(curve, None, (), 'live')
 
-    monkeypatch.setattr(sim, '_freeze_gate_curve', fail_then_recover_curve)
+    monkeypatch.setattr(
+        sim,
+        '_freeze_gate_curve_record',
+        fail_then_recover_curve,
+    )
     monkeypatch.setattr(
         sim.campaign_mgr,
         'o2_bubbler_controls',
@@ -3759,18 +3791,24 @@ def test_invalid_redox_gate_curve_does_not_poison_valid_retry(
         nonlocal curve_calls
         curve_calls += 1
         if curve_calls == 1:
-            return {
+            curve = {
                 'source': 'test_invalid_curve',
                 'solidus_T_C': 1800.0,
                 'liquidus_T_C': 1700.0,
             }
-        return {
-            'source': 'test_recovered_curve',
-            'solidus_T_C': 1000.0,
-            'liquidus_T_C': 1700.0,
-        }
+        else:
+            curve = {
+                'source': 'test_recovered_curve',
+                'solidus_T_C': 1000.0,
+                'liquidus_T_C': 1700.0,
+            }
+        return gate_curve_memo_record(curve, None, (), 'live')
 
-    monkeypatch.setattr(sim, '_freeze_gate_curve', invalid_then_valid_curve)
+    monkeypatch.setattr(
+        sim,
+        '_freeze_gate_curve_record',
+        invalid_then_valid_curve,
+    )
     key = _freeze_gate_key_for_current_state(sim)
 
     assert sim._freeze_gate_liquid_fraction_curve_memo == {}
@@ -4022,17 +4060,19 @@ def test_core_gate_curve_memo_reuses_fallback_curve_after_provider_unavailable(
         raise AssertionError(f'unexpected intent: {intent}')
 
     monkeypatch.setattr(sim, '_dispatch_only', unavailable_kernel_provider)
-    live_producer = sim._freeze_gate_curve
+    live_producer = sim._freeze_gate_curve_record
 
     def produce_floor_after_kernel_unavailable():
         try:
             return live_producer()
         except ProviderUnavailableError:
-            return dict(fallback_curve)
+            return gate_curve_memo_record(
+                fallback_curve, None, (), 'live'
+            )
 
     monkeypatch.setattr(
         sim,
-        '_freeze_gate_curve',
+        '_freeze_gate_curve_record',
         produce_floor_after_kernel_unavailable,
     )
 
@@ -4470,7 +4510,7 @@ def test_fallback_authorized_redox_transition_is_balanced_and_provenanced(
     def unavailable_curve():
         raise ProviderUnavailableError('fallback transition test failure')
 
-    monkeypatch.setattr(sim, '_freeze_gate_curve', unavailable_curve)
+    monkeypatch.setattr(sim, '_freeze_gate_curve_record', unavailable_curve)
     transition_count = len(sim.atom_ledger.transitions)
 
     diagnostic = sim._apply_fe_redox_respeciation()
@@ -4517,13 +4557,22 @@ def test_fallback_diagnostic_log_survives_recovered_last_value(
         curve_calls += 1
         if curve_calls == 1:
             raise ProviderUnavailableError('durable diagnostic test failure')
-        return {
-            'source': 'test_recovered_curve',
-            'solidus_T_C': 1000.0,
-            'liquidus_T_C': 1700.0,
-        }
+        return gate_curve_memo_record(
+            {
+                'source': 'test_recovered_curve',
+                'solidus_T_C': 1000.0,
+                'liquidus_T_C': 1700.0,
+            },
+            None,
+            (),
+            'live',
+        )
 
-    monkeypatch.setattr(sim, '_freeze_gate_curve', fail_then_recover_curve)
+    monkeypatch.setattr(
+        sim,
+        '_freeze_gate_curve_record',
+        fail_then_recover_curve,
+    )
 
     sim._melt_redox_liquidus_gate_curve()
     fallback_record = dict(
@@ -4556,7 +4605,7 @@ def test_fallback_log_is_bounded_and_snapshot_serializes_hourly_summary(
     def unavailable_curve():
         raise ProviderUnavailableError('bounded fallback history failure')
 
-    monkeypatch.setattr(sim, '_freeze_gate_curve', unavailable_curve)
+    monkeypatch.setattr(sim, '_freeze_gate_curve_record', unavailable_curve)
 
     for _ in range(300):
         sim._melt_redox_liquidus_gate_curve()
@@ -4640,7 +4689,11 @@ def test_unrecognised_engine_status_does_not_authorize_the_redox_floor_fallback(
         # adapter reports a token outside INTENT_RESULT_STATUSES.
         raise IntentResultStatusError('failed')
 
-    monkeypatch.setattr(sim, '_freeze_gate_curve', unrecognised_status_curve)
+    monkeypatch.setattr(
+        sim,
+        '_freeze_gate_curve_record',
+        unrecognised_status_curve,
+    )
     transition_count = len(sim.atom_ledger.transitions)
     fallback_count = len(sim._melt_redox_liquidus_gate_fallback_diagnostics)
 

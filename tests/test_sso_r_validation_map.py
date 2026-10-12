@@ -437,7 +437,11 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
         pin_window = False
         return result
 
-    monkeypatch.setattr(simulator_type, '_freeze_gate_curve', fail_then_recover)
+    monkeypatch.setattr(
+        simulator_type,
+        '_freeze_gate_curve_record',
+        fail_then_recover,
+    )
     monkeypatch.setattr(
         simulator_type,
         '_establish_melt_redox_gate_authority_for_current_hour',
