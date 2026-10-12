@@ -38,6 +38,7 @@ from simulator.battery.records import (
     DecisionBand,
     Execution,
     Located,
+    Locator,
     Notice,
     Residual,
     ResidualNumeric,
@@ -341,7 +342,12 @@ def test_pin_figure_only_rows_are_comparison_candidates() -> None:
 
 def test_pin_figure_only_scores_with_notice_and_printed_band() -> None:
     rows, experiments, bench = _demaria_shape_figure_rows()
-    reference = rows[0]
+    raw_uncertainty = dict(rows[0].uncertainty.verbatim)
+    raw_uncertainty["confidence_level"] = "one_sigma"
+    reference = replace(
+        rows[0],
+        uncertainty=replace(rows[0].uncertainty, verbatim=raw_uncertainty),
+    )
     context = _demaria_context([reference], experiments, bench)
     prediction = _predict(Decimal("1.5e-5"), reference.identity)
     residual, _ = compile_residual(
@@ -359,8 +365,8 @@ def test_pin_figure_only_scores_with_notice_and_printed_band() -> None:
     # Mapped dex=0.3 reading band must be taken from this row, not erased by
     # the catalogue-composition label.
     assert residual.numeric.decision_band is not None
-    # Synthetic fixture: sigma_log10P_dex_per_point is a 1-sigma dex field
-    # under q6-v1 (simulator/battery/score.py:2279-2280). Its two-sided 95%
+    # Synthetic fixture explicitly states one_sigma for this dex field.
+    # Its two-sided 95%
     # normal quantile z=1.959963984540054 is defined at score.py:270-275;
     # dex stays dex. Sanity: 0.3 -> 0.5879891953620162 dex.
     assert residual.numeric.decision_band.value == (
@@ -746,6 +752,7 @@ def test_pin_figure_mapped_dex_uncertainty_is_read() -> None:
     rows, experiments, bench = _demaria_shape_figure_rows()
     figure = replace(
         rows[0],
+        locator=Locator(page=1, figure="2"),
         notices=(),
         identity=replace(
             rows[0].identity,
@@ -768,12 +775,15 @@ def test_pin_figure_mapped_dex_uncertainty_is_read() -> None:
     )
     assert residual.numeric is not None
     assert residual.numeric.decision_band is not None
-    # Synthetic fixture: sigma_log10P_dex_per_point is a 1-sigma dex field
-    # under q6-v1 (simulator/battery/score.py:2279-2280). Its two-sided 95%
-    # normal quantile z=1.959963984540054 is defined at score.py:270-275;
-    # dex stays dex. Sanity: 0.3 -> 0.5879891953620162 dex.
-    assert residual.numeric.decision_band.value == (
-        Decimal("0.3") * Decimal("1.959963984540054")
+    # The field name contains sigma, but this fixture has no stated level.
+    # q6 keeps the printed width and attaches the confidence notice.
+    assert residual.numeric.decision_band.value == Decimal("0.3")
+    assert any(
+        notice.reason == "confidence_level_not_stated"
+        and "sigma_log10P_dex_per_point" in notice.band
+        and "printed_width=0.3" in notice.band
+        and '"figure": "2"' in notice.band
+        for notice in residual.notices
     )
     assert "source-printed" in residual.numeric.decision_band.rule
 
@@ -782,7 +792,12 @@ def test_pin_catalogue_composition_does_not_erase_figure_reading_band() -> None:
     """Finding 3: catalogue label keeps figure out of certified but keeps band."""
     rows, experiments, bench = _demaria_shape_figure_rows()
     # rows[0] already has catalogue composition + mapped dex=0.3
-    reference = rows[0]
+    raw_uncertainty = dict(rows[0].uncertainty.verbatim)
+    raw_uncertainty["confidence_level"] = "one_sigma"
+    reference = replace(
+        rows[0],
+        uncertainty=replace(rows[0].uncertainty, verbatim=raw_uncertainty),
+    )
     context = _demaria_context([reference], experiments, bench)
     residual, _ = compile_residual(
         reference,
@@ -792,8 +807,8 @@ def test_pin_catalogue_composition_does_not_erase_figure_reading_band() -> None:
     )
     assert residual.numeric is not None
     assert residual.numeric.decision_band is not None
-    # Synthetic fixture: sigma_log10P_dex_per_point is a 1-sigma dex field
-    # under q6-v1 (simulator/battery/score.py:2279-2280). Its two-sided 95%
+    # Synthetic fixture explicitly states one_sigma for this dex field. Its
+    # two-sided 95%
     # normal quantile z=1.959963984540054 is defined at score.py:270-275;
     # dex stays dex. Sanity: 0.3 -> 0.5879891953620162 dex.
     assert residual.numeric.decision_band.value == (

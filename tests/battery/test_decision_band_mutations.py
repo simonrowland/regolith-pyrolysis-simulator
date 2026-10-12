@@ -25,7 +25,7 @@ from simulator.battery.enums import (
     SourceRelation,
     UncertaintyKind,
 )
-from simulator.battery.records import DecisionBand, Execution, Notice, Uncertainty
+from simulator.battery.records import DecisionBand, Execution, Locator, Notice, Uncertainty
 from simulator.battery.score import (
     DECISION_BAND_POLICY_VERSION,
     DECISION_BAND_PERCENTILE,
@@ -120,11 +120,21 @@ def _only_band(context: ScoreContext, *, tier: str) -> DecisionBand | None:
 
 
 def test_printed_uncertainty_kinds_precede_derived_and_unparseable_refuses() -> None:
-    def resolve(raw: str, *, basis: str | None = None, value=None):
+    def resolve(
+        raw: str,
+        *,
+        confidence_level: str = "not_stated",
+        basis: str | None = None,
+        value=None,
+        include_value: bool = True,
+    ):
+        verbatim = {"note": raw, "confidence_level": confidence_level}
+        if include_value:
+            verbatim["value"] = value if value is not None else "0.1"
         uncertainty = Uncertainty(
             kind=UncertaintyKind.PRINTED,
-            verbatim=raw,
-            value=value,
+            verbatim=verbatim,
+            value=None,
             basis=basis,
         )
         return _printed_uncertainty_band(
@@ -133,40 +143,45 @@ def test_printed_uncertainty_kinds_precede_derived_and_unparseable_refuses() -> 
             Decimal("2"),
         )
 
-    one_sigma = resolve("± 0.1 kJ/mol (1σ)")
+    one_sigma = resolve("Table 1 SD", confidence_level="one_sigma")
     assert one_sigma.band is not None
     assert one_sigma.band.value == _Z95 * Decimal("0.1")
     assert _decision_band_kind(one_sigma.band) == "printed_1sigma"
 
-    standard_error = resolve("0.1", basis="standard_error", value=Decimal("0.1"))
-    assert standard_error.band is not None
-    assert standard_error.band.value == one_sigma.band.value
-    assert _decision_band_kind(standard_error.band) == "printed_1sigma"
+    field_name_only = resolve("sigma_x", confidence_level="not_stated")
+    assert field_name_only.band is not None
+    assert field_name_only.band.value == Decimal("0.1")
+    assert _decision_band_kind(field_name_only.band) == "printed_unstated"
+    assert field_name_only.notice is not None
+    assert field_name_only.notice.reason == "confidence_level_not_stated"
 
-    two_sigma = resolve("0.1 (2-sigma)")
+    two_sigma = resolve("Table 1 2-sigma", confidence_level="two_sigma")
     assert two_sigma.band is not None
     assert two_sigma.band.value == Decimal("0.1")
     assert _decision_band_kind(two_sigma.band) == "printed_2sigma"
 
-    confidence_interval = resolve("95% confidence interval: 0.1 kJ/mol")
+    confidence_interval = resolve("Table 2 95% confidence interval", confidence_level="ci95")
     assert confidence_interval.band is not None
     assert confidence_interval.band.value == Decimal("0.1")
     assert _decision_band_kind(confidence_interval.band) == "printed_2sigma"
 
-    bounds = resolve("[1.0, 1.4] kJ/mol range")
+    bounds = resolve("range", value=(Decimal("1.0"), Decimal("1.4")))
     assert bounds.band is not None
     assert bounds.band.value == Decimal("0.2")
     assert _decision_band_kind(bounds.band) == "printed_range"
+    assert bounds.notice is not None
+    assert bounds.notice.reason == "confidence_level_not_stated"
 
-    unstated = resolve("±0.1 kJ/mol")
+    unstated = resolve("printed width")
     assert unstated.band is not None
-    assert unstated.band.value == one_sigma.band.value
+    assert unstated.band.value == Decimal("0.1")
     assert _decision_band_kind(unstated.band) == "printed_unstated"
     assert unstated.notice is not None
-    assert unstated.notice.reason == "uncertainty_kind_unstated"
-    assert unstated.notice.band == "±0.1 kJ/mol"
+    assert unstated.notice.reason == "confidence_level_not_stated"
+    assert "field=" in unstated.notice.band
+    assert "printed_width=0.1" in unstated.notice.band
 
-    unparseable = resolve("uncertainty not quantified")
+    unparseable = resolve("uncertainty not quantified", include_value=False)
     assert unparseable.band is None
     assert unparseable.refusal is not None
     assert unparseable.refusal["reason"] == "unparseable_printed_uncertainty"
@@ -191,7 +206,7 @@ def test_printed_uncertainty_converts_units_before_setting_ticket() -> None:
 
     def source(unit: str, quantity: Quantity):
         return SimpleNamespace(
-            locator=SimpleNamespace(note=f"printed unit='{unit}'"),
+            locator=Locator(note=f"printed unit='{unit}'"),
             derivation=SimpleNamespace(output_unit=QUANTITY_UNITS[quantity]),
         )
 
@@ -202,7 +217,7 @@ def test_printed_uncertainty_converts_units_before_setting_ticket() -> None:
     )
     assert relative.band is not None
     assert relative.band.unit == "dimensionless"
-    assert relative.band.value == _Z95 * Decimal("0.02")
+    assert relative.band.value == Decimal("0.02")
 
     kcal = _printed_uncertainty_band(
         Quantity.DELTA_FG,
@@ -212,11 +227,18 @@ def test_printed_uncertainty_converts_units_before_setting_ticket() -> None:
     )
     assert kcal.band is not None
     assert kcal.band.unit == "kJ_per_declared_mol_basis"
-    assert kcal.band.value == _Z95 * Decimal("0.573208")
+    assert kcal.band.value == Decimal("0.573208")
 
     heat = _printed_uncertainty_band(
         Quantity.CP,
-        Uncertainty(kind=UncertaintyKind.PRINTED, verbatim="0.24 (2-sigma)"),
+        Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim={
+                "note": "0.24 (2-sigma)",
+                "value": "0.24",
+                "confidence_level": "two_sigma",
+            },
+        ),
         Decimal("300"),
         source_observation=source("cal deg^-1 gfw^-1", Quantity.CP),
     )
@@ -226,7 +248,14 @@ def test_printed_uncertainty_converts_units_before_setting_ticket() -> None:
 
     pressure = _printed_uncertainty_band(
         Quantity.P_PARTIAL,
-        Uncertainty(kind=UncertaintyKind.PRINTED, verbatim="1 kPa (2-sigma)"),
+        Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim={
+                "note": "1 kPa (2-sigma)",
+                "value": "1 kPa",
+                "confidence_level": "two_sigma",
+            },
+        ),
         Decimal("100000"),
         source_observation=source("Pa", Quantity.P_PARTIAL),
     )

@@ -14979,6 +14979,10 @@ class Migrator:
         unc = uncertainty
         if extra_unc is not None:
             verbatim = {"sigma": extra_unc, "parent": parent_id}
+            if isinstance(uncertainty.verbatim, Mapping):
+                confidence_level = uncertainty.verbatim.get("confidence_level")
+                if confidence_level is not None:
+                    verbatim["confidence_level"] = confidence_level
             if extra_unc_k is not None:
                 verbatim["k"] = extra_unc_k
                 numeric_extra_unc = _as_dec_or_none(extra_unc)

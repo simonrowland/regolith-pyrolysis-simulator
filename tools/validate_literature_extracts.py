@@ -91,6 +91,7 @@ OBSERVATION_TYPES = frozenset(
 )
 
 REVIEW_STATUSES = frozenset({"draft", "reviewed", "rejected"})
+CONFIDENCE_LEVELS = frozenset({"one_sigma", "two_sigma", "ci95", "not_stated"})
 
 def equipment_fields_from_vocabulary(
     path: Path = LAB_PARAMETER_VOCABULARY_PATH,
@@ -1154,6 +1155,31 @@ def _check_equipment(
             )
 
 
+def _check_uncertainty(uncertainty: Any, path: str, errors: list[str]) -> None:
+    if uncertainty is None:
+        return
+    if isinstance(uncertainty, Mapping):
+        level = uncertainty.get("confidence_level")
+        if "confidence_level" in uncertainty and (
+            not isinstance(level, str) or level not in CONFIDENCE_LEVELS
+        ):
+            errors.append(
+                f"{path}.uncertainty.confidence_level: must be one of {sorted(CONFIDENCE_LEVELS)}"
+            )
+        if not _has_payload_leaf(uncertainty):
+            # Allow {} only when no uncertainty was stated; null-only mappings
+            # are migrator artifacts.
+            if any(v is None for v in uncertainty.values()) and not _has_payload_leaf(
+                {k: v for k, v in uncertainty.items() if v is not None}
+            ):
+                errors.append(
+                    f"{path}: uncertainty mapping is null-only "
+                    f"(omit the key if no uncertainty was stated, or retain verbatim text)"
+                )
+    elif isinstance(uncertainty, str) and not uncertainty.strip():
+        errors.append(f"{path}: uncertainty string must be non-empty when present")
+
+
 def _check_observation(
     obs: Any,
     path: str,
@@ -1210,20 +1236,7 @@ def _check_observation(
             errors.append(f"{path}: units required when values are present")
 
     # Uncertainty is first-class: if present, must not be a bare null sink.
-    unc = obs.get("uncertainty")
-    if unc is not None:
-        if isinstance(unc, Mapping) and not _has_payload_leaf(unc):
-            # Allow {} only when no uncertainty was stated; prefer omission.
-            # A mapping whose only leaves are null is a migrator artifact.
-            if any(v is None for v in unc.values()) and not _has_payload_leaf(
-                {k: v for k, v in unc.items() if v is not None}
-            ):
-                errors.append(
-                    f"{path}: uncertainty mapping is null-only "
-                    f"(omit the key if no uncertainty was stated, or retain verbatim text)"
-                )
-        elif isinstance(unc, str) and not unc.strip():
-            errors.append(f"{path}: uncertainty string must be non-empty when present")
+    _check_uncertainty(obs.get("uncertainty"), path, errors)
 
     tr = obs.get("T_range_K")
     if tr is not None:
@@ -1307,18 +1320,7 @@ def _check_context_row(
         if not row.get("units"):
             errors.append(f"{path}: units required when values are present")
 
-    unc = row.get("uncertainty")
-    if unc is not None:
-        if isinstance(unc, Mapping) and not _has_payload_leaf(unc):
-            if any(v is None for v in unc.values()) and not _has_payload_leaf(
-                {k: v for k, v in unc.items() if v is not None}
-            ):
-                errors.append(
-                    f"{path}: uncertainty mapping is null-only "
-                    f"(omit the key if no uncertainty was stated, or retain verbatim text)"
-                )
-        elif isinstance(unc, str) and not unc.strip():
-            errors.append(f"{path}: uncertainty string must be non-empty when present")
+    _check_uncertainty(row.get("uncertainty"), path, errors)
 
     tr = row.get("T_range_K")
     if tr is not None:
