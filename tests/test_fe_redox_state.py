@@ -142,3 +142,20 @@ def test_normalizer_checks_buffer_offset_at_reference_temperature() -> None:
     )
     with pytest.raises(RedoxStateInputError, match='disagrees'):
         normalize_redox_state(reference_value + 0.01, state)
+
+
+def test_reanchor_redox_state_moves_reference_value_without_changing_line_shape() -> None:
+    from simulator.fe_redox import _reanchor_redox_state
+
+    state = RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, 0.2)
+    new_reference = state.log_fO2_at(REDOX_STATE_REFERENCE_T_K) + 0.05
+    target_T_K = 1900.0
+
+    reanchored = _reanchor_redox_state(state, new_reference)
+
+    assert reanchored.log_fO2_at(REDOX_STATE_REFERENCE_T_K) == pytest.approx(
+        new_reference
+    )
+    assert reanchored.log_fO2_at(target_T_K) == pytest.approx(
+        state.log_fO2_at(target_T_K) + 0.05
+    )

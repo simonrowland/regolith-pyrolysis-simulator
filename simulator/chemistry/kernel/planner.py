@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import weakref
 from collections.abc import Mapping
+from dataclasses import replace
 from typing import Any, Optional
 
 from simulator.accounting.exceptions import AccountingError
@@ -33,6 +34,7 @@ from simulator.accounting.ledger import (
     AtomLedger,
     LedgerTransition,
 )
+from simulator.fe_redox import RedoxState, normalize_redox_state
 from simulator.chemistry.kernel.account_filters import build_provider_account_view
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.chemistry.kernel.config import (
@@ -61,6 +63,16 @@ from simulator.chemistry.kernel.validation import (
     validate_intent_authority,
     validate_proposal_accounts,
 )
+
+
+def _normalized_intent_request(request: IntentRequest) -> IntentRequest:
+    fO2_log, redox_state = normalize_redox_state(
+        request.fO2_log,
+        request.redox_state,
+    )
+    if fO2_log == request.fO2_log and redox_state is request.redox_state:
+        return request
+    return replace(request, fO2_log=fO2_log, redox_state=redox_state)
 
 
 class Planner:
@@ -151,11 +163,14 @@ class Planner:
                 registered for ``request.intent``.
         """
 
+        request = _normalized_intent_request(request)
         authoritative = self._registry.authoritative_for(request.intent)
         if authoritative is None:
             raise ProviderUnavailableError(
                 f"no authoritative provider registered for intent {request.intent.value!r}"
             )
+        if not authoritative.capability_profile().consumes_fO2:
+            request = replace(request, fO2_log=None, redox_state=None)
 
         shadows = self._registry.shadows_for(request.intent)
         shadow_results: list[tuple[ChemistryProvider, str, IntentResult]] = []
@@ -180,6 +195,9 @@ class Planner:
                     pressure_bar=request.pressure_bar,
                     fO2_log=(
                         request.fO2_log if profile.consumes_fO2 else None
+                    ),
+                    redox_state=(
+                        request.redox_state if profile.consumes_fO2 else None
                     ),
                     fe_redox_policy=request.fe_redox_policy,
                     control_inputs=request.control_inputs,
@@ -264,11 +282,14 @@ class Planner:
         consumed value.
         """
 
+        request = _normalized_intent_request(request)
         authoritative = self._registry.authoritative_for(request.intent)
         if authoritative is None:
             raise ProviderUnavailableError(
                 f"no authoritative provider registered for intent {request.intent.value!r}"
             )
+        if not authoritative.capability_profile().consumes_fO2:
+            request = replace(request, fO2_log=None, redox_state=None)
         return authoritative.dispatch(request)
 
     def _append_shadow_trace(self, record: dict[str, Any]) -> None:
@@ -505,6 +526,7 @@ class ChemistryKernel:
         temperature_C: float,
         pressure_bar: float,
         fO2_log: Optional[float] = None,
+        redox_state: RedoxState | None = None,
         fe_redox_policy: str = "intrinsic",
         control_inputs: Optional[Mapping[str, Any]] = None,
         declared_accounts: Optional[frozenset[str]] = None,
@@ -542,6 +564,7 @@ class ChemistryKernel:
             validators rejected the authoritative result.
         """
 
+        fO2_log, redox_state = normalize_redox_state(fO2_log, redox_state)
         provider = self._registry.authoritative_for(intent)
         if provider is None:
             fallback = self._registry.fallback_for(intent)
@@ -555,6 +578,7 @@ class ChemistryKernel:
                 temperature_C=temperature_C,
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
+                redox_state=redox_state,
                 fe_redox_policy=fe_redox_policy,
                 control_inputs=control_inputs,
                 declared_accounts=declared_accounts,
@@ -569,6 +593,7 @@ class ChemistryKernel:
                 temperature_C=temperature_C,
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
+                redox_state=redox_state,
                 fe_redox_policy=fe_redox_policy,
                 control_inputs=control_inputs,
                 declared_accounts=declared_accounts,
@@ -586,6 +611,7 @@ class ChemistryKernel:
                 temperature_C=temperature_C,
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
+                redox_state=redox_state,
                 fe_redox_policy=fe_redox_policy,
                 control_inputs=control_inputs,
                 declared_accounts=declared_accounts,
@@ -607,6 +633,7 @@ class ChemistryKernel:
                 temperature_C=temperature_C,
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
+                redox_state=redox_state,
                 fe_redox_policy=fe_redox_policy,
                 control_inputs=control_inputs,
                 declared_accounts=declared_accounts,
@@ -621,6 +648,7 @@ class ChemistryKernel:
         temperature_C: float,
         pressure_bar: float,
         fO2_log: Optional[float] = None,
+        redox_state: RedoxState | None = None,
         fe_redox_policy: str = "intrinsic",
         control_inputs: Optional[Mapping[str, Any]] = None,
         declared_accounts: Optional[frozenset[str]] = None,
@@ -628,6 +656,7 @@ class ChemistryKernel:
     ) -> IntentResult:
         """Run an authoritative read-only dispatch without diagnostic shadows."""
 
+        fO2_log, redox_state = normalize_redox_state(fO2_log, redox_state)
         provider = self._registry.authoritative_for(intent)
         if provider is None:
             raise ProviderUnavailableError(
@@ -639,6 +668,7 @@ class ChemistryKernel:
             temperature_C=temperature_C,
             pressure_bar=pressure_bar,
             fO2_log=fO2_log,
+            redox_state=redox_state,
             fe_redox_policy=fe_redox_policy,
             control_inputs=control_inputs,
             declared_accounts=declared_accounts,
@@ -654,6 +684,7 @@ class ChemistryKernel:
         temperature_C: float,
         pressure_bar: float,
         fO2_log: Optional[float],
+        redox_state: RedoxState | None,
         fe_redox_policy: str,
         control_inputs: Optional[Mapping[str, Any]],
         declared_accounts: Optional[frozenset[str]],
@@ -672,12 +703,16 @@ class ChemistryKernel:
         consumers can tell which slot answered.
         """
 
+        fO2_log, redox_state = normalize_redox_state(fO2_log, redox_state)
         profile = provider.capability_profile()
         if not profile.can_dispatch(intent):
             raise UnauthorizedIntentError(
                 f"provider {profile.provider_id!r} no longer declares dispatch "
                 f"capability for intent {intent.value!r}"
             )
+        if not profile.consumes_fO2:
+            fO2_log = None
+            redox_state = None
         if declared_accounts is None:
             declared_accounts = profile.declared_accounts
         else:
@@ -698,6 +733,7 @@ class ChemistryKernel:
             temperature_C=temperature_C,
             pressure_bar=pressure_bar,
             fO2_log=fO2_log if profile.consumes_fO2 else None,
+            redox_state=redox_state if profile.consumes_fO2 else None,
             fe_redox_policy=fe_redox_policy,
             control_inputs=control_inputs or {},
         )

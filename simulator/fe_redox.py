@@ -643,6 +643,28 @@ def normalize_redox_state(
     return scalar, redox_state
 
 
+def _reanchor_redox_state(
+    redox_state: RedoxState | None,
+    fO2_log: float | None,
+) -> RedoxState | None:
+    """Move a state to a canonical scalar at the owner reference temperature."""
+    if fO2_log is None:
+        return redox_state
+    canonical = _redox_state_finite_float(fO2_log, 'fO2_log')
+    if redox_state is None or redox_state.kind == 'absolute':
+        return RedoxState.absolute(canonical)
+    current = _redox_state_finite_float(
+        redox_state.log_fO2_at(REDOX_STATE_REFERENCE_T_K),
+        'redox_state reference fO2',
+    )
+    assert redox_state.buffer is not None
+    assert redox_state.delta_log10 is not None
+    return RedoxState.buffer_offset(
+        redox_state.buffer,
+        redox_state.delta_log10 + (canonical - current),
+    )
+
+
 def _alpha_j(cation_a: str, cation_b: str) -> float | None:
     if cation_a == cation_b:
         return 0.0

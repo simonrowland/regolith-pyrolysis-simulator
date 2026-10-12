@@ -31,6 +31,11 @@ from simulator.chemistry.kernel.dto import ProviderAccountView
 # Planner is an internal seam, intentionally not on the package's
 # public surface; tests reach for it via the module-qualified path.
 from simulator.chemistry.kernel.planner import Planner
+from simulator.fe_redox import (
+    FE_FEO_BUFFER_STANDARD,
+    REDOX_STATE_REFERENCE_T_K,
+    RedoxState,
+)
 
 
 def _make_request(intent: ChemistryIntent) -> IntentRequest:
@@ -433,3 +438,132 @@ def test_chemistry_kernel_clear_shadow_trace_passthrough():
     assert kernel.planner.shadow_trace != ()
     kernel.clear_shadow_trace()
     assert kernel.planner.shadow_trace == ()
+
+
+class _RedoxRecordingProvider(ChemistryProvider):
+    def __init__(
+        self,
+        provider_id: str,
+        *,
+        status: str = 'ok',
+        consumes_fO2: bool = True,
+    ) -> None:
+        self.provider_id = provider_id
+        self.status = status
+        self.consumes_fO2 = consumes_fO2
+        self.requests: list[IntentRequest] = []
+
+    def capability_profile(self) -> CapabilityProfile:
+        return CapabilityProfile(
+            provider_id=self.provider_id,
+            intents=frozenset({ChemistryIntent.VAPOR_PRESSURE}),
+            is_authoritative_for=frozenset({ChemistryIntent.VAPOR_PRESSURE}),
+            declared_accounts=frozenset({'process.cleaned_melt'}),
+            consumes_fO2=self.consumes_fO2,
+        )
+
+    def dispatch(self, request: IntentRequest) -> IntentResult:
+        self.requests.append(request)
+        return IntentResult(
+            intent=request.intent,
+            status=self.status,
+            transition=None,
+            diagnostic={'source': self.provider_id},
+        )
+
+
+def test_planner_forwards_redox_state_to_authoritative_and_shadow():
+    state = RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, 0.2)
+    registry = ProviderRegistry()
+    authoritative = _RedoxRecordingProvider('redox-authoritative')
+    shadow = _RedoxRecordingProvider('redox-shadow')
+    registry.register(authoritative, [ChemistryIntent.VAPOR_PRESSURE])
+    registry.register(shadow, [ChemistryIntent.VAPOR_PRESSURE], shadow=True)
+
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(accounts={}, species_formula_registry={}),
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+        redox_state=state,
+    )
+    Planner(registry).dispatch(request)
+
+    assert authoritative.requests[0].redox_state == state
+    assert shadow.requests[0].redox_state == state
+    assert authoritative.requests[0].fO2_log == pytest.approx(
+        state.log_fO2_at(REDOX_STATE_REFERENCE_T_K)
+    )
+
+
+def test_kernel_redox_state_survives_fallback_and_is_cleared_for_nonconsumer():
+    state = RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, 0.2)
+    registry = ProviderRegistry()
+    authoritative = _RedoxRecordingProvider(
+        'redox-primary',
+        status='unavailable',
+    )
+    fallback = _RedoxRecordingProvider('redox-fallback')
+    registry.register(authoritative, [ChemistryIntent.VAPOR_PRESSURE])
+    registry.register(fallback, [ChemistryIntent.VAPOR_PRESSURE], fallback=True)
+    kernel = ChemistryKernel(
+        AtomLedger(),
+        registry,
+        species_formula_registry={},
+        allow_fallback_intents=frozenset({ChemistryIntent.VAPOR_PRESSURE}),
+    )
+
+    kernel.dispatch(
+        ChemistryIntent.VAPOR_PRESSURE,
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+        redox_state=state,
+    )
+
+    assert fallback.requests[0].redox_state == state
+    assert fallback.requests[0].fO2_log == pytest.approx(
+        state.log_fO2_at(REDOX_STATE_REFERENCE_T_K)
+    )
+
+    no_shadow_registry = ProviderRegistry()
+    no_shadow_provider = _RedoxRecordingProvider('redox-no-shadows')
+    no_shadow_registry.register(
+        no_shadow_provider,
+        [ChemistryIntent.VAPOR_PRESSURE],
+    )
+    no_shadow_kernel = ChemistryKernel(
+        AtomLedger(),
+        no_shadow_registry,
+        species_formula_registry={},
+    )
+    no_shadow_kernel._dispatch_authoritative_without_shadows(
+        ChemistryIntent.VAPOR_PRESSURE,
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+        redox_state=state,
+    )
+    assert no_shadow_provider.requests[0].redox_state == state
+
+    nonconsumer_registry = ProviderRegistry()
+    nonconsumer = _RedoxRecordingProvider(
+        'redox-nonconsumer',
+        consumes_fO2=False,
+    )
+    nonconsumer_registry.register(
+        nonconsumer,
+        [ChemistryIntent.VAPOR_PRESSURE],
+    )
+    nonconsumer_kernel = ChemistryKernel(
+        AtomLedger(),
+        nonconsumer_registry,
+        species_formula_registry={},
+    )
+    nonconsumer_kernel.dispatch(
+        ChemistryIntent.VAPOR_PRESSURE,
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+        redox_state=state,
+    )
+
+    assert nonconsumer.requests[0].redox_state is None
+    assert nonconsumer.requests[0].fO2_log is None

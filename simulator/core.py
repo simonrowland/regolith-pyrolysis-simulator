@@ -385,6 +385,8 @@ from simulator.feedstock_composition import (
 )
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR, feedstock_body
 from simulator.fe_redox import (
+    RedoxState,
+    _reanchor_redox_state,
     calphad_ferrous_feo_activity_diagnostic,
     feo_iw_log10_fO2_bar,
     feot_equivalent_wt_pct,
@@ -394,6 +396,7 @@ from simulator.fe_redox import (
     kress91_ln_fO2_temperature_delta,
     kress91_split,
     melt_mol_fractions_for_kress91,
+    normalize_redox_state,
 )
 from simulator.melt_regime import MeltRegime, melt_regime
 from simulator.config_flags import bool_feature_flag
@@ -2371,6 +2374,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         *,
         control_inputs: Mapping[str, Any],
         fO2_log: Optional[float] = None,
+        redox_state: RedoxState | None = None,
         fe_redox_policy: str = 'intrinsic',
         temperature_C_override: float | None = None,
         include_diagnostic_shadows: bool = True,
@@ -2389,6 +2393,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         split.  Use :meth:`_dispatch_and_commit` instead when the site
         does NOT need bookkeeping between dispatch and commit.
         """
+        fO2_log, redox_state = normalize_redox_state(
+            fO2_log,
+            redox_state,
+        )
         kernel = self._require_chem_kernel()
         control_inputs = dict(control_inputs)
         temperature_C = (
@@ -2405,6 +2413,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 temperature_C = float(controls['temperature_C'])
             pressure_bar = float(controls['pressure_bar'])
             fO2_log = controls['fO2_log']
+            redox_state = _reanchor_redox_state(redox_state, fO2_log)
+            fO2_log, redox_state = normalize_redox_state(
+                fO2_log,
+                redox_state,
+            )
             if fO2_log is not None and 'melt_fO2_log' in control_inputs:
                 control_inputs['melt_fO2_log'] = float(fO2_log)
             canonicalizer = getattr(
@@ -2471,6 +2484,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             temperature_C=temperature_C,
             pressure_bar=pressure_bar,
             fO2_log=fO2_log,
+            redox_state=redox_state,
             fe_redox_policy=fe_redox_policy,
             control_inputs=control_inputs,
             account_mol_overrides=account_mol_overrides,

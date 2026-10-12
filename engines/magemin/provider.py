@@ -46,6 +46,7 @@ Parity tolerances (binding spec §4 MAGEMin):
 
 from __future__ import annotations
 
+from dataclasses import replace
 from typing import Any, Mapping, Optional
 
 from engines.magemin.domain import MAGEMinDomainGate
@@ -61,6 +62,7 @@ from simulator.chemistry.kernel.dto import (
     IntentResult,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
+from simulator.fe_redox import normalize_redox_state
 from simulator.melt_backend.base import (
     EquilibriumResult,
     MeltCompositionError,
@@ -160,6 +162,16 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
            :class:`MAGEMinShadowDiagnostics`.
         7. Returns the :class:`IntentResult` with ``transition=None``.
         """
+        fO2_log, redox_state = normalize_redox_state(
+            request.fO2_log,
+            request.redox_state,
+        )
+        if fO2_log != request.fO2_log or redox_state is not request.redox_state:
+            request = replace(
+                request,
+                fO2_log=fO2_log,
+                redox_state=redox_state,
+            )
         # Defence in depth: the registry routes only declared intents
         # here, but a future caller bypassing the registry must hit a
         # clean ``unsupported`` instead of a silent mis-answer.
@@ -514,6 +526,10 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         *,
         composition_mol_by_account: dict,
     ) -> Any:
+        fO2_log, redox_state = normalize_redox_state(
+            request.fO2_log,
+            request.redox_state,
+        )
         finder = getattr(backend, 'find_liquidus_solidus', None)
         if not callable(finder):
             return self._run_backend(
@@ -527,11 +543,8 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         try:
             return finder(
                 pressure_bar=float(request.pressure_bar),
-                fO2_log=(
-                    float(request.fO2_log)
-                    if request.fO2_log is not None
-                    else -9.0
-                ),
+                fO2_log=(float(fO2_log) if fO2_log is not None else -9.0),
+                redox_state=redox_state,
                 composition_mol_by_account=composition_mol_by_account,
                 species_formula_registry=species_registry,
             )
