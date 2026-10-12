@@ -1,0 +1,685 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2025-saratov-alkali-evaporation
+source:
+  citation: >-
+    Shornikov, S., and Yakovlev, O. (2025). Evaporation of Alkaline Components
+    (Na2O and K2O) from the Chondrule Melts of the Saratov Chondrite (L4). In
+    Advances in Ceramic Materials and Processing, chapter 23, pp. 113–118.
+  doi: 10.1007/978-3-031-87558-8_23
+  year: 2025
+  corpus_asset: raw/shornikov-2025-saratov-alkali-evaporation/shornikov-2025-saratov-alkali-evaporation.pdf
+  corpus_sha256: 60790b61f867e2fbee22478d375c2f754c54cead52210bac84ec1152cc62b768
+extraction:
+  method: >-
+    Manual transcription of the full six-page PDF checked against 300 dpi
+    renders of every page. The chapter has no numerical data tables. Numerical
+    pressure and ratio summaries in the text are retained; curves in Figures
+    1–4 are retained as figure-only context and are not digitized.
+  date: '2026-10-04'
+  worker: codex
+review_status: draft
+fidelity_samples:
+  - species: K
+    observable: partial_pressure
+    observation_id: shornikov_2025_k_pressure_range_1450_1500k
+    field: pressure_range_as_printed
+    value: 10^-8–10^-7 atm
+    locator:
+      page: 116
+      published_page: 116
+      pdf_page_index: 3
+      section: Results and Discussion
+      note: Printed K partial-pressure range at 1450–1500 K.
+  - species: K
+    observable: experiment_series
+    observation_id: shornikov_2025_pk_over_pna_estimate_1450_1500k
+    field: estimate_as_printed
+    value: 0.57
+    locator:
+      page: 116
+      published_page: 116
+      pdf_page_index: 3
+      section: Results and Discussion
+      note: The authors' stated estimate of p(K)/p(Na).
+benches:
+  - id: shornikov-2025-tungsten-kems
+    identity:
+      basis: described_in_this_work
+    apparatus_family:
+      state:
+        tag: value
+        value: Knudsen mass spectrometric effusion apparatus
+      locator:
+        page: 115
+        published_page: 115
+        pdf_page_index: 2
+        section: Experimental
+        note: The paper names the Knudsen mass spectrometric effusion method but gives no mass-spectrometer model.
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: tungsten effusion cell
+      locator:
+        page: 115
+        published_page: 115
+        pdf_page_index: 2
+        section: Experimental
+        note: The paper states that evaporation was from a tungsten effusion cell; it does not name a liner.
+    cell_materials:
+      - state:
+          tag: value
+          value: W
+        locator:
+          page: 115
+          published_page: 115
+          pdf_page_index: 2
+          section: Experimental
+          note: Tungsten, as printed.
+    temperature_measurement:
+      sensor:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          page: 115
+          published_page: 115
+          pdf_page_index: 2
+          section: Experimental
+          note: Experimental details are referred to Yakovlev et al. (1984); the sensor is not specified in this chapter.
+      stated_uncertainty:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          page: 115
+          published_page: 115
+          pdf_page_index: 2
+          section: Experimental
+          note: No temperature uncertainty is stated in this chapter; experiment details are referred to Yakovlev et al. (1984).
+    temperature_calibration:
+      method:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          page: 115
+          published_page: 115
+          pdf_page_index: 2
+          section: Experimental
+          note: No calibration procedure is stated in this chapter; experiment details are referred to Yakovlev et al. (1984).
+      reference:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          page: 115
+          published_page: 115
+          pdf_page_index: 2
+          section: Experimental
+          note: No temperature calibration reference is stated in this chapter.
+    ionization:
+      electron_energy_eV:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          page: 115
+          published_page: 115
+          pdf_page_index: 2
+          section: Experimental
+          note: No ionization energy is stated in this chapter; experiment details are referred to Yakovlev et al. (1984).
+      cross_sections:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          page: 115
+          published_page: 115
+          pdf_page_index: 2
+          section: Experimental
+          note: Ionization cross-sections and their source are not stated in this chapter.
+      multiplier_corrections:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          page: 115
+          published_page: 115
+          pdf_page_index: 2
+          section: Experimental
+          note: Multiplier corrections are not stated in this chapter.
+      isotope_corrections:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          page: 115
+          published_page: 115
+          pdf_page_index: 2
+          section: Experimental
+          note: Isotope corrections are not stated in this chapter.
+    other_facts:
+      - name: liner_material
+        unit: as printed
+        value:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 115
+            published_page: 115
+            pdf_page_index: 2
+            section: Experimental
+            note: A tungsten effusion cell is named; no liner is stated.
+experiments:
+  - experiment_id: saratov-chondrule-kems-series
+    bench_id: shornikov-2025-tungsten-kems
+    method: knudsen_effusion
+    locator:
+      page: 115
+      published_page: 115
+      pdf_page_index: 2
+      section: Experimental
+      note: The paper describes evaporation of Saratov chondrite chondrules by the Knudsen mass spectrometric effusion method at 1300–2400 K.
+    sample:
+      mass_kg:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          page: 115
+          published_page: 115
+          pdf_page_index: 2
+          section: Experimental
+          note: Sample charge details are referred to Yakovlev et al. (1984).
+      form:
+        state:
+          tag: value
+          value: pyroxene chondrules from the Saratov chondrite
+        locator:
+          page: 115
+          published_page: 115
+          pdf_page_index: 2
+          section: Experimental
+      characterization:
+        state:
+          tag: value
+          value: Type IIB chondrules; oxide composition reported in weight percent.
+        locator:
+          page: 115
+          published_page: 115
+          pdf_page_index: 2
+          section: Experimental
+      printed_composition:
+        state:
+          tag: value
+          value:
+            basis: Saratov chondrule oxide composition as printed
+            amount_basis: mass_percent
+            components:
+              - [SiO2, '54.44']
+              - [TiO2, '0.13']
+              - [Al2O3, '3.20']
+              - [FeO, '13.17']
+              - [MgO, '24.98']
+              - [CaO, '2.24']
+              - [Na2O, '1.44']
+              - [K2O, '0.40']
+        locator:
+          page: 115
+          published_page: 115
+          pdf_page_index: 2
+          section: Experimental
+          note: The listed bulk oxide composition is presented for the Saratov chondrite chondrules; no separate as-prepared assay is given.
+      initial_composition:
+        state:
+          tag: value
+          value:
+            basis: printed Saratov chondrule oxide composition
+            amount_basis: mass_percent
+            components:
+              - [SiO2, '54.44']
+              - [TiO2, '0.13']
+              - [Al2O3, '3.20']
+              - [FeO, '13.17']
+              - [MgO, '24.98']
+              - [CaO, '2.24']
+              - [Na2O, '1.44']
+              - [K2O, '0.40']
+        locator:
+          page: 115
+          published_page: 115
+          pdf_page_index: 2
+          section: Experimental
+          note: Used as the stated chondrule composition; the paper does not report a separate as-prepared measurement.
+      pretreatment:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          page: 115
+          published_page: 115
+          pdf_page_index: 2
+          section: Experimental
+          note: Preparation details are referred to Yakovlev et al. (1984) and are not restated here.
+    apparatus:
+      geometry:
+        orifice_diameter_m:
+          state:
+            tag: unknown
+            reason: in_cited_source
+          locator:
+            page: 115
+            published_page: 115
+            pdf_page_index: 2
+            section: Experimental
+            note: Cell and orifice details are referred to Yakovlev et al. (1984); no diameter is stated in this chapter.
+        orifice_channel_length_m:
+          state:
+            tag: unknown
+            reason: in_cited_source
+          locator:
+            page: 115
+            published_page: 115
+            pdf_page_index: 2
+            section: Experimental
+            note: Cell and orifice details are referred to Yakovlev et al. (1984); no channel length is stated in this chapter.
+      calibration:
+        method:
+          state:
+            tag: unknown
+            reason: in_cited_source
+          locator:
+            page: 115
+            published_page: 115
+            pdf_page_index: 2
+            section: Experimental
+            note: The intensity-to-pressure conversion method is not described here; apparatus details are referred to Yakovlev et al. (1984).
+        reference_substance:
+          state:
+            tag: unknown
+            reason: in_cited_source
+          locator:
+            page: 115
+            published_page: 115
+            pdf_page_index: 2
+            section: Experimental
+            note: No calibration substance is stated in this chapter.
+    conditions:
+      temperature_K:
+        state:
+          tag: value
+          value:
+            kind: interval
+            interval_low: '1300'
+            interval_high: '2400'
+        locator:
+          page: 115
+          published_page: 115
+          pdf_page_index: 2
+          section: Experimental
+          note: Overall experimental temperature range; not a single run setpoint.
+    thermal_schedule:
+      total_duration_s:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          page: 115
+          published_page: 115
+          pdf_page_index: 2
+          section: Experimental
+          note: The chapter discusses dependence on evaporation time but does not state charge-specific run durations; details are referred to Yakovlev et al. (1984).
+    pressure_environment:
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          page: 115
+          published_page: 115
+          pdf_page_index: 2
+          section: Experimental
+          note: Chamber background pressure is not reported in this chapter; apparatus details are referred to Yakovlev et al. (1984). The printed sample vapor pressures are not chamber pressure.
+      sweep_gas:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 115
+          published_page: 115
+          pdf_page_index: 2
+          section: Experimental
+          note: No sweep or carrier gas is stated.
+      regime:
+        regime_class:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 115
+          published_page: 115
+          pdf_page_index: 2
+          section: Experimental
+          note: The flow regime is not classified in this chapter.
+species:
+  K:
+    observations:
+      - observation_id: shornikov_2025_k_pressure_range_1450_1500k
+        type: partial_pressure
+        locator:
+          page: 116
+          published_page: 116
+          pdf_page_index: 3
+          section: Results and Discussion
+          paragraph: 1
+        T_range_K: [1450.0, 1500.0]
+        phase: gas
+        experiment: saratov-chondrule-kems-series
+        regime: kems_effusion
+        units: atm as printed
+        uncertainty:
+          note: No uncertainty for the pressure range is stated in this chapter.
+        values:
+          quantity: partial_pressure
+          method_class: measured_direct
+          admission_status: admitted
+          gas_species: K(g)
+          oxides_wt_pct:
+            SiO2: 54.44
+            TiO2: 0.13
+            Al2O3: 3.20
+            FeO: 13.17
+            MgO: 24.98
+            CaO: 2.24
+            Na2O: 1.44
+            K2O: 0.40
+          composition_derivation: Printed Saratov chondrule oxide composition in mass percent, copied from the experiment sample record.
+          method_as_printed: Knudsen mass spectrometric effusion method; pressure-conversion details are referred to Yakovlev et al. (1984).
+          pressure_range_as_printed: 10^-8–10^-7 atm
+          pressure_atm:
+            kind: interval
+            interval_low: '1e-8'
+            interval_high: '1e-7'
+          temperature_range_as_printed: 1450–1500 K
+          composition_basis: Stated Saratov chondrule oxide composition in the experiment sample record.
+          note: The prose reports a range across 1450–1500 K; individual pressure points are not printed.
+    context:
+      - observation_id: shornikov_2025_pk_over_pna_estimate_1450_1500k
+        type: experiment_series
+        locator:
+          page: 116
+          published_page: 116
+          pdf_page_index: 3
+          section: Results and Discussion
+          paragraph: 1
+        experiment: saratov-chondrule-kems-series
+        units: dimensionless as printed
+        values:
+          quantity_as_printed: p(K)/p(Na)
+          method_class: author_estimate
+          model: Authors' estimate from the experimental pressure comparison.
+          estimate_as_printed: 0.57
+          temperature_range_as_printed: 1450–1500 K
+          derived_from:
+            - shornikov_2025_k_pressure_range_1450_1500k
+            - shornikov_2025_na_pressure_range_1450_1500k
+          derivation:
+            relation: p(K)/p(Na), estimated by the authors from their experimental pressure comparison.
+            inputs:
+              - shornikov_2025_k_pressure_range_1450_1500k
+              - shornikov_2025_na_pressure_range_1450_1500k
+            output_unit: dimensionless
+          note: The chapter reports this as an estimate; it does not print the pointwise K and Na pressures used in the comparison.
+          abstract_qualification: The abstract describes the same ratio as approximately 0.57.
+          author_interpretation: The authors say this ratio confirms greater sodium than potassium volatility during chondrule melt evaporation.
+      - observation_id: shornikov_2025_data_qualifications
+        type: experiment_series
+        locator:
+          page: 116
+          published_page: 116
+          pdf_page_index: 3
+          section: Results and Discussion
+        experiment: saratov-chondrule-kems-series
+        units: statements as printed
+        values:
+          statements:
+            - Alkalis were observed in the gas phase at 1300–1600 K during chondrule evaporation.
+            - Evaporation of potassium and sodium oxides was not observed at 1700 K and above.
+            - The reported p(K) and p(Na) pressures were in the range 10^-8–10^-7 atm at 1450–1500 K.
+            - The residual-melt composition change was calculated from experimental vapor-species partial pressures as a function of temperature and evaporation time.
+            - No experimental uncertainty or post-run bulk composition analysis is stated in this chapter.
+            - The preparation and apparatus details are referred to Yakovlev et al. (1984).
+      - observation_id: shornikov_2025_activity_reference_states
+        type: thermodynamic_example
+        locator:
+          page: 116
+          published_page: 116
+          pdf_page_index: 3
+          section: Results and Discussion
+          note: Model discussion and Figures 2 and 4.
+        units: as printed
+        values:
+          activity_quantities_discussed:
+            - gamma(K2O)
+            - gamma(Na2O)
+          method_class: figure_only
+          defining_ions:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              page: 116
+              published_page: 116
+              pdf_page_index: 3
+              section: Results and Discussion
+              note: The chapter does not identify ion currents defining either oxide activity coefficient.
+          standard_state:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              page: 116
+              published_page: 116
+              pdf_page_index: 3
+              section: Results and Discussion
+              note: The chapter discusses activity coefficients but does not state their oxide reference phases or standard states.
+          note: No numerical activities or activity coefficients are tabulated; model curves remain figure-only.
+      - observation_id: shornikov_2025_figure_1_only
+        type: thermodynamic_example
+        locator:
+          page: 116
+          published_page: 116
+          pdf_page_index: 3
+          figure: '1'
+        units: axes and species labels as printed
+        values:
+          method_class: figure_only
+          panel_A_species: K, Na, Ca, Mg, Al, Fe, TiO, SiO
+          panel_A: Experimental partial-pressure curves versus temperature; no point values tabulated.
+          panel_B_species: K2O, Na2O, CaO, MgO, Al2O3, FeO, TiO2, SiO2
+          panel_B: Calculated residual-melt composition changes during evaporation; no point values tabulated.
+          note: The figure was inspected and retained without digitizing curves.
+      - observation_id: shornikov_2025_figure_2_only
+        type: thermodynamic_example
+        locator:
+          page: 117
+          published_page: 117
+          pdf_page_index: 4
+          figure: '2'
+        units: axes and labels as printed
+        values:
+          method_class: figure_only
+          plotted_quantities: gamma(K2O), gamma(Na2O), gamma(K2O)/gamma(Na2O)
+          composition_axis: SiO2 wt %
+          temperatures_K: [1373, 1673]
+          composition: K2O–Na2O–SiO2 melts; mass ratio K2O/Na2O approximately 3/4.
+          data_origin: Authors' model calculations.
+          note: The curves were inspected and not digitized.
+      - observation_id: shornikov_2025_figure_3_only
+        type: thermodynamic_example
+        locator:
+          page: 117
+          published_page: 117
+          pdf_page_index: 4
+          figure: '3'
+        units: axes and labels as printed
+        values:
+          method_class: figure_only
+          plotted_quantity: p(K)/p(Na)
+          panel_A: Composition dependence at 1473 K for K2O–Na2O–SiO2 melts and Saratov chondrule melts.
+          panel_B: Temperature dependence for ultrabasic and medium-acidity K2O–Na2O–SiO2 melts.
+          model_melt_silica_contents_wt_pct: [35, 55]
+          model_melt_mass_ratio_K2O_to_Na2O: approximately 3/4
+          Saratov_chondrule_series_attribution: Yakovlev et al. (1984), as attributed in the Figure 3 caption.
+          note: The chapter gives no numerical curve points; curves were not digitized.
+      - observation_id: shornikov_2025_figure_4_only
+        type: thermodynamic_example
+        locator:
+          page: 118
+          published_page: 118
+          pdf_page_index: 5
+          figure: '4'
+        units: axes and labels as printed
+        values:
+          method_class: figure_only
+          calculated_quantities: atomic K and Na partial pressures; K2O and Na2O activity coefficients.
+          temperature_K: 1450
+          composition_axis: residual chondrule mass q, wt %.
+          data_origin: Authors' model calculations during evaporation.
+          note: The figure was inspected and not digitized.
+      - observation_id: shornikov_2025_model_and_qualifying_claims
+        type: thermodynamic_example
+        locator:
+          page: 116
+          published_page: 116
+          pdf_page_index: 3
+          section: Results and Discussion
+        units: statements as printed
+        values:
+          method_class: model_derived
+          model_description: >-
+            A semi-empirical ideal-associated-solution model is used to calculate
+            activity coefficients in multicomponent oxide melts over composition
+            and temperature ranges. The model parameters are standard Gibbs
+            energies for compounds and gas species over the melt, obtained from
+            experimental and theoretical data.
+          claims:
+            - The model calculation covers K2O–Na2O–SiO2 melts and Saratov chondrule melts at 1300–2400 K.
+            - The authors report monotonically decreasing gamma(K2O) and gamma(Na2O) as SiO2 content increases.
+            - The authors state gamma(K2O) is almost an order of magnitude lower than gamma(Na2O), indicating stronger potassium–silica bonding in the melt.
+            - The activity coefficients decrease by 3–4 orders of magnitude over the selected SiO2-content range.
+            - For evaporation from chondrule melt, the authors describe the oxide activity coefficients as "symbatic linear logarithmic dependencies" and quite low, 10^-12–10^-8; the meaning of "symbatic" in this English translation is unclear.
+            - The authors say the activity-coefficient decrease should reduce evaporation rate from ultrabasic to acidic melts.
+            - The gamma(K2O)/gamma(Na2O) ratio decreases by a factor of two and drops sharply over 42–52 wt % SiO2, corresponding to the chondrule silica content.
+            - At 1473 K the authors describe p(K)/p(Na) greater than one for the ultrabasic model melt and less than one for the average-acidity melt at relatively low K2O content.
+            - '“Figure 3b shows a decrease in the p(K) / p(Na) ratio with an increase in temperature in the ultrabasic melt and their absence in the melt of medium acidity.” (p. 117, Results and Discussion, paragraph following Fig. 3)'
+            - Relative volatility may invert with melt acidity and alkali content; the authors say temperature dependence is controlled by acid–base parameters.
+            - At 1450 K the authors state that K2O and Na2O oxide evaporation ends almost simultaneously; despite potassium's individual volatility, its partial pressure is lower because K2O content is low.
+            - For Saratov chondrules the authors state that 54.44 wt % SiO2 gives high melt acidity and does not allow K2O to have high volatility.
+          note: These are author-reported interpretations and model claims, not additional numeric rows.
+      - observation_id: shornikov_2025_chondrule_formation_background
+        type: historical_context
+        locator:
+          page: 115
+          published_page: 115
+          pdf_page_index: 2
+          section: Introduction
+        units: located background statements as printed; not experimental observations
+        values:
+          method_class: quoted_unattributed
+          claims:
+            - '“As it is known, chondrules are iron-magnesian silicate spherical objects or particles (spherules) with a diameter of 0.1–1.0 mm, more than half of the volume of chondrite matter consists of them.”'
+            - '“They appeared in the first millions of years at the stage of formation of the protoplanetary disk.”'
+            - '“According to the estimates of various authors, the chondrules were completely melted at 1800–2100 K in a few minutes, which could have been caused by the passage of a shock wave through the dust component of a gas-dust cloud.”'
+            - '“Further cooling of the chondrules occurred in a wide range of velocities (50–1000 K/h) in a hydrogen medium at 10^-4–10^-3 atm.”'
+          note: These are located background claims from the Introduction, not measurements or observations from this experiment.
+      - observation_id: shornikov_2025_sample_preparation_purity_and_postrun_absence
+        type: characterization
+        locator:
+          page: 115
+          published_page: 115
+          pdf_page_index: 2
+          section: Experimental
+        experiment: saratov-chondrule-kems-series
+        units: source-stated facts and typed absences
+        values:
+          starting_material:
+            state:
+              tag: value
+              value: Saratov chondrite pyroxene chondrules, type IIB.
+            locator:
+              page: 115
+              published_page: 115
+              pdf_page_index: 2
+              section: Experimental
+          preparation:
+            state:
+              tag: unknown
+              reason: in_cited_source
+            locator:
+              page: 115
+              published_page: 115
+              pdf_page_index: 2
+              section: Experimental
+              note: Preparation details are referred to Yakovlev et al. (1984) and are not restated here.
+          purity_or_grade:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              page: 115
+              published_page: 115
+              pdf_page_index: 2
+              section: Experimental
+              note: No sample purity or grade is stated.
+          postrun_bulk_analysis:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              page: 116
+              published_page: 116
+              pdf_page_index: 3
+              section: Results and Discussion
+              note: The residual composition is calculated from measured vapor-species pressures; no post-run bulk assay is reported.
+  Na:
+    observations:
+      - observation_id: shornikov_2025_na_pressure_range_1450_1500k
+        type: partial_pressure
+        locator:
+          page: 116
+          published_page: 116
+          pdf_page_index: 3
+          section: Results and Discussion
+          paragraph: 1
+        T_range_K: [1450.0, 1500.0]
+        phase: gas
+        experiment: saratov-chondrule-kems-series
+        regime: kems_effusion
+        units: atm as printed
+        uncertainty:
+          note: No uncertainty for the pressure range is stated in this chapter.
+        values:
+          quantity: partial_pressure
+          method_class: measured_direct
+          admission_status: admitted
+          gas_species: Na(g)
+          oxides_wt_pct:
+            SiO2: 54.44
+            TiO2: 0.13
+            Al2O3: 3.20
+            FeO: 13.17
+            MgO: 24.98
+            CaO: 2.24
+            Na2O: 1.44
+            K2O: 0.40
+          composition_derivation: Printed Saratov chondrule oxide composition in mass percent, copied from the experiment sample record.
+          method_as_printed: Knudsen mass spectrometric effusion method; pressure-conversion details are referred to Yakovlev et al. (1984).
+          pressure_range_as_printed: 10^-8–10^-7 atm
+          pressure_atm:
+            kind: interval
+            interval_low: '1e-8'
+            interval_high: '1e-7'
+          temperature_range_as_printed: 1450–1500 K
+          composition_basis: Stated Saratov chondrule oxide composition in the experiment sample record.
+          note: The prose reports a range across 1450–1500 K; individual pressure points are not printed.

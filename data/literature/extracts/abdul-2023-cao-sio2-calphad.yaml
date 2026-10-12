@@ -1,0 +1,1193 @@
+schema_version: literature_extract.v1
+source_id: abdul-2023-cao-sio2-calphad
+source:
+  citation: 'Abdul, W., Mawalala, C., Pisch, A. & Bannerman, M. N. (2023). CaO-SiO2 assessment using 3rd generation CALPHAD models. Cement and Concrete Research, 173, 107309. doi:10.1016/j.cemconres.2023.107309.'
+  doi: 10.1016/j.cemconres.2023.107309
+  url: https://eprints.whiterose.ac.uk/id/eprint/202703/1/1-s2.0-S0008884623002235-main.pdf
+  year: 2023
+  cited_references:
+    '3': 'J. L. Haas Jr., G. R. Robinson Jr. & B. S. Hemingway, Thermodynamic tabulations for selected phases in the system CaO-Al2O3-SiO2-H2 at 101.325 kPa (1 atm) between 273.15 and 1800 K, Journal of Physical and Chemical Reference Data 10 (1981) 575–670. doi:10.1063/1.555645.'
+    '5': 'C. W. Bale, E. Bélisle, P. Chartrand, S. A. Decterov, G. Eriksson, A. E. Gheribi, K. Hack, I. H. Jung, Y. B. Kang, J. Melançon, A. D. Pelton, S. Petersen, C. Robelin, J. Sangster, P. Spencer & M. A. Van Ende, FactSage thermochemical software and databases, 2010–2016, Calphad 54 (2016) 35–53. doi:10.1016/j.calphad.2016.05.002.'
+    '6': 'G. Deffrennes, N. Jakse, C. M. S. S. Alvares, I. Nuta, A. Pasturel, A. Khvan & A. Pisch, Thermodynamic modelling of the Ca–O system including 3rd generation description of CaO and CaO2, Calphad 69 (2020) 101764. doi:10.1016/j.calphad.2020.101764.'
+    '7': 'I. Bajenova, A. Khvan, A. Dinsdale & A. Kondratiev, Implementation of the extended Einstein and two-state liquid models for thermodynamic description of pure SiO2 at 1 atm, Calphad 68 (2020) 101716. doi:10.1016/j.calphad.2019.101716.'
+    '8': 'M. Bigaré, A. Guinier, C. Mazières, M. Regourd, N. Yannaquis, W. Eysbl, T. Hahn & E. Woermann, Polymorphism of tricalcium silicate and its solid solutions, Journal of the American Ceramic Society 50 (1967) 609–619. doi:10.1111/j.1151-2916.1967.tb15009.x.'
+    '9': 'E. G. King, Low temperature heat capacities and entropies at 298.15 K of some crystalline silicates containing calcium, Journal of the American Chemical Society 79 (1957) 5437–5438. doi:10.1021/ja01577a028.'
+    '10': 'M. Hillert, B. Sundman & X. Wang, An assessment of the CaO-SiO2 system, Metallurgical Transactions B 21 (1990) 303–312. doi:10.1007/BF02664198.'
+    '11': 'M. Hillert, B. Sundman, X. Wang & T. Barry, A reevaluation of the rankinite phase in the CaO-SiO2 system, Calphad 15 (1991) 53–58. doi:10.1016/0364-5916(91)90025-F.'
+    '13': 'G. Eriksson, P. Wu, M. Blander & A. D. Pelton, Critical evaluation and optimization of the thermodynamic properties and phase diagrams of the MnO-SiO2 and CaO-SiO2 systems, Canadian Metallurgical Quarterly 33 (1994) 13–21. doi:10.1179/cmq.1994.33.1.13.'
+    '15': 'T. I. Barry, A. T. Dinsdale & J. A. Gisby, Predictive thermochemistry and phase equilibria of slags, JOM 45 (1993) 32–38. doi:10.1007/BF03223284.'
+    '20': 'M. Regourd, Polymorphism of tricalcium silicate—new X-ray-diffraction data, Comptes Rendus Hebdomadaires des Séances de l’Académie des Sciences, Série B 289 (1979) 17–20.'
+    '21': 'F. Dunstetter, M. N. De Noirfontaine & M. Courtial, Polymorphism of tricalcium silicate, the major compound of Portland cement clinker: 1. Structural data: review and unified analysis, Cement and Concrete Research 36 (2006) 39–53. doi:10.1016/j.cemconres.2004.12.003.'
+    '22': 'J. W. Jeffery, The crystal structure of tricalcium silicate, Acta Crystallographica 5 (1952) 26. doi:10.1107/S0365110X52000083.'
+    '23': 'F. Nishi & Y. Takeuchi, The rhombohedral structure of tricalcium silicate at 1200 °C, Zeitschrift für Kristallographie—Materials 168 (1984) 197–212.'
+    '24': 'N. I. Golovastikov, R. G. Matveeva & N. V. Belov, Crystal structure of tricalcium silicate, 3CaOSiO2=C3S, Soviet Physics Crystallography 20 (1975) 441–445.'
+    '25': 'W. G. Mumme, Crystal-structure of tricalcium silicate from a Portland-cement clinker and its application to quantitative XRD analysis, Neues Jahrbuch für Mineralogie (1995) 145–160.'
+    '26': 'F. Nishi, Y. Takeuchi & I. Maki, Tricalcium silicate Ca3O[SiO4]: the monoclinic superstructure, Zeitschrift für Kristallographie—Materials 172 (1985) 297–314.'
+    '27': 'Á. G. De La Torre, S. Bruque, J. Campo & M. A. G. Aranda, The superstructure of C3S from synchrotron and neutron powder diffraction and its role in quantitative phase analyses, Cement and Concrete Research 32 (2002) 1347–1356.'
+    '28': 'A. Guinier & M. Regourd, Structure of Portland cement minerals, in: 5th International Congress on the Chemistry of Cement, Part 1 (1968) 1–43.'
+    '29': 'W. G. Mumme, L. Cranswick & B. Chakoumakos, Rietveld crystal structure refinement from high-temperature neutron powder diffraction data for the polymorphs of dicalcium silicate, Neues Jahrbuch für Mineralogie—Abhandlungen 170 (1996) 171–188.'
+    '30': 'J. Forest, Knowledge of dicalcium silicate, Bulletin de la Société Française de Minéralogie et de Cristallographie 94 (1971) 118.'
+    '31': 'W. Lerch, Approximate glass content of commercial Portland cement clinker, Journal of Research of the National Bureau of Standards 20 (1938) 77–81. doi:10.6028/jres.020.045.'
+    '32': 'F. Hanic, J. Kamarad, J. Stracelsky & I. Kapralik, The P-T diagram of Ca2SiO4, British Ceramic Transactions Journal 86 (1987) 194–198.'
+    '33': 'S. Saburi, I. Kusachi, C. Henmi, A. Kawahara, K. Henmi & I. Kawada, Refinement of the structure of rankinite, Mineralogical Journal 8 (1976) 240–246. doi:10.2465/minerj.8.240.'
+    '34': 'S. O. Agrell & P. Gay, Kilchoanite, a polymorph of rankinite, Nature 189 (1961) 743.'
+    '35': 'K. F. Hesse, Refinement of the crystal structure of wollastonite-2M (parawollastonite), Zeitschrift für Kristallographie—New Crystal Structures 168 (1984). doi:10.1524/zkri.1984.168.1-4.93.'
+    '36': 'H. Yang & C. T. Prewitt, Crystal structure and compressibility of a two-layer polytype of pseudowollastonite (CaSiO3), American Mineralogist 84 (1999). doi:10.2138/am-1999-11-1217.'
+    '37': 'T. Yamanaka & H. Mori, The structure and polytypes of α-CaSiO3 (pseudowollastonite), Acta Crystallographica Section B 37 (1981). doi:10.1107/S0567740881004962.'
+    '38': 'Y. K. Voronko, A. A. Sobol, S. N. Ushakov, J. Guochang & Y. Jinglin, Phase transformations and melt structure of calcium metasilicate, Inorganic Materials 38 (2002).'
+    '39': 'S. S. Todd, Low-temperature heat capacities and entropies at 298.16 K of crystalline calcium orthosilicate, zinc orthosilicate and tricalcium silicate, Journal of the American Chemical Society 73 (1951) 3277–3278. doi:10.1021/ja01151a084.'
+    '40': 'K. D. Grevel, F. Bellmann, J. Majzlan, E. Dachs, A. Benisek & H. M. Ludwig, Thermodynamic data of belite polymorphs, Cement and Concrete Research 152 (2022) 106621. doi:10.1016/j.cemconres.2021.106621.'
+    '41': 'J. P. Coughlin & C. J. O’Brien, High temperature heat contents of calcium orthosilicate, Journal of Physical Chemistry 61 (1957) 767–769. doi:10.1021/j150552a016.'
+    '42': 'E. G. King, Heats of formation of crystalline calcium orthosilicate, tricalcium silicate and zinc orthosilicate, Journal of the American Chemical Society 73 (1951) 656–658. doi:10.1021/ja01146a046.'
+    '43': 'K. K. Kelley, Heats and Free Energies of Formation of Anhydrous Silicates, U.S. Department of the Interior, Bureau of Mines (1962).'
+    '44': 'H. E. von Gronow & H. E. Schwiete, Die spezifischen Wärmen von CaO, Al2O3, CaO·Al2O3, 3CaO·Al2O3, 2CaO·SiO2, 3CaO·SiO2, 2CaO·Al2O3·SiO2 von 20° bis 1500°C, Zeitschrift für anorganische und allgemeine Chemie 216 (1933) 185–195. doi:10.1002/zaac.19332160212.'
+    '45': 'S. Brunauer, D. L. Kantro & C. H. Weise, The heat of decomposition of tricalcium silicate into β-dicalcium silicate and calcium oxide, Journal of Physical Chemistry 60 (1956) 771–774. doi:10.1021/j150540a015.'
+    '46': 'W. F. Weeks, Heats of formation of metamorphic minerals in the system CaO-MgO-SiO2-H2O and their petrological significance, Journal of Geology 64 (1956) 456–472. JSTOR 30057040.'
+    '47': 'R. Benz & C. Wagner, Thermodynamics of the solid system CaO-SiO2 from electromotive force data, Journal of Physical Chemistry 65 (1961) 1308–1311. doi:10.1021/j100826a007.'
+    '48': 'H. Wagner, Zur Thermochemie der Metasilikate des Calciums und Magnesiums und des Diopsids, Zeitschrift für anorganische und allgemeine Chemie 208 (1932) 1–22. doi:10.1002/zaac.19322080102.'
+    '49': 'P. Courtial, C. Tequi & P. Richet, Thermodynamics of diopside, anorthite, pseudowollastonite, CaMgGeO4 olivine and akermanite up to near the melting point, Physics and Chemistry of Minerals 27 (2000) 242–250. doi:10.1007/s002690050253.'
+    '50': 'P. Richet & G. Fiquet, High-temperature heat capacity and premelting of minerals in the system MgO-CaO-Al2O3-SiO2, Journal of Geophysical Research: Solid Earth 96 (1991) 445–456. doi:10.1029/90JB02172.'
+    '51': 'T. V. Charlu, R. C. Newton & O. J. Kleppa, Enthalpy of formation of some lime silicates by high-temperature solution calorimetry, with discussion of high pressure phase equilibria, Geochimica et Cosmochimica Acta 42 (1978) 367–375. doi:10.1016/0016-7037(78)90267-3.'
+    '52': 'E. M. Levin, C. R. Robbins, H. F. McMurdie & American Ceramic Society, Phase Diagrams for Ceramists, American Ceramic Society, Columbus, Ohio (1964).'
+    '53': 'G. A. Rankin, The ternary system CaO-Al2O3-SiO2, American Journal of Science XXXIX (1915) 1–79.'
+    '54': 'T. J. D. & H. P. C., The two phase region in the CaO-SiO2 system: experimental data and thermodynamic analysis, Physics and Chemistry of Glasses 20 (1979) 41–52.'
+    '55': 'J. W. Greig, Immiscibility in silicate melts, American Journal of Science 13 (1927) 1–44.'
+    '56': 'R. H. Rein & J. Chipman, Activities in the liquid solution SiO2-CaO-MgO-Al2O3 at 1600°C, Transactions of the Metallurgical Society of AIME 233 (1965) 415–425.'
+    '57': 'R. A. Sharma & F. D. Richardson, Solubility of calcium sulphide and activities in lime-silica melts, Journal of the Iron and Steel Institute 200 (1962) 373.'
+    '58': 'J. D. Baird & J. Taylor, Reaction between silica and carbon and the activity of silica in slag solution, Transactions of the Faraday Society 54 (1958) 526–539.'
+    '59': 'D. A. R. Kay & J. Taylor, Activities of silica in the lime + alumina + silica system, Transactions of the Faraday Society 56 (1960) 1372–1386.'
+    '79': 'D. R. Torgeson & T. G. Sahama, A hydrofluoric acid solution calorimeter and the determination of the heats of formation of Mg2SiO4, MgSiO3, and CaSiO3, Journal of the American Chemical Society 70 (1948) 2156–2160. doi:10.1021/ja01186a048.'
+    '80': 'P. T. Carter & T. G. Macfarlane, Part II—the thermodynamic properties of CaO-SiO2 slags, Journal of the Iron and Steel Institute 185 (1957) 62–66.'
+    '81': 'M. A. Bredig, Polymorphism of calcium orthosilicate, Journal of the American Ceramic Society 33 (1950) 188–192. doi:10.1111/j.1151-2916.1950.tb12789.x.'
+    '82': 'I. Barin, F. Sauert, E. Schultze-Rhonhof & W. Shu Sheng, Thermochemical Data of Pure Substances, VCH, Weinheim (1989).'
+    '83': 'K. Adamkovicova, The Heat of Fusion of CaSiO3 (1980).'
+    '85': 'W. Köther & F. Müller, Thermochemische Untersuchung zur Stabilität von Orthosilicaten und -germanaten, Zeitschrift für anorganische und allgemeine Chemie 444 (1978) 77–90.'
+    '86': 'E. T. Carlson, The decomposition of tricalcium silicate in the temperature range 1000–1300°C, Bureau of Standards Journal of Research 7 (1931).'
+    '87': 'M. Akaogi, M. Yano, Y. Tejima, M. Iijima & H. Kojitani, High-pressure transitions of diopside and wollastonite: phase equilibria and thermochemistry of CaMgSi2O6, CaSiO3 and CaSi2O5-CaTiSiO5 system, Physics of the Earth and Planetary Interiors 143 (2004) 145–156. doi:10.1016/j.pepi.2003.08.008.'
+extraction:
+  method: manual transcription from controller-supplied PDF; all pages rendered at 180 dpi and data-table pages checked against images
+  date: '2026-10-04'
+  worker: extract-abdul2023
+  provenance_path: tables/abdul-2023-cao-sio2-calphad
+  method_token_note: >-
+    Drop calorimetry and solution calorimetry have no MethodToken in the pinned simulator
+    vocabulary. Own drop-calorimetry and DSC methods retain their published names; the
+    drop-calorimetry experiment uses the typed unknown method State. No enum token was added.
+  source_note: >-
+    The paper uses CALPHAD calculated quantities, experimental comparisons, and cited
+    source values. Printed values and labels are preserved in the table context rows and CSVs.
+    Table 3's printed heat-content unit header reads J mol−1 K−1 and that exact header is
+    retained in its context table. The typed H_minus_H298 projection uses the listed
+    heat-content amounts in J/mol, then the simulator's exact J-to-kJ conversion; no
+    numeric value is adjusted. This preserves the apparent printed dimensional mismatch.
+    No numerical CaO melting point or explicit CaO liquid reference-state value is printed.
+review_status: draft
+fidelity_samples:
+  - path: species.Ca3Si2O7.observations[abdul_2023_rankinite_heat_content].values.series[0].enthalpy_increment
+    value: 147433.0
+    locator: {page: 8, published_page: 7, table: '3'}
+  - path: species.Ca2SiO4.observations[abdul_2023_belite_heat_content].values.series[0].enthalpy_increment
+    value: 108430.8
+    locator: {page: 8, published_page: 7, table: '4'}
+  - species: CaO-SiO2
+    observation_id: abdul_2023_table9_assessment_transitions_and_invariants
+    field: composition_basis_as_printed
+    value: 'X(SiO2) in liquid; interpreted as a binary oxide mole fraction from X notation; the paper does not state a formula-unit basis explicitly'
+    locator: {page: 10, published_page: 9, table: '9'}
+benches:
+  - id: abdul-2023-mhtc96-drop-calorimeter
+    identity: {basis: described_in_this_work}
+    apparatus_family:
+      state: {tag: value, value: MHTC96 high-temperature calorimeter}
+      locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements'}
+    method:
+      state: {tag: value, value: high-temperature drop calorimetry}
+      locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements'}
+    detector:
+      state: {tag: value, value: 'drop measuring head, Type S'}
+      locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements'}
+    cell_material_and_liner:
+      state: {tag: value, value: alumina crucible with platinum inlay}
+      locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements'}
+    temperature_measurement:
+      introduction_temperature_sensor:
+        state: {tag: value, value: thermocouple}
+        locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements'}
+    temperature_calibration:
+      reference_material:
+        state: {tag: value, value: 'pure alumina (Al2O3, 99.95 %)'}
+        locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements'}
+      reference_material_preparation:
+        state: {tag: value, value: dried and calcined at 1400 °C for 12 h}
+        locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements'}
+      calibration_constant_method:
+        state: {tag: value, value: 'linear regression of integrated heat flux against alumina heat content, forced through the origin; heat reference values from FTOxid [5]'}
+        locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements'}
+      calibration_constant_uncertainty:
+        state: {tag: value, value: twice the standard variation of the slope}
+        locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements'}
+    other_facts:
+      - name: introduction_temperature_uncertainty
+        unit: K
+        value: {state: {tag: value, value: {kind: point, point: '0.1'}}, locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements', note: 'Printed ±0.1 K.'}}
+      - name: high_temperature_variation
+        unit: K
+        value: {state: {tag: value, value: {kind: point, point: '0.4'}}, locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements', note: 'Printed ±0.4 K.'}}
+      - name: baseline_return_time
+        unit: min
+        value: {state: {tag: value, value: {kind: point, point: '25'}}, locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements'}}
+      - name: maximum_temperature
+        unit: °C
+        value: {state: {tag: value, value: {kind: point, point: '1300'}}, locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements'}}
+      - name: crucible_diameter
+        unit: mm
+        value: {state: {tag: value, value: {kind: point, point: '13'}}, locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements'}}
+      - name: crucible_height
+        unit: mm
+        value: {state: {tag: value, value: {kind: point, point: '46'}}, locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements'}}
+      - name: calibration_pellet_mass
+        unit: mg
+        value: {state: {tag: value, value: {kind: interval, interval_low: '15', interval_high: '150'}}, locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements'}}
+      - name: calibration_pellet_mass_uncertainty
+        unit: mg
+        value: {state: {tag: value, value: {kind: point, point: '0.02'}}, locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements'}}
+      - name: calibration_series_per_temperature
+        unit: count
+        value: {state: {tag: value, value: {kind: interval, interval_low: '3', interval_high: '3'}}, locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements', note: 'Three series at each setpoint.'}}
+      - name: calibration_pellets_per_series
+        unit: count
+        value: {state: {tag: value, value: {kind: interval, interval_low: '6', interval_high: '7'}}, locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements'}}
+      - name: atmosphere
+        unit: as published
+        value: {state: {tag: value, value: {kind: categorical, categorical: flowing Ar}}, locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements'}}
+      - name: integration_software
+        unit: name
+        value: {state: {tag: value, value: {kind: categorical, categorical: Calypso (Setaram)}}, locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements'}}
+  - id: abdul-2023-labsys-evo-dsc
+    identity: {basis: described_in_this_work}
+    apparatus_family:
+      state: {tag: value, value: differential scanning calorimeter}
+      locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements'}
+    method:
+      state: {tag: value, value: differential scanning calorimetry}
+      locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements'}
+    detector:
+      state: {tag: value, value: 'Labsys Evo, SETARAM'}
+      locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements'}
+    temperature_measurement:
+      sensor:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements', note: 'No DSC temperature sensor is specified.'}
+    temperature_calibration:
+      reference_materials:
+        state: {tag: value, value: 'pure NaCl (99.9 % Alfa Aesar), α-β quartz transition, and K2SO4 melting point (99.5 % Alfa Aesar)'}
+        locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements'}
+    other_facts:
+      - name: calibration_heating_cooling_rates
+        unit: K/min
+        value: {state: {tag: value, value: {kind: interval, interval_low: '5', interval_high: '10'}}, locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements', note: 'Both heating and cooling rates are printed in K/min.'}}
+      - name: NaCl_purity
+        unit: '%'
+        value: {state: {tag: value, value: {kind: point, point: '99.9'}}, locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements'}}
+      - name: K2SO4_purity
+        unit: '%'
+        value: {state: {tag: value, value: {kind: point, point: '99.5'}}, locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements'}}
+experiments:
+  - experiment_id: abdul-2023-heat-content-measurements
+    bench_id: abdul-2023-mhtc96-drop-calorimeter
+    method: {tag: unknown, reason: 'unmapped published method: drop calorimetry'}
+    method_as_published: high-temperature drop calorimetry
+    locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements', tables: ['3', '4']}
+    sample:
+      mass_kg:
+        state: {tag: value, value: {kind: interval, interval_low: '0.000015', interval_high: '0.000080'}}
+        locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements', note: 'Printed 15–80 mg; converted to 0.000015–0.000080 kg (1 mg = 10−6 kg).'}
+      form:
+        state: {tag: value, value: pellets}
+        locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements'}
+      characterization:
+        state: {tag: value, value: rankinite (Ca3Si2O7) and belite (Ca2SiO4) pellets; preparation is described in Section 5.1}
+        locator: {page: 7, published_page: 6, section: '5.1 Synthesis of C3S2 and γ-C2S'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements', note: 'Pressure is not stated.'}
+      sweep_gas:
+        state: {tag: value, value: {species: Ar, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
+        locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    fO2_control:
+      channel: {tag: unknown, reason: not_published}
+      atmosphere: {state: {tag: value, value: flowing Ar}, locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements', note: 'No oxygen fugacity control is stated.'}}
+      oxygen_partial_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements', note: 'No oxygen partial pressure is stated.'}}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: pellets are dropped into the high-temperature calorimeter at a calibration temperature}
+        locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements'}
+      cooling_or_quench:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements'}
+  - experiment_id: abdul-2023-rankinite-melting-dsc
+    bench_id: abdul-2023-labsys-evo-dsc
+    method: dta_dsc
+    method_as_published: differential scanning calorimetry
+    locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements'}
+    sample:
+      mass_kg:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements', note: 'No DSC sample mass is printed.'}
+      characterization:
+        state: {tag: value, value: rankinite sample; authors report residual γ-Ca2SiO4 and CaSiO3 that did not completely convert to Ca3Si2O7}
+        locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements'}
+    conditions:
+      temperature_K:
+        state: {tag: value, value: 1737}
+        locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements', note: 'Measured melting temperature.'}
+    fO2_control:
+      channel: {tag: unknown, reason: not_published}
+      oxygen_partial_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements', note: 'No oxygen fugacity control is stated.'}}
+    thermal_schedule:
+      method:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements', note: 'The stated 5 and 10 K/min rates apply to reference calibration; sample run schedule is not stated.'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements'}
+species:
+  CaO-SiO2:
+    observations: []
+    context:
+      - observation_id: abdul_2023_cited_reference_bibliography_context
+        type: reference_citation_map
+        locator:
+          section: References
+        units: full citation as printed in source.cited_references
+        values:
+          reference_count: 58
+          references:
+            '3': J. L. Haas Jr., G. R. Robinson Jr. & B. S. Hemingway, Thermodynamic tabulations for selected phases in
+              the system CaO-Al2O3-SiO2-H2 at 101.325 kPa (1 atm) between 273.15 and 1800 K, Journal of Physical and Chemical
+              Reference Data 10 (1981) 575–670. doi:10.1063/1.555645.
+            '5': C. W. Bale, E. Bélisle, P. Chartrand, S. A. Decterov, G. Eriksson, A. E. Gheribi, K. Hack, I. H. Jung,
+              Y. B. Kang, J. Melançon, A. D. Pelton, S. Petersen, C. Robelin, J. Sangster, P. Spencer & M. A. Van Ende,
+              FactSage thermochemical software and databases, 2010–2016, Calphad 54 (2016) 35–53. doi:10.1016/j.calphad.2016.05.002.
+            '6': G. Deffrennes, N. Jakse, C. M. S. S. Alvares, I. Nuta, A. Pasturel, A. Khvan & A. Pisch, Thermodynamic
+              modelling of the Ca–O system including 3rd generation description of CaO and CaO2, Calphad 69 (2020) 101764.
+              doi:10.1016/j.calphad.2020.101764.
+            '7': I. Bajenova, A. Khvan, A. Dinsdale & A. Kondratiev, Implementation of the extended Einstein and two-state
+              liquid models for thermodynamic description of pure SiO2 at 1 atm, Calphad 68 (2020) 101716. doi:10.1016/j.calphad.2019.101716.
+            '8': M. Bigaré, A. Guinier, C. Mazières, M. Regourd, N. Yannaquis, W. Eysbl, T. Hahn & E. Woermann, Polymorphism
+              of tricalcium silicate and its solid solutions, Journal of the American Ceramic Society 50 (1967) 609–619.
+              doi:10.1111/j.1151-2916.1967.tb15009.x.
+            '9': E. G. King, Low temperature heat capacities and entropies at 298.15 K of some crystalline silicates containing
+              calcium, Journal of the American Chemical Society 79 (1957) 5437–5438. doi:10.1021/ja01577a028.
+            '10': M. Hillert, B. Sundman & X. Wang, An assessment of the CaO-SiO2 system, Metallurgical Transactions B
+              21 (1990) 303–312. doi:10.1007/BF02664198.
+            '11': M. Hillert, B. Sundman, X. Wang & T. Barry, A reevaluation of the rankinite phase in the CaO-SiO2 system,
+              Calphad 15 (1991) 53–58. doi:10.1016/0364-5916(91)90025-F.
+            '13': G. Eriksson, P. Wu, M. Blander & A. D. Pelton, Critical evaluation and optimization of the thermodynamic
+              properties and phase diagrams of the MnO-SiO2 and CaO-SiO2 systems, Canadian Metallurgical Quarterly 33
+              (1994) 13–21. doi:10.1179/cmq.1994.33.1.13.
+            '15': T. I. Barry, A. T. Dinsdale & J. A. Gisby, Predictive thermochemistry and phase equilibria of slags,
+              JOM 45 (1993) 32–38. doi:10.1007/BF03223284.
+            '20': M. Regourd, Polymorphism of tricalcium silicate—new X-ray-diffraction data, Comptes Rendus Hebdomadaires
+              des Séances de l’Académie des Sciences, Série B 289 (1979) 17–20.
+            '21': 'F. Dunstetter, M. N. De Noirfontaine & M. Courtial, Polymorphism of tricalcium silicate, the major
+              compound of Portland cement clinker: 1. Structural data: review and unified analysis, Cement and Concrete
+              Research 36 (2006) 39–53. doi:10.1016/j.cemconres.2004.12.003.'
+            '22': J. W. Jeffery, The crystal structure of tricalcium silicate, Acta Crystallographica 5 (1952) 26. doi:10.1107/S0365110X52000083.
+            '23': F. Nishi & Y. Takeuchi, The rhombohedral structure of tricalcium silicate at 1200 °C, Zeitschrift für
+              Kristallographie—Materials 168 (1984) 197–212.
+            '24': N. I. Golovastikov, R. G. Matveeva & N. V. Belov, Crystal structure of tricalcium silicate, 3CaOSiO2=C3S,
+              Soviet Physics Crystallography 20 (1975) 441–445.
+            '25': W. G. Mumme, Crystal-structure of tricalcium silicate from a Portland-cement clinker and its application
+              to quantitative XRD analysis, Neues Jahrbuch für Mineralogie (1995) 145–160.
+            '26': 'F. Nishi, Y. Takeuchi & I. Maki, Tricalcium silicate Ca3O[SiO4]: the monoclinic superstructure, Zeitschrift
+              für Kristallographie—Materials 172 (1985) 297–314.'
+            '27': Á. G. De La Torre, S. Bruque, J. Campo & M. A. G. Aranda, The superstructure of C3S from synchrotron
+              and neutron powder diffraction and its role in quantitative phase analyses, Cement and Concrete Research
+              32 (2002) 1347–1356.
+            '28': 'A. Guinier & M. Regourd, Structure of Portland cement minerals, in: 5th International Congress on the
+              Chemistry of Cement, Part 1 (1968) 1–43.'
+            '29': W. G. Mumme, L. Cranswick & B. Chakoumakos, Rietveld crystal structure refinement from high-temperature
+              neutron powder diffraction data for the polymorphs of dicalcium silicate, Neues Jahrbuch für Mineralogie—Abhandlungen
+              170 (1996) 171–188.
+            '30': J. Forest, Knowledge of dicalcium silicate, Bulletin de la Société Française de Minéralogie et de Cristallographie
+              94 (1971) 118.
+            '31': W. Lerch, Approximate glass content of commercial Portland cement clinker, Journal of Research of the
+              National Bureau of Standards 20 (1938) 77–81. doi:10.6028/jres.020.045.
+            '32': F. Hanic, J. Kamarad, J. Stracelsky & I. Kapralik, The P-T diagram of Ca2SiO4, British Ceramic Transactions
+              Journal 86 (1987) 194–198.
+            '33': S. Saburi, I. Kusachi, C. Henmi, A. Kawahara, K. Henmi & I. Kawada, Refinement of the structure of rankinite,
+              Mineralogical Journal 8 (1976) 240–246. doi:10.2465/minerj.8.240.
+            '34': S. O. Agrell & P. Gay, Kilchoanite, a polymorph of rankinite, Nature 189 (1961) 743.
+            '35': K. F. Hesse, Refinement of the crystal structure of wollastonite-2M (parawollastonite), Zeitschrift
+              für Kristallographie—New Crystal Structures 168 (1984). doi:10.1524/zkri.1984.168.1-4.93.
+            '36': H. Yang & C. T. Prewitt, Crystal structure and compressibility of a two-layer polytype of pseudowollastonite
+              (CaSiO3), American Mineralogist 84 (1999). doi:10.2138/am-1999-11-1217.
+            '37': T. Yamanaka & H. Mori, The structure and polytypes of α-CaSiO3 (pseudowollastonite), Acta Crystallographica
+              Section B 37 (1981). doi:10.1107/S0567740881004962.
+            '38': Y. K. Voronko, A. A. Sobol, S. N. Ushakov, J. Guochang & Y. Jinglin, Phase transformations and melt
+              structure of calcium metasilicate, Inorganic Materials 38 (2002).
+            '39': S. S. Todd, Low-temperature heat capacities and entropies at 298.16 K of crystalline calcium orthosilicate,
+              zinc orthosilicate and tricalcium silicate, Journal of the American Chemical Society 73 (1951) 3277–3278.
+              doi:10.1021/ja01151a084.
+            '40': K. D. Grevel, F. Bellmann, J. Majzlan, E. Dachs, A. Benisek & H. M. Ludwig, Thermodynamic data of belite
+              polymorphs, Cement and Concrete Research 152 (2022) 106621. doi:10.1016/j.cemconres.2021.106621.
+            '41': J. P. Coughlin & C. J. O’Brien, High temperature heat contents of calcium orthosilicate, Journal of
+              Physical Chemistry 61 (1957) 767–769. doi:10.1021/j150552a016.
+            '42': E. G. King, Heats of formation of crystalline calcium orthosilicate, tricalcium silicate and zinc orthosilicate,
+              Journal of the American Chemical Society 73 (1951) 656–658. doi:10.1021/ja01146a046.
+            '43': K. K. Kelley, Heats and Free Energies of Formation of Anhydrous Silicates, U.S. Department of the Interior,
+              Bureau of Mines (1962).
+            '44': H. E. von Gronow & H. E. Schwiete, Die spezifischen Wärmen von CaO, Al2O3, CaO·Al2O3, 3CaO·Al2O3, 2CaO·SiO2,
+              3CaO·SiO2, 2CaO·Al2O3·SiO2 von 20° bis 1500°C, Zeitschrift für anorganische und allgemeine Chemie 216 (1933)
+              185–195. doi:10.1002/zaac.19332160212.
+            '45': S. Brunauer, D. L. Kantro & C. H. Weise, The heat of decomposition of tricalcium silicate into β-dicalcium
+              silicate and calcium oxide, Journal of Physical Chemistry 60 (1956) 771–774. doi:10.1021/j150540a015.
+            '46': W. F. Weeks, Heats of formation of metamorphic minerals in the system CaO-MgO-SiO2-H2O and their petrological
+              significance, Journal of Geology 64 (1956) 456–472. JSTOR 30057040.
+            '47': R. Benz & C. Wagner, Thermodynamics of the solid system CaO-SiO2 from electromotive force data, Journal
+              of Physical Chemistry 65 (1961) 1308–1311. doi:10.1021/j100826a007.
+            '48': H. Wagner, Zur Thermochemie der Metasilikate des Calciums und Magnesiums und des Diopsids, Zeitschrift
+              für anorganische und allgemeine Chemie 208 (1932) 1–22. doi:10.1002/zaac.19322080102.
+            '49': P. Courtial, C. Tequi & P. Richet, Thermodynamics of diopside, anorthite, pseudowollastonite, CaMgGeO4
+              olivine and akermanite up to near the melting point, Physics and Chemistry of Minerals 27 (2000) 242–250.
+              doi:10.1007/s002690050253.
+            '50': 'P. Richet & G. Fiquet, High-temperature heat capacity and premelting of minerals in the system MgO-CaO-Al2O3-SiO2,
+              Journal of Geophysical Research: Solid Earth 96 (1991) 445–456. doi:10.1029/90JB02172.'
+            '51': T. V. Charlu, R. C. Newton & O. J. Kleppa, Enthalpy of formation of some lime silicates by high-temperature
+              solution calorimetry, with discussion of high pressure phase equilibria, Geochimica et Cosmochimica Acta
+              42 (1978) 367–375. doi:10.1016/0016-7037(78)90267-3.
+            '52': E. M. Levin, C. R. Robbins, H. F. McMurdie & American Ceramic Society, Phase Diagrams for Ceramists,
+              American Ceramic Society, Columbus, Ohio (1964).
+            '53': G. A. Rankin, The ternary system CaO-Al2O3-SiO2, American Journal of Science XXXIX (1915) 1–79.
+            '54': 'T. J. D. & H. P. C., The two phase region in the CaO-SiO2 system: experimental data and thermodynamic
+              analysis, Physics and Chemistry of Glasses 20 (1979) 41–52.'
+            '55': J. W. Greig, Immiscibility in silicate melts, American Journal of Science 13 (1927) 1–44.
+            '56': R. H. Rein & J. Chipman, Activities in the liquid solution SiO2-CaO-MgO-Al2O3 at 1600°C, Transactions
+              of the Metallurgical Society of AIME 233 (1965) 415–425.
+            '57': R. A. Sharma & F. D. Richardson, Solubility of calcium sulphide and activities in lime-silica melts,
+              Journal of the Iron and Steel Institute 200 (1962) 373.
+            '58': J. D. Baird & J. Taylor, Reaction between silica and carbon and the activity of silica in slag solution,
+              Transactions of the Faraday Society 54 (1958) 526–539.
+            '59': D. A. R. Kay & J. Taylor, Activities of silica in the lime + alumina + silica system, Transactions of
+              the Faraday Society 56 (1960) 1372–1386.
+            '79': D. R. Torgeson & T. G. Sahama, A hydrofluoric acid solution calorimeter and the determination of the
+              heats of formation of Mg2SiO4, MgSiO3, and CaSiO3, Journal of the American Chemical Society 70 (1948) 2156–2160.
+              doi:10.1021/ja01186a048.
+            '80': P. T. Carter & T. G. Macfarlane, Part II—the thermodynamic properties of CaO-SiO2 slags, Journal of
+              the Iron and Steel Institute 185 (1957) 62–66.
+            '81': M. A. Bredig, Polymorphism of calcium orthosilicate, Journal of the American Ceramic Society 33 (1950)
+              188–192. doi:10.1111/j.1151-2916.1950.tb12789.x.
+            '82': I. Barin, F. Sauert, E. Schultze-Rhonhof & W. Shu Sheng, Thermochemical Data of Pure Substances, VCH,
+              Weinheim (1989).
+            '83': K. Adamkovicova, The Heat of Fusion of CaSiO3 (1980).
+            '85': W. Köther & F. Müller, Thermochemische Untersuchung zur Stabilität von Orthosilicaten und -germanaten,
+              Zeitschrift für anorganische und allgemeine Chemie 444 (1978) 77–90.
+            '86': E. T. Carlson, The decomposition of tricalcium silicate in the temperature range 1000–1300°C, Bureau
+              of Standards Journal of Research 7 (1931).
+            '87': 'M. Akaogi, M. Yano, Y. Tejima, M. Iijima & H. Kojitani, High-pressure transitions of diopside and wollastonite:
+              phase equilibria and thermochemistry of CaMgSi2O6, CaSiO3 and CaSi2O5-CaTiSiO5 system, Physics of the Earth
+              and Planetary Interiors 143 (2004) 145–156. doi:10.1016/j.pepi.2003.08.008.'
+      - observation_id: abdul_2023_figure_only_data_context
+        type: figure_context
+        locator: {section: 'Figures 1–8', note: 'Figure-specific PDF page and identifier are recorded on each item.'}
+        units: figure values not digitized
+        values:
+          figures:
+            - {figure: '1', page: 5, method_class: figure_only, description: diagnostic error plot of experimental heat-capacity measurements used while fitting C2S polymorphs, numeric_values_digitized: false}
+            - {figure: '2', page: 8, method_class: figure_only, description: rankinite heat-content measurements compared with FactSage and Haas estimates, numeric_values_digitized: false}
+            - {figure: '3', page: 9, method_class: figure_only, description: gamma and alpha-prime Ca2SiO4 heat-content measurements compared with FactSage and Haas data, numeric_values_digitized: false}
+            - {figure: '4', page: 10, method_class: figure_only, description: calculated 298 K formation enthalpies compared with experimental values, numeric_values_digitized: false}
+            - {figure: '5', page: 11, method_class: figure_only, description: calculated SiO2 activity at 1823 K compared with experiments, numeric_values_digitized: false}
+            - {figure: '6', page: 11, method_class: figure_only, description: calculated CaO activity at 1773 K compared with experiments, numeric_values_digitized: false}
+            - {figure: '7', page: 11, method_class: figure_only, description: calculated C2S and CS abundance in the melt compared with spectroscopic data, numeric_values_digitized: false}
+            - {figure: '8', page: 12, method_class: figure_only, description: calculated CaO-SiO2 phase diagram with experimental points, numeric_values_digitized: false}
+      - observation_id: abdul_2023_table1_structure
+        type: table_transcription
+        locator: {page: 3, table: '1', source_path: tables/abdul-2023-cao-sio2-calphad/table-1.csv}
+        units: as printed
+        values:
+          table_number: '1'
+          title_as_printed: Structural information, polymorphism & transition data for the solid phases in the CaO-SiO2 binary system as found in the literature
+          method_class: quoted_attributed
+          columns_as_printed: [Compound, Designation, Space group, Reference]
+          rows:
+            - {compound: Ca3SiO5, designation: T1, space_group: P-1, reference: '[22,24]'}
+            - {compound: Ca3SiO5, designation: T2, space_group: '–', reference: '[20,21]'}
+            - {compound: Ca3SiO5, designation: T3, space_group: '–', reference: '[20,21]'}
+            - {compound: Ca3SiO5, designation: M1, space_group: Pc, reference: '[27]'}
+            - {compound: Ca3SiO5, designation: M2, space_group: '–', reference: '[20,21]'}
+            - {compound: Ca3SiO5, designation: M3, space_group: 'Cm (Am)', reference: '[25,26]'}
+            - {compound: Ca3SiO5, designation: R, space_group: R3m, reference: '[22,23]'}
+            - {compound: Ca2SiO4, designation: γ olivine, space_group: Pnma, reference: '[29]'}
+            - {compound: Ca2SiO4, designation: β larnite, space_group: P21/c, reference: '[29]'}
+            - {compound: Ca2SiO4, designation: αH′, space_group: Pna21, reference: '[29]'}
+            - {compound: Ca2SiO4, designation: αL′, space_group: Pnma, reference: '[29]'}
+            - {compound: Ca2SiO4, designation: α, space_group: P63/mmc, reference: '[29]'}
+            - {compound: Ca3Si2O7, designation: Kilchoanite, space_group: Ima2, reference: '[34]'}
+            - {compound: Ca3Si2O7, designation: Rankinite, space_group: P21/c, reference: '[33]'}
+            - {compound: CaSiO3, designation: Wollastonite, space_group: P21/c, reference: '[35]'}
+            - {compound: CaSiO3, designation: Pseudo-wollastonite, space_group: C21/c, reference: '[36]'}
+            - {compound: CaSiO3, designation: '', space_group: C-1, reference: '[37]'}
+      - observation_id: abdul_2023_table2_solid_transitions
+        type: table_transcription
+        locator: {page: 3, table: '2', source_path: tables/abdul-2023-cao-sio2-calphad/table-2.csv}
+        units: 'temperature: °C; transition heat: kJ mol−1'
+        values:
+          table_number: '2'
+          title_as_printed: Properties of the polymorphic transitions for all solids in the CaO-SiO2 system found in the literature
+          method_class: quoted_attributed
+          columns_as_printed: ['Compound', 'Transition reaction', 'Transition temperature [°C]', 'Transition heat [kJ mol−1]', 'Experimental technique']
+          rows:
+            - {compound: Ca3SiO5, reaction: 'TI → TII', temperature_C: 620, transition_heat_kJ_mol: 0.57, technique: DTA, reference: '[28]'}
+            - {compound: Ca3SiO5, reaction: 'TII → TIII', temperature_C: 920, transition_heat_kJ_mol: 0.96, technique: DTA, reference: '[28]'}
+            - {compound: Ca3SiO5, reaction: 'TIII → MI', temperature_C: 980, transition_heat_kJ_mol: 0.48, technique: DTA, reference: '[28]'}
+            - {compound: Ca3SiO5, reaction: 'MI → MII', temperature_C: 990, transition_heat_kJ_mol: 0.05, technique: DTA, reference: '[28]'}
+            - {compound: Ca3SiO5, reaction: 'MII → R', temperature_C: 1050, transition_heat_kJ_mol: 0.048, technique: DTA, reference: '[8,28]'}
+            - {compound: Ca2SiO4, reaction: 'γ → α′L', temperature_C: 847, transition_heat_as_printed: '7.757–15.460', transition_heat_kJ_mol: [7.757, 15.460], technique: DTA, reference: '[30]'}
+            - {compound: Ca2SiO4, reaction: 'γ → α′L', transition_heat_kJ_mol: 14.393, technique: Drop calorimetry, reference: '[41]'}
+            - {compound: Ca2SiO4, reaction: '', temperature_C: 711, transition_heat_kJ_mol: 13.020, technique: DTA at 0.34 GPa, reference: '[32]'}
+            - {compound: Ca2SiO4, reaction: 'β → α′L', temperature_C: 680, transition_heat_kJ_mol: 1.439, technique: DTA, reference: '[29]'}
+            - {compound: Ca2SiO4, reaction: 'β → α′L', transition_heat_kJ_mol: 1.841, technique: Drop calorimetry, reference: '[41]'}
+            - {compound: Ca2SiO4, reaction: '', temperature_C: 711, transition_heat_kJ_mol: 1.780, technique: DTA at 0.34 GPa, reference: '[32]'}
+            - {compound: Ca2SiO4, reaction: 'γ → β', transition_heat_kJ_mol: 4.678, technique: DTA, reference: '[30]'}
+            - {compound: Ca2SiO4, reaction: 'γ → β', transition_heat_kJ_mol: 4.48, technique: Solution calorimetry at 20 °C, reference: '[31]'}
+            - {compound: Ca2SiO4, reaction: '', temperature_C: 711, transition_heat_kJ_mol: 11.250, technique: DTA at 0.34 GPa, reference: '[32]'}
+            - {compound: Ca2SiO4, reaction: 'α′L → α′H', temperature_C: 1160, transition_heat_kJ_mol: 0.720, technique: DTA, reference: '[30]'}
+            - {compound: Ca2SiO4, reaction: 'α′H → α', temperature_C: 1425, transition_heat_kJ_mol: 13.305, technique: DTA, reference: '[30]'}
+            - {compound: Ca2SiO4, reaction: 'α′H → α', transition_heat_kJ_mol: 14.184, technique: Drop calorimetry, reference: '[41]'}
+            - {compound: Ca3Si2O7, reaction: 'Kilch → rank', temperature_C_as_printed: '954–1090', temperature_C: [954, 1090], transition_heat: '—', technique: '—', reference: '[32]'}
+            - {compound: CaSiO3, reaction: 'Woll → p-woll', temperature_C: 1125, transition_heat: '—', technique: '—', reference: '[38]'}
+      - observation_id: abdul_2023_table3_rankinite_transcription
+        type: table_transcription
+        locator: {page: 8, table: '3', source_path: tables/abdul-2023-cao-sio2-calphad/table-3.csv}
+        units: 'T: °C, K; H_T−H_298K and uncertainty: header prints J mol−1 K−1; uncertainty percent: %'
+        values:
+          table_number: '3'
+          title_as_printed: Rankinite (Ca3Si2O7) heat content measurement
+          method_class: measured_direct
+          uncertainty_statement: The uncertainty corresponds to a 95 % confidence interval.
+          rows:
+            - {T_C: 25, T_K: 298.15, H_T_minus_H_29815_as_printed: '–', uncertainty_as_printed: '–', uncertainty_percent_as_printed: '–'}
+            - {T_C: 599.3, T_K: 872.45, H_T_minus_H_29815: 147433.0, H_as_printed: '147,433.0', uncertainty: 3570.3, uncertainty_as_printed: '3570.3', uncertainty_percent: 2.4}
+            - {T_C: 699.8, T_K: 972.95, H_T_minus_H_29815: 180036.6, H_as_printed: '180,036.6', uncertainty: 4109.9, uncertainty_as_printed: '4109.9', uncertainty_percent: 2.3}
+            - {T_C: 799.2, T_K: 1072.35, H_T_minus_H_29815: 206085.9, H_as_printed: '206,085.9', uncertainty: 5517.3, uncertainty_as_printed: '5517.3', uncertainty_percent: 2.7}
+            - {T_C: 899.0, T_K: 1172.15, H_T_minus_H_29815: 233439.6, H_as_printed: '233,439.6', uncertainty: 6032.1, uncertainty_as_printed: '6032.1', uncertainty_percent: 2.6}
+            - {T_C: 998.8, T_K: 1271.95, H_T_minus_H_29815: 264146.9, H_as_printed: '264,146.9', uncertainty: 6983.6, uncertainty_as_printed: '6983.6', uncertainty_percent: 2.6}
+            - {T_C: 1097.7, T_K: 1370.85, H_T_minus_H_29815: 293304.5, H_as_printed: '293,304.5', uncertainty: 7690.3, uncertainty_as_printed: '7690.3', uncertainty_percent: 2.6}
+            - {T_C: 1198.5, T_K: 1471.65, H_T_minus_H_29815: 322841.2, H_as_printed: '322,841.2', uncertainty: 6913.1, uncertainty_as_printed: '6913.1', uncertainty_percent: 2.2}
+      - observation_id: abdul_2023_table4_belite_transcription
+        type: table_transcription
+        locator: {page: 8, table: '4', source_path: tables/abdul-2023-cao-sio2-calphad/table-4.csv}
+        units: 'T: °C, K; H_T−H_298K and uncertainty: J mol−1; uncertainty percent: %'
+        values:
+          table_number: '4'
+          title_as_printed: (γ, α′) Ca2SiO4 heat contents measurements from 972.86 to 1471.05 K; transition from γ to α′ occurs at 1170 K
+          method_class: measured_direct
+          rows:
+            - {T_C: 25, T_K: 298.15, H_T_minus_H_29815_as_printed: '–', uncertainty_as_printed: '–', uncertainty_percent_as_printed: '–'}
+            - {T_C: 699.7, T_K: 972.86, H_T_minus_H_29815: 108430.8, H_as_printed: '108,430.8', uncertainty: 3617.9, uncertainty_as_printed: '3617.9', uncertainty_percent: 3.3}
+            - {T_C: 798.9, T_K: 1072.09, H_T_minus_H_29815: 123306.7, H_as_printed: '123,306.7', uncertainty: 3251.5, uncertainty_as_printed: '3251.5', uncertainty_percent: 2.6}
+            - {T_C: 898.2, T_K: 1171.39, H_T_minus_H_29815: 148801.8, H_as_printed: '148,801.8', uncertainty: 3879.2, uncertainty_as_printed: '3879.2', uncertainty_percent: 2.6}
+            - {T_C: 998.5, T_K: 1271.67, H_T_minus_H_29815: 171305.2, H_as_printed: '171,305.2', uncertainty: 4185.5, uncertainty_as_printed: '4185.5', uncertainty_percent: 2.4}
+            - {T_C: 1097.9, T_K: 1371.05, H_T_minus_H_29815: 187889.9, H_as_printed: '187,889.9', uncertainty: 4479.1, uncertainty_as_printed: '4479.1', uncertainty_percent: 2.4}
+            - {T_C: 1197.9, T_K: 1471.05, H_T_minus_H_29815: 212360.1, H_as_printed: '212,360.1', uncertainty: 6444.6, uncertainty_as_printed: '6444.6', uncertainty_percent: 3.0}
+      - observation_id: abdul_2023_table5_dft_ground_state_energies
+        type: table_transcription
+        locator: {page: 9, table: '5', source_path: tables/abdul-2023-cao-sio2-calphad/table-5.csv}
+        units: 'E0 and dE: eV per formula unit'
+        values:
+          table_number: '5'
+          title_as_printed: Calculated ground state energies at 0 K in eV per formula unit
+          method_class: model_derived
+          columns_as_printed: ['Compound', 'E0 (0 K) [eV/f.u]', 'dE (0 K) [eV/f.u]']
+          rows:
+            - {compound: CaO, E0_eV_per_formula_unit: -27.36219, dE_as_printed: Ground state}
+            - {compound: Alpha quartz-SiO2, E0_eV_per_formula_unit: -31.66647, dE_as_printed: Ground state}
+            - {compound: Monoclinic-Ca3SiO5, E0_eV_per_formula_unit: -114.97448, dE_as_printed: Ground state}
+            - {compound: γ-Ca2SiO4, E0_eV_per_formula_unit: -87.74651, dE_as_printed: Ground state}
+            - {compound: β-Ca2SiO4, E0_eV_per_formula_unit: -87.65976, dE_eV_per_formula_unit: 0.08675}
+            - {compound: α′-Ca2SiO4, E0_eV_per_formula_unit: -87.63451, dE_eV_per_formula_unit: 0.11200, dE_as_printed: '0.11200'}
+            - {compound: Ca3Si2O7, E0_eV_per_formula_unit: -147.61658, dE_as_printed: Ground state}
+            - {compound: CaSiO3-wollastonite, E0_eV_per_formula_unit: -59.91709, dE_as_printed: Ground state}
+            - {compound: CaSiO3-cyclowollatonite, E0_eV_per_formula_unit: -59.83180, dE_eV_per_formula_unit: 0.085}
+      - observation_id: abdul_2023_table6_formation_and_transition_energies
+        type: table_transcription
+        locator: {page: 9, table: '6', source_path: tables/abdul-2023-cao-sio2-calphad/table-6.csv}
+        units: kJ mol−1
+        values:
+          table_number: '6'
+          title_as_printed: Calculated heat of formation at 0 K relative to CaO and α-SiO2 (low quartz) and calculated heat of transitions
+          method_class: model_derived
+          rows:
+            - {compound: Monoclinic-Ca3SiO5, Efor_0K_kJ_mol: -117.9, Etrans_as_printed: '–'}
+            - {compound: γ-Ca2SiO4, Efor_0K_kJ_mol: -131.2, Etrans_as_printed: '–'}
+            - {compound: β-Ca2SiO4, Efor_0K_kJ_mol: -124.8, Etrans_0K_kJ_mol: 6.2}
+            - {compound: α′-Ca2SiO4, Efor_0K_kJ_mol: -122.4, Etrans_0K_kJ_mol: 8.8}
+            - {compound: Ca3Si2O7, Efor_0K_kJ_mol: -212.0, Etrans_as_printed: '–'}
+            - {compound: CaSiO3-wollastonite, Efor_0K_kJ_mol: -85.7, Etrans_as_printed: '–'}
+            - {compound: CaSiO3-cyclowollastonite, Efor_0K_kJ_mol: -77.5, Etrans_0K_kJ_mol: 8.2}
+          correction_note: 'Ca2SiO4 values include zero-point energy contributions: −0.4 kJ mol−1 for γ and −2.5 kJ mol−1 for β and α′, as stated immediately after Table 6.'
+      - observation_id: abdul_2023_table7_model_and_haas_thermodynamics
+        type: table_transcription
+        locator: {page: 9, table: '7', source_path: tables/abdul-2023-cao-sio2-calphad/table-7.csv}
+        units: 'H298: kJ mol−1; S298: J mol−1 K−1'
+        values:
+          table_number: '7'
+          title_as_printed: H298 and S298 of compounds in the C-S system, model values compared with Haas et al. [3]
+          method_class_by_column: {Calc.: model_derived, Haas.: quoted_attributed}
+          comparison_reference: '[3]'
+          rows:
+            - {compound: Monoclinic-Ca3SiO5, H298_calc: -2932, H298_Haas_as_printed: '–', S298_calc: 166.4, S298_Haas_as_printed: '–'}
+            - {compound: Triclinic-Ca3SiO5, H298_calc: -2933, H298_Haas: -2933, S298_calc: 166.5, S298_Haas: 168.6}
+            - {compound: Rhombohedral-Ca3SiO5, H298_calc: -2932, H298_Haas_as_printed: '–', S298_calc: 166.4, S298_Haas_as_printed: '–'}
+            - {compound: Rankinite-Ca3Si2O7, H298_calc: -3951, H298_Haas: -3973, S298_calc: 207.6, S298_Haas: 210.6}
+            - {compound: Wollastonite-CaSiO3, H298_calc: -1634, H298_Haas: -1634, S298_calc: 79.6, S298_Haas: 81.0}
+            - {compound: Cyclowollastonite-CaSiO3, H298_calc: -1627, H298_Haas: -1627, S298_calc: 87.6, S298_Haas: 87.2}
+            - {compound: α-Ca2SiO4, H298_calc: -2293, H298_Haas_as_printed: '-2548a', S298_calc: 132.7, S298_Haas_as_printed: '84.91a'}
+            - {compound: α′-Ca2SiO4, H298_calc: -2304, H298_Haas: -2198, S298_calc: 130.4, S298_Haas: 116.0}
+            - {compound: β-Ca2SiO4, H298_calc: -2307, H298_Haas: -2306, S298_calc: 126.1, S298_Haas: 126.7}
+            - {compound: γ-Ca2SiO4, H298_calc: -2316, H298_Haas: -2316, S298_calc: 119.0, S298_Haas: 120.5}
+          footnote_a: This value is extrapolated beyond the temperature limits of the curve.
+      - observation_id: abdul_2023_table8_liquid_associate_model
+        type: table_transcription
+        locator: {page: 10, table: '8', source_path: tables/abdul-2023-cao-sio2-calphad/table-8.csv}
+        units: as printed; parameter units are not stated in the table
+        values:
+          table_number: '8'
+          title_as_printed: Functions for the melt phase used for the C-S phase diagram
+          liquid_model: associate model; two-state liquid end-member descriptions
+          rows:
+            - {parameter: GC, expression_as_printed: 'GC = GCaO,Liquid [6]', method_class: quoted_attributed, reference: '[6]', numeric_parameters: []}
+            - {parameter: GS, expression_as_printed: 'GS = GSiO2,Liquid [7]', method_class: quoted_attributed, reference: '[7]', numeric_parameters: []}
+            - {parameter: GC2S, expression_as_printed: 'GC2S = 2GCaO,Liquid + GSiO2,Liquid − 185132.188472035 − 1.6*T', method_class: model_derived, numeric_parameters: [-185132.188472035, -1.6]}
+            - {parameter: GCS, expression_as_printed: 'GCS = GCaO,Liquid + GSiO2,Liquid − 131793.447600044 + 12.6747313767583*T', method_class: model_derived, numeric_parameters: [-131793.447600044, 12.6747313767583]}
+            - {parameter: 'LCS,S,0', expression_as_printed: 'LCS,S,0 = 206415.921620474 − 107.044648799784*T', method_class: model_derived, numeric_parameters: [206415.921620474, -107.044648799784]}
+            - {parameter: 'LCS,S,1', expression_as_printed: 'LCS,S,1 = −10306.431303854 − 2.24993113828298*T', method_class: model_derived, numeric_parameters: [-10306.431303854, -2.24993113828298]}
+            - {parameter: 'LCS,S,2', expression_as_printed: 'LCS,S,2 = 174447.554314851 − 64.2938830701164*T', method_class: model_derived, numeric_parameters: [174447.554314851, -64.2938830701164]}
+            - {parameter: 'LC,C2S,1', expression_as_printed: 'LC,C2S,1 = 5490.98163817185', method_class: model_derived, numeric_parameters: [5490.98163817185]}
+            - {parameter: 'LC2S,S,0', expression_as_printed: 'LC2S,S,0 = −3*T', method_class: model_derived, numeric_parameters: [-3]}
+      - observation_id: abdul_2023_table9_assessment_transitions_and_invariants
+        type: table_transcription
+        locator: {page: 10, table: '9', source_path: tables/abdul-2023-cao-sio2-calphad/table-9.csv}
+        units: 'temperature: K; transition enthalpy and fusion enthalpy: kJ mol−1; X(SiO2) as printed'
+        values:
+          table_number: '9'
+          title_as_printed: Summary of transitions and invariant reactions in the C-S system from the calculated phase diagram compared to experimental data in parentheses
+          composition_basis_as_printed: 'X(SiO2) in liquid; interpreted as a binary oxide mole fraction from X notation; the paper does not state a formula-unit basis explicitly'
+          calculated_label: calculated phase diagram, model_derived
+          parenthesized_label: experimental comparison, quoted_attributed
+          invariant_rows:
+            - {reaction: 'Liquid + CaO → Ca3SiO5', T_calculated_K: 2430, calculated_method_class: model_derived, T_experimental_K: 2423, experimental_method_class: quoted_attributed, temperature_reference: '[52]', x_SiO2_calculated: 0.27, x_SiO2_experimental: 0.27, composition_reference: '[52]', composition_mol_calculated: {CaO: 0.73, SiO2: 0.27}, composition_mol_experimental: {CaO: 0.73, SiO2: 0.27}}
+            - {reaction: 'Liquid → Ca3SiO5 + α-Ca2SiO4', T_calculated_K: 2300, calculated_method_class: model_derived, T_experimental_K: 2323, experimental_method_class: quoted_attributed, temperature_reference: '[52]', x_SiO2_calculated: 0.30, x_SiO2_experimental: 0.29, composition_reference: '[52]', composition_mol_calculated: {CaO: 0.70, SiO2: 0.30}, composition_mol_experimental: {CaO: 0.71, SiO2: 0.29}}
+            - {reaction: 'Liquid + α-Ca2SiO4 → Ca3Si2O7', T_calculated_K: 1741, calculated_method_class: model_derived, T_experimental_K: 1737, experimental_method_class: quoted_attributed, temperature_reference: '[52]', x_SiO2_calculated: 0.41, x_SiO2_experimental: 0.43, composition_reference: '[52]', composition_mol_calculated: {CaO: 0.59, SiO2: 0.41}, composition_mol_experimental: {CaO: 0.57, SiO2: 0.43}}
+            - {reaction: 'Liquid → Ca3Si2O7 + CaSiO3', T_calculated_K: 1734, calculated_method_class: model_derived, T_experimental_K: 1733, experimental_method_class: quoted_attributed, temperature_reference: '[52]', x_SiO2_calculated: 0.42, x_SiO2_experimental: 0.44, composition_reference: '[52]', composition_mol_calculated: {CaO: 0.58, SiO2: 0.42}, composition_mol_experimental: {CaO: 0.56, SiO2: 0.44}}
+            - {reaction: 'Liquid → SiO2 + CaSiO3', T_calculated_K: 1700, calculated_method_class: model_derived, T_experimental_K: 1709, experimental_method_class: quoted_attributed, temperature_reference: '[52]', x_SiO2_calculated: 0.63, x_SiO2_experimental: 0.61, composition_reference: '[52]', composition_mol_calculated: {CaO: 0.37, SiO2: 0.63}, composition_mol_experimental: {CaO: 0.39, SiO2: 0.61}}
+          invariant_experimental_attribution_full: 'E. M. Levin, C. R. Robbins, H. F. McMurdie & American Ceramic Society, Phase Diagrams for Ceramists, American Ceramic Society, Columbus, Ohio (1964).'
+          table9_cited_sources_full:
+            "[8]": "M. Bigaré, A. Guinier, C. Mazières, M. Regourd, N. Yannaquis, W. Eysbl, T. Hahn & E. Woermann, Polymorphism of tricalcium silicate and its solid solutions, Journal of the American Ceramic Society 50 (1967) 609–619. doi:10.1111/j.1151-2916.1967.tb15009.x."
+            "[38]": "Y. K. Voronko, A. A. Sobol, S. N. Ushakov, J. Guochang & Y. Jinglin, Phase transformations and melt structure of calcium metasilicate, Inorganic Materials 38 (2002)."
+            "[41]": "J. P. Coughlin & C. J. O’Brien, High temperature heat contents of calcium orthosilicate, Journal of Physical Chemistry 61 (1957) 767–769. doi:10.1021/j150552a016."
+            "[51]": "T. V. Charlu, R. C. Newton & O. J. Kleppa, Enthalpy of formation of some lime silicates by high-temperature solution calorimetry, with discussion of high pressure phase equilibria, Geochimica et Cosmochimica Acta 42 (1978) 367–375. doi:10.1016/0016-7037(78)90267-3."
+            "[52]": "E. M. Levin, C. R. Robbins, H. F. McMurdie & American Ceramic Society, Phase Diagrams for Ceramists, American Ceramic Society, Columbus, Ohio (1964)."
+            "[53]": "G. A. Rankin, The ternary system CaO-Al2O3-SiO2, American Journal of Science XXXIX (1915) 1–79."
+            "[81]": "M. A. Bredig, Polymorphism of calcium orthosilicate, Journal of the American Ceramic Society 33 (1950) 188–192. doi:10.1111/j.1151-2916.1950.tb12789.x."
+            "[82]": "I. Barin, F. Sauert, E. Schultze-Rhonhof & W. Shu Sheng, Thermochemical Data of Pure Substances, VCH, Weinheim (1989)."
+            "[83]": "K. Adamkovicova, The Heat of Fusion of CaSiO3 (1980)."
+          transition_rows:
+            - {reaction: 'γ-Ca2SiO4 → α′-Ca2SiO4', T_calculated_K: 1120, calculated_method_class: model_derived, T_experimental_K: 1120, experimental_method_class: quoted_attributed, temperature_reference: '[81]', H_calculated_kJ_mol: 14.3, enthalpy_calculated_method_class: model_derived, H_experimental_kJ_mol: 14.3, enthalpy_experimental_method_class: quoted_attributed, enthalpy_reference: '[41]'}
+            - {reaction: 'β-Ca2SiO4 → α′-Ca2SiO4', T_calculated_K: 970, calculated_method_class: model_derived, T_experimental_K: 970, experimental_method_class: quoted_attributed, temperature_reference: '[81]', H_calculated_kJ_mol: 2.17, enthalpy_calculated_method_class: model_derived, H_experimental_kJ_mol: 1.84, enthalpy_experimental_method_class: quoted_attributed, enthalpy_reference: '[41]'}
+            - {reaction: 'α′-Ca2SiO4 → α-Ca2SiO4', T_calculated_K: 1710, calculated_method_class: model_derived, T_experimental_K: 1710, experimental_method_class: quoted_attributed, temperature_reference: '[81]', H_calculated_kJ_mol: 16.2, enthalpy_calculated_method_class: model_derived, H_experimental_kJ_mol: 14.1, enthalpy_experimental_method_class: quoted_attributed, enthalpy_reference: '[41]'}
+            - {reaction: 'Wollastonite → cyclo-CaSiO3', T_calculated_K: 1397, calculated_method_class: model_derived, T_experimental_K: 1398, experimental_method_class: quoted_attributed, temperature_reference: '[38]', H_calculated_kJ_mol: 8.68, enthalpy_calculated_method_class: model_derived, H_experimental_kJ_mol: 5.85, enthalpy_experimental_method_class: quoted_attributed, enthalpy_reference: '[51]'}
+            - {reaction: 'Triclinic → monoclinic-Ca3SiO5', T_calculated_K: 1254, calculated_method_class: model_derived, T_experimental_K: 1253, experimental_method_class: quoted_attributed, temperature_reference: '[8]', H_calculated_kJ_mol: 0.477, enthalpy_calculated_method_class: model_derived, H_experimental_kJ_mol: 0.477, enthalpy_experimental_method_class: quoted_attributed, enthalpy_reference: '[8]'}
+            - {reaction: 'Monoclinic → rhombohedral-Ca3SiO5', T_calculated_K: 1317, calculated_method_class: model_derived, T_experimental_K: 1323, experimental_method_class: quoted_attributed, temperature_reference: '[8]', H_calculated_kJ_mol: 0.047, enthalpy_calculated_method_class: model_derived, H_experimental_kJ_mol: 0.047, enthalpy_experimental_method_class: quoted_attributed, enthalpy_reference: '[8]'}
+          melting_rows:
+            - {compound: α-Ca2SiO4, Tm_calculated_K: 2371, Tm_calculated_method_class: model_derived, Tm_experimental_K: 2403, Tm_experimental_method_class: quoted_attributed, Tm_reference: '[53]', Hfusion_calculated_kJ_mol: 59.3, Hfusion_experimental_kJ_mol: 61.0, Hfusion_reference: '[82]'}
+            - {compound: cyclo-CaSiO3, Tm_calculated_K: 1840, Tm_calculated_method_class: model_derived, Tm_experimental_K: 1817, Tm_experimental_method_class: quoted_unattributed, Hfusion_calculated_kJ_mol: 56.8, Hfusion_experimental_kJ_mol: 57.3, Hfusion_reference: '[83]', note: 'No experimental source is printed beside this melting temperature.'}
+          composition_derivation: 'The table prints only X(SiO2); x(CaO) values in this extract are the binary complement 1−x(SiO2), derived only to provide the two numeric oxide amounts needed by the reader.'
+      - observation_id: abdul_2023_table_a1_solid_model_coefficients
+        type: table_transcription
+        locator: {page: 13, table: 'A.1', source_path: tables/abdul-2023-cao-sio2-calphad/table-a1.csv}
+        units: 'θ1, θ2, θ3: K; other coefficient units not stated in the table'
+        values:
+          table_number: 'A.1'
+          method_class: model_derived
+          title_as_printed: Optimised coefficients for solid phases in the C-S system for the 3rd generation CALPHAD function
+          columns_as_printed: [α (Compound), D1,α, θ1,α, D2,α, θ2,α, D3,α, θ3,α, C2, H0]
+          rows:
+            - {phase: cyclowollastonite-CaSiO3, D1: 3.20933, theta1_K: 398.726519, D2: 0.448513, theta2_K: 113.639538, D3: 1.337919, theta3_K: 1779.149444, C2: -0.004177, H0: -1686958.147895}
+            - {phase: monoclinic-Ca3SiO5, D1: 2.721575, theta1_K: 216.554568, D2: 4.322571, theta2_K: 502.02771, D3: 1.955837, theta3_K: 1253.079747, C2: -0.013441, H0: -3026014.386963}
+            - {phase: rankinite-Ca3Si2O7, D1: 3.262669, theta1_K: 201.048711, D2: 5.228277, theta2_K: 471.758995, D3: 3.509145, theta3_K: 1114.209222, C2: 0.001345, H0: -4081064.820333}
+            - {phase: rhombohedral-Ca3SiO5, D1: 2.728885, theta1_K: 216.897351, D2: 4.322171, theta2_K: 502.823393, D3: 1.948978, theta3_K: 1257.541676, C2: -0.013504, H0: -3026101.460607}
+            - {phase: triclinic-Ca3SiO5, D1: 2.770329, theta1_K: 217.322399, D2: 4.397009, theta2_K: 511.911036, D3: 1.832799, theta3_K: 1306.969635, C2: -0.013446, H0: -3026703.415132}
+            - {phase: wollastonite-CaSiO3, D1: 0.021926, theta1_K: 39.983404, D2: 1.364237, theta2_K: 180.16112, D3: 3.611497, theta3_K: 777.592204, C2: -0.00094, H0: -1685783.296919}
+            - {phase: α-Ca2SiO4, D1: 3.310467, theta1_K: 427.508038, D2: 1.659827, theta2_K: 174.273816, D3: 2.029525, theta3_K: 1235.840109, C2: -0.008061, H0: -2368644.112281}
+            - {phase: α′-Ca2SiO4, D1: 0.626679, theta1_K: 122.320053, D2: 3.608269, theta2_K: 315.618264, D3: 2.756109, theta3_K: 1092.028025, C2: -0.005737, H0: -2377633.243328}
+            - {phase: β-Ca2SiO4, D1: 0.452659, theta1_K: 2585.222081, D2: 3.03791, theta2_K: 835.357211, D3: 3.509071, theta3_K: 259.231418, C2: -0.008614, H0: -2385856.23658}
+            - {phase: γ-Ca2SiO4, D1: 0.151692, theta1_K: 88.647382, D2: 2.689799, theta2_K: 257.3199, D3: 4.158219, theta3_K: 759.369678, C2: -0.001096, H0: -2384448.968068}
+      - observation_id: abdul_2023_liquid_model_reference_and_validity
+        type: thermodynamic_model_context
+        locator: {page: 4, published_page: 3, section: '3. Literature review of the liquid and melt phases', table: '8'}
+        units: as stated
+        values:
+          liquid_model: associate model, as in Barry et al. [15]
+          endmember_liquid_functions: {CaO: 'G_CaO,Liquid from [6]', SiO2: 'G_SiO2,Liquid from [7]'}
+          liquid_endmember_reference_statement: 'Their expressions, which incorporate a two-state model for the liquid phase, are adopted here.'
+          endmember_reassessment_required: false
+          solid_model: 3rd generation CALPHAD function with Einstein terms plus polynomial corrections
+          solid_model_validity_as_stated: from 0 K to each solid's melting point using one function
+          liquid_parameter_selection: corrected Akaike information criterion (AICc); ESPEI Bayesian optimization after an initial hand fit
+          activity_data_temperature_range_K: [1773, 1873]
+          phase_diagram_fit_data: all available experimental invariant and liquidus data, as stated by the authors
+          phase_diagram_data_sources: ['[52]', '[53]']
+          phase_diagram_data_sources_full:
+            '[52]': 'E. M. Levin, C. R. Robbins, H. F. McMurdie & American Ceramic Society, Phase Diagrams for Ceramists, American Ceramic Society, Columbus, Ohio (1964).'
+            '[53]': 'G. A. Rankin, The ternary system CaO-Al2O3-SiO2, American Journal of Science XXXIX (1915) 1–79.'
+          activity_data_fit_status: not fitted; calculated model activities compared with experiments
+          activity_data_sources: ['[56]', '[57]', '[58]', '[59]', '[80]']
+          standard_state_note: The paper identifies the liquid end-member functions and their two-state model but does not state a numerical CaO melting point or a separate numeric CaO liquid reference-state value.
+          evidence_label: model_derived
+      - observation_id: abdul_2023_cao_melting_point_and_liquid_reference_statements
+        type: assessment_context
+        locator: {page: 3, published_page: 2, section: 'Introduction'}
+        units: as published
+        values:
+          quote_cao_melting_point: 'There has been a dramatic change to the assessed melting point of CaO.'
+          quote_cao_reassessment: 'The thermodynamic properties of the liquid end-members CaO and SiO2 were recently assessed by Deffrennes et al. [6] and Bajenova et al. [7] respectively with a 3rd generation CALPHAD model, thus a reassessment of these is not required and instead their expressions, which incorporate a two-state model for the liquid phase, are adopted here.'
+          table8_cao_reference_expression: 'GC = GCaO,Liquid [6]'
+          source_does_not_print_numeric_cao_melting_point: true
+          source_does_not_print_separate_numeric_cao_liquid_reference_value: true
+          evidence_class: quoted_attributed
+          attribution: '[6] and [7] are fully cited in source.cited_references.'
+      - observation_id: abdul_2023_cao_reassessment_correction_context
+        type: assessment_context
+        locator: {page: 4, published_page: 3, section: '3. Literature review of the liquid and melt phases'}
+        units: as published
+        values:
+          quote: 'However, corrections for the CaO side are required due to the dramatic change in the melting point of CaO in the recent reassessment [10].'
+          reference_10: 'M. Hillert, B. Sundman & X. Wang, An assessment of the CaO-SiO2 system, Metallurgical Transactions B 21 (1990) 303–312. doi:10.1007/BF02664198.'
+          evidence_class: quoted_attributed
+      - observation_id: abdul_2023_fit_data_and_model_comparison_context
+        type: assessment_context
+        locator: {page: '3-10', published_pages: '2-9', sections: ['2. Literature review of the solid phases', '3. Literature review of the liquid and melt phases', '4. Thermodynamic modelling', '6. Results and discussion'], table: 'A.2'}
+        units: as stated in source
+        values:
+          solid_fit_data_references_from_table_a2: ['[8]', '[9]', '[30]', '[38]', '[39]', '[40]', '[41]', '[42]', '[43]', '[44]', '[45]', '[46]', '[48]', '[49]', '[50]', '[51]', '[79]', '[81]', '[85]', '[86]', '[87]']
+          solid_fit_data_citations_full:
+            "[8]": "M. Bigaré, A. Guinier, C. Mazières, M. Regourd, N. Yannaquis, W. Eysbl, T. Hahn & E. Woermann, Polymorphism of tricalcium silicate and its solid solutions, Journal of the American Ceramic Society 50 (1967) 609–619. doi:10.1111/j.1151-2916.1967.tb15009.x."
+            "[9]": "E. G. King, Low temperature heat capacities and entropies at 298.15 K of some crystalline silicates containing calcium, Journal of the American Chemical Society 79 (1957) 5437–5438. doi:10.1021/ja01577a028."
+            "[30]": "J. Forest, Knowledge of dicalcium silicate, Bulletin de la Société Française de Minéralogie et de Cristallographie 94 (1971) 118."
+            "[38]": "Y. K. Voronko, A. A. Sobol, S. N. Ushakov, J. Guochang & Y. Jinglin, Phase transformations and melt structure of calcium metasilicate, Inorganic Materials 38 (2002)."
+            "[39]": "S. S. Todd, Low-temperature heat capacities and entropies at 298.16 K of crystalline calcium orthosilicate, zinc orthosilicate and tricalcium silicate, Journal of the American Chemical Society 73 (1951) 3277–3278. doi:10.1021/ja01151a084."
+            "[40]": "K. D. Grevel, F. Bellmann, J. Majzlan, E. Dachs, A. Benisek & H. M. Ludwig, Thermodynamic data of belite polymorphs, Cement and Concrete Research 152 (2022) 106621. doi:10.1016/j.cemconres.2021.106621."
+            "[41]": "J. P. Coughlin & C. J. O’Brien, High temperature heat contents of calcium orthosilicate, Journal of Physical Chemistry 61 (1957) 767–769. doi:10.1021/j150552a016."
+            "[42]": "E. G. King, Heats of formation of crystalline calcium orthosilicate, tricalcium silicate and zinc orthosilicate, Journal of the American Chemical Society 73 (1951) 656–658. doi:10.1021/ja01146a046."
+            "[43]": "K. K. Kelley, Heats and Free Energies of Formation of Anhydrous Silicates, U.S. Department of the Interior, Bureau of Mines (1962)."
+            "[44]": "H. E. von Gronow & H. E. Schwiete, Die spezifischen Wärmen von CaO, Al2O3, CaO·Al2O3, 3CaO·Al2O3, 2CaO·SiO2, 3CaO·SiO2, 2CaO·Al2O3·SiO2 von 20° bis 1500°C, Zeitschrift für anorganische und allgemeine Chemie 216 (1933) 185–195. doi:10.1002/zaac.19332160212."
+            "[45]": "S. Brunauer, D. L. Kantro & C. H. Weise, The heat of decomposition of tricalcium silicate into β-dicalcium silicate and calcium oxide, Journal of Physical Chemistry 60 (1956) 771–774. doi:10.1021/j150540a015."
+            "[46]": "W. F. Weeks, Heats of formation of metamorphic minerals in the system CaO-MgO-SiO2-H2O and their petrological significance, Journal of Geology 64 (1956) 456–472. JSTOR 30057040."
+            "[48]": "H. Wagner, Zur Thermochemie der Metasilikate des Calciums und Magnesiums und des Diopsids, Zeitschrift für anorganische und allgemeine Chemie 208 (1932) 1–22. doi:10.1002/zaac.19322080102."
+            "[49]": "P. Courtial, C. Tequi & P. Richet, Thermodynamics of diopside, anorthite, pseudowollastonite, CaMgGeO4 olivine and akermanite up to near the melting point, Physics and Chemistry of Minerals 27 (2000) 242–250. doi:10.1007/s002690050253."
+            "[50]": "P. Richet & G. Fiquet, High-temperature heat capacity and premelting of minerals in the system MgO-CaO-Al2O3-SiO2, Journal of Geophysical Research: Solid Earth 96 (1991) 445–456. doi:10.1029/90JB02172."
+            "[51]": "T. V. Charlu, R. C. Newton & O. J. Kleppa, Enthalpy of formation of some lime silicates by high-temperature solution calorimetry, with discussion of high pressure phase equilibria, Geochimica et Cosmochimica Acta 42 (1978) 367–375. doi:10.1016/0016-7037(78)90267-3."
+            "[79]": "D. R. Torgeson & T. G. Sahama, A hydrofluoric acid solution calorimeter and the determination of the heats of formation of Mg2SiO4, MgSiO3, and CaSiO3, Journal of the American Chemical Society 70 (1948) 2156–2160. doi:10.1021/ja01186a048."
+            "[81]": "M. A. Bredig, Polymorphism of calcium orthosilicate, Journal of the American Ceramic Society 33 (1950) 188–192. doi:10.1111/j.1151-2916.1950.tb12789.x."
+            "[85]": "W. Köther & F. Müller, Thermochemische Untersuchung zur Stabilität von Orthosilicaten und -germanaten, Zeitschrift für anorganische und allgemeine Chemie 444 (1978) 77–90."
+            "[86]": "E. T. Carlson, The decomposition of tricalcium silicate in the temperature range 1000–1300°C, Bureau of Standards Journal of Research 7 (1931)."
+            "[87]": "M. Akaogi, M. Yano, Y. Tejima, M. Iijima & H. Kojitani, High-pressure transitions of diopside and wollastonite: phase equilibria and thermochemistry of CaMgSi2O6, CaSiO3 and CaSi2O5-CaTiSiO5 system, Physics of the Earth and Planetary Interiors 143 (2004) 145–156. doi:10.1016/j.pepi.2003.08.008."
+          table_a2_comparator_citations_full:
+            "[40]": "K. D. Grevel, F. Bellmann, J. Majzlan, E. Dachs, A. Benisek & H. M. Ludwig, Thermodynamic data of belite polymorphs, Cement and Concrete Research 152 (2022) 106621. doi:10.1016/j.cemconres.2021.106621."
+            "[47]": "R. Benz & C. Wagner, Thermodynamics of the solid system CaO-SiO2 from electromotive force data, Journal of Physical Chemistry 65 (1961) 1308–1311. doi:10.1021/j100826a007."
+          table_a2_not_fit_reference_rows: '[40]a and [47]a rows carry footnote a: not fitted; reported only for comparison. The printed fitted uncertainty for these comparator rows is the uncertainty selected to place each measurement one sigma from the fit.'
+          table_a2_emf_data: '[47]a electromotive-force rows are comparator data and were not fitted.'
+          liquid_phase_fit_data: all available experimental invariant and liquidus data; invariant comparison values in Table 9 cite [52]
+          activity_data_fit_status: 'Activity data was not fit in this assessment.'
+          activity_comparison: Calculated SiO2 activity agrees with Baird and Taylor [58], with good agreement at high CaO concentrations across [56], [58], [59]; CaO activities are in line with prior models [10], [13] and agree with Carter and Macfarlane [80].
+          rankinite_heat_content_comparison: Some agreement with Haas [3]; FactSage FTPs [5] calculated values clearly overestimate the measured heat content.
+          belite_heat_content_comparison: γ-Ca2SiO4 measurements from 972–1072 K agree with FactSage [5], Haas [3], and Coughlin [41]. Above 1072 K, γ and α′ measurements disagree with FactSage; measured α′ values are 24–32 kJ lower, while Haas [3] and Coughlin [41] agree.
+          h298_s298_comparison: Most values are within expected error of Haas [3]; rankinite H298 disagrees, as previously reported by Hillert et al. [11]; α′-Ca2SiO4 H298 and S298 disagree with Haas owing to new enthalpy and heat-capacity data in this work.
+          model_derived_enthalpy_comparison: Generally good agreement; the main discrepancy is triclinic-Ca3SiO5 at x=0.25, attributed to Brunauer et al. [45] conflicting with King [42].
+      - observation_id: abdul_2023_sample_synthesis_context
+        type: sample_preparation
+        locator: {page: 7, published_page: 6, section: '5.1. Synthesis of C3S2 and γ-C2S'}
+        units: temperatures in °C, masses in g, durations in h, lambda in Å
+        values:
+          method_class: measured_direct
+          starting_materials: {CaCO3: 'Alpha Aesar, 99.5 %', SiO2: 'Sibelco, 99 %'}
+          starting_material_drying: {temperature_C: 500, duration_h: 24, atmosphere: air, equipment: muffle furnace}
+          rankinite_starting_masses_g: {CaCO3: 6.25, CaCO3_uncertainty_g: 0.01, SiO2: 2.50, SiO2_uncertainty_g: 0.01}
+          rankinite_mixing: {equipment: mechanical mixer, duration_h: 24, form: dry powder mixture}
+          rankinite_pressing: {equipment: hydraulic workshop press, force_tons: 4.5, powder_mass_g: 3}
+          rankinite_heat_treatment: {calcination_temperature_C: 1000, calcination_duration_h: 1, first_anneal_temperature_C: 1380, first_anneal_duration_h: 12, repeated_anneal_count: 4, repeated_anneal_temperature_C: 1420, repeated_anneal_duration_h: 12, intermediate_grinding: true}
+          rankinite_loss_on_ignition_percent: 31.9444
+          belite_starting_masses_g: {CaCO3: 6.97, CaCO3_uncertainty_g: 0.01, SiO2: 2.09, SiO2_uncertainty_g: 0.01}
+          belite_heat_treatment: {calcination_temperature_C: 1000, calcination_duration_h: 1, anneal_temperature_C: 1550, anneal_duration_h: 8, cooling: slow cooling to room temperature}
+          belite_loss_on_ignition_percent: 34.0844
+          xrd_characterization: {instrument: X’Pert Pro MPD, manufacturer: PANalytical, radiation: Cu Kα, wavelength_A: 1.5419}
+      - observation_id: abdul_2023_rankinite_melting_dsc_context
+        type: assessment_context
+        locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements'}
+        units: K
+        values:
+          method_class: measured_direct
+          method_as_published: differential scanning calorimetry
+          measured_melting_temperature_K: 1737
+          uncertainty_K: 5
+          sample_characterization: rankinite; residual γ-Ca2SiO4 and CaSiO3 were reported as not completely converted to Ca3Si2O7
+      - observation_id: abdul_2023_calorimetry_setup_numeric_context
+        type: assessment_context
+        locator: {page: 7, published_page: 6, section: '5.2 Heat content measurements'}
+        units: 'calibration grid: °C; measurement sample uncertainty: mg; pellets and series: count'
+        values:
+          mhtc96_calibration_temperature_grid_C: [600, 700, 800, 900, 1000, 1100, 1200]
+          measurement_sample_mass_uncertainty_mg: 0.02
+          measurement_sample_mass_uncertainty_conversion_to_kg: '0.02 mg × 10−6 kg/mg = 0.00000002 kg'
+          pellets_per_measurement_series: [6, 7]
+          measurement_series_per_calibration_temperature: 2
+      - observation_id: abdul_2023_table_a2_fit_input_data
+        type: table_transcription
+        locator: {page: '13-14', table: 'A.2', source_path: tables/abdul-2023-cao-sio2-calphad/table-a2.csv}
+        units: as printed; heading gives Value (J mol−1), with variable-specific quantities and uncertainties as shown
+        values:
+          table_number: 'A.2'
+          title_as_printed: Table of all experimental measurements from literature including the uncertainty used in the fitting
+          method_class_by_source_label: {cited reference: quoted_attributed, 'Present work': measured_direct}
+          present_work_rows_label_as_printed: Present work
+          row_count: 55
+          columns_as_printed: ['Variable', 'Chemistry', 'T (K)', 'Value (J mol−1)', 'Reported uncertainty', 'Fitted uncertainty', 'Ref']
+          numeric_cell_order: [temperature cell(s), value cell(s), reported uncertainty cell(s) and printed percent(s), fitted uncertainty cell(s) and printed percent(s)]
+          rows:
+            - row: 1
+              pdftotext_line_range: "949-950"
+              numeric_cells_in_printed_order: [2.2107,0.001,127.07,0.0,0.28,8.02,0.01,42.49,1203.1,302.887,0.22,33.44]
+            - row: 2
+              pdftotext_line_range: "951-952"
+              numeric_cells_in_printed_order: [282.354,123.47,151.7,0.09,0.04,0.07,0.02,5.25,0.88,463.843]
+            - row: 3
+              pdftotext_line_range: "953-954"
+              numeric_cells_in_printed_order: [480.85,147.73,286.23,1.36,3.88,0.24,2.56,5.39,1.67,3.19,768.943,0.46]
+            - row: 4
+              pdftotext_line_range: "955-956"
+              numeric_cells_in_printed_order: [2.19619,0.0012,127.85,0.0,0.32,11.4,0.01,29.86,1072.06,302.975,0.25,23.35]
+            - row: 5
+              pdftotext_line_range: "957-958"
+              numeric_cells_in_printed_order: [284.136,125.13,171.6,0.08,1.28,0.06,0.02,1.28,0.06,766.466]
+            - row: 6
+              pdftotext_line_range: "959-960"
+              numeric_cells_in_printed_order: [406.0,14811.36,740.57,5.0,740.57,5.0,964.6,108784.0,5439.2,5439.2]
+            - row: 7
+              pdftotext_line_range: "961-962"
+              numeric_cells_in_printed_order: [52.66,17.08,128.11,0.85,6.41,5.0,0.85,6.41,5.0,296.48]
+            - row: 8
+              pdftotext_line_range: "963-963"
+              numeric_cells_in_printed_order: [298.15,-126314.96,962.32,0.76,962.32,0.76]
+            - row: 9
+              pdftotext_line_range: "964-964"
+              numeric_cells_in_printed_order: [298.15,-2308400.0,4600.0,0.2,4600.0,0.2]
+            - row: 10
+              pdftotext_line_range: "965-965"
+              numeric_cells_in_printed_order: [967.0,-149200.0,1500.0,1.01,22500.0,15.08]
+            - row: 11
+              pdftotext_line_range: "966-967"
+              numeric_cells_in_printed_order: [573.15,55354.32,1000.0,1.81,1000.0,1.81,0.51,1173.15,196688.16,0.51]
+            - row: 12
+              pdftotext_line_range: "968-969"
+              numeric_cells_in_printed_order: [54.26,23.3,171.87,0.19,0.82,1.5,6.43,0.87,298.16,0.11]
+            - row: 13
+              pdftotext_line_range: "970-970"
+              numeric_cells_in_printed_order: [298.15,-112884.32,920.48,0.82,4602.4,4.08]
+            - row: 14
+              pdftotext_line_range: "972-972"
+              numeric_cells_in_printed_order: [296.15,8786.4,836.8,9.52,836.8,9.52]
+            - row: 15
+              pdftotext_line_range: "973-973"
+              numeric_cells_in_printed_order: [1253.0,5.0]
+            - row: 16
+              pdftotext_line_range: "975-975"
+              numeric_cells_in_printed_order: [1253.0,477.6036,23.8,5.0]
+            - row: 17
+              pdftotext_line_range: "977-977"
+              numeric_cells_in_printed_order: [1323.0,5.0]
+            - row: 18
+              pdftotext_line_range: "979-979"
+              numeric_cells_in_printed_order: [1323.0,47.76036,2.38,5.0]
+            - row: 19
+              pdftotext_line_range: "981-982"
+              numeric_cells_in_printed_order: [2.20845,0.003,128.307,0.0,0.25,2.91,1.93,3.52,58.21,302.96,0.19,3.88]
+            - row: 20
+              pdftotext_line_range: "983-984"
+              numeric_cells_in_printed_order: [282.386,123.11,173.696,6.16,8.68,5.0,6.16,8.68,5.0,862.307]
+            - row: 21
+              pdftotext_line_range: "985-986"
+              numeric_cells_in_printed_order: [405.2,13807.2,690.36,5.0,690.36,5.0,1112.9,133134.88,6656.74,6656.74]
+            - row: 22
+              pdftotext_line_range: "987-988"
+              numeric_cells_in_printed_order: [54.15,16.05,126.81,0.8,6.34,5.0,0.8,6.34,5.0,298.15]
+            - row: 23
+              pdftotext_line_range: "989-990"
+              numeric_cells_in_printed_order: [972.86,108430.8,3617.9,3.34,3617.9,3.34,1072.09,123306.7,3251.5,3251.5]
+            - row: 24
+              pdftotext_line_range: "991-991"
+              numeric_cells_in_printed_order: [298.15,-136816.8,836.8,0.61,836.8,0.61]
+            - row: 25
+              pdftotext_line_range: "992-992"
+              numeric_cells_in_printed_order: [298.15,-2316000.0,4500.0,0.19,4500.0,0.19]
+            - row: 26
+              pdftotext_line_range: "993-993"
+              numeric_cells_in_printed_order: [12.0,300.0,0.21,128.69,0.01,6.43,5.0,0.01,6.43,5.0]
+            - row: 27
+              pdftotext_line_range: "995-996"
+              numeric_cells_in_printed_order: [974.1,111796.48,5589.0,5.0,7825.75,7.0,1690.6,252755.44,12637.0,17692.88]
+            - row: 28
+              pdftotext_line_range: "997-998"
+              numeric_cells_in_printed_order: [1171.39,148801.8,3879.2,2.61,3879.2,2.61,1471.05,212360.1,6444.6,6444.6]
+            - row: 29
+              pdftotext_line_range: "999-999"
+              numeric_cells_in_printed_order: [1120.0,10.0]
+            - row: 30
+              pdftotext_line_range: "1010-1010"
+              numeric_cells_in_printed_order: [970.0,10.0]
+            - row: 31
+              pdftotext_line_range: "1011-1011"
+              numeric_cells_in_printed_order: [1120.0,14100.08,705.0,5.0,2092.0,14.84]
+            - row: 32
+              pdftotext_line_range: "1012-1012"
+              numeric_cells_in_printed_order: [970.0,1422.56,71.0,5.0,418.4,29.41]
+            - row: 33
+              pdftotext_line_range: "1013-1013"
+              numeric_cells_in_printed_order: [1524.0,10.0]
+            - row: 34
+              pdftotext_line_range: "1014-1015"
+              numeric_cells_in_printed_order: [1730.5,274763.28,13735.0,5.0,2747.63,1.0,1816.0,291750.32,14585.0,2853.49]
+            - row: 35
+              pdftotext_line_range: "1016-1016"
+              numeric_cells_in_printed_order: [1710.0,10.0]
+            - row: 36
+              pdftotext_line_range: "1017-1017"
+              numeric_cells_in_printed_order: [1710.0,16800.0,815.0,5.0,1000.0,5.95]
+            - row: 37
+              pdftotext_line_range: "1019-1019"
+              numeric_cells_in_printed_order: [1710.0,13472.48,2092.0,15.53,2092.0,15.53]
+            - row: 38
+              pdftotext_line_range: "1020-1021"
+              numeric_cells_in_printed_order: [53.45,29.6,214.38,0.28,0.95,0.14,0.47,0.07,298.15,0.13]
+            - row: 39
+              pdftotext_line_range: "1022-1023"
+              numeric_cells_in_printed_order: [872.45,148228.7,3574.7,2.41,1818.81,0.72,1471.65,411438.02,7015.8,1344.66]
+            - row: 40
+              pdftotext_line_range: "1024-1025"
+              numeric_cells_in_printed_order: [943.0,10999.32,771.88,7.02,2315.65,21.05,963.0,11578.24,6.9,20.69]
+            - row: 41
+              pdftotext_line_range: "1026-1027"
+              numeric_cells_in_printed_order: [971.0,11192.29,771.88,6.9,2315.65,20.69,1143.0,12736.06,6.45,19.35]
+            - row: 42
+              pdftotext_line_range: "1028-1028"
+              numeric_cells_in_printed_order: [298.15,-229136.76,4184.0,1.83,4184.0,1.83]
+            - row: 43
+              pdftotext_line_range: "1030-1030"
+              numeric_cells_in_printed_order: [0.0,-212000.0,10000.0,4.72,20000.0,9.43]
+            - row: 44
+              pdftotext_line_range: "1032-1032"
+              numeric_cells_in_printed_order: [9.81,303.8,0.192,86.06,0.02,8.61,10.0,0.02,8.61,10.0]
+            - row: 45
+              pdftotext_line_range: "1033-1034"
+              numeric_cells_in_printed_order: [373.2,97.4,123.3,1.0,1.03,1.0,1.03,0.81,1173.2,0.81]
+            - row: 46
+              pdftotext_line_range: "1035-1036"
+              numeric_cells_in_printed_order: [573.15,28503.08,761.0,2.67,761.0,2.67,0.61,1373.15,124987.79,0.61]
+            - row: 47
+              pdftotext_line_range: "1037-1037"
+              numeric_cells_in_printed_order: [298.15,-88910.0,543.92,0.61,543.92,0.61]
+            - row: 48
+              pdftotext_line_range: "1039-1039"
+              numeric_cells_in_printed_order: [970.0,-89872.32,1506.24,1.68,1506.24,1.68]
+            - row: 49
+              pdftotext_line_range: "1041-1041"
+              numeric_cells_in_printed_order: [298.15,-86520.0,4340.0,5.02,4340.0,5.02]
+            - row: 50
+              pdftotext_line_range: "1043-1043"
+              numeric_cells_in_printed_order: [298.15,-1634320.0,2710.0,0.17,2710.0,0.17]
+            - row: 51
+              pdftotext_line_range: "1044-1045"
+              numeric_cells_in_printed_order: [898.15,88380.57,771.88,0.87,771.88,0.87,1148.15,89731.36]
+            - row: 52
+              pdftotext_line_range: "1046-1047"
+              numeric_cells_in_printed_order: [10.7,0.22,127.61,0.01,6.38,5.0,0.02,12.76,10.0,1573.2]
+            - row: 53
+              pdftotext_line_range: "1048-1049"
+              numeric_cells_in_printed_order: [373.2,95.81,132.42,1.0,1.04,1.0,1.04,0.76,1573.2,0.76]
+            - row: 54
+              pdftotext_line_range: "1050-1051"
+              numeric_cells_in_printed_order: [815.9,57803.0,2000.0,3.46,2000.0,3.46,1.41,1488.9,141370.0,1.41]
+            - row: 55
+              pdftotext_line_range: "1052-1052"
+              numeric_cells_in_printed_order: [1102.3,92588.0,2000.0,1.72,2000.0,1.72,1.13]
+          source_rows_as_printed:
+            - row: 1
+              variable_as_printed: Cp
+              layout_transcription_as_printed: Cp              0.957 β-Ca2SiO4 + 0.043 CaOH2          2.2107 →           0.0010 → 127.07     0.0 → 0.28          8.02 % →       0.01
+                → 42.49         1203.1 % →           [40]a ↩ 302.887                                                    0.22 %                              33.44 %
+            - row: 2
+              variable_as_printed: Cp
+              layout_transcription_as_printed: Cp              0.957 β-Ca2SiO4 + 0.043 CaOH2          282.354 →          123.47 → 151.70     0.09 → 0.04         0.07 %         0.02
+                → 5.25          0.88 %               [40]a ↩ 463.843
+            - row: 3
+              variable_as_printed: Cp
+              layout_transcription_as_printed: Cp              0.957 β-Ca2SiO4 + 0.043 CaOH2          480.85 →           147.73 → 286.23     1.36 → 3.88         0.24 % →       2.56
+                → 5.39          1.67 % → 3.19        [40]a ↩ 768.943                                                    0.46 %                              %
+            - row: 4
+              variable_as_printed: Cp
+              layout_transcription_as_printed: Cp              β-Ca2SiO4                              2.19619 →          0.0012 → 127.85     0.0 → 0.32          11.4 % →       0.01
+                → 29.86         1072.06 % →          [40]a ↩ 302.975                                                    0.25 %                              23.35 %
+            - row: 5
+              variable_as_printed: Cp
+              layout_transcription_as_printed: Cp              β-Ca2SiO4                              284.136 →          125.13 → 171.60     0.08 → 1.28         0.06 %         0.02
+                → 1.28          0.06 %               [40] ↩ 766.466
+            - row: 6
+              variable_as_printed: HT-
+              layout_transcription_as_printed: HT-             β-Ca2SiO4                              406.0 →            14,811.36 →         740.57 →            5.0 %          740.57
+                →             5.0 %                [41] ↩ H298.15                                              964.6              108,784.0           5439.2                             5439.2
+            - row: 7
+              variable_as_printed: Cp
+              layout_transcription_as_printed: Cp              β-Ca2SiO4                              52.66 →            17.08 → 128.11      0.85 → 6.41         5.0 %          0.85
+                → 6.41          5.0 %                [39] ↩ 296.48
+            - row: 8
+              variable_as_printed: ΔH
+              layout_transcription_as_printed: ΔH              2 CaO + α quartz-SiO2 → β-Ca2SiO4      298.15             −126,314.96         962.32              0.76 %         962.32               0.76
+                %               [42]
+            - row: 9
+              variable_as_printed: ΔH
+              layout_transcription_as_printed: ΔH              β-Ca2SiO4                              298.15             −2,308,400          4600.0              0.2 %          4600.0               0.2
+                %                [40]
+            - row: 10
+              variable_as_printed: ΔH
+              layout_transcription_as_printed: ΔH              2 CaO + α-quartz-SiO2 → β-Ca2SiO4      967.0              −149,200            1500.0              1.01 %         22,500.0             15.08
+                %              [85]
+            - row: 11
+              variable_as_printed: HT-
+              layout_transcription_as_printed: HT-             triclinic-Ca3SiO5                      573.15 →           55,354.32 →         1000.0              1.81 % →       1000.0               1.81
+                % → 0.51        [44] ↩ H293.15                                              1173.15            196,688.16                              0.51 %                              %
+            - row: 12
+              variable_as_printed: Cp
+              layout_transcription_as_printed: Cp              triclinic-Ca3SiO5                      54.26 →            23.3 →171.87        0.19                0.82 % →       1.5                  6.43
+                % → 0.87        [39] ↩ 298.16                                                     0.11 %                              %
+            - row: 13
+              variable_as_printed: ΔH
+              layout_transcription_as_printed: ΔH              3 CaO + α-quartz-SiO2 → triclinic-     298.15             −112,884.32         920.48              0.82 %         4602.4               4.08
+                %               [42]
+            - row: 14
+              variable_as_printed: ΔH
+              layout_transcription_as_printed: ΔH              CaO + β-Ca2SiO4 → triclinic-Ca3SiO5    296.15             8786.4              836.8               9.52 %         836.8                9.52
+                %               [45]
+            - row: 15
+              variable_as_printed: Ttransition
+              layout_transcription_as_printed: Ttransition     monoclinic-Ca3SiO5 → triclinic-        1253.0             –                   5.0 K               –              –                    –                    [8]
+            - row: 16
+              variable_as_printed: ΔH
+              layout_transcription_as_printed: ΔH              triclinic-Ca3SiO5 → monoclinic-        1253.0             477.6036            23.8                5%             –                    –                    [8]
+            - row: 17
+              variable_as_printed: Ttransition
+              layout_transcription_as_printed: Ttransition     rhombohedral-Ca3SiO5 → monoclinic-     1323.0             –                   5.0 K               –              –                    –                    [8]
+            - row: 18
+              variable_as_printed: ΔH
+              layout_transcription_as_printed: ΔH              monoclinic-Ca3SiO5 → rhombohedral-     1323.0             47.76036            2.38                5%             –                    –                    [8]
+            - row: 19
+              variable_as_printed: Cp
+              layout_transcription_as_printed: Cp              γ-Ca2SiO4                              2.20845 →          0.003 → 128.307     0.0 → 0.25          2.91 % →       1.93
+                → 3.52          58.21 % →            [40]a ↩ 302.96                                                     0.19 %                              3.88 %
+            - row: 20
+              variable_as_printed: Cp
+              layout_transcription_as_printed: Cp              γ-Ca2SiO4                              282.386 →          123.11 → 173.696    6.16 → 8.68         5.0 %          6.16
+                → 8.68          5.0 %                [40] ↩ 862.307
+            - row: 21
+              variable_as_printed: HT-
+              layout_transcription_as_printed: HT-             γ-Ca2SiO4                              405.2 →            13,807.2 →          690.36 →            5.0 %          690.36
+                →             5.0 %                [41] ↩ H298.15                                              1112.9             133,134.88          6656.74                            6656.74
+            - row: 22
+              variable_as_printed: Cp
+              layout_transcription_as_printed: Cp              γ-Ca2SiO4                              54.15 →            16.05 → 126.81      0.8 → 6.34          5.0 %          0.8
+                → 6.34           5.0 %                [9] ↩ 298.15
+            - row: 23
+              variable_as_printed: HT-
+              layout_transcription_as_printed: HT-             γ-Ca2SiO4                              972.86 →           108,430.8 →         3617.9 →            3.34 %         3617.9
+                →             3.34 %               Present ↩ H298.15                                              1072.09            123,306.7           3251.5                             3251.5                                    work
+            - row: 24
+              variable_as_printed: ΔH
+              layout_transcription_as_printed: ΔH              2 CaO + α-quartz-SiO2 → γ-Ca2SiO4      298.15             −136,816.8          836.8               0.61 %         836.8                0.61
+                %               [43]
+            - row: 25
+              variable_as_printed: ΔH
+              layout_transcription_as_printed: ΔH              γ-Ca2SiO4                              298.15             −2,316,000          4500.0              0.19 %         4500.0               0.19
+                %               [40]
+            - row: 26
+              variable_as_printed: Cp
+              layout_transcription_as_printed: Cp              α′-Ca2SiO4                             12.0 → 300.0       0.21 → 128.69       0.01 → 6.43         5.0 %          0.01
+                → 6.43          5.0 %                Present
+            - row: 27
+              variable_as_printed: ΔH
+              layout_transcription_as_printed: ΔH              β-Ca2SiO4 → α′-Ca2SiO4                 974.1 →            111,796.48 →        5589 →              5.0 %          7825.75
+                →            7.0 %                [41] ↩ 1690.6             252,755.44          12,637                             17,692.88
+            - row: 28
+              variable_as_printed: ΔH
+              layout_transcription_as_printed: ΔH              γ-Ca2SiO4 → α′-Ca2SiO4                 1171.39 →          148,801.8 →         3879.2 →            2.61 %         3879.2
+                →             2.61 %               Present ↩ 1471.05            212,360.1           6444.6                             6444.6                                    work
+            - row: 29
+              variable_as_printed: Ttransition
+              layout_transcription_as_printed: Ttransition     α′-Ca2SiO4 → γ-Ca2SiO4                 1120.0             –                   10.0 K              –              –                    –                    [81]
+            - row: 30
+              variable_as_printed: Ttransition
+              layout_transcription_as_printed: Ttransition     α′-Ca2SiO4 → β-Ca2SiO4                  970.0             –                      10.0 K           –               –                    –                  [81]
+            - row: 31
+              variable_as_printed: ΔH
+              layout_transcription_as_printed: ΔH              γ-Ca2SiO4 → α′-Ca2SiO4                  1120.0            14,100.08              705              5%              2092.0               14.84
+                %            [30]
+            - row: 32
+              variable_as_printed: ΔH
+              layout_transcription_as_printed: ΔH              β-Ca2SiO4 → α′-Ca2SiO4                  970.0             1422.56                71               5%              418.4                29.41
+                %            [30]
+            - row: 33
+              variable_as_printed: Ttransition
+              layout_transcription_as_printed: Ttransition     CaO + α′-Ca2SiO4 → triclinic-Ca3SiO5    1524.0            –                      10.0 K           –               –                    –                  [86]
+            - row: 34
+              variable_as_printed: ΔH
+              layout_transcription_as_printed: ΔH              β-Ca2SiO4 → α-Ca2SiO4                   1730.5 →          274,763.28 →           13,735 →         5.0 %           2747.63
+                →            1.0 %              [41] ↩ 1816.0            291,750.32             14,585                           2853.49
+            - row: 35
+              variable_as_printed: Ttransition
+              layout_transcription_as_printed: Ttransition     α-Ca2SiO4 → α′-Ca2SiO4                  1710.0            –                      10.0 K           –               –                    –                  [81]
+            - row: 36
+              variable_as_printed: ΔH
+              layout_transcription_as_printed: ΔH              α′-Ca2SiO4 → α-Ca2SiO4                  1710.0            16,800                 815              5.0 %           1000.0               5.95
+                %             Present
+            - row: 37
+              variable_as_printed: ΔH
+              layout_transcription_as_printed: ΔH              α′-Ca2SiO4 → α-Ca2SiO4                  1710.0            13,472.48              2092.0           15.53 %         2092.0               15.53
+                %            [30]
+            - row: 38
+              variable_as_printed: Cp
+              layout_transcription_as_printed: Cp              rankinite-Ca3Si2O7                      53.45 →           29.60 → 214.38         0.28             0.95 % →        0.14                 0.47
+                % → 0.07      [9] ↩ 298.15                                                    0.13 %                               %
+            - row: 39
+              variable_as_printed: HT-
+              layout_transcription_as_printed: HT-             rankinite-Ca3Si2O7                      872.45 →          148,228.7 →            3574.7 →         2.41 %          1818.81
+                →            0.72 %             Present ↩ H298.15                                                1471.65           411,438.02             7015.8                           1344.66                                 work
+            - row: 40
+              variable_as_printed: ΔG
+              layout_transcription_as_printed: ΔG              β-Ca2SiO4 → 0.5 CaO + 0.5 rankinite-    943.0 →           10,999.32 →            771.88           7.02 % →        2315.65              21.05
+                % →          [47]a ↩ Ca3Si2O7                                963.0             11,578.24                               6.9 %                                20.69
+                %
+            - row: 41
+              variable_as_printed: ΔG
+              layout_transcription_as_printed: ΔG              α′-Ca2SiO4 → 0.5 CaO + 0.5 rankinite-   971.0 →           11,192.29 →            771.88           6.9 % →         2315.65              20.69
+                % →          [47]a ↩ Ca3Si2O7                                1143.0            12,736.06                               6.45 %                               19.35
+                %
+            - row: 42
+              variable_as_printed: ΔH
+              layout_transcription_as_printed: ΔH              3 CaO + 2 α-quartz-SiO2 → rankinite-    298.15            −229,136.76            4184.0           1.83 %          4184.0               1.83
+                %             [46]
+            - row: 43
+              variable_as_printed: ΔH
+              layout_transcription_as_printed: ΔH              3 CaO + 2 α-quartz-SiO2 → rankinite-    0.0               −212,000               10,000.0         4.72 %          20,000.0             9.43
+                %             Present
+            - row: 44
+              variable_as_printed: Cp
+              layout_transcription_as_printed: Cp              wollastonite-CaSiO3                     9.81 → 303.8      0.192 →86.06           0.02 → 8.61      10.0 %          0.02
+                → 8.61          10.0 %             [48]
+            - row: 45
+              variable_as_printed: Cp
+              layout_transcription_as_printed: Cp              wollastonite-CaSiO3                     373.2 →           97.4 → 123.3           1.0              1.03 % →        1.0                  1.03
+                % → 0.81      [48] ↩ 1173.2                                                    0.81 %                               %
+            - row: 46
+              variable_as_printed: HT-
+              layout_transcription_as_printed: HT-             wollastonite-CaSiO3                     573.15 →          28,503.08 →            761.0            2.67 % →        761.0                2.67
+                % → 0.61      [44] ↩ H293.15                                                1373.15           124,987.79                              0.61 %                               %
+            - row: 47
+              variable_as_printed: ΔH
+              layout_transcription_as_printed: ΔH              CaO + α-quartz-SiO2 → wollastonite-     298.15            −88,910                543.92           0.61 %          543.92               0.61
+                %             [79]
+            - row: 48
+              variable_as_printed: ΔH
+              layout_transcription_as_printed: ΔH              CaO + α-quartz-SiO2 → wollastonite-     970.0             −89,872.32             1506.24          1.68 %          1506.24              1.68
+                %             [51]
+            - row: 49
+              variable_as_printed: ΔH
+              layout_transcription_as_printed: ΔH              CaO + α-quartz-SiO2 → wollastonite-     298.15            −86,520                4340.0           5.02 %          4340.0               5.02
+                %             [87]
+            - row: 50
+              variable_as_printed: ΔH
+              layout_transcription_as_printed: ΔH              wollastonite-CaSiO3                     298.15            −1,634,320             2710.0           0.17 %          2710.0               0.17
+                %             [40]
+            - row: 51
+              variable_as_printed: ΔG
+              layout_transcription_as_printed: ΔG              wollastonite-CaSiO3 → CaO +             898.15 →          88,380.57 →            771.88           0.87 %          771.88               0.87
+                %             [47] ↩ β-quartz-SiO2                           1148.15           89,731.36
+            - row: 52
+              variable_as_printed: Cp
+              layout_transcription_as_printed: Cp              cyclowollastonite-CaSiO3                10.7 →            0.22 → 127.61          0.01 → 6.38      5.0 %           0.02
+                → 12.76         10.0 %             [48] ↩ 1573.2
+            - row: 53
+              variable_as_printed: Cp
+              layout_transcription_as_printed: Cp              cyclowollastonite-CaSiO3                373.2 →           95.81 → 132.42         1.0              1.04 % →        1.0                  1.04
+                % → 0.76      [48] ↩ 1573.2                                                    0.76 %                               %
+            - row: 54
+              variable_as_printed: HT-
+              layout_transcription_as_printed: HT-             cyclowollastonite-CaSiO3                815.9 →           57,803.0 →             2000.0           3.46 % →        2000.0               3.46
+                % → 1.41      [50] ↩ H273.15                                                1488.9            141,370.0                               1.41 %                               %
+            - row: 55
+              variable_as_printed: HT-
+              layout_transcription_as_printed: HT-             cyclowollastonite-CaSiO3                1102.3 →          92,588.0 →             2000.0           1.72 % →        2000.0               1.72
+                % → 1.13      [49]
+  Ca3Si2O7:
+    observations:
+      - observation_id: abdul_2023_rankinite_heat_content
+        experiment: abdul-2023-heat-content-measurements
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 8, published_page: 7, table: '3'}
+        phase: cr
+        crystal_phase_as_stated: rankinite
+        condensed_form: {state: crystalline rankinite, polymorph: rankinite}
+        standard_state: heat content relative to 298.15 K
+        units: J/mol
+        values:
+          quantity: H_minus_H298
+          method_class: measured_direct
+          admission_status: admitted
+          temperature_basis: measured introduction temperature; corrected to 298.15 K using low-temperature heat capacities [9]
+          printed_table_unit_note: Table 3 header prints J mol−1 K−1 for heat content and uncertainty.
+          series:
+            - {T_K: 872.45, enthalpy_increment: 147433.0, uncertainty: 3570.3, uncertainty_percent: 2.4}
+            - {T_K: 972.95, enthalpy_increment: 180036.6, uncertainty: 4109.9, uncertainty_percent: 2.3}
+            - {T_K: 1072.35, enthalpy_increment: 206085.9, uncertainty: 5517.3, uncertainty_percent: 2.7}
+            - {T_K: 1172.15, enthalpy_increment: 233439.6, uncertainty: 6032.1, uncertainty_percent: 2.6}
+            - {T_K: 1271.95, enthalpy_increment: 264146.9, uncertainty: 6983.6, uncertainty_percent: 2.6}
+            - {T_K: 1370.85, enthalpy_increment: 293304.5, uncertainty: 7690.3, uncertainty_percent: 2.6}
+            - {T_K: 1471.65, enthalpy_increment: 322841.2, uncertainty: 6913.1, uncertainty_percent: 2.2}
+  Ca2SiO4:
+    observations:
+      - observation_id: abdul_2023_belite_heat_content
+        experiment: abdul-2023-heat-content-measurements
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 8, published_page: 7, table: '4'}
+        phase: cr
+        crystal_phase_as_stated: γ/α′-Ca2SiO4
+        polymorph_notes: 'Table 4 identifies γ and α′-Ca2SiO4; its heat-content series crosses the stated γ→α′ transition at 1170 K, so no single polymorph token applies to the series.'
+        standard_state: heat content relative to 298.15 K
+        units: J/mol
+        values:
+          quantity: H_minus_H298
+          method_class: measured_direct
+          admission_status: admitted
+          uncertainty_percent_basis: as printed in Table 4
+          series:
+            - {T_K: 972.86, enthalpy_increment: 108430.8, uncertainty: 3617.9, uncertainty_percent: 3.3}
+            - {T_K: 1072.09, enthalpy_increment: 123306.7, uncertainty: 3251.5, uncertainty_percent: 2.6}
+            - {T_K: 1171.39, enthalpy_increment: 148801.8, uncertainty: 3879.2, uncertainty_percent: 2.6}
+            - {T_K: 1271.67, enthalpy_increment: 171305.2, uncertainty: 4185.5, uncertainty_percent: 2.4}
+            - {T_K: 1371.05, enthalpy_increment: 187889.9, uncertainty: 4479.1, uncertainty_percent: 2.4}
+            - {T_K: 1471.05, enthalpy_increment: 212360.1, uncertainty: 6444.6, uncertainty_percent: 3.0}

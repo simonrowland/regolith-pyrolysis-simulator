@@ -1,4 +1,4 @@
-"""Compilation-tier scoring: series cells as points, engine thermochemistry.
+"""Compilation-tier scoring: streamed series cells and engine thermochemistry.
 
 Evaluated compilations stay COMPILATION_ASSESSED. Printed (T, value) pairs
 are scored in place. They are not written back as new store rows: a JANAF
@@ -129,6 +129,24 @@ class _Product:
 
 
 @dataclass(frozen=True)
+class _CompilationSeriesCell:
+    """Scalar scoring view of one stored compilation-series cell."""
+
+    parent: Observation
+    observation_id: str
+    identity: Identity
+    value: Value
+    notices: tuple[Notice, ...]
+
+    @property
+    def derived_from(self) -> tuple[str, ...]:
+        return (self.parent.observation_id,) + tuple(self.parent.derived_from or ())
+
+    def __getattr__(self, name: str) -> object:
+        return getattr(self.parent, name)
+
+
+@dataclass(frozen=True)
 class ThermoAttempt:
     """One engine thermochemistry attempt. ``value is None`` is a refusal.
 
@@ -189,6 +207,19 @@ def compilation_point_id(
     return f"{observation_id}#{token}"
 
 
+def compilation_point_temperature(reference_id: str) -> Decimal | None:
+    """Printed T of a compilation series cell id, else None.
+
+    The inverse of the ``t`` token ``compilation_point_id`` writes. Ids that
+    are not a printed cell (plain ids, ``#<index>`` points) return None.
+    """
+
+    _parent, sep, suffix = reference_id.rpartition("#")
+    if not sep or not _is_point_suffix(suffix):
+        return None
+    return Decimal(suffix[1:].partition("v")[0])
+
+
 def parent_observation_id(reference_id: str) -> str:
     """Series-point ids end in ``#<index>`` or ``#t<T>v<value>``.
 
@@ -217,20 +248,6 @@ def _score_predicates():
     )
 
     return is_compilation_source, is_internal_consistency, is_sf04_workbook, parse_species_formula
-
-
-def compilation_series_points(
-    observation: Observation,
-    origin: str | None = None,
-) -> tuple[Observation, ...]:
-    """Printed series cells as point observations. Store rows are not copied.
-
-    One point per stored pair. No midpoint. ``transition_temperature``
-    series, internal-consistency ledgers, and the SF04 workbook stay as
-    they are. Empirical series are not compilation series.
-    """
-
-    return tuple(_iter_compilation_series_points(observation, origin))
 
 
 def _compilation_series_pairs(
@@ -265,10 +282,10 @@ def _compilation_series_point_count(
     return 1 if pairs is None else len(pairs)
 
 
-def _iter_compilation_series_points(
+def _iter_compilation_series_cells(
     observation: Observation,
     origin: str | None = None,
-) -> Iterable[Observation]:
+) -> Iterable[Observation | _CompilationSeriesCell]:
     pairs = _compilation_series_pairs(observation, origin)
     if pairs is None:
         yield observation
@@ -280,19 +297,15 @@ def _iter_compilation_series_points(
         key = f"{_decimal_token(temp_d)}|{_decimal_token(mag_d)}"
         occurrence = seen.get(key, 0)
         seen[key] = occurrence + 1
-        identity = replace(
-            observation.identity,
-            temperature_K=State.of(temp_d),
-        )
-        yield replace(
-            observation,
+        identity = replace(observation.identity, temperature_K=State.of(temp_d))
+        yield _CompilationSeriesCell(
+            parent=observation,
             observation_id=compilation_point_id(
                 observation.observation_id, temp_d, mag_d, occurrence
             ),
             identity=identity,
             value=Value.point_of(mag_d),
-            derived_from=(observation.observation_id,)
-            + tuple(observation.derived_from or ()),
+            notices=observation.notices,
         )
 
 
@@ -1801,7 +1814,7 @@ def write_compilation_comparisons_jsonl(context, path: Path) -> int:
                 if is_internal_consistency(origin) or is_sf04_workbook(observation):
                     continue
 
-                for point in _iter_compilation_series_points(observation, origin):
+                for point in _iter_compilation_series_cells(observation, origin):
                     identity = point.identity
                     if not isinstance(identity, Identity):
                         continue
@@ -1830,7 +1843,8 @@ def write_compilation_comparisons_jsonl(context, path: Path) -> int:
                         else point.locator.record
                     )
                     if not record_id:
-                        _source, separator, record_id = point.observation_id.partition("::")
+                        parent_id = parent_observation_id(point.observation_id)
+                        _source, separator, record_id = parent_id.partition("::")
                         if not separator:
                             continue
                     temperature_K = float(as_decimal(temperature.value))
@@ -2145,7 +2159,7 @@ def compilation_tier_census(
                 f"compilation census observations={walked} points={reachable}",
                 flush=True,
             )
-        for point in _iter_compilation_series_points(obs, origin):
+        for point in _iter_compilation_series_cells(obs, origin):
             if point.value.kind is not ValueKind.POINT or point.value.point is None:
                 continue
             token = quantity_token(point.identity) if isinstance(point.identity, Identity) else None

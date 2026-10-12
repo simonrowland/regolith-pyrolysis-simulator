@@ -238,6 +238,52 @@ def _predict(value: Decimal, identity, **kwargs) -> EnginePrediction:
     )
 
 
+def test_prediction_refusal_reports_unknown_composition_component() -> None:
+    reason = "printed oxide wt% map has unsupported numeric component(s): XxO"
+    identity = replace(
+        F.activity_identity(), composition=State.unknown(reason)
+    )
+    observation = F.observation(
+        "activity-unknown-composition",
+        "fixture-experiment",
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+
+    prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, observation)
+
+    assert prediction.refusal_detail["reason"] == "composition_incomplete"
+    assert prediction.refusal_detail["detail"] == reason
+
+
+def test_feot_conversion_notice_reaches_scorer_residual() -> None:
+    experiment = F.tabulation_experiment()
+    identity = F.activity_identity()
+    notice = Notice(
+        kind=NoticeKind.TOTAL_IRON_REPORTED_AS_FEO,
+        affected_quantities=(Quantity.ACTIVITY,),
+        reason="FeOT (total iron) treated as FeO for conversion; printed key FeOT",
+        origin="feot-observation",
+    )
+    reference = F.observation(
+        "feot-observation",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        notices=(notice,),
+    )
+
+    residual, _candidate = _compile(
+        reference,
+        experiment,
+        _predict(Decimal("0.2"), identity),
+    )
+
+    assert notice in residual.notices
+
+
 def _compile(reference, experiment, predict, review=None, extra_obs=()):
     ctx = _context(F.work(), experiment, reference, *extra_obs, review=review)
     return compile_residual(
@@ -1782,6 +1828,280 @@ def test_unknown_method_on_vapour_is_typed_method_unknown() -> None:
     assert residual.refusal is not None
     assert residual.refusal.reason is RefusalReason.METHOD_UNKNOWN
     assert residual.refusal.reason is not RefusalReason.UNDERDETERMINED_APPARATUS
+
+
+@pytest.mark.parametrize(
+    ("temperature", "expected_pressure", "extrapolated"),
+    [
+        (Decimal("1056"), Decimal("33991.26"), False),
+        (Decimal("1200"), Decimal("117402.2"), True),
+    ],
+)
+def test_static_equilibrium_pressure_uses_pure_sodium_total_surface(
+    temperature: Decimal, expected_pressure: Decimal, extrapolated: bool
+) -> None:
+    experiment = F.tabulation_experiment(
+        method=MethodToken.STATIC_EQUILIBRIUM, T_K=temperature
+    )
+    identity = replace(
+        F.psat_identity("Na", T_K=temperature),
+        species=Species("Na", Phase.L),
+    )
+    reference = F.observation(
+        "static-pure-sodium",
+        experiment.experiment_id,
+        identity,
+        expected_pressure,
+        source_id="static-source",
+    )
+
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL, reference, experiment=experiment
+    )
+
+    assert prediction.value is not None
+    assert abs(float(prediction.value) - float(expected_pressure)) <= (
+        float(expected_pressure) * 1e-6
+    )
+    assert prediction.unit == "Pa"
+    assert prediction.identity is identity
+    assert prediction.identity.species.phase.value is Phase.L
+    assert prediction.authority is (
+        Authority.EXTRAPOLATED if extrapolated else Authority.CERTIFIED
+    )
+    assert any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        for notice in prediction.notices
+    ) is extrapolated
+
+
+def test_static_equilibrium_pressure_refuses_missing_reservoir_or_engine_total(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+
+    experiment = F.tabulation_experiment(
+        method=MethodToken.STATIC_EQUILIBRIUM, T_K=Decimal("1056")
+    )
+    missing_reservoir = F.observation(
+        "static-missing-reservoir",
+        experiment.experiment_id,
+        replace(
+            F.psat_identity("Na", T_K=Decimal("1056")),
+            species=Species("Na", State.unknown("source does not state phase")),
+            reservoir=State.unknown("source does not state condensed reservoir"),
+        ),
+        Decimal("33991.26"),
+        source_id="static-source",
+    )
+    refusal = predict_with_engine(
+        Engine.THERMOENGINE, missing_reservoir, experiment=experiment
+    )
+    assert refusal.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert (
+        refusal.refusal_detail["reason"]
+        == "static_equilibrium_pure_reservoir_not_stated"
+    )
+
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        EngineHandle,
+        EquilibrateCell,
+    )
+
+    reference = F.observation(
+        "static-engine-without-total",
+        experiment.experiment_id,
+        replace(
+            F.psat_identity("Na", T_K=Decimal("1056")),
+            species=Species("Na", Phase.L),
+        ),
+        Decimal("33991.26"),
+        source_id="static-source",
+    )
+    reported_pressures: dict[str, float] = {}
+    handle = EngineHandle(
+        name=Engine.THERMOENGINE.value,
+        backend=object(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=False,
+        supports_intrinsic_fo2=True,
+    )
+    monkeypatch.setattr(battery, "open_battery_engine", lambda _name: handle)
+
+    def fake_gas_pressures(_handle, pot, *, temperature_K, po2, **_kwargs):
+        return EquilibrateCell(
+            pot_id=pot.pot_id,
+            engine=Engine.THERMOENGINE.value,
+            temperature_K=temperature_K,
+            po2=po2,
+            status="ok",
+            refusal_reason=None,
+            engine_status="ok",
+            engine_reason=None,
+            melt_activities={},
+            gas_partial_pressures_Pa=dict(reported_pressures),
+            liquid_fraction=1.0,
+            wall_s=0.0,
+            cpu_s=0.0,
+            hostname="test",
+        )
+
+    monkeypatch.setattr(battery, "equilibrate_cell", fake_gas_pressures)
+    no_total = predict_with_engine(
+        Engine.THERMOENGINE, reference, experiment=experiment
+    )
+    assert no_total.refusal_reason is RefusalReason.UNSUPPORTED
+    assert (
+        no_total.refusal_detail["reason"]
+        == "static_equilibrium_total_pressure_not_reported"
+    )
+
+    reported_pressures.update({"Na": 20000.0, "Na2": 13991.26166001457})
+    total = predict_with_engine(
+        Engine.THERMOENGINE, reference, experiment=experiment
+    )
+    assert total.value is not None
+    assert abs(float(total.value) - 33991.26) <= 33991.26e-6
+
+
+@pytest.mark.parametrize("invalid_na2", (float("nan"), float("inf"), -1.0, None))
+def test_static_equilibrium_pressure_refuses_invalid_reported_component(
+    invalid_na2: float | None,
+) -> None:
+    from types import SimpleNamespace
+
+    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+
+    experiment = F.tabulation_experiment(
+        method=MethodToken.STATIC_EQUILIBRIUM, T_K=Decimal("1056")
+    )
+    reference = F.observation(
+        "static-invalid-component",
+        experiment.experiment_id,
+        replace(
+            F.psat_identity("Na", T_K=Decimal("1056")),
+            species=Species("Na", Phase.L),
+        ),
+        Decimal("33991.26"),
+        source_id="static-source",
+    )
+
+    class Backend:
+        reported_pressures = {"Na": 20000.0, "Na2": invalid_na2}
+
+        def equilibrate(self, **_kwargs):
+            return SimpleNamespace(
+                status="ok",
+                vapor_pressures_Pa=self.reported_pressures,
+                activity_coefficients={},
+                liquid_fraction=1.0,
+                diagnostics={},
+            )
+
+    handle = EngineHandle(
+        name=Engine.THERMOENGINE.value,
+        backend=Backend(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=False,
+        supports_intrinsic_fo2=True,
+    )
+    prediction = predict_with_engine(
+        Engine.THERMOENGINE,
+        reference,
+        experiment=experiment,
+        handles={Engine.THERMOENGINE.value: handle},
+        isolated=False,
+    )
+    if invalid_na2 is None:
+        # None is intentionally kept inside the backend's declared map.
+        assert handle.backend.reported_pressures["Na2"] is None
+
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.METRIC_DOMAIN
+    assert prediction.refusal_detail["reason"] == (
+        "static_equilibrium_total_pressure_invalid"
+    )
+    assert prediction.refusal_detail["reported"] == ["Na", "Na2"]
+
+
+def test_static_equilibrium_pressure_sums_valid_reported_components() -> None:
+    from types import SimpleNamespace
+
+    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+
+    experiment = F.tabulation_experiment(
+        method=MethodToken.STATIC_EQUILIBRIUM, T_K=Decimal("1056")
+    )
+    reference = F.observation(
+        "static-valid-total",
+        experiment.experiment_id,
+        replace(
+            F.psat_identity("Na", T_K=Decimal("1056")),
+            species=Species("Na", Phase.L),
+        ),
+        Decimal("33991.26"),
+        source_id="static-source",
+    )
+
+    class Backend:
+        def equilibrate(self, **_kwargs):
+            return SimpleNamespace(
+                status="ok",
+                vapor_pressures_Pa={"Na": 20000.0, "Na2": 13991.26166001457},
+                activity_coefficients={},
+                liquid_fraction=1.0,
+                diagnostics={},
+            )
+
+    handle = EngineHandle(
+        name=Engine.THERMOENGINE.value,
+        backend=Backend(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=False,
+        supports_intrinsic_fo2=True,
+    )
+    prediction = predict_with_engine(
+        Engine.THERMOENGINE,
+        reference,
+        experiment=experiment,
+        handles={Engine.THERMOENGINE.value: handle},
+        isolated=False,
+    )
+
+    assert prediction.value is not None
+    assert float(prediction.value) == pytest.approx(33991.26166001457)
+    assert prediction.unit == "Pa"
+
+
+def test_static_equilibrium_method_is_scoped_to_the_vapour_rail() -> None:
+    experiment = F.tabulation_experiment(method=MethodToken.STATIC_EQUILIBRIUM)
+    reference = F.observation(
+        "static-method-activity",
+        experiment.experiment_id,
+        F.activity_identity(formula="NaO0.5"),
+        Decimal("0.5"),
+        source_id="static-source",
+    )
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=ScoreContext(
+            works={},
+            experiments={experiment.experiment_id: experiment},
+            observations={reference.observation_id: reference},
+        ),
+    )
+    assert residual.rail is Rail.MELT_ACTIVITY
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.UNSUPPORTED
+    assert (
+        residual.refusal.detail["reason"]
+        == "static_equilibrium_method_is_vapour_rail_only"
+    )
 
 
 @pytest.mark.parametrize(
@@ -3672,6 +3992,96 @@ def test_headline_records_keep_tiers_separate_and_count_no_band() -> None:
     assert "tail membership, not accuracy" in payload_record["match_rate_label"]
 
 
+def test_compilation_series_does_not_change_empirical_headline() -> None:
+    from simulator.battery.score import ENGINE_CHANNELS, headline_rows
+
+    engine = Engine.INTERNAL_ANALYTICAL
+    experiment = F.tabulation_experiment()
+    identity = F.oxide_identity(
+        "Na2O",
+        Phase.L,
+        T_K=Decimal("2200"),
+        metal_formula="Na",
+    )
+    measured = F.observation(
+        "empirical-na2o",
+        experiment.experiment_id,
+        identity,
+        Decimal("-3.886"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-measured-source",
+    )
+    series = F.observation(
+        "compilation-na2o-series",
+        experiment.experiment_id,
+        replace(identity, temperature_K=State.unknown("series")),
+        Decimal("0"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+    series = replace(
+        series,
+        value=Value(
+            ValueKind.SERIES,
+            series=(
+                (Decimal("2100"), Decimal("-4")),
+                (Decimal("2200"), Decimal("-3.886")),
+            ),
+        ),
+    )
+    measured_context = _context(F.work(), experiment, measured)
+    combined_context = replace(
+        _context(F.work(), experiment, measured, series),
+        origins={series.observation_id: "compilations-janaf/janaf-Na.yaml"},
+    )
+
+    def predict(engine, reference, **kwargs):
+        del kwargs
+        return EnginePrediction(
+            engine,
+            ENGINE_CHANNELS[engine],
+            Execution(state=ExecutionState.PRODUCED, call_evidence="synthetic"),
+            value=reference.value.point,
+            unit=QUANTITY_UNITS[Quantity.DELTA_FG],
+            identity=reference.identity,
+        )
+
+    measured_residuals, _ = score_store(
+        measured_context,
+        engines=(engine,),
+        predict=predict,
+    )
+    combined_residuals, _ = score_store(
+        combined_context,
+        engines=(engine,),
+        predict=predict,
+    )
+    before = headline_rows(
+        measured_residuals,
+        context=measured_context,
+        tier="measured",
+        engines=(engine,),
+    )
+    after = headline_rows(
+        combined_residuals,
+        context=combined_context,
+        tier="measured",
+        engines=(engine,),
+    )
+    assert before == after
+    thermochemistry = next(
+        row
+        for row in after
+        if row["rail"] == Rail.THERMOCHEMISTRY.value
+        and row["engine"] == engine.value
+    )
+    assert (
+        thermochemistry["n_candidates"],
+        thermochemistry["n_scored"],
+        thermochemistry["n_inside_band"],
+    ) == (1, 1, 1)
+
+
 def test_pyrolysis_yield_keeps_residual_without_robinot_floor() -> None:
     """n=2 same-rig O2 scatter is not a sourced agreement band."""
 
@@ -4639,7 +5049,7 @@ def test_compilation_pin_join_uses_sidecar_not_engine_residuals() -> None:
         [_pin_test_record("nasa_cea_9")],
         compilation_comparisons=[
             {
-                "reference_id": "pin-ref",
+                "reference_id": "pin-ref#t1100v1.03",
                 "quantity": "delta_fG",
                 "comparison_channel": "nasa_cea_9",
                 "comparison_key": "janaf::record:T=1100::nasa_cea_9::delta_fG_kJ_mol",

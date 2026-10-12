@@ -91,6 +91,8 @@ observations:
     note: Pound, G. M. (1972), J. Phys. Chem. Ref. Data 1, 135-146, Table 1
     record: chromium_solid_langmuir_knudsen
   read_from: unknown:REF-040
+  derived_from:
+  - kems-003-pound-1972::pound_1972_cr_solid_alpha_mccabe
 - observation_id: iron_olivine_kems
   experiment_id: a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab::REF-016
   identity:
@@ -281,3 +283,6 @@ observations:
         note: Fedkin et al. (2006), Geochim. Cosmochim. Acta 70, 206-223; value tabulated with uncertainty by Richter et al.
           (2011), Meteorit. Planet. Sci. 46
         record: potassium_silicate_vacuum
+  derived_from:
+  - kems-005-fedkin-2006::fedkin_2006_k_yu_langmuir
+  - kems-005-fedkin-2006::fedkin_2006_k_class_b1

@@ -81,9 +81,9 @@ observations:
       reason: unmapped regime 'mixed_kms_tms'
     original_method_class: mixed_kms_tms
   admission:
-    status: superseded
-    reason: superseded by a later observation in the same extract
-    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_alpha_absence_audited
+    status: rejected
+    reason: NBSIR 83-2731 reports KMS/TMS equilibrium partial pressures and activities of alkali metaborates. No evaporation
+      or condensation coefficient α is tabulated or plotted.
     decided_by:
       worker: hunt-RH-48
       date: '2026-09-06'
@@ -576,19 +576,14 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: superseded
-    reason: superseded by a later observation in the same extract
-    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_csbo2_fit_quoted
-    decided_by:
-      worker: extract-supersedes
-      date: unspecified
-      evidence:
-        published_page: 45
-        pdf_page_index: 51
-        figure: '19'
-        note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by two
-          (average of Series I and II).
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls::T=1100.0:h=e93daf08d31a
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 45
@@ -724,19 +719,14 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: superseded
-    reason: superseded by a later observation in the same extract
-    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_csbo2_fit_quoted
-    decided_by:
-      worker: extract-supersedes
-      date: unspecified
-      evidence:
-        published_page: 45
-        pdf_page_index: 51
-        figure: '19'
-        note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by two
-          (average of Series I and II).
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls::T=1200.0:h=ad8dcf297945
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 45
@@ -872,19 +862,14 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: superseded
-    reason: superseded by a later observation in the same extract
-    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_csbo2_fit_quoted
-    decided_by:
-      worker: extract-supersedes
-      date: unspecified
-      evidence:
-        published_page: 45
-        pdf_page_index: 51
-        figure: '19'
-        note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by two
-          (average of Series I and II).
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls::T=1250.0:h=ae3b69ee8db3
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 45
@@ -1020,19 +1005,14 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: superseded
-    reason: superseded by a later observation in the same extract
-    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_csbo2_fit_quoted
-    decided_by:
-      worker: extract-supersedes
-      date: unspecified
-      evidence:
-        published_page: 45
-        pdf_page_index: 51
-        figure: '19'
-        note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by two
-          (average of Series I and II).
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls::T=1300.0:h=de101914ca94
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 45
@@ -1168,19 +1148,14 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: superseded
-    reason: superseded by a later observation in the same extract
-    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_csbo2_fit_quoted
-    decided_by:
-      worker: extract-supersedes
-      date: unspecified
-      evidence:
-        published_page: 45
-        pdf_page_index: 51
-        figure: '19'
-        note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by two
-          (average of Series I and II).
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls::T=1400.0:h=7f94aad0bd5e
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 45
@@ -1316,19 +1291,14 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: superseded
-    reason: superseded by a later observation in the same extract
-    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_csbo2_fit_quoted
-    decided_by:
-      worker: extract-supersedes
-      date: unspecified
-      evidence:
-        published_page: 45
-        pdf_page_index: 51
-        figure: '19'
-        note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by two
-          (average of Series I and II).
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls::T=1500.0:h=65a15c4273c0
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 45
@@ -1464,19 +1434,14 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: superseded
-    reason: superseded by a later observation in the same extract
-    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_csbo2_fit_quoted
-    decided_by:
-      worker: extract-supersedes
-      date: unspecified
-      evidence:
-        published_page: 45
-        pdf_page_index: 51
-        figure: '19'
-        note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by two
-          (average of Series I and II).
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls::T=1600.0:h=90d7a7af205a
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 45
@@ -1612,18 +1577,14 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: superseded
-    reason: superseded by a later observation in the same extract
-    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_libo2_fit_quoted
-    decided_by:
-      worker: extract-supersedes
-      date: unspecified
-      evidence:
-        published_page: 45
-        pdf_page_index: 51
-        figure: '19'
-        note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1000.0:h=c368d21e3159
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 45
@@ -1755,18 +1716,14 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: superseded
-    reason: superseded by a later observation in the same extract
-    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_libo2_fit_quoted
-    decided_by:
-      worker: extract-supersedes
-      date: unspecified
-      evidence:
-        published_page: 45
-        pdf_page_index: 51
-        figure: '19'
-        note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1100.0:h=79ea37904bcc
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 45
@@ -1898,18 +1855,14 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: superseded
-    reason: superseded by a later observation in the same extract
-    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_libo2_fit_quoted
-    decided_by:
-      worker: extract-supersedes
-      date: unspecified
-      evidence:
-        published_page: 45
-        pdf_page_index: 51
-        figure: '19'
-        note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1200.0:h=2db4dec5147b
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 45
@@ -2041,18 +1994,14 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: superseded
-    reason: superseded by a later observation in the same extract
-    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_libo2_fit_quoted
-    decided_by:
-      worker: extract-supersedes
-      date: unspecified
-      evidence:
-        published_page: 45
-        pdf_page_index: 51
-        figure: '19'
-        note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1250.0:h=297af26062cf
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 45
@@ -2184,18 +2133,14 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: superseded
-    reason: superseded by a later observation in the same extract
-    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_libo2_fit_quoted
-    decided_by:
-      worker: extract-supersedes
-      date: unspecified
-      evidence:
-        published_page: 45
-        pdf_page_index: 51
-        figure: '19'
-        note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1300.0:h=47be77b8b03a
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 45
@@ -2327,18 +2272,14 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: superseded
-    reason: superseded by a later observation in the same extract
-    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_libo2_fit_quoted
-    decided_by:
-      worker: extract-supersedes
-      date: unspecified
-      evidence:
-        published_page: 45
-        pdf_page_index: 51
-        figure: '19'
-        note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1400.0:h=91eba2cdbb09
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 45
@@ -2470,18 +2411,14 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: superseded
-    reason: superseded by a later observation in the same extract
-    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_libo2_fit_quoted
-    decided_by:
-      worker: extract-supersedes
-      date: unspecified
-      evidence:
-        published_page: 45
-        pdf_page_index: 51
-        figure: '19'
-        note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1423.15:h=cc49cab0fda1
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 45
@@ -2613,18 +2550,14 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: superseded
-    reason: superseded by a later observation in the same extract
-    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_libo2_fit_quoted
-    decided_by:
-      worker: extract-supersedes
-      date: unspecified
-      evidence:
-        published_page: 45
-        pdf_page_index: 51
-        figure: '19'
-        note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1500.0:h=f4b5fc597850
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 45
@@ -2756,18 +2689,14 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: superseded
-    reason: superseded by a later observation in the same extract
-    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_libo2_fit_quoted
-    decided_by:
-      worker: extract-supersedes
-      date: unspecified
-      evidence:
-        published_page: 45
-        pdf_page_index: 51
-        figure: '19'
-        note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1600.0:h=302a07b5bab6
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 45
@@ -2900,19 +2829,14 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: superseded
-    reason: superseded by a later observation in the same extract
-    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_nabo2_fit_quoted
-    decided_by:
-      worker: extract-supersedes
-      date: unspecified
-      evidence:
-        published_page: 45
-        pdf_page_index: 51
-        figure: '19'
-        note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
-          equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls::T=1000.0:h=ab17e525982e
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 45
@@ -3049,19 +2973,14 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: superseded
-    reason: superseded by a later observation in the same extract
-    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_nabo2_fit_quoted
-    decided_by:
-      worker: extract-supersedes
-      date: unspecified
-      evidence:
-        published_page: 45
-        pdf_page_index: 51
-        figure: '19'
-        note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
-          equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls::T=1100.0:h=0b0d048df3fd
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 45
@@ -3198,19 +3117,14 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: superseded
-    reason: superseded by a later observation in the same extract
-    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_nabo2_fit_quoted
-    decided_by:
-      worker: extract-supersedes
-      date: unspecified
-      evidence:
-        published_page: 45
-        pdf_page_index: 51
-        figure: '19'
-        note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
-          equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls::T=1200.0:h=f00c3544c7ab
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 45
@@ -3347,19 +3261,14 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: superseded
-    reason: superseded by a later observation in the same extract
-    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_nabo2_fit_quoted
-    decided_by:
-      worker: extract-supersedes
-      date: unspecified
-      evidence:
-        published_page: 45
-        pdf_page_index: 51
-        figure: '19'
-        note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
-          equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls::T=1250.0:h=1c52d5bef45c
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 45
@@ -3496,19 +3405,14 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: superseded
-    reason: superseded by a later observation in the same extract
-    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_nabo2_fit_quoted
-    decided_by:
-      worker: extract-supersedes
-      date: unspecified
-      evidence:
-        published_page: 45
-        pdf_page_index: 51
-        figure: '19'
-        note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
-          equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls::T=1300.0:h=bea99e58d80f
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 45
@@ -3645,19 +3549,14 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: superseded
-    reason: superseded by a later observation in the same extract
-    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_nabo2_fit_quoted
-    decided_by:
-      worker: extract-supersedes
-      date: unspecified
-      evidence:
-        published_page: 45
-        pdf_page_index: 51
-        figure: '19'
-        note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
-          equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls::T=1400.0:h=a06ab10e3887
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 45
@@ -3794,19 +3693,14 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: superseded
-    reason: superseded by a later observation in the same extract
-    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_nabo2_fit_quoted
-    decided_by:
-      worker: extract-supersedes
-      date: unspecified
-      evidence:
-        published_page: 45
-        pdf_page_index: 51
-        figure: '19'
-        note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
-          equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls::T=1423.15:h=43868802bb86
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 45
@@ -3943,19 +3837,14 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: superseded
-    reason: superseded by a later observation in the same extract
-    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_nabo2_fit_quoted
-    decided_by:
-      worker: extract-supersedes
-      date: unspecified
-      evidence:
-        published_page: 45
-        pdf_page_index: 51
-        figure: '19'
-        note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
-          equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls::T=1500.0:h=abddf66e4845
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 45
@@ -4092,19 +3981,14 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: superseded
-    reason: superseded by a later observation in the same extract
-    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_nabo2_fit_quoted
-    decided_by:
-      worker: extract-supersedes
-      date: unspecified
-      evidence:
-        published_page: 45
-        pdf_page_index: 51
-        figure: '19'
-        note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
-          equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls::T=1600.0:h=966c02c5f618
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 45
@@ -4808,9 +4692,9 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: superseded
-    reason: superseded by a later observation in the same extract
-    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_o2_figure_only_quoted
+    status: rejected
+    reason: O2 P(T) exists only as Fig. 5 plate scatter plus an unpublished LS (five lowest-T points rejected). No numeric
+      table or printed A,B.
     decided_by:
       worker: hunt-RH-48
       date: '2026-09-06'

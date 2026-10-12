@@ -39,9 +39,9 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: superseded
-    reason: superseded by a later observation in the same extract
-    superseded_by: kems-138-bischof-2023::bischof_2023_fig5_ga_psat_figure_only_deep4_quoted
+    status: rejected
+    reason: Full P(T) series exists only as Fig. 5; not digitised this round. Printed 1752 K points are in bischof_2023_psat_ga_1752k
+      / _gao_ / _ga2o_.
     decided_by:
       worker: wave-W2-kems-138-bischof-2023
       date: '2026-09-06'
@@ -153,9 +153,8 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: superseded
-    reason: superseded by a later observation in the same extract
-    superseded_by: kems-138-bischof-2023::bischof_2023_fig6_in_psat_figure_only_deep4_quoted
+    status: rejected
+    reason: Full P(T) series exists only as Fig. 6; not digitised this round.
     decided_by:
       worker: wave-W2-kems-138-bischof-2023
       date: '2026-09-06'

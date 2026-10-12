@@ -96,6 +96,10 @@ class EngineWorkerRemoteError(RuntimeError):
         self.remote_traceback = remote_traceback
 
 
+class EngineWorkerPoolLifecycleError(RuntimeError):
+    """The pool cannot accept work because its lifecycle has ended."""
+
+
 class EngineWorkerUnavailable(RuntimeError):
     """Parent-side: the isolated worker handle is absent after start.
 
@@ -110,6 +114,21 @@ class EngineWorkerUnavailable(RuntimeError):
     def __init__(self, worker_name: str) -> None:
         self.worker_name = str(worker_name)
         super().__init__(f'{self.worker_name} worker is unavailable')
+
+
+class EngineWorkerDied(RuntimeError):
+    """The worker exited or hit EOF before returning a result.
+
+    Raised by the pool itself, only for that event. ``phase`` is
+    ``start`` (pre-ready during construction), ``restart`` (pre-ready
+    inside ``call``), or ``call`` (died while a request was in flight).
+    Other exceptions are not rewritten into this type.
+    """
+
+    def __init__(self, phase: str, detail: str) -> None:
+        self.phase = phase
+        self.detail = str(detail)
+        super().__init__(self.detail)
 
 
 class EngineWorkerTimeout(TimeoutError):
@@ -419,13 +438,20 @@ class WarmEngineWorker:
                 if parent.poll(min(ENGINE_WORKER_CANCEL_POLL_S, remaining)):
                     break
             message = parent.recv()
-        except (EOFError, OSError, TimeoutError):
+        except (EOFError, OSError, TimeoutError) as exc:
             self._discard_current(
                 diagnostic=False,
                 expected_process=process,
                 expected_connection=parent,
             )
-            raise
+            # EngineWorkerTimeout stays itself. EOF and a dead pipe are
+            # the worker exiting before ready.
+            if isinstance(exc, TimeoutError):
+                raise
+            raise EngineWorkerDied(
+                'start',
+                f'{type(exc).__name__}: {exc}',
+            ) from exc
         if message[0] == 'timeout':
             self._discard_current(
                 diagnostic=False,
@@ -491,7 +517,12 @@ class WarmEngineWorker:
             # its own budget — never let the tighter one strangle the
             # other. The call wall below still bounds the job itself.
             t_start = time.monotonic()
-            self.start()
+            try:
+                self.start()
+            except EngineWorkerDied as exc:
+                # Construction and this restart share start(); the phase
+                # records which caller observed the pre-ready death.
+                raise EngineWorkerDied('restart', exc.detail) from exc.__cause__
             _pool_debug(
                 f'{self.name}: cold start ok in '
                 f'{time.monotonic() - t_start:.2f}s pid='
@@ -534,8 +565,10 @@ class WarmEngineWorker:
                         and self.connection is connection
                     )
                 if not current:
-                    raise RuntimeError(
-                        f'{self.name} worker exited without a result'
+                    # In-flight state loss is worker death, not a local error.
+                    raise EngineWorkerDied(
+                        'call',
+                        f'{self.name} worker exited without a result',
                     )
                 poll_remaining = deadline - time.monotonic()
                 if poll_remaining <= 0.0:
@@ -569,8 +602,9 @@ class WarmEngineWorker:
                 expected_process=process,
                 expected_connection=connection,
             )
-            raise RuntimeError(
-                f'{self.name} worker exited without a result'
+            raise EngineWorkerDied(
+                'call',
+                f'{self.name} worker exited without a result',
             ) from exc
         with self._state_lock:
             current = (
@@ -579,7 +613,12 @@ class WarmEngineWorker:
                 and self.connection is connection
             )
         if not current:
-            raise RuntimeError(f'{self.name} worker exited without a result')
+            # The result arrived after the slot was dropped. Same death
+            # as a mid-call EOF: the pool owns it.
+            raise EngineWorkerDied(
+                'call',
+                f'{self.name} worker exited without a result',
+            )
         if message[0] == 'ok':
             return message[1]
         if message[0] == 'timeout':
@@ -892,7 +931,9 @@ class EngineWorkerPool:
     def submit(self, request: Any, *, timeout_s: Optional[float] = None) -> Future:
         with self._lifecycle_lock:
             if self._closed:
-                raise RuntimeError('engine worker pool is closed')
+                raise EngineWorkerPoolLifecycleError(
+                    'engine worker pool is closed'
+                )
             # A queued item MUST have someone who will run it. `timeout_s` is
             # not a wall on this call -- it is stashed in the queue item and
             # enforced later by `_consume` -> `worker.call`. So the wall is
@@ -915,15 +956,14 @@ class EngineWorkerPool:
             # long queue wait keeps every thread alive. It fires only when no
             # thread remains that could ever complete the future.
             #
-            # Deliberately a plain RuntimeError, matching the `is closed`
-            # guard immediately above -- both are lifecycle refusals of the
-            # same kind. NOT EngineWorkerUnavailable: that type is read
+            # This is a pool lifecycle refusal. It is NOT
+            # EngineWorkerUnavailable: that type is read
             # downstream as engine ABSENCE and routes to a fallback, which
             # would convert this loud refusal into a quiet substitution of
             # analytical curves for native results. A hang is bad; wrong
             # numbers that nobody notices are worse.
             if not any(thread.is_alive() for thread in self._threads):
-                raise RuntimeError(
+                raise EngineWorkerPoolLifecycleError(
                     f'engine worker pool has no live consumer to run this '
                     f'request ({len(self._threads)} slot(s), all exited); '
                     f'submitting would leave the future permanently pending'

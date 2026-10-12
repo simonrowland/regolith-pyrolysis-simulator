@@ -286,7 +286,10 @@ def test_provider_rejects_ec_sample_without_residual_liquid_composition():
 
     assert result.status == 'not_converged'
     assert result.transition is None
-    assert any('lacks residual liquid composition' in w for w in result.warnings)
+    assert any(
+        'lacks residual liquid composition' in warning
+        for warning in result.warnings
+    )
 
 
 @pytest.mark.parametrize('mode', ('thermoengine', 'python_api'))

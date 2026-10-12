@@ -23,6 +23,10 @@ from simulator.chemistry.kernel.capabilities import CapabilityProfile
 from simulator.chemistry.kernel.dto import IntentRequest, IntentResult
 from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.corpus_version import current_corpus_version
+from simulator.fe_redox import (
+    KRESS91_FO2_KEY_REFERENCE_T_K,
+    kress91_referenced_log_fO2,
+)
 from simulator.config import (
     DEFAULT_ALPHAMELTS_MODEL,
     resolve_alphamelts_python_api_model,
@@ -1533,6 +1537,158 @@ def test_pt0_gate_curve_key_is_tstd_aligned_across_isochemical_ramp(
 
     assert redox_key != capture_key
     assert redox_key["controls"]["log_fO2"] != capture_key["controls"]["log_fO2"]
+
+
+def test_pt0_production_gate_curve_cold_replays_across_isochemical_ramp(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "pt1-production-gate-ramp.db"
+    curve = {
+        "source": "unit-test",
+        "solidus_T_C": 1210.0,
+        "liquidus_T_C": 1320.0,
+        "path": ((1210.0, 0.0), (1320.0, 1.0)),
+    }
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    capture_sim = _build_pt0_sim(capture)
+    capture_sim.start_campaign(CampaignPhase.C2A_STAGED)
+    capture_sim.melt.temperature_C = 1450.0
+    capture_sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
+    capture_sim.melt.oxygen_reservoir.reference_T_K = 1723.15
+    capture_sim._sync_oxygen_reservoir_mirror()
+    capture_redox_key_fO2_log = capture_sim._freeze_gate_redox_key_fO2_log()
+    capture_local_key = capture_sim._freeze_gate_cache_key(
+        pressure_bar=capture_sim.melt.p_total_mbar / 1000.0,
+        fO2_log=capture_redox_key_fO2_log,
+    )
+    capture_sim._freeze_gate_liquid_fraction_cache = {
+        "key": capture_local_key,
+        "curve": curve,
+    }
+
+    assert capture_sim._freeze_gate_curve() == curve
+    capture_key = capture.capture_sequence[-1]["key"]
+    capture_controls = capture_key["controls"]
+    assert capture_controls["T_K"] == pytest.approx(298.15)
+    assert capture_redox_key_fO2_log == pytest.approx(
+        capture_controls["log_fO2"],
+        abs=ControlQuantization.PRODUCTION.log_fo2_quantum / 2.0,
+        rel=0.0,
+    )
+    assert capture_local_key[2] == round(capture_redox_key_fO2_log)
+
+    replay = PT0DeterminismStore("replay", db_path=db_path)
+    replay_sim = _build_pt0_sim(replay)
+    replay_sim.start_campaign(CampaignPhase.C2A_STAGED)
+    replay_sim.melt.temperature_C = 1450.0
+    replay_sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
+    replay_sim.melt.oxygen_reservoir.reference_T_K = 1723.15
+    replay_sim._sync_oxygen_reservoir_mirror()
+    assert replay_sim._freeze_gate_curve() == curve
+    replay_controls = replay.replay_sequence[-1]["key"]["controls"]
+    assert replay_controls == capture_controls
+
+    replay_sim.melt.temperature_C = 1600.0
+    replay_sim._re_reference_melt_fO2_to_temperature(1873.15)
+    replay_redox_key_fO2_log = replay_sim._freeze_gate_redox_key_fO2_log()
+    replay_local_key = replay_sim._freeze_gate_cache_key(
+        pressure_bar=replay_sim.melt.p_total_mbar / 1000.0,
+        fO2_log=replay_redox_key_fO2_log,
+    )
+    replay_sim._freeze_gate_liquid_fraction_cache = None
+    replay_sim._freeze_gate_liquid_fraction_curve_memo = {}
+
+    assert replay_sim._melt_redox_liquidus_gate_curve() == curve
+    replay_key = replay.replay_sequence[-1]["key"]
+    replay_controls = replay_key["controls"]
+    assert replay_controls == capture_controls
+    assert replay_redox_key_fO2_log == pytest.approx(
+        replay_controls["log_fO2"],
+        abs=ControlQuantization.PRODUCTION.log_fo2_quantum / 2.0,
+        rel=0.0,
+    )
+    assert replay_local_key == capture_local_key
+    assert replay_local_key[2] == round(replay_redox_key_fO2_log)
+
+
+def test_pt0_gate_curve_rekeys_from_live_fo2_after_first_liquid_seed(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "pt1-preseed-gate-rekey.db"
+    curve = {
+        "source": "unit-test",
+        "solidus_T_C": 1210.0,
+        "liquidus_T_C": 1320.0,
+        "path": ((1210.0, 0.0), (1320.0, 1.0)),
+    }
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    capture_sim = _build_pt0_sim(capture)
+    capture_sim.start_campaign(CampaignPhase.C2A_STAGED)
+    capture_sim.melt.temperature_C = 1450.0
+    capture_sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
+    capture_sim.melt.oxygen_reservoir.reference_T_K = None
+    capture_sim._sync_oxygen_reservoir_mirror()
+    preseed_redox_key_fO2_log = capture_sim._freeze_gate_redox_key_fO2_log()
+    preseed_local_key = capture_sim._freeze_gate_cache_key(
+        pressure_bar=capture_sim.melt.p_total_mbar / 1000.0,
+        fO2_log=preseed_redox_key_fO2_log,
+    )
+    capture_sim._freeze_gate_liquid_fraction_cache = {
+        "key": preseed_local_key,
+        "curve": curve,
+    }
+
+    assert capture_sim._freeze_gate_curve() == curve
+    preseed_controls = capture.capture_sequence[-1]["key"]["controls"]
+    assert preseed_controls["log_fO2"] == pytest.approx(-9.0)
+    assert preseed_controls["T_K"] == pytest.approx(298.15)
+    assert preseed_redox_key_fO2_log == pytest.approx(
+        preseed_controls["log_fO2"],
+        abs=ControlQuantization.PRODUCTION.log_fo2_quantum / 2.0,
+        rel=0.0,
+    )
+    assert preseed_local_key[2] == round(preseed_redox_key_fO2_log)
+
+    replay = PT0DeterminismStore("replay", db_path=db_path)
+    replay_sim = _build_pt0_sim(replay)
+    replay_sim.start_campaign(CampaignPhase.C2A_STAGED)
+    replay_sim.melt.temperature_C = 1450.0
+    replay_sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
+    replay_sim.melt.oxygen_reservoir.reference_T_K = None
+    replay_sim._sync_oxygen_reservoir_mirror()
+    assert replay_sim._freeze_gate_curve() == curve
+    assert replay.replay_sequence[-1]["key"]["controls"] == preseed_controls
+
+    replay_sim._re_reference_melt_fO2_to_temperature(1723.15)
+    postseed_redox_key_fO2_log = replay_sim._freeze_gate_redox_key_fO2_log()
+    postseed_local_key = replay_sim._freeze_gate_cache_key(
+        pressure_bar=replay_sim.melt.p_total_mbar / 1000.0,
+        fO2_log=postseed_redox_key_fO2_log,
+    )
+    replay_sim._freeze_gate_liquid_fraction_cache = None
+    replay_sim._freeze_gate_liquid_fraction_curve_memo = {}
+
+    with pytest.raises(PT0CacheMiss):
+        replay_sim._melt_redox_liquidus_gate_curve()
+
+    postseed_controls = replay.replay_sequence[-1]["key"]["controls"]
+    expected_postseed_fO2 = kress91_referenced_log_fO2(
+        -9.0,
+        reference_T_K=1723.15,
+        target_T_K=KRESS91_FO2_KEY_REFERENCE_T_K,
+    )
+    assert postseed_controls["log_fO2"] == pytest.approx(
+        expected_postseed_fO2,
+        abs=ControlQuantization.PRODUCTION.log_fo2_quantum / 2.0,
+        rel=0.0,
+    )
+    assert postseed_redox_key_fO2_log == pytest.approx(
+        postseed_controls["log_fO2"],
+        abs=ControlQuantization.PRODUCTION.log_fo2_quantum / 2.0,
+        rel=0.0,
+    )
+    assert postseed_local_key[2] == round(postseed_redox_key_fO2_log)
+    assert postseed_controls["log_fO2"] != preseed_controls["log_fO2"]
 
 
 def test_pt2_equilibrium_provider_id_is_namespace_metadata_only() -> None:

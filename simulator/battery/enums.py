@@ -189,6 +189,7 @@ class NoticeKind(StrEnum):
     OUT_OF_CERTIFIED_BAND = "out_of_certified_band"
     DERIVATION_USES_COMPILATION = "derivation_uses_compilation"
     COMPOSITION_PROJECTED = "composition_projected"
+    TOTAL_IRON_REPORTED_AS_FEO = "total_iron_reported_as_feo"
     PRESSURE_PROVENANCE_UNKNOWN = "pressure_provenance_unknown"
     SOURCE_DISAGREEMENT = "source_disagreement"
     # An input was left out because this row does not take it. The reason
@@ -331,6 +332,7 @@ class AmountBasis(StrEnum):
 
 class MethodToken(StrEnum):
     KNUDSEN_EFFUSION = "knudsen_effusion"
+    STATIC_EQUILIBRIUM = "static_equilibrium"
     LANGMUIR_FREE_EVAPORATION = "langmuir_free_evaporation"
     TRANSPIRATION = "transpiration"
     TGA = "tga"
