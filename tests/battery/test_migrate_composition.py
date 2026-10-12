@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from collections import Counter
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
@@ -13,7 +14,7 @@ import pytest
 
 from simulator.battery import migrate as migrate_module
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
-from simulator.battery.enums import AmountBasis, NoticeKind
+from simulator.battery.enums import AmountBasis, NoticeKind, Quantity
 from simulator.battery.migrate import (
     Migrator,
     REPO_ROOT,
@@ -81,6 +82,81 @@ def test_wt_percent_conversion_handles_swept_species_and_feot_alias() -> None:
     assert "FeOT" not in components
     assert oxide_molar_mass("FeOT") == oxide_molar_mass("FeO")
     assert abs(sum(components.values()) - Decimal("1")) < Decimal("1e-27")
+
+
+def test_partial_wt_percent_vector_is_flagged_without_changing_typed_ratios() -> None:
+    converted = wt_pct_to_mole_fraction(
+        {"Al2O3": Decimal("60"), "CaO": Decimal("20")}
+    )
+
+    assert converted.proxy_flag == "partial_vector:typed_sum=80wt%"
+    assert dict(converted.components) == {
+        "Al2O3": Decimal("0.6226371420844516107408049923"),
+        "CaO": Decimal("0.3773628579155483892591950077"),
+    }
+
+
+def test_complete_wt_percent_composition_keeps_its_previous_serialized_value() -> None:
+    converted = wt_pct_to_mole_fraction(
+        {"SiO2": Decimal("60"), "MgO": Decimal("40")}
+    )
+
+    assert converted.proxy_flag is None
+    assert to_plain(converted) == {
+        "basis": "printed_oxides",
+        "components": [
+            ["SiO2", "0.5015472170832676561113000772"],
+            ["MgO", "0.4984527829167323438886999229"],
+        ],
+        "amount_basis": "mole_fraction",
+    }
+
+
+@pytest.mark.parametrize(
+    ("typed_sum", "expected_flag"),
+    (("98", None), ("97.999", "partial_vector:typed_sum=97.999wt%")),
+)
+def test_partial_composition_cutoff_is_98_wt_percent(
+    typed_sum: str, expected_flag: str | None
+) -> None:
+    converted = wt_pct_to_mole_fraction(
+        {"SiO2": Decimal(typed_sum), "MgO": Decimal("0")}
+    )
+
+    assert converted.proxy_flag == expected_flag
+
+
+def test_markova_partial_point_compositions_stay_located_and_flagged(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(
+        tmp_path, "kems-026-markova-1984.yaml", write=False
+    )
+    partial = []
+    for observation in result.observations.values():
+        point = (observation.point_conditions or {}).get("composition")
+        if (
+            point is not None
+            and point.state.is_value
+            and point.state.value.proxy_flag is not None
+            and point.state.value.proxy_flag.startswith("partial_vector:")
+        ):
+            partial.append(observation)
+
+    assert len(partial) == 12
+    assert all(
+        observation.identity.quantity.is_value
+        and observation.point_conditions["composition"].locator is not None
+        for observation in partial
+    )
+    assert Counter(
+        observation.identity.quantity.value.value for observation in partial
+    ) == Counter(
+        {
+            Quantity.RESIDUE_COMPONENT_COMPOSITION.value: 10,
+            Quantity.MASS_LOSS_FRACTION.value: 2,
+        }
+    )
 
 
 @pytest.mark.parametrize("iron_oxide", ("FeO", "Fe2O3"))

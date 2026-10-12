@@ -302,11 +302,14 @@ class Reaction:
 
 
 # Composition.proxy_flag tokens. Absent (None) means a printed analysis of the
-# point. ``composition_from_sample_catalog``: a catalogue proxy.
+# point. ``partial_vector:typed_sum=...wt%`` marks incomplete oxide coverage;
+# consumers that require a complete composition must refuse it.
+# ``composition_from_sample_catalog``: a catalogue proxy.
 # ``initial_charge_only``: the source prints the starting charge while the
 # datum describes a later (depleted) state; consumers may predict with it but
 # the residual is flagged (b-716).
 INITIAL_CHARGE_ONLY_PROXY_FLAG = "initial_charge_only"
+_PARTIAL_COMPOSITION_PROXY_PREFIX = "partial_vector:"
 
 
 @dataclass(frozen=True)
