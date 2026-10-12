@@ -723,83 +723,6 @@ def test_harness_ledgers_are_not_simulation_runtime_inputs() -> None:
     def is_battery_module(name: str) -> bool:
         return name == "simulator.battery" or name.startswith("simulator.battery.")
 
-    closure: set[str] = set()
-    parents: dict[str, tuple[str, int]] = {}
-    # Engines are loaded by name from PyrolysisSimulator's registration table,
-    # so their modules are runtime roots even though core.py's loop variable
-    # cannot create static import edges to them.
-    engine_roots = sorted(
-        module for module in files if module == "engines" or module.startswith("engines.")
-    )
-    pending = [*entry_modules, *engine_roots]
-    dynamic_sites: dict[str, int] = {}
-    while pending:
-        source = pending.pop()
-        if source in closure or source not in files:
-            continue
-        closure.add(source)
-        relpath, source_text = files[source]
-        tree = ast.parse(source_text, filename=relpath)
-        package = source if Path(relpath).name == "__init__.py" else source.rpartition(".")[0]
-        parts = source.split(".")
-        for parent_size in range(1, len(parts)):
-            parent = ".".join(parts[:parent_size])
-            if (
-                parent in files
-                and Path(files[parent][0]).name == "__init__.py"
-                and parent not in closure
-            ):
-                pending.append(parent)
-        imports, module_dynamic_sites = _imports(
-            tree, source, relpath, package, project_modules
-        )
-        dynamic_sites.update(module_dynamic_sites)
-        for target, line in imports:
-            parents.setdefault(target, (source, line))
-            if target not in closure:
-                pending.append(target)
-
-    # The site counts make any new computed import an explicit review point.
-    allowed_dynamic_sites = {
-        "simulator/core.py:PyrolysisSimulator._build_chemistry_kernel": 1,
-        "simulator/melt_backend/vaporock.py:_bootstrap_vaporock_worker": 1,
-        "simulator/melt_backend/vaporock.py:VapoRockBackend._import_vaporock": 1,
-        "simulator/optimize/__init__.py:__getattr__": 1,
-        "simulator/optimize/evaluate.py:_vapor_pressure_provider_code_fingerprint": 1,
-        "simulator/optimize/strategy/__init__.py:__getattr__": 1,
-    }
-    # These scoring-side modules statically import simulator.battery and are
-    # intentionally outside the simulation runtime closure.
-    # simulator/melt_backend/pure_phase_janaf_score.py
-    # simulator/diagnostic_helpers/gibbs_battery.py
-    # simulator/diagnostic_helpers/binary_pot_battery.py
-    assert dynamic_sites == allowed_dynamic_sites, (
-        "computed dynamic-import sites changed in simulation closure: "
-        f"found={dynamic_sites}, allowed={allowed_dynamic_sites}; a new legitimate "
-        "computed site must be added to the runtime driver after review, never by "
-        "relaxing the guard"
-    )
-
-    battery_reachable = sorted(
-        module for module in closure if is_battery_module(module)
-    )
-    chains = {}
-    for target in battery_reachable:
-        chain = [target]
-        current = target
-        seen = {current}
-        while current in parents and parents[current][0] not in seen:
-            parent, line = parents[current]
-            chain.append(f"{parent}:{line}")
-            seen.add(parent)
-            current = parent
-        chains[target] = list(reversed(chain))
-    assert not battery_reachable, (
-        "static simulation entry/engine import closure reaches a battery module; "
-        f"entries={entry_modules}, module_sources={chains}; remove the battery "
-        "dependency from the simulation run path"
-    )
-
     probe = r'''import builtins
 import importlib
 import importlib.abc
@@ -811,6 +734,8 @@ import sys
 requested = []
 site_requests = {}
 active_site = None
+lazy_maps = {}
+core_provider_registration_count = None
 project_modules = set(json.loads(os.environ["RAIL_PROJECT_MODULES"]))
 external_package_names = set(json.loads(os.environ["RAIL_EXTERNAL_PACKAGE_NAMES"]))
 optional_packages = external_package_names | {"optuna"}
@@ -873,19 +798,37 @@ def drive(site, action):
 
 def drive_optimizer_exports():
     package = real_import_module("simulator.optimize")
-    for name in tuple(package._LAZY_EXPORTS):
+    runtime_map = dict(package._LAZY_EXPORTS)
+    resolved = []
+    for name in runtime_map:
         try:
             getattr(package, name)
         except AttributeError:
             pass
+        else:
+            resolved.append(name)
+    lazy_maps["simulator.optimize.__getattr__"] = {
+        "keys": list(runtime_map),
+        "values": list(runtime_map.values()),
+        "resolved_keys": resolved,
+    }
 
 def drive_strategy_exports():
     package = real_import_module("simulator.optimize.strategy")
-    for name in tuple(package._LAZY_EXPORTS):
+    runtime_map = dict(package._LAZY_EXPORTS)
+    resolved = []
+    for name in runtime_map:
         try:
             getattr(package, name)
         except AttributeError:
             pass
+        else:
+            resolved.append(name)
+    lazy_maps["simulator.optimize.strategy.__getattr__"] = {
+        "keys": list(runtime_map),
+        "values": list(runtime_map.values()),
+        "resolved_keys": resolved,
+    }
 
 fingerprint_driver = {}
 def drive_provider_fingerprints():
@@ -906,8 +849,12 @@ def drive_provider_fingerprints():
     })
 
 def drive_core_registrations():
+    global core_provider_registration_count
     from simulator.core import PyrolysisSimulator
     simulator = PyrolysisSimulator(None, {}, {}, {})
+    core_provider_registration_count = len(
+        PyrolysisSimulator._BUILTIN_PROVIDER_REGISTRATIONS
+    )
     try:
         simulator._build_chemistry_kernel()
     except AttributeError:
@@ -916,7 +863,7 @@ def drive_core_registrations():
 def tolerate_missing_vaporock(action, error_prefix):
     try:
         action()
-    except RuntimeError as exc:
+    except ModuleNotFoundError as exc:
         if not str(exc).startswith(error_prefix):
             raise
 
@@ -956,6 +903,8 @@ print(json.dumps({
     "site_requests": site_requests,
     "loaded_project_modules": loaded_project_modules,
     "fingerprint_driver": fingerprint_driver,
+    "lazy_maps": lazy_maps,
+    "core_provider_registration_count": core_provider_registration_count,
 }))
 '''
     probe_env = os.environ.copy()
@@ -1064,6 +1013,119 @@ print(json.dumps({
         "not drive every registered provider id plus an unregistered fallback; "
         f"driver={fingerprint_driver}; add a new legitimate computed site to the "
         "driver after review"
+    )
+
+    lazy_sites = {
+        "simulator.optimize.__getattr__",
+        "simulator.optimize.strategy.__getattr__",
+    }
+    assert set(runtime["lazy_maps"]) == lazy_sites, (
+        "runtime probe did not capture every lazy-export map: "
+        f"found={sorted(runtime['lazy_maps'])}, expected={sorted(lazy_sites)}"
+    )
+    for site, lazy_map in runtime["lazy_maps"].items():
+        assert set(lazy_map["keys"]) == set(lazy_map["resolved_keys"]), (
+            f"{site} did not resolve every runtime lazy-export key; "
+            f"runtime keys={lazy_map['keys']}, resolved={lazy_map['resolved_keys']}"
+        )
+        assert set(lazy_map["values"]) <= set(requests_by_site[site]), (
+            f"{site} did not request every runtime lazy-export target; "
+            f"runtime targets={sorted(set(lazy_map['values']))}, "
+            f"requested={sorted(set(requests_by_site[site]))}"
+        )
+
+    core_site = "simulator.core.PyrolysisSimulator._build_chemistry_kernel"
+    core_requested_modules = set(requests_by_site[core_site])
+    assert len(core_requested_modules) == runtime["core_provider_registration_count"], (
+        f"{core_site} requested {len(core_requested_modules)} distinct provider "
+        "modules, but its runtime registration table contains "
+        f"{runtime['core_provider_registration_count']} rows: "
+        f"{sorted(core_requested_modules)}"
+    )
+
+    runtime_project_modules = {
+        request["name"] for request in requests if request["name"] in project_modules
+    } | set(runtime["loaded_project_modules"])
+    engine_roots = sorted(
+        module for module in files if module == "engines" or module.startswith("engines.")
+    )
+    pending = [*entry_modules, *engine_roots, *sorted(runtime_project_modules)]
+    closure: set[str] = set()
+    parents: dict[str, tuple[str, int]] = {}
+    dynamic_sites: dict[str, int] = {}
+    while pending:
+        source = pending.pop()
+        if source in closure or source not in files:
+            continue
+        closure.add(source)
+        relpath, source_text = files[source]
+        tree = ast.parse(source_text, filename=relpath)
+        package = source if Path(relpath).name == "__init__.py" else source.rpartition(".")[0]
+        parts = source.split(".")
+        for parent_size in range(1, len(parts)):
+            parent = ".".join(parts[:parent_size])
+            if (
+                parent in files
+                and Path(files[parent][0]).name == "__init__.py"
+                and parent not in closure
+            ):
+                pending.append(parent)
+        imports, module_dynamic_sites = _imports(
+            tree, source, relpath, package, project_modules
+        )
+        dynamic_sites.update(module_dynamic_sites)
+        for target, line in imports:
+            parents.setdefault(target, (source, line))
+            if target not in closure:
+                pending.append(target)
+
+    assert set(runtime["loaded_project_modules"]) <= closure, (
+        "static import closure omitted project modules loaded by the runtime probe: "
+        f"loaded={sorted(set(runtime['loaded_project_modules']) - closure)}"
+    )
+    assert len(closure) >= 236, (
+        f"static import closure regressed below the expected 236 modules: {len(closure)}"
+    )
+
+    # The site counts make any new computed import an explicit review point.
+    allowed_dynamic_sites = {
+        "simulator/core.py:PyrolysisSimulator._build_chemistry_kernel": 1,
+        "simulator/melt_backend/vaporock.py:_bootstrap_vaporock_worker": 1,
+        "simulator/melt_backend/vaporock.py:VapoRockBackend._import_vaporock": 1,
+        "simulator/optimize/__init__.py:__getattr__": 1,
+        "simulator/optimize/evaluate.py:_vapor_pressure_provider_code_fingerprint": 1,
+        "simulator/optimize/strategy/__init__.py:__getattr__": 1,
+    }
+    # These scoring-side modules statically import simulator.battery and are
+    # intentionally outside the simulation runtime closure.
+    # simulator/melt_backend/pure_phase_janaf_score.py
+    # simulator/diagnostic_helpers/gibbs_battery.py
+    # simulator/diagnostic_helpers/binary_pot_battery.py
+    assert dynamic_sites == allowed_dynamic_sites, (
+        "computed dynamic-import sites changed in simulation closure: "
+        f"found={dynamic_sites}, allowed={allowed_dynamic_sites}; a new legitimate "
+        "computed site must be added to the runtime driver after review, never by "
+        "relaxing the guard"
+    )
+
+    battery_reachable = sorted(
+        module for module in closure if is_battery_module(module)
+    )
+    chains = {}
+    for target in battery_reachable:
+        chain = [target]
+        current = target
+        seen = {current}
+        while current in parents and parents[current][0] not in seen:
+            parent, line = parents[current]
+            chain.append(f"{parent}:{line}")
+            seen.add(parent)
+            current = parent
+        chains[target] = list(reversed(chain))
+    assert not battery_reachable, (
+        "static simulation entry/engine import closure reaches a battery module; "
+        f"entries={entry_modules}, module_sources={chains}; remove the battery "
+        "dependency from the simulation run path"
     )
 
 
