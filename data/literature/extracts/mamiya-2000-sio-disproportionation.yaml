@@ -41,6 +41,60 @@ fidelity_samples:
     value: between 200 and 300 C
     locator: {page: 62, published_page: 56, pdf_page_index: 61, section: '3.5 In situ observation of the high-low transformation in cristobalite'}
     note: HT-XRD heating bracket; no midpoint is inferred.
+  - species: SiO
+    observation_id: mamiya_2000_fig3_8_cristobalite_reaction_times
+    field: points
+    value:
+      - T_C: 1000
+        time_hr: 20
+        point_conditions:
+          temperature: {state: {tag: value, value: 1000}, locator: {page: 53, published_page: 47, pdf_page_index: 52, figure: '3-8'}}
+      - T_C: 1100
+        time_hr: 20
+        point_conditions:
+          temperature: {state: {tag: value, value: 1100}, locator: {page: 53, published_page: 47, pdf_page_index: 52, figure: '3-8'}}
+      - T_C: 1200
+        time_hr: 10
+        point_conditions:
+          temperature: {state: {tag: value, value: 1200}, locator: {page: 53, published_page: 47, pdf_page_index: 52, figure: '3-8'}}
+      - T_C: 1300
+        time_hr: 2
+        point_conditions:
+          temperature: {state: {tag: value, value: 1300}, locator: {page: 53, published_page: 47, pdf_page_index: 52, figure: '3-8'}}
+      - T_C: 1350
+        time_hr: 1
+        point_conditions:
+          temperature: {state: {tag: value, value: 1350}, locator: {page: 53, published_page: 47, pdf_page_index: 52, figure: '3-8'}}
+      - T_C: 1400
+        time_hr: 0.1
+        point_conditions:
+          temperature: {state: {tag: value, value: 1400}, locator: {page: 53, published_page: 47, pdf_page_index: 52, figure: '3-8'}}
+    locator: {page: 53, published_page: 47, pdf_page_index: 52, figure: '3-8'}
+  - species: SiO
+    observation_id: mamiya_2000_fig4_14_rate_constants
+    field: points
+    value:
+      - T_C: 900
+        k_as_digitized: 0.58
+        point_conditions:
+          temperature: {state: {tag: value, value: 900}, locator: {page: 102, published_page: 96, pdf_page_index: 101, figure: '4-14'}}
+      - T_C: 1000
+        k_as_digitized: 4.2
+        point_conditions:
+          temperature: {state: {tag: value, value: 1000}, locator: {page: 102, published_page: 96, pdf_page_index: 101, figure: '4-14'}}
+      - T_C: 1100
+        k_as_digitized: 6.7
+        point_conditions:
+          temperature: {state: {tag: value, value: 1100}, locator: {page: 102, published_page: 96, pdf_page_index: 101, figure: '4-14'}}
+      - T_C: 1200
+        k_as_digitized: 12
+        point_conditions:
+          temperature: {state: {tag: value, value: 1200}, locator: {page: 102, published_page: 96, pdf_page_index: 101, figure: '4-14'}}
+      - T_C: 1300
+        k_as_digitized: 20
+        point_conditions:
+          temperature: {state: {tag: value, value: 1300}, locator: {page: 102, published_page: 96, pdf_page_index: 101, figure: '4-14'}}
+    locator: {page: 102, published_page: 96, pdf_page_index: 101, figure: '4-14'}
 species:
   SiO:
     observations: []
