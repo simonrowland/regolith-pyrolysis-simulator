@@ -642,6 +642,17 @@ def _k2o_authority_exclusion_for_pack_digest(
     return exclusion
 
 
+def openimcc_binding_selected_by_inputs(
+    *,
+    temperature_K: float,
+    controls: Mapping[str, Any],
+) -> bool:
+    mode = normalize_high_t_melt_activity(
+        controls.get("high_t_melt_activity", "openimcc")
+    )
+    return not (temperature_K <= VAPOROCK_T_MAX_K or mode != "openimcc")
+
+
 def _build_high_t_melt_activity_authority(
     *,
     composition_mol: Mapping[str, float],
@@ -657,11 +668,12 @@ def _build_high_t_melt_activity_authority(
     activity object for the eight flux oxides when this payload is successful.
     """
 
-    mode = normalize_high_t_melt_activity(
-        controls.get("high_t_melt_activity", "openimcc")
-    )
-    if temperature_K <= VAPOROCK_T_MAX_K or mode != "openimcc":
+    if not openimcc_binding_selected_by_inputs(
+        temperature_K=temperature_K,
+        controls=controls,
+    ):
         return None
+    mode = "openimcc"
 
     base: dict[str, Any] = {
         "schema": "high_t_melt_activity.v1",

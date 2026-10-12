@@ -47,12 +47,14 @@ INPUT_EXACT = {
 
 # Migration-code closure outside data/literature and simulator/battery: the
 # molar-mass table (atomic weights), the shared physical constants
-# (STANDARD_ATMOSPHERE_PA), and the JANAF formula parser validate.py uses.
+# (STANDARD_ATMOSPHERE_PA), the JANAF formula parser validate.py uses, and the
+# State/StateTag owner that battery records and enums re-export.
 CODE_INPUTS = (
     "simulator/accounting/exceptions.py",
     "simulator/accounting/formulas.py",
     "simulator/physical_constants.py",
     "simulator/reference_data/janaf.py",
+    "simulator/state_types.py",
 )
 
 
@@ -82,10 +84,15 @@ CODE_INPUTS = (
 #     hard_issues=3631). This acknowledges STORE outputs only; runtime effects on
 #     scores, refusals, and lineage labels are covered by the commits' tests,
 #     not by this regeneration.
+#   6c3b40660: State/StateTag move from simulator/battery to
+#     simulator/state_types.py with re-exports (b-672); class bodies unchanged,
+#     and a full regen on the rebased tip produced no store diff (0 store paths
+#     changed; observations 122164, works 276, experiments 3576, queue 77761,
+#     hard issues 3631).
 STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "1b78b5697", "574800443", "149df2858",
     "9bb0a22ce", "1d254d51e", "b8be6d576",
-    "d47e84bec",
+    "d47e84bec", "6c3b40660",
     "23df83343", "2bd2918e6", "34132a932",
 })
 

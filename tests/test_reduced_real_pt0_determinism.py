@@ -63,6 +63,21 @@ from tests.chemistry.conftest import _build_sim
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 
 
+@pytest.fixture(autouse=True)
+def _synthetic_binding_receipt_for_pt0_store_tests(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Give replay mechanics a test-only receipt, never a real engine pin."""
+    from tests.binding_admission_fixtures import install_synthetic_binding_receipt
+
+    install_synthetic_binding_receipt(
+        tmp_path,
+        monkeypatch,
+        bind_direct_backend=False,
+    )
+
+
 def _load_yaml(name: str) -> dict:
     return yaml.safe_load((DATA_DIR / name).read_text())
 
@@ -85,6 +100,35 @@ def _build_pt0_sim(store: PT0DeterminismStore | None):
     )
     sim.configure_pt0_determinism_store(store)
     return sim
+
+
+def _select_synthetic_gate_curve_binding(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator import engine_binding_admission as admission
+
+    identity = admission.BindingIdentity(
+        engine_id="synthetic-fake",
+        model_id="fixture-model-v1",
+        binding_revision="synthetic-r1",
+        transport="subprocess",
+    )
+    provenance = {
+        "binding_provenance_verifiable": True,
+        "test_fixture": "binding_admission_synthetic/synthetic-fake.json",
+    }
+    monkeypatch.setattr(
+        admission,
+        "selected_binding_identities",
+        lambda _sim, *, artifact, provider_role=None: (
+            (identity,) if artifact == "freeze_gate_curve" else ()
+        ),
+    )
+    monkeypatch.setattr(
+        admission,
+        "selected_binding_provenance",
+        lambda _identity, _sim: provenance,
+    )
 
 
 def _persistent_artifact_count(db_path: Path, artifact: str) -> int:
@@ -414,6 +458,41 @@ def test_pt2_db_path_none_keeps_write_through_inert() -> None:
     assert store.write_through_enabled is False
     assert store.cached_equilibrium(sim) is None
     assert store.summary()["persistent_store"] is None
+
+
+def test_malformed_receipt_identity_keeps_pt0_live_fill_cache_ineligible(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator import engine_binding_admission as admission
+    from simulator.engine_binding_admission import (
+        BindingIdentity,
+        binding_admission_run_notice,
+    )
+
+    identity = BindingIdentity(
+        engine_id="synthetic-fake",
+        model_id="fixture-model-v1",
+        binding_revision="synthetic-r1",
+        transport="subprocess",
+    )
+    receipt_path = admission.binding_receipt_path()
+    receipt = json.loads(receipt_path.read_text())
+    receipt["entries"][0]["identity"] = None
+    receipt_path.write_text(json.dumps(receipt))
+    monkeypatch.setattr(
+        admission,
+        "binding_identity_for_backend",
+        lambda _backend: identity,
+    )
+
+    store = PT0DeterminismStore("capture", db_path=tmp_path / "malformed.db")
+    sim = _build_pt0_sim(store)
+
+    assert store.cached_equilibrium(sim) is None
+    notice = binding_admission_run_notice(sim)
+    assert notice is not None
+    assert notice["notices"][0]["reason"] == "receipt invalid"
 
 
 def _run_capped_c2a(
@@ -977,6 +1056,22 @@ def test_magemin_shadow_fallback_under_alphamelts_config_excludes_engine_version
         )
         is None
     )
+
+
+def test_failed_version_getter_is_typed_pt1_provenance() -> None:
+    class BrokenVersionBackend:
+        def get_engine_version(self) -> str:
+            raise RuntimeError("version unavailable")
+
+    provenance = json.loads(
+        rrd._backend_version_for_key(BrokenVersionBackend())
+    )
+
+    assert provenance == {
+        "tag": "unknown",
+        "value": None,
+        "reason": "version getter failed: RuntimeError",
+    }
 
 
 def _c3a_ladder_key(
@@ -3117,6 +3212,200 @@ def test_pt1_capture_gate_curve_skips_non_cacheable_status(
     assert capture.last_cache_state == "live_fill"
     assert sim._last_reduced_real_cache_state == "live_fill"
     assert _persistent_artifact_count(db_path, "freeze_gate_curve") == 1
+
+
+def test_pt0_gate_memo_hit_does_not_capture_without_receipt(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from tests.binding_admission_fixtures import install_synthetic_binding_receipt
+    from simulator.engine_binding_admission import binding_receipt_path
+
+    install_synthetic_binding_receipt(
+        tmp_path,
+        monkeypatch,
+        bind_direct_backend=True,
+    )
+    _select_synthetic_gate_curve_binding(monkeypatch)
+    receipt_path = binding_receipt_path()
+    receipt_path.unlink()
+
+    db_path = tmp_path / "pt0-gate-memo-no-receipt.db"
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    sim = _build_pt0_sim(capture)
+    sim.start_campaign(CampaignPhase.C2A_STAGED)
+    curve = {
+        "source": "gate_liquid_fraction:fallback:synthetic-fake",
+        "status": "ok",
+        "solidus_T_C": 1210.0,
+        "liquidus_T_C": 1320.0,
+        "path": ((1210.0, 0.0), (1320.0, 1.0)),
+    }
+    provider_calls = []
+    sim._freeze_gate_curve_from_gate_dispatch = (
+        lambda reasons, *, fO2_log: provider_calls.append(fO2_log)
+        or dict(curve)
+    )
+    store_calls = []
+    persistent_put_calls = []
+    original_store = capture._store
+    original_put = capture.persistent_store.put
+
+    def record_store(*args, **kwargs):
+        store_calls.append((args, kwargs))
+        return original_store(*args, **kwargs)
+
+    def record_put(*args, **kwargs):
+        persistent_put_calls.append((args, kwargs))
+        return original_put(*args, **kwargs)
+
+    monkeypatch.setattr(capture, "_store", record_store)
+    monkeypatch.setattr(capture.persistent_store, "put", record_put)
+
+    first = sim._freeze_gate_curve()
+    second = sim._freeze_gate_curve()
+
+    assert first == second
+    assert len(provider_calls) == 1
+    assert store_calls == []
+    assert persistent_put_calls == []
+    assert _persistent_artifact_count(db_path, "freeze_gate_curve") == 0
+
+
+def test_pt0_gate_capture_with_receipt_covers_fresh_curve_and_memo_hit(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from tests.binding_admission_fixtures import install_synthetic_binding_receipt
+
+    install_synthetic_binding_receipt(
+        tmp_path,
+        monkeypatch,
+        bind_direct_backend=True,
+    )
+    _select_synthetic_gate_curve_binding(monkeypatch)
+    db_path = tmp_path / "pt0-gate-memo-with-receipt.db"
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    sim = _build_pt0_sim(capture)
+    sim.start_campaign(CampaignPhase.C2A_STAGED)
+    curve = {
+        "source": "gate_liquid_fraction:fallback:synthetic-fake",
+        "status": "ok",
+        "solidus_T_C": 1210.0,
+        "liquidus_T_C": 1320.0,
+        "path": ((1210.0, 0.0), (1320.0, 1.0)),
+    }
+    provider_calls = []
+    sim._freeze_gate_curve_from_gate_dispatch = (
+        lambda reasons, *, fO2_log: provider_calls.append(fO2_log)
+        or dict(curve)
+    )
+    capture_calls = []
+    original_capture = capture.capture_gate_curve
+
+    def record_capture(*args, **kwargs):
+        capture_calls.append((args, kwargs))
+        return original_capture(*args, **kwargs)
+
+    monkeypatch.setattr(capture, "capture_gate_curve", record_capture)
+
+    first = sim._freeze_gate_curve()
+    second = sim._freeze_gate_curve()
+
+    assert first == second
+    assert len(provider_calls) == 1
+    assert len(capture_calls) == 2
+    assert _persistent_artifact_count(db_path, "freeze_gate_curve") == 1
+
+
+def test_pt0_equilibrium_lookup_capture_and_replay_stay_receipt_gated(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from tests.binding_admission_fixtures import install_synthetic_binding_receipt
+    from simulator.engine_binding_admission import (
+        EngineBindingAdmissionError,
+        binding_receipt_path,
+    )
+
+    install_synthetic_binding_receipt(
+        tmp_path,
+        monkeypatch,
+        bind_direct_backend=True,
+    )
+    _select_synthetic_gate_curve_binding(monkeypatch)
+    db_path = tmp_path / "pt0-other-artifacts-receipt-gated.db"
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    sim = _build_pt0_sim(capture)
+    sim.start_campaign(CampaignPhase.C2A_STAGED)
+    curve = {
+        "source": "gate_liquid_fraction:fallback:synthetic-fake",
+        "status": "ok",
+        "solidus_T_C": 1210.0,
+        "liquidus_T_C": 1320.0,
+        "path": ((1210.0, 0.0), (1320.0, 1.0)),
+    }
+    capture.capture_gate_curve(
+        sim,
+        fO2_log=sim._compute_intrinsic_melt_fO2(),
+        curve=curve,
+    )
+    replay = capture.clone_for_replay()
+
+    receipt_path = binding_receipt_path()
+    receipt_path.unlink()
+    result = EquilibriumResult(
+        liquid_fraction=0.5,
+        vapor_pressures_Pa={"Fe": 1.0},
+        status="ok",
+    )
+    equilibrium_lookups = []
+    replay_lookups = []
+    replay_gate_lookups = []
+    monkeypatch.setattr(
+        capture,
+        "_lookup_optional",
+        lambda *args, **kwargs: equilibrium_lookups.append((args, kwargs)),
+    )
+    original_lookup = replay._lookup
+    original_gate_lookup = replay._lookup_first_available
+
+    def record_replay_lookup(*args, **kwargs):
+        replay_lookups.append((args, kwargs))
+        return original_lookup(*args, **kwargs)
+
+    def record_replay_gate_lookup(*args, **kwargs):
+        replay_gate_lookups.append((args, kwargs))
+        return original_gate_lookup(*args, **kwargs)
+
+    monkeypatch.setattr(replay, "_lookup", record_replay_lookup)
+    monkeypatch.setattr(
+        replay,
+        "_lookup_first_available",
+        record_replay_gate_lookup,
+    )
+    store_calls = []
+    original_store = capture._store
+
+    def record_store(*args, **kwargs):
+        store_calls.append((args, kwargs))
+        return original_store(*args, **kwargs)
+
+    monkeypatch.setattr(capture, "_store", record_store)
+
+    assert capture.cached_equilibrium(sim) is None
+    capture.capture_equilibrium(sim, result)
+    assert store_calls == []
+    assert equilibrium_lookups == []
+    with pytest.raises(EngineBindingAdmissionError, match="receipt missing"):
+        replay.replay_equilibrium(sim)
+    with pytest.raises(EngineBindingAdmissionError, match="receipt missing"):
+        replay.replay_gate_curve(
+            sim,
+            fO2_log=sim._compute_intrinsic_melt_fO2(),
+        )
+    assert replay_lookups == []
+    assert replay_gate_lookups == []
 
 
 def test_pt2_live_write_through_skips_unavailable_equilibrium_cells(

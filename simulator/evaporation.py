@@ -2027,6 +2027,8 @@ class EvaporationMixin:
         )
         store_getter = getattr(self, '_pt0_store', None)
         store = store_getter() if callable(store_getter) else None
+        from simulator.engine_binding_admission import gate_curve_memo_eligibility
+
         if store is not None and getattr(store, 'replay_enabled', False):
             curve = store.replay_gate_curve(self, fO2_log=fO2_log)
             self._record_composition_projected_liquidus_notice_from_curve(curve)
@@ -2037,6 +2039,7 @@ class EvaporationMixin:
             cache
             and cache.get('key') == key
             and isinstance(cached_curve, Mapping)
+            and gate_curve_memo_eligibility(self, cached_curve)
         ):
             curve = dict(cached_curve)
             self._record_composition_projected_liquidus_notice_from_curve(curve)
@@ -2058,7 +2061,10 @@ class EvaporationMixin:
         )
         if isinstance(shared_curve_cache, dict):
             process_cached = shared_curve_cache.get(key)
-            if isinstance(process_cached, Mapping):
+            if (
+                isinstance(process_cached, Mapping)
+                and gate_curve_memo_eligibility(self, process_cached)
+            ):
                 curve = dict(process_cached)
                 self._record_composition_projected_liquidus_notice_from_curve(curve)
                 self._freeze_gate_liquid_fraction_cache = {
@@ -2176,15 +2182,17 @@ class EvaporationMixin:
                 )
 
             self._record_composition_projected_liquidus_notice_from_curve(curve)
-            self._freeze_gate_liquid_fraction_cache = {
-                'key': key,
-                'curve': dict(curve),
-            }
-            if isinstance(shared_curve_cache, dict):
-                # Store a copy so later sim mutations of their local cache
-                # cannot corrupt the caller-owned memo used by sibling rows.
-                shared_curve_cache[key] = dict(curve)
-            cache_committed = True
+            cache_eligible = gate_curve_memo_eligibility(self, curve)
+            if cache_eligible:
+                self._freeze_gate_liquid_fraction_cache = {
+                    'key': key,
+                    'curve': dict(curve),
+                }
+                if isinstance(shared_curve_cache, dict):
+                    # Store a copy so later sim mutations of their local cache
+                    # cannot corrupt the caller-owned memo used by sibling rows.
+                    shared_curve_cache[key] = dict(curve)
+                cache_committed = True
             self._freeze_gate_cache_rebuild_count = (
                 int(getattr(self, '_freeze_gate_cache_rebuild_count', 0)) + 1
             )
