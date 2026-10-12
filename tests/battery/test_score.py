@@ -824,6 +824,79 @@ def test_plante_k_partial_pressure_rows_keep_registered_band_after_fresh_migrati
     assert not missing_or_changed, missing_or_changed[:5]
 
 
+@pytest.mark.parametrize(
+    ("source_name", "expected_rail"),
+    (
+        ("shornikov-1997-cao-alumina-vapor.yaml", Rail.VAPOUR),
+        (
+            "stolyarova-1996-cao-alumina-silica-kems.yaml",
+            Rail.SIO_EVOLUTION,
+        ),
+        (
+            "stolyarova-1996-cao-alumina-silica-kems.yaml",
+            Rail.VAPOUR,
+        ),
+    ),
+)
+def test_kems_partial_pressure_band_survives_unparseable_cell_notes(
+    tmp_path: Path, source_name: str, expected_rail: Rail
+) -> None:
+    """The source-wide KEMS pressure band survives cell-note parse refusals."""
+    from simulator.battery.enums import Quantity
+    from simulator.battery.score import (
+        _printed_uncertainty_band,
+        derive_kems_partial_pressure_band,
+        rail_for_quantity,
+        point_magnitude,
+        populate_numeric,
+    )
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    plante = _migrate_real_extract(
+        tmp_path / "plante", "kems-042-plante-1979.yaml"
+    )
+    target = _migrate_real_extract(tmp_path / "target", source_name)
+    observations = {**plante.observations, **target.observations}
+    experiments = {**plante.experiments, **target.experiments}
+    benches = {**plante.benches, **target.benches}
+    target_reference = next(
+        observation
+        for observation in target.observations.values()
+        if quantity_token(observation.identity) is Quantity.P_PARTIAL
+        and rail_for_quantity(
+            Quantity.P_PARTIAL,
+            species_formula=observation.identity.species.formula,
+        )
+        is expected_rail
+    )
+    band = derive_kems_partial_pressure_band(
+        observations, experiments, benches=benches
+    )
+    assert band is not None
+    assert band.value.quantize(Decimal("0.000001")) == Decimal("0.146128")
+    reference_value = point_magnitude(target_reference.value)
+    assert reference_value is not None
+    printed = _printed_uncertainty_band(
+        Quantity.P_PARTIAL,
+        target_reference.uncertainty,
+        reference_value,
+        source_observation=target_reference,
+        method=experiments[target_reference.experiment_id].method.value,
+    )
+    assert printed.refusal is not None
+    numeric, reason, detail = populate_numeric(
+        quantity=Quantity.P_PARTIAL,
+        candidate=reference_value,
+        reference=reference_value,
+        source_relation=SourceRelation.UNKNOWN,
+        printed_refusal=printed.refusal,
+        derived_band=band,
+    )
+    assert reason is None, detail
+    assert numeric is not None
+    assert numeric.decision_band == band
+
+
 
 
 def test_zhang_alpha_gamma_bound_uses_implied_alpha_verdict() -> None:

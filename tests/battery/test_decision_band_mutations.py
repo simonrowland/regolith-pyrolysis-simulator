@@ -258,6 +258,28 @@ def test_incompatible_borrowed_band_is_rejected_without_losing_numeric_residual(
     assert numeric.decision_band is None
 
 
+@pytest.mark.parametrize(
+    "quantity", (Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT)
+)
+def test_kems_pressure_band_is_not_admitted_for_dimensionless_activity(
+    quantity: Quantity,
+) -> None:
+    numeric, reason, detail = populate_numeric(
+        quantity=quantity,
+        candidate=Decimal("0.5"),
+        reference=Decimal("0.5"),
+        source_relation=SourceRelation.INDEPENDENT,
+        derived_band=DecisionBand(
+            Decimal("0.146128"),
+            "dimensionless",
+            "KEMS p_partial measured uncertainty: test pressure envelope",
+        ),
+    )
+    assert reason is None, detail
+    assert numeric is not None
+    assert numeric.decision_band is None
+
+
 def test_source_scatter_requires_exact_alignment_and_distinct_sources(tmp_path: Path) -> None:
     experiment, rows, origins = _observations(
         (Decimal("10"), Decimal("11"), Decimal("12")),
