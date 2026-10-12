@@ -3076,15 +3076,18 @@ def generate_report(
             boundary_groups[(str(row["composition_id"]), str(row["trajectory"]))].append(row)
         for (composition_id, trajectory), group in sorted(boundary_groups.items()):
             ordered = sorted(group, key=lambda row: int(row["step"]))
-            first_refusal = next(
+            first_out_of_domain = next(
                 (row for row in ordered if row["alphamelts_status"] != "ok"), None
             )
-            if first_refusal is None:
-                lines.append(f"- `{composition_id}` / `{trajectory}`: no refusal in sweep.")
+            if first_out_of_domain is None:
+                lines.append(
+                    f"- `{composition_id}` / `{trajectory}`: no out-of-domain step in sweep."
+                )
             else:
                 lines.append(
-                    f"- `{composition_id}` / `{trajectory}`: first refusal at step {first_refusal['step']}, "
-                    f"SiO2={float(first_refusal['SiO2_wt_pct']):.3f} wt%."
+                    f"- `{composition_id}` / `{trajectory}`: first out-of-domain step: "
+                    f"step {first_out_of_domain['step']}, "
+                    f"SiO2={float(first_out_of_domain['SiO2_wt_pct']):.3f} wt%."
                 )
     lines.extend(
         [
@@ -3094,7 +3097,7 @@ def generate_report(
     )
     if alpha_rows:
         lines.append(
-            "It answers the rump question as a curve: AlphaMELTS rejects every normalized step below its 30 wt% SiO2 floor."
+            "Every normalized step below 30 wt% SiO2 is outside the AlphaMELTS certified band, and the adapter admits such melts with a notice and extrapolated authority."
         )
     rump_comparisons = summarize_rump_coverage(coverage_rows)
     if rump_comparisons:
