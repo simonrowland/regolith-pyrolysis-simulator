@@ -13,6 +13,36 @@ extraction:
   provenance_path: corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
 review_status: draft
 corrections: []
+fidelity_samples:
+- path: species.P2O5.observations[nagabayashi_1989_experiment_1823K].values.T_K
+  value: 1823.0
+  locator:
+    source_path: corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+    page: 140
+    section: '2. Experimentals'
+    note: One of the three stated experimental temperatures; the printed row reports 1823 K.
+benches:
+- id: nagabayashi-1989-reactor
+  identity: {basis: described_in_this_work}
+  other_facts:
+  - name: reaction_chamber_dimensions_m_as_printed
+    unit: m
+    value:
+      state: {tag: value, value: {kind: categorical, categorical: '0.42 x 0.52 x 1 m'}}
+      locator:
+        source_path: corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+        page: 140
+        section: '2. Experimentals'
+        note: 'The experimental apparatus consists of the purification train of Ar, an alumina tube (0.42 x 0.52 x 1 m) as a reaction chamber.'
+  - name: slag_mass_kg_range_as_printed
+    unit: kg
+    value:
+      state: {tag: value, value: {kind: interval, interval_low: 0.006, interval_high: 0.008}}
+      locator:
+        source_path: corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+        page: 140
+        section: '2. Experimentals'
+        note: 'The premelted synthetic slag of (6-8) x 10^-3 kg was set in a crucible.'
 species:
   P2O5:
     observations:
@@ -57,18 +87,21 @@ species:
         method_class_note: These are measured experimental conditions and sample-analysis procedures, not inferred values.
       equipment:
         sample:
-          mass_kg: 1.5e-2
-          form: Fe-P alloy plus premelted synthetic slag, melted under flowing Ar
-          container: crucible
+          value:
+            mass_kg: 1.5e-2
+            form: Fe-P alloy plus premelted synthetic slag, melted under flowing Ar
+            container: crucible
           locator:
             source_path: corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
             page: 140
             section: '2. Experimentals'
-        chamber_length_m: 1.0
-        reaction_chamber_dimensions_m_as_printed: [0.42, 0.52, 1.0]
-        slag_mass_kg_range_as_printed: [6.0e-3, 8.0e-3]
-        atmosphere: Ar
-        argon_flow_Nm3_per_s: 1.67e-6
+        chamber_length_m:
+          value: 1.0
+          locator:
+            source_path: corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+            page: 140
+            section: '2. Experimentals'
+            note: Alumina reaction chamber is 1 m long.
         cell_material:
           value: crucible materials were CaO, SiO2 or MgO; CaO crucible was stabilized with about 10 mass% FeO
           locator:
