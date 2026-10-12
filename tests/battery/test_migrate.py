@@ -10126,6 +10126,123 @@ def test_live_target_doi_alias_is_preserved_for_later_sources(tmp_path: Path) ->
     assert resolved == "C"
 
 
+def test_late_live_extract_keeps_carried_doi_alias(tmp_path: Path) -> None:
+    doi = "10.1234/shared"
+    extracts = [
+        ("a", _named_extract("a", doi)),
+        ("b", _named_extract("b", doi)),
+        ("c", _named_extract("c", "10.1234/primary")),
+    ]
+    root = _write_multi_extract_tree(tmp_path, extracts)
+    index_path = root / "data" / "literature" / "INDEX.yaml"
+    index_doc = yaml.safe_load(index_path.read_text(encoding="utf-8"))
+    index_doc["sources"] = [
+        row for row in index_doc["sources"] if row["source_id"] != "c"
+    ]
+    index_path.write_text(yaml.safe_dump(index_doc, sort_keys=False), encoding="utf-8")
+    aliases_path = root / "data" / "literature" / "works" / "ALIASES.yaml"
+    dump_yaml(
+        {
+            "schema_version": "battery_work_aliases.v1",
+            "aliases": {"a": "A", "b": "B", "c": "C", doi: "C"},
+        },
+        aliases_path,
+    )
+
+    result = migrate(root, write=False)
+
+    assert "C" in result.works
+    assert result.aliases[doi] == "C"
+
+
+def test_late_compilation_work_keeps_carried_doi_alias(tmp_path: Path) -> None:
+    doi = "10.1234/shared"
+    root = _write_multi_extract_tree(
+        tmp_path, [("a", _named_extract("a", "10.1234/primary"))]
+    )
+    manifest = (
+        root
+        / "data"
+        / "literature"
+        / "compilations"
+        / "fixture"
+        / "manifest.yaml"
+    )
+    manifest.parent.mkdir(parents=True)
+    manifest.write_text(
+        yaml.safe_dump(
+            {
+                "source_id": "compilation-source",
+                "source": {"citation": "Compilation fixture"},
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    aliases_path = root / "data" / "literature" / "works" / "ALIASES.yaml"
+    dump_yaml(
+        {
+            "schema_version": "battery_work_aliases.v1",
+            "aliases": {"a": "A", "compilation-source": "COMP", doi: "COMP"},
+        },
+        aliases_path,
+    )
+
+    result = migrate(root, write=False)
+
+    assert "COMP" in result.works
+    assert result.aliases[doi] == "COMP"
+
+
+def test_deleted_index_only_survivor_reclaims_doi_in_first_pass(tmp_path: Path) -> None:
+    doi = "10.1234/shared"
+    root = _write_multi_extract_tree(
+        tmp_path, [("bbb-survivor", _named_extract("bbb-survivor", doi))]
+    )
+    (root / "data" / "literature" / "extracts" / "bbb-survivor.yaml").unlink()
+    aliases_path = root / "data" / "literature" / "works" / "ALIASES.yaml"
+    dump_yaml(
+        {
+            "schema_version": "battery_work_aliases.v1",
+            "aliases": {
+                "aaa-deleted-owner": "owner-work",
+                "bbb-survivor": "survivor-work",
+                doi: "owner-work",
+            },
+        },
+        aliases_path,
+    )
+
+    result = migrate(root, write=False)
+
+    assert set(result.works) == {"survivor-work"}
+    assert result.aliases[doi] == "survivor-work"
+
+
+def test_shared_doi_claimant_is_independent_of_index_order(tmp_path: Path) -> None:
+    doi = "10.1234/shared"
+    claimants = []
+    for order in (("a", "b"), ("b", "a")):
+        root = _write_multi_extract_tree(
+            tmp_path / "-".join(order),
+            [(source_id, _named_extract(source_id, doi)) for source_id in order],
+        )
+        aliases_path = root / "data" / "literature" / "works" / "ALIASES.yaml"
+        dump_yaml(
+            {
+                "schema_version": "battery_work_aliases.v1",
+                "aliases": {"a": "A", "b": "B", doi: "deleted-owner"},
+            },
+            aliases_path,
+        )
+
+        result = migrate(root, write=False)
+
+        claimants.append(result.aliases[doi])
+
+    assert claimants == ["A", "A"]
+
+
 def _equipment_context_row(observation_id: str, experiment: object) -> dict:
     return {
         "observation_id": observation_id,

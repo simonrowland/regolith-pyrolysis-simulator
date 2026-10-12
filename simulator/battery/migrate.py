@@ -17080,11 +17080,11 @@ class Migrator:
 
     def run(self) -> MigrationResult:
         self.migrate_index_only_sources()
-        _prune_carried_doi_aliases_to_live_works(self.result)
-        self.aliases = dict(self.result.aliases)
         self.migrate_extracts()
         self.migrate_named_sources()
         self.migrate_compilations()
+        _prune_carried_doi_aliases_to_live_works(self.result)
+        self.aliases = dict(self.result.aliases)
         self.finalize()
         return self.result
 
@@ -17608,6 +17608,16 @@ def _prune_carried_doi_aliases_to_live_works(result: MigrationResult) -> None:
         for alias, work_id in result.aliases.items()
         if extract_doi(alias) is None or work_id in live_work_ids
     }
+    # Keep any carried DOI alias that still targets a live work. Reclaim only
+    # orphaned or absent DOI aliases, in source-ID order so discovery order
+    # cannot decide which surviving work owns a shared DOI.
+    works_by_source_id = sorted(
+        result.works.values(),
+        key=lambda work: (min(work.source_ids, default=work.work_id), work.work_id),
+    )
+    for work in works_by_source_id:
+        if work.doi:
+            result.aliases.setdefault(work.doi, work.work_id)
 
 
 def migrate(
