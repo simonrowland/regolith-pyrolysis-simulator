@@ -33,6 +33,11 @@ from simulator.chemistry.kernel import ChemistryIntent
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.core import CampaignPhase, PyrolysisSimulator
 from simulator.backends import BackendSelectionPolicy, resolve_backend
+from simulator.fe_redox import (
+    FE_FEO_BUFFER_STANDARD,
+    REDOX_STATE_REFERENCE_T_K,
+    RedoxState,
+)
 from simulator.melt_backend.alphamelts import (
     ALPHAMELTS_DESCENDANT_CONTAINMENT,
     ALPHAMELTS_EXECUTED_T_TOLERANCE_C,
@@ -1013,6 +1018,132 @@ def test_thermoengine_liquidus_scan_records_absolute_sample_targets(monkeypatch)
         )
         for temperature_C, _target in sampled_targets
     ), 'the transport fake must observe bisection samples as well as the coarse scan'
+
+
+def test_thermoengine_liquidus_scan_evaluates_buffer_offset_per_sample():
+    backend = ThermoEngineBackend()
+    backend._mode = 'thermoengine'
+    sampled_targets = []
+
+    class FakeTransport:
+        def equilibrate(
+            self,
+            *,
+            temperature_C,
+            pressure_bar,
+            comp_wt,
+            fO2_log,
+            warnings,
+        ):
+            temperature_C = float(temperature_C)
+            target = float(fO2_log)
+            sampled_targets.append((temperature_C, target))
+            liquid_fraction = max(
+                0.0,
+                min(1.0, (temperature_C - 1000.0) / 300.0),
+            )
+            return ThermoEnginePayload(
+                phases_present=('Liquid', 'Olivine'),
+                phase_masses_kg={
+                    'Liquid': liquid_fraction,
+                    'Olivine': 1.0 - liquid_fraction,
+                },
+                liquid_fraction=liquid_fraction,
+                liquid_composition_wt_pct={'SiO2': 100.0},
+                solved_fO2_log=target,
+            )
+
+    backend._thermoengine_transport = FakeTransport()
+    backend._activities_times_antoine_or_fail = lambda *_args, **_kwargs: {}
+    state = RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, -0.75)
+
+    result = backend.find_liquidus_solidus(
+        composition_kg=_melts_domain_composition(),
+        fO2_log=state.log_fO2_at(REDOX_STATE_REFERENCE_T_K),
+        redox_state=state,
+        pressure_bar=1.0,
+        min_T_C=900.0,
+        max_T_C=1400.0,
+        scan_step_C=100.0,
+        tolerance_C=1.0,
+    )
+
+    assert result.status == 'ok'
+    assert len(sampled_targets) > 6
+    for temperature_C, target in sampled_targets:
+        assert target == state.log_fO2_at(temperature_C + 273.15)
+    assert len({target for _temperature_C, target in sampled_targets}) > 1
+
+
+def test_thermoengine_liquidus_state_receives_kelvin_for_each_sample():
+    backend = ThermoEngineBackend()
+    backend._mode = 'thermoengine'
+    sampled_targets = []
+    absolute = RedoxState.absolute(-9.0)
+
+    class RecordingAbsoluteState:
+        kind = 'absolute'
+
+        def __init__(self):
+            self.temperatures_K = []
+
+        def log_fO2_at(self, temperature_K):
+            self.temperatures_K.append(temperature_K)
+            return absolute.log_fO2_at(temperature_K)
+
+    class FakeTransport:
+        def equilibrate(
+            self,
+            *,
+            temperature_C,
+            pressure_bar,
+            comp_wt,
+            fO2_log,
+            warnings,
+        ):
+            temperature_C = float(temperature_C)
+            target = float(fO2_log)
+            sampled_targets.append((temperature_C, target))
+            liquid_fraction = max(
+                0.0,
+                min(1.0, (temperature_C - 1000.0) / 300.0),
+            )
+            return ThermoEnginePayload(
+                phases_present=('Liquid', 'Olivine'),
+                phase_masses_kg={
+                    'Liquid': liquid_fraction,
+                    'Olivine': 1.0 - liquid_fraction,
+                },
+                liquid_fraction=liquid_fraction,
+                liquid_composition_wt_pct={'SiO2': 100.0},
+                solved_fO2_log=target,
+            )
+
+    backend._thermoengine_transport = FakeTransport()
+    backend._activities_times_antoine_or_fail = lambda *_args, **_kwargs: {}
+    state = RecordingAbsoluteState()
+
+    result = backend.find_liquidus_solidus(
+        composition_kg=_melts_domain_composition(),
+        fO2_log=-9.0,
+        redox_state=state,
+        pressure_bar=1.0,
+        min_T_C=900.0,
+        max_T_C=1400.0,
+        scan_step_C=100.0,
+        tolerance_C=1.0,
+    )
+
+    assert result.status == 'ok'
+    assert all(target == -9.0 for _temperature_C, target in sampled_targets)
+    sample_temperatures_K = [
+        temperature_C + 273.15
+        for temperature_C, _target in sampled_targets
+    ]
+    assert state.temperatures_K == [
+        REDOX_STATE_REFERENCE_T_K,
+        *sample_temperatures_K,
+    ]
 
 
 def test_petthermotools_liquidus_scan_checks_absolute_fo2_per_sample():
