@@ -777,46 +777,12 @@ def normalized_composition(
     printed_species: set[str] | None = None
     printed_path = None
     printed_basis_exempt: set[str] = set()
+    coverage_sources: dict[str, tuple[object, object]] = {}
     for field, key in (("printed_composition", "printed_composition"),
                        ("initial_composition", "composition")):
         located = point.get(key) if key in point else getattr(experiment.sample, field)
         path = (f"observation[{observation.observation_id}].point_conditions.{key}"
                 if key in point else f"experiment.sample.{field}")
-        if (
-            field == "initial_composition"
-            and isinstance(located, Located)
-            and located.state.is_value
-            and isinstance(located.state.value, Composition)
-            and composition_is_partial(located.state.value)
-        ):
-            missing = (
-                path,
-                "partial composition requires complete constituent coverage",
-            )
-            if key not in point:
-                printed = experiment.sample.printed_composition
-                if isinstance(printed, Located) and printed.state.is_value:
-                    pairs = _printed_component_pairs(printed.state.value)
-                    if pairs is not None:
-                        present = located.state.value.as_map()
-                        dropped = tuple(
-                            name for name, _amount in pairs if name not in present
-                        )
-                        if dropped:
-                            missing = tuple(
-                                f"experiment.sample.printed_composition.{name}"
-                                for name in dropped
-                            )
-            return WaypointResult(
-                "normalized_composition",
-                None,
-                (),
-                WaypointAbsence(
-                    "normalized_composition",
-                    GapReason.UNSUPPORTED_PRINT_FORM,
-                    missing,
-                ),
-            )
         if (
             field == "initial_composition"
             and key in point
@@ -903,22 +869,9 @@ def normalized_composition(
                             printed_path = path
                     else:
                         raw = _printed_composition_map(raw)
-            if (
-                field == "printed_composition"
-                and not as_moles
-                and isinstance(raw, Mapping)
-                and _composition_coverage_proxy_flag(raw, declared_untyped) is not None
-            ):
-                return WaypointResult(
-                    "normalized_composition",
-                    None,
-                    (),
-                    WaypointAbsence(
-                        "normalized_composition",
-                        GapReason.UNSUPPORTED_PRINT_FORM,
-                        (path, "partial composition requires complete constituent coverage"),
-                    ),
-                )
+            coverage_source = raw if not as_moles and isinstance(raw, Mapping) else None
+        else:
+            coverage_source = raw
         try:
             if field == "printed_composition":
                 if not isinstance(raw, Mapping):
@@ -1011,6 +964,7 @@ def normalized_composition(
                 route_name,
                 WaypointAuthority.DERIVED, (path,), notice=notice,
                 inference=basis_inference))
+            coverage_sources[route_name] = (coverage_source, declared_untyped)
             if field == "printed_composition":
                 printed_basis_exempt = set(basis_exempt)
             # Rank source evidence before normalization makes every output DERIVED.
@@ -1043,6 +997,35 @@ def normalized_composition(
             return WaypointResult(result.name, None, result.routes, WaypointAbsence(
                 result.name, GapReason.UNSUPPORTED_PRINT_FORM,
                 tuple(f"{printed_path}.{species}" for species in dropped)))
+    if result.selected is not None and result.selected.route in coverage_sources:
+        coverage_source, declared_untyped = coverage_sources[result.selected.route]
+        if isinstance(coverage_source, Composition):
+            coverage_flag = (
+                coverage_source.proxy_flag
+                if composition_is_partial(coverage_source)
+                else None
+            )
+        elif isinstance(coverage_source, Mapping):
+            coverage_flag = _composition_coverage_proxy_flag(
+                coverage_source, declared_untyped
+            )
+        else:
+            coverage_flag = None
+    else:
+        coverage_flag = None
+    if result.selected is not None and coverage_flag:
+        selected_path = result.selected.inputs[0]
+        _, separator, declared = coverage_flag.partition("untyped=")
+        missing = (
+            tuple(f"{selected_path}.{name}" for name in declared.split(",") if name)
+            if separator and declared
+            else (selected_path, "partial composition requires complete constituent coverage")
+        )
+        return WaypointResult(result.name, None, result.routes, WaypointAbsence(
+            result.name,
+            GapReason.UNSUPPORTED_PRINT_FORM,
+            missing,
+        ))
     if not routes and unsupported:
         return replace(result, absence=WaypointAbsence(
             result.name, GapReason.UNSUPPORTED_PRINT_FORM, tuple(missing)))
