@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import Counter
 import math
 from decimal import Decimal
 
@@ -793,6 +794,7 @@ def test_smooth_fit_rejects_cp_relative_error_above_one_per_thousand() -> None:
 def test_janaf_o029_formation_gibbs_zero_pin() -> None:
     assert (TABLES_DIR / "O-029.yaml").is_file()
     records = generate_janaf_sidecar(table_ids=["O-029"])
+    assert Counter(record["status"] for record in records) == Counter({"accepted": 1})
     oxygen = next(record for record in records if record["source_record_id"] == "O-029")
     assert oxygen["status"] == "accepted", oxygen
     assert oxygen["acceptance_tier"] == "smooth_fit"
@@ -808,6 +810,20 @@ def test_janaf_o029_formation_gibbs_zero_pin() -> None:
     )
     assert oxygen["fit_statistics"]["smooth_fit_checks"]["maximum_relative_Cp_residual"] <= 1e-3
     assert oxygen["fit_statistics"]["derived_formation_G_kJ_per_mol"]["max_abs"] == 0.0
+    segment = oxygen["thermo_record"]["segments"][0]
+    assert tuple(float(value).hex() for value in segment["a_coefficients"]) == (
+        "-0x1.32a0dca63f355p+15",
+        "0x1.1916cf2960d16p+9",
+        "0x1.4e0af97dd3cc1p-1",
+        "0x1.74b22eaf4f3fcp-8",
+        "-0x1.81e4031cc678fp-19",
+        "-0x1.3ee65d5b2f475p-32",
+        "0x1.16ca172f1b4d2p-41",
+    )
+    assert (float(segment["b1"]).hex(), float(segment["b2"]).hex()) == (
+        "-0x1.d5881f0e11a42p+11",
+        "0x1.50e0b9ef64478p+4",
+    )
     segments = [
         Nasa9Segment(
             T_min_K=item["T_min_K"],
@@ -918,10 +934,28 @@ def test_janaf_formation_anchor_does_not_require_element_fit_at_298_15_k() -> No
 def test_janaf_na_cr_uses_reduced_basis_and_keeps_typed_rejection() -> None:
     assert (TABLES_DIR / "Na-001.yaml").is_file()
     records = generate_janaf_sidecar(table_ids=["Na-001"])
+    assert Counter(record["status"] for record in records) == Counter(
+        {"accepted": 1, "rejected": 2}
+    )
     sodium = next(record for record in records if record["phase"] == "cr")
 
     assert sodium["status"] == "rejected", sodium
     assert sodium["reason_code"] == "segmentation_exhausted"
+    liquid = next(record for record in records if record["phase"] == "l")
+    segment = liquid["thermo_record"]["segments"][0]
+    assert tuple(float(value).hex() for value in segment["a_coefficients"]) == (
+        "0x1.dc7f59959a2b3p+15",
+        "-0x1.e2a669b2f4ed8p+8",
+        "0x1.7ea7a1b0fc0d8p+2",
+        "-0x1.24a87dfdbb2d8p-8",
+        "0x1.78da2f19d4adfp-19",
+        "-0x1.cbeffa315b2fep-32",
+        "0x0.0p+0",
+    )
+    assert (float(segment["b1"]).hex(), float(segment["b2"]).hex()) == (
+        "0x1.98c7a5f21f584p+10",
+        "-0x1.b2c83c048b4c1p+4",
+    )
     cp_count = sodium["fit_statistics"]["cp_J_per_mol_K"]["cell_count"]
     assert 4 <= cp_count <= 8
     assert sodium["basis_terms"] == cp_count - 2
