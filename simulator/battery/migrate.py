@@ -57,6 +57,7 @@ from simulator.battery.polymorph_dictionary import (
     is_generic_polymorph_name,
     resolve_formula_polymorph,
 )
+from simulator.battery.extract_context import iter_extract_context_containers
 from simulator.battery.enums import (
     AdmissionStatus,
     AmountBasis,
@@ -12175,13 +12176,7 @@ class Migrator:
         source_id: str,
         experiment_refs: Mapping[str, str],
     ) -> None:
-        species = doc.get("species")
-        if not isinstance(species, Mapping):
-            return
-        for formula, body in species.items():
-            if not isinstance(body, Mapping):
-                continue
-            rows = body.get("context")
+        for formula, rows in iter_extract_context_containers(doc):
             if rows is None:
                 continue
             if not isinstance(rows, (list, tuple)):
