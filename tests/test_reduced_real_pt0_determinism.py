@@ -2637,7 +2637,18 @@ def test_pt1_persistent_store_round_trips_exact_payload(tmp_path: Path) -> None:
         fe_redox_policy="intrinsic",
     )
 
-    seed_gate_curve_memo_record(sim, curve)
+    runtime_record = seed_gate_curve_memo_record(sim, curve)
+    assert set(runtime_record) == {
+        "curve",
+        "origin",
+        "repair_notices",
+        "disposition",
+    }
+    assert set(runtime_record["origin"]) == {
+        "producer_pid",
+        "producer_configuration",
+        "producer_evidence",
+    }
     capture.capture_gate_curve(sim, fO2_log=fO2_log, curve=curve)
 
     with sqlite3.connect(db_path) as conn:
@@ -2679,6 +2690,9 @@ def test_pt1_persistent_store_round_trips_exact_payload(tmp_path: Path) -> None:
     )
     payload = json.loads(row[3])
     assert set(payload) == {"curve"}
+    assert b"producer_pid" not in row[3]
+    assert b"producer_configuration" not in row[3]
+    assert b"producer_evidence" not in row[3]
     assert set(payload["curve"]) == {
         "liquidus_T_C",
         "path",
@@ -3385,7 +3399,7 @@ def test_pt1_capture_gate_curve_skips_non_cacheable_status(
     assert _persistent_artifact_count(db_path, "freeze_gate_curve") == 1
 
 
-def test_pt0_gate_memo_hit_does_not_capture_without_receipt(
+def test_gate_capture_rechecks_receipt_after_memo_hit(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

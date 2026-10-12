@@ -4,7 +4,9 @@ from __future__ import annotations
 
 from collections import Counter
 from copy import deepcopy
+import json
 import math
+import os
 from types import SimpleNamespace
 
 import pytest
@@ -30,7 +32,11 @@ from simulator.fe_redox import (
     KRESS91_LIQUID_CALIBRATION_MIN_T_C,
     kress91_ln_fO2_temperature_delta,
 )
-from simulator.melt_backend.base import EquilibriumResult, MeltCompositionError
+from simulator.melt_backend.base import (
+    EquilibriumResult,
+    InternalAnalyticalBackend,
+    MeltCompositionError,
+)
 from simulator.reduced_real_determinism import (
     PT0DeterminismStore,
     canonical_json_bytes,
@@ -182,6 +188,72 @@ def _freeze_gate_key_for_current_state(sim) -> tuple:
     return sim._freeze_gate_cache_key(
         pressure_bar=pressure_bar,
         fO2_log=redox_key_fO2_log,
+    )
+
+
+def _configure_magemin_origin_evidence(
+    sim,
+    monkeypatch,
+    provenance_for_read,
+):
+    identity = admission_module.BindingIdentity(
+        'magemin',
+        'ig',
+        'magemin-ig-r1',
+        'subprocess',
+    )
+    sim.backend = SimpleNamespace(
+        name='MAGEMinBackend',
+        get_engine_version=lambda: 'fixture-runtime',
+    )
+    monkeypatch.setattr(
+        admission_module,
+        'binding_identity_for_backend',
+        lambda _backend: identity,
+    )
+    monkeypatch.setattr(
+        admission_module,
+        'current_backend_provenance',
+        lambda *_args, **_kwargs: provenance_for_read(),
+    )
+    monkeypatch.setattr(
+        admission_module,
+        'selected_binding_identities',
+        lambda *_args, **_kwargs: (),
+    )
+    return identity
+
+
+def _write_gate_receipt_for_test(
+    monkeypatch,
+    tmp_path,
+    identity,
+    provenance,
+):
+    receipt_path = tmp_path / 'gate-origin-receipt.json'
+    receipt_path.write_text(
+        json.dumps(
+            {
+                'schema_version': admission_module.RECEIPT_SCHEMA_VERSION,
+                'assessed_at': 'test-only',
+                'entries': [
+                    {
+                        'identity': identity.as_dict(),
+                        'status': 'admitted',
+                        'reason': None,
+                        'artifacts': ['freeze_gate_curve'],
+                        'comparison': {'status': 'matched', 'artifacts': []},
+                        'provenance': provenance,
+                    }
+                ],
+            }
+        ),
+        encoding='utf-8',
+    )
+    monkeypatch.setattr(
+        admission_module,
+        'binding_receipt_path',
+        lambda *_args, **_kwargs: receipt_path,
     )
 
 
@@ -4027,6 +4099,735 @@ def test_core_gate_curve_memo_hit_skips_install_provenance(
     assert len(provider_calls) == 1
 
 
+def test_core_gate_curve_local_slot_reads_match_green_provenance_count(
+    monkeypatch,
+    tmp_path,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    binary = tmp_path / 'magemin-fixture'
+    binary.write_text('selected producer fixture\n')
+    sim.backend = SimpleNamespace(
+        name='MAGEMinBackend',
+        _binary_path=binary,
+        get_engine_version=lambda: 'fixture-runtime',
+    )
+    curve = {
+        'source': 'gate_liquid_fraction:authoritative:test',
+        'status': 'ok',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1300.0,
+    }
+    original_install_provenance = admission_module.install_provenance
+    provenance_calls = []
+
+    def count_install_provenance(*args, **kwargs):
+        provenance_calls.append(None)
+        return original_install_provenance(*args, **kwargs)
+
+    monkeypatch.setattr(
+        admission_module,
+        'install_provenance',
+        count_install_provenance,
+    )
+    record = engine_binding_admission.write_gate_curve_memo_record(
+        sim,
+        curve,
+    )
+    sim._freeze_gate_liquid_fraction_cache = {
+        'key': _freeze_gate_key_for_current_state(sim),
+        **record,
+    }
+    provenance_calls.clear()
+    sim._freeze_gate_curve_record = lambda: pytest.fail(
+        'a local-slot hit must not enter the producer'
+    )
+
+    for _ in range(5):
+        assert sim._melt_redox_liquidus_gate_curve() == curve
+
+    assert provenance_calls == []
+
+
+def test_gate_memo_origin_reuses_live_binding_provenance_per_read(
+    monkeypatch,
+    tmp_path,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    binary = tmp_path / 'magemin-fixture'
+    binary.write_text('selected producer fixture\n')
+    sim.backend = SimpleNamespace(
+        name='MAGEMinBackend',
+        _binary_path=binary,
+        get_engine_version=lambda: 'fixture-runtime',
+    )
+    curve = {
+        'source': 'gate_liquid_fraction:authoritative:test',
+        'status': 'ok',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1300.0,
+    }
+    monkeypatch.setattr(
+        admission_module,
+        'selected_binding_identities',
+        lambda *_args, **_kwargs: (),
+    )
+    original_install_provenance = admission_module.install_provenance
+    provenance_calls = []
+
+    def count_install_provenance(*args, **kwargs):
+        provenance_calls.append(None)
+        return original_install_provenance(*args, **kwargs)
+
+    monkeypatch.setattr(
+        admission_module,
+        'install_provenance',
+        count_install_provenance,
+    )
+    record = engine_binding_admission.write_gate_curve_memo_record(
+        sim,
+        curve,
+    )
+    sim._freeze_gate_liquid_fraction_cache = {
+        'key': _freeze_gate_key_for_current_state(sim),
+        **record,
+    }
+    provenance_calls.clear()
+    sim._freeze_gate_curve_from_gate_dispatch = lambda *_args, **_kwargs: pytest.fail(
+        'a local memo hit must not run the producer'
+    )
+
+    hit = sim._freeze_gate_curve_record()
+
+    assert hit['curve'] == curve
+    assert hit['disposition'] == 'memo-hit'
+    assert len(provenance_calls) == 1
+
+
+def test_gate_memo_origin_keeps_producer_dependency_vector(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    curve = {
+        'source': 'unit-test',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1300.0,
+    }
+
+    record = engine_binding_admission.write_gate_curve_memo_record(sim, curve)
+
+    assert record['origin']['producer_configuration'] == (
+        gate_curve_memo_producer_configuration(sim, curve)
+    )
+    assert set(record['origin']['producer_configuration']) == {
+        'namespace_id',
+        'vapor_pressure_provider_selection',
+        'sulfur_side',
+        'model',
+    }
+    assert set(
+        record['origin']['producer_configuration']['sulfur_side']
+    ) == {'sulfsat_available', 'sulfsat_provider_selection'}
+    assert set(record['origin']['producer_configuration']['model']) == {
+        'model',
+        'mode',
+        'magemin_database',
+    }
+    assert record['origin']['producer_evidence'] == 'no-external-install'
+
+
+def test_gate_memo_origin_writer_records_three_members(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    curve = {
+        'source': 'unit-test',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1300.0,
+    }
+
+    record = engine_binding_admission.write_gate_curve_memo_record(sim, curve)
+
+    assert set(record) == {'curve', 'origin', 'repair_notices', 'disposition'}
+    assert record['curve'] == curve
+    assert set(record['origin']) == {
+        'producer_pid',
+        'producer_configuration',
+        'producer_evidence',
+    }
+    assert record['origin']['producer_pid'] == os.getpid()
+    assert record['origin']['producer_evidence'] == 'no-external-install'
+
+
+def test_gate_memo_origin_stays_outside_curve_and_serialized_bytes(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    curve = {
+        'source': 'unit-test',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1300.0,
+    }
+    key_before = _freeze_gate_key_for_current_state(sim)
+
+    record = engine_binding_admission.write_gate_curve_memo_record(sim, curve)
+    record['origin']['producer_pid'] += 1
+    sim._freeze_gate_liquid_fraction_cache = {
+        'key': key_before,
+        **record,
+    }
+    payload = canonical_json_bytes({'curve': record['curve']})
+
+    assert set(record['curve']) == set(curve)
+    assert b'producer_pid' not in payload
+    assert b'producer_configuration' not in payload
+    assert b'producer_evidence' not in payload
+    assert _freeze_gate_key_for_current_state(sim) == key_before
+
+
+def test_gate_memo_origin_missing_is_a_miss(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    curve = {
+        'source': 'unit-test',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1300.0,
+    }
+    record = engine_binding_admission.write_gate_curve_memo_record(sim, curve)
+    record['origin'] = None
+    sim._freeze_gate_liquid_fraction_cache = {
+        'key': _freeze_gate_key_for_current_state(sim),
+        **record,
+    }
+    producer_calls = []
+    sim._freeze_gate_curve_from_gate_dispatch = (
+        lambda reasons, *, fO2_log, repair_notices=None: (
+            producer_calls.append(fO2_log) or dict(curve)
+        )
+    )
+
+    result = sim._freeze_gate_curve_record()
+
+    assert result['curve'] == curve
+    assert result['disposition'] == 'live'
+    assert len(producer_calls) == 1
+
+
+def test_gate_memo_origin_rejects_install_fingerprint_change(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    first_digest = 'a' * 64
+    provenance = [{
+        'binding_provenance_verifiable': True,
+        'runtime_artifacts': {
+            'magemin_selected_binary': {'sha256': first_digest},
+        },
+    }]
+    identity = _configure_magemin_origin_evidence(
+        sim,
+        monkeypatch,
+        lambda: dict(provenance[0]),
+    )
+    curve = {
+        'source': 'gate_liquid_fraction:authoritative:test',
+        'status': 'ok',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1300.0,
+    }
+    record = engine_binding_admission.write_gate_curve_memo_record(sim, curve)
+    sim._freeze_gate_liquid_fraction_cache = {
+        'key': _freeze_gate_key_for_current_state(sim),
+        **record,
+    }
+    provenance[0] = {
+        'binding_provenance_verifiable': True,
+        'runtime_artifacts': {
+            'magemin_selected_binary': {'sha256': 'b' * 64},
+        },
+    }
+    producer_calls = []
+    sim._freeze_gate_curve_from_gate_dispatch = (
+        lambda reasons, *, fO2_log, repair_notices=None: (
+            producer_calls.append(fO2_log) or dict(curve)
+        )
+    )
+
+    result = sim._freeze_gate_curve_record()
+
+    assert result['curve'] == curve
+    assert result['origin']['producer_evidence'] == (
+        admission_module.admission_fingerprint(identity, provenance[0])
+    )
+    assert len(producer_calls) == 1
+
+
+def test_gate_memo_origin_requires_current_pid_fork(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    curve = {
+        'source': 'unit-test',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1300.0,
+    }
+    record = engine_binding_admission.write_gate_curve_memo_record(sim, curve)
+    read_fd, write_fd = os.pipe()
+    child_pid = os.fork()
+    if child_pid == 0:
+        os.close(read_fd)
+        try:
+            matched = engine_binding_admission.gate_curve_memo_origin_matches(
+                sim,
+                curve,
+                record['origin'],
+                fresh_evidence=False,
+            )
+            os.write(write_fd, b'hit' if matched else b'miss')
+            os._exit(0)
+        except BaseException:
+            os.write(write_fd, b'error')
+            os._exit(1)
+    os.close(write_fd)
+    result = os.read(read_fd, 16)
+    os.close(read_fd)
+    _, wait_status = os.waitpid(child_pid, 0)
+
+    assert os.WIFEXITED(wait_status)
+    assert os.WEXITSTATUS(wait_status) == 0
+    assert result == b'miss'
+
+
+def test_gate_memo_origin_unproven_is_miss_and_noticed(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    monkeypatch.setattr(
+        admission_module,
+        'selected_binding_identities',
+        lambda *_args, **_kwargs: (),
+    )
+    sim.backend = SimpleNamespace(name='unregistered-gate-backend')
+    curve = {
+        'source': 'unit-test',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1300.0,
+    }
+    record = engine_binding_admission.write_gate_curve_memo_record(sim, curve)
+    assert record['origin']['producer_evidence'] == 'unproven'
+    sim._freeze_gate_liquid_fraction_cache = {
+        'key': _freeze_gate_key_for_current_state(sim),
+        **record,
+    }
+    sim._freeze_gate_curve_from_gate_dispatch = (
+        lambda reasons, *, fO2_log, repair_notices=None: dict(curve)
+    )
+
+    result = sim._freeze_gate_curve_record()
+    notice = admission_module.binding_admission_run_notice(sim)
+
+    assert result['curve'] == curve
+    assert notice is not None
+    assert [
+        item['reason']
+        for item in notice['notices']
+        if item['reason'].startswith('unproven gate producer;')
+    ] == [
+        'unproven gate producer; register its adapter; in-process reuse '
+        "of this producer's gate curves is off"
+    ]
+
+
+@pytest.mark.parametrize('evidence_case', ['provenance-raises', 'null-digest'])
+def test_gate_memo_origin_evidence_unavailable_is_a_miss(
+    evidence_case,
+    monkeypatch,
+    tmp_path,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    provenance_calls = []
+    provenance = {
+        'binding_provenance_verifiable': True,
+        'runtime_artifacts': {
+            'magemin_selected_binary': {'sha256': None},
+        },
+    }
+
+    def provenance_for_read():
+        provenance_calls.append(None)
+        if evidence_case == 'provenance-raises':
+            raise OSError('install provenance fixture failed')
+        return dict(provenance)
+
+    identity = _configure_magemin_origin_evidence(
+        sim,
+        monkeypatch,
+        provenance_for_read,
+    )
+    if evidence_case == 'null-digest':
+        _write_gate_receipt_for_test(
+            monkeypatch,
+            tmp_path,
+            identity,
+            provenance,
+        )
+    curve = {
+        'source': 'gate_liquid_fraction:authoritative:test',
+        'status': 'ok',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1300.0,
+    }
+    record = engine_binding_admission.write_gate_curve_memo_record(sim, curve)
+    assert record['origin']['producer_evidence'] == 'evidence-unavailable'
+    assert len(provenance_calls) == 1
+    assert not engine_binding_admission.gate_curve_memo_origin_matches(
+        sim,
+        curve,
+        record['origin'],
+        fresh_evidence=False,
+    )
+    assert len(provenance_calls) == 1
+    sim._freeze_gate_liquid_fraction_cache = {
+        'key': _freeze_gate_key_for_current_state(sim),
+        **record,
+    }
+    producer_calls = []
+    sim._freeze_gate_curve_from_gate_dispatch = (
+        lambda reasons, *, fO2_log, repair_notices=None: (
+            producer_calls.append(fO2_log) or dict(curve)
+        )
+    )
+
+    result = sim._freeze_gate_curve_record()
+
+    assert result['curve'] == curve
+    assert len(producer_calls) == 1
+    assert len(provenance_calls) == 2
+    notice = admission_module.binding_admission_run_notice(sim)
+    if evidence_case == 'provenance-raises':
+        assert notice is not None
+        assert [item['reason'] for item in notice['notices']] == [
+            'install provenance unverifiable'
+        ]
+    else:
+        assert notice is not None
+        assert [item['reason'] for item in notice['notices']] == [
+            'live binding was not admitted after initialization'
+        ]
+
+
+def test_gate_memo_reuses_live_curve_without_metadata_receipt_digests(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    provenance = {
+        'binding_provenance_verifiable': False,
+        'runtime_artifacts': {
+            'magemin_selected_binary': {'sha256': 'a' * 64},
+        },
+        'selected_source_digests': {
+            'species_catalog': {'sha256': None},
+        },
+    }
+    _configure_magemin_origin_evidence(
+        sim,
+        monkeypatch,
+        lambda: dict(provenance),
+    )
+    curve = {
+        'source': 'gate_liquid_fraction:authoritative:test',
+        'status': 'ok',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1300.0,
+    }
+    record = engine_binding_admission.write_gate_curve_memo_record(sim, curve)
+    sim._freeze_gate_liquid_fraction_cache = {
+        'key': _freeze_gate_key_for_current_state(sim),
+        **record,
+    }
+    sim._freeze_gate_curve_from_gate_dispatch = lambda *_args, **_kwargs: pytest.fail(
+        'an unchanged selected producer digest should reuse the live curve'
+    )
+
+    hit = sim._freeze_gate_curve_record()
+
+    assert hit['curve'] == curve
+    assert hit['disposition'] == 'memo-hit'
+
+
+def test_gate_capture_rejects_foreign_origin_with_valid_consumer_receipt(
+    monkeypatch,
+    tmp_path,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    provenance = {
+        'binding_provenance_verifiable': True,
+        'runtime_artifacts': {
+            'magemin_selected_binary': {'sha256': 'a' * 64},
+        },
+    }
+    identity = _configure_magemin_origin_evidence(
+        sim,
+        monkeypatch,
+        lambda: dict(provenance),
+    )
+    _write_gate_receipt_for_test(
+        monkeypatch,
+        tmp_path,
+        identity,
+        provenance,
+    )
+    curve = {
+        'source': 'gate_liquid_fraction:authoritative:test',
+        'status': 'ok',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1300.0,
+    }
+    record = engine_binding_admission.write_gate_curve_memo_record(sim, curve)
+    record['origin']['producer_configuration']['model']['model'] = (
+        'foreign-producer-model'
+    )
+    sim._freeze_gate_liquid_fraction_cache = {
+        'key': _freeze_gate_key_for_current_state(sim),
+        **record,
+    }
+    store = PT0DeterminismStore('capture', db_path=tmp_path / 'foreign-origin.db')
+
+    store.capture_gate_curve(
+        sim,
+        fO2_log=sim._compute_intrinsic_melt_fO2(),
+        curve=curve,
+    )
+
+    assert store.summary()['entries'] == 0
+    assert store.summary()['capture_calls'] == 0
+
+
+def test_gate_memo_replay_return_is_not_written_to_core_memo(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    curve = {
+        'source': 'gate_liquid_fraction:replay:test',
+        'status': 'ok',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1300.0,
+    }
+    replay_calls = []
+    store = PT0DeterminismStore('replay')
+
+    def replay_gate_curve(target, *, fO2_log):
+        replay_calls.append(fO2_log)
+        target._last_reduced_real_replay_notices = []
+        return dict(curve)
+
+    monkeypatch.setattr(store, 'replay_gate_curve', replay_gate_curve)
+    sim.configure_pt0_determinism_store(store)
+    shared_cache = {}
+    sim._freeze_gate_shared_curve_cache = shared_cache
+    key = _freeze_gate_key_for_current_state(sim)
+    prior_authority = sim._melt_redox_gate_authority_this_tick
+
+    record = sim._melt_redox_liquidus_gate_record()
+    assert record['disposition'] == 'replay'
+    assert sim._establish_melt_redox_gate_authority_for_current_hour() == curve
+
+    assert len(replay_calls) == 2
+    assert key not in sim._freeze_gate_liquid_fraction_curve_memo
+    assert sim._freeze_gate_liquid_fraction_cache is None
+    assert shared_cache == {}
+    assert sim._melt_redox_gate_authority_this_tick is prior_authority
+    assert sim._melt_redox_gate_authority_tick_hour is None
+
+
+@pytest.mark.parametrize('foreign_member', ['pid', 'configuration'])
+def test_core_gate_curve_memo_rejects_foreign_pid_or_configuration(
+    foreign_member,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    curve = {
+        'source': 'unit-test',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1300.0,
+    }
+    record = engine_binding_admission.write_gate_curve_memo_record(sim, curve)
+    if foreign_member == 'pid':
+        record['origin']['producer_pid'] += 1
+    else:
+        record['origin']['producer_configuration']['model']['model'] = (
+            'foreign-producer-model'
+        )
+    key = _freeze_gate_key_for_current_state(sim)
+    sim._freeze_gate_liquid_fraction_cache = None
+    sim._freeze_gate_liquid_fraction_curve_memo[key] = record
+    producer_calls = []
+    sim._freeze_gate_curve_from_gate_dispatch = (
+        lambda reasons, *, fO2_log, repair_notices=None: (
+            producer_calls.append(fO2_log) or dict(curve)
+        )
+    )
+
+    result = sim._melt_redox_liquidus_gate_curve()
+
+    assert result == curve
+    assert len(producer_calls) == 1
+    assert sim._freeze_gate_liquid_fraction_curve_memo[key]['origin'][
+        'producer_pid'
+    ] == os.getpid()
+
+
+@pytest.mark.parametrize('foreign_member', ['pid', 'configuration'])
+def test_per_tick_gate_authority_rejects_foreign_pid_or_configuration(
+    foreign_member,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    curve = {
+        'source': 'unit-test',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1300.0,
+    }
+    record = engine_binding_admission.write_gate_curve_memo_record(sim, curve)
+    if foreign_member == 'pid':
+        record['origin']['producer_pid'] += 1
+    else:
+        record['origin']['producer_configuration']['model']['model'] = (
+            'foreign-producer-model'
+        )
+    sim._freeze_gate_liquid_fraction_cache = None
+    sim._freeze_gate_liquid_fraction_curve_memo.clear()
+    sim._melt_redox_gate_authority_this_tick = record
+    sim._melt_redox_gate_authority_tick_hour = int(sim.melt.hour)
+    producer_calls = []
+    sim._freeze_gate_curve_from_gate_dispatch = (
+        lambda reasons, *, fO2_log, repair_notices=None: (
+            producer_calls.append(fO2_log) or dict(curve)
+        )
+    )
+
+    result = sim._establish_melt_redox_gate_authority_for_current_hour()
+
+    assert result == curve
+    assert len(producer_calls) == 1
+    assert sim._melt_redox_gate_authority_this_tick['origin'][
+        'producer_pid'
+    ] == os.getpid()
+
+
 def test_core_gate_curve_memo_reuses_fallback_curve_after_provider_unavailable(
     monkeypatch,
     vapor_pressure_data,
@@ -4165,7 +4966,7 @@ def test_replay_gate_curve_is_not_pinned_as_tick_authority(
 
 
 @pytest.mark.parametrize('memo_form', ('local', 'shared'))
-def test_freeze_gate_memo_refuses_origin_configuration_mismatch(
+def test_gate_memo_origin_rejects_configuration_change(
     monkeypatch,
     vapor_pressure_data,
     feedstocks_data,

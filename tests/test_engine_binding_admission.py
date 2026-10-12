@@ -270,6 +270,26 @@ def test_install_provenance_distinguishes_selected_digest_from_optional_metadata
     assert admission._selected_producer_digest(identity, unavailable) is None
 
 
+def test_gate_memo_origin_fingerprint_covers_transport_identity() -> None:
+    provenance = {
+        "binding_provenance_verifiable": True,
+        "runtime_artifacts": {
+            "alphamelts_selected_binary": {"sha256": "a" * 64},
+        },
+    }
+    subprocess_identity = BindingIdentity(
+        "alphamelts", "MELTSv1.0.2", "fixture-r1", "subprocess"
+    )
+    python_identity = BindingIdentity(
+        "alphamelts", "MELTSv1.0.2", "fixture-r1", "python_api"
+    )
+
+    assert admission.admission_fingerprint(
+        subprocess_identity,
+        provenance,
+    ) != admission.admission_fingerprint(python_identity, provenance)
+
+
 def test_openimcc_admission_records_production_default_pack() -> None:
     from simulator.melt_backend import openimcc_bridge as bridge
 
