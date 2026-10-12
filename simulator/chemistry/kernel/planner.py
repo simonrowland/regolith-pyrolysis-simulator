@@ -27,6 +27,7 @@ import weakref
 from collections.abc import Mapping
 from typing import Any, Optional
 
+from simulator.accounting.exceptions import AccountingError
 from simulator.accounting.ledger import (
     _C7_TERMINAL_SLAG_REWORK_CAPABILITY,
     AtomLedger,
@@ -827,12 +828,7 @@ class ChemistryKernel:
         validate_intent_authority(intent, profile)
         validate_proposal_accounts(proposal, profile.declared_accounts)
 
-        try:
-            validate_atom_balance(proposal, self._species_formula_registry)
-        except KernelError:
-            raise
-        except Exception as exc:  # noqa: BLE001 -- surface as ProposalRejected
-            raise ProposalRejected(str(exc)) from exc
+        validate_atom_balance(proposal, self._species_formula_registry)
 
         transition = _proposal_to_ledger_transition(
             proposal,
@@ -851,7 +847,7 @@ class ChemistryKernel:
                 transition,
                 _terminal_debit_capability=terminal_debit_capability,
             )
-        except Exception as exc:  # noqa: BLE001
+        except AccountingError as exc:
             raise ProposalRejected(str(exc)) from exc
         return applied
 
@@ -898,13 +894,8 @@ class ChemistryKernel:
         profile = provider.capability_profile()
         validate_intent_authority(intent, profile)
         validate_proposal_accounts(proposal, profile.declared_accounts)
-        try:
-            validate_atom_balance(proposal, self._species_formula_registry)
-        except KernelError:
-            raise
-        except Exception as exc:  # noqa: BLE001 -- surface as ProposalRejected
-            raise ProposalRejected(str(exc)) from exc
+        validate_atom_balance(proposal, self._species_formula_registry)
         try:
             return self._ledger.apply(transition)
-        except Exception as exc:  # noqa: BLE001
+        except AccountingError as exc:
             raise ProposalRejected(str(exc)) from exc

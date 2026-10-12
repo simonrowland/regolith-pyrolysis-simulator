@@ -3,9 +3,10 @@
 Thin glue layer between :class:`AlphaMELTSProvider` and the today-hook
 adapter in :mod:`simulator.melt_backend.alphamelts`. The math lives in
 the adapter (the PetThermoTools / MELTSdynamic / equilibrate_MELTS
-call) -- this module owns ONLY the mode-selection contract: it tells
-the provider whether the Python API path is reachable and runs an
-equilibration through it.
+call) -- this module owns the mode-selection contract and the
+origin tag for a PetThermoTools library call. The tag lives here, not
+in the adapter, so the failure classifier and the adapter can share
+one class without an import cycle.
 
 Goal #8 checklist item 3 calls for a separate ``petthermo.py`` for the
 Python API path and ``subprocess_runner.py`` + ``parser.py`` for the
@@ -19,6 +20,19 @@ would duplicate hardened code that goal #1 already locked down.
 from __future__ import annotations
 
 from typing import Any, Mapping, Optional
+
+
+class _PetThermoToolsExternalCallFailure(RuntimeError):
+    """Tag a remote exception raised by a PetThermoTools-owned operation."""
+
+    def __init__(self, exception_class: str, message: str) -> None:
+        self.exception_class = str(exception_class)
+        self.message = str(message)
+        super().__init__(f'{self.exception_class}: {self.message}')
+
+
+class _PetThermoToolsUnavailable(ImportError):
+    """PetThermoTools runtime or loader is absent."""
 
 
 def equilibrate_via_python_api(

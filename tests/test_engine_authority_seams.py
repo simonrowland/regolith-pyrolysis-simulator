@@ -4,6 +4,7 @@ from types import SimpleNamespace
 
 import pytest
 
+from engines.alphamelts.petthermo import _PetThermoToolsExternalCallFailure
 from engines.alphamelts.thermoengine import (
     ThermoEngineIsolationError,
     ThermoEngineOutOfDomainError,
@@ -55,6 +56,21 @@ def test_thermoengine_liquidus_preserves_policy_refusal() -> None:
         raise RuntimeError("solver iteration failed")
 
     backend.equilibrate = solver_failure  # type: ignore[method-assign]
+    with pytest.raises(RuntimeError, match="solver iteration failed"):
+        backend.find_liquidus_solidus(
+            composition_mol={"SiO2": 1.0, "MgO": 1.0},
+            min_T_C=800.0,
+            max_T_C=900.0,
+            scan_step_C=100.0,
+        )
+
+    def tagged_solver_failure(_temperature_C: float, **_kwargs: object) -> None:
+        raise _PetThermoToolsExternalCallFailure(
+            "RuntimeError",
+            "solver iteration failed",
+        )
+
+    backend.equilibrate = tagged_solver_failure  # type: ignore[method-assign]
     not_converged = backend.find_liquidus_solidus(
         composition_mol={"SiO2": 1.0, "MgO": 1.0},
         min_T_C=800.0,
@@ -63,6 +79,9 @@ def test_thermoengine_liquidus_preserves_policy_refusal() -> None:
     )
 
     assert not_converged.status == "not_converged"
+    assert not_converged.diagnostics["exception_class"] == (
+        "_PetThermoToolsExternalCallFailure"
+    )
 
 
 def test_thermoengine_liquidus_preserves_isolation_policy_refusal() -> None:
