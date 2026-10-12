@@ -359,7 +359,13 @@ def test_pin_figure_only_scores_with_notice_and_printed_band() -> None:
     # Mapped dex=0.3 reading band must be taken from this row, not erased by
     # the catalogue-composition label.
     assert residual.numeric.decision_band is not None
-    assert residual.numeric.decision_band.value == Decimal("0.3")
+    # Synthetic fixture: sigma_log10P_dex_per_point is a 1-sigma dex field
+    # under q6-v1 (simulator/battery/score.py:2279-2280). Its two-sided 95%
+    # normal quantile z=1.959963984540054 is defined at score.py:270-275;
+    # dex stays dex. Sanity: 0.3 -> 0.5879891953620162 dex.
+    assert residual.numeric.decision_band.value == (
+        Decimal("0.3") * Decimal("1.959963984540054")
+    )
     assert "source-printed" in residual.numeric.decision_band.rule
     assert residual.score_eligible is False
     assert any(
@@ -762,7 +768,13 @@ def test_pin_figure_mapped_dex_uncertainty_is_read() -> None:
     )
     assert residual.numeric is not None
     assert residual.numeric.decision_band is not None
-    assert residual.numeric.decision_band.value == Decimal("0.3")
+    # Synthetic fixture: sigma_log10P_dex_per_point is a 1-sigma dex field
+    # under q6-v1 (simulator/battery/score.py:2279-2280). Its two-sided 95%
+    # normal quantile z=1.959963984540054 is defined at score.py:270-275;
+    # dex stays dex. Sanity: 0.3 -> 0.5879891953620162 dex.
+    assert residual.numeric.decision_band.value == (
+        Decimal("0.3") * Decimal("1.959963984540054")
+    )
     assert "source-printed" in residual.numeric.decision_band.rule
 
 
@@ -780,7 +792,13 @@ def test_pin_catalogue_composition_does_not_erase_figure_reading_band() -> None:
     )
     assert residual.numeric is not None
     assert residual.numeric.decision_band is not None
-    assert residual.numeric.decision_band.value == Decimal("0.3")
+    # Synthetic fixture: sigma_log10P_dex_per_point is a 1-sigma dex field
+    # under q6-v1 (simulator/battery/score.py:2279-2280). Its two-sided 95%
+    # normal quantile z=1.959963984540054 is defined at score.py:270-275;
+    # dex stays dex. Sanity: 0.3 -> 0.5879891953620162 dex.
+    assert residual.numeric.decision_band.value == (
+        Decimal("0.3") * Decimal("1.959963984540054")
+    )
     assert residual.score_eligible is False
     assert any(
         notice.kind is NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG
