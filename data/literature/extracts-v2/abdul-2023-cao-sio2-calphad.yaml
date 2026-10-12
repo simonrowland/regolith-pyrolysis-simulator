@@ -1,0 +1,1577 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/abdul-2023-cao-sio2-calphad.yaml
+observations:
+- observation_id: abdul-2023-cao-sio2-calphad::abdul_2023_belite_heat_content::T=1072.09:h=4e62ff2c9c58
+  experiment_id: 10.1016/j.cemconres.2023.107309::experiment::abdul-2023-heat-content-measurements
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Ca2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1072.09'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '123.3067'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: extract-abdul2023
+      date: '2026-10-04'
+      evidence:
+        page: 8
+        published_page: 7
+        table: '4'
+  notices: []
+  source_id: abdul-2023-cao-sio2-calphad
+  locator:
+    page: 8
+    published_page: 7
+    table: '4'
+  read_from: pdf:abdul-2023-cao-sio2-calphad
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1072.09'
+      locator:
+        page: 8
+        published_page: 7
+        table: '4'
+  derivation:
+    relation: J_to_kJ_exact
+    inputs:
+    - pdf:abdul-2023-cao-sio2-calphad
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '123306.7'
+        locator:
+          page: 8
+          published_page: 7
+          table: '4'
+    - - factor
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          page: 8
+          published_page: 7
+          table: '4'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: abdul-2023-cao-sio2-calphad::abdul_2023_belite_heat_content::T=1171.39:h=d11b8d15a6af
+  experiment_id: 10.1016/j.cemconres.2023.107309::experiment::abdul-2023-heat-content-measurements
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Ca2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1171.39'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '148.8018'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: extract-abdul2023
+      date: '2026-10-04'
+      evidence:
+        page: 8
+        published_page: 7
+        table: '4'
+  notices: []
+  source_id: abdul-2023-cao-sio2-calphad
+  locator:
+    page: 8
+    published_page: 7
+    table: '4'
+  read_from: pdf:abdul-2023-cao-sio2-calphad
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1171.39'
+      locator:
+        page: 8
+        published_page: 7
+        table: '4'
+  derivation:
+    relation: J_to_kJ_exact
+    inputs:
+    - pdf:abdul-2023-cao-sio2-calphad
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '148801.8'
+        locator:
+          page: 8
+          published_page: 7
+          table: '4'
+    - - factor
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          page: 8
+          published_page: 7
+          table: '4'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: abdul-2023-cao-sio2-calphad::abdul_2023_belite_heat_content::T=1271.67:h=4a44c2b81a34
+  experiment_id: 10.1016/j.cemconres.2023.107309::experiment::abdul-2023-heat-content-measurements
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Ca2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1271.67'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '171.3052'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: extract-abdul2023
+      date: '2026-10-04'
+      evidence:
+        page: 8
+        published_page: 7
+        table: '4'
+  notices: []
+  source_id: abdul-2023-cao-sio2-calphad
+  locator:
+    page: 8
+    published_page: 7
+    table: '4'
+  read_from: pdf:abdul-2023-cao-sio2-calphad
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1271.67'
+      locator:
+        page: 8
+        published_page: 7
+        table: '4'
+  derivation:
+    relation: J_to_kJ_exact
+    inputs:
+    - pdf:abdul-2023-cao-sio2-calphad
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '171305.2'
+        locator:
+          page: 8
+          published_page: 7
+          table: '4'
+    - - factor
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          page: 8
+          published_page: 7
+          table: '4'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: abdul-2023-cao-sio2-calphad::abdul_2023_belite_heat_content::T=1371.05:h=d6e07445bafd
+  experiment_id: 10.1016/j.cemconres.2023.107309::experiment::abdul-2023-heat-content-measurements
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Ca2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1371.05'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '187.8899'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: extract-abdul2023
+      date: '2026-10-04'
+      evidence:
+        page: 8
+        published_page: 7
+        table: '4'
+  notices: []
+  source_id: abdul-2023-cao-sio2-calphad
+  locator:
+    page: 8
+    published_page: 7
+    table: '4'
+  read_from: pdf:abdul-2023-cao-sio2-calphad
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1371.05'
+      locator:
+        page: 8
+        published_page: 7
+        table: '4'
+  derivation:
+    relation: J_to_kJ_exact
+    inputs:
+    - pdf:abdul-2023-cao-sio2-calphad
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '187889.9'
+        locator:
+          page: 8
+          published_page: 7
+          table: '4'
+    - - factor
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          page: 8
+          published_page: 7
+          table: '4'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: abdul-2023-cao-sio2-calphad::abdul_2023_belite_heat_content::T=1471.05:h=288cc66d9854
+  experiment_id: 10.1016/j.cemconres.2023.107309::experiment::abdul-2023-heat-content-measurements
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Ca2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1471.05'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '212.3601'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: extract-abdul2023
+      date: '2026-10-04'
+      evidence:
+        page: 8
+        published_page: 7
+        table: '4'
+  notices: []
+  source_id: abdul-2023-cao-sio2-calphad
+  locator:
+    page: 8
+    published_page: 7
+    table: '4'
+  read_from: pdf:abdul-2023-cao-sio2-calphad
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1471.05'
+      locator:
+        page: 8
+        published_page: 7
+        table: '4'
+  derivation:
+    relation: J_to_kJ_exact
+    inputs:
+    - pdf:abdul-2023-cao-sio2-calphad
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '212360.1'
+        locator:
+          page: 8
+          published_page: 7
+          table: '4'
+    - - factor
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          page: 8
+          published_page: 7
+          table: '4'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: abdul-2023-cao-sio2-calphad::abdul_2023_belite_heat_content::T=972.86:h=5c43645e182c
+  experiment_id: 10.1016/j.cemconres.2023.107309::experiment::abdul-2023-heat-content-measurements
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Ca2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '972.86'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '108.4308'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: extract-abdul2023
+      date: '2026-10-04'
+      evidence:
+        page: 8
+        published_page: 7
+        table: '4'
+  notices: []
+  source_id: abdul-2023-cao-sio2-calphad
+  locator:
+    page: 8
+    published_page: 7
+    table: '4'
+  read_from: pdf:abdul-2023-cao-sio2-calphad
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '972.86'
+      locator:
+        page: 8
+        published_page: 7
+        table: '4'
+  derivation:
+    relation: J_to_kJ_exact
+    inputs:
+    - pdf:abdul-2023-cao-sio2-calphad
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '108430.8'
+        locator:
+          page: 8
+          published_page: 7
+          table: '4'
+    - - factor
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          page: 8
+          published_page: 7
+          table: '4'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: abdul-2023-cao-sio2-calphad::abdul_2023_rankinite_heat_content::T=1072.35:h=5ea62f4d06f4
+  experiment_id: 10.1016/j.cemconres.2023.107309::experiment::abdul-2023-heat-content-measurements
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Ca3Si2O7
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: rankinite
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1072.35'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '206.0859'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: extract-abdul2023
+      date: '2026-10-04'
+      evidence:
+        page: 8
+        published_page: 7
+        table: '3'
+  notices: []
+  source_id: abdul-2023-cao-sio2-calphad
+  locator:
+    page: 8
+    published_page: 7
+    table: '3'
+  read_from: pdf:abdul-2023-cao-sio2-calphad
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1072.35'
+      locator:
+        page: 8
+        published_page: 7
+        table: '3'
+  derivation:
+    relation: J_to_kJ_exact
+    inputs:
+    - pdf:abdul-2023-cao-sio2-calphad
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '206085.9'
+        locator:
+          page: 8
+          published_page: 7
+          table: '3'
+    - - factor
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          page: 8
+          published_page: 7
+          table: '3'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: abdul-2023-cao-sio2-calphad::abdul_2023_rankinite_heat_content::T=1172.15:h=5d9b87b0cd59
+  experiment_id: 10.1016/j.cemconres.2023.107309::experiment::abdul-2023-heat-content-measurements
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Ca3Si2O7
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: rankinite
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1172.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '233.4396'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: extract-abdul2023
+      date: '2026-10-04'
+      evidence:
+        page: 8
+        published_page: 7
+        table: '3'
+  notices: []
+  source_id: abdul-2023-cao-sio2-calphad
+  locator:
+    page: 8
+    published_page: 7
+    table: '3'
+  read_from: pdf:abdul-2023-cao-sio2-calphad
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1172.15'
+      locator:
+        page: 8
+        published_page: 7
+        table: '3'
+  derivation:
+    relation: J_to_kJ_exact
+    inputs:
+    - pdf:abdul-2023-cao-sio2-calphad
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '233439.6'
+        locator:
+          page: 8
+          published_page: 7
+          table: '3'
+    - - factor
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          page: 8
+          published_page: 7
+          table: '3'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: abdul-2023-cao-sio2-calphad::abdul_2023_rankinite_heat_content::T=1271.95:h=d83c7a19a15f
+  experiment_id: 10.1016/j.cemconres.2023.107309::experiment::abdul-2023-heat-content-measurements
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Ca3Si2O7
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: rankinite
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1271.95'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '264.1469'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: extract-abdul2023
+      date: '2026-10-04'
+      evidence:
+        page: 8
+        published_page: 7
+        table: '3'
+  notices: []
+  source_id: abdul-2023-cao-sio2-calphad
+  locator:
+    page: 8
+    published_page: 7
+    table: '3'
+  read_from: pdf:abdul-2023-cao-sio2-calphad
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1271.95'
+      locator:
+        page: 8
+        published_page: 7
+        table: '3'
+  derivation:
+    relation: J_to_kJ_exact
+    inputs:
+    - pdf:abdul-2023-cao-sio2-calphad
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '264146.9'
+        locator:
+          page: 8
+          published_page: 7
+          table: '3'
+    - - factor
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          page: 8
+          published_page: 7
+          table: '3'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: abdul-2023-cao-sio2-calphad::abdul_2023_rankinite_heat_content::T=1370.85:h=bfddb6187b3a
+  experiment_id: 10.1016/j.cemconres.2023.107309::experiment::abdul-2023-heat-content-measurements
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Ca3Si2O7
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: rankinite
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1370.85'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '293.3045'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: extract-abdul2023
+      date: '2026-10-04'
+      evidence:
+        page: 8
+        published_page: 7
+        table: '3'
+  notices: []
+  source_id: abdul-2023-cao-sio2-calphad
+  locator:
+    page: 8
+    published_page: 7
+    table: '3'
+  read_from: pdf:abdul-2023-cao-sio2-calphad
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1370.85'
+      locator:
+        page: 8
+        published_page: 7
+        table: '3'
+  derivation:
+    relation: J_to_kJ_exact
+    inputs:
+    - pdf:abdul-2023-cao-sio2-calphad
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '293304.5'
+        locator:
+          page: 8
+          published_page: 7
+          table: '3'
+    - - factor
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          page: 8
+          published_page: 7
+          table: '3'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: abdul-2023-cao-sio2-calphad::abdul_2023_rankinite_heat_content::T=1471.65:h=58d883c177e4
+  experiment_id: 10.1016/j.cemconres.2023.107309::experiment::abdul-2023-heat-content-measurements
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Ca3Si2O7
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: rankinite
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1471.65'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '322.8412'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: extract-abdul2023
+      date: '2026-10-04'
+      evidence:
+        page: 8
+        published_page: 7
+        table: '3'
+  notices: []
+  source_id: abdul-2023-cao-sio2-calphad
+  locator:
+    page: 8
+    published_page: 7
+    table: '3'
+  read_from: pdf:abdul-2023-cao-sio2-calphad
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1471.65'
+      locator:
+        page: 8
+        published_page: 7
+        table: '3'
+  derivation:
+    relation: J_to_kJ_exact
+    inputs:
+    - pdf:abdul-2023-cao-sio2-calphad
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '322841.2'
+        locator:
+          page: 8
+          published_page: 7
+          table: '3'
+    - - factor
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          page: 8
+          published_page: 7
+          table: '3'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: abdul-2023-cao-sio2-calphad::abdul_2023_rankinite_heat_content::T=872.45:h=6f28aed4437a
+  experiment_id: 10.1016/j.cemconres.2023.107309::experiment::abdul-2023-heat-content-measurements
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Ca3Si2O7
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: rankinite
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '872.45'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '147.433'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: extract-abdul2023
+      date: '2026-10-04'
+      evidence:
+        page: 8
+        published_page: 7
+        table: '3'
+  notices: []
+  source_id: abdul-2023-cao-sio2-calphad
+  locator:
+    page: 8
+    published_page: 7
+    table: '3'
+  read_from: pdf:abdul-2023-cao-sio2-calphad
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '872.45'
+      locator:
+        page: 8
+        published_page: 7
+        table: '3'
+  derivation:
+    relation: J_to_kJ_exact
+    inputs:
+    - pdf:abdul-2023-cao-sio2-calphad
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '147433'
+        locator:
+          page: 8
+          published_page: 7
+          table: '3'
+    - - factor
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          page: 8
+          published_page: 7
+          table: '3'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: abdul-2023-cao-sio2-calphad::abdul_2023_rankinite_heat_content::T=972.95:h=ed303c21ee30
+  experiment_id: 10.1016/j.cemconres.2023.107309::experiment::abdul-2023-heat-content-measurements
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Ca3Si2O7
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: rankinite
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '972.95'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '180.0366'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: extract-abdul2023
+      date: '2026-10-04'
+      evidence:
+        page: 8
+        published_page: 7
+        table: '3'
+  notices: []
+  source_id: abdul-2023-cao-sio2-calphad
+  locator:
+    page: 8
+    published_page: 7
+    table: '3'
+  read_from: pdf:abdul-2023-cao-sio2-calphad
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '972.95'
+      locator:
+        page: 8
+        published_page: 7
+        table: '3'
+  derivation:
+    relation: J_to_kJ_exact
+    inputs:
+    - pdf:abdul-2023-cao-sio2-calphad
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '180036.6'
+        locator:
+          page: 8
+          published_page: 7
+          table: '3'
+    - - factor
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          page: 8
+          published_page: 7
+          table: '3'
+    output_unit: kJ_per_declared_mol_basis
