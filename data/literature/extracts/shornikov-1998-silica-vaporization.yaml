@@ -1,0 +1,5120 @@
+schema_version: literature_extract.v1
+source_id: shornikov-1998-silica-vaporization
+source:
+  citation: Shornikov, S. I., Archakov, I. Yu., and Shul’ts, M. M. (1998). Mass Spectrometric Study of Vaporization
+    and Thermodynamic Properties of Silicon Dioxide. I. Composition of the Gas Phase and Partial Vapor Pressures
+    of the Molecular Forms over Silicon Dioxide. Russian Journal of General Chemistry, 68(8), 1171–1177.
+  year: 1998
+  corpus_asset: raw/shornikov-1998-silica-vaporization/shornikov-1998-silica-vaporization.pdf
+  corpus_sha256: 3a38a303b366dc121cf09f6dd8a5425990fd781854382f66cec924e70b9c58bd
+extraction:
+  method: Manual table transcription checked digit-by-digit against all seven page images rendered at 300 dpi. All
+    Table 1, Table 2, and Table 3 rows are retained in relative tables/ CSV files and migrated context; Figs. 1–2
+    are figure-only and were not digitized. Each printed equation is retained as located relation context.
+  date: '2026-10-04'
+  worker: codex
+  provenance_path: tables/shornikov-1998-silica-vaporization/
+review_status: draft
+benches:
+- id: ms1301-w
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: MS-1301 high-temperature mass spectrometer; electron-bombardment heating
+    locator: &id002
+      published_page: 1172
+      pdf_page_index: 1
+      section: Experimental
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: tungsten effusion cell
+    locator: &id001
+      published_page: 1172
+      pdf_page_index: 1
+      section: Experimental
+      note: Cell description for W run set; as printed.
+  cell_materials:
+  - state:
+      tag: value
+      value: W
+    locator: *id001
+  geometry:
+    orifice_diameter_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Experimental
+        note: No orifice diameter is stated for this cell.
+    orifice_channel_length_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Experimental
+        note: No orifice channel length is stated for this cell.
+  heating_method:
+    state:
+      tag: value
+      value: electron bombardment
+    locator: *id002
+  detector:
+    state:
+      tag: value
+      value: high-temperature mass spectrometer (MS-1301)
+    locator: *id002
+  ionization:
+    energy_eV:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '70'
+      locator:
+        published_page: 1173
+        pdf_page_index: 2
+        table: '1'
+        note: The current-work mass spectra in Table 1 use Uion = 70 eV.
+    cross_sections_method:
+      state:
+        tag: value
+        value: Calculated from atomic cross sections assuming additivity.
+      locator: &id003
+        published_page: 1174
+        pdf_page_index: 3
+        section: Results
+    cross_sections_source:
+      state:
+        tag: value
+        value: Reference [39].
+      locator: *id003
+    secondary_electron_multiplier_correction:
+      state:
+        tag: value
+        value: Conversion factors for the apparatus were considered when a secondary-electron multiplier was used.
+      locator: *id003
+    SiO2_fragmentation_correction:
+      state:
+        tag: value
+        value: The increase in fragmentation of SiO2+ at 70 eV was taken into account when evaluating SiO and SiO2
+          partial pressures.
+      locator: *id003
+    silicon_isotope_ratio_check:
+      state:
+        tag: value
+        value: Si+ and SiO+ isotope ratios agree with natural abundances in [4] within 13%; no separate applied
+          isotope correction is stated.
+      locator:
+        published_page: 1173
+        pdf_page_index: 2
+        table: '1'
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: EOP-66 optical pyrometer; WRe5/WRe20 thermocouple welded to the cell lid used as a comparison.
+      locator: *id002
+  temperature_calibration:
+    aperture_glass_absorption_correction:
+      state:
+        tag: value
+        value: Light absorption by the glass of the pyrometric aperture was corrected.
+      locator: *id002
+    thermocouple_comparison:
+      state:
+        tag: value
+        value: At 2000 K the EOP-66 and lid thermocouple readings differed by no more than 10 K.
+      locator: *id002
+  other_facts:
+  - name: orifice_to_vaporization_area_ratio_as_printed
+    unit: as printed
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: about 1:550
+      locator: *id002
+  - name: aperture_glass_absorption_correction_at_2000_K
+    unit: K
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '40'
+      locator: *id002
+  - name: aperture_glass_absorption_correction_uncertainty_at_2000_K
+    unit: K
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5'
+      locator: *id002
+  - name: pyrometer_thermocouple_difference_upper_bound_at_2000_K
+    unit: K
+    value:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <=
+          bound_value: '10'
+      locator: *id002
+  - name: separate_cell_liner_material
+    unit: as printed
+    value:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Experimental
+        note: No separate liner material is stated.
+- id: ms1301-ir-w
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: MS-1301 high-temperature mass spectrometer; electron-bombardment heating
+    locator: *id002
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: iridium-coated tungsten effusion cell
+    locator: &id004
+      published_page: 1172
+      pdf_page_index: 1
+      section: Experimental
+      note: Cell description for Ir(W) run set; as printed.
+  cell_materials:
+  - state:
+      tag: value
+      value: Ir
+    locator: *id004
+  - state:
+      tag: value
+      value: W
+    locator: *id004
+  geometry:
+    orifice_diameter_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Experimental
+        note: No orifice diameter is stated for this cell.
+    orifice_channel_length_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Experimental
+        note: No orifice channel length is stated for this cell.
+  heating_method:
+    state:
+      tag: value
+      value: electron bombardment
+    locator: *id002
+  detector:
+    state:
+      tag: value
+      value: high-temperature mass spectrometer (MS-1301)
+    locator: *id002
+  ionization:
+    energy_eV:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '70'
+      locator:
+        published_page: 1173
+        pdf_page_index: 2
+        table: '1'
+        note: The current-work mass spectra in Table 1 use Uion = 70 eV.
+    cross_sections_method:
+      state:
+        tag: value
+        value: Calculated from atomic cross sections assuming additivity.
+      locator: *id003
+    cross_sections_source:
+      state:
+        tag: value
+        value: Reference [39].
+      locator: *id003
+    secondary_electron_multiplier_correction:
+      state:
+        tag: value
+        value: Conversion factors for the apparatus were considered when a secondary-electron multiplier was used.
+      locator: *id003
+    SiO2_fragmentation_correction:
+      state:
+        tag: value
+        value: The increase in fragmentation of SiO2+ at 70 eV was taken into account when evaluating SiO and SiO2
+          partial pressures.
+      locator: *id003
+    silicon_isotope_ratio_check:
+      state:
+        tag: value
+        value: Si+ and SiO+ isotope ratios agree with natural abundances in [4] within 13%; no separate applied
+          isotope correction is stated.
+      locator:
+        published_page: 1173
+        pdf_page_index: 2
+        table: '1'
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: EOP-66 optical pyrometer; WRe5/WRe20 thermocouple welded to the cell lid used as a comparison.
+      locator: *id002
+  temperature_calibration:
+    aperture_glass_absorption_correction:
+      state:
+        tag: value
+        value: Light absorption by the glass of the pyrometric aperture was corrected.
+      locator: *id002
+    thermocouple_comparison:
+      state:
+        tag: value
+        value: At 2000 K the EOP-66 and lid thermocouple readings differed by no more than 10 K.
+      locator: *id002
+  other_facts:
+  - name: orifice_to_vaporization_area_ratio_as_printed
+    unit: as printed
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: about 1:550
+      locator: *id002
+  - name: aperture_glass_absorption_correction_at_2000_K
+    unit: K
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '40'
+      locator: *id002
+  - name: aperture_glass_absorption_correction_uncertainty_at_2000_K
+    unit: K
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5'
+      locator: *id002
+  - name: pyrometer_thermocouple_difference_upper_bound_at_2000_K
+    unit: K
+    value:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <=
+          bound_value: '10'
+      locator: *id002
+  - name: separate_cell_liner_material
+    unit: as printed
+    value:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Experimental
+        note: No separate liner material is stated.
+  - name: iridium_coating_mass
+    unit: mg
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '600'
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Experimental
+  - name: iridium_coating_temperature
+    unit: K
+    value:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '2900'
+          interval_high: '3000'
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Experimental
+  - name: iridium_coating_duration
+    unit: h
+    value:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '4'
+          interval_high: '5'
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Experimental
+- id: ms1301-ptrh-mo
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: MS-1301 high-temperature mass spectrometer; electron-bombardment heating
+    locator: *id002
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: 'molybdenum crucible with Pt–20% Rh inserts (Table 2: Pt–Rh (Mo))'
+    locator: &id005
+      published_page: 1172
+      pdf_page_index: 1
+      section: Experimental
+      note: Cell description for Pt–Rh (Mo) run set; as printed.
+  cell_materials:
+  - state:
+      tag: value
+      value: Mo
+    locator: *id005
+  - state:
+      tag: value
+      value: Pt
+    locator: *id005
+  - state:
+      tag: value
+      value: Rh
+    locator: *id005
+  geometry:
+    orifice_diameter_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Experimental
+        note: No orifice diameter is stated for this cell.
+    orifice_channel_length_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Experimental
+        note: No orifice channel length is stated for this cell.
+  heating_method:
+    state:
+      tag: value
+      value: electron bombardment
+    locator: *id002
+  detector:
+    state:
+      tag: value
+      value: high-temperature mass spectrometer (MS-1301)
+    locator: *id002
+  ionization:
+    energy_eV:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '70'
+      locator:
+        published_page: 1173
+        pdf_page_index: 2
+        table: '1'
+        note: The current-work mass spectra in Table 1 use Uion = 70 eV.
+    cross_sections_method:
+      state:
+        tag: value
+        value: Calculated from atomic cross sections assuming additivity.
+      locator: *id003
+    cross_sections_source:
+      state:
+        tag: value
+        value: Reference [39].
+      locator: *id003
+    secondary_electron_multiplier_correction:
+      state:
+        tag: value
+        value: Conversion factors for the apparatus were considered when a secondary-electron multiplier was used.
+      locator: *id003
+    SiO2_fragmentation_correction:
+      state:
+        tag: value
+        value: The increase in fragmentation of SiO2+ at 70 eV was taken into account when evaluating SiO and SiO2
+          partial pressures.
+      locator: *id003
+    silicon_isotope_ratio_check:
+      state:
+        tag: value
+        value: Si+ and SiO+ isotope ratios agree with natural abundances in [4] within 13%; no separate applied
+          isotope correction is stated.
+      locator:
+        published_page: 1173
+        pdf_page_index: 2
+        table: '1'
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: EOP-66 optical pyrometer; WRe5/WRe20 thermocouple welded to the cell lid used as a comparison.
+      locator: *id002
+  temperature_calibration:
+    aperture_glass_absorption_correction:
+      state:
+        tag: value
+        value: Light absorption by the glass of the pyrometric aperture was corrected.
+      locator: *id002
+    thermocouple_comparison:
+      state:
+        tag: value
+        value: At 2000 K the EOP-66 and lid thermocouple readings differed by no more than 10 K.
+      locator: *id002
+  other_facts:
+  - name: orifice_to_vaporization_area_ratio_as_printed
+    unit: as printed
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: about 1:250
+      locator: *id002
+  - name: aperture_glass_absorption_correction_at_2000_K
+    unit: K
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '40'
+      locator: *id002
+  - name: aperture_glass_absorption_correction_uncertainty_at_2000_K
+    unit: K
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5'
+      locator: *id002
+  - name: pyrometer_thermocouple_difference_upper_bound_at_2000_K
+    unit: K
+    value:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <=
+          bound_value: '10'
+      locator: *id002
+  - name: separate_cell_liner_material
+    unit: as printed
+    value:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Experimental
+        note: The source names Pt–20% Rh inserts in the molybdenum crucible but does not call them a liner.
+- id: mi1201-mo
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: MI-1201 high-temperature mass spectrometer; tantalum tube heating
+    locator: *id002
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: molybdenum effusion cell
+    locator: &id006
+      published_page: 1172
+      pdf_page_index: 1
+      section: Experimental
+      note: Cell description for Mo run set; as printed.
+  cell_materials:
+  - state:
+      tag: value
+      value: Mo
+    locator: *id006
+  geometry:
+    orifice_diameter_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Experimental
+        note: No orifice diameter is stated for this cell.
+    orifice_channel_length_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Experimental
+        note: No orifice channel length is stated for this cell.
+  heating_method:
+    state:
+      tag: value
+      value: tantalum tube heater
+    locator: *id002
+  detector:
+    state:
+      tag: value
+      value: high-temperature mass spectrometer (MI-1201)
+    locator: *id002
+  ionization:
+    energy_eV:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '70'
+      locator:
+        published_page: 1173
+        pdf_page_index: 2
+        table: '1'
+        note: The current-work Mo mass spectrum in Table 1 uses Uion = 70 eV.
+    cross_sections_method:
+      state:
+        tag: value
+        value: Calculated from atomic cross sections assuming additivity.
+      locator: *id003
+    cross_sections_source:
+      state:
+        tag: value
+        value: Reference [39].
+      locator: *id003
+    secondary_electron_multiplier_correction:
+      state:
+        tag: value
+        value: Conversion factors for the apparatus were considered when a secondary-electron multiplier was used.
+      locator: *id003
+    SiO2_fragmentation_correction:
+      state:
+        tag: value
+        value: The increase in fragmentation of SiO2+ at 70 eV was taken into account when evaluating SiO and SiO2
+          partial pressures.
+      locator: *id003
+    silicon_isotope_ratio_check:
+      state:
+        tag: value
+        value: Si+ and SiO+ isotope ratios agree with natural abundances in [4] within 13%; no separate applied
+          isotope correction is stated.
+      locator:
+        published_page: 1173
+        pdf_page_index: 2
+        table: '1'
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: WRe5/WRe20 thermocouple; a pair was welded to the cell lid and bottom to determine the gradient.
+      locator: *id002
+  temperature_calibration:
+    lid_bottom_gradient_check:
+      state:
+        tag: value
+        value: The lid-to-bottom gradient was determined from the difference between two thermocouples.
+      locator: *id002
+  other_facts:
+  - name: orifice_to_vaporization_area_ratio_as_printed
+    unit: as printed
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: about 1:400
+      locator: *id002
+  - name: lid_bottom_temperature_gradient_at_2000_K
+    unit: K
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '7'
+      locator: *id002
+  - name: lid_bottom_temperature_gradient_uncertainty_at_2000_K
+    unit: K
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3'
+      locator: *id002
+  - name: separate_cell_liner_material
+    unit: as printed
+    value:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Experimental
+        note: No separate liner material is stated.
+experiments:
+- experiment_id: ms1301-w-sio2
+  bench_id: ms1301-w
+  method: knudsen_effusion
+  locator: *id002
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          material: silicon dioxide
+          brand: KS-4V
+          purity_min_wt_pct: 99.9999
+      locator: &id007
+        published_page: 1172
+        pdf_page_index: 1
+        section: Experimental
+        note: The authors identify the feedstock as SiO2 from the Institute of Chemistry of Silicates, Russian Academy
+          of Sciences, KS-4V brand, purity no less than 99.9999 wt%.
+    characterization:
+      state:
+        tag: value
+        value: Institute of Chemistry of Silicates, Russian Academy of Sciences; KS-4V; purity no less than 99.9999
+          wt%.
+      locator: *id007
+  apparatus:
+    calibration:
+      method:
+        state:
+          tag: value
+          value: Complete-vaporization procedure and comparison of ion currents.
+        locator: *id003
+      reference_substance:
+        state:
+          tag: value
+          value: Silver and gold vapors; their standard vapor partial pressures were used for the ion-current comparison.
+        locator: *id003
+      cross_sections:
+        state:
+          tag: value
+          value: Ionization cross sections were calculated from atomic cross sections in [39] under the additivity
+            assumption.
+        locator: *id003
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 1172
+          pdf_page_index: 1
+          section: Experimental
+          note: The paper states area ratios but no orifice diameter for this run set.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 1172
+          pdf_page_index: 1
+          section: Experimental
+          note: The paper does not state an orifice channel length for this run set.
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: Temperature is reported as a range for each fitted dependence, not as a single experiment setpoint.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Experimental
+        note: No chamber or residual/background pressure is reported; this is not the sample vapor pressure.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Experimental
+        note: No sweep gas is reported.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+- experiment_id: ms1301-ir-w-sio2
+  bench_id: ms1301-ir-w
+  method: knudsen_effusion
+  locator: *id002
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          material: silicon dioxide
+          brand: KS-4V
+          purity_min_wt_pct: 99.9999
+      locator: &id008
+        published_page: 1172
+        pdf_page_index: 1
+        section: Experimental
+        note: The authors identify the feedstock as SiO2 from the Institute of Chemistry of Silicates, Russian Academy
+          of Sciences, KS-4V brand, purity no less than 99.9999 wt%.
+    characterization:
+      state:
+        tag: value
+        value: Institute of Chemistry of Silicates, Russian Academy of Sciences; KS-4V; purity no less than 99.9999
+          wt%.
+      locator: *id008
+  apparatus:
+    calibration:
+      method:
+        state:
+          tag: value
+          value: Complete-vaporization procedure and comparison of ion currents.
+        locator: *id003
+      reference_substance:
+        state:
+          tag: value
+          value: Silver and gold vapors; their standard vapor partial pressures were used for the ion-current comparison.
+        locator: *id003
+      cross_sections:
+        state:
+          tag: value
+          value: Ionization cross sections were calculated from atomic cross sections in [39] under the additivity
+            assumption.
+        locator: *id003
+      reference_transfer:
+        state:
+          tag: value
+          value: Gold and silver vaporization data from tungsten and molybdenum cells of the same geometry were
+            used.
+        locator: *id003
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 1172
+          pdf_page_index: 1
+          section: Experimental
+          note: The paper states area ratios but no orifice diameter for this run set.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 1172
+          pdf_page_index: 1
+          section: Experimental
+          note: The paper does not state an orifice channel length for this run set.
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: Temperature is reported as a range for each fitted dependence, not as a single experiment setpoint.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Experimental
+        note: No chamber or residual/background pressure is reported; this is not the sample vapor pressure.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Experimental
+        note: No sweep gas is reported.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+- experiment_id: ms1301-ptrh-mo-sio2
+  bench_id: ms1301-ptrh-mo
+  method: knudsen_effusion
+  locator: *id002
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          material: silicon dioxide
+          brand: KS-4V
+          purity_min_wt_pct: 99.9999
+      locator: &id009
+        published_page: 1172
+        pdf_page_index: 1
+        section: Experimental
+        note: The authors identify the feedstock as SiO2 from the Institute of Chemistry of Silicates, Russian Academy
+          of Sciences, KS-4V brand, purity no less than 99.9999 wt%.
+    characterization:
+      state:
+        tag: value
+        value: Institute of Chemistry of Silicates, Russian Academy of Sciences; KS-4V; purity no less than 99.9999
+          wt%.
+      locator: *id009
+  apparatus:
+    calibration:
+      method:
+        state:
+          tag: value
+          value: Complete-vaporization procedure and comparison of ion currents.
+        locator: *id003
+      reference_substance:
+        state:
+          tag: value
+          value: Silver and gold vapors; their standard vapor partial pressures were used for the ion-current comparison.
+        locator: *id003
+      cross_sections:
+        state:
+          tag: value
+          value: Ionization cross sections were calculated from atomic cross sections in [39] under the additivity
+            assumption.
+        locator: *id003
+      partial_pressure_calculation:
+        state:
+          tag: value
+          value: Hertz–Knudsen equation, with the SiO vaporization coefficient from [27]; results agreed within
+            about 15% with ion-current comparison.
+        locator: *id003
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 1172
+          pdf_page_index: 1
+          section: Experimental
+          note: The paper states area ratios but no orifice diameter for this run set.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 1172
+          pdf_page_index: 1
+          section: Experimental
+          note: The paper does not state an orifice channel length for this run set.
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: Temperature is reported as a range for each fitted dependence, not as a single experiment setpoint.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Experimental
+        note: No chamber or residual/background pressure is reported; this is not the sample vapor pressure.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Experimental
+        note: No sweep gas is reported.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+- experiment_id: mi1201-mo-sio2
+  bench_id: mi1201-mo
+  method: knudsen_effusion
+  locator: *id002
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          material: silicon dioxide
+          brand: KS-4V
+          purity_min_wt_pct: 99.9999
+      locator: &id010
+        published_page: 1172
+        pdf_page_index: 1
+        section: Experimental
+        note: The authors identify the feedstock as SiO2 from the Institute of Chemistry of Silicates, Russian Academy
+          of Sciences, KS-4V brand, purity no less than 99.9999 wt%.
+    characterization:
+      state:
+        tag: value
+        value: Institute of Chemistry of Silicates, Russian Academy of Sciences; KS-4V; purity no less than 99.9999
+          wt%.
+      locator: *id010
+  apparatus:
+    calibration:
+      method:
+        state:
+          tag: value
+          value: Complete-vaporization procedure and comparison of ion currents.
+        locator: *id003
+      reference_substance:
+        state:
+          tag: value
+          value: Silver and gold vapors; their standard vapor partial pressures were used for the ion-current comparison.
+        locator: *id003
+      cross_sections:
+        state:
+          tag: value
+          value: Ionization cross sections were calculated from atomic cross sections in [39] under the additivity
+            assumption.
+        locator: *id003
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 1172
+          pdf_page_index: 1
+          section: Experimental
+          note: The paper states area ratios but no orifice diameter for this run set.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 1172
+          pdf_page_index: 1
+          section: Experimental
+          note: The paper does not state an orifice channel length for this run set.
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: Temperature is reported as a range for each fitted dependence, not as a single experiment setpoint.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Experimental
+        note: No chamber or residual/background pressure is reported; this is not the sample vapor pressure.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Experimental
+        note: No sweep gas is reported.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+species:
+  SiO2:
+    context:
+    - observation_id: sh98_t1_ref_28_mass_spectrum
+      type: experiment_series
+      locator:
+        published_page: 1173
+        pdf_page_index: 2
+        table: '1'
+        note: Reference [28] column; all listed ions carried in values. Table entries checked visually against the
+          page image.
+      units: relative ion intensity as printed
+      values:
+        quantity: relative_ion_intensity
+        method_class: quoted_attributed
+        attribution: Reference [28]
+        table: '1'
+        reference_column_as_printed: Reference [28]
+        cell_material_as_printed: Al2O3
+        temperature_K: 1900
+        ionization_energy_eV: 15
+        composition_as_studied: SiO2 feedstock; no mixture composition stated
+        normalization: (44SiO)+ relative ion intensity = 100.0
+        ions:
+        - ion_as_printed: 28(Si)+
+          relative_ion_intensity_as_printed: —
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: dash
+          printed_status: dash
+        - ion_as_printed: 29(Si)+
+          relative_ion_intensity_as_printed: null
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: blank
+          printed_status: blank
+        - ion_as_printed: 30(Si)+
+          relative_ion_intensity_as_printed: null
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: blank
+          printed_status: blank
+        - ion_as_printed: 44(SiO)+
+          relative_ion_intensity_as_printed: '100.0'
+          relative_ion_intensity: 100.0
+          printed_status: numeric
+        - ion_as_printed: 45(SiO)+
+          relative_ion_intensity_as_printed: null
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: blank
+          printed_status: blank
+        - ion_as_printed: 46(SiO)+
+          relative_ion_intensity_as_printed: null
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: blank
+          printed_status: blank
+        - ion_as_printed: 16(O)+
+          relative_ion_intensity_as_printed: '3.0'
+          relative_ion_intensity: 3.0
+          printed_status: numeric
+        - ion_as_printed: 32(O2)+
+          relative_ion_intensity_as_printed: '4.1'
+          relative_ion_intensity: 4.1
+          printed_status: numeric
+        - ion_as_printed: 60(SiO2)+
+          relative_ion_intensity_as_printed: '2.3'
+          relative_ion_intensity: 2.3
+          printed_status: numeric
+        - ion_as_printed: 98(Mo)+
+          relative_ion_intensity_as_printed: —
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: dash
+          printed_status: dash
+        - ion_as_printed: 130(MoO2)+
+          relative_ion_intensity_as_printed: —
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: dash
+          printed_status: dash
+        - ion_as_printed: 136(MoO3)+
+          relative_ion_intensity_as_printed: —
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: dash
+          printed_status: dash
+        - ion_as_printed: 184(W)+
+          relative_ion_intensity_as_printed: —
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: dash
+          printed_status: dash
+        - ion_as_printed: 200(WO)+
+          relative_ion_intensity_as_printed: —
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: dash
+          printed_status: dash
+        - ion_as_printed: 216(WO2)+
+          relative_ion_intensity_as_printed: —
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: dash
+          printed_status: dash
+        - ion_as_printed: 232(WO3)+
+          relative_ion_intensity_as_printed: —
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: dash
+          printed_status: dash
+    - observation_id: sh98_t1_ref_25_mass_spectrum
+      type: experiment_series
+      locator:
+        published_page: 1173
+        pdf_page_index: 2
+        table: '1'
+        note: Reference [25] column; all listed ions carried in values. Table entries checked visually against the
+          page image.
+      units: relative ion intensity as printed
+      values:
+        quantity: relative_ion_intensity
+        method_class: quoted_attributed
+        attribution: Reference [25]
+        table: '1'
+        reference_column_as_printed: Reference [25]
+        cell_material_as_printed: Pt
+        temperature_K: 1950
+        ionization_energy_eV: 15
+        composition_as_studied: SiO2 feedstock; no mixture composition stated
+        normalization: (44SiO)+ relative ion intensity = 100.0
+        ions:
+        - ion_as_printed: 28(Si)+
+          relative_ion_intensity_as_printed: —
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: dash
+          printed_status: dash
+        - ion_as_printed: 29(Si)+
+          relative_ion_intensity_as_printed: null
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: blank
+          printed_status: blank
+        - ion_as_printed: 30(Si)+
+          relative_ion_intensity_as_printed: null
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: blank
+          printed_status: blank
+        - ion_as_printed: 44(SiO)+
+          relative_ion_intensity_as_printed: '100.0'
+          relative_ion_intensity: 100.0
+          printed_status: numeric
+        - ion_as_printed: 45(SiO)+
+          relative_ion_intensity_as_printed: null
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: blank
+          printed_status: blank
+        - ion_as_printed: 46(SiO)+
+          relative_ion_intensity_as_printed: null
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: blank
+          printed_status: blank
+        - ion_as_printed: 16(O)+
+          relative_ion_intensity_as_printed: '2.67'
+          relative_ion_intensity: 2.67
+          printed_status: numeric
+        - ion_as_printed: 32(O2)+
+          relative_ion_intensity_as_printed: '17.51'
+          relative_ion_intensity: 17.51
+          printed_status: numeric
+        - ion_as_printed: 60(SiO2)+
+          relative_ion_intensity_as_printed: '6.32'
+          relative_ion_intensity: 6.32
+          printed_status: numeric
+        - ion_as_printed: 98(Mo)+
+          relative_ion_intensity_as_printed: —
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: dash
+          printed_status: dash
+        - ion_as_printed: 130(MoO2)+
+          relative_ion_intensity_as_printed: —
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: dash
+          printed_status: dash
+        - ion_as_printed: 136(MoO3)+
+          relative_ion_intensity_as_printed: —
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: dash
+          printed_status: dash
+        - ion_as_printed: 184(W)+
+          relative_ion_intensity_as_printed: —
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: dash
+          printed_status: dash
+        - ion_as_printed: 200(WO)+
+          relative_ion_intensity_as_printed: —
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: dash
+          printed_status: dash
+        - ion_as_printed: 216(WO2)+
+          relative_ion_intensity_as_printed: —
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: dash
+          printed_status: dash
+        - ion_as_printed: 232(WO3)+
+          relative_ion_intensity_as_printed: —
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: dash
+          printed_status: dash
+    - observation_id: sh98_t1_this_work_W_mass_spectrum
+      type: experiment_series
+      locator:
+        published_page: 1173
+        pdf_page_index: 2
+        table: '1'
+        note: This work column; all listed ions carried in values. Table entries checked visually against the page
+          image.
+      units: relative ion intensity as printed
+      values:
+        quantity: relative_ion_intensity
+        method_class: measured_tabulated
+        table: '1'
+        reference_column_as_printed: This work
+        cell_material_as_printed: W
+        temperature_K: 1900
+        ionization_energy_eV: 70
+        composition_as_studied: SiO2 feedstock; no mixture composition stated
+        normalization: (44SiO)+ relative ion intensity = 100.0
+        ions:
+        - ion_as_printed: 28(Si)+
+          relative_ion_intensity_as_printed: '38.7'
+          relative_ion_intensity: 38.7
+          printed_status: numeric
+        - ion_as_printed: 29(Si)+
+          relative_ion_intensity_as_printed: '2.30'
+          relative_ion_intensity: 2.3
+          printed_status: numeric
+        - ion_as_printed: 30(Si)+
+          relative_ion_intensity_as_printed: '1.33'
+          relative_ion_intensity: 1.33
+          printed_status: numeric
+        - ion_as_printed: 44(SiO)+
+          relative_ion_intensity_as_printed: '100.0'
+          relative_ion_intensity: 100.0
+          printed_status: numeric
+        - ion_as_printed: 45(SiO)+
+          relative_ion_intensity_as_printed: '5.12'
+          relative_ion_intensity: 5.12
+          printed_status: numeric
+        - ion_as_printed: 46(SiO)+
+          relative_ion_intensity_as_printed: '3.68'
+          relative_ion_intensity: 3.68
+          printed_status: numeric
+        - ion_as_printed: 16(O)+
+          relative_ion_intensity_as_printed: '0.17'
+          relative_ion_intensity: 0.17
+          printed_status: numeric
+        - ion_as_printed: 32(O2)+
+          relative_ion_intensity_as_printed: —
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: dash
+          printed_status: dash
+        - ion_as_printed: 60(SiO2)+
+          relative_ion_intensity_as_printed: '0.043'
+          relative_ion_intensity: 0.043
+          printed_status: numeric
+        - ion_as_printed: 98(Mo)+
+          relative_ion_intensity_as_printed: —
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: dash
+          printed_status: dash
+        - ion_as_printed: 130(MoO2)+
+          relative_ion_intensity_as_printed: —
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: dash
+          printed_status: dash
+        - ion_as_printed: 136(MoO3)+
+          relative_ion_intensity_as_printed: —
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: dash
+          printed_status: dash
+        - ion_as_printed: 184(W)+
+          relative_ion_intensity_as_printed: '1.11'
+          relative_ion_intensity: 1.11
+          printed_status: numeric
+        - ion_as_printed: 200(WO)+
+          relative_ion_intensity_as_printed: '1.31'
+          relative_ion_intensity: 1.31
+          printed_status: numeric
+        - ion_as_printed: 216(WO2)+
+          relative_ion_intensity_as_printed: '4.72'
+          relative_ion_intensity: 4.72
+          printed_status: numeric
+        - ion_as_printed: 232(WO3)+
+          relative_ion_intensity_as_printed: '4.15'
+          relative_ion_intensity: 4.15
+          printed_status: numeric
+    - observation_id: sh98_t1_this_work_Ir_W_mass_spectrum
+      type: experiment_series
+      locator:
+        published_page: 1173
+        pdf_page_index: 2
+        table: '1'
+        note: This work column; all listed ions carried in values. Table entries checked visually against the page
+          image.
+      units: relative ion intensity as printed
+      values:
+        quantity: relative_ion_intensity
+        method_class: measured_tabulated
+        table: '1'
+        reference_column_as_printed: This work
+        cell_material_as_printed: Ir (W)
+        temperature_K: 1900
+        ionization_energy_eV: 70
+        composition_as_studied: SiO2 feedstock; no mixture composition stated
+        normalization: (44SiO)+ relative ion intensity = 100.0
+        ions:
+        - ion_as_printed: 28(Si)+
+          relative_ion_intensity_as_printed: '36.5'
+          relative_ion_intensity: 36.5
+          printed_status: numeric
+        - ion_as_printed: 29(Si)+
+          relative_ion_intensity_as_printed: '2.01'
+          relative_ion_intensity: 2.01
+          printed_status: numeric
+        - ion_as_printed: 30(Si)+
+          relative_ion_intensity_as_printed: '1.25'
+          relative_ion_intensity: 1.25
+          printed_status: numeric
+        - ion_as_printed: 44(SiO)+
+          relative_ion_intensity_as_printed: '100.0'
+          relative_ion_intensity: 100.0
+          printed_status: numeric
+        - ion_as_printed: 45(SiO)+
+          relative_ion_intensity_as_printed: '5.41'
+          relative_ion_intensity: 5.41
+          printed_status: numeric
+        - ion_as_printed: 46(SiO)+
+          relative_ion_intensity_as_printed: '3.67'
+          relative_ion_intensity: 3.67
+          printed_status: numeric
+        - ion_as_printed: 16(O)+
+          relative_ion_intensity_as_printed: '1.9'
+          relative_ion_intensity: 1.9
+          printed_status: numeric
+        - ion_as_printed: 32(O2)+
+          relative_ion_intensity_as_printed: —
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: dash
+          printed_status: dash
+        - ion_as_printed: 60(SiO2)+
+          relative_ion_intensity_as_printed: '0.05'
+          relative_ion_intensity: 0.05
+          printed_status: numeric
+        - ion_as_printed: 98(Mo)+
+          relative_ion_intensity_as_printed: —
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: dash
+          printed_status: dash
+        - ion_as_printed: 130(MoO2)+
+          relative_ion_intensity_as_printed: —
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: dash
+          printed_status: dash
+        - ion_as_printed: 136(MoO3)+
+          relative_ion_intensity_as_printed: —
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: dash
+          printed_status: dash
+        - ion_as_printed: 184(W)+
+          relative_ion_intensity_as_printed: +
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_numeric
+            printed_status: detected_only
+          printed_status: detected_only
+        - ion_as_printed: 200(WO)+
+          relative_ion_intensity_as_printed: —
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: dash
+          printed_status: dash
+        - ion_as_printed: 216(WO2)+
+          relative_ion_intensity_as_printed: —
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: dash
+          printed_status: dash
+        - ion_as_printed: 232(WO3)+
+          relative_ion_intensity_as_printed: —
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: dash
+          printed_status: dash
+    - observation_id: sh98_t1_this_work_Pt_Rh_mass_spectrum
+      type: experiment_series
+      locator:
+        published_page: 1173
+        pdf_page_index: 2
+        table: '1'
+        note: This work column; all listed ions carried in values. Table entries checked visually against the page
+          image.
+      units: relative ion intensity as printed
+      values:
+        quantity: relative_ion_intensity
+        method_class: measured_tabulated
+        table: '1'
+        reference_column_as_printed: This work
+        cell_material_as_printed: Pt–Rh
+        temperature_K: 1985
+        ionization_energy_eV: 70
+        composition_as_studied: SiO2 feedstock; no mixture composition stated
+        normalization: (44SiO)+ relative ion intensity = 100.0
+        ions:
+        - ion_as_printed: 28(Si)+
+          relative_ion_intensity_as_printed: '35.9'
+          relative_ion_intensity: 35.9
+          printed_status: numeric
+        - ion_as_printed: 29(Si)+
+          relative_ion_intensity_as_printed: '2.04'
+          relative_ion_intensity: 2.04
+          printed_status: numeric
+        - ion_as_printed: 30(Si)+
+          relative_ion_intensity_as_printed: '1.12'
+          relative_ion_intensity: 1.12
+          printed_status: numeric
+        - ion_as_printed: 44(SiO)+
+          relative_ion_intensity_as_printed: '100.0'
+          relative_ion_intensity: 100.0
+          printed_status: numeric
+        - ion_as_printed: 45(SiO)+
+          relative_ion_intensity_as_printed: '5.26'
+          relative_ion_intensity: 5.26
+          printed_status: numeric
+        - ion_as_printed: 46(SiO)+
+          relative_ion_intensity_as_printed: '3.33'
+          relative_ion_intensity: 3.33
+          printed_status: numeric
+        - ion_as_printed: 16(O)+
+          relative_ion_intensity_as_printed: '3.33'
+          relative_ion_intensity: 3.33
+          printed_status: numeric
+        - ion_as_printed: 32(O2)+
+          relative_ion_intensity_as_printed: '13.3'
+          relative_ion_intensity: 13.3
+          printed_status: numeric
+        - ion_as_printed: 60(SiO2)+
+          relative_ion_intensity_as_printed: '1.44'
+          relative_ion_intensity: 1.44
+          printed_status: numeric
+        - ion_as_printed: 98(Mo)+
+          relative_ion_intensity_as_printed: +
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_numeric
+            printed_status: detected_only
+          printed_status: detected_only
+        - ion_as_printed: 130(MoO2)+
+          relative_ion_intensity_as_printed: —
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: dash
+          printed_status: dash
+        - ion_as_printed: 136(MoO3)+
+          relative_ion_intensity_as_printed: —
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: dash
+          printed_status: dash
+        - ion_as_printed: 184(W)+
+          relative_ion_intensity_as_printed: —
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: dash
+          printed_status: dash
+        - ion_as_printed: 200(WO)+
+          relative_ion_intensity_as_printed: —
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: dash
+          printed_status: dash
+        - ion_as_printed: 216(WO2)+
+          relative_ion_intensity_as_printed: —
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: dash
+          printed_status: dash
+        - ion_as_printed: 232(WO3)+
+          relative_ion_intensity_as_printed: —
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: dash
+          printed_status: dash
+    - observation_id: sh98_t1_this_work_Mo_mass_spectrum
+      type: experiment_series
+      locator:
+        published_page: 1173
+        pdf_page_index: 2
+        table: '1'
+        note: This work column; all listed ions carried in values. Table entries checked visually against the page
+          image.
+      units: relative ion intensity as printed
+      values:
+        quantity: relative_ion_intensity
+        method_class: measured_tabulated
+        table: '1'
+        reference_column_as_printed: This work
+        cell_material_as_printed: Mo
+        temperature_K: 1933
+        ionization_energy_eV: 70
+        composition_as_studied: SiO2 feedstock; no mixture composition stated
+        normalization: (44SiO)+ relative ion intensity = 100.0
+        ions:
+        - ion_as_printed: 28(Si)+
+          relative_ion_intensity_as_printed: '43.7'
+          relative_ion_intensity: 43.7
+          printed_status: numeric
+        - ion_as_printed: 29(Si)+
+          relative_ion_intensity_as_printed: '2.30'
+          relative_ion_intensity: 2.3
+          printed_status: numeric
+        - ion_as_printed: 30(Si)+
+          relative_ion_intensity_as_printed: '1.58'
+          relative_ion_intensity: 1.58
+          printed_status: numeric
+        - ion_as_printed: 44(SiO)+
+          relative_ion_intensity_as_printed: '100.0'
+          relative_ion_intensity: 100.0
+          printed_status: numeric
+        - ion_as_printed: 45(SiO)+
+          relative_ion_intensity_as_printed: '5.21'
+          relative_ion_intensity: 5.21
+          printed_status: numeric
+        - ion_as_printed: 46(SiO)+
+          relative_ion_intensity_as_printed: '3.44'
+          relative_ion_intensity: 3.44
+          printed_status: numeric
+        - ion_as_printed: 16(O)+
+          relative_ion_intensity_as_printed: —
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: dash
+          printed_status: dash
+        - ion_as_printed: 32(O2)+
+          relative_ion_intensity_as_printed: —
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: dash
+          printed_status: dash
+        - ion_as_printed: 60(SiO2)+
+          relative_ion_intensity_as_printed: '0.025'
+          relative_ion_intensity: 0.025
+          printed_status: numeric
+        - ion_as_printed: 98(Mo)+
+          relative_ion_intensity_as_printed: +
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_numeric
+            printed_status: detected_only
+          printed_status: detected_only
+        - ion_as_printed: 130(MoO2)+
+          relative_ion_intensity_as_printed: '0.022'
+          relative_ion_intensity: 0.022
+          printed_status: numeric
+        - ion_as_printed: 136(MoO3)+
+          relative_ion_intensity_as_printed: '0.005'
+          relative_ion_intensity: 0.005
+          printed_status: numeric
+        - ion_as_printed: 184(W)+
+          relative_ion_intensity_as_printed: —
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: dash
+          printed_status: dash
+        - ion_as_printed: 200(WO)+
+          relative_ion_intensity_as_printed: —
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: dash
+          printed_status: dash
+        - ion_as_printed: 216(WO2)+
+          relative_ion_intensity_as_printed: —
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: dash
+          printed_status: dash
+        - ion_as_printed: 232(WO3)+
+          relative_ion_intensity_as_printed: —
+          relative_ion_intensity:
+            state:
+              tag: unknown
+              reason: not_published
+            printed_status: dash
+          printed_status: dash
+    - observation_id: sh98_t3_enthalpy_row_1
+      type: thermodynamic_example
+      locator:
+        published_page: 1176
+        pdf_page_index: 5
+        table: '3'
+        note: Table 3, 1996 K; author estimate from reactions (1) and (3).
+      units: kJ/mol
+      values:
+        quantity: enthalpy_of_fusion
+        method_class: model_derived
+        cell_as_printed: Mo
+        temperature_K: 1996.0
+        unit_as_printed: kJ/mol
+        reactions_used:
+        - (1)
+        - (3)
+        reaction_1_as_printed: 50.7 ± 24.4
+        reaction_1_kJ_mol: 50.7
+        reaction_1_sigma_kJ_mol: 24.4
+        reaction_3_as_printed: 37.1 ± 11.4
+        reaction_3_kJ_mol: 37.1
+        reaction_3_sigma_kJ_mol: 11.4
+        accepted_reaction_1_as_printed:
+          state:
+            tag: unknown
+            reason: not_published
+        accepted_reaction_1_kJ_mol:
+          state:
+            tag: unknown
+            reason: not_published
+        accepted_reaction_1_sigma_kJ_mol:
+          state:
+            tag: unknown
+            reason: not_published
+        accepted_reaction_3_as_printed:
+          state:
+            tag: unknown
+            reason: not_published
+        accepted_reaction_3_kJ_mol:
+          state:
+            tag: unknown
+            reason: not_published
+        accepted_reaction_3_sigma_kJ_mol:
+          state:
+            tag: unknown
+            reason: not_published
+    - observation_id: sh98_t3_enthalpy_row_2
+      type: thermodynamic_example
+      locator:
+        published_page: 1176
+        pdf_page_index: 5
+        table: '3'
+        note: Table 3, 1996 K; author estimate from reactions (1) and (3).
+      units: kJ/mol
+      values:
+        quantity: enthalpy_of_fusion
+        method_class: model_derived
+        cell_as_printed: W
+        temperature_K: 1996.0
+        unit_as_printed: kJ/mol
+        reactions_used:
+        - (1)
+        - (3)
+        reaction_1_as_printed: 29.4 ± 34.4
+        reaction_1_kJ_mol: 29.4
+        reaction_1_sigma_kJ_mol: 34.4
+        reaction_3_as_printed: 40.6 ± 20.2
+        reaction_3_kJ_mol: 40.6
+        reaction_3_sigma_kJ_mol: 20.2
+        accepted_reaction_1_as_printed:
+          state:
+            tag: unknown
+            reason: not_published
+        accepted_reaction_1_kJ_mol:
+          state:
+            tag: unknown
+            reason: not_published
+        accepted_reaction_1_sigma_kJ_mol:
+          state:
+            tag: unknown
+            reason: not_published
+        accepted_reaction_3_as_printed:
+          state:
+            tag: unknown
+            reason: not_published
+        accepted_reaction_3_kJ_mol:
+          state:
+            tag: unknown
+            reason: not_published
+        accepted_reaction_3_sigma_kJ_mol:
+          state:
+            tag: unknown
+            reason: not_published
+    - observation_id: sh98_t3_enthalpy_row_3
+      type: thermodynamic_example
+      locator:
+        published_page: 1176
+        pdf_page_index: 5
+        table: '3'
+        note: Table 3, 1996 K; author estimate from reactions (1) and (3).
+      units: kJ/mol
+      values:
+        quantity: enthalpy_of_fusion
+        method_class: model_derived
+        cell_as_printed: Ir (W)
+        temperature_K: 1996.0
+        unit_as_printed: kJ/mol
+        reactions_used:
+        - (1)
+        - (3)
+        reaction_1_as_printed: —
+        reaction_1_kJ_mol:
+          state:
+            tag: unknown
+            reason: not_applicable
+        reaction_1_sigma_kJ_mol:
+          state:
+            tag: unknown
+            reason: not_applicable
+        reaction_3_as_printed: 67.8 ± 32.9
+        reaction_3_kJ_mol: 67.8
+        reaction_3_sigma_kJ_mol: 32.9
+        accepted_reaction_1_as_printed:
+          state:
+            tag: unknown
+            reason: not_published
+        accepted_reaction_1_kJ_mol:
+          state:
+            tag: unknown
+            reason: not_published
+        accepted_reaction_1_sigma_kJ_mol:
+          state:
+            tag: unknown
+            reason: not_published
+        accepted_reaction_3_as_printed:
+          state:
+            tag: unknown
+            reason: not_published
+        accepted_reaction_3_kJ_mol:
+          state:
+            tag: unknown
+            reason: not_published
+        accepted_reaction_3_sigma_kJ_mol:
+          state:
+            tag: unknown
+            reason: not_published
+        reaction_1_absence: not estimated in Table 3
+    - observation_id: sh98_t3_enthalpy_row_4
+      type: thermodynamic_example
+      locator:
+        published_page: 1176
+        pdf_page_index: 5
+        table: '3'
+        note: Table 3, 1996 K; author estimate from reactions (1) and (3).
+      units: kJ/mol
+      values:
+        quantity: enthalpy_of_fusion
+        method_class: model_derived
+        cell_as_printed: Pt–Rh (Mo)
+        temperature_K: 1996.0
+        unit_as_printed: kJ/mol
+        reactions_used:
+        - (1)
+        - (3)
+        reaction_1_as_printed: 10.6 ± 18.6
+        reaction_1_kJ_mol: 10.6
+        reaction_1_sigma_kJ_mol: 18.6
+        reaction_3_as_printed: 25.6 ± 24.8
+        reaction_3_kJ_mol: 25.6
+        reaction_3_sigma_kJ_mol: 24.8
+        accepted_reaction_1_as_printed:
+          state:
+            tag: unknown
+            reason: not_published
+        accepted_reaction_1_kJ_mol:
+          state:
+            tag: unknown
+            reason: not_published
+        accepted_reaction_1_sigma_kJ_mol:
+          state:
+            tag: unknown
+            reason: not_published
+        accepted_reaction_3_as_printed:
+          state:
+            tag: unknown
+            reason: not_published
+        accepted_reaction_3_kJ_mol:
+          state:
+            tag: unknown
+            reason: not_published
+        accepted_reaction_3_sigma_kJ_mol:
+          state:
+            tag: unknown
+            reason: not_published
+    - observation_id: sh98_t3_enthalpy_row_5
+      type: thermodynamic_example
+      locator:
+        published_page: 1176
+        pdf_page_index: 5
+        table: '3'
+        note: Table 3, 1996 K; author estimate from reactions (1) and (3).
+      units: kJ/mol
+      values:
+        quantity: enthalpy_of_fusion
+        method_class: model_derived
+        cell_as_printed: Accepted value
+        temperature_K: 1996.0
+        unit_as_printed: kJ/mol
+        reactions_used:
+        - (1)
+        - (3)
+        reaction_1_as_printed:
+          state:
+            tag: unknown
+            reason: not_published
+        reaction_1_kJ_mol:
+          state:
+            tag: unknown
+            reason: not_published
+        reaction_1_sigma_kJ_mol:
+          state:
+            tag: unknown
+            reason: not_published
+        reaction_3_as_printed:
+          state:
+            tag: unknown
+            reason: not_published
+        reaction_3_kJ_mol:
+          state:
+            tag: unknown
+            reason: not_published
+        reaction_3_sigma_kJ_mol:
+          state:
+            tag: unknown
+            reason: not_published
+        accepted_reaction_1_as_printed: 30.2 ± 26.6
+        accepted_reaction_1_kJ_mol: 30.2
+        accepted_reaction_1_sigma_kJ_mol: 26.6
+        accepted_reaction_3_as_printed: 42.8 ± 23.6
+        accepted_reaction_3_kJ_mol: 42.8
+        accepted_reaction_3_sigma_kJ_mol: 23.6
+    - observation_id: sh98_equation_1
+      type: thermodynamic_example
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Equations
+        note: Equation (1) as printed; brackets and parentheses distinguish condensed and gaseous species.
+      units: relation as printed
+      values:
+        equation_number: 1
+        relation: '[SiO2] = (SiO) + (O)'
+        relation_form: equilibrium reaction
+        reactants_and_products_as_printed: '[SiO2] = (SiO) + (O)'
+    - observation_id: sh98_equation_2
+      type: thermodynamic_example
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Equations
+        note: Equation (2) as printed; brackets and parentheses distinguish condensed and gaseous species.
+      units: relation as printed
+      values:
+        equation_number: 2
+        relation: '[SiO2] = (SiO) + 1/2 (O2)'
+        relation_form: equilibrium reaction
+        reactants_and_products_as_printed: '[SiO2] = (SiO) + 1/2 (O2)'
+    - observation_id: sh98_equation_3
+      type: thermodynamic_example
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Equations
+        note: Equation (3) as printed; brackets and parentheses distinguish condensed and gaseous species.
+      units: relation as printed
+      values:
+        equation_number: 3
+        relation: '[SiO2] = (SiO2)'
+        relation_form: equilibrium reaction
+        reactants_and_products_as_printed: '[SiO2] = (SiO2)'
+    - observation_id: sh98_equation_4
+      type: thermodynamic_example
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Equations
+        note: Equation (4) as printed; brackets and parentheses distinguish condensed and gaseous species.
+      units: relation as printed
+      values:
+        equation_number: 4
+        relation: (SiO2) = (SiO) + (O)
+        relation_form: equilibrium reaction
+        reactants_and_products_as_printed: (SiO2) = (SiO) + (O)
+    - observation_id: sh98_equation_5
+      type: thermodynamic_example
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Equations
+        note: Equation (5) as printed; brackets and parentheses distinguish condensed and gaseous species.
+      units: relation as printed
+      values:
+        equation_number: 5
+        relation: (SiO2) = (SiO) + 1/2 (O2)
+        relation_form: equilibrium reaction
+        reactants_and_products_as_printed: (SiO2) = (SiO) + 1/2 (O2)
+    - observation_id: sh98_equation_6
+      type: thermodynamic_example
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Equations
+        note: Equation (6) as printed; brackets and parentheses distinguish condensed and gaseous species.
+      units: relation as printed
+      values:
+        equation_number: 6
+        relation: (O2) = 2 (O)
+        relation_form: equilibrium reaction
+        reactants_and_products_as_printed: (O2) = 2 (O)
+    - observation_id: sh98_equation_7
+      type: thermodynamic_example
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Equations
+        note: Equation (7) as printed; brackets and parentheses distinguish condensed and gaseous species.
+      units: relation as printed
+      values:
+        equation_number: 7
+        relation: (WO3) = (WO2) + (O)
+        relation_form: equilibrium reaction
+        reactants_and_products_as_printed: (WO3) = (WO2) + (O)
+    - observation_id: sh98_equation_8
+      type: thermodynamic_example
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Equations
+        note: Equation (8) as printed; brackets and parentheses distinguish condensed and gaseous species.
+      units: relation as printed
+      values:
+        equation_number: 8
+        relation: (MoO3) = (MoO2) + (O)
+        relation_form: equilibrium reaction
+        reactants_and_products_as_printed: (MoO3) = (MoO2) + (O)
+    - observation_id: sh98_equation_9
+      type: thermodynamic_example
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        section: Results
+        note: Equation (9); pressure in atm as printed.
+      units: relation as printed
+      values:
+        equation_number: 9
+        relation: log p_i = −A/T + B, atm
+        relation_form: temperature dependence of partial pressure
+        variables:
+          p_i: partial pressure in atm
+          A: coefficient with units K
+          T: temperature in K
+          B: intercept
+    - observation_id: sh98_oxygen_relation_from_7
+      type: thermodynamic_example
+      locator:
+        published_page: 1174
+        pdf_page_index: 3
+        section: Results
+        note: Oxygen-pressure relation printed below reactions (7) and (8).
+      units: relation as printed
+      values:
+        relation: pO = K_r7,T × (pWO3 / pWO2)
+        relation_form: equilibrium-derived oxygen partial pressure
+        inputs:
+        - K_r7,T
+        - pWO3
+        - pWO2
+        output: pO
+    - observation_id: sh98_oxygen_relation_from_8
+      type: thermodynamic_example
+      locator:
+        published_page: 1174
+        pdf_page_index: 3
+        section: Results
+        note: Oxygen-pressure relation printed below reactions (7) and (8).
+      units: relation as printed
+      values:
+        relation: pO = K_r8,T × (pMoO3 / pMoO2)
+        relation_form: equilibrium-derived oxygen partial pressure
+        inputs:
+        - K_r8,T
+        - pMoO3
+        - pMoO2
+        output: pO
+    - observation_id: sh98_oxygen_relation_from_6
+      type: thermodynamic_example
+      locator:
+        published_page: 1174
+        pdf_page_index: 3
+        section: Results
+        note: Oxygen-pressure relation printed below reactions (7) and (8).
+      units: relation as printed
+      values:
+        relation: pO2 = pO^2 / K_r6,T
+        relation_form: equilibrium-derived molecular oxygen partial pressure
+        inputs:
+        - pO
+        - K_r6,T
+        output: pO2
+    - observation_id: sh98_source_statement_01
+      type: laboratory_conditions
+      locator:
+        published_page: 1171
+        pdf_page_index: 0
+        section: Abstract
+        note: Verbatim translation transcription re-checked against the rendered page image.
+      units: verbatim source statement
+      values:
+        statement_as_printed: Vaporization of silicon dioxide in the 1800–2200 K range as influenced by the material
+          of the effusion cells (Mo, W, Ir, Pt–Rh) was studied by the Knudsen high-temperature mass spectrometric
+          effusion method.
+    - observation_id: sh98_source_statement_02
+      type: laboratory_conditions
+      locator:
+        published_page: 1171
+        pdf_page_index: 0
+        section: Abstract
+        note: Verbatim translation transcription re-checked against the rendered page image.
+      units: verbatim source statement
+      values:
+        statement_as_printed: The partial pressures of molecular forms of the vapor over SiO2 were determined by
+          the procedure of complete vaporization and by comparison of ion currents using the partial vapor pressures
+          of silver and gold as standards.
+    - observation_id: sh98_source_statement_03
+      type: laboratory_conditions
+      locator:
+        published_page: 1171
+        pdf_page_index: 0
+        section: Introduction
+        note: Verbatim translation transcription re-checked against the rendered page image.
+      units: verbatim source statement
+      values:
+        statement_as_printed: The melting point of [SiO2] is 1996 ± 5 K [4, 5], though slightly different temperatures
+          are also published [6, 7].
+    - observation_id: sh98_source_statement_04
+      type: laboratory_conditions
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Introduction
+        note: Verbatim translation transcription re-checked against the rendered page image.
+      units: verbatim source statement
+      values:
+        statement_as_printed: According to [4], at temperatures higher than 1800 K under the chemically neutral
+          or close-to-neutral conditions the vapor phase over silicon dioxide predominantly consists of (SiO), (O),
+          (O2), and (SiO2).
+    - observation_id: sh98_source_statement_05
+      type: laboratory_conditions
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Introduction
+        note: Verbatim translation transcription re-checked against the rendered page image.
+      units: verbatim source statement
+      values:
+        statement_as_printed: The total concentration of (Si2O2), (O3), and (Sin) (n = 1, 2, 3) molecules in the
+          vapor is lower than 0.05%.
+    - observation_id: sh98_source_statement_06
+      type: laboratory_conditions
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Introduction
+        note: Verbatim translation transcription re-checked against the rendered page image.
+      units: verbatim source statement
+      values:
+        statement_as_printed: This probably explains the overestimated total vapor pressures over silicon dioxide
+          as determined by the method of boiling points and the rapid breakdown of iridium crucible at 2333 K [10].
+    - observation_id: sh98_source_statement_07
+      type: laboratory_conditions
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Introduction
+        note: Verbatim translation transcription re-checked against the rendered page image.
+      units: verbatim source statement
+      values:
+        statement_as_printed: As known [8], the vapor of silicon monoxide at high temperatures reacts with platinum
+          forming platinum silicide [Pt5Si2], which, according to the equilibrium phase diagram of the Pt–Si system,
+          forms an eutectic with metallic platinum at 1103 K [9]. Similar processes can occur with the other platinum
+          group metals.
+    - observation_id: sh98_source_statement_08
+      type: laboratory_conditions
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Introduction
+        note: Verbatim translation transcription re-checked against the rendered page image.
+      units: verbatim source statement
+      values:
+        statement_as_printed: The enthalpy of fusion of cristobalite (9.6 ± 0.5 kJ/mol), recommended in [4], was
+          determined indirectly by solution calorimetry as the difference between the enthalpies of formation of
+          cristobalite and vitreous [SiO2].
+    - observation_id: sh98_source_statement_09
+      type: laboratory_conditions
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Introduction
+        note: Verbatim translation transcription re-checked against the rendered page image.
+      units: verbatim source statement
+      values:
+        statement_as_printed: Thus, reliable experimental data on vaporization and thermodynamic properties of silicon
+          dioxide at temperatures above mp are almost lacking.
+    - observation_id: sh98_source_statement_10
+      type: laboratory_conditions
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Experimental
+        note: Verbatim translation transcription re-checked against the rendered page image.
+      units: verbatim source statement
+      values:
+        statement_as_printed: Using the Knudsen mass spectrometric effusion method we studied vaporization of samples
+          of silicon dioxide (Institute of Chemistry of Silicates, Russian Academy of Sciences, KS-4V brand, purity
+          no less than 99.9999 wt%) from cells prepared from tungsten, iridium-coated tungsten, and molybdenum (with
+          Pt–20% Rh inserts) crucibles on an MS-1301 mass spectrometer [16, 17, 26, 35].
+    - observation_id: sh98_source_statement_11
+      type: laboratory_conditions
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Experimental
+        note: Verbatim translation transcription re-checked against the rendered page image.
+      units: verbatim source statement
+      values:
+        statement_as_printed: For example, at 2000 K the correction for the light absorption was 40 ± 5 K.
+    - observation_id: sh98_source_statement_12
+      type: laboratory_conditions
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Experimental
+        note: Verbatim translation transcription re-checked against the rendered page image.
+      units: verbatim source statement
+      values:
+        statement_as_printed: The difference in the temperature data registered by the EOP-66 pyrometer and by a
+          WRe5/WRe20 thermocouple welded to the cell lid at 2000 K was within 10 K.
+    - observation_id: sh98_source_statement_13
+      type: laboratory_conditions
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Experimental
+        note: Verbatim translation transcription re-checked against the rendered page image.
+      units: verbatim source statement
+      values:
+        statement_as_printed: The temperature gradient between the lid and the bottom of the cell did not exceed
+          7 ± 3 K at 2000 K and was determined as the difference between the data of two thermocouples welded to
+          the lid and the bottom of the effusion cell.
+    - observation_id: sh98_fig1_figure_only
+      type: experiment_series
+      locator:
+        published_page: 1174
+        pdf_page_index: 3
+        figure: '1'
+        note: Relative and absolute ion currents versus ionization energy at 2126 ± 7 K; curves not digitized.
+      units: figure-only
+      values:
+        quantity: ion current versus ionization energy
+        method_class: figure_only
+        temperature_K: 2126
+        temperature_uncertainty_K: 7
+        species_as_plotted:
+        - 28Si+
+        - 29Si+
+        - 30Si+
+        - 44SiO+
+        - 45SiO+
+        - 46SiO+
+        - 60SiO2+
+        digitized: false
+    - observation_id: sh98_fig2_figure_only
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        figure: '2'
+        note: Temperature dependences of SiO partial pressure by cell material; curves not digitized.
+      units: figure-only
+      values:
+        quantity: SiO partial pressure versus temperature
+        method_class: figure_only
+        series_as_plotted:
+        - Mo
+        - W
+        - Ir-coated W
+        - Pt–Rh
+        digitized: false
+    - observation_id: t2_sio2_01
+      type: experiment_series
+      locator:
+        published_page: 1176
+        pdf_page_index: 5
+        table: '2'
+        note: SiO2 row; original temperature limits, A and B coefficients, uncertainties, method code, cell and
+          reference retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: Reference [4]; the cell and method label are transcribed from this paper Table 2.
+        gas_species: SiO2(g)
+        table: '2'
+        method_code_as_printed: IV
+        method_token: tabulation
+        cell_material_as_printed: —
+        reference_as_printed: '[4]'
+        reference_resolved: '[4]'
+        temperature_range_K:
+        - 1600
+        - 1996
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 29858±26
+          A_K: 29858.0
+          sigma_A_K: 26.0
+          B_as_printed: 8.79±0.02
+          B: 8.79
+          sigma_B: 0.02
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+    - observation_id: t2_sio2_02
+      type: experiment_series
+      locator:
+        published_page: 1176
+        pdf_page_index: 5
+        table: '2'
+        note: SiO2 row; original temperature limits, A and B coefficients, uncertainties, method code, cell and
+          reference retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: Reference [40]; the cell and method label are transcribed from this paper Table 2.
+        gas_species: SiO2(g)
+        table: '2'
+        method_code_as_printed: IV
+        method_token: tabulation
+        cell_material_as_printed: —
+        reference_as_printed: '[40]'
+        reference_resolved: '[40]'
+        temperature_range_K:
+        - 1700
+        - 1996
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 29714±30
+          A_K: 29714.0
+          sigma_A_K: 30.0
+          B_as_printed: 8.71±0.02
+          B: 8.71
+          sigma_B: 0.02
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+    - observation_id: t2_sio2_03
+      type: experiment_series
+      locator:
+        published_page: 1176
+        pdf_page_index: 5
+        table: '2'
+        note: SiO2 row; original temperature limits, A and B coefficients, uncertainties, method code, cell and
+          reference retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: Reference [27]; the cell and method label are transcribed from this paper Table 2.
+        gas_species: SiO2(g)
+        table: '2'
+        method_code_as_printed: II
+        method_token: knudsen_effusion
+        cell_material_as_printed: Al2O3
+        cell_material_reported: Al2O3
+        reference_as_printed: '[27]'
+        reference_resolved: '[27]'
+        temperature_range_K:
+        - 1800
+        - 1900
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 27219±1601a
+          A_K: 27219.0
+          sigma_A_K: 1601.0
+          B_as_printed: 7.33±0.43a
+          B: 7.33
+          sigma_B: 0.43
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+        footnote_marker: a
+    - observation_id: t2_sio2_04
+      type: experiment_series
+      locator:
+        published_page: 1176
+        pdf_page_index: 5
+        table: '2'
+        note: SiO2 row; original temperature limits, A and B coefficients, uncertainties, method code, cell and
+          reference retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: Reference [29]; the cell and method label are transcribed from this paper Table 2.
+        gas_species: SiO2(g)
+        table: '2'
+        method_code_as_printed: II
+        method_token: knudsen_effusion
+        cell_material_as_printed: ZrO2, Ta
+        cell_material_reported: ZrO2, Ta
+        reference_as_printed: '[29]'
+        reference_resolved: '[29]'
+        temperature_range_K:
+        - 1833
+        - 1877
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 18793±2009
+          A_K: 18793.0
+          sigma_A_K: 2009.0
+          B_as_printed: 2.84±1.08
+          B: 2.84
+          sigma_B: 1.08
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+    - observation_id: t2_sio2_05
+      type: experiment_series
+      locator:
+        published_page: 1176
+        pdf_page_index: 5
+        table: '2'
+        note: SiO2 row; original temperature limits, A and B coefficients, uncertainties, method code, cell and
+          reference retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        gas_species: SiO2(g)
+        table: '2'
+        method_code_as_printed: II
+        method_token: knudsen_effusion
+        cell_material_as_printed: Mo
+        cell_material_reported: Mo
+        reference_as_printed: This work
+        reference_resolved: This work
+        temperature_range_K:
+        - 1833
+        - 1995
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 30710±510
+          A_K: 30710.0
+          sigma_A_K: 510.0
+          B_as_printed: 8.91±0.47
+          B: 8.91
+          sigma_B: 0.47
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+      experiment: mi1201-mo-sio2
+    - observation_id: t2_sio2_06
+      type: experiment_series
+      locator:
+        published_page: 1176
+        pdf_page_index: 5
+        table: '2'
+        note: SiO2 row; original temperature limits, A and B coefficients, uncertainties, method code, cell and
+          reference retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        gas_species: SiO2(g)
+        table: '2'
+        method_code_as_printed: II
+        method_token: knudsen_effusion
+        cell_material_as_printed: Ir (W)
+        cell_material_reported: Ir (W)
+        reference_as_printed: '"'
+        reference_resolved: This work
+        temperature_range_K:
+        - 1866
+        - 1983
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 30637±1720
+          A_K: 30637.0
+          sigma_A_K: 1720.0
+          B_as_printed: 8.85±0.72
+          B: 8.85
+          sigma_B: 0.72
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+      experiment: ms1301-ir-w-sio2
+    - observation_id: t2_sio2_07
+      type: experiment_series
+      locator:
+        published_page: 1176
+        pdf_page_index: 5
+        table: '2'
+        note: SiO2 row; original temperature limits, A and B coefficients, uncertainties, method code, cell and
+          reference retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        gas_species: SiO2(g)
+        table: '2'
+        method_code_as_printed: II
+        method_token: knudsen_effusion
+        cell_material_as_printed: Pt–Rh (Mo)
+        cell_material_reported: Pt–Rh (Mo)
+        reference_as_printed: '"'
+        reference_resolved: This work
+        temperature_range_K:
+        - 1872
+        - 1997
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 30155±1251
+          A_K: 30155.0
+          sigma_A_K: 1251.0
+          B_as_printed: 8.68±0.59
+          B: 8.68
+          sigma_B: 0.59
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+      experiment: ms1301-ptrh-mo-sio2
+    - observation_id: t2_sio2_08
+      type: experiment_series
+      locator:
+        published_page: 1176
+        pdf_page_index: 5
+        table: '2'
+        note: SiO2 row; original temperature limits, A and B coefficients, uncertainties, method code, cell and
+          reference retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        gas_species: SiO2(g)
+        table: '2'
+        method_code_as_printed: II
+        method_token: knudsen_effusion
+        cell_material_as_printed: W
+        cell_material_reported: W
+        reference_as_printed: '"'
+        reference_resolved: This work
+        temperature_range_K:
+        - 1903
+        - 1982
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 30505±950
+          A_K: 30505.0
+          sigma_A_K: 950.0
+          B_as_printed: 8.70±0.53
+          B: 8.7
+          sigma_B: 0.53
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+      experiment: ms1301-w-sio2
+    - observation_id: t2_sio2_09
+      type: experiment_series
+      locator:
+        published_page: 1176
+        pdf_page_index: 5
+        table: '2'
+        note: SiO2 row; original temperature limits, A and B coefficients, uncertainties, method code, cell and
+          reference retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: Reference [25]; the cell and method label are transcribed from this paper Table 2.
+        gas_species: SiO2(g)
+        table: '2'
+        method_code_as_printed: II
+        method_token: knudsen_effusion
+        cell_material_as_printed: Pt
+        cell_material_reported: Pt
+        reference_as_printed: '[25]'
+        reference_resolved: '[25]'
+        temperature_range_K:
+        - 1905
+        - 1988
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 28984±1121
+          A_K: 28984.0
+          sigma_A_K: 1121.0
+          B_as_printed: 8.33±0.58
+          B: 8.33
+          sigma_B: 0.58
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+    - observation_id: t2_sio2_10
+      type: experiment_series
+      locator:
+        published_page: 1176
+        pdf_page_index: 5
+        table: '2'
+        note: SiO2 row; original temperature limits, A and B coefficients, uncertainties, method code, cell and
+          reference retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: Reference [4]; the cell and method label are transcribed from this paper Table 2.
+        gas_species: SiO2(g)
+        table: '2'
+        method_code_as_printed: IV
+        method_token: tabulation
+        cell_material_as_printed: —
+        reference_as_printed: '[4]'
+        reference_resolved: '[4]'
+        temperature_range_K:
+        - 1996
+        - 2300
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 28834±35
+          A_K: 28834.0
+          sigma_A_K: 35.0
+          B_as_printed: 8.27±0.02
+          B: 8.27
+          sigma_B: 0.02
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+    - observation_id: t2_sio2_11
+      type: experiment_series
+      locator:
+        published_page: 1176
+        pdf_page_index: 5
+        table: '2'
+        note: SiO2 row; original temperature limits, A and B coefficients, uncertainties, method code, cell and
+          reference retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: Reference [40]; the cell and method label are transcribed from this paper Table 2.
+        gas_species: SiO2(g)
+        table: '2'
+        method_code_as_printed: IV
+        method_token: tabulation
+        cell_material_as_printed: —
+        reference_as_printed: '[40]'
+        reference_resolved: '[40]'
+        temperature_range_K:
+        - 1996
+        - 3000
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 28605±161
+          A_K: 28605.0
+          sigma_A_K: 161.0
+          B_as_printed: 8.16±0.07
+          B: 8.16
+          sigma_B: 0.07
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+    - observation_id: t2_sio2_12
+      type: experiment_series
+      locator:
+        published_page: 1176
+        pdf_page_index: 5
+        table: '2'
+        note: SiO2 row; original temperature limits, A and B coefficients, uncertainties, method code, cell and
+          reference retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        gas_species: SiO2(g)
+        table: '2'
+        method_code_as_printed: II
+        method_token: knudsen_effusion
+        cell_material_as_printed: Pt–Rh (Mo)
+        cell_material_reported: Pt–Rh (Mo)
+        reference_as_printed: This work
+        reference_resolved: This work
+        temperature_range_K:
+        - 2000
+        - 2032
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 28815±343
+          A_K: 28815.0
+          sigma_A_K: 343.0
+          B_as_printed: 8.17±0.65
+          B: 8.17
+          sigma_B: 0.65
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+      experiment: ms1301-ptrh-mo-sio2
+    - observation_id: t2_sio2_13
+      type: experiment_series
+      locator:
+        published_page: 1176
+        pdf_page_index: 5
+        table: '2'
+        note: SiO2 row; original temperature limits, A and B coefficients, uncertainties, method code, cell and
+          reference retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        gas_species: SiO2(g)
+        table: '2'
+        method_code_as_printed: II
+        method_token: knudsen_effusion
+        cell_material_as_printed: Mo
+        cell_material_reported: Mo
+        reference_as_printed: '"'
+        reference_resolved: This work
+        temperature_range_K:
+        - 2000
+        - 2038
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 28771±669
+          A_K: 28771.0
+          sigma_A_K: 669.0
+          B_as_printed: 8.05±0.64
+          B: 8.05
+          sigma_B: 0.64
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+      experiment: mi1201-mo-sio2
+    - observation_id: t2_sio2_14
+      type: experiment_series
+      locator:
+        published_page: 1176
+        pdf_page_index: 5
+        table: '2'
+        note: SiO2 row; original temperature limits, A and B coefficients, uncertainties, method code, cell and
+          reference retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        gas_species: SiO2(g)
+        table: '2'
+        method_code_as_printed: II
+        method_token: knudsen_effusion
+        cell_material_as_printed: W
+        cell_material_reported: W
+        reference_as_printed: '"'
+        reference_resolved: This work
+        temperature_range_K:
+        - 2000
+        - 2100
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 28383±1151
+          A_K: 28383.0
+          sigma_A_K: 1151.0
+          B_as_printed: 7.92±0.55
+          B: 7.92
+          sigma_B: 0.55
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+      experiment: ms1301-w-sio2
+    - observation_id: t2_sio2_15
+      type: experiment_series
+      locator:
+        published_page: 1176
+        pdf_page_index: 5
+        table: '2'
+        note: SiO2 row; original temperature limits, A and B coefficients, uncertainties, method code, cell and
+          reference retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        gas_species: SiO2(g)
+        table: '2'
+        method_code_as_printed: II
+        method_token: knudsen_effusion
+        cell_material_as_printed: Ir (W)
+        cell_material_reported: Ir (W)
+        reference_as_printed: '"'
+        reference_resolved: This work
+        temperature_range_K:
+        - 2007
+        - 2100
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 27093±1714
+          A_K: 27093.0
+          sigma_A_K: 1714.0
+          B_as_printed: 8.00±0.91
+          B: 8.0
+          sigma_B: 0.91
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+      experiment: ms1301-ir-w-sio2
+    - observation_id: sh98_source_statement_28
+      type: laboratory_conditions
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        section: Results
+        note: Verbatim translation transcription re-checked against the rendered page image.
+      units: verbatim source statement
+      values:
+        statement_as_printed: Using our data we estimated the enthalpy of fusion of silicon dioxide at 36 ± 25 kJ/mol,
+          which is consistent with the data in [4] (Table 3).
+    - observation_id: sh98_source_statement_29
+      type: laboratory_conditions
+      locator:
+        published_page: 1176
+        pdf_page_index: 5
+        section: Results
+        note: Verbatim translation transcription re-checked against the rendered page image.
+      units: verbatim source statement
+      values:
+        statement_as_printed: The partial vapor pressures of the (SiO) molecule in the course of vaporization of
+          silicon dioxide from the molybdenum, tungsten, and iridium-coated tungsten cells are overestimated as
+          compared with the data registered for platinum–rhodium cells (Fig. 2).
+    - observation_id: sh98_source_statement_30
+      type: laboratory_conditions
+      locator:
+        published_page: 1176
+        pdf_page_index: 5
+        section: Results
+        note: Verbatim translation transcription re-checked against the rendered page image.
+      units: verbatim source statement
+      values:
+        statement_as_printed: During vaporization of [SiO2] from the platinum–rhodium effusion cell at temperatures
+          higher than 1950°C we observed breakdown of the cell lid near the orifice.
+    - observation_id: sh98_source_statement_31
+      type: laboratory_conditions
+      locator:
+        published_page: 1176
+        pdf_page_index: 5
+        section: Discussion
+        note: Verbatim translation transcription re-checked against the rendered page image.
+      units: verbatim source statement
+      values:
+        statement_as_printed: Thus, we found no material for the effusion cells that could provide reliable experimental
+          data on vaporization of [SiO2] under chemically neutral conditions at temperatures higher than the mp
+          of silicon dioxide.
+    - observation_id: sh98_after_run_composition_absence
+      type: characterization
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Experimental
+        note: The methods and results report starting SiO2 quality but no post-run composition assay.
+      units: typed absence
+      values:
+        after_run_composition:
+          state:
+            tag: unknown
+            reason: not_published
+          reason: not_published
+        starting_composition_as_printed: SiO2 feedstock; KS-4V; purity no less than 99.9999 wt%
+    - observation_id: sh98_oxide_activity_absence
+      type: thermodynamic_example
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        section: Results
+        note: Tables 1–3 and the discussion contain no oxide activity or activity coefficient values.
+      units: typed absence
+      values:
+        oxide_activities:
+          state:
+            tag: unknown
+            reason: not_published
+          reason: not_published
+        activity_defining_ions:
+          state:
+            tag: unknown
+            reason: not_published
+          reason: not_published
+        activity_standard_states:
+          state:
+            tag: unknown
+            reason: not_published
+          reason: not_published
+    - observation_id: sh98_orifice_geometry_absence
+      type: apparatus
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Experimental
+        note: Only area ratios are printed; no diameter or channel length is stated.
+      units: typed absence
+      values:
+        orifice_diameter_m:
+          state:
+            tag: unknown
+            reason: not_published
+          reason: not_published
+        orifice_channel_length_m:
+          state:
+            tag: unknown
+            reason: not_published
+          reason: not_published
+    - observation_id: sh98_residual_pressure_absence
+      type: laboratory_conditions
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Experimental
+        note: No chamber residual/background pressure or sweep gas is given.
+      units: typed absence
+      values:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          reason: not_published
+        sweep_gas:
+          state:
+            tag: unknown
+            reason: not_published
+          reason: not_published
+    - observation_id: sh98_cell_reaction_qualifier
+      type: laboratory_conditions
+      locator:
+        published_page: 1171
+        pdf_page_index: 0
+        section: Introduction
+        note: Verbatim translation transcription checked against rendered page image.
+      units: verbatim source context
+      values:
+        statement_as_printed: Study of vaporization of silicon dioxide involves inevitable experimental difficulties
+          originating from complex reactions of both molecular forms of the vapor (predominantly silicon monoxide
+          and oxygen) and condensed phases with the material of the crucible, support, or effusion cell. The nature
+          of these high-temperature reactions mainly depends on the cell material and affects the results of determination
+          of the thermodynamic properties of silicon dioxide. These reactions affect the partial pressures of the
+          molecular forms of the vapor over [SiO2] and probably determine the more negative enthalpies of formation
+          of (SiO), obtained by the Knudsen effusion procedure [4], as compared with the other methods.
+    - observation_id: sh98_platinum_standard_qualifier
+      type: laboratory_conditions
+      locator:
+        published_page: 1171
+        pdf_page_index: 0
+        section: Introduction
+        note: Verbatim translation transcription checked against rendered page image.
+      units: verbatim source context
+      values:
+        statement_as_printed: Moreover, the vapor pressures of silver and gold recommended by IUPAC [11] as standards
+          for evaluation of the partial pressures of the vapor over tested compound cannot be used when the crucibles
+          are prepared of platinum metals.
+    - observation_id: sh98_prior_studies_qualifier
+      type: laboratory_conditions
+      locator:
+        published_page: 1171
+        pdf_page_index: 0
+        section: Introduction
+        note: Verbatim translation transcription checked against rendered page image.
+      units: verbatim source context
+      values:
+        statement_as_printed: Except [10, 12, 13] direct experimental studies of vaporization of silicon dioxide
+          at temperatures above mp were not carried out, and data on the thermodynamic properties in this temperature
+          range are limited to a few experimental works [14, 15]. The results obtained in [10, 12–14] are characterized
+          by significant errors; e.g., in [14] the enthalpy of sublimation of silicon dioxide was determined with
+          an accuracy of 53%.
+    - observation_id: sh98_oxide_film_qualifier
+      type: laboratory_conditions
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Introduction
+        note: Verbatim translation transcription checked against rendered page image.
+      units: verbatim source context
+      values:
+        statement_as_printed: The presence of atomic and molecular oxygen over silicon dioxide during its vaporization
+          from metallic cells prepared from Ir [12, 16, 17], Pt [18–25], Ta [21–24], Mo [21–24], W [16, 26], and
+          Pt–Rh alloys [16, 17, 19, 20, 27] at high temperatures provides formation of oxide films on the surface
+          of the cells, which shifts the equilibrium in the main reactions of vaporization from the chemically neutral
+          conditions.
+    - observation_id: sh98_translation_garbled_masses
+      type: laboratory_conditions
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Experimental
+        note: Verbatim translation transcription checked against rendered page image.
+      units: verbatim source context
+      values:
+        statement_as_printed: In the mass spectrometric study of vaporization of silicon dioxide it is necessary
+          to separate the peaks of the vapor mass spectra at with the m/e 28 and 44, corresponding to the fragment
+          28(Si)+ of the 44(SiO)+ molecular ion from the ions 28(N2)+ and 44(CO2)+ of the background spectrum [16,
+          17, 30, 31].
+    - observation_id: sh98_translation_garbled_masses_note
+      type: laboratory_conditions
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Experimental
+        note: Verbatim translation transcription checked against rendered page image.
+      units: verbatim source context
+      values:
+        statement_as_printed: The translation plainly prints “at with the m/e 28 and 44”; the grammar is garbled.
+          The same sentence identifies overlapping background 28(N2)+ and 44(CO2)+ ions.
+    - observation_id: sh98_table2_note
+      type: experiment_series
+      locator:
+        published_page: 1176
+        pdf_page_index: 5
+        section: Table 2
+        note: Verbatim translation transcription checked against rendered page image.
+      units: verbatim source context
+      values:
+        statement_as_printed: Errors in coefficients A and B are root-mean-square deviations of the least-squares
+          procedure.
+    - observation_id: sh98_table2_footnotes
+      type: experiment_series
+      locator:
+        published_page: 1176
+        pdf_page_index: 5
+        section: Table 2
+        note: Verbatim translation transcription checked against rendered page image.
+      units: verbatim source context
+      values:
+        statement_as_printed: a Determined in this work. b Recommended in original works.
+    - observation_id: sh98_ir_coating_conditions
+      type: apparatus
+      locator:
+        published_page: 1172
+        pdf_page_index: 1
+        section: Experimental
+        note: Verbatim translation transcription checked against rendered page image.
+      units: verbatim source context
+      values:
+        statement_as_printed: The tungsten cells were coated with iridium by vacuum vaporization of metallic iridium
+          (600 mg) from those cells at 2900–3000 K for 4–5 h.
+        mass_mg: 600
+        temperature_range_K:
+        - 2900
+        - 3000
+        duration_h:
+        - 4
+        - 5
+    - observation_id: sh98_fusion_source_range
+      type: thermodynamic_example
+      locator:
+        published_page: 1171
+        pdf_page_index: 0
+        section: Abstract
+        note: Verbatim translation transcription checked against rendered page image.
+      units: verbatim source context
+      values:
+        statement_as_printed: From the enthalpies of sublimation and vaporization at 1800–1995 and 2000–2200 K,
+          the enthalpy of SiO2 fusion was evaluated.
+    - observation_id: sh98_silica_stability_note
+      type: laboratory_conditions
+      locator:
+        published_page: 1171
+        pdf_page_index: 0
+        section: Introduction
+        note: Verbatim translation transcribed and checked against rendered page image.
+      units: verbatim source context
+      values:
+        statement_as_printed: Silica [SiO2] (hereinafter brackets and parentheses denote the condensed and gas phases,
+          respectively) is the most widespread and stable compound in this system.
+    - observation_id: sh98_cristobalite_form_note
+      type: laboratory_conditions
+      locator:
+        published_page: 1171
+        pdf_page_index: 0
+        section: Introduction
+        note: Verbatim translation transcribed and checked against rendered page image.
+      units: verbatim source context
+      values:
+        statement_as_printed: In vaporization of silica the condensed phase is often considered as β-cristobalite;
+          the article does not assign this polymorph to its sample.
+    - observation_id: sh98_metal_ion_origin_note
+      type: laboratory_conditions
+      locator:
+        published_page: 1173
+        pdf_page_index: 2
+        section: Results
+        note: Verbatim translation transcribed and checked against rendered page image.
+      units: verbatim source context
+      values:
+        statement_as_printed: The mass spectra of the vapor registered in vaporization of [SiO2] from the platinum–rhodium
+          and iridium-coated tungsten effusion cells contained (Mo)+ and (W)+ ions, which can be formed by thermal
+          or surface ionization during electron bombardment of the crucible materials [35].
+    - observation_id: sh98_t1_reaction_confirmation
+      type: laboratory_conditions
+      locator:
+        published_page: 1173
+        pdf_page_index: 2
+        section: Results
+        note: Verbatim translation transcribed and checked against rendered page image.
+      units: verbatim source context
+      values:
+        statement_as_printed: This result additionally confirms, in the first case, the absence of reaction with
+          the construction material and, in the second case, the quality of iridium coating of the tungsten effusion
+          cells.
+    observations: []
+  SiO:
+    context:
+    - observation_id: t2_sio_01
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: SiO row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: Reference [21]; the cell and method label are transcribed from this paper Table 2.
+        gas_species: SiO(g)
+        table: '2'
+        method_code_as_printed: I
+        cell_material_as_printed: Mo
+        cell_material_reported: Mo
+        reference_as_printed: '[21]'
+        reference_resolved: '[21]'
+        temperature_range_K:
+        - 1600
+        - 1800
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 16600±1470a
+          A_K: 16600.0
+          sigma_A_K: 1470.0
+          B_as_printed: 3.27±0.86a
+          B: 3.27
+          sigma_B: 0.86
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+        footnote_marker: a
+        method_label_as_printed: effusion and mass spectroscopic
+    - observation_id: t2_sio_02
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: SiO row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: Reference [23]; the cell and method label are transcribed from this paper Table 2.
+        gas_species: SiO(g)
+        table: '2'
+        method_code_as_printed: I
+        cell_material_as_printed: Mo
+        cell_material_reported: Mo
+        reference_as_printed: '[23]'
+        reference_resolved: '[23]'
+        temperature_range_K:
+        - 1600
+        - 1800
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 23802±2110
+          A_K: 23802.0
+          sigma_A_K: 2110.0
+          B_as_printed: 6.58±1.73
+          B: 6.58
+          sigma_B: 1.73
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+        method_label_as_printed: effusion and mass spectroscopic
+    - observation_id: t2_sio_03
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: SiO row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: Reference [22]; the cell and method label are transcribed from this paper Table 2.
+        gas_species: SiO(g)
+        table: '2'
+        method_code_as_printed: I
+        cell_material_as_printed: Mo
+        cell_material_reported: Mo
+        reference_as_printed: '[22]'
+        reference_resolved: '[22]'
+        temperature_range_K:
+        - 1601
+        - 1754
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 18266±1617
+          A_K: 18266.0
+          sigma_A_K: 1617.0
+          B_as_printed: 3.66±0.96
+          B: 3.66
+          sigma_B: 0.96
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+        method_label_as_printed: effusion and mass spectroscopic
+    - observation_id: t2_sio_04
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: SiO row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        gas_species: SiO(g)
+        table: '2'
+        method_code_as_printed: II
+        method_token: knudsen_effusion
+        cell_material_as_printed: Mo
+        cell_material_reported: Mo
+        reference_as_printed: This work
+        reference_resolved: This work
+        temperature_range_K:
+        - 1610
+        - 1995
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 27185±318
+          A_K: 27185.0
+          sigma_A_K: 318.0
+          B_as_printed: 10.35±0.18
+          B: 10.35
+          sigma_B: 0.18
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+      experiment: mi1201-mo-sio2
+    - observation_id: t2_sio_05
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: SiO row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: Reference [24]; the cell and method label are transcribed from this paper Table 2.
+        gas_species: SiO(g)
+        table: '2'
+        method_code_as_printed: I
+        cell_material_as_printed: Mo
+        cell_material_reported: Mo
+        reference_as_printed: '[24]'
+        reference_resolved: '[24]'
+        temperature_range_K:
+        - 1692
+        - 1739
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 22218±1970a
+          A_K: 22218.0
+          sigma_A_K: 1970.0
+          B_as_printed: 6.93±1.81a
+          B: 6.93
+          sigma_B: 1.81
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+        footnote_marker: a
+        method_label_as_printed: effusion and mass spectroscopic
+    - observation_id: t2_sio_06
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: SiO row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: Reference [40]; the cell and method label are transcribed from this paper Table 2.
+        gas_species: SiO(g)
+        table: '2'
+        method_code_as_printed: IV
+        method_token: tabulation
+        cell_material_as_printed: —
+        reference_as_printed: '[40]'
+        reference_resolved: '[40]'
+        temperature_range_K:
+        - 1700
+        - 1996
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 27351±10
+          A_K: 27351.0
+          sigma_A_K: 10.0
+          B_as_printed: 8.65±0.01
+          B: 8.65
+          sigma_B: 0.01
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+    - observation_id: t2_sio_07
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: SiO row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        gas_species: SiO(g)
+        table: '2'
+        method_code_as_printed: II
+        method_token: knudsen_effusion
+        cell_material_as_printed: Ir (W)
+        cell_material_reported: Ir (W)
+        reference_as_printed: This work
+        reference_resolved: This work
+        temperature_range_K:
+        - 1766
+        - 1989
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 28134±367
+          A_K: 28134.0
+          sigma_A_K: 367.0
+          B_as_printed: 9.46±0.19
+          B: 9.46
+          sigma_B: 0.19
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+      experiment: ms1301-ir-w-sio2
+    - observation_id: t2_sio_08
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: SiO row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        gas_species: SiO(g)
+        table: '2'
+        method_code_as_printed: II
+        method_token: knudsen_effusion
+        cell_material_as_printed: W
+        cell_material_reported: W
+        reference_as_printed: '"'
+        reference_resolved: This work
+        temperature_range_K:
+        - 1788
+        - 1982
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 26855±678
+          A_K: 26855.0
+          sigma_A_K: 678.0
+          B_as_printed: 9.55±0.36
+          B: 9.55
+          sigma_B: 0.36
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+      experiment: ms1301-w-sio2
+    - observation_id: t2_sio_09
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: SiO row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: Reference [28]; the cell and method label are transcribed from this paper Table 2.
+        gas_species: SiO(g)
+        table: '2'
+        method_code_as_printed: II
+        method_token: knudsen_effusion
+        cell_material_as_printed: Al2O3
+        cell_material_reported: Al2O3
+        reference_as_printed: '[28]'
+        reference_resolved: '[28]'
+        temperature_range_K:
+        - 1800
+        - 1900
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 23905±1406a
+          A_K: 23905.0
+          sigma_A_K: 1406.0
+          B_as_printed: 8.11±0.48a
+          B: 8.11
+          sigma_B: 0.48
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+        footnote_marker: a
+    - observation_id: t2_sio_10
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: SiO row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: Reference [27]; the cell and method label are transcribed from this paper Table 2.
+        gas_species: SiO(g)
+        table: '2'
+        method_code_as_printed: I
+        cell_material_as_printed: ZrO2–CaO
+        cell_material_reported: ZrO2–CaO
+        reference_as_printed: '[27]'
+        reference_resolved: '[27]'
+        temperature_range_K:
+        - 1824
+        - 1976
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 25998±724
+          A_K: 25998.0
+          sigma_A_K: 724.0
+          B_as_printed: 8.39±0.38
+          B: 8.39
+          sigma_B: 0.38
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+        method_label_as_printed: effusion and mass spectroscopic
+    - observation_id: t2_sio_11
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: SiO row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: Reference [27]; the cell and method label are transcribed from this paper Table 2.
+        gas_species: SiO(g)
+        table: '2'
+        method_code_as_printed: I
+        cell_material_as_printed: Pt–Rh
+        cell_material_reported: Pt–Rh
+        reference_as_printed: '[27]'
+        reference_resolved: '[27]'
+        temperature_range_K:
+        - 1831
+        - 1972
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 29294±1099
+          A_K: 29294.0
+          sigma_A_K: 1099.0
+          B_as_printed: 10.17±0.58
+          B: 10.17
+          sigma_B: 0.58
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+        method_label_as_printed: effusion and mass spectroscopic
+    - observation_id: t2_sio_12
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: SiO row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: Reference [18]; the cell and method label are transcribed from this paper Table 2.
+        gas_species: SiO(g)
+        table: '2'
+        method_code_as_printed: II
+        method_token: knudsen_effusion
+        cell_material_as_printed: Pt
+        cell_material_reported: Pt
+        reference_as_printed: '[18]'
+        reference_resolved: '[18]'
+        temperature_range_K:
+        - 1840
+        - 1951
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 9670±58
+          A_K: 9670.0
+          sigma_A_K: 58.0
+          B_as_printed: −0.13±0.30
+          B: -0.13
+          sigma_B: 0.3
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+    - observation_id: t2_sio_13
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: SiO row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        gas_species: SiO(g)
+        table: '2'
+        method_code_as_printed: II
+        method_token: knudsen_effusion
+        cell_material_as_printed: Pt–Rh (Mo)
+        cell_material_reported: Pt–Rh (Mo)
+        reference_as_printed: This work
+        reference_resolved: This work
+        temperature_range_K:
+        - 1862
+        - 1995
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 27010±520
+          A_K: 27010.0
+          sigma_A_K: 520.0
+          B_as_printed: 8.56±0.27
+          B: 8.56
+          sigma_B: 0.27
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+      experiment: ms1301-ptrh-mo-sio2
+    - observation_id: t2_sio_14
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: SiO row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: Reference [25]; the cell and method label are transcribed from this paper Table 2.
+        gas_species: SiO(g)
+        table: '2'
+        method_code_as_printed: II
+        method_token: knudsen_effusion
+        cell_material_as_printed: Pt
+        cell_material_reported: Pt
+        reference_as_printed: '[25]'
+        reference_resolved: '[25]'
+        temperature_range_K:
+        - 1895
+        - 1984
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 27803±830
+          A_K: 27803.0
+          sigma_A_K: 830.0
+          B_as_printed: 8.98±0.43
+          B: 8.98
+          sigma_B: 0.43
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+    - observation_id: t2_sio_15
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: SiO row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: Reference [40]; the cell and method label are transcribed from this paper Table 2.
+        gas_species: SiO(g)
+        table: '2'
+        method_code_as_printed: IV
+        method_token: tabulation
+        cell_material_as_printed: —
+        reference_as_printed: '[40]'
+        reference_resolved: '[40]'
+        temperature_range_K:
+        - 1996
+        - 3000
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 26493±149
+          A_K: 26493.0
+          sigma_A_K: 149.0
+          B_as_printed: 8.23±0.06
+          B: 8.23
+          sigma_B: 0.06
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+    - observation_id: t2_sio_16
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: SiO row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        gas_species: SiO(g)
+        table: '2'
+        method_code_as_printed: II
+        method_token: knudsen_effusion
+        cell_material_as_printed: Ir (W)
+        cell_material_reported: Ir (W)
+        reference_as_printed: This work
+        reference_resolved: This work
+        temperature_range_K:
+        - 1999
+        - 2043
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 27294±656
+          A_K: 27294.0
+          sigma_A_K: 656.0
+          B_as_printed: 9.06±0.32
+          B: 9.06
+          sigma_B: 0.32
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+      experiment: ms1301-ir-w-sio2
+    - observation_id: t2_sio_17
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: SiO row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        gas_species: SiO(g)
+        table: '2'
+        method_code_as_printed: II
+        method_token: knudsen_effusion
+        cell_material_as_printed: Mo
+        cell_material_reported: Mo
+        reference_as_printed: '"'
+        reference_resolved: This work
+        temperature_range_K:
+        - 2000
+        - 2038
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 25684±2102
+          A_K: 25684.0
+          sigma_A_K: 2102.0
+          B_as_printed: 9.61±1.04
+          B: 9.61
+          sigma_B: 1.04
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+      experiment: mi1201-mo-sio2
+    - observation_id: t2_sio_18
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: SiO row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        gas_species: SiO(g)
+        table: '2'
+        method_code_as_printed: II
+        method_token: knudsen_effusion
+        cell_material_as_printed: Pt–Rh (Mo)
+        cell_material_reported: Pt–Rh (Mo)
+        reference_as_printed: '"'
+        reference_resolved: This work
+        temperature_range_K:
+        - 2001
+        - 2032
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 26768±912
+          A_K: 26768.0
+          sigma_A_K: 912.0
+          B_as_printed: 8.04±0.46
+          B: 8.04
+          sigma_B: 0.46
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+      experiment: ms1301-ptrh-mo-sio2
+    - observation_id: t2_sio_19
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: SiO row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        gas_species: SiO(g)
+        table: '2'
+        method_code_as_printed: II
+        method_token: knudsen_effusion
+        cell_material_as_printed: W
+        cell_material_reported: W
+        reference_as_printed: '"'
+        reference_resolved: This work
+        temperature_range_K:
+        - 2000
+        - 2100
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 25419±2245
+          A_K: 25419.0
+          sigma_A_K: 2245.0
+          B_as_printed: 8.97±1.22
+          B: 8.97
+          sigma_B: 1.22
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+      experiment: ms1301-w-sio2
+    - observation_id: sh98_source_statement_14
+      type: laboratory_conditions
+      locator:
+        published_page: 1173
+        pdf_page_index: 2
+        section: Results
+        note: Verbatim translation transcription re-checked against the rendered page image.
+      units: verbatim source statement
+      values:
+        statement_as_printed: Dissociative ionization of the (SiO) molecule begins at the ionization energy of 16
+          eV, and at 32 eV it is about 15% [31].
+    - observation_id: sh98_source_statement_15
+      type: laboratory_conditions
+      locator:
+        published_page: 1173
+        pdf_page_index: 2
+        section: Results
+        note: Verbatim translation transcription re-checked against the rendered page image.
+      units: verbatim source statement
+      values:
+        statement_as_printed: The isotopic ratio of the (Si)+ and (SiO)+ ions in the mass spectra of the vapor over
+          silicon dioxide agrees with the natural isotopic abundances given in [4] to within 13%.
+    - observation_id: sh98_source_statement_16
+      type: laboratory_conditions
+      locator:
+        published_page: 1173
+        pdf_page_index: 2
+        section: Results
+        note: Verbatim translation transcription re-checked against the rendered page image.
+      units: verbatim source statement
+      values:
+        statement_as_printed: The presence in the vapor of (Mo)+, (MoO)+, (MoO2)+, and (MoO3)+ and (W)+, (WO)+,
+          (WO2)+, (WO3)+, (W2O2)+, and (W2O6)+ ions during vaporization of silicon dioxide from the molybdenum and
+          tungsten effusion cells and the absence of (Pt)+, (PtO)+, (PtO2)+, and (PtO3)+ and (Ir)+, (IrO)+, (IrO2)+,
+          (IrO3)+, and (Ir2O)+ ions during vaporization of silicon dioxide from the platinum–rhodium and iridium
+          effusion cells, respectively, indicates in the former case a reaction of silica with the material of the
+          effusion cell.
+    - observation_id: sh98_source_statement_17
+      type: laboratory_conditions
+      locator:
+        published_page: 1173
+        pdf_page_index: 2
+        section: Results
+        note: Verbatim translation transcription re-checked against the rendered page image.
+      units: verbatim source statement
+      values:
+        statement_as_printed: However, almost no (MoO)+, (MoO2)+, and (MoO3)+ and (WO)+, (WO2)+, (WO3)+, (W2O2)+,
+          and (W2O6)+ ions were observed in the mass spectra during vaporization of [SiO2] from the platinum–rhodium
+          and iridium-coated tungsten effusion cells.
+    - observation_id: sh98_source_statement_18
+      type: laboratory_conditions
+      locator:
+        published_page: 1174
+        pdf_page_index: 3
+        section: Results
+        note: Verbatim translation transcription re-checked against the rendered page image.
+      units: verbatim source statement
+      values:
+        statement_as_printed: In vaporization from the cells of all types, the peak intensity of the 22(SiO)2+ ion
+          registered in the vapor over silicon dioxide was ≤0.90 ± 0.5% relative to the 44(SiO)+ ion.
+    - observation_id: sh98_source_statement_19
+      type: laboratory_conditions
+      locator:
+        published_page: 1174
+        pdf_page_index: 3
+        section: Results
+        note: Verbatim translation transcription re-checked against the rendered page image.
+      units: verbatim source statement
+      values:
+        statement_as_printed: The mass spectra of the vapor over silicon dioxide obtained on an MS-1301 mass spectrometer
+          (Uion 70 V) did not allow correct evaluation of the intensity of the ion current of (SiO2)+.
+    - observation_id: sh98_source_statement_20
+      type: laboratory_conditions
+      locator:
+        published_page: 1174
+        pdf_page_index: 3
+        section: Results
+        note: Verbatim translation transcription re-checked against the rendered page image.
+      units: verbatim source statement
+      values:
+        statement_as_printed: We studied the dependence of the mass spectra of the vapor over [SiO2] as influenced
+          by the ionization energy and found a threefold decrease in the peak intensity of the (SiO2)+ ion as compared
+          with (SiO)+ with Uion increased from 20 to 70 eV (Fig. 1a).
+    - observation_id: sh98_source_statement_21
+      type: laboratory_conditions
+      locator:
+        published_page: 1174
+        pdf_page_index: 3
+        section: Results
+        note: Verbatim translation transcription re-checked against the rendered page image.
+      units: verbatim source statement
+      values:
+        statement_as_printed: This decrease in the peak intensity of the (SiO2)+ ion in the mass spectra of the
+          vapor over silicon dioxide with increasing ionization energy is due to greater fragmentation, which is
+          confirmed by simultaneous increase in the content of the (Si)+ fragment in the mass spectrum (Fig. 1b).
+    - observation_id: sh98_source_statement_22
+      type: laboratory_conditions
+      locator:
+        published_page: 1174
+        pdf_page_index: 3
+        section: Results
+        note: Verbatim translation transcription re-checked against the rendered page image.
+      units: verbatim source statement
+      values:
+        statement_as_printed: The evaluated intensity of the (SiO2)+ ion in the mass spectra of the vapor over [SiO2]
+          did not exceed 0.5 ± 0.1% as compared with the ion current of (SiO)+; this is comparable with the sensitivity
+          of the MS-1301 mass spectrometer.
+    - observation_id: sh98_source_statement_23
+      type: laboratory_conditions
+      locator:
+        published_page: 1174
+        pdf_page_index: 3
+        section: Results
+        note: Verbatim translation transcription re-checked against the rendered page image.
+      units: verbatim source statement
+      values:
+        statement_as_printed: The partial pressures (pi) of (SiO), (SiO2), (O), and (O2) during vaporization of
+          [SiO2] from the platinum–rhodium cell were calculated from the Hertz–Knudsen equation [35, 37, 38] taking
+          into account the vaporization coefficient of silicon monoxide [27] and were similar within an error of
+          about 15% to those determined by the method of comparison of ion currents [16, 17].
+    - observation_id: sh98_source_statement_24
+      type: laboratory_conditions
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        section: Results
+        note: Verbatim translation transcription re-checked against the rendered page image.
+      units: verbatim source statement
+      values:
+        statement_as_printed: As seen from Table 2, the coefficient A in the temperature dependences of the partial
+          vapor pressures for all types of the cells remains constant within the calculation error, and its values
+          are fairly close to those obtained in [13, 25, 27, 40].
+    observations: []
+  O:
+    context:
+    - observation_id: t2_o_01
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: O row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: Reference [23]; the cell and method label are transcribed from this paper Table 2.
+        gas_species: O(g)
+        table: '2'
+        method_code_as_printed: I
+        cell_material_as_printed: Mo
+        cell_material_reported: Mo
+        reference_as_printed: '[23]'
+        reference_resolved: '[23]'
+        temperature_range_K:
+        - 1600
+        - 1800
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 25250±2140
+          A_K: 25250.0
+          sigma_A_K: 2140.0
+          B_as_printed: 6.55±1.03
+          B: 6.55
+          sigma_B: 1.03
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+        method_label_as_printed: effusion and mass spectroscopic
+    - observation_id: t2_o_02
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: O row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: Reference [22]; the cell and method label are transcribed from this paper Table 2.
+        gas_species: O(g)
+        table: '2'
+        method_code_as_printed: I
+        cell_material_as_printed: Mo
+        cell_material_reported: Mo
+        reference_as_printed: '[22]'
+        reference_resolved: '[22]'
+        temperature_range_K:
+        - 1601
+        - 1754
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 29992±2539
+          A_K: 29992.0
+          sigma_A_K: 2539.0
+          B_as_printed: 9.63±1.51
+          B: 9.63
+          sigma_B: 1.51
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+        method_label_as_printed: effusion and mass spectroscopic
+    - observation_id: t2_o_03
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: O row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: Reference [40]; the cell and method label are transcribed from this paper Table 2.
+        gas_species: O(g)
+        table: '2'
+        method_code_as_printed: IV
+        method_token: tabulation
+        cell_material_as_printed: —
+        reference_as_printed: '[40]'
+        reference_resolved: '[40]'
+        temperature_range_K:
+        - 1700
+        - 1996
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 26966±14
+          A_K: 26966.0
+          sigma_A_K: 14.0
+          B_as_printed: 7.61±0.01
+          B: 7.61
+          sigma_B: 0.01
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+    - observation_id: t2_o_04
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: O row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: Reference [28]; the cell and method label are transcribed from this paper Table 2.
+        gas_species: O(g)
+        table: '2'
+        method_code_as_printed: II
+        method_token: knudsen_effusion
+        cell_material_as_printed: Al2O3
+        cell_material_reported: Al2O3
+        reference_as_printed: '[28]'
+        reference_resolved: '[28]'
+        temperature_range_K:
+        - 1800
+        - 1900
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 16713±983a
+          A_K: 16713.0
+          sigma_A_K: 983.0
+          B_as_printed: 2.14±0.13a
+          B: 2.14
+          sigma_B: 0.13
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+        footnote_marker: a
+    - observation_id: t2_o_05
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: O row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: model_derived
+        gas_species: O(g)
+        table: '2'
+        method_code_as_printed: II
+        method_token: knudsen_effusion
+        cell_material_as_printed: Mo
+        cell_material_reported: Mo
+        reference_as_printed: This work
+        reference_resolved: This work
+        temperature_range_K:
+        - 1833
+        - 1995
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 26972±971
+          A_K: 26972.0
+          sigma_A_K: 971.0
+          B_as_printed: 5.62±0.43
+          B: 5.62
+          sigma_B: 0.43
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+      experiment: mi1201-mo-sio2
+    - observation_id: t2_o_06
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: O row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: model_derived
+        gas_species: O(g)
+        table: '2'
+        method_code_as_printed: II
+        method_token: knudsen_effusion
+        cell_material_as_printed: W
+        cell_material_reported: W
+        reference_as_printed: '"'
+        reference_resolved: This work
+        temperature_range_K:
+        - 1840
+        - 1987
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 27816±1050
+          A_K: 27816.0
+          sigma_A_K: 1050.0
+          B_as_printed: 6.15±0.56
+          B: 6.15
+          sigma_B: 0.56
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+      experiment: ms1301-w-sio2
+    - observation_id: t2_o_07
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: O row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: model_derived
+        gas_species: O(g)
+        table: '2'
+        method_code_as_printed: II
+        method_token: knudsen_effusion
+        cell_material_as_printed: Pt–Rh (Mo)
+        cell_material_reported: Pt–Rh (Mo)
+        reference_as_printed: '"'
+        reference_resolved: This work
+        temperature_range_K:
+        - 1872
+        - 1997
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 26924±1131
+          A_K: 26924.0
+          sigma_A_K: 1131.0
+          B_as_printed: 7.72±0.56
+          B: 7.72
+          sigma_B: 0.56
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+      experiment: ms1301-ptrh-mo-sio2
+    - observation_id: t2_o_08
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: O row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: Reference [25]; the cell and method label are transcribed from this paper Table 2.
+        gas_species: O(g)
+        table: '2'
+        method_code_as_printed: II
+        method_token: knudsen_effusion
+        cell_material_as_printed: —
+        reference_as_printed: '[25]'
+        reference_resolved: '[25]'
+        temperature_range_K:
+        - 1946
+        - 1961
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 26161±600b
+          A_K: 26161.0
+          sigma_A_K: 600.0
+          B_as_printed: 7.31±0.06b
+          B: 7.31
+          sigma_B: 0.06
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+        footnote_marker: b
+    - observation_id: t2_o_09
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: O row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: Reference [40]; the cell and method label are transcribed from this paper Table 2.
+        gas_species: O(g)
+        table: '2'
+        method_code_as_printed: IV
+        method_token: tabulation
+        cell_material_as_printed: —
+        reference_as_printed: '[40]'
+        reference_resolved: '[40]'
+        temperature_range_K:
+        - 1996
+        - 3000
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 26607±57
+          A_K: 26607.0
+          sigma_A_K: 57.0
+          B_as_printed: 7.43±0.02
+          B: 7.43
+          sigma_B: 0.02
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+    - observation_id: t2_o_10
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: O row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: model_derived
+        gas_species: O(g)
+        table: '2'
+        method_code_as_printed: II
+        method_token: knudsen_effusion
+        cell_material_as_printed: Pt–Rh (Mo)
+        cell_material_reported: Pt–Rh (Mo)
+        reference_as_printed: This work
+        reference_resolved: This work
+        temperature_range_K:
+        - 2000
+        - 2032
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 26612±1178
+          A_K: 26612.0
+          sigma_A_K: 1178.0
+          B_as_printed: 7.70±0.47
+          B: 7.7
+          sigma_B: 0.47
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+      experiment: ms1301-ptrh-mo-sio2
+    - observation_id: t2_o_11
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: O row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: model_derived
+        gas_species: O(g)
+        table: '2'
+        method_code_as_printed: II
+        method_token: knudsen_effusion
+        cell_material_as_printed: Mo
+        cell_material_reported: Mo
+        reference_as_printed: '"'
+        reference_resolved: This work
+        temperature_range_K:
+        - 2000
+        - 2038
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 25822±1032
+          A_K: 25822.0
+          sigma_A_K: 1032.0
+          B_as_printed: 5.93±0.66
+          B: 5.93
+          sigma_B: 0.66
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+      experiment: mi1201-mo-sio2
+    - observation_id: t2_o_12
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: O row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: model_derived
+        gas_species: O(g)
+        table: '2'
+        method_code_as_printed: II
+        method_token: knudsen_effusion
+        cell_material_as_printed: W
+        cell_material_reported: W
+        reference_as_printed: '"'
+        reference_resolved: This work
+        temperature_range_K:
+        - 2000
+        - 2100
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 27715±2521
+          A_K: 27715.0
+          sigma_A_K: 2521.0
+          B_as_printed: 6.87±1.55
+          B: 6.87
+          sigma_B: 1.55
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+      experiment: ms1301-w-sio2
+    - observation_id: sh98_source_statement_25
+      type: laboratory_conditions
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        section: Results
+        note: Verbatim translation transcription re-checked against the rendered page image.
+      units: verbatim source statement
+      values:
+        statement_as_printed: Therewith, the data reported in [21–24] significantly differ from each other.
+    - observation_id: sh98_source_statement_26
+      type: laboratory_conditions
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        section: Results
+        note: Verbatim translation transcription re-checked against the rendered page image.
+      units: verbatim source statement
+      values:
+        statement_as_printed: The coefficient B for the molecular vapor form (SiO) [or (O) and (O2)] characterizes
+          the reaction with the material of the cell during vaporization of [SiO2].
+    - observation_id: sh98_source_statement_27
+      type: laboratory_conditions
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        section: Results
+        note: Verbatim translation transcription re-checked against the rendered page image.
+      units: verbatim source statement
+      values:
+        statement_as_printed: The insignificant deviation of the coefficient B in equation (9) for (SiO2) from the
+          values recommended in [4] is probably due to fragmentation of this molecule; more correct data can be
+          obtained at lower ionization energies.
+    observations: []
+  O2:
+    context:
+    - observation_id: t2_o2_01
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: O2 row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: Reference [23]; the cell and method label are transcribed from this paper Table 2.
+        gas_species: O2(g)
+        table: '2'
+        method_code_as_printed: I
+        cell_material_as_printed: Mo
+        cell_material_reported: Mo
+        reference_as_printed: '[23]'
+        reference_resolved: '[23]'
+        temperature_range_K:
+        - 1600
+        - 1800
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 23839±2120
+          A_K: 23839.0
+          sigma_A_K: 2120.0
+          B_as_printed: 6.12±1.61
+          B: 6.12
+          sigma_B: 1.61
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+        method_label_as_printed: effusion and mass spectroscopic
+    - observation_id: t2_o2_02
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: O2 row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: Reference [22]; the cell and method label are transcribed from this paper Table 2.
+        gas_species: O2(g)
+        table: '2'
+        method_code_as_printed: I
+        cell_material_as_printed: Mo
+        cell_material_reported: Mo
+        reference_as_printed: '[22]'
+        reference_resolved: '[22]'
+        temperature_range_K:
+        - 1601
+        - 1754
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 4595±2414
+          A_K: 4595.0
+          sigma_A_K: 2414.0
+          B_as_printed: 1.00±1.43
+          B: 1.0
+          sigma_B: 1.43
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+        method_label_as_printed: effusion and mass spectroscopic
+    - observation_id: t2_o2_03
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: O2 row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: Reference [40]; the cell and method label are transcribed from this paper Table 2.
+        gas_species: O2(g)
+        table: '2'
+        method_code_as_printed: IV
+        method_token: tabulation
+        cell_material_as_printed: —
+        reference_as_printed: '[40]'
+        reference_resolved: '[40]'
+        temperature_range_K:
+        - 1700
+        - 1996
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 27420±25
+          A_K: 27420.0
+          sigma_A_K: 25.0
+          B_as_printed: 8.32±0.01
+          B: 8.32
+          sigma_B: 0.01
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+    - observation_id: t2_o2_04
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: O2 row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: Reference [13]; the cell and method label are transcribed from this paper Table 2.
+        gas_species: O2(g)
+        table: '2'
+        method_code_as_printed: III
+        method_token: langmuir_free_evaporation
+        cell_material_as_printed: Pt
+        cell_material_reported: Pt
+        reference_as_printed: '[13]'
+        reference_resolved: '[13]'
+        temperature_range_K:
+        - 1773
+        - 2001
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 27709±1249
+          A_K: 27709.0
+          sigma_A_K: 1249.0
+          B_as_printed: 8.29±0.66
+          B: 8.29
+          sigma_B: 0.66
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+    - observation_id: t2_o2_05
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: O2 row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: Reference [13]; the cell and method label are transcribed from this paper Table 2.
+        gas_species: O2(g)
+        table: '2'
+        method_code_as_printed: III
+        method_token: langmuir_free_evaporation
+        cell_material_as_printed: Ir
+        cell_material_reported: Ir
+        reference_as_printed: '[13]'
+        reference_resolved: '[13]'
+        temperature_range_K:
+        - 1773
+        - 2001
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 30821±1666
+          A_K: 30821.0
+          sigma_A_K: 1666.0
+          B_as_printed: 9.63±0.88
+          B: 9.63
+          sigma_B: 0.88
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+    - observation_id: t2_o2_06
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: O2 row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: Reference [28]; the cell and method label are transcribed from this paper Table 2.
+        gas_species: O2(g)
+        table: '2'
+        method_code_as_printed: II
+        method_token: knudsen_effusion
+        cell_material_as_printed: Al2O3
+        cell_material_reported: Al2O3
+        reference_as_printed: '[28]'
+        reference_resolved: '[28]'
+        temperature_range_K:
+        - 1800
+        - 1900
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 6765±399a
+          A_K: 6765.0
+          sigma_A_K: 399.0
+          B_as_printed: −3.52±0.21a
+          B: -3.52
+          sigma_B: 0.21
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+        footnote_marker: a
+    - observation_id: t2_o2_07
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: O2 row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: model_derived
+        gas_species: O2(g)
+        table: '2'
+        method_code_as_printed: II
+        method_token: knudsen_effusion
+        cell_material_as_printed: Mo
+        cell_material_reported: Mo
+        reference_as_printed: This work
+        reference_resolved: This work
+        temperature_range_K:
+        - 1833
+        - 1995
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 27328±428
+          A_K: 27328.0
+          sigma_A_K: 428.0
+          B_as_printed: 4.28±0.22
+          B: 4.28
+          sigma_B: 0.22
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+      experiment: mi1201-mo-sio2
+    - observation_id: t2_o2_08
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: O2 row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: model_derived
+        gas_species: O2(g)
+        table: '2'
+        method_code_as_printed: II
+        method_token: knudsen_effusion
+        cell_material_as_printed: W
+        cell_material_reported: W
+        reference_as_printed: '"'
+        reference_resolved: This work
+        temperature_range_K:
+        - 1840
+        - 1987
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 29016±1050
+          A_K: 29016.0
+          sigma_A_K: 1050.0
+          B_as_printed: 5.34±0.56
+          B: 5.34
+          sigma_B: 0.56
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+      experiment: ms1301-w-sio2
+    - observation_id: t2_o2_09
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: O2 row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: model_derived
+        gas_species: O2(g)
+        table: '2'
+        method_code_as_printed: II
+        method_token: knudsen_effusion
+        cell_material_as_printed: Pt–Rh (Mo)
+        cell_material_reported: Pt–Rh (Mo)
+        reference_as_printed: '"'
+        reference_resolved: This work
+        temperature_range_K:
+        - 1872
+        - 1997
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 27232±1112
+          A_K: 27232.0
+          sigma_A_K: 1112.0
+          B_as_printed: 8.48±0.49
+          B: 8.48
+          sigma_B: 0.49
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+      experiment: ms1301-ptrh-mo-sio2
+    - observation_id: t2_o2_10
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: O2 row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: Reference [25]; the cell and method label are transcribed from this paper Table 2.
+        gas_species: O2(g)
+        table: '2'
+        method_code_as_printed: II
+        method_token: knudsen_effusion
+        cell_material_as_printed: Pt
+        cell_material_reported: Pt
+        reference_as_printed: '[25]'
+        reference_resolved: '[25]'
+        temperature_range_K:
+        - 1887
+        - 1980
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 28905±1006
+          A_K: 28905.0
+          sigma_A_K: 1006.0
+          B_as_printed: 9.20±0.52
+          B: 9.2
+          sigma_B: 0.52
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+    - observation_id: t2_o2_11
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: O2 row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: Reference [40]; the cell and method label are transcribed from this paper Table 2.
+        gas_species: O2(g)
+        table: '2'
+        method_code_as_printed: IV
+        method_token: tabulation
+        cell_material_as_printed: —
+        reference_as_printed: '[40]'
+        reference_resolved: '[40]'
+        temperature_range_K:
+        - 1996
+        - 3000
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 26430±277
+          A_K: 26430.0
+          sigma_A_K: 277.0
+          B_as_printed: 7.81±0.12
+          B: 7.81
+          sigma_B: 0.12
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+    - observation_id: t2_o2_12
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: O2 row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: model_derived
+        gas_species: O2(g)
+        table: '2'
+        method_code_as_printed: II
+        method_token: knudsen_effusion
+        cell_material_as_printed: Mo
+        cell_material_reported: Mo
+        reference_as_printed: This work
+        reference_resolved: This work
+        temperature_range_K:
+        - 2000
+        - 2038
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 25028±2631
+          A_K: 25028.0
+          sigma_A_K: 2631.0
+          B_as_printed: 4.90±1.31
+          B: 4.9
+          sigma_B: 1.31
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+      experiment: mi1201-mo-sio2
+    - observation_id: t2_o2_13
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: O2 row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: model_derived
+        gas_species: O2(g)
+        table: '2'
+        method_code_as_printed: II
+        method_token: knudsen_effusion
+        cell_material_as_printed: Pt–Rh (Mo)
+        cell_material_reported: Pt–Rh (Mo)
+        reference_as_printed: '"'
+        reference_resolved: This work
+        temperature_range_K:
+        - 2000
+        - 2032
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 26608±1151
+          A_K: 26608.0
+          sigma_A_K: 1151.0
+          B_as_printed: 8.62±0.41
+          B: 8.62
+          sigma_B: 0.41
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+      experiment: ms1301-ptrh-mo-sio2
+    - observation_id: t2_o2_14
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: O2 row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: model_derived
+        gas_species: O2(g)
+        table: '2'
+        method_code_as_printed: II
+        method_token: knudsen_effusion
+        cell_material_as_printed: W
+        cell_material_reported: W
+        reference_as_printed: '"'
+        reference_resolved: This work
+        temperature_range_K:
+        - 2000
+        - 2100
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 28814±2521
+          A_K: 28814.0
+          sigma_A_K: 2521.0
+          B_as_printed: 6.78±1.55
+          B: 6.78
+          sigma_B: 1.55
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+      experiment: ms1301-w-sio2
+    - observation_id: t2_o2_15
+      type: experiment_series
+      locator:
+        published_page: 1175
+        pdf_page_index: 4
+        table: '2'
+        note: O2 row; original temperature limits, A and B coefficients, uncertainties, method code, cell and reference
+          retained.
+      units: log p_i coefficient relation; pressure in atm as printed
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: Reference [13]; the cell and method label are transcribed from this paper Table 2.
+        gas_species: O2(g)
+        table: '2'
+        method_code_as_printed: III
+        method_token: langmuir_free_evaporation
+        cell_material_as_printed: Ir
+        cell_material_reported: Ir
+        reference_as_printed: '[13]'
+        reference_resolved: '[13]'
+        temperature_range_K:
+        - 2001
+        - 2149
+        composition_basis_as_reported: SiO2 feedstock; composition held as pure silicon dioxide in this source (no
+          mixtures reported)
+        pressure_temperature_relation:
+          relation_as_printed: log p_i = −A/T + B, atm
+          pressure_unit_as_printed: atm
+          A_as_printed: 38740±4183
+          A_K: 38740.0
+          sigma_A_K: 4183.0
+          B_as_printed: 13.57±2.05
+          B: 13.57
+          sigma_B: 2.05
+        coefficient_uncertainty_note: Root-mean-square deviations of the least-squares procedure; footnote markers
+          retained separately.
+    observations: []

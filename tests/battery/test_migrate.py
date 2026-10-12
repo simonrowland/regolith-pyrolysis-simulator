@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import csv
 import hashlib
+import itertools
 import json
 import os
 import re
@@ -34,6 +36,7 @@ from simulator.battery.enums import (
     Polymorph,
     Quantity,
     Rail,
+    ResidualStatus,
     ReferenceStateConvention,
     RefusalReason,
     StateTag,
@@ -48,6 +51,7 @@ from simulator.battery.migrate import (
     DuplicateContextIdError,
     QUEUE_SCHEMA_VERSION,
     DuplicateObservationIdError,
+    MigrationResult,
     Migrator,
     UnknownRailSpellingError,
     UnresolvedEquipmentContextError,
@@ -321,6 +325,7 @@ def test_reference_phase_convention_notice_round_trips_and_legacy_notice_stays_v
 from simulator.battery.records import (
     Bench,
     BenchIdentity,
+    Notice,
     Reaction,
     Species,
     State,
@@ -1081,7 +1086,8 @@ def test_hastie_initial_charges_bind_to_figure_points_as_proxies(
     expected_counts = {
         "fig4_illite_K_SiO_digitized": 6,
         "fig5_glass_Na_this_work_digitized": 6,
-        "fig11_k1_slag_k2o_gamma_digitized": 19,
+        # The Figure 11 caption moves one point to TMS: 19 - 1 = 18 KMS.
+        "fig11_k1_slag_k2o_gamma_digitized": 18,
     }
     for series, composition_wt_pct in expected_wt_pct.items():
         rows = [
@@ -1099,6 +1105,122 @@ def test_hastie_initial_charges_bind_to_figure_points_as_proxies(
             assert composition is not None and composition.is_value
             assert composition.value.as_map() == expected.as_map()
             assert composition.value.proxy_flag == "initial_charge_only"
+
+    k1 = next(
+        row
+        for row in _extract_observations("kems-020-hastie-1981-nbsir.yaml")
+        if row.get("observation_id") == "hastie_1981_fig11_k1_slag_k2o_gamma_digitized"
+    )
+    k1_experiment = result.experiments[
+        next(
+            observation.experiment_id
+            for observation in result.observations.values()
+            if "::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T="
+            in observation.observation_id
+        )
+    ]
+    assert k1["experiment"] == "hastie-1981-k1-kms"
+    assert k1_experiment.experiment_id.endswith("::experiment::hastie-1981-k1-kms")
+    assert k1_experiment.bench_id is None
+    assert k1_experiment.apparatus is None
+    assert k1_experiment.locator is not None
+    assert k1_experiment.locator.page == 10
+    assert k1_experiment.locator.section == "6.2 Partial Pressure Determination"
+
+    k2_experiment = next(
+        experiment
+        for experiment in result.experiments.values()
+        if experiment.experiment_id.endswith("::experiment::hastie-1981-pt-kms")
+    )
+    assert k2_experiment.apparatus is not None
+    assert k2_experiment.apparatus.calibration is not None
+    k2_calibration = k2_experiment.apparatus.calibration["pressure_method"]
+    assert k2_calibration.locator is not None
+    assert k2_calibration.locator.page == 32
+    assert k2_calibration.locator.section == "discussion of Figure 12 KMS data"
+    assert k2_experiment.bench_id is not None
+    k2_bench = result.benches[k2_experiment.bench_id]
+    assert k2_bench.cell_material_and_liner is not None
+    assert k2_bench.cell_material_and_liner.state.is_value
+    assert k2_bench.cell_material_and_liner.state.value == "platinum KMS cell"
+
+    moved = next(
+        row
+        for row in _extract_observations("kems-020-hastie-1981-nbsir.yaml")
+        if row.get("observation_id")
+        == "hastie_1981_fig11_k1_slag_k2o_gamma_tms_open_square"
+    )
+    (moved_point,) = moved["values"]["points"]
+    assert moved["experiment"] == "hastie-1981-pt-tms"
+    assert moved["regime"] == "transpiration_mass_spectrometry"
+    assert moved_point["run"] == 1
+    assert moved_point["T_K"] == 1575.0
+    assert "Digitization read 1559.9 K" in moved_point["note"]
+    assert "caption prints 1575 K" in moved_point["note"]
+    moved_migrated = [
+        observation
+        for observation in result.observations.values()
+        if "::hastie_1981_fig11_k1_slag_k2o_gamma_tms_open_square::T=1575.0:"
+        in observation.observation_id
+    ]
+    assert len(moved_migrated) == 1
+    moved_observation = moved_migrated[0]
+    assert result.experiments[moved_observation.experiment_id].experiment_id.endswith(
+        "::experiment::hastie-1981-pt-tms"
+    )
+    assert moved_observation.identity.temperature_K.is_value
+    assert moved_observation.identity.temperature_K.value == Decimal("1575.0")
+    moved_composition = moved_observation.identity.composition
+    assert moved_composition is not None and moved_composition.is_value
+    assert moved_composition.value.proxy_flag == "initial_charge_only"
+    moved_prediction = predict_with_engine(
+        Engine.OPENIMCC,
+        moved_observation,
+        experiment=result.experiments[moved_observation.experiment_id],
+    )
+    assert moved_prediction.value is None
+    assert moved_prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert moved_prediction.refusal_detail["reason"] == "missing_evidence"
+    (oxygen_gap,) = moved_prediction.refusal_detail["gaps"]
+    assert oxygen_gap["waypoint"] == "oxygen_condition"
+    assert "fO2_log" in oxygen_gap["missing"]
+
+    na_kms = next(
+        row
+        for row in _extract_observations("kems-020-hastie-1981-nbsir.yaml")
+        if row.get("observation_id") == "hastie_1981_fig5_glass_Na_this_work_digitized"
+    )
+    assert na_kms["experiment"] == "hastie-1981-measured-soda-lime-glass-kms"
+    assert na_kms["phase"] == "gas"
+    assert [point["series"] for point in na_kms["values"]["points"]] == [
+        "KMS_1",
+        "KMS_1",
+        "KMS_3",
+    ]
+    assert [point["T_K"] for point in na_kms["values"]["points"]] == [
+        1488.8,
+        1333.3,
+        1428.6,
+    ]
+    na_kms_migrated = [
+        observation
+        for observation in result.observations.values()
+        if "::hastie_1981_fig5_glass_Na_this_work_digitized::T="
+        in observation.observation_id
+        and result.experiments[observation.experiment_id].experiment_id.endswith(
+            "::experiment::hastie-1981-measured-soda-lime-glass-kms"
+        )
+    ]
+    assert len(na_kms_migrated) == 3
+    assert {
+        observation.identity.temperature_K.value
+        for observation in na_kms_migrated
+    } == {Decimal("1488.8"), Decimal("1333.3"), Decimal("1428.6")}
+    assert all(
+        observation.identity.species.phase.is_value
+        and observation.identity.species.phase.value is Phase.G
+        for observation in na_kms_migrated
+    )
 
 
 def _run_migrate_cli(args: list[str]) -> subprocess.CompletedProcess[str]:
@@ -2171,6 +2293,34 @@ def test_g02_iron_olivine_kems_is_knudsen_not_langmuir(tmp_path: Path) -> None:
     assert obs.evidence.class_.value is not EvidenceClass.MEASURED_DIRECT
 
 
+def test_g02_langmuir_ledger_keeps_qualified_derived_from(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    parent = "10.1016/j.gca.2005.08.014::kems-005-fedkin-2006::fedkin_2006_k_yu_langmuir"
+    (root / "data" / "literature" / "langmuir_knudsen_flux_validation.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "measurements": {
+                    "potassium_silicate_vacuum": {
+                        "species": "K",
+                        "temperature_range_k": [1723.15, 1723.15],
+                        "measured_langmuir_to_effusion_flux_ratio": {"value": 0.13},
+                        "derived_from": [parent],
+                        "source": {
+                            "citation_id": "REF-014",
+                            "citation": "Fedkin et al. (2006), DOI 10.1016/j.gca.2005.08.014",
+                            "doi": "10.1016/j.gca.2005.08.014",
+                        },
+                    }
+                }
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    observation = migrate(root, write=False).observations["potassium_silicate_vacuum"]
+    assert observation.derived_from == (parent,)
+
+
 def test_g02_kems_row_without_method_is_unknown(tmp_path: Path) -> None:
     root = _write_min_tree(tmp_path)
     (root / "data" / "literature" / "kems_measurements.yaml").write_text(
@@ -2409,6 +2559,85 @@ def test_j02_model_derived_without_parent_is_conditional_field(tmp_path: Path) -
         "derived_from" in (e.axes or ()) or "derivation" in (e.axes or ())
         for e in result.queue
     )
+
+
+def test_dump_hard_issues_writes_complete_source_labeled_census(tmp_path: Path) -> None:
+    from tools.dump_hard_issues import dump_hard_issues
+
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    values = extract["species"]["Na"]["observations"][0]["values"]
+    values["method_class"] = "model_derived"
+    values.pop("series", None)
+    root = _write_min_tree(tmp_path / "tree", extract)
+    result = migrate(root, write=False)
+    out = tmp_path / "issues.tsv"
+
+    written = dump_hard_issues(root, out)
+    with out.open(encoding="utf-8", newline="") as stream:
+        rows = list(csv.DictReader(stream, delimiter="\t"))
+
+    assert written == len(rows) == len(result.validation.hard_issues)
+    assert any(
+        row["source_id"] == "fixture-source"
+        and row["field"] == "derived_from"
+        and row["issue_code"] == "conditional_field"
+        for row in rows
+    )
+
+    filtered = tmp_path / "filtered.tsv"
+    assert dump_hard_issues(root, filtered, "fixture-source") == len(rows)
+    assert dump_hard_issues(root, tmp_path / "empty.tsv", "other-source") == 0
+
+
+def test_dump_hard_issues_preserves_indexed_notice_path(tmp_path: Path) -> None:
+    from unittest.mock import patch
+
+    import tools.dump_hard_issues as exporter
+
+    root = _write_min_tree(tmp_path / "tree")
+    result = migrate(root, write=False)
+    observation_id = "fixture-source::na_psat::T=1200.0:h=8f69f8b68978"
+    observation = result.observations[observation_id]
+    result.observations[observation_id] = replace(
+        observation,
+        notices=(
+            Notice(
+                kind=NoticeKind.FALLBACK,
+                affected_quantities=(Quantity.P_SAT,),
+                reason="validator regression fixture",
+                origin=observation_id,
+            ),
+        ),
+    )
+    result.validation = validate_corpus(
+        result.works,
+        result.experiments,
+        result.observations,
+        benches=result.benches,
+    )
+    assert any(
+        issue.path == f"observation[{observation_id}].notices[0]"
+        for issue in result.validation.hard_issues
+    )
+
+    out = tmp_path / "indexed-issues.tsv"
+    with patch.object(exporter, "migrate", return_value=result):
+        assert exporter.dump_hard_issues(root, out, "fixture-source") == 1
+    with out.open(encoding="utf-8", newline="") as stream:
+        rows = list(csv.DictReader(stream, delimiter="\t"))
+
+    assert rows == [
+        {
+            "source_id": "fixture-source",
+            "observation_id": observation_id,
+            "field": "notices[0]",
+            "issue_code": "conditional_field",
+            "message": "fallback notice requires from/to",
+            "evidence_class": "measured_direct",
+            "method_class": "measured_direct",
+            "quantity": "p_sat",
+        }
+    ]
 
 
 def test_j02_source_stated_derived_from_is_stored(tmp_path: Path) -> None:
@@ -3140,12 +3369,461 @@ def test_g04_supersedes_marks_the_old_row(tmp_path: Path) -> None:
     new = result.observations["fixture-source::homma_1966_mn_olette_experimental_quoted_deep"]
     newer = result.observations["fixture-source::newer_list"]
     assert old.admission.status is AdmissionStatus.SUPERSEDED
-    assert old.admission.superseded_by == new.observation_id
+    assert old.admission.superseded_by == newer.observation_id
     assert new.admission.status is AdmissionStatus.SUPERSEDED
     assert new.admission.superseded_by == newer.observation_id
     assert newer.admission.status is AdmissionStatus.ADMITTED
     assert newer.admission.superseded_by is None
     assert any("missing_target" in (e.why or "") for e in result.queue)
+
+
+def _migrate_supersedes_rows(
+    tmp_path: Path, rows: list[tuple[str, str | None, str]]
+) -> MigrationResult:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"] = []
+    for observation_id, supersedes, status in rows:
+        row = {
+            "observation_id": observation_id,
+            "type": "alpha",
+            "locator": {"table": "1"},
+            "phase": "gas",
+            "values": {
+                "quantity": "literature_vaporization_coefficient",
+                "method_class": "measured_direct",
+                "admission_status": status,
+            },
+        }
+        if supersedes is not None:
+            row["supersedes"] = supersedes
+        extract["species"]["Na"]["observations"].append(row)
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    _assert_superseded_targets_are_live(result)
+    return result
+
+
+def _assert_superseded_targets_are_live(result: MigrationResult) -> None:
+    observations = result.observations
+    for observation in observations.values():
+        target_id = observation.admission.superseded_by
+        if target_id is None:
+            continue
+        assert target_id in observations
+        assert observations[target_id].admission.status in {
+            AdmissionStatus.ADMITTED, AdmissionStatus.PENDING
+        }
+
+
+@pytest.mark.parametrize("order", list(itertools.permutations(("A", "B", "C"))))
+def test_g04_supersedes_chain_is_order_independent_and_flattened(
+    tmp_path: Path, order: tuple[str, ...]
+) -> None:
+    specs = {
+        "A": (None, "admitted"),
+        "B": ("A", "admitted"),
+        "C": ("B", "admitted"),
+    }
+    result = _migrate_supersedes_rows(
+        tmp_path, [(name, *specs[name]) for name in order]
+    )
+    assert (
+        result.observations["fixture-source::A"].admission.superseded_by
+        == "fixture-source::C"
+    )
+    assert (
+        result.observations["fixture-source::B"].admission.superseded_by
+        == "fixture-source::C"
+    )
+    assert (
+        result.observations["fixture-source::C"].admission.status
+        is AdmissionStatus.ADMITTED
+    )
+
+
+def test_g04_supersedes_cycle_keeps_rows_live_and_emits_hard_issue(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_supersedes_rows(
+        tmp_path, [("A", "B", "admitted"), ("B", "A", "admitted")]
+    )
+    for name in ("A", "B"):
+        row = result.observations[f"fixture-source::{name}"]
+        assert row.admission.status is AdmissionStatus.ADMITTED
+        assert row.admission.superseded_by is None
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and "supersedes_cycle" in issue.detail
+        and "fixture-source::A" in issue.detail
+        and "fixture-source::B" in issue.detail
+        for issue in result.validation.hard_issues
+    )
+
+
+def test_g04_competing_superseders_keep_green_precedence(tmp_path: Path) -> None:
+    result = _migrate_supersedes_rows(
+        tmp_path,
+        [("A", None, "admitted"), ("B", "A", "admitted"), ("C", "A", "admitted")],
+    )
+    assert (
+        result.observations["fixture-source::A"].admission.superseded_by
+        == "fixture-source::C"
+    )
+    assert (
+        result.observations["fixture-source::B"].admission.status
+        is AdmissionStatus.ADMITTED
+    )
+    assert (
+        result.observations["fixture-source::C"].admission.status
+        is AdmissionStatus.ADMITTED
+    )
+
+
+def _stage_keyed_children(
+    tmp_path: Path,
+    specs: list[tuple[str, str, str | None]],
+) -> Migrator:
+    """Build admitted rows, then give each a temperature and a ``:row=`` id.
+
+    ``specs`` entries are ``(stored_id, row_label, temperature_K or None)``.
+    """
+
+    from simulator.battery.records import State
+
+    result = _migrate_supersedes_rows(
+        tmp_path, [(stored_id, None, "admitted") for stored_id, _row, _temp in specs]
+    )
+    staged = {}
+    for stored_id, row_label, temperature in specs:
+        observation = result.observations.pop(f"fixture-source::{stored_id}")
+        identity = observation.identity
+        if temperature is None:
+            identity = replace(identity, temperature_K=None)
+        else:
+            identity = replace(identity, temperature_K=State.of(Decimal(temperature)))
+        observation_id = f"fixture-source::{stored_id}::T={temperature}:row={row_label}"
+        staged[observation_id] = replace(
+            observation, observation_id=observation_id, identity=identity
+        )
+    result.observations = staged
+    migrator = Migrator(tmp_path)
+    migrator.result = result
+    return migrator
+
+
+def test_g04_singleton_explosion_requires_same_measurement_key(tmp_path: Path) -> None:
+    migrator = _stage_keyed_children(
+        tmp_path,
+        [("A-child", "a", "1000"), ("B-child", "b", "2000")],
+    )
+    parent_a = "fixture-source::A"
+    parent_b = "fixture-source::B"
+    child_a = "fixture-source::A-child::T=1000:row=a"
+    child_b = "fixture-source::B-child::T=2000:row=b"
+    migrator._exploded_children = {parent_a: [child_a], parent_b: [child_b]}
+    sample = migrator.result.observations[child_a]
+    migrator._pending_supersedes = [
+        (parent_a, parent_b, sample.experiment_id, sample.locator, "fixture-source.yaml")
+    ]
+
+    migrator._apply_supersedes()
+
+    kept = migrator.result.observations[child_a]
+    assert kept.admission.status is AdmissionStatus.ADMITTED
+    assert kept.admission.superseded_by is None
+    assert any(
+        "no unique matching row" in (entry.why or "") and "row left live" in (entry.why or "")
+        for entry in migrator.result.queue
+    )
+    _assert_superseded_targets_are_live(migrator.result)
+
+
+def test_g04_exploded_row_without_correspondence_stays_live(tmp_path: Path) -> None:
+    migrator = _stage_keyed_children(
+        tmp_path,
+        [("A-a", "a", "1000"), ("A-b", "b", "2000"), ("B-a", "a", "1000")],
+    )
+    parent_a = "fixture-source::A"
+    parent_b = "fixture-source::B"
+    row_a = "fixture-source::A-a::T=1000:row=a"
+    row_b = "fixture-source::A-b::T=2000:row=b"
+    successor = "fixture-source::B-a::T=1000:row=a"
+    migrator._exploded_children = {
+        parent_a: [row_a, row_b],
+        parent_b: [successor],
+    }
+    sample = migrator.result.observations[row_a]
+    migrator._pending_supersedes = [
+        (parent_a, parent_b, sample.experiment_id, sample.locator, "fixture-source.yaml")
+    ]
+
+    migrator._apply_supersedes()
+
+    matched = migrator.result.observations[row_a]
+    unmatched = migrator.result.observations[row_b]
+    assert matched.admission.status is AdmissionStatus.SUPERSEDED
+    assert matched.admission.superseded_by == successor
+    assert unmatched.admission.status is AdmissionStatus.ADMITTED
+    assert unmatched.admission.superseded_by is None
+    assert any(
+        row_b in (entry.why or "") and "row left live" in (entry.why or "")
+        for entry in migrator.result.queue
+    )
+    _assert_superseded_targets_are_live(migrator.result)
+
+
+def test_g04_unexpanded_shell_without_key_follows_exploded_series(
+    tmp_path: Path,
+) -> None:
+    migrator = _stage_keyed_children(
+        tmp_path,
+        [("shell", "shell", None), ("B-b", "b", "2000"), ("B-a", "a", "1000")],
+    )
+    shell_id = "fixture-source::shell::T=None:row=shell"
+    child_a = "fixture-source::B-a::T=1000:row=a"
+    child_b = "fixture-source::B-b::T=2000:row=b"
+    parent_b = "fixture-source::B"
+    migrator._exploded_children = {parent_b: [child_b, child_a]}
+    sample = migrator.result.observations[shell_id]
+    migrator._pending_supersedes = [
+        (shell_id, parent_b, sample.experiment_id, sample.locator, "fixture-source.yaml")
+    ]
+
+    migrator._apply_supersedes()
+
+    shell = migrator.result.observations[shell_id]
+    assert shell.admission.status is AdmissionStatus.SUPERSEDED
+    assert shell.admission.superseded_by == min(child_a, child_b)
+    _assert_superseded_targets_are_live(migrator.result)
+
+
+@pytest.mark.parametrize("temperature_kind", ["absent", "unknown"])
+def test_g04_numeric_row_without_temperature_stays_live(
+    tmp_path: Path, temperature_kind: str
+) -> None:
+    from types import SimpleNamespace
+
+    from simulator.battery.score import comparison_candidates
+
+    migrator = _stage_keyed_children(
+        tmp_path,
+        [("A", "a", None), ("B-a", "a", "1000"), ("B-b", "b", "2000")],
+    )
+    staged_id = "fixture-source::A::T=None:row=a"
+    old = migrator.result.observations.pop(staged_id)
+    temperature = (
+        None if temperature_kind == "absent" else State.unknown("not printed")
+    )
+    old = replace(
+        old,
+        observation_id="fixture-source::A",
+        identity=replace(old.identity, temperature_K=temperature),
+        value=Value(ValueKind.POINT, point=Decimal("0.7")),
+    )
+    migrator.result.observations[old.observation_id] = old
+    children = sorted(
+        oid for oid in migrator.result.observations if oid != old.observation_id
+    )
+    for child_id in children:
+        migrator.result.observations[child_id] = replace(
+            migrator.result.observations[child_id],
+            value=Value(ValueKind.POINT, point=Decimal("0.8")),
+        )
+    migrator._exploded_children = {"fixture-source::B": children}
+    migrator._pending_supersedes = [
+        (
+            old.observation_id,
+            "fixture-source::B",
+            old.experiment_id,
+            old.locator,
+            "fixture-source.yaml",
+        )
+    ]
+    before = comparison_candidates(
+        SimpleNamespace(observations=migrator.result.observations)
+    )
+
+    migrator._apply_supersedes()
+
+    kept = migrator.result.observations[old.observation_id]
+    after = comparison_candidates(
+        SimpleNamespace(observations=migrator.result.observations)
+    )
+    diagnostics = [
+        entry
+        for entry in migrator.result.queue
+        if entry.why
+        and "no unique matching row" in entry.why
+        and "row left live" in entry.why
+    ]
+    assert kept.admission.status is AdmissionStatus.ADMITTED
+    assert kept.admission.superseded_by is None
+    assert [row.observation_id for row in after] == [
+        row.observation_id for row in before
+    ]
+    assert len(diagnostics) == 1
+    assert old.observation_id in (diagnostics[0].why or "")
+    _assert_superseded_targets_are_live(migrator.result)
+
+
+def test_g04_correspondence_diagnostic_follows_the_final_successor_set(
+    tmp_path: Path,
+) -> None:
+    migrator = _stage_keyed_children(
+        tmp_path,
+        [
+            ("A-a", "a", "1000"),
+            ("A-b", "b", "2000"),
+            ("A-c", "c", "1800"),
+            ("E-b", "b", "2000"),
+            ("B-a", "a", "1000"),
+            ("C-x", "x", "1500"),
+            ("D-a", "a", "1000"),
+        ],
+    )
+    ids = {
+        "A-a": "fixture-source::A-a::T=1000:row=a",
+        "A-b": "fixture-source::A-b::T=2000:row=b",
+        "A-c": "fixture-source::A-c::T=1800:row=c",
+        "E-b": "fixture-source::E-b::T=2000:row=b",
+        "B-a": "fixture-source::B-a::T=1000:row=a",
+        "C-x": "fixture-source::C-x::T=1500:row=x",
+        "D-a": "fixture-source::D-a::T=1000:row=a",
+    }
+    migrator._exploded_children = {
+        "fixture-source::A": [ids["A-a"], ids["A-b"], ids["A-c"]],
+        "fixture-source::E": [ids["E-b"]],
+        "fixture-source::B": [ids["B-a"]],
+        "fixture-source::C": [ids["C-x"]],
+        "fixture-source::D": [ids["D-a"]],
+    }
+    sample = migrator.result.observations[ids["A-a"]]
+    migrator._pending_supersedes = [
+        (
+            "fixture-source::A",
+            successor,
+            sample.experiment_id,
+            sample.locator,
+            "fixture-source.yaml",
+        )
+        for successor in (
+            "fixture-source::E",
+            "fixture-source::B",
+            "fixture-source::C",
+            "fixture-source::D",
+        )
+    ]
+
+    migrator._apply_supersedes()
+
+    matched_later = migrator.result.observations[ids["A-a"]]
+    matched_earlier = migrator.result.observations[ids["A-b"]]
+    unmatched = migrator.result.observations[ids["A-c"]]
+    assert matched_later.admission.status is AdmissionStatus.SUPERSEDED
+    assert matched_later.admission.superseded_by == ids["D-a"]
+    assert matched_earlier.admission.status is AdmissionStatus.SUPERSEDED
+    assert matched_earlier.admission.superseded_by == ids["E-b"]
+    assert unmatched.admission.status is AdmissionStatus.ADMITTED
+    assert unmatched.admission.superseded_by is None
+    live_notes = [
+        entry
+        for entry in migrator.result.queue
+        if entry.why and "row left live" in entry.why
+    ]
+    assert len(live_notes) == 1
+    assert ids["A-c"] in (live_notes[0].why or "")
+    assert ids["A-a"] not in (live_notes[0].why or "")
+    assert ids["A-b"] not in (live_notes[0].why or "")
+    _assert_superseded_targets_are_live(migrator.result)
+
+
+def test_g04_rejected_superseder_does_not_supersede_measured_row(
+    tmp_path: Path,
+) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"] = [
+        {
+            "observation_id": "measured_row",
+            "type": "alpha",
+            "locator": {"table": "1"},
+            "phase": "gas",
+            "values": {
+                "quantity": "literature_vaporization_coefficient",
+                "method_class": "measured_direct",
+                "admission_status": "admitted",
+            },
+        },
+        {
+            "observation_id": "rejected_figure_row",
+            "supersedes": "measured_row",
+            "type": "alpha",
+            "locator": {"figure": "1"},
+            "phase": "gas",
+            "values": {
+                "quantity": "unknown_figure_quantity",
+                "method_class": "figure_only",
+                "admission_status": "rejected",
+                "reason": "figure digitisation has no numeric point",
+            },
+        },
+    ]
+    root = _write_min_tree(tmp_path, extract)
+
+    result = migrate(root, write=False)
+
+    measured = result.observations["fixture-source::measured_row"]
+    assert measured.admission.status in {
+        AdmissionStatus.ADMITTED,
+        AdmissionStatus.PENDING,
+    }
+    assert measured.admission.superseded_by is None
+
+
+def test_g04_dangling_superseder_chain_keeps_measured_row_live(
+    tmp_path: Path,
+) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"] = [
+        {
+            "observation_id": "measured_row",
+            "type": "alpha",
+            "locator": {"table": "1"},
+            "phase": "gas",
+            "values": {
+                "quantity": "literature_vaporization_coefficient",
+                "method_class": "measured_direct",
+                "admission_status": "admitted",
+            },
+        }
+    ]
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    measured = result.observations["fixture-source::measured_row"]
+    dangling = replace(
+        measured,
+        observation_id="fixture-source::dangling_intermediate",
+        admission=replace(
+            measured.admission,
+            status=AdmissionStatus.SUPERSEDED,
+            reason="superseded test fixture",
+            superseded_by="fixture-source::missing_terminal",
+        ),
+    )
+    result.observations[dangling.observation_id] = dangling
+    migrator = Migrator(tmp_path)
+    migrator.result = result
+    migrator._pending_supersedes = [
+        (
+            measured.observation_id,
+            dangling.observation_id,
+            measured.experiment_id,
+            measured.locator,
+            "data/literature/extracts/fixture-source.yaml",
+        )
+    ]
+
+    migrator._apply_supersedes()
+
+    assert measured.admission.status is AdmissionStatus.ADMITTED
+    assert measured.admission.superseded_by is None
 
 
 def test_h03_pressure_conversion_keeps_derivation_trail() -> None:
@@ -3736,10 +4414,10 @@ def test_j01_explicit_pressure_atm_control_still_lifts(tmp_path: Path) -> None:
 
 
 def test_j01_fedkin_alpha_series_not_mass_loss_rate(tmp_path: Path) -> None:
-    src = REPO_ROOT / "data" / "literature" / "extracts" / "fedkin-grossman-ghiorso-2006.yaml"
+    src = REPO_ROOT / "data" / "literature" / "extracts" / "kems-005-fedkin-2006.yaml"
     extract = load_cached_safe_yaml(src.read_text(encoding="utf-8"))
     root = _write_min_tree(tmp_path, extract)
-    (root / "data" / "literature" / "extracts" / "fedkin-grossman-ghiorso-2006.yaml").write_text(
+    (root / "data" / "literature" / "extracts" / "kems-005-fedkin-2006.yaml").write_text(
         src.read_text(encoding="utf-8"), encoding="utf-8"
     )
     (root / "data" / "literature" / "extracts" / "fixture-source.yaml").unlink()
@@ -3747,7 +4425,8 @@ def test_j01_fedkin_alpha_series_not_mass_loss_rate(tmp_path: Path) -> None:
     alpha_points = [
         o
         for o in result.observations.values()
-        if "per_T_alpha_series::T=" in o.observation_id
+        if "_table3::T=" in o.observation_id
+        or "sio_hashimoto_table3_complete_b1::T=" in o.observation_id
     ]
     assert len(alpha_points) == 12
     for obs in alpha_points:
@@ -3757,7 +4436,7 @@ def test_j01_fedkin_alpha_series_not_mass_loss_rate(tmp_path: Path) -> None:
     fe0 = next(
         o
         for o in alpha_points
-        if "fe_hashimoto_langmuir_per_T_alpha_series::T=1973" in o.observation_id
+        if "fe_hashimoto_langmuir_table3::T=1973" in o.observation_id
     )
     assert fe0.value.point == as_decimal("0.23")
     assert float(fe0.identity.temperature_K.value) == 1973.0
@@ -3967,6 +4646,24 @@ def _census_expected_point(item: dict, q_token: str | None, units: str):
         }:
             return amount / as_decimal("100")
         return amount
+    if q_token == "H_minus_H298":
+        # Heat-content series (first adopter: abdul-2023-cao-sio2-calphad Tables 3-4,
+        # printed in J per mol of formula unit). The store keeps H(T)-H(298.15) in kJ/mol
+        # (migrate derivation J_to_kJ_exact), so a J/mol cell is divided by exactly 1000:
+        # 147,433.0 J/mol / 1000 = 147.433 kJ/mol. Any other unit is not inferred.
+        for key in ("enthalpy_increment", "H_minus_H298"):
+            if key not in item:
+                continue
+            amount = _num(item.get(key))
+            if amount is None:
+                return None
+            unit = str(units or "").strip().lower().replace(" ", "")
+            if unit in {"j/mol", "jmol-1", "jmol^-1"}:
+                return amount / as_decimal("1000")
+            if unit in {"kj/mol", "kjmol-1", "kjmol^-1"}:
+                return amount
+            return None
+        return None
     if q_token == "delta_fG":
         if "delta_fG" in item:
             return _num(item.get("delta_fG"))
@@ -4222,7 +4919,10 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     # cells, evaporation_coefficient_alpha 30->34 and n_numeric 450->454.
     assert census.get("p_partial") == 136
     assert census.get("p_sat") == 21
-    assert census.get("evaporation_coefficient_alpha") == 34
+    # Twelve repeated Fedkin table cells are no longer counted through the retired
+    # mirror; the KEMS owner extract retains the cells (Fedkin et al. 2006, Table 3,
+    # p. 212, DOI 10.1016/j.gca.2005.08.014).
+    assert census.get("evaporation_coefficient_alpha") == 22
     # Re-pinned with the d-032 store regen. _series_census skips a source with no
     # extracts-v2 sibling, and the pre-regen store was missing 26 sources' derived
     # files, so their series went uncounted: evaporation_rate 21->25,
@@ -4258,15 +4958,16 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     assert per_source.get("kems-026-markova-1984") == {
         "residue_component_composition": 110
     }
-    # Re-pinned for the loader-survival batch: Richter 2007 +50 printed mass-loss cells
-    # (starting-material initial compositions now survive migration), on top of the
-    # landed 450 (scorer p_partial +61, Holzheid +33): n_numeric 450->500; t-998 adds
-    # four Zhang Table 4 alpha cells, and 1164 residue components, so the merged
-    # total is 1668; mismatches remains 0.
-    # O'Neill & Eggins 2002 adds 91 activity_coefficient cells: n_numeric 1668->1759.
-    # t-1122 adds the eight printed residue component points above: 1759->1767.
-    # t-1152 adds 110 printed residue component cells: 1767->1877.
-    assert n_numeric == 1877, (n_numeric, census, n_unavailable)
+    # Current total includes the 110 Markova 1984 residue components and omits
+    # the 12 duplicate Fedkin mirror cells (b677: the pre-item24 total 1877->1865).
+    # Item 24 adds 13 Abdul 2023 H_minus_H298 cells (Table 3 rankinite 7 + Table 4
+    # belite 6), which moved 1877->1890 on the tree that still counted those 12
+    # Fedkin mirror cells. Combined: 1865 + 13 = 1878 (equivalently 1890 - 12).
+    # Per-source delta abdul-2023-cao-sio2-calphad 0->13; H_minus_H298 0->13.
+    # No check was relaxed and mismatches stay 0.
+    assert census.get("H_minus_H298") == 13
+    assert per_source.get("abdul-2023-cao-sio2-calphad") == {"H_minus_H298": 13}
+    assert n_numeric == 1878, (n_numeric, census, n_unavailable)
 
 
 def test_residue_point_condition_values_keep_their_printed_types() -> None:
@@ -4411,7 +5112,7 @@ def test_k04_census_goes_red_when_stored_alpha_is_corrupted(tmp_path: Path) -> N
         pytest.skip("migrated store not generated yet")
     dest = tmp_path / "extracts-v2"
     shutil.copytree(extracts_v2, dest)
-    fedkin = dest / "fedkin-grossman-ghiorso-2006.yaml"
+    fedkin = dest / "kems-005-fedkin-2006.yaml"
     stored = yaml.safe_load(fedkin.read_text(encoding="utf-8"))
     n_mutated = 0
     for obs in stored.get("observations") or []:
@@ -4460,8 +5161,9 @@ def test_located_printed_and_initial_pins_numeric_composition() -> None:
     ]
 
 
+@pytest.mark.parametrize("container_name", ("points", "tests"))
 def test_b718_partial_pressure_point_composition_stays_on_own_point(
-    tmp_path: Path,
+    tmp_path: Path, container_name: str,
 ) -> None:
     point_composition = {"K2O": 7.4, "Al2O3": 26, "SiO2": 66.6}
     extract = _scalar_extract(
@@ -4470,7 +5172,7 @@ def test_b718_partial_pressure_point_composition_stays_on_own_point(
         values={
             "quantity": "partial_pressure",
             "method_class": "measured_direct",
-            "points": [
+            container_name: [
                 {
                     "T_K": 1300,
                     "pressure_atm": 1,
@@ -4479,6 +5181,7 @@ def test_b718_partial_pressure_point_composition_stays_on_own_point(
                 {
                     "T_K": 1400,
                     "pressure_atm": 2,
+                    "T_C_is_initial_composition": True,
                     "locator": {"table": "2", "note": "2"},
                     "composition_wt_pct": point_composition,
                 },
@@ -4513,6 +5216,41 @@ def test_b718_partial_pressure_point_composition_stays_on_own_point(
     assert rows[1].identity.composition is not None
     assert rows[1].identity.composition.value == wt_pct_to_mole_fraction(
         {name: Decimal(str(value)) for name, value in point_composition.items()}
+    )
+
+
+def test_nonyield_point_without_numeric_value_is_queued_not_emitted(
+    tmp_path: Path,
+) -> None:
+    extract = _scalar_extract(
+        quantity="partial_pressure",
+        units="atm",
+        values={
+            "quantity": "partial_pressure",
+            "method_class": "measured_direct",
+            "points": [
+                {"T_K": 1300, "pressure_atm": 1},
+                {
+                    "T_K": 1400,
+                    "omitted_reason": "source omitted numeric cell",
+                },
+            ],
+        },
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    parent_id = "fixture-source::na_psat"
+    points = [
+        obs for oid, obs in result.observations.items()
+        if oid.startswith(parent_id + "::")
+    ]
+
+    assert len(points) == 1
+    assert points[0].value.kind is ValueKind.POINT
+    assert points[0].value.point == Decimal("101325")
+    assert any(
+        entry.why == "source omitted numeric cell"
+        and entry.observation_id == f"{parent_id}::point:points:1"
+        for entry in result.queue
     )
 
 
@@ -5944,6 +6682,48 @@ def test_stolyarova_table3_137_row_ids_and_reference_states_unchanged(
     assert digest == "a3f9988c9f64bb73c07eefa07b1d2edaac77abb0b2496799dba925c6bedaa968"
 
 
+def test_schaefer_photochemical_lifetimes_retain_table4_rate_ancestry(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(
+        tmp_path,
+        "schaefer-fegley-2011-vaporization-earth.yaml",
+        use_repository_index_row=True,
+    )
+    lifetime_rows = [
+        obs
+        for obs in result.observations.values()
+        if "schaefer_2012_table4_photochemical_lifetimes" in obs.observation_id
+    ]
+
+    assert len(lifetime_rows) == 33
+    for obs in lifetime_rows:
+        gas = obs.observation_id.rsplit("::rows:row=", 1)[1].split(":", 1)[0]
+        rate_record = (
+            "schaefer_2012_table4_sio_j1_photolysis_rate"
+            if gas == "sio"
+            else (
+                "schaefer_2012_table4_j1_photolysis_rates"
+                if gas == "h2o"
+                else f"schaefer_2012_table4_j1_photolysis_rates_{gas}"
+            )
+        )
+        assert obs.derived_from is not None and len(obs.derived_from) == 1
+        assert obs.derived_from[0].startswith(
+            "schaefer-fegley-2011-vaporization-earth::"
+            f"{rate_record}::rows:row={gas}:"
+        )
+        assert obs.derivation is not None
+        assert obs.derivation.inputs == obs.derived_from
+        assert "§4.3" in obs.derivation.relation
+        assert "PDF page index 24" in obs.derivation.relation
+        assert (
+            "We then scaled the solar flux as a function of radial distance"
+            in obs.derivation.relation
+        )
+        assert all("table2" not in parent for parent in obs.derived_from)
+
+
 def test_stolyarova_1996_comparison_provenance_is_activity_only(
     tmp_path: Path,
 ) -> None:
@@ -6338,7 +7118,11 @@ def test_demaria_fe_rows_use_the_pure_iron_reference_state(tmp_path: Path) -> No
 
 
 def test_tsaplin_gibbs_duhem_sio2_is_not_measured_direct(tmp_path: Path) -> None:
-    from simulator.battery.score import ScoreContext, comparison_candidates
+    from simulator.battery.score import (
+        ScoreContext,
+        comparison_candidates,
+        score_store,
+    )
 
     result = _migrate_real_extract(tmp_path, "kems-ms2000-044.yaml")
     r2 = [
@@ -6358,6 +7142,9 @@ def test_tsaplin_gibbs_duhem_sio2_is_not_measured_direct(tmp_path: Path) -> None
         assert reference.value.endmember.formula == "SiO2"
         assert reference.value.endmember.phase.value is Phase.L
         assert reference.value.reference_pressure_bar is None
+        species_phase = obs.identity.species.phase
+        assert species_phase is not None and species_phase.is_value
+        assert species_phase.value is Phase.L
     superseded = [
         obs
         for obs in result.observations.values()
@@ -6378,6 +7165,21 @@ def test_tsaplin_gibbs_duhem_sio2_is_not_measured_direct(tmp_path: Path) -> None
     candidate_ids = {obs.observation_id for obs in candidates}
     assert r2_ids.isdisjoint(candidate_ids)
     assert {obs.observation_id for obs in superseded}.isdisjoint(candidate_ids)
+    residuals, _ = score_store(
+        ScoreContext(
+            works=result.works,
+            experiments=result.experiments,
+            observations=result.observations,
+            benches=result.benches,
+        ),
+        engines=(Engine.OPENIMCC,),
+        rail=Rail.MELT_ACTIVITY,
+    )
+    silica_residuals = [row for row in residuals if row.reference in r2_ids]
+    assert len(silica_residuals) == 24
+    assert all(row.status is ResidualStatus.NO_BAND for row in silica_residuals)
+    assert all(row.numeric is not None for row in silica_residuals)
+    assert all(row.numeric.value.is_finite() for row in silica_residuals if row.numeric)
 
 
 def test_unprinted_temperature_envelopes_are_not_loaded(tmp_path: Path) -> None:
@@ -10504,6 +11306,26 @@ def test_residue_component_quantity_aliases_keep_printed_values_and_missing_cell
         assert "null" in (missing.reason or "")
 
 
+def test_hashimoto_row_left_live_diagnostics_are_final(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-015-hashimoto-1983.yaml")
+    left_live = [
+        entry
+        for entry in result.queue
+        if entry.why and "row left live" in entry.why
+    ]
+    contradicted = [
+        entry
+        for entry in left_live
+        if entry.observation_id in result.observations
+        and result.observations[entry.observation_id].admission.status
+        is AdmissionStatus.SUPERSEDED
+    ]
+    assert contradicted == []
+    assert len(left_live) == 0
+
+
 def test_residue_store_write_files_cells_under_their_extract_sources(
     tmp_path: Path,
 ) -> None:
@@ -10721,6 +11543,22 @@ def test_residue_cells_keep_run_identity_and_printed_conditions(
     hashimoto = _migrate_real_extract(
         tmp_path / "hashimoto", f"{hashimoto_id}.yaml"
     )
+    _assert_superseded_targets_are_live(hashimoto)
+    for row_label, run_id in (("c3-(2)", "17c3-2"), ("c5-(1)", "17c5-1")):
+        old = next(
+            obs
+            for obs in hashimoto.observations.values()
+            if obs.observation_id.startswith(
+                f"{hashimoto_id}::hashimoto_1983_table3_cao_residue_series::T=1973.15:row={row_label}:"
+            )
+        )
+        target = hashimoto.observations[old.admission.superseded_by]
+        assert target.observation_id.startswith(
+            f"{hashimoto_id}::hashimoto_1983_table3_residue_composition_series_quoted__run_{run_id}::T=1973.15:row={row_label}:"
+        )
+        assert target.admission.status in {
+            AdmissionStatus.ADMITTED, AdmissionStatus.PENDING
+        }
     hashimoto_source = _extract_observations(f"{hashimoto_id}.yaml")
     run_sources = {}
     for source_obs in hashimoto_source:
@@ -11022,3 +11860,124 @@ def test_residue_series_emits_numeric_component_cells_with_component_identity(
     assert pressure["value"] == "0.00015"
     assert pressure["units"] == "Torr"
     assert pressure["kind"] == "about_nominal_by_temperature"
+
+
+def _same_work_observation_duplicate_pairs(observations: list[dict]) -> list[tuple[str, str, str]]:
+    """Return equal admitted values for one work that came from separate extracts."""
+    grouped: dict[tuple[object, ...], list[dict]] = {}
+
+    def canonical(value: object) -> object:
+        if isinstance(value, dict):
+            if value.get("tag") == "value":
+                return canonical(value.get("value"))
+            return tuple(sorted((key, canonical(item)) for key, item in value.items()))
+        if isinstance(value, list):
+            return tuple(canonical(item) for item in value)
+        if value is None:
+            return None
+        try:
+            return Decimal(str(value))
+        except Exception:
+            return value
+
+    for obs in observations:
+        if (obs.get("admission") or {}).get("status") not in {"admitted", "pending"}:
+            continue
+        identity = obs.get("identity") or {}
+        quantity = canonical(identity.get("quantity"))
+        species = (identity.get("species") or {}).get("formula")
+        temperature_state = identity.get("temperature_K") or {}
+        if isinstance(temperature_state, dict) and temperature_state.get("tag") != "value":
+            continue
+        temperature = canonical(temperature_state)
+        value = obs.get("value") or {}
+        value_payload = {key: item for key, item in value.items() if key not in {"kind", "approximate"}}
+        experiment_id = str(obs.get("experiment_id") or "")
+        work_id = experiment_id.split("::", 1)[0]
+        source_id = str(obs.get("source_id") or "")
+        if not all((quantity, species, temperature is not None, value_payload, work_id, source_id)):
+            continue
+        grouped.setdefault(
+            (work_id, quantity, species, temperature, canonical(value_payload)), []
+        ).append(obs)
+
+    pairs: list[tuple[str, str, str]] = []
+    for (work_id, *_), members in grouped.items():
+        for index, left in enumerate(members):
+            for right in members[index + 1 :]:
+                if left.get("source_id") == right.get("source_id"):
+                    continue
+                left_id = str(left.get("observation_id") or "")
+                right_id = str(right.get("observation_id") or "")
+                left_parents = left.get("derived_from") or []
+                right_parents = right.get("derived_from") or []
+                if isinstance(left_parents, str):
+                    left_parents = [left_parents]
+                if isinstance(right_parents, str):
+                    right_parents = [right_parents]
+                if left_id in right_parents or right_id in left_parents:
+                    continue
+                pairs.append((work_id, left_id, right_id))
+    return sorted(pairs)
+
+
+def test_literature_store_has_no_duplicate_values_across_extracts() -> None:
+    roots = (
+        REPO_ROOT / "data" / "literature" / "extracts-v2",
+        REPO_ROOT / "data" / "literature" / "observations-v2",
+    )
+    observations: list[dict] = []
+    summary = load_observation_store_summary(REPO_ROOT)
+    for root in roots:
+        for path in iter_observation_store_paths(root):
+            if compilation_family_from_store_path(path) is not None:
+                _account_compilation_shard(path, summary)
+                continue
+            stored = yaml.load(path.read_text(encoding="utf-8"), Loader=yaml.CSafeLoader)
+            if isinstance(stored, dict):
+                observations.extend(stored.get("observations") or [])
+    duplicates = _same_work_observation_duplicate_pairs(observations)
+    # b-677 retired the 17-row secondary extract and linked its two remaining
+    # KEMS/REF-014 overlaps as derived, so no independent duplicate pairs remain.
+    expected_fedkin_duplicates = []
+    assert duplicates == expected_fedkin_duplicates, duplicates
+
+
+def test_duplicate_guard_catches_measured_copy_but_not_ulp_or_different_value() -> None:
+    owner = {
+        "observation_id": "owner::row",
+        "experiment_id": "10.1234/example::owner",
+        "source_id": "owner",
+        "identity": {
+            "quantity": {"tag": "value", "value": "evaporation_coefficient_alpha"},
+            "species": {"formula": "Fe"},
+            "temperature_K": {"tag": "value", "value": "2073"},
+        },
+        "value": {"kind": "point", "point": "0.25", "approximate": False},
+        "admission": {"status": "admitted"},
+    }
+    duplicate = {
+        **owner,
+        "observation_id": "secondary::row",
+        "experiment_id": "10.1234/example::secondary",
+        "source_id": "secondary",
+        "evidence": {"class": {"tag": "value", "value": "measured_direct"}},
+    }
+    assert _same_work_observation_duplicate_pairs([owner, duplicate]) == [
+        ("10.1234/example", "owner::row", "secondary::row")
+    ]
+
+    duplicate["derived_from"] = ["owner::row"]
+    assert _same_work_observation_duplicate_pairs([owner, duplicate]) == []
+    duplicate.pop("derived_from")
+
+    # A precise decimal difference well below displayed precision is not equality.
+    duplicate["value"] = {
+        "kind": "point",
+        "point": "0.2500000000000000000000000001",
+        "approximate": False,
+    }
+    assert _same_work_observation_duplicate_pairs([owner, duplicate]) == []
+
+    duplicate["value"] = {"kind": "point", "point": "0.3", "approximate": False}
+    assert _same_work_observation_duplicate_pairs([owner, duplicate]) == []

@@ -16,6 +16,7 @@ import numbers
 from types import MappingProxyType
 from typing import Any
 
+from simulator.accounting.exceptions import UnknownSpeciesError
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.feedstock_composition import (
     FEOT_FROM_FE2O3,
@@ -42,7 +43,7 @@ from simulator.melt_backend.base import (
 
 try:  # Optional dependency: C1 must remain importable without openimcc.
     import openimcc as _openimcc
-except ImportError as exc:  # pragma: no cover - exercised without PYTHONPATH
+except (ImportError, OSError, RuntimeError) as exc:  # pragma: no cover
     _openimcc = None
     _OPENIMCC_IMPORT_ERROR: BaseException | None = exc
 else:
@@ -281,7 +282,10 @@ def evaluate_gas_oxygen_balance(
     try:
         solver = getattr(package, "evaluate_gas_oxygen_balance")
     except (AttributeError, ImportError) as exc:
-        raise OpenImccOxygenBalanceUnavailableError() from exc
+        error = OpenImccOxygenBalanceUnavailableError()
+        error.backend_status_reason += f" ({type(exc).__name__}: {exc})"
+        error.args = (error.backend_status_reason,)
+        raise error from exc
     return solver(
         parent_activities,
         float(temperature_K),
@@ -297,7 +301,11 @@ def _canonical_composition(composition: Mapping[str, float]) -> dict[str, float]
     normalized = {str(name): value for name, value in composition.items()}
     if "FeO_total" in normalized:
         if "FeO" in normalized:
-            raise ValueError("composition cannot contain both FeO and FeO_total")
+            raise OpenImccCompositionPolicyRefusal(
+                "openimcc_composition_canonicalization",
+                "cannot canonicalize cleaned-melt composition: "
+                "composition cannot contain both FeO and FeO_total",
+            )
         # The simulator's cleaned-melt FeO/FeO_total convention is an FeO
         # equivalent.  This is a rename, not an Fe3+/Fe2+ split.
         normalized["FeO"] = normalized.pop("FeO_total")
@@ -309,13 +317,7 @@ def _cleaned_melt_projection(
 ) -> tuple[dict[str, float], dict[str, float]]:
     """Return source wt% and the cleaned IMCC mole projection."""
 
-    try:
-        canonical = _canonical_composition(composition_mol)
-    except Exception as exc:  # noqa: BLE001 - policy turns this into a refusal
-        raise OpenImccCompositionPolicyRefusal(
-            "openimcc_composition_canonicalization",
-            f"cannot canonicalize cleaned-melt composition: {exc}",
-        ) from exc
+    canonical = _canonical_composition(composition_mol)
 
     source_mass_kg: dict[str, float] = {}
     cleaned_composition_mol: dict[str, float] = {}
@@ -363,12 +365,14 @@ def _cleaned_melt_projection(
         if name in OPENIMCC_PARENT_OXIDES:
             cleaned_composition_mol[name] = mol
         try:
-            mass_kg = mol * resolve_species_formula(name).molar_mass_kg_per_mol()
-        except Exception as exc:  # noqa: BLE001 - policy turns this into a typed refusal
+            formula = resolve_species_formula(name)
+        except UnknownSpeciesError as exc:
             raise OpenImccCompositionPolicyRefusal(
                 "openimcc_composition_formula_unavailable",
-                f"cannot resolve cleaned-melt formula for {name!r}: {exc}",
+                f"cannot resolve cleaned-melt formula for {name!r} "
+                f"({type(exc).__name__}: {exc})",
             ) from exc
+        mass_kg = mol * formula.molar_mass_kg_per_mol()
         source_mass_kg[name] = source_mass_kg.get(name, 0.0) + mass_kg
 
     feo_moles, fe2o3_moles = iron_oxide_values(canonical)
@@ -651,14 +655,17 @@ def engine_binding_identity(melt_pack: Any, gas_pack: Any) -> dict[str, str]:
         raise OpenImccBindingDigestUnavailableError()
     try:
         identity = owner(melt_pack, gas_pack)
-        result = {
-            "engine_binding_digest": identity.digest,
-            "melt_binding_digest": identity.melt_binding_digest,
-            "condensate_table_digest": identity.condensate_table_digest,
-            "gas_table_digest": identity.gas_table_digest,
-        }
     except Exception as exc:
-        raise OpenImccBindingDigestUnavailableError() from exc
+        error = OpenImccBindingDigestUnavailableError()
+        error.backend_status_reason += f" ({type(exc).__name__}: {exc})"
+        error.args = (error.backend_status_reason,)
+        raise error from exc
+    result = {
+        "engine_binding_digest": identity.digest,
+        "melt_binding_digest": identity.melt_binding_digest,
+        "condensate_table_digest": identity.condensate_table_digest,
+        "gas_table_digest": identity.gas_table_digest,
+    }
     if any(not isinstance(value, str) or not value for value in result.values()):
         raise OpenImccBindingDigestUnavailableError()
     return result

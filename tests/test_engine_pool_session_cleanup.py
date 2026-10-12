@@ -11,6 +11,7 @@ import conftest
 import simulator.engine_pool as engine_pool
 from simulator.engine_pool import (
     ENGINE_POOL_AUTOMATIC_TOTAL_BUDGET_S,
+    EngineWorkerDied,
     EngineWorkerTimeout,
     EngineWorkerPool,
     WarmEngineWorker,
@@ -98,8 +99,9 @@ def test_sessionfinish_interrupts_in_flight_job_within_automatic_budget():
 
     assert elapsed <= ENGINE_POOL_AUTOMATIC_TOTAL_BUDGET_S
     assert future.done()
-    with pytest.raises(RuntimeError, match="worker exited without a result"):
+    with pytest.raises(EngineWorkerDied, match="worker exited without a result") as caught:
         future.result(timeout=0.1)
+    assert caught.value.phase == "call"
     with pytest.raises(ProcessLookupError):
         os.kill(worker_pid, 0)
 
@@ -125,8 +127,9 @@ def test_registry_cancel_escalates_concurrent_graceful_close():
 
     assert not graceful_close.is_alive()
     assert pool not in engine_pool._LIVE_ENGINE_POOLS
-    with pytest.raises(RuntimeError, match="worker exited without a result"):
+    with pytest.raises(EngineWorkerDied, match="worker exited without a result") as caught:
         future.result(timeout=0.1)
+    assert caught.value.phase == "call"
     with pytest.raises(ProcessLookupError):
         os.kill(worker_pid, 0)
 
