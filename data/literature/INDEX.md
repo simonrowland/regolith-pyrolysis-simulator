@@ -28,7 +28,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 | source_id | citation | DOI / report | PDF (simulator, sha8) | corpus raw / text / tables | extract (rows, review) | ledger stage |
 |---|---|---|---|---|---|---|
-| `1997jonesthermo-jones-1997` | Jones, R. T. (1997), "Thermodynamics and its applications – an overview", SAIMM Pyrometallurgy School, Mintek, Randburg, 20–21 May 1997. |  | ABSENT, `` | `raw/1997jonesthermo/1997jonesthermo.pdf` (present, d8ac7ea5); `text/1997jonesthermo-jones-1997/` (0 files, ABSENT); `tables/1997jonesthermo-jones-1997/` (0 files, ABSENT) | `data/literature/extracts/1997jonesthermo-jones-1997.yaml` (2 rows, draft, private_path) | `ledger/1997jonesthermo-jones-1997.yaml`: — (—) |
+| `1997jonesthermo` | Jones, R. T. (1997), "Thermodynamics and its applications – an overview", SAIMM Pyrometallurgy School, Mintek, Randburg, 20–21 May 1997. |  | ABSENT, `` | `raw/1997jonesthermo/1997jonesthermo.pdf` (present, d8ac7ea5); `text/1997jonesthermo/` (82 files, exists); `tables/1997jonesthermo/` (0 files, ABSENT) | `data/literature/extracts/1997jonesthermo.yaml` (2 rows, draft, private_path) | `ledger/1997jonesthermo.yaml`: decoded (2026-09-06) |
 | `2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019` | Zahnle, K., Schaefer, L. & Fegley, B. (2010), "Earth's Earliest Atmospheres", Cold Spring Harb Perspect Biol, doi: 10.1101/cshperspect.a004895. | 10.1101/cshperspect.a004895 | ABSENT, `` | `raw/2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019/2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019.pdf` (present, 251bafd1); `text/2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019/` (15 files, exists); `tables/2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019/` (0 files, ABSENT) | `data/literature/extracts/2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019.yaml` (8 rows, draft) | `ledger/2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019.yaml`: decoded (2026-09-06) |
 | `aithala-2026-magmatic-iron-redox-to-2100c` | Aithala, S. P., Macris, C. A., and Hirschmann, M. M. (2026). Temperature dependence of magmatic iron redox speciation to 2100 °C. Geochemical Perspectives Letters 40, 18–23. | 10.7185/geochemlet.2617 | ABSENT, `` | `raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c.pdf` (ABSENT, ); `text/aithala-2026-magmatic-iron-redox-to-2100c/` (0 files, ABSENT); `tables/aithala-2026-magmatic-iron-redox-to-2100c/` (0 files, ABSENT) | `data/literature/extracts/aithala-2026-magmatic-iron-redox-to-2100c.yaml` (28 rows, draft) | `ledger/aithala-2026-magmatic-iron-redox-to-2100c.yaml`: — (—) |
 | `ames-walsh-white-1967` | Ames, Walsh & White, J. Phys. Chem. 71 (1967) 2707–2718 |  | ABSENT, `` | `raw/ames-walsh-white-1967/ames-walsh-white-1967.pdf` (ABSENT, ); `text/ames-walsh-white-1967/` (0 files, ABSENT); `tables/ames-walsh-white-1967/` (0 files, ABSENT) | `data/literature/extracts/ames-walsh-white-1967.yaml` (2 rows, draft) | `ledger/ames-walsh-white-1967.yaml`: extracted (2026-09-06) |
@@ -314,7 +314,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ### Extracts with no PDF
 
-- `1997jonesthermo-jones-1997`
+- `1997jonesthermo`
 - `2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019`
 - `aithala-2026-magmatic-iron-redox-to-2100c`
 - `ames-walsh-white-1967`
@@ -594,7 +594,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ### Extracts needing public row locators (b-477)
 
-- `1997jonesthermo-jones-1997`
+- `1997jonesthermo`
 - `ammin-73-470-oneill-1988`
 - `ammin-75-781-hemingway-1990`
 - `ammin-76-904-lange-1991`
