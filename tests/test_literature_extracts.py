@@ -3125,40 +3125,50 @@ def test_fidelity_sample_mutation_reds():
     )
     assert any("mismatch" in e for e in errs), errs
 
-    # The Jones context-value samples use the same gate as observation samples.
+    # Every Jones and Lange sample is independently mutation-sensitive.
     jones_path = EXTRACTS / "1997jonesthermo.yaml"
-    jones_doc = load_cached_safe_yaml(jones_path.read_text(encoding="utf-8"))
-    jones_samples = jones_doc.get("fidelity_samples") or []
+    jones_samples = load_cached_safe_yaml(
+        jones_path.read_text(encoding="utf-8")
+    ).get("fidelity_samples") or []
     assert jones_samples, "Jones extract must carry fidelity samples"
-    assert vle.check_all_fidelity_samples_match(jones_doc, label="jones-owner") == []
-    jones_sample = next(
-        sample for sample in jones_samples
-        if sample["path"].endswith("enthalpy_1600_C_kJ_per_mol")
-    )
-    jones_context = next(
-        row for row in jones_doc["species"]["Fe"]["context"]
-        if row["observation_id"] == "jones_1997_fe_heating_enthalpy_example"
-    )
-    jones_expected = jones_sample["value"]
-    jones_context["values"]["enthalpy_1600_C_kJ_per_mol"] += 1
-    assert jones_sample["value"] == jones_expected
-    jones_errs = vle.check_all_fidelity_samples_match(
-        jones_doc, label="jones-owner-mutated"
-    )
-    assert any("mismatch" in error for error in jones_errs), jones_errs
+    for index, sample in enumerate(jones_samples):
+        jones_doc = load_cached_safe_yaml(jones_path.read_text(encoding="utf-8"))
+        assert vle.check_all_fidelity_samples_match(jones_doc, label="jones-owner") == []
+        row = next(
+            row
+            for container in ("observations", "context")
+            for row in jones_doc["species"][sample["species"]].get(container, [])
+            if row.get("observation_id") == sample["observation_id"]
+        )
+        row["values"][sample["field"]] += 1
+        errors = vle.check_all_fidelity_samples_match(
+            jones_doc, label="jones-owner-mutated"
+        )
+        assert any(
+            f"fidelity_samples[{index}]" in error and "mismatch" in error
+            for error in errors
+        ), errors
 
     lange_path = EXTRACTS / "ammin-76-904.yaml"
-    lange_doc = load_cached_safe_yaml(lange_path.read_text(encoding="utf-8"))
-    lange_samples = lange_doc.get("fidelity_samples") or []
+    lange_samples = load_cached_safe_yaml(
+        lange_path.read_text(encoding="utf-8")
+    ).get("fidelity_samples") or []
     assert len(lange_samples) >= 3, "Lange extract must carry table-spread samples"
-    assert vle.check_all_fidelity_samples_match(lange_doc, label="lange-owner") == []
-    lange_doc["species"]["CaMgSi2O6"]["observations"][0]["values"][
-        "series"
-    ][0][1] += 1
-    lange_errs = vle.check_all_fidelity_samples_match(
-        lange_doc, label="lange-owner-mutated"
-    )
-    assert any("mismatch" in error for error in lange_errs), lange_errs
+    for index, sample in enumerate(lange_samples):
+        lange_doc = load_cached_safe_yaml(lange_path.read_text(encoding="utf-8"))
+        assert vle.check_all_fidelity_samples_match(lange_doc, label="lange-owner") == []
+        resolved = vle.resolve_fidelity_sample(lange_doc, sample)
+        if isinstance(resolved, list):
+            resolved[0] += 1
+        else:
+            resolved["crystal"]["SiO2"]["value"] += 1
+        errors = vle.check_all_fidelity_samples_match(
+            lange_doc, label="lange-owner-mutated"
+        )
+        assert any(
+            f"fidelity_samples[{index}]" in error and "mismatch" in error
+            for error in errors
+        ), errors
 
 
 def test_costa_fe_summary_key_is_retired_to_owner_series():
