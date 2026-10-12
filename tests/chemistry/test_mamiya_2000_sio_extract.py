@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from simulator.battery.migrate import Migrator
 from simulator.yaml_cache import load_cached_safe_yaml
 
 EXTRACT = (
@@ -25,6 +26,7 @@ def test_mamiya_context_numbers_match_the_transcription() -> None:
     assert fit["fitted_parameter_as_printed"] == "E* = 82.2 kJ mol-1"
 
     times = rows["mamiya_2000_fig3_8_cristobalite_reaction_times"]["points"]
+    # These points cannot yet be reached by the production fidelity check (t-1222).
     assert [(point["T_C"], point["time_hr"]) for point in times] == [
         (1000, 20),
         (1100, 20),
@@ -111,3 +113,16 @@ def test_mamiya_context_numbers_match_the_transcription() -> None:
     assert bracket_sample["locator"] == doc_rows[
         "mamiya_2000_cristobalite_htxrd_transition_bracket"
     ]["locator"]
+
+    migrator = Migrator(root=EXTRACT.parents[3])
+    migrator._migrate_extract(EXTRACT)
+    lifted = next(
+        row
+        for context_rows in migrator.result.context_by_work.values()
+        for row in context_rows
+        if row["observation_id"] == "mamiya_2000_cristobalite_htxrd_transition_bracket"
+    )
+    assert lifted["locator"] == doc_rows[
+        "mamiya_2000_cristobalite_htxrd_transition_bracket"
+    ]["locator"]
+    assert lifted["values"]["conditions_locator"] == bracket["conditions_locator"]

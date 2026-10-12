@@ -24,18 +24,6 @@ fidelity_samples:
     value: 242
     locator: {page: 63, published_page: 57, pdf_page_index: 62, figure: '3-16'}
   - species: SiO
-    observation_id: mamiya_2000_fig3_8_cristobalite_reaction_times
-    field: printed_times_hr_fidelity_pin
-    value: [20, 20, 10, 2, 1, 0.1]
-    locator: {page: 53, published_page: 47, pdf_page_index: 52, figure: '3-8'}
-    note: Printed crystallization times, pinned in source order for the structured resolver.
-  - species: SiO
-    observation_id: mamiya_2000_fig4_14_rate_constants
-    field: representative_digitized_points_fidelity_pin
-    value: '900 C: 0.58 s-1; 1300 C: 20 s-1'
-    locator: {page: 102, published_page: 96, pdf_page_index: 101, figure: '4-14'}
-    note: Representative digitized endpoints, transcribed from Fig. 4-14.
-  - species: SiO
     observation_id: mamiya_2000_fig4_12_kinetic_fit_and_activation_energy
     field: fitted_equation_as_printed
     value: 'log k = 9.190 - 9884.7 x (1/T)'
@@ -200,7 +188,6 @@ species:
           method_class: figure_only
           method: transcribed printed labels in figure
           T_C: [1000, 1100, 1200, 1300, 1350, 1400]
-          printed_times_hr_fidelity_pin: [20, 20, 10, 2, 1, 0.1]
           points:
             - T_C: 1000
               time_hr: 20
@@ -327,7 +314,6 @@ species:
           quantity: first-order Si-crystallization velocity constant k versus temperature, as plotted
           method_class: figure_only
           method: figure_digitized
-          representative_digitized_points_fidelity_pin: '900 C: 0.58 s-1; 1300 C: 20 s-1'
           read_method: Linear calibration of inverse-temperature axis and logarithmic calibration of k axis; marker centers read to approximately two significant figures.
           digitization_tolerance: Approximately ±0.05 s-1 at 900 C; approximately ±5% for the other marker centers.
           T_C: [900, 1000, 1100, 1200, 1300]
