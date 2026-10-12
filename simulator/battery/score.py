@@ -1751,17 +1751,25 @@ def _fusion_comparison_reference(
     # move it to liquid. Since μ=G°+RT ln(a), each step multiplies activity
     # by exp(−ΔG/RT). B1259's common printed H/S grid ends at 2000 K; its edge
     # H/S are held beyond that limit (dCp=0) and the notice marks extrapolation.
+    above_crossing_notice: Notice | None = None
     if (
         temperature_K >= fusion.melting_temperature_K
         and not tridymite_to_cristobalite
     ):
-        notice = Notice(
+        inferred_conversion = inferred_reference_notice is not None
+        domain_notice = Notice(
             kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
             affected_quantities=(Quantity.ACTIVITY,),
             reason=(
                 f"solid reference recorded at T={temperature_K} K >= "
-                f"JANAF T_fus={fusion.melting_temperature_K} K; no numeric "
-                "reference-state conversion applied because liquid is natural"
+                f"JANAF T_fus={fusion.melting_temperature_K} K; "
+                + (
+                    "inferred solid-reference activity converted numerically; "
+                    "liquid is natural"
+                    if inferred_conversion
+                    else "no numeric reference-state conversion applied because "
+                    "liquid is natural"
+                )
             ),
             origin=reference.observation_id,
             band=(
@@ -1769,16 +1777,25 @@ def _fusion_comparison_reference(
                 f"tables={fusion.crystal_table}/{fusion.liquid_table}"
             ),
         )
-        notices = (notice,) if melts_notice is None else (notice, melts_notice)
-        return replace(
-            reference,
-            identity=comparison_identity,
-            notices=union_notices(reference.notices, notices),
-        )
+        if inferred_conversion:
+            above_crossing_notice = domain_notice
+        else:
+            notices = (domain_notice,) if melts_notice is None else (
+                domain_notice,
+                melts_notice,
+            )
+            return replace(
+                reference,
+                identity=comparison_identity,
+                notices=union_notices(reference.notices, notices),
+            )
 
     # For the same chemical potential, mu = G° + RT ln(a) gives
-    # log10(a_l/a_s) = -DeltaG_fus/(RT ln(10)); JANAF reports DeltaG_fus in
-    # kJ/mol, so multiply by 1000 and use R=8.314462618 J/(mol*K). For CaO,
+    # a_l = a_s*exp(-DeltaG/RT), where DeltaG=G_l-G_s per mole of oxide.
+    # J/mol over J/(mol K)*K is dimensionless, and DeltaG=0 at the crossing
+    # leaves the activity unchanged. In log10 units,
+    # log10(a_l/a_s) = -DeltaG/(RT ln(10)); JANAF reports DeltaG in kJ/mol,
+    # so multiply by 1000 and use R=8.31441 J/(mol*K). For CaO,
     # JANAF interpolation gives DeltaG_fus=33.80370 and 32.59870 kJ/mol at
     # 1823 and 1873 K, hence shifts -0.96857 and -0.90911 dex. Sanity check:
     # DeltaH_fus(1-T/Tm), with the JANAF crossing Tm=3200 K, gives 34.208 and
@@ -1820,7 +1837,11 @@ def _fusion_comparison_reference(
         ),
         origin=reference.observation_id,
     )
-    notices = (notice,) if melts_notice is None else (notice, melts_notice)
+    notices = (notice,)
+    if above_crossing_notice is not None:
+        notices = (above_crossing_notice,) + notices
+    if melts_notice is not None:
+        notices += (melts_notice,)
     if tridymite_notice is not None:
         notices += (tridymite_notice,)
     return replace(

@@ -6688,6 +6688,151 @@ def test_inference_notice_reaches_a_numeric_residual() -> None:
     )
 
 
+@pytest.mark.parametrize(
+    (
+        "formula",
+        "temperature_K",
+        "expected_activity",
+        "expected_residual",
+        "default_solid_table",
+        "selected_solid_table",
+        "liquid_table",
+        "delta_g_kJ_per_mol",
+        "crossing_K",
+        "source_hashes",
+    ),
+    (
+        (
+            "Al2O3",
+            Decimal("2400"),
+            Decimal("0.3583233854709349838426386125"),
+            Decimal("0.021519916602154066"),
+            "Al-096",
+            "Al-096",
+            "Al-100",
+            Decimal("-3.545"),
+            Decimal("2326.528497409326424870466321"),
+            (
+                "2054107c6e2f7c35d0196530f1d9362981612271d82731437cc016d74f147da6",
+                "b27ae0ccebb7433b209b9dbd7f0b67448e49cf2b613625e22b05709e49c0dbe0",
+            ),
+        ),
+        (
+            "Al2O3",
+            Decimal("2500"),
+            Decimal("0.4337601535097755115490675312"),
+            Decimal("-0.037220177900394995"),
+            "Al-096",
+            "Al-098",
+            "Al-100",
+            Decimal("-7.664"),
+            Decimal("2289.031679617453676031081889"),
+            (
+                "035d4d22aebf50e27e86e50b938508d792aaa53b8b6ea3eec2dc8908cdabff84",
+                "b27ae0ccebb7433b209b9dbd7f0b67448e49cf2b613625e22b05709e49c0dbe0",
+            ),
+        ),
+        (
+            "SiO2",
+            Decimal("2000"),
+            Decimal("0.3004513633937164890006667638"),
+            Decimal("0.2211958252328113"),
+            "O-035",
+            "O-035",
+            "O-038",
+            Decimal("-0.025"),
+            Decimal("1994.469026548672566371681416"),
+            (
+                "b3b964ea6baf5ad47b27a212ef9192762c51fb2acf26f1cec521658fb41fb742",
+                "f1233d320c6c49aa8055a95b7e0f2d6404b47d42079f42966c5f1331f94f3f2c",
+            ),
+        ),
+    ),
+)
+def test_inferred_solid_activity_above_crossing_is_converted_with_selected_pair(
+    formula: str,
+    temperature_K: Decimal,
+    expected_activity: Decimal,
+    expected_residual: Decimal,
+    default_solid_table: str,
+    selected_solid_table: str,
+    liquid_table: str,
+    delta_g_kJ_per_mol: Decimal,
+    crossing_K: Decimal,
+    source_hashes: tuple[str, str],
+) -> None:
+    import json
+
+    from simulator.battery.generators.janaf import janaf_fusion_energy
+    from simulator.battery.score import _fusion_comparison_reference
+
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula=formula,
+            T_K=temperature_K,
+            endmember_phase=Phase.CR,
+            component_basis=formula,
+            composition=Composition(
+                basis="ordered_complete_mole_inventory",
+                components=(("SiO2", Decimal("0.5")), ("Al2O3", Decimal("0.5"))),
+                amount_basis=AmountBasis.MOLE_FRACTION,
+            ),
+        ),
+        None,
+    )
+    reference = F.observation(
+        f"inferred-{formula}-activity-at-{temperature_K}-K",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-inferred-solid-reference",
+    )
+
+    comparison = _fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    inference = next(
+        notice
+        for notice in comparison.notices
+        if notice.reason.startswith("reference_polymorph_inferred_from_stability: ")
+    )
+    detail = json.loads(inference.reason.split(": ", 1)[1])
+    conversion = next(
+        notice
+        for notice in comparison.notices
+        if notice.reason.startswith("reference_converted_via_fusion;")
+    )
+    domain_notice = next(
+        notice
+        for notice in comparison.notices
+        if notice.kind is NoticeKind.OUT_OF_GAMMA_DOMAIN
+    )
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+    )
+
+    assert temperature_K > crossing_K
+    assert janaf_fusion_energy(formula, temperature_K).crystal_table == (
+        default_solid_table
+    )
+    assert detail["chosen_table"] == selected_solid_table
+    assert comparison.value.point == expected_activity
+    assert f"DeltaG_fus={delta_g_kJ_per_mol} kJ/mol" in conversion.reason
+    assert f"JANAF_Tm={crossing_K} K" in conversion.reason
+    assert f"tables={selected_solid_table}/{liquid_table}" in conversion.reason
+    assert f"source_sha256={source_hashes[0]}/{source_hashes[1]}" in conversion.reason
+    assert domain_notice.reason == (
+        f"solid reference recorded at T={temperature_K} K >= "
+        f"JANAF T_fus={crossing_K} K; inferred solid-reference activity "
+        "converted numerically; liquid is natural"
+    )
+    assert residual.status is not ResidualStatus.REFUSED
+    assert residual.numeric is not None
+    assert residual.numeric.value == expected_residual
+
+
 def test_unknown_polymorph_with_multiple_solid_tables_uses_lowest_janaf_gibbs() -> None:
     import json
 
