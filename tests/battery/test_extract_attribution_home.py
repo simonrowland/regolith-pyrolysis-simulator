@@ -42,7 +42,7 @@ RENAMED = {
 # Written from the page (or the page's reference list); see the t-1117 rename report.
 REPAIRED = {
     ("jsc-lunar-catalog-12023.yaml", "jsc_12023_carbon_nitrogen_compilation"): "Moore et al. (1971); Kaplan and Petrowski (1971); Kerridge et al. (1978); Norris et al. (1983)",
-    ("ammin-76-904-lange-1991.yaml", "ammin_76_904_quoted_comparator_enthalpy_values"): "Stebbins et al. (1983); Richet and Bottinga (1984); Ferrier (1968); Stebbins et al. (1984); Adamkovicova et al. (1980)",
+    ("ammin-76-904.yaml", "ammin_76_904_quoted_comparator_enthalpy_values"): "Stebbins et al. (1983); Richet and Bottinga (1984); Ferrier (1968); Stebbins et al. (1984); Adamkovicova et al. (1980)",
     ("hashimoto-nakano-2021-bubbles-to-chondrites-ii.yaml", "hashimoto_2021_appendix_sample_provenance"): "Jarosewich (1990)",
     ("lpi-compendium-15013.yaml", "lpi_15013_maturity_and_grain_size"): "Morris 1978 (for Is/FeO = 77)",
     ("lpi-compendium-15013.yaml", "lpi_15013_carbon_and_nitrogen"): "Moore et al. 1973; Des Marais et al. 1973; Kothari and Goel 1972; Muller 1973",

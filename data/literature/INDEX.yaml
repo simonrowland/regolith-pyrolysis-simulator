@@ -26,7 +26,7 @@ gaps:
   - ames-walsh-white-1967
   - ammin-73-470-oneill-1988
   - ammin-75-781-hemingway-1990
-  - ammin-76-904-lange-1991
+  - ammin-76-904
   - arxiv-1602-00658-fegley-rock-steam-solubility
   - arxiv-1902-05005
   - arxiv-2509-sio-flame-nucleation
@@ -302,7 +302,7 @@ gaps:
   - 1997jonesthermo
   - ammin-73-470-oneill-1988
   - ammin-75-781-hemingway-1990
-  - ammin-76-904-lange-1991
+  - ammin-76-904
   - bencze-yazhenskikh-2016
   - boulliung-2025-mercury-volatile-metals-magmatic
   - boulliung-wood-2022-so2-solubility-silicate-melts
@@ -1077,7 +1077,7 @@ sources:
       last_stage: null
       date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
-- source_id: ammin-76-904-lange-1991
+- source_id: ammin-76-904
   aliases: []
   citation: Lange, R. A., De Yoreo, J. J. & Navrotsky, A. (1991), "Scanning calorimetric measurement of
     heat capacity during incongruent melting of diopside", American Mineralogist 76, 904-912.
@@ -1099,7 +1099,7 @@ sources:
   - retrieval_url
   access_status: unknown
   extracts:
-  - path: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  - path: data/literature/extracts/ammin-76-904.yaml
     review_status: draft
     rows: 5
     locator_status: private_path
@@ -1118,23 +1118,23 @@ sources:
       path: raw/ammin-76-904/sidecar.yaml
       present: true
     text:
-      path: text/ammin-76-904-lange-1991
-      exists: false
-      file_count: 0
+      path: text/ammin-76-904
+      exists: true
+      file_count: 28
     tables:
-      path: tables/ammin-76-904-lange-1991
+      path: tables/ammin-76-904
       exists: false
       file_count: 0
     extract:
-      path: extracts/ammin-76-904-lange-1991.yaml
-      present: true
-      matches_simulator: false
-    ledger:
-      path: ledger/ammin-76-904-lange-1991.yaml
+      path: extracts/ammin-76-904.yaml
       present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/ammin-76-904.yaml
+      present: true
       error: null
-      last_stage: null
-      date: null
+      last_stage: decoded
+      date: '2026-09-06'
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: arxiv-1602-00658-fegley-rock-steam-solubility
   aliases: []

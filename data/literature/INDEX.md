@@ -34,7 +34,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `ames-walsh-white-1967` | Ames, Walsh & White, J. Phys. Chem. 71 (1967) 2707–2718 |  | ABSENT, `` | `raw/ames-walsh-white-1967/ames-walsh-white-1967.pdf` (ABSENT, ); `text/ames-walsh-white-1967/` (0 files, ABSENT); `tables/ames-walsh-white-1967/` (0 files, ABSENT) | `data/literature/extracts/ames-walsh-white-1967.yaml` (2 rows, draft) | `ledger/ames-walsh-white-1967.yaml`: extracted (2026-09-06) |
 | `ammin-73-470-oneill-1988` | O'Neill, H. St. C. (1988), "Thermodynamic data for the equilibria Fe-\"FeO,\" Fe-Fe3O4, \"FeO\"-Fe3O4, Fe3O4-Fe2O3, Cu-Cu2O, and Cu2O-CuO from emf measurements", American Mineralogist 73:470-486. |  | ABSENT, `` | `raw/ammin-73-470/ammin-73-470.pdf` (present, ce068ba4); `text/ammin-73-470-oneill-1988/` (0 files, ABSENT); `tables/ammin-73-470-oneill-1988/` (0 files, ABSENT) | `data/literature/extracts/ammin-73-470-oneill-1988.yaml` (9 rows, draft, private_path) | `ledger/ammin-73-470-oneill-1988.yaml`: — (—) |
 | `ammin-75-781-hemingway-1990` | Hemingway, B. S. (1990), "Thermodynamic properties of bunsenite, NiO, magnetite, Fe3O4, and hematite, Fe2O3", American Mineralogist, 75, 781-790. |  | ABSENT, `` | `raw/ammin-75-781/ammin-75-781.pdf` (present, d64de2d3); `text/ammin-75-781-hemingway-1990/` (0 files, ABSENT); `tables/ammin-75-781-hemingway-1990/` (0 files, ABSENT) | `data/literature/extracts/ammin-75-781-hemingway-1990.yaml` (12 rows, draft, private_path) | `ledger/ammin-75-781-hemingway-1990.yaml`: — (—) |
-| `ammin-76-904-lange-1991` | Lange, R. A., De Yoreo, J. J. & Navrotsky, A. (1991), "Scanning calorimetric measurement of heat capacity during incongruent melting of diopside", American Mineralogist 76, 904-912. |  | ABSENT, `` | `raw/ammin-76-904/ammin-76-904.pdf` (present, 7571d8eb); `text/ammin-76-904-lange-1991/` (0 files, ABSENT); `tables/ammin-76-904-lange-1991/` (0 files, ABSENT) | `data/literature/extracts/ammin-76-904-lange-1991.yaml` (5 rows, draft, private_path) | `ledger/ammin-76-904-lange-1991.yaml`: — (—) |
+| `ammin-76-904` | Lange, R. A., De Yoreo, J. J. & Navrotsky, A. (1991), "Scanning calorimetric measurement of heat capacity during incongruent melting of diopside", American Mineralogist 76, 904-912. |  | ABSENT, `` | `raw/ammin-76-904/ammin-76-904.pdf` (present, 7571d8eb); `text/ammin-76-904/` (28 files, exists); `tables/ammin-76-904/` (0 files, ABSENT) | `data/literature/extracts/ammin-76-904.yaml` (5 rows, draft, private_path) | `ledger/ammin-76-904.yaml`: decoded (2026-09-06) |
 | `arxiv-1602-00658-fegley-rock-steam-solubility` | Fegley, B., Jr., Jacobson, N. S., Williams, K. B., Plane, J. M., Schaefer, L. & Lodders, K. (2016), "Solubility of Rock in Steam Atmospheres of Planets", submitted to the Astrophysical Journal, arXiv:1602.00658. |  | ABSENT, `` | `raw/arxiv-1602-00658/arxiv-1602-00658.pdf` (present, fb2feb01); `text/arxiv-1602-00658-fegley-rock-steam-solubility/` (0 files, ABSENT); `tables/arxiv-1602-00658-fegley-rock-steam-solubility/` (0 files, ABSENT) | `data/literature/extracts/arxiv-1602-00658-fegley-rock-steam-solubility.yaml` (5 rows, draft) | `ledger/arxiv-1602-00658-fegley-rock-steam-solubility.yaml`: — (—) |
 | `arxiv-1902-05005` | Sossi, P. A. & Fegley, B. Jr. (2018), "Thermodynamics of Element Volatility and its Application to Planetary Processes", Reviews in Mineralogy and Geochemistry 84(1):393-459. | 10.2138/rmg.2018.84.11 | ABSENT, `` | `raw/arxiv-1902-05005/arxiv-1902-05005.pdf` (present, ae809bbb); `text/arxiv-1902-05005/` (106 files, exists); `tables/arxiv-1902-05005/` (0 files, ABSENT) | `data/literature/extracts/arxiv-1902-05005.yaml` (2 rows, draft) | `ledger/arxiv-1902-05005.yaml`: decoded (2026-09-06) |
 | `arxiv-2509-sio-flame-nucleation` | Haugen, N. E. L., Brandenburg, A., Friede, B. & Birkeland, R. G. (2025), Silicon-monoxide flames: the nucleation and condensation of silica fume, arXiv:2509.03106v2. |  | ABSENT, `` | `raw/arxiv-2509-sio-flame-nucleation/arxiv-2509-sio-flame-nucleation.pdf` (present, 5c42bdf5); `text/arxiv-2509-sio-flame-nucleation/` (122 files, exists); `tables/arxiv-2509-sio-flame-nucleation/` (0 files, ABSENT) | `data/literature/extracts/arxiv-2509-sio-flame-nucleation.yaml` (11 rows, draft) | `ledger/arxiv-2509-sio-flame-nucleation.yaml`: decoded (2026-09-06) |
@@ -320,7 +320,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `ames-walsh-white-1967`
 - `ammin-73-470-oneill-1988`
 - `ammin-75-781-hemingway-1990`
-- `ammin-76-904-lange-1991`
+- `ammin-76-904`
 - `arxiv-1602-00658-fegley-rock-steam-solubility`
 - `arxiv-1902-05005`
 - `arxiv-2509-sio-flame-nucleation`
@@ -597,7 +597,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `1997jonesthermo`
 - `ammin-73-470-oneill-1988`
 - `ammin-75-781-hemingway-1990`
-- `ammin-76-904-lange-1991`
+- `ammin-76-904`
 - `bencze-yazhenskikh-2016`
 - `boulliung-2025-mercury-volatile-metals-magmatic`
 - `boulliung-wood-2022-so2-solubility-silicate-melts`
