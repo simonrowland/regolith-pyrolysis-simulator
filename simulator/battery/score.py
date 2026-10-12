@@ -1214,16 +1214,29 @@ def _is_flagged_stratum_notice(notice: Notice) -> bool:
 
 
 @lru_cache(maxsize=1)
-def _janaf_pure_solid_table_index() -> tuple[tuple[str, str], ...]:
-    """Return the JANAF neutral crystal-table index by normalized formula."""
+def _janaf_pure_solid_table_index() -> tuple[tuple[str, str, Polymorph | None], ...]:
+    """Return JANAF neutral crystal tables and their canonical polymorphs."""
 
     from simulator.reference_data.janaf import load_manifest
+    from simulator.battery.polymorph_dictionary import (
+        JANAF_CRYSTAL_DICTIONARY,
+        JANAF_CRYSTAL_TABLE_IDS,
+    )
 
     entries = load_manifest().get("entries")
     if not isinstance(entries, list):
         return ()
+    table_polymorphs = {
+        table_id: JANAF_CRYSTAL_DICTIONARY[key]
+        for key, table_ids in JANAF_CRYSTAL_TABLE_IDS.items()
+        for table_id in table_ids
+    }
     return tuple(
-        (str(entry["formula_normalised"]), str(entry["table_id"]))
+        (
+            str(entry["formula_normalised"]),
+            str(entry["table_id"]),
+            table_polymorphs.get(str(entry["table_id"])),
+        )
         for entry in entries
         if isinstance(entry, Mapping)
         and entry.get("phase") == "cr"
@@ -1471,24 +1484,151 @@ def _fusion_comparison_reference(
         and source_polymorph.is_unknown
         and not (source_polymorph.reason or "").startswith("unrecognised polymorph ")
     )
+    source_polymorph_is_unspecified = (
+        source_polymorph is None or source_polymorph_is_unknown
+    )
     unique_unknown_polymorph_table = False
+    inferred_reference_notice: Notice | None = None
+    eligible_solid_tables: tuple[tuple[str, Polymorph | None], ...] = ()
     if (
         expected_polymorph is not None
         and observed_polymorph is not expected_polymorph
-        and source_polymorph_is_unknown
+        and source_polymorph_is_unspecified
     ):
         eligible_solid_tables = tuple(
-            table_id
-            for candidate_formula, table_id in _janaf_pure_solid_table_index()
+            (table_id, table_polymorph)
+            for candidate_formula, table_id, table_polymorph
+            in _janaf_pure_solid_table_index()
             if candidate_formula == formula
             and (
                 table_range := _janaf_pure_solid_table_temperature_range(table_id)
             ) is not None
             and table_range[0] <= temperature_K <= table_range[1]
         )
-        unique_unknown_polymorph_table = eligible_solid_tables == (
-            fusion.crystal_table,
-        )
+        if len(eligible_solid_tables) == 1:
+            unique_unknown_polymorph_table = eligible_solid_tables[0][0] == (
+                fusion.crystal_table
+            )
+        elif len(eligible_solid_tables) > 1:
+            from simulator.battery.generators import janaf as janaf_tables
+
+            candidates: list[tuple[str, Polymorph, Decimal]] = []
+            for table_id, table_polymorph in eligible_solid_tables:
+                if table_polymorph is None:
+                    candidates = []
+                    break
+                try:
+                    points, _source_sha256 = janaf_tables._fusion_table_points(
+                        table_id
+                    )
+                    gibbs_kJ_per_mol = janaf_tables._interpolate_formation_gibbs(
+                        points, temperature_K
+                    )
+                except ValueError:
+                    continue
+                candidates.append((table_id, table_polymorph, gibbs_kJ_per_mol))
+
+            if len(candidates) == len(eligible_solid_tables) and candidates:
+                stable_table, stable_polymorph, stable_gibbs_kJ_per_mol = min(
+                    candidates, key=lambda item: item[2]
+                )
+                alternatives = tuple(
+                    item for item in candidates if item[0] != stable_table
+                )
+                if alternatives:
+                    # For equal chemical potential, changing the pure-solid
+                    # standard state shifts activity by exp(dG/RT). Therefore
+                    # d log10(a) = dG / (R T ln 10); J/mol divided by
+                    # (J/mol/K) K is dimensionless, and ln(10) converts ln to
+                    # log10. JANAF gives the quartz alternative to cristobalite
+                    # as 0.038716 dex at 1823 K and 0.039634 dex at 1873 K.
+                    # Its Al2O3 delta/gamma/kappa alternatives give a maximum
+                    # 0.209434 dex at 1823 K and 0.188226 dex at 1873 K. Those
+                    # transition aluminas are metastable relative to corundum
+                    # at these temperatures, so this is an upper bound over
+                    # tabulated phases, not a claim that experiments used them.
+                    # Tridymite is absent from these JANAF tables, so the SiO2
+                    # bound does not cover tridymite.
+                    bound_by_alternative = tuple(
+                        (
+                            abs(gibbs_kJ_per_mol - stable_gibbs_kJ_per_mol)
+                            * Decimal(1000)
+                            / (
+                                JANAF_R_J_PER_MOL_K
+                                * temperature_K
+                                * Decimal(10).ln()
+                            ),
+                            table_id,
+                            polymorph,
+                            gibbs_kJ_per_mol,
+                        )
+                        for table_id, polymorph, gibbs_kJ_per_mol in alternatives
+                    )
+                    bound_dex, max_table, max_polymorph, _max_gibbs = max(
+                        bound_by_alternative, key=lambda item: item[0]
+                    )
+                    row_band = _printed_uncertainty_band(
+                        Quantity.ACTIVITY,
+                        reference.uncertainty,
+                        reference.value.point,
+                        source_observation=reference,
+                    )
+                    bound_exceeds_row_band = (
+                        None if row_band is None else bound_dex > row_band.value
+                    )
+                    inference_detail = {
+                        "oxide": formula,
+                        "temperature_K": str(temperature_K),
+                        "chosen_polymorph": stable_polymorph.value,
+                        "chosen_table": stable_table,
+                        "alternatives": [
+                            {"polymorph": polymorph.value, "table": table_id}
+                            for table_id, polymorph, _gibbs in alternatives
+                        ],
+                        "bound_dex": str(bound_dex),
+                        "maximum_alternative": {
+                            "polymorph": max_polymorph.value,
+                            "table": max_table,
+                        },
+                        "row_decision_band_dex": (
+                            None if row_band is None else str(row_band.value)
+                        ),
+                        "bound_exceeds_row_band": bound_exceeds_row_band,
+                        "authority": Authority.CERTIFIED.value,
+                    }
+                    inferred_reference_notice = Notice(
+                        kind=NoticeKind.DERIVATION_USES_COMPILATION,
+                        affected_quantities=(Quantity.ACTIVITY,),
+                        reason=(
+                            "reference_polymorph_inferred_from_stability: "
+                            + json.dumps(inference_detail, sort_keys=True)
+                        ),
+                        origin=reference.observation_id,
+                        band=f"JANAF stability bound {bound_dex} dex",
+                        authority=Authority.CERTIFIED,
+                        certification=(
+                            "NIST-JANAF solid formation Gibbs energies compared at T"
+                        ),
+                    )
+                    unique_unknown_polymorph_table = True
+                    if stable_table != fusion.crystal_table:
+                        solid_points, solid_sha256 = janaf_tables._fusion_table_points(
+                            stable_table
+                        )
+                        liquid_points, liquid_sha256 = janaf_tables._fusion_table_points(
+                            fusion.liquid_table
+                        )
+                        fusion = replace(
+                            fusion,
+                            delta_g_fus_kJ_per_mol=(
+                                janaf_tables._interpolate_formation_gibbs(
+                                    liquid_points, temperature_K
+                                )
+                                - stable_gibbs_kJ_per_mol
+                            ),
+                            crystal_table=stable_table,
+                            source_sha256=(solid_sha256, liquid_sha256),
+                        )
     if (
         expected_polymorph is not None
         and observed_polymorph is not expected_polymorph
@@ -1512,6 +1652,12 @@ def _fusion_comparison_reference(
             ),
         )
         return replace(reference, notices=union_notices(reference.notices, (notice,)))
+
+    if inferred_reference_notice is not None:
+        reference = replace(
+            reference,
+            notices=union_notices(reference.notices, (inferred_reference_notice,)),
+        )
 
     tridymite_notice: Notice | None = None
     tridymite_offset_dex = Decimal(0)
