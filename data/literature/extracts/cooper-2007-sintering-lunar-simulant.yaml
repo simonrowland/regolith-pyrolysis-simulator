@@ -260,13 +260,15 @@ species:
         note: Figure-only qualitative study; no plotted values were read.
       uncertainty: {note: figure-only; no numerical uncertainty printed}
   JSC-1:
-    observations:
+    observations: []
+    context:
     - observation_id: cooper_2007_jsc1_sintered_brick_strength
       type: viscosity
       locator: {pdf_page_index: 7, section: Sintered Construction Materials}
       phase: glass
       regime: sintered_construction_material
       units: kPa and psi as printed
+      reason: no closed observation type for mechanical strength; off-rail (decision d-126)
       values:
         quantity: sintered_strength
         method_class: quoted_attributed
