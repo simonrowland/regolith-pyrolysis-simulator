@@ -20,14 +20,14 @@ counts:
 gaps:
   pdfs_without_extract: []
   extracts_without_pdf:
-  - 1997jonesthermo-jones-1997
+  - 1997jonesthermo
   - 2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
   - abdul-2023-cao-sio2-calphad
   - aithala-2026-magmatic-iron-redox-to-2100c
   - ames-walsh-white-1967
   - ammin-73-470-oneill-1988
   - ammin-75-781-hemingway-1990
-  - ammin-76-904-lange-1991
+  - ammin-76-904
   - arxiv-1602-00658-fegley-rock-steam-solubility
   - arxiv-1902-05005
   - arxiv-2509-sio-flame-nucleation
@@ -309,10 +309,10 @@ gaps:
   - zigo-1987-gehlenite-fusion
   untracked_files: []
   extracts_with_private_locators:
-  - 1997jonesthermo-jones-1997
+  - 1997jonesthermo
   - ammin-73-470-oneill-1988
   - ammin-75-781-hemingway-1990
-  - ammin-76-904-lange-1991
+  - ammin-76-904
   - bencze-yazhenskikh-2016
   - boulliung-2025-mercury-volatile-metals-magmatic
   - boulliung-wood-2022-so2-solubility-silicate-melts
@@ -701,7 +701,7 @@ gaps:
     - kems-087-yamada-kato-1980
     resolution: owner/controller
 sources:
-- source_id: 1997jonesthermo-jones-1997
+- source_id: 1997jonesthermo
   aliases: []
   citation: Jones, R. T. (1997), "Thermodynamics and its applications – an overview", SAIMM Pyrometallurgy
     School, Mintek, Randburg, 20–21 May 1997.
@@ -723,7 +723,7 @@ sources:
   - retrieval_url
   access_status: unknown
   extracts:
-  - path: data/literature/extracts/1997jonesthermo-jones-1997.yaml
+  - path: data/literature/extracts/1997jonesthermo.yaml
     review_status: draft
     rows: 2
     locator_status: private_path
@@ -742,23 +742,23 @@ sources:
       path: raw/1997jonesthermo/sidecar.yaml
       present: true
     text:
-      path: text/1997jonesthermo-jones-1997
-      exists: false
-      file_count: 0
+      path: text/1997jonesthermo
+      exists: true
+      file_count: 82
     tables:
-      path: tables/1997jonesthermo-jones-1997
+      path: tables/1997jonesthermo
       exists: false
       file_count: 0
     extract:
-      path: extracts/1997jonesthermo-jones-1997.yaml
-      present: true
-      matches_simulator: false
-    ledger:
-      path: ledger/1997jonesthermo-jones-1997.yaml
+      path: extracts/1997jonesthermo.yaml
       present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/1997jonesthermo.yaml
+      present: true
       error: null
-      last_stage: null
-      date: null
+      last_stage: decoded
+      date: '2026-09-06'
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: 2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
   aliases: []
@@ -1109,7 +1109,7 @@ sources:
       last_stage: null
       date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
-- source_id: ammin-76-904-lange-1991
+- source_id: ammin-76-904
   aliases: []
   citation: Lange, R. A., De Yoreo, J. J. & Navrotsky, A. (1991), "Scanning calorimetric measurement of
     heat capacity during incongruent melting of diopside", American Mineralogist 76, 904-912.
@@ -1131,7 +1131,7 @@ sources:
   - retrieval_url
   access_status: unknown
   extracts:
-  - path: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  - path: data/literature/extracts/ammin-76-904.yaml
     review_status: draft
     rows: 5
     locator_status: private_path
@@ -1150,23 +1150,23 @@ sources:
       path: raw/ammin-76-904/sidecar.yaml
       present: true
     text:
-      path: text/ammin-76-904-lange-1991
-      exists: false
-      file_count: 0
+      path: text/ammin-76-904
+      exists: true
+      file_count: 28
     tables:
-      path: tables/ammin-76-904-lange-1991
+      path: tables/ammin-76-904
       exists: false
       file_count: 0
     extract:
-      path: extracts/ammin-76-904-lange-1991.yaml
-      present: true
-      matches_simulator: false
-    ledger:
-      path: ledger/ammin-76-904-lange-1991.yaml
+      path: extracts/ammin-76-904.yaml
       present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/ammin-76-904.yaml
+      present: true
       error: null
-      last_stage: null
-      date: null
+      last_stage: decoded
+      date: '2026-09-06'
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: arxiv-1602-00658-fegley-rock-steam-solubility
   aliases: []

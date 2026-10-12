@@ -650,6 +650,39 @@ def _write_extract(directory: Path, doc: dict) -> Path:
     return path
 
 
+def _write_companion_table(
+    tmp_path: Path,
+    *,
+    filename: str = "fixture-source-table-s1.yaml",
+    parent_exists: bool = True,
+    parent_links: bool = True,
+) -> Path:
+    directory = tmp_path / "data" / "literature" / "extracts"
+    directory.mkdir(parents=True, exist_ok=True)
+    table_path = directory / filename
+    table_path.write_text(
+        yaml.safe_dump(
+            {
+                "schema_version": "literature_extract_table.v1",
+                "source_id": "fixture-source",
+                "rows": [{"value": 1}],
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    if parent_exists:
+        parent_doc = _minimal_extract()
+        if parent_links:
+            parent_doc["species"]["Fe"]["observations"][0]["values"][
+                "table_transcription"
+            ] = table_path.relative_to(tmp_path).as_posix()
+        (directory / "fixture-source.yaml").write_text(
+            yaml.safe_dump(parent_doc, sort_keys=False), encoding="utf-8"
+        )
+    return table_path
+
+
 # ---------------------------------------------------------------------------
 # Validator unit tests
 # ---------------------------------------------------------------------------
@@ -674,6 +707,88 @@ def test_refuses_source_id_filename_mismatch(tmp_extracts: Path):
     path.write_text(yaml.safe_dump(doc), encoding="utf-8")
     errs = vle.validate_extract_file(path)
     assert any("does not match filename stem" in e for e in errs)
+
+
+def test_accepts_linked_companion_table(tmp_path: Path, monkeypatch):
+    monkeypatch.setattr(vle, "ROOT", tmp_path)
+    path = _write_companion_table(tmp_path)
+
+    assert vle.validate_extract_file(path) == []
+
+
+def test_refuses_absolute_locator_path_on_companion(tmp_path: Path, monkeypatch):
+    monkeypatch.setattr(vle, "ROOT", tmp_path)
+    path = _write_companion_table(tmp_path)
+    doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+    doc["rows"][0]["locator"] = {"source_path": "/private/tmp/not-portable.pdf"}
+    path.write_text(yaml.safe_dump(doc, sort_keys=False), encoding="utf-8")
+
+    errors = vle.validate_extract_file(path)
+
+    assert any(
+        "locator.source_path must be repository-relative" in error
+        and "/private/tmp/not-portable.pdf" in error
+        for error in errors
+    )
+
+
+def test_refuses_companion_table_with_unprefixed_filename(
+    tmp_path: Path, monkeypatch
+):
+    monkeypatch.setattr(vle, "ROOT", tmp_path)
+    path = _write_companion_table(tmp_path, filename="other-table-s1.yaml")
+
+    errs = vle.validate_extract_file(path)
+
+    assert any("filename stem must start with source_id" in error for error in errs)
+    assert not any("parent extract does not link" in error for error in errs)
+
+
+def test_refuses_companion_table_without_parent_extract(
+    tmp_path: Path, monkeypatch
+):
+    monkeypatch.setattr(vle, "ROOT", tmp_path)
+    path = _write_companion_table(tmp_path, parent_exists=False)
+
+    errs = vle.validate_extract_file(path)
+
+    assert any("companion parent extract does not exist" in error for error in errs)
+
+
+def test_refuses_companion_table_not_linked_by_parent(
+    tmp_path: Path, monkeypatch
+):
+    monkeypatch.setattr(vle, "ROOT", tmp_path)
+    path = _write_companion_table(tmp_path, parent_links=False)
+
+    errs = vle.validate_extract_file(path)
+
+    assert any(
+        "parent extract does not link companion table" in error for error in errs
+    )
+
+
+def test_main_reports_all_source_id_filename_mismatches(tmp_path: Path, capsys):
+    first = tmp_path / "wrong-one.yaml"
+    second = tmp_path / "wrong-two.yaml"
+    text = yaml.safe_dump(_minimal_extract(), sort_keys=False)
+    first.write_text(text, encoding="utf-8")
+    second.write_text(text, encoding="utf-8")
+
+    status = vle.main(
+        [
+            "--skip-priority",
+            "--skip-fidelity-policy",
+            str(first),
+            str(second),
+        ]
+    )
+    stderr = capsys.readouterr().err
+
+    assert status == 1
+    assert f"{first}: source_id" in stderr
+    assert f"{second}: source_id" in stderr
+    assert stderr.count("does not match filename stem") == 2
 
 
 def test_refuses_unknown_observation_type():
@@ -3000,6 +3115,24 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
     assert errs == [], "\n".join(errs)
 
 
+def test_bencze_supplement_fidelity_sample_rejects_mutated_value():
+    path = EXTRACTS / "bencze-yazhenskikh-2016.yaml"
+    doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+    sample = doc["fidelity_samples"][0]
+
+    assert sample["locator"]["page"] == 1
+    assert sample["locator"]["table"] == "S-I"
+    assert sample["value"] == "1.70·10-2"
+    assert vle.check_all_fidelity_samples_match(doc, label=path.stem) == []
+
+    doc["species"]["Na"]["observations"][0]["values"]["rows"][0][
+        "p_Na_at_1273_K_Pa"
+    ] = "1.71·10-2"
+    errors = vle.check_all_fidelity_samples_match(doc, label=path.stem)
+
+    assert any("fidelity_samples[0]" in error and "mismatch" in error for error in errors)
+
+
 def test_fidelity_sample_mutation_reds():
     """Prove the gate: mutate one extract value in memory → match test REDS.
 
@@ -3037,6 +3170,51 @@ def test_fidelity_sample_mutation_reds():
         f"original={original!r}"
     )
     assert any("mismatch" in e for e in errs), errs
+
+    # Every Jones and Lange sample is independently mutation-sensitive.
+    jones_path = EXTRACTS / "1997jonesthermo.yaml"
+    jones_samples = load_cached_safe_yaml(
+        jones_path.read_text(encoding="utf-8")
+    ).get("fidelity_samples") or []
+    assert jones_samples, "Jones extract must carry fidelity samples"
+    for index, sample in enumerate(jones_samples):
+        jones_doc = load_cached_safe_yaml(jones_path.read_text(encoding="utf-8"))
+        assert vle.check_all_fidelity_samples_match(jones_doc, label="jones-owner") == []
+        row = next(
+            row
+            for container in ("observations", "context")
+            for row in jones_doc["species"][sample["species"]].get(container, [])
+            if row.get("observation_id") == sample["observation_id"]
+        )
+        row["values"][sample["field"]] += 1
+        errors = vle.check_all_fidelity_samples_match(
+            jones_doc, label="jones-owner-mutated"
+        )
+        assert any(
+            f"fidelity_samples[{index}]" in error and "mismatch" in error
+            for error in errors
+        ), errors
+
+    lange_path = EXTRACTS / "ammin-76-904.yaml"
+    lange_samples = load_cached_safe_yaml(
+        lange_path.read_text(encoding="utf-8")
+    ).get("fidelity_samples") or []
+    assert len(lange_samples) >= 3, "Lange extract must carry table-spread samples"
+    for index, sample in enumerate(lange_samples):
+        lange_doc = load_cached_safe_yaml(lange_path.read_text(encoding="utf-8"))
+        assert vle.check_all_fidelity_samples_match(lange_doc, label="lange-owner") == []
+        resolved = vle.resolve_fidelity_sample(lange_doc, sample)
+        if isinstance(resolved, list):
+            resolved[0] += 1
+        else:
+            resolved["crystal"]["SiO2"]["value"] += 1
+        errors = vle.check_all_fidelity_samples_match(
+            lange_doc, label="lange-owner-mutated"
+        )
+        assert any(
+            f"fidelity_samples[{index}]" in error and "mismatch" in error
+            for error in errors
+        ), errors
 
 
 def test_costa_fe_summary_key_is_retired_to_owner_series():

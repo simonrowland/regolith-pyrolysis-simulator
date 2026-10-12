@@ -24,7 +24,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import EvidenceClass
+from simulator.battery.enums import EvidenceClass, Quantity, ValueKind
 from simulator.battery.migrate import REPO_ROOT
 from tests.battery.test_migrate import _extract_observations, _migrate_real_extract
 
@@ -42,7 +42,7 @@ RENAMED = {
 # Written from the page (or the page's reference list); see the t-1117 rename report.
 REPAIRED = {
     ("jsc-lunar-catalog-12023.yaml", "jsc_12023_carbon_nitrogen_compilation"): "Moore et al. (1971); Kaplan and Petrowski (1971); Kerridge et al. (1978); Norris et al. (1983)",
-    ("ammin-76-904-lange-1991.yaml", "ammin_76_904_quoted_comparator_enthalpy_values"): "Stebbins et al. (1983); Richet and Bottinga (1984); Ferrier (1968); Stebbins et al. (1984); Adamkovicova et al. (1980)",
+    ("ammin-76-904.yaml", "ammin_76_904_quoted_comparator_enthalpy_values"): "Stebbins et al. (1983)",
     ("hashimoto-nakano-2021-bubbles-to-chondrites-ii.yaml", "hashimoto_2021_appendix_sample_provenance"): "Jarosewich (1990)",
     ("lpi-compendium-15013.yaml", "lpi_15013_maturity_and_grain_size"): "Morris 1978 (for Is/FeO = 77)",
     ("lpi-compendium-15013.yaml", "lpi_15013_carbon_and_nitrogen"): "Moore et al. 1973; Des Marais et al. 1973; Kothari and Goel 1972; Muller 1973",
@@ -137,3 +137,172 @@ def test_no_quoted_attributed_record_without_attribution(tmp_path: Path, name: s
         if issue.detail == "quoted_attributed requires attribution"
     ]
     assert missing == []
+
+
+def test_lange_split_comparator_quotes_migrate_with_their_typed_payloads(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(tmp_path, "ammin-76-904.yaml")
+    expected = {
+        "ammin_76_904_quoted_comparator_enthalpy_values": (
+            "CaMgSi2O6",
+            None,
+            ValueKind.UNAVAILABLE,
+            "enthalpy_of_fusion_kJ_per_mol",
+            138.1,  # Printed p. 909 / PDF p. 6: Stebbins et al. (1983), diopside.
+            "kJ_per_mol",
+            "Stebbins et al. (1983)",
+            909,
+            6,
+            1665,
+        ),
+        "ammin_76_904_quoted_richet_bottinga_diopside_fusion": (
+            "CaMgSi2O6",
+            None,
+            ValueKind.UNAVAILABLE,
+            "enthalpy_of_fusion_kJ_per_mol",
+            137.7,  # Printed p. 909 / PDF p. 6: Richet and Bottinga (1984), diopside.
+            "kJ_per_mol",
+            "Richet and Bottinga (1984)",
+            909,
+            6,
+            1665,
+        ),
+        "ammin_76_904_quoted_ferrier_diopside_fusion": (
+            "CaMgSi2O6",
+            None,
+            ValueKind.UNAVAILABLE,
+            "enthalpy_of_fusion_kJ_per_mol",
+            128,  # Printed p. 909 / PDF p. 6: Ferrier (1968), diopside.
+            "kJ_per_mol",
+            "Ferrier (1968)",
+            909,
+            6,
+            1665,
+        ),
+        "ammin_76_904_quoted_richet_bottinga_liquid_heat_capacity": (
+            "CaMgSi2O6",
+            Quantity.CP,
+            ValueKind.POINT,
+            "cp",
+            334,  # Printed p. 909 / PDF p. 6: Richet and Bottinga (1984).
+            "J/mol K",
+            "Richet and Bottinga (1984)",
+            909,
+            6,
+            None,
+        ),
+        "ammin_76_904_quoted_stebbins_1984_liquid_heat_capacity": (
+            "CaMgSi2O6",
+            Quantity.CP,
+            ValueKind.POINT,
+            "cp",
+            353,  # Printed p. 909 / PDF p. 6: Stebbins et al. (1984).
+            "J/mol K",
+            "Stebbins et al. (1984)",
+            909,
+            6,
+            None,
+        ),
+        "ammin_76_904_quoted_adamkovicova_wollastonite_fusion": (
+            "CaSiO3",
+            None,
+            ValueKind.UNAVAILABLE,
+            "enthalpy_of_fusion_kJ_per_mol",
+            57.3,  # Printed p. 911 / PDF p. 8: Adamkovicova et al. (1980), wollastonite.
+            "kJ_per_mol",
+            "Adamkovicova et al. (1980)",
+            911,
+            8,
+            1821,
+        ),
+    }
+
+    for raw_id, (
+        species_formula,
+        quantity,
+        value_kind,
+        raw_value_key,
+        raw_value,
+        units,
+        attribution,
+        published_page,
+        pdf_page,
+        fusion_temperature,
+    ) in expected.items():
+        raw = next(
+            obs
+            for obs in _extract_observations("ammin-76-904.yaml")
+            if obs.get("observation_id") == raw_id
+        )
+        assert raw["units"] == units
+        assert raw["values"][raw_value_key] == raw_value
+        assert raw["values"]["attribution"] == attribution
+        assert raw["locator"]["published_page"] == published_page
+        assert raw["locator"]["pdf_page"] == pdf_page
+        if fusion_temperature is not None:
+            assert raw["values"]["fusion_temperature_K"] == fusion_temperature
+
+        observation = result.observations[f"ammin-76-904::{raw_id}"]
+        actual_quantity = observation.identity.quantity
+        assert actual_quantity.is_value is (quantity is not None)
+        if quantity is None:
+            assert "unsupported quantity 'heat_of_fusion'" in actual_quantity.reason
+        else:
+            assert actual_quantity.value is quantity
+        assert observation.value.kind is value_kind
+        assert observation.identity.species.formula == species_formula
+        assert observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+        assert observation.evidence.attribution == attribution
+        if quantity is Quantity.CP:
+            assert observation.value.point == raw_value
+        else:
+            assert observation.value.kind is ValueKind.UNAVAILABLE
+
+
+def test_lange_quoted_cp_points_do_not_enter_scorer_selection(tmp_path: Path) -> None:
+    from simulator.battery.enums import Engine
+    from simulator.battery.score import (
+        ScoreContext,
+        comparison_candidates,
+        score_store,
+    )
+
+    result = _migrate_real_extract(tmp_path, "ammin-76-904.yaml")
+    quote_ids = {
+        f"ammin-76-904::{raw_id}"
+        for raw_id in (
+            "ammin_76_904_quoted_comparator_enthalpy_values",
+            "ammin_76_904_quoted_richet_bottinga_diopside_fusion",
+            "ammin_76_904_quoted_ferrier_diopside_fusion",
+            "ammin_76_904_quoted_richet_bottinga_liquid_heat_capacity",
+            "ammin_76_904_quoted_stebbins_1984_liquid_heat_capacity",
+            "ammin_76_904_quoted_adamkovicova_wollastonite_fusion",
+        )
+    }
+    observations = {
+        observation_id: result.observations[observation_id]
+        for observation_id in quote_ids
+    }
+    context = ScoreContext(result.works, result.experiments, observations)
+
+    available_cp = [
+        observation
+        for observation in observations.values()
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.CP
+        and observation.value.kind is ValueKind.POINT
+    ]
+    assert sorted(observation.value.point for observation in available_cp) == [334, 353]
+    assert comparison_candidates(context) == ()
+
+    def unexpected_prediction(*args, **kwargs):
+        raise AssertionError("quoted references must be filtered before prediction")
+
+    residuals, selected = score_store(
+        context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        predict=unexpected_prediction,
+    )
+    assert selected == {}
+    assert residuals == ()
