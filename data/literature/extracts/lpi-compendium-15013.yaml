@@ -83,7 +83,7 @@ sample_characterization:
         note: 'The page text says average grain size = 52 microns; Figure 5 caption separately prints average grain size = 53 microns.'
       disagreement: 'Narrative and Figure 5 caption differ: 52 versus 53 microns. Both are retained; neither is reconciled.'
     - observation_id: lpi_15013_carbon_and_nitrogen
-      type: sample_characterization
+      type: concentration_series
       locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 1, section: Chemistry, figure: '2'}
       units: as_published
       values:
@@ -101,7 +101,7 @@ sample_characterization:
   figure_only_characterization:
     observations: &sample_15013_figure_observations
     - observation_id: lpi_15013_grain_size_distribution_figure_only
-      type: sample_characterization
+      type: figure_summary
       locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 2, figure: '5'}
       units: as_published
       values:
@@ -112,7 +112,7 @@ sample_characterization:
         attribution: 'Graf 1993'
         plotted_values: not_digitized
     - observation_id: lpi_15013_maturity_carbon_figure_only
-      type: sample_characterization
+      type: figure_summary
       locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 1, figure: '2'}
       units: as_published
       values:
@@ -122,7 +122,7 @@ sample_characterization:
         plotted_values: not_digitized
         attribution: 'Moore et al. 1973; Morris 1978'
     - observation_id: lpi_15013_ree_normalized_pattern_figure_only
-      type: composition_pattern
+      type: figure_summary
       locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 2, figure: '4'}
       units: normalized_to_chondrite_as_plotted
       values:
@@ -136,7 +136,7 @@ chemical_composition:
   sample_15013_and_reference_materials:
     observations: &sample_15013_chemistry_observations
     - observation_id: lpi_15013_table1_major_oxide_composition
-      type: composition_table
+      type: composition_series
       locator: *table_1
       units: wt_percent_as_published
       values:
@@ -159,7 +159,7 @@ chemical_composition:
         analytical_technique_key: {a: microchemical, b: INAA}
       note: 'Blank cells are absent, not zero. The table is a compilation of cited analyses, not a new apparatus record.'
     - observation_id: lpi_15013_table1_trace_element_composition
-      type: composition_table
+      type: concentration_series
       locator: *table_1
       units: mixed_ppm_and_ppb_as_published
       values:
@@ -198,7 +198,7 @@ chemical_composition:
   volatile_context:
     observations: &sample_15013_volatile_observations
     - observation_id: lpi_15013_lm_exhaust_release_context
-      type: volatile_release_context
+      type: source_context
       locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 3, figure: '6'}
       units: as_published
       values:
@@ -209,7 +209,7 @@ chemical_composition:
         attribution: 'Simoneit et al. 1973'
         note: 'The page text says these products could be released at relatively low temperatures in a vacuum; it gives no numeric release temperature in prose.'
     - observation_id: lpi_15013_volatile_release_curve_figure_only
-      type: volatile_release_context
+      type: figure_summary
       locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 3, figure: '7'}
       units: as_plotted
       values:
@@ -221,9 +221,9 @@ chemical_composition:
         plotted_values: not_digitized
 species:
   sample_15013: {observations: *sample_15013_observations}
-  sample_15013_figure_only: {observations: *sample_15013_figure_observations}
+  sample_15013_figure_only: {observations: [], context: *sample_15013_figure_observations}
   sample_15013_chemistry: {observations: *sample_15013_chemistry_observations}
-  sample_15013_volatile_context: {observations: *sample_15013_volatile_observations}
+  sample_15013_volatile_context: {observations: [], context: *sample_15013_volatile_observations}
 notes:
   - 'No thermal vaporization run, apparatus, pressure history, pumping, temperature calibration, fO2 control, or run uncertainty is reported in this six-page entry.'
   - 'Figure-only curves and image-only particle sketches were not converted into numbers.'
