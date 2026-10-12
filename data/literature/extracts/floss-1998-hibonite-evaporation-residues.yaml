@@ -174,6 +174,10 @@ species:
           mass_loss_pct: 37.5
           Al2O3_wt_pct: 89.17
           CaO_wt_pct: 5.70
+          composition_wt_pct: {Al2O3: 89.17, CaO: 5.70, TiO2: 0.05}
+          composition_mol: {Al2O3: '0.8953021428204296923307524309', CaO: '0.1040569509094337158761371670', TiO2: '0.0006409062701365917931104021436'}
+          composition_conversion: computed from printed wt% map
+          untyped_constituents: &floss_table5_untyped [REE2O3, Y2O3, ZrO2, HfO2, ThO2]
           point_conditions: &floss_hibonite_conditions
             atmosphere: {state: {tag: value, value: high vacuum}, locator: {published_page: 191, pdf_page_index: 1, section: Experimental and Analytical Procedures}}
             total_pressure_Pa: {state: {tag: unknown, reason: numerical pressure not reported}, locator: {published_page: 191, pdf_page_index: 1, section: Experimental and Analytical Procedures}}
@@ -195,6 +199,10 @@ species:
           mass_loss_pct: 41.2
           Al2O3_wt_pct: 89.27
           CaO_wt_pct: 6.23
+          composition_wt_pct: {Al2O3: 89.27, CaO: 6.23, TiO2: 0.05}
+          composition_mol: {Al2O3: '0.8868352164416951443484980910', CaO: '0.1125306495291964705004652491', TiO2: '0.0006341340291083851510366598191'}
+          composition_conversion: computed from printed wt% map
+          untyped_constituents: *floss_table5_untyped
           point_conditions: *floss_hibonite_conditions
           locator: {published_page: 196, pdf_page_index: 6, table: '5'}
     - observation_id: floss_1998_mh5_bulk_residue
@@ -214,6 +222,10 @@ species:
           mass_loss_pct: 72.4
           Al2O3_wt_pct: 90.38
           CaO_wt_pct: 3.49
+          composition_wt_pct: {Al2O3: 90.38, CaO: 3.49, TiO2: 0.09}
+          composition_mol: {Al2O3: '0.9332874843116698071199928581', CaO: '0.06552603882690493548193528419', TiO2: '0.001186476861425257398071857707'}
+          composition_conversion: computed from printed wt% map
+          untyped_constituents: *floss_table5_untyped
           point_conditions: *floss_hibonite_conditions
           locator: {published_page: 196, pdf_page_index: 6, table: '5'}
     - observation_id: floss_1998_mh9_bulk_residue
@@ -233,6 +245,10 @@ species:
           mass_loss_pct: 81.1
           Al2O3_wt_pct: 89.56
           CaO_wt_pct: 1.83
+          composition_wt_pct: {Al2O3: 89.56, CaO: 1.83}
+          composition_mol: {Al2O3: '0.9641788130822657759506130418', CaO: '0.03582118691773422404938695817'}
+          composition_conversion: computed from printed wt% map
+          untyped_constituents: *floss_table5_untyped
           point_conditions: *floss_hibonite_conditions
           locator: {published_page: 196, pdf_page_index: 6, table: '5'}
     - observation_id: floss_1998_mh3_bulk_residue
@@ -252,6 +268,10 @@ species:
           mass_loss_pct: 82.8
           Al2O3_wt_pct: 88.17
           CaO_wt_pct: 2.59
+          composition_wt_pct: {Al2O3: 88.17, CaO: 2.59, TiO2: 0.04}
+          composition_mol: {Al2O3: '0.9487761527867458222053632495', CaO: '0.05067433598658815490112708353', TiO2: '0.0005495112266660228935096669444'}
+          composition_conversion: computed from printed wt% map
+          untyped_constituents: *floss_table5_untyped
           point_conditions: *floss_hibonite_conditions
           locator: {published_page: 196, pdf_page_index: 6, table: '5'}
     - observation_id: floss_1998_mh10_bulk_residue
@@ -271,6 +291,10 @@ species:
           mass_loss_pct: 84.0
           Al2O3_wt_pct: 92.49
           CaO_wt_pct: 1.47
+          composition_wt_pct: {Al2O3: 92.49, CaO: 1.47}
+          composition_mol: {Al2O3: '0.9719136301133639632977157592', CaO: '0.02808636988663603670228424079'}
+          composition_conversion: computed from printed wt% map
+          untyped_constituents: *floss_table5_untyped
           point_conditions: *floss_hibonite_conditions
           locator: {published_page: 196, pdf_page_index: 6, table: '5'}
     - observation_id: floss_1998_mh6_bulk_residue
@@ -290,6 +314,10 @@ species:
           mass_loss_pct: 85.6
           Al2O3_wt_pct: 89.03
           CaO_wt_pct: 2.15
+          composition_wt_pct: {Al2O3: 89.03, CaO: 2.15}
+          composition_mol: {Al2O3: '0.9579384683438057738058481103', CaO: '0.04206153165619422619415188962'}
+          composition_conversion: computed from printed wt% map
+          untyped_constituents: *floss_table5_untyped
           point_conditions: *floss_hibonite_conditions
           locator: {published_page: 196, pdf_page_index: 6, table: '5'}
     - observation_id: floss_1998_mh8_bulk_residue
@@ -309,6 +337,10 @@ species:
           mass_loss_pct: 92.5
           Al2O3_wt_pct: 86.31
           CaO_wt_pct: 0.82
+          composition_wt_pct: {Al2O3: 86.31, CaO: 0.82}
+          composition_mol: {Al2O3: '0.9830191241920991378469464887', CaO: '0.01698087580790086215305351132'}
+          composition_conversion: computed from printed wt% map
+          untyped_constituents: *floss_table5_untyped
           point_conditions: *floss_hibonite_conditions
           locator: {published_page: 196, pdf_page_index: 6, table: '5'}
     - observation_id: floss_1998_mh7_bulk_residue
@@ -328,6 +360,10 @@ species:
           mass_loss_pct: 93.8
           Al2O3_wt_pct: 82.88
           CaO_wt_pct: 0.97
+          composition_wt_pct: {Al2O3: 82.88, CaO: 0.97}
+          composition_mol: {Al2O3: '0.9791636023861507035425496860', CaO: '0.02083639761384929645745031399'}
+          composition_conversion: computed from printed wt% map
+          untyped_constituents: *floss_table5_untyped
           point_conditions: *floss_hibonite_conditions
           locator: {published_page: 196, pdf_page_index: 6, table: '5'}
     - observation_id: floss_1998_mh12_bulk_residue
@@ -347,6 +383,10 @@ species:
           mass_loss_pct: 90.7
           Al2O3_wt_pct: 83.62
           CaO_wt_pct: 3.42
+          composition_wt_pct: {Al2O3: 83.62, CaO: 3.42, TiO2: 0.09}
+          composition_mol: {Al2O3: '0.9295945376675805769999375061', CaO: '0.06912814275650463561314993334', TiO2: '0.001277319575914787386912560536'}
+          composition_conversion: computed from printed wt% map
+          untyped_constituents: *floss_table5_untyped
           point_conditions: *floss_hibonite_conditions
           locator: {published_page: 196, pdf_page_index: 6, table: '5'}
     - observation_id: floss_1998_mh16_bulk_residue
@@ -366,6 +406,10 @@ species:
           mass_loss_pct: 96.0
           Al2O3_wt_pct: 75.63
           CaO_wt_pct: 2.34
+          composition_wt_pct: {Al2O3: 75.63, CaO: 2.34, TiO2: 0.32}
+          composition_mol: {Al2O3: '0.9419233895667827685034827043', CaO: '0.05298863368423011501187027787', TiO2: '0.005087976748987116484647017899'}
+          composition_conversion: computed from printed wt% map
+          untyped_constituents: *floss_table5_untyped
           point_conditions: *floss_hibonite_conditions
           locator: {published_page: 196, pdf_page_index: 6, table: '5'}
     - observation_id: floss_1998_mh15_bulk_residue
@@ -385,6 +429,10 @@ species:
           mass_loss_pct: 96.8
           Al2O3_wt_pct: 73.93
           CaO_wt_pct: 2.33
+          composition_wt_pct: {Al2O3: 73.93, CaO: 2.33, TiO2: 0.17}
+          composition_mol: {Al2O3: '0.9431835108825674758282663583', CaO: '0.05404764775791463354747679539', TiO2: '0.002768841359517890624256846291'}
+          composition_conversion: computed from printed wt% map
+          untyped_constituents: *floss_table5_untyped
           point_conditions: *floss_hibonite_conditions
           locator: {published_page: 196, pdf_page_index: 6, table: '5'}
     - observation_id: floss_1998_mh14_bulk_residue
@@ -404,6 +452,10 @@ species:
           mass_loss_pct: 99.5
           Al2O3_wt_pct: 49.02
           CaO_wt_pct: 0.66
+          composition_wt_pct: {Al2O3: 49.02, CaO: 0.66, TiO2: 0.26}
+          composition_mol: {Al2O3: '0.9696954794679799529093788335', CaO: '0.02373839667092165583899146538', TiO2: '0.006566123861098391251629701205'}
+          composition_conversion: computed from printed wt% map
+          untyped_constituents: *floss_table5_untyped
           point_conditions: *floss_hibonite_conditions
           locator: {published_page: 196, pdf_page_index: 6, table: '5'}
     - observation_id: floss_1998_ca6_1_bulk_residue
@@ -423,6 +475,10 @@ species:
           mass_loss_pct: 6.0
           Al2O3_wt_pct: 90.67
           CaO_wt_pct: 7.99
+          composition_wt_pct: {Al2O3: 90.67, CaO: 7.99, TiO2: 1.00}
+          composition_mol: {Al2O3: '0.8515678130314769404645423966', CaO: '0.1364419081834555521122846775', TiO2: '0.01199027878506750742317292594'}
+          composition_conversion: computed from printed wt% map
+          untyped_constituents: *floss_table5_untyped
           point_conditions: *floss_hibonite_conditions
           locator: {published_page: 196, pdf_page_index: 6, table: '5'}
     - observation_id: floss_1998_ca6_2_bulk_residue
@@ -442,6 +498,10 @@ species:
           mass_loss_pct: 31.6
           Al2O3_wt_pct: 93.38
           CaO_wt_pct: 6.15
+          composition_wt_pct: {Al2O3: 93.38, CaO: 6.15}
+          composition_mol: {Al2O3: '0.8930584414589213445257939431', CaO: '0.1069415585410786554742060566'}
+          composition_conversion: computed from printed wt% map
+          untyped_constituents: *floss_table5_untyped
           point_conditions: *floss_hibonite_conditions
           locator: {published_page: 196, pdf_page_index: 6, table: '5'}
     - observation_id: floss_1998_ca6_4_bulk_residue
@@ -461,6 +521,10 @@ species:
           mass_loss_pct: 53.5
           Al2O3_wt_pct: 94.41
           CaO_wt_pct: 5.01
+          composition_wt_pct: {Al2O3: 94.41, CaO: 5.01}
+          composition_mol: {Al2O3: '0.9120041989542941650811818743', CaO: '0.08799580104570583491881812603'}
+          composition_conversion: computed from printed wt% map
+          untyped_constituents: *floss_table5_untyped
           point_conditions: *floss_hibonite_conditions
           locator: {published_page: 196, pdf_page_index: 6, table: '5'}
     - observation_id: floss_1998_table4_mh1_glass_residue
@@ -469,112 +533,112 @@ species:
       locator: {published_page: 195, pdf_page_index: 5, table: '4'}
       phase: glass
       units: wt% as published
-      values: {quantity: residue_composition_vs_time, method_class: measured_direct, evidence_class: authors_table, composition_wt_pct: *floss_natural_start, series: [{run_id: MH-1, T_C: 2100, mass_loss_pct: 37.5, Al2O3_wt_pct: 86.09, CaO_wt_pct: 7.38, point_conditions: *floss_hibonite_conditions, locator: {published_page: 195, pdf_page_index: 5, table: '4'}}]}
+      values: {quantity: residue_composition_vs_time, method_class: measured_direct, evidence_class: authors_table, composition_wt_pct: *floss_natural_start, series: [{run_id: MH-1, T_C: 2100, mass_loss_pct: 37.5, Al2O3_wt_pct: 86.09, CaO_wt_pct: 7.38, composition_wt_pct: {Al2O3: 86.09, CaO: 7.38, TiO2: 0.02}, composition_mol: {Al2O3: '0.8649308863692209417867584601', CaO: '0.1348125870618190863102120647', TiO2: '0.0002565265689599719030294752903'}, composition_conversion: computed from printed wt% map, untyped_constituents: &floss_table4_untyped [REE2O3, Y2O3, ZrO2, HfO2, UO2, ThO2], point_conditions: *floss_hibonite_conditions, locator: {published_page: 195, pdf_page_index: 5, table: '4'}}]}
     - observation_id: floss_1998_table4_mh2_glass_residue
       experiment: floss-1998-run-mh-2
       type: rate_series
       locator: {published_page: 195, pdf_page_index: 5, table: '4'}
       phase: glass
       units: wt% as published
-      values: {quantity: residue_composition_vs_time, method_class: measured_direct, evidence_class: authors_table, composition_wt_pct: *floss_natural_start, series: [{run_id: MH-2, T_C: 2100, mass_loss_pct: 41.2, Al2O3_wt_pct: 86.03, CaO_wt_pct: 7.77, point_conditions: *floss_hibonite_conditions, locator: {published_page: 195, pdf_page_index: 5, table: '4'}}]}
+      values: {quantity: residue_composition_vs_time, method_class: measured_direct, evidence_class: authors_table, composition_wt_pct: *floss_natural_start, series: [{run_id: MH-2, T_C: 2100, mass_loss_pct: 41.2, Al2O3_wt_pct: 86.03, CaO_wt_pct: 7.77, composition_wt_pct: {Al2O3: 86.03, CaO: 7.77}, composition_mol: {Al2O3: '0.8589468552998424117532405972', CaO: '0.1410531447001575882467594028'}, composition_conversion: computed from printed wt% map, untyped_constituents: *floss_table4_untyped, point_conditions: *floss_hibonite_conditions, locator: {published_page: 195, pdf_page_index: 5, table: '4'}}]}
     - observation_id: floss_1998_table4_mh5_glass_residue
       experiment: floss-1998-run-mh-5
       type: rate_series
       locator: {published_page: 195, pdf_page_index: 5, table: '4'}
       phase: glass
       units: wt% as published
-      values: {quantity: residue_composition_vs_time, method_class: measured_direct, evidence_class: authors_table, composition_wt_pct: *floss_natural_start, series: [{run_id: MH-5, T_C: 2100, mass_loss_pct: 72.4, Al2O3_wt_pct: 83.41, CaO_wt_pct: 6.11, point_conditions: *floss_hibonite_conditions, locator: {published_page: 195, pdf_page_index: 5, table: '4'}}]}
+      values: {quantity: residue_composition_vs_time, method_class: measured_direct, evidence_class: authors_table, composition_wt_pct: *floss_natural_start, series: [{run_id: MH-5, T_C: 2100, mass_loss_pct: 72.4, Al2O3_wt_pct: 83.41, CaO_wt_pct: 6.11, composition_wt_pct: {Al2O3: 83.41, CaO: 6.11}, composition_mol: {Al2O3: '0.8824652985340707735027594251', CaO: '0.1175347014659292264972405749'}, composition_conversion: computed from printed wt% map, untyped_constituents: *floss_table4_untyped, point_conditions: *floss_hibonite_conditions, locator: {published_page: 195, pdf_page_index: 5, table: '4'}}]}
     - observation_id: floss_1998_table4_mh9_glass_residue
       experiment: floss-1998-run-mh-9
       type: rate_series
       locator: {published_page: 195, pdf_page_index: 5, table: '4'}
       phase: glass
       units: wt% as published
-      values: {quantity: residue_composition_vs_time, method_class: measured_direct, evidence_class: authors_table, composition_wt_pct: *floss_natural_start, series: [{run_id: MH-9, T_C: 2100, mass_loss_pct: 81.1, Al2O3_wt_pct: 81.78, CaO_wt_pct: 4.20, point_conditions: *floss_hibonite_conditions, locator: {published_page: 195, pdf_page_index: 5, table: '4'}}]}
+      values: {quantity: residue_composition_vs_time, method_class: measured_direct, evidence_class: authors_table, composition_wt_pct: *floss_natural_start, series: [{run_id: MH-9, T_C: 2100, mass_loss_pct: 81.1, Al2O3_wt_pct: 81.78, CaO_wt_pct: 4.20, composition_wt_pct: {Al2O3: 81.78, CaO: 4.20}, composition_mol: {Al2O3: '0.9145962422674844127095764664', CaO: '0.08540375773251558729042353361'}, composition_conversion: computed from printed wt% map, untyped_constituents: *floss_table4_untyped, point_conditions: *floss_hibonite_conditions, locator: {published_page: 195, pdf_page_index: 5, table: '4'}}]}
     - observation_id: floss_1998_table4_mh3_glass_residue
       experiment: floss-1998-run-mh-3
       type: rate_series
       locator: {published_page: 195, pdf_page_index: 5, table: '4'}
       phase: glass
       units: wt% as published
-      values: {quantity: residue_composition_vs_time, method_class: measured_direct, evidence_class: authors_table, composition_wt_pct: *floss_natural_start, series: [{run_id: MH-3, T_C: 2100, mass_loss_pct: 82.8, Al2O3_wt_pct: 82.00, CaO_wt_pct: 4.34, point_conditions: *floss_hibonite_conditions, locator: {published_page: 195, pdf_page_index: 5, table: '4'}}]}
+      values: {quantity: residue_composition_vs_time, method_class: measured_direct, evidence_class: authors_table, composition_wt_pct: *floss_natural_start, series: [{run_id: MH-3, T_C: 2100, mass_loss_pct: 82.8, Al2O3_wt_pct: 82.00, CaO_wt_pct: 4.34, composition_wt_pct: {Al2O3: 82.00, CaO: 4.34}, composition_mol: {Al2O3: '0.9122153400180410531513385104', CaO: '0.08778465998195894684866148961'}, composition_conversion: computed from printed wt% map, untyped_constituents: *floss_table4_untyped, point_conditions: *floss_hibonite_conditions, locator: {published_page: 195, pdf_page_index: 5, table: '4'}}]}
     - observation_id: floss_1998_table4_mh10_glass_residue
       experiment: floss-1998-run-mh-10
       type: rate_series
       locator: {published_page: 195, pdf_page_index: 5, table: '4'}
       phase: glass
       units: wt% as published
-      values: {quantity: residue_composition_vs_time, method_class: measured_direct, evidence_class: authors_table, composition_wt_pct: *floss_natural_start, series: [{run_id: MH-10, T_C: 2100, mass_loss_pct: 84.0, Al2O3_wt_pct: 78.80, CaO_wt_pct: 4.29, point_conditions: *floss_hibonite_conditions, locator: {published_page: 195, pdf_page_index: 5, table: '4'}}]}
+      values: {quantity: residue_composition_vs_time, method_class: measured_direct, evidence_class: authors_table, composition_wt_pct: *floss_natural_start, series: [{run_id: MH-10, T_C: 2100, mass_loss_pct: 84.0, Al2O3_wt_pct: 78.80, CaO_wt_pct: 4.29, composition_wt_pct: {Al2O3: 78.80, CaO: 4.29}, composition_mol: {Al2O3: '0.9099291925382926885361693478', CaO: '0.09007080746170731146383065218'}, composition_conversion: computed from printed wt% map, untyped_constituents: *floss_table4_untyped, point_conditions: *floss_hibonite_conditions, locator: {published_page: 195, pdf_page_index: 5, table: '4'}}]}
     - observation_id: floss_1998_table4_mh6_glass_residue
       experiment: floss-1998-run-mh-6
       type: rate_series
       locator: {published_page: 195, pdf_page_index: 5, table: '4'}
       phase: glass
       units: wt% as published
-      values: {quantity: residue_composition_vs_time, method_class: measured_direct, evidence_class: authors_table, composition_wt_pct: *floss_natural_start, series: [{run_id: MH-6, T_C: 2100, mass_loss_pct: 85.6, Al2O3_wt_pct: 80.83, CaO_wt_pct: 4.38, point_conditions: *floss_hibonite_conditions, locator: {published_page: 195, pdf_page_index: 5, table: '4'}}]}
+      values: {quantity: residue_composition_vs_time, method_class: measured_direct, evidence_class: authors_table, composition_wt_pct: *floss_natural_start, series: [{run_id: MH-6, T_C: 2100, mass_loss_pct: 85.6, Al2O3_wt_pct: 80.83, CaO_wt_pct: 4.38, composition_wt_pct: {Al2O3: 80.83, CaO: 4.38}, composition_mol: {Al2O3: '0.9103114655483303287745559377', CaO: '0.08968853445166967122544406224'}, composition_conversion: computed from printed wt% map, untyped_constituents: *floss_table4_untyped, point_conditions: *floss_hibonite_conditions, locator: {published_page: 195, pdf_page_index: 5, table: '4'}}]}
     - observation_id: floss_1998_table4_mh8_glass_residue
       experiment: floss-1998-run-mh-8
       type: rate_series
       locator: {published_page: 195, pdf_page_index: 5, table: '4'}
       phase: glass
       units: wt% as published
-      values: {quantity: residue_composition_vs_time, method_class: measured_direct, evidence_class: authors_table, composition_wt_pct: *floss_natural_start, series: [{run_id: MH-8, T_C: 2100, mass_loss_pct: 92.5, Al2O3_wt_pct: 77.02, CaO_wt_pct: 1.98, point_conditions: *floss_hibonite_conditions, locator: {published_page: 195, pdf_page_index: 5, table: '4'}}]}
+      values: {quantity: residue_composition_vs_time, method_class: measured_direct, evidence_class: authors_table, composition_wt_pct: *floss_natural_start, series: [{run_id: MH-8, T_C: 2100, mass_loss_pct: 92.5, Al2O3_wt_pct: 77.02, CaO_wt_pct: 1.98, composition_wt_pct: {Al2O3: 77.02, CaO: 1.98}, composition_mol: {Al2O3: '0.9553452750176160357283359636', CaO: '0.04465472498238396427166403647'}, composition_conversion: computed from printed wt% map, untyped_constituents: *floss_table4_untyped, point_conditions: *floss_hibonite_conditions, locator: {published_page: 195, pdf_page_index: 5, table: '4'}}]}
     - observation_id: floss_1998_table4_mh7_glass_residue
       experiment: floss-1998-run-mh-7
       type: rate_series
       locator: {published_page: 195, pdf_page_index: 5, table: '4'}
       phase: glass
       units: wt% as published
-      values: {quantity: residue_composition_vs_time, method_class: measured_direct, evidence_class: authors_table, composition_wt_pct: *floss_natural_start, series: [{run_id: MH-7, T_C: 2100, mass_loss_pct: 93.8, Al2O3_wt_pct: 76.46, CaO_wt_pct: 1.83, point_conditions: *floss_hibonite_conditions, locator: {published_page: 195, pdf_page_index: 5, table: '4'}}]}
+      values: {quantity: residue_composition_vs_time, method_class: measured_direct, evidence_class: authors_table, composition_wt_pct: *floss_natural_start, series: [{run_id: MH-7, T_C: 2100, mass_loss_pct: 93.8, Al2O3_wt_pct: 76.46, CaO_wt_pct: 1.83, composition_wt_pct: {Al2O3: 76.46, CaO: 1.83}, composition_mol: {Al2O3: '0.9582974592166757505424249633', CaO: '0.04170254078332424945757503670'}, composition_conversion: computed from printed wt% map, untyped_constituents: *floss_table4_untyped, point_conditions: *floss_hibonite_conditions, locator: {published_page: 195, pdf_page_index: 5, table: '4'}}]}
     - observation_id: floss_1998_table4_mh12_glass_residue
       experiment: floss-1998-run-mh-12
       type: rate_series
       locator: {published_page: 195, pdf_page_index: 5, table: '4'}
       phase: glass
       units: wt% as published
-      values: {quantity: residue_composition_vs_time, method_class: measured_direct, evidence_class: authors_table, composition_wt_pct: *floss_natural_start, series: [{run_id: MH-12, T_C: 2500, mass_loss_pct: 90.7, Al2O3_wt_pct: 83.72, CaO_wt_pct: 4.36, point_conditions: *floss_hibonite_conditions, locator: {published_page: 195, pdf_page_index: 5, table: '4'}}]}
+      values: {quantity: residue_composition_vs_time, method_class: measured_direct, evidence_class: authors_table, composition_wt_pct: *floss_natural_start, series: [{run_id: MH-12, T_C: 2500, mass_loss_pct: 90.7, Al2O3_wt_pct: 83.72, CaO_wt_pct: 4.36, composition_wt_pct: {Al2O3: 83.72, CaO: 4.36}, composition_mol: {Al2O3: '0.9135008920998462160799551110', CaO: '0.08649910790015378392004488901'}, composition_conversion: computed from printed wt% map, untyped_constituents: *floss_table4_untyped, point_conditions: *floss_hibonite_conditions, locator: {published_page: 195, pdf_page_index: 5, table: '4'}}]}
     - observation_id: floss_1998_table4_mh16_glass_residue
       experiment: floss-1998-run-mh-16
       type: rate_series
       locator: {published_page: 195, pdf_page_index: 5, table: '4'}
       phase: glass
       units: wt% as published
-      values: {quantity: residue_composition_vs_time, method_class: measured_direct, evidence_class: authors_table, composition_wt_pct: *floss_natural_start, series: [{run_id: MH-16, T_C: 2500, mass_loss_pct: 96.0, Al2O3_wt_pct: 81.04, CaO_wt_pct: 2.80, point_conditions: *floss_hibonite_conditions, locator: {published_page: 195, pdf_page_index: 5, table: '4'}}]}
+      values: {quantity: residue_composition_vs_time, method_class: measured_direct, evidence_class: authors_table, composition_wt_pct: *floss_natural_start, series: [{run_id: MH-16, T_C: 2500, mass_loss_pct: 96.0, Al2O3_wt_pct: 81.04, CaO_wt_pct: 2.80, composition_wt_pct: {Al2O3: 81.04, CaO: 2.80}, composition_mol: {Al2O3: '0.9408923209992757584655876247', CaO: '0.05910767900072424153441237526'}, composition_conversion: computed from printed wt% map, untyped_constituents: *floss_table4_untyped, point_conditions: *floss_hibonite_conditions, locator: {published_page: 195, pdf_page_index: 5, table: '4'}}]}
     - observation_id: floss_1998_table4_mh15_glass_residue
       experiment: floss-1998-run-mh-15
       type: rate_series
       locator: {published_page: 195, pdf_page_index: 5, table: '4'}
       phase: glass
       units: wt% as published
-      values: {quantity: residue_composition_vs_time, method_class: measured_direct, evidence_class: authors_table, composition_wt_pct: *floss_natural_start, series: [{run_id: MH-15, T_C: 2500, mass_loss_pct: 96.8, Al2O3_wt_pct: 80.61, CaO_wt_pct: 2.33, point_conditions: *floss_hibonite_conditions, locator: {published_page: 195, pdf_page_index: 5, table: '4'}}]}
+      values: {quantity: residue_composition_vs_time, method_class: measured_direct, evidence_class: authors_table, composition_wt_pct: *floss_natural_start, series: [{run_id: MH-15, T_C: 2500, mass_loss_pct: 96.8, Al2O3_wt_pct: 80.61, CaO_wt_pct: 2.33, composition_wt_pct: {Al2O3: 80.61, CaO: 2.33}, composition_mol: {Al2O3: '0.9500692985787541052952267507', CaO: '0.04993070142124589470477324933'}, composition_conversion: computed from printed wt% map, untyped_constituents: *floss_table4_untyped, point_conditions: *floss_hibonite_conditions, locator: {published_page: 195, pdf_page_index: 5, table: '4'}}]}
     - observation_id: floss_1998_table4_mh14_glass_residue
       experiment: floss-1998-run-mh-14
       type: rate_series
       locator: {published_page: 195, pdf_page_index: 5, table: '4'}
       phase: glass
       units: wt% as published
-      values: {quantity: residue_composition_vs_time, method_class: measured_direct, evidence_class: authors_table, composition_wt_pct: *floss_natural_start, series: [{run_id: MH-14, T_C: 2500, mass_loss_pct: 99.5, Al2O3_wt_pct: 74.72, CaO_wt_pct: 0.33, point_conditions: *floss_hibonite_conditions, locator: {published_page: 195, pdf_page_index: 5, table: '4'}}]}
+      values: {quantity: residue_composition_vs_time, method_class: measured_direct, evidence_class: authors_table, composition_wt_pct: *floss_natural_start, series: [{run_id: MH-14, T_C: 2500, mass_loss_pct: 99.5, Al2O3_wt_pct: 74.72, CaO_wt_pct: 0.33, composition_wt_pct: {Al2O3: 74.72, CaO: 0.33}, composition_mol: {Al2O3: '0.9920338414251650559987639642', CaO: '0.007966158574834944001236035786'}, composition_conversion: computed from printed wt% map, untyped_constituents: *floss_table4_untyped, point_conditions: *floss_hibonite_conditions, locator: {published_page: 195, pdf_page_index: 5, table: '4'}}]}
     - observation_id: floss_1998_table4_ca6_1_glass_residue
       experiment: floss-1998-run-ca6-1
       type: rate_series
       locator: {published_page: 195, pdf_page_index: 5, table: '4'}
       phase: glass
       units: wt% as published
-      values: {quantity: residue_composition_vs_time, method_class: measured_direct, evidence_class: authors_table, composition_wt_pct: *floss_ca6_start, series: [{run_id: CA6-1, T_C: 2100, mass_loss_pct: 6.0, Al2O3_wt_pct: 74.10, CaO_wt_pct: 22.41, point_conditions: *floss_hibonite_conditions, locator: {published_page: 195, pdf_page_index: 5, table: '4'}}]}
+      values: {quantity: residue_composition_vs_time, method_class: measured_direct, evidence_class: authors_table, composition_wt_pct: *floss_ca6_start, series: [{run_id: CA6-1, T_C: 2100, mass_loss_pct: 6.0, Al2O3_wt_pct: 74.10, CaO_wt_pct: 22.41, composition_wt_pct: {Al2O3: 74.10, CaO: 22.41, TiO2: 1.12}, composition_mol: {Al2O3: '0.6372764630832498880777588850', CaO: '0.3504264752142285720871824701', TiO2: '0.01229706170252153983505864514'}, composition_conversion: computed from printed wt% map, untyped_constituents: *floss_table4_untyped, point_conditions: *floss_hibonite_conditions, locator: {published_page: 195, pdf_page_index: 5, table: '4'}}]}
     - observation_id: floss_1998_table4_ca6_2_glass_residue
       experiment: floss-1998-run-ca6-2
       type: rate_series
       locator: {published_page: 195, pdf_page_index: 5, table: '4'}
       phase: glass
       units: wt% as published
-      values: {quantity: residue_composition_vs_time, method_class: measured_direct, evidence_class: authors_table, composition_wt_pct: *floss_ca6_start, series: [{run_id: CA6-2, T_C: 2100, mass_loss_pct: 31.6, Al2O3_wt_pct: 66.34, CaO_wt_pct: 30.52, point_conditions: *floss_hibonite_conditions, locator: {published_page: 195, pdf_page_index: 5, table: '4'}}]}
+      values: {quantity: residue_composition_vs_time, method_class: measured_direct, evidence_class: authors_table, composition_wt_pct: *floss_ca6_start, series: [{run_id: CA6-2, T_C: 2100, mass_loss_pct: 31.6, Al2O3_wt_pct: 66.34, CaO_wt_pct: 30.52, composition_wt_pct: {Al2O3: 66.34, CaO: 30.52, TiO2: 0.01}, composition_mol: {Al2O3: '0.5444635354212869174679929066', CaO: '0.4554316873299727939493347148', TiO2: '0.0001047772487402885826723785750'}, composition_conversion: computed from printed wt% map, untyped_constituents: *floss_table4_untyped, point_conditions: *floss_hibonite_conditions, locator: {published_page: 195, pdf_page_index: 5, table: '4'}}]}
     - observation_id: floss_1998_table4_ca6_4_glass_residue
       experiment: floss-1998-run-ca6-4
       type: rate_series
       locator: {published_page: 195, pdf_page_index: 5, table: '4'}
       phase: glass
       units: wt% as published
-      values: {quantity: residue_composition_vs_time, method_class: measured_direct, evidence_class: authors_table, composition_wt_pct: *floss_ca6_start, series: [{run_id: CA6-4, T_C: 2100, mass_loss_pct: 53.5, Al2O3_wt_pct: 87.30, CaO_wt_pct: 9.90, point_conditions: *floss_hibonite_conditions, locator: {published_page: 195, pdf_page_index: 5, table: '4'}}]}
+      values: {quantity: residue_composition_vs_time, method_class: measured_direct, evidence_class: authors_table, composition_wt_pct: *floss_ca6_start, series: [{run_id: CA6-4, T_C: 2100, mass_loss_pct: 53.5, Al2O3_wt_pct: 87.30, CaO_wt_pct: 9.90, composition_wt_pct: {Al2O3: 87.30, CaO: 9.90}, composition_mol: {Al2O3: '0.8290571948071798007943524173', CaO: '0.1709428051928201992056475827'}, composition_conversion: computed from printed wt% map, untyped_constituents: *floss_table4_untyped, point_conditions: *floss_hibonite_conditions, locator: {published_page: 195, pdf_page_index: 5, table: '4'}}]}
     context:
     - observation_id: floss_1998_initial_material_characterization
       type: characterization
@@ -678,6 +742,7 @@ species:
       values:
         quantity: phase_compositions_not_fully_typeable
         method_class: measured_direct
+        untyped_constituents: [REE2O3, Y2O3, ZrO2, HfO2, UO2, ThO2]
         table3_corundum_average_and_range_by_starting_material:
           columns: [Al2O3, CaO, TiO2, FeO, MgO, SiO2, REE2O3, Y2O3, ZrO2, HfO2, UO2, ThO2, Total]
           natural_MH_mean_then_range: [99.84, 0.05, below_detection, below_detection, below_detection, below_detection, 0.16, below_detection, below_detection, below_detection, below_detection, 0.04, 100.09]
