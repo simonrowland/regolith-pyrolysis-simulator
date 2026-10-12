@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 import os
 import resource
 import time
@@ -242,6 +243,30 @@ def test_classify_out_of_domain_and_no_liquid() -> None:
     )
     assert status == "refusal"
     assert reason == "no_liquid"
+
+
+@pytest.mark.parametrize(
+    ("liquid_fraction", "expected"),
+    [
+        (0.0, ("refusal", "no_liquid")),
+        (-0.25, ("refusal", "no_liquid")),
+        (1.0e-15, ("ok", None)),
+        (1.1, ("ok", None)),
+        (math.nan, ("ok", None)),
+    ],
+)
+def test_classify_legacy_no_liquid_boundary_values(liquid_fraction, expected):
+    result = SimpleNamespace(
+        status="ok",
+        diagnostics={},
+        warnings=[],
+        liquid_fraction=liquid_fraction,
+        phase_assemblage_available=True,
+    )
+
+    status, reason, _ = classify_equilibrate_outcome(result)
+
+    assert (status, reason) == expected
 
 
 def test_classify_composition_projected_is_typed_refusal() -> None:
