@@ -24,7 +24,68 @@ from simulator.battery.migrate import (
     wt_pct_to_mole_fraction,
 )
 from simulator.battery.records import Located, State, Value, ValueKind, as_decimal
-from tests.battery.test_migrate import FIXTURE_EXTRACT, _write_min_tree
+from tests.battery.test_migrate import (
+    FIXTURE_EXTRACT,
+    _migrate_real_extract,
+    _write_min_tree,
+)
+
+
+def test_wrapped_equipment_sample_and_composition_match_bare_form(
+    tmp_path: Path,
+) -> None:
+    bare = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = bare["species"]["Na"]["observations"][0]
+    locator = {"page": 2, "section": "Sample preparation"}
+    composition_locator = {"page": 2, "table": "I"}
+    row["equipment"] = {
+        "sample": {
+            "mass_kg": {"value": 0.003, "locator": locator},
+            "form": "powder",
+            "container": "alumina crucible",
+            "locator": locator,
+        },
+        "starting_glass_wt_pct": {
+            "SiO2": 50.0,
+            "MgO": 50.0,
+            "locator": composition_locator,
+        },
+    }
+    wrapped = yaml.safe_load(yaml.safe_dump(bare))
+    equipment = wrapped["species"]["Na"]["observations"][0]["equipment"]
+    sample = equipment["sample"]
+    equipment["sample"] = {
+        "value": {k: v for k, v in sample.items() if k != "locator"},
+        "locator": sample["locator"],
+    }
+    composition = equipment["starting_glass_wt_pct"]
+    equipment["starting_glass_wt_pct"] = {
+        "value": {k: v for k, v in composition.items() if k != "locator"},
+        "locator": composition["locator"],
+    }
+
+    bare_result = migrate(_write_min_tree(tmp_path / "bare", bare), write=False)
+    wrapped_result = migrate(_write_min_tree(tmp_path / "wrapped", wrapped), write=False)
+    assert {
+        key: to_plain(value) for key, value in bare_result.experiments.items()
+    } == {key: to_plain(value) for key, value in wrapped_result.experiments.items()}
+    assert {
+        key: to_plain(value) for key, value in bare_result.observations.items()
+    } == {key: to_plain(value) for key, value in wrapped_result.observations.items()}
+
+
+def test_wrapped_bischof_sample_container_reaches_every_run(tmp_path: Path) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-137-bischof-2023.yaml")
+    runs = {
+        key: experiment
+        for key, experiment in result.experiments.items()
+        if key.endswith(("::an-di-1-low", "::an-di-2-low", "::an-di-3-high", "::an-di-series"))
+    }
+    assert len(result.observations) == 164
+    assert len(runs) == 4
+    for experiment in runs.values():
+        assert experiment.sample.container is not None
+        assert experiment.sample.container.state.value == "iridium Knudsen cell (crucible and lid)"
 
 
 def test_equal_pressure_duplicates_keep_printed_approximation() -> None:
