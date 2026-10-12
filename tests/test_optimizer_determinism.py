@@ -431,37 +431,81 @@ def test_thread_env_vars_have_one_production_literal_owner() -> None:
     from simulator import _blas_policy
     from simulator.optimize import determinism
 
-    expected = (
-        "OMP_NUM_THREADS",
-        "OPENBLAS_NUM_THREADS",
-        "MKL_NUM_THREADS",
-        "NUMEXPR_NUM_THREADS",
-        "VECLIB_MAXIMUM_THREADS",
-    )
     assert determinism.THREAD_ENV_VARS is _blas_policy.THREAD_ENV_VARS
 
     root = Path(__file__).resolve().parents[1]
     production_files = [
         *root.glob("*.py"),
-        *(path for directory in ("simulator", "engines", "scripts")
+        *(path for directory in ("simulator", "engines", "scripts", "tools", "web", "benchmarks")
           for path in (root / directory).rglob("*.py")),
     ]
+    thread_names = set(_blas_policy.THREAD_ENV_VARS)
     literals = []
     for path in sorted(production_files):
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        parents = {
+            child: parent
+            for parent in ast.walk(tree)
+            for child in ast.iter_child_nodes(parent)
+        }
+        assignments = {}
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Assign) and isinstance(node.value, (ast.Tuple, ast.List)):
+                assignments.update(
+                    (node.value, target.id)
+                    for target in node.targets
+                    if isinstance(target, ast.Name)
+                )
+            elif isinstance(node, ast.AnnAssign) and isinstance(node.value, (ast.Tuple, ast.List)):
+                if isinstance(node.target, ast.Name):
+                    assignments[node.value] = node.target.id
+        owner_containers = {
+            node
+            for node, name in assignments.items()
+            if path == root / "simulator" / "_blas_policy.py"
+            and name in {"THREAD_ENV_VARS", "_RUNTIME_CONTROLS"}
+        }
         for node in ast.walk(tree):
             if not isinstance(node, (ast.Tuple, ast.List)):
+                continue
+            parent = parents.get(node)
+            while parent is not None:
+                if parent in owner_containers:
+                    break
+                parent = parents.get(parent)
+            else:
+                parent = None
+            if parent is not None:
                 continue
             try:
                 value = ast.literal_eval(node)
             except (ValueError, TypeError):
                 continue
-            if isinstance(value, (tuple, list)) and any(
-                isinstance(item, str) and item in expected for item in value
-            ):
-                literals.append((path.relative_to(root).as_posix(), node.lineno, tuple(value)))
+            flattened = set()
+            stack = [value]
+            while stack:
+                item = stack.pop()
+                if isinstance(item, (tuple, list)):
+                    stack.extend(item)
+                elif isinstance(item, str) and item in thread_names:
+                    flattened.add(item)
+            if flattened:
+                literals.append(
+                    (path.relative_to(root).as_posix(), assignments.get(node), flattened)
+                )
 
-    assert literals == [("simulator/_blas_policy.py", 3, expected)]
+    assert sorted(literals) == [
+        (
+            "simulator/_blas_policy.py",
+            "THREAD_ENV_VARS",
+            thread_names,
+        ),
+        (
+            "simulator/_blas_policy.py",
+            "_RUNTIME_CONTROLS",
+            thread_names,
+        ),
+    ]
 
 
 def test_pin_seeds_is_deterministic() -> None:
