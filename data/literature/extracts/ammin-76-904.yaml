@@ -195,7 +195,7 @@ species:
           more_accurate_combined_uncertainty_J_per_mol_K: 20
         note: The 312 +/- 10 J/mol K fit is author-derived, not a direct measurement; 334 +/- 7 J/mol K combines this study with Stebbins et al. (1983) and Richet & Bottinga (1984).
       - observation_id: ammin_76_904_quoted_comparator_enthalpy_values
-        type: quoted_comparator
+        type: phase_transition
         locator:
           source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
           published_page: 909
@@ -206,14 +206,54 @@ species:
         units: as_published
         values:
           method_class: quoted_attributed
+          evidence_class: quoted_attributed
           attribution: 'Stebbins et al. (1983); Richet and Bottinga (1984); Ferrier (1968); Stebbins et al. (1984); Adamkovicova et al. (1980)'
           cited_values:
-            - {source: Stebbins et al. (1983), quantity: enthalpy_of_fusion, value_kJ_per_mol: 138.1}
-            - {source: Richet and Bottinga (1984), quantity: enthalpy_of_fusion, value_kJ_per_mol: 137.7}
-            - {source: Ferrier (1968), quantity: enthalpy_of_fusion, value_kJ_per_mol: 128}
-            - {source: Richet and Bottinga (1984), quantity: liquid_heat_capacity, value_J_per_mol_K: 334}
-            - {source: Stebbins et al. (1984), quantity: liquid_heat_capacity, value_J_per_mol_K: 353}
-            - {source: Adamkovicova et al. (1980), quantity: wollastonite_enthalpy_of_fusion, value_kJ_per_mol: 57.3, temperature_K: 1821}
+            - source: Stebbins et al. (1983)
+              quantity: enthalpy_of_fusion
+              value_kJ_per_mol: 138.1
+              reference_as_printed: >-
+                Stebbins, J.F., Carmichael, I.S.E., and Weill, D.E. (1983) The high
+                temperature liquid and glass heat contents and the heats of fusion
+                of diopside, albite, sanidine and nepheline. American Mineralogist,
+                68, 717–730.
+            - source: Richet and Bottinga (1984)
+              quantity: enthalpy_of_fusion
+              value_kJ_per_mol: 137.7
+              reference_as_printed: >-
+                Richet, P., and Bottinga, Y. (1984) Anorthite, andesine, wollastonite,
+                diopside, cordierite and pyrope: Thermodynamics of melting, glass
+                transitions, and properties of the amorphous phases. Earth and
+                Planetary Science Letters, 67, 415–432.
+            - source: Ferrier (1968)
+              quantity: enthalpy_of_fusion
+              value_kJ_per_mol: 128
+              reference_as_printed: >-
+                Ferrier, A. (1968) Mesure de l'enthalpie du diopside synthétique entre
+                298 et 1885 K. Comptes Rendues Academie des Sciences de Paris, C,
+                267, 101–103.
+            - source: Richet and Bottinga (1984)
+              quantity: liquid_heat_capacity
+              value_J_per_mol_K: 334
+              reference_as_printed: >-
+                Richet, P., and Bottinga, Y. (1984) Anorthite, andesine, wollastonite,
+                diopside, cordierite and pyrope: Thermodynamics of melting, glass
+                transitions, and properties of the amorphous phases. Earth and
+                Planetary Science Letters, 67, 415–432.
+            - source: Stebbins et al. (1984)
+              quantity: liquid_heat_capacity
+              value_J_per_mol_K: 353
+              reference_as_printed: >-
+                Stebbins, J.F., Carmichael, I.S.E., and Moret, L.K. (1984) Heat
+                capacities and entropies of silicate liquids and glasses.
+                Contributions to Mineralogy and Petrology, 86, 131–148.
+            - source: Adamkovicova et al. (1980)
+              quantity: wollastonite_enthalpy_of_fusion
+              value_kJ_per_mol: 57.3
+              temperature_K: 1821
+              reference_as_printed: >-
+                Adamkovicova, K., Kosa, L., and Proks, I. (1980) The heat of fusion
+                of CaSiO3. Silikaty, 24, 193–201.
         note: Values are quoted or attributed by Lange et al.; they are not measurements made in this source.
     context:
       - observation_id: ammin_76_904_table1_diopside_composition
