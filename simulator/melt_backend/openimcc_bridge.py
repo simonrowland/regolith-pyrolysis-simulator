@@ -55,12 +55,16 @@ OPENIMCC_INSTALL_HINT = (
 )
 OPENIMCC_RECORDED_PIN = (
     "openimcc @ git+https://github.com/simonrowland/openimcc"
-    "@f037d0518f47b136b9e4d33bb1ad60aea3c6cc6a"
+    "@1f3c82d885bfd2906fed285752b188eaf5ded6e7"
 )
+DEFAULT_BACKEND_PACK_NAME = "default"
 
 _PACK_RESOURCE_NAMES = {
-    "v1.0.2": None,
-    "ext-v4": "imcc-sf04-ext-v4.json",
+    "default": None,
+    "published-core": "imcc-sf04-v1.0.2.json",
+    "published-ext": "imcc-sf04-ext-v4.json",
+    "d066-ext": "imcc-sf04-d066-ext-v1.json",
+    "d066-kca-sensitivity": "imcc-sf04-d066-v1-kcaalsi2o7.json",
 }
 
 OPENIMCC_PARENT_OXIDES = (
@@ -558,7 +562,7 @@ def evaluate_cleaned_melt(
     bridge = evaluate(
         composition_mol=cleaned_composition_mol,
         temperature_K=temperature_K,
-        pack="v1.0.2",
+        pack=DEFAULT_BACKEND_PACK_NAME,
         allow_extrapolation=allow_extrapolation,
         allow_out_of_envelope=False,
     )
@@ -610,6 +614,13 @@ def evaluate_cleaned_melt(
 
 @lru_cache(maxsize=2)
 def _load_pack(pack_name: str) -> Any:
+    """Load the packaged default or a named pack variant.
+
+    ``published-core`` and ``published-ext`` select published reproductions;
+    ``d066-ext`` and ``d066-kca-sensitivity`` select D066 variants. ``default``
+    always delegates to openimcc's packaged default.
+    """
+
     package = _require_openimcc()
     if pack_name not in _PACK_RESOURCE_NAMES:
         allowed = ", ".join(sorted(_PACK_RESOURCE_NAMES))
@@ -658,7 +669,7 @@ def evaluate(
     temperature_K: float | None = None,
     *,
     composition_kg: Mapping[str, float] | None = None,
-    pack: str = "v1.0.2",
+    pack: str = "default",
     allow_extrapolation: bool = False,
     allow_out_of_envelope: bool = False,
 ) -> OpenImccBridgeResult:
@@ -670,9 +681,11 @@ def evaluate(
     both are supplied, the molar composition takes precedence, matching the
     simulator MeltBackend adapter.
 
-    ``pack`` accepts ``"v1.0.2"`` or ``"ext-v4"``.  The two extrapolation
-    switches are explicit and default to refusal.  Positive ``Fe2O3`` remains
-    an openimcc typed refusal because the IMCC adapter requires the caller's
+    ``pack`` accepts ``"default"``, ``"published-core"``, ``"published-ext"``,
+    ``"d066-ext"`` or ``"d066-kca-sensitivity"``. The default resolves to
+    openimcc's packaged default. The two extrapolation switches are explicit
+    and default to refusal. Positive ``Fe2O3`` remains an openimcc typed refusal
+    because the IMCC adapter requires the caller's
     redox model to convert it to the FeO-equivalent convention first.
     """
 
@@ -695,7 +708,7 @@ def evaluate(
         float(temperature_K),
         loaded_pack,
         basis_type=basis_type,
-        enable_sp_extension=pack == "ext-v4",
+        enable_sp_extension=pack in {"published-ext", "d066-ext"},
         allow_extrapolation=allow_extrapolation,
         allow_out_of_envelope=allow_out_of_envelope,
     )
@@ -797,7 +810,7 @@ class OpenImccMeltBackend(MeltBackend):
         self._pack = None
         self._last_error = None
         try:
-            self._pack = _load_pack("v1.0.2")
+            self._pack = _load_pack(DEFAULT_BACKEND_PACK_NAME)
         except OpenImccUnavailableError as exc:
             self._last_error = str(exc)
             return False
@@ -859,7 +872,7 @@ class OpenImccMeltBackend(MeltBackend):
                 composition_mol=composition_mol,
                 composition_kg=None if composition_mol else composition_kg,
                 temperature_K=float(temperature_C) + 273.15,
-                pack="v1.0.2",
+                pack=DEFAULT_BACKEND_PACK_NAME,
             )
         except ImccNonconvergenceError as exc:
             return EquilibriumResult(

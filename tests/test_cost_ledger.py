@@ -593,7 +593,9 @@ def test_cost_rollup_empty_electrical_breakdown_mapping_means_zero():
     assert fe.thermal_flux_h == pytest.approx(1273.15)
 
 
-def test_cost_rollup_metadata_is_golden_neutral_for_runner_fixture():
+def test_cost_rollup_metadata_is_golden_neutral_for_runner_fixture(
+    isolated_engine_config,
+):
     # Fixture regenerated 2026-08-02 under REPAIRED MAGEMin config per the
     # train13 adjudication; prior value was generated against the
     # broken-liquidus job tree. docs-private/research/2026-08-02-train13-adjudication.md
