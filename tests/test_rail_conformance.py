@@ -717,285 +717,11 @@ def test_harness_ledgers_are_not_simulation_runtime_inputs() -> None:
             entry_modules[module] = relpath
     project_modules = set(files)
 
-    # These are the only external package roots used by current static import
-    # declarations: upstream VapoRock metadata and its retained legacy probe.
+    # These are the only external package roots used as computed import targets.
     external_package_names = {"vaporock", "thermoengine", "VapoRock"}
 
-    def resolve_literal_targets(
-        module: str, variable: str, *, mapping: bool
-    ) -> tuple[str, ...]:
-        """Resolve one literal map or candidate sequence without importing it."""
-        relpath, source_text = files[module]
-        tree = ast.parse(source_text, filename=relpath)
-        assignments = [
-            node
-            for node in ast.walk(tree)
-            if (
-                isinstance(node, ast.Assign)
-                and any(
-                    isinstance(target, ast.Name) and target.id == variable
-                    for target in node.targets
-                )
-            )
-            or (
-                isinstance(node, ast.AnnAssign)
-                and isinstance(node.target, ast.Name)
-                and node.target.id == variable
-            )
-        ]
-        assert len(assignments) == 1, (
-            f"{relpath}:{variable} must have exactly one literal assignment; "
-            f"found {len(assignments)}"
-        )
-        value_node = assignments[0].value
-        try:
-            if mapping:
-                assert isinstance(value_node, ast.Dict), (
-                    f"{relpath}:{variable} must be a direct literal mapping, "
-                    f"found {ast.unparse(value_node)}"
-                )
-                assert all(
-                    isinstance(key, ast.Name)
-                    or (
-                        isinstance(key, ast.Constant)
-                        and isinstance(key.value, str)
-                    )
-                    for key in value_node.keys
-                ), f"{relpath}:{variable} has a non-literal mapping key"
-                value = [ast.literal_eval(item) for item in value_node.values]
-            else:
-                value = ast.literal_eval(value_node)
-        except (ValueError, TypeError) as exc:
-            raise AssertionError(
-                f"{relpath}:{variable} must be a pure literal; "
-                f"could not resolve {ast.unparse(value_node)}"
-            ) from exc
-
-        if mapping:
-            values = value
-        else:
-            assert isinstance(value, (tuple, list)), (
-                f"{relpath}:{variable} must be a literal tuple or list, "
-                f"found {type(value).__name__}"
-            )
-            values = (value,)
-
-        targets: list[str] = []
-
-        def collect(item: object) -> None:
-            if isinstance(item, str):
-                targets.append(item)
-            elif isinstance(item, (tuple, list)):
-                for child in item:
-                    collect(child)
-            else:
-                raise AssertionError(
-                    f"{relpath}:{variable} contains non-string target "
-                    f"{item!r} ({type(item).__name__})"
-                )
-
-        for item in values:
-            collect(item)
-        assert targets, f"{relpath}:{variable} must contain at least one target"
-        return tuple(targets)
-
-    literal_maps = {
-        "simulator.optimize.__init__._LAZY_EXPORTS": resolve_literal_targets(
-            "simulator.optimize", "_LAZY_EXPORTS", mapping=True
-        ),
-        "simulator.optimize.strategy.__init__._LAZY_EXPORTS": resolve_literal_targets(
-            "simulator.optimize.strategy", "_LAZY_EXPORTS", mapping=True
-        ),
-        "simulator.optimize.evaluate._VAPOR_PRESSURE_PROVIDER_SOURCE_MODULES": resolve_literal_targets(
-            "simulator.optimize.evaluate",
-            "_VAPOR_PRESSURE_PROVIDER_SOURCE_MODULES",
-            mapping=True,
-        ),
-    }
-
-    mapped_project_roots: set[str] = set()
-    for source, targets in literal_maps.items():
-        for target in targets:
-            package_name = target.partition(".")[0]
-            assert target != "simulator.battery" and not target.startswith(
-                "simulator.battery."
-            ), f"{source} targets forbidden battery module {target!r}"
-            assert target in project_modules or package_name in external_package_names, (
-                f"{source} has unknown import target {target!r}; expected a project "
-                "module or an explicitly listed external package"
-            )
-            if target in project_modules:
-                mapped_project_roots.add(target)
-
-    vaporock_candidate_targets = resolve_literal_targets(
-        "simulator.melt_backend.vaporock", "_IMPORT_CANDIDATES", mapping=False
-    )
-    assert vaporock_candidate_targets == ("vaporock", "VapoRock"), (
-        "simulator/melt_backend/vaporock.py:_IMPORT_CANDIDATES changed: "
-        f"{vaporock_candidate_targets}"
-    )
-    for target in vaporock_candidate_targets:
-        assert target not in project_modules, (
-            "VapoRock import candidate must remain external, found project module "
-            f"{target!r}"
-        )
-        assert target.partition(".")[0] in external_package_names, (
-            f"VapoRock import candidate is not an allowed external package: {target!r}"
-        )
-
-    def assert_computed_import_source(
-        module: str,
-        function_name: str,
-        argument_name: str,
-        source_name: str,
-        *,
-        owner_name: str | None = None,
-        source_kind: str,
-    ) -> None:
-        """Bind one counted import call to its literal source declaration."""
-        relpath, source_text = files[module]
-        tree = ast.parse(source_text, filename=relpath)
-        function_nodes = [
-            node
-            for node in ast.walk(tree)
-            if isinstance(node, ast.ClassDef)
-            and owner_name is not None
-            and node.name == owner_name
-        ]
-        functions = [
-            child
-            for node in (function_nodes if owner_name else ast.walk(tree))
-            for child in (node.body if isinstance(node, ast.ClassDef) else [node])
-            if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef))
-            and child.name == function_name
-        ]
-        context = f"{relpath}:{owner_name + '.' if owner_name else ''}{function_name}"
-        assert len(functions) == 1, f"{context} must resolve to one function"
-        function = functions[0]
-        calls = [
-            node
-            for node in ast.walk(function)
-            if isinstance(node, ast.Call)
-            and (
-                isinstance(node.func, ast.Name) and node.func.id == "import_module"
-                or isinstance(node.func, ast.Attribute) and node.func.attr == "import_module"
-            )
-        ]
-        assert len(calls) == 1, (
-            f"{context} must contain exactly one import_module call; found {len(calls)}"
-        )
-        call = calls[0]
-        assert (
-            len(call.args) == 1
-            and not call.keywords
-            and isinstance(call.args[0], ast.Name)
-            and call.args[0].id == argument_name
-        ), (
-            f"{context} import_module argument must be the bound name "
-            f"{argument_name!r}; found {ast.unparse(call)}"
-        )
-        stores = [
-            node
-            for node in ast.walk(function)
-            if isinstance(node, ast.Name)
-            and node.id == argument_name
-            and isinstance(node.ctx, ast.Store)
-        ]
-        assert len(stores) == 1, (
-            f"{context} must bind {argument_name!r} exactly once; found {len(stores)} stores"
-        )
-        if source_kind == "map_lookup":
-            bindings = [
-                node
-                for node in ast.walk(function)
-                if isinstance(node, ast.Assign)
-                and any(
-                    isinstance(target, ast.Name) and target.id == argument_name
-                    for target in node.targets
-                )
-                and isinstance(node.value, ast.Subscript)
-                and isinstance(node.value.value, ast.Name)
-                and node.value.value.id == source_name
-            ]
-            assert len(bindings) == 1, f"{context} must bind its import name from {source_name}"
-            return
-
-        loops = [
-            node
-            for node in ast.walk(function)
-            if isinstance(node, ast.For)
-            and argument_name in (
-                [node.target.id]
-                if isinstance(node.target, ast.Name)
-                else [
-                    item.id for item in node.target.elts if isinstance(item, ast.Name)
-                ]
-                if isinstance(node.target, (ast.Tuple, ast.List))
-                else []
-            )
-        ]
-        assert len(loops) == 1, f"{context} must bind its import name in one {source_name} loop"
-        iterator = loops[0].iter
-        if source_kind == "registry_loop":
-            bound_source = (
-                isinstance(iterator, ast.Attribute)
-                and iterator.attr == source_name
-                and isinstance(iterator.value, ast.Name)
-                and iterator.value.id == "self"
-                and isinstance(loops[0].target, ast.Tuple)
-                and isinstance(loops[0].target.elts[0], ast.Name)
-                and loops[0].target.elts[0].id == argument_name
-            )
-        elif source_kind == "map_loop":
-            bound_source = (
-                isinstance(iterator, ast.Call)
-                and isinstance(iterator.func, ast.Attribute)
-                and iterator.func.attr == "get"
-                and isinstance(iterator.func.value, ast.Name)
-                and iterator.func.value.id == source_name
-            )
-        else:
-            bound_source = isinstance(iterator, ast.Name) and iterator.id == source_name
-        assert bound_source, f"{context} loop must use {source_name}; found {ast.unparse(iterator)}"
-
-    for module, function_name in (
-        ("simulator.optimize", "__getattr__"),
-        ("simulator.optimize.strategy", "__getattr__"),
-    ):
-        assert_computed_import_source(
-            module,
-            function_name,
-            "module_name",
-            "_LAZY_EXPORTS",
-            source_kind="map_lookup",
-        )
-    assert_computed_import_source(
-        "simulator.optimize.evaluate",
-        "_vapor_pressure_provider_code_fingerprint",
-        "module_name",
-        "_VAPOR_PRESSURE_PROVIDER_SOURCE_MODULES",
-        source_kind="map_loop",
-    )
-    assert_computed_import_source(
-        "simulator.core",
-        "_build_chemistry_kernel",
-        "module_path",
-        "_BUILTIN_PROVIDER_REGISTRATIONS",
-        owner_name="PyrolysisSimulator",
-        source_kind="registry_loop",
-    )
-    for function_name, owner_name in (
-        ("_bootstrap_vaporock_worker", None),
-        ("_import_vaporock", "VapoRockBackend"),
-    ):
-        assert_computed_import_source(
-            "simulator.melt_backend.vaporock",
-            function_name,
-            "module_name",
-            "_IMPORT_CANDIDATES",
-            owner_name=owner_name,
-            source_kind="candidate_loop",
-        )
+    def is_battery_module(name: str) -> bool:
+        return name == "simulator.battery" or name.startswith("simulator.battery.")
 
     closure: set[str] = set()
     parents: dict[str, tuple[str, int]] = {}
@@ -1005,7 +731,7 @@ def test_harness_ledgers_are_not_simulation_runtime_inputs() -> None:
     engine_roots = sorted(
         module for module in files if module == "engines" or module.startswith("engines.")
     )
-    pending = [*entry_modules, *engine_roots, *mapped_project_roots]
+    pending = [*entry_modules, *engine_roots]
     dynamic_sites: dict[str, int] = {}
     while pending:
         source = pending.pop()
@@ -1033,45 +759,7 @@ def test_harness_ledgers_are_not_simulation_runtime_inputs() -> None:
             if target not in closure:
                 pending.append(target)
 
-    assert mapped_project_roots <= closure, (
-        "literal project-module targets are missing from import closure: "
-        f"{sorted(mapped_project_roots - closure)}"
-    )
-
-    # This table-driven loader is the one known computed dynamic import in the
-    # runtime closure. Its module names are literals and must stay outside the
-    # battery subtree; any other computed site is an unreviewed import edge.
-    core_tree = ast.parse(files["simulator.core"][1], filename=files["simulator.core"][0])
-    registration_rows = next(
-        node.value
-        for node in ast.walk(core_tree)
-        if isinstance(node, ast.AnnAssign)
-        and isinstance(node.target, ast.Name)
-        and node.target.id == "_BUILTIN_PROVIDER_REGISTRATIONS"
-    )
-    engine_module_paths = [
-        row.elts[0].value
-        for row in registration_rows.elts
-        if isinstance(row, ast.Tuple)
-        and row.elts
-        and isinstance(row.elts[0], ast.Constant)
-        and isinstance(row.elts[0].value, str)
-    ]
-    assert len(engine_module_paths) == len(registration_rows.elts)
-    assert all(
-        module in project_modules
-        and module != "simulator.battery"
-        and not module.startswith("simulator.battery.")
-        for module in engine_module_paths
-    ), f"builtin engine registration has invalid module paths: {engine_module_paths}"
-    assert set(engine_module_paths) <= closure, (
-        "registered builtin engine modules are missing from import closure: "
-        f"{sorted(set(engine_module_paths) - closure)}"
-    )
-    # Existing computed sites: the core table is validated above; VapoRock
-    # probes external package candidates; optimize's lazy exports and provider
-    # fingerprint import through reviewed module-name maps. Keep counts exact
-    # so a new call in an existing function also requires review.
+    # The site counts make any new computed import an explicit review point.
     allowed_dynamic_sites = {
         "simulator/core.py:PyrolysisSimulator._build_chemistry_kernel": 1,
         "simulator/melt_backend/vaporock.py:_bootstrap_vaporock_worker": 1,
@@ -1085,20 +773,15 @@ def test_harness_ledgers_are_not_simulation_runtime_inputs() -> None:
     # simulator/melt_backend/pure_phase_janaf_score.py
     # simulator/diagnostic_helpers/gibbs_battery.py
     # simulator/diagnostic_helpers/binary_pot_battery.py
-    vaporock_candidate_sites = {
-        "simulator/melt_backend/vaporock.py:_bootstrap_vaporock_worker",
-        "simulator/melt_backend/vaporock.py:VapoRockBackend._import_vaporock",
-    }
-    assert vaporock_candidate_sites <= allowed_dynamic_sites.keys()
     assert dynamic_sites == allowed_dynamic_sites, (
         "computed dynamic-import sites changed in simulation closure: "
-        f"found={dynamic_sites}, allowed={allowed_dynamic_sites}"
+        f"found={dynamic_sites}, allowed={allowed_dynamic_sites}; a new legitimate "
+        "computed site must be added to the runtime driver after review, never by "
+        "relaxing the guard"
     )
 
     battery_reachable = sorted(
-        module
-        for module in closure
-        if module == "simulator.battery" or module.startswith("simulator.battery.")
+        module for module in closure if is_battery_module(module)
     )
     chains = {}
     for target in battery_reachable:
@@ -1112,8 +795,275 @@ def test_harness_ledgers_are_not_simulation_runtime_inputs() -> None:
             current = parent
         chains[target] = list(reversed(chain))
     assert not battery_reachable, (
-        "simulation entry import closure reaches simulator.battery; "
-        f"entries={entry_modules}, chains={chains}"
+        "static simulation entry/engine import closure reaches a battery module; "
+        f"entries={entry_modules}, module_sources={chains}; remove the battery "
+        "dependency from the simulation run path"
+    )
+
+    probe = r'''import builtins
+import importlib
+import importlib.abc
+import importlib.util
+import json
+import os
+import sys
+
+requested = []
+site_requests = {}
+active_site = None
+project_modules = set(json.loads(os.environ["RAIL_PROJECT_MODULES"]))
+external_package_names = set(json.loads(os.environ["RAIL_EXTERNAL_PACKAGE_NAMES"]))
+optional_packages = external_package_names | {"optuna"}
+
+class BlockOptionalPackages(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        root = fullname.partition(".")[0]
+        if root in optional_packages:
+            raise ModuleNotFoundError(f"No module named {root!r}", name=root)
+        return None
+
+sys.meta_path.insert(0, BlockOptionalPackages())
+real_import_module = importlib.import_module
+real_import = builtins.__import__
+
+def absolute_name(name, package=None, globals_=None, level=0):
+    if level:
+        package = (globals_ or {}).get("__package__") or (globals_ or {}).get("__name__")
+        return importlib.util.resolve_name("." * level + name, package)
+    if name.startswith("."):
+        return importlib.util.resolve_name(name, package)
+    return name
+
+def record_request(name, package, caller, globals_=None, level=0):
+    if active_site is None:
+        return
+    caller_name = (
+        caller.f_globals.get("__name__", "") + "." + caller.f_code.co_qualname
+    )
+    if caller_name != active_site:
+        return
+    absolute = absolute_name(name, package, globals_, level)
+    # The lazy exporters import this stdlib helper locally. It is not a
+    # computed target; record the module requested by the helper call below.
+    if absolute != "importlib":
+        requested.append({"site": active_site, "name": absolute})
+
+def tracked_import_module(name, package=None):
+    record_request(name, package, sys._getframe(1))
+    return real_import_module(name, package)
+
+def tracked_import(name, globals=None, locals=None, fromlist=(), level=0):
+    record_request(name, None, sys._getframe(1), globals, level)
+    return real_import(name, globals, locals, fromlist, level)
+
+# Install both hooks before importing any project module.
+importlib.import_module = tracked_import_module
+builtins.__import__ = tracked_import
+
+def drive(site, action):
+    global active_site
+    print("DRIVING " + site, file=sys.stderr, flush=True)
+    active_site = site
+    start = len(requested)
+    try:
+        action()
+    finally:
+        site_requests[site] = [row["name"] for row in requested[start:]]
+        active_site = None
+
+def drive_optimizer_exports():
+    package = real_import_module("simulator.optimize")
+    for name in tuple(package._LAZY_EXPORTS):
+        try:
+            getattr(package, name)
+        except AttributeError:
+            pass
+
+def drive_strategy_exports():
+    package = real_import_module("simulator.optimize.strategy")
+    for name in tuple(package._LAZY_EXPORTS):
+        try:
+            getattr(package, name)
+        except AttributeError:
+            pass
+
+fingerprint_driver = {}
+def drive_provider_fingerprints():
+    module = real_import_module("simulator.optimize.evaluate")
+    registered_ids = tuple(module._VAPOR_PRESSURE_PROVIDER_SOURCE_MODULES)
+    called_ids = []
+    for provider_id in registered_ids:
+        module._vapor_pressure_provider_code_fingerprint(provider_id)
+        called_ids.append(provider_id)
+    unregistered_id = "__rail_guard_unregistered_provider__"
+    while unregistered_id in module._VAPOR_PRESSURE_PROVIDER_SOURCE_MODULES:
+        unregistered_id += "_"
+    module._vapor_pressure_provider_code_fingerprint(unregistered_id)
+    fingerprint_driver.update({
+        "registered_ids": list(registered_ids),
+        "called_ids": called_ids,
+        "unregistered_id": unregistered_id,
+    })
+
+def drive_core_registrations():
+    from simulator.core import PyrolysisSimulator
+    simulator = PyrolysisSimulator(None, {}, {}, {})
+    try:
+        simulator._build_chemistry_kernel()
+    except AttributeError:
+        pass
+
+def tolerate_missing_vaporock(action, error_prefix):
+    try:
+        action()
+    except RuntimeError as exc:
+        if not str(exc).startswith(error_prefix):
+            raise
+
+def drive_vaporock_worker_bootstrap():
+    module = real_import_module("simulator.melt_backend.vaporock")
+    tolerate_missing_vaporock(
+        lambda: module._bootstrap_vaporock_worker("C", "Pa", False),
+        "VapoRock import failed in warm worker:",
+    )
+
+def drive_vaporock_backend_import():
+    module = real_import_module("simulator.melt_backend.vaporock")
+    backend = object.__new__(module.VapoRockBackend)
+    backend._import_vaporock()
+
+drive("simulator.optimize.strategy.__getattr__", drive_strategy_exports)
+drive("simulator.optimize.__getattr__", drive_optimizer_exports)
+drive(
+    "simulator.optimize.evaluate._vapor_pressure_provider_code_fingerprint",
+    drive_provider_fingerprints,
+)
+drive("simulator.core.PyrolysisSimulator._build_chemistry_kernel", drive_core_registrations)
+drive(
+    "simulator.melt_backend.vaporock._bootstrap_vaporock_worker",
+    drive_vaporock_worker_bootstrap,
+)
+drive(
+    "simulator.melt_backend.vaporock.VapoRockBackend._import_vaporock",
+    drive_vaporock_backend_import,
+)
+
+loaded_project_modules = sorted(
+    name for name in sys.modules if name in project_modules
+)
+print(json.dumps({
+    "requests": requested,
+    "site_requests": site_requests,
+    "loaded_project_modules": loaded_project_modules,
+    "fingerprint_driver": fingerprint_driver,
+}))
+'''
+    probe_env = os.environ.copy()
+    probe_env["PYTHONPATH"] = str(ROOT)
+    probe_env["RAIL_PROJECT_MODULES"] = json.dumps(sorted(project_modules))
+    probe_env["RAIL_EXTERNAL_PACKAGE_NAMES"] = json.dumps(
+        sorted(external_package_names)
+    )
+    try:
+        probe_result = subprocess.run(
+            [sys.executable, "-c", probe],
+            cwd=ROOT,
+            env=probe_env,
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=180,
+        )
+    except subprocess.TimeoutExpired as exc:
+        stderr = exc.stderr or ""
+        if isinstance(stderr, bytes):
+            stderr = stderr.decode("utf-8", errors="replace")
+        active = [
+            line.removeprefix("DRIVING ")
+            for line in stderr.splitlines()
+            if line.startswith("DRIVING ")
+        ]
+        site = active[-1] if active else "startup before any computed site"
+        pytest.fail(
+            f"runtime import probe timed out while driving {site}; remove the "
+            "battery dependency from the run path or review the driver"
+        )
+    stderr = probe_result.stderr
+    active = [
+        line.removeprefix("DRIVING ")
+        for line in stderr.splitlines()
+        if line.startswith("DRIVING ")
+    ]
+    active_site = active[-1] if active else "startup before any computed site"
+    assert probe_result.returncode == 0, (
+        f"runtime import probe failed while driving {active_site}; "
+        f"stdout={probe_result.stdout!r}, stderr={stderr!r}; remove the battery "
+        "dependency from the run path"
+    )
+    try:
+        runtime = json.loads(probe_result.stdout)
+    except json.JSONDecodeError as exc:
+        pytest.fail(
+            f"runtime import probe returned invalid JSON while driving {active_site}: "
+            f"{probe_result.stdout!r}; remove the battery dependency from the run path"
+        )
+
+    site_requests = runtime["site_requests"]
+    requests_by_site: dict[str, list[str]] = {
+        site: names for site, names in site_requests.items()
+    }
+    loaded_battery_modules = sorted(
+        module
+        for module in runtime["loaded_project_modules"]
+        if is_battery_module(module)
+    )
+    assert not loaded_battery_modules, (
+        "runtime probe loaded forbidden battery modules "
+        f"{loaded_battery_modules}; computed source requests={requests_by_site}; "
+        "remove the battery dependency from the run path"
+    )
+
+    expected_runtime_sites = {
+        "simulator.optimize.__getattr__",
+        "simulator.optimize.strategy.__getattr__",
+        "simulator.optimize.evaluate._vapor_pressure_provider_code_fingerprint",
+        "simulator.core.PyrolysisSimulator._build_chemistry_kernel",
+        "simulator.melt_backend.vaporock._bootstrap_vaporock_worker",
+        "simulator.melt_backend.vaporock.VapoRockBackend._import_vaporock",
+    }
+    assert set(site_requests) == expected_runtime_sites, (
+        "runtime driver site set changed; add a new legitimate computed site to "
+        f"the driver after review: found={sorted(site_requests)}, "
+        f"expected={sorted(expected_runtime_sites)}"
+    )
+    for site in sorted(expected_runtime_sites):
+        assert site_requests[site], (
+            f"{site} did not request an import through its real source; add any "
+            "new legitimate computed site to the driver after review"
+        )
+
+    requests = runtime["requests"]
+    for request in requests:
+        site = request["site"]
+        name = request["name"]
+        assert not is_battery_module(name), (
+            f"{site} requested forbidden module {name!r}; remove the battery "
+            "dependency from the run path"
+        )
+        assert name in project_modules or name.partition(".")[0] in external_package_names, (
+            f"{site} requested unknown module {name!r}; a new legitimate computed "
+            "site or target must be reviewed and added to the driver, never by "
+            "relaxing the guard"
+        )
+
+    fingerprint_driver = runtime["fingerprint_driver"]
+    assert fingerprint_driver["called_ids"] == fingerprint_driver["registered_ids"] and (
+        fingerprint_driver["unregistered_id"] not in fingerprint_driver["registered_ids"]
+    ), (
+        "simulator.optimize.evaluate._vapor_pressure_provider_code_fingerprint did "
+        "not drive every registered provider id plus an unregistered fallback; "
+        f"driver={fingerprint_driver}; add a new legitimate computed site to the "
+        "driver after review"
     )
 
 
