@@ -23,6 +23,15 @@ extraction:
 review_status: draft
 fidelity_samples:
 - species: Fe2O3
+  observable: rate_series
+  observation_id: suzuki_2026_hematite_abstract_oxygen_removed
+  field: mass_yield_percent
+  value: 3
+  locator:
+    pdf_page_index: 0
+    published_page: 'Article in Press; no printed page number'
+    section: Abstract
+- species: Fe2O3
   observable: mass_loss
   observation_id: suzuki_2026_hematite_mass_loss_1200C
   field: mass_loss_wt_pct
@@ -202,10 +211,10 @@ experiments:
           kind: point
           point: '5400'
       locator:
-        pdf_page_index: 7
+        pdf_page_index: 3
         published_page: 'Article in Press; no printed page number'
-        section: Vacuum heating experiment
-        note: Printed duration 1.5 h; converted to seconds for the thermal schedule.
+        section: Results
+        note: Printed duration 1.5 h; converted to seconds by 1.5 h × 3600 s/h = 5400 s.
 
 - experiment_id: fayalite-vacuum-heating-1500C
   bench_id: vacuum-heating-furnace
@@ -480,6 +489,30 @@ species:
       uncertainty:
         note: No uncertainty width or confidence level is stated for the 3.5 wt% result; Methods reports a 0.1% balance uncertainty without specifying its basis.
 
+    - observation_id: suzuki_2026_hematite_abstract_oxygen_removed
+      experiment: hematite-vacuum-heating-1200C
+      type: rate_series
+      locator:
+        pdf_page_index: 0
+        published_page: 'Article in Press; no printed page number'
+        section: Abstract
+      phase: condensed_solid
+      regime: vacuum_chamber_pyrolysis
+      units: oxygen mass per initial sample mass; percent as normalized by printed masses
+      values:
+        quantity: measured_oxygen_yield
+        method_class: measured_direct
+        gas_species: O
+        T_C: 1200
+        total_pressure_Pa: 0.00101325
+        total_pressure_as_printed: 10^-8 atm
+        mass_yield_percent: 3
+        oxygen_mass_g_as_printed: 0.03
+        initial_sample_mass_g_as_printed: 1
+        normalization_as_printed: '0.03 g O / 1 g initial hematite pellet = 3 mass percent.'
+      uncertainty:
+        note: No uncertainty width or confidence level is stated for the abstract oxygen result.
+
     context:
     - observation_id: suzuki_2026_hematite_oxygen_pressure_ratio
       experiment: hematite-vacuum-heating-1200C
@@ -493,19 +526,7 @@ species:
       values:
         printed_quantity: oxygen partial pressure with sample relative to blank
         printed_value: 50-100 times higher initially; gradually decreased to the value without sample
-        oxygen_yield_or_extraction_ratio: Not reported for this figure result; the abstract separately reports 0.03 g oxygen removed from a 1 g initial hematite pellet.
-    - observation_id: suzuki_2026_hematite_abstract_oxygen_removed
-      experiment: hematite-vacuum-heating-1200C
-      type: laboratory_conditions
-      locator:
-        pdf_page_index: 0
-        published_page: 'Article in Press; no printed page number'
-        section: Abstract
-      units: g O as printed
-      values:
-        printed_result: 0.03 g of oxygen was removed from a 1 g hematite pellet heated at 1200 °C under 10^-8 atm total pressure.
-        initial_sample_basis_as_printed: 1 g hematite pellet before the experiment
-        method_class: measured_direct
+        oxygen_yield_or_extraction_ratio: Not reported for this figure result.
 
   Fe2SiO4:
     observations:

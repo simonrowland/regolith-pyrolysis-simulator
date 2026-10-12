@@ -11,41 +11,44 @@ EXTRACT = (
     Path(__file__).resolve().parents[1]
     / "data/literature/extracts/suzuki-2026-vacuum-oxygen-extraction.yaml"
 )
-ABSTRACT_RESULT = (
-    "0.03 g of oxygen was removed from a 1 g hematite pellet heated at 1200 °C "
-    "under 10^-8 atm total pressure."
-)
 
 
-def _assert_abstract_oxygen_context(doc: dict) -> None:
+def _assert_abstract_oxygen_observation(doc: dict) -> None:
     rows = [
         row
-        for row in doc["species"]["Fe2O3"]["context"]
+        for row in doc["species"]["Fe2O3"]["observations"]
         if row["observation_id"] == "suzuki_2026_hematite_abstract_oxygen_removed"
     ]
     assert len(rows) == 1
     row = rows[0]
     assert row["locator"]["pdf_page_index"] == 0
-    assert row["values"]["printed_result"] == ABSTRACT_RESULT
-    assert row["values"]["initial_sample_basis_as_printed"] == (
-        "1 g hematite pellet before the experiment"
+    assert row["type"] == "rate_series"
+    assert row["values"]["quantity"] == "measured_oxygen_yield"
+    assert row["values"]["oxygen_mass_g_as_printed"] == 0.03
+    assert row["values"]["initial_sample_mass_g_as_printed"] == 1
+    assert row["values"]["mass_yield_percent"] == 3
+    assert row["values"]["normalization_as_printed"] == (
+        "0.03 g O / 1 g initial hematite pellet = 3 mass percent."
     )
+    assert row["values"]["T_C"] == 1200
+    assert row["values"]["total_pressure_Pa"] == 0.00101325
+    assert row["values"]["total_pressure_as_printed"] == "10^-8 atm"
     assert row["values"]["method_class"] == "measured_direct"
 
 
-def test_suzuki_2026_abstract_oxygen_context_is_pinned_and_mutation_fails() -> None:
+def test_suzuki_2026_abstract_oxygen_observation_is_pinned_and_mutation_fails() -> None:
     doc = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
-    _assert_abstract_oxygen_context(doc)
+    _assert_abstract_oxygen_observation(doc)
 
     mutated = deepcopy(doc)
     row = next(
         row
-        for row in mutated["species"]["Fe2O3"]["context"]
+        for row in mutated["species"]["Fe2O3"]["observations"]
         if row["observation_id"] == "suzuki_2026_hematite_abstract_oxygen_removed"
     )
-    row["values"]["printed_result"] = ABSTRACT_RESULT.replace("0.03 g", "0.04 g")
+    row["values"]["oxygen_mass_g_as_printed"] = 0.04
     with pytest.raises(AssertionError):
-        _assert_abstract_oxygen_context(mutated)
+        _assert_abstract_oxygen_observation(mutated)
 
 
 def test_suzuki_2026_emf_pressure_range_is_measured_context() -> None:
