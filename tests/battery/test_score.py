@@ -6553,6 +6553,104 @@ def test_unknown_cao_polymorph_converts_via_unique_janaf_solid_table(
     assert "source polymorph is unknown" in notice.reason
 
 
+def test_stated_silica_polymorph_is_not_reinferred() -> None:
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="SiO2",
+            T_K=Decimal("1823"),
+            endmember_phase=Phase.CR,
+            component_basis="SiO2",
+        ),
+        "quartz",
+    )
+    reference = F.observation(
+        "silica-stated-quartz-reference",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-stated-silica-polymorph",
+    )
+
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+    )
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert residual.refusal.detail["reason"] == (
+        "solid_liquid_reference_conversion_missing_input"
+    )
+    assert residual.refusal.detail["notice"] == (
+        "fusion conversion missing input: JANAF solid table O-035 represents "
+        "polymorph cristobalite_high, but measured reference polymorph is quartz"
+    )
+
+
+def test_solid_reference_without_temperature_remains_a_missing_input_refusal() -> None:
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="SiO2",
+            T_K=Decimal("1823"),
+            endmember_phase=Phase.CR,
+            component_basis="SiO2",
+        ),
+        None,
+    )
+    identity = replace(identity, temperature_K=State.unknown("source omits T"))
+    reference = F.observation(
+        "silica-solid-reference-without-temperature",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-missing-solid-reference-temperature",
+    )
+
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+    )
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert residual.refusal.detail["missing_input"] == (
+        "activity observation temperature_K"
+    )
+    assert residual.refusal.detail["notice"] == (
+        "fusion conversion missing input: activity observation has no temperature_K"
+    )
+
+
+def test_kume_2000_silica_row_has_the_current_polymorph_refusal() -> None:
+    context = load_score_context(sources=("kume-2000-cao-activities",))
+    reference = context.observations[
+        "kume-2000-cao-activities::kume_2000_table1_sample_1_sio2_activity"
+    ]
+
+    residual, _candidate = compile_residual(
+        reference, Engine.OPENIMCC, context=context
+    )
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert residual.refusal.detail["reason"] == (
+        "solid_liquid_reference_conversion_missing_input"
+    )
+    assert residual.refusal.detail["notice"] == (
+        "fusion conversion missing input: JANAF solid table O-035 represents "
+        "polymorph cristobalite_high, but measured reference polymorph is unknown"
+    )
+
+
 def test_unknown_polymorph_with_multiple_eligible_solid_tables_still_refuses() -> None:
     from simulator.battery.score import _fusion_comparison_reference
 
