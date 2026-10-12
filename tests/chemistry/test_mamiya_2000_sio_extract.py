@@ -26,7 +26,7 @@ def test_mamiya_context_numbers_match_the_transcription() -> None:
     assert fit["fitted_parameter_as_printed"] == "E* = 82.2 kJ mol-1"
 
     times = rows["mamiya_2000_fig3_8_cristobalite_reaction_times"]["points"]
-    # These points cannot yet be reached by the production fidelity check (t-1222).
+    # Whole-list structured fidelity samples (field: points) also pin these points in the production check.
     assert [(point["T_C"], point["time_hr"]) for point in times] == [
         (1000, 20),
         (1100, 20),
