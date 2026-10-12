@@ -2587,7 +2587,7 @@ def assess_qualification_gate(
     sio2 = float(composition_wt_pct.get("SiO2", 0.0) or 0.0)
     crash_floor = float(band["sio2_crash_floor_wt_pct"])
     below_crash_floor = sio2 < crash_floor
-    if below_crash_floor and "silicate_network_band" not in failed:
+    if below_crash_floor and not assessment.outside_certified_band:
         # 30–34 wt% sliver: default band admits it; crash floor does not.
         warnings.append(
             f"SiO2 = {sio2:.3f} wt% is below the measured alphaMELTS "

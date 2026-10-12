@@ -858,12 +858,18 @@ class AlphaMeltsEngine:
             composition_wt_pct,
             silicate_network_band=self.silicate_network_band,
         )
+        outside_certified_band = assessment.outside_certified_band
+        status = (
+            "out_of_domain"
+            if not assessment.valid or outside_certified_band
+            else "ok"
+        )
         return EngineResult(
-            status="ok" if assessment.valid else "out_of_domain",
+            status=status,
             reason=(
-                ""
-                if assessment.valid
-                else _reason_line("; ".join(assessment.warnings))
+                _reason_line("; ".join(assessment.warnings))
+                if status != "ok"
+                else ""
             ),
             details={
                 "domain_reason": assessment.reason,
