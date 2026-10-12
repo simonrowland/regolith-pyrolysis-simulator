@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import hashlib
 import json
+import os
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -37,6 +39,116 @@ SYNTHETIC_CURVE = {
     "liquidus_T_C": 1300.0,
     "path": ((1000.0, 0.0), (1300.0, 1.0)),
 }
+
+
+def _configured_alphamelts_identity(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    content: bytes | None,
+) -> tuple[BindingIdentity, Path]:
+    from simulator import engine_local_config
+
+    binary = tmp_path / "alphamelts"
+    if content is not None:
+        binary.write_bytes(content)
+    (tmp_path / "engines.local.toml").write_text(
+        "[paths]\n" f"alphamelts_binary_path = {json.dumps(str(binary))}\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(
+        engine_local_config,
+        "config_path",
+        lambda: tmp_path / "engines.local.toml",
+    )
+    return BindingIdentity(
+        "alphamelts", "MELTSv1.0.2", "fixture-r1", "subprocess"
+    ), binary
+
+
+def test_artifact_digest_matches_independent_file_and_directory_composition(
+    tmp_path: Path,
+) -> None:
+    first = tmp_path / "first.bin"
+    second = tmp_path / "second.bin"
+    first_bytes = b"first fixture contents\x00"
+    second_bytes = b"second fixture contents\x01"
+    first.write_bytes(first_bytes)
+    second.write_bytes(second_bytes)
+
+    expected_file = hashlib.sha256(first_bytes).hexdigest()
+    entries = [
+        ("first.bin", hashlib.sha256(first_bytes).hexdigest()),
+        ("second.bin", hashlib.sha256(second_bytes).hexdigest()),
+    ]
+    encoded_entries = json.dumps(
+        entries, sort_keys=True, separators=(",", ":"), ensure_ascii=False
+    ).encode("utf-8")
+    expected_directory = hashlib.sha256(encoded_entries).hexdigest()
+
+    assert admission._artifact_digest(first) == expected_file
+    assert admission._artifact_digest(tmp_path) == expected_directory
+
+
+def test_install_provenance_repeats_equal_mapping_and_fingerprint(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    identity, _binary = _configured_alphamelts_identity(
+        tmp_path, monkeypatch, b"stable engine bytes"
+    )
+
+    first = install_provenance(identity)
+    second = install_provenance(identity)
+
+    assert first == second
+    assert admission.admission_fingerprint(
+        identity, first
+    ) == admission.admission_fingerprint(identity, second)
+
+
+@pytest.mark.parametrize(
+    ("change", "initial", "replacement"),
+    [
+        ("different_size", b"old", b"replacement"),
+        ("same_size_mtime", b"old bytes", b"new bytes"),
+        ("replace_same_size_mtime", b"old bytes", b"new bytes"),
+        ("appears", None, b"newly present"),
+        ("deleted", b"present", None),
+    ],
+)
+def test_install_provenance_detects_engine_file_changes(
+    change: str,
+    initial: bytes | None,
+    replacement: bytes | None,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    identity, binary = _configured_alphamelts_identity(
+        tmp_path, monkeypatch, initial
+    )
+    before = install_provenance(identity)["runtime_artifacts"][
+        "alphamelts_binary_path"
+    ]
+    old_mtime_ns = binary.stat().st_mtime_ns if binary.exists() else None
+
+    if change == "appears":
+        binary.write_bytes(replacement or b"")
+    elif change == "deleted":
+        binary.unlink()
+    elif change == "replace_same_size_mtime":
+        candidate = tmp_path / "replacement.bin"
+        candidate.write_bytes(replacement or b"")
+        os.utime(candidate, ns=(candidate.stat().st_atime_ns, old_mtime_ns))
+        os.replace(candidate, binary)
+    else:
+        binary.write_bytes(replacement or b"")
+        if change == "same_size_mtime":
+            os.utime(binary, ns=(binary.stat().st_atime_ns, old_mtime_ns))
+
+    after = install_provenance(identity)["runtime_artifacts"][
+        "alphamelts_binary_path"
+    ]
+    assert after != before
 
 
 def test_openimcc_admission_records_production_default_pack() -> None:
