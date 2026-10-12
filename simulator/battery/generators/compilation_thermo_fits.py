@@ -32,8 +32,7 @@ from typing import Any, Mapping, Sequence
 
 import numpy as np
 
-from simulator.battery.enums import Quantity
-from simulator.battery.records import ValueKind
+from simulator.battery.enums import Quantity, ValueKind
 from simulator.diagnostic_helpers.gibbs_battery import (
     formation_subtraction_kJ_mol,
 )
@@ -46,7 +45,7 @@ REFERENCE_T_K = 298.15
 FIT_T_MIN_K = 200.0
 NASA9_CP_TERM_ORDER = (2, 3, 4, 1, 0, 5, 6)
 DEFAULT_SIDECAR_PATH = (
-    Path(__file__).resolve().parents[2]
+    Path(__file__).resolve().parents[3]
     / "data"
     / "literature"
     / "compilation-thermo-fits.generated.json"
