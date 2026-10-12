@@ -1362,9 +1362,9 @@ species:
             published_page: 3711
             note: No numeric oxygen fugacity is printed for this row.
   O:
-    context:
+    observations:
     - observation_id: stolyarova_1991_printed_equilibrium_1
-      type: method_example
+      type: thermodynamic_example
       locator:
         page: 3711
         published_page: 3711
@@ -1376,7 +1376,6 @@ species:
         quantity: printed_equilibrium
         method_class: method_only
         equation_as_printed: (WO3) = (WO2) + (O)
-    observations:
     - observation_id: stolyarova_1991_o_atomic_partial_pressure_1933k_equilibrium
       type: partial_pressure
       locator:
