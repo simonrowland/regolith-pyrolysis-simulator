@@ -51,7 +51,6 @@ from simulator.vapour_rail.engine_crosscheck import (
 from simulator.vapour_rail.instrumentation import serialize_vapour_answer
 from simulator.vapour_rail.request import VapourResolveState
 from tests.chemistry.conftest import _build_sim, _load_yaml
-from tests.git_history import require_git_history
 from tests.test_import_boundary import _imports, _project_files
 
 
@@ -612,7 +611,6 @@ def _covered_pairs(stage0_committed_carriers: set[str]) -> set[tuple[str, str]]:
 
 
 def test_demand_manifest_is_fresh() -> None:
-    require_git_history(ROOT)
     subprocess.run(
         [
             sys.executable,
@@ -628,6 +626,22 @@ def test_demand_manifest_is_fresh() -> None:
     )
 
 
+def test_demand_manifest_freshness_does_not_probe_git(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    commands = []
+
+    def run(command, **kwargs):
+        commands.append(command)
+        assert Path(command[1]).name == "generate_rail_demand_manifest.py"
+        assert command[2:4] == ["--check", "--output"]
+        return subprocess.CompletedProcess(command, 0, "", "")
+
+    monkeypatch.setattr(subprocess, "run", run)
+    test_demand_manifest_is_fresh()
+    assert len(commands) == 1
+
+
 def test_harness_ledgers_are_not_simulation_runtime_inputs() -> None:
     forbidden = {
         "vapour_rail_demand_manifest.yaml",
@@ -638,7 +652,7 @@ def test_harness_ledgers_are_not_simulation_runtime_inputs() -> None:
         *sorted(
             path
             for path in (ROOT / "simulator").rglob("*.py")
-            if "battery" not in path.relative_to(ROOT / "simulator").parts
+            if path.relative_to(ROOT / "simulator").parts[0] != "battery"
         ),
         *sorted((ROOT / "engines").rglob("*.py")),
         ROOT / "app.py",
@@ -676,14 +690,42 @@ def test_harness_ledgers_are_not_simulation_runtime_inputs() -> None:
         "__regolith_entry__": "regolith-pyrolysis-run.py",
         "simulator.__main__": "simulator/__main__.py",
         "simulator.runner.__main__": "simulator/runner/__main__.py",
+        "simulator.optimize.__main__": "simulator/optimize/__main__.py",
     }
     files = _project_files(ROOT)
     for module, relpath in entry_modules.items():
         files[module] = (relpath, (ROOT / relpath).read_text(encoding="utf-8"))
+    for module, (relpath, source_text) in files.items():
+        if not relpath.startswith(("simulator/", "engines/", "web/")):
+            continue
+        if relpath.startswith("simulator/battery/"):
+            continue
+        tree = ast.parse(source_text, filename=relpath)
+        has_main_guard = any(
+            isinstance(node, ast.If)
+            and isinstance(node.test, ast.Compare)
+            and isinstance(node.test.left, ast.Name)
+            and node.test.left.id == "__name__"
+            and any(
+                isinstance(comparator, ast.Constant)
+                and comparator.value == "__main__"
+                for comparator in node.test.comparators
+            )
+            for node in ast.walk(tree)
+        )
+        if has_main_guard:
+            entry_modules[module] = relpath
     project_modules = set(files)
     closure: set[str] = set()
     parents: dict[str, tuple[str, int]] = {}
-    pending = list(entry_modules)
+    # Engines are loaded by name from PyrolysisSimulator's registration table,
+    # so their modules are runtime roots even though core.py's loop variable
+    # cannot create static import edges to them.
+    engine_roots = sorted(
+        module for module in files if module == "engines" or module.startswith("engines.")
+    )
+    pending = [*entry_modules, *engine_roots]
+    dynamic_sites: dict[str, int] = {}
     while pending:
         source = pending.pop()
         if source in closure or source not in files:
@@ -692,13 +734,70 @@ def test_harness_ledgers_are_not_simulation_runtime_inputs() -> None:
         relpath, source_text = files[source]
         tree = ast.parse(source_text, filename=relpath)
         package = source if Path(relpath).name == "__init__.py" else source.rpartition(".")[0]
-        imports, _dynamic_sites = _imports(
+        parts = source.split(".")
+        for parent_size in range(1, len(parts)):
+            parent = ".".join(parts[:parent_size])
+            if (
+                parent in files
+                and Path(files[parent][0]).name == "__init__.py"
+                and parent not in closure
+            ):
+                pending.append(parent)
+        imports, module_dynamic_sites = _imports(
             tree, source, relpath, package, project_modules
         )
+        dynamic_sites.update(module_dynamic_sites)
         for target, line in imports:
             parents.setdefault(target, (source, line))
             if target not in closure:
                 pending.append(target)
+
+    # This table-driven loader is the one known computed dynamic import in the
+    # runtime closure. Its module names are literals and must stay outside the
+    # battery subtree; any other computed site is an unreviewed import edge.
+    core_tree = ast.parse(files["simulator.core"][1], filename=files["simulator.core"][0])
+    registration_rows = next(
+        node.value
+        for node in ast.walk(core_tree)
+        if isinstance(node, ast.AnnAssign)
+        and isinstance(node.target, ast.Name)
+        and node.target.id == "_BUILTIN_PROVIDER_REGISTRATIONS"
+    )
+    engine_module_paths = [
+        row.elts[0].value
+        for row in registration_rows.elts
+        if isinstance(row, ast.Tuple)
+        and row.elts
+        and isinstance(row.elts[0], ast.Constant)
+        and isinstance(row.elts[0].value, str)
+    ]
+    assert len(engine_module_paths) == len(registration_rows.elts)
+    assert all(
+        module in project_modules
+        and module != "simulator.battery"
+        and not module.startswith("simulator.battery.")
+        for module in engine_module_paths
+    ), f"builtin engine registration has invalid module paths: {engine_module_paths}"
+    assert set(engine_module_paths) <= closure, (
+        "registered builtin engine modules are missing from import closure: "
+        f"{sorted(set(engine_module_paths) - closure)}"
+    )
+    # Existing computed sites: the core table is validated above; VapoRock
+    # probes external package candidates; optimize's lazy exports and provider
+    # fingerprint import through reviewed module-name maps. Keep counts exact
+    # so a new call in an existing function also requires review.
+    allowed_dynamic_sites = {
+        "simulator/core.py:PyrolysisSimulator._build_chemistry_kernel": 1,
+        "simulator/melt_backend/vaporock.py:_bootstrap_vaporock_worker": 1,
+        "simulator/melt_backend/vaporock.py:VapoRockBackend._import_vaporock": 1,
+        "simulator/optimize/__init__.py:__getattr__": 1,
+        "simulator/optimize/evaluate.py:_vapor_pressure_provider_code_fingerprint": 1,
+        "simulator/optimize/strategy/__init__.py:__getattr__": 1,
+    }
+    assert dynamic_sites == allowed_dynamic_sites, (
+        "computed dynamic-import sites changed in simulation closure: "
+        f"found={dynamic_sites}, allowed={allowed_dynamic_sites}"
+    )
 
     battery_reachable = sorted(
         module

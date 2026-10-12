@@ -510,7 +510,10 @@ def test_require_git_history_skips_only_missing_history(
     monkeypatch.setattr(
         git_history.subprocess, "run", run_results((completed(), completed()))
     )
-    require_git_history(tmp_path, "reachable")
+    try:
+        require_git_history(tmp_path, "reachable")
+    except pytest.skip.Exception as exc:
+        pytest.fail(f"reachable history was unexpectedly skipped: {exc}")
 
     monkeypatch.setattr(
         git_history.subprocess,
@@ -534,9 +537,14 @@ def test_require_git_history_skips_only_missing_history(
         )
 
     monkeypatch.setattr(git_history.subprocess, "run", other_error)
-    with pytest.raises(subprocess.CalledProcessError) as raised:
+    try:
         require_git_history(tmp_path)
-    assert raised.value.stderr == "fatal: permission denied"
+    except pytest.skip.Exception as exc:
+        pytest.fail(f"unrelated Git error was unexpectedly skipped: {exc}")
+    except subprocess.CalledProcessError as raised:
+        assert raised.stderr == "fatal: permission denied"
+    else:
+        pytest.fail("unrelated Git error should propagate")
 
 
 def test_t622_oxidative_window_envelope_evidence_is_reproducible(
