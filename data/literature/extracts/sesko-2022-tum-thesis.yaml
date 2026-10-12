@@ -1,0 +1,410 @@
+schema_version: literature_extract.v1
+source_id: sesko-2022-tum-thesis
+source:
+  citation: 'Šeško R. (2022) Solar-vapor pyrolysis of lunar regolith for oxygen production in high vacuum: An experimental investigation and thermochemical modeling. Technical University of Munich, M.Sc. thesis RT-MA 2022/01.'
+  url: https://mediatum.ub.tum.de/doc/1730482/1730482.pdf
+  version: thesis
+  year: 2022
+  sha256: 22ca3c77e3e84f398b8b9ced101a3d1e927f6d70ca0c42962cbecd692937075c
+extraction:
+  method: Manual transcription of Table 3.3 from the rendered page, checked independently by row and by column; experimental-condition prose and plot values read from rendered figures; values from the thermochemical-modeling chapter excluded.
+  date: '2026-10-12'
+  worker: sesko22
+review_status: draft
+species:
+  EAC-1A:
+    observations: []
+    context:
+      - observation_id: sesko_2022_table3_3_exposure_1
+        type: experiment_series
+        experiment: sesko_2022_exposure_1
+        locator: {page: 27, pdf_page_index: 41, table: '3.3'}
+        units: as printed
+        values:
+          quantity: measured_solar_exposure_conditions
+          exposure: 1
+          duration_hms: '00:02:20'
+          mass_of_melted_regolith_sample_g: '0.39'
+          initial_pressure_mbar_as_published: '7.0 × 10^-6'
+          chamber_pressure_mbar_as_published: '2 × 10^-1 to 7 × 10^-1'
+          setup_version: 1
+          sample_as_published: EAC-1A
+          sample_composition_pointer: 'Table 4.1, EAC-1A column; composition used for thermochemical simulations'
+          temperature: not plotted for exposures 1–2; no per-exposure value in Table 3.3
+          temperature_measurement: Optris IR camera peak surface measurement; thermocouples were not useful during solar exposure
+          container_as_published: Regolith in crucible; Table 3.3 does not identify crucible material for this exposure
+          heating_method_as_published: Focused sunlight; shade manually removed to start and replaced to end the exposure
+          heating_rate: not reported
+          note: 'm is the mass of melted regolith sample, not initial sample mass or measured mass loss'
+      - observation_id: sesko_2022_table3_3_exposure_2
+        type: experiment_series
+        experiment: sesko_2022_exposure_2
+        locator: {page: 27, pdf_page_index: 41, table: '3.3'}
+        units: as printed
+        values:
+          quantity: measured_solar_exposure_conditions
+          exposure: 2
+          duration_hms: '00:05:00'
+          mass_of_melted_regolith_sample_g: '0.82'
+          initial_pressure_mbar_as_published: '7.0 × 10^-6'
+          chamber_pressure_mbar_as_published: '3 × 10^-1 to 1.2'
+          setup_version: 1
+          sample_as_published: EAC-1A
+          sample_composition_pointer: 'Table 4.1, EAC-1A column; composition used for thermochemical simulations'
+          temperature: not plotted for exposures 1–2; no per-exposure value in Table 3.3
+          temperature_measurement: Optris IR camera peak surface measurement; thermocouples were not useful during solar exposure
+          container_as_published: Regolith in crucible; Table 3.3 does not identify crucible material for this exposure
+          heating_method_as_published: Focused sunlight; shade manually removed to start and replaced to end the exposure
+          heating_rate: not reported
+          note: 'm is the mass of melted regolith sample, not initial sample mass or measured mass loss'
+      - observation_id: sesko_2022_table3_3_exposure_3
+        type: experiment_series
+        experiment: sesko_2022_exposure_3
+        locator: {page: 27, pdf_page_index: 41, table: '3.3'}
+        units: as printed
+        values:
+          quantity: measured_solar_exposure_conditions
+          exposure: 3
+          duration_hms: '00:00:30'
+          mass_of_melted_regolith_sample_g: '0.10'
+          initial_pressure_mbar_as_published: '1.2 × 10^-7'
+          chamber_pressure_mbar_as_published: '2 × 10^-2 to 3 × 10^-2'
+          setup_version: 2
+          sample_as_published: EAC-1A
+          sample_composition_pointer: 'Table 4.1, EAC-1A column; composition used for thermochemical simulations'
+          temperature_measurement: Optris IR camera peak surface measurement; thermocouples were not useful during solar exposure
+          container_as_published: Regolith in crucible; Table 3.3 does not identify crucible material for this exposure
+          heating_method_as_published: Focused sunlight; shade manually removed to start and replaced to end the exposure
+          heating_rate: not reported
+          note: 'm is the mass of melted regolith sample, not initial sample mass or measured mass loss'
+      - observation_id: sesko_2022_exposure_3_temperature_figure_read
+        type: experiment_series
+        experiment: sesko_2022_exposure_3
+        locator: {page: 28, pdf_page_index: 42, figure: '3.9b'}
+        units: K
+        values:
+          quantity: figure_digitized_surface_temperature
+          method_class: figure_digitized
+          read_method: Approximate operating range read from the plotted temperature trace and right-hand Kelvin axis, rounded to about 50 K; no temperature table is printed.
+          surface_temperature_range_K_approximate: '1550 to 1700'
+          temperature_measurement: Optris IR camera, peak surface temperature, emissivity 0.98
+      - observation_id: sesko_2022_table3_3_exposure_4
+        type: experiment_series
+        experiment: sesko_2022_exposure_4
+        locator: {page: 27, pdf_page_index: 41, table: '3.3'}
+        units: as printed
+        values:
+          quantity: measured_solar_exposure_conditions
+          exposure: 4
+          duration_hms: '00:00:15'
+          mass_of_melted_regolith_sample_g: '0.00'
+          initial_pressure_mbar_as_published: '2.6 × 10^-6'
+          chamber_pressure_mbar_as_published: '2 × 10^-2 to 3 × 10^-2'
+          setup_version: 2
+          sample_as_published: EAC-1A
+          sample_composition_pointer: 'Table 4.1, EAC-1A column; composition used for thermochemical simulations'
+          temperature_measurement: Optris IR camera peak surface measurement; thermocouples were not useful during solar exposure
+          container_as_published: Regolith in crucible; Table 3.3 does not identify crucible material for this exposure
+          heating_method_as_published: Focused sunlight; shade manually removed to start and replaced to end the exposure
+          heating_rate: not reported
+          note: 'm is the mass of melted regolith sample, not initial sample mass or measured mass loss'
+      - observation_id: sesko_2022_exposure_4_temperature_figure_read
+        type: experiment_series
+        experiment: sesko_2022_exposure_4
+        locator: {page: 28, pdf_page_index: 42, figure: '3.9a'}
+        units: K
+        values:
+          quantity: figure_digitized_surface_temperature
+          method_class: figure_digitized
+          read_method: Approximate operating range read from the plotted temperature trace and right-hand Kelvin axis, rounded to about 50 K; no temperature table is printed.
+          surface_temperature_range_K_approximate: '1500 to 1600'
+          temperature_measurement: Optris IR camera, peak surface temperature, emissivity 0.98
+      - observation_id: sesko_2022_table3_3_exposure_5
+        type: experiment_series
+        experiment: sesko_2022_exposure_5
+        locator: {page: 27, pdf_page_index: 41, table: '3.3'}
+        units: as printed
+        values:
+          quantity: measured_solar_exposure_conditions
+          exposure: 5
+          duration_hms: '00:00:45'
+          mass_of_melted_regolith_sample_g: '0.20'
+          initial_pressure_mbar_as_published: '2.7 × 10^-6'
+          chamber_pressure_mbar_as_published: '2 × 10^-2 to 3 × 10^-2'
+          setup_version: 2
+          sample_as_published: EAC-1A
+          sample_composition_pointer: 'Table 4.1, EAC-1A column; composition used for thermochemical simulations'
+          temperature_measurement: Optris IR camera peak surface measurement; thermocouples were not useful during solar exposure
+          container_as_published: Regolith in crucible; Table 3.3 does not identify crucible material for this exposure
+          heating_method_as_published: Focused sunlight; shade manually removed to start and replaced to end the exposure
+          heating_rate: not reported
+          note: 'm is the mass of melted regolith sample, not initial sample mass or measured mass loss'
+      - observation_id: sesko_2022_exposure_5_temperature_figure_read
+        type: experiment_series
+        experiment: sesko_2022_exposure_5
+        locator: {page: 28, pdf_page_index: 42, figure: '3.9c'}
+        units: K
+        values:
+          quantity: figure_digitized_surface_temperature
+          method_class: figure_digitized
+          read_method: Approximate operating range read from the plotted temperature trace and right-hand Kelvin axis, rounded to about 50 K; no temperature table is printed.
+          surface_temperature_range_K_approximate: '1400 to 1650'
+          temperature_measurement: Optris IR camera, peak surface temperature, emissivity 0.98
+      - observation_id: sesko_2022_table3_3_exposure_6
+        type: experiment_series
+        experiment: sesko_2022_exposure_6
+        locator: {page: 27, pdf_page_index: 41, table: '3.3'}
+        units: as printed
+        values:
+          quantity: measured_solar_exposure_conditions
+          exposure: 6
+          duration_hms: '00:02:30'
+          mass_of_melted_regolith_sample_g: '0.39'
+          initial_pressure_mbar_as_published: '3.3 × 10^-6'
+          chamber_pressure_mbar_as_published: '2 × 10^-2 to 3 × 10^-2'
+          setup_version: 2
+          sample_as_published: EAC-1A
+          sample_composition_pointer: 'Table 4.1, EAC-1A column; composition used for thermochemical simulations'
+          temperature_measurement: Optris IR camera peak surface measurement; thermocouples were not useful during solar exposure
+          container_as_published: Regolith in crucible; Table 3.3 does not identify crucible material for this exposure
+          heating_method_as_published: Focused sunlight; shade manually removed to start and replaced to end the exposure
+          heating_rate: not reported
+          note: 'm is the mass of melted regolith sample, not initial sample mass or measured mass loss'
+      - observation_id: sesko_2022_exposure_6_temperature_figure_read
+        type: experiment_series
+        experiment: sesko_2022_exposure_6
+        locator: {page: 28, pdf_page_index: 42, figure: '3.9d'}
+        units: K
+        values:
+          quantity: figure_digitized_surface_temperature
+          method_class: figure_digitized
+          read_method: Approximate operating range read from the plotted temperature trace and right-hand Kelvin axis, rounded to about 50 K; no temperature table is printed.
+          surface_temperature_range_K_approximate: '1550 to 2000'
+          temperature_measurement: Optris IR camera, peak surface temperature, emissivity 0.98
+      - observation_id: sesko_2022_table3_3_exposure_7
+        type: experiment_series
+        experiment: sesko_2022_exposure_7
+        locator: {page: 27, pdf_page_index: 41, table: '3.3'}
+        units: as printed
+        values:
+          quantity: measured_solar_exposure_conditions
+          exposure: 7
+          duration_hms: '00:00:30'
+          mass_of_melted_regolith_sample_g: '0.17'
+          initial_pressure_mbar_as_published: '6.4 × 10^-6'
+          chamber_pressure_mbar_as_published: '2 × 10^-2 to 3 × 10^-2'
+          setup_version: 2
+          sample_as_published: EAC-1A
+          sample_composition_pointer: 'Table 4.1, EAC-1A column; composition used for thermochemical simulations'
+          temperature: no per-exposure numeric temperature published in Table 3.3; exposure 7 is not plotted in Figures 3.9–3.11
+          temperature_measurement: Optris IR camera peak surface measurement; thermocouples were not useful during solar exposure
+          container_as_published: Regolith in crucible; Table 3.3 does not identify crucible material for this exposure
+          heating_method_as_published: Focused sunlight; shade manually removed to start and replaced to end the exposure
+          heating_rate: not reported
+          note: 'm is the mass of melted regolith sample, not initial sample mass or measured mass loss'
+      - observation_id: sesko_2022_table3_3_exposure_8
+        type: experiment_series
+        experiment: sesko_2022_exposure_8
+        locator: {page: 27, pdf_page_index: 41, table: '3.3'}
+        units: as printed
+        values:
+          quantity: measured_solar_exposure_conditions
+          exposure: 8
+          duration_hms: '00:00:30'
+          mass_of_melted_regolith_sample_g: '0.09'
+          initial_pressure_mbar_as_published: '1.1 × 10^-7'
+          chamber_pressure_mbar_as_published: '2 × 10^-3 to 4 × 10^-3'
+          setup_version: 3
+          sample_as_published: EAC-1A
+          sample_composition_pointer: 'Table 4.1, EAC-1A column; composition used for thermochemical simulations'
+          temperature: no per-exposure numeric temperature published in Table 3.3; exposure 8 is not plotted in Figures 3.9–3.11
+          temperature_measurement: Optris IR camera peak surface measurement; thermocouples were not useful during solar exposure
+          container_as_published: Regolith in crucible; Table 3.3 does not identify crucible material for this exposure
+          heating_method_as_published: Focused sunlight; shade manually removed to start and replaced to end the exposure
+          heating_rate: not reported
+          note: 'm is the mass of melted regolith sample, not initial sample mass or measured mass loss'
+      - observation_id: sesko_2022_table3_3_exposure_9
+        type: experiment_series
+        experiment: sesko_2022_exposure_9
+        locator: {page: 27, pdf_page_index: 41, table: '3.3'}
+        units: as printed
+        values:
+          quantity: measured_solar_exposure_conditions
+          exposure: 9
+          duration_hms: '00:38:00'
+          mass_of_melted_regolith_sample_g: '0.00'
+          initial_pressure_mbar_as_published: '1.0 × 10^-6'
+          chamber_pressure_mbar_as_published: '2 × 10^-5 to 3 × 10^-4'
+          setup_version: 3
+          sample_as_published: EAC-1A
+          sample_composition_pointer: 'Table 4.1, EAC-1A column; composition used for thermochemical simulations'
+          temperature_K_as_published: '1400 to 1450'
+          temperature_locator: {page: 30, pdf_page_index: 44, paragraph: 'Sample 9 temperature description in section 3.3.1'}
+          temperature_measurement: Optris IR camera peak surface measurement; thermocouples were not useful during solar exposure
+          container_as_published: Regolith in crucible; Table 3.3 does not identify crucible material for this exposure
+          heating_method_as_published: Focused sunlight; shade manually removed to start and replaced to end the exposure
+          heating_rate: not reported
+          note: 'partially sintered sample; below melting temperature; m is melted regolith mass, not initial sample mass or measured mass loss'
+      - observation_id: sesko_2022_table3_3_exposure_10
+        type: experiment_series
+        experiment: sesko_2022_exposure_10
+        locator: {page: 27, pdf_page_index: 41, table: '3.3'}
+        units: as printed
+        values:
+          quantity: measured_solar_exposure_conditions
+          exposure: 10
+          duration_hms: '00:31:00'
+          mass_of_melted_regolith_sample_g: '1.03'
+          initial_pressure_mbar_as_published: '1.5 × 10^-6'
+          chamber_pressure_mbar_as_published: '5 × 10^-5 to 8 × 10^-3'
+          setup_version: 3
+          sample_as_published: EAC-1A
+          sample_composition_pointer: 'Table 4.1, EAC-1A column; composition used for thermochemical simulations'
+          temperature_measurement: Optris IR camera peak surface measurement; thermocouples were not useful during solar exposure
+          container_as_published: Regolith in crucible; Table 3.3 does not identify crucible material for this exposure
+          heating_method_as_published: Focused sunlight; shade manually removed to start and replaced to end the exposure
+          heating_rate: not reported
+          note: 'm is the mass of melted regolith sample, not initial sample mass or measured mass loss'
+      - observation_id: sesko_2022_exposure_10_temperature_figure_read
+        type: experiment_series
+        experiment: sesko_2022_exposure_10
+        locator: {page: 28, pdf_page_index: 42, figure: '3.10a'}
+        units: K
+        values:
+          quantity: figure_digitized_surface_temperature
+          method_class: figure_digitized
+          read_method: Approximate operating range read from the plotted temperature trace and right-hand Kelvin axis, rounded to about 50 K; no temperature table is printed.
+          surface_temperature_range_K_approximate: '1750 to 2050'
+          temperature_measurement: Optris IR camera, peak surface temperature, emissivity 0.98
+      - observation_id: sesko_2022_table3_3_exposure_11
+        type: experiment_series
+        experiment: sesko_2022_exposure_11
+        locator: {page: 27, pdf_page_index: 41, table: '3.3'}
+        units: as printed
+        values:
+          quantity: measured_solar_exposure_conditions
+          exposure: 11
+          duration_hms: '00:10:00'
+          mass_of_melted_regolith_sample_g: '0.66'
+          initial_pressure_mbar_as_published: '5.0 × 10^-7'
+          chamber_pressure_mbar_as_published: '2 × 10^-4 to 2 × 10^-2'
+          setup_version: 3
+          sample_as_published: EAC-1A
+          sample_composition_pointer: 'Table 4.1, EAC-1A column; composition used for thermochemical simulations'
+          temperature_measurement: Optris IR camera peak surface measurement; thermocouples were not useful during solar exposure
+          container_as_published: Regolith in crucible; Table 3.3 does not identify crucible material for this exposure
+          heating_method_as_published: Focused sunlight; shade manually removed to start and replaced to end the exposure
+          heating_rate: not reported
+          note: 'm is the mass of melted regolith sample, not initial sample mass or measured mass loss'
+      - observation_id: sesko_2022_exposure_11_temperature_figure_read
+        type: experiment_series
+        experiment: sesko_2022_exposure_11
+        locator: {page: 28, pdf_page_index: 42, figure: '3.10b'}
+        units: K
+        values:
+          quantity: figure_digitized_surface_temperature
+          method_class: figure_digitized
+          read_method: Approximate operating range read from the plotted temperature trace and right-hand Kelvin axis, rounded to about 50 K; no temperature table is printed.
+          surface_temperature_range_K_approximate: '1750 to 2000'
+          temperature_measurement: Optris IR camera, peak surface temperature, emissivity 0.98
+      - observation_id: sesko_2022_exposure_12_temperature_figure_read
+        type: experiment_series
+        experiment: sesko_2022_exposure_12
+        locator: {page: 29, pdf_page_index: 43, figure: '3.11'}
+        units: K
+        values:
+          quantity: figure_digitized_surface_temperature
+          sample_as_published: EAC-1A
+          sample_composition_pointer: 'Table 4.1, EAC-1A column; composition used for thermochemical simulations'
+          method_class: figure_digitized
+          read_method: Approximate range read from the plotted temperature trace and right-hand Kelvin axis; no temperature table is printed.
+          surface_temperature_range_K_approximate: '1600 to 2100'
+          temperature_measurement: Optris IR camera, peak surface temperature, emissivity 0.98
+          container_as_published: Crucible; the thesis identifies pure alumina ceramic for the crucible used after exposure 12
+          heating_method_as_published: Focused sunlight; shade manually removed to start and replaced to end the exposure
+          heating_rate: not reported
+          overlap_note: Table 3.3 duration, melt mass, and pressure for exposure 12 are already held as conditions in kems-036-sesko-2024 and are not repeated here.
+      - observation_id: sesko_2022_temperature_measurement_conditions
+        type: method
+        locator: {page: 22, pdf_page_index: 36, section: '3.1.3 Sensors and measurement'}
+        units: as printed
+        values:
+          quantity: temperature_and_pressure_measurement_methods
+          temperature: Optris IR camera through the solar window; logged peak temperature at emissivity 0.98; Type-K thermocouples were not useful during solar exposure
+          camera_window_error_C: '14.5 average over 1000 °C to 1450 °C, based on eight measurement sets'
+          pressure: KJL CCPG-H2-6 cold-cathode/Pirani combination gauge connected directly to the chamber
+          heating_method: concentrated sunlight from heliostat mirror and Fresnel lens; manual shade removal starts and ends each exposure
+          heating_rate: not reported
+          holding_time: no separate isothermal hold; exposure duration is listed per run in Table 3.3
+      - observation_id: sesko_2022_edx_melt_residue_qualitative
+        type: characterization
+        locator: {page: 34, pdf_page_index: 48, figure: '3.19'}
+        units: qualitative EDX, silicon-normalized counts
+        values:
+          quantity: qualitative_residue_composition_context
+          samples: [10, 11, 12]
+          method: Point EDX on selected melt and condensation-skin surfaces; no quantitative composition table is printed.
+          melt_surface: Oxygen signal lower than the bulk EAC-1A reference for all three samples; no significant difference in other major elements was resolved.
+          condensation_skin: Oxygen signal appears lower than bulk, with larger variation in other elements; magnesium signal elevated at sample 11 point 2 and sample 12 points 1 and 2.
+          sample_11_skin_point_1: Strong iron and oxygen signal, excluded from Figure 3.19b to avoid skewing the graph; source suggests a high-iron-oxide particle.
+          limitation: EDX depth and condensate thickness are unknown; no composition of the melt beneath the surface is established.
+          composition_basis: Recorded qualitatively; plotted silicon-normalized counts are not reported as composition percentages.
+      - observation_id: sesko_2022_exposure_12_condensate_edx_distinction
+        type: characterization
+        experiment: sesko_2022_exposure_12
+        locator: {page: 35, pdf_page_index: 49, figure: '3.20'}
+        units: qualitative EDX
+        values:
+          quantity: qualitative_condensate_composition_context
+          regions: [A, B]
+          relation: Region A appears to have deposited first; region B is layered over it.
+          region_A: Aluminum and oxygen are present; the thesis attributes aluminum to the alumina crucible seen through a thin condensate layer.
+          region_B: Aluminum peak absent; sodium signal is stronger relative to potassium than in region A.
+          overlap_note: 'The exposure-12 condensate EDX measurement is held in kems-036-sesko-2024; this row retains only the thesis-specific A/B layering and relative-signal description not represented there.'
+      - observation_id: sesko_2022_measured_yield_absence
+        type: experiment_series
+        locator: {page: 29, pdf_page_index: 43, section: '3.3.1 Pressure and temperature measurements'}
+        units: as printed
+        values:
+          quantity: measured_gas_and_mass_loss_results
+          oxygen_yield: no quantitative oxygen or gas yield reported; RGA produced no significant gas-composition results
+          mass_loss: no mass-loss value reported; Table 3.3 m is mass of melted regolith samples, not initial-minus-final sample mass
+          heating_rate: not reported
+          source_note: All exposures exceeded the RGA measurement limit of 10^-5 mbar; source attributes much of the gas to desorbed volatiles and says the amount of vaporization products is undetermined.
+experiments:
+  - experiment_id: sesko_2022_exposure_1
+    method: solar_furnace_pyrolysis
+    locator: {page: 27, pdf_page_index: 41, table: '3.3'}
+  - experiment_id: sesko_2022_exposure_2
+    method: solar_furnace_pyrolysis
+    locator: {page: 27, pdf_page_index: 41, table: '3.3'}
+  - experiment_id: sesko_2022_exposure_3
+    method: solar_furnace_pyrolysis
+    locator: {page: 27, pdf_page_index: 41, table: '3.3'}
+  - experiment_id: sesko_2022_exposure_4
+    method: solar_furnace_pyrolysis
+    locator: {page: 27, pdf_page_index: 41, table: '3.3'}
+  - experiment_id: sesko_2022_exposure_5
+    method: solar_furnace_pyrolysis
+    locator: {page: 27, pdf_page_index: 41, table: '3.3'}
+  - experiment_id: sesko_2022_exposure_6
+    method: solar_furnace_pyrolysis
+    locator: {page: 27, pdf_page_index: 41, table: '3.3'}
+  - experiment_id: sesko_2022_exposure_7
+    method: solar_furnace_pyrolysis
+    locator: {page: 27, pdf_page_index: 41, table: '3.3'}
+  - experiment_id: sesko_2022_exposure_8
+    method: solar_furnace_pyrolysis
+    locator: {page: 27, pdf_page_index: 41, table: '3.3'}
+  - experiment_id: sesko_2022_exposure_9
+    method: solar_furnace_pyrolysis
+    locator: {page: 27, pdf_page_index: 41, table: '3.3'}
+  - experiment_id: sesko_2022_exposure_10
+    method: solar_furnace_pyrolysis
+    locator: {page: 27, pdf_page_index: 41, table: '3.3'}
+  - experiment_id: sesko_2022_exposure_11
+    method: solar_furnace_pyrolysis
+    locator: {page: 27, pdf_page_index: 41, table: '3.3'}
+  - experiment_id: sesko_2022_exposure_12
+    method: solar_furnace_pyrolysis
+    locator: {page: 29, pdf_page_index: 43, figure: '3.11'}
