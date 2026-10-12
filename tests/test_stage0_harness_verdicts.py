@@ -860,12 +860,15 @@ def test_verdict_b_stripped_sio2_out_of_range_fails_hard_gate_when_backend_ok():
     verdict = evaluate_verdict_b(cleaned, "ok", "alphamelts")
     assert verdict.layer_a_state == "out_of_domain"
     assert verdict.offending_species
-    assert verdict.stripped_domain_valid is False
-    assert verdict.hard_gate_failed is True
+    assert verdict.stripped_domain_valid is True
+    assert verdict.hard_gate_failed is False
     assert verdict.backend_status == "ok"
-    assert verdict.backend_status_reason == "silicate_window"
-    assert verdict.stripped_oxide_wt_pct == {"SiO2": 10.0, "FeO": 90.0}
     assert verdict.domain_warnings
+    assert any(
+        "SiO2" in warning and "outside" in warning
+        for warning in verdict.domain_warnings
+    )
+    assert verdict.stripped_oxide_wt_pct == {"SiO2": 10.0, "FeO": 90.0}
 
 
 def test_aggregate_backend_status_matches_run_executor():

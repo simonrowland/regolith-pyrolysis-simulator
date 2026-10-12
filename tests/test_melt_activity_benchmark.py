@@ -293,7 +293,7 @@ def test_imcc_benchmark_uses_openimcc():
     assert result.details["model_id"] == "IMCC-SF04"
 
 
-def test_coverage_map_records_melts_refusal_below_30_sio2():
+def test_coverage_map_reports_silicate_band_miss_below_30_sio2():
     fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
     rows = benchmark.run_coverage_map(
         fixture, [benchmark.AlphaMeltsEngine()], steps=11
@@ -896,12 +896,12 @@ def test_provider_crash_diagnostic_overrides_out_of_domain_status():
     assert "SIGSEGV" in result.reason
 
 
-def test_coverage_silicate_band_is_rail_owned():
+def test_coverage_silicate_band_status_tracks_rail_band():
     # UPDATED 2026-08-16: was SiO2 10.0 with band (0, 100). That asserted the
     # rail could open alphaMELTS down to 10 wt%; the rump-hotwire measurement
     # found it SIGABRTs on all 40 multi-component sub-30 points, so a band
-    # below the 34.0 wt% crash floor is now refused. Widening is still
-    # rail-owned -- it goes UPWARD past the default 80 wt% max.
+    # below the 30.0 wt% certified minimum is outside the band. Widening is
+    # still rail-owned -- it goes UPWARD past the default 80 wt% max.
     composition = {"SiO2": 85.0, "MgO": 7.5, "FeO": 7.5}
     default = benchmark.AlphaMeltsEngine()
     widened = benchmark.AlphaMeltsEngine(silicate_network_band=(34.0, 100.0))
