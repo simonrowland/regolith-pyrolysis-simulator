@@ -2206,18 +2206,25 @@ def decision_band_for(
     derived_band: DecisionBand | None = None,
     operation: MetricOperation | None = None,
 ) -> DecisionBand | None:
-    """Choose the one owner-supplied band: printed, then source scatter, else none.
+    """Choose a printed or derived band, then apply its quantity and unit gates.
 
-    ``source_relation`` labels lineage only. An unparseable printed uncertainty
-    refuses the band's verdict and cannot fall through to a derived threshold.
+    ``source_relation`` labels lineage only. A KEMS pressure envelope covers
+    admitted measured partial-pressure rows whose cell uncertainty is unparseable;
+    other printed-uncertainty refusals block derived-band fallthrough.
     """
     del source_relation
-    if printed_refusal is not None:
-        return None
     band = printed_band if printed_band is not None else derived_band
-    if band is None or not band_dimension_matches(
-        quantity, band, operation=operation
-    ):
+    if band is None:
+        return None
+    kems_pressure_band = band.rule.startswith(
+        "KEMS p_partial measured uncertainty:"
+    )
+    if kems_pressure_band:
+        if quantity is not Quantity.P_PARTIAL:
+            return None
+    elif printed_refusal is not None:
+        return None
+    if not band_dimension_matches(quantity, band, operation=operation):
         return None
     return band
 
