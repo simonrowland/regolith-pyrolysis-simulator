@@ -3147,6 +3147,19 @@ def test_fidelity_sample_mutation_reds():
     )
     assert any("mismatch" in error for error in jones_errs), jones_errs
 
+    lange_path = EXTRACTS / "ammin-76-904.yaml"
+    lange_doc = load_cached_safe_yaml(lange_path.read_text(encoding="utf-8"))
+    lange_samples = lange_doc.get("fidelity_samples") or []
+    assert len(lange_samples) >= 3, "Lange extract must carry table-spread samples"
+    assert vle.check_all_fidelity_samples_match(lange_doc, label="lange-owner") == []
+    lange_doc["species"]["CaMgSi2O6"]["observations"][0]["values"][
+        "series"
+    ][0][1] += 1
+    lange_errs = vle.check_all_fidelity_samples_match(
+        lange_doc, label="lange-owner-mutated"
+    )
+    assert any("mismatch" in error for error in lange_errs), lange_errs
+
 
 def test_costa_fe_summary_key_is_retired_to_owner_series():
     secondary = load_cached_safe_yaml(

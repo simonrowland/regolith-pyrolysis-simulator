@@ -13,6 +13,48 @@ extraction:
   worker: codex-extract-ingest
   provenance_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 review_status: draft
+fidelity_samples:
+  - species: CaMgSi2O6
+    observation_id: ammin_76_904_table1_diopside_composition
+    observable: composition
+    field: composition_wt_pct
+    value:
+      crystal:
+        SiO2: {value: 55.75, uncertainty: 0.64}
+        MgO: {value: 18.15, uncertainty: 0.32}
+        CaO: {value: 25.78, uncertainty: 0.51}
+        total: 99.67
+      glass_electron_microprobe:
+        SiO2: {value: 55.50, uncertainty: 0.58}
+        MgO: {value: 18.25, uncertainty: 0.30}
+        CaO: {value: 26.11, uncertainty: 0.41}
+        total: 99.86
+      glass_wet_chemical:
+        SiO2: 55.72
+        MgO: 18.43
+        CaO: 25.75
+        total: 99.90
+      ideal:
+        SiO2: 55.49
+        MgO: 18.61
+        CaO: 25.90
+        total: 100.00
+    note: "Table 1 on page 905 prints the crystal, glass, and ideal compositions."
+    locator:
+      published_page: 905
+      table: '1'
+  - path: species.CaMgSi2O6.observations[ammin_76_904_table2_step_scan_heat_capacity_enthalpy].values.series[0]
+    value: [1403, 265.34, 259.54, 2.23, 258.93, 258.93, 0.00]
+    note: "Table 2 on page 908 prints this heat-capacity and enthalpy row at 1403 K."
+    locator:
+      published_page: 908
+      table: '2'
+  - path: species.CaMgSi2O6.observations[ammin_76_904_table2_step_scan_heat_capacity_enthalpy].values.series[12]
+    value: [1620, 522.80, 261.40, 100.0, 319.30, 315.36, 1.25]
+    note: "Table 2 on page 908 prints this heat-capacity and enthalpy row at 1620 K."
+    locator:
+      published_page: 908
+      table: '2'
 species:
   CaMgSi2O6:
     observations:
