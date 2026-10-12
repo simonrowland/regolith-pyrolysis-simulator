@@ -15,7 +15,7 @@ from simulator.battery.migrate import (
 )
 from simulator.battery.records import State, Value
 from simulator.diagnostic_helpers.gibbs_battery import formation_subtraction_kJ_mol
-from simulator.reference_data.compilation_thermo_fits import (
+from simulator.battery.generators.compilation_thermo_fits import (
     _Cell,
     FittedCurve,
     _element_reference_terms,
@@ -30,7 +30,7 @@ from simulator.reference_data.compilation_thermo_fits import (
 )
 from simulator.reference_data.janaf import TABLES_DIR, load_table_document
 from simulator.vapour_rail.nasa_cea import Nasa9Segment, R_J_PER_MOL_K
-import simulator.reference_data.compilation_thermo_fits as compilation_thermo_fits
+import simulator.battery.generators.compilation_thermo_fits as compilation_thermo_fits
 
 
 PRESSURE_PA = 101325.0
@@ -1037,7 +1037,7 @@ def test_fit_cli_accepts_sampling_options_and_reports_summary(
         ]
 
     monkeypatch.setattr(
-        "simulator.reference_data.compilation_thermo_fits.generate_janaf_sidecar",
+        "simulator.battery.generators.compilation_thermo_fits.generate_janaf_sidecar",
         fake_generate,
     )
     output = tmp_path / "fits.json"
