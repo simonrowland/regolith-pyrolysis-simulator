@@ -9,14 +9,14 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 292
-  extracts: 290
+  sources: 297
+  extracts: 295
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 59
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 290
-  alias_groups_needing_resolution: 36
+  extracts_without_pdf: 295
+  alias_groups_needing_resolution: 37
 gaps:
   pdfs_without_extract: []
   extracts_without_pdf:
@@ -36,6 +36,7 @@ gaps:
   - behrens-rosenblatt-1972
   - bencze-yazhenskikh-2016
   - berkowitz-chupka-inghram-1957
+  - borisov-2018-compilation
   - boulliung-2025-mercury-volatile-metals-magmatic
   - boulliung-wood-2022-so2-solubility-silicate-melts
   - britt-2019-asteroid-simulants
@@ -61,6 +62,7 @@ gaps:
   - fray-schmitt-2009-co-1
   - fray-schmitt-2009-nh3
   - fujisawa-1990-cao-al2o3-activities
+  - gca-366-210-berry-2024
   - giauque-powell-1939-cl2
   - giauque-ruehrwein-1939-hcn-psat
   - gibbons-1963-thesis-cas-slags-cas
@@ -190,6 +192,7 @@ gaps:
   - lpsc-2019-2641
   - lpsc-2024-bennu-pyrolysis-vandam
   - lunarsurface-2020-5029
+  - matzen-2022-martian-basalt-redox
   - mendybaev-2017-fun-cai-lab-evaporation
   - mendybaev-2021-cai-low-pressure-h2-evap
   - metsoc-2019-6005
@@ -252,6 +255,7 @@ gaps:
   - robie-hemingway-wilson-1980-usgs-of-80-908
   - robinot-2025-promes-review
   - rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
+  - sato-1976-lunar-fo2-apollo-17
   - sato-hickling-mclane-1973-lunar-fo2
   - schaefer-and-fegley-2007-icarus-outgassing-of-oc
   - schaefer-fegley-2011-vaporization-earth
@@ -275,6 +279,7 @@ gaps:
   - slag-003-hino-kitagawa-banya-1993
   - smales-1971-lpsc-12022
   - sossi-2020-cu-zn-isotope-evap-formalism
+  - sossi-2020-magma-ocean-redox
   - span-wagner-1996-co2-psat
   - stebbins-carmichael-weill-1983
   - steurer-1985-vapor-phase-pyrolysis
@@ -696,6 +701,12 @@ gaps:
     source_ids:
     - kems-041-sossi-fegley-2018
     - kems-045-sossi-2018-pnas-cr
+    resolution: owner/controller
+  - type: source_id_alias
+    key: sossi-2020
+    source_ids:
+    - sossi-2020-cu-zn-isotope-evap-formalism
+    - sossi-2020-magma-ocean-redox
     resolution: owner/controller
   - type: source_id_alias
     key: yamada-1980
@@ -1339,7 +1350,7 @@ sources:
     extract:
       path: extracts/arxiv-2509-sio-flame-nucleation.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/arxiv-2509-sio-flame-nucleation.yaml
       present: true
@@ -1635,6 +1646,65 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: borisov-2018-compilation
+  aliases: []
+  citation: 'Borisov, A., Behrens, H. & Holtz, F. (2018), Ferric/ferrous ratio in silicate melts: a new
+    model for 1 atm data with special emphasis on the effects of melt composition, Contributions to Mineralogy
+    and Petrology 173, 98, Electronic Supplementary Material 1, Supplementary Table 2.'
+  doi: 10.1007/s00410-018-1524-8
+  report_number: null
+  identifier: 10.1007/s00410-018-1524-8
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/borisov-2018-compilation.yaml
+    review_status: draft
+    rows: 435
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/borisov-2018-compilation/borisov-2018-compilation.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/borisov-2018-compilation/sidecar.yaml
+      present: false
+    text:
+      path: text/borisov-2018-compilation
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/borisov-2018-compilation
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/borisov-2018-compilation.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/borisov-2018-compilation.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: boulliung-2025-mercury-volatile-metals-magmatic
   aliases: []
@@ -2040,7 +2110,7 @@ sources:
     extract:
       path: extracts/cardiff-2007-vacuum-pyrolysis-gsfc.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/cardiff-2007-vacuum-pyrolysis-gsfc.yaml
       present: true
@@ -3104,6 +3174,65 @@ sources:
       last_stage: null
       date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: gca-366-210-berry-2024
+  aliases: []
+  citation: Berry, A.J., Doyle, P.M., Schofield, P.F., Miller, L.A., Le Losq, C., Burnham, A.D., & Mosselmans,
+    J.F.W. (2024). The oxidation state of titanium in silicate melts. Geochimica et Cosmochimica Acta,
+    366, 210–220.
+  doi: 10.1016/j.gca.2023.11.014
+  report_number: null
+  identifier: 10.1016/j.gca.2023.11.014
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/gca-366-210-berry-2024.yaml
+    review_status: draft
+    rows: 0
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/gca-366-210-berry-2024/gca-366-210-berry-2024.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/gca-366-210-berry-2024/sidecar.yaml
+      present: false
+    text:
+      path: text/gca-366-210-berry-2024
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/gca-366-210-berry-2024
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/gca-366-210-berry-2024.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/gca-366-210-berry-2024.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: giauque-powell-1939-cl2
   aliases: []
   citation: Giauque, W.F. & Powell, T.M. (1939), "Chlorine. The Heat Capacity, Vapor Pressure, Heats of
@@ -3596,7 +3725,7 @@ sources:
   extracts:
   - path: data/literature/extracts/holzheid-1997-feo-nio-coo-activity-metal-saturated.yaml
     review_status: draft
-    rows: 37
+    rows: 41
   battery_datasets: []
   hunt_ids: []
   copies: []
@@ -4030,7 +4159,7 @@ sources:
     extract:
       path: extracts/jaggi-2021-mercury-atmosphere.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/jaggi-2021-mercury-atmosphere.yaml
       present: true
@@ -4554,7 +4683,7 @@ sources:
     extract:
       path: extracts/kems-005-fedkin-2006.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-005-fedkin-2006.yaml
       present: true
@@ -5010,7 +5139,7 @@ sources:
     extract:
       path: extracts/kems-014-drowart-2005.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-014-drowart-2005.yaml
       present: true
@@ -5176,7 +5305,7 @@ sources:
     extract:
       path: extracts/kems-017-stolyarova-2013.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-017-stolyarova-2013.yaml
       present: true
@@ -5892,7 +6021,7 @@ sources:
   extracts:
   - path: data/literature/extracts/kems-031-halwax-2024.yaml
     review_status: draft
-    rows: 22
+    rows: 28
     locator_status: private_path
   battery_datasets:
   - data/literature/kems_measurements.yaml
@@ -6564,7 +6693,7 @@ sources:
     extract:
       path: extracts/kems-044-robinot-2026.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-044-robinot-2026.yaml
       present: true
@@ -6741,7 +6870,7 @@ sources:
     extract:
       path: extracts/kems-047-turkdogan-1984-isij.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-047-turkdogan-1984-isij.yaml
       present: true
@@ -6914,7 +7043,7 @@ sources:
     extract:
       path: extracts/kems-050-gorokhov-1977.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-050-gorokhov-1977.yaml
       present: true
@@ -7493,7 +7622,7 @@ sources:
     extract:
       path: extracts/kems-093-piacente-1975.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-093-piacente-1975.yaml
       present: true
@@ -7604,7 +7733,7 @@ sources:
     extract:
       path: extracts/kems-097-ikeda-1978.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-097-ikeda-1978.yaml
       present: true
@@ -10544,6 +10673,64 @@ sources:
       last_stage: decoded
       date: '2026-09-06'
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: matzen-2022-martian-basalt-redox
+  aliases: []
+  citation: Matzen, A.K., Woodland, A., Beckett, J.R. & Wood, B.J. (2022) Oxidation state of iron and
+    Fe-Mg partitioning between olivine and basaltic Martian melts. American Mineralogist, in press.
+  doi: 10.2138/am-2021-7682
+  report_number: null
+  identifier: 10.2138/am-2021-7682
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/matzen-2022-martian-basalt-redox.yaml
+    review_status: draft
+    rows: 24
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/matzen-2022-martian-basalt-redox/matzen-2022-martian-basalt-redox.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/matzen-2022-martian-basalt-redox/sidecar.yaml
+      present: false
+    text:
+      path: text/matzen-2022-martian-basalt-redox
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/matzen-2022-martian-basalt-redox
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/matzen-2022-martian-basalt-redox.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/matzen-2022-martian-basalt-redox.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: mendybaev-2017-fun-cai-lab-evaporation
   aliases: []
   citation: 'Mendybaev, R. A., Williams, C. D., Spicuzza, M. J., Richter, F. M., Valley, J. W., Fedkin,
@@ -11828,7 +12015,7 @@ sources:
     extract:
       path: extracts/no27-fegley-cameron-1987-epsl.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/no27-fegley-cameron-1987-epsl.yaml
       present: true
@@ -14228,6 +14415,65 @@ sources:
       last_stage: decoded
       date: '2026-09-06'
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: sato-1976-lunar-fo2-apollo-17
+  aliases: []
+  citation: Sato, M. (1976), Oxygen fugacity and other thermochemical parameters of Apollo 17 high-Ti
+    basalts and their implications on the reduction mechanism, Proceedings of the Lunar Science Conference,
+    7th, 1323-1344.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/sato-1976-lunar-fo2-apollo-17.yaml
+    review_status: draft
+    rows: 21
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/sato-1976-lunar-fo2-apollo-17/sato-1976-lunar-fo2-apollo-17.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/sato-1976-lunar-fo2-apollo-17/sidecar.yaml
+      present: false
+    text:
+      path: text/sato-1976-lunar-fo2-apollo-17
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/sato-1976-lunar-fo2-apollo-17
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/sato-1976-lunar-fo2-apollo-17.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/sato-1976-lunar-fo2-apollo-17.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: sato-hickling-mclane-1973-lunar-fo2
   aliases: []
   citation: Sato, M., Hickling, N. L. & McLane, J. E. (1973), “Oxygen fugacity values of Apollo 12, 14,
@@ -15575,6 +15821,65 @@ sources:
       last_stage: decoded
       date: '2026-09-06'
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: sossi-2020-magma-ocean-redox
+  aliases: []
+  citation: Sossi, P. A., Burnham, A. D., Badro, J., Lanzirotti, A., Newville, M., and O'Neill, H. St.C.
+    (2020). Redox state of Earth's magma ocean and its Venus-like early atmosphere. Science Advances 6,
+    eabd1387.
+  doi: 10.1126/sciadv.abd1387
+  report_number: null
+  identifier: 10.1126/sciadv.abd1387
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/sossi-2020-magma-ocean-redox.yaml
+    review_status: draft
+    rows: 12
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/sossi-2020-magma-ocean-redox/sossi-2020-magma-ocean-redox.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/sossi-2020-magma-ocean-redox/sidecar.yaml
+      present: false
+    text:
+      path: text/sossi-2020-magma-ocean-redox
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/sossi-2020-magma-ocean-redox
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/sossi-2020-magma-ocean-redox.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/sossi-2020-magma-ocean-redox.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: span-wagner-1996-co2-psat
   aliases: []
   citation: 'Span, R. & Wagner, W. (1996), "A New Equation of State for Carbon Dioxide Covering the Fluid
@@ -16270,7 +16575,7 @@ sources:
     extract:
       path: extracts/ta-mendybaev-2002-lpsc.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/ta-mendybaev-2002-lpsc.yaml
       present: true
@@ -16387,7 +16692,7 @@ sources:
     extract:
       path: extracts/ta-shirai-2000-lpsc.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/ta-shirai-2000-lpsc.yaml
       present: true
@@ -16679,7 +16984,7 @@ sources:
     extract:
       path: extracts/thomas-wood-2021-chlorine-silicate-melts.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/thomas-wood-2021-chlorine-silicate-melts.yaml
       present: true
@@ -17263,7 +17568,7 @@ sources:
     extract:
       path: extracts/visscher-fegley-2013-debris-disks.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/visscher-fegley-2013-debris-disks.yaml
       present: true
