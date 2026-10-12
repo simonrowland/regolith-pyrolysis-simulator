@@ -177,7 +177,7 @@ species:
       - observation_id: schaefer_2012_cc_100bar_major_gas_summary
         type: gas_speciation
         derived_from: [schaefer_2012_table2_continental_crust_bulk_composition]
-        derivation: {relation: authors Gibbs-energy-minimization equilibrium calculation, output_unit: as_printed}
+        derivation: {relation: authors Gibbs-energy-minimization equilibrium calculation, inputs: [schaefer_2012_table2_continental_crust_bulk_composition], output_unit: as_printed}
         locator: {pdf_page_index: 7, figure: '1', section: '3.1.1 Continental Crust', row: prose summaries, column: printed model results}
         T_range_K: [500, 4000]
         phase: gas_phase
@@ -234,7 +234,7 @@ species:
       - observation_id: schaefer_2012_cc_variable_h_model_outputs
         type: gas_speciation
         derived_from: [schaefer_2012_table2_continental_crust_bulk_composition]
-        derivation: {relation: authors variable-hydrogen Gibbs-energy-minimization equilibrium calculation, output_unit: as_printed}
+        derivation: {relation: authors variable-hydrogen Gibbs-energy-minimization equilibrium calculation, inputs: [schaefer_2012_table2_continental_crust_bulk_composition], output_unit: as_printed}
         locator: {pdf_page_index: 11, figure: '3', section: '3.2.1 Hydrogen', row: prose summaries, column: printed model results}
         phase: gas_phase
         regime: engine_evaluation
@@ -266,7 +266,7 @@ species:
       - observation_id: schaefer_2012_cc_variable_c_model_outputs
         type: gas_speciation
         derived_from: [schaefer_2012_table2_continental_crust_bulk_composition]
-        derivation: {relation: authors variable-carbon Gibbs-energy-minimization equilibrium calculation, output_unit: as_printed}
+        derivation: {relation: authors variable-carbon Gibbs-energy-minimization equilibrium calculation, inputs: [schaefer_2012_table2_continental_crust_bulk_composition], output_unit: as_printed}
         locator: {pdf_page_index: 13, figure: '4', section: '3.2.2 Carbon', row: prose summaries, column: printed model results}
         phase: gas_phase
         regime: engine_evaluation
@@ -295,7 +295,7 @@ species:
       - observation_id: schaefer_2012_cc_variable_o_model_outputs
         type: gas_speciation
         derived_from: [schaefer_2012_table2_continental_crust_bulk_composition]
-        derivation: {relation: authors variable-oxygen Gibbs-energy-minimization equilibrium calculation, output_unit: as_printed}
+        derivation: {relation: authors variable-oxygen Gibbs-energy-minimization equilibrium calculation, inputs: [schaefer_2012_table2_continental_crust_bulk_composition], output_unit: as_printed}
         locator: {pdf_page_index: 14, figure: '5', section: '3.2.3 Oxygen', row: prose summaries, column: printed model results}
         phase: gas_phase
         regime: engine_evaluation
@@ -330,7 +330,7 @@ species:
       - observation_id: schaefer_2012_table3_cc_extreme_atmospheres
         type: gas_speciation
         derived_from: [schaefer_2012_table2_continental_crust_bulk_composition]
-        derivation: {relation: authors Gibbs-energy-minimization equilibrium calculation at the four Table 3 T-P points, output_unit: as_printed}
+        derivation: {relation: authors Gibbs-energy-minimization equilibrium calculation at the four Table 3 T-P points, inputs: [schaefer_2012_table2_continental_crust_bulk_composition], output_unit: as_printed}
         locator: {pdf_page_index: 33, table: '3', row: all CC cells, column: major atmospheric composition}
         phase: gas_phase
         regime: engine_evaluation
@@ -359,7 +359,7 @@ species:
       - observation_id: schaefer_2012_cc_pressure_effects_printed
         type: gas_speciation
         derived_from: [schaefer_2012_table2_continental_crust_bulk_composition]
-        derivation: {relation: authors pressure-sweep Gibbs-energy-minimization equilibrium calculation, output_unit: as_printed}
+        derivation: {relation: authors pressure-sweep Gibbs-energy-minimization equilibrium calculation, inputs: [schaefer_2012_table2_continental_crust_bulk_composition], output_unit: as_printed}
         locator: {pdf_page_index: 15, figure: '7', section: '3.3 Effects of Total Pressure on Gas Composition', row: prose summaries, column: printed model results}
         phase: gas_phase
         regime: engine_evaluation
@@ -385,7 +385,7 @@ species:
       - observation_id: schaefer_2012_cc_exoplanet_atmospheric_profiles
         type: gas_speciation
         derived_from: [schaefer_2012_table2_continental_crust_bulk_composition]
-        derivation: {relation: authors dry-adiabatic CoRoT-7b equilibrium-profile calculation, output_unit: as_printed}
+        derivation: {relation: authors dry-adiabatic CoRoT-7b equilibrium-profile calculation, inputs: [schaefer_2012_table2_continental_crust_bulk_composition], output_unit: as_printed}
         locator: {pdf_page_index: 22, figure: '11', section: '4.2.2 Hot Super-Earths', row: prose summaries, column: condensation pressures}
         phase: gas_phase_and_condensate
         regime: engine_evaluation
@@ -466,7 +466,7 @@ species:
       - observation_id: schaefer_2012_bse_100bar_major_gas_summary
         type: gas_speciation
         derived_from: [schaefer_2012_table2_bse_bulk_composition]
-        derivation: {relation: authors Gibbs-energy-minimization equilibrium calculation, output_unit: as_printed}
+        derivation: {relation: authors Gibbs-energy-minimization equilibrium calculation, inputs: [schaefer_2012_table2_bse_bulk_composition], output_unit: as_printed}
         locator: {pdf_page_index: 10, figure: '2', section: '3.1.2 Bulk Silicate Earth', row: prose summaries, column: printed model results}
         T_range_K: [500, 4000]
         phase: gas_phase
@@ -501,7 +501,7 @@ species:
       - observation_id: schaefer_2012_table3_bse_extreme_atmospheres
         type: gas_speciation
         derived_from: [schaefer_2012_table2_bse_bulk_composition]
-        derivation: {relation: authors Gibbs-energy-minimization equilibrium calculation at the four Table 3 T-P points, output_unit: as_printed}
+        derivation: {relation: authors Gibbs-energy-minimization equilibrium calculation at the four Table 3 T-P points, inputs: [schaefer_2012_table2_bse_bulk_composition], output_unit: as_printed}
         locator: {pdf_page_index: 33, table: '3', row: all BSE cells, column: major atmospheric composition}
         phase: gas_phase
         regime: engine_evaluation
@@ -530,7 +530,7 @@ species:
       - observation_id: schaefer_2012_bse_variable_h_model_outputs
         type: gas_speciation
         derived_from: [schaefer_2012_table2_bse_bulk_composition]
-        derivation: {relation: authors variable-hydrogen Gibbs-energy-minimization equilibrium calculation, output_unit: as_printed}
+        derivation: {relation: authors variable-hydrogen Gibbs-energy-minimization equilibrium calculation, inputs: [schaefer_2012_table2_bse_bulk_composition], output_unit: as_printed}
         locator: {pdf_page_index: 12, figure: '3', section: '3.2.1 Hydrogen', row: BSE prose summaries, column: printed model results}
         phase: gas_phase
         regime: engine_evaluation
@@ -553,7 +553,7 @@ species:
       - observation_id: schaefer_2012_bse_variable_c_model_outputs
         type: gas_speciation
         derived_from: [schaefer_2012_table2_bse_bulk_composition]
-        derivation: {relation: authors variable-carbon Gibbs-energy-minimization equilibrium calculation, output_unit: as_printed}
+        derivation: {relation: authors variable-carbon Gibbs-energy-minimization equilibrium calculation, inputs: [schaefer_2012_table2_bse_bulk_composition], output_unit: as_printed}
         locator: {pdf_page_index: 13, figure: '4', section: '3.2.2 Carbon', row: BSE prose summaries, column: printed model results}
         phase: gas_phase
         regime: engine_evaluation
@@ -575,7 +575,7 @@ species:
       - observation_id: schaefer_2012_bse_variable_o_model_outputs
         type: gas_speciation
         derived_from: [schaefer_2012_table2_bse_bulk_composition]
-        derivation: {relation: authors variable-oxygen Gibbs-energy-minimization equilibrium calculation, output_unit: as_printed}
+        derivation: {relation: authors variable-oxygen Gibbs-energy-minimization equilibrium calculation, inputs: [schaefer_2012_table2_bse_bulk_composition], output_unit: as_printed}
         locator: {pdf_page_index: 14, figure: '5', section: '3.2.3 Oxygen', row: BSE prose summaries, column: printed model results}
         phase: gas_phase
         regime: engine_evaluation
@@ -601,7 +601,7 @@ species:
       - observation_id: schaefer_2012_bse_exoplanet_atmospheric_profiles
         type: gas_speciation
         derived_from: [schaefer_2012_table2_bse_bulk_composition]
-        derivation: {relation: authors dry-adiabatic CoRoT-7b equilibrium-profile calculation, output_unit: as_printed}
+        derivation: {relation: authors dry-adiabatic CoRoT-7b equilibrium-profile calculation, inputs: [schaefer_2012_table2_bse_bulk_composition], output_unit: as_printed}
         locator: {pdf_page_index: 22, figure: '11', section: '4.2.2 Hot Super-Earths', row: prose summaries, column: condensation pressures}
         phase: gas_phase_and_condensate
         regime: engine_evaluation
@@ -640,9 +640,9 @@ species:
     observations:
       - observation_id: schaefer_2012_table4_photochemical_lifetimes
         type: rate_series
-        derived_from: [schaefer_2012_table2_continental_crust_bulk_composition]
-        derivation: {relation: authors photochemical lifetime calculation from printed photodissociation rates, output_unit: as_printed}
-        locator: {pdf_page_index: 34, table: '4', row: all, column: 'tchem (s) at 1 AU, 0.25 AU, 0.017 AU'}
+        derived_from: [schaefer_2012_table4_j1_photolysis_rates]
+        derivation: {relation: "authors' photochemical lifetime calculation from Table 4 photodissociation rates; §4.3 (PDF page index 24) states, 'We then scaled the solar flux as a function of radial distance'", inputs: [schaefer_2012_table4_j1_photolysis_rates], output_unit: as_printed}
+        locator: {pdf_page_index: 24, section: '4.3 Photochemistry', paragraph: 2, row: photochemical lifetime calculation, column: photodissociation rates and solar-flux scaling}
         phase: gas_phase
         regime: engine_evaluation
         units: 'tchem s at 1 AU, 0.25 AU, 0.017 AU as printed'
@@ -661,36 +661,247 @@ species:
             - {gas: H2O, column: 'tchem (s), 1 AU', value_as_printed: '8.47×10^4', locator: {pdf_page_index: 34, table: '4', row: H2O, column: 'tchem (s), 1 AU'}}
             - {gas: H2O, column: 'tchem (s), 0.25 AU', value_as_printed: '5.29×10^3', locator: {pdf_page_index: 34, table: '4', row: H2O, column: 'tchem (s), 0.25 AU'}}
             - {gas: H2O, column: 'tchem (s), 0.017 AU', value_as_printed: '2.45×10^1', locator: {pdf_page_index: 34, table: '4', row: H2O, column: 'tchem (s), 0.017 AU'}}
+
+      - observation_id: schaefer_2012_table4_photochemical_lifetimes_co2
+        type: rate_series
+        derived_from: [schaefer_2012_table4_j1_photolysis_rates_co2]
+        derivation: {relation: "authors' photochemical lifetime calculation from Table 4 photodissociation rates; §4.3 (PDF page index 24) states, 'We then scaled the solar flux as a function of radial distance'", inputs: [schaefer_2012_table4_j1_photolysis_rates_co2], output_unit: as_printed}
+        locator: {pdf_page_index: 24, section: '4.3 Photochemistry', paragraph: 2, row: photochemical lifetime calculation, column: photodissociation rates and solar-flux scaling}
+        phase: gas_phase
+        regime: engine_evaluation
+        units: 'tchem s at 1 AU, 0.25 AU, 0.017 AU as printed'
+        values:
+          quantity: photochemical_dissociation_rate_and_chemical_lifetime
+          method_class: model_derived
+          evidence_class: model_derived
+          value_status: derived
+          generator: authors chemical-lifetime calculation from printed photodissociation rates; SiO rate estimated from Matveev (1986)
+          derivation: Chemical lifetimes are transcribed from the authors' calculation; no orbital scaling or lifetime recomputation was performed.
+          conditions:
+            temperature: {tag: unknown, reason: not_published}
+            composition: Earth-like atmospheric model
+            fO2: {tag: unknown, reason: not_published}
+          rows:
             - {gas: CO2, column: 'tchem (s), 1 AU', value_as_printed: '4.95×10^5', locator: {pdf_page_index: 34, table: '4', row: CO2, column: 'tchem (s), 1 AU'}}
             - {gas: CO2, column: 'tchem (s), 0.25 AU', value_as_printed: '3.09×10^4', locator: {pdf_page_index: 34, table: '4', row: CO2, column: 'tchem (s), 0.25 AU'}}
             - {gas: CO2, column: 'tchem (s), 0.017 AU', value_as_printed: '1.43×10^2', locator: {pdf_page_index: 34, table: '4', row: CO2, column: 'tchem (s), 0.017 AU'}}
+
+      - observation_id: schaefer_2012_table4_photochemical_lifetimes_co
+        type: rate_series
+        derived_from: [schaefer_2012_table4_j1_photolysis_rates_co]
+        derivation: {relation: "authors' photochemical lifetime calculation from Table 4 photodissociation rates; §4.3 (PDF page index 24) states, 'We then scaled the solar flux as a function of radial distance'", inputs: [schaefer_2012_table4_j1_photolysis_rates_co], output_unit: as_printed}
+        locator: {pdf_page_index: 24, section: '4.3 Photochemistry', paragraph: 2, row: photochemical lifetime calculation, column: photodissociation rates and solar-flux scaling}
+        phase: gas_phase
+        regime: engine_evaluation
+        units: 'tchem s at 1 AU, 0.25 AU, 0.017 AU as printed'
+        values:
+          quantity: photochemical_dissociation_rate_and_chemical_lifetime
+          method_class: model_derived
+          evidence_class: model_derived
+          value_status: derived
+          generator: authors chemical-lifetime calculation from printed photodissociation rates; SiO rate estimated from Matveev (1986)
+          derivation: Chemical lifetimes are transcribed from the authors' calculation; no orbital scaling or lifetime recomputation was performed.
+          conditions:
+            temperature: {tag: unknown, reason: not_published}
+            composition: Earth-like atmospheric model
+            fO2: {tag: unknown, reason: not_published}
+          rows:
             - {gas: CO, column: 'tchem (s), 1 AU', value_as_printed: '1.55×10^6', locator: {pdf_page_index: 34, table: '4', row: CO, column: 'tchem (s), 1 AU'}}
             - {gas: CO, column: 'tchem (s), 0.25 AU', value_as_printed: '9.68×10^4', locator: {pdf_page_index: 34, table: '4', row: CO, column: 'tchem (s), 0.25 AU'}}
             - {gas: CO, column: 'tchem (s), 0.017 AU', value_as_printed: '4.47×10^2', locator: {pdf_page_index: 34, table: '4', row: CO, column: 'tchem (s), 0.017 AU'}}
+
+      - observation_id: schaefer_2012_table4_photochemical_lifetimes_so2
+        type: rate_series
+        derived_from: [schaefer_2012_table4_j1_photolysis_rates_so2]
+        derivation: {relation: "authors' photochemical lifetime calculation from Table 4 photodissociation rates; §4.3 (PDF page index 24) states, 'We then scaled the solar flux as a function of radial distance'", inputs: [schaefer_2012_table4_j1_photolysis_rates_so2], output_unit: as_printed}
+        locator: {pdf_page_index: 24, section: '4.3 Photochemistry', paragraph: 2, row: photochemical lifetime calculation, column: photodissociation rates and solar-flux scaling}
+        phase: gas_phase
+        regime: engine_evaluation
+        units: 'tchem s at 1 AU, 0.25 AU, 0.017 AU as printed'
+        values:
+          quantity: photochemical_dissociation_rate_and_chemical_lifetime
+          method_class: model_derived
+          evidence_class: model_derived
+          value_status: derived
+          generator: authors chemical-lifetime calculation from printed photodissociation rates; SiO rate estimated from Matveev (1986)
+          derivation: Chemical lifetimes are transcribed from the authors' calculation; no orbital scaling or lifetime recomputation was performed.
+          conditions:
+            temperature: {tag: unknown, reason: not_published}
+            composition: Earth-like atmospheric model
+            fO2: {tag: unknown, reason: not_published}
+          rows:
             - {gas: SO2, column: 'tchem (s), 1 AU', value_as_printed: '4.01×10^3', locator: {pdf_page_index: 34, table: '4', row: SO2, column: 'tchem (s), 1 AU'}}
             - {gas: SO2, column: 'tchem (s), 0.25 AU', value_as_printed: '2.51×10^2', locator: {pdf_page_index: 34, table: '4', row: SO2, column: 'tchem (s), 0.25 AU'}}
             - {gas: SO2, column: 'tchem (s), 0.017 AU', value_as_printed: '1.16×10^0', locator: {pdf_page_index: 34, table: '4', row: SO2, column: 'tchem (s), 0.017 AU'}}
+
+      - observation_id: schaefer_2012_table4_photochemical_lifetimes_o2
+        type: rate_series
+        derived_from: [schaefer_2012_table4_j1_photolysis_rates_o2]
+        derivation: {relation: "authors' photochemical lifetime calculation from Table 4 photodissociation rates; §4.3 (PDF page index 24) states, 'We then scaled the solar flux as a function of radial distance'", inputs: [schaefer_2012_table4_j1_photolysis_rates_o2], output_unit: as_printed}
+        locator: {pdf_page_index: 24, section: '4.3 Photochemistry', paragraph: 2, row: photochemical lifetime calculation, column: photodissociation rates and solar-flux scaling}
+        phase: gas_phase
+        regime: engine_evaluation
+        units: 'tchem s at 1 AU, 0.25 AU, 0.017 AU as printed'
+        values:
+          quantity: photochemical_dissociation_rate_and_chemical_lifetime
+          method_class: model_derived
+          evidence_class: model_derived
+          value_status: derived
+          generator: authors chemical-lifetime calculation from printed photodissociation rates; SiO rate estimated from Matveev (1986)
+          derivation: Chemical lifetimes are transcribed from the authors' calculation; no orbital scaling or lifetime recomputation was performed.
+          conditions:
+            temperature: {tag: unknown, reason: not_published}
+            composition: Earth-like atmospheric model
+            fO2: {tag: unknown, reason: not_published}
+          rows:
             - {gas: O2, column: 'tchem (s), 1 AU', value_as_printed: '2.06×10^5', locator: {pdf_page_index: 34, table: '4', row: O2, column: 'tchem (s), 1 AU'}}
             - {gas: O2, column: 'tchem (s), 0.25 AU', value_as_printed: '1.29×10^4', locator: {pdf_page_index: 34, table: '4', row: O2, column: 'tchem (s), 0.25 AU'}}
             - {gas: O2, column: 'tchem (s), 0.017 AU', value_as_printed: '5.94×10^1', locator: {pdf_page_index: 34, table: '4', row: O2, column: 'tchem (s), 0.017 AU'}}
+
+      - observation_id: schaefer_2012_table4_photochemical_lifetimes_ch4
+        type: rate_series
+        derived_from: [schaefer_2012_table4_j1_photolysis_rates_ch4]
+        derivation: {relation: "authors' photochemical lifetime calculation from Table 4 photodissociation rates; §4.3 (PDF page index 24) states, 'We then scaled the solar flux as a function of radial distance'", inputs: [schaefer_2012_table4_j1_photolysis_rates_ch4], output_unit: as_printed}
+        locator: {pdf_page_index: 24, section: '4.3 Photochemistry', paragraph: 2, row: photochemical lifetime calculation, column: photodissociation rates and solar-flux scaling}
+        phase: gas_phase
+        regime: engine_evaluation
+        units: 'tchem s at 1 AU, 0.25 AU, 0.017 AU as printed'
+        values:
+          quantity: photochemical_dissociation_rate_and_chemical_lifetime
+          method_class: model_derived
+          evidence_class: model_derived
+          value_status: derived
+          generator: authors chemical-lifetime calculation from printed photodissociation rates; SiO rate estimated from Matveev (1986)
+          derivation: Chemical lifetimes are transcribed from the authors' calculation; no orbital scaling or lifetime recomputation was performed.
+          conditions:
+            temperature: {tag: unknown, reason: not_published}
+            composition: Earth-like atmospheric model
+            fO2: {tag: unknown, reason: not_published}
+          rows:
             - {gas: CH4, column: 'tchem (s), 1 AU', value_as_printed: '1.28×10^5', locator: {pdf_page_index: 34, table: '4', row: CH4, column: 'tchem (s), 1 AU'}}
             - {gas: CH4, column: 'tchem (s), 0.25 AU', value_as_printed: '8.02×10^3', locator: {pdf_page_index: 34, table: '4', row: CH4, column: 'tchem (s), 0.25 AU'}}
             - {gas: CH4, column: 'tchem (s), 0.017 AU', value_as_printed: '3.71×10^1', locator: {pdf_page_index: 34, table: '4', row: CH4, column: 'tchem (s), 0.017 AU'}}
+
+      - observation_id: schaefer_2012_table4_photochemical_lifetimes_nh3
+        type: rate_series
+        derived_from: [schaefer_2012_table4_j1_photolysis_rates_nh3]
+        derivation: {relation: "authors' photochemical lifetime calculation from Table 4 photodissociation rates; §4.3 (PDF page index 24) states, 'We then scaled the solar flux as a function of radial distance'", inputs: [schaefer_2012_table4_j1_photolysis_rates_nh3], output_unit: as_printed}
+        locator: {pdf_page_index: 24, section: '4.3 Photochemistry', paragraph: 2, row: photochemical lifetime calculation, column: photodissociation rates and solar-flux scaling}
+        phase: gas_phase
+        regime: engine_evaluation
+        units: 'tchem s at 1 AU, 0.25 AU, 0.017 AU as printed'
+        values:
+          quantity: photochemical_dissociation_rate_and_chemical_lifetime
+          method_class: model_derived
+          evidence_class: model_derived
+          value_status: derived
+          generator: authors chemical-lifetime calculation from printed photodissociation rates; SiO rate estimated from Matveev (1986)
+          derivation: Chemical lifetimes are transcribed from the authors' calculation; no orbital scaling or lifetime recomputation was performed.
+          conditions:
+            temperature: {tag: unknown, reason: not_published}
+            composition: Earth-like atmospheric model
+            fO2: {tag: unknown, reason: not_published}
+          rows:
             - {gas: NH3, column: 'tchem (s), 1 AU', value_as_printed: '5.73×10^3', locator: {pdf_page_index: 34, table: '4', row: NH3, column: 'tchem (s), 1 AU'}}
             - {gas: NH3, column: 'tchem (s), 0.25 AU', value_as_printed: '3.58×10^2', locator: {pdf_page_index: 34, table: '4', row: NH3, column: 'tchem (s), 0.25 AU'}}
             - {gas: NH3, column: 'tchem (s), 0.017 AU', value_as_printed: '1.66×10^0', locator: {pdf_page_index: 34, table: '4', row: NH3, column: 'tchem (s), 0.017 AU'}}
+
+      - observation_id: schaefer_2012_table4_photochemical_lifetimes_h2s
+        type: rate_series
+        derived_from: [schaefer_2012_table4_j1_photolysis_rates_h2s]
+        derivation: {relation: "authors' photochemical lifetime calculation from Table 4 photodissociation rates; §4.3 (PDF page index 24) states, 'We then scaled the solar flux as a function of radial distance'", inputs: [schaefer_2012_table4_j1_photolysis_rates_h2s], output_unit: as_printed}
+        locator: {pdf_page_index: 24, section: '4.3 Photochemistry', paragraph: 2, row: photochemical lifetime calculation, column: photodissociation rates and solar-flux scaling}
+        phase: gas_phase
+        regime: engine_evaluation
+        units: 'tchem s at 1 AU, 0.25 AU, 0.017 AU as printed'
+        values:
+          quantity: photochemical_dissociation_rate_and_chemical_lifetime
+          method_class: model_derived
+          evidence_class: model_derived
+          value_status: derived
+          generator: authors chemical-lifetime calculation from printed photodissociation rates; SiO rate estimated from Matveev (1986)
+          derivation: Chemical lifetimes are transcribed from the authors' calculation; no orbital scaling or lifetime recomputation was performed.
+          conditions:
+            temperature: {tag: unknown, reason: not_published}
+            composition: Earth-like atmospheric model
+            fO2: {tag: unknown, reason: not_published}
+          rows:
             - {gas: H2S, column: 'tchem (s), 1 AU', value_as_printed: '3.03×10^2', locator: {pdf_page_index: 34, table: '4', row: H2S, column: 'tchem (s), 1 AU'}}
             - {gas: H2S, column: 'tchem (s), 0.25 AU', value_as_printed: '1.89×10^1', locator: {pdf_page_index: 34, table: '4', row: H2S, column: 'tchem (s), 0.25 AU'}}
             - {gas: H2S, column: 'tchem (s), 0.017 AU', value_as_printed: '8.76×10^-2', locator: {pdf_page_index: 34, table: '4', row: H2S, column: 'tchem (s), 0.017 AU'}}
+
+      - observation_id: schaefer_2012_table4_photochemical_lifetimes_no
+        type: rate_series
+        derived_from: [schaefer_2012_table4_j1_photolysis_rates_no]
+        derivation: {relation: "authors' photochemical lifetime calculation from Table 4 photodissociation rates; §4.3 (PDF page index 24) states, 'We then scaled the solar flux as a function of radial distance'", inputs: [schaefer_2012_table4_j1_photolysis_rates_no], output_unit: as_printed}
+        locator: {pdf_page_index: 24, section: '4.3 Photochemistry', paragraph: 2, row: photochemical lifetime calculation, column: photodissociation rates and solar-flux scaling}
+        phase: gas_phase
+        regime: engine_evaluation
+        units: 'tchem s at 1 AU, 0.25 AU, 0.017 AU as printed'
+        values:
+          quantity: photochemical_dissociation_rate_and_chemical_lifetime
+          method_class: model_derived
+          evidence_class: model_derived
+          value_status: derived
+          generator: authors chemical-lifetime calculation from printed photodissociation rates; SiO rate estimated from Matveev (1986)
+          derivation: Chemical lifetimes are transcribed from the authors' calculation; no orbital scaling or lifetime recomputation was performed.
+          conditions:
+            temperature: {tag: unknown, reason: not_published}
+            composition: Earth-like atmospheric model
+            fO2: {tag: unknown, reason: not_published}
+          rows:
             - {gas: 'NO', column: 'tchem (s), 1 AU', value_as_printed: '2.83×10^5', locator: {pdf_page_index: 34, table: '4', row: 'NO', column: 'tchem (s), 1 AU'}}
             - {gas: 'NO', column: 'tchem (s), 0.25 AU', value_as_printed: '1.77×10^4', locator: {pdf_page_index: 34, table: '4', row: 'NO', column: 'tchem (s), 0.25 AU'}}
             - {gas: 'NO', column: 'tchem (s), 0.017 AU', value_as_printed: '8.19×10^1', locator: {pdf_page_index: 34, table: '4', row: 'NO', column: 'tchem (s), 0.017 AU'}}
+
+      - observation_id: schaefer_2012_table4_photochemical_lifetimes_n2
+        type: rate_series
+        derived_from: [schaefer_2012_table4_j1_photolysis_rates_n2]
+        derivation: {relation: "authors' photochemical lifetime calculation from Table 4 photodissociation rates; §4.3 (PDF page index 24) states, 'We then scaled the solar flux as a function of radial distance'", inputs: [schaefer_2012_table4_j1_photolysis_rates_n2], output_unit: as_printed}
+        locator: {pdf_page_index: 24, section: '4.3 Photochemistry', paragraph: 2, row: photochemical lifetime calculation, column: photodissociation rates and solar-flux scaling}
+        phase: gas_phase
+        regime: engine_evaluation
+        units: 'tchem s at 1 AU, 0.25 AU, 0.017 AU as printed'
+        values:
+          quantity: photochemical_dissociation_rate_and_chemical_lifetime
+          method_class: model_derived
+          evidence_class: model_derived
+          value_status: derived
+          generator: authors chemical-lifetime calculation from printed photodissociation rates; SiO rate estimated from Matveev (1986)
+          derivation: Chemical lifetimes are transcribed from the authors' calculation; no orbital scaling or lifetime recomputation was performed.
+          conditions:
+            temperature: {tag: unknown, reason: not_published}
+            composition: Earth-like atmospheric model
+            fO2: {tag: unknown, reason: not_published}
+          rows:
             - {gas: N2, column: 'tchem (s), 1 AU', value_as_printed: '9.76×10^5', locator: {pdf_page_index: 34, table: '4', row: N2, column: 'tchem (s), 1 AU'}}
             - {gas: N2, column: 'tchem (s), 0.25 AU', value_as_printed: '6.10×10^4', locator: {pdf_page_index: 34, table: '4', row: N2, column: 'tchem (s), 0.25 AU'}}
             - {gas: N2, column: 'tchem (s), 0.017 AU', value_as_printed: '2.82×10^2', locator: {pdf_page_index: 34, table: '4', row: N2, column: 'tchem (s), 0.017 AU'}}
+
+      - observation_id: schaefer_2012_table4_photochemical_lifetimes_sio
+        type: rate_series
+        derived_from: [schaefer_2012_table4_sio_j1_photolysis_rate]
+        derivation: {relation: "authors' photochemical lifetime calculation from Table 4 photodissociation rates; §4.3 (PDF page index 24) states, 'We then scaled the solar flux as a function of radial distance'", inputs: [schaefer_2012_table4_sio_j1_photolysis_rate], output_unit: as_printed}
+        locator: {pdf_page_index: 24, section: '4.3 Photochemistry', paragraph: 2, row: photochemical lifetime calculation, column: photodissociation rates and solar-flux scaling}
+        phase: gas_phase
+        regime: engine_evaluation
+        units: 'tchem s at 1 AU, 0.25 AU, 0.017 AU as printed'
+        values:
+          quantity: photochemical_dissociation_rate_and_chemical_lifetime
+          method_class: model_derived
+          evidence_class: model_derived
+          value_status: derived
+          generator: authors chemical-lifetime calculation from printed photodissociation rates; SiO rate estimated from Matveev (1986)
+          derivation: Chemical lifetimes are transcribed from the authors' calculation; no orbital scaling or lifetime recomputation was performed.
+          conditions:
+            temperature: {tag: unknown, reason: not_published}
+            composition: Earth-like atmospheric model
+            fO2: {tag: unknown, reason: not_published}
+          rows:
             - {gas: SiO, column: 'tchem (s), 1 AU', value_as_printed: '2.48×10^2', locator: {pdf_page_index: 34, table: '4', row: SiO, column: 'tchem (s), 1 AU'}}
             - {gas: SiO, column: 'tchem (s), 0.25 AU', value_as_printed: '1.55×10^1', locator: {pdf_page_index: 34, table: '4', row: SiO, column: 'tchem (s), 0.25 AU'}}
             - {gas: SiO, column: 'tchem (s), 0.017 AU', value_as_printed: '7.17×10^-2', locator: {pdf_page_index: 34, table: '4', row: SiO, column: 'tchem (s), 0.017 AU'}}
+
       - observation_id: schaefer_2012_table4_j1_photolysis_rates
         type: rate_series
         quote: 'Table 4 footnote a: top of the atmosphere, Levine (1985).'
@@ -706,15 +917,151 @@ species:
           attribution: 'Levine (1985)'
           rows:
             - {gas: H2O, column: 'J1 (s^-1), 1 AU', value_as_printed: '1.18×10^-5', source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: H2O, column: 'J1 (s^-1), 1 AU'}}
+
+      - observation_id: schaefer_2012_table4_j1_photolysis_rates_co2
+        type: rate_series
+        quote: 'Table 4 footnote a: top of the atmosphere, Levine (1985).'
+        locator: {pdf_page_index: 34, table: '4', row: all, column: 'J1 (s^-1), 1 AU'}
+        phase: gas_phase
+        regime: tabulation
+        units: 'J1 s^-1 at 1 AU as printed'
+        values:
+          quantity: photochemical_dissociation_rate_and_chemical_lifetime
+          method_class: quoted_literature
+          evidence_class: quoted_literature
+          value_status: printed
+          attribution: 'Levine (1985)'
+          rows:
             - {gas: CO2, column: 'J1 (s^-1), 1 AU', value_as_printed: '2.02×10^-6', source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: CO2, column: 'J1 (s^-1), 1 AU'}}
+
+      - observation_id: schaefer_2012_table4_j1_photolysis_rates_co
+        type: rate_series
+        quote: 'Table 4 footnote a: top of the atmosphere, Levine (1985).'
+        locator: {pdf_page_index: 34, table: '4', row: all, column: 'J1 (s^-1), 1 AU'}
+        phase: gas_phase
+        regime: tabulation
+        units: 'J1 s^-1 at 1 AU as printed'
+        values:
+          quantity: photochemical_dissociation_rate_and_chemical_lifetime
+          method_class: quoted_literature
+          evidence_class: quoted_literature
+          value_status: printed
+          attribution: 'Levine (1985)'
+          rows:
             - {gas: CO, column: 'J1 (s^-1), 1 AU', value_as_printed: '6.46×10^-7', source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: CO, column: 'J1 (s^-1), 1 AU'}}
+
+      - observation_id: schaefer_2012_table4_j1_photolysis_rates_so2
+        type: rate_series
+        quote: 'Table 4 footnote a: top of the atmosphere, Levine (1985).'
+        locator: {pdf_page_index: 34, table: '4', row: all, column: 'J1 (s^-1), 1 AU'}
+        phase: gas_phase
+        regime: tabulation
+        units: 'J1 s^-1 at 1 AU as printed'
+        values:
+          quantity: photochemical_dissociation_rate_and_chemical_lifetime
+          method_class: quoted_literature
+          evidence_class: quoted_literature
+          value_status: printed
+          attribution: 'Levine (1985)'
+          rows:
             - {gas: SO2, column: 'J1 (s^-1), 1 AU', value_as_printed: '2.49×10^-4', source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: SO2, column: 'J1 (s^-1), 1 AU'}}
+
+      - observation_id: schaefer_2012_table4_j1_photolysis_rates_o2
+        type: rate_series
+        quote: 'Table 4 footnote a: top of the atmosphere, Levine (1985).'
+        locator: {pdf_page_index: 34, table: '4', row: all, column: 'J1 (s^-1), 1 AU'}
+        phase: gas_phase
+        regime: tabulation
+        units: 'J1 s^-1 at 1 AU as printed'
+        values:
+          quantity: photochemical_dissociation_rate_and_chemical_lifetime
+          method_class: quoted_literature
+          evidence_class: quoted_literature
+          value_status: printed
+          attribution: 'Levine (1985)'
+          rows:
             - {gas: O2, column: 'J1 (s^-1), 1 AU', value_as_printed: '4.86×10^-6', source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: O2, column: 'J1 (s^-1), 1 AU'}}
+
+      - observation_id: schaefer_2012_table4_j1_photolysis_rates_ch4
+        type: rate_series
+        quote: 'Table 4 footnote a: top of the atmosphere, Levine (1985).'
+        locator: {pdf_page_index: 34, table: '4', row: all, column: 'J1 (s^-1), 1 AU'}
+        phase: gas_phase
+        regime: tabulation
+        units: 'J1 s^-1 at 1 AU as printed'
+        values:
+          quantity: photochemical_dissociation_rate_and_chemical_lifetime
+          method_class: quoted_literature
+          evidence_class: quoted_literature
+          value_status: printed
+          attribution: 'Levine (1985)'
+          rows:
             - {gas: CH4, column: 'J1 (s^-1), 1 AU', value_as_printed: '7.79×10^-6', source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: CH4, column: 'J1 (s^-1), 1 AU'}}
+
+      - observation_id: schaefer_2012_table4_j1_photolysis_rates_nh3
+        type: rate_series
+        quote: 'Table 4 footnote a: top of the atmosphere, Levine (1985).'
+        locator: {pdf_page_index: 34, table: '4', row: all, column: 'J1 (s^-1), 1 AU'}
+        phase: gas_phase
+        regime: tabulation
+        units: 'J1 s^-1 at 1 AU as printed'
+        values:
+          quantity: photochemical_dissociation_rate_and_chemical_lifetime
+          method_class: quoted_literature
+          evidence_class: quoted_literature
+          value_status: printed
+          attribution: 'Levine (1985)'
+          rows:
             - {gas: NH3, column: 'J1 (s^-1), 1 AU', value_as_printed: '1.74×10^-4', source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: NH3, column: 'J1 (s^-1), 1 AU'}}
+
+      - observation_id: schaefer_2012_table4_j1_photolysis_rates_h2s
+        type: rate_series
+        quote: 'Table 4 footnote a: top of the atmosphere, Levine (1985).'
+        locator: {pdf_page_index: 34, table: '4', row: all, column: 'J1 (s^-1), 1 AU'}
+        phase: gas_phase
+        regime: tabulation
+        units: 'J1 s^-1 at 1 AU as printed'
+        values:
+          quantity: photochemical_dissociation_rate_and_chemical_lifetime
+          method_class: quoted_literature
+          evidence_class: quoted_literature
+          value_status: printed
+          attribution: 'Levine (1985)'
+          rows:
             - {gas: H2S, column: 'J1 (s^-1), 1 AU', value_as_printed: '3.30×10^-3', source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: H2S, column: 'J1 (s^-1), 1 AU'}}
+
+      - observation_id: schaefer_2012_table4_j1_photolysis_rates_no
+        type: rate_series
+        quote: 'Table 4 footnote a: top of the atmosphere, Levine (1985).'
+        locator: {pdf_page_index: 34, table: '4', row: all, column: 'J1 (s^-1), 1 AU'}
+        phase: gas_phase
+        regime: tabulation
+        units: 'J1 s^-1 at 1 AU as printed'
+        values:
+          quantity: photochemical_dissociation_rate_and_chemical_lifetime
+          method_class: quoted_literature
+          evidence_class: quoted_literature
+          value_status: printed
+          attribution: 'Levine (1985)'
+          rows:
             - {gas: 'NO', column: 'J1 (s^-1), 1 AU', value_as_printed: '3.53×10^-6', source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: 'NO', column: 'J1 (s^-1), 1 AU'}}
+
+      - observation_id: schaefer_2012_table4_j1_photolysis_rates_n2
+        type: rate_series
+        quote: 'Table 4 footnote a: top of the atmosphere, Levine (1985).'
+        locator: {pdf_page_index: 34, table: '4', row: all, column: 'J1 (s^-1), 1 AU'}
+        phase: gas_phase
+        regime: tabulation
+        units: 'J1 s^-1 at 1 AU as printed'
+        values:
+          quantity: photochemical_dissociation_rate_and_chemical_lifetime
+          method_class: quoted_literature
+          evidence_class: quoted_literature
+          value_status: printed
+          attribution: 'Levine (1985)'
+          rows:
             - {gas: N2, column: 'J1 (s^-1), 1 AU', value_as_printed: '1.02×10^-6', source_attribution: 'Levine (1985)', locator: {pdf_page_index: 34, table: '4', row: N2, column: 'J1 (s^-1), 1 AU'}}
+
       - observation_id: schaefer_2012_table4_sio_j1_photolysis_rate
         type: rate_series
         quote: 'Table 4 footnote b: estimated based on data from Matveev (1986).'
@@ -832,7 +1179,7 @@ species:
       - observation_id: schaefer_2012_observable_gas_thresholds
         type: gas_speciation
         derived_from: [schaefer_2012_cc_100bar_major_gas_summary, schaefer_2012_bse_100bar_major_gas_summary]
-        derivation: {relation: authors equilibrium and atmospheric-chemistry calculations, output_unit: as_printed}
+        derivation: {relation: authors equilibrium and atmospheric-chemistry calculations, inputs: [schaefer_2012_cc_100bar_major_gas_summary, schaefer_2012_bse_100bar_major_gas_summary], output_unit: as_printed}
         locator: {pdf_page_index: 25, section: '4.4 Spectroscopically Observable Gases', row: prose summaries, column: threshold and peak abundances}
         phase: gas_phase
         regime: engine_evaluation

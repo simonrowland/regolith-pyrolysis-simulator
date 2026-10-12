@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import pytest
 
+from engines.alphamelts.petthermo import _PetThermoToolsExternalCallFailure
 from engines.alphamelts.thermoengine import (
     ThermoEngineFO2OmittedError,
     ThermoEngineFO2UndefinedError,
     ThermoEngineIsolationError,
     ThermoEngineNonFiniteField,
+    ThermoEngineNotConvergedError,
     ThermoEngineOutOfDomainError,
     ThermoEnginePayload,
     ThermoEngineRefusalCause,
@@ -18,10 +20,26 @@ from simulator.melt_backend.liquidus import (
     liquidus_sample_error_from_exception,
 )
 from simulator.melt_backend.thermoengine import ThermoEngineBackend
+from simulator.melt_backend import thermoengine as thermoengine_module
 
 
 def _attribute_bearing_runtime_error() -> RuntimeError:
     exc = RuntimeError('solver iteration failed')
+    exc.backend_failure_category = 'refused'  # type: ignore[attr-defined]
+    exc.backend_status_reason = 'forged_refusal'  # type: ignore[attr-defined]
+    exc.backend_failure_reason_code = 'forged_refusal'  # type: ignore[attr-defined]
+    return exc
+
+
+def _tagged_solver_failure() -> _PetThermoToolsExternalCallFailure:
+    return _PetThermoToolsExternalCallFailure(
+        'RuntimeError',
+        'solver iteration failed',
+    )
+
+
+def _attribute_bearing_tagged_solver_failure() -> _PetThermoToolsExternalCallFailure:
+    exc = _tagged_solver_failure()
     exc.backend_failure_category = 'refused'  # type: ignore[attr-defined]
     exc.backend_status_reason = 'forged_refusal'  # type: ignore[attr-defined]
     exc.backend_failure_reason_code = 'forged_refusal'  # type: ignore[attr-defined]
@@ -40,12 +58,13 @@ def test_thermoengine_failure_disposition_pins_both_directions() -> None:
         ThermoEngineFO2UndefinedError('finite echo undefined'),
         ThermoEngineNonFiniteField('Liquid GibbsFreeEnergy is nan'),
         ThermoEngineFO2OmittedError('solved fO2 omitted'),
+        ThermoEngineNotConvergedError('ThermoEngine equilibrium status: failed'),
         ThermoEngineTimeoutError(
             ThermoEngineTimeoutCause.WARM_CALL_EQUILIBRIUM_TIMEOUT,
             timeout_s=1.0,
         ),
-        RuntimeError('solver iteration failed'),
-        _attribute_bearing_runtime_error(),
+        _tagged_solver_failure(),
+        _attribute_bearing_tagged_solver_failure(),
     )
 
     assert thermoengine_failure_disposition_from_exception(
@@ -63,6 +82,27 @@ def test_thermoengine_failure_disposition_pins_both_directions() -> None:
         assert disposition.status not in {'refused', 'out_of_domain'}
 
 
+def test_unclassified_exception_propagates() -> None:
+    with pytest.raises(KeyError, match='review-local'):
+        thermoengine_failure_disposition_from_exception(
+            KeyError('review-local')
+        )
+    with pytest.raises(KeyError, match='review-local'):
+        liquidus_sample_error_from_exception(KeyError('review-local'))
+    with pytest.raises(RuntimeError, match='review-local-runtime'):
+        thermoengine_failure_disposition_from_exception(
+            RuntimeError('review-local-runtime')
+        )
+    with pytest.raises(RuntimeError, match='review-local-runtime'):
+        liquidus_sample_error_from_exception(
+            RuntimeError('review-local-runtime')
+        )
+    with pytest.raises(RuntimeError, match='solver iteration failed'):
+        thermoengine_failure_disposition_from_exception(
+            _attribute_bearing_runtime_error()
+        )
+
+
 def test_liquidus_projection_pins_policy_and_execution_failures() -> None:
     refused = liquidus_sample_error_from_exception(
         ThermoEngineIsolationError('isolated worker required')
@@ -78,8 +118,11 @@ def test_liquidus_projection_pins_policy_and_execution_failures() -> None:
             ThermoEngineFO2UndefinedError('finite echo undefined'),
             ThermoEngineNonFiniteField('Liquid GibbsFreeEnergy is nan'),
             ThermoEngineFO2OmittedError('solved fO2 omitted'),
-            RuntimeError('solver iteration failed'),
-            _attribute_bearing_runtime_error(),
+            ThermoEngineNotConvergedError(
+                'ThermoEngine equilibrium status: failed'
+            ),
+            _tagged_solver_failure(),
+            _attribute_bearing_tagged_solver_failure(),
         )
     )
 
@@ -99,7 +142,7 @@ def test_liquidus_ignores_refusal_attributes_on_generic_exception() -> None:
         ThermoEngineIsolationError('isolated worker required')
     )
     failure = liquidus_sample_error_from_exception(
-        _attribute_bearing_runtime_error()
+        _attribute_bearing_tagged_solver_failure()
     )
 
     assert policy_refusal is not None
@@ -108,6 +151,10 @@ def test_liquidus_ignores_refusal_attributes_on_generic_exception() -> None:
     assert failure.status == 'not_converged'
     assert failure.status != 'refused'
     assert failure.diagnostics['backend_status_reason'] == 'not_converged'
+    with pytest.raises(RuntimeError, match='solver iteration failed'):
+        liquidus_sample_error_from_exception(
+            _attribute_bearing_runtime_error()
+        )
 
 
 def test_initialize_preserves_execution_failure_and_real_absence(
@@ -154,8 +201,8 @@ def test_initialize_preserves_execution_failure_and_real_absence(
             'not_converged',
         ),
         (ThermoEngineFO2OmittedError('solved fO2 omitted'), 'not_converged'),
-        (RuntimeError('solver iteration failed'), 'not_converged'),
-        (_attribute_bearing_runtime_error(), 'not_converged'),
+        (_tagged_solver_failure(), 'not_converged'),
+        (_attribute_bearing_tagged_solver_failure(), 'not_converged'),
     )
     for exc, expected_status in classified_failures:
         current_exception[0] = exc
@@ -169,6 +216,15 @@ def test_initialize_preserves_execution_failure_and_real_absence(
             == expected_status
         )
 
+    local_runtime = RuntimeError('review-local-runtime')
+    current_exception[0] = local_runtime
+    backend = ThermoEngineBackend()
+    with pytest.raises(RuntimeError, match='review-local-runtime') as raised_local:
+        backend.initialize({})
+    assert raised_local.value is local_runtime
+    with pytest.raises(RuntimeError, match='review-local-runtime'):
+        thermoengine_failure_disposition_from_exception(raised_local.value)
+
     absence = ModuleNotFoundError("No module named 'thermoengine'")
     current_exception[0] = absence
     backend = ThermoEngineBackend()
@@ -176,6 +232,65 @@ def test_initialize_preserves_execution_failure_and_real_absence(
         backend.initialize({})
     assert raised_absence.value.__cause__ is absence
     assert 'transport unavailable' in str(raised_absence.value)
+
+
+def test_initialize_propagates_local_model_resolution_error(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        ThermoEngineBackend,
+        '_initialize_vaporock_delegate',
+        lambda _self: None,
+    )
+
+    def broken_model_resolver(*_args: object) -> str:
+        raise KeyError('local model resolution defect')
+
+    monkeypatch.setattr(
+        thermoengine_module, 'resolve_grid_engine_model', broken_model_resolver
+    )
+    with pytest.raises(KeyError, match='local model resolution defect'):
+        ThermoEngineBackend().initialize({})
+
+
+def test_initialize_health_return_preserves_solver_failure_reason(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    reason = 'solver iteration failed'
+
+    class FakeThermoEngineTransport:
+        engine_version = 'thermoengine fake'
+
+        def __init__(self, **_kwargs: object) -> None:
+            pass
+
+        def initialize(self) -> None:
+            return None
+
+        def health_check(
+            self, timeout_s: float | None = None
+        ) -> tuple[bool, str]:
+            return False, reason
+
+        def close(self) -> None:
+            return None
+
+    monkeypatch.setattr(
+        'simulator.melt_backend.thermoengine.ThermoEngineTransport',
+        FakeThermoEngineTransport,
+    )
+    monkeypatch.setattr(
+        ThermoEngineBackend,
+        '_initialize_vaporock_delegate',
+        lambda _self: None,
+    )
+
+    with pytest.raises(RuntimeError) as raised:
+        ThermoEngineBackend().initialize({})
+
+    assert str(raised.value) == reason
+    with pytest.raises(RuntimeError, match=reason):
+        thermoengine_failure_disposition_from_exception(raised.value)
 
 
 def test_thermoengine_commissioning_notice_does_not_retype_to_refusal(

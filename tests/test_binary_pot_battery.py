@@ -435,7 +435,7 @@ def test_report_renders_from_fixture(tmp_path: Path) -> None:
 
 
 def test_extract_reads_vaporock_full_speciation_when_pressures_blank() -> None:
-    activities, pressures = extract_reported_quantities(
+    activities, pressures, invalid_pressures = extract_reported_quantities(
         SimpleNamespace(
             activity_coefficients={"SiO2": 0.4},
             vapor_pressures_Pa={},
@@ -444,6 +444,20 @@ def test_extract_reads_vaporock_full_speciation_when_pressures_blank() -> None:
     )
     assert activities == {"SiO2": 0.4}
     assert pressures == {"Na": 12.0, "K": 3.5}
+    assert invalid_pressures == ()
+
+
+def test_extract_preserves_valid_partial_pressures_and_reports_invalid_names() -> None:
+    activities, pressures, invalid_pressures = extract_reported_quantities(
+        SimpleNamespace(
+            activity_coefficients={},
+            vapor_pressures_Pa={"Na": 20000.0, "Na2": float("nan")},
+        )
+    )
+
+    assert activities == {}
+    assert pressures == {"Na": 20000.0}
+    assert invalid_pressures == ("Na2",)
 
 
 def test_alphamelts_cell_passes_isothermal_subprocess_run_mode() -> None:
@@ -701,10 +715,11 @@ def test_floor_value_is_typed_refusal_not_residual() -> None:
         vapor_pressures_Pa={"Si": floor_fill, "SiO": 0.013},
         vaporock_full_speciation_Pa=None,
     )
-    activities, pressures = extract_reported_quantities(synthetic)
+    activities, pressures, invalid_pressures = extract_reported_quantities(synthetic)
     assert activities == {"SiO2": 0.75}
     assert pressures["Si"] == floor_fill
     assert pressures["SiO"] == pytest.approx(0.013)
+    assert invalid_pressures == ()
 
     _speciation_builtin = {
         "Si": "builtin_authoritative:standard_reaction_term",
@@ -1286,6 +1301,7 @@ def test_equilibrate_cell_payload_round_trip_keeps_flags() -> None:
         wall_s=0.2,
         cpu_s=0.0,
         hostname="test",
+        invalid_gas_partial_pressure_components=("Na2",),
     )
     for cell in (flagged, projected):
         rebuilt = EquilibrateCell.from_payload(cell.as_payload())

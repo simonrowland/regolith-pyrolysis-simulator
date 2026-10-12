@@ -85,118 +85,118 @@ experiments:
         value:
           basis: printed_oxides
           components:
-          - - Al2O3
-            - '0.0177605412496463051663569829'
-          - - CaO
-            - '0.02585443302100830695634774454'
-          - - FeO
-            - '0.279494240044188115007600164'
-          - - MgO
-            - '0.338966961036585759784575344'
           - - SiO2
-            - '0.3379238246485715130851197642'
+            - '0.3379238246485715130851197644'
+          - - Al2O3
+            - '0.01776054124964630516635698291'
+          - - FeO
+            - '0.2794942400441881150076001642'
+          - - MgO
+            - '0.3389669610365857597845753442'
+          - - CaO
+            - '0.02585443302100830695634774455'
           amount_basis: mole_fraction
       locator:
-        figure: '1'
-        section: EXPERIMENTS
-        line_range: 33-90
-        source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+        published_page: 113
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 row (1) Ave.; regarded as the starting composition in the experiments
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
         parameters:
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '3.16'
-            locator:
-              figure: '1'
-              section: EXPERIMENTS
-              line_range: 33-90
-              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              figure: '1'
-              section: EXPERIMENTS
-              line_range: 33-90
-              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '2.53'
-            locator:
-              figure: '1'
-              section: EXPERIMENTS
-              line_range: 33-90
-              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              figure: '1'
-              section: EXPERIMENTS
-              line_range: 33-90
-              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '35.04'
-            locator:
-              figure: '1'
-              section: EXPERIMENTS
-              line_range: 33-90
-              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              figure: '1'
-              section: EXPERIMENTS
-              line_range: 33-90
-              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '23.84'
-            locator:
-              figure: '1'
-              section: EXPERIMENTS
-              line_range: 33-90
-              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              figure: '1'
-              section: EXPERIMENTS
-              line_range: 33-90
-              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
         - - original_SiO2_wt_pct
           - state:
               tag: value
               value: '35.43'
             locator:
-              figure: '1'
-              section: EXPERIMENTS
-              line_range: 33-90
-              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; regarded as the starting composition in the experiments
         - - M_SiO2_g_mol
           - state:
               tag: value
               value: '60.083'
             locator:
-              figure: '1'
-              section: EXPERIMENTS
-              line_range: 33-90
-              source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; regarded as the starting composition in the experiments
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; regarded as the starting composition in the experiments
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; regarded as the starting composition in the experiments
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; regarded as the starting composition in the experiments
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; regarded as the starting composition in the experiments
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; regarded as the starting composition in the experiments
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; regarded as the starting composition in the experiments
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; regarded as the starting composition in the experiments
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; regarded as the starting composition in the experiments
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -360,14 +360,113 @@ experiments:
         pdf_page_index: 3
         table: '1'
         note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting composition
-          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances; derived wt% to mole fraction
-          for initial_composition
+          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters: []
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -625,14 +724,113 @@ experiments:
         pdf_page_index: 3
         table: '1'
         note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting composition
-          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances; derived wt% to mole fraction
-          for initial_composition
+          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters: []
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -872,14 +1070,113 @@ experiments:
         pdf_page_index: 3
         table: '1'
         note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting composition
-          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances; derived wt% to mole fraction
-          for initial_composition
+          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters: []
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -1119,14 +1416,113 @@ experiments:
         pdf_page_index: 3
         table: '1'
         note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting composition
-          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances; derived wt% to mole fraction
-          for initial_composition
+          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters: []
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -1366,14 +1762,113 @@ experiments:
         pdf_page_index: 3
         table: '1'
         note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting composition
-          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances; derived wt% to mole fraction
-          for initial_composition
+          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters: []
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -1613,14 +2108,113 @@ experiments:
         pdf_page_index: 3
         table: '1'
         note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting composition
-          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances; derived wt% to mole fraction
-          for initial_composition
+          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters: []
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -1860,14 +2454,113 @@ experiments:
         pdf_page_index: 3
         table: '1'
         note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting composition
-          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances; derived wt% to mole fraction
-          for initial_composition
+          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters: []
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -2107,14 +2800,113 @@ experiments:
         pdf_page_index: 3
         table: '1'
         note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting composition
-          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances; derived wt% to mole fraction
-          for initial_composition
+          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters: []
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -2354,14 +3146,113 @@ experiments:
         pdf_page_index: 3
         table: '1'
         note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting composition
-          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances; derived wt% to mole fraction
-          for initial_composition
+          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters: []
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -2601,14 +3492,113 @@ experiments:
         pdf_page_index: 3
         table: '1'
         note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting composition
-          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances; derived wt% to mole fraction
-          for initial_composition
+          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters: []
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -2866,14 +3856,113 @@ experiments:
         pdf_page_index: 3
         table: '1'
         note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting composition
-          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances; derived wt% to mole fraction
-          for initial_composition
+          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters: []
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -3113,14 +4202,113 @@ experiments:
         pdf_page_index: 3
         table: '1'
         note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting composition
-          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances; derived wt% to mole fraction
-          for initial_composition
+          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters: []
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -3360,14 +4548,113 @@ experiments:
         pdf_page_index: 3
         table: '1'
         note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting composition
-          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances; derived wt% to mole fraction
-          for initial_composition
+          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters: []
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -3607,14 +4894,113 @@ experiments:
         pdf_page_index: 3
         table: '1'
         note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting composition
-          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances; derived wt% to mole fraction
-          for initial_composition
+          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters: []
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -3854,14 +5240,113 @@ experiments:
         pdf_page_index: 3
         table: '1'
         note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting composition
-          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances; derived wt% to mole fraction
-          for initial_composition
+          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters: []
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -4101,14 +5586,113 @@ experiments:
         pdf_page_index: 3
         table: '1'
         note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting composition
-          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances; derived wt% to mole fraction
-          for initial_composition
+          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters: []
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -4348,14 +5932,113 @@ experiments:
         pdf_page_index: 3
         table: '1'
         note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting composition
-          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances; derived wt% to mole fraction
-          for initial_composition
+          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters: []
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -4595,14 +6278,113 @@ experiments:
         pdf_page_index: 3
         table: '1'
         note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting composition
-          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances; derived wt% to mole fraction
-          for initial_composition
+          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters: []
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -4842,14 +6624,113 @@ experiments:
         pdf_page_index: 3
         table: '1'
         note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting composition
-          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances; derived wt% to mole fraction
-          for initial_composition
+          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters: []
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -5089,14 +6970,113 @@ experiments:
         pdf_page_index: 3
         table: '1'
         note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting composition
-          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances; derived wt% to mole fraction
-          for initial_composition
+          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters: []
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -5336,14 +7316,113 @@ experiments:
         pdf_page_index: 3
         table: '1'
         note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting composition
-          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances; derived wt% to mole fraction
-          for initial_composition
+          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters: []
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -5583,14 +7662,113 @@ experiments:
         pdf_page_index: 3
         table: '1'
         note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting composition
-          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances; derived wt% to mole fraction
-          for initial_composition
+          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters: []
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -5830,14 +8008,113 @@ experiments:
         pdf_page_index: 3
         table: '1'
         note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting composition
-          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances; derived wt% to mole fraction
-          for initial_composition
+          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters: []
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -6077,14 +8354,113 @@ experiments:
         pdf_page_index: 3
         table: '1'
         note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting composition
-          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances; derived wt% to mole fraction
-          for initial_composition
+          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters: []
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -6324,14 +8700,113 @@ experiments:
         pdf_page_index: 3
         table: '1'
         note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting composition
-          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances; derived wt% to mole fraction
-          for initial_composition
+          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters: []
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -6571,14 +9046,113 @@ experiments:
         pdf_page_index: 3
         table: '1'
         note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting composition
-          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances; derived wt% to mole fraction
-          for initial_composition
+          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters: []
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -6818,14 +9392,113 @@ experiments:
         pdf_page_index: 3
         table: '1'
         note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting composition
-          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances; derived wt% to mole fraction
-          for initial_composition
+          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters: []
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -7065,14 +9738,113 @@ experiments:
         pdf_page_index: 3
         table: '1'
         note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting composition
-          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances; derived wt% to mole fraction
-          for initial_composition
+          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters: []
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -7312,14 +10084,113 @@ experiments:
         pdf_page_index: 3
         table: '1'
         note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting composition
-          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances; derived wt% to mole fraction
-          for initial_composition
+          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters: []
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -7559,14 +10430,113 @@ experiments:
         pdf_page_index: 3
         table: '1'
         note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting composition
-          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances; derived wt% to mole fraction
-          for initial_composition
+          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters: []
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -7806,14 +10776,113 @@ experiments:
         pdf_page_index: 3
         table: '1'
         note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting composition
-          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances; derived wt% to mole fraction
-          for initial_composition
+          in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters: []
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.43'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.16'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '35.04'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.84'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.53'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 113
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 row (1) Ave.; wt% 100% normalized; the paper says this composition is regarded as the starting
+                composition in the experiments; label FeO-MgO-SiO2-CaO-Al2O3 melt with solar elemental abundances
         output_unit: mole_fraction
     printed_composition:
       state:

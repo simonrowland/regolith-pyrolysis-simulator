@@ -5,7 +5,6 @@ work:
     169:216-241 (MAGMA code; α_s survey Table 10)
   source_ids:
   - kems-008-schaefer-fegley-2004
-  - ref-016-sio-kems-1700-2000k
   - sf04-magma-companion-workbook
   source_files:
     corpus_repo: regolith-corpus
@@ -32,30 +31,6 @@ work:
         tag: unknown
         reason: INDEX does not give table sha256
     - asset_id: unknown:kems-008-schaefer-fegley-2004
-      role: pdftotext
-      path: unknown
-      sha256:
-        tag: unknown
-        reason: INDEX does not give an unmatched-layer asset
-    - asset_id: pdf:ref-016-sio-kems-1700-2000k
-      role: pdf
-      path: raw/ref-016-sio-kems-1700-2000k/ref-016-sio-kems-1700-2000k.pdf
-      sha256:
-        tag: unknown
-        reason: INDEX does not give sha256
-    - asset_id: pdftotext:ref-016-sio-kems-1700-2000k
-      role: pdftotext
-      path: text/ref-016-sio-kems-1700-2000k
-      sha256:
-        tag: unknown
-        reason: INDEX does not give text sha256
-    - asset_id: tables:ref-016-sio-kems-1700-2000k
-      role: table_csv
-      path: tables/ref-016-sio-kems-1700-2000k
-      sha256:
-        tag: unknown
-        reason: INDEX does not give table sha256
-    - asset_id: unknown:ref-016-sio-kems-1700-2000k
       role: pdftotext
       path: unknown
       sha256:
@@ -236,36 +211,3 @@ experiments:
     table: '10'
     line_range: 649-661
     source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
-- experiment_id: 10.1016/j.icarus.2003.08.023::ref-016-sio-kems-1700-2000k
-  kind: literature
-  method:
-    tag: unknown
-    reason: source does not state method
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
-          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
-          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
-          / P_test_Torr in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.icarus.2003.08.023
-  locator:
-    note: "(1) Costa, G.C.C. & Jacobson, N.S. (2015) olivine KEMS SiO partials —\n    Clausius–Clapeyron A=7.83, B=22.43 (grid-25-sio\
-      \ cj2015 @1700–2000 K:\n    4.32e-3 … 4.12e-1 Pa) — project REF-016; docs-private/vapor-pressure-\n    calibration-sio-tsweep-2026-05-19.md.\n\
-      (2) Schaefer, L. & Fegley, B. (2004) Icar"
-    record: REF-016#SiO_KEMS_1700_2000K

@@ -198,7 +198,10 @@ def test_vaporock_1773k_cell_keeps_extrapolated_flag(monkeypatch) -> None:
         pressure_bar=1.0e-6,
         fO2_log=-9.0,
     )
-    direct_activities, direct_pressures = extract_reported_quantities(direct)
+    direct_activities, direct_pressures, invalid_pressures = (
+        extract_reported_quantities(direct)
+    )
+    assert invalid_pressures == ()
     assert hot.gas_partial_pressures_Pa == direct_pressures
     assert hot.melt_activities == direct_activities
 
@@ -240,7 +243,10 @@ def test_openimcc_temperature_notice_survives_cell_notices() -> None:
         fO2_log=-9.0,
         pressure_bar=1.0e-6,
     )
-    direct_activities, direct_pressures = extract_reported_quantities(direct)
+    direct_activities, direct_pressures, invalid_pressures = (
+        extract_reported_quantities(direct)
+    )
+    assert invalid_pressures == ()
 
     assert hot.status == "ok"
     assert hot.authority == AUTHORITY_EXTRAPOLATED

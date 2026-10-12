@@ -1287,6 +1287,47 @@ def test_redox_liquidus_failure_uses_kress_floor_above_1200_default_off(
     assert sim._melt_redox_liquid_fraction_factor(1200.0 + 273.15) == 0.0
 
 
+def test_redox_gate_propagates_keyerror_from_curve_notice_recording(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=False,
+    )
+
+    def fake_dispatch(intent, *args, **kwargs):
+        assert intent is ChemistryIntent.GATE_LIQUID_FRACTION
+        return SimpleNamespace(
+            status='ok',
+            diagnostic={
+                'backend_status': 'ok',
+                'solidus_T_C': 1000.0,
+                'liquidus_T_C': 1500.0,
+            },
+        )
+
+    def fail_notice_recording(_curve):
+        raise KeyError('floor_T_C')
+
+    monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
+    monkeypatch.setattr(
+        sim,
+        '_record_composition_projected_liquidus_notice_from_curve',
+        fail_notice_recording,
+    )
+    fallback_count = sim._melt_redox_liquidus_gate_fallback_count
+
+    with pytest.raises(KeyError, match='floor_T_C'):
+        sim._melt_redox_liquidus_gate_curve()
+
+    assert sim._melt_redox_liquidus_gate_fallback_count == fallback_count == 0
+
+
 def _lunar_composition_projected_diagnostic(sim):
     """Ig-order drop notice for the lunar cleaned melt, without a binary."""
     from simulator.melt_backend.magemin import (
@@ -2002,6 +2043,13 @@ def test_nonfinite_mapping_curve_floor_falls_back_instead_of_zeroing_capacity(
     assert fallback['status'] == 'liquidus_unavailable_floor_fallback'
     assert fallback['liquidus_status'] == 'invalid'
     assert fallback['source'] == 'none:nonfinite_liquid_fraction'
+    assert fallback['repair_notice'] == {
+        'kind': 'kress_liquidus_floor_repair',
+        'repaired': 'unusable liquidus bounds or interpolation',
+        'reason': 'non-finite liquid_fraction=nan',
+        'replacement': 'deterministic Kress91 liquidus floor',
+        'floor_T_C': 1200.0,
+    }
     assert sim._melt_redox_liquid_fraction_factor(1200.0 + 273.15) == 0.0
     assert sim._last_melt_redox_liquid_fraction_diagnostic['status'] == (
         'invalid'
@@ -2102,7 +2150,7 @@ def test_not_converged_token_is_not_rewritten_to_out_of_domain(
     )
 
     def raise_both_tokens():
-        raise RuntimeError(
+        raise ProviderUnavailableError(
             'gate liquid fraction unavailable: status=not_converged; '
             'kernel liquidus unavailable: status=out_of_domain'
         )

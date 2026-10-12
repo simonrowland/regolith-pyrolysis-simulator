@@ -866,9 +866,19 @@ class AlphaMELTSProvider(ChemistryProvider):
             # through with an empty composition dict and the
             # downstream path-builder handles them.
             if not composition and liquid_fraction > 0.0:
-                raise RuntimeError(
+                message = (
                     'AlphaMELTS EC sample lacks residual liquid '
                     f'composition despite liquid_fraction={liquid_fraction!r}'
+                )
+                raise LiquidusSampleError(
+                    'not_converged',
+                    (message,),
+                    {
+                        'backend_status': 'not_converged',
+                        'backend_status_reason': 'not_converged',
+                        'backend_failure_reason_code': 'not_converged',
+                        'backend_failure_category': 'not_converged',
+                    },
                 )
             for warning in getattr(result, 'warnings', ()) or ():
                 if warning not in sample_warnings:

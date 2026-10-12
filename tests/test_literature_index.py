@@ -57,6 +57,19 @@ def test_regenerated_index_matches_committed(tmp_path: Path) -> None:
     assert regenerated == committed
 
 
+def test_index_extract_row_counts_match_source_extracts() -> None:
+    """Every indexed row count must agree with its owning extract file."""
+    index = yaml.safe_load(COMMITTED_YAML.read_text())
+    for source in index["sources"]:
+        for extract in source.get("extracts") or []:
+            doc = yaml.safe_load((REPO_ROOT / extract["path"]).read_text())
+            rows = sum(
+                len(body.get("observations") or [])
+                for body in (doc.get("species") or {}).values()
+            )
+            assert extract["rows"] == rows, extract["path"]
+
+
 def test_builder_temp_corpus_row_truth(tmp_path: Path) -> None:
     """Two fake PDFs + one extract + one preset: exact rows without the corpus."""
     root = tmp_path / "corpus"
@@ -381,7 +394,7 @@ def test_private_locator_reporting(tmp_path, monkeypatch):
 
 def test_nasa_cea_private_locator_backlog():
     index = yaml.safe_load(COMMITTED_YAML.read_text())
-    for source_id in ("nasa-cea-thermo", "ref-016-sio-kems-1700-2000k"):
+    for source_id in ("nasa-cea-thermo",):
         row = next(row for row in index["sources"] if row["source_id"] == source_id)
         assert row["extracts"][0]["locator_status"] == "private_path"
         assert source_id in index["gaps"]["extracts_with_private_locators"]

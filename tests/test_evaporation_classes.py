@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 import math
+from pathlib import Path
+
+import yaml
 
 import pytest
 
@@ -15,6 +18,7 @@ from simulator.evaporation_classes import (
     interface_share_s,
     report_species_class_diagnostics,
 )
+import simulator.evaporation_classes as evaporation_classes
 
 
 NAN = float("nan")
@@ -166,3 +170,35 @@ def test_redox_class_band_covers_every_grounded_alpha():
     ]
     assert grounded
     assert all(cls.band_low() <= alpha <= cls.band_high() for alpha in grounded)
+
+
+def test_consolidated_duplicate_evidence_alpha_values_stay_pinned():
+    rows = (
+        *evaporation_classes._SIO_EVIDENCE,
+        *evaporation_classes._REDOX_EVIDENCE,
+        *evaporation_classes._MODIFIER_EVIDENCE,
+        *evaporation_classes._MARKED_IDEAL_FENCES,
+    )
+    owner_extract = yaml.safe_load(
+        (Path(__file__).parents[1] / "data/literature/extracts/kems-005-fedkin-2006.yaml")
+        .read_text(encoding="utf-8")
+    )
+    mg_owner = next(
+        row
+        for row in owner_extract["species"]["Mg"]["observations"]
+        if row["observation_id"] == "fedkin_2006_mg_hashimoto_langmuir_table3"
+    )
+    targets = {
+        ("kems-005-fedkin-2006", "fedkin_2006_sio_hashimoto_langmuir_table3"): 0.17,
+        ("kems-005-fedkin-2006", "fedkin_2006_fe_hashimoto_langmuir_table3"): 0.24,
+        ("kems-005-fedkin-2006", "fedkin_2006_mg_hashimoto_langmuir_table3"): mg_owner[
+            "values"
+        ]["alpha"],
+        ("kems-005-fedkin-2006", "fedkin_2006_na_yu_langmuir"): 0.26,
+        ("kems-005-fedkin-2006", "fedkin_2006_k_yu_langmuir"): 0.13,
+        ("kems-012-sossi-2019", "sossi_2019_na_alpha_e_authors_adopted_unity"): 1.0,
+        ("kems-009-safarian-2013", "safarian_2013_si_pure_liquid_alpha_b1"): 1.0,
+    }
+    actual = {(row.source_id, row.observation_id): row.alpha for row in rows
+              if (row.source_id, row.observation_id) in targets}
+    assert actual == targets

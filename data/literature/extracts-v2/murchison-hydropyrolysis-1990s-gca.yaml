@@ -150,51 +150,6 @@ observations:
     table: '1'
     note: Bulk C (wt%) by IRMS; measured values plain text; calculated italics
   read_from: pdf:murchison-hydropyrolysis-1990s-gca
-- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2_pyrolysis_carbon_wt_percent::points:h=c277e81bf35d
-  experiment_id: 10.1016/j.gca.2003.08.019::experiment::murchison-h2-pyrolysis-series
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'bulk_carbon_wt_percent'
-    species:
-      formula: C
-      phase:
-        tag: unknown
-        reason: phase string 'Murchison_H2_pyrolysis_fractions' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-      charge:
-        tag: value
-        value: 0
-    temperature_K:
-      tag: unknown
-      reason: source T_range_K [493.15, 793.15]; no midpoint invented
-    total_pressure_Pa:
-      tag: value
-      value: '15000000'
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: measured_direct
-    original_method_class: measured_direct
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: murchison-hydropyrolysis-1990s-gca
-  locator:
-    published_page: 1389
-    pdf_page_index: 5
-    table: '1'
-    note: Bulk C (wt%) by IRMS; measured values plain text; calculated italics
-  read_from: pdf:murchison-hydropyrolysis-1990s-gca
 - observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2_pyrolysis_carbon_wt_percent::points:h=e63d94d67e30
   experiment_id: 10.1016/j.gca.2003.08.019::experiment::murchison-h2-pyrolysis-series
   identity:
@@ -503,51 +458,6 @@ observations:
     pdf_page_index: 5
     table: '1'
     note: delta13C and delta15N (permil)
-  read_from: pdf:murchison-hydropyrolysis-1990s-gca
-- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2_pyrolysis_nitrogen_wt_percent::points:h=3a74fb0f58c0
-  experiment_id: 10.1016/j.gca.2003.08.019::experiment::murchison-h2-pyrolysis-series
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'bulk_nitrogen_wt_percent'
-    species:
-      formula: N
-      phase:
-        tag: unknown
-        reason: phase string 'Murchison_H2_pyrolysis_fractions' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-      charge:
-        tag: value
-        value: 0
-    temperature_K:
-      tag: unknown
-      reason: source T_range_K [493.15, 793.15]; no midpoint invented
-    total_pressure_Pa:
-      tag: value
-      value: '15000000'
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: measured_direct
-    original_method_class: measured_direct
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: murchison-hydropyrolysis-1990s-gca
-  locator:
-    published_page: 1389
-    pdf_page_index: 5
-    table: '1'
-    note: Bulk N (wt%) and N/C by IRMS
   read_from: pdf:murchison-hydropyrolysis-1990s-gca
 - observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2_pyrolysis_nitrogen_wt_percent::points:h=490c2af2f135
   experiment_id: 10.1016/j.gca.2003.08.019::experiment::murchison-h2-pyrolysis-series

@@ -1,0 +1,370 @@
+schema_version: literature_extract.v1
+source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
+source:
+  citation: 'Kress, V. C., and Carmichael, I. S. E. (1988). Stoichiometry of the iron oxidation reaction in silicate melts. American Mineralogist, 73, 1267–1274.'
+  url: https://msaweb.org/AmMin/AM73/AM73_1267.pdf
+  year: 1988
+  sha256: 1e7faa7c77023e5df0d04f6ce4423175e10bf3f9a7e6aa51eb3cea4ebc7749fa
+extraction:
+  method: >-
+    Manual transcription of all numerical rows in Tables 1 and 2 from the supplied
+    8-page PDF. Table 1 compositions, temperatures, log10 fO2, and FeO/Fe2O3
+    results are retained row by row; Table 2 fit parameters are retained in
+    context as model evidence. No figure values were digitized.
+  date: '2026-10-03'
+  worker: codex-resume-5446-1791041222
+  provenance_path: tables/kress-carmichael-1988-iron-oxidation-stoichiometry/
+review_status: draft
+fidelity_samples:
+  - path: species.Fe.observations[kress_1988_table1_measured_redox_series].values.rows[0].FeO_wt_pct
+    value: 10.34
+    locator: {published_page: 1270, pdf_page_index: 3, table: '1', row: '71'}
+  - path: species.Fe.observations[kress_1988_table1_calculated_ferric_iron].values.rows[62].Fe2O3_calculated_wt_pct
+    value: 2.75
+    locator: {published_page: 1271, pdf_page_index: 4, table: '1', row: B120}
+  - species: Fe
+    observable: composition_series
+    observation_id: kress_1988_mean_measured_log_ratio_slope
+    field: slope
+    value: 0.2071
+    locator: {published_page: 1269, pdf_page_index: 2, section: Results and Discussion}
+  - path: species.Fe.observations[kress_1988_mean_measured_log_ratio_slope].values.source_wording
+    value: 'average slope of 0.2071 ± 0.0072 (2σ)'
+    locator: {published_page: 1269, pdf_page_index: 2, section: Results and Discussion, note: Printed mean slope and 2σ uncertainty}
+  - path: species.Fe.observations[kress_1988_table1_measured_redox_series].values.rows[8].oxide_wt_percent
+    value: 'SiO2=41.11;TiO2=3.07;Al2O3=14.36;Fe2O3=2.06;Cr2O3=0.02;FeO=9.31;MnO=0.41;MgO=6.30;CaO=18.02;Na2O=1.42;K2O=1.32;P2O5=0.42;V2O3=0.08'
+    locator: {published_page: 1270, pdf_page_index: 3, table: '1', row: '101', note: TiO2 is 3.07 wt%}
+benches:
+  - id: vertical-quench-furnace
+    identity: {basis: described_in_this_work}
+    apparatus_family:
+      state: {tag: value, value: vertical quench furnace}
+      locator: {published_page: 1269, pdf_page_index: 2, section: Experimental Technique}
+    temperature_measurement:
+      sensor:
+        state: {tag: value, value: Pt-Rh thermocouple roughly 3 mm above experiment cage}
+        locator: {published_page: 1269, pdf_page_index: 2, section: Experimental Technique}
+    temperature_calibration:
+      checks:
+        state:
+          tag: value
+          value: >-
+            99.99% Au melting-point checks indicated 1063.8 °C before and 1063.1 °C
+            after the experiments, compared with the accepted 1064.43 °C (IPTS, 1969;
+            International Practical Temperature Scale of 1968). A +2 °C correction
+            was added for measured temperature gradients inside the furnace.
+        locator: {published_page: 1269, pdf_page_index: 2, section: Experimental Technique}
+experiments:
+  - experiment_id: kress_1988_table1_equilibration_series
+    bench_id: vertical-quench-furnace
+    method: quench_equilibration
+    method_as_printed: ferric-ferrous equilibrium experiments across air, CO2, and CO-CO2 gas environments; individual Table 1 runs are not assigned an atmosphere; samples quenched by dropping into cold distilled water previously boiled
+    locator: {published_page: 1267-1269, pdf_page_index: 0-2, section: Abstract and Experimental Technique}
+    sample:
+      printed_composition:
+        state: {tag: value, value: six silicate melt compositions; individual run compositions transcribed in Table 1}
+        locator: {published_page: 1270, pdf_page_index: 3, table: '1'}
+    fO2_control:
+      channel: {tag: value, value: gas_mix}
+      state: {tag: value, value: 'Air, CO2, and CO-CO2 gas environments are reported across the series; individual Table 1 runs are not assigned an atmosphere. CO-CO2 fugacities were calibrated against iron-wustite, nickel-nickel oxide, and magnetite-hematite assemblages.'}
+      locator: {published_page: 1267, pdf_page_index: 0, section: Abstract, note: Experimental Technique on p. 1269 (PDF page index 2) describes CO-CO2 calibration; no gas is assigned per Table 1 run.}
+    thermal_schedule:
+      cooling_or_quench:
+        state: {tag: value, value: 'dropped into cold distilled H2O that had been previously boiled'}
+        locator: {published_page: 1269, pdf_page_index: 2, section: Experimental Technique}
+species:
+  Fe:
+    observations:
+      - observation_id: kress_1988_table1_measured_redox_series
+        type: composition_series
+        locator:
+          published_page: 1270-1271
+          pdf_page_index: 3-4
+          table: '1'
+          note: All 63 experiment rows. See the paired CSV transcription for the same rows in oxide-column form.
+        experiment: kress_1988_table1_equilibration_series
+        phase: quenched_silicate_glass
+        regime: quench_equilibration
+        units: 'oxide wt%; T in °C; log10 fO2 as printed'
+        uncertainty: >-
+          Row-specific uncertainties are not printed. The paper reports standard
+          deviations of major-element analyses between 0.8 and 8.0% relative.
+          Ferrous iron was determined by wet-chemical techniques; ferric iron was
+          calculated from total Fe and FeO, not independently measured.
+        values:
+          quantity: table_1_run_composition_and_iron_oxidation_state
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          value_status: printed
+          table_csv: tables/kress-carmichael-1988-iron-oxidation-stoichiometry/t1.csv
+          composition_units: wt% oxides, as printed
+          temperature_units: °C, as printed; paper states a 2 °C correction was added for measured furnace gradients
+          column_method_class:
+            experiment: quoted_unattributed
+            composition: quoted_unattributed
+            experiment_id: quoted_unattributed
+            T_C: measured_reduced
+            log10_fO2: measured_reduced
+            SiO2: measured_reduced
+            TiO2: measured_reduced
+            Al2O3: measured_reduced
+            Fe2O3: measured_reduced
+            Cr2O3: measured_reduced
+            FeO: measured_direct
+            FeO_wt_pct: measured_direct
+            Fe2O3_calculated_wt_pct: measured_reduced
+            MnO: measured_reduced
+            MgO: measured_reduced
+            CaO: measured_reduced
+            Na2O: measured_reduced
+            K2O: measured_reduced
+            P2O5: measured_reduced
+            V2O3: measured_reduced
+            reported_total_wt_percent: measured_reduced
+            total_marker: quoted_unattributed
+          fO2_basis:
+            logarithm: base 10, printed as log10 fO2
+            standard_state: pure component at P and T, as defined in the paper's equilibrium convention
+            table_unit: not separately printed
+            individual_furnace_calibration_corrections: '+0.09 to +0.4 log10 units, applied by CO-CO2 mixing ratio'
+          iron_method:
+            total_iron: electron microprobe, reported as FeO*
+            ferrous_iron: wet-chemical determination
+            ferric_iron: 'calculated as Fe2O3 = 1.1113(FeO* - FeO), where FeO* is total iron as FeO'
+            microprobe_points_per_glass_sample: 22-24
+          data_ranges:
+            experiment_rows: 63
+            T_C: ['1249', '1636']
+            log10_fO2: ['-10.23', '-0.68']
+            Na2O_wt_pct: ['0.47', '4.15']
+            K2O_wt_pct: ['0.12', '4.38']
+          rows:
+            - {experiment_id: '71', composition: 'JDFD2', T_C: '1461', log10_fO2: '-7.17', oxide_wt_percent: 'SiO2=51.36;TiO2=1.90;Al2O3=14.02;Fe2O3=1.09;Cr2O3=0.02;FeO=10.34;MnO=0.25;MgO=6.93;CaO=10.50;Na2O=2.29;K2O=0.72;P2O5=0.20;V2O3=0.06', FeO_wt_pct: 10.34}
+            - {experiment_id: '74', composition: '780-U-105', T_C: '1461', log10_fO2: '-7.17', oxide_wt_percent: 'SiO2=42.12;TiO2=6.06;Al2O3=10.58;Fe2O3=1.93;Cr2O3=0.02;FeO=11.66;MnO=0.31;MgO=7.33;CaO=15.51;Na2O=0.62;K2O=1.53;P2O5=0.09;V2O3=0.12', FeO_wt_pct: 11.66}
+            - {experiment_id: '79', composition: 'JDFD2', T_C: '1459', log10_fO2: '-8.21', oxide_wt_percent: 'SiO2=52.57;TiO2=1.94;Al2O3=14.23;Fe2O3=0.76;Cr2O3=0.02;FeO=8.79;MnO=0.25;MgO=7.03;CaO=10.70;Na2O=2.38;K2O=1.08;P2O5=0.13;V2O3=0.06', FeO_wt_pct: 8.79}
+            - {experiment_id: '83', composition: 'JDFD2', T_C: '1459', log10_fO2: '-8.21', oxide_wt_percent: 'SiO2=51.76;TiO2=1.95;Al2O3=14.16;Fe2O3=0.78;Cr2O3=0.02;FeO=10.00;MnO=0.24;MgO=7.06;CaO=10.53;Na2O=2.26;K2O=0.84;P2O5=0.15;V2O3=0.05', FeO_wt_pct: 10.00}
+            - {experiment_id: '86', composition: '780-U-105', T_C: '1459', log10_fO2: '-8.21', oxide_wt_percent: 'SiO2=42.78;TiO2=6.19;Al2O3=10.65;Fe2O3=0.98;Cr2O3=0.02;FeO=11.97;MnO=0.32;MgO=7.40;CaO=15.90;Na2O=0.70;K2O=0.52;P2O5=0.10;V2O3=0.12', FeO_wt_pct: 11.97}
+            - {experiment_id: '89', composition: 'JDFD2', T_C: '1459', log10_fO2: '-9.21', oxide_wt_percent: 'SiO2=52.03;TiO2=1.95;Al2O3=14.23;Fe2O3=0.58;Cr2O3=0.02;FeO=8.81;MnO=0.25;MgO=7.04;CaO=10.77;Na2O=2.06;K2O=1.64;P2O5=0.14;V2O3=0.06', FeO_wt_pct: 8.81}
+            - {experiment_id: '91', composition: '20424', T_C: '1459', log10_fO2: '-9.21', oxide_wt_percent: 'SiO2=42.75;TiO2=3.20;Al2O3=14.77;Fe2O3=0.70;Cr2O3=0.02;FeO=9.50;MnO=0.43;MgO=6.40;CaO=18.79;Na2O=0.63;K2O=0.33;P2O5=0.21;V2O3=0.08', FeO_wt_pct: 9.50}
+            - {experiment_id: '100', composition: 'COL-11', T_C: '1459', log10_fO2: '-6.15', oxide_wt_percent: 'SiO2=56.81;TiO2=0.74;Al2O3=17.01;Fe2O3=0.86;Cr2O3=0.03;FeO=5.09;MnO=0.15;MgO=6.26;CaO=7.28;Na2O=4.12;K2O=1.80;P2O5=0.15;V2O3=0.02', FeO_wt_pct: 5.09}
+            - {experiment_id: '101', composition: '20424', T_C: '1459', log10_fO2: '-6.15', oxide_wt_percent: 'SiO2=41.11;TiO2=3.07;Al2O3=14.36;Fe2O3=2.06;Cr2O3=0.02;FeO=9.31;MnO=0.41;MgO=6.30;CaO=18.02;Na2O=1.42;K2O=1.32;P2O5=0.42;V2O3=0.08', FeO_wt_pct: 9.31}
+            - {experiment_id: '102', composition: '780-U-105', T_C: '1459', log10_fO2: '-6.15', oxide_wt_percent: 'SiO2=41.84;TiO2=5.91;Al2O3=10.48;Fe2O3=2.88;Cr2O3=0.01;FeO=10.37;MnO=0.32;MgO=7.05;CaO=15.48;Na2O=1.30;K2O=1.87;P2O5=0.19;V2O3=0.12', FeO_wt_pct: 10.37}
+            - {experiment_id: '103', composition: 'JDFD2', T_C: '1459', log10_fO2: '-6.15', oxide_wt_percent: 'SiO2=51.28;TiO2=1.91;Al2O3=13.99;Fe2O3=2.04;Cr2O3=0.02;FeO=9.47;MnO=0.25;MgO=6.93;CaO=10.35;Na2O=2.77;K2O=0.66;P2O5=0.16;V2O3=0.05', FeO_wt_pct: 9.47}
+            - {experiment_id: '107', composition: 'K-1919', T_C: '1459', log10_fO2: '-6.15', oxide_wt_percent: 'SiO2=49.97;TiO2=2.86;Al2O3=14.04;Fe2O3=1.58;Cr2O3=0.04;FeO=9.09;MnO=0.19;MgO=7.17;CaO=10.89;Na2O=2.74;K2O=1.20;P2O5=0.25;V2O3=0.06', FeO_wt_pct: 9.09}
+            - {experiment_id: '121', composition: '20424', T_C: '1458', log10_fO2: '-10.23', oxide_wt_percent: 'SiO2=43.62;TiO2=3.24;Al2O3=15.39;Fe2O3=0.52;Cr2O3=0.02;FeO=8.44;MnO=0.43;MgO=6.49;CaO=18.86;Na2O=0.62;K2O=0.34;P2O5=0.08;V2O3=0.09', FeO_wt_pct: 8.44}
+            - {experiment_id: '125', composition: '20424', T_C: '1458', log10_fO2: '-10.23', oxide_wt_percent: 'SiO2=43.98;TiO2=3.21;Al2O3=14.71;Fe2O3=0.68;Cr2O3=0.14;FeO=8.46;MnO=0.40;MgO=6.59;CaO=19.14;Na2O=0.53;K2O=0.29;P2O5=0.07;V2O3=0.12', FeO_wt_pct: 8.46}
+            - {experiment_id: '129', composition: 'JDFD2', T_C: '1455', log10_fO2: '-2.42', oxide_wt_percent: 'SiO2=49.08;TiO2=1.81;Al2O3=13.65;Fe2O3=7.43;Cr2O3=0.02;FeO=6.93;MnO=0.22;MgO=6.61;CaO=10.27;Na2O=2.95;K2O=0.70;P2O5=0.29;V2O3=0.06', FeO_wt_pct: 6.93}
+            - {experiment_id: '130', composition: 'COL-11', T_C: '1455', log10_fO2: '-2.42', oxide_wt_percent: 'SiO2=56.89;TiO2=0.74;Al2O3=16.91;Fe2O3=2.89;Cr2O3=0.04;FeO=3.75;MnO=0.13;MgO=6.39;CaO=7.31;Na2O=3.87;K2O=1.44;P2O5=0.20;V2O3=0.03', FeO_wt_pct: 3.75}
+            - {experiment_id: '131', composition: '20424', T_C: '1455', log10_fO2: '-2.42', oxide_wt_percent: 'SiO2=39.41;TiO2=2.84;Al2O3=14.21;Fe2O3=8.23;Cr2O3=0.03;FeO=3.98;MnO=0.17;MgO=5.87;CaO=17.29;Na2O=3.67;K2O=2.80;P2O5=0.59;V2O3=0.07', FeO_wt_pct: 3.98}
+            - {experiment_id: '132', composition: '780-U-105', T_C: '1455', log10_fO2: '-2.42', oxide_wt_percent: 'SiO2=39.77;TiO2=5.84;Al2O3=10.06;Fe2O3=9.21;Cr2O3=0.02;FeO=5.19;MnO=0.13;MgO=6.90;CaO=14.89;Na2O=2.29;K2O=3.83;P2O5=0.22;V2O3=0.11', FeO_wt_pct: 5.19}
+            - {experiment_id: '137', composition: 'K-1919', T_C: '1455', log10_fO2: '-2.42', oxide_wt_percent: 'SiO2=49.22;TiO2=2.75;Al2O3=13.82;Fe2O3=5.80;Cr2O3=0.04;FeO=5.36;MnO=0.09;MgO=6.91;CaO=10.82;Na2O=2.83;K2O=1.55;P2O5=0.37;V2O3=0.05', FeO_wt_pct: 5.36}
+            - {experiment_id: '139', composition: 'JDFD2', T_C: '1362', log10_fO2: '-7.93', oxide_wt_percent: 'SiO2=51.11;TiO2=1.95;Al2O3=14.09;Fe2O3=1.10;Cr2O3=0.04;FeO=9.68;MnO=0.11;MgO=6.94;CaO=10.53;Na2O=3.11;K2O=0.94;P2O5=0.35;V2O3=0.06', FeO_wt_pct: 9.68}
+            - {experiment_id: '141', composition: '20424', T_C: '1362', log10_fO2: '-7.93', oxide_wt_percent: 'SiO2=40.34;TiO2=3.01;Al2O3=13.90;Fe2O3=1.12;Cr2O3=0.04;FeO=9.97;MnO=0.19;MgO=6.11;CaO=17.70;Na2O=2.50;K2O=2.49;P2O5=1.27;V2O3=0.08', FeO_wt_pct: 9.97}
+            - {experiment_id: '142', composition: '780-U-105', T_C: '1362', log10_fO2: '-7.93', oxide_wt_percent: 'SiO2=41.12;TiO2=6.11;Al2O3=10.60;Fe2O3=1.23;Cr2O3=0.02;FeO=11.56;MnO=0.14;MgO=7.17;CaO=15.45;Na2O=1.60;K2O=3.12;P2O5=0.66;V2O3=0.11', FeO_wt_pct: 11.56}
+            - {experiment_id: '147', composition: 'KIL-2', T_C: '1362', log10_fO2: '-7.93', oxide_wt_percent: 'SiO2=50.06;TiO2=3.24;Al2O3=13.85;Fe2O3=1.17;Cr2O3=0.04;FeO=10.37;MnO=0.08;MgO=6.29;CaO=9.79;Na2O=3.03;K2O=1.29;P2O5=0.38;V2O3=0.06', FeO_wt_pct: 10.37}
+            - {experiment_id: '151', composition: '20424', T_C: '1361', log10_fO2: '-9.97', oxide_wt_percent: 'SiO2=42.08;TiO2=3.03;Al2O3=14.85;Fe2O3=0.79;Cr2O3=0.04;FeO=10.10;MnO=0.19;MgO=6.25;CaO=18.62;Na2O=1.12;K2O=0.98;P2O5=0.50;V2O3=0.07', FeO_wt_pct: 10.10}
+            - {experiment_id: '155', composition: '20424', T_C: '1361', log10_fO2: '-9.97', oxide_wt_percent: 'SiO2=42.30;TiO2=3.16;Al2O3=14.41;Fe2O3=0.67;Cr2O3=0.13;FeO=9.62;MnO=0.42;MgO=6.37;CaO=18.58;Na2O=1.05;K2O=0.91;P2O5=0.45;V2O3=0.12', FeO_wt_pct: 9.62}
+            - {experiment_id: '159', composition: 'JDFD2', T_C: '1361', log10_fO2: '-2.74', oxide_wt_percent: 'SiO2=50.22;TiO2=1.91;Al2O3=13.77;Fe2O3=7.18;Cr2O3=0.02;FeO=5.34;MnO=0.13;MgO=6.74;CaO=10.39;Na2O=2.81;K2O=0.53;P2O5=0.46;V2O3=0.05', FeO_wt_pct: 5.34}
+            - {experiment_id: '160', composition: 'COL-11', T_C: '1361', log10_fO2: '-2.74', oxide_wt_percent: 'SiO2=56.77;TiO2=0.74;Al2O3=16.91;Fe2O3=3.65;Cr2O3=0.03;FeO=3.22;MnO=0.06;MgO=6.27;CaO=7.34;Na2O=3.84;K2O=1.24;P2O5=0.29;V2O3=0.02', FeO_wt_pct: 3.22}
+            - {experiment_id: '161', composition: '20424', T_C: '1361', log10_fO2: '-2.74', oxide_wt_percent: 'SiO2=38.67;TiO2=2.88;Al2O3=13.35;Fe2O3=8.27;Cr2O3=0.03;FeO=3.89;MnO=0.18;MgO=5.83;CaO=17.12;Na2O=4.15;K2O=3.22;P2O5=0.89;V2O3=0.07', FeO_wt_pct: 3.89}
+            - {experiment_id: '167', composition: 'KIL-2', T_C: '1361', log10_fO2: '-2.74', oxide_wt_percent: 'SiO2=50.45;TiO2=3.21;Al2O3=13.13;Fe2O3=6.99;Cr2O3=0.05;FeO=4.84;MnO=0.19;MgO=6.28;CaO=9.85;Na2O=2.54;K2O=0.91;P2O5=0.49;V2O3=0.07', FeO_wt_pct: 4.84}
+            - {experiment_id: '169', composition: 'JDFD2', T_C: '1364', log10_fO2: '-5.86', oxide_wt_percent: 'SiO2=50.65;TiO2=1.93;Al2O3=13.50;Fe2O3=1.96;Cr2O3=0.04;FeO=9.38;MnO=0.22;MgO=6.79;CaO=10.57;Na2O=2.94;K2O=0.69;P2O5=0.35;V2O3=0.07', FeO_wt_pct: 9.38}
+            - {experiment_id: '171', composition: '20424', T_C: '1364', log10_fO2: '-5.86', oxide_wt_percent: 'SiO2=39.60;TiO2=2.91;Al2O3=13.58;Fe2O3=3.28;Cr2O3=0.04;FeO=7.83;MnO=0.39;MgO=6.08;CaO=17.54;Na2O=3.15;K2O=3.00;P2O5=1.09;V2O3=0.07', FeO_wt_pct: 7.83}
+            - {experiment_id: '172', composition: '780-U-105', T_C: '1364', log10_fO2: '-5.86', oxide_wt_percent: 'SiO2=39.89;TiO2=5.84;Al2O3=9.99;Fe2O3=3.51;Cr2O3=0.04;FeO=9.62;MnO=0.29;MgO=7.07;CaO=15.13;Na2O=2.05;K2O=4.38;P2O5=0.59;V2O3=0.12', FeO_wt_pct: 9.62}
+            - {experiment_id: '174', composition: 'COL-11', T_C: '1364', log10_fO2: '-5.86', oxide_wt_percent: 'SiO2=57.17;TiO2=0.73;Al2O3=16.89;Fe2O3=1.01;Cr2O3=0.10;FeO=4.95;MnO=0.13;MgO=6.26;CaO=7.29;Na2O=4.04;K2O=1.45;P2O5=0.23;V2O3=0.04', FeO_wt_pct: 4.95}
+            - {experiment_id: '177', composition: 'KIL-2', T_C: '1364', log10_fO2: '-5.86', oxide_wt_percent: 'SiO2=50.77;TiO2=3.23;Al2O3=13.56;Fe2O3=2.17;Cr2O3=0.10;FeO=8.78;MnO=0.17;MgO=6.29;CaO=9.60;Na2O=3.05;K2O=1.39;P2O5=0.50;V2O3=0.11', FeO_wt_pct: 8.78}
+            - {experiment_id: '199', composition: 'JDFD2', T_C: '1366', log10_fO2: '-8.91', oxide_wt_percent: 'SiO2=51.93;TiO2=1.97;Al2O3=14.41;Fe2O3=0.69;Cr2O3=0.03;FeO=10.08;MnO=0.10;MgO=6.88;CaO=10.87;Na2O=1.72;K2O=0.68;P2O5=0.56;V2O3=0.05', FeO_wt_pct: 10.08}
+            - {experiment_id: '202', composition: '780-U-105', T_C: '1366', log10_fO2: '-8.91', oxide_wt_percent: 'SiO2=41.47;TiO2=6.06;Al2O3=10.65;Fe2O3=1.03;Cr2O3=0.02;FeO=13.68;MnO=0.13;MgO=7.15;CaO=15.72;Na2O=0.55;K2O=1.44;P2O5=0.55;V2O3=0.12', FeO_wt_pct: 13.68}
+            - {experiment_id: '205', composition: '20424', T_C: '1366', log10_fO2: '-8.91', oxide_wt_percent: 'SiO2=41.92;TiO2=3.19;Al2O3=14.38;Fe2O3=1.05;Cr2O3=0.14;FeO=10.40;MnO=0.41;MgO=6.32;CaO=18.37;Na2O=0.47;K2O=0.54;P2O5=1.10;V2O3=0.12', FeO_wt_pct: 10.40}
+            - {experiment_id: '208', composition: 'KIL-2', T_C: '1366', log10_fO2: '-8.91', oxide_wt_percent: 'SiO2=51.41;TiO2=3.29;Al2O3=13.64;Fe2O3=0.57;Cr2O3=0.10;FeO=10.49;MnO=0.19;MgO=6.46;CaO=9.86;Na2O=2.09;K2O=0.83;P2O5=0.43;V2O3=0.11', FeO_wt_pct: 10.49}
+            - {experiment_id: '209', composition: 'JDFD2', T_C: '1360', log10_fO2: '-0.68', oxide_wt_percent: 'SiO2=50.55;TiO2=1.89;Al2O3=13.69;Fe2O3=9.77;Cr2O3=0.00;FeO=3.10;MnO=0.22;MgO=6.71;CaO=10.40;Na2O=2.58;K2O=0.43;P2O5=0.21;V2O3=0.06', FeO_wt_pct: 3.10}
+            - {experiment_id: '210', composition: 'COL-11', T_C: '1360', log10_fO2: '-0.68', oxide_wt_percent: 'SiO2=56.81;TiO2=0.71;Al2O3=16.71;Fe2O3=5.12;Cr2O3=0.00;FeO=1.82;MnO=0.13;MgO=6.20;CaO=7.43;Na2O=3.63;K2O=1.10;P2O5=0.11;V2O3=0.03', FeO_wt_pct: 1.82}
+            - {experiment_id: '211', composition: '780-U-105', T_C: '1360', log10_fO2: '-0.68', oxide_wt_percent: 'SiO2=40.33;TiO2=5.87;Al2O3=10.05;Fe2O3=12.59;Cr2O3=0.01;FeO=2.51;MnO=0.28;MgO=6.91;CaO=15.09;Na2O=1.88;K2O=2.77;P2O5=0.09;V2O3=0.12', FeO_wt_pct: 2.51}
+            - {experiment_id: '212', composition: '20424', T_C: '1360', log10_fO2: '-0.68', oxide_wt_percent: 'SiO2=38.85;TiO2=2.91;Al2O3=13.46;Fe2O3=10.69;Cr2O3=0.02;FeO=1.97;MnO=0.37;MgO=5.80;CaO=17.53;Na2O=3.52;K2O=1.90;P2O5=0.51;V2O3=0.07', FeO_wt_pct: 1.97}
+            - {experiment_id: '218', composition: 'KIL-2', T_C: '1360', log10_fO2: '-0.68', oxide_wt_percent: 'SiO2=50.66;TiO2=3.21;Al2O3=13.53;Fe2O3=9.33;Cr2O3=0.01;FeO=3.06;MnO=0.18;MgO=6.30;CaO=9.72;Na2O=2.37;K2O=0.67;P2O5=0.15;V2O3=0.07', FeO_wt_pct: 3.06}
+            - {experiment_id: '229', composition: 'JDFD2', T_C: '1458', log10_fO2: '-0.68', oxide_wt_percent: 'SiO2=50.93;TiO2=1.91;Al2O3=13.67;Fe2O3=8.69;Cr2O3=0.01;FeO=4.14;MnO=0.22;MgO=6.96;CaO=10.40;Na2O=2.47;K2O=0.36;P2O5=0.09;V2O3=0.05', FeO_wt_pct: 4.14}
+            - {experiment_id: '230', composition: 'COL-11', T_C: '1458', log10_fO2: '-0.68', oxide_wt_percent: 'SiO2=57.27;TiO2=0.74;Al2O3=16.76;Fe2O3=4.51;Cr2O3=0.01;FeO=2.45;MnO=0.13;MgO=6.32;CaO=7.42;Na2O=3.60;K2O=1.02;P2O5=0.10;V2O3=0.02', FeO_wt_pct: 2.45}
+            - {experiment_id: '231', composition: '20424', T_C: '1458', log10_fO2: '-0.68', oxide_wt_percent: 'SiO2=40.78;TiO2=3.01;Al2O3=13.49;Fe2O3=10.02;Cr2O3=0.03;FeO=3.00;MnO=0.38;MgO=6.04;CaO=17.97;Na2O=2.68;K2O=0.97;P2O5=0.09;V2O3=0.08', FeO_wt_pct: 3.00}
+            - {experiment_id: '236', composition: '780-U-105', T_C: '1458', log10_fO2: '-0.68', oxide_wt_percent: 'SiO2=41.14;TiO2=5.93;Al2O3=10.25;Fe2O3=11.24;Cr2O3=0.02;FeO=3.65;MnO=0.27;MgO=7.12;CaO=15.40;Na2O=1.39;K2O=1.70;P2O5=0.01;V2O3=0.11', FeO_wt_pct: 3.65}
+            - {experiment_id: '238', composition: 'KIL-2', T_C: '1458', log10_fO2: '-0.68', oxide_wt_percent: 'SiO2=51.15;TiO2=3.28;Al2O3=13.77;Fe2O3=8.29;Cr2O3=0.01;FeO=3.81;MnO=0.17;MgO=6.14;CaO=9.79;Na2O=2.29;K2O=0.61;P2O5=0.04;V2O3=0.07', FeO_wt_pct: 3.81}
+            - {experiment_id: 'B27', composition: 'JDFD2', T_C: '1437', log10_fO2: '-0.68', oxide_wt_percent: 'SiO2=50.46;TiO2=1.88;Al2O3=13.87;Fe2O3=9.46;Cr2O3=0.02;FeO=3.49;MnO=0.17;MgO=6.84;CaO=10.65;Na2O=2.68;K2O=0.19;P2O5=0.10;V2O3=0.06', FeO_wt_pct: 3.49}
+            - {experiment_id: 'B34', composition: 'JDFD2', T_C: '1388', log10_fO2: '-0.68', oxide_wt_percent: 'SiO2=50.64;TiO2=1.89;Al2O3=13.93;Fe2O3=9.91;Cr2O3=0.02;FeO=2.92;MnO=0.17;MgO=6.76;CaO=10.66;Na2O=2.66;K2O=0.19;P2O5=0.16;V2O3=0.06', FeO_wt_pct: 2.92}
+            - {experiment_id: 'B44', composition: 'JDFD2', T_C: '1485', log10_fO2: '-0.68', oxide_wt_percent: 'SiO2=50.61;TiO2=1.90;Al2O3=14.03;Fe2O3=8.94;Cr2O3=0.02;FeO=3.96;MnO=0.17;MgO=6.66;CaO=10.61;Na2O=2.43;K2O=0.17;P2O5=0.05;V2O3=0.06', FeO_wt_pct: 3.96}
+            - {experiment_id: 'B54', composition: 'JDFD2', T_C: '1535', log10_fO2: '-0.68', oxide_wt_percent: 'SiO2=51.09;TiO2=1.89;Al2O3=13.94;Fe2O3=8.38;Cr2O3=0.02;FeO=4.46;MnO=0.17;MgO=6.77;CaO=10.67;Na2O=2.43;K2O=0.17;P2O5=0.04;V2O3=0.05', FeO_wt_pct: 4.46}
+            - {experiment_id: 'B64', composition: 'JDFD2', T_C: '1584', log10_fO2: '-0.68', oxide_wt_percent: 'SiO2=51.00;TiO2=1.92;Al2O3=13.96;Fe2O3=7.60;Cr2O3=0.01;FeO=5.12;MnO=0.17;MgO=6.86;CaO=10.69;Na2O=2.32;K2O=0.16;P2O5=0.02;V2O3=0.05', FeO_wt_pct: 5.12}
+            - {experiment_id: 'B73', composition: 'JDFD2', T_C: '1635', log10_fO2: '-0.68', oxide_wt_percent: 'SiO2=51.22;TiO2=1.93;Al2O3=13.91;Fe2O3=7.02;Cr2O3=0.01;FeO=5.58;MnO=0.17;MgO=6.80;CaO=10.66;Na2O=2.22;K2O=0.15;P2O5=0.01;V2O3=0.04', FeO_wt_pct: 5.58}
+            - {experiment_id: 'B76', composition: 'JDFD2', T_C: '1342', log10_fO2: '-2.89', oxide_wt_percent: 'SiO2=51.24;TiO2=1.91;Al2O3=13.81;Fe2O3=8.21;Cr2O3=0.02;FeO=4.55;MnO=0.17;MgO=6.78;CaO=10.52;Na2O=2.67;K2O=0.21;P2O5=0.20;V2O3=0.06', FeO_wt_pct: 4.55}
+            - {experiment_id: 'B79', composition: 'JDFD2', T_C: '1296', log10_fO2: '-3.07', oxide_wt_percent: 'SiO2=50.90;TiO2=1.91;Al2O3=13.85;Fe2O3=8.46;Cr2O3=0.02;FeO=4.46;MnO=0.17;MgO=6.82;CaO=10.61;Na2O=2.69;K2O=0.20;P2O5=0.24;V2O3=0.05', FeO_wt_pct: 4.46}
+            - {experiment_id: 'B82', composition: 'JDFD2', T_C: '1249', log10_fO2: '-3.26', oxide_wt_percent: 'SiO2=50.38;TiO2=1.93;Al2O3=13.70;Fe2O3=9.00;Cr2O3=0.02;FeO=3.91;MnO=0.17;MgO=6.93;CaO=10.54;Na2O=2.70;K2O=0.20;P2O5=0.21;V2O3=0.05', FeO_wt_pct: 3.91}
+            - {experiment_id: 'B105', composition: 'JDFD2', T_C: '1636', log10_fO2: '-6.29', oxide_wt_percent: 'SiO2=52.50;TiO2=2.02;Al2O3=14.52;Fe2O3=1.46;Cr2O3=0.03;FeO=10.26;MnO=0.21;MgO=7.24;CaO=11.53;Na2O=0.56;K2O=0.14;P2O5=0.05;V2O3=0.09', FeO_wt_pct: 10.26}
+            - {experiment_id: 'B111', composition: 'JDFD2', T_C: '1363', log10_fO2: '-6.81', oxide_wt_percent: 'SiO2=52.39;TiO2=1.96;Al2O3=13.96;Fe2O3=2.07;Cr2O3=0.03;FeO=9.84;MnO=0.22;MgO=7.06;CaO=11.17;Na2O=2.38;K2O=0.20;P2O5=0.17;V2O3=0.08', FeO_wt_pct: 9.84}
+            - {experiment_id: 'B112', composition: 'JDFD2', T_C: '1363', log10_fO2: '-6.81', oxide_wt_percent: 'SiO2=52.35;TiO2=1.98;Al2O3=14.25;Fe2O3=1.96;Cr2O3=0.02;FeO=9.54;MnO=0.21;MgO=7.11;CaO=11.31;Na2O=2.33;K2O=0.17;P2O5=0.21;V2O3=0.07', FeO_wt_pct: 9.54}
+            - {experiment_id: 'B113', composition: 'JDFD2', T_C: '1299', log10_fO2: '-7.38', oxide_wt_percent: 'SiO2=51.42;TiO2=2.00;Al2O3=14.12;Fe2O3=2.19;Cr2O3=0.02;FeO=9.18;MnO=0.22;MgO=7.19;CaO=11.40;Na2O=2.65;K2O=0.21;P2O5=0.24;V2O3=0.08', FeO_wt_pct: 9.18}
+            - {experiment_id: 'B118', composition: 'JDFD2', T_C: '1544', log10_fO2: '-5.42', oxide_wt_percent: 'SiO2=52.02;TiO2=1.99;Al2O3=14.30;Fe2O3=2.94;Cr2O3=0.04;FeO=9.65;MnO=0.21;MgO=7.16;CaO=11.37;Na2O=1.22;K2O=0.14;P2O5=0.05;V2O3=0.08', FeO_wt_pct: 9.65}
+            - {experiment_id: 'B120', composition: 'JDFD2', T_C: '1632', log10_fO2: '-4.74', oxide_wt_percent: 'SiO2=52.02;TiO2=1.98;Al2O3=14.28;Fe2O3=2.75;Cr2O3=0.03;FeO=10.01;MnO=0.23;MgO=7.21;CaO=11.41;Na2O=0.85;K2O=0.12;P2O5=0.03;V2O3=0.09', FeO_wt_pct: 10.01}
+      - observation_id: kress_1988_table1_calculated_ferric_iron
+        type: composition_series
+        locator:
+          published_page: 1270-1271
+          pdf_page_index: 3-4
+          table: '1'
+          note: Fe2O3 values calculated by difference for all 63 Table 1 rows.
+        experiment: kress_1988_table1_equilibration_series
+        phase: quenched_silicate_glass
+        regime: quench_equilibration
+        units: wt% Fe2O3
+        derived_from: [kress_1988_table1_measured_redox_series]
+        derivation:
+          relation: 'Fe2O3 = 1.1113 * (FeO* - FeO)'
+          inputs: [kress_1988_table1_measured_redox_series]
+        values:
+          quantity: calculated_ferric_iron_composition_series
+          method_class: measured_reduced
+          evidence_class: measured_reduced
+          table_csv: tables/kress-carmichael-1988-iron-oxidation-stoichiometry/t1.csv
+          rows:
+            - {experiment_id: '71', Fe2O3_calculated_wt_pct: 1.09}
+            - {experiment_id: '74', Fe2O3_calculated_wt_pct: 1.93}
+            - {experiment_id: '79', Fe2O3_calculated_wt_pct: 0.76}
+            - {experiment_id: '83', Fe2O3_calculated_wt_pct: 0.78}
+            - {experiment_id: '86', Fe2O3_calculated_wt_pct: 0.98}
+            - {experiment_id: '89', Fe2O3_calculated_wt_pct: 0.58}
+            - {experiment_id: '91', Fe2O3_calculated_wt_pct: 0.7}
+            - {experiment_id: '100', Fe2O3_calculated_wt_pct: 0.86}
+            - {experiment_id: '101', Fe2O3_calculated_wt_pct: 2.06}
+            - {experiment_id: '102', Fe2O3_calculated_wt_pct: 2.88}
+            - {experiment_id: '103', Fe2O3_calculated_wt_pct: 2.04}
+            - {experiment_id: '107', Fe2O3_calculated_wt_pct: 1.58}
+            - {experiment_id: '121', Fe2O3_calculated_wt_pct: 0.52}
+            - {experiment_id: '125', Fe2O3_calculated_wt_pct: 0.68}
+            - {experiment_id: '129', Fe2O3_calculated_wt_pct: 7.43}
+            - {experiment_id: '130', Fe2O3_calculated_wt_pct: 2.89}
+            - {experiment_id: '131', Fe2O3_calculated_wt_pct: 8.23}
+            - {experiment_id: '132', Fe2O3_calculated_wt_pct: 9.21}
+            - {experiment_id: '137', Fe2O3_calculated_wt_pct: 5.8}
+            - {experiment_id: '139', Fe2O3_calculated_wt_pct: 1.1}
+            - {experiment_id: '141', Fe2O3_calculated_wt_pct: 1.12}
+            - {experiment_id: '142', Fe2O3_calculated_wt_pct: 1.23}
+            - {experiment_id: '147', Fe2O3_calculated_wt_pct: 1.17}
+            - {experiment_id: '151', Fe2O3_calculated_wt_pct: 0.79}
+            - {experiment_id: '155', Fe2O3_calculated_wt_pct: 0.67}
+            - {experiment_id: '159', Fe2O3_calculated_wt_pct: 7.18}
+            - {experiment_id: '160', Fe2O3_calculated_wt_pct: 3.65}
+            - {experiment_id: '161', Fe2O3_calculated_wt_pct: 8.27}
+            - {experiment_id: '167', Fe2O3_calculated_wt_pct: 6.99}
+            - {experiment_id: '169', Fe2O3_calculated_wt_pct: 1.96}
+            - {experiment_id: '171', Fe2O3_calculated_wt_pct: 3.28}
+            - {experiment_id: '172', Fe2O3_calculated_wt_pct: 3.51}
+            - {experiment_id: '174', Fe2O3_calculated_wt_pct: 1.01}
+            - {experiment_id: '177', Fe2O3_calculated_wt_pct: 2.17}
+            - {experiment_id: '199', Fe2O3_calculated_wt_pct: 0.69}
+            - {experiment_id: '202', Fe2O3_calculated_wt_pct: 1.03}
+            - {experiment_id: '205', Fe2O3_calculated_wt_pct: 1.05}
+            - {experiment_id: '208', Fe2O3_calculated_wt_pct: 0.57}
+            - {experiment_id: '209', Fe2O3_calculated_wt_pct: 9.77}
+            - {experiment_id: '210', Fe2O3_calculated_wt_pct: 5.12}
+            - {experiment_id: '211', Fe2O3_calculated_wt_pct: 12.59}
+            - {experiment_id: '212', Fe2O3_calculated_wt_pct: 10.69}
+            - {experiment_id: '218', Fe2O3_calculated_wt_pct: 9.33}
+            - {experiment_id: '229', Fe2O3_calculated_wt_pct: 8.69}
+            - {experiment_id: '230', Fe2O3_calculated_wt_pct: 4.51}
+            - {experiment_id: '231', Fe2O3_calculated_wt_pct: 10.02}
+            - {experiment_id: '236', Fe2O3_calculated_wt_pct: 11.24}
+            - {experiment_id: '238', Fe2O3_calculated_wt_pct: 8.29}
+            - {experiment_id: 'B27', Fe2O3_calculated_wt_pct: 9.46}
+            - {experiment_id: 'B34', Fe2O3_calculated_wt_pct: 9.91}
+            - {experiment_id: 'B44', Fe2O3_calculated_wt_pct: 8.94}
+            - {experiment_id: 'B54', Fe2O3_calculated_wt_pct: 8.38}
+            - {experiment_id: 'B64', Fe2O3_calculated_wt_pct: 7.6}
+            - {experiment_id: 'B73', Fe2O3_calculated_wt_pct: 7.02}
+            - {experiment_id: 'B76', Fe2O3_calculated_wt_pct: 8.21}
+            - {experiment_id: 'B79', Fe2O3_calculated_wt_pct: 8.46}
+            - {experiment_id: 'B82', Fe2O3_calculated_wt_pct: 9.0}
+            - {experiment_id: 'B105', Fe2O3_calculated_wt_pct: 1.46}
+            - {experiment_id: 'B111', Fe2O3_calculated_wt_pct: 2.07}
+            - {experiment_id: 'B112', Fe2O3_calculated_wt_pct: 1.96}
+            - {experiment_id: 'B113', Fe2O3_calculated_wt_pct: 2.19}
+            - {experiment_id: 'B118', Fe2O3_calculated_wt_pct: 2.94}
+            - {experiment_id: 'B120', Fe2O3_calculated_wt_pct: 2.75}
+
+      - observation_id: kress_1988_mean_measured_log_ratio_slope
+        type: composition_series
+        locator: {published_page: 1269, pdf_page_index: 2, section: Results and Discussion}
+        experiment: kress_1988_table1_equilibration_series
+        units: 'dimensionless slope: ln(X_Fe2O3/X_FeO) versus ln(fO2)'
+        derived_from: [kress_1988_table1_measured_redox_series]
+        derivation:
+          relation: average of linear best-fit slopes for the plotted Table 1 composition series
+          inputs: [kress_1988_table1_measured_redox_series]
+          dependent_variable: ln(X_Fe2O3/X_FeO)
+          independent_variable: ln(fO2)
+          note: The paper reports natural logarithms for the plotted slope; this is distinct from Table 1's log10 fO2 column.
+        uncertainty: '±0.0072 (2σ), as printed'
+        values:
+          quantity: average_measured_data_log_ratio_slope
+          method_class: measured_reduced
+          evidence_class: measured_reduced
+          slope: 0.2071
+          source_wording: 'average slope of 0.2071 ± 0.0072 (2σ)'
+          source_scope: compositions considered in the Table 1 series
+    context:
+      - observation_id: kress_1988_adopted_reaction_and_regression_model
+        type: thermodynamic_example
+        locator: {published_page: 1271-1272, pdf_page_index: 4-5, table: '2', equation: '4, 7, 9'}
+        units: 'reaction stoichiometry as printed; ΔH in kJ; ΔS in J/K; ΔW terms in kJ; fit diagnostics as printed'
+        values:
+          quantity: authors_adopted_iron_oxidation_reaction_and_regression_parameters
+          method_class: model_derived
+          evidence_class: model_derived
+          source_wording: 'FeO + 0.232 O2 = FeO1.464'
+          associated_component_formula:
+            formula: FeO1.464
+            uncertainty: '±0.003'
+            uncertainty_level: not stated in the paper
+            source_wording: 'FeO1.464±0.003'
+          reaction:
+            reactants: {FeO: '1', O2: '0.232'}
+            products: {FeO1.464: '1'}
+            equation_number: '4'
+            published_page: 1272
+          derivation:
+            relation: FeO + x O2 -> FeO_(1 + 2x)
+            input: {x: '0.232', source: equation_4}
+            result: {associate_formula: FeO1.464, calculation: '1 + 2 × 0.232 = 1.464'}
+            evidence_basis: fitted/model formulation, not a direct identification of a discrete melt species
+          component_recasting:
+            basis: FeO1.5
+            molecular_weight: '79.849'
+            equations:
+              - {number: '5', source_wording: 'X_FeO1.464 = 1.0776 X_FeO1.5'}
+              - {number: '6', source_wording: 'X_FeO = X_FeO - 0.0776 X_FeO1.5'}
+            note: In Eq. 6, the left-hand FeO is the recast component and the right-hand FeO is the analytical component before association.
+          equation_9:
+            dependent_variable: 'ln(X^liq_FeO1.464 / X^liq_FeO)'
+            source_wording: 'ln(X^liq_FeO1.464 / X^liq_FeO) = 0.232 ln fO2 - ΔH4/(R T) + ΔS4/R - (1/(R T)) Σ_i ΔW_i X_i'
+            component_difference: 'ΔW_i = W_(i,FeO1.464) - W_(i,FeO)'
+            variable_definitions: X_i are component mole fractions; T is in kelvins; R is the universal gas constant.
+          equation_7_and_9_composition_terms:
+            - {oxide: Al2O3, coefficient: '49.04', standard_error: '15.53', unit: kJ}
+            - {oxide: CaO, coefficient: '-48.87', standard_error: '6.71', unit: kJ}
+            - {oxide: Na2O, coefficient: '-106.04', standard_error: '20.64', unit: kJ}
+            - {oxide: K2O, coefficient: '-110.46', standard_error: '19.52', unit: kJ}
+          thermodynamic_parameters:
+            - {coefficient: ΔH, value: '-95.93', standard_error: '6.39', unit: kJ}
+            - {coefficient: ΔS, value: '-46.05', standard_error: '3.55', unit: J/K}
+          fit_diagnostics:
+            R_squared: '0.95'
+            standard_error: '0.30'
+            standard_error_unit: ln units
+          fit_data_scope:
+            sources: [Table 1 experiments in this work, Sack et al. (1980), Kilinc et al. (1983)]
+            exclusion: >-
+              Most highly reduced experiments with log10 fO2 less than -9.5 were omitted.
+              A serious Kilinc et al. (1983) outlier for composition 20424, inconsistent
+              with this study's results for the same composition under nearly identical
+              conditions, was also omitted; the authors state that its omission
+              substantially improved regression precision.
+          interpretation_note: >-
+            The authors caution that FeO1.464 may not represent a discrete species;
+            they interpret it as a probable stoichiometry from a distribution of
+            configurations involving other melt cations.

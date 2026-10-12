@@ -661,13 +661,18 @@ def test_provider_subprocess_required_skips_thermoengine_route(monkeypatch):
     ],
 )
 def test_provider_liquidus_exception_surfaces_status_reason(intent):
+    from engines.alphamelts.petthermo import _PetThermoToolsExternalCallFailure
+
     backend = _FakeAlphaMELTSBackend(
         mode='python_api',
         equilibrium=_build_equilibrium_for_basalt(),
     )
 
     def fail_liquidus(**kwargs):
-        raise RuntimeError('finder exploded')
+        raise _PetThermoToolsExternalCallFailure(
+            'RuntimeError',
+            'finder exploded',
+        )
 
     backend.find_liquidus_solidus = fail_liquidus
     provider = AlphaMELTSProvider(backend=backend)
@@ -742,6 +747,7 @@ def test_provider_liquidus_exception_preserves_typed_policy_refusal(
 
 
 def test_provider_liquidus_exception_discriminates_type_both_directions():
+    from engines.alphamelts.petthermo import _PetThermoToolsExternalCallFailure
     from engines.alphamelts.thermoengine import (
         ThermoEngineIsolationError,
         ThermoEngineNonFiniteField,
@@ -781,21 +787,159 @@ def test_provider_liquidus_exception_discriminates_type_both_directions():
     forged.backend_failure_category = 'refused'
     forged.backend_status_reason = 'forged_refusal'
     forged.backend_failure_reason_code = 'forged_refusal'
-    forged_result = dispatch_raising(forged)
+    tagged = _PetThermoToolsExternalCallFailure(
+        'RuntimeError',
+        'solver iteration failed',
+    )
+    tagged.backend_failure_category = 'refused'
+    tagged.backend_status_reason = 'forged_refusal'
+    tagged.backend_failure_reason_code = 'forged_refusal'
+    tagged_result = dispatch_raising(tagged)
 
     assert refused.status == 'refused'
     assert out_of_domain.status == 'out_of_domain'
-    for result in (not_converged, forged_result):
-        assert result.status == 'not_converged'
-        assert result.status != 'refused'
+    assert not_converged.status == 'not_converged'
+    assert not_converged.status != 'refused'
+    assert tagged_result.status == 'not_converged'
+    assert tagged_result.status != 'refused'
     assert (
         dict(not_converged.diagnostic or {}).get('backend_status_reason')
         == 'thermoengine_nonfinite_field'
     )
     assert (
-        dict(forged_result.diagnostic or {}).get('backend_status_reason')
+        dict(tagged_result.diagnostic or {}).get('backend_status_reason')
         == 'not_converged'
     )
+    with pytest.raises(RuntimeError, match='solver iteration failed'):
+        dispatch_raising(forged)
+
+
+def test_provider_ec_sampling_projects_tagged_engine_failure():
+    """EC sampling after successful bounds keeps a tagged library failure."""
+    import simulator.config as simulator_config
+    import simulator.melt_backend.alphamelts as alphamelts_module
+    from simulator.engine_pool import EngineWorkerRemoteError
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+
+    def external(**_kwargs):
+        raise RuntimeError('review-real-engine-runtime')
+
+    resource = {
+        'module': SimpleNamespace(equilibrate_MELTS=external),
+        'loader': lambda _model_code: object(),
+        'model_code': 1,
+    }
+
+    class Wire:
+        def call(self, request, **_kwargs):
+            try:
+                return alphamelts_module._handle_petthermotools_request(
+                    resource,
+                    request,
+                    None,
+                )
+            except Exception as exc:
+                raise EngineWorkerRemoteError(
+                    type(exc).__name__,
+                    str(exc),
+                    'engine traceback',
+                ) from exc
+
+    backend = AlphaMELTSBackend()
+    backend._mode = 'python_api'
+    backend._python_api_model = (
+        simulator_config.resolve_alphamelts_python_api_model(
+            backend._raw_model_name
+        )
+    )
+    backend._pet_worker = Wire()
+    backend._require_petthermotools_runtime = lambda: resource['module']
+    backend.find_liquidus_solidus = lambda **_kwargs: LiquidusSolidusResult(
+        status='ok',
+        solidus_T_C=1300.0,
+        liquidus_T_C=1400.0,
+        liquidus_T_K=1673.15,
+        liquid_fraction=1.0,
+    )
+    provider = AlphaMELTSProvider(backend=backend)
+    result = provider.dispatch(
+        _make_request(
+            ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
+            composition_mol=_basalt_species_mol(),
+        )
+    )
+
+    assert result.status == 'not_converged'
+    assert any(
+        'review-real-engine-runtime' in warning
+        for warning in result.warnings
+    )
+    diagnostic = dict(result.diagnostic or {})
+    assert diagnostic.get('backend_status_reason') == 'not_converged'
+
+
+def test_provider_ec_sampling_propagates_local_runtime_error():
+    def fail_sample(**_kwargs):
+        raise RuntimeError('review-local-runtime')
+
+    backend = _FakeAlphaMELTSBackend(
+        mode='python_api',
+        equilibrium=_build_equilibrium_for_basalt(),
+        finder_result=LiquidusSolidusResult(
+            status='ok',
+            solidus_T_C=1000.0,
+            liquidus_T_C=1100.0,
+            liquidus_T_K=1373.15,
+            liquid_fraction=1.0,
+        ),
+        equilibrate_func=fail_sample,
+    )
+    provider = AlphaMELTSProvider(backend=backend)
+    with pytest.raises(RuntimeError, match='review-local-runtime'):
+        provider.dispatch(
+            _make_request(
+                ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
+                composition_mol=_basalt_species_mol(),
+            )
+        )
+
+
+def test_python_api_wrong_mode_propagates():
+    from engines.alphamelts.petthermo import equilibrate_via_python_api
+
+    with pytest.raises(RuntimeError, match='python_api'):
+        equilibrate_via_python_api(
+            SimpleNamespace(_mode='subprocess'),
+            temperature_C=1400.0,
+            pressure_bar=1.0,
+            fO2_log=-9.0,
+            composition_mol_by_account={},
+            species_formula_registry={},
+        )
+
+
+@pytest.mark.parametrize(
+    'intent',
+    (
+        ChemistryIntent.SILICATE_LIQUIDUS,
+        ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
+    ),
+)
+def test_provider_finder_propagates_local_runtime_error(intent):
+    backend = _FakeAlphaMELTSBackend(
+        mode='python_api',
+        equilibrium=_build_equilibrium_for_basalt(),
+    )
+
+    def local(**_kwargs):
+        raise RuntimeError('review-local-runtime')
+
+    backend.find_liquidus_solidus = local
+    provider = AlphaMELTSProvider(backend=backend)
+    with pytest.raises(RuntimeError, match='review-local-runtime'):
+        provider.dispatch(
+            _make_request(intent, composition_mol=_basalt_species_mol())
+        )
 
 
 def test_provider_handles_silicate_equilibrium_intent():
