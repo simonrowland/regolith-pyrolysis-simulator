@@ -35,6 +35,7 @@ from simulator.reduced_real_determinism import (
     PT0DeterminismStore,
     _gate_provider_role_for_key,
     canonical_json_bytes,
+    gate_curve_memo_producer_configuration,
     record_dependency_vector,
     uncacheable_replay_disposition,
 )
@@ -3844,6 +3845,49 @@ def test_gate_curve_memo_ignores_sulfur_input_drift_same_key(
     # simulator/evaporation.py:2036-2044.
     assert first == second
     assert len(provider_calls) == 1
+
+
+def test_gate_curve_memo_producer_configuration_projects_sulfur_state(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sims = [
+        _build_freeze_gate_sim(
+            vapor_pressure_data,
+            feedstocks_data,
+            setpoints_data,
+            enabled=True,
+        )
+        for _ in range(2)
+    ]
+    _, state_changed = sims
+    curve = {
+        'source': 'gate_liquid_fraction:authoritative:test',
+        'status': 'ok',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1300.0,
+    }
+    monkeypatch.setattr(
+        state_changed,
+        '_stage0_sulfur_input_ppm',
+        lambda: 200.0,
+    )
+    state_changed.inventory.salt_phase_kg['SO3'] = 1.0
+    state_changed.inventory.sulfide_matte_kg['FeS'] = 1.0
+
+    first = gate_curve_memo_producer_configuration(sims[0], curve)
+    second = gate_curve_memo_producer_configuration(state_changed, curve)
+
+    assert first == second
+
+    class _OtherSulfSatGate:
+        def is_available(self):
+            return False
+
+    state_changed._sulfsat_gate = _OtherSulfSatGate()
+    assert gate_curve_memo_producer_configuration(state_changed, curve) != first
 
 
 def test_core_gate_curve_memo_reuses_local_slot_refused_curve(

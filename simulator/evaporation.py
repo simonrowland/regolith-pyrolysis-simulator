@@ -2055,7 +2055,7 @@ class EvaporationMixin:
 
     def _freeze_gate_curve(self) -> dict[str, Any]:
         from simulator.reduced_real_determinism import (
-            gate_curve_memo_dependency_vector,
+            gate_curve_memo_producer_configuration,
             record_repair_notice,
             uncacheable_replay_disposition,
         )
@@ -2085,7 +2085,7 @@ class EvaporationMixin:
         cached_curve = cache.get('curve') if isinstance(cache, dict) else None
         cached_notices = cache.get('repair_notices') if isinstance(cache, dict) else None
         current_dependency_vector = (
-            gate_curve_memo_dependency_vector(self, cached_curve)
+            gate_curve_memo_producer_configuration(self, cached_curve)
             if isinstance(cached_curve, Mapping)
             else None
         )
@@ -2124,7 +2124,7 @@ class EvaporationMixin:
                 shared_value = dict(process_cached)
                 shared_vector = shared_value.pop('dependency_vector', None)
                 shared_notices = shared_value.pop('repair_notices', None)
-                current_dependency_vector = gate_curve_memo_dependency_vector(
+                current_dependency_vector = gate_curve_memo_producer_configuration(
                     self,
                     shared_value,
                 )
@@ -2294,7 +2294,7 @@ class EvaporationMixin:
                 and gate_curve_memo_eligibility(self, curve)
             )
             if cache_eligible:
-                dependency_vector = gate_curve_memo_dependency_vector(
+                dependency_vector = gate_curve_memo_producer_configuration(
                     self,
                     curve,
                 )

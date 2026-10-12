@@ -2484,19 +2484,37 @@ def replay_dependency_vectors_match(
     )
 
 
-def gate_curve_memo_dependency_vector(
+def gate_curve_memo_producer_configuration(
     sim: Any,
     curve: Mapping[str, Any],
 ) -> dict[str, Any]:
     provider_role = _gate_curve_provider_role(curve)
     if provider_role is None:
         provider_role = _gate_provider_role_for_key(sim)
-    return record_dependency_vector(
+    dependency_vector = record_dependency_vector(
         sim,
         ChemistryIntent.GATE_LIQUID_FRACTION,
         artifact="freeze_gate_curve",
         provider_role=provider_role,
     )
+    sulfur_side = dependency_vector["sulfur_side"]
+    model = dependency_vector["model"]
+    return {
+        "namespace_id": dependency_vector["namespace_id"],
+        "vapor_pressure_provider_selection": dependency_vector[
+            "vapor_pressure_provider_selection"
+        ],
+        "sulfur_side": {
+            "sulfsat_available": sulfur_side["sulfsat_available"],
+            "sulfsat_provider_selection": (
+                sulfur_side["sulfsat_provider_selection"]
+            ),
+        },
+        "model": {
+            name: model[name]
+            for name in ("model", "mode", "magemin_database")
+        },
+    }
 
 
 def uncacheable_replay_disposition(sim: Any) -> bool:

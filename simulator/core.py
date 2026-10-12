@@ -4684,7 +4684,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     ) -> Mapping[str, Any] | _MeltRedoxLiquidusFloorFallback | None:
         from simulator.engine_binding_admission import gate_curve_memo_eligibility
         from simulator.reduced_real_determinism import (
-            gate_curve_memo_dependency_vector,
+            gate_curve_memo_producer_configuration,
             record_repair_notice,
             uncacheable_replay_disposition,
         )
@@ -4704,7 +4704,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         cache_vector = cache.get('dependency_vector') if isinstance(cache, dict) else None
         cache_vector_matches = (
             isinstance(curve, Mapping)
-            and cache_vector == gate_curve_memo_dependency_vector(self, curve)
+            and cache_vector == gate_curve_memo_producer_configuration(self, curve)
         )
         cache_hit = bool(
             isinstance(cache, dict)
@@ -4832,13 +4832,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             and isinstance(validated_curve, Mapping)
             and dict(validated_curve) == normalized_curve
             and validated_cache.get('dependency_vector')
-            == gate_curve_memo_dependency_vector(self, normalized_curve)
+            == gate_curve_memo_producer_configuration(self, normalized_curve)
             and isinstance(validated_cache.get('repair_notices'), list)
         ):
             self._freeze_gate_liquid_fraction_cache = {
                 'key': key,
                 'curve': dict(normalized_curve),
-                'dependency_vector': gate_curve_memo_dependency_vector(
+                'dependency_vector': gate_curve_memo_producer_configuration(
                     self,
                     normalized_curve,
                 ),
