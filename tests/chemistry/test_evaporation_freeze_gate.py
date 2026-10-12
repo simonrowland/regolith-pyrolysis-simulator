@@ -2808,7 +2808,7 @@ def test_gate_curve_memo_reuses_without_receipt_and_emits_notice_once(
     for index, sim in enumerate(sims):
         sim._freeze_gate_shared_curve_cache = shared_cache
         sim._freeze_gate_curve_from_gate_dispatch = (
-            lambda reasons, *, fO2_log, index=index: (
+            lambda reasons, *, fO2_log, repair_notices=None, index=index: (
                 calls.append(index) or dict(curve)
             )
         )
@@ -2881,7 +2881,7 @@ def test_uncacheable_gate_curve_never_enters_local_or_shared_memo(
     for index, sim in enumerate(sims):
         sim._freeze_gate_shared_curve_cache = shared_cache
         sim._freeze_gate_curve_from_gate_dispatch = (
-            lambda reasons, *, fO2_log, index=index: (
+            lambda reasons, *, fO2_log, repair_notices=None, index=index: (
                 calls.append(index) or dict(curve)
             )
         )

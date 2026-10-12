@@ -3407,8 +3407,9 @@ def test_pt0_gate_memo_hit_does_not_capture_without_receipt(
     }
     provider_calls = []
     sim._freeze_gate_curve_from_gate_dispatch = (
-        lambda reasons, *, fO2_log: provider_calls.append(fO2_log)
-        or dict(curve)
+        lambda reasons, *, fO2_log, repair_notices=None: (
+            provider_calls.append(fO2_log) or dict(curve)
+        )
     )
     store_calls = []
     persistent_put_calls = []
@@ -3461,8 +3462,9 @@ def test_pt0_gate_capture_with_receipt_covers_fresh_curve_and_memo_hit(
     }
     provider_calls = []
     sim._freeze_gate_curve_from_gate_dispatch = (
-        lambda reasons, *, fO2_log: provider_calls.append(fO2_log)
-        or dict(curve)
+        lambda reasons, *, fO2_log, repair_notices=None: (
+            provider_calls.append(fO2_log) or dict(curve)
+        )
     )
     capture_calls = []
     original_capture = capture.capture_gate_curve
