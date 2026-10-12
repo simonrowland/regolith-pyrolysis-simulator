@@ -636,6 +636,39 @@ def _write_extract(directory: Path, doc: dict) -> Path:
     return path
 
 
+def _write_companion_table(
+    tmp_path: Path,
+    *,
+    filename: str = "fixture-source-table-s1.yaml",
+    parent_exists: bool = True,
+    parent_links: bool = True,
+) -> Path:
+    directory = tmp_path / "data" / "literature" / "extracts"
+    directory.mkdir(parents=True, exist_ok=True)
+    table_path = directory / filename
+    table_path.write_text(
+        yaml.safe_dump(
+            {
+                "schema_version": "literature_extract_table.v1",
+                "source_id": "fixture-source",
+                "rows": [{"value": 1}],
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    if parent_exists:
+        parent_doc = _minimal_extract()
+        if parent_links:
+            parent_doc["species"]["Fe"]["observations"][0]["values"][
+                "table_transcription"
+            ] = table_path.relative_to(tmp_path).as_posix()
+        (directory / "fixture-source.yaml").write_text(
+            yaml.safe_dump(parent_doc, sort_keys=False), encoding="utf-8"
+        )
+    return table_path
+
+
 # ---------------------------------------------------------------------------
 # Validator unit tests
 # ---------------------------------------------------------------------------
@@ -660,6 +693,72 @@ def test_refuses_source_id_filename_mismatch(tmp_extracts: Path):
     path.write_text(yaml.safe_dump(doc), encoding="utf-8")
     errs = vle.validate_extract_file(path)
     assert any("does not match filename stem" in e for e in errs)
+
+
+def test_accepts_linked_companion_table(tmp_path: Path, monkeypatch):
+    monkeypatch.setattr(vle, "ROOT", tmp_path)
+    path = _write_companion_table(tmp_path)
+
+    assert vle.validate_extract_file(path) == []
+
+
+def test_refuses_companion_table_with_unprefixed_filename(
+    tmp_path: Path, monkeypatch
+):
+    monkeypatch.setattr(vle, "ROOT", tmp_path)
+    path = _write_companion_table(tmp_path, filename="other-table-s1.yaml")
+
+    errs = vle.validate_extract_file(path)
+
+    assert any("filename stem must start with source_id" in error for error in errs)
+    assert not any("parent extract does not link" in error for error in errs)
+
+
+def test_refuses_companion_table_without_parent_extract(
+    tmp_path: Path, monkeypatch
+):
+    monkeypatch.setattr(vle, "ROOT", tmp_path)
+    path = _write_companion_table(tmp_path, parent_exists=False)
+
+    errs = vle.validate_extract_file(path)
+
+    assert any("companion parent extract does not exist" in error for error in errs)
+
+
+def test_refuses_companion_table_not_linked_by_parent(
+    tmp_path: Path, monkeypatch
+):
+    monkeypatch.setattr(vle, "ROOT", tmp_path)
+    path = _write_companion_table(tmp_path, parent_links=False)
+
+    errs = vle.validate_extract_file(path)
+
+    assert any(
+        "parent extract does not link companion table" in error for error in errs
+    )
+
+
+def test_main_reports_all_source_id_filename_mismatches(tmp_path: Path, capsys):
+    first = tmp_path / "wrong-one.yaml"
+    second = tmp_path / "wrong-two.yaml"
+    text = yaml.safe_dump(_minimal_extract(), sort_keys=False)
+    first.write_text(text, encoding="utf-8")
+    second.write_text(text, encoding="utf-8")
+
+    status = vle.main(
+        [
+            "--skip-priority",
+            "--skip-fidelity-policy",
+            str(first),
+            str(second),
+        ]
+    )
+    stderr = capsys.readouterr().err
+
+    assert status == 1
+    assert f"{first}: source_id" in stderr
+    assert f"{second}: source_id" in stderr
+    assert stderr.count("does not match filename stem") == 2
 
 
 def test_refuses_unknown_observation_type():
