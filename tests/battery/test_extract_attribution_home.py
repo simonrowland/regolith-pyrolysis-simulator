@@ -24,7 +24,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import EvidenceClass
+from simulator.battery.enums import EvidenceClass, Quantity, ValueKind
 from simulator.battery.migrate import REPO_ROOT
 from tests.battery.test_migrate import _extract_observations, _migrate_real_extract
 
@@ -42,7 +42,7 @@ RENAMED = {
 # Written from the page (or the page's reference list); see the t-1117 rename report.
 REPAIRED = {
     ("jsc-lunar-catalog-12023.yaml", "jsc_12023_carbon_nitrogen_compilation"): "Moore et al. (1971); Kaplan and Petrowski (1971); Kerridge et al. (1978); Norris et al. (1983)",
-    ("ammin-76-904.yaml", "ammin_76_904_quoted_comparator_enthalpy_values"): "Stebbins et al. (1983); Richet and Bottinga (1984); Ferrier (1968); Stebbins et al. (1984); Adamkovicova et al. (1980)",
+    ("ammin-76-904.yaml", "ammin_76_904_quoted_comparator_enthalpy_values"): "Stebbins et al. (1983)",
     ("hashimoto-nakano-2021-bubbles-to-chondrites-ii.yaml", "hashimoto_2021_appendix_sample_provenance"): "Jarosewich (1990)",
     ("lpi-compendium-15013.yaml", "lpi_15013_maturity_and_grain_size"): "Morris 1978 (for Is/FeO = 77)",
     ("lpi-compendium-15013.yaml", "lpi_15013_carbon_and_nitrogen"): "Moore et al. 1973; Des Marais et al. 1973; Kothari and Goel 1972; Muller 1973",
@@ -137,3 +137,54 @@ def test_no_quoted_attributed_record_without_attribution(tmp_path: Path, name: s
         if issue.detail == "quoted_attributed requires attribution"
     ]
     assert missing == []
+
+
+def test_lange_split_comparator_quotes_migrate_with_their_typed_payloads(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(tmp_path, "ammin-76-904.yaml")
+    expected = {
+        "ammin_76_904_quoted_comparator_enthalpy_values": (
+            "CaMgSi2O6",
+            None,
+            ValueKind.UNAVAILABLE,
+        ),
+        "ammin_76_904_quoted_richet_bottinga_diopside_fusion": (
+            "CaMgSi2O6",
+            None,
+            ValueKind.UNAVAILABLE,
+        ),
+        "ammin_76_904_quoted_ferrier_diopside_fusion": (
+            "CaMgSi2O6",
+            None,
+            ValueKind.UNAVAILABLE,
+        ),
+        "ammin_76_904_quoted_richet_bottinga_liquid_heat_capacity": (
+            "CaMgSi2O6",
+            Quantity.CP,
+            ValueKind.POINT,
+        ),
+        "ammin_76_904_quoted_stebbins_1984_liquid_heat_capacity": (
+            "CaMgSi2O6",
+            Quantity.CP,
+            ValueKind.POINT,
+        ),
+        "ammin_76_904_quoted_adamkovicova_wollastonite_fusion": (
+            "CaSiO3",
+            None,
+            ValueKind.UNAVAILABLE,
+        ),
+    }
+
+    for raw_id, (species_formula, quantity, value_kind) in expected.items():
+        observation = result.observations[f"ammin-76-904::{raw_id}"]
+        actual_quantity = observation.identity.quantity
+        assert actual_quantity.is_value is (quantity is not None)
+        if quantity is None:
+            assert "unsupported quantity 'heat_of_fusion'" in actual_quantity.reason
+        else:
+            assert actual_quantity.value is quantity
+        assert observation.value.kind is value_kind
+        assert observation.identity.species.formula == species_formula
+        assert observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+        assert observation.evidence.attribution

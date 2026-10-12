@@ -702,6 +702,22 @@ def test_accepts_linked_companion_table(tmp_path: Path, monkeypatch):
     assert vle.validate_extract_file(path) == []
 
 
+def test_refuses_absolute_locator_path_on_companion(tmp_path: Path, monkeypatch):
+    monkeypatch.setattr(vle, "ROOT", tmp_path)
+    path = _write_companion_table(tmp_path)
+    doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+    doc["rows"][0]["locator"] = {"source_path": "/private/tmp/not-portable.pdf"}
+    path.write_text(yaml.safe_dump(doc, sort_keys=False), encoding="utf-8")
+
+    errors = vle.validate_extract_file(path)
+
+    assert any(
+        "locator.source_path must be repository-relative" in error
+        and "/private/tmp/not-portable.pdf" in error
+        for error in errors
+    )
+
+
 def test_refuses_companion_table_with_unprefixed_filename(
     tmp_path: Path, monkeypatch
 ):
@@ -3085,6 +3101,24 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
     doc = load_cached_safe_yaml(extract_path.read_text(encoding="utf-8"))
     errs = vle.check_all_fidelity_samples_match(doc, label=extract_path.stem)
     assert errs == [], "\n".join(errs)
+
+
+def test_bencze_supplement_fidelity_sample_rejects_mutated_value():
+    path = EXTRACTS / "bencze-yazhenskikh-2016.yaml"
+    doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+    sample = doc["fidelity_samples"][0]
+
+    assert sample["locator"]["page"] == 1
+    assert sample["locator"]["table"] == "S-I"
+    assert sample["value"] == "1.70·10-2"
+    assert vle.check_all_fidelity_samples_match(doc, label=path.stem) == []
+
+    doc["species"]["Na"]["observations"][0]["values"]["rows"][0][
+        "p_Na_at_1273_K_Pa"
+    ] = "1.71·10-2"
+    errors = vle.check_all_fidelity_samples_match(doc, label=path.stem)
+
+    assert any("fidelity_samples[0]" in error and "mismatch" in error for error in errors)
 
 
 def test_fidelity_sample_mutation_reds():
