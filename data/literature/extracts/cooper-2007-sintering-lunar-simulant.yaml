@@ -67,8 +67,8 @@ species:
         onset_time: a matter of minutes
         sample_form: compressed JSC-1 samples
         outcome: high-strength sintered bricks
+        note: apparatus details of the cited experiment are not stated in this source
       uncertainty: {note: no numerical uncertainty printed}
-      equipment: {note: apparatus details of the cited experiment are not stated in this source}
     - observation_id: cooper_2007_jsc1a_sintering_1050c_three_hours
       type: transition_point
       locator: {pdf_page_index: 2, section: 'What Is Sintering, and Why Is It a Concern?'}
@@ -83,8 +83,8 @@ species:
         duration_h: 3
         sample_form: uncompressed samples
         outcome: lightly-sintered material disaggregable with gentle pressure
+        note: apparatus details of the cited experiment are not stated in this source
       uncertainty: {note: no numerical uncertainty printed}
-      equipment: {note: apparatus details of the cited experiment are not stated in this source}
     context:
     - observation_id: cooper_2007_jsc1a_glass_fraction
       type: condensate_composition
@@ -114,8 +114,15 @@ species:
         mean_size_um: 22.14
         standard_deviation_um: 9.99
         distribution_type: well-graded / poorly-sorted
+        note: measurement courtesy of Microtrac Incorporated
       uncertainty: {note: printed standard deviation is retained; no other uncertainty printed}
-      equipment: {instrument: Microtrac S3500 laser diffraction instrument, note: measurement courtesy of Microtrac Incorporated}
+      equipment:
+        other_facts:
+          value:
+          - name: instrument
+            value: Microtrac S3500 laser diffraction instrument
+            locator: {pdf_page_index: 8, section: Nomenclature}
+          locator: {pdf_page_index: 8, section: Nomenclature}
     - observation_id: cooper_2007_jsc1af_figure1_sintering_threshold
       type: transition_point
       locator: {pdf_page_index: 2, figure: '1', section: 'What Is Sintering, and Why Is It a Concern?'}
@@ -168,23 +175,7 @@ species:
         note: The prose reports the cited result; this paper does not provide the cited apparatus details.
       uncertainty: {note: no numerical uncertainty printed}
   Fluidized_bed:
-    observations:
-    - observation_id: cooper_2007_fluidization_fraction_1000c_model
-      type: mass_loss_fraction_vs_T
-      locator: {pdf_page_index: 5, figure: '5', section: A Wide Distribution of Grain Sizes Can Inhibit Fluidization}
-      phase: particulate_simulant
-      regime: fluidization_model
-      units: percent, degree C, and litres per minute as printed
-      values:
-        quantity: fluidizing_fraction
-        method_class: model_derived
-        generator: author's simple cylindrical-reactor fluidization calculation; software/tool not named
-        material: JSC-1A
-        T_C: 1000
-        fluidizing_fraction_pct: approximately 70
-        flow_rate_axis: 0.01 to 100 L/min as plotted
-        note: The curve, bin steps, and ambient-vs-1000-C comparison were not digitised; 70% is the printed prose summary.
-      uncertainty: {note: approximate qualifier retained; no model uncertainty printed}
+    observations: []
     context:
     - observation_id: cooper_2007_humid_air_channelization_sequence
       type: mass_loss_fraction_vs_T
@@ -215,6 +206,22 @@ species:
         desiccated_air_channelization: did not occur during the observation window
         note: Informal tests with mockups; no gas humidity, flow, sample mass, or chamber geometry is stated.
       uncertainty: {note: observation window is qualitative and retained as printed}
+    - observation_id: cooper_2007_fluidization_fraction_1000c_model
+      type: model_output
+      locator: {pdf_page_index: 5, figure: '5', section: A Wide Distribution of Grain Sizes Can Inhibit Fluidization}
+      phase: particulate_simulant
+      regime: fluidization_model
+      units: percent, degree C, and litres per minute as printed
+      values:
+        quantity: fluidizing_fraction
+        method_class: model_derived
+        generator: author's simple cylindrical-reactor fluidization calculation; software/tool not named
+        material: JSC-1A
+        T_C: 1000
+        fluidizing_fraction_pct: approximately 70
+        flow_rate_axis: 0.01 to 100 L/min as plotted
+        note: The curve, bin steps, and ambient-vs-1000-C comparison were not digitised; 70% is the printed prose summary.
+      uncertainty: {note: approximate qualifier retained; no model uncertainty printed}
     - observation_id: cooper_2007_thermocouple_divergence_after_heater_600c
       type: transition_temperature
       locator: {pdf_page_index: 3, figure: '3', section: Indirect evidence of channel formation}
@@ -230,8 +237,15 @@ species:
         note: Figure 3 identifies TC 212 and TC 215 near the outer edge/middle sample area; no calibration or complete run conditions are printed.
       uncertainty: {note: approximate qualifiers retained; no numerical uncertainty printed}
       equipment:
-        chamber_material: inconel
-        temperature_measurement: thermocouples
+        other_facts:
+          value:
+          - name: chamber_material
+            value: inconel
+            locator: {pdf_page_index: 3, figure: '3', section: Indirect evidence of channel formation}
+          locator: {pdf_page_index: 3, figure: '3', section: Indirect evidence of channel formation}
+        temperature_measurement:
+          value: thermocouples
+          locator: {pdf_page_index: 3, figure: '3', section: Indirect evidence of channel formation}
     - observation_id: cooper_2007_partial_gravity_fluidized_bed_figure_only
       type: transition_temperature
       locator: {pdf_page_index: 6, figure: '6', section: Discussion}
