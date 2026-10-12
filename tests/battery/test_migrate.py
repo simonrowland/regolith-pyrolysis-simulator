@@ -516,6 +516,12 @@ def test_hastie_initial_charges_bind_to_figure_points_as_proxies(
             in {Quantity.P_PARTIAL, Quantity.ACTIVITY_COEFFICIENT}
         ]
         assert len(rows) == expected_counts[series]
+        if series == "fig5_glass_Na_this_work_digitized":
+            assert all(
+                observation.evidence.class_.is_value
+                and observation.evidence.class_.value is EvidenceClass.FIGURE_ONLY
+                for observation in rows
+            )
         expected = wt_pct_to_mole_fraction(composition_wt_pct)
         for observation in rows:
             composition = observation.identity.composition
@@ -638,6 +644,87 @@ def test_hastie_initial_charges_bind_to_figure_points_as_proxies(
         and observation.identity.species.phase.value is Phase.G
         for observation in na_kms_migrated
     )
+
+
+def test_repaired_figure_read_sources_keep_figure_only_evidence(
+    tmp_path: Path,
+) -> None:
+    cases = (
+        (
+            "kems-025-markova-1983.yaml",
+            (
+                "markova_1983_fe_psat_figs",
+                "markova_1983_mg_psat_figs",
+                "markova_1983_feo_psat_figs",
+            ),
+        ),
+        (
+            "stolyarova-1996-cao-alumina-silica-kems.yaml",
+            (
+                "stolyarova_1996_fig1_sio2_activity_figure_only",
+                "stolyarova_1996_fig2_sio2_activity_figure_only",
+                "stolyarova_1996_fig1_cao_activity_figure_only",
+                "stolyarova_1996_fig2_cao_activity_figure_only",
+                "stolyarova_1996_fig1_al2o3_activity_figure_only",
+                "stolyarova_1996_fig2_al2o3_activity_figure_only",
+            ),
+        ),
+        (
+            "kems-035-sauerborn-2005.yaml",
+            (
+                "sauerborn_2005_jsc1_composition_figure_only_blocked_deep2",
+                "sauerborn_2005_fig523_ms1_epma_glass_deep2",
+                "sauerborn_2005_fig532_rfa_oxide_ratio_deep2",
+                "sauerborn_2005_qms_traces_figure_only_blocked_deep2",
+                "sauerborn_2005_fig555_o2_reference_normalized_deep2",
+                "sauerborn_2005_fig556_o2_vs_T_normalized_deep2",
+            ),
+        ),
+    )
+    for name, identifiers in cases:
+        migrated = _migrate_real_extract(tmp_path / name, name)
+        for identifier in identifiers:
+            matching = [
+                observation
+                for observation in migrated.observations.values()
+                if f"::{identifier}" in observation.observation_id
+            ]
+            assert matching, (name, identifier)
+            assert all(
+                observation.evidence.class_.is_value
+                and observation.evidence.class_.value is EvidenceClass.FIGURE_ONLY
+                for observation in matching
+            ), (name, identifier)
+
+
+def test_printed_value_exclusions_keep_their_migrated_refusals(
+    tmp_path: Path,
+) -> None:
+    tsukihashi = _migrate_real_extract(tmp_path / "ts1985", "ts1985.yaml")
+    coefficients = [
+        observation
+        for observation in tsukihashi.observations.values()
+        if "::ts1985_na2o_table2_log10_a_AT_B::" in observation.observation_id
+    ]
+    assert len(coefficients) == 4
+    assert all(
+        observation.evidence.class_.is_value
+        and observation.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
+        for observation in coefficients
+    )
+
+    mendybaev = _migrate_real_extract(
+        tmp_path / "mendybaev",
+        "mendybaev-2021-cai-low-pressure-h2-evap.yaml",
+    )
+    rates = [
+        observation
+        for observation in mendybaev.observations.values()
+        if "::mendybaev_2021_weight_loss_rates_by_arm" in observation.observation_id
+    ]
+    assert len(rates) == 1
+    assert rates[0].evidence.class_.is_unknown
+    assert rates[0].value.kind is ValueKind.UNAVAILABLE
 
 
 def _run_migrate_cli(args: list[str]) -> subprocess.CompletedProcess[str]:
