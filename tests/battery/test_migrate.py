@@ -10097,6 +10097,35 @@ def test_stale_doi_alias_is_reassigned_in_one_pass_and_then_idempotent(
     assert output_bytes() == second_bytes
 
 
+def test_live_target_doi_alias_is_preserved_for_later_sources(tmp_path: Path) -> None:
+    doi = "10.1234/shared"
+    extracts = [
+        ("a", _named_extract("a", doi)),
+        ("b", _named_extract("b", doi)),
+        ("c", _named_extract("c", "10.1234/primary")),
+    ]
+    root = _write_multi_extract_tree(tmp_path, extracts)
+    aliases_path = root / "data" / "literature" / "works" / "ALIASES.yaml"
+    dump_yaml(
+        {
+            "schema_version": "battery_work_aliases.v1",
+            "aliases": {"a": "A", "b": "B", "c": "C", doi: "C"},
+        },
+        aliases_path,
+    )
+
+    result = migrate(root, write=True)
+    assert set(result.works) == {"A", "B", "C"}
+    assert result.aliases[doi] == "C"
+    resolved, _ = work_id_for(
+        citation="New source sharing historical DOI",
+        doi=doi,
+        source_id="new-source",
+        aliases=result.aliases,
+    )
+    assert resolved == "C"
+
+
 def _equipment_context_row(observation_id: str, experiment: object) -> dict:
     return {
         "observation_id": observation_id,

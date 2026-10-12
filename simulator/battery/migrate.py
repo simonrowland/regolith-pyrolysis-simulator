@@ -11333,26 +11333,6 @@ class Migrator:
             self.literature / "works" / "ALIASES.yaml"
         )
         self.aliases.update(REVIEWED_ALIASES)
-        doi_work_ids: dict[str, set[str]] = defaultdict(set)
-        for source_id, row in self.index.items():
-            work_id = self.aliases.get(source_id)
-            if work_id is None:
-                continue
-            doi = extract_doi(row.get("doi"), str(row.get("citation") or ""))
-            if doi:
-                doi_work_ids[doi].add(work_id)
-        # A carried DOI alias is authoritative only while a live source-ID
-        # alias for that DOI still resolves to its target. Drop an orphan
-        # before work_id_for can let it occupy the DOI for this run.
-        self.aliases = {
-            alias: work_id
-            for alias, work_id in self.aliases.items()
-            if (
-                canonicalize_doi(alias) not in doi_work_ids
-                or work_id in doi_work_ids[canonicalize_doi(alias)]
-            )
-        }
-        self.aliases.update(REVIEWED_ALIASES)
         self.result = MigrationResult(aliases=dict(self.aliases))
         self._vocab = _vocab_for_root(self.root)
         self._work_citations: dict[str, str] = {}
@@ -17100,6 +17080,8 @@ class Migrator:
 
     def run(self) -> MigrationResult:
         self.migrate_index_only_sources()
+        _prune_carried_doi_aliases_to_live_works(self.result)
+        self.aliases = dict(self.result.aliases)
         self.migrate_extracts()
         self.migrate_named_sources()
         self.migrate_compilations()
@@ -17303,8 +17285,8 @@ def write_outputs(result: MigrationResult, root: Path | None = None) -> None:
     observations_v2.mkdir(parents=True, exist_ok=True)
     battery.mkdir(parents=True, exist_ok=True)
 
-    live_work_ids = set(result.works)
-    result.aliases = {k: v for k, v in result.aliases.items() if v in live_work_ids}
+    live_work_ids = _live_work_ids(result)
+    _prune_aliases_to_live_works(result)
     dump_yaml(
         {
             "schema_version": "battery_work_aliases.v1",
@@ -17604,6 +17586,28 @@ def write_report(result: MigrationResult, path: Path) -> None:
         for kind, n in sorted(census.items(), key=lambda kv: (-kv[1], kv[0])):
             lines.append(f"| `{kind}` | {n} |")
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def _live_work_ids(result: MigrationResult) -> set[str]:
+    return set(result.works)
+
+
+def _prune_aliases_to_live_works(result: MigrationResult) -> None:
+    live_work_ids = _live_work_ids(result)
+    result.aliases = {
+        alias: work_id
+        for alias, work_id in result.aliases.items()
+        if work_id in live_work_ids
+    }
+
+
+def _prune_carried_doi_aliases_to_live_works(result: MigrationResult) -> None:
+    live_work_ids = _live_work_ids(result)
+    result.aliases = {
+        alias: work_id
+        for alias, work_id in result.aliases.items()
+        if extract_doi(alias) is None or work_id in live_work_ids
+    }
 
 
 def migrate(
