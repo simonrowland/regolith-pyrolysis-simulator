@@ -15,6 +15,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+import simulator.reference_data.burcat as burcat_module
 from simulator.reference_data.burcat import (
     COMPILATION_ROOT,
     SOURCE_REL,
@@ -293,7 +294,38 @@ def _alias_entry_from_source_records(burcat_id: str, peer_id: str) -> dict:
         "peer_formula": peer["formula"],
         "peer_name": peer["name_as_published"],
         "peer_phase": peer["phase"],
-        "peer_has_coefficients": peer["coefficient_count"] > 0,
+        "peer_data_kind": "nasa_polynomial",
+        "peer_has_data": peer["coefficient_count"] > 0,
+    }
+
+
+def _janaf_alias_entry_from_source_records(burcat_id: str, peer_id: str) -> dict:
+    burcat = json.loads(
+        (COMPILATION_ROOT / "records" / f"{burcat_id}.json").read_text()
+    )
+    peer_path = (
+        burcat_module.ROOT
+        / "data"
+        / "literature"
+        / "compilations"
+        / "janaf"
+        / "tables"
+        / f"{peer_id}.yaml"
+    )
+    peer = yaml.safe_load(peer_path.read_text())["table"]
+    index_entry = peer["index_entry"]
+    return {
+        "burcat_record_id": burcat_id,
+        "burcat_formula": burcat["formula"],
+        "burcat_name": burcat["name_as_published"],
+        "burcat_phase": burcat["phase"],
+        "peer_compilation": "janaf",
+        "peer_record_id": peer_id,
+        "peer_formula": index_entry.get("formula_as_published") or index_entry["formula"],
+        "peer_name": index_entry["name"],
+        "peer_phase": index_entry["state"],
+        "peer_data_kind": "janaf_table",
+        "peer_has_data": True,
     }
 
 
@@ -325,7 +357,44 @@ def test_peer_alias_loader_rejects_peer_without_coefficients(tmp_path) -> None:
         [_alias_entry_from_source_records("BU-0440", "NG-2036")],
     )
 
-    with pytest.raises(BurcatParseError, match="has no coefficients"):
+    with pytest.raises(BurcatParseError, match="no usable thermodynamic data"):
+        load_peer_aliases(alias_path)
+
+
+def test_peer_alias_loader_accepts_janaf_data_and_rejects_empty_table(
+    tmp_path, monkeypatch
+) -> None:
+    alias_path = tmp_path / "peer-aliases.yaml"
+    alias = _janaf_alias_entry_from_source_records("BU-3006", "Cl-141")
+    _write_alias_fixture(alias_path, [alias])
+
+    assert load_peer_aliases(alias_path) == [alias]
+
+    source_path = (
+        burcat_module.ROOT
+        / "data"
+        / "literature"
+        / "compilations"
+        / "janaf"
+        / "tables"
+        / "Cl-141.yaml"
+    )
+    empty_peer = yaml.safe_load(source_path.read_text())
+    empty_peer["table"]["values"] = []
+    peer_path = (
+        tmp_path
+        / "data"
+        / "literature"
+        / "compilations"
+        / "janaf"
+        / "tables"
+        / "Cl-141.yaml"
+    )
+    peer_path.parent.mkdir(parents=True)
+    peer_path.write_text(yaml.safe_dump(empty_peer, sort_keys=False))
+    monkeypatch.setattr(burcat_module, "ROOT", tmp_path)
+
+    with pytest.raises(BurcatParseError, match="no usable thermodynamic data"):
         load_peer_aliases(alias_path)
 
 

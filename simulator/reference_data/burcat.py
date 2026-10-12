@@ -12,6 +12,7 @@ On-disk home: ``data/literature/compilations/burcat/``.
 from __future__ import annotations
 
 import json
+import math
 import re
 import xml.etree.ElementTree as ET
 from collections import defaultdict
@@ -683,7 +684,8 @@ def load_peer_aliases(path: Path | None = None) -> list[dict[str, Any]]:
         "peer_formula",
         "peer_name",
         "peer_phase",
-        "peer_has_coefficients",
+        "peer_data_kind",
+        "peer_has_data",
     }
     loaded: list[dict[str, Any]] = []
     seen: set[tuple[str, str, str]] = set()
@@ -691,11 +693,11 @@ def load_peer_aliases(path: Path | None = None) -> list[dict[str, Any]]:
         label = f"{alias_path}: aliases[{index}]"
         if not isinstance(entry, dict) or set(entry) != fields:
             raise BurcatParseError(f"{label}: malformed alias entry")
-        for key in fields - {"peer_has_coefficients"}:
+        for key in fields - {"peer_has_data"}:
             if not isinstance(entry.get(key), str) or not entry[key].strip():
                 raise BurcatParseError(f"{label}: {key} must be a non-empty string")
-        if type(entry["peer_has_coefficients"]) is not bool:
-            raise BurcatParseError(f"{label}: peer_has_coefficients must be boolean")
+        if type(entry["peer_has_data"]) is not bool:
+            raise BurcatParseError(f"{label}: peer_has_data must be boolean")
 
         burcat_id = entry["burcat_record_id"]
         peer_compilation = entry["peer_compilation"]
@@ -749,6 +751,7 @@ def load_peer_aliases(path: Path | None = None) -> list[dict[str, Any]]:
                 f"{label}: {peer_compilation} record {peer_id} does not exist"
             )
         if peer_compilation == "nasa-glenn":
+            peer_data_kind = "nasa_polynomial"
             peer_doc = json.loads(peer_path.read_text(encoding="utf-8"))
             if peer_doc.get("record_id") != peer_id:
                 raise BurcatParseError(f"{label}: peer record id does not match its file")
@@ -756,8 +759,9 @@ def load_peer_aliases(path: Path | None = None) -> list[dict[str, Any]]:
             peer_name = peer_doc.get("name_as_published")
             peer_phase = peer_doc.get("phase")
             coefficient_count = peer_doc.get("coefficient_count")
-            peer_has_coefficients = type(coefficient_count) is int and coefficient_count > 0
+            peer_has_data = type(coefficient_count) is int and coefficient_count > 0
         else:
+            peer_data_kind = "janaf_table"
             peer_doc = load_cached_safe_yaml(peer_path.read_text(encoding="utf-8"))
             table = peer_doc.get("table") if isinstance(peer_doc, dict) else None
             index_entry = table.get("index_entry") if isinstance(table, dict) else None
@@ -767,7 +771,7 @@ def load_peer_aliases(path: Path | None = None) -> list[dict[str, Any]]:
             peer_name = index_entry.get("name")
             peer_phase = index_entry.get("state")
             values = table.get("values")
-            peer_has_coefficients = isinstance(values, list) and bool(values)
+            peer_has_data = _janaf_has_finite_thermo_row(values)
 
         if entry["peer_formula"] != peer_formula:
             raise BurcatParseError(f"{label}: peer_formula does not match record {peer_id}")
@@ -775,11 +779,15 @@ def load_peer_aliases(path: Path | None = None) -> list[dict[str, Any]]:
             raise BurcatParseError(f"{label}: peer_name does not match record {peer_id}")
         if entry["peer_phase"] != peer_phase:
             raise BurcatParseError(f"{label}: peer_phase does not match record {peer_id}")
-        if not peer_has_coefficients:
-            raise BurcatParseError(f"{label}: peer record {peer_id} has no coefficients")
-        if entry["peer_has_coefficients"] is not peer_has_coefficients:
+        if entry["peer_data_kind"] != peer_data_kind:
+            raise BurcatParseError(f"{label}: peer_data_kind does not match record {peer_id}")
+        if not peer_has_data:
             raise BurcatParseError(
-                f"{label}: peer_has_coefficients does not match record {peer_id}"
+                f"{label}: peer record {peer_id} has no usable thermodynamic data"
+            )
+        if entry["peer_has_data"] is not peer_has_data:
+            raise BurcatParseError(
+                f"{label}: peer_has_data does not match record {peer_id}"
             )
         if entry["burcat_formula"] == entry["peer_formula"]:
             raise BurcatParseError(f"{label}: alias formulas must differ")
@@ -791,6 +799,23 @@ def load_peer_aliases(path: Path | None = None) -> list[dict[str, Any]]:
             raise BurcatParseError(f"{label}: charge mismatch")
         loaded.append(dict(entry))
     return loaded
+
+
+def _janaf_has_finite_thermo_row(values: Any) -> bool:
+    if not isinstance(values, list):
+        return False
+    data_fields = ("heat_capacity", "entropy", "enthalpy_increment", "formation_enthalpy")
+    return any(
+        isinstance(row, dict)
+        and any(
+            isinstance(row.get(field), dict)
+            and isinstance(row[field].get("value"), (int, float))
+            and not isinstance(row[field]["value"], bool)
+            and math.isfinite(row[field]["value"])
+            for field in data_fields
+        )
+        for row in values
+    )
 
 
 def _phase_identity(value: str) -> str:
