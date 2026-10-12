@@ -756,6 +756,74 @@ def test_uncalibrated_kems_residual_matches_between_oxygen_balance_engines() -> 
     )
 
 
+def test_plante_k_partial_pressure_rows_keep_registered_band_after_fresh_migration(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.score import derive_kems_partial_pressure_band, score_store
+    from tests.battery.test_migrate import REPO_ROOT, _migrate_real_extract
+
+    migrated = _migrate_real_extract(tmp_path, "kems-042-plante-1979.yaml")
+    assert len(migrated.observations) == 383
+    expected = derive_kems_partial_pressure_band(
+        migrated.observations,
+        migrated.experiments,
+        benches=migrated.benches,
+    )
+    assert expected is not None
+    assert expected.value.quantize(Decimal("0.000001")) == Decimal("0.146128")
+
+    context = ScoreContext(
+        works=migrated.works,
+        experiments=migrated.experiments,
+        observations=migrated.observations,
+        benches=migrated.benches,
+        extract_review={"kems-042-plante-1979": "reviewed"},
+    )
+    extract = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts/kems-042-plante-1979.yaml").read_text()
+    )
+    engine_row_ids = {
+        "kems-042-plante-1979::" + row["observation_id"]
+        for row in extract["species"]["K"]["observations"]
+        if row.get("supersedes")
+    }
+    references = {
+        observation.observation_id: observation
+        for observation_id in engine_row_ids
+        if (observation := context.observations[observation_id])
+        and observation.source_id == "kems-042-plante-1979"
+        and quantity_token(observation.identity) is Quantity.P_PARTIAL
+        and observation.identity.species.formula == "K"
+    }
+    assert len(references) == 162
+    work_id = migrated.experiments[next(iter(references.values())).experiment_id].work_id
+    residuals, _candidates = score_store(
+        context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        work_id=work_id,
+        rail=Rail.VAPOUR,
+        predict=_partial_prediction,
+    )
+    scored = [row for row in residuals if row.reference in references]
+    assert len(scored) == 162
+    missing_or_changed = [
+        (
+            row.reference,
+            None
+            if row.numeric is None or row.numeric.decision_band is None
+            else row.numeric.decision_band.value,
+        )
+        for row in scored
+        if (
+            row.numeric is None
+            or row.numeric.decision_band is None
+            or row.numeric.decision_band.value.quantize(Decimal("0.000001"))
+            != expected.value.quantize(Decimal("0.000001"))
+        )
+    ]
+    assert not missing_or_changed, missing_or_changed[:5]
+
+
 
 
 def test_zhang_alpha_gamma_bound_uses_implied_alpha_verdict() -> None:

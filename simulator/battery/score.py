@@ -1938,6 +1938,246 @@ def band_dimension_matches(
     return quantity_dim is not None and quantity_dim == band_dim
 
 
+def pooled_log_pressure_sd(
+    replicate_log_pressures: Sequence[Sequence[Decimal | int | float]],
+) -> Decimal | None:
+    """Return the pooled sample SD of replicate log10(p) values."""
+
+    sum_squares = Decimal(0)
+    degrees_of_freedom = 0
+    for raw_group in replicate_log_pressures:
+        group: list[Decimal] = []
+        for raw_value in raw_group:
+            try:
+                value = as_decimal(raw_value)
+            except (TypeError, ValueError, ArithmeticError):
+                continue
+            if value.is_finite():
+                group.append(value)
+        if len(group) < 2:
+            continue
+        mean = sum(group, Decimal(0)) / Decimal(len(group))
+        sum_squares += sum((value - mean) ** 2 for value in group)
+        degrees_of_freedom += len(group) - 1
+    if degrees_of_freedom == 0:
+        return None
+    return (sum_squares / Decimal(degrees_of_freedom)).sqrt()
+
+
+def _printed_pressure_uncertainty_dex(observation: Observation) -> Decimal | None:
+    uncertainty = observation.uncertainty
+    if uncertainty.kind is not UncertaintyKind.PRINTED:
+        return None
+    if uncertainty.value is not None and uncertainty.basis in {
+        "relative",
+        "fraction",
+    }:
+        raw = uncertainty.value
+        if isinstance(raw, tuple):
+            fraction = max(abs(raw[0]), abs(raw[1]))
+        else:
+            fraction = abs(raw)
+        if fraction.is_finite() and fraction > 0:
+            return (Decimal(1) + fraction).ln() / Decimal(10).ln()
+    try:
+        text = json.dumps(to_plain(uncertainty.verbatim), sort_keys=True)
+    except (TypeError, ValueError):
+        text = str(uncertainty.verbatim)
+    for match in re.finditer(r"(\d+(?:\.\d+)?)\s*(?:%|percent)", text, re.IGNORECASE):
+        window = text[max(0, match.start() - 80) : min(len(text), match.end() + 80)]
+        if not re.search(r"\b(?:k\s+)?pressure\b|\bp[_\s]?k\b", window, re.IGNORECASE):
+            continue
+        fraction = Decimal(match.group(1)) / Decimal(100)
+        if fraction > 0:
+            # The source prints a relative pressure envelope. Convert its upper
+            # multiplicative edge to the dex residual metric.
+            return (Decimal(1) + fraction).ln() / Decimal(10).ln()
+    return None
+
+
+def _observation_flagged_strata(
+    observation: Observation,
+    experiments: Mapping[str, Experiment],
+    point_observations_by_experiment: Mapping[str, tuple[Observation, ...]],
+    benches: Mapping[str, Bench] | None = None,
+) -> tuple[str, ...]:
+    existing = flagged_strata(observation.notices)
+    experiment = experiments.get(observation.experiment_id)
+    if experiment is None:
+        return existing
+    gates = run_validity_gates(
+        experiment,
+        observation,
+        point_observations=point_observations_by_experiment.get(
+            observation.experiment_id, ()
+        ),
+    )
+    bench = (
+        None
+        if experiment.bench_id is None or benches is None
+        else benches.get(experiment.bench_id)
+    )
+    return tuple(
+        dict.fromkeys(
+            (
+                *existing,
+                *flagged_strata(
+                    _flagged_stratum_notices(observation, experiment, gates, bench)
+                ),
+            )
+        )
+    )
+
+
+def _kems_replicate_groups(
+    observations: Mapping[str, Observation],
+    experiments: Mapping[str, Experiment],
+    benches: Mapping[str, Bench],
+) -> tuple[tuple[Decimal, ...], ...]:
+    groups: dict[tuple[object, ...], list[Decimal]] = {}
+    point_observations_by_experiment = _partial_pressure_observations_by_experiment(
+        observations.values()
+    )
+    for observation in observations.values():
+        identity = observation.identity
+        quantity = quantity_token(identity) if isinstance(identity, Identity) else None
+        if quantity is not Quantity.P_PARTIAL or not isinstance(identity, Identity):
+            continue
+        if _observation_flagged_strata(
+            observation, experiments, point_observations_by_experiment, benches
+        ):
+            continue
+        evidence = observation.evidence.class_
+        if not evidence.is_value or evidence.value not in MEASURED_EVIDENCE:
+            continue
+        experiment = experiments.get(observation.experiment_id)
+        if (
+            experiment is None
+            or not experiment.method.is_value
+            or experiment.method.value is not MethodToken.KNUDSEN_EFFUSION
+            or observation.admission.status is not AdmissionStatus.ADMITTED
+        ):
+            continue
+        temperature = temperature_of(identity)
+        composition = identity.composition
+        point = point_magnitude(observation.value)
+        if (
+            temperature is None
+            or composition is None
+            or not composition.is_value
+            or composition.value is None
+            or point is None
+            or point <= 0
+        ):
+            continue
+        key = (
+            observation.experiment_id,
+            identity.species.formula,
+            str(temperature),
+            tuple((name, str(amount)) for name, amount in composition.value.components),
+        )
+        groups.setdefault(key, []).append(point.ln() / Decimal(10).ln())
+    return tuple(tuple(values) for values in groups.values() if len(values) >= 2)
+
+
+def derive_kems_partial_pressure_band(
+    observations: Mapping[str, Observation],
+    experiments: Mapping[str, Experiment],
+    *,
+    benches: Mapping[str, Bench] | None = None,
+) -> DecisionBand | None:
+    """Resolve the source-printed or replicate band for measured KEMS pressures."""
+
+    return _derive_kems_partial_pressure_band(
+        observations, experiments, benches or {}
+    )
+
+
+def _derive_kems_partial_pressure_band(
+    observations: Mapping[str, Observation],
+    experiments: Mapping[str, Experiment],
+    benches: Mapping[str, Bench],
+) -> DecisionBand | None:
+    """Resolve one band from admitted measured KEMS partial-pressure rows."""
+
+    candidates = []
+    point_observations_by_experiment = _partial_pressure_observations_by_experiment(
+        observations.values()
+    )
+    for observation in observations.values():
+        identity = observation.identity
+        quantity = quantity_token(identity) if isinstance(identity, Identity) else None
+        if quantity is not Quantity.P_PARTIAL or not isinstance(identity, Identity):
+            continue
+        if _observation_flagged_strata(
+            observation, experiments, point_observations_by_experiment, benches
+        ):
+            continue
+        evidence = observation.evidence.class_
+        if not evidence.is_value or evidence.value not in MEASURED_EVIDENCE:
+            continue
+        experiment = experiments.get(observation.experiment_id)
+        if (
+            experiment is None
+            or not experiment.method.is_value
+            or experiment.method.value is not MethodToken.KNUDSEN_EFFUSION
+            or observation.admission.status is not AdmissionStatus.ADMITTED
+            or rail_for_quantity(quantity, species_formula=identity.species.formula)
+            is not Rail.VAPOUR
+        ):
+            continue
+        candidates.append(observation)
+    if not candidates:
+        return None
+
+    printed_observations = []
+    for observation in candidates:
+        reference_value = point_magnitude(observation.value)
+        if reference_value is None:
+            continue
+        pressure_width = _printed_pressure_uncertainty_dex(observation)
+        if pressure_width is not None:
+            printed_observations.append((observation, pressure_width))
+    printed = [width for _, width in printed_observations]
+    if printed:
+        width = _rms(printed)
+        if width is None or not width.is_finite() or width <= 0:
+            return None
+        if any(
+            observation.source_id == "kems-042-plante-1979"
+            for observation, _ in printed_observations
+        ):
+            rule = (
+                "KEMS p_partial measured uncertainty: source-printed pressure "
+                "envelope (RMS of admitted printed log10 pressure envelopes only); "
+                "Plante width log10(1.40) from the printed page-280 1500 K "
+                "sentence, using the upper multiplicative edge and accepting "
+                "pressure ratios [1/1.40, 1.40] (-28.6%..+40%), not a symmetric "
+                "+/-40% relative band; NOTICE: the single 1500 K figure is "
+                "applied across the tabulated T range"
+            )
+        else:
+            rule = (
+                "KEMS p_partial measured uncertainty: source-printed pressure "
+                "envelope (RMS of admitted printed log10 pressure envelopes only)"
+            )
+        return DecisionBand(width, "dimensionless", rule)
+
+    replicate_scatter = pooled_log_pressure_sd(
+        _kems_replicate_groups(observations, experiments, benches)
+    )
+    if replicate_scatter is None:
+        return None
+    if not replicate_scatter.is_finite() or replicate_scatter <= 0:
+        return None
+    rule = (
+        "KEMS p_partial measured uncertainty: replicate scatter (pooled replicate "
+        "log10 pressure SD; used because no admitted printed pressure envelope "
+        "exists)"
+    )
+    return DecisionBand(replicate_scatter, "dimensionless", rule)
+
+
 def _decision_band_kind(
     band: DecisionBand | Mapping[str, object] | str | None,
 ) -> str:
@@ -2324,10 +2564,20 @@ def _printed_uncertainty_band(
     reference: Decimal,
     *,
     source_observation: Observation | None = None,
+    method: MethodToken | None = None,
 ) -> _PrintedBandResolution:
     if uncertainty is None or uncertainty.kind is not UncertaintyKind.PRINTED:
         return _PrintedBandResolution()
     if not _uncertainty_scope_covers_cell(uncertainty, source_observation):
+        return _PrintedBandResolution()
+    if (
+        quantity is Quantity.P_PARTIAL
+        and method is MethodToken.KNUDSEN_EFFUSION
+        and source_observation is not None
+        and _printed_pressure_uncertainty_dex(source_observation) is not None
+    ):
+        # This source-wide KEMS envelope is pooled by the registered resolver;
+        # the generic per-cell parser would mistake its pressure label for a unit.
         return _PrintedBandResolution()
     raw_text = _uncertainty_original(uncertainty)
     source_value, shape, mapped_unit = _printed_uncertainty_source(uncertainty)
@@ -5663,6 +5913,11 @@ def compile_residual(
             reference.uncertainty,
             ref_point,
             source_observation=reference,
+            method=(
+                experiment.method.value
+                if experiment is not None and experiment.method.is_value
+                else None
+            ),
         )
         if printed.notice is not None:
             notices = union_notices(notices, (printed.notice,))
@@ -6065,6 +6320,9 @@ def _score_store_with_decisions(
     source_bands, _source_band_records, source_band_reasons = _source_band_catalog(
         context, ratchet_entries
     )
+    kems_partial_pressure_band = derive_kems_partial_pressure_band(
+        observations, context.experiments, benches=context.benches
+    )
     residue_prediction_cache: dict[tuple[str, Engine], Mapping[str, object]] = {}
     try:
         with bound_work_inputs(context.works, observations, context.experiments):
@@ -6116,6 +6374,18 @@ def _score_store_with_decisions(
                             source_key = _group_token(group_key)
                             source_band = source_bands.get(source_key)
                             source_band_reason = source_band_reasons.get(source_key)
+                    derived_band = source_band
+                    derived_band_reason = source_band_reason
+                    experiment = context.experiments.get(point.experiment_id)
+                    if (
+                        derived_band is None
+                        and quantity is Quantity.P_PARTIAL
+                        and experiment is not None
+                        and experiment.method.is_value
+                        and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
+                    ):
+                        derived_band = kems_partial_pressure_band
+                        derived_band_reason = None
                     for engine in engine_set:
                         prediction = None
                         if (
@@ -6175,8 +6445,8 @@ def _score_store_with_decisions(
                                 else None
                             ),
                             table_index=table_index,
-                            derived_band=source_band,
-                            derived_band_reason=source_band_reason,
+                            derived_band=derived_band,
+                            derived_band_reason=derived_band_reason,
                             ratchet_missing=ratchet_missing,
                             point_observations=point_observations_by_experiment.get(
                                 point.experiment_id, ()
