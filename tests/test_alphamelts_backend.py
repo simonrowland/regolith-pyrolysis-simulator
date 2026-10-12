@@ -1796,6 +1796,27 @@ def test_alphamelts_subprocess_liquidus_pins_single_absolute_melts_request(
     assert float(offset_line.split(':', 1)[1]) == -9.0
 
 
+def test_alphamelts_subprocess_liquidus_refuses_buffer_offset(monkeypatch):
+    backend, _captured_env, launches = _prepare_subprocess_launch_probe(
+        monkeypatch,
+        model_name='',
+    )
+    state = RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, -0.75)
+
+    result = backend.find_liquidus_solidus(
+        composition_kg=_melts_domain_composition(),
+        fO2_log=state.log_fO2_at(REDOX_STATE_REFERENCE_T_K),
+        redox_state=state,
+        pressure_bar=1.0,
+    )
+
+    assert result.status == 'unavailable'
+    assert result.diagnostics == {
+        'reason': 'redox_state_not_expressible',
+    }
+    assert launches == []
+
+
 def _melts_domain_composition() -> dict[str, float]:
     return {
         'SiO2': 49.0,

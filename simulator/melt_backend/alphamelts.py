@@ -1635,7 +1635,7 @@ class _MELTSBackendSupport(MeltBackend):
         """Find solidus/liquidus when a liquid-fraction transport is live."""
         fO2_log, redox_state = normalize_redox_state(fO2_log, redox_state)
         if (
-            self._mode == 'python_api'
+            self._mode in {'python_api', 'subprocess'}
             and redox_state is not None
             and redox_state.kind == 'buffer_offset'
         ):
