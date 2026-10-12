@@ -33,10 +33,8 @@ from simulator.fe_redox import (
 from simulator.melt_backend.base import EquilibriumResult, MeltCompositionError
 from simulator.reduced_real_determinism import (
     PT0DeterminismStore,
-    _gate_provider_role_for_key,
     canonical_json_bytes,
     gate_curve_memo_producer_configuration,
-    record_dependency_vector,
     uncacheable_replay_disposition,
 )
 from simulator.runner import _attach_composition_projected_liquidus_notice
@@ -444,12 +442,7 @@ def _install_freeze_gate_curve(
     }
     if path is not None:
         curve['path'] = path
-    dependency_vector = record_dependency_vector(
-        sim,
-        ChemistryIntent.GATE_LIQUID_FRACTION,
-        artifact='freeze_gate_curve',
-        provider_role=_gate_provider_role_for_key(sim),
-    )
+    dependency_vector = gate_curve_memo_producer_configuration(sim, curve)
     sim._freeze_gate_liquid_fraction_cache = {
         'key': _freeze_gate_key_for_current_state(sim),
         'curve': curve,
@@ -3780,7 +3773,7 @@ def test_invalid_redox_gate_curve_does_not_poison_valid_retry(
     monkeypatch.setattr(sim, '_freeze_gate_curve', invalid_then_valid_curve)
     key = _freeze_gate_key_for_current_state(sim)
 
-    assert not hasattr(sim, '_freeze_gate_liquid_fraction_curve_memo')
+    assert sim._freeze_gate_liquid_fraction_curve_memo == {}
 
     invalid = sim._melt_redox_liquidus_gate_curve()
 
@@ -4052,6 +4045,80 @@ def test_core_gate_curve_memo_reuses_fallback_curve_after_provider_unavailable(
     assert second == first
 
 
+def test_replay_gate_curve_is_not_written_to_core_memo(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    curve = {
+        'source': 'gate_liquid_fraction:replay:test',
+        'status': 'ok',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1300.0,
+    }
+    replay_calls = []
+    store = PT0DeterminismStore('replay')
+
+    def replay_gate_curve(target, *, fO2_log):
+        replay_calls.append(fO2_log)
+        target._last_reduced_real_replay_notices = []
+        return dict(curve)
+
+    monkeypatch.setattr(store, 'replay_gate_curve', replay_gate_curve)
+    sim.configure_pt0_determinism_store(store)
+    key = _freeze_gate_key_for_current_state(sim)
+
+    assert sim._melt_redox_liquidus_gate_curve() == curve
+    assert len(replay_calls) == 1
+    assert key not in sim._freeze_gate_liquid_fraction_curve_memo
+
+
+def test_replay_gate_curve_is_not_pinned_as_tick_authority(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    curve = {
+        'source': 'gate_liquid_fraction:replay:test',
+        'status': 'ok',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1300.0,
+    }
+    replay_calls = []
+    store = PT0DeterminismStore('replay')
+
+    def replay_gate_curve(target, *, fO2_log):
+        replay_calls.append(fO2_log)
+        target._last_reduced_real_replay_notices = []
+        return dict(curve)
+
+    monkeypatch.setattr(store, 'replay_gate_curve', replay_gate_curve)
+    sim.configure_pt0_determinism_store(store)
+    prior_authority = object()
+    prior_tick_hour = -1
+    sim._melt_redox_gate_authority_this_tick = prior_authority
+    sim._melt_redox_gate_authority_tick_hour = prior_tick_hour
+
+    assert sim._establish_melt_redox_gate_authority_for_current_hour() == curve
+    assert len(replay_calls) == 1
+    assert sim._melt_redox_gate_authority_this_tick is prior_authority
+    assert sim._melt_redox_gate_authority_tick_hour == prior_tick_hour
+
+
 @pytest.mark.parametrize('memo_form', ('local', 'shared'))
 def test_freeze_gate_memo_refuses_dependency_vector_mismatch(
     monkeypatch,
@@ -4069,19 +4136,17 @@ def test_freeze_gate_memo_refuses_dependency_vector_mismatch(
     sim.melt.temperature_C = 1600.0
     sim.melt.p_total_mbar = 10.0
     key = _freeze_gate_key_for_current_state(sim)
-    dependency_vector = record_dependency_vector(
-        sim,
-        ChemistryIntent.GATE_LIQUID_FRACTION,
-        artifact='freeze_gate_curve',
-        provider_role='authoritative',
-    )
-    mismatched_vector = deepcopy(dependency_vector)
-    mismatched_vector['model']['model'] = 'other-admitted-model'
     stale_curve = {
         'source': 'stale-binding',
         'solidus_T_C': 900.0,
         'liquidus_T_C': 1200.0,
     }
+    dependency_vector = gate_curve_memo_producer_configuration(
+        sim,
+        stale_curve,
+    )
+    mismatched_vector = deepcopy(dependency_vector)
+    mismatched_vector['model']['model'] = 'other-admitted-model'
     shared_cache = {}
     if memo_form == 'local':
         sim._freeze_gate_liquid_fraction_cache = {

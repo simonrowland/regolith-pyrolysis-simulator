@@ -1151,6 +1151,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         self._freeze_gate_config = self._resolve_freeze_gate_config()
         self._freeze_gate_liquid_fraction_cache: Optional[Dict[str, Any]] = None
+        self._freeze_gate_liquid_fraction_curve_memo: Dict[
+            tuple,
+            Dict[str, Any],
+        ] = {}
         self._freeze_gate_curve_in_progress: bool = False
         self._last_freeze_gate_diagnostic: Dict[str, Any] = {}
         self._melt_redox_liquidus_gate_fallback_diagnostics: deque[
@@ -3371,12 +3375,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         *,
         freeze_gate_config: Optional[Mapping[str, Any]] = None,
     ) -> None:
+        previous_config = getattr(self, '_freeze_gate_config', None)
         self._freeze_gate_config = dict(
             freeze_gate_config
             if freeze_gate_config is not None
             else self._resolve_freeze_gate_config(campaign)
         )
         self._freeze_gate_liquid_fraction_cache = None
+        if previous_config != self._freeze_gate_config:
+            self._freeze_gate_liquid_fraction_curve_memo = {}
         self._freeze_gate_curve_in_progress = False
         self._last_freeze_gate_diagnostic = {}
 
@@ -4660,8 +4667,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         ):
             return pinned_authority
         authority = self._melt_redox_liquidus_gate_curve()
-        self._melt_redox_gate_authority_this_tick = authority
-        self._melt_redox_gate_authority_tick_hour = current_hour
+        if not isinstance(
+            getattr(self, '_last_reduced_real_replay_notices', None),
+            list,
+        ):
+            self._melt_redox_gate_authority_this_tick = authority
+            self._melt_redox_gate_authority_tick_hour = current_hour
         return authority
 
     def _clear_melt_redox_gate_authority_for_completed_hour(
@@ -4689,6 +4700,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             uncacheable_replay_disposition,
         )
 
+        self._last_reduced_real_replay_notices = None
         pressure_bar = float(self.melt.p_total_mbar) / 1000.0
         fO2_log = float(self._current_melt_redox_fO2_log())
         redox_key_fO2_log = self._freeze_gate_redox_key_fO2_log(
@@ -4716,6 +4728,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         if not cache_hit:
             curve = None
+
+        memo = getattr(
+            self,
+            '_freeze_gate_liquid_fraction_curve_memo',
+            None,
+        )
+        core_memo_hit = False
+        if curve is None and isinstance(memo, dict):
+            memoized_curve = memo.get(key)
+            if isinstance(memoized_curve, Mapping):
+                curve = dict(memoized_curve)
+                core_memo_hit = True
 
         gate_curve_in_progress = (
             bool(getattr(self, '_freeze_gate_curve_in_progress', False))
@@ -4784,6 +4808,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 and self._freeze_gate_liquid_fraction_cache.get('key') == key
             ):
                 self._freeze_gate_liquid_fraction_cache = None
+            if isinstance(memo, dict):
+                memo.pop(key, None)
             return self._melt_redox_liquidus_floor_fallback(
                 source='none:invalid_liquidus_curve',
                 reason=str(exc),
@@ -4799,6 +4825,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 and self._freeze_gate_liquid_fraction_cache.get('key') == key
             ):
                 self._freeze_gate_liquid_fraction_cache = None
+            if isinstance(memo, dict):
+                memo.pop(key, None)
             return self._melt_redox_liquidus_floor_fallback(
                 source='none:invalid_liquidus_bounds',
                 reason=(
@@ -4817,9 +4845,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if cache_hit:
             for notice in cache_notices or ():
                 record_repair_notice(self, notice)
-        cache_eligible = reusable_curve and gate_curve_memo_eligibility(
-            self,
-            normalized_curve,
+        cache_eligible = (
+            not core_memo_hit
+            and reusable_curve
+            and gate_curve_memo_eligibility(self, normalized_curve)
         )
         validated_curve = (
             validated_cache.get('curve')
@@ -4844,6 +4873,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 ),
                 'repair_notices': list(cache_notices or ()),
             }
+        replay_notices = getattr(
+            self,
+            '_last_reduced_real_replay_notices',
+            None,
+        )
+        if isinstance(memo, dict) and not isinstance(replay_notices, list):
+            memo[key] = dict(normalized_curve)
         self._record_composition_projected_liquidus_notice_from_curve(
             normalized_curve
         )

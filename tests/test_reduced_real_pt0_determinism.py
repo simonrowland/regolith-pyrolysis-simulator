@@ -3453,6 +3453,7 @@ def test_pt0_gate_capture_with_receipt_covers_fresh_curve_and_memo_hit(
     capture = PT0DeterminismStore("capture", db_path=db_path)
     sim = _build_pt0_sim(capture)
     sim.start_campaign(CampaignPhase.C2A_STAGED)
+    sim._register_freeze_gate_liquid_fraction_providers()
     curve = {
         "source": "gate_liquid_fraction:fallback:synthetic-fake",
         "status": "ok",

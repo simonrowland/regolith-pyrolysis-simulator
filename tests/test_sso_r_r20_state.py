@@ -2579,11 +2579,9 @@ def test_live_paths_do_not_call_intrinsic_heuristic(
     sim._freeze_gate_liquid_fraction_cache = {
         "key": key,
         "curve": curve,
-        "dependency_vector": rrd.record_dependency_vector(
+        "dependency_vector": rrd.gate_curve_memo_producer_configuration(
             sim,
-            ChemistryIntent.GATE_LIQUID_FRACTION,
-            artifact="freeze_gate_curve",
-            provider_role=rrd._gate_provider_role_for_key(sim),
+            curve,
         ),
         "repair_notices": [],
     }
