@@ -8891,17 +8891,12 @@ def _hit_from_value(
     if kind == "composition" or _lab_kind(entry.field) == "composition":
         return None
     units = entry.unit
-    loc = parent_locator
-    raw = value
-    mapping: Mapping[str, Any] | None = None
+    raw, loc, mapping = _unwrap_located_equipment_value(value, parent_locator)
     if isinstance(value, Mapping):
-        mapping = value
         if "value" not in value or value.get("value") is None:
             return None
-        raw = value.get("value")
         if value.get("units") not in (None, ""):
             units = str(value.get("units"))
-        loc = locator_from_mapping(value.get("locator")) or loc
     if loc is None:
         return None
     nested_value = raw if isinstance(raw, Mapping) else None
@@ -8993,6 +8988,21 @@ def _hit_from_value(
         path=path,
         mapping=mapping,
     )
+
+
+def _unwrap_located_equipment_value(
+    value: object,
+    parent_locator: Locator | None = None,
+) -> tuple[object, Locator | None, Mapping[str, Any] | None]:
+    """Extract a located equipment value without changing its bare form."""
+
+    if isinstance(value, Mapping) and "value" in value and value.get("value") is not None:
+        return (
+            value.get("value"),
+            locator_from_mapping(value.get("locator")) or parent_locator,
+            value,
+        )
+    return value, parent_locator, value if isinstance(value, Mapping) else None
 
 
 def _walk_lab_hits(
