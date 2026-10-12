@@ -65,6 +65,13 @@ species:
         quantity: calibration_reference_gas_composition
         method_class: measured_direct
         evidence_class: authors_own_calibration
+        reference_gas_pressure:
+          value: 5-10
+          units: bar
+          bound_kind: range_as_printed
+          locator:
+            pdf_page_index: 1
+            section: Experimental technique
         gas_species:
           H2: 56.78
           He: 15.91
@@ -80,21 +87,21 @@ species:
         abundance_unit: vol%
         abundance_uncertainty_as_printed: approximately 1% relative
         source_note: Single gases or this 11-species mixture were used; the printed list is split across the two-column page.
+      equipment:
+        other_facts:
+          value:
+          - name: vessel_and_restriction
+            unit: as printed
+            value:
+              state: {tag: value, value: {kind: categorical, categorical: vessel connected to the vacuum system via a capillary leak or piezo-electric (PZT) metering valve}}
+              locator:
+                pdf_page_index: 1
+                section: Experimental technique
+          locator:
+            pdf_page_index: 1
+            section: Experimental technique
       uncertainty:
         relative_abundance: approximately 1% relative
-      equipment:
-        reference_gas_pressure:
-          value: 5-10
-          units: bar
-          bound_kind: range_as_printed
-          locator:
-            pdf_page_index: 1
-            section: Experimental technique
-        vessel_and_restriction:
-          value: vessel connected to the vacuum system via a capillary leak or piezo-electric (PZT) metering valve
-          locator:
-            pdf_page_index: 1
-            section: Experimental technique
     - observation_id: lpsc_2019_2641_qms_calibration_power_law_fits
       type: calibration
       locator:

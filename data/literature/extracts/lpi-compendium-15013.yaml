@@ -13,7 +13,7 @@ extraction:
   scope: 'secondary lunar sample compendium entry; sample provenance and characterization are retained as measurements, cited analyses as attributed/compiled values'
 review_status: draft
 fidelity_samples:
-- path: species.sample_15013.observations[lpi_15013_sample_mass_and_collection].values.sample_mass_g
+- path: species.sample_15013.observations[lpi_15013_carbon_and_nitrogen].equipment.sample.value.sample_mass_g.value
   value: 296.2
   locator: {pdf_page_index: 1, section: Introduction, figure: '1'}
 source_locators:
@@ -54,36 +54,8 @@ coverage:
 sample_characterization:
   sample_15013:
     observations: &sample_15013_observations
-    - observation_id: lpi_15013_sample_mass_and_collection
-      type: sample_characterization
-      locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 1, section: Introduction, figure: '1'}
-      units: as_published
-      values:
-        method_class: measured_tabulated
-        evidence_class: measured_tabulated
-        sample_id: '15013'
-        sample_form: lunar soil
-        sample_mass_g: 296.2
-        collection_location: surface under the Lunar Module
-        collection_container: special environmental sample container (SESC)
-        container_status_on_opening: 'wire caught in seal; container was not under vacuum when opened'
-      quote: 'Soil (vacuum container) 296.2 grams; the introduction states that the sample was collected from the surface under the Lunar Module and that the SESC had not sealed.'
-    - observation_id: lpi_15013_maturity_and_grain_size
-      type: sample_characterization
-      locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 1, section: Petrography}
-      units: as_published
-      values:
-        method_class: quoted_attributed
-        attribution: 'Morris 1978 (for Is/FeO = 77)'
-        evidence_class: quoted_attributed
-        sample_id: '15013'
-        maturity_index_Is_FeO: 77
-        average_grain_size_micrometres: 52
-        maturity_index_source: Morris 1978
-        note: 'The page text says average grain size = 52 microns; Figure 5 caption separately prints average grain size = 53 microns.'
-      disagreement: 'Narrative and Figure 5 caption differ: 52 versus 53 microns. Both are retained; neither is reconciled.'
     - observation_id: lpi_15013_carbon_and_nitrogen
-      type: sample_characterization
+      type: concentration_series
       locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 1, section: Chemistry, figure: '2'}
       units: as_published
       values:
@@ -98,10 +70,52 @@ sample_characterization:
         - {value: 98, source: 'Kothari and Goel 1972'}
         - {value: 113, source: 'Muller 1973'}
       note: 'These are attributed reported analyses; the compendium does not state an apparatus or uncertainty for the original determinations here.'
+      equipment:
+        sample:
+          value:
+            sample_mass_g:
+              value: 296.2
+              units: g
+              locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 1, section: Introduction, figure: '1'}
+            form:
+              value: lunar soil
+              locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 1, section: Introduction, figure: '1'}
+          locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 1, section: Introduction, figure: '1'}
+    context: &sample_15013_context
+    - observation_id: lpi_15013_sample_mass_and_collection
+      type: sample_characterization
+      locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 1, section: Introduction, figure: '1'}
+      units: as_published
+      values:
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
+        sample_id: '15013'
+        sample_form: lunar soil
+        sample_mass_g: 296.2
+        collection_location: surface under the Lunar Module
+        collection_container: special environmental sample container (SESC)
+        container_status_on_opening: 'wire caught in seal; container was not under vacuum when opened'
+      quote: 'Soil (vacuum container) 296.2 grams; the introduction states that the sample was collected from the surface under the Lunar Module and that the SESC had not sealed.'
+      reason: 'no closed observation type; off-rail sample characterization (decision d-126)'
+    - observation_id: lpi_15013_maturity_and_grain_size
+      type: sample_characterization
+      locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 1, section: Petrography}
+      units: as_published
+      values:
+        method_class: quoted_attributed
+        attribution: 'Morris 1978 (for Is/FeO = 77)'
+        evidence_class: quoted_attributed
+        sample_id: '15013'
+        maturity_index_Is_FeO: 77
+        average_grain_size_micrometres: 52
+        maturity_index_source: Morris 1978
+        note: 'The page text says average grain size = 52 microns; Figure 5 caption separately prints average grain size = 53 microns.'
+      disagreement: 'Narrative and Figure 5 caption differ: 52 versus 53 microns. Both are retained; neither is reconciled.'
+      reason: 'no closed observation type; off-rail sample characterization (decision d-126)'
   figure_only_characterization:
     observations: &sample_15013_figure_observations
     - observation_id: lpi_15013_grain_size_distribution_figure_only
-      type: sample_characterization
+      type: figure_summary
       locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 2, figure: '5'}
       units: as_published
       values:
@@ -112,7 +126,7 @@ sample_characterization:
         attribution: 'Graf 1993'
         plotted_values: not_digitized
     - observation_id: lpi_15013_maturity_carbon_figure_only
-      type: sample_characterization
+      type: figure_summary
       locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 1, figure: '2'}
       units: as_published
       values:
@@ -122,7 +136,7 @@ sample_characterization:
         plotted_values: not_digitized
         attribution: 'Moore et al. 1973; Morris 1978'
     - observation_id: lpi_15013_ree_normalized_pattern_figure_only
-      type: composition_pattern
+      type: figure_summary
       locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 2, figure: '4'}
       units: normalized_to_chondrite_as_plotted
       values:
@@ -136,7 +150,7 @@ chemical_composition:
   sample_15013_and_reference_materials:
     observations: &sample_15013_chemistry_observations
     - observation_id: lpi_15013_table1_major_oxide_composition
-      type: composition_table
+      type: composition_series
       locator: *table_1
       units: wt_percent_as_published
       values:
@@ -159,7 +173,7 @@ chemical_composition:
         analytical_technique_key: {a: microchemical, b: INAA}
       note: 'Blank cells are absent, not zero. The table is a compilation of cited analyses, not a new apparatus record.'
     - observation_id: lpi_15013_table1_trace_element_composition
-      type: composition_table
+      type: concentration_series
       locator: *table_1
       units: mixed_ppm_and_ppb_as_published
       values:
@@ -198,7 +212,7 @@ chemical_composition:
   volatile_context:
     observations: &sample_15013_volatile_observations
     - observation_id: lpi_15013_lm_exhaust_release_context
-      type: volatile_release_context
+      type: source_context
       locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 3, figure: '6'}
       units: as_published
       values:
@@ -209,7 +223,7 @@ chemical_composition:
         attribution: 'Simoneit et al. 1973'
         note: 'The page text says these products could be released at relatively low temperatures in a vacuum; it gives no numeric release temperature in prose.'
     - observation_id: lpi_15013_volatile_release_curve_figure_only
-      type: volatile_release_context
+      type: figure_summary
       locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 3, figure: '7'}
       units: as_plotted
       values:
@@ -220,10 +234,10 @@ chemical_composition:
         attribution: 'Gibson and Moore 1972'
         plotted_values: not_digitized
 species:
-  sample_15013: {observations: *sample_15013_observations}
-  sample_15013_figure_only: {observations: *sample_15013_figure_observations}
+  sample_15013: {observations: *sample_15013_observations, context: *sample_15013_context}
+  sample_15013_figure_only: {observations: [], context: *sample_15013_figure_observations}
   sample_15013_chemistry: {observations: *sample_15013_chemistry_observations}
-  sample_15013_volatile_context: {observations: *sample_15013_volatile_observations}
+  sample_15013_volatile_context: {observations: [], context: *sample_15013_volatile_observations}
 notes:
   - 'No thermal vaporization run, apparatus, pressure history, pumping, temperature calibration, fO2 control, or run uncertainty is reported in this six-page entry.'
   - 'Figure-only curves and image-only particle sketches were not converted into numbers.'
