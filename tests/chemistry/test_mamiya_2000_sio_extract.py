@@ -82,3 +82,32 @@ def test_mamiya_context_numbers_match_the_transcription() -> None:
     size_1000 = rows["mamiya_2000_crystallite_size_1000c_1h"]
     assert size_1000["XRD_mean_size_nm"] == 3.67
     assert size_1000["TEM_size_as_printed"] == "about 4 nm"
+
+    bracket = rows["mamiya_2000_cristobalite_htxrd_transition_bracket"]
+    assert bracket["conditions_as_printed"].startswith("successive heating at 100, 200, 300")
+    assert bracket["conditions_locator"] == {
+        "page": 40,
+        "published_page": 34,
+        "pdf_page_index": 39,
+        "section": "3.2 Experimental",
+    }
+
+    doc_rows = {
+        row["observation_id"]: row
+        for species in doc["species"].values()
+        for row in species.get("context", [])
+    }
+    assert doc_rows["mamiya_2000_cristobalite_htxrd_transition_bracket"]["locator"] == {
+        "page": 62,
+        "published_page": 56,
+        "pdf_page_index": 61,
+        "section": "3.5 In situ observation of the high-low transformation in cristobalite",
+    }
+    bracket_sample = next(
+        sample
+        for sample in doc["fidelity_samples"]
+        if sample.get("observation_id") == "mamiya_2000_cristobalite_htxrd_transition_bracket"
+    )
+    assert bracket_sample["locator"] == doc_rows[
+        "mamiya_2000_cristobalite_htxrd_transition_bracket"
+    ]["locator"]
