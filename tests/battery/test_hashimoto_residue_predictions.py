@@ -297,6 +297,36 @@ def test_hashimoto_cohort_has_complete_vectors_bands_and_value_provenance(
     assert math.isclose(fe_runtime_alpha, 0.02, rel_tol=1.0e-12)
 
 
+def test_hashimoto_without_melt_pack_identity_has_no_sf04_fallback(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    pytest.importorskip("openimcc")
+    import simulator.battery.residue as residue
+
+    def integrate_at_steps(inventory, _channels, _pressure_model, *, steps, **_kwargs):
+        values = residue._hashimoto_project_oxide_wt_pct(inventory)
+        shift = 0.8 / steps
+        values["FeO"] += shift
+        values["MgO"] -= shift
+        return values, (0.1,), (), None, {"Fe": 0.0, "O": 0.0}
+
+    monkeypatch.setattr(residue, "_hashimoto_integrate_geometry", integrate_at_steps)
+    experiments, _measured_rows, preform_dimensions_mm = _source_data()
+    catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
+    predictions = _predict_hashimoto_residue_cohort(
+        [experiments[0]],
+        catalog,
+        preform_dimensions_mm=preform_dimensions_mm,
+        code_revision="test-revision",
+        engine="internal-analytical",
+        _allow_partial_cohort_for_test=True,
+    )
+
+    provenance = predictions[0].provenance
+    assert provenance["datapack_version"] is None
+    assert provenance["openimcc_model_id"] is None
+
+
 def test_hashimoto_refinement_rechecks_activities_for_changed_composition(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

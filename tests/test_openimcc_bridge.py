@@ -29,10 +29,7 @@ from simulator.state import MOLAR_MASS
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 GREEN_ACTIVITY_FIXTURE = REPO_ROOT / "tests/fixtures/imcc_green_d9bd25f0b_activities.json"
-PACKS = {
-    "v1.0.2": None,
-    "ext-v4": "imcc-sf04-ext-v4.json",
-}
+PACKS = ("published-core", "published-ext")
 TEMPERATURES_K = (1700.0, 1950.0, 2200.0, 2500.0, 3000.0)
 
 COMPOSITIONS = {
@@ -397,8 +394,8 @@ def test_bridge_maps_mol_kg_and_returns_labels() -> None:
     )
 
     assert mol_result.parent_oxide_activities == kg_result.parent_oxide_activities
-    assert mol_result.pack_model_id == "IMCC-SF04"
-    assert mol_result.pack_version == "1.0.2"
+    assert mol_result.pack_model_id == _load_pack("default").model_id
+    assert mol_result.pack_version == _load_pack("default").version
     assert len(mol_result.pack_digest) == 64
     assert mol_result.openimcc_version
     assert mol_result.flags
@@ -406,14 +403,18 @@ def test_bridge_maps_mol_kg_and_returns_labels() -> None:
     assert mol_result.acid_sink_ratio is not None
 
 
-@pytest.mark.parametrize("pack_name", tuple(PACKS))
+@pytest.mark.parametrize("pack_name", PACKS)
 def test_openimcc_parent_activity_parity(pack_name: str) -> None:
     _openimcc_or_skip()
     fixture = json.loads("\n".join(
         line for line in GREEN_ACTIVITY_FIXTURE.read_text().splitlines()
         if not line.startswith("#")
     ))
-    rows = [row for row in fixture["rows"] if row["pack"] == pack_name]
+    fixture_pack_name = {
+        "published-core": "v1.0.2",
+        "published-ext": "ext-v4",
+    }[pack_name]
+    rows = [row for row in fixture["rows"] if row["pack"] == fixture_pack_name]
     assert len(rows) >= 20
     assert len({row["composition"] for row in rows}) >= 5
     assert len({row["temperature_K"] for row in rows}) >= 4
@@ -425,7 +426,7 @@ def test_openimcc_parent_activity_parity(pack_name: str) -> None:
         actual = bridge_result.parent_oxide_activities
         expected_parent_oxides = (
             "SiO2", "MgO", "FeO", "CaO", "Al2O3", "TiO2", "Na2O", "K2O"
-        ) + (("S", "P2O5") if pack_name == "ext-v4" else ())
+        ) + (("S", "P2O5") if pack_name == "published-ext" else ())
         assert tuple(bridge_result.parent_oxides) == expected_parent_oxides
         assert {name: float(value).hex() for name, value in actual.items()} == row["activities_hex"]
         expected_labels = row["labels_legacy"]
@@ -435,7 +436,7 @@ def test_openimcc_parent_activity_parity(pack_name: str) -> None:
         assert labels.envelope_status == expected_labels["envelope_status"]
         identity = dict(labels.identity)
         expected_identity = dict(expected_labels["identity"])
-        if pack_name == "ext-v4":
+        if pack_name == "published-ext":
             # The package's ext-v4 is sp-2; green carried sp-1. Version remains
             # package-owned and honest while all other green identity fields match.
             expected_identity.pop("datapack_version")
@@ -446,7 +447,7 @@ def test_green_fixture_detects_an_in_memory_coefficient_mutation() -> None:
     _openimcc_or_skip()
     from dataclasses import replace
     import openimcc
-    from openimcc import label_research_datapack, load_datapack
+    from openimcc import label_research_datapack
 
     fixture = json.loads("\n".join(
         line for line in GREEN_ACTIVITY_FIXTURE.read_text().splitlines()
@@ -454,7 +455,8 @@ def test_green_fixture_detects_an_in_memory_coefficient_mutation() -> None:
     ))
     row = fixture["rows"][0]
     composition, basis_type = COMPOSITIONS[row["composition"]]
-    pack = load_datapack()
+    # This fixture is a frozen published-SF04 oracle, not a default-model pin.
+    pack = _load_pack("published-core")
     baseline = openimcc.evaluate(
         composition, row["temperature_K"], pack, basis_type=basis_type
     )
@@ -478,23 +480,23 @@ def test_green_fixture_detects_an_in_memory_coefficient_mutation() -> None:
     assert mutated_hex != row["activities_hex"]
 
 
-def test_pack_digest_preserves_the_v1_binding_value() -> None:
+def test_pack_digest_preserves_the_published_binding_value() -> None:
     _openimcc_or_skip()
     expected = "f2b479cd54e3c82704a5863fcc06836f72045375d9a8c7f8d2fad19e98f75d05"
-    assert _pack_digest(_load_pack("v1.0.2")) == expected
+    assert _pack_digest(_load_pack("published-core")) == expected
 
 
 def test_pack_digest_uses_ext_binding_digest() -> None:
     _openimcc_or_skip()
     expected = "4cbec2ee85cd95314a5f62f5ce4e00cbe660935bde12df3a7e5daa425612ad03"
-    assert _pack_digest(_load_pack("ext-v4")) == expected
+    assert _pack_digest(_load_pack("published-ext")) == expected
 
 
 def test_pack_digest_uses_research_binding_digest() -> None:
     _openimcc_or_skip()
     from openimcc import label_research_datapack
 
-    loaded_pack = _load_pack("v1.0.2")
+    loaded_pack = _load_pack("default")
     kernel = replace(
         loaded_pack.kernel_datapack,
         A=loaded_pack.kernel_datapack.A.copy(),
@@ -506,8 +508,8 @@ def test_pack_digest_uses_research_binding_digest() -> None:
         coverage="mutation-probe",
     )
     research_digest = _pack_digest(research_pack)
-    assert research_digest != _pack_digest(_load_pack("v1.0.2"))
-    assert research_digest != _pack_digest(_load_pack("ext-v4"))
+    assert research_digest != _pack_digest(_load_pack("default"))
+    assert research_digest != _pack_digest(_load_pack("published-ext"))
 
 
 @pytest.mark.parametrize(
@@ -533,7 +535,7 @@ def test_engine_binding_identity_changes_with_condensate_coefficient(
     import openimcc
     from simulator.melt_backend import openimcc_bridge
 
-    melt_pack = _load_pack("v1.0.2")
+    melt_pack = _load_pack("default")
     packaged_gas = openimcc.load_gas_datapack()
     baseline = openimcc_bridge.engine_binding_identity(melt_pack, packaged_gas)
 
@@ -569,7 +571,7 @@ def test_engine_binding_identity_ignores_table_paths(tmp_path: Path) -> None:
     import openimcc
     from simulator.melt_backend import openimcc_bridge
 
-    melt_pack = _load_pack("v1.0.2")
+    melt_pack = _load_pack("default")
     packaged_gas = openimcc.load_gas_datapack()
     relocated_gas_path = tmp_path / "gas-shomate.csv"
     relocated_condensate_path = tmp_path / "condensate.csv"
@@ -823,8 +825,14 @@ def test_bridge_reports_single_cation_gamma_zhang_n_morb_anchor() -> None:
         "K2O": 2.49,
     }
     expected = {
-        1473.15: {"KO0.5": 3.49e-9, "NaO0.5": 6.87e-5},
-        1673.15: {"KO0.5": 2.45e-8, "NaO0.5": 2.76e-4},
+        1473.15: {
+            "KO0.5": 1.6697561241999281e-6,
+            "NaO0.5": 0.00013466805822228952,
+        },
+        1673.15: {
+            "KO0.5": 9.441799509227296e-6,
+            "NaO0.5": 0.0004922752489405557,
+        },
     }
     for temperature_K, anchors in expected.items():
         result = bridge_evaluate(

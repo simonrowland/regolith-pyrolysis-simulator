@@ -18,7 +18,6 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     DEFAULT_POTS_PATH,
     FINDING_CLASS_FALLBACK_VS_SPECIATION,
     OPENIMCC_ENGINE_NAMES,
-    OPENIMCC_MODEL_IDS,
     QUALIFICATION_SIO2_SWEEP_WT_PCT,
     QUANTITY_ACTIVITY,
     QUANTITY_PRESSURE,
@@ -535,7 +534,91 @@ def test_battery_engine_names_match_backends_py_surface() -> None:
         "cached-real",
     )
     assert BATTERY_ENGINE_NAMES[-len(OPENIMCC_ENGINE_NAMES):] == OPENIMCC_ENGINE_NAMES
-    assert OPENIMCC_MODEL_IDS == {"openimcc": "IMCC-SF04"}
+
+
+def test_openimcc_invalid_cell_refusal_uses_loaded_backend_model_id() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        PO2_OXYGEN_BALANCE_EFFUSION,
+    )
+
+    handle = open_battery_engine("openimcc")
+    assert handle.available, handle.unavailable_reason
+    backend = handle.backend
+    assert backend is not None
+
+    cell = equilibrate_cell(
+        handle,
+        BinaryPot(
+            pot_id="invalid-cell-model-id",
+            kato_1993_table4_system=None,
+            why="identity refusal test",
+            composition_wt_pct={"K2O": 43.94, "SiO2": 56.06},
+        ),
+        temperature_K=1933.0,
+        po2=Po2Request(
+            mode=PO2_OXYGEN_BALANCE_EFFUSION,
+            po2_bar=None,
+            cell_material="Pt",
+        ),
+        isolated=False,
+    )
+
+    assert cell.status == "refusal"
+    assert cell.refusal_reason == "oxygen_balance_cell_material_invalid"
+    assert cell.as_payload()["model_id"] == backend.model_id
+
+
+def test_crash_serializer_uses_loaded_backend_model_id() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        ARM_HEADLINE,
+        _crash_cell_from_returncode,
+    )
+
+    handle = open_battery_engine("openimcc")
+    assert handle.available, handle.unavailable_reason
+    backend = handle.backend
+    assert backend is not None
+    pot = BinaryPot(
+        pot_id="crash-model-id",
+        kato_1993_table4_system=None,
+        why="identity crash test",
+        composition_wt_pct={"K2O": 43.94, "SiO2": 56.06},
+    )
+
+    cell = _crash_cell_from_returncode(
+        handle=handle,
+        pot=pot,
+        temperature_K=1933.0,
+        po2=Po2Request(mode="commanded", po2_bar=1.0e-9),
+        wall0=time.perf_counter(),
+        cpu0=time.process_time(),
+        hostname="test",
+        returncode=1,
+        timed_out=False,
+        stderr="synthetic crash",
+        arm=ARM_HEADLINE,
+        notices=(),
+        authority=None,
+        certified_band=None,
+    )
+
+    assert cell.status == "refusal"
+    assert cell.model_id == backend.model_id
+
+
+def test_handle_without_backend_has_no_model_id() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import _handle_model_id
+
+    handle = EngineHandle(
+        name="openimcc",
+        backend=None,
+        available=False,
+        unavailable_reason="engine is unavailable",
+        takes_fo2=False,
+        supports_intrinsic_fo2=False,
+    )
+
+    assert _handle_model_id(handle) is None
 
 
 def _ok_cell(
@@ -1229,7 +1312,7 @@ def test_openimcc_cell_round_trips_through_harness() -> None:
         handle, pot, temperature_K=1700.0, po2=po2, isolated=False
     )
     assert cell.engine == "openimcc"
-    assert cell.model_id == "IMCC-SF04"
+    assert cell.model_id == handle.backend.model_id
     if cell.status == "ok":
         assert cell.melt_activities
         assert "SiO2" in cell.melt_activities
@@ -1238,7 +1321,7 @@ def test_openimcc_cell_round_trips_through_harness() -> None:
         assert cell.refusal_reason is not None
     rebuilt = EquilibrateCell.from_payload(cell.as_payload())
     assert rebuilt.as_payload() == cell.as_payload()
-    assert rebuilt.model_id == "IMCC-SF04"
+    assert rebuilt.model_id == handle.backend.model_id
 
 def test_openimcc_refuses_species_outside_parent_basis() -> None:
     pot = BinaryPot(

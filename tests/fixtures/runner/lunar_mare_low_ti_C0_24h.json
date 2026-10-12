@@ -107,6 +107,22 @@
     "campaigns_elapsed": 2.2222222222222223,
     "backend_status": "unavailable",
     "backend_authoritative": false,
+    "engine_binding_admission_notice": {
+      "notices": [
+        {
+          "type": "typed_notice",
+          "kind": "engine_binding_not_admitted",
+          "identity": {
+            "engine_id": "magemin",
+            "model_id": "ig",
+            "binding_revision": "magemin-ig-r1",
+            "transport": "subprocess"
+          },
+          "reason": "receipt missing",
+          "message": "binding not admitted on this host (receipt missing); replay and capture disabled; run scripts/assess_engine_bindings.py"
+        }
+      ]
+    },
     "sulfur_saturation_notice": {
       "notices": [
         {

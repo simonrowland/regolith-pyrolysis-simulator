@@ -5009,7 +5009,17 @@ def test_cached_real_profile_builds_honest_evalspec_and_cache_config(
     assert executor.config.reduced_real_cache == cache_config
 
 
-def test_empty_cached_real_store_miss_still_aborts(tmp_path) -> None:
+def test_empty_cached_real_store_miss_still_aborts(
+    tmp_path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from tests.binding_admission_fixtures import install_synthetic_binding_receipt
+
+    install_synthetic_binding_receipt(
+        tmp_path,
+        monkeypatch,
+        bind_direct_backend=False,
+    )
     cache_config = {
         "db_path": str(tmp_path / "empty-pt0-cache.sqlite"),
         "miss_policy": "fail-loud",

@@ -187,3 +187,15 @@ def test_mutation_stale_tip_is_flagged_by_freshness_stale_half() -> None:
     stale = freshness.stale_input_commits(head, last_store)
     assert stale, "expected STALE_TIP to have post-regen migrate-input commits"
     assert any("d4f91337f" in k for k in stale), stale
+
+
+def test_shared_state_owner_is_a_migrate_input() -> None:
+    """State/StateTag moved out of simulator/battery into simulator/state_types.
+
+    Battery records and enums re-export them and migration serialises them, so
+    the new owner must stay inside the freshness guard's input closure; a move
+    out of simulator/battery would otherwise escape the STALE check.
+    """
+    freshness = _load_freshness()
+    assert freshness._is_input("simulator/state_types.py")
+    assert "simulator/state_types.py" in freshness.CODE_INPUTS
