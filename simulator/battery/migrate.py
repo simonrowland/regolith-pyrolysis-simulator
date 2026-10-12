@@ -126,6 +126,7 @@ from simulator.battery.stable_ids import (
 )
 from simulator.battery.records import (
     INITIAL_CHARGE_ONLY_PROXY_FLAG,
+    _PARTIAL_COMPOSITION_PROXY_PREFIX,
     Admission,
     AdmissionDecision,
     Annotations,
@@ -1306,13 +1307,17 @@ def _composition_located_from_plain(payload: object) -> Located[Composition]:
                 locator=locator,
             )
         if isinstance(payload, Mapping):
+            payload_proxy_flag = (
+                None
+                if payload.get("proxy_flag") in (None, "")
+                else str(payload.get("proxy_flag"))
+            )
+            if payload_proxy_flag is not None:
+                composition = _replace_composition_proxy_flag(
+                    composition, payload_proxy_flag
+                )
             composition = replace(
                 composition,
-                proxy_flag=(
-                    None
-                    if payload.get("proxy_flag") in (None, "")
-                    else str(payload.get("proxy_flag"))
-                ),
                 proxy_source=(
                     None
                     if payload.get("proxy_source") in (None, "")
@@ -3657,7 +3662,7 @@ def oxide_molar_mass(oxide: str) -> Decimal:
 
 
 def wt_pct_to_mole_fraction(wt: Mapping[str, Decimal]) -> Composition:
-    """Convert a printed oxide wt% map to mole fraction. Does not renormalize wt%."""
+    """Convert a printed oxide wt% map to mole fraction and flag low totals."""
 
     names = {str(oxide).strip() for oxide in wt}
     if "FeOT" in names and names.intersection({"FeO", "Fe2O3"}):
@@ -3698,11 +3703,41 @@ def wt_pct_to_mole_fraction(wt: Mapping[str, Decimal]) -> Composition:
         total += n
     if total <= 0:
         raise ValueError("printed oxide wt% map has no positive mass")
+    typed_sum = sum(
+        (
+            amount
+            for oxide, raw in wt.items()
+            if str(oxide).strip().casefold() not in _PRINTED_COMPOSITION_TOTAL_KEYS
+            if (amount := _as_dec_or_none(raw)) is not None
+        ),
+        Decimal("0"),
+    )
+    # Full analyses cluster at 98–101 wt%; lower totals signal omitted
+    # components, which must not become an apparently complete feed.
+    proxy_flag = (
+        f"{_PARTIAL_COMPOSITION_PROXY_PREFIX}typed_sum="
+        f"{format(typed_sum.normalize(), 'f')}wt%"
+        if typed_sum < Decimal("98")
+        else None
+    )
     return Composition(
         basis="printed_oxides",
         components=tuple((oxide, n / total) for oxide, n in moles.items()),
         amount_basis=AmountBasis.MOLE_FRACTION,
+        proxy_flag=proxy_flag,
     )
+
+
+def _replace_composition_proxy_flag(
+    composition: Composition, proxy_flag: str
+) -> Composition:
+    """Keep a partial-vector reason when applying a secondary proxy label."""
+
+    if composition.proxy_flag is not None and composition.proxy_flag.startswith(
+        _PARTIAL_COMPOSITION_PROXY_PREFIX
+    ):
+        return composition
+    return replace(composition, proxy_flag=proxy_flag)
 
 
 def _total_iron_reported_as_feo_notice(
@@ -4061,10 +4096,12 @@ def _catalogue_composition_located_from_values(
         converted = wt_pct_to_mole_fraction(wt)
     except (ArithmeticError, ValueError):
         return None
+    composition = replace(converted, basis="sample_catalog_proxy")
+    composition = _replace_composition_proxy_flag(
+        composition, "composition_from_sample_catalog"
+    )
     composition = replace(
-        converted,
-        basis="sample_catalog_proxy",
-        proxy_flag="composition_from_sample_catalog",
+        composition,
         proxy_source=source or "sample catalogue source not named",
         analysis_selection_rule=rule,
     )
@@ -4310,7 +4347,7 @@ def _composition_located_from_values(
         )
     composition = wt_pct_to_mole_fraction(wt)
     if role == INITIAL_CHARGE_ONLY_PROXY_FLAG:
-        composition = replace(composition, proxy_flag=role)
+        composition = _replace_composition_proxy_flag(composition, role)
     return Located(
         State.of(composition),
         locator=locator,
@@ -4476,7 +4513,9 @@ def _owner_initial_from_printed(
             initial = replace(
                 initial,
                 state=State.of(
-                    replace(initial.state.value, proxy_flag=proxy_flag)
+                    _replace_composition_proxy_flag(
+                        initial.state.value, proxy_flag
+                    )
                 ),
             )
         return initial
@@ -18599,7 +18638,9 @@ class Migrator:
             if residual is not None and role == INITIAL_CHARGE_ONLY_PROXY_FLAG:
                 residual = replace(
                     residual,
-                    state=State.of(replace(residual.state.value, proxy_flag=role)),
+                    state=State.of(
+                        _replace_composition_proxy_flag(residual.state.value, role)
+                    ),
                 )
             extra_pc: dict[str, Located[Any]] = {}
             if printed is not None:
