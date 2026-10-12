@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import math
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
+from dataclasses import dataclass
+from types import MappingProxyType
+from typing import Literal
 
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
 from simulator.feedstock_composition import (
@@ -66,6 +69,7 @@ KRESS91_AITHALA_EXPERIMENTAL_CONFIRMATION_MAX_T_C = 2100.0
 KRESS91_HIGH_UNCERTAINTY_MAX_T_C = 2500.0
 # 1400 C cache-label convention for isochemical redox keys, not new physics.
 KRESS91_FO2_KEY_REFERENCE_T_K = 1673.15
+REDOX_STATE_REFERENCE_T_K = KRESS91_FO2_KEY_REFERENCE_T_K
 
 
 def kress91_temperature_band_case(temperature_C: float) -> dict[str, object]:
@@ -502,6 +506,141 @@ def feo_iw_log10_fO2_bar(T_K: float, *, a_feo: float = 1.0) -> float:
         + holzheid_feo_liquid_delta_g_j_mol(T_K) / (R * float(T_K))
     )
     return ln_fO2 / math.log(10.0)
+
+
+# This identifier follows the coded line's wustite-liquid standard. Holzheid
+# et al. (1997), Eq. 9, constructed it from O'Neill and Pownceby (1993) and
+# Barin (1989); the paper states no uncertainty for the line, and this code
+# states no validity range.
+FE_FEO_BUFFER_STANDARD = 'wustite_FeO_l_holzheid1997_eq9'
+REDOX_BUFFER_LINES: Mapping[str, Callable[[float], float]] = MappingProxyType(
+    {
+        FE_FEO_BUFFER_STANDARD: lambda T_K: feo_iw_log10_fO2_bar(
+            T_K,
+            a_feo=1.0,
+        ),
+    }
+)
+
+
+class RedoxStateInputError(ValueError):
+    """Invalid or inconsistent redox-state request inputs."""
+
+
+def _redox_state_finite_float(value: object, name: str) -> float:
+    if isinstance(value, bool):
+        raise TypeError(f'{name} must be numeric, not bool')
+    try:
+        number = float(value)
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise TypeError(f'{name} must be numeric') from exc
+    if not math.isfinite(number):
+        raise ValueError(f'{name} must be finite')
+    return number
+
+
+@dataclass(frozen=True, slots=True)
+class RedoxState:
+    """Immutable absolute fO2 or a registered buffer line plus an offset."""
+
+    kind: Literal['absolute', 'buffer_offset']
+    log_fO2: float | None = None
+    buffer: str | None = None
+    delta_log10: float | None = None
+
+    def __post_init__(self) -> None:
+        if self.kind == 'absolute':
+            if self.buffer is not None or self.delta_log10 is not None:
+                raise ValueError('absolute redox state requires only log_fO2')
+            object.__setattr__(
+                self,
+                'log_fO2',
+                _redox_state_finite_float(self.log_fO2, 'log_fO2'),
+            )
+            return
+        if self.kind == 'buffer_offset':
+            if self.log_fO2 is not None or self.buffer is None:
+                raise ValueError(
+                    'buffer_offset redox state requires buffer and delta_log10 only'
+                )
+            if not isinstance(self.buffer, str):
+                raise TypeError('buffer must be a registered string identifier')
+            if self.buffer not in REDOX_BUFFER_LINES:
+                raise ValueError(f'unregistered redox buffer line: {self.buffer!r}')
+            object.__setattr__(
+                self,
+                'delta_log10',
+                _redox_state_finite_float(self.delta_log10, 'delta_log10'),
+            )
+            return
+        raise ValueError(f'unsupported redox-state kind: {self.kind!r}')
+
+    @classmethod
+    def absolute(cls, log_fO2: float) -> 'RedoxState':
+        return cls(kind='absolute', log_fO2=log_fO2)
+
+    @classmethod
+    def buffer_offset(cls, buffer: str, delta: float) -> 'RedoxState':
+        return cls(kind='buffer_offset', buffer=buffer, delta_log10=delta)
+
+    def log_fO2_at(self, T_K: float) -> float:
+        temperature = _redox_state_finite_float(T_K, 'T_K')
+        if temperature <= 0.0:
+            raise ValueError('T_K must be positive')
+        if self.kind == 'absolute':
+            assert self.log_fO2 is not None
+            return self.log_fO2
+        assert self.buffer is not None
+        assert self.delta_log10 is not None
+        return REDOX_BUFFER_LINES[self.buffer](temperature) + self.delta_log10
+
+    def to_descriptor(self) -> dict[str, str | float]:
+        if self.kind == 'absolute':
+            assert self.log_fO2 is not None
+            return {'kind': 'absolute', 'log_fO2': self.log_fO2}
+        assert self.buffer is not None
+        assert self.delta_log10 is not None
+        return {
+            'kind': 'buffer_offset',
+            'buffer': self.buffer,
+            'delta_log10': self.delta_log10,
+        }
+
+
+def normalize_redox_state(
+    fO2_log: float | None,
+    redox_state: RedoxState | None = None,
+) -> tuple[float | None, RedoxState | None]:
+    """Normalize the scalar/state pair while preserving omitted controls."""
+    if fO2_log is None and redox_state is None:
+        return None, None
+
+    scalar = (
+        None
+        if fO2_log is None
+        else _redox_state_finite_float(fO2_log, 'fO2_log')
+    )
+    if redox_state is None:
+        assert scalar is not None
+        return scalar, RedoxState.absolute(scalar)
+
+    reference_value = _redox_state_finite_float(
+        redox_state.log_fO2_at(REDOX_STATE_REFERENCE_T_K),
+        'redox_state reference fO2',
+    )
+    if scalar is None:
+        return reference_value, redox_state
+    if not math.isclose(
+        scalar,
+        reference_value,
+        rel_tol=0.0,
+        abs_tol=1.0e-9,
+    ):
+        raise RedoxStateInputError(
+            'fO2_log disagrees with redox_state at '
+            f'{REDOX_STATE_REFERENCE_T_K} K: {scalar!r} != {reference_value!r}'
+        )
+    return scalar, redox_state
 
 
 def _alpha_j(cation_a: str, cation_b: str) -> float | None:
