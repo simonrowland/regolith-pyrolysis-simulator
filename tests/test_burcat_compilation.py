@@ -216,6 +216,22 @@ def test_formulas_absent_from_janaf_and_nasa_glenn(manifest, record_docs) -> Non
     assert any(len(formula) >= 4 for formula in unique_formulas)
 
 
+def test_formula_absence_comparison_normalizes_formula_order() -> None:
+    text = SOURCE.read_text(encoding="utf-8-sig")
+    parsed = parse_burcat_thr(text, source_path=SOURCE_REL)
+    equivalent_spellings = (("Cl3P", "PCl3"), ("FH", "HF"), ("MgO4S", "MgSO4"))
+
+    for burcat_formula, peer_formula in equivalent_spellings:
+        records = [
+            record
+            for record in parsed.records
+            if record.formula == burcat_formula
+            and record.record_kind == "nasa7_polynomial"
+        ]
+        assert records, f"BURCAT has no polynomial record for {burcat_formula}"
+        assert formulas_absent_from_janaf_and_glenn(records, [peer_formula], []) == []
+
+
 def test_same_formula_distinct_phase_census(record_docs) -> None:
     from collections import defaultdict
 

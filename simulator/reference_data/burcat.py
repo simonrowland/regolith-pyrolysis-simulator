@@ -35,6 +35,7 @@ from simulator.reference_data.nasa_glenn import (
     published_float_pairs,
     resolve_phase,
 )
+from simulator.reference_data.janaf import formula_composition
 from simulator.yaml_cache import load_cached_safe_yaml
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -665,13 +666,16 @@ def formulas_absent_from_janaf_and_glenn(
     janaf_formulas: Iterable[str],
     glenn_formulas: Iterable[str],
 ) -> list[dict[str, Any]]:
-    peers = set(janaf_formulas) | set(glenn_formulas)
+    peers = {
+        formula_composition(formula) or formula
+        for formula in (*janaf_formulas, *glenn_formulas)
+    }
     seen: dict[str, dict[str, Any]] = {}
     for rec in records:
         if rec.record_kind != "nasa7_polynomial":
             continue
         formula = rec.formula.strip()
-        if not formula or formula in peers:
+        if not formula or (formula_composition(formula) or formula) in peers:
             continue
         row = seen.setdefault(
             formula,
