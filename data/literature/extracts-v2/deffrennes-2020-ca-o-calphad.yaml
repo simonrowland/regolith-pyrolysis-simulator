@@ -1,0 +1,293 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/deffrennes-2020-ca-o-calphad.yaml
+observations:
+- observation_id: deffrennes-2020-ca-o-calphad::deffrennes_2020_manara_air_solidification
+  experiment_id: 10.1016/j.calphad.2020.101764::experiment::manara_2014_air_laser_heating
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: source states transition property_kind 'melting_point' and phases 'crystalline CaO' -> 'liquid CaO' in values.phase_from/phase_to;
+          v2.1 species.phase has one phase axis and cannot hold a transition's phases
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: value
+      value: '300000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '3222'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 3222±25 K as printed
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Manara et al. [19], as reported in Deffrennes et al. (2020)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: deffrennes-2020-ca-o-calphad::deffrennes_2020_manara_air_solidification
+  source_id: deffrennes-2020-ca-o-calphad
+  locator:
+    page: 6
+    section: '2.3'
+  read_from: pdf:deffrennes-2020-ca-o-calphad
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:deffrennes-2020-ca-o-calphad
+    parameters: []
+    output_unit: Pa
+- observation_id: deffrennes-2020-ca-o-calphad::deffrennes_2020_manara_reducing_solidification
+  experiment_id: 10.1016/j.calphad.2020.101764::experiment::manara_2014_reducing_laser_heating
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: source states transition property_kind 'melting_point' and phases 'crystalline CaO' -> 'liquid CaO with oxygen
+          defects' in values.phase_from/phase_to; v2.1 species.phase has one phase axis and cannot hold a transition's phases
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: value
+      value: '300000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '3192'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 3192±40 K as printed
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Manara et al. [19], as reported in Deffrennes et al. (2020)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: deffrennes-2020-ca-o-calphad::deffrennes_2020_manara_reducing_solidification
+  source_id: deffrennes-2020-ca-o-calphad
+  locator:
+    page: 6
+    section: '2.3'
+  read_from: pdf:deffrennes-2020-ca-o-calphad
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:deffrennes-2020-ca-o-calphad
+    parameters: []
+    output_unit: Pa
+- observation_id: deffrennes-2020-ca-o-calphad::deffrennes_2020_yamada_solidification
+  experiment_id: 10.1016/j.calphad.2020.101764::experiment::yamada_1986_digital_pyrometry
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: source states transition property_kind 'melting_point' and phases 'CaO solid' -> 'CaO liquid' in values.phase_from/phase_to;
+          v2.1 species.phase has one phase axis and cannot hold a transition's phases
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '3178'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Yamada et al. [58], as reported by Manara et al. [19] and Deffrennes et al. (2020)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: deffrennes-2020-ca-o-calphad::deffrennes_2020_yamada_solidification
+  source_id: deffrennes-2020-ca-o-calphad
+  locator:
+    page: 23
+    section: '5'
+  read_from: pdf:deffrennes-2020-ca-o-calphad
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:deffrennes-2020-ca-o-calphad
+    parameters: []
+    output_unit: Pa

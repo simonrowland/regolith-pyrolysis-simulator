@@ -25,25 +25,29 @@ observations:
         basis: printed_oxides
         components:
         - - SiO2
-          - '0.3033994463846653047360345565'
+          - '0.2322263749183866734350135003'
         - - TiO2
-          - '0.004564990656014485820936621614'
+          - '0.003494110632748119075939627157'
         - - Al2O3
-          - '0.02216960338509847185141337593'
+          - '0.01696893876652777425814903613'
+        - - FeO
+          - '0.2004252090267316985133871368'
         - - MnO
-          - '0.003083717264079373621114829244'
+          - '0.002360322307913720199561050129'
         - - MgO
-          - '0.5463679018472819911021694726'
+          - '0.41819798529524323173866283'
         - - CaO
-          - '0.03900882487393372087469899142'
+          - '0.02985792524754482284554957825'
         - - Na2O
-          - '0.07529480746609653759414639841'
+          - '0.05763174717814264243716245862'
         - - K2O
-          - '0.003096390733686897562850946628'
+          - '0.002370022766960907133665847006'
         - - P2O5
-          - '0.002054820322923782934583985275'
+          - '0.001572789536656639853371645115'
         - - Cr2O3
-          - '0.0009594970662194339020508209697'
+          - '0.0007344130916786944512388325141'
+        - - SO3
+          - '0.0341601612314650760582984569'
         amount_basis: mole_fraction
   value:
     kind: unavailable
@@ -69,6 +73,242 @@ observations:
     table: '3'
     note: Simulant prototype major element chemistry measured by XRF; CI Simulant column.
   read_from: pdf:britt-2019-asteroid-simulants
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.2322263749183866734350135003'
+          - - TiO2
+            - '0.003494110632748119075939627157'
+          - - Al2O3
+            - '0.01696893876652777425814903613'
+          - - FeO
+            - '0.2004252090267316985133871368'
+          - - MnO
+            - '0.002360322307913720199561050129'
+          - - MgO
+            - '0.41819798529524323173866283'
+          - - CaO
+            - '0.02985792524754482284554957825'
+          - - Na2O
+            - '0.05763174717814264243716245862'
+          - - K2O
+            - '0.002370022766960907133665847006'
+          - - P2O5
+            - '0.001572789536656639853371645115'
+          - - Cr2O3
+            - '0.0007344130916786944512388325141'
+          - - SO3
+            - '0.0341601612314650760582984569'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 9
+        table: '3'
+        note: Simulant prototype major element chemistry measured by XRF; CI Simulant column.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - FeOT (total iron) treated as FeO; printed key FeOT
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CI Simulant column.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CI Simulant column.
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '0.5'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CI Simulant column.
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CI Simulant column.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.1'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CI Simulant column.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CI Simulant column.
+        - - original_FeOT_wt_pct
+          - state:
+              tag: value
+              value: '25.8'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CI Simulant column.
+        - - M_FeOT_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CI Simulant column.
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.3'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CI Simulant column.
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CI Simulant column.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '30.2'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CI Simulant column.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CI Simulant column.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '3'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CI Simulant column.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CI Simulant column.
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '6.4'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CI Simulant column.
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CI Simulant column.
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.4'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CI Simulant column.
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CI Simulant column.
+        - - original_P2O5_wt_pct
+          - state:
+              tag: value
+              value: '0.4'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CI Simulant column.
+        - - M_P2O5_g_mol
+          - state:
+              tag: value
+              value: '141.942523996'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CI Simulant column.
+        - - original_Cr2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.2'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CI Simulant column.
+        - - M_Cr2O3_g_mol
+          - state:
+              tag: value
+              value: '151.98919999999998'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CI Simulant column.
+        - - original_SO3_wt_pct
+          - state:
+              tag: value
+              value: '4.9'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CI Simulant column.
+        - - M_SO3_g_mol
+          - state:
+              tag: value
+              value: '80.057'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CI Simulant column.
+        output_unit: mole_fraction
 - observation_id: britt-2019-asteroid-simulants::britt_2019_ci_tg_integrated_mass_loss
   experiment_id: 10.1111/maps.13345::experiment::tga-ega-ci
   identity:
@@ -187,25 +427,29 @@ observations:
         basis: printed_oxides
         components:
         - - SiO2
-          - '0.3521791876429390450623220629'
+          - '0.2946468272894386213775831879'
         - - TiO2
-          - '0.002445663456831561719379856952'
+          - '0.002046137317187909291725478747'
         - - Al2O3
-          - '0.0197953632099075830051483142'
+          - '0.01656157197669169944851165018'
+        - - FeO
+          - '0.1531548952411563010035557724'
         - - MnO
-          - '0.001835645627596705577584844344'
+          - '0.001535772638408900297411653823'
         - - MgO
-          - '0.518547826067989192359446543'
+          - '0.4338373109761245580451350618'
         - - CaO
-          - '0.03599223847789903429440984937'
+          - '0.03011250876445829360466076226'
         - - Na2O
-          - '0.06513018228628410549693506489'
+          - '0.0544904476038851527269767937'
         - - K2O
-          - '0.001382392326745995755769712353'
+          - '0.001156563270734601726504248324'
         - - P2O5
-          - '0.001834760591644891970435460213'
+          - '0.001535032182855622811875809944'
         - - Cr2O3
-          - '0.0008567403121618847585682914328'
+          - '0.0007167823189069240756892591814'
+        - - SO3
+          - '0.01020615042015141559037032115'
         amount_basis: mole_fraction
   value:
     kind: unavailable
@@ -231,6 +475,242 @@ observations:
     table: '3'
     note: Simulant prototype major element chemistry measured by XRF; CM Simulant column.
   read_from: pdf:britt-2019-asteroid-simulants
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.2946468272894386213775831879'
+          - - TiO2
+            - '0.002046137317187909291725478747'
+          - - Al2O3
+            - '0.01656157197669169944851165018'
+          - - FeO
+            - '0.1531548952411563010035557724'
+          - - MnO
+            - '0.001535772638408900297411653823'
+          - - MgO
+            - '0.4338373109761245580451350618'
+          - - CaO
+            - '0.03011250876445829360466076226'
+          - - Na2O
+            - '0.0544904476038851527269767937'
+          - - K2O
+            - '0.001156563270734601726504248324'
+          - - P2O5
+            - '0.001535032182855622811875809944'
+          - - Cr2O3
+            - '0.0007167823189069240756892591814'
+          - - SO3
+            - '0.01020615042015141559037032115'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 9
+        table: '3'
+        note: Simulant prototype major element chemistry measured by XRF; CM Simulant column.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - FeOT (total iron) treated as FeO; printed key FeOT
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '32.5'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CM Simulant column.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CM Simulant column.
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '0.3'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CM Simulant column.
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CM Simulant column.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.1'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CM Simulant column.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CM Simulant column.
+        - - original_FeOT_wt_pct
+          - state:
+              tag: value
+              value: '20.2'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CM Simulant column.
+        - - M_FeOT_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CM Simulant column.
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.2'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CM Simulant column.
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CM Simulant column.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '32.1'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CM Simulant column.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CM Simulant column.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '3.1'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CM Simulant column.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CM Simulant column.
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '6.2'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CM Simulant column.
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CM Simulant column.
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.2'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CM Simulant column.
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CM Simulant column.
+        - - original_P2O5_wt_pct
+          - state:
+              tag: value
+              value: '0.4'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CM Simulant column.
+        - - M_P2O5_g_mol
+          - state:
+              tag: value
+              value: '141.942523996'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CM Simulant column.
+        - - original_Cr2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.2'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CM Simulant column.
+        - - M_Cr2O3_g_mol
+          - state:
+              tag: value
+              value: '151.98919999999998'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CM Simulant column.
+        - - original_SO3_wt_pct
+          - state:
+              tag: value
+              value: '1.5'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CM Simulant column.
+        - - M_SO3_g_mol
+          - state:
+              tag: value
+              value: '80.057'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CM Simulant column.
+        output_unit: mole_fraction
 - observation_id: britt-2019-asteroid-simulants::britt_2019_cm_tg_integrated_mass_loss
   experiment_id: 10.1111/maps.13345::experiment::tga-ega-cm
   identity:
@@ -349,25 +829,29 @@ observations:
         basis: printed_oxides
         components:
         - - SiO2
-          - '0.2766531417313088484520738136'
+          - '0.1815358528346533662051463077'
         - - TiO2
-          - '0.004313535753408288284808581045'
+          - '0.002830480748663493531786653087'
         - - Al2O3
-          - '0.01013633599784216357151938964'
+          - '0.006651319368619442419099223964'
+        - - FeO
+          - '0.3374609292410370099904811463'
         - - MnO
-          - '0.003642319797107202661273537052'
+          - '0.002390038394382594137797816703'
         - - MgO
-          - '0.643203282656385446256807233'
+          - '0.4220608366576207273828804565'
         - - CaO
-          - '0.01228669625500482954328857419'
+          - '0.008062355154234709087870362648'
         - - Na2O
-          - '0.04585667011255374143287604299'
+          - '0.03009049405672339307085764601'
         - - K2O
-          - '0.0009143222532314485598749764457'
+          - '0.0005999652451707136822636647804'
         - - P2O5
-          - '0.002427042462311443142405182944'
+          - '0.001592590709450680711820678711'
         - - Cr2O3
-          - '0.0005666529808465880950726692964'
+          - '0.0003718296184729078458576506203'
+        - - SO3
+          - '0.006353307970970961934138393389'
         amount_basis: mole_fraction
   value:
     kind: unavailable
@@ -393,6 +877,242 @@ observations:
     table: '3'
     note: Simulant prototype major element chemistry measured by XRF; CR Simulant column.
   read_from: pdf:britt-2019-asteroid-simulants
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.1815358528346533662051463077'
+          - - TiO2
+            - '0.002830480748663493531786653087'
+          - - Al2O3
+            - '0.006651319368619442419099223964'
+          - - FeO
+            - '0.3374609292410370099904811463'
+          - - MnO
+            - '0.002390038394382594137797816703'
+          - - MgO
+            - '0.4220608366576207273828804565'
+          - - CaO
+            - '0.008062355154234709087870362648'
+          - - Na2O
+            - '0.03009049405672339307085764601'
+          - - K2O
+            - '0.0005999652451707136822636647804'
+          - - P2O5
+            - '0.001592590709450680711820678711'
+          - - Cr2O3
+            - '0.0003718296184729078458576506203'
+          - - SO3
+            - '0.006353307970970961934138393389'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 9
+        table: '3'
+        note: Simulant prototype major element chemistry measured by XRF; CR Simulant column.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - FeOT (total iron) treated as FeO; printed key FeOT
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '19.3'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CR Simulant column.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CR Simulant column.
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '0.4'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CR Simulant column.
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CR Simulant column.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '1.2'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CR Simulant column.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CR Simulant column.
+        - - original_FeOT_wt_pct
+          - state:
+              tag: value
+              value: '42.9'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CR Simulant column.
+        - - M_FeOT_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CR Simulant column.
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.3'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CR Simulant column.
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CR Simulant column.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '30.1'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CR Simulant column.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CR Simulant column.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '0.8'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CR Simulant column.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CR Simulant column.
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '3.3'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CR Simulant column.
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CR Simulant column.
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.1'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CR Simulant column.
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CR Simulant column.
+        - - original_P2O5_wt_pct
+          - state:
+              tag: value
+              value: '0.4'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CR Simulant column.
+        - - M_P2O5_g_mol
+          - state:
+              tag: value
+              value: '141.942523996'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CR Simulant column.
+        - - original_Cr2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.1'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CR Simulant column.
+        - - M_Cr2O3_g_mol
+          - state:
+              tag: value
+              value: '151.98919999999998'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CR Simulant column.
+        - - original_SO3_wt_pct
+          - state:
+              tag: value
+              value: '0.9'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CR Simulant column.
+        - - M_SO3_g_mol
+          - state:
+              tag: value
+              value: '80.057'
+            locator:
+              pdf_page_index: 9
+              table: '3'
+              note: Simulant prototype major element chemistry measured by XRF; CR Simulant column.
+        output_unit: mole_fraction
 - observation_id: britt-2019-asteroid-simulants::britt_2019_cr_tg_integrated_mass_loss
   experiment_id: 10.1111/maps.13345::experiment::tga-ega-cr
   identity:
