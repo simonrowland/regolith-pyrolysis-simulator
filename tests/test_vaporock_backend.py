@@ -1243,6 +1243,11 @@ def test_vaporock_import_boundary_handles_library_failures_only(monkeypatch):
 
 def test_vaporock_runtime_probe_propagates_our_initialize_error(monkeypatch):
     monkeypatch.setattr(
+        vaporock_module,
+        "_VAPOROCK_RUNTIME_AVAILABLE_CACHE",
+        None,
+    )
+    monkeypatch.setattr(
         VapoRockBackend,
         "initialize",
         lambda _self, _config: (_ for _ in ()).throw(KeyError("local init bug")),

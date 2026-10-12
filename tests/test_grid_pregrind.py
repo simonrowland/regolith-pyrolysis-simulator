@@ -48,13 +48,6 @@ from simulator.fe_redox import Kress91InvalidControls as _ORIGINAL_KRESS91_INVAL
 from simulator.melt_backend.vaporock import VapoRockBackend as _ORIGINAL_VAPOROCK_BACKEND
 
 
-@pytest.fixture(scope="module", autouse=True)
-def _restore_vaporock_runtime_cache():
-    original_cache = vaporock_module._VAPOROCK_RUNTIME_AVAILABLE_CACHE
-    yield
-    vaporock_module._VAPOROCK_RUNTIME_AVAILABLE_CACHE = original_cache
-
-
 def test_feedstock_simplex_grid_sums_deduplicates_and_respects_bounds():
     bounds = load_feedstock_box(DEFAULT_FEEDSTOCKS)
     points = generate_simplex_grid(bounds)
