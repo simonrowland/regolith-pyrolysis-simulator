@@ -23,6 +23,36 @@ fidelity_samples:
     field: T_C
     value: 242
     locator: {page: 63, published_page: 57, pdf_page_index: 62, figure: '3-16'}
+  - species: SiO
+    observation_id: mamiya_2000_fig3_8_cristobalite_reaction_times
+    field: printed_times_hr_fidelity_pin
+    value: [20, 20, 10, 2, 1, 0.1]
+    locator: {page: 53, published_page: 47, pdf_page_index: 52, figure: '3-8'}
+    note: Printed crystallization times, pinned in source order for the structured resolver.
+  - species: SiO
+    observation_id: mamiya_2000_fig4_14_rate_constants
+    field: representative_digitized_points_fidelity_pin
+    value: '900 C: 0.58 s-1; 1300 C: 20 s-1'
+    locator: {page: 102, published_page: 96, pdf_page_index: 101, figure: '4-14'}
+    note: Representative digitized endpoints, transcribed from Fig. 4-14.
+  - species: SiO
+    observation_id: mamiya_2000_fig4_12_kinetic_fit_and_activation_energy
+    field: fitted_equation_as_printed
+    value: 'log k = 9.190 - 9884.7 x (1/T)'
+    locator: {page: 99, published_page: 93, pdf_page_index: 98, section: '4.6'}
+    note: Printed least-squares fitted equation.
+  - species: SiO
+    observation_id: mamiya_2000_fig4_12_kinetic_fit_and_activation_energy
+    field: fitted_parameter_as_printed
+    value: 'E* = 82.2 kJ mol-1'
+    locator: {page: 99, published_page: 93, pdf_page_index: 98, section: '4.6'}
+    note: Printed fitted activation energy.
+  - species: SiO2
+    observation_id: mamiya_2000_cristobalite_htxrd_transition_bracket
+    field: transition_interval_as_printed
+    value: between 200 and 300 C
+    locator: {page: 63, published_page: 57, pdf_page_index: 62, section: '3.5'}
+    note: HT-XRD heating bracket; no midpoint is inferred.
 species:
   SiO:
     observations: []
@@ -170,6 +200,7 @@ species:
           method_class: figure_only
           method: transcribed printed labels in figure
           T_C: [1000, 1100, 1200, 1300, 1350, 1400]
+          printed_times_hr_fidelity_pin: [20, 20, 10, 2, 1, 0.1]
           points:
             - T_C: 1000
               time_hr: 20
@@ -296,6 +327,7 @@ species:
           quantity: first-order Si-crystallization velocity constant k versus temperature, as plotted
           method_class: figure_only
           method: figure_digitized
+          representative_digitized_points_fidelity_pin: '900 C: 0.58 s-1; 1300 C: 20 s-1'
           read_method: Linear calibration of inverse-temperature axis and logarithmic calibration of k axis; marker centers read to approximately two significant figures.
           digitization_tolerance: Approximately ±0.05 s-1 at 900 C; approximately ±5% for the other marker centers.
           T_C: [900, 1000, 1100, 1200, 1300]
@@ -468,6 +500,20 @@ species:
         point_conditions:
           total_pressure_Pa: {state: {tag: unknown, reason: not_reported}, locator: {page: 63, published_page: 57, pdf_page_index: 62, section: 3.5}}
     context:
+      - observation_id: mamiya_2000_cristobalite_htxrd_transition_bracket
+        type: characterization
+        locator: {page: 63, published_page: 57, pdf_page_index: 62, section: '3.5 In situ observation of the high-low transformation in cristobalite'}
+        units: degC as printed
+        values:
+          quantity: HT-XRD heating transition interval
+          method_class: measured_direct
+          method: in situ high-temperature X-ray powder diffraction (HT-XRD)
+          transition_as_printed: cristobalite high-low transformation
+          scan_direction: heating
+          transition_interval_as_printed: between 200 and 300 C
+          note: Patterns unchanged below 200 C, changed considerably between 200 and 300 C, and showed no further change above 300 C; interval retained without a midpoint. Section 3.6 separately summarizes the transition as around 265 C, while section 3.5 reports DTA peaks at 246 C on heating and 242 C on cooling; these source statements are preserved as distinct results.
+          conditions_as_printed: successive heating at 100, 200, 300, 500, 650 and 800 C; 15 C/min between holding points; air atmosphere; cristobalite powder synthesized by heating silica glass at 1400 C for 20 hours.
+          conditions_locator: {page: 40, published_page: 34, pdf_page_index: 39, section: '2.4 Experimental'}
       - observation_id: mamiya_2000_cristobalite_transition_summary
         type: characterization
         locator: {page: 69, published_page: 63, pdf_page_index: 68, section: 3.6 Summary}
