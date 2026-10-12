@@ -1229,6 +1229,32 @@ def test_petthermotools_liquidus_scan_checks_absolute_fo2_per_sample():
     assert mismatched_targets == [(900.0, -9.0)]
 
 
+def test_petthermotools_liquidus_rejects_buffer_offset_before_findliq():
+    backend = AlphaMELTSBackend()
+    _select_python_api_for_test(backend)
+    findliq_calls = []
+    backend._require_petthermotools_runtime = lambda: types.SimpleNamespace(
+        findLiq=lambda *_args, **_kwargs: None,
+    )
+    backend._run_petthermotools_isolated = (
+        lambda operation, **_kwargs: findliq_calls.append(operation) or None
+    )
+    state = RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, -0.75)
+
+    result = backend.find_liquidus_solidus(
+        composition_kg=_melts_domain_composition(),
+        fO2_log=state.log_fO2_at(REDOX_STATE_REFERENCE_T_K),
+        redox_state=state,
+        pressure_bar=1.0,
+    )
+
+    assert result.status == 'unavailable'
+    assert result.diagnostics == {
+        'reason': 'redox_state_not_expressible',
+    }
+    assert findliq_calls == []
+
+
 def test_alphamelts_liquidus_propagates_local_result_processing_error():
     class ParsedResult:
         status = 'ok'
