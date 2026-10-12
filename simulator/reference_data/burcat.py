@@ -35,7 +35,6 @@ from simulator.reference_data.nasa_glenn import (
     published_float_pairs,
     resolve_phase,
 )
-from simulator.reference_data.janaf import formula_composition
 from simulator.yaml_cache import load_cached_safe_yaml
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -661,21 +660,175 @@ def peer_formula_sets(
     return janaf, glenn
 
 
+def load_peer_aliases(path: Path | None = None) -> list[dict[str, Any]]:
+    """Load and validate evidenced formula aliases against their source records."""
+
+    alias_path = path or (COMPILATION_ROOT / "peer-aliases.yaml")
+    payload = load_cached_safe_yaml(alias_path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict) or set(payload) != {"schema_version", "aliases"}:
+        raise BurcatParseError(f"{alias_path}: malformed peer-alias document")
+    if payload.get("schema_version") != "burcat_peer_aliases.v1":
+        raise BurcatParseError(f"{alias_path}: unsupported peer-alias schema")
+    aliases = payload.get("aliases")
+    if not isinstance(aliases, list):
+        raise BurcatParseError(f"{alias_path}: aliases must be a list")
+
+    fields = {
+        "burcat_record_id",
+        "burcat_formula",
+        "burcat_name",
+        "burcat_phase",
+        "peer_compilation",
+        "peer_record_id",
+        "peer_formula",
+        "peer_name",
+        "peer_phase",
+        "peer_has_coefficients",
+    }
+    loaded: list[dict[str, Any]] = []
+    seen: set[tuple[str, str, str]] = set()
+    for index, entry in enumerate(aliases):
+        label = f"{alias_path}: aliases[{index}]"
+        if not isinstance(entry, dict) or set(entry) != fields:
+            raise BurcatParseError(f"{label}: malformed alias entry")
+        for key in fields - {"peer_has_coefficients"}:
+            if not isinstance(entry.get(key), str) or not entry[key].strip():
+                raise BurcatParseError(f"{label}: {key} must be a non-empty string")
+        if type(entry["peer_has_coefficients"]) is not bool:
+            raise BurcatParseError(f"{label}: peer_has_coefficients must be boolean")
+
+        burcat_id = entry["burcat_record_id"]
+        peer_compilation = entry["peer_compilation"]
+        peer_id = entry["peer_record_id"]
+        if not re.fullmatch(r"BU-\d{4}", burcat_id):
+            raise BurcatParseError(f"{label}: invalid Burcat record id {burcat_id!r}")
+        if peer_compilation == "nasa-glenn":
+            if not re.fullmatch(r"NG-\d{4}", peer_id):
+                raise BurcatParseError(f"{label}: invalid NASA Glenn record id {peer_id!r}")
+            peer_path = (
+                ROOT / "data" / "literature" / "compilations" / "nasa-glenn"
+                / "records" / f"{peer_id}.json"
+            )
+        elif peer_compilation == "janaf":
+            if not re.fullmatch(r"[A-Za-z]+-\d{3}", peer_id):
+                raise BurcatParseError(f"{label}: invalid JANAF table id {peer_id!r}")
+            peer_path = (
+                ROOT / "data" / "literature" / "compilations" / "janaf"
+                / "tables" / f"{peer_id}.yaml"
+            )
+        else:
+            raise BurcatParseError(
+                f"{label}: unsupported peer compilation {peer_compilation!r}"
+            )
+
+        key = (burcat_id, peer_compilation, peer_id)
+        if key in seen:
+            raise BurcatParseError(f"{label}: duplicate peer alias {key!r}")
+        seen.add(key)
+
+        burcat_path = COMPILATION_ROOT / "records" / f"{burcat_id}.json"
+        if not burcat_path.is_file():
+            raise BurcatParseError(f"{label}: Burcat record {burcat_id} does not exist")
+        burcat_doc = json.loads(burcat_path.read_text(encoding="utf-8"))
+        if burcat_doc.get("record_id") != burcat_id:
+            raise BurcatParseError(f"{label}: Burcat record id does not match its file")
+        if burcat_doc.get("record_kind") != "nasa7_polynomial":
+            raise BurcatParseError(f"{label}: Burcat record {burcat_id} has no polynomial")
+        for field, source_field in (
+            ("burcat_formula", "formula"),
+            ("burcat_name", "name_as_published"),
+            ("burcat_phase", "phase"),
+        ):
+            if entry[field] != burcat_doc.get(source_field):
+                raise BurcatParseError(
+                    f"{label}: {field} does not match Burcat record {burcat_id}"
+                )
+
+        if not peer_path.is_file():
+            raise BurcatParseError(
+                f"{label}: {peer_compilation} record {peer_id} does not exist"
+            )
+        if peer_compilation == "nasa-glenn":
+            peer_doc = json.loads(peer_path.read_text(encoding="utf-8"))
+            if peer_doc.get("record_id") != peer_id:
+                raise BurcatParseError(f"{label}: peer record id does not match its file")
+            peer_formula = peer_doc.get("formula")
+            peer_name = peer_doc.get("name_as_published")
+            peer_phase = peer_doc.get("phase")
+            coefficient_count = peer_doc.get("coefficient_count")
+            peer_has_coefficients = type(coefficient_count) is int and coefficient_count > 0
+        else:
+            peer_doc = load_cached_safe_yaml(peer_path.read_text(encoding="utf-8"))
+            table = peer_doc.get("table") if isinstance(peer_doc, dict) else None
+            index_entry = table.get("index_entry") if isinstance(table, dict) else None
+            if not isinstance(index_entry, dict) or table.get("table_id") != peer_id:
+                raise BurcatParseError(f"{label}: malformed JANAF record {peer_id}")
+            peer_formula = index_entry.get("formula_as_published") or index_entry.get("formula")
+            peer_name = index_entry.get("name")
+            peer_phase = index_entry.get("state")
+            values = table.get("values")
+            peer_has_coefficients = isinstance(values, list) and bool(values)
+
+        if entry["peer_formula"] != peer_formula:
+            raise BurcatParseError(f"{label}: peer_formula does not match record {peer_id}")
+        if entry["peer_name"] != peer_name:
+            raise BurcatParseError(f"{label}: peer_name does not match record {peer_id}")
+        if entry["peer_phase"] != peer_phase:
+            raise BurcatParseError(f"{label}: peer_phase does not match record {peer_id}")
+        if not peer_has_coefficients:
+            raise BurcatParseError(f"{label}: peer record {peer_id} has no coefficients")
+        if entry["peer_has_coefficients"] is not peer_has_coefficients:
+            raise BurcatParseError(
+                f"{label}: peer_has_coefficients does not match record {peer_id}"
+            )
+        if entry["burcat_formula"] == entry["peer_formula"]:
+            raise BurcatParseError(f"{label}: alias formulas must differ")
+        if _phase_identity(entry["burcat_phase"]) != _phase_identity(entry["peer_phase"]):
+            raise BurcatParseError(f"{label}: phase/state mismatch")
+        if _charge_identity(entry["burcat_formula"], entry["burcat_name"]) != _charge_identity(
+            entry["peer_formula"], entry["peer_name"]
+        ):
+            raise BurcatParseError(f"{label}: charge mismatch")
+        loaded.append(dict(entry))
+    return loaded
+
+
+def _phase_identity(value: str) -> str:
+    phase = value.strip().casefold()
+    return {"g": "gas", "l": "liquid"}.get(phase, phase)
+
+
+def _charge_identity(formula: str, name: str) -> tuple[str, int]:
+    identities = set()
+    for value in (formula, name):
+        match = re.search(r"([+-]+)$", value.strip())
+        if match:
+            signs = match.group(1)
+            identities.add((signs[-1], len(signs)))
+    if len(identities) > 1:
+        return ("conflicting", 0)
+    return next(iter(identities), ("neutral", 0))
+
+
 def formulas_absent_from_janaf_and_glenn(
     records: Iterable[BurcatRecord],
     janaf_formulas: Iterable[str],
     glenn_formulas: Iterable[str],
 ) -> list[dict[str, Any]]:
-    peers = {
-        formula_composition(formula) or formula
-        for formula in (*janaf_formulas, *glenn_formulas)
+    peers = {"janaf": set(janaf_formulas), "nasa-glenn": set(glenn_formulas)}
+    aliases = {
+        (entry["burcat_record_id"], entry["burcat_formula"])
+        for entry in load_peer_aliases()
+        if entry["peer_formula"] in peers[entry["peer_compilation"]]
     }
     seen: dict[str, dict[str, Any]] = {}
     for rec in records:
         if rec.record_kind != "nasa7_polynomial":
             continue
         formula = rec.formula.strip()
-        if not formula or (formula_composition(formula) or formula) in peers:
+        if not formula or formula in peers["janaf"] | peers["nasa-glenn"]:
+            continue
+        if (rec.record_id, formula) in aliases:
             continue
         row = seen.setdefault(
             formula,

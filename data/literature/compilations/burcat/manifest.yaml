@@ -1000,7 +1000,7 @@ feedstock_element_coverage:
       - BU-3430
       - BU-3431
 formulas_absent_from_janaf_and_nasa_glenn:
-  count: 1413
+  count: 1444
   formulas:
   - formula: AlB2
     record_count: 2
@@ -1189,6 +1189,13 @@ formulas_absent_from_janaf_and_nasa_glenn:
     - HOBr Hypobromous
     record_ids_head:
     - BU-0143
+  - formula: BrI
+    record_count: 2
+    names_head:
+    - BrI
+    record_ids_head:
+    - BU-0146
+    - BU-0147
   - formula: BrNO2
     record_count: 1
     names_head:
@@ -2479,6 +2486,14 @@ formulas_absent_from_janaf_and_nasa_glenn:
     - C2BR6
     record_ids_head:
     - BU-0598
+  - formula: C2Cl2F2
+    record_count: 2
+    names_head:
+    - C2Cl2F2 1,2-trans
+    - C2Cl2F2 1,2-cis
+    record_ids_head:
+    - BU-0601
+    - BU-0602
   - formula: C2Cl2F4
     record_count: 2
     names_head:
@@ -2531,6 +2546,12 @@ formulas_absent_from_janaf_and_nasa_glenn:
     - C2CL5F  G3B3 cal
     record_ids_head:
     - BU-0612
+  - formula: C2Cr3
+    record_count: 1
+    names_head:
+    - Cr3C2(S)
+    record_ids_head:
+    - BU-2333
   - formula: C2D
     record_count: 1
     names_head:
@@ -2591,6 +2612,12 @@ formulas_absent_from_janaf_and_nasa_glenn:
     - C2H4F2  HFC-152a
     record_ids_head:
     - BU-0791
+  - formula: C2F2HCl
+    record_count: 1
+    names_head:
+    - C2HCLF2 1,1
+    record_ids_head:
+    - BU-0646
   - formula: C2F3NE
     record_count: 1
     names_head:
@@ -2935,6 +2962,12 @@ formulas_absent_from_janaf_and_nasa_glenn:
     - C2H4F2  HFC-152
     record_ids_head:
     - BU-0790
+  - formula: C2H4I2
+    record_count: 1
+    names_head:
+    - (CH2I)2 DiIodoet
+    record_ids_head:
+    - BU-0792
   - formula: C2H4N2O4
     record_count: 1
     names_head:
@@ -3451,6 +3484,14 @@ formulas_absent_from_janaf_and_nasa_glenn:
     - C2HCLF 1,1-CLF
     record_ids_head:
     - BU-0645
+  - formula: C2HClF2
+    record_count: 2
+    names_head:
+    - C2HClF2  cis
+    - C2HClF2 trans
+    record_ids_head:
+    - BU-0647
+    - BU-0648
   - formula: C2HClF4
     record_count: 2
     names_head:
@@ -3489,6 +3530,14 @@ formulas_absent_from_janaf_and_nasa_glenn:
     - C2HF+
     record_ids_head:
     - BU-0661
+  - formula: C2HN
+    record_count: 2
+    names_head:
+    - HCCN singlet
+    - HCCN Triplet
+    record_ids_head:
+    - BU-0665
+    - BU-0666
   - formula: C2HN2O4
     record_count: 1
     names_head:
@@ -3729,6 +3778,12 @@ formulas_absent_from_janaf_and_nasa_glenn:
     - C3Cl4 PerchloroA
     record_ids_head:
     - BU-0961
+  - formula: C3Cr7
+    record_count: 1
+    names_head:
+    - Cr7C3(S)
+    record_ids_head:
+    - BU-2334
   - formula: C3D4
     record_count: 2
     names_head:
@@ -4667,6 +4722,12 @@ formulas_absent_from_janaf_and_nasa_glenn:
     - C4H11P+ DiEthylPH+
     record_ids_head:
     - BU-1369
+  - formula: C4H12Si
+    record_count: 1
+    names_head:
+    - C4H12Si (C2H5)2SiH
+    record_ids_head:
+    - BU-1373
   - formula: C4H12SiE-1
     record_count: 2
     names_head:
@@ -5595,6 +5656,12 @@ formulas_absent_from_janaf_and_nasa_glenn:
     - C6CL6- Hexachlor
     record_ids_head:
     - BU-1527
+  - formula: C6Cr23
+    record_count: 1
+    names_head:
+    - C6Cr23
+    record_ids_head:
+    - BU-2335
   - formula: C6F14
     record_count: 1
     names_head:
@@ -6881,12 +6948,24 @@ formulas_absent_from_janaf_and_nasa_glenn:
     - C9H9 Indanyl Rad
     record_ids_head:
     - BU-1918
+  - formula: CBr2Cl2
+    record_count: 1
+    names_head:
+    - CBr2Cl2  DiBromo
+    record_ids_head:
+    - BU-0188
   - formula: CBr2O
     record_count: 1
     names_head:
     - CBr2O
     record_ids_head:
     - BU-0190
+  - formula: CBr3Cl
+    record_count: 1
+    names_head:
+    - CBR3CL  TriBromo
+    record_ids_head:
+    - BU-0192
   - formula: CBr3OH
     record_count: 2
     names_head:
@@ -6895,6 +6974,18 @@ formulas_absent_from_janaf_and_nasa_glenn:
     record_ids_head:
     - BU-0277
     - BU-0278
+  - formula: CBrCl2F
+    record_count: 1
+    names_head:
+    - CBrCL2F
+    record_ids_head:
+    - BU-0180
+  - formula: CBrCl3
+    record_count: 1
+    names_head:
+    - CBRCL3 Bromotric
+    record_ids_head:
+    - BU-0181
   - formula: CCl2E-1
     record_count: 1
     names_head:
@@ -7199,6 +7290,24 @@ formulas_absent_from_janaf_and_nasa_glenn:
     - CH2NO3  *CH2ONO2
     record_ids_head:
     - BU-0368
+  - formula: CH2O
+    record_count: 3
+    names_head:
+    - CHOH trans  Hydr
+    - CH2O  CH**-OH cis
+    - CH2O HCOH triplet
+    record_ids_head:
+    - BU-0383
+    - BU-0384
+    - BU-0387
+  - formula: CH2O2
+    record_count: 2
+    names_head:
+    - CH2O2 Liquid
+    - CH2O2 cycCH2(OO)
+    record_ids_head:
+    - BU-0390
+    - BU-0398
   - formula: CH2O2E
     record_count: 2
     names_head:
@@ -7405,6 +7514,12 @@ formulas_absent_from_janaf_and_nasa_glenn:
     - CH3OO+  cation
     record_ids_head:
     - BU-0458
+  - formula: CH3O2N
+    record_count: 1
+    names_head:
+    - CH3ONO
+    record_ids_head:
+    - BU-0440
   - formula: CH3OD
     record_count: 1
     names_head:
@@ -7737,6 +7852,12 @@ formulas_absent_from_janaf_and_nasa_glenn:
     - CHF+
     record_ids_head:
     - BU-0292
+  - formula: CHFO
+    record_count: 1
+    names_head:
+    - HFCO+
+    record_ids_head:
+    - BU-0295
   - formula: CHN2
     record_count: 2
     names_head:
@@ -7757,6 +7878,22 @@ formulas_absent_from_janaf_and_nasa_glenn:
     - HCN-
     record_ids_head:
     - BU-0304
+  - formula: CHO
+    record_count: 1
+    names_head:
+    - COH   C-OH
+    record_ids_head:
+    - BU-0321
+  - formula: CHO2
+    record_count: 3
+    names_head:
+    - HOCO trans
+    - HOCO cis
+    - HCOO  Formyloxy
+    record_ids_head:
+    - BU-0325
+    - BU-0326
+    - BU-0329
   - formula: CHO2E
     record_count: 1
     names_head:
@@ -7769,6 +7906,12 @@ formulas_absent_from_janaf_and_nasa_glenn:
     - CHO3 formylperoxy
     record_ids_head:
     - BU-0334
+  - formula: CHOCl
+    record_count: 1
+    names_head:
+    - CHClO  Formyl Ch
+    record_ids_head:
+    - BU-0282
   - formula: CHOCl2
     record_count: 1
     names_head:
@@ -7845,12 +7988,26 @@ formulas_absent_from_janaf_and_nasa_glenn:
     - ClCN+   ATcT C
     record_ids_head:
     - BU-0204
+  - formula: CNF
+    record_count: 1
+    names_head:
+    - FNC
+    record_ids_head:
+    - BU-0242
   - formula: CNFE-1
     record_count: 1
     names_head:
     - FCN+   ATcT C
     record_ids_head:
     - BU-0241
+  - formula: CNO
+    record_count: 2
+    names_head:
+    - CNO
+    - C(NO)   cyclo
+    record_ids_head:
+    - BU-0540
+    - BU-0546
   - formula: CNOE
     record_count: 3
     names_head:
@@ -8437,6 +8594,12 @@ formulas_absent_from_janaf_and_nasa_glenn:
     - H3+ TRIHYDROGEN
     record_ids_head:
     - BU-2570
+  - formula: H3O
+    record_count: 1
+    names_head:
+    - TO  Tritium MOno
+    record_ids_head:
+    - BU-2968
   - formula: H3O2E-1
     record_count: 1
     names_head:
@@ -8489,6 +8652,14 @@ formulas_absent_from_janaf_and_nasa_glenn:
     record_ids_head:
     - BU-0303
     - BU-0306
+  - formula: HCO2
+    record_count: 2
+    names_head:
+    - HCOO Dioxymethylen
+    - HC(OO) cyclo rad
+    record_ids_head:
+    - BU-0331
+    - BU-0332
   - formula: HCO2E
     record_count: 1
     names_head:
@@ -8531,6 +8702,12 @@ formulas_absent_from_janaf_and_nasa_glenn:
     - HF-
     record_ids_head:
     - BU-2396
+  - formula: HN
+    record_count: 1
+    names_head:
+    - NH excited
+    record_ids_head:
+    - BU-2781
   - formula: HNO4
     record_count: 1
     names_head:
@@ -8565,6 +8742,13 @@ formulas_absent_from_janaf_and_nasa_glenn:
     record_ids_head:
     - BU-2538
     - BU-2539
+  - formula: HO3N
+    record_count: 2
+    names_head:
+    - HOONO Peroxynitr
+    record_ids_head:
+    - BU-2518
+    - BU-2789
   - formula: HOI
     record_count: 1
     names_head:
@@ -9057,6 +9241,12 @@ formulas_absent_from_janaf_and_nasa_glenn:
     - NO-  anion
     record_ids_head:
     - BU-2820
+  - formula: NOH
+    record_count: 1
+    names_head:
+    - NOH
+    record_ids_head:
+    - BU-2786
   - formula: NOHE
     record_count: 2
     names_head:
@@ -9237,6 +9427,18 @@ formulas_absent_from_janaf_and_nasa_glenn:
     - PCl2+ cation
     record_ids_head:
     - BU-3002
+  - formula: PClF
+    record_count: 1
+    names_head:
+    - PCLF
+    record_ids_head:
+    - BU-2993
+  - formula: PClFE
+    record_count: 1
+    names_head:
+    - PCLF-
+    record_ids_head:
+    - BU-2995
   - formula: PClFE-1
     record_count: 1
     names_head:
@@ -9557,6 +9759,12 @@ formulas_absent_from_janaf_and_nasa_glenn:
     - SCl2-
     record_ids_head:
     - BU-3144
+  - formula: SD2
+    record_count: 1
+    names_head:
+    - T2S DiTritium Sul
+    record_ids_head:
+    - BU-3179
   - formula: SH3
     record_count: 1
     names_head:
