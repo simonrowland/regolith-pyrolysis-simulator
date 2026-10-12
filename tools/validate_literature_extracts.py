@@ -49,7 +49,7 @@ import yaml
 
 from simulator.battery.extract_context import (
     SUPPORTED_EXTRACT_CONTEXT_PATH,
-    iter_context_container_paths,
+    iter_unsupported_context_container_paths,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -1567,17 +1567,12 @@ def validate_extract_document(
     if not isinstance(doc, Mapping):
         return [f"{label}: root must be a mapping"]
 
-    for key_path in iter_context_container_paths(doc):
-        if not (
-            len(key_path) == 3
-            and key_path[0] == "species"
-            and key_path[2] == "context"
-        ):
-            rendered_path = ".".join(key_path)
-            errors.append(
-                f"{label}:{rendered_path}: context container is not lifted by "
-                f"the migrator; supported location is {SUPPORTED_EXTRACT_CONTEXT_PATH}"
-            )
+    for key_path in iter_unsupported_context_container_paths(doc):
+        rendered_path = ".".join(key_path)
+        errors.append(
+            f"{label}:{rendered_path}: context container is not lifted by "
+            f"the migrator; supported location is {SUPPORTED_EXTRACT_CONTEXT_PATH}"
+        )
 
     if doc.get("schema_version") != SCHEMA_VERSION:
         errors.append(
