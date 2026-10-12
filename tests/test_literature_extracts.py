@@ -687,6 +687,24 @@ def test_refuses_context_container_outside_species_block():
     )
 
 
+def test_validator_help_works_without_pythonpath():
+    import os
+    import subprocess
+
+    env = os.environ.copy()
+    env.pop("PYTHONPATH", None)
+    result = subprocess.run(
+        [sys.executable, str(TOOLS / "validate_literature_extracts.py"), "--help"],
+        cwd=REPO_ROOT,
+        env=env,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
+    assert "usage:" in result.stdout.lower()
+
+
 def test_accepts_scalar_context_description_inside_row():
     doc = _minimal_extract()
     doc["species"]["Fe"]["observations"][0]["values"]["context"] = (
