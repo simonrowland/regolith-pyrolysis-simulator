@@ -169,7 +169,7 @@ experiments:
           kind: point
           point: '0.00101325'
       locator:
-        pdf_page_index: 7
+        pdf_page_index: 8
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
         note: Total pressure 10^-8 atm as printed; converted using 101325 Pa per atm.
@@ -294,7 +294,7 @@ experiments:
           kind: point
           point: '0.00101325'
       locator:
-        pdf_page_index: 7
+        pdf_page_index: 8
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
         note: Total pressure 10^-8 atm as printed; converted using 101325 Pa per atm.
@@ -415,7 +415,7 @@ experiments:
           kind: point
           point: '0.00101325'
       locator:
-        pdf_page_index: 7
+        pdf_page_index: 8
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
         note: Total pressure 10^-8 atm as printed; converted using 101325 Pa per atm.
@@ -523,7 +523,7 @@ species:
         total_pressure_Pa:
           state: {tag: value, value: 0.00101325}
           locator:
-            pdf_page_index: 7
+            pdf_page_index: 8
             published_page: 'Article in Press; no printed page number'
             section: Vacuum heating experiment
             note: Total pressure is 10^-8 atm as printed.
@@ -533,6 +533,7 @@ species:
         method_class: measured_direct
         property: melting_point
         T_C: 1330
+        pressure_basis_Pa: 0.00101325
         observation_as_printed: The pellet of fayalite melted when heated to 1330 °C.
     context:
     - observation_id: suzuki_2026_fayalite_melting_and_oxygen_pressure
@@ -764,30 +765,24 @@ species:
       uncertainty:
         note: No uncertainty width or confidence level is stated; values are approximate figure reads.
 
+    context:
     - observation_id: suzuki_2026_hematite_emf_pO2_range
       experiment: hematite-vacuum-heating-1200C
-      type: partial_pressure
+      type: laboratory_conditions
       locator:
         pdf_page_index: 4
         published_page: 'Article in Press; no printed page number'
         equation: '2'
         section: Results
         note: Figure S2 is referenced but not included; the pressure interval is printed in the article text.
-      phase: gas
-      regime: vacuum_chamber_pyrolysis
-      units: atm
+      units: atm as printed
       values:
-        quantity: partial_pressure_O2
-        method_class: measured_direct
-        gas_species: O2
-        T_C: 1200
+        printed_quantity: oxygen partial pressure at 1200 °C by EMF
         range: [1.1e-12, 1.4e-12]
         range_as_printed: 1.1–1.4 × 10−12 atm
+        method_class: measured_direct
         measurement_method: EMF with a solid-electrolyte cell; stated identical to mass-spectrometer values in Figure 2a.
-      uncertainty:
-        note: The interval is the measured range; no confidence level is stated.
-
-    context:
+      d-126_reason: 'migrator has no p_partial range mapping; b-867'
     - observation_id: suzuki_2026_supplementary_materials_pointer
       type: method
       locator:
