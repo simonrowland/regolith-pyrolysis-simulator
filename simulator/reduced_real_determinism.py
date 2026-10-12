@@ -663,7 +663,45 @@ class PT0DeterminismStore:
         if not _is_cacheable_gate_curve(curve):
             self._mark_uncacheable_capture(sim)
             return
-        if not self.gate_curve_cache_eligible(sim, curve):
+        from simulator.engine_binding_admission import (
+            gate_curve_memo_evidence,
+            gate_curve_memo_origin_matches,
+        )
+
+        active_record = getattr(
+            sim,
+            "_freeze_gate_liquid_fraction_cache",
+            None,
+        )
+        if not (
+            isinstance(active_record, Mapping)
+            and active_record.get("disposition") in {"live", "memo-hit"}
+            and isinstance(active_record.get("curve"), Mapping)
+            and dict(active_record["curve"]) == dict(curve)
+            and gate_curve_memo_origin_matches(
+                sim,
+                curve,
+                active_record.get("origin"),
+                fresh_evidence=False,
+            )
+        ):
+            self._mark_uncacheable_capture(sim)
+            return
+        evidence = gate_curve_memo_evidence(
+            sim,
+            curve,
+            include_selected_bindings=True,
+        )
+        if (
+            not gate_curve_memo_origin_matches(
+                sim,
+                curve,
+                active_record.get("origin"),
+                fresh_evidence=True,
+                evidence=evidence,
+            )
+            or not evidence.eligible
+        ):
             self._mark_uncacheable_capture(sim)
             return
         provider_role = _gate_provider_role_for_capture(sim, curve)

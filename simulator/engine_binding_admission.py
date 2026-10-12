@@ -775,6 +775,95 @@ def write_gate_curve_memo_origin(
     }
 
 
+def write_gate_curve_memo_record(
+    sim: Any,
+    curve: Mapping[str, Any],
+    repair_notices: Sequence[Mapping[str, Any]] | None = None,
+    *,
+    disposition: str = "live",
+    evidence: GateCurveEvidence | None = None,
+) -> dict[str, Any]:
+    """Write one origin-bearing runtime record for production or a fixture."""
+
+    from simulator.reduced_real_determinism import (
+        _is_cacheable_gate_curve,
+        gate_curve_memo_record,
+        uncacheable_replay_disposition,
+    )
+
+    if evidence is None:
+        evidence = gate_curve_memo_evidence(
+            sim,
+            curve,
+            include_selected_bindings=(
+                _is_cacheable_gate_curve(curve)
+                and not uncacheable_replay_disposition(sim)
+            ),
+        )
+    origin = write_gate_curve_memo_origin(sim, curve, evidence)
+    return gate_curve_memo_record(
+        curve,
+        origin,
+        repair_notices,
+        disposition,
+    )
+
+
+def gate_curve_memo_origin_matches(
+    sim: Any,
+    curve: Mapping[str, Any],
+    origin: Mapping[str, Any] | None,
+    *,
+    fresh_evidence: bool,
+    evidence: GateCurveEvidence | None = None,
+) -> bool:
+    import os
+
+    from simulator.reduced_real_determinism import (
+        _gate_curve_provider_role,
+        gate_curve_memo_producer_configuration,
+    )
+
+    if not isinstance(origin, Mapping):
+        return False
+    producer_pid = origin.get("producer_pid")
+    if (
+        isinstance(producer_pid, bool)
+        or not isinstance(producer_pid, int)
+        or producer_pid != os.getpid()
+    ):
+        return False
+    try:
+        configuration = gate_curve_memo_producer_configuration(sim, curve)
+    except Exception:  # noqa: BLE001 - malformed configuration is a miss
+        return False
+    if origin.get("producer_configuration") != configuration:
+        return False
+    producer_evidence = origin.get("producer_evidence")
+    if producer_evidence == "no-external-install":
+        from simulator.melt_backend.base import InternalAnalyticalBackend
+
+        if not isinstance(
+            _gate_curve_producer_backend(sim, _gate_curve_provider_role(curve)),
+            InternalAnalyticalBackend,
+        ):
+            return False
+    elif (
+        not isinstance(producer_evidence, str)
+        or len(producer_evidence) != 64
+        or any(character not in "0123456789abcdef" for character in producer_evidence)
+    ):
+        return False
+    if not fresh_evidence:
+        return True
+    current = evidence or gate_curve_memo_evidence(
+        sim,
+        curve,
+        include_selected_bindings=True,
+    )
+    return current.producer_evidence == producer_evidence
+
+
 def gate_curve_memo_eligibility(sim: Any, curve: Mapping[str, Any]) -> bool:
     from simulator.reduced_real_determinism import (
         _is_cacheable_gate_curve,

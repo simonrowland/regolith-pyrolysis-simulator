@@ -59,6 +59,7 @@ from simulator.reduced_real_determinism import (
 from simulator.runner import _attach_composition_projected_liquidus_notice
 from simulator.state import CampaignPhase
 from tests.chemistry.conftest import _build_sim
+from tests.binding_admission_fixtures import seed_gate_curve_memo_record
 
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
@@ -1518,10 +1519,11 @@ def test_pt0_gate_curve_key_is_tstd_aligned_across_isochemical_ramp(
     capture = PT0DeterminismStore("capture", db_path=db_path)
     sim = _build_pt0_sim(capture)
     sim.start_campaign(CampaignPhase.C2A_STAGED)
-    sim._freeze_gate_liquid_fraction_cache = {
-        "key": ("test",),
-        "curve": {"source": "test", "solidus_T_C": 1000.0, "liquidus_T_C": 1300.0},
-    }
+    seed_gate_curve_memo_record(
+        sim,
+        {"source": "test", "solidus_T_C": 1000.0, "liquidus_T_C": 1300.0},
+        key=("test",),
+    )
     sim.melt.temperature_C = 1450.0
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
     sim.melt.oxygen_reservoir.reference_T_K = 1450.0 + 273.15
@@ -1533,6 +1535,7 @@ def test_pt0_gate_curve_key_is_tstd_aligned_across_isochemical_ramp(
         "path": ((1210.0, 0.0), (1320.0, 1.0)),
     }
 
+    seed_gate_curve_memo_record(sim, curve)
     capture.capture_gate_curve(
         sim,
         fO2_log=sim._current_melt_redox_fO2_log(),
@@ -1601,10 +1604,7 @@ def test_pt0_production_gate_curve_cold_replays_across_isochemical_ramp(
         pressure_bar=capture_sim.melt.p_total_mbar / 1000.0,
         fO2_log=capture_redox_key_fO2_log,
     )
-    capture_sim._freeze_gate_liquid_fraction_cache = {
-        "key": capture_local_key,
-        "curve": curve,
-    }
+    seed_gate_curve_memo_record(capture_sim, curve, key=capture_local_key)
 
     assert capture_sim._freeze_gate_curve() == curve
     capture_key = capture.capture_sequence[-1]["key"]
@@ -1673,10 +1673,7 @@ def test_pt0_gate_curve_rekeys_from_live_fo2_after_first_liquid_seed(
         pressure_bar=capture_sim.melt.p_total_mbar / 1000.0,
         fO2_log=preseed_redox_key_fO2_log,
     )
-    capture_sim._freeze_gate_liquid_fraction_cache = {
-        "key": preseed_local_key,
-        "curve": curve,
-    }
+    seed_gate_curve_memo_record(capture_sim, curve, key=preseed_local_key)
 
     assert capture_sim._freeze_gate_curve() == curve
     preseed_controls = capture.capture_sequence[-1]["key"]["controls"]
@@ -2640,6 +2637,7 @@ def test_pt1_persistent_store_round_trips_exact_payload(tmp_path: Path) -> None:
         fe_redox_policy="intrinsic",
     )
 
+    seed_gate_curve_memo_record(sim, curve)
     capture.capture_gate_curve(sim, fO2_log=fO2_log, curve=curve)
 
     with sqlite3.connect(db_path) as conn:
@@ -2742,6 +2740,11 @@ def test_pt1_repair_notices_are_outside_payload_and_reemit_on_exact_replay(
         capture = PT0DeterminismStore("capture", db_path=db_path)
         sim = _build_pt0_sim(capture)
         sim.start_campaign(CampaignPhase.C2A_STAGED)
+        seed_gate_curve_memo_record(
+            sim,
+            curve,
+            repair_notices=captured_notices,
+        )
         capture.capture_gate_curve(
             sim,
             fO2_log=sim._compute_intrinsic_melt_fO2(),
@@ -2787,6 +2790,7 @@ def test_pt1_legacy_null_repair_notices_emit_typed_unavailable_notice(
         "liquidus_T_C": 1600.0,
         "path": ((1100.0, 0.0), (1600.0, 1.0)),
     }
+    seed_gate_curve_memo_record(sim, curve)
     capture.capture_gate_curve(sim, fO2_log=fO2_log, curve=curve, repair_notices=[])
     with sqlite3.connect(db_path) as conn:
         conn.execute(
@@ -2821,6 +2825,7 @@ def test_pt1_attached_legacy_table_without_notice_column_reads_as_null(
         "liquidus_T_C": 1600.0,
         "path": ((1100.0, 0.0), (1600.0, 1.0)),
     }
+    seed_gate_curve_memo_record(capture_sim, curve)
     capture.capture_gate_curve(
         capture_sim,
         fO2_log=fO2_log,
@@ -3075,6 +3080,7 @@ def test_pt1_projected_gate_notice_replays_into_run_metadata(tmp_path: Path) -> 
     capture_sim = _build_pt0_sim(capture)
     capture_sim.start_campaign(CampaignPhase.C2A_STAGED)
     capture_fO2_log = capture_sim._compute_intrinsic_melt_fO2()
+    seed_gate_curve_memo_record(capture_sim, curve)
     capture.capture_gate_curve(
         capture_sim,
         fO2_log=capture_fO2_log,
@@ -3367,6 +3373,7 @@ def test_pt1_capture_gate_curve_skips_non_cacheable_status(
     assert sim._last_reduced_real_cache_state is None
     assert _persistent_artifact_count(db_path, "freeze_gate_curve") == 0
 
+    seed_gate_curve_memo_record(sim, ok_curve)
     capture.capture_gate_curve(sim, fO2_log=fO2_log, curve=ok_curve)
 
     assert capture.summary()["entries"] == 1
@@ -3512,6 +3519,7 @@ def test_pt0_equilibrium_lookup_capture_and_replay_stay_receipt_gated(
         "liquidus_T_C": 1320.0,
         "path": ((1210.0, 0.0), (1320.0, 1.0)),
     }
+    seed_gate_curve_memo_record(sim, curve)
     capture.capture_gate_curve(
         sim,
         fO2_log=sim._compute_intrinsic_melt_fO2(),
@@ -3697,16 +3705,14 @@ def test_pt1_verify_on_hit_fails_loudly(
     sim = _build_pt0_sim(capture)
     sim.start_campaign(CampaignPhase.C2A_STAGED)
     fO2_log = sim._compute_intrinsic_melt_fO2()
-    capture.capture_gate_curve(
-        sim,
-        fO2_log=fO2_log,
-        curve={
-            "source": "unit-test",
-            "solidus_T_C": 1210.0,
-            "liquidus_T_C": 1320.0,
-            "path": ((1210.0, 0.0), (1320.0, 1.0)),
-        },
-    )
+    curve = {
+        "source": "unit-test",
+        "solidus_T_C": 1210.0,
+        "liquidus_T_C": 1320.0,
+        "path": ((1210.0, 0.0), (1320.0, 1.0)),
+    }
+    seed_gate_curve_memo_record(sim, curve)
+    capture.capture_gate_curve(sim, fO2_log=fO2_log, curve=curve)
     with sqlite3.connect(db_path) as conn:
         conn.execute(
             f"UPDATE {PT1_EQUILIBRIUM_TABLE} SET {column} = ?",

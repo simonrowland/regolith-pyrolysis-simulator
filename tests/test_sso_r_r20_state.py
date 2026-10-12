@@ -2539,7 +2539,7 @@ def test_live_paths_do_not_call_intrinsic_heuristic(
     tmp_path: Path,
     monkeypatch,
 ) -> None:
-    from simulator import reduced_real_determinism as rrd
+    from simulator.engine_binding_admission import write_gate_curve_memo_record
     from tests.binding_admission_fixtures import install_synthetic_binding_receipt
 
     install_synthetic_binding_receipt(
@@ -2578,12 +2578,7 @@ def test_live_paths_do_not_call_intrinsic_heuristic(
     monkeypatch.setattr(sim._sulfsat_gate, "compute_sulfur_saturation", fake_sulfsat)
     sim._freeze_gate_liquid_fraction_cache = {
         "key": key,
-        "curve": curve,
-        "dependency_vector": rrd.gate_curve_memo_producer_configuration(
-            sim,
-            curve,
-        ),
-        "repair_notices": [],
+        **write_gate_curve_memo_record(sim, curve),
     }
 
     assert sim._freeze_gate_curve()["source"] == curve_source

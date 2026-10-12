@@ -2059,7 +2059,6 @@ class EvaporationMixin:
     def _freeze_gate_curve_record(self) -> dict[str, Any]:
         from simulator.reduced_real_determinism import (
             gate_curve_memo_record,
-            gate_curve_memo_producer_configuration,
             _is_cacheable_gate_curve,
             record_repair_notice,
             uncacheable_replay_disposition,
@@ -2080,7 +2079,9 @@ class EvaporationMixin:
         )
         store_getter = getattr(self, '_pt0_store', None)
         store = store_getter() if callable(store_getter) else None
-        from simulator.engine_binding_admission import gate_curve_memo_eligibility
+        from simulator.engine_binding_admission import (
+            gate_curve_memo_origin_matches,
+        )
 
         if store is not None and getattr(store, 'replay_enabled', False):
             curve = store.replay_gate_curve(self, fO2_log=fO2_log)
@@ -2097,18 +2098,19 @@ class EvaporationMixin:
         cache = getattr(self, '_freeze_gate_liquid_fraction_cache', None)
         cached_curve = cache.get('curve') if isinstance(cache, dict) else None
         cached_notices = cache.get('repair_notices') if isinstance(cache, dict) else None
-        current_dependency_vector = (
-            gate_curve_memo_producer_configuration(self, cached_curve)
-            if isinstance(cached_curve, Mapping)
-            else None
-        )
         if (
             cache
             and cache.get('key') == key
+            and cache.get('disposition') in {'live', 'memo-hit'}
             and isinstance(cached_curve, Mapping)
-            and cache.get('dependency_vector') == current_dependency_vector
+            and _is_cacheable_gate_curve(cached_curve)
             and isinstance(cached_notices, list)
-            and gate_curve_memo_eligibility(self, cached_curve)
+            and gate_curve_memo_origin_matches(
+                self,
+                cached_curve,
+                cache.get('origin'),
+                fresh_evidence=True,
+            )
         ):
             curve = dict(cached_curve)
             for notice in cached_notices:
@@ -2141,47 +2143,37 @@ class EvaporationMixin:
             if isinstance(process_cached, Mapping):
                 shared_value = process_cached.get('curve')
                 shared_origin = process_cached.get('origin')
-                shared_vector = process_cached.get('dependency_vector')
                 shared_notices = process_cached.get('repair_notices')
-                if not isinstance(shared_value, Mapping):
-                    shared_value = {
-                        name: value
-                        for name, value in process_cached.items()
-                        if name not in {
-                            'origin',
-                            'disposition',
-                            'dependency_vector',
-                            'repair_notices',
-                        }
-                    }
-                    shared_origin = None
-                current_dependency_vector = gate_curve_memo_producer_configuration(
-                    self,
-                    shared_value,
-                )
             else:
                 shared_value = {}
                 shared_origin = None
-                shared_vector = None
                 shared_notices = None
-                current_dependency_vector = None
             if (
                 isinstance(process_cached, Mapping)
-                and shared_vector == current_dependency_vector
+                and process_cached.get('disposition') in {'live', 'memo-hit'}
+                and isinstance(shared_value, Mapping)
+                and _is_cacheable_gate_curve(shared_value)
                 and isinstance(shared_notices, list)
-                and gate_curve_memo_eligibility(self, shared_value)
+                and gate_curve_memo_origin_matches(
+                    self,
+                    shared_value,
+                    shared_origin,
+                    fresh_evidence=True,
+                )
             ):
                 curve = shared_value
                 for notice in shared_notices:
                     record_repair_notice(self, notice)
                 self._record_composition_projected_liquidus_notice_from_curve(curve)
+                record = gate_curve_memo_record(
+                    curve,
+                    shared_origin,
+                    shared_notices,
+                    'memo-hit',
+                )
                 self._freeze_gate_liquid_fraction_cache = {
+                    **record,
                     'key': key,
-                    'curve': dict(curve),
-                    'origin': shared_origin,
-                    'dependency_vector': current_dependency_vector,
-                    'repair_notices': list(shared_notices),
-                    'disposition': 'memo-hit',
                 }
                 if store is not None and getattr(store, 'capture_enabled', False):
                     store.capture_gate_curve(
@@ -2190,12 +2182,7 @@ class EvaporationMixin:
                         curve=curve,
                         repair_notices=shared_notices,
                     )
-                return gate_curve_memo_record(
-                    curve,
-                    shared_origin,
-                    shared_notices,
-                    'memo-hit',
-                )
+                return record
 
         previous_in_progress = bool(
             getattr(self, '_freeze_gate_curve_in_progress', False)
@@ -2332,7 +2319,7 @@ class EvaporationMixin:
             cache_eligible = not sticky and _is_cacheable_gate_curve(curve)
             from simulator.engine_binding_admission import (
                 gate_curve_memo_evidence,
-                write_gate_curve_memo_origin,
+                write_gate_curve_memo_record,
             )
 
             evidence = gate_curve_memo_evidence(
@@ -2340,30 +2327,22 @@ class EvaporationMixin:
                 curve,
                 include_selected_bindings=cache_eligible,
             )
-            origin = write_gate_curve_memo_origin(self, curve, evidence)
+            record = write_gate_curve_memo_record(
+                self,
+                curve,
+                repair_notices,
+                evidence=evidence,
+            )
+            origin = record['origin']
             if cache_eligible:
-                dependency_vector = gate_curve_memo_producer_configuration(
-                    self,
-                    curve,
-                )
                 self._freeze_gate_liquid_fraction_cache = {
+                    **record,
                     'key': key,
-                    'curve': dict(curve),
-                    'origin': origin,
-                    'dependency_vector': dependency_vector,
-                    'repair_notices': list(repair_notices),
-                    'disposition': 'live',
                 }
                 if isinstance(shared_curve_cache, dict):
                     # Store a copy so later sim mutations of their local cache
                     # cannot corrupt the caller-owned memo used by sibling rows.
-                    shared_curve_cache[key] = {
-                        'curve': dict(curve),
-                        'origin': origin,
-                        'disposition': 'live',
-                        'dependency_vector': dependency_vector,
-                        'repair_notices': list(repair_notices),
-                    }
+                    shared_curve_cache[key] = record
                 cache_committed = True
             self._freeze_gate_cache_rebuild_count = (
                 int(getattr(self, '_freeze_gate_cache_rebuild_count', 0)) + 1
@@ -2388,12 +2367,7 @@ class EvaporationMixin:
                 curve=curve,
                 repair_notices=repair_notices,
             )
-        return gate_curve_memo_record(
-            curve,
-            origin,
-            repair_notices,
-            'live',
-        )
+        return record
 
     @staticmethod
     def _freeze_gate_liquidus_fO2_log(fO2_log: float) -> float:

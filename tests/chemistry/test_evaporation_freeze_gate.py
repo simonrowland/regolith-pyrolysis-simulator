@@ -443,12 +443,13 @@ def _install_freeze_gate_curve(
     }
     if path is not None:
         curve['path'] = path
-    dependency_vector = gate_curve_memo_producer_configuration(sim, curve)
+    record = engine_binding_admission.write_gate_curve_memo_record(
+        sim,
+        curve,
+    )
     sim._freeze_gate_liquid_fraction_cache = {
         'key': _freeze_gate_key_for_current_state(sim),
-        'curve': curve,
-        'dependency_vector': dependency_vector,
-        'repair_notices': [],
+        **record,
     }
 
 
@@ -795,15 +796,36 @@ def test_freeze_gate_enabled_no_engine_freeze_stops(
 
 def test_freeze_gate_enabled_reaches_magemin_gate_fallback(
     monkeypatch,
+    tmp_path,
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
 ):
+    from simulator.engine_binding_admission import BindingIdentity
+    from tests.binding_admission_fixtures import (
+        install_synthetic_binding_receipt,
+        register_synthetic_gate_curve_producer,
+    )
+
     sim = _build_freeze_gate_sim(
         vapor_pressure_data,
         feedstocks_data,
         setpoints_data,
         enabled=True,
+    )
+    install_synthetic_binding_receipt(
+        tmp_path,
+        monkeypatch,
+        bind_direct_backend=True,
+        identity_override=BindingIdentity(
+            'magemin', 'ig', 'magemin-ig-r1', 'subprocess'
+        ),
+        provenance_override={
+            'binding_provenance_verifiable': True,
+            'runtime_artifacts': {
+                'magemin_selected_binary': {'sha256': 'a' * 64},
+            },
+        },
     )
     authoritative = _UnavailableGateProvider()
     fallback = _FakeMAGEMinGateFallbackProvider()
@@ -818,6 +840,7 @@ def test_freeze_gate_enabled_reaches_magemin_gate_fallback(
         '_register_freeze_gate_liquid_fraction_providers',
         lambda: None,
     )
+    register_synthetic_gate_curve_producer(sim)
     original_dispatch = sim._dispatch_only
 
     def fake_dispatch(intent, *args, **kwargs):
@@ -1214,11 +1237,6 @@ def test_uncacheable_gate_failure_survives_in_progress_redox_bootstrap(
     sim._freeze_gate_shared_curve_cache = shared_cache
     store = PT0DeterminismStore('capture', db_path=tmp_path / 'nested.db')
     sim.configure_pt0_determinism_store(store)
-    monkeypatch.setattr(
-        engine_binding_admission,
-        'gate_curve_memo_eligibility',
-        lambda *_args, **_kwargs: True,
-    )
     monkeypatch.setattr(
         store,
         'gate_curve_cache_eligible',
@@ -2694,7 +2712,7 @@ def test_freeze_gate_cache_key_includes_pressure_and_fo2(
     assert different_fO2 != baseline
 
 
-def test_shared_freeze_gate_curve_cache_uses_melt_input_only(
+def test_shared_freeze_gate_curve_cache_reuses_same_analytical_producer(
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
@@ -2710,41 +2728,26 @@ def test_shared_freeze_gate_curve_cache_uses_melt_input_only(
         for _ in range(4)
     ]
     calls = []
-    curves = [
-        {'source': 'first', 'solidus_T_C': 900.0, 'liquidus_T_C': 1300.0},
-        {'source': 'same', 'solidus_T_C': 910.0, 'liquidus_T_C': 1310.0},
-        {'source': 'backend-b-v1', 'solidus_T_C': 1000.0, 'liquidus_T_C': 1500.0},
-        {'source': 'backend-b-v2', 'solidus_T_C': 1050.0, 'liquidus_T_C': 1550.0},
-    ]
-    backend_specs = (
-        ('backend-a', '1.0'),
-        ('backend-a', '1.0'),
-        ('backend-b', '1.0'),
-        ('backend-b', '2.0'),
-    )
-    for index, (sim, (backend_name, engine_version)) in enumerate(
-        zip(sims, backend_specs, strict=True)
-    ):
-        sim.backend = SimpleNamespace(
-            backend_name=backend_name,
-            get_engine_version=lambda version=engine_version: version,
-        )
+    curve = {
+        'source': 'gate_liquid_fraction:analytical-test',
+        'solidus_T_C': 900.0,
+        'liquidus_T_C': 1300.0,
+    }
+    analytical_backend = sims[0].backend
+    for index, sim in enumerate(sims):
+        sim.backend = analytical_backend
         sim._freeze_gate_shared_curve_cache = shared_cache
         sim._freeze_gate_curve_from_gate_dispatch = (
             lambda reasons, *, fO2_log, repair_notices=None, index=index: (
-                calls.append(index) or curves[index]
+                calls.append(index) or dict(curve)
             )
         )
 
     first = sims[0]._freeze_gate_curve()
-    same_backend = sims[1]._freeze_gate_curve()
-    different_backend = sims[2]._freeze_gate_curve()
-    different_version = sims[3]._freeze_gate_curve()
+    second = sims[1]._freeze_gate_curve()
 
     assert calls == [0]
-    assert same_backend == first
-    assert different_backend == first
-    assert different_version == first
+    assert second == first == curve
     assert len(shared_cache) == 1
 
 
@@ -2758,16 +2761,22 @@ def test_gate_curve_memo_reuses_without_receipt_and_emits_notice_once(
     setpoints_data,
 ):
     from simulator.engine_binding_admission import binding_admission_run_notice
+    from tests.binding_admission_fixtures import (
+        register_synthetic_gate_curve_producer,
+    )
 
     missing_receipt = tmp_path / 'missing-binding-admission.json'
     identity = admission_module.BindingIdentity(
-        engine_id='synthetic-fake',
-        model_id='fixture-model-v1',
-        binding_revision='synthetic-r1',
+        engine_id='magemin',
+        model_id='ig',
+        binding_revision='magemin-ig-r1',
         transport='subprocess',
     )
     provenance = {
         'binding_provenance_verifiable': True,
+        'runtime_artifacts': {
+            'magemin_selected_binary': {'sha256': 'a' * 64},
+        },
         'runtime_artifact': 'test-only',
     }
     monkeypatch.setattr(
@@ -2796,13 +2805,14 @@ def test_gate_curve_memo_reuses_without_receipt_and_emits_notice_once(
         for _ in range(2)
     ]
     curve = {
-        'source': 'gate_liquid_fraction:authoritative:synthetic-fake',
+        'source': 'gate_liquid_fraction:fallback:magemin-shadow',
         'status': 'ok',
         'solidus_T_C': 1000.0,
         'liquidus_T_C': 1300.0,
     }
     calls = []
     for index, sim in enumerate(sims):
+        register_synthetic_gate_curve_producer(sim)
         sim._freeze_gate_shared_curve_cache = shared_cache
         sim._freeze_gate_curve_from_gate_dispatch = (
             lambda reasons, *, fO2_log, repair_notices=None, index=index: (
@@ -3220,7 +3230,10 @@ def test_full_tick_pins_failed_authority_and_poisoned_retry(
         tick_curve_calls += 1
         if tick_curve_calls == 1:
             raise ProviderUnavailableError('transient tick liquidus failure')
-        return dict(recovered_curve)
+        return engine_binding_admission.write_gate_curve_memo_record(
+            tick_sim,
+            dict(recovered_curve),
+        )
 
     def fake_dispatch(intent, *args, **kwargs):
         if intent is ChemistryIntent.EVAPORATION_FLUX:
@@ -3322,7 +3335,10 @@ def test_abort_before_any_commit_allows_same_hour_retry_with_pinned_authority(
     def resolve_curve():
         nonlocal curve_calls
         curve_calls += 1
-        return gate_curve_memo_record(pinned_curve, None, (), 'live')
+        return engine_binding_admission.write_gate_curve_memo_record(
+            sim,
+            pinned_curve,
+        )
 
     def abort_once_before_commit():
         nonlocal exchange_calls
@@ -3364,7 +3380,8 @@ def test_abort_before_any_commit_allows_same_hour_retry_with_pinned_authority(
 
     assert type(first_error.value) is RuntimeError
     failed_authority = sim._melt_redox_gate_authority_this_tick
-    assert failed_authority == pinned_curve
+    assert failed_authority['curve'] == pinned_curve
+    assert failed_authority['disposition'] == 'live'
     assert curve_calls == 1
     assert sim._poisoned_hour is None
     assert len(sim.atom_ledger.transitions) == transition_count_before_attempt
@@ -3376,7 +3393,7 @@ def test_abort_before_any_commit_allows_same_hour_retry_with_pinned_authority(
     assert curve_calls == 1
     assert resolved_authorities
     assert all(
-        authority is failed_authority
+        authority is failed_authority['curve']
         for authority in resolved_authorities
     )
     assert sim._melt_redox_gate_authority_tick_hour is None
@@ -3855,11 +3872,6 @@ def test_gate_curve_memo_ignores_sulfur_input_drift_same_key(
         '_stage0_sulfur_input_ppm',
         lambda: sulfur_input_ppm[0],
     )
-    monkeypatch.setattr(
-        admission_module,
-        'gate_curve_memo_eligibility',
-        lambda *_args, **_kwargs: True,
-    )
     sim._freeze_gate_curve_from_gate_dispatch = (
         lambda reasons, *, fO2_log, repair_notices=None: (
             provider_calls.append(fO2_log) or dict(curve)
@@ -3940,11 +3952,6 @@ def test_core_gate_curve_memo_reuses_local_slot_refused_curve(
         'liquidus_T_C': 1300.0,
     }
     provider_calls = []
-    monkeypatch.setattr(
-        admission_module,
-        'gate_curve_memo_eligibility',
-        lambda *_args, **_kwargs: True,
-    )
     sim._freeze_gate_curve_from_gate_dispatch = (
         lambda reasons, *, fO2_log, repair_notices=None: (
             provider_calls.append(fO2_log) or dict(curve)
@@ -3963,6 +3970,7 @@ def test_core_gate_curve_memo_reuses_local_slot_refused_curve(
 
 def test_core_gate_curve_memo_hit_skips_install_provenance(
     monkeypatch,
+    tmp_path,
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
@@ -3982,22 +3990,18 @@ def test_core_gate_curve_memo_hit_skips_install_provenance(
     provider_calls = []
     provenance_calls = []
     original_install_provenance = admission_module.install_provenance
-    identity = admission_module.BindingIdentity(
-        engine_id='synthetic-gate',
-        model_id='fixture-model-v1',
-        binding_revision='synthetic-r1',
-        transport='test',
+    binary = tmp_path / 'magemin-fixture'
+    binary.write_text('selected producer fixture\n')
+    sim.backend = SimpleNamespace(
+        name='MAGEMinBackend',
+        _binary_path=binary,
+        get_engine_version=lambda: 'fixture-runtime',
     )
 
     def count_install_provenance(*args, **kwargs):
         provenance_calls.append(None)
         return original_install_provenance(*args, **kwargs)
 
-    monkeypatch.setattr(
-        admission_module,
-        'binding_identity_for_backend',
-        lambda _backend: identity,
-    )
     monkeypatch.setattr(
         admission_module,
         'install_provenance',
@@ -4066,8 +4070,9 @@ def test_core_gate_curve_memo_reuses_fallback_curve_after_provider_unavailable(
         try:
             return live_producer()
         except ProviderUnavailableError:
-            return gate_curve_memo_record(
-                fallback_curve, None, (), 'live'
+            return engine_binding_admission.write_gate_curve_memo_record(
+                sim,
+                fallback_curve,
             )
 
     monkeypatch.setattr(
@@ -4160,7 +4165,7 @@ def test_replay_gate_curve_is_not_pinned_as_tick_authority(
 
 
 @pytest.mark.parametrize('memo_form', ('local', 'shared'))
-def test_freeze_gate_memo_refuses_dependency_vector_mismatch(
+def test_freeze_gate_memo_refuses_origin_configuration_mismatch(
     monkeypatch,
     vapor_pressure_data,
     feedstocks_data,
@@ -4181,32 +4186,22 @@ def test_freeze_gate_memo_refuses_dependency_vector_mismatch(
         'solidus_T_C': 900.0,
         'liquidus_T_C': 1200.0,
     }
-    dependency_vector = gate_curve_memo_producer_configuration(
+    record = engine_binding_admission.write_gate_curve_memo_record(
         sim,
         stale_curve,
     )
-    mismatched_vector = deepcopy(dependency_vector)
-    mismatched_vector['model']['model'] = 'other-admitted-model'
+    record['origin']['producer_configuration']['model']['model'] = (
+        'other-admitted-model'
+    )
     shared_cache = {}
     if memo_form == 'local':
         sim._freeze_gate_liquid_fraction_cache = {
             'key': key,
-            'curve': stale_curve,
-            'dependency_vector': mismatched_vector,
-            'repair_notices': [],
+            **record,
         }
     else:
         sim._freeze_gate_shared_curve_cache = shared_cache
-        shared_cache[key] = {
-            **stale_curve,
-            'dependency_vector': mismatched_vector,
-            'repair_notices': [],
-        }
-    monkeypatch.setattr(
-        engine_binding_admission,
-        'gate_curve_memo_eligibility',
-        lambda *_args, **_kwargs: True,
-    )
+        shared_cache[key] = record
     calls = []
 
     def dispatch(intent, *args, **kwargs):
@@ -4286,12 +4281,6 @@ def test_freeze_gate_memos_preserve_sr18_and_sr19_repair_notices(
     sim._freeze_gate_shared_curve_cache = shared_cache
     store = PT0DeterminismStore('capture')
     sim.configure_pt0_determinism_store(store)
-    monkeypatch.setattr(
-        engine_binding_admission,
-        'gate_curve_memo_eligibility',
-        lambda *_args, **_kwargs: True,
-    )
-
     def dispatch(intent, *args, **kwargs):
         if intent is ChemistryIntent.OVERHEAD_GAS_EQUILIBRIUM:
             return IntentResult(
@@ -4386,12 +4375,6 @@ def test_uncacheable_gate_curve_fallback_skips_every_memo(
     sim._freeze_gate_shared_curve_cache = shared_cache
     store = PT0DeterminismStore('capture', db_path=tmp_path / 'uncacheable.db')
     sim.configure_pt0_determinism_store(store)
-    monkeypatch.setattr(
-        engine_binding_admission,
-        'gate_curve_memo_eligibility',
-        lambda *_args, **_kwargs: True,
-    )
-
     def unavailable_dispatch(intent, *args, **kwargs):
         if intent is ChemistryIntent.OVERHEAD_GAS_EQUILIBRIUM:
             return IntentResult(
@@ -4437,11 +4420,6 @@ def test_freeze_gate_sr19_names_nonok_backend_as_failed_source(
     )
     sim.melt.temperature_C = 1600.0
     sim.melt.p_total_mbar = 10.0
-    monkeypatch.setattr(
-        engine_binding_admission,
-        'gate_curve_memo_eligibility',
-        lambda *_args, **_kwargs: True,
-    )
     monkeypatch.setattr(
         sim,
         '_dispatch_only',
