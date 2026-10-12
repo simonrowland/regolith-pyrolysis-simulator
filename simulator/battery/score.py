@@ -1428,18 +1428,17 @@ def _fusion_comparison_reference(
 
     from simulator.battery.generators.janaf import (
         JANAF_R_J_PER_MOL_K,
+        _janaf_fusion_energy_for_pair,
         janaf_fusion_energy,
     )
 
-    try:
-        fusion = janaf_fusion_energy(formula, temperature_K)
-    except ValueError as exc:
-        reason = str(exc)
+    def fusion_missing_input_notice(reason: str) -> Notice | None:
         if not any(
             expected in reason
             for expected in (
                 f"no JANAF fusion table pair for {formula}",
                 "JANAF crystal/liquid tables do not overlap",
+                "JANAF tables have fewer than two complete overlap nodes",
                 "expected one JANAF cr/l crossing",
                 "outside the JANAF table range",
                 "is not bracketed by JANAF table rows",
@@ -1451,14 +1450,22 @@ def _fusion_comparison_reference(
                 "spans missing grid node",
             )
         ):
-            raise
-        notice = Notice(
+            return None
+        return Notice(
             kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
             affected_quantities=(Quantity.ACTIVITY,),
             reason=f"fusion conversion missing input for {formula}: {reason}",
             origin=reference.observation_id,
             band=f"JANAF fusion data for {formula}: {reason}",
         )
+
+    try:
+        fusion = janaf_fusion_energy(formula, temperature_K)
+    except ValueError as exc:
+        reason = str(exc)
+        notice = fusion_missing_input_notice(reason)
+        if notice is None:
+            raise
         return replace(reference, notices=union_notices(reference.notices, (notice,)))
 
     # JANAF Mg-008 (MgO(cr), periclase) and Mg-009 (MgO(l)) give, by node
@@ -1612,23 +1619,24 @@ def _fusion_comparison_reference(
                     )
                     unique_unknown_polymorph_table = True
                     if stable_table != fusion.crystal_table:
-                        solid_points, solid_sha256 = janaf_tables._fusion_table_points(
-                            stable_table
-                        )
-                        liquid_points, liquid_sha256 = janaf_tables._fusion_table_points(
-                            fusion.liquid_table
-                        )
-                        fusion = replace(
-                            fusion,
-                            delta_g_fus_kJ_per_mol=(
-                                janaf_tables._interpolate_formation_gibbs(
-                                    liquid_points, temperature_K
-                                )
-                                - stable_gibbs_kJ_per_mol
-                            ),
-                            crystal_table=stable_table,
-                            source_sha256=(solid_sha256, liquid_sha256),
-                        )
+                        try:
+                            fusion = _janaf_fusion_energy_for_pair(
+                                formula,
+                                stable_table,
+                                fusion.liquid_table,
+                                temperature_K,
+                            )
+                        except ValueError as exc:
+                            notice = fusion_missing_input_notice(str(exc))
+                            if notice is None:
+                                raise
+                            notices = (notice,)
+                            if inferred_reference_notice is not None:
+                                notices = (inferred_reference_notice, notice)
+                            return replace(
+                                reference,
+                                notices=union_notices(reference.notices, notices),
+                            )
     if (
         expected_polymorph is not None
         and observed_polymorph is not expected_polymorph

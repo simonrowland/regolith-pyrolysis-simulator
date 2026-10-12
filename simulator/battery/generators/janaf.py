@@ -2742,11 +2742,28 @@ def janaf_fusion_energy(oxide: str, temperature_K: Decimal) -> JANAFFusionEnergy
 
     try:
         crystal_table, liquid_table = _FUSION_TABLES[oxide]
+    except KeyError as exc:
+        raise ValueError(f"no JANAF fusion table pair for {oxide}") from exc
+    return _janaf_fusion_energy_for_pair(
+        oxide, crystal_table, liquid_table, temperature_K
+    )
+
+
+def _janaf_fusion_energy_for_pair(
+    oxide: str,
+    solid_table: str,
+    liquid_table: str,
+    temperature_K: Decimal,
+) -> JANAFFusionEnergy:
+    """Return coherent fusion data for a selected JANAF solid/liquid pair."""
+
+    try:
         accepted_tm = _ACCEPTED_MELTING_K[oxide]
     except KeyError as exc:
         raise ValueError(f"no JANAF fusion table pair for {oxide}") from exc
     temperature_K = Decimal(str(temperature_K))
-    crystal, crystal_sha = _fusion_table_points(crystal_table)
+    crystal_table = solid_table
+    crystal, crystal_sha = _fusion_table_points(solid_table)
     liquid, liquid_sha = _fusion_table_points(liquid_table)
     overlap = sorted(
         {t for t, _ in crystal if liquid[0][0] <= t <= liquid[-1][0]}
