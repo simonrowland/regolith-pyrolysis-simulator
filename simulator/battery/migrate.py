@@ -8124,11 +8124,7 @@ def _point_selection(
     condition_ranges: tuple[tuple[str, Decimal, Decimal], ...],
 ) -> SourceSelection:
     return SourceSelection(
-        value=Value(
-            ValueKind.POINT,
-            point=amount,
-            approximate=bool(payload.get("approximate")),
-        ),
+        value=Value.point_of(amount),
         field_name=field_name,
         unit_trail=unit_trail,
         amount=amount,
