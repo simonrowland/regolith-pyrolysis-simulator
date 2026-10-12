@@ -3004,15 +3004,6 @@ def _composition_coverage_proxy_flag(
     wt: Mapping[str, Decimal] | None,
     untyped_constituents: Sequence[object] = (),
 ) -> str | None:
-    typed_sum = sum(
-        (
-            amount
-            for oxide, raw in (wt or {}).items()
-            if str(oxide).strip().casefold() not in _PRINTED_COMPOSITION_TOTAL_KEYS
-            if (amount := _as_dec_or_none(raw)) is not None
-        ),
-        Decimal("0"),
-    )
     if isinstance(untyped_constituents, (str, bytes)):
         untyped_constituents = ()
     declared = tuple(sorted({
@@ -3020,6 +3011,21 @@ def _composition_coverage_proxy_flag(
         for name in untyped_constituents
         if str(name).strip()
     }))
+    if wt is None:
+        return (
+            f"{_PARTIAL_COMPOSITION_PROXY_PREFIX}untyped={','.join(declared)}"
+            if declared
+            else None
+        )
+    typed_sum = sum(
+        (
+            amount
+            for oxide, raw in wt.items()
+            if str(oxide).strip().casefold() not in _PRINTED_COMPOSITION_TOTAL_KEYS
+            if (amount := _as_dec_or_none(raw)) is not None
+        ),
+        Decimal("0"),
+    )
     # The extract migration census found 733 unique typed wt% vectors: 730 fall
     # in 96–101 wt%, one is 95.01 wt%, and two below 95 (Markova 91.43; NASA
     # simulant guide 92.7) have no untyped-constituent declaration. d-131 sets

@@ -784,6 +784,24 @@ def normalized_composition(
                 if key == "composition"
                 else "experiment.sample.initial_composition"
             )
+            missing = (
+                path,
+                "partial composition requires complete constituent coverage",
+            )
+            if key == "initial_composition":
+                printed = experiment.sample.printed_composition
+                if isinstance(printed, Located) and printed.state.is_value:
+                    pairs = _printed_component_pairs(printed.state.value)
+                    if pairs is not None:
+                        present = located.state.value.as_map()
+                        dropped = tuple(
+                            name for name, _amount in pairs if name not in present
+                        )
+                        if dropped:
+                            missing = tuple(
+                                f"experiment.sample.printed_composition.{name}"
+                                for name in dropped
+                            )
             return WaypointResult(
                 "normalized_composition",
                 None,
@@ -791,7 +809,7 @@ def normalized_composition(
                 WaypointAbsence(
                     "normalized_composition",
                     GapReason.UNSUPPORTED_PRINT_FORM,
-                    (path, "partial composition requires complete constituent coverage"),
+                    missing,
                 ),
             )
     routes = []

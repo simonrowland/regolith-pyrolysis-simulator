@@ -136,6 +136,33 @@ def test_declared_untyped_constituent_flags_near_closed_composition() -> None:
     assert converted.proxy_flag == "partial_vector:untyped=Y2O3"
 
 
+def test_absent_wt_percent_evidence_does_not_mark_mole_map_partial() -> None:
+    composition, omitted = _mole_fraction_composition_from_values(
+        {"composition_mol": {"Na2O": "0.195", "SiO2": "0.805"}}
+    )
+
+    assert omitted == ()
+    assert composition is not None
+    assert composition.proxy_flag is None
+    assert composition.as_map() == {
+        "Na2O": Decimal("0.195"),
+        "SiO2": Decimal("0.805"),
+    }
+
+
+def test_absent_wt_percent_evidence_still_honours_untyped_declaration() -> None:
+    composition, omitted = _mole_fraction_composition_from_values(
+        {
+            "composition_mol": {"Na2O": "0.195", "SiO2": "0.805"},
+            "untyped_constituents": ["minor constituents"],
+        }
+    )
+
+    assert omitted == ()
+    assert composition is not None
+    assert composition.proxy_flag == "partial_vector:untyped=minor constituents"
+
+
 def test_preconverted_mole_map_uses_its_declared_wt_percent_coverage() -> None:
     composition, omitted = _mole_fraction_composition_from_values(
         {
