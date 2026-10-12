@@ -907,3 +907,17 @@ def test_recorded_openimcc_pin_matches_pyproject_extra() -> None:
     )
     extra = pyproject["project"]["optional-dependencies"]["imcc"]
     assert extra == [OPENIMCC_RECORDED_PIN]
+
+
+def test_evaluate_default_tracks_runtime_backend_pack(monkeypatch) -> None:
+    _openimcc_or_skip()
+    from simulator.melt_backend import openimcc_bridge
+
+    monkeypatch.setattr(openimcc_bridge, "DEFAULT_BACKEND_PACK_NAME", "published-core")
+    expected_pack = openimcc_bridge._load_pack("published-core")
+    result = bridge_evaluate(
+        composition_mol={"SiO2": 0.95, "K2O": 0.05}, temperature_K=2200.0
+    )
+
+    assert result.pack_model_id == expected_pack.model_id
+    assert result.pack_digest == openimcc_bridge._pack_digest(expected_pack)

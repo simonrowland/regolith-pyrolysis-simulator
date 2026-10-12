@@ -78,6 +78,10 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
     import simulator.battery.residue as residue
     from simulator.melt_backend import openimcc_bridge
 
+    monkeypatch.setattr(
+        openimcc_bridge, "DEFAULT_BACKEND_PACK_NAME", "published-core"
+    )
+
     def no_evaporation(inventory, *_args, **_kwargs):
         return SimpleNamespace(
             residue_mol=dict(inventory), buffer_oxygen_exchange_mol=0.0
@@ -105,7 +109,7 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
 
     gas_pack = openimcc.load_gas_datapack()
     package_identity = openimcc.engine_binding_identity(
-        openimcc_bridge._load_pack("default"), gas_pack
+        openimcc_bridge._load_pack("published-core"), gas_pack
     )
     expected_identity = {
         "engine_binding_digest": package_identity.digest,

@@ -536,6 +536,23 @@ def test_openimcc_producer_emits_activity_and_vapour_rails() -> None:
     assert handle.identity["pack"] == backend._pack_name
 
 
+def test_openimcc_battery_reports_runtime_backend_pack(monkeypatch) -> None:
+    from simulator.melt_backend import openimcc_bridge
+    from simulator.diagnostic_helpers.binary_pot_battery import _OpenImccBatteryBackend
+
+    monkeypatch.setattr(
+        openimcc_bridge, "DEFAULT_BACKEND_PACK_NAME", "published-core"
+    )
+    backend = _OpenImccBatteryBackend("openimcc")
+    expected_pack = openimcc_bridge._load_pack("published-core")
+
+    assert backend._pack_name == "published-core"
+    assert backend.model_id == expected_pack.model_id
+    assert backend._identity["pack_digest"] == openimcc_bridge._pack_digest(
+        expected_pack
+    )
+
+
 def test_missing_binding_digest_refuses_without_residual_identity_or_cache_key(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
