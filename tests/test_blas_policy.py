@@ -651,6 +651,8 @@ builtins.__import__ = blocked
 policy.prepare()
 builtins.__import__ = real_import
 import numpy
+observations, readback_available = policy._gather_runtime_observations()
+assert readback_available and any(item.num_threads == 1 for item in observations)
 state = policy.finish()
 runtime = next(item for item in state.runtimes if item.api == "openblas")
 assert any(
@@ -862,6 +864,22 @@ print("pool=2")
     assert output == "pool=2"
 
 
+def test_blas_policy_worker_helper_preserves_launcher_openblas_two() -> None:
+    output = _run(
+        r'''
+import os
+import simulator
+from simulator.optimize.determinism import pin_worker_env
+from threadpoolctl import threadpool_info
+pin_worker_env()
+pool = next(pool for pool in threadpool_info() if pool["internal_api"] == "openblas")
+assert os.environ["OPENBLAS_NUM_THREADS"] == "2"
+assert pool["num_threads"] == 2
+print("worker helper preserved pool=2")
+''',
+        overrides={"OPENBLAS_NUM_THREADS": "2"},
+    )
+    assert output == "worker helper preserved pool=2"
 
 
 def test_blas_policy_package_import_survives_unavailable_threadpoolctl() -> None:
@@ -897,6 +915,7 @@ def test_blas_policy_conftest_and_package_share_canonical_module() -> None:
             r'''
 import conftest
 owner = sys.modules["simulator._blas_policy"]
+assert conftest._blas_policy is owner
 snapshot = owner._snapshot()
 import simulator
 assert owner is simulator._blas_policy
@@ -910,6 +929,7 @@ import simulator
 owner = simulator._blas_policy
 snapshot = owner._snapshot()
 import conftest
+assert conftest._blas_policy is owner
 assert owner is sys.modules["simulator._blas_policy"]
 assert owner is simulator._blas_policy
 assert owner._snapshot() is snapshot
