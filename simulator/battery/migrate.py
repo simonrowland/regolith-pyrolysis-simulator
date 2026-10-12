@@ -7757,9 +7757,9 @@ def _convert_compilation_amount(
             "cal/deg-mole",
             "cal/degmole",
             "calmol^-1k^-1",
+            "caldeg^-1gfw^-1",
+            "caldeg-1gfw-1",
         }:
-            return amount * Decimal("4.184"), "thermochemical_calorie_to_J_exact"
-        if heat and token in {"caldeg^-1gfw^-1", "caldeg-1gfw-1"}:
             return amount * Decimal("4.184"), "thermochemical_calorie_to_J_exact"
         if heat and token in {
             "j/mol/k",
@@ -7770,9 +7770,12 @@ def _convert_compilation_amount(
             "jmol^-1k^-1",
         }:
             return amount, "identity:J_per_mol_K"
-        if energy and token in {"kcal/mol", "kcal/mole"}:
-            return amount * Decimal("4.184"), "thermochemical_kcal_to_kJ_exact"
-        if energy and token in {"kcalgfw^-1", "kcalgfw-1"}:
+        if energy and token in {
+            "kcal/mol",
+            "kcal/mole",
+            "kcalgfw^-1",
+            "kcalgfw-1",
+        }:
             return amount * Decimal("4.184"), "thermochemical_kcal_to_kJ_exact"
         if energy and token in {"j/mol", "j/mole"}:
             return amount / Decimal("1000"), "J_to_kJ_exact"
