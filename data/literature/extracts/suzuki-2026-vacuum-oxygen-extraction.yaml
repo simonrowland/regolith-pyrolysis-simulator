@@ -29,6 +29,7 @@ fidelity_samples:
   field: mass_yield_percent
   value: 3
   locator:
+    page: 1
     pdf_page_index: 0
     published_page: 'Article in Press; no printed page number'
     section: Abstract
@@ -38,6 +39,7 @@ fidelity_samples:
   field: mass_loss_wt_pct
   value: 3.5
   locator:
+    page: 4
     pdf_page_index: 3
     published_page: 'Article in Press; no printed page number'
     figure: '2'
@@ -45,12 +47,14 @@ fidelity_samples:
 - path: species.O2.observations[suzuki_2026_fayalite_pO2_figure2].values.series[1].pressure_atm
   value: 2.0e-11
   locator:
+    page: 4
     pdf_page_index: 3
     published_page: 'Article in Press; no printed page number'
     figure: '2'
 - path: species.O2.observations[suzuki_2026_hematite_pO2_run02_figure2].values.series[1].pressure_atm
   value: 3.5e-11
   locator:
+    page: 4
     pdf_page_index: 3
     published_page: 'Article in Press; no printed page number'
     figure: '2'
@@ -64,6 +68,7 @@ benches:
       tag: value
       value: Vacuum-heating chamber with an electric furnace
     locator: &apparatus_locator
+      page: 9
       pdf_page_index: 8
       published_page: 'Article in Press; no printed page number'
       section: Vacuum heating experiment
@@ -87,6 +92,7 @@ benches:
       tag: value
       value: Qulee CGM-052 quadrupole mass spectrometer
     locator:
+      page: 9
       pdf_page_index: 8
       published_page: 'Article in Press; no printed page number'
       section: Oxygen gas detection
@@ -96,6 +102,7 @@ experiments:
   bench_id: vacuum-heating-furnace
   method: vacuum_chamber_pyrolysis
   locator:
+    page: 8
     pdf_page_index: 7
     published_page: 'Article in Press; no printed page number'
     section: Vacuum heating experiment
@@ -107,6 +114,7 @@ experiments:
           kind: point
           point: '0.001'
       locator:
+        page: 8
         pdf_page_index: 7
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
@@ -118,6 +126,7 @@ experiments:
           formula: Fe2O3
           material: hematite reagent powder
       locator:
+        page: 4
         pdf_page_index: 3
         published_page: 'Article in Press; no printed page number'
         figure: '2'
@@ -127,6 +136,7 @@ experiments:
         tag: value
         value: Pressed pellet, 10 mm diameter and 5 mm height
       locator:
+        page: 8
         pdf_page_index: 7
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
@@ -135,6 +145,7 @@ experiments:
         tag: value
         value: Pure-alumina boat inside a shielding chamber with a closed-end alumina-tube heating area
       locator:
+        page: 9
         pdf_page_index: 8
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
@@ -144,6 +155,7 @@ experiments:
         tag: value
         value: '1473.15'
       locator:
+        page: 4
         pdf_page_index: 3
         published_page: 'Article in Press; no printed page number'
         figure: '2'
@@ -159,6 +171,7 @@ experiments:
               tag: value
               value: '1200'
             locator:
+              page: 4
               pdf_page_index: 3
               published_page: 'Article in Press; no printed page number'
               figure: '2'
@@ -167,6 +180,7 @@ experiments:
               tag: value
               value: '273.15'
             locator:
+              page: 4
               pdf_page_index: 3
               published_page: 'Article in Press; no printed page number'
               figure: '2'
@@ -179,6 +193,7 @@ experiments:
           kind: point
           point: '0.00101325'
       locator:
+        page: 9
         pdf_page_index: 8
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
@@ -192,6 +207,7 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
+        page: 8
         pdf_page_index: 7
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
@@ -202,6 +218,7 @@ experiments:
         tag: value
         value: Heated in an electric furnace under vacuum
       locator:
+        page: 9
         pdf_page_index: 8
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
@@ -212,6 +229,7 @@ experiments:
           kind: point
           point: '5400'
       locator:
+        page: 4
         pdf_page_index: 3
         published_page: 'Article in Press; no printed page number'
         section: Results
@@ -221,6 +239,7 @@ experiments:
   bench_id: vacuum-heating-furnace
   method: vacuum_chamber_pyrolysis
   locator:
+    page: 8
     pdf_page_index: 7
     published_page: 'Article in Press; no printed page number'
     section: Vacuum heating experiment
@@ -232,6 +251,7 @@ experiments:
           kind: point
           point: '0.001'
       locator:
+        page: 8
         pdf_page_index: 7
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
@@ -243,6 +263,7 @@ experiments:
           formula: Fe2SiO4
           material: fayalite reagent powder
       locator:
+        page: 4
         pdf_page_index: 3
         published_page: 'Article in Press; no printed page number'
         figure: '2'
@@ -252,6 +273,7 @@ experiments:
         tag: value
         value: Pressed pellet, 10 mm diameter and 5 mm height
       locator:
+        page: 8
         pdf_page_index: 7
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
@@ -260,6 +282,7 @@ experiments:
         tag: value
         value: Pure-alumina boat inside a shielding chamber with a closed-end alumina-tube heating area
       locator:
+        page: 9
         pdf_page_index: 8
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
@@ -269,6 +292,7 @@ experiments:
         tag: value
         value: '1773.15'
       locator:
+        page: 4
         pdf_page_index: 3
         published_page: 'Article in Press; no printed page number'
         figure: '2'
@@ -284,6 +308,7 @@ experiments:
               tag: value
               value: '1500'
             locator:
+              page: 4
               pdf_page_index: 3
               published_page: 'Article in Press; no printed page number'
               figure: '2'
@@ -292,6 +317,7 @@ experiments:
               tag: value
               value: '273.15'
             locator:
+              page: 4
               pdf_page_index: 3
               published_page: 'Article in Press; no printed page number'
               figure: '2'
@@ -304,6 +330,7 @@ experiments:
           kind: point
           point: '0.00101325'
       locator:
+        page: 9
         pdf_page_index: 8
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
@@ -317,6 +344,7 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
+        page: 8
         pdf_page_index: 7
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
@@ -327,6 +355,7 @@ experiments:
         tag: value
         value: Heated in an electric furnace under vacuum
       locator:
+        page: 9
         pdf_page_index: 8
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
@@ -335,6 +364,7 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
+        page: 9
         pdf_page_index: 8
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
@@ -344,6 +374,7 @@ experiments:
   bench_id: vacuum-heating-furnace
   method: vacuum_chamber_pyrolysis
   locator:
+    page: 8
     pdf_page_index: 7
     published_page: 'Article in Press; no printed page number'
     section: Vacuum heating experiment
@@ -355,6 +386,7 @@ experiments:
           kind: point
           point: '0.001'
       locator:
+        page: 8
         pdf_page_index: 7
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
@@ -364,6 +396,7 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
+        page: 5
         pdf_page_index: 4
         published_page: 'Article in Press; no printed page number'
         figure: '2'
@@ -373,6 +406,7 @@ experiments:
         tag: value
         value: Pressed pellet, 10 mm diameter and 5 mm height
       locator:
+        page: 8
         pdf_page_index: 7
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
@@ -381,6 +415,7 @@ experiments:
         tag: value
         value: Pure-alumina boat inside a shielding chamber with a closed-end alumina-tube heating area
       locator:
+        page: 9
         pdf_page_index: 8
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
@@ -390,6 +425,7 @@ experiments:
         tag: value
         value: '1773.15'
       locator:
+        page: 4
         pdf_page_index: 3
         published_page: 'Article in Press; no printed page number'
         figure: '2'
@@ -405,6 +441,7 @@ experiments:
               tag: value
               value: '1500'
             locator:
+              page: 4
               pdf_page_index: 3
               published_page: 'Article in Press; no printed page number'
               figure: '2'
@@ -413,6 +450,7 @@ experiments:
               tag: value
               value: '273.15'
             locator:
+              page: 4
               pdf_page_index: 3
               published_page: 'Article in Press; no printed page number'
               figure: '2'
@@ -425,6 +463,7 @@ experiments:
           kind: point
           point: '0.00101325'
       locator:
+        page: 9
         pdf_page_index: 8
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
@@ -438,6 +477,7 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
+        page: 8
         pdf_page_index: 7
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
@@ -448,6 +488,7 @@ experiments:
         tag: value
         value: Heated in an electric furnace under vacuum
       locator:
+        page: 9
         pdf_page_index: 8
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
@@ -456,6 +497,7 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
+        page: 9
         pdf_page_index: 8
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
@@ -468,6 +510,7 @@ species:
       experiment: hematite-vacuum-heating-1200C
       type: mass_loss
       locator:
+        page: 4
         pdf_page_index: 3
         published_page: 'Article in Press; no printed page number'
         figure: '2'
@@ -494,6 +537,7 @@ species:
       experiment: hematite-vacuum-heating-1200C
       type: rate_series
       locator:
+        page: 1
         pdf_page_index: 0
         published_page: 'Article in Press; no printed page number'
         section: Abstract
@@ -519,6 +563,7 @@ species:
       experiment: hematite-vacuum-heating-1200C
       type: laboratory_conditions
       locator:
+        page: 4
         pdf_page_index: 3
         published_page: 'Article in Press; no printed page number'
         figure: '2'
@@ -535,6 +580,7 @@ species:
       experiment: fayalite-vacuum-heating-1500C
       type: transition_point
       locator:
+        page: 4
         pdf_page_index: 3
         published_page: 'Article in Press; no printed page number'
         figure: '2'
@@ -545,6 +591,7 @@ species:
         total_pressure_Pa:
           state: {tag: value, value: 0.00101325}
           locator:
+            page: 9
             pdf_page_index: 8
             published_page: 'Article in Press; no printed page number'
             section: Vacuum heating experiment
@@ -562,6 +609,7 @@ species:
       experiment: fayalite-vacuum-heating-1500C
       type: laboratory_conditions
       locator:
+        page: 4
         pdf_page_index: 3
         published_page: 'Article in Press; no printed page number'
         figure: '2'
@@ -580,6 +628,7 @@ species:
       experiment: fayalite-alumina-vacuum-heating-1500C
       type: laboratory_conditions
       locator:
+        page: 5
         pdf_page_index: 4
         published_page: 'Article in Press; no printed page number'
         figure: '2'
@@ -604,6 +653,7 @@ species:
       experiment: hematite-vacuum-heating-1200C
       type: partial_pressure
       locator:
+        page: 4
         pdf_page_index: 3
         published_page: 'Article in Press; no printed page number'
         figure: '2'
@@ -626,20 +676,21 @@ species:
           point_conditions:
             time_min:
               state: {tag: value, value: 0}
-              locator: {pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
+              locator: {page: 4, pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
         - time_min: 15
           pressure_atm: 3.2e-11
           approximate: true
           point_conditions:
             time_min:
               state: {tag: value, value: 15}
-              locator: {pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
+              locator: {page: 4, pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
       uncertainty:
         note: No uncertainty width or confidence level is stated; values are approximate figure reads.
     - observation_id: suzuki_2026_hematite_pO2_run02_figure2
       experiment: hematite-vacuum-heating-1200C
       type: partial_pressure
       locator:
+        page: 4
         pdf_page_index: 3
         published_page: 'Article in Press; no printed page number'
         figure: '2'
@@ -662,34 +713,35 @@ species:
           point_conditions:
             time_min:
               state: {tag: value, value: 0}
-              locator: {pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
+              locator: {page: 4, pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
         - time_min: 30
           pressure_atm: 3.5e-11
           approximate: true
           point_conditions:
             time_min:
               state: {tag: value, value: 30}
-              locator: {pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
+              locator: {page: 4, pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
         - time_min: 60
           pressure_atm: 1.3e-12
           approximate: true
           point_conditions:
             time_min:
               state: {tag: value, value: 60}
-              locator: {pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
+              locator: {page: 4, pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
         - time_min: 90
           pressure_atm: 1.0e-12
           approximate: true
           point_conditions:
             time_min:
               state: {tag: value, value: 90}
-              locator: {pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
+              locator: {page: 4, pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
       uncertainty:
         note: No uncertainty width or confidence level is stated; values are approximate figure reads.
     - observation_id: suzuki_2026_fayalite_pO2_figure2
       experiment: fayalite-vacuum-heating-1500C
       type: partial_pressure
       locator:
+        page: 4
         pdf_page_index: 3
         published_page: 'Article in Press; no printed page number'
         figure: '2'
@@ -712,34 +764,35 @@ species:
           point_conditions:
             time_min:
               state: {tag: value, value: 0}
-              locator: {pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
+              locator: {page: 4, pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
         - time_min: 30
           pressure_atm: 2.0e-11
           approximate: true
           point_conditions:
             time_min:
               state: {tag: value, value: 30}
-              locator: {pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
+              locator: {page: 4, pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
         - time_min: 60
           pressure_atm: 1.2e-11
           approximate: true
           point_conditions:
             time_min:
               state: {tag: value, value: 60}
-              locator: {pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
+              locator: {page: 4, pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
         - time_min: 90
           pressure_atm: 9.5e-12
           approximate: true
           point_conditions:
             time_min:
               state: {tag: value, value: 90}
-              locator: {pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
+              locator: {page: 4, pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
       uncertainty:
         note: No uncertainty width or confidence level is stated; values are approximate figure reads.
     - observation_id: suzuki_2026_fayalite_alumina_pO2_figure2
       experiment: fayalite-alumina-vacuum-heating-1500C
       type: partial_pressure
       locator:
+        page: 4
         pdf_page_index: 3
         published_page: 'Article in Press; no printed page number'
         figure: '2'
@@ -762,21 +815,21 @@ species:
           point_conditions:
             time_min:
               state: {tag: value, value: 30}
-              locator: {pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
+              locator: {page: 4, pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
         - time_min: 60
           pressure_atm: 2.5e-11
           approximate: true
           point_conditions:
             time_min:
               state: {tag: value, value: 60}
-              locator: {pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
+              locator: {page: 4, pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
         - time_min: 90
           pressure_atm: 2.0e-11
           approximate: true
           point_conditions:
             time_min:
               state: {tag: value, value: 90}
-              locator: {pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
+              locator: {page: 4, pdf_page_index: 3, published_page: 'Article in Press; no printed page number', figure: '2'}
       uncertainty:
         note: No uncertainty width or confidence level is stated; values are approximate figure reads.
 
@@ -785,6 +838,7 @@ species:
       experiment: hematite-vacuum-heating-1200C
       type: laboratory_conditions
       locator:
+        page: 5
         pdf_page_index: 4
         published_page: 'Article in Press; no printed page number'
         equation: '2'
@@ -801,6 +855,7 @@ species:
     - observation_id: suzuki_2026_supplementary_materials_pointer
       type: method
       locator:
+        page: 10
         pdf_page_index: 9
         published_page: 'Article in Press; no printed page number'
         section: Supplementary Information
@@ -819,6 +874,7 @@ species:
     - observation_id: suzuki_2026_replicate_count
       type: laboratory_conditions
       locator:
+        page: 8
         pdf_page_index: 7
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
@@ -828,6 +884,7 @@ species:
     - observation_id: suzuki_2026_weighing_uncertainty
       type: laboratory_conditions
       locator:
+        page: 9
         pdf_page_index: 8
         published_page: 'Article in Press; no printed page number'
         section: Vacuum heating experiment
@@ -840,6 +897,7 @@ species:
     - observation_id: suzuki_2026_predicted_regolith_o2_mass
       type: thermodynamic_example
       locator:
+        page: 6
         pdf_page_index: 5
         published_page: 'Article in Press; no printed page number'
         section: Discussion

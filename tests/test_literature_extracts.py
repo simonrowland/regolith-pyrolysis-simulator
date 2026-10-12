@@ -4101,3 +4101,37 @@ def test_printed_experiment_bench_links_carry_locator(tmp_path: Path):
     mo = experiment_named(allibert, "allibert-1981-mo-kems")
     assert all(item.experiment_id != mo.experiment_id for item in emf)
     assert allibert.experiments[emf[0].experiment_id].bench_id is None
+
+
+def test_offer10_extract_locators_use_physical_pdf_pages() -> None:
+    source_ids = (
+        "sesko-2022-tum-thesis",
+        "sutherland-2025-mare-simulant-volatile-loss",
+        "ewing-1963-sodium-potassium-properties",
+        "suzuki-2026-vacuum-oxygen-extraction",
+        "mamiya-2000-sio-disproportionation",
+    )
+
+    def walk(value):
+        if isinstance(value, dict):
+            if "page" in value or "pdf_page_index" in value:
+                assert value["page"] == value["pdf_page_index"] + 1
+            for child in value.values():
+                walk(child)
+        elif isinstance(value, list):
+            for child in value:
+                walk(child)
+
+    for source_id in source_ids:
+        document = yaml.safe_load((EXTRACTS / f"{source_id}.yaml").read_text())
+        walk(document)
+
+    ewing = yaml.safe_load(
+        (EXTRACTS / "ewing-1963-sodium-potassium-properties.yaml").read_text()
+    )
+    assert ewing["fidelity_samples"][0]["locator"] == {
+        "page": 12,
+        "published_page": 7,
+        "pdf_page_index": 11,
+        "figure": "6",
+    }
