@@ -1075,7 +1075,7 @@ def test_redox_liquid_gate_builds_outer_curve_when_cache_missing_default_off(
     memo_curve = sim._melt_redox_liquidus_gate_curve()
 
     assert memo_curve['source'] == 'gate_liquid_fraction'
-    assert gate_calls == 2
+    assert gate_calls == 1
 
 
 def test_redox_liquid_gate_rebuilds_stale_cache_on_key_mismatch(
