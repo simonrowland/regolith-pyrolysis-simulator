@@ -44,7 +44,6 @@ REPAIRED = {
     ("jsc-lunar-catalog-12023.yaml", "jsc_12023_carbon_nitrogen_compilation"): "Moore et al. (1971); Kaplan and Petrowski (1971); Kerridge et al. (1978); Norris et al. (1983)",
     ("ammin-76-904-lange-1991.yaml", "ammin_76_904_quoted_comparator_enthalpy_values"): "Stebbins et al. (1983); Richet and Bottinga (1984); Ferrier (1968); Stebbins et al. (1984); Adamkovicova et al. (1980)",
     ("hashimoto-nakano-2021-bubbles-to-chondrites-ii.yaml", "hashimoto_2021_appendix_sample_provenance"): "Jarosewich (1990)",
-    ("lpi-compendium-15013.yaml", "lpi_15013_maturity_and_grain_size"): "Morris 1978 (for Is/FeO = 77)",
     ("lpi-compendium-15013.yaml", "lpi_15013_carbon_and_nitrogen"): "Moore et al. 1973; Des Marais et al. 1973; Kothari and Goel 1972; Muller 1973",
     ("lpi-compendium-65701.yaml", "lpi_compendium_65701_attributed_trace_and_exposure_values"): "Moore et al. (1973); Kerridge et al. (1975); Cirlin and Housley (1981); Wrigley (1973); Walton et al. (1973); Graf (1993), from data by Butler et al. (1973)",
     ("itoh-hino-banya-1998-spinel.yaml", "itoh_1998_quoted_prior_interaction_parameters"): "Mizin et al. (1983, ref 10) for e_Mg_Al_1873K; Sponseller and Flinn (1964, ref 11) for e_Ca_Al_1873K",
@@ -56,6 +55,10 @@ REPAIRED = {
     ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_sanidine_table_6_vitrification_quotes"): "Waldbaum and Robie (1971); Tamman (1903)",
     ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_nepheline_table_6_vitrification_quotes"): "Navrotsky et al. (1980)",
     ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_anorthite_table_7_fusion_quotes"): "Weill et al. (1980b); Robie et al. (1978)",
+}
+
+CONTEXT_REPAIRED = {
+    ("lpi-compendium-15013.yaml", "lpi_15013_maturity_and_grain_size"): "Morris 1978 (for Is/FeO = 77)",
 }
 
 TURKDOGAN_REF2 = (
@@ -121,6 +124,37 @@ def test_page_repaired_name_reaches_evidence_attribution(tmp_path: Path, key, ex
     for obs in _migrated(_migrate_real_extract(tmp_path, name), raw_id):
         assert obs.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
         assert obs.evidence.attribution == expected
+
+
+@pytest.mark.parametrize(
+    ("key", "expected"),
+    sorted(CONTEXT_REPAIRED.items()),
+    ids=lambda value: value[1] if isinstance(value, tuple) else None,
+)
+def test_page_repaired_name_survives_on_context_record(
+    tmp_path: Path, key, expected: str
+) -> None:
+    name, raw_id = key
+    path = EXTRACTS / name
+    doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+    rows = [
+        row
+        for block in doc["species"].values()
+        for row in block.get("context", [])
+        if row.get("observation_id") == raw_id
+    ]
+    assert len(rows) == 1
+    assert rows[0]["values"]["attribution"] == expected
+
+    migrated = _migrate_real_extract(tmp_path, name)
+    migrated_rows = [
+        row
+        for context_rows in migrated.context_by_work.values()
+        for row in context_rows
+        if row.get("observation_id") == raw_id
+    ]
+    assert len(migrated_rows) == 1
+    assert migrated_rows[0]["values"]["attribution"] == expected
 
 
 def test_turkdogan_self_citation_names_reference_2() -> None:

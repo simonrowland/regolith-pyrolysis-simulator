@@ -8994,7 +8994,7 @@ def _unwrap_located_equipment_value(
     value: object,
     parent_locator: Locator | None = None,
 ) -> tuple[object, Locator | None, Mapping[str, Any] | None]:
-    """Extract a located equipment value without changing its bare form."""
+    """Read the validator's ``value`` wrapper while retaining its locator."""
 
     if isinstance(value, Mapping) and "value" in value and value.get("value") is not None:
         return (

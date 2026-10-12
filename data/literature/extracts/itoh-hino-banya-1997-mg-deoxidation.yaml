@@ -251,15 +251,20 @@ species:
       uncertainty:
         note: No numerical uncertainty is printed for the apparatus dimensions, concentrations, or analysis results in the cited section.
       equipment:
-        reaction_tube:
-          value: opaque quartz, 80 mm OD × 65 mm ID × 500 mm H
-          locator: {published_page: 624, pdf_page_index: 2, figure: '2', section: '2. Experimental method'}
-        crucibles:
+        crucible_material:
           value: MgO protective and melting crucibles; melting crucible 25 mm OD × 20 mm ID × 50 mm H
           locator: {published_page: 624, pdf_page_index: 2, figure: '2', section: '2. Experimental method'}
-        gas_inlet:
-          value: alumina tube, 13 mm OD × 9 mm ID
-          locator: {published_page: 624, pdf_page_index: 2, figure: '2', section: '2. Experimental method'}
-        temperature:
+        temperature_calibration:
           value: optical pyrometer corrected using iron melting temperature
           locator: {published_page: 624, pdf_page_index: 2, section: '2. Experimental method'}
+        other_facts:
+          value:
+          - name: reaction_tube
+            unit: mm
+            value: opaque quartz, 80 mm OD × 65 mm ID × 500 mm H
+            locator: {published_page: 624, pdf_page_index: 2, figure: '2', section: '2. Experimental method'}
+          - name: gas_inlet
+            unit: mm
+            value: alumina tube, 13 mm OD × 9 mm ID
+            locator: {published_page: 624, pdf_page_index: 2, figure: '2', section: '2. Experimental method'}
+          locator: {published_page: 624, pdf_page_index: 2, figure: '2', section: '2. Experimental method'}

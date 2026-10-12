@@ -19,9 +19,10 @@ evidence_policy:
   absent_fields: sample mass, sample composition, bulk density, container material, oven geometry, orifice geometry, exposed area, chamber pressure or vacuum, pumping, gas pressure, temperature sensor/calibration, fO2 control, run duration, and numerical uncertainties.
 species:
   lunar_volatiles:
-    observations:
+    observations: []
+    context:
     - observation_id: barber_2017_prospa_sample_preservation_and_oven
-      type: rate_series
+      type: method_description
       locator:
         page: 1
         pdf_page_index: 1
@@ -43,14 +44,25 @@ species:
         sample_presence_check: imager confirms presence and enables volume estimation
         sealing: actuator seals oven to a pipe leading to the chemical analysis laboratory
         volatile_preservation_design_goal: minimize duration from sample extraction to sealing
+        note: Oven and SIS geometry, sample mass/form, and container material are not stated.
       uncertainty:
         note: No numerical uncertainty is printed; the local regolith temperature is explicitly described as assumed and sample volume is an upper estimate.
       equipment:
-        solids_inlet_system: series of single-use sample ovens on a rotary carousel with sample imager
-        thermal_isolation: SIS thermally isolated from the warm enclosure
-        locator_note: Oven and SIS geometry, sample mass/form, and container material are not stated.
+        other_facts:
+          value:
+          - name: solids_inlet_system
+            unit: as printed
+            value:
+              state: {tag: value, value: {kind: categorical, categorical: series of single-use sample ovens on a rotary carousel with sample imager}}
+              locator: {page: 1, pdf_page_index: 1, section: Volatiles Preservation}
+          - name: thermal_isolation
+            unit: as printed
+            value:
+              state: {tag: value, value: {kind: categorical, categorical: SIS thermally isolated from the warm enclosure}}
+              locator: {page: 1, pdf_page_index: 1, section: Volatiles Preservation}
+          locator: {page: 1, pdf_page_index: 1, section: Volatiles Preservation}
     - observation_id: barber_2017_prospa_extraction_programmes
-      type: rate_series
+      type: method_description
       locator:
         page: 2
         pdf_page_index: 2
@@ -71,14 +83,21 @@ species:
         stepped_pyrolysis: gases released at a series of fixed temperatures from samples in vacuum
         combustion: gases released at a series of fixed temperatures from samples in oxygen
         heating_profiles: example profiles are shown in Figure 2 and were not digitized
+        gases: hydrogen feed gas for reduction; vacuum or oxygen for stepped pyrolysis or combustion
+        note: Oven dimensions, pressure, flow rate, pumping, and temperature calibration are not stated.
       uncertainty:
         note: No numerical uncertainty or run duration is printed.
       equipment:
-        sample_oven: sealed sample oven for thermal extraction
-        gases: hydrogen feed gas for reduction; vacuum or oxygen for stepped pyrolysis or combustion
-        locator_note: Oven dimensions, pressure, flow rate, pumping, and temperature calibration are not stated.
+        other_facts:
+          value:
+          - name: sample_oven
+            unit: as printed
+            value:
+              state: {tag: value, value: {kind: categorical, categorical: sealed sample oven for thermal extraction}}
+              locator: {page: 2, pdf_page_index: 2, section: Evolved gas analysis; In Situ Resource Utilization demonstration; Stepped pyrolysis or combustion}
+          locator: {page: 2, pdf_page_index: 2, section: Evolved gas analysis; In Situ Resource Utilization demonstration; Stepped pyrolysis or combustion}
     - observation_id: barber_2017_prospa_analysis_capability_and_status
-      type: rate_series
+      type: method_description
       locator:
         page: 2
         pdf_page_index: 2
@@ -107,15 +126,30 @@ species:
         development_status: Phase B
         preliminary_design_review: Q4 2017
         experimental_and_modelling_status: theoretical and laboratory work underway
+        note: Electron energy, detector calibration, chamber pressure, pumping, and gas-handling flow conditions are not stated.
         reference_materials: on-board reference materials used for contextual interpretation
         instrument_heritage: Rosetta Philae and ExoMars rover systems, with Beagle 2 Gas Analysis Package heritage for the magnetic sector instrument
       uncertainty:
         note: No numerical uncertainty is printed; isotope precision, peak power, and mass are approximate or design-level statements where qualified in the source.
       equipment:
-        mass_spectrometers: ion trap device and magnetic sector instrument
-        heritage_device_mass_as_printed: "<500 gram all-in device"
-        gas_handling: open/closed valves, metering valves, micro-reactors, pressure sensors, and reference materials
-        locator_note: Electron energy, detector calibration, chamber pressure, pumping, and gas-handling flow conditions are not stated.
+        other_facts:
+          value:
+          - name: mass_spectrometers
+            unit: as printed
+            value:
+              state: {tag: value, value: {kind: categorical, categorical: ion trap device and magnetic sector instrument}}
+              locator: {page: 2, pdf_page_index: 2, section: Volatiles Analysis; Instrument Heritage; Current Status; Conclusions}
+          - name: heritage_device_mass_as_printed
+            unit: as printed
+            value:
+              state: {tag: value, value: {kind: categorical, categorical: "<500 gram all-in device"}}
+              locator: {page: 2, pdf_page_index: 2, section: Instrument Heritage}
+          - name: gas_handling
+            unit: as printed
+            value:
+              state: {tag: value, value: {kind: categorical, categorical: 'open/closed valves, metering valves, micro-reactors, pressure sensors, and reference materials'}}
+              locator: {page: 2, pdf_page_index: 2, section: Volatiles Analysis}
+          locator: {page: 2, pdf_page_index: 2, section: Volatiles Analysis; Instrument Heritage; Current Status; Conclusions}
 vocabulary_gaps:
 - ion_trap_target_mz_range_amu
 - magnetic_sector_isotope_precision

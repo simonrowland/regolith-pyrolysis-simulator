@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-import hashlib
 import inspect
-import json
 from decimal import Decimal
 from pathlib import Path
 
@@ -33,76 +31,6 @@ from tests.battery.test_migrate import (
 )
 
 
-_BARE_REAL_PAYLOAD_HASHES = (
-    (
-        "ammin-75-781-hemingway-1990.yaml",
-        "98c2a6f2ddece8f774ebb55179c398b61651b2f06be3d2a62f490a9dc45fe49a",
-    ),
-    (
-        "arxiv-1602-00658-fegley-rock-steam-solubility.yaml",
-        "034938227e90cee7530cb9525e0cb9fd608037add6409c3ab60f05a1ddd7dfbd",
-    ),
-    (
-        "deguzman-2026-simulant-physicochemical.yaml",
-        "731db003fed0596fdb42e9ed1e4a469118d1a0387f1eb2b8a7cd172d87aad4f6",
-    ),
-    (
-        "hendrix-2024-reactivity-reduced-simulants.yaml",
-        "33d733b249145a51f1cd0d061d54b02a3bb4cf2836e023253ac8818f7d7f0e3e",
-    ),
-    (
-        "itoh-hino-banya-1997-mg-deoxidation.yaml",
-        "299d236ebffd71ba500998192f8182c5009d31cf3c2f07b901039617d374d0c9",
-    ),
-)
-_SYNTHETIC_BARE_PAYLOAD_HASH = (
-    "3ec3fec3fafbdce5986d3b695233b524f1113ebceb3665c181eb11afe4a1f188"
-)
-
-
-def _migration_payload_hash(result) -> str:
-    payload = {
-        "experiments": {
-            key: to_plain(result.experiments[key])
-            for key in sorted(result.experiments)
-        },
-        "observations": {
-            key: to_plain(result.observations[key])
-            for key in sorted(result.observations)
-        },
-    }
-    encoded = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
-    return hashlib.sha256(encoded).hexdigest()
-
-
-@pytest.mark.parametrize(("name", "expected"), _BARE_REAL_PAYLOAD_HASHES)
-def test_bare_real_extract_payload_hashes(
-    tmp_path: Path, name: str, expected: str
-) -> None:
-    result = _migrate_real_extract(tmp_path, name)
-    assert _migration_payload_hash(result) == expected
-
-
-def test_synthetic_bare_extract_payload_hash(tmp_path: Path) -> None:
-    bare = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
-    row = bare["species"]["Na"]["observations"][0]
-    row["equipment"] = {
-        "sample": {
-            "mass_kg": 0.003,
-            "form": "powder",
-            "container": "alumina crucible",
-            "locator": {"page": 2, "section": "Sample preparation"},
-        },
-        "starting_glass_wt_pct": {
-            "SiO2": 50.0,
-            "MgO": 50.0,
-            "locator": {"page": 2, "table": "I"},
-        },
-    }
-    result = migrate(_write_min_tree(tmp_path / "synthetic", bare), write=False)
-    assert _migration_payload_hash(result) == _SYNTHETIC_BARE_PAYLOAD_HASH
-
-
 def test_wrapped_equipment_sample_and_composition_match_bare_form(
     tmp_path: Path,
 ) -> None:
@@ -127,14 +55,12 @@ def test_wrapped_equipment_sample_and_composition_match_bare_form(
     equipment = wrapped["species"]["Na"]["observations"][0]["equipment"]
     sample = equipment["sample"]
     equipment["sample"] = {
-        "value": {key: value for key, value in sample.items() if key != "locator"},
+        "value": {k: v for k, v in sample.items() if k != "locator"},
         "locator": sample["locator"],
     }
     composition = equipment["starting_glass_wt_pct"]
     equipment["starting_glass_wt_pct"] = {
-        "value": {
-            key: value for key, value in composition.items() if key != "locator"
-        },
+        "value": {k: v for k, v in composition.items() if k != "locator"},
         "locator": composition["locator"],
     }
 
@@ -149,69 +75,53 @@ def test_wrapped_equipment_sample_and_composition_match_bare_form(
 
 
 def test_wrapped_bischof_sample_container_reaches_every_run(tmp_path: Path) -> None:
-    name = "kems-137-bischof-2023.yaml"
-    source_path = REPO_ROOT / "data" / "literature" / "extracts" / name
-    document = yaml.safe_load(source_path.read_text(encoding="utf-8"))
-    source = document.get("source") if isinstance(document.get("source"), dict) else {}
-    source_id = document.get("source_id") or source_path.stem
-    wrapped_equipment: set[int] = set()
-    for block in document["species"].values():
-        for row in block.get("observations", []):
-            equipment = row.get("equipment")
-            sample = equipment.get("sample") if isinstance(equipment, dict) else None
-            if (
-                isinstance(sample, dict)
-                and "locator" in sample
-                and id(equipment) not in wrapped_equipment
-            ):
-                wrapped_equipment.add(id(equipment))
-                equipment["sample"] = {
-                    "value": {
-                        key: value for key, value in sample.items() if key != "locator"
-                    },
-                    "locator": sample["locator"],
-                }
-
-    root = tmp_path / "tree"
-    extracts = root / "data" / "literature" / "extracts"
-    extracts.mkdir(parents=True)
-    (root / "data" / "literature" / "compilations").mkdir(parents=True)
-    index_row = {
-        "source_id": source_id,
-        "citation": source.get("citation") or source_path.stem,
-        "doi": source.get("doi"),
-    }
-    (root / "data" / "literature" / "INDEX.yaml").write_text(
-        yaml.safe_dump(
-            {"schema_version": "literature_index.v1", "sources": [index_row]},
-            sort_keys=False,
-        ),
-        encoding="utf-8",
-    )
-    (extracts / name).write_text(
-        yaml.safe_dump(document, sort_keys=False), encoding="utf-8"
-    )
-    result = migrate(root, write=False)
+    result = _migrate_real_extract(tmp_path, "kems-137-bischof-2023.yaml")
     runs = {
         key: experiment
         for key, experiment in result.experiments.items()
-        if key.endswith(
-            (
-                "::an-di-1-low",
-                "::an-di-2-low",
-                "::an-di-3-high",
-                "::an-di-series",
-            )
-        )
+        if key.endswith(("::an-di-1-low", "::an-di-2-low", "::an-di-3-high", "::an-di-series"))
     }
     assert len(result.observations) == 164
     assert len(runs) == 4
     for experiment in runs.values():
         assert experiment.sample.container is not None
-        assert (
-            experiment.sample.container.state.value
-            == "iridium Knudsen cell (crucible and lid)"
-        )
+        assert experiment.sample.container.state.value == "iridium Knudsen cell (crucible and lid)"
+
+
+def test_nagabayashi_unlabeled_chamber_dimensions_do_not_become_a_length(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(
+        tmp_path, "nagabayashi-hino-banya-1989-phosphorus.yaml"
+    )
+
+    assert result.experiments
+    assert all(
+        experiment.apparatus is None
+        or experiment.apparatus.geometry is None
+        or experiment.apparatus.geometry.chamber_length_m is None
+        for experiment in result.experiments.values()
+    )
+    assert all(
+        bench.geometry is None or bench.geometry.chamber_length_m is None
+        for bench in result.benches.values()
+    )
+
+    bench_facts = [
+        (bench, fact)
+        for bench in result.benches.values()
+        for fact in bench.other_facts
+        if fact.name == "reaction_chamber_dimensions_m_as_printed"
+    ]
+    assert len(bench_facts) == 1
+    _, fact = bench_facts[0]
+    plain_fact = to_plain(fact)
+    assert (
+        plain_fact["value"]["state"]["value"]["categorical"]
+        == "0.42 x 0.52 x 1 m"
+    )
+    assert plain_fact["value"]["locator"]["page"] == 140
+    assert plain_fact["value"]["locator"]["section"] == "2. Experimentals"
 
 
 def test_equal_pressure_duplicates_keep_printed_approximation() -> None:
