@@ -62,7 +62,7 @@ from simulator.battery.identity import (
     quantity_token,
     validate_quantity_profile,
 )
-from simulator.battery.migrate import wt_pct_to_mole_fraction
+from simulator.battery.migrate import _composition_from_plain, wt_pct_to_mole_fraction
 from simulator.battery.records import (
     Apparatus,
     ApparatusGeometry,
@@ -301,6 +301,40 @@ def test_partial_composition_refuses_scoring_with_missing_complete_input(
         "missing_input": "complete composition",
         "composition_proxy_flag": "partial_vector:typed_sum=80wt%",
     }
+    assert candidate is None
+
+
+@pytest.mark.parametrize("metadata_flag", (None, "initial_charge_only", "composition_from_sample_catalog"))
+def test_mass_percent_identity_loader_preserves_partial_flag_through_scoring(
+    metadata_flag: str | None,
+) -> None:
+    payload = {
+        "basis": "printed_oxides",
+        "amount_basis": "mass_percent",
+        "components": [["Al2O3", "60"], ["CaO", "20"]],
+        "proxy_flag": metadata_flag,
+    }
+    composition = _composition_from_plain(payload)
+    assert composition.proxy_flag is not None
+    assert composition.proxy_flag.startswith("partial_vector:typed_sum=80wt%")
+    if metadata_flag is not None:
+        assert metadata_flag in composition.proxy_flag
+
+    identity = replace(F.activity_identity(), composition=State.of(composition))
+    experiment = F.tabulation_experiment()
+    reference = F.observation(
+        f"identity-partial-loader-{metadata_flag}",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+    )
+    residual, candidate = _compile(
+        reference, experiment, _predict(Decimal("0.2"), identity)
+    )
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
     assert candidate is None
 
 

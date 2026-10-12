@@ -10,6 +10,7 @@ from collections.abc import Iterator, Mapping
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.battery.enums import AmountBasis, MethodToken, Quantity, ValueKind
 from simulator.battery.migrate import (
+    _composition_coverage_proxy_flag,
     _is_engine_oxide_component,
     _knudsen_effusion_chamber_background_not_for_identity,
 )
@@ -26,6 +27,7 @@ from simulator.battery.records import (
     ThermalSchedule,
     Value,
     as_decimal,
+    composition_is_partial,
 )
 from simulator.lab_schedule import LAB_SCHEDULE_PRESSURE_FLOOR_MBAR
 from simulator.transport_constants import COLLISION_DIAMETERS_M, FREE_MOLECULAR_KNUDSEN_MIN
@@ -767,6 +769,31 @@ def normalized_composition(
     if observation is not None and observation.experiment_id != experiment.experiment_id:
         raise ValueError("Observation belongs to a different experiment")
     point = (observation.point_conditions or {}) if observation else {}
+    for key, located in (
+        ("composition", point.get("composition")),
+        ("initial_composition", experiment.sample.initial_composition),
+    ):
+        if (
+            isinstance(located, Located)
+            and located.state.is_value
+            and isinstance(located.state.value, Composition)
+            and composition_is_partial(located.state.value)
+        ):
+            path = (
+                f"observation[{observation.observation_id}].point_conditions.{key}"
+                if key == "composition"
+                else "experiment.sample.initial_composition"
+            )
+            return WaypointResult(
+                "normalized_composition",
+                None,
+                (),
+                WaypointAbsence(
+                    "normalized_composition",
+                    GapReason.UNSUPPORTED_PRINT_FORM,
+                    (path, "partial composition requires complete constituent coverage"),
+                ),
+            )
     routes = []
     evidence_ranks = []
     absent = []
@@ -800,6 +827,11 @@ def normalized_composition(
             absent.append(path)
             continue
         raw = located.state.value
+        declared_untyped = (
+            raw.get("untyped_constituents", ())
+            if isinstance(raw, Mapping)
+            else ()
+        )
         basis_exempt: set[str] = set()
         basis_notice: str | None = None
         basis_inference: Derivation | None = None
@@ -861,6 +893,22 @@ def normalized_composition(
                             printed_path = path
                     else:
                         raw = _printed_composition_map(raw)
+            if (
+                field == "printed_composition"
+                and not as_moles
+                and isinstance(raw, Mapping)
+                and _composition_coverage_proxy_flag(raw, declared_untyped) is not None
+            ):
+                return WaypointResult(
+                    "normalized_composition",
+                    None,
+                    (),
+                    WaypointAbsence(
+                        "normalized_composition",
+                        GapReason.UNSUPPORTED_PRINT_FORM,
+                        (path, "partial composition requires complete constituent coverage"),
+                    ),
+                )
         try:
             if field == "printed_composition":
                 if not isinstance(raw, Mapping):

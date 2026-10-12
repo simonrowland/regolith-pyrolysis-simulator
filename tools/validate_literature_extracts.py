@@ -1154,6 +1154,25 @@ def _check_equipment(
             )
 
 
+def _check_untyped_constituents(value: object, path: str, errors: list[str]) -> None:
+    if isinstance(value, Mapping):
+        if "untyped_constituents" in value:
+            names = value["untyped_constituents"]
+            if (
+                not isinstance(names, list)
+                or not names
+                or any(not isinstance(name, str) or not name.strip() for name in names)
+            ):
+                errors.append(
+                    f"{path}.untyped_constituents must be a non-empty list of names"
+                )
+        for key, child in value.items():
+            _check_untyped_constituents(child, f"{path}.{key}", errors)
+    elif isinstance(value, list):
+        for index, child in enumerate(value):
+            _check_untyped_constituents(child, f"{path}[{index}]", errors)
+
+
 def _check_observation(
     obs: Any,
     path: str,
@@ -1206,6 +1225,8 @@ def _check_observation(
             errors.append(
                 f"{path}: values is empty or null-only (refuse empty evidence payloads)"
             )
+        else:
+            _check_untyped_constituents(obs["values"], f"{path}.values", errors)
         if not obs.get("units"):
             errors.append(f"{path}: units required when values are present")
 
@@ -1304,6 +1325,8 @@ def _check_context_row(
             errors.append(
                 f"{path}: values is empty or null-only (refuse empty evidence payloads)"
             )
+        else:
+            _check_untyped_constituents(row["values"], f"{path}.values", errors)
         if not row.get("units"):
             errors.append(f"{path}: units required when values are present")
 

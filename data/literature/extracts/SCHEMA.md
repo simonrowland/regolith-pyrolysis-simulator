@@ -276,6 +276,10 @@ Rules:
 - Pointer / bound-not-point / competing-observation rows must carry explicit
   structured content (e.g. `semantics: bound_not_point_ordering`,
   `semantics: competing_observation_do_not_average`).
+- A printed oxide map that names constituents omitted from its typed map must
+  list those names in the same values mapping as `untyped_constituents: [Y2O3]`.
+  The composition remains partial even when its typed values close near 100 wt%;
+  the list is a coverage declaration, not another composition amount.
 
 ### Uncertainty (first-class)
 

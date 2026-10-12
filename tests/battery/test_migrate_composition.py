@@ -22,6 +22,7 @@ from simulator.battery.migrate import (
     _composition_located_from_values,
     _declared_wt_composition_point_map,
     _initial_oxide_map_from_values,
+    _mole_fraction_composition_from_values,
     _oxide_map_from_mapping,
     _sample_from_plain,
     migrate,
@@ -114,9 +115,9 @@ def test_complete_wt_percent_composition_keeps_its_previous_serialized_value() -
 
 @pytest.mark.parametrize(
     ("typed_sum", "expected_flag"),
-    (("98", None), ("97.999", "partial_vector:typed_sum=97.999wt%")),
+    (("95", None), ("96", None), ("94.999", "partial_vector:typed_sum=94.999wt%")),
 )
-def test_partial_composition_cutoff_is_98_wt_percent(
+def test_partial_composition_cutoff_is_95_wt_percent(
     typed_sum: str, expected_flag: str | None
 ) -> None:
     converted = wt_pct_to_mole_fraction(
@@ -124,6 +125,48 @@ def test_partial_composition_cutoff_is_98_wt_percent(
     )
 
     assert converted.proxy_flag == expected_flag
+
+
+def test_declared_untyped_constituent_flags_near_closed_composition() -> None:
+    converted = wt_pct_to_mole_fraction(
+        {"SiO2": Decimal("70"), "CaO": Decimal("29")},
+        untyped_constituents=("Y2O3",),
+    )
+
+    assert converted.proxy_flag == "partial_vector:untyped=Y2O3"
+
+
+def test_preconverted_mole_map_uses_its_declared_wt_percent_coverage() -> None:
+    composition, omitted = _mole_fraction_composition_from_values(
+        {
+            "composition_mol": {"Al2O3": "0.6", "CaO": "0.4"},
+            "composition_wt_pct": {"Al2O3": "60", "CaO": "20"},
+            "composition_conversion": "computed from printed wt% map",
+        }
+    )
+
+    assert omitted == ()
+    assert composition is not None
+    assert composition.proxy_flag == "partial_vector:typed_sum=80wt%"
+    assert dict(composition.components) == {
+        "Al2O3": Decimal("0.6"),
+        "CaO": Decimal("0.4"),
+    }
+
+
+def test_guo_wt_derived_mole_maps_remain_complete() -> None:
+    extract = REPO_ROOT / "data/literature/extracts/guo-2021-mgo-activity-cmas-slag.yaml"
+    doc = migrate_module.load_yaml(extract)
+    rows = [
+        row
+        for observation in doc["species"]["MgO"]["observations"]
+        for row in observation["values"].get("points", [])
+        if row.get("composition_wt_pct") and row.get("composition_mol")
+    ]
+
+    assert len(rows) == 8
+    converted = [_mole_fraction_composition_from_values(row)[0] for row in rows]
+    assert all(item is not None and item.proxy_flag is None for item in converted)
 
 
 def test_markova_partial_point_compositions_stay_located_and_flagged(
@@ -143,7 +186,8 @@ def test_markova_partial_point_compositions_stay_located_and_flagged(
         ):
             partial.append(observation)
 
-    assert len(partial) == 12
+    # d-131 moves the low-coverage boundary below 95 wt%, leaving six 91.43 wt% rows.
+    assert len(partial) == 6
     assert all(
         observation.identity.quantity.is_value
         and observation.point_conditions["composition"].locator is not None
@@ -153,8 +197,8 @@ def test_markova_partial_point_compositions_stay_located_and_flagged(
         observation.identity.quantity.value.value for observation in partial
     ) == Counter(
         {
-            Quantity.RESIDUE_COMPONENT_COMPOSITION.value: 10,
-            Quantity.MASS_LOSS_FRACTION.value: 2,
+            Quantity.RESIDUE_COMPONENT_COMPOSITION.value: 5,
+            Quantity.MASS_LOSS_FRACTION.value: 1,
         }
     )
 

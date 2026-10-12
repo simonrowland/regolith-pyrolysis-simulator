@@ -301,15 +301,24 @@ class Reaction:
             raise ValueError("Reaction requires at least one term")
 
 
-# Composition.proxy_flag tokens. Absent (None) means a printed analysis of the
-# point. ``partial_vector:typed_sum=...wt%`` marks incomplete oxide coverage;
-# consumers that require a complete composition must refuse it.
+# Composition.proxy_flag tokens. ``partial_vector:`` marks incomplete oxide
+# coverage; consumers that require a complete composition must refuse it.
+# An absent flag allows ordinary analytical closure around 100 wt%.
 # ``composition_from_sample_catalog``: a catalogue proxy.
 # ``initial_charge_only``: the source prints the starting charge while the
 # datum describes a later (depleted) state; consumers may predict with it but
 # the residual is flagged (b-716).
 INITIAL_CHARGE_ONLY_PROXY_FLAG = "initial_charge_only"
 _PARTIAL_COMPOSITION_PROXY_PREFIX = "partial_vector:"
+
+
+def composition_is_partial(composition: Composition) -> bool:
+    """Whether a converted composition carries the coverage refusal marker."""
+
+    return bool(
+        composition.proxy_flag
+        and composition.proxy_flag.startswith(_PARTIAL_COMPOSITION_PROXY_PREFIX)
+    )
 
 
 @dataclass(frozen=True)

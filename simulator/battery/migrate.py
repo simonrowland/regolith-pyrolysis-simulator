@@ -985,7 +985,14 @@ def _composition_located_from_plain(payload: object) -> Located[Composition]:
             source = _located_from_plain(payload, lambda value: value)
             locator = source.locator
         try:
-            composition = wt_pct_to_mole_fraction(wt)
+            composition = wt_pct_to_mole_fraction(
+                wt,
+                untyped_constituents=(
+                    payload.get("untyped_constituents", ())
+                    if isinstance(payload, Mapping)
+                    else ()
+                ),
+            )
         except (ArithmeticError, ValueError) as exc:
             return Located(
                 State.unknown(f"mass-percent composition is not usable: {exc}"),
@@ -1221,7 +1228,15 @@ def _composition_from_plain(payload: object) -> Composition:
     if amount_basis is AmountBasis.MASS_PERCENT:
         wt = _mass_percent_components(payload)
         if wt is not None:
-            return replace(wt_pct_to_mole_fraction(wt), **metadata)
+            composition = replace(
+                wt_pct_to_mole_fraction(
+                    wt,
+                    untyped_constituents=payload.get("untyped_constituents", ()),
+                ),
+                proxy_source=metadata["proxy_source"],
+                analysis_selection_rule=metadata["analysis_selection_rule"],
+            )
+            return _replace_composition_proxy_flag(composition, metadata["proxy_flag"])
         raise ValueError(
             "mass-percent composition contains unsupported or ambiguous components"
         )
@@ -2985,8 +3000,46 @@ def oxide_molar_mass(oxide: str) -> Decimal:
     )
 
 
-def wt_pct_to_mole_fraction(wt: Mapping[str, Decimal]) -> Composition:
-    """Convert a printed oxide wt% map to mole fraction and flag low totals."""
+def _composition_coverage_proxy_flag(
+    wt: Mapping[str, Decimal] | None,
+    untyped_constituents: Sequence[object] = (),
+) -> str | None:
+    typed_sum = sum(
+        (
+            amount
+            for oxide, raw in (wt or {}).items()
+            if str(oxide).strip().casefold() not in _PRINTED_COMPOSITION_TOTAL_KEYS
+            if (amount := _as_dec_or_none(raw)) is not None
+        ),
+        Decimal("0"),
+    )
+    if isinstance(untyped_constituents, (str, bytes)):
+        untyped_constituents = ()
+    declared = tuple(sorted({
+        str(name).strip()
+        for name in untyped_constituents
+        if str(name).strip()
+    }))
+    # The extract migration census found 733 unique typed wt% vectors: 730 fall
+    # in 96–101 wt%, one is 95.01 wt%, and two below 95 (Markova 91.43; NASA
+    # simulant guide 92.7) have no untyped-constituent declaration. d-131 sets
+    # the partial boundary below 95, preserving the observed >=96 full-analysis
+    # band while allowing ordinary analytical closure; a declaration independently
+    # proves missing coverage at any sum.
+    if typed_sum < Decimal("95"):
+        flag = f"{_PARTIAL_COMPOSITION_PROXY_PREFIX}typed_sum={format(typed_sum.normalize(), 'f')}wt%"
+        return f"{flag};untyped={','.join(declared)}" if declared else flag
+    if declared:
+        return f"{_PARTIAL_COMPOSITION_PROXY_PREFIX}untyped={','.join(declared)}"
+    return None
+
+
+def wt_pct_to_mole_fraction(
+    wt: Mapping[str, Decimal],
+    *,
+    untyped_constituents: Sequence[object] = (),
+) -> Composition:
+    """Convert a printed oxide wt% map to mole fraction and mark partial coverage."""
 
     names = {str(oxide).strip() for oxide in wt}
     if "FeOT" in names and names.intersection({"FeO", "Fe2O3"}):
@@ -3027,24 +3080,7 @@ def wt_pct_to_mole_fraction(wt: Mapping[str, Decimal]) -> Composition:
         total += n
     if total <= 0:
         raise ValueError("printed oxide wt% map has no positive mass")
-    typed_sum = sum(
-        (
-            amount
-            for oxide, raw in wt.items()
-            if str(oxide).strip().casefold() not in _PRINTED_COMPOSITION_TOTAL_KEYS
-            if (amount := _as_dec_or_none(raw)) is not None
-        ),
-        Decimal("0"),
-    )
-    # The corpus scan found 1,667/1,854 typed oxide maps in the 98–101 wt%
-    # band, two above it, and 185 below 98. The lower edge of that dominant
-    # full-analysis band is the fail-closed coverage threshold.
-    proxy_flag = (
-        f"{_PARTIAL_COMPOSITION_PROXY_PREFIX}typed_sum="
-        f"{format(typed_sum.normalize(), 'f')}wt%"
-        if typed_sum < Decimal("98")
-        else None
-    )
+    proxy_flag = _composition_coverage_proxy_flag(wt, untyped_constituents)
     return Composition(
         basis="printed_oxides",
         components=tuple((oxide, n / total) for oxide, n in moles.items()),
@@ -3054,15 +3090,22 @@ def wt_pct_to_mole_fraction(wt: Mapping[str, Decimal]) -> Composition:
 
 
 def _replace_composition_proxy_flag(
-    composition: Composition, proxy_flag: str
+    composition: Composition, proxy_flag: str | None
 ) -> Composition:
-    """Keep a partial-vector reason when applying a secondary proxy label."""
+    """Combine labels while keeping the partial-vector marker first for readers."""
 
-    if composition.proxy_flag is not None and composition.proxy_flag.startswith(
-        _PARTIAL_COMPOSITION_PROXY_PREFIX
-    ):
-        return composition
-    return replace(composition, proxy_flag=proxy_flag)
+    labels = list(dict.fromkeys(
+        label.strip()
+        for raw in (composition.proxy_flag, proxy_flag)
+        if raw
+        for label in raw.split(";")
+        if label.strip()
+    ))
+    labels.sort(key=lambda label: not label.startswith(_PARTIAL_COMPOSITION_PROXY_PREFIX))
+    combined = ";".join(labels) or None
+    return composition if combined == composition.proxy_flag else replace(
+        composition, proxy_flag=combined
+    )
 
 
 def _total_iron_reported_as_feo_notice(
@@ -3404,7 +3447,9 @@ def _catalogue_composition_located_from_values(
     if not rule:
         rule = "source-declared catalogue analysis; no separate selection rule stated"
     try:
-        converted = wt_pct_to_mole_fraction(wt)
+        converted = wt_pct_to_mole_fraction(
+            wt, untyped_constituents=values.get("untyped_constituents", ())
+        )
     except (ArithmeticError, ValueError):
         return None
     composition = replace(converted, basis="sample_catalog_proxy")
@@ -3529,17 +3574,32 @@ def _mole_fraction_composition_from_values(
         return None, tuple(omitted)
     if omitted:
         return None, tuple(omitted)
+    conversion_note = " ".join(
+        str(values.get(key) or "")
+        for key in ("composition_conversion", "composition_derivation")
+    ).casefold()
+    wt_map = values.get("composition_wt_pct")
+    coverage_wt = (
+        wt_map
+        if isinstance(wt_map, Mapping)
+        and ("wt" in conversion_note or "mass" in conversion_note)
+        else None
+    )
+    coverage_flag = _composition_coverage_proxy_flag(
+        coverage_wt,
+        values.get("untyped_constituents", ()),
+    )
     basis = (
         _declared_composition_mol_basis(values, raw) or _DEFAULT_COMPOSITION_MOL_BASIS
     )
-    return (
-        Composition(
-            basis=basis,
-            components=tuple(components),
-            amount_basis=AmountBasis.MOLE_FRACTION,
-        ),
-        tuple(omitted),
+    composition = Composition(
+        basis=basis,
+        components=tuple(components),
+        amount_basis=AmountBasis.MOLE_FRACTION,
     )
+    if coverage_flag is not None:
+        composition = _replace_composition_proxy_flag(composition, coverage_flag)
+    return composition, tuple(omitted)
 
 
 def _printed_map_payload(wt: Mapping[str, Decimal]) -> dict[str, str]:
@@ -3609,7 +3669,13 @@ def _composition_located_from_values(
             inputs=(*derivation.inputs, "values.composition_derivation"),
         )
     return Located(
-        State.of(wt_pct_to_mole_fraction(wt)),
+        State.of(wt_pct_to_mole_fraction(
+            wt, untyped_constituents=(
+                values.get("untyped_constituents", ())
+                if isinstance(values, Mapping)
+                else ()
+            )
+        )),
         locator=locator,
         inference=derivation,
     )
@@ -13129,7 +13195,10 @@ class Migrator:
         elif composition_located is not None:
             ident_kwargs["composition"] = composition_located.state
         elif initial_oxide_map:
-            initial_composition = wt_pct_to_mole_fraction(initial_oxide_map)
+            initial_composition = wt_pct_to_mole_fraction(
+                initial_oxide_map,
+                untyped_constituents=values.get("untyped_constituents", ()),
+            )
             if Path(source_key).name == "kems-020-hastie-1981-nbsir.yaml":
                 composition_role, role_refusal = _declared_composition_role(values)
                 if role_refusal is not None:
@@ -13917,7 +13986,12 @@ class Migrator:
                 # default condition on every sibling point.
                 if rowless_initial_map:
                     point_identity_kwargs["composition"] = State.of(
-                        wt_pct_to_mole_fraction(rowless_initial_map)
+                        wt_pct_to_mole_fraction(
+                            rowless_initial_map,
+                            untyped_constituents=rowless_values.get(
+                                "untyped_constituents", ()
+                            ),
+                        )
                     )
                 else:
                     point_identity_kwargs.pop("composition", None)
@@ -14551,7 +14625,14 @@ class Migrator:
             )
         elif q_token_point is Quantity.P_PARTIAL and point_oxide_map:
             ident_kwargs["composition"] = State.of(
-                wt_pct_to_mole_fraction(point_oxide_map)
+                wt_pct_to_mole_fraction(
+                    point_oxide_map,
+                    untyped_constituents=(
+                        raw_item.get("untyped_constituents", ())
+                        if isinstance(raw_item, Mapping)
+                        else ()
+                    ),
+                )
             )
         elif ident_kwargs.get("composition") is None:
             composition_refusal: list[str] = []
@@ -14562,7 +14643,14 @@ class Migrator:
             )
             if initial_map:
                 ident_kwargs["composition"] = State.of(
-                    wt_pct_to_mole_fraction(initial_map)
+                    wt_pct_to_mole_fraction(
+                        initial_map,
+                        untyped_constituents=(
+                            parent_values.get("untyped_constituents", ())
+                            if isinstance(parent_values, Mapping)
+                            else ()
+                        ),
+                    )
                 )
             elif composition_refusal or q_token_point in _BULK_PROPERTY_QUANTITIES:
                 ident_kwargs["composition"] = State.unknown(
