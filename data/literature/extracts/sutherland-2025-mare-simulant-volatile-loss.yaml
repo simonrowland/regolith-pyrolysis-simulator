@@ -1,0 +1,394 @@
+schema_version: literature_extract.v1
+source_id: sutherland-2025-mare-simulant-volatile-loss
+source:
+  citation: Sutherland J. et al. (2025) Volatile loss during heating of lunar mare simulants and related compositions. Chemical Geology 698, 123115.
+  doi: 10.1016/j.chemgeo.2025.123115
+  url: https://epub.ub.uni-muenchen.de/130313/1/1-s2.0-S0009254125005054-main.pdf
+  version: version of record
+  year: 2025
+  sha256: dd3e0adc8c8f95cac05039bc57466abfe2ad23b3ab0d203fcec498339669e789
+extraction:
+  method: Manual transcription of the version-of-record PDF. Tables 1 and 2 were read from rendered page images at 200 dpi twice, first by rows and then by columns. Experimental conditions and sample descriptions were read from the methods and sample-origins sections. Natural-deposit and processed-analogue rows were outside the requested mare-simulant scope. NPD phase-profile figures were reviewed but not transcribed as residue compositions because they report diffraction/phase changes, not chemical residue analyses or numerical mass loss.
+  date: '2026-10-12'
+  worker: suth25
+review_status: draft
+benches:
+- id: simultaneous-tga-dsc-ega-ms
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: 'Mettler Toledo TGA/DSC 3+ with high-temperature furnace, linked to ThermoStar Pfeiffer Vacuum GSD 320 EGA-MS'}
+    locator: &methods_loc {page: 3, published_page: 3, section: '2.2.1'}
+  heating_method:
+    state: {tag: value, value: '150–1300 °C ramp at 15 °C/min, 10-min isothermal hold at 1300 °C, then cooling at 30 °C/min'}
+    locator: *methods_loc
+  cell_material_and_liner:
+    state: {tag: value, value: alumina crucible}
+    locator: *methods_loc
+  detector:
+    state: {tag: value, value: ThermoStar Pfeiffer Vacuum GSD 320 EGA-MS}
+    locator: *methods_loc
+  other_facts:
+  - name: evolved_gas_transfer_line
+    unit: as published
+    value:
+      state: {tag: value, value: {kind: categorical, categorical: heated at 150 °C to prevent gas condensation}}
+      locator: *methods_loc
+  - name: gas_analysis_vacuum
+    unit: bar
+    value:
+      state: {tag: value, value: {kind: point, point: '1e-9'}}
+      locator: {page: 3, published_page: 3, section: '2.2.1', note: 'Printed 10⁻⁹ bar; this is the integrated pump retrieving gases from the STA furnace, not the sample furnace pressure.'}
+experiments:
+- experiment_id: eac-1a-tga-dsc-ega
+  bench_id: simultaneous-tga-dsc-ega-ms
+  method: simultaneous_thermal_analysis_and_evolved_gas_analysis
+  locator: {page: 5, published_page: 5, table: '1', note: 'EAC-1A row; total mass loss for the 150–1300 °C applied range including 10-min hold. The 1300 °C upper limit is applied furnace temperature; maximum sample temperature varies.'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: interval, interval_low: '0.000025', interval_high: '0.000125'}}
+      locator: {page: 3, published_page: 3, section: '2.2.1', note: '25–125 mg per run; measured mass accuracy ±0.1 μg as printed.'}
+    printed_composition:
+      state: {tag: value, value: 'EAC-1A mare simulant obtained from basanite in the Siebengebirge Volcanic Field, Germany; bulk chemical data referred to supplementary Table S1.'}
+      locator: {page: 2, published_page: 2, section: '2.1.1'}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1573.15'}
+      locator: {page: 5, published_page: 5, table: '1', note: 'Applied furnace upper limit is 1300 °C; maximum sample temperature varies. K conversion only.'}
+  thermal_schedule:
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '12000', approximate: true}}
+      locator: *methods_loc
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: *methods_loc
+    sweep_gas:
+      state: {tag: value, value: {species: N2, flow_sccm: {tag: value, value: 100}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
+      locator: *methods_loc
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+- experiment_id: jsc-1a-tga-dsc-ega
+  bench_id: simultaneous-tga-dsc-ega-ms
+  method: simultaneous_thermal_analysis_and_evolved_gas_analysis
+  locator: {page: 5, published_page: 5, table: '1', note: 'JSC-1A row; total mass loss for the 150–1300 °C applied range including 10-min hold. The 1300 °C upper limit is applied furnace temperature; maximum sample temperature varies.'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: interval, interval_low: '0.000025', interval_high: '0.000125'}}
+      locator: {page: 3, published_page: 3, section: '2.2.1', note: '25–125 mg per run; measured mass accuracy ±0.1 μg as printed.'}
+    printed_composition:
+      state: {tag: value, value: 'JSC-1A mare simulant from ash deposit related to Merriam Crater in the San Francisco Volcano Field, Arizona; the supplied sample lacked its finest grain fraction after prior mechanical testing; bulk chemical data referred to supplementary Table S1.'}
+      locator: {page: 2, published_page: 2, section: '2.1.1'}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1573.15'}
+      locator: {page: 5, published_page: 5, table: '1', note: 'Applied furnace upper limit is 1300 °C; maximum sample temperature varies. K conversion only.'}
+  thermal_schedule:
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '12000', approximate: true}}
+      locator: *methods_loc
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: *methods_loc
+    sweep_gas:
+      state: {tag: value, value: {species: N2, flow_sccm: {tag: value, value: 100}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
+      locator: *methods_loc
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+- experiment_id: lms-1-tga-dsc-ega
+  bench_id: simultaneous-tga-dsc-ega-ms
+  method: simultaneous_thermal_analysis_and_evolved_gas_analysis
+  locator: {page: 5, published_page: 5, table: '1', note: 'LMS-1 row; total mass loss for the 150–1300 °C applied range including 10-min hold. The 1300 °C upper limit is applied furnace temperature; maximum sample temperature varies.'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: interval, interval_low: '0.000025', interval_high: '0.000125'}}
+      locator: {page: 3, published_page: 3, section: '2.2.1', note: '25–125 mg per run; measured mass accuracy ±0.1 μg as printed.'}
+    printed_composition:
+      state: {tag: value, value: 'LMS-1 second manufacture batch; 32.0 wt% Butler Arts basalt of undisclosed provenance, 19.8 wt% GreenSpar anorthosite from Kangerlussuaq, Greenland, 32.8 wt% pyroxene from Stillwater Mine, Montana, 11.1 wt% olivine from Sisters Mining District, Washington, and 4.3 wt% unspecified commercial ilmenite from Long-Fox et al. (2023); bulk chemical data referred to supplementary Table S1.'}
+      locator: {page: 2, published_page: 2, section: '2.1.1'}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1573.15'}
+      locator: {page: 5, published_page: 5, table: '1', note: 'Applied furnace upper limit is 1300 °C; maximum sample temperature varies. K conversion only.'}
+  thermal_schedule:
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '12000', approximate: true}}
+      locator: *methods_loc
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: *methods_loc
+    sweep_gas:
+      state: {tag: value, value: {species: N2, flow_sccm: {tag: value, value: 100}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
+      locator: *methods_loc
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+- experiment_id: oprl2n-tga-dsc-ega
+  bench_id: simultaneous-tga-dsc-ega-ms
+  method: simultaneous_thermal_analysis_and_evolved_gas_analysis
+  locator: {page: 5, published_page: 5, table: '1', note: 'OPRL2N row; total mass loss for the 150–1300 °C applied range including 10-min hold. The 1300 °C upper limit is applied furnace temperature; maximum sample temperature varies.'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: interval, interval_low: '0.000025', interval_high: '0.000125'}}
+      locator: {page: 3, published_page: 3, section: '2.2.1', note: '25–125 mg per run; measured mass accuracy ±0.1 μg as printed.'}
+    printed_composition:
+      state: {tag: value, value: 'OPRL2N matched 90.0 wt% to the San Francisco Volcano Field and 10.0 wt% from the Shawmere Anorthosite Complex, Ontario; bulk chemical data referred to supplementary Table S1.'}
+      locator: {page: 2, published_page: 2, section: '2.1.1'}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1573.15'}
+      locator: {page: 5, published_page: 5, table: '1', note: 'Applied furnace upper limit is 1300 °C; maximum sample temperature varies. K conversion only.'}
+  thermal_schedule:
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '12000', approximate: true}}
+      locator: *methods_loc
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: *methods_loc
+    sweep_gas:
+      state: {tag: value, value: {species: N2, flow_sccm: {tag: value, value: 100}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
+      locator: *methods_loc
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+- experiment_id: oprl2nt-tga-dsc-ega
+  bench_id: simultaneous-tga-dsc-ega-ms
+  method: simultaneous_thermal_analysis_and_evolved_gas_analysis
+  locator: {page: 5, published_page: 5, table: '1', note: 'OPRL2NT row; total mass loss for the 150–1300 °C applied range including 10-min hold. The 1300 °C upper limit is applied furnace temperature; maximum sample temperature varies.'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: interval, interval_low: '0.000025', interval_high: '0.000125'}}
+      locator: {page: 3, published_page: 3, section: '2.2.1', note: '25–125 mg per run; measured mass accuracy ±0.1 μg as printed.'}
+    printed_composition:
+      state: {tag: value, value: 'OPRL2NT is the high-titanium version of OPRL2N with 14.4 wt% ilmenite, reducing the mare component by a corresponding fraction; bulk chemical data referred to supplementary Table S1.'}
+      locator: {page: 2, published_page: 2, section: '2.1.1'}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1573.15'}
+      locator: {page: 5, published_page: 5, table: '1', note: 'Applied furnace upper limit is 1300 °C; maximum sample temperature varies. K conversion only.'}
+  thermal_schedule:
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '12000', approximate: true}}
+      locator: *methods_loc
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: *methods_loc
+    sweep_gas:
+      state: {tag: value, value: {species: N2, flow_sccm: {tag: value, value: 100}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
+      locator: *methods_loc
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+- experiment_id: tubs-m-tga-dsc-ega
+  bench_id: simultaneous-tga-dsc-ega-ms
+  method: simultaneous_thermal_analysis_and_evolved_gas_analysis
+  locator: {page: 5, published_page: 5, table: '1', note: 'TUBS-M row; total mass loss for the 150–1300 °C applied range including 10-min hold. The 1300 °C upper limit is applied furnace temperature; maximum sample temperature varies.'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: interval, interval_low: '0.000025', interval_high: '0.000125'}}
+      locator: {page: 3, published_page: 3, section: '2.2.1', note: '25–125 mg per run; measured mass accuracy ±0.1 μg as printed.'}
+    printed_composition:
+      state: {tag: value, value: 'TUBS-M mare simulant sourced from a basalt complex west of Göttingen, Germany; bulk chemical data referred to supplementary Table S1.'}
+      locator: {page: 2, published_page: 2, section: '2.1.1'}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1573.15'}
+      locator: {page: 5, published_page: 5, table: '1', note: 'Applied furnace upper limit is 1300 °C; maximum sample temperature varies. K conversion only.'}
+  thermal_schedule:
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '12000', approximate: true}}
+      locator: *methods_loc
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: *methods_loc
+    sweep_gas:
+      state: {tag: value, value: {species: N2, flow_sccm: {tag: value, value: 100}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
+      locator: *methods_loc
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+fidelity_samples:
+- path: species.EAC-1A.observations[sutherland_2025_eac_1a_total_mass_loss_150_1300_c].values.points[0].mass_loss_wt_pct
+  value: 1.785
+  locator: {page: 5, published_page: 5, table: '1', note: '−Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature varying.'}
+- path: species.JSC-1A.observations[sutherland_2025_jsc_1a_total_mass_loss_150_1300_c].values.points[0].mass_loss_wt_pct
+  value: 0.161
+  locator: {page: 5, published_page: 5, table: '1', note: '−Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature varying.'}
+- path: species.LMS-1.observations[sutherland_2025_lms_1_total_mass_loss_150_1300_c].values.points[0].mass_loss_wt_pct
+  value: 1.102
+  locator: {page: 5, published_page: 5, table: '1', note: '−Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature varying.'}
+- path: species.OPRL2N.observations[sutherland_2025_oprl2n_total_mass_loss_150_1300_c].values.points[0].mass_loss_wt_pct
+  value: 0.331
+  locator: {page: 5, published_page: 5, table: '1', note: '−Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature varying.'}
+- path: species.OPRL2NT.observations[sutherland_2025_oprl2nt_total_mass_loss_150_1300_c].values.points[0].mass_loss_wt_pct
+  value: 0.670
+  locator: {page: 5, published_page: 5, table: '1', note: '−Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature varying.'}
+- path: species.TUBS-M.observations[sutherland_2025_tubs_m_total_mass_loss_150_1300_c].values.points[0].mass_loss_wt_pct
+  value: 0.979
+  locator: {page: 5, published_page: 5, table: '1', note: '−Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature varying.'}
+species:
+  EAC-1A:
+    observations:
+    - observation_id: sutherland_2025_eac_1a_total_mass_loss_150_1300_c
+      experiment: eac-1a-tga-dsc-ega
+      type: rate_series
+      locator: {page: 5, published_page: 5, table: '1', note: '−Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature varying.'}
+      phase: EAC-1A mare simulant
+      regime: simultaneous_thermal_analysis_and_evolved_gas_analysis
+      units: wt_percent
+      values:
+        quantity: bulk_mass_loss_wt_pct
+        method_class: measured_direct
+        points:
+        - T_C: 1300
+          mass_loss_wt_pct: 1.785
+          point_conditions:
+            atmosphere: {state: {tag: value, value: 'N2 5.0 purge at 100 mL/min (99.999% guaranteed purity); near-inert external conditions; empty-baseline analyses indicated up to 200 ppm O2.'}, locator: *methods_loc}
+            total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: *methods_loc}
+            time_min: {state: {tag: value, value: 200}, locator: {page: 3, published_page: 3, section: '2.2.1', note: 'Each analysis took ca. 200 min.'}}
+      uncertainty: 'Printed sample mass accuracy ±0.1 μg and temperature accuracy ±5 °C; confidence level not stated. No uncertainty is printed for the mass-loss value.'
+    context:
+    - observation_id: sutherland_2025_table1_mass_loss_ranges
+      experiment: eac-1a-tga-dsc-ega
+      type: experiment_series
+      locator: {page: 5, published_page: 5, table: '1'}
+      units: wt_percent
+      values:
+        quantity: table_1_mass_loss_contributions_as_printed
+        method_class: method_only
+        temperature_ranges_as_printed: [150–500 °C, 500–1000 °C, 1000–1300 °C, 150 °C–TAS, TAS–1300 °C 10′, 150–1300 °C 10′]
+        EAC-1A: [0.681, 1.042, '0.0611 (3.42 %)', 1.743, 0.042, 1.785]
+        JSC-1A: [0.072, 0.074, '0.015 (9.32 %)', 0.150, 0.011, 0.161]
+        LMS-1: [0.315, 0.751, '0.036 (3.27 %)', 1.074, 0.028, 1.102]
+        OPRL2N: [0.103, 0.212, '0.017 (5.14 %)', 0.320, 0.011, 0.331]
+        OPRL2NT: [0.373, 0.271, '0.026 (3.88 %)', 0.652, 0.018, 0.670]
+        TUBS-M: [0.797, 0.169, '0.012 (1.23 %)', 0.978, 0.001, 0.979]
+        table_note: Mass losses are normalized to dried sample mass at 150 °C; the upper 1300 °C value is applied furnace temperature and maximum sample temperature varies. The ±5 °C in the caption applies to temperature estimations, not the mass-loss values.
+  JSC-1A:
+    observations:
+    - observation_id: sutherland_2025_jsc_1a_total_mass_loss_150_1300_c
+      experiment: jsc-1a-tga-dsc-ega
+      type: rate_series
+      locator: {page: 5, published_page: 5, table: '1', note: '−Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature varying.'}
+      phase: JSC-1A mare simulant
+      regime: simultaneous_thermal_analysis_and_evolved_gas_analysis
+      units: wt_percent
+      values:
+        quantity: bulk_mass_loss_wt_pct
+        method_class: measured_direct
+        points:
+        - T_C: 1300
+          mass_loss_wt_pct: 0.161
+          point_conditions:
+            atmosphere: {state: {tag: value, value: 'N2 5.0 purge at 100 mL/min (99.999% guaranteed purity); near-inert external conditions; empty-baseline analyses indicated up to 200 ppm O2.'}, locator: *methods_loc}
+            total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: *methods_loc}
+            time_min: {state: {tag: value, value: 200}, locator: {page: 3, published_page: 3, section: '2.2.1', note: 'Each analysis took ca. 200 min.'}}
+      uncertainty: 'Printed sample mass accuracy ±0.1 μg and temperature accuracy ±5 °C; confidence level not stated. No uncertainty is printed for the mass-loss value.'
+    context:
+    - observation_id: sutherland_2025_jsc_1a_integrated_gas_releases
+      experiment: jsc-1a-tga-dsc-ega
+      type: laboratory_conditions
+      locator: {page: 14, published_page: 14, table: '2', note: Integrated concentrations for JSC-1A; units and parenthetical element contributions as printed.}
+      units: integrated_ppm_as_published
+      values:
+        quantity: integrated_gas_release_concentrations
+        method_class: measured_direct
+        temperature_ranges_as_printed: [150–1300 °C, 1000–1300 °C, TAS–1300 °C]
+        H2O_ppm: [1564, 47, 2]
+        H2O_wt_percent_as_printed: [0.16, null, null]
+        CO2_ppm_with_C_contribution_in_parentheses: ['244 (67)', '59 (16)', '67 (18)']
+        SO2_ppm_with_S_contribution_in_parentheses: ['5 (3)', '29 (15)', '36 (18)']
+        table_note: Integrated ppm is calculated from relative gas fractions normalized against measured mass loss; starred narrow intervals neglect O2 and assume similar gas behaviour across the full range.
+    - observation_id: sutherland_2025_supplementary_and_residue_data_pointer
+      experiment: jsc-1a-tga-dsc-ega
+      type: characterization
+      locator: {page: 2, published_page: 2, section: '2.1.1', note: Table S1 is cited for bulk chemistry but is not included in the supplied PDF.}
+      units: as published
+      values:
+        quantity: composition_and_residue_data_availability
+        method_class: method_only
+        supplementary_table_S1: Bulk chemical data for samples; cited in sample-origins section, not present in supplied PDF.
+        supplementary_table_S2: Apollo vacuum-pyrolysis studies; cited in discussion, not present in supplied PDF.
+        residue_chemical_composition: not printed for the mare-simulant heating runs in this PDF.
+        element_losses: Na, K, and Fe losses are not printed; Table 2 reports integrated H2O, CO2, and SO2 for JSC-1A.
+        residue_characterization: NPD identifies structural changes and crystalline phases for JSC-1A and TUBS-M; it does not report chemical residue compositions.
+  LMS-1:
+    observations:
+    - observation_id: sutherland_2025_lms_1_total_mass_loss_150_1300_c
+      experiment: lms-1-tga-dsc-ega
+      type: rate_series
+      locator: {page: 5, published_page: 5, table: '1', note: '−Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature varying.'}
+      phase: LMS-1 mare simulant
+      regime: simultaneous_thermal_analysis_and_evolved_gas_analysis
+      units: wt_percent
+      values:
+        quantity: bulk_mass_loss_wt_pct
+        method_class: measured_direct
+        points:
+        - T_C: 1300
+          mass_loss_wt_pct: 1.102
+          point_conditions:
+            atmosphere: {state: {tag: value, value: 'N2 5.0 purge at 100 mL/min (99.999% guaranteed purity); near-inert external conditions; empty-baseline analyses indicated up to 200 ppm O2.'}, locator: *methods_loc}
+            total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: *methods_loc}
+            time_min: {state: {tag: value, value: 200}, locator: {page: 3, published_page: 3, section: '2.2.1', note: 'Each analysis took ca. 200 min.'}}
+      uncertainty: 'Printed sample mass accuracy ±0.1 μg and temperature accuracy ±5 °C; confidence level not stated. No uncertainty is printed for the mass-loss value.'
+  OPRL2N:
+    observations:
+    - observation_id: sutherland_2025_oprl2n_total_mass_loss_150_1300_c
+      experiment: oprl2n-tga-dsc-ega
+      type: rate_series
+      locator: {page: 5, published_page: 5, table: '1', note: '−Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature varying.'}
+      phase: OPRL2N mare simulant
+      regime: simultaneous_thermal_analysis_and_evolved_gas_analysis
+      units: wt_percent
+      values:
+        quantity: bulk_mass_loss_wt_pct
+        method_class: measured_direct
+        points:
+        - T_C: 1300
+          mass_loss_wt_pct: 0.331
+          point_conditions:
+            atmosphere: {state: {tag: value, value: 'N2 5.0 purge at 100 mL/min (99.999% guaranteed purity); near-inert external conditions; empty-baseline analyses indicated up to 200 ppm O2.'}, locator: *methods_loc}
+            total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: *methods_loc}
+            time_min: {state: {tag: value, value: 200}, locator: {page: 3, published_page: 3, section: '2.2.1', note: 'Each analysis took ca. 200 min.'}}
+      uncertainty: 'Printed sample mass accuracy ±0.1 μg and temperature accuracy ±5 °C; confidence level not stated. No uncertainty is printed for the mass-loss value.'
+  OPRL2NT:
+    observations:
+    - observation_id: sutherland_2025_oprl2nt_total_mass_loss_150_1300_c
+      experiment: oprl2nt-tga-dsc-ega
+      type: rate_series
+      locator: {page: 5, published_page: 5, table: '1', note: '−Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature varying.'}
+      phase: OPRL2NT mare simulant
+      regime: simultaneous_thermal_analysis_and_evolved_gas_analysis
+      units: wt_percent
+      values:
+        quantity: bulk_mass_loss_wt_pct
+        method_class: measured_direct
+        points:
+        - T_C: 1300
+          mass_loss_wt_pct: 0.670
+          point_conditions:
+            atmosphere: {state: {tag: value, value: 'N2 5.0 purge at 100 mL/min (99.999% guaranteed purity); near-inert external conditions; empty-baseline analyses indicated up to 200 ppm O2.'}, locator: *methods_loc}
+            total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: *methods_loc}
+            time_min: {state: {tag: value, value: 200}, locator: {page: 3, published_page: 3, section: '2.2.1', note: 'Each analysis took ca. 200 min.'}}
+      uncertainty: 'Printed sample mass accuracy ±0.1 μg and temperature accuracy ±5 °C; confidence level not stated. No uncertainty is printed for the mass-loss value.'
+  TUBS-M:
+    observations:
+    - observation_id: sutherland_2025_tubs_m_total_mass_loss_150_1300_c
+      experiment: tubs-m-tga-dsc-ega
+      type: rate_series
+      locator: {page: 5, published_page: 5, table: '1', note: '−Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature varying.'}
+      phase: TUBS-M mare simulant
+      regime: simultaneous_thermal_analysis_and_evolved_gas_analysis
+      units: wt_percent
+      values:
+        quantity: bulk_mass_loss_wt_pct
+        method_class: measured_direct
+        points:
+        - T_C: 1300
+          mass_loss_wt_pct: 0.979
+          point_conditions:
+            atmosphere: {state: {tag: value, value: 'N2 5.0 purge at 100 mL/min (99.999% guaranteed purity); near-inert external conditions; empty-baseline analyses indicated up to 200 ppm O2.'}, locator: *methods_loc}
+            total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: *methods_loc}
+            time_min: {state: {tag: value, value: 200}, locator: {page: 3, published_page: 3, section: '2.2.1', note: 'Each analysis took ca. 200 min.'}}
+      uncertainty: 'Printed sample mass accuracy ±0.1 μg and temperature accuracy ±5 °C; confidence level not stated. No uncertainty is printed for the mass-loss value.'
