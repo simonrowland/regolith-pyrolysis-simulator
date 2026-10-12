@@ -151,6 +151,118 @@ def test_install_provenance_detects_engine_file_changes(
     assert after != before
 
 
+@pytest.mark.parametrize(
+    ("identity", "backend_attribute", "artifact_name"),
+    [
+        (
+            BindingIdentity("alphamelts", "MELTSv1.0.2", "alphamelts-r1", "subprocess"),
+            "_binary_path",
+            "alphamelts_selected_binary",
+        ),
+        (
+            BindingIdentity("alphamelts", "MELTSv1.0.2", "alphamelts-r1", "python_api"),
+            "_pet_module",
+            "alphamelts_python_api_module",
+        ),
+        (
+            BindingIdentity("thermoengine", "MELTSv1.0.2", "thermoengine-r1", "native"),
+            "_thermoengine",
+            "thermoengine_module",
+        ),
+        (
+            BindingIdentity("magemin", "ig", "magemin-ig-r1", "subprocess"),
+            "_binary_path",
+            "magemin_selected_binary",
+        ),
+    ],
+)
+def test_install_provenance_records_selected_producer_artifact(
+    identity: BindingIdentity,
+    backend_attribute: str,
+    artifact_name: str,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator import engine_local_config
+
+    config_path = tmp_path / "engines.local.toml"
+    config_path.write_text("[paths]\n", encoding="utf-8")
+    monkeypatch.setattr(
+        engine_local_config,
+        "config_path",
+        lambda: config_path,
+    )
+    artifact_path = tmp_path / artifact_name
+    artifact_bytes = b"selected producer artifact"
+    artifact_path.write_bytes(artifact_bytes)
+    selected = (
+        SimpleNamespace(__file__=str(artifact_path))
+        if backend_attribute in {"_pet_module", "_thermoengine"}
+        else artifact_path
+    )
+    backend = SimpleNamespace(**{backend_attribute: selected})
+
+    provenance = install_provenance(identity, runtime_backend=backend)
+
+    assert provenance["runtime_artifacts"][artifact_name]["sha256"] == (
+        hashlib.sha256(artifact_bytes).hexdigest()
+    )
+
+
+def test_install_provenance_distinguishes_selected_digest_from_optional_metadata(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator import engine_local_config
+
+    config_path = tmp_path / "engines.local.toml"
+    config_path.write_text("[paths]\n", encoding="utf-8")
+    monkeypatch.setattr(
+        engine_local_config,
+        "config_path",
+        lambda: config_path,
+    )
+    identity = BindingIdentity(
+        "alphamelts", "MELTSv1.0.2", "alphamelts-r1", "python_api"
+    )
+    selected_path = tmp_path / "petthermotools.py"
+    selected_bytes = b"selected Python API module"
+    selected_path.write_bytes(selected_bytes)
+    backend = SimpleNamespace(
+        _pet_module=SimpleNamespace(__file__=str(selected_path))
+    )
+    species_catalog = (
+        Path(admission.__file__).resolve().parent.parent
+        / "data"
+        / "species_catalog.yaml"
+    ).resolve()
+    original_is_file = Path.is_file
+
+    def missing_optional_catalog(path: Path) -> bool:
+        if path.resolve() == species_catalog:
+            return False
+        return original_is_file(path)
+
+    monkeypatch.setattr(Path, "is_file", missing_optional_catalog)
+    provenance = install_provenance(identity, runtime_backend=backend)
+
+    assert provenance["runtime_artifacts"]["alphamelts_python_api_module"][
+        "sha256"
+    ] == hashlib.sha256(selected_bytes).hexdigest()
+    assert provenance["selected_source_digests"]["species_catalog"][
+        "sha256"
+    ] is None
+    assert provenance["binding_provenance_verifiable"] is False
+
+    backend._pet_module = SimpleNamespace(
+        __file__=str(tmp_path / "missing-petthermotools.py")
+    )
+    unavailable = install_provenance(identity, runtime_backend=backend)
+    assert unavailable["runtime_artifacts"]["alphamelts_python_api_module"][
+        "sha256"
+    ] is None
+
+
 def test_openimcc_admission_records_production_default_pack() -> None:
     from simulator.melt_backend import openimcc_bridge as bridge
 
