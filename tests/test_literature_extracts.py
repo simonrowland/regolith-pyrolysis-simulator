@@ -2528,21 +2528,25 @@ def _assert_halwax_figure_only_pressure_transcription(doc: dict) -> None:
         ("Mg", "O(g)"): ("mgo-series", "O(g)", "pure MgO(s)", 1926.0),
         ("Mg", "O2(g)"): ("mgo-series", "O2(g)", "pure MgO(s)", 1926.0),
     }
-    caption_only_ids = {
-        "halwax_2024_cao_isothermal_o2_pressure_figure_only",
-        "halwax_2024_cao_isothermal_o_pressure_figure_only",
-        "halwax_2024_mgo_isothermal_mg_pressure_figure_only",
-        "halwax_2024_mgo_isothermal_o2_pressure_figure_only",
+    restored_ids = {
+        "halwax_2024_cao_isothermal_o2_pressure_figure_only": ("O2(g)", "O2", "pure CaO(s)"),
+        "halwax_2024_cao_isothermal_o_pressure_figure_only": ("O(g)", "O", "pure CaO(s)"),
+        "halwax_2024_mgo_isothermal_mg_pressure_figure_only": ("Mg(g)", "Mg", "pure MgO(s)"),
+        "halwax_2024_mgo_isothermal_o2_pressure_figure_only": ("O2(g)", "O2", "pure MgO(s)"),
     }
     legacy_ids = {
         ("Ca", "Ca(g)"): "halwax_2024_cao_isothermal_ca_pressure_figure_only",
         ("Mg", "O(g)"): "halwax_2024_mgo_isothermal_o_pressure_figure_only",
     }
-    assert set(rows) == caption_only_ids | set(legacy_ids.values())
-    for observation_id in caption_only_ids:
+    assert set(rows) == set(restored_ids) | set(legacy_ids.values())
+    for observation_id, (gas_species, formula, condensed_phase) in restored_ids.items():
         species, row = rows[observation_id]
         temperature = 2077.0 if species == "Ca" else 1926.0
         values = row["values"]
+        assert values["quantity"] == "partial_pressure"
+        assert values.get("gas_species") == gas_species
+        assert values.get("formula") == formula
+        assert values.get("condensed_phase") == condensed_phase
         assert row["T_range_K"] == [temperature, temperature]
         assert row["locator"]["page"] == 826
         assert row["locator"]["published_page"] == 826
@@ -2553,7 +2557,6 @@ def _assert_halwax_figure_only_pressure_transcription(doc: dict) -> None:
         assert "points" not in values
         assert "temperature_K" not in values
         assert "partial_pressure_pa" not in values
-        assert "gas_species" not in values
     for key, observation_id in legacy_ids.items():
         assert (rows[observation_id][0], rows[observation_id][1]["values"]["gas_species"]) == key
     for (species, gas_species), observation_id in legacy_ids.items():
@@ -2645,8 +2648,8 @@ def _assert_halwax_figure_only_pressure_transcription(doc: dict) -> None:
     assert factor_pin["locator"]["pdf_page_index"] == 5
 
 
-def test_halwax_isothermal_pressures_are_pinned_to_pdf_figures_and_caption_only():
-    """Page 826 Fig. 7 caption-only rows and pages 827–828 figures 8–13."""
+def test_halwax_isothermal_pressures_are_pinned_to_pdf_figures_and_identities():
+    """Page 826 Fig. 7 pressure identities and pages 827–828 figures 8–13."""
     path = EXTRACTS / "kems-031-halwax-2024.yaml"
     doc = yaml.safe_load(path.read_text())
     _assert_halwax_figure_only_pressure_transcription(doc)
@@ -2687,6 +2690,15 @@ def test_halwax_isothermal_pressures_are_pinned_to_pdf_figures_and_caption_only(
     o2_row["values"]["points"] = []
     with pytest.raises(AssertionError):
         _assert_halwax_figure_only_pressure_transcription(null_points)
+
+    missing_gas = copy.deepcopy(doc)
+    o2_row = next(
+        row for row in missing_gas["species"]["Ca"]["observations"]
+        if row["observation_id"] == "halwax_2024_cao_isothermal_o2_pressure_figure_only"
+    )
+    del o2_row["values"]["gas_species"]
+    with pytest.raises(AssertionError):
+        _assert_halwax_figure_only_pressure_transcription(missing_gas)
 
 
 def test_source_priority_file_present_and_valid():
