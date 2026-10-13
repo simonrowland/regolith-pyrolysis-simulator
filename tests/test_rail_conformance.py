@@ -104,6 +104,20 @@ def _yaml(path: Path) -> dict[str, Any]:
     return payload
 
 
+def _source_debited_rates(sim, candidate_rates: dict[str, float]) -> dict[str, float]:
+    authority = sim.condensation_model.last_condensation_authority_by_species
+    # t-1217: route-retained candidates have no source debit without executable wall saturation.
+    return {
+        species: rate
+        for species, rate in candidate_rates.items()
+        if float(
+            authority.get(species, {}).get("retained_in_source_mass_kg_hr", 0.0)
+            or 0.0
+        )
+        == 0.0
+    }
+
+
 @lru_cache(maxsize=1)
 def _git_tracked_files() -> frozenset[str]:
     """Repo-relative paths present in the git index (tracked or staged).
@@ -2056,23 +2070,30 @@ def test_c6_shared_si_reservoir_conserves_independent_carrier_sum(
         _flux(requested_rates)
     )
     assert set(smoothed.species_kg_hr) == set(requested_rates)
-    # Independent expectation from applied carrier masses, not ledger deltas.
+    # Independent expectation from source-debited carrier masses, not ledger deltas.
     # Premise: each Si_xO_y carrier debits x Si atoms from the one shared SiO2
     # parent and releases (2x-y)/2 O2 per carrier molecule. Algebra:
     # debit_Si=sum(n_i*x_i); release_O2=sum(n_i*(2x_i-y_i)/2).
     # Unit check: kg / (kg mol^-1) = mol. Sanity: the MC-4b Si/SiO/Si2/Si3/
     # SiO2(g) case adds every carrier independently, then performs one grouped
     # reservoir debit rather than debiting the full SiO2 parent five times.
+    sim._configure_condensation_operating_conditions(smoothed)
+    sim._route_to_condensation(smoothed)
+    debited_rates = _source_debited_rates(sim, smoothed.species_kg_hr)
+    # t-1217: only the Si/SiO carrier subset has source authority in this probe.
+    assert set(debited_rates) == set(requested_rates) & {"Si", "SiO"}
+    sim._update_melt_composition(smoothed)
+
     carrier_formulas = {
         species_id: resolve_species_formula(
             species_id, sim.species_formula_registry
         )
-        for species_id in smoothed.species_kg_hr
+        for species_id in debited_rates
     }
     carrier_mol = {
         species_id: rate_kg_hr
         / carrier_formulas[species_id].molar_mass_kg_per_mol()
-        for species_id, rate_kg_hr in smoothed.species_kg_hr.items()
+        for species_id, rate_kg_hr in debited_rates.items()
     }
     expected_si_debit_mol = sum(
         carrier_mol[species_id] * carrier_formulas[species_id].elements["Si"]
@@ -2087,10 +2108,6 @@ def test_c6_shared_si_reservoir_conserves_independent_carrier_sum(
         / 2.0
         for species_id in carrier_mol
     )
-
-    sim._configure_condensation_operating_conditions(smoothed)
-    sim._route_to_condensation(smoothed)
-    sim._update_melt_composition(smoothed)
 
     after_si = sim.atom_ledger.atom_moles_by_account("process.cleaned_melt")["Si"]
     after_o2 = sum(
@@ -2123,19 +2140,23 @@ def test_c6_shared_ti_reservoir_conserves_three_carrier_sum_once() -> None:
     # debit_Ti=sum(n_i), release_O2=n_Ti+n_TiO/2. Unit check: kg divided by
     # kg/mol gives mol. Sanity: three per-carrier transitions must sum to one
     # shared parent debit, never debit the TiO2 reservoir three times.
+    sim._configure_condensation_operating_conditions(smoothed)
+    sim._route_to_condensation(smoothed)
+    debited_rates = _source_debited_rates(sim, smoothed.species_kg_hr)
+    # t-1217: Ti is the only admitted carrier in this synthetic source probe.
+    assert set(debited_rates) == {"Ti"}
+    sim._update_melt_composition(smoothed)
     carrier_mol = {
         species_id: rate_kg_hr
         / resolve_species_formula(
             species_id, sim.species_formula_registry
         ).molar_mass_kg_per_mol()
-        for species_id, rate_kg_hr in smoothed.species_kg_hr.items()
+        for species_id, rate_kg_hr in debited_rates.items()
     }
     expected_ti_debit_mol = sum(carrier_mol.values())
-    expected_o2_release_mol = carrier_mol["Ti"] + 0.5 * carrier_mol["TiO"]
-
-    sim._configure_condensation_operating_conditions(smoothed)
-    sim._route_to_condensation(smoothed)
-    sim._update_melt_composition(smoothed)
+    expected_o2_release_mol = carrier_mol.get("Ti", 0.0) + 0.5 * carrier_mol.get(
+        "TiO", 0.0
+    )
 
     after_ti = sim.atom_ledger.atom_moles_by_account("process.cleaned_melt")["Ti"]
     after_o2 = sum(
@@ -2147,11 +2168,9 @@ def test_c6_shared_ti_reservoir_conserves_three_carrier_sum_once() -> None:
     transition_reasons = {
         transition.reason for transition in sim.atom_ledger.transitions
     }
-    assert {
-        "evaporate_Ti",
-        "evaporate_TiO",
-        "evaporate_TiO2_gas",
-    } <= transition_reasons
+    assert {f"evaporate_{species_id}" for species_id in debited_rates} <= (
+        transition_reasons
+    )
     assert abs(sim._make_snapshot().mass_balance_error_pct) <= 5.0e-12
 
 
@@ -2188,6 +2207,11 @@ def test_c6_shared_al_reservoir_conserves_seven_carrier_sum_once() -> None:
     assert set(smoothed_releasing.species_kg_hr) == set(releasing_rates)
     sim._configure_condensation_operating_conditions(smoothed_releasing)
     sim._route_to_condensation(smoothed_releasing)
+    releasing_debited_rates = _source_debited_rates(
+        sim, smoothed_releasing.species_kg_hr
+    )
+    # t-1217: the admitted bare Al carrier keeps the shared-reservoir check active.
+    assert "Al" in releasing_debited_rates
     sim._update_melt_composition(smoothed_releasing)
 
     # AlO2 consumes O2, so evaluate it after the co-carriers have populated
@@ -2195,12 +2219,16 @@ def test_c6_shared_al_reservoir_conserves_seven_carrier_sum_once() -> None:
     smoothed_oxidizing = sim._apply_analytic_evaporation_depletion(
         _flux({"AlO2": requested_rates["AlO2"]})
     )
-    assert set(smoothed_oxidizing.species_kg_hr) == {"AlO2"}
+    # t-1217: retained source carriers released no O2, leaving AlO2's O2 draw unavailable.
+    assert smoothed_oxidizing.species_kg_hr == {}
     sim._configure_condensation_operating_conditions(smoothed_oxidizing)
     sim._route_to_condensation(smoothed_oxidizing)
+    oxidizing_debited_rates = _source_debited_rates(
+        sim, smoothed_oxidizing.species_kg_hr
+    )
     sim._update_melt_composition(smoothed_oxidizing)
-    applied_rates = dict(smoothed_releasing.species_kg_hr)
-    applied_rates.update(smoothed_oxidizing.species_kg_hr)
+    applied_rates = dict(releasing_debited_rates)
+    applied_rates.update(oxidizing_debited_rates)
     # Premise: all seven carriers draw from one Al2O3 reservoir. Al atoms per
     # carrier are 1,2,2,2,2,1,1; O2 released per carrier is
     # 3/4,3/2,1,1/2,0,1/4,-1/4. Algebra: sum each applied carrier mole times
@@ -2251,7 +2279,7 @@ def test_c6_shared_al_reservoir_conserves_seven_carrier_sum_once() -> None:
     transition_reasons = {
         transition.reason for transition in sim.atom_ledger.transitions
     }
-    assert {f"evaporate_{species_id}" for species_id in requested_rates} <= (
+    assert {f"evaporate_{species_id}" for species_id in applied_rates} <= (
         transition_reasons
     )
     assert abs(sim._make_snapshot().mass_balance_error_pct) <= 5.0e-12

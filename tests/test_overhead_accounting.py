@@ -957,16 +957,14 @@ def test_cro2_condenses_to_terminal_chromium_oxide_account():
         cro2_kg = sim.atom_ledger.kg_by_account(account).get("CrO2", 0.0)
         if cro2_kg > 0.0:
             wall_cro2_by_account_kg[account] = cro2_kg
-    # 2026-07-30 7d42b4f rebaseline: real flowing CrO2 partial pressure is
-    # supersaturated on the first two walls; segment-local depletion then
-    # leaves 0.913341865141524 kg for terminal conversion.
+    # t-1217: causal inlet-driven wall capture sets these CrO2 deposits before terminal conversion.
     assert wall_cro2_by_account_kg == pytest.approx(
         {
             "process.wall_deposit_segment_stage_0_to_stage_1": (
-                0.04078029875692986
+                0.017091617459996433
             ),
             "process.wall_deposit_segment_stage_1_to_stage_2": (
-                0.045877836101546096
+                0.019228069642495987
             ),
         },
         rel=1e-12,
@@ -975,13 +973,11 @@ def test_cro2_condenses_to_terminal_chromium_oxide_account():
     remaining_cro2_kg = flux.species_kg_hr["CrO2"] - sum(
         wall_cro2_by_account_kg.values()
     )
-    # The terminal account receives only that segment-locally depleted
-    # remainder, converted by the fixture's exact CrO2 -> Cr2O3 stoichiometry.
+    # t-1217: only stage-captured CrO2 converts; the final 1.8e-9 kg stays in offgas.
+    authority = sim.condensation_model.last_condensation_authority_by_species["CrO2"]
+    remaining_cro2_kg -= authority["remaining_mass_kg_hr"]
     expected_cr2o3_kg = (
-        remaining_cro2_kg
-        * 0.5
-        * MOLAR_MASS["Cr2O3"]
-        / MOLAR_MASS["CrO2"]
+        remaining_cro2_kg * 0.5 * MOLAR_MASS["Cr2O3"] / MOLAR_MASS["CrO2"]
     )
     assert chromium["Cr2O3"] == pytest.approx(
         expected_cr2o3_kg, rel=1e-12, abs=0.0

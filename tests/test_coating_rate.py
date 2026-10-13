@@ -801,7 +801,8 @@ def test_shadow_rate_shares_species_supply_across_segments() -> None:
         and record["supersaturated"] is False
         for record in records_by_species["Na"]
     )
-    assert len(records_by_species["SiO"]) > 1
+    # t-1217: complete first-wall SiO capture leaves one segment with positive supply.
+    assert len(records_by_species["SiO"]) == 1
     for species, records in records_by_species.items():
         available_supply_mol_s = max(
             float(record["available_supply_mol_s"])

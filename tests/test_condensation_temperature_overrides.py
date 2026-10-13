@@ -756,8 +756,9 @@ def test_configured_stage_area_scales_baffle_capture(monkeypatch):
             inlet_partial_pressure_pa=100.0,
         )
 
-    assert efficiency(0.25) == pytest.approx(-math.expm1(-0.05))
-    assert efficiency(1.0) == pytest.approx(-math.expm1(-0.2))
+    # t-1217: P_sat/p_in=0.01 leaves f_eq=0.99 excess inventory for the integrated kinetics.
+    assert efficiency(0.25) == pytest.approx(0.048758364372035276)
+    assert efficiency(1.0) == pytest.approx(0.181092363070676)
 
 
 def test_missing_stage_area_cannot_make_flux_ratio_a_rate_constant(monkeypatch):

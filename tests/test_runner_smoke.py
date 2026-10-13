@@ -384,9 +384,9 @@ def test_per_hour_alkali_series_separate_cumulative_condensate_from_live_product
         return sum(float(values.get(species, 0.0)) for species in ("Na", "K"))
 
     assert rows[8]["product_ledger_kg_at_hour"] == rows[8]["metal_yields_kg"]
-    assert alkali_total(rows[8], "product_ledger_kg_at_hour") < alkali_total(
-        rows[7], "product_ledger_kg_at_hour"
-    )
+    # t-1217: Stage 4 is above the alkali dew points, so Na and K stay uncaptured and escape as terminal loss.
+    assert alkali_total(rows[8], "product_ledger_kg_at_hour") == 0.0
+    assert alkali_total(rows[7], "product_ledger_kg_at_hour") == 0.0
     for key in (
         "condensation_train_kg_cumulative",
         "recycled_to_reagent_kg_cumulative",
@@ -401,9 +401,10 @@ def test_per_hour_alkali_series_separate_cumulative_condensate_from_live_product
                 == pytest.approx(
                     row["product_ledger_kg_at_hour"].get(species, 0.0)
                     + row["recycled_to_reagent_kg_cumulative"].get(species, 0.0)
-                    - offgas[species]
                 )
             )
+            assert offgas[species] >= 0.0
+    assert sum(terminal_offgas[-1].values()) > 0.0
 
 
 @pytest.mark.parametrize(

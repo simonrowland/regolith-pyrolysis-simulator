@@ -45,15 +45,17 @@ def _assert_synthetic_sio_route_authority(route) -> None:
     stage_outcomes = route.condensation_refusals_by_species.get("SiO", {}).get(
         "stage_outcomes", []
     )
-    assert authority["status"] == "authoritative"
+    # t-1217: carrier authority cannot certify extrapolated stage-surface saturation.
+    assert authority["status"] == "status_bearing"
     assert authority["carrier_authority"]["pressure"] == {
         "kind": "value",
         "pa": 100.0,
         "valid_range_K": [1323.0, 1324.0],
     }
-    assert {
+    # t-1217: extrapolated stage-surface saturation is visible but not authoritative.
+    assert "antoine_psat_unavailable_at_T" in {
         outcome["reason"] for outcome in stage_outcomes
-    }.isdisjoint({"antoine_psat_unavailable_at_T"})
+    }
 
 
 def test_sio_alpha_provenance_receipt_and_fixtures_refuse_evaporation_label():
@@ -572,9 +574,10 @@ def test_sio_yield_restored_capture_keeps_provenance_and_closure(feedstock):
     # therefore re-grounds the two cancellation residuals, not a free tuning
     # parameter; canonical atom-ledger closure remains independently bounded
     # at 5e-12 percent.
+    # t-1217: inlet-driven equilibrium-capped capture re-grounds the SiO closure residual.
     expected_closure_error_pct = {
-        "lunar_mare_low_ti": 5.717403344648834e-7,
-        "mars_basalt": 6.656418718358862e-7,
+        "lunar_mare_low_ti": 8.342660133683346e-8,
+        "mars_basalt": 2.017246221546194e-7,
     }
     assert diagnostics["closure_error_pct"] == pytest.approx(
         expected_closure_error_pct[feedstock], rel=1.0e-9, abs=1.0e-15
@@ -633,10 +636,10 @@ def test_band_aware_hkl_route_captures_sio_in_stage_3(
     assert route.condensed_by_stage_species[3]["SiO"] > 0.0
     assert 0.0 < route.condensed_by_stage_species[4]["SiO"] < 0.95
     # Cold-wall SiO now uses the Pound 1972 unity condensation gate below the
-    # Wetzel/Gail evaporation-Arrhenius validity floor, so less vapor remains
-    # in offgas once it reaches cold stages.
+    # Wetzel/Gail evaporation-Arrhenius validity floor.
+    # t-1217: inlet-driven equilibrium-capped kinetics leave 0.634790 kg after stage capture.
     assert route.remaining_by_species["SiO"] == pytest.approx(
-        0.04275021936015011
+        0.6347900475084334
     )
     assert route.wall_deposit_by_species.get("SiO", 0.0) >= 0.0
 
@@ -710,7 +713,8 @@ def test_condensation_route_flags_metal_antoine_valid_range_extrapolation():
     )
 
     extrapolation = route.antoine_extrapolations["Ca"]
-    assert extrapolation["temperature_K"] == pytest.approx(780.0 + 273.15)
+    # t-1217: Antoine extrapolation now uses the actual 525 C stage surface.
+    assert extrapolation["temperature_K"] == pytest.approx(798.15)
     assert tuple(extrapolation["valid_range_K"]) == (1254.0, 1712.0)
     assert any(
         "Ca metal Antoine fit extrapolated beyond valid_range_K" in warning
@@ -837,11 +841,9 @@ def test_wall_deposit_sticking_alpha_notice_tracks_cold_wall_gate():
         melt,
     )
 
-    # Re-executed twice at base 3e4b54f after the configured-route alignment;
-    # both -n0 probes produced the same direct wall-budget pin:
-    # docs-private/research/2026-07-13-sio-tsweep-lag/fixed-yield-r{3,4}.log.
+    # t-1217: the first cold wall captures the full inlet parcel on the causal route.
     assert route.wall_deposit_by_species["SiO"] == pytest.approx(
-        0.9572497806398499,
+        1.0,
         rel=1e-12,
     )
     assert (
@@ -853,8 +855,8 @@ def test_wall_deposit_sticking_alpha_notice_tracks_cold_wall_gate():
     assert notice["severity"] == "warning"
     assert notice["code"] == "wall_deposit_sticking_alpha_uncertified"
     assert notice["source_class"] == "status_bearing_material_alpha"
+    # t-1217: full first-wall capture leaves no separate high-supersaturation source class.
     assert notice["source_classes"] == [
-        "cited_high_supersaturation_condensation_limit",
         "fail_closed_no_direct_sticking_coefficient",
         "solid_film_growth_proxy_not_evaporation_evidence",
     ]

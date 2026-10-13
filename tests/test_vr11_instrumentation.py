@@ -453,7 +453,8 @@ def test_b112_positive_efficiency_does_not_mint_outcome(monkeypatch) -> None:
         alpha_s_value=1.0,
         efficiency_outcomes=outcomes,
     )
-    assert eta == pytest.approx(-math.expm1(-0.2))
+    # t-1217: 1 Pa saturation leaves 99% equilibrium headroom at the 100 Pa inlet.
+    assert eta == pytest.approx(0.181092363070676)
     assert outcomes == []
 
 
