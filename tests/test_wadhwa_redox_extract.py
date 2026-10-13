@@ -1,7 +1,9 @@
 from pathlib import Path
 
+import pytest
+
 from simulator.battery.enums import EvidenceClass, Quantity
-from simulator.battery.migrate import Migrator, load_yaml
+from simulator.battery.migrate import Migrator
 
 
 EXTRACT = Path("data/literature/extracts/wadhwa-2008-redox-small-bodies.yaml")
@@ -29,16 +31,6 @@ def test_wadhwa_redox_source_facts_survive_production_migration():
     assert contexts["wadh08_fig4_angrite_augite_comparison"]["values"]["axes"] == (
         "x = Eu/Sm pigeonite oxybarometer; y = angrite augite oxybarometer"
     )
-
-    source = load_yaml(EXTRACT)
-    printed_points = (
-        source["species"]["FeO"]["observations"][0]["values"]["points"]
-    )
-    assert [point["fO2_as_published"] for point in printed_points] == [
-        "~10−18",
-        "~10−12",
-    ]
-    assert all("log10_fO2" not in point for point in printed_points)
 
     ureilite = sorted(
         (
@@ -70,4 +62,35 @@ def test_wadhwa_redox_source_facts_survive_production_migration():
         obs.point_conditions["temperature_K"].locator.published_page == 496
         for obs in ureilite
     )
+    assert [obs.evidence.attribution for obs in ureilite] == [
+        "Berkley and Jones (1982) report approximately ~10−18 at 1200 K and ~10−12 at 1600 K."
+    ] * 2
     assert not result.validation.hard_issues
+
+
+def test_wadhwa_ureilite_attribution_mutation_turns_migration_check_red(tmp_path):
+    original = EXTRACT.read_text()
+    mutated = original.replace(
+        "          attribution: 'Berkley and Jones (1982) report approximately ~10−18 at 1200 K and ~10−12 at 1600 K.'\n",
+        "",
+    )
+    assert mutated != original
+    mutated_extract = tmp_path / EXTRACT.name
+    mutated_extract.write_text(mutated)
+
+    migrator = Migrator(Path.cwd(), index={}, aliases={})
+    migrator._migrate_extract(mutated_extract)
+    migrator.finalize()
+    migrated = sorted(
+        (
+            obs
+            for obs in migrator.result.observations.values()
+            if obs.source_id == EXTRACT.stem
+        ),
+        key=lambda obs: obs.identity.temperature_K.value,
+    )
+    assert len(migrated) == 2
+    with pytest.raises(AssertionError):
+        assert [obs.evidence.attribution for obs in migrated] == [
+            "Berkley and Jones (1982) report approximately ~10−18 at 1200 K and ~10−12 at 1600 K."
+        ] * 2
