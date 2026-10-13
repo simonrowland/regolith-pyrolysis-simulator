@@ -9711,10 +9711,27 @@ def test_d036_equipment_fk_resolves_through_context_row(tmp_path: Path) -> None:
     assert row is not None
     assert row["context_id"] == context_id
     assert row["type"] == "laboratory_conditions"
-    assert row["equipment"]["cell_material"] == "silica tube"
-    assert row["equipment"]["crucible_material"] == "alumina"
+    assert row["equipment"]["cell_material"]["value"] == "silica tube"
+    assert row["equipment"]["cell_material"]["locator"] == {
+        "pdf_page_index": 8,
+        "section": "2.1 Experiments",
+    }
+    assert row["equipment"]["crucible_material"]["value"] == "alumina"
+    assert row["equipment"]["crucible_material"]["locator"] == {
+        "pdf_page_index": 8,
+        "section": "2.1 Experiments",
+    }
     assert row["equipment"]["sample_container"]["value"] == "alumina crucible"
-    assert row["equipment"]["ampoule_volume_m3"]["value"] == "4.4 x 10^-6"
+    ampoule_volume = next(
+        fact
+        for fact in row["equipment"]["other_facts"]["value"]
+        if fact["name"] == "ampoule_volume_m3"
+    )
+    assert ampoule_volume["value"] == "4.4 x 10^-6"
+    assert ampoule_volume["locator"] == {
+        "pdf_page_index": 9,
+        "section": "2.1 Experiments",
+    }
     assert row["values"]["apparatus"]["furnace"] == "muffle furnace"
 
     # No duplication: the experiment record carries none of the row's

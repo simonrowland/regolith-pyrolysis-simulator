@@ -121,34 +121,39 @@ experiments:
         page: 141
         section: 2. Experimentals
         source_path: corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
-    geometry:
-      chamber_length_m:
-        state:
-          tag: value
-          value:
-            kind: point
-            point: '1'
-            approximate: false
-        locator:
-          page: 140
-          section: 2. Experimentals
-          note: Abstract gives the full temperature range; the apparatus and run parameters are printed in section 2 on published
-            page 140.
-          source_path: corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
-        inference:
-          relation: identity:m
-          inputs:
-          - as_published=1.0 m
-          - printed=chamber_length_m
-          parameters:
-          - - original
-            - state:
-                tag: value
-                value: '1'
-              locator:
-                page: 140
-                section: 2. Experimentals
-                note: Abstract gives the full temperature range; the apparatus and run parameters are printed in section 2
-                  on published page 140.
-                source_path: corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
-          output_unit: m
+benches:
+- id: 18759a2d5a208680dd48432f0ff7030e0b32e32a2e5893c1a3abc5e91e6a4743::bench::nagabayashi-1989-reactor
+  work_id: 18759a2d5a208680dd48432f0ff7030e0b32e32a2e5893c1a3abc5e91e6a4743
+  identity:
+    basis: described_in_this_work
+  other_facts:
+  - name: reaction_chamber_dimensions_m_as_printed
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: 0.42 x 0.52 x 1 m
+          approximate: false
+      locator:
+        page: 140
+        section: 2. Experimentals
+        note: The experimental apparatus consists of the purification train of Ar, an alumina tube (0.42 x 0.52 x 1 m) as
+          a reaction chamber.
+        source_path: corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+    unit: m
+  - name: slag_mass_kg_range_as_printed
+    value:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.006'
+          interval_high: '0.008'
+          approximate: false
+      locator:
+        page: 140
+        section: 2. Experimentals
+        note: The premelted synthetic slag of (6-8) x 10^-3 kg was set in a crucible.
+        source_path: corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+    unit: kg

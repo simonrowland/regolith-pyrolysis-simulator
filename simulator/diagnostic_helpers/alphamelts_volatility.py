@@ -744,9 +744,11 @@ def _alphamelts_domain_diagnostic(
     temperature_C: float,
     pressure_bar: float,
 ) -> dict[str, Any]:
-    valid, warnings, reason = AlphaMELTSDomainGate.validate_with_reason(
-        composition_wt_pct
-    )
+    assessment = AlphaMELTSDomainGate.assess(composition_wt_pct)
+    valid = assessment.valid
+    warnings = assessment.warnings
+    reason = assessment.reason
+    extrapolation_limited = not valid or assessment.outside_certified_band
     crash_point = {
         "temperature_C": float(temperature_C),
         "pressure_bar": float(pressure_bar),
@@ -754,11 +756,11 @@ def _alphamelts_domain_diagnostic(
     }
     status = "diagnostic"
     reason_code = reason_value(reason)
-    if not valid:
+    if extrapolation_limited:
         status = "extrapolation_limited"
     return {
         "status": status,
-        "extrapolation_limited": not valid,
+        "extrapolation_limited": extrapolation_limited,
         "backend_status_reason": reason_code,
         "warnings": tuple(warnings),
         "out_of_domain_crash_point": crash_point if not valid else None,

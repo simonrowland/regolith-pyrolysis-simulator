@@ -1,7 +1,8 @@
 """Optimizer determinism utilities.
 
-Call :func:`pin_worker_env` at worker start, before NumPy/SciPy or BLAS-backed
-backends import and bind thread pools. Eval seeds follow the existing DOE/run
+Package startup applies the numerical thread defaults before NumPy/SciPy or
+BLAS-backed backends bind pools; :func:`pin_worker_env` reapplies those defaults
+for workers without replacing launcher values. Eval seeds follow the existing DOE/run
 integer-seed convention; future samplers reuse that seed instead of adding a
 second seed namespace.
 """
@@ -12,12 +13,11 @@ import dataclasses
 import difflib
 import json
 import math
-import os
 import random
 from collections.abc import Callable, Mapping
 from typing import Any
 
-from simulator._blas_policy import THREAD_ENV_VARS
+from simulator._blas_policy import THREAD_ENV_VARS, apply_environment_defaults
 from simulator.optimize.canonical import canonical_json_dumps, normalize_canonical_value
 from simulator.optimize.evalspec import canonical_evalspec_json
 from simulator.optimize.evaluate import FailureCategory, RunReference, ScoredResult
@@ -42,10 +42,9 @@ _VOLATILE_KEYS = frozenset(
 
 
 def pin_worker_env() -> None:
-    """Pin BLAS/numerics pools to one thread; safe to call repeatedly."""
+    """Reapply startup thread defaults while preserving launcher settings."""
 
-    for name in THREAD_ENV_VARS:
-        os.environ[name] = "1"
+    apply_environment_defaults()
 
 
 def pin_seeds(seed: int) -> None:

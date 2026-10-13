@@ -1,0 +1,1269 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c
+  citation: Sato, M., Hickling, N. L. & McLane, J. E. (1973), “Oxygen fugacity values of Apollo 12, 14, and 15 lunar samples
+    and reduced state of lunar magmas”, Proceedings of the Fourth Lunar Science Conference (Supplement 4, Geochimica et Cosmochimica
+    Acta), vol. 1, pp. 1061–1079.
+  source_ids:
+  - sato-hickling-mclane-1973-lunar-fo2
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+    files:
+    - asset_id: pdf:sato-hickling-mclane-1973-lunar-fo2
+      role: pdf
+      path: raw/sato-hickling-mclane-1973-lunar-fo2/sato-hickling-mclane-1973-lunar-fo2.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:sato-hickling-mclane-1973-lunar-fo2
+      role: pdftotext
+      path: text/sato-hickling-mclane-1973-lunar-fo2
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:sato-hickling-mclane-1973-lunar-fo2
+      role: table_csv
+      path: tables/sato-hickling-mclane-1973-lunar-fo2
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: unknown:sato-hickling-mclane-1973-lunar-fo2
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12009_35_bulk_plus_fe
+  kind: literature
+  method:
+    tag: value
+    value: emf_cell
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 1062
+        section: Experimental Procedure
+        note: About 100 mg for the bulk-rock plus metallic-iron procedure; not assigned to individual Table 1 observations.
+    initial_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1061
+        section: Samples Studied
+    form:
+      state:
+        tag: value
+        value: Lunar sample 12009,35; bulk rock plus iron foil
+      locator:
+        page: 3
+        published_page: 1063
+        table: '1'
+    characterization:
+      state:
+        tag: value
+        value: Basaltic igneous rock; selected bulk-rock run with iron foil
+      locator:
+        page: 2
+        published_page: 1062
+        section: Experimental Procedure
+    pretreatment:
+      state:
+        tag: value
+        value: Previously melted sample; 99.99% pure iron foil added
+      locator:
+        page: 2
+        published_page: 1062
+        section: Experimental Procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+    note: row=12009,35
+  bench_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::bench::sato-solid-electrolyte-oxygen-cell
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Anomalously high initial first-heating readings after prolonged air exposure were omitted from the visually
+          fitted curves.
+      locator:
+        page: 3
+        published_page: 1063
+        section: Experimental Results
+- experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12009_35_bulk_rock
+  kind: literature
+  method:
+    tag: value
+    value: emf_cell
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1061
+        section: Samples Studied
+    form:
+      state:
+        tag: value
+        value: Lunar sample 12009,35; bulk rock
+      locator:
+        page: 3
+        published_page: 1063
+        table: '1'
+    characterization:
+      state:
+        tag: value
+        value: Basaltic igneous rock; bulk rock
+      locator:
+        page: 1
+        published_page: 1061
+        section: Samples Studied
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+    note: row=12009,35
+  bench_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::bench::sato-solid-electrolyte-oxygen-cell
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Anomalously high initial first-heating readings after prolonged air exposure were omitted from the visually
+          fitted curves.
+      locator:
+        page: 3
+        published_page: 1063
+        section: Experimental Results
+- experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12009_35_groundmass
+  kind: literature
+  method:
+    tag: value
+    value: emf_cell
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1061
+        section: Samples Studied
+    form:
+      state:
+        tag: value
+        value: Lunar sample 12009,35; groundmass
+      locator:
+        page: 3
+        published_page: 1063
+        table: '1'
+    characterization:
+      state:
+        tag: value
+        value: Basaltic igneous rock; groundmass
+      locator:
+        page: 1
+        published_page: 1061
+        section: Samples Studied
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+    note: row=12009,35
+  bench_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::bench::sato-solid-electrolyte-oxygen-cell
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Anomalously high initial first-heating readings after prolonged air exposure were omitted from the visually
+          fitted curves.
+      locator:
+        page: 3
+        published_page: 1063
+        section: Experimental Results
+- experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12009_35_olivine
+  kind: literature
+  method:
+    tag: value
+    value: emf_cell
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1061
+        section: Samples Studied
+    form:
+      state:
+        tag: value
+        value: Lunar sample 12009,35; olivine
+      locator:
+        page: 3
+        published_page: 1063
+        table: '1'
+    characterization:
+      state:
+        tag: value
+        value: Basaltic igneous rock; olivine separate
+      locator:
+        page: 1
+        published_page: 1061
+        section: Samples Studied
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+    note: row=12009,35
+  bench_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::bench::sato-solid-electrolyte-oxygen-cell
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Anomalously high initial first-heating readings after prolonged air exposure were omitted from the visually
+          fitted curves.
+      locator:
+        page: 3
+        published_page: 1063
+        section: Experimental Results
+- experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12022_36_bulk_plus_fe
+  kind: literature
+  method:
+    tag: value
+    value: emf_cell
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 1062
+        section: Experimental Procedure
+        note: About 100 mg for the bulk-rock plus metallic-iron procedure; not assigned to individual Table 1 observations.
+    initial_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1061
+        section: Samples Studied
+    form:
+      state:
+        tag: value
+        value: Lunar sample 12022,36; bulk rock plus iron foil
+      locator:
+        page: 3
+        published_page: 1063
+        table: '1'
+    characterization:
+      state:
+        tag: value
+        value: Basaltic igneous rock; selected bulk-rock run with iron foil
+      locator:
+        page: 2
+        published_page: 1062
+        section: Experimental Procedure
+    pretreatment:
+      state:
+        tag: value
+        value: Previously melted sample; 99.99% pure iron foil added
+      locator:
+        page: 2
+        published_page: 1062
+        section: Experimental Procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+    note: row=12022,36
+  bench_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::bench::sato-solid-electrolyte-oxygen-cell
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Anomalously high initial first-heating readings after prolonged air exposure were omitted from the visually
+          fitted curves.
+      locator:
+        page: 3
+        published_page: 1063
+        section: Experimental Results
+- experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12053_89_bulk_plus_fe
+  kind: literature
+  method:
+    tag: value
+    value: emf_cell
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 1062
+        section: Experimental Procedure
+        note: About 100 mg for the bulk-rock plus metallic-iron procedure; not assigned to individual Table 1 observations.
+    initial_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1061
+        section: Samples Studied
+    form:
+      state:
+        tag: value
+        value: Lunar sample 12053,89; bulk rock plus iron foil
+      locator:
+        page: 3
+        published_page: 1063
+        table: '1'
+    characterization:
+      state:
+        tag: value
+        value: Basaltic igneous rock; selected bulk-rock run with iron foil
+      locator:
+        page: 2
+        published_page: 1062
+        section: Experimental Procedure
+    pretreatment:
+      state:
+        tag: value
+        value: Previously melted sample; 99.99% pure iron foil added
+      locator:
+        page: 2
+        published_page: 1062
+        section: Experimental Procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+    note: row=12053,89
+  bench_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::bench::sato-solid-electrolyte-oxygen-cell
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Anomalously high initial first-heating readings after prolonged air exposure were omitted from the visually
+          fitted curves.
+      locator:
+        page: 3
+        published_page: 1063
+        section: Experimental Results
+- experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12053_89_bulk_rock
+  kind: literature
+  method:
+    tag: value
+    value: emf_cell
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1061
+        section: Samples Studied
+    form:
+      state:
+        tag: value
+        value: Lunar sample 12053,89; bulk rock
+      locator:
+        page: 3
+        published_page: 1063
+        table: '1'
+    characterization:
+      state:
+        tag: value
+        value: Basaltic igneous rock; bulk rock
+      locator:
+        page: 1
+        published_page: 1061
+        section: Samples Studied
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+    note: row=12053,89
+  bench_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::bench::sato-solid-electrolyte-oxygen-cell
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Anomalously high initial first-heating readings after prolonged air exposure were omitted from the visually
+          fitted curves.
+      locator:
+        page: 3
+        published_page: 1063
+        section: Experimental Results
+- experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12053_89_pyroxenes
+  kind: literature
+  method:
+    tag: value
+    value: emf_cell
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1061
+        section: Samples Studied
+    form:
+      state:
+        tag: value
+        value: Lunar sample 12053,89; pyroxenes
+      locator:
+        page: 3
+        published_page: 1063
+        table: '1'
+    characterization:
+      state:
+        tag: value
+        value: Basaltic igneous rock; pyroxene separates
+      locator:
+        page: 1
+        published_page: 1061
+        section: Samples Studied
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+    note: row=12053,89
+  bench_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::bench::sato-solid-electrolyte-oxygen-cell
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Anomalously high initial first-heating readings after prolonged air exposure were omitted from the visually
+          fitted curves.
+      locator:
+        page: 3
+        published_page: 1063
+        section: Experimental Results
+- experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_14310_195_bulk_rock
+  kind: literature
+  method:
+    tag: value
+    value: emf_cell
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1061
+        section: Samples Studied
+    form:
+      state:
+        tag: value
+        value: Lunar sample 14310,195; bulk rock
+      locator:
+        page: 3
+        published_page: 1063
+        table: '1'
+    characterization:
+      state:
+        tag: value
+        value: “Igneous” rock; origin disputed; bulk rock
+      locator:
+        page: 1
+        published_page: 1061
+        section: Samples Studied
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+    note: row=14310,195
+  bench_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::bench::sato-solid-electrolyte-oxygen-cell
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Table 1 values for the two 14310 chips are from the first heating cycle. Both showed a highly irreversible,
+          reproducible abrupt rise in bulk-rock fO2 above the iron-wustite buffer at about 1170 °C; on cooling fO2 remained
+          up to 1 log unit above initial heating.
+      locator:
+        page: 7
+        published_page: 1067
+        section: Experimental Results
+- experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_14310_207_bulk_rock
+  kind: literature
+  method:
+    tag: value
+    value: emf_cell
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1061
+        section: Samples Studied
+    form:
+      state:
+        tag: value
+        value: Lunar sample 14310,207; bulk rock
+      locator:
+        page: 3
+        published_page: 1063
+        table: '1'
+    characterization:
+      state:
+        tag: value
+        value: “Igneous” rock; origin disputed; bulk rock
+      locator:
+        page: 1
+        published_page: 1061
+        section: Samples Studied
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+    note: row=14310,207
+  bench_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::bench::sato-solid-electrolyte-oxygen-cell
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Table 1 values for the two 14310 chips are from the first heating cycle. Both showed a highly irreversible,
+          reproducible abrupt rise in bulk-rock fO2 above the iron-wustite buffer at about 1170 °C; on cooling fO2 remained
+          up to 1 log unit above initial heating.
+      locator:
+        page: 7
+        published_page: 1067
+        section: Experimental Results
+- experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_14321_105_bulk_rock
+  kind: literature
+  method:
+    tag: value
+    value: emf_cell
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1061
+        section: Samples Studied
+    form:
+      state:
+        tag: value
+        value: Lunar sample 14321,105; bulk rock
+      locator:
+        page: 3
+        published_page: 1063
+        table: '1'
+    characterization:
+      state:
+        tag: value
+        value: Microbreccia; bulk rock
+      locator:
+        page: 1
+        published_page: 1061
+        section: Samples Studied
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+    note: row=14321,105
+  bench_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::bench::sato-solid-electrolyte-oxygen-cell
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: The authors report irregular fO2 values for sample 14321 in the heating cycle; they do not identify which cycle
+          supplied Table 1 values.
+      locator:
+        page: 7
+        published_page: 1067
+        section: Experimental Results
+- experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_15058_81_bulk_rock
+  kind: literature
+  method:
+    tag: value
+    value: emf_cell
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1061
+        section: Samples Studied
+    form:
+      state:
+        tag: value
+        value: Lunar sample 15058,81; bulk rock
+      locator:
+        page: 3
+        published_page: 1063
+        table: '1'
+    characterization:
+      state:
+        tag: value
+        value: Basaltic igneous rock; bulk rock
+      locator:
+        page: 1
+        published_page: 1061
+        section: Samples Studied
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+    note: row=15058,81
+  bench_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::bench::sato-solid-electrolyte-oxygen-cell
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: The authors report that chips 15058,81 and 15058,88 produced almost identical results; they do not identify
+          which cycle supplied Table 1 values.
+      locator:
+        page: 3
+        published_page: 1063
+        section: Experimental Results
+- experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_15058_88_bulk_rock
+  kind: literature
+  method:
+    tag: value
+    value: emf_cell
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1061
+        section: Samples Studied
+    form:
+      state:
+        tag: value
+        value: Lunar sample 15058,88; bulk rock
+      locator:
+        page: 3
+        published_page: 1063
+        table: '1'
+    characterization:
+      state:
+        tag: value
+        value: Basaltic igneous rock; bulk rock
+      locator:
+        page: 1
+        published_page: 1061
+        section: Samples Studied
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+    note: row=15058,88
+  bench_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::bench::sato-solid-electrolyte-oxygen-cell
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: The authors report that chips 15058,81 and 15058,88 produced almost identical results; they do not identify
+          which cycle supplied Table 1 values.
+      locator:
+        page: 3
+        published_page: 1063
+        section: Experimental Results
+- experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_15595_25_bulk_plus_fe
+  kind: literature
+  method:
+    tag: value
+    value: emf_cell
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 1062
+        section: Experimental Procedure
+        note: About 100 mg for the bulk-rock plus metallic-iron procedure; not assigned to individual Table 1 observations.
+    initial_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1061
+        section: Samples Studied
+    form:
+      state:
+        tag: value
+        value: Lunar sample 15595,25; bulk rock plus iron foil
+      locator:
+        page: 3
+        published_page: 1063
+        table: '1'
+    characterization:
+      state:
+        tag: value
+        value: Basaltic igneous rock; selected bulk-rock run with iron foil
+      locator:
+        page: 2
+        published_page: 1062
+        section: Experimental Procedure
+    pretreatment:
+      state:
+        tag: value
+        value: Previously melted sample; 99.99% pure iron foil added
+      locator:
+        page: 2
+        published_page: 1062
+        section: Experimental Procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+    note: row=15595,25
+  bench_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::bench::sato-solid-electrolyte-oxygen-cell
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: The authors report agreement between heating and cooling results for rock 15595; they do not identify which
+          cycle supplied Table 1 values.
+      locator:
+        page: 3
+        published_page: 1063
+        section: Experimental Results
+- experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_15595_25_bulk_rock
+  kind: literature
+  method:
+    tag: value
+    value: emf_cell
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1061
+        section: Samples Studied
+    form:
+      state:
+        tag: value
+        value: Lunar sample 15595,25; bulk rock
+      locator:
+        page: 3
+        published_page: 1063
+        table: '1'
+    characterization:
+      state:
+        tag: value
+        value: Basaltic igneous rock; bulk rock
+      locator:
+        page: 1
+        published_page: 1061
+        section: Samples Studied
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+    note: row=15595,25
+  bench_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::bench::sato-solid-electrolyte-oxygen-cell
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: The authors report agreement between heating and cooling results for rock 15595; they do not identify which
+          cycle supplied Table 1 values.
+      locator:
+        page: 3
+        published_page: 1063
+        section: Experimental Results
+benches:
+- id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::bench::sato-solid-electrolyte-oxygen-cell
+  work_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Opposed-double-tube solid-electrolyte oxygen cell with negative-feedback servo control
+    locator:
+      page: 2
+      published_page: 1062
+      figure: '1'
+      section: Experimental Procedure
+  method:
+    state:
+      tag: value
+      value: Zirconia solid electrolyte; air at 1 atm is the internal reference gas for the reference electrode (Eq. 1)
+    locator:
+      page: 2
+      published_page: 1062
+      figure: '1'
+      equation: '1'
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Zirconia electrolyte tubes; silica crucible for bulk rock or groundmass, calcia-stabilized zirconia crucible
+        for mineral separates; Ag-Pd foil cap/sample electrode; Pt sample wire and reference basket; Vycor capillary-bore
+        rod
+    locator:
+      page: 1
+      published_page: 1061
+      section: Experimental Procedure
+      note: Figure 1 and its caption identify cell and crucible materials
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: Thermocouple
+      locator:
+        page: 2
+        published_page: 1062
+        figure: '1'
+    increments:
+      state:
+        tag: value
+        value: About 20 °C during heating and about 40 °C during cooling, after equilibration periods of about 1 h
+      locator:
+        page: 2
+        published_page: 1062
+        section: Experimental Procedure
+  heating_method:
+    state:
+      tag: value
+      value: Furnace heating
+    locator:
+      page: 2
+      published_page: 1062
+      figure: '1'
+  other_facts: []
+context:
+- observation_id: sato73_method_equations_and_buffer
+  type: method
+  locator:
+    page: 2
+    published_page: 1062
+    equations: 1–5
+  units: equations as printed
+  values:
+    method_class: method_only
+    emf_relation_as_printed: log fO2 = E (in millivolts)/(0.0496 T (°K)) − 0.68
+    emf_relation_description: Equation (1), solid-electrolyte cell relation; T is absolute temperature. Air at 1 atm is the
+      internal reference gas for the reference electrode.
+    iron_iron_oxide_reaction_as_printed: Fe (in metallic phase) + 1/2 O2 = FeO (in melt)
+    iron_iron_oxide_reaction_locator:
+      page: 5
+      published_page: 1065
+      equation: '2'
+    log_fo2_activity_relation_as_printed: log fO2 = 2 log aFeO − 2 log aFe − 2 log K
+    log_fo2_activity_relation_locator:
+      page: 5
+      published_page: 1065
+      equation: '3'
+    metallic_iron_activity_relation_as_printed: log aFe = 1/2[log fO2(rock + iron foil) − log fO2(bulk rock)]
+    metallic_iron_activity_relation_locator:
+      page: 6
+      published_page: 1066
+      equation: '4'
+    iron_wustite_buffer_relation_as_printed: log fO2 = 6.824 − 27470/T
+    iron_wustite_buffer_relation_locator:
+      page: 7
+      published_page: 1067
+      equation: '5'
+    iron_wustite_buffer_temperature_range_as_printed: 850–1300 °C
+    iron_wustite_buffer_temperature_unit: T in K (absolute temperature)
+    iron_wustite_reference_state: Wustite and metallic iron; the authors do not state a wustite stoichiometry for their own
+      buffer fit. The discussion calls the iron reference solid metallic iron; no alloy correction is stated for the buffer
+      equation.
+    buffer_comparison: The authors say alternatives include JANAF (1971), wustite Fe0.947O, and iron-wustite values from Eugster
+      and Wones (1962) or Huebner (1971); they also prefer values measured in the same oxygen cell. They give no numerical
+      point-by-point comparison with Eugster and Wones or Huebner. They report comparison slopes of −2.75 × 10^4 K−1 for iron-wustite,
+      −2.80 × 10^4 K−1 for iron-ulvospinel-ilmenite, and −3.08 × 10^4 K−1 for iron-ilmenite-ferropseudobrookite.
+    buffer_comparison_locator:
+      page: 7
+      published_page: 1067
+      note: Experimental Results; page 11, published page 1071, Oxygen fugacity-temperature relations
+    uncertainty_as_printed: No uncertainty is printed for Equation (5). The abstract states measurement accuracy was mostly
+      better than 0.2 log fO2 unit; the results section says within 0.2 log unit scatter for a given sample, except the first
+      heating cycles of Apollo 12 samples, whose anomalously high initial readings were omitted from the visually fitted curves.
+    sample_temperature_relations_as_printed: No per-sample log fO2-temperature equation is printed; values in Table 1 were
+      read from visually drawn best-fit curves. For bulk-rock log fO2 versus 1/T from 1000 to 1200 °C, the reported slopes
+      are −2.8 × 10^4 to −3.1 × 10^4 K−1, except sample 14310 above 1170 °C. The authors compare these with −2.75 × 10^4 K−1
+      (iron-wustite), −2.80 × 10^4 K−1 (iron-ulvospinel-ilmenite), and −3.08 × 10^4 K−1 (iron-ilmenite-ferropseudobrookite).
+    sample_temperature_relations_locator:
+      page: 11
+      published_page: 1071
+      section: Oxygen fugacity-temperature relations
+    measurement_atmosphere_as_printed: Furnace atmosphere was N2 diluent with about 1% CO2 and variable H2, servo-controlled
+      to keep its fO2 within about 0.1 log fO2 unit of the sample.
+    sample_electrode_foil_as_printed: The capped Ag-Pd foil composition was initially Ag60Pd40 and later Ag40Pd60.
+    reference_as_printed: Air at 1 atm was the internal reference gas at the reference electrode.
+    reversibility_check_as_printed: The authors compared repeated heating and cooling cycles and report agreement for rock
+      15595. Table 1 values were read from visually drawn best-fit curves through measured points. Anomalously high initial
+      first-heating readings for Apollo 12 samples were omitted from those curves. The first-heating-cycle statement on p.
+      1067 applies to samples 14310,195 and 14310,207; both showed an abrupt, irreversible rise above about 1170 °C.
+    reversibility_check_locator:
+      page: 3
+      published_page: 1063
+      section: Experimental Results
+      note: Page 7, published page 1067, limits the first-heating statement to the two 14310 chips
+    iron_foil_added_for_selected_runs_as_printed: For selected bulk-rock plus iron runs, about 100 mg of previously melted
+      sample was measured with 3–4 mg of 99.99% pure iron foil lining the crucible.
+    iron_foil_locator:
+      page: 2
+      published_page: 1062
+      section: Experimental Procedure
+  context_id: sato-hickling-mclane-1973-lunar-fo2::context::sato73_method_equations_and_buffer
+  work_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  species: O2

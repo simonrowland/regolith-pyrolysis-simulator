@@ -13,6 +13,48 @@ extraction:
   worker: codex-extract-ingest
   provenance_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 review_status: draft
+fidelity_samples:
+  - species: CaMgSi2O6
+    observation_id: ammin_76_904_table1_diopside_composition
+    observable: composition
+    field: composition_wt_pct
+    value:
+      crystal:
+        SiO2: {value: 55.75, uncertainty: 0.64}
+        MgO: {value: 18.15, uncertainty: 0.32}
+        CaO: {value: 25.78, uncertainty: 0.51}
+        total: 99.67
+      glass_electron_microprobe:
+        SiO2: {value: 55.50, uncertainty: 0.58}
+        MgO: {value: 18.25, uncertainty: 0.30}
+        CaO: {value: 26.11, uncertainty: 0.41}
+        total: 99.86
+      glass_wet_chemical:
+        SiO2: 55.72
+        MgO: 18.43
+        CaO: 25.75
+        total: 99.90
+      ideal:
+        SiO2: 55.49
+        MgO: 18.61
+        CaO: 25.90
+        total: 100.00
+    note: "Table 1 on page 905 prints the crystal, glass, and ideal compositions."
+    locator:
+      published_page: 905
+      table: '1'
+  - path: species.CaMgSi2O6.observations[ammin_76_904_table2_step_scan_heat_capacity_enthalpy].values.series[0]
+    value: [1403, 265.34, 259.54, 2.23, 258.93, 258.93, 0.00]
+    note: "Table 2 on page 908 prints this heat-capacity and enthalpy row at 1403 K."
+    locator:
+      published_page: 908
+      table: '2'
+  - path: species.CaMgSi2O6.observations[ammin_76_904_table2_step_scan_heat_capacity_enthalpy].values.series[12]
+    value: [1620, 522.80, 261.40, 100.0, 319.30, 315.36, 1.25]
+    note: "Table 2 on page 908 prints this heat-capacity and enthalpy row at 1620 K."
+    locator:
+      published_page: 908
+      table: '2'
 species:
   CaMgSi2O6:
     observations:
@@ -153,7 +195,7 @@ species:
           more_accurate_combined_uncertainty_J_per_mol_K: 20
         note: The 312 +/- 10 J/mol K fit is author-derived, not a direct measurement; 334 +/- 7 J/mol K combines this study with Stebbins et al. (1983) and Richet & Bottinga (1984).
       - observation_id: ammin_76_904_quoted_comparator_enthalpy_values
-        type: quoted_comparator
+        type: heat_capacity_and_heat_content_series
         locator:
           source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
           published_page: 909
@@ -161,18 +203,80 @@ species:
           section: Final capacity of crystal and liquid, enthalpy of fusion, and analysis of error
         phase: diopside
         regime: cited_literature_comparison
-        units: as_published
+        units: kJ_per_mol
         values:
           method_class: quoted_attributed
-          attribution: 'Stebbins et al. (1983); Richet and Bottinga (1984); Ferrier (1968); Stebbins et al. (1984); Adamkovicova et al. (1980)'
-          cited_values:
-            - {source: Stebbins et al. (1983), quantity: enthalpy_of_fusion, value_kJ_per_mol: 138.1}
-            - {source: Richet and Bottinga (1984), quantity: enthalpy_of_fusion, value_kJ_per_mol: 137.7}
-            - {source: Ferrier (1968), quantity: enthalpy_of_fusion, value_kJ_per_mol: 128}
-            - {source: Richet and Bottinga (1984), quantity: liquid_heat_capacity, value_J_per_mol_K: 334}
-            - {source: Stebbins et al. (1984), quantity: liquid_heat_capacity, value_J_per_mol_K: 353}
-            - {source: Adamkovicova et al. (1980), quantity: wollastonite_enthalpy_of_fusion, value_kJ_per_mol: 57.3, temperature_K: 1821}
-        note: Values are quoted or attributed by Lange et al.; they are not measurements made in this source.
+          quantity: heat_of_fusion
+          enthalpy_of_fusion_kJ_per_mol: 138.1
+          fusion_temperature_K: 1665
+          attribution: Stebbins et al. (1983)
+        note: Printed p. 909/PDF p. 6; cited diopside fusion enthalpy, not measured by Lange et al. No closed heat-of-fusion quantity exists, so migration preserves the quote as unavailable.
+      - observation_id: ammin_76_904_quoted_richet_bottinga_diopside_fusion
+        type: heat_capacity_and_heat_content_series
+        locator:
+          source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
+          published_page: 909
+          pdf_page: 6
+          section: Final capacity of crystal and liquid, enthalpy of fusion, and analysis of error
+        phase: diopside
+        regime: cited_literature_comparison
+        units: kJ_per_mol
+        values:
+          method_class: quoted_attributed
+          quantity: heat_of_fusion
+          enthalpy_of_fusion_kJ_per_mol: 137.7
+          fusion_temperature_K: 1665
+          attribution: Richet and Bottinga (1984)
+        note: Printed p. 909/PDF p. 6; cited diopside fusion enthalpy, not measured by Lange et al. No closed heat-of-fusion quantity exists, so migration preserves the quote as unavailable.
+      - observation_id: ammin_76_904_quoted_ferrier_diopside_fusion
+        type: heat_capacity_and_heat_content_series
+        locator:
+          source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
+          published_page: 909
+          pdf_page: 6
+          section: Final capacity of crystal and liquid, enthalpy of fusion, and analysis of error
+        phase: diopside
+        regime: cited_literature_comparison
+        units: kJ_per_mol
+        values:
+          method_class: quoted_attributed
+          quantity: heat_of_fusion
+          enthalpy_of_fusion_kJ_per_mol: 128
+          fusion_temperature_K: 1665
+          attribution: Ferrier (1968)
+        note: Printed p. 909/PDF p. 6; cited diopside fusion enthalpy, not measured by Lange et al. No closed heat-of-fusion quantity exists, so migration preserves the quote as unavailable.
+      - observation_id: ammin_76_904_quoted_richet_bottinga_liquid_heat_capacity
+        type: heat_capacity_and_heat_content_series
+        locator:
+          source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
+          published_page: 909
+          pdf_page: 6
+          section: Final capacity of crystal and liquid, enthalpy of fusion, and analysis of error
+        phase: liquid_diopside
+        regime: cited_literature_comparison
+        units: J/mol K
+        values:
+          method_class: quoted_attributed
+          quantity: cp
+          cp: 334
+          attribution: Richet and Bottinga (1984)
+        note: Quoted liquid-diopside heat capacity on printed p. 909/PDF p. 6; not measured by Lange et al.
+      - observation_id: ammin_76_904_quoted_stebbins_1984_liquid_heat_capacity
+        type: heat_capacity_and_heat_content_series
+        locator:
+          source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
+          published_page: 909
+          pdf_page: 6
+          section: Final capacity of crystal and liquid, enthalpy of fusion, and analysis of error
+        phase: liquid_diopside
+        regime: cited_literature_comparison
+        units: J/mol K
+        values:
+          method_class: quoted_attributed
+          quantity: cp
+          cp: 353
+          attribution: Stebbins et al. (1984)
+        note: Quoted liquid-diopside heat capacity on printed p. 909/PDF p. 6; not measured by Lange et al.
     context:
       - observation_id: ammin_76_904_table1_diopside_composition
         type: composition
@@ -218,6 +322,25 @@ species:
           phase_checks: optical microscopy, backscattered-electron imaging at approximately 1 micrometre resolution, and XRD
           phase_check_result: single crystalline phase; no forsterite or wollastonite peaks within the XRD detection limit of approximately 2%
         missing: [sample_mass_for_composition_analysis, analysis_pressure, analysis_atmosphere]
+  CaSiO3:
+    observations:
+      - observation_id: ammin_76_904_quoted_adamkovicova_wollastonite_fusion
+        type: heat_capacity_and_heat_content_series
+        locator:
+          source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
+          published_page: 911
+          pdf_page: 8
+          section: Observations on incongruent melting and a preliminary crystallization study
+        phase: wollastonite
+        regime: cited_literature_comparison
+        units: kJ_per_mol
+        values:
+          method_class: quoted_attributed
+          quantity: heat_of_fusion
+          enthalpy_of_fusion_kJ_per_mol: 57.3
+          fusion_temperature_K: 1821
+          attribution: Adamkovicova et al. (1980)
+        note: Printed p. 911/PDF p. 8; this value is for wollastonite (CaSiO3), not diopside. No closed heat-of-fusion quantity exists, so migration preserves the quote as unavailable.
 metadata:
   scope_verdict: in_scope_direct_step_scan_calorimetry_on_silicate_diopside
   source_type: primary_experimental_paper

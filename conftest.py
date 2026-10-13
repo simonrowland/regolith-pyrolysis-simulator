@@ -1,5 +1,33 @@
 from __future__ import annotations
 
+import importlib.util as _importlib_util
+from pathlib import Path as _Path
+import sys as _sys
+
+_BLAS_POLICY_NAME = "simulator._blas_policy"
+_blas_policy = _sys.modules.get(_BLAS_POLICY_NAME)
+if _blas_policy is None:
+    if "simulator" in _sys.modules:
+        from importlib import import_module as _import_module
+
+        _blas_policy = _import_module(_BLAS_POLICY_NAME)
+    else:
+        _policy_path = _Path(__file__).resolve().parent / "simulator" / "_blas_policy.py"
+        _policy_spec = _importlib_util.spec_from_file_location(_BLAS_POLICY_NAME, _policy_path)
+        if _policy_spec is None or _policy_spec.loader is None:
+            raise ImportError(f"cannot load {_BLAS_POLICY_NAME} from {_policy_path}")
+        _blas_policy = _importlib_util.module_from_spec(_policy_spec)
+        _sys.modules[_BLAS_POLICY_NAME] = _blas_policy
+        try:
+            _policy_spec.loader.exec_module(_blas_policy)
+            _blas_policy.prepare()
+        except BaseException:
+            if _sys.modules.get(_BLAS_POLICY_NAME) is _blas_policy:
+                del _sys.modules[_BLAS_POLICY_NAME]
+            raise
+else:
+    _blas_policy.prepare()
+
 from collections.abc import Iterator
 
 import os

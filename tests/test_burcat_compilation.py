@@ -9,19 +9,24 @@ not validation measurements.
 from __future__ import annotations
 
 import hashlib
+import json
 from pathlib import Path
 
 import pytest
+import yaml
 
+import simulator.reference_data.burcat as burcat_module
 from simulator.reference_data.burcat import (
     COMPILATION_ROOT,
     SOURCE_REL,
+    BurcatParseError,
     coverage_by_element,
     feedstock_element_symbols,
     formulas_absent_from_janaf_and_glenn,
     iter_record_paths,
     load_all_record_documents,
     load_manifest,
+    load_peer_aliases,
     parse_burcat_thr,
     parse_burcat_xml,
     peer_formula_sets,
@@ -46,6 +51,12 @@ def manifest():
 @pytest.fixture(scope="module")
 def record_docs():
     return load_all_record_documents()
+
+
+@pytest.fixture(scope="module")
+def parsed_records():
+    text = SOURCE.read_text(encoding="utf-8-sig")
+    return parse_burcat_thr(text, source_path=SOURCE_REL).records
 
 
 def _sha256(path: Path) -> str:
@@ -214,6 +225,190 @@ def test_formulas_absent_from_janaf_and_nasa_glenn(manifest, record_docs) -> Non
     recomputed = formulas_absent_from_janaf_and_glenn(parsed.records, janaf, glenn)
     assert {row["formula"] for row in recomputed} == unique_formulas
     assert any(len(formula) >= 4 for formula in unique_formulas)
+
+
+def test_formula_absence_accepts_only_evidenced_spelling_aliases(parsed_records) -> None:
+    by_id = {record.record_id: record for record in parsed_records}
+    janaf, glenn = peer_formula_sets()
+
+    for record_id in ("BU-3006", "BU-2394", "BU-2722"):
+        record = by_id[record_id]
+        assert record.record_kind == "nasa7_polynomial"
+        assert formulas_absent_from_janaf_and_glenn([record], janaf, glenn) == []
+
+
+def test_distinct_and_unresolved_composition_matches_remain_absent(parsed_records) -> None:
+    by_id = {record.record_id: record for record in parsed_records}
+    janaf, glenn = peer_formula_sets()
+    negative_ids = (
+        "BU-0383",
+        "BU-0398",
+        "BU-0440",
+        "BU-0242",
+        "BU-0546",
+        "BU-1373",
+        "BU-2789",
+        "BU-0295",
+        "BU-2968",
+        "BU-3179",
+    )
+
+    for record_id in negative_ids:
+        record = by_id[record_id]
+        absent = formulas_absent_from_janaf_and_glenn([record], janaf, glenn)
+        assert record.formula in {row["formula"] for row in absent}, record_id
+
+
+def test_alias_for_one_record_does_not_cover_its_formula_group(parsed_records) -> None:
+    by_id = {record.record_id: record for record in parsed_records}
+    janaf, glenn = peer_formula_sets()
+    absent = formulas_absent_from_janaf_and_glenn(
+        [by_id["BU-1371"], by_id["BU-1373"]], janaf, glenn
+    )
+
+    assert {row["formula"] for row in absent} == {"C4H12Si"}
+
+
+def _alias_entry_from_source_records(burcat_id: str, peer_id: str) -> dict:
+    burcat = json.loads(
+        (COMPILATION_ROOT / "records" / f"{burcat_id}.json").read_text()
+    )
+    peer = json.loads(
+        (
+            ROOT
+            / "data"
+            / "literature"
+            / "compilations"
+            / "nasa-glenn"
+            / "records"
+            / f"{peer_id}.json"
+        ).read_text()
+    )
+    return {
+        "burcat_record_id": burcat_id,
+        "burcat_formula": burcat["formula"],
+        "burcat_name": burcat["name_as_published"],
+        "burcat_phase": burcat["phase"],
+        "peer_compilation": "nasa-glenn",
+        "peer_record_id": peer_id,
+        "peer_formula": peer["formula"],
+        "peer_name": peer["name_as_published"],
+        "peer_phase": peer["phase"],
+        "peer_data_kind": "nasa_polynomial",
+        "peer_has_data": peer["coefficient_count"] > 0,
+    }
+
+
+def _janaf_alias_entry_from_source_records(burcat_id: str, peer_id: str) -> dict:
+    burcat = json.loads(
+        (COMPILATION_ROOT / "records" / f"{burcat_id}.json").read_text()
+    )
+    peer_path = (
+        burcat_module.ROOT
+        / "data"
+        / "literature"
+        / "compilations"
+        / "janaf"
+        / "tables"
+        / f"{peer_id}.yaml"
+    )
+    peer = yaml.safe_load(peer_path.read_text())["table"]
+    index_entry = peer["index_entry"]
+    return {
+        "burcat_record_id": burcat_id,
+        "burcat_formula": burcat["formula"],
+        "burcat_name": burcat["name_as_published"],
+        "burcat_phase": burcat["phase"],
+        "peer_compilation": "janaf",
+        "peer_record_id": peer_id,
+        "peer_formula": index_entry.get("formula_as_published") or index_entry["formula"],
+        "peer_name": index_entry["name"],
+        "peer_phase": index_entry["state"],
+        "peer_data_kind": "janaf_table",
+        "peer_has_data": True,
+    }
+
+
+def _write_alias_fixture(path: Path, aliases: list[dict]) -> None:
+    path.write_text(
+        yaml.safe_dump(
+            {"schema_version": "burcat_peer_aliases.v1", "aliases": aliases},
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+
+
+def test_peer_alias_loader_rejects_mismatched_charge(tmp_path) -> None:
+    alias_path = tmp_path / "peer-aliases.yaml"
+    _write_alias_fixture(
+        alias_path,
+        [_alias_entry_from_source_records("BU-0295", "NG-0315")],
+    )
+
+    with pytest.raises(BurcatParseError, match="charge mismatch"):
+        load_peer_aliases(alias_path)
+
+
+def test_peer_alias_loader_rejects_peer_without_coefficients(tmp_path) -> None:
+    alias_path = tmp_path / "peer-aliases.yaml"
+    _write_alias_fixture(
+        alias_path,
+        [_alias_entry_from_source_records("BU-0440", "NG-2036")],
+    )
+
+    with pytest.raises(BurcatParseError, match="no usable thermodynamic data"):
+        load_peer_aliases(alias_path)
+
+
+def test_peer_alias_loader_accepts_janaf_data_and_rejects_empty_table(
+    tmp_path, monkeypatch
+) -> None:
+    alias_path = tmp_path / "peer-aliases.yaml"
+    alias = _janaf_alias_entry_from_source_records("BU-3006", "Cl-141")
+    _write_alias_fixture(alias_path, [alias])
+
+    assert load_peer_aliases(alias_path) == [alias]
+
+    source_path = (
+        burcat_module.ROOT
+        / "data"
+        / "literature"
+        / "compilations"
+        / "janaf"
+        / "tables"
+        / "Cl-141.yaml"
+    )
+    empty_peer = yaml.safe_load(source_path.read_text())
+    empty_peer["table"]["values"] = []
+    peer_path = (
+        tmp_path
+        / "data"
+        / "literature"
+        / "compilations"
+        / "janaf"
+        / "tables"
+        / "Cl-141.yaml"
+    )
+    peer_path.parent.mkdir(parents=True)
+    peer_path.write_text(yaml.safe_dump(empty_peer, sort_keys=False))
+    monkeypatch.setattr(burcat_module, "ROOT", tmp_path)
+
+    with pytest.raises(BurcatParseError, match="no usable thermodynamic data"):
+        load_peer_aliases(alias_path)
+
+
+def test_peer_alias_loader_rejects_malformed_entries_and_missing_ids(tmp_path) -> None:
+    alias_path = tmp_path / "peer-aliases.yaml"
+    _write_alias_fixture(alias_path, [{"burcat_record_id": "BU-3006"}])
+    with pytest.raises(BurcatParseError, match="malformed alias entry"):
+        load_peer_aliases(alias_path)
+
+    alias = _alias_entry_from_source_records("BU-3006", "NG-0948")
+    alias["burcat_record_id"] = "BU-9999"
+    _write_alias_fixture(alias_path, [alias])
+    with pytest.raises(BurcatParseError, match="does not exist"):
+        load_peer_aliases(alias_path)
 
 
 def test_same_formula_distinct_phase_census(record_docs) -> None:

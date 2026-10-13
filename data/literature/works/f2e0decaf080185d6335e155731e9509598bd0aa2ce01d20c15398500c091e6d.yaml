@@ -111,6 +111,274 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d
   locator:
+    published_page: 11
+    pdf_page_index: 11
+    section: '3.2'
+context:
+- observation_id: wolf_2023_abstract_factor3_model_accuracy
+  type: model_scope
+  class_tag: model
+  locator:
     published_page: 1
     pdf_page_index: 1
     section: abstract
+  phase: gas
+  regime: engine_evaluation
+  units: dimensionless factor as printed
+  values:
+    quantity: model_accuracy_factor
+    method_class: model_derived
+    generator: VapoRock
+    evidence_class: model_derived
+    model_accuracy_factor: ~3
+    claim_as_printed: Comparison with experiments shows that pressures and melt-oxide activities (which vary over many orders
+      of magnitude) are reproduced to within a factor of ~3, consistent with measurement uncertainties.
+  context_id: kems-039-wolf-2023-vaporock::context::wolf_2023_abstract_factor3_model_accuracy
+  work_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d
+  source_id: kems-039-wolf-2023-vaporock
+  species: VapoRock
+- observation_id: wolf_2023_bse_vapor_model_scope
+  type: model_scope
+  class_tag: model
+  locator:
+    published_page: 22
+    pdf_page_index: 22
+    section: '4.3'
+    figure: '4'
+  phase: gas
+  regime: engine_evaluation
+  units: bar as plotted; T range in K
+  values:
+    quantity: p_partial
+    method_class: model_derived
+    generator: VapoRock
+    evidence_class: model_derived
+    composition: Bulk Silicate Earth
+    temperature_range_K:
+    - 1500
+    - 3000
+    oxygen_fugacity_source: Schaefer & Fegley 2009 and ONeill et al. 1998
+    dominant_species_by_element:
+      Na: Na
+      Si: SiO
+      Mg: Mg
+      Al: AlO
+      Ti: TiO2
+      Fe: Fe
+      Ca: Ca
+      K: K
+      Cr: CrO2
+    printed_trend: Na dominates until approximately 2700 K, then SiO; SiO reaches 0.01 to 0.1 bar at the upper end.
+  context_id: kems-039-wolf-2023-vaporock::context::wolf_2023_bse_vapor_model_scope
+  work_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d
+  source_id: kems-039-wolf-2023-vaporock
+  species: VapoRock
+- observation_id: wolf_2023_demaria_lunar_kems_scope
+  type: literature_scope
+  class_tag: quoted
+  locator:
+    published_page: 12
+    pdf_page_index: 12
+    figure: '2'
+    section: '3.3'
+  phase: gas
+  regime: quoted_literature
+  units: bar and K as printed
+  quote: De Maria et al. 1971 KEMS measurements summarized by Wolf et al.
+  values:
+    quantity: p_partial
+    method_class: quoted_measurement
+    evidence_class: quoted_attributed
+    attribution: De Maria et al. 1971
+    source_measurement: Na(g), K(g), O2(g), Fe(g), SiO(g), Mg(g), Mn(g), Cr(g), Ca(g), Al(g), AlO(g), TiO(g), and TiO2(g)
+      partial pressures
+    samples:
+    - Apollo 12022
+    - Apollo 12065
+    heated_to_K:
+      '12022': 2270
+      '12065': 2500
+    pO2_determined_range_K:
+    - 1396
+    - 1499
+    comparison_range_used_by_VapoRock_K:
+    - 1400
+    - 1500
+    stated_uncertainty: approximately 50 percent relative for KEMS-derived partial pressures
+    raw_pressure_points: absent_from_this_paper
+  context_id: kems-039-wolf-2023-vaporock::context::wolf_2023_demaria_lunar_kems_scope
+  work_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d
+  source_id: kems-039-wolf-2023-vaporock
+  species: external_KEMS
+- observation_id: wolf_2023_eq9_sio_sio2_fo2_proxy
+  type: model_relation
+  class_tag: model
+  locator:
+    published_page: 25
+    pdf_page_index: 25
+    section: '4.5'
+    equation: '9'
+  phase: gas
+  regime: engine_evaluation
+  units: log10 equilibrium constant; T in K
+  values:
+    quantity: log10_Kf
+    method_class: model_derived
+    generator: VapoRock using JANAF
+    evidence_class: model_derived
+    gas_reaction: SiO(g) + 1/2 O2(g) = SiO2(g)
+    logK_expression: 10278/T - 4.0436
+    proxy_expression: fO2 = (pSiO2 / (pSiO * K(7)))^2
+  context_id: kems-039-wolf-2023-vaporock::context::wolf_2023_eq9_sio_sio2_fo2_proxy
+  work_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d
+  source_id: kems-039-wolf-2023-vaporock
+  species: VapoRock
+- observation_id: wolf_2023_hastie_kems_scope_and_uncertainty
+  type: literature_scope
+  class_tag: quoted
+  locator:
+    published_page: 10
+    pdf_page_index: 10
+    figure: '1'
+    section: '3.2'
+  phase: gas
+  regime: quoted_literature
+  units: bar and K as printed
+  quote: Hastie et al. 1981 and Hastie & Bonnell 1985, 1986 KEMS measurements summarized by Wolf et al.
+  values:
+    quantity: p_partial
+    method_class: quoted_measurement
+    evidence_class: quoted_attributed
+    attribution: Hastie et al. 1981; Hastie & Bonnell 1985, 1986
+    source_measurement: SiO(g), Na(g), O2(g), and K(g) partial pressures above SRM 621 and illite liquids
+    temperature_ranges_K:
+      SRM_621:
+      - 1340
+      - 1710
+      illite:
+      - 1550
+      - 1960
+    stated_uncertainty: within 50 percent in chemically inert systems; likely higher for silicate melts
+    raw_pressure_points: absent_from_this_paper
+  context_id: kems-039-wolf-2023-vaporock::context::wolf_2023_hastie_kems_scope_and_uncertainty
+  work_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d
+  source_id: kems-039-wolf-2023-vaporock
+  species: external_KEMS
+- observation_id: wolf_2023_table3_vaporock_vs_magma22
+  type: model_comparison
+  class_tag: model
+  locator:
+    published_page: 17
+    pdf_page_index: 17
+    table: '3'
+    section: '3.4'
+  phase: gas
+  regime: engine_evaluation
+  units: elemental abundances relative to Na; column scale factors as printed
+  values:
+    quantity: model_elemental_vapor_abundance
+    method_class: model_derived
+    generator: VapoRock, compared with MAGMA 04 and MAGMA 22
+    evidence_class: model_derived
+    temperature_K: 1900
+    oxygen_fugacity: composition-specific IW values printed in Table 3
+    column_scale_factors:
+      Na: 100
+      K: 1e-4
+      Al: 1e-9
+      Si: 1e-3
+      Ca: 1e-8
+      Ti: 1e-6
+      Fe: 1e-3
+      Mg: 1e-4
+    rows_as_printed: Table 3 contains VapoRock, MAGMA 04, MAGMA 22, and [M/Na]/[M/Ca] ratios for Tholeiite, Alkali basalt,
+      Komatiite, Dunite, and Bishop Tuff.
+    headline_comparison: VapoRock and MAGMA 22 generally agree within factor 5 for K and within factors 3-5 for Na after Ca
+      normalization; MAGMA 04 K differs by roughly 2-3 orders of magnitude.
+  context_id: kems-039-wolf-2023-vaporock::context::wolf_2023_table3_vaporock_vs_magma22
+  work_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d
+  source_id: kems-039-wolf-2023-vaporock
+  species: VapoRock
+- observation_id: wolf_2023_vaporock_system_and_species
+  type: model_description
+  class_tag: model
+  locator:
+    published_page: 5
+    pdf_page_index: 5
+    table: '1'
+    section: '2.2'
+  phase: gas
+  regime: engine_evaluation
+  units: as printed; species list has no scalar value
+  values:
+    quantity: model_system_and_vapor_species
+    method_class: model_derived
+    generator: VapoRock
+    evidence_class: model_derived
+    measurement_status: model_output_not_measurement
+    liquid_model: MELTS (Ghiorso & Sack 1995)
+    gas_databases:
+    - NIST-JANAF / Chase 1998
+    - Lamoreaux & Hildenbrand 1984
+    - Lamoreaux et al. 1987
+    system_components:
+    - SiO2
+    - MgO
+    - FeO
+    - Fe2O3
+    - Al2O3
+    - CaO
+    - Na2O
+    - K2O
+    - TiO2
+    - Cr2O3
+    vapor_species_count: 34
+    vapor_species_by_element:
+      Si:
+      - Si
+      - Si2
+      - Si3
+      - SiO
+      - SiO2
+      Mg:
+      - Mg
+      - Mg2
+      - MgO
+      Fe:
+      - Fe
+      - FeO
+      Al:
+      - Al
+      - Al2
+      - Al2O
+      - AlO
+      - Al2O2
+      - AlO2
+      Ca:
+      - Ca
+      - Ca2
+      - CaO
+      Na:
+      - Na
+      - Na2
+      - NaO
+      K:
+      - K
+      - K2
+      - KO
+      Ti:
+      - Ti
+      - TiO
+      - TiO2
+      Cr:
+      - Cr
+      - CrO
+      - CrO2
+      - CrO3
+      O:
+      - O
+      - O2
+  context_id: kems-039-wolf-2023-vaporock::context::wolf_2023_vaporock_system_and_species
+  work_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d
+  source_id: kems-039-wolf-2023-vaporock
+  species: VapoRock

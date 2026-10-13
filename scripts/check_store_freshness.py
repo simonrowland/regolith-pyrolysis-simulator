@@ -63,6 +63,16 @@ CODE_INPUTS = (
 # can exist to follow them, and they would read as STALE forever. Each entry
 # needs that receipt (regen run, no store diff). Short shas, 9 characters,
 # matching the keys stale_input_commits() emits.
+#   09c498b65: b-851 renames the private scorer helper _fusion_comparison_reference
+#     in simulator/battery/score.py to the public fusion_comparison_reference so the
+#     melt-activity benchmark shares the one owner. Name and docstring only: no
+#     expression, branch or literal changes. Migration imports only the unchanged
+#     parse_species_formula from score.py (simulator/battery/migrate.py), and the
+#     series changes nothing under scripts/battery_migrate.py, migrate.py,
+#     validate.py or data/. Store receipt to be confirmed by the landing gate's full
+#     regen on the merge with green (expected: 0 files changed under data/). This acknowledges
+#     STORE outputs only; the benchmark shift is covered by the series' tests and
+#     owner decision d-135.
 #   1b78b5697, 574800443, 149df2858: bench payload and ledger/sticking changes
 #     not consumed by battery_migrate or build_index (R17).
 #   9bb0a22ce, 1d254d51e, b8be6d576: kems-041 misprint notes and compilation
@@ -98,12 +108,25 @@ CODE_INPUTS = (
 #     rows_in=47960 observations=122164 works=276 experiments=3576 queue=77761
 #     hard_issues=3631). This acknowledges STORE outputs only; the runtime tie
 #     to the constant is covered by the commit's tests.
+#   f522e152c, da3640753, e84b44277: b-837 unstated solid polymorph
+#     predict-and-flag (score.py inference of the stable solid reference and
+#     its notice; the JANAF fusion-pair owner in generators/janaf.py; the
+#     above-crossing conversion). The series changes no file under
+#     scripts/battery_migrate.py, simulator/battery/migrate.py, validate.py or
+#     data/ (git diff 2c49cd0b8 e84b44277 on those paths is empty), and the
+#     review of record's fresh migrations at base and tip gave identical
+#     observation hashes. The landing train's full regen at the merge onto
+#     green ba62a746d (3dd98193c, studio-3) changed 0 files under data/.
+#     This acknowledges STORE outputs only; the scoring change (237 residual
+#     records, 94 new numeric candidates) is covered by the commits' tests.
 STORE_NEUTRAL_INPUT_COMMITS = frozenset({
+    "09c498b65",
     "1b78b5697", "574800443", "149df2858",
     "9bb0a22ce", "1d254d51e", "b8be6d576",
     "d47e84bec", "6c3b40660",
     "23df83343", "2bd2918e6", "34132a932",
     "8d90cc936",
+    "f522e152c", "da3640753", "e84b44277",
 })
 
 

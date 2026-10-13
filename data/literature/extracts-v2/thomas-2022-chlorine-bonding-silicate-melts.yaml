@@ -2,47 +2,6 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/extracts/thomas-2022-chlorine-bonding-silicate-melts.yaml
 observations:
-- observation_id: thomas-2022-chlorine-bonding-silicate-melts::thomas_2022_author_chloride_capacity_model
-  experiment_id: 10.1016/j.chemgeo.2022.121269::thomas-2022-chlorine-bonding-silicate-melts
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'chloride_capacity_model'
-    species:
-      formula: Cl
-      phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-      charge:
-        tag: value
-        value: 0
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'chloride_capacity_model'; refusing to pick a number
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: model_derived
-    original_method_class: model_derived
-    model: model_derived
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: thomas-2022-chlorine-bonding-silicate-melts
-  locator:
-    published_page: 121270
-    pdf_page_index: 2
-    section: 1.1 Chlorine incorporation in silicate melts and glasses
-    equation: '3'
-    source_path: corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf
-  read_from: pdf:thomas-2022-chlorine-bonding-silicate-melts
 - observation_id: thomas-2022-chlorine-bonding-silicate-melts::thomas_2022_table1_chlorine_concentrations_all_rows::rows:h=065fd610220f
   experiment_id: 10.1016/j.chemgeo.2022.121269::experiment::quench-glass-series
   identity:
