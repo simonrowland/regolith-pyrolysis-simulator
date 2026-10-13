@@ -320,8 +320,6 @@ def _plante_score_context() -> ScoreContext:
              REPO_ROOT / "data/literature/extracts" / extract_file),
             (Path("data/literature/works") / coefficient_work_file,
              REPO_ROOT / "data/literature/works" / coefficient_work_file),
-            (Path("data/battery/decision-band-ratchet.yaml"),
-             REPO_ROOT / "data/battery/decision-band-ratchet.yaml"),
             (Path("data/literature/extracts-v2") / coefficient_extract_file,
              REPO_ROOT / "data/literature/extracts-v2" / coefficient_extract_file),
             (Path("data/literature/extracts") / coefficient_extract_file,
@@ -1243,8 +1241,8 @@ summary = next(
     row for row in headline_rows(residuals, context=context, engines=engines)
     if row["rail"] == "vapour" and row["engine"] == Engine.OPENIMCC.value
 )
-# d-128 also flags all 162 rows: Plante states no confidence level for this band.
-assert summary["n_score_eligible"] == 0
+# d-128 keeps the printed band score-eligible and adds an informational notice.
+assert summary["n_score_eligible"] == 160
 assert all(
     any(notice.reason == "confidence_level_not_stated" for notice in residual.notices)
     for residual, candidate in engine_rows
@@ -1272,8 +1270,8 @@ print(json.dumps({"headline": summary, "lineage": "independent"}))
     )
     assert completed.returncode == 0, completed.stderr
     result = json.loads(completed.stdout.strip().splitlines()[-1])
-    # d-128's confidence notice keeps the Plante rows diagnostic-only.
-    assert result["headline"]["n_score_eligible"] == 0
+    # d-128 keeps the printed band score-eligible and adds an informational notice.
+    assert result["headline"]["n_score_eligible"] == 160
     assert result["headline"]["n_inside_band"] == 56
     assert float(result["headline"]["median_dex"]) == pytest.approx(
         -0.193144973432544415, abs=1e-8
@@ -1571,7 +1569,7 @@ def test_plante_solved_effusion_uses_the_prediction_engine_notice() -> None:
         residual for residual, candidate in rows
         if candidate.engine is not None and candidate.engine.name is Engine.OPENIMCC
     ]
-    assert openimcc["n_score_eligible"] == 0
+    assert openimcc["n_score_eligible"] == 160
     assert len(openimcc_rows) == 162
     assert all(
         any(notice.reason == "confidence_level_not_stated" for notice in residual.notices)
