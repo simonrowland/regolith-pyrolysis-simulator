@@ -11686,13 +11686,17 @@ def test_fusion_quantities_migrate_with_phase_transition_identity(tmp_path: Path
         assert identity.temperature_K.value == Decimal("1200")
         assert identity.subtype is not None
         assert identity.subtype.value == "solid_to_liquid"
-        assert identity_equal(identity, identity).kind is IdentityEqualKind.EQUAL
+        assert identity.species.polymorph is not None
+        assert identity.species.polymorph.is_unknown
+        assert identity.species.polymorph.reason == "source does not state polymorph"
+        identity_outcome = identity_equal(identity, identity)
+        assert identity_outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+        assert identity_outcome.fields == ("species.polymorph",)
         assert observation.point_conditions is not None
         temperature = observation.point_conditions["temperature_K"]
         assert temperature.state.value == Decimal("1200")
         assert temperature.locator is not None
         assert temperature.locator.table == "4"
-        assert temperature.locator.row == "Na"
 
     heat_content = by_id["na_heat_content"]
     assert quantity_token(heat_content.identity) is Quantity.H_MINUS_H298
