@@ -930,6 +930,24 @@ def _locator_from_plain(payload: object) -> Locator | None:
     return Locator(**kwargs)
 
 
+def _derivation_inputs_requirement_error(
+    derivation: Derivation, *, has_resolved_lineage: bool = False
+) -> str | None:
+    if (
+        not derivation.inputs
+        and derivation.declares_unprinted_raw_inputs
+        and not derivation.has_located_unprinted_raw_inputs
+    ):
+        return "raw_inputs not_printed declaration requires a locator"
+    if (
+        not derivation.inputs
+        and derivation.raw_inputs is None
+        and not has_resolved_lineage
+    ):
+        return "Derivation.inputs is required unless raw_inputs is located not_printed"
+    return None
+
+
 def _derivation_from_plain(
     payload: object,
     *,
@@ -996,14 +1014,10 @@ def _derivation_from_plain(
         pure_substance_reference=raw_marker,
         raw_inputs=parsed_raw_inputs,
     )
-    if (
-        require_inputs
-        and not derivation.inputs
-        and not derivation.has_located_unprinted_raw_inputs
-    ):
-        raise ValueError(
-            "Derivation.inputs is required unless raw_inputs is located not_printed"
-        )
+    if require_inputs:
+        requirement_error = _derivation_inputs_requirement_error(derivation)
+        if requirement_error is not None:
+            raise ValueError(requirement_error)
     return derivation
 
 
@@ -6235,15 +6249,14 @@ def source_derivation_from_source(
     if relation_missing:
         invalid.append((field, "derivation relation (author method) is required"))
     if error is None and parsed is not None:
-        if (
-            not parsed.inputs
-            and not parsed.has_located_unprinted_raw_inputs
-            and not has_resolved_lineage
-        ):
+        requirement_error = _derivation_inputs_requirement_error(
+            parsed, has_resolved_lineage=has_resolved_lineage
+        )
+        if requirement_error is not None:
             invalid.append(
                 (
                     field,
-                    "Derivation.inputs is required unless raw_inputs is located not_printed",
+                    requirement_error,
                 )
             )
         if not relation_missing:
