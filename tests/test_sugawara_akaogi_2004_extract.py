@@ -100,6 +100,37 @@ def test_extract_validates_and_fidelity_sample_matches() -> None:
     ) == []
 
 
+def test_table1_fidelity_pin_fails_after_enthalpy_mutation() -> None:
+    document = _document()
+    mutated = deepcopy(document)
+    first = mutated["species"]["Na2SiO3"]["observations"][0]["values"][
+        "series"
+    ][0]
+    first["enthalpy_increment"] = 210.7
+
+    errors = validate_extract_document(
+        mutated,
+        expected_source_id=EXTRACT.stem,
+        pre_policy_ids=set(),
+        check_fidelity_match=True,
+    )
+    assert any("fidelity" in error.casefold() for error in errors)
+
+
+def test_table1_fidelity_drift_guard_fails_when_matching_is_bypassed(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    validator = validate_extract_document
+
+    def bypass_matching(*args, **kwargs):
+        kwargs["check_fidelity_match"] = False
+        return validator(*args, **kwargs)
+
+    monkeypatch.setitem(globals(), "validate_extract_document", bypass_matching)
+    with pytest.raises(AssertionError, match="fidelity"):
+        test_table1_fidelity_pin_fails_after_enthalpy_mutation()
+
+
 def test_independent_source_cells_pin_table1_and_endmembers() -> None:
     _assert_independent_printed_cells(_document())
 
@@ -214,6 +245,7 @@ def test_pure_heat_contents_migrate_with_conditions_and_printed_uncertainty(
         observation = table1[key]
         assert observation.identity.quantity.value is Quantity.H_MINUS_H298
         assert observation.identity.species.phase.value is phase
+        assert observation.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
         assert observation.value.point == Decimal(str(enthalpy))
         assert observation.uncertainty.verbatim["sigma"] == width
         temperature = observation.point_conditions["temperature_K"]
