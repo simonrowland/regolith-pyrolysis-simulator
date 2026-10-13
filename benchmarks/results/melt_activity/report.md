@@ -11,14 +11,14 @@ Residual convention: `log10(predicted/measured)`; positive means overprediction.
 | Species | Observable | Engine | n | RMSE (dex) | Median residual | ok | OOD | crash | refused | not converged | not attempted | observable unavailable | unavailable |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | Al | activity | alphamelts | 0 | — | — | 0 | 0 | 0 | 0 | 0 | 0 | 62 | 0 |
-| Al | activity | imcc-ext | 62 | 1.211 | -0.324 | 62 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| Al | activity | imcc-published | 62 | 1.211 | -0.324 | 62 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| Al | activity | internal_analytic | 62 | 1.121 | -0.8134 | 62 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| Al | activity | thermoengine | 34 | 1.398 | -0.1375 | 34 | 10 | 0 | 18 | 0 | 0 | 0 | 0 |
+| Al | activity | imcc-ext | 62 | 1.33 | 0.272 | 62 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| Al | activity | imcc-published | 62 | 1.329 | 0.272 | 62 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| Al | activity | internal_analytic | 62 | 1.002 | -0.2175 | 62 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| Al | activity | thermoengine | 34 | 1.686 | 0.4584 | 34 | 10 | 0 | 18 | 0 | 0 | 0 | 0 |
 | Ca | activity | alphamelts | 0 | — | — | 0 | 0 | 0 | 0 | 0 | 0 | 99 | 0 |
-| Ca | activity | imcc-ext | 99 | 0.8344 | -0.6161 | 99 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| Ca | activity | imcc-published | 99 | 0.8344 | -0.6151 | 99 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| Ca | activity | internal_analytic | 99 | 0.4597 | 0.1005 | 99 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| Ca | activity | imcc-ext | 99 | 0.5594 | 0.3276 | 99 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| Ca | activity | imcc-published | 99 | 0.5604 | 0.3278 | 99 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| Ca | activity | internal_analytic | 99 | 1.106 | 1.01 | 99 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 | Ca | activity | thermoengine | 0 | — | — | 0 | 10 | 0 | 31 | 0 | 0 | 58 | 0 |
 | K | partial_pressure | alphamelts | 0 | — | — | 0 | 0 | 0 | 0 | 0 | 0 | 3 | 0 |
 | K | partial_pressure | imcc-ext | 3 | 0.933 | -0.9496 | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
@@ -27,9 +27,9 @@ Residual convention: `log10(predicted/measured)`; positive means overprediction.
 | K | partial_pressure | thermoengine | 0 | — | — | 0 | 0 | 0 | 0 | 0 | 0 | 3 | 0 |
 | K | partial_pressure | vaporock | 2 | 0.07991 | -0.07488 | 2 | 1 | 0 | 0 | 0 | 0 | 0 | 0 |
 | Mg | activity | alphamelts | 0 | — | — | 0 | 0 | 0 | 0 | 0 | 0 | 45 | 0 |
-| Mg | activity | imcc-ext | 45 | 1.09 | -1.009 | 45 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| Mg | activity | imcc-published | 45 | 1.099 | -1.021 | 45 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| Mg | activity | internal_analytic | 45 | 0.3062 | 0.01139 | 45 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| Mg | activity | imcc-ext | 45 | 0.3956 | -0.215 | 45 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| Mg | activity | imcc-published | 45 | 0.4008 | -0.2269 | 45 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| Mg | activity | internal_analytic | 45 | 0.8437 | 0.8054 | 45 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 | Mg | activity | thermoengine | 0 | — | — | 0 | 1 | 0 | 16 | 0 | 0 | 28 | 0 |
 | Mg | activity_coefficient | alphamelts | 0 | — | — | 0 | 0 | 0 | 0 | 0 | 0 | 3 | 0 |
 | Mg | activity_coefficient | imcc-ext | 3 | 0.1182 | 0.05689 | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
@@ -48,10 +48,10 @@ Residual convention: `log10(predicted/measured)`; positive means overprediction.
 | Na | activity | internal_analytic | 0 | — | — | 54 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 | Na | activity | thermoengine | 0 | — | — | 0 | 1 | 0 | 17 | 0 | 0 | 36 | 0 |
 | SiO | activity | alphamelts | 0 | — | — | 0 | 0 | 0 | 0 | 0 | 0 | 126 | 0 |
-| SiO | activity | imcc-ext | 86 | 0.4467 | -0.3158 | 86 | 40 | 0 | 0 | 0 | 0 | 0 | 0 |
-| SiO | activity | imcc-published | 86 | 0.4466 | -0.3158 | 86 | 40 | 0 | 0 | 0 | 0 | 0 | 0 |
-| SiO | activity | internal_analytic | 126 | 1.1 | 0.239 | 126 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| SiO | activity | thermoengine | 74 | 0.5834 | -0.2833 | 74 | 11 | 0 | 41 | 0 | 0 | 0 | 0 |
+| SiO | activity | imcc-ext | 86 | 0.4352 | -0.2986 | 86 | 40 | 0 | 0 | 0 | 0 | 0 | 0 |
+| SiO | activity | imcc-published | 86 | 0.4351 | -0.2986 | 86 | 40 | 0 | 0 | 0 | 0 | 0 | 0 |
+| SiO | activity | internal_analytic | 126 | 1.103 | 0.2494 | 126 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| SiO | activity | thermoengine | 74 | 0.5782 | -0.2802 | 74 | 11 | 0 | 41 | 0 | 0 | 0 | 0 |
 | SiO | activity_coefficient | alphamelts | 0 | — | — | 0 | 0 | 0 | 0 | 0 | 0 | 3 | 0 |
 | SiO | activity_coefficient | imcc-ext | 3 | 0.5754 | 0.5414 | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 | SiO | activity_coefficient | imcc-published | 3 | 0.5769 | 0.5429 | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
@@ -70,33 +70,33 @@ Every pair of engines with both-ok residuals on the same scored point enters thi
 
 | Species | Observable | Engine A | Engine B | Paired n | A RMSE (dex) | B RMSE (dex) | A closer | B closer | ties | Decision |
 |---|---|---|---|---:|---:|---:|---:|---:|---:|---|
-| Al | activity | imcc-ext | imcc-published | 62 | 1.211 | 1.211 | 2 | 13 | 47 | imcc-published |
-| Al | activity | imcc-ext | internal_analytic | 62 | 1.211 | 1.121 | 41 | 21 | 0 | internal_analytic |
-| Al | activity | imcc-ext | thermoengine | 34 | 1.442 | 1.398 | 14 | 20 | 0 | thermoengine |
-| Al | activity | imcc-published | internal_analytic | 62 | 1.211 | 1.121 | 41 | 21 | 0 | internal_analytic |
-| Al | activity | imcc-published | thermoengine | 34 | 1.441 | 1.398 | 15 | 19 | 0 | thermoengine |
-| Al | activity | internal_analytic | thermoengine | 34 | 1.241 | 1.398 | 10 | 24 | 0 | internal_analytic |
-| Ca | activity | imcc-ext | imcc-published | 99 | 0.8344 | 0.8344 | 7 | 33 | 59 | imcc-ext |
-| Ca | activity | imcc-ext | internal_analytic | 99 | 0.8344 | 0.4597 | 26 | 73 | 0 | internal_analytic |
-| Ca | activity | imcc-published | internal_analytic | 99 | 0.8344 | 0.4597 | 26 | 73 | 0 | internal_analytic |
+| Al | activity | imcc-ext | imcc-published | 62 | 1.33 | 1.329 | 1 | 14 | 47 | imcc-published |
+| Al | activity | imcc-ext | internal_analytic | 62 | 1.33 | 1.002 | 25 | 37 | 0 | internal_analytic |
+| Al | activity | imcc-ext | thermoengine | 34 | 1.718 | 1.686 | 18 | 16 | 0 | thermoengine |
+| Al | activity | imcc-published | internal_analytic | 62 | 1.329 | 1.002 | 25 | 37 | 0 | internal_analytic |
+| Al | activity | imcc-published | thermoengine | 34 | 1.717 | 1.686 | 19 | 15 | 0 | thermoengine |
+| Al | activity | internal_analytic | thermoengine | 34 | 1.267 | 1.686 | 23 | 11 | 0 | internal_analytic |
+| Ca | activity | imcc-ext | imcc-published | 99 | 0.5594 | 0.5604 | 34 | 6 | 59 | imcc-ext |
+| Ca | activity | imcc-ext | internal_analytic | 99 | 0.5594 | 1.106 | 79 | 20 | 0 | imcc-ext |
+| Ca | activity | imcc-published | internal_analytic | 99 | 0.5604 | 1.106 | 79 | 20 | 0 | imcc-published |
 | K | partial_pressure | imcc-ext | imcc-published | 3 | 0.933 | 0.9339 | 3 | 0 | 0 | imcc-ext |
 | K | partial_pressure | imcc-ext | internal_analytic | 3 | 0.933 | 0.373 | 0 | 3 | 0 | internal_analytic |
 | K | partial_pressure | imcc-ext | vaporock | 2 | 0.9221 | 0.07991 | 0 | 2 | 0 | vaporock |
 | K | partial_pressure | imcc-published | internal_analytic | 3 | 0.9339 | 0.373 | 0 | 3 | 0 | internal_analytic |
 | K | partial_pressure | imcc-published | vaporock | 2 | 0.923 | 0.07991 | 0 | 2 | 0 | vaporock |
 | K | partial_pressure | internal_analytic | vaporock | 2 | 0.4116 | 0.07991 | 0 | 2 | 0 | vaporock |
-| Mg | activity | imcc-ext | imcc-published | 45 | 1.09 | 1.099 | 45 | 0 | 0 | imcc-ext |
-| Mg | activity | imcc-ext | internal_analytic | 45 | 1.09 | 0.3062 | 1 | 44 | 0 | internal_analytic |
-| Mg | activity | imcc-published | internal_analytic | 45 | 1.099 | 0.3062 | 1 | 44 | 0 | internal_analytic |
+| Mg | activity | imcc-ext | imcc-published | 45 | 0.3956 | 0.4008 | 38 | 7 | 0 | imcc-ext |
+| Mg | activity | imcc-ext | internal_analytic | 45 | 0.3956 | 0.8437 | 39 | 6 | 0 | imcc-ext |
+| Mg | activity | imcc-published | internal_analytic | 45 | 0.4008 | 0.8437 | 39 | 6 | 0 | imcc-published |
 | Mg | activity_coefficient | imcc-ext | imcc-published | 3 | 0.1182 | 0.1103 | 0 | 3 | 0 | imcc-published |
 | Mg | activity_coefficient | imcc-ext | internal_analytic | 3 | 0.1182 | 0.9525 | 3 | 0 | 0 | imcc-ext |
 | Mg | activity_coefficient | imcc-published | internal_analytic | 3 | 0.1103 | 0.9525 | 3 | 0 | 0 | imcc-published |
-| SiO | activity | imcc-ext | imcc-published | 86 | 0.4467 | 0.4466 | 11 | 16 | 59 | imcc-published |
-| SiO | activity | imcc-ext | internal_analytic | 86 | 0.4467 | 0.5329 | 31 | 55 | 0 | imcc-ext |
-| SiO | activity | imcc-ext | thermoengine | 48 | 0.3571 | 0.3748 | 27 | 21 | 0 | imcc-ext |
-| SiO | activity | imcc-published | internal_analytic | 86 | 0.4466 | 0.5329 | 31 | 55 | 0 | imcc-published |
-| SiO | activity | imcc-published | thermoengine | 48 | 0.3564 | 0.3748 | 27 | 21 | 0 | imcc-published |
-| SiO | activity | internal_analytic | thermoengine | 74 | 0.3844 | 0.5834 | 57 | 17 | 0 | internal_analytic |
+| SiO | activity | imcc-ext | imcc-published | 86 | 0.4352 | 0.4351 | 11 | 16 | 59 | imcc-published |
+| SiO | activity | imcc-ext | internal_analytic | 86 | 0.4352 | 0.5429 | 32 | 54 | 0 | imcc-ext |
+| SiO | activity | imcc-ext | thermoengine | 48 | 0.3452 | 0.3623 | 26 | 22 | 0 | imcc-ext |
+| SiO | activity | imcc-published | internal_analytic | 86 | 0.4351 | 0.5429 | 32 | 54 | 0 | imcc-published |
+| SiO | activity | imcc-published | thermoengine | 48 | 0.3445 | 0.3623 | 26 | 22 | 0 | imcc-published |
+| SiO | activity | internal_analytic | thermoengine | 74 | 0.3848 | 0.5782 | 58 | 16 | 0 | internal_analytic |
 | SiO | activity_coefficient | imcc-ext | imcc-published | 3 | 0.5754 | 0.5769 | 2 | 1 | 0 | imcc-ext |
 | SiO | activity_coefficient | imcc-ext | internal_analytic | 3 | 0.5754 | 0.9451 | 3 | 0 | 0 | imcc-ext |
 | SiO | activity_coefficient | imcc-ext | thermoengine | 3 | 0.5754 | 0.7269 | 3 | 0 | 0 | imcc-ext |
@@ -114,7 +114,7 @@ Every pair of engines with both-ok residuals on the same scored point enters thi
 | SiO | partial_pressure | internal_analytic | vaporock | 3 | 0.2563 | 0.2498 | 0 | 3 | 0 | vaporock |
 | SiO | partial_pressure | thermoengine | vaporock | 3 | 0.2508 | 0.2498 | 0 | 3 | 0 | vaporock |
 
-Decision verdict: `imcc-ext` vs `imcc-published`: mixed by species/observable (4 imcc-ext, 4 imcc-published, 0 tied; n=62,99,3,45,3,86,3,3); `imcc-ext` vs `internal_analytic`: mixed by species/observable (4 imcc-ext, 4 internal_analytic, 0 tied; n=62,99,3,45,3,86,3,3); `imcc-ext` vs `thermoengine`: mixed by species/observable (3 imcc-ext, 1 thermoengine, 0 tied; n=34,48,3,3); `imcc-ext` vs `vaporock`: mixed by species/observable (1 imcc-ext, 1 vaporock, 0 tied; n=2,3); `imcc-published` vs `internal_analytic`: mixed by species/observable (4 imcc-published, 4 internal_analytic, 0 tied; n=62,99,3,45,3,86,3,3); `imcc-published` vs `thermoengine`: mixed by species/observable (3 imcc-published, 1 thermoengine, 0 tied; n=34,48,3,3); `imcc-published` vs `vaporock`: mixed by species/observable (1 imcc-published, 1 vaporock, 0 tied; n=2,3); `internal_analytic` vs `thermoengine`: mixed by species/observable (2 internal_analytic, 2 thermoengine, 0 tied; n=34,74,3,3); `internal_analytic` vs `vaporock`: vaporock better on every comparable group (0 internal_analytic, 2 vaporock, 0 tied; n=2,3); `thermoengine` vs `vaporock`: vaporock better on every comparable group (0 thermoengine, 1 vaporock, 0 tied; n=3).
+Decision verdict: `imcc-ext` vs `imcc-published`: mixed by species/observable (4 imcc-ext, 4 imcc-published, 0 tied; n=62,99,3,45,3,86,3,3); `imcc-ext` vs `internal_analytic`: mixed by species/observable (6 imcc-ext, 2 internal_analytic, 0 tied; n=62,99,3,45,3,86,3,3); `imcc-ext` vs `thermoengine`: mixed by species/observable (3 imcc-ext, 1 thermoengine, 0 tied; n=34,48,3,3); `imcc-ext` vs `vaporock`: mixed by species/observable (1 imcc-ext, 1 vaporock, 0 tied; n=2,3); `imcc-published` vs `internal_analytic`: mixed by species/observable (6 imcc-published, 2 internal_analytic, 0 tied; n=62,99,3,45,3,86,3,3); `imcc-published` vs `thermoengine`: mixed by species/observable (3 imcc-published, 1 thermoengine, 0 tied; n=34,48,3,3); `imcc-published` vs `vaporock`: mixed by species/observable (1 imcc-published, 1 vaporock, 0 tied; n=2,3); `internal_analytic` vs `thermoengine`: mixed by species/observable (2 internal_analytic, 2 thermoengine, 0 tied; n=34,74,3,3); `internal_analytic` vs `vaporock`: vaporock better on every comparable group (0 internal_analytic, 2 vaporock, 0 tied; n=2,3); `thermoengine` vs `vaporock`: vaporock better on every comparable group (0 thermoengine, 1 vaporock, 0 tied; n=3).
 
 ## IMCC extrapolated tier (computed-and-marked, not validated)
 
@@ -407,17 +407,17 @@ ThermoEngine coverage cells are explicitly `coverage not measured for this engin
 
 AlphaMELTS trajectory boundaries:
 
-- `sf04_alkali_basalt` / `remove_silica`: first refusal at step 11, SiO2=28.534 wt%.
-- `sf04_alkali_basalt` / `strip_modifiers`: first refusal at step 17, SiO2=81.286 wt%.
-- `sf04_dunite` / `remove_silica`: first refusal at step 8, SiO2=29.695 wt%.
-- `sf04_dunite` / `strip_modifiers`: first refusal at step 18, SiO2=82.451 wt%.
-- `sf04_komatiite` / `remove_silica`: first refusal at step 12, SiO2=28.265 wt%.
-- `sf04_komatiite` / `strip_modifiers`: first refusal at step 17, SiO2=82.640 wt%.
-- `sf04_tholeiite` / `remove_silica`: first refusal at step 13, SiO2=29.174 wt%.
-- `sf04_tholeiite` / `strip_modifiers`: first refusal at step 16, SiO2=81.775 wt%.
+- `sf04_alkali_basalt` / `remove_silica`: first out-of-domain step: step 11, SiO2=28.534 wt%.
+- `sf04_alkali_basalt` / `strip_modifiers`: first out-of-domain step: step 17, SiO2=81.286 wt%.
+- `sf04_dunite` / `remove_silica`: first out-of-domain step: step 8, SiO2=29.695 wt%.
+- `sf04_dunite` / `strip_modifiers`: first out-of-domain step: step 18, SiO2=82.451 wt%.
+- `sf04_komatiite` / `remove_silica`: first out-of-domain step: step 12, SiO2=28.265 wt%.
+- `sf04_komatiite` / `strip_modifiers`: first out-of-domain step: step 17, SiO2=82.640 wt%.
+- `sf04_tholeiite` / `remove_silica`: first out-of-domain step: step 13, SiO2=29.174 wt%.
+- `sf04_tholeiite` / `strip_modifiers`: first out-of-domain step: step 16, SiO2=81.775 wt%.
 
 The CSV preserves each composition step, engine status, and typed reason.
-It answers the rump question as a curve: AlphaMELTS rejects every normalized step below its 30 wt% SiO2 floor.
+Every normalized step below 30 wt% SiO2 is outside the AlphaMELTS certified band, and the adapter admits such melts with a notice and extrapolated authority.
 
 Paired below-30 wt% SiO2 coverage:
 

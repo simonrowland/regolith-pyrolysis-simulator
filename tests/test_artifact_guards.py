@@ -1,12 +1,25 @@
 import ast
+import os
 import re
-import shutil
-import subprocess
 from pathlib import Path
 
 import pytest
 
 from simulator.accounting import load_species_formulas
+
+
+FORBIDDEN_INTERNAL_KG_MUTATION_PATTERNS = [
+    r"oxygen_cumulative_kg \+=",
+    r"O2_vented_cumulative_kg \+=",
+    r"train\.stages\[6\].*O2",
+    r"stages\[6\]\.collected_kg\['O2'\]",
+    r"composition_kg\[[^\]]+\]\s*=",
+    r"collected_kg\[[^\]]+\]\s*=",
+    r"shuttle_.*inventory_kg\s*-=",
+    r"thermite_Mg_inventory_kg\s*-=",
+    r"terminal\.oxygen_stored",
+    r"terminal\.oxygen_vented_to_vacuum",
+]
 
 
 def test_internal_analytical_implementation_has_no_legacy_stub_symbols():
@@ -49,43 +62,190 @@ def test_internal_analytical_implementation_has_no_legacy_stub_symbols():
     assert not violations, "\n".join(violations)
 
 
-@pytest.mark.skipif(shutil.which("rg") is None, reason="requires ripgrep (rg)")
 def test_simulator_has_no_forbidden_internal_kg_mutations():
     repo = Path(__file__).parent.parent
-    forbidden = [
-        r"oxygen_cumulative_kg \+=",
-        r"O2_vented_cumulative_kg \+=",
-        r"train\.stages\[6\].*O2",
-        r"stages\[6\]\.collected_kg\['O2'\]",
-        r"composition_kg\[[^\]]+\]\s*=",
-        r"collected_kg\[[^\]]+\]\s*=",
-        r"shuttle_.*inventory_kg\s*-=",
-        r"thermite_Mg_inventory_kg\s*-=",
-        r"terminal\.oxygen_stored",
-        r"terminal\.oxygen_vented_to_vacuum",
-    ]
+    violations = _forbidden_internal_kg_mutation_hits(repo / "simulator")
+    assert not violations, "\n".join(violations)
 
-    result = subprocess.run(
-        ["rg", "-n", "|".join(forbidden), "simulator"],
-        cwd=repo,
-        check=False,
-        text=True,
-        capture_output=True,
+
+def _forbidden_internal_kg_mutation_hits(root: Path) -> list[str]:
+    # Scan regular files under the old roots and extensions, skipping only
+    # __pycache__ and hidden directories. This intentionally does not emulate
+    # ripgrep ignore files: ignored source must not hide from this guard, and
+    # selection must not depend on Git metadata. File symlinks are excluded.
+    hits = []
+    scanned = 0
+
+    def scan_directory(directory: Path) -> None:
+        nonlocal scanned
+        try:
+            entries = os.scandir(directory)
+        except OSError as exc:
+            raise AssertionError(
+                f"could not scan {directory} after {scanned} files: {exc}"
+            ) from exc
+        with entries:
+            for entry in entries:
+                if entry.is_dir(follow_symlinks=False):
+                    if entry.name == "__pycache__" or entry.name.startswith("."):
+                        continue
+                    scan_directory(Path(entry.path))
+                    continue
+                if not entry.is_file(follow_symlinks=False):
+                    continue
+                path = Path(entry.path)
+                scanned += 1
+                try:
+                    with path.open(encoding="utf-8", newline="") as source:
+                        content = source.read()
+                except (OSError, UnicodeError) as exc:
+                    raise AssertionError(
+                        f"could not read {path} after scanning {scanned} files: {exc}"
+                    ) from exc
+                for line_number, line in enumerate(content.split("\n"), start=1):
+                    if line.endswith("\r"):
+                        line = line[:-1]
+                    if any(
+                        re.search(pattern, line)
+                        for pattern in FORBIDDEN_INTERNAL_KG_MUTATION_PATTERNS
+                    ):
+                        hits.append(
+                            f"{path.relative_to(root).as_posix()}:{line_number}"
+                        )
+
+    try:
+        scan_directory(root)
+    except OSError as exc:
+        raise AssertionError(
+            f"could not inspect entries under {root} after {scanned} files: {exc}"
+        ) from exc
+    assert scanned > 0, f"scanned 0 files under {root}; guard cannot certify an empty scan"
+    return sorted(hits)
+
+
+@pytest.mark.parametrize(
+    "source",
+    (
+        "self.melt.composition_kg['FeO']\f= 0\n",
+        "# self.melt.composition_kg['FeO']\u00a0= 0\n",
+    ),
+    ids=("form-feed", "unicode-space"),
+)
+def test_forbidden_internal_kg_mutation_scanner_preserves_line_matching(tmp_path, source):
+    if "\f" in source:
+        compile(source, "planted.py", "exec")
+    root = tmp_path / "simulator"
+    root.mkdir()
+    (root / "planted.py").write_text(source, encoding="utf-8")
+
+    assert _forbidden_internal_kg_mutation_hits(root) == ["planted.py:1"]
+
+
+def test_forbidden_internal_kg_mutation_scanner_fails_on_missing_root(tmp_path):
+    with pytest.raises(AssertionError, match=r"could not scan .* after 0 files"):
+        _forbidden_internal_kg_mutation_hits(tmp_path / "missing")
+
+
+def test_forbidden_internal_kg_mutation_scanner_fails_on_zero_files(tmp_path):
+    root = tmp_path / "simulator"
+    root.mkdir()
+    (root / ".hidden").mkdir()
+    (root / "__pycache__").mkdir()
+
+    with pytest.raises(AssertionError, match=r"scanned 0 files"):
+        _forbidden_internal_kg_mutation_hits(root)
+
+
+def test_forbidden_internal_kg_mutation_scanner_reports_unreadable_file(tmp_path):
+    if os.geteuid() == 0:
+        pytest.skip("chmod 000 is readable when running as root")
+    root = tmp_path / "simulator"
+    root.mkdir()
+    unreadable = root / "unreadable.py"
+    unreadable.write_text("safe = True\n", encoding="utf-8")
+    unreadable.chmod(0)
+
+    try:
+        with pytest.raises(AssertionError, match=r"unreadable\.py.*scanning 1 files"):
+            _forbidden_internal_kg_mutation_hits(root)
+    finally:
+        unreadable.chmod(0o600)
+
+
+def test_forbidden_internal_kg_mutation_scanner_scans_ignored_regular_files(tmp_path):
+    root = tmp_path / "simulator"
+    root.mkdir()
+    (root / ".ignore").write_text("excluded.py\n", encoding="utf-8")
+    (root / ".gitignore").write_text("*.log\n", encoding="utf-8")
+    (root / "excluded.py").write_text(
+        "self.melt.composition_kg['FeO'] = 0\n", encoding="utf-8"
+    )
+    (root / "ignored.log").write_text(
+        "self.melt.composition_kg['FeO'] = 0\n", encoding="utf-8"
     )
 
-    assert result.returncode == 1, result.stdout
+    assert _forbidden_internal_kg_mutation_hits(root) == [
+        "excluded.py:1",
+        "ignored.log:1",
+    ]
+
+
+def test_forbidden_internal_kg_mutation_scanner_skips_file_symlinks(tmp_path):
+    root = tmp_path / "simulator"
+    root.mkdir()
+    target = tmp_path / "outside.py"
+    target.write_text("self.melt.composition_kg['FeO'] = 0\n", encoding="utf-8")
+    (root / "linked.py").symlink_to(target)
+    (root / "safe.py").write_text("safe = True\n", encoding="utf-8")
+
+    assert _forbidden_internal_kg_mutation_hits(root) == []
+
+
+def test_forbidden_internal_kg_mutation_scanner_fails_on_invalid_utf8(tmp_path):
+    root = tmp_path / "simulator"
+    root.mkdir()
+    (root / "invalid.py").write_bytes(b"\xff")
+
+    with pytest.raises(AssertionError, match=r"invalid\.py.*scanning 1 files"):
+        _forbidden_internal_kg_mutation_hits(root)
+
+
+def test_forbidden_internal_kg_mutation_scanner_matches_crlf_lines(tmp_path):
+    root = tmp_path / "simulator"
+    root.mkdir()
+    (root / "planted.py").write_bytes(
+        b"safe = True\r\nself.melt.composition_kg['FeO'] = 0\r\n"
+    )
+
+    assert _forbidden_internal_kg_mutation_hits(root) == ["planted.py:2"]
+
+
+def test_forbidden_internal_kg_mutation_scanner_matches_lone_cr_in_assignment(tmp_path):
+    root = tmp_path / "simulator"
+    root.mkdir()
+    (root / "planted.py").write_bytes(
+        b"(train.stages[6].\rcollected_kg['O2']) = 0\n"
+    )
+
+    assert _forbidden_internal_kg_mutation_hits(root) == ["planted.py:1"]
 
 
 def test_forbidden_internal_kg_mutation_patterns_match_samples():
     samples = {
-        r"oxygen_cumulative_kg \+=": "self.oxygen_cumulative_kg += 1.0",
-        r"O2_vented_cumulative_kg \+=": "self.O2_vented_cumulative_kg += vented",
-        r"composition_kg\[[^\]]+\]\s*=": "self.melt.composition_kg['FeO'] = 0",
-        r"collected_kg\[[^\]]+\]\s*=": "stage.collected_kg['O2'] = 1",
-        r"terminal\.oxygen_stored": "terminal.oxygen_stored",
+        FORBIDDEN_INTERNAL_KG_MUTATION_PATTERNS[0]: "self.oxygen_cumulative_kg += 1.0",
+        FORBIDDEN_INTERNAL_KG_MUTATION_PATTERNS[1]: "self.O2_vented_cumulative_kg += vented",
+        FORBIDDEN_INTERNAL_KG_MUTATION_PATTERNS[2]: "train.stages[6].available_O2",
+        FORBIDDEN_INTERNAL_KG_MUTATION_PATTERNS[3]: "stage.stages[6].collected_kg['O2'] = 1",
+        FORBIDDEN_INTERNAL_KG_MUTATION_PATTERNS[4]: "self.melt.composition_kg['FeO'] = 0",
+        FORBIDDEN_INTERNAL_KG_MUTATION_PATTERNS[5]: "stage.collected_kg['O2'] = 1",
+        FORBIDDEN_INTERNAL_KG_MUTATION_PATTERNS[6]: "self.shuttle_main_inventory_kg -= moved",
+        FORBIDDEN_INTERNAL_KG_MUTATION_PATTERNS[7]: "self.thermite_Mg_inventory_kg -= reacted",
+        FORBIDDEN_INTERNAL_KG_MUTATION_PATTERNS[8]: "terminal.oxygen_stored",
+        FORBIDDEN_INTERNAL_KG_MUTATION_PATTERNS[9]: "terminal.oxygen_vented_to_vacuum",
     }
 
-    for pattern, sample in samples.items():
+    for pattern in FORBIDDEN_INTERNAL_KG_MUTATION_PATTERNS:
+        sample = samples[pattern]
         assert re.search(pattern, sample), pattern
 
 
@@ -101,13 +261,40 @@ def test_species_catalog_loads_case_sensitive_species_ids():
 def test_no_direct_melt_regime_membership_comparisons_outside_helper():
     repo = Path(__file__).parent.parent
     violations = []
-    for root in (repo / "simulator", repo / "engines" / "builtin"):
+    for root in _melt_regime_guard_roots(repo):
         for path in root.rglob("*.py"):
             if path.relative_to(repo).as_posix() == "simulator/melt_regime.py":
                 continue
             violations.extend(_melt_regime_membership_ast_violations(path, repo))
 
     assert not violations, "\n".join(violations)
+
+
+def test_melt_regime_guard_roots_include_engine_and_script_layers():
+    repo = Path(__file__).parent.parent
+
+    assert {root.relative_to(repo).as_posix() for root in _melt_regime_guard_roots(repo)} == {
+        "simulator",
+        "engines",
+        "scripts",
+    }
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        "if liquid_fraction_value < 0.0: pass",
+        "if liquid_fraction_value > 1.0: pass",
+        "if liquid_fraction_at(temperature_C) > 0.0: pass",
+        "if melts_fraction > 0.0: pass",
+        "if freeze_fraction == 0.0: pass",
+    ],
+)
+def test_melt_regime_ast_guard_detects_liquid_fraction_aliases(source):
+    assert _melt_regime_membership_ast_violations_from_source(
+        source,
+        "engines/fixture.py",
+    )
 
 
 def test_pressure_channel_consumers_declare_intent():
@@ -176,6 +363,10 @@ def _melt_regime_membership_ast_violations(
     )
 
 
+def _melt_regime_guard_roots(repo: Path) -> tuple[Path, ...]:
+    return (repo / "simulator", repo / "engines", repo / "scripts")
+
+
 def _melt_regime_membership_ast_violations_from_source(
     source: str,
     label: str,
@@ -205,13 +396,13 @@ def _forbidden_liquid_fraction_compare(
     op: ast.cmpop,
     right: ast.expr,
 ) -> bool:
-    if not isinstance(op, (ast.Eq, ast.LtE, ast.GtE)):
+    if not isinstance(op, (ast.Eq, ast.Lt, ast.LtE, ast.Gt, ast.GtE)):
         return False
     return (
         _expr_mentions_liquid_fraction(left)
-        and _expr_is_zero_or_epsilon_boundary(right)
+        and _expr_is_liquid_fraction_boundary(right)
     ) or (
-        _expr_is_zero_or_epsilon_boundary(left)
+        _expr_is_liquid_fraction_boundary(left)
         and _expr_mentions_liquid_fraction(right)
     )
 
@@ -235,13 +426,25 @@ def _forbidden_solidus_compare(
 def _expr_mentions_liquid_fraction(expr: ast.expr) -> bool:
     expr = _unwrap_float_call(expr)
     if isinstance(expr, ast.Name):
-        return expr.id == "liquid_fraction"
+        return expr.id in {
+            "liquid_fraction",
+            "liquid_fraction_value",
+            "liquid_fraction_at",
+            "melts_fraction",
+            "freeze_fraction",
+        }
     if isinstance(expr, ast.Attribute):
-        return expr.attr == "liquid_fraction"
+        return expr.attr in {"liquid_fraction", "liquid_fraction_value"}
     if isinstance(expr, ast.Subscript):
-        return _subscript_key(expr.slice) == "liquid_fraction"
+        return _subscript_key(expr.slice) in {
+            "liquid_fraction",
+            "liquid_fraction_value",
+        }
     if isinstance(expr, ast.Call):
-        return _call_reads_liquid_fraction(expr) or any(
+        return (
+            isinstance(expr.func, ast.Name)
+            and expr.func.id == "liquid_fraction_at"
+        ) or _call_reads_liquid_fraction(expr) or any(
             _expr_mentions_liquid_fraction(child)
             for child in ast.iter_child_nodes(expr)
             if isinstance(child, ast.expr)
@@ -279,13 +482,13 @@ def _expr_mentions_solidus_boundary(expr: ast.expr) -> bool:
     )
 
 
-def _expr_is_zero_or_epsilon_boundary(expr: ast.expr) -> bool:
+def _expr_is_liquid_fraction_boundary(expr: ast.expr) -> bool:
     expr = _unwrap_float_call(expr)
     if isinstance(expr, ast.Constant):
         return (
             isinstance(expr.value, (int, float))
             and not isinstance(expr.value, bool)
-            and float(expr.value) == 0.0
+            and float(expr.value) in {0.0, 1.0}
         )
     if isinstance(expr, ast.Name):
         return expr.id in {"_FREEZE_GATE_EPSILON", "MELT_REGIME_EPSILON"}
@@ -360,6 +563,21 @@ if (float(T_K) - 273.15) > solidus_T_C:
 
     assert len(violations) == 7
     assert all("legacy_predicate" not in violation for violation in violations)
+
+
+def test_melt_regime_ast_guard_detects_strict_liquid_fraction_comparisons():
+    violations = _melt_regime_membership_ast_violations_from_source(
+        "if liquid_fraction < 0.0:\n    pass\n"
+        "if 0 < result.liquid_fraction:\n    pass\n"
+        "if liquid_fraction > MELT_REGIME_EPSILON:\n    pass\n",
+        "sample.py",
+    )
+
+    assert violations == [
+        "sample.py:1: liquid_fraction < 0.0",
+        "sample.py:3: 0 < result.liquid_fraction",
+        "sample.py:5: liquid_fraction > MELT_REGIME_EPSILON",
+    ]
 
 
 def test_ok_equilibrium_result_constructors_do_not_hardcode_liquid_fraction():

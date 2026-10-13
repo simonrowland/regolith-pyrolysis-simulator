@@ -1,0 +1,1186 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/sutherland-2025-mare-simulant-volatile-loss.yaml
+observations:
+- observation_id: sutherland-2025-mare-simulant-volatile-loss::sutherland_2025_eac_1a_total_mass_loss_150_1300_c::T=1573.15:h=1ea83e50e59c
+  experiment_id: 10.1016/j.chemgeo.2025.123115::experiment::eac-1a-tga-dsc-ega
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: EAC-1A
+      phase:
+        tag: unknown
+        reason: phase string 'EAC-1A mare simulant' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / composition_mole_fraction
+        / composition_mass_percent / sample_oxide_composition_wt_pct / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO
+        Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.01785'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: Printed sample mass accuracy ±0.1 μg and temperature accuracy ±5 °C; confidence level not stated. No uncertainty
+      is printed for the mass-loss value.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: printed numeric mass-loss cell with page locator
+    decided_by:
+      worker: suth25
+      date: '2026-10-12'
+      evidence:
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        table: '1'
+        note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature
+          varying.
+  notices: []
+  source_id: sutherland-2025-mare-simulant-volatile-loss
+  locator:
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    table: '1'
+    note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature varying.
+  read_from: pdf:sutherland-2025-mare-simulant-volatile-loss
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        table: '1'
+        note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature
+          varying.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 5
+              published_page: 5
+              pdf_page_index: 4
+              table: '1'
+              note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature
+                varying.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 5
+              pdf_page_index: 4
+              table: '1'
+              note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature
+                varying.
+        output_unit: K
+    atmosphere:
+      state:
+        tag: value
+        value: N2 5.0 purge at 100 mL/min (99.999% guaranteed purity); near-inert external conditions; empty-baseline analyses
+          indicated up to 200 ppm O2.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+    time_min:
+      state:
+        tag: value
+        value: '200'
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+        note: Each analysis took ca. 200 min.
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:sutherland-2025-mare-simulant-volatile-loss
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '1.785'
+        locator:
+          page: 5
+          published_page: 5
+          pdf_page_index: 4
+          table: '1'
+          note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature
+            varying.
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 5
+          published_page: 5
+          pdf_page_index: 4
+          table: '1'
+          note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature
+            varying.
+    output_unit: dimensionless
+- observation_id: sutherland-2025-mare-simulant-volatile-loss::sutherland_2025_jsc_1a_total_mass_loss_150_1300_c::T=1573.15:h=43be52741ae1
+  experiment_id: 10.1016/j.chemgeo.2025.123115::experiment::jsc-1a-tga-dsc-ega
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: JSC-1A
+      phase:
+        tag: unknown
+        reason: phase string 'JSC-1A mare simulant' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / composition_mole_fraction
+        / composition_mass_percent / sample_oxide_composition_wt_pct / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO
+        Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.00161'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: Printed sample mass accuracy ±0.1 μg and temperature accuracy ±5 °C; confidence level not stated. No uncertainty
+      is printed for the mass-loss value.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: printed numeric mass-loss cell with page locator
+    decided_by:
+      worker: suth25
+      date: '2026-10-12'
+      evidence:
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        table: '1'
+        note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature
+          varying.
+  notices: []
+  source_id: sutherland-2025-mare-simulant-volatile-loss
+  locator:
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    table: '1'
+    note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature varying.
+  read_from: pdf:sutherland-2025-mare-simulant-volatile-loss
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        table: '1'
+        note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature
+          varying.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 5
+              published_page: 5
+              pdf_page_index: 4
+              table: '1'
+              note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature
+                varying.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 5
+              pdf_page_index: 4
+              table: '1'
+              note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature
+                varying.
+        output_unit: K
+    atmosphere:
+      state:
+        tag: value
+        value: N2 5.0 purge at 100 mL/min (99.999% guaranteed purity); near-inert external conditions; empty-baseline analyses
+          indicated up to 200 ppm O2.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+    time_min:
+      state:
+        tag: value
+        value: '200'
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+        note: Each analysis took ca. 200 min.
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:sutherland-2025-mare-simulant-volatile-loss
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.161'
+        locator:
+          page: 5
+          published_page: 5
+          pdf_page_index: 4
+          table: '1'
+          note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature
+            varying.
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 5
+          published_page: 5
+          pdf_page_index: 4
+          table: '1'
+          note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature
+            varying.
+    output_unit: dimensionless
+- observation_id: sutherland-2025-mare-simulant-volatile-loss::sutherland_2025_lms_1_total_mass_loss_150_1300_c::T=1573.15:h=0d8bce737fd6
+  experiment_id: 10.1016/j.chemgeo.2025.123115::experiment::lms-1-tga-dsc-ega
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: LMS-1
+      phase:
+        tag: unknown
+        reason: phase string 'LMS-1 mare simulant' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / composition_mole_fraction
+        / composition_mass_percent / sample_oxide_composition_wt_pct / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO
+        Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.01102'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: Printed sample mass accuracy ±0.1 μg and temperature accuracy ±5 °C; confidence level not stated. No uncertainty
+      is printed for the mass-loss value.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: printed numeric mass-loss cell with page locator
+    decided_by:
+      worker: suth25
+      date: '2026-10-12'
+      evidence:
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        table: '1'
+        note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature
+          varying.
+  notices: []
+  source_id: sutherland-2025-mare-simulant-volatile-loss
+  locator:
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    table: '1'
+    note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature varying.
+  read_from: pdf:sutherland-2025-mare-simulant-volatile-loss
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        table: '1'
+        note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature
+          varying.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 5
+              published_page: 5
+              pdf_page_index: 4
+              table: '1'
+              note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature
+                varying.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 5
+              pdf_page_index: 4
+              table: '1'
+              note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature
+                varying.
+        output_unit: K
+    atmosphere:
+      state:
+        tag: value
+        value: N2 5.0 purge at 100 mL/min (99.999% guaranteed purity); near-inert external conditions; empty-baseline analyses
+          indicated up to 200 ppm O2.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+    time_min:
+      state:
+        tag: value
+        value: '200'
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+        note: Each analysis took ca. 200 min.
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:sutherland-2025-mare-simulant-volatile-loss
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '1.102'
+        locator:
+          page: 5
+          published_page: 5
+          pdf_page_index: 4
+          table: '1'
+          note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature
+            varying.
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 5
+          published_page: 5
+          pdf_page_index: 4
+          table: '1'
+          note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature
+            varying.
+    output_unit: dimensionless
+- observation_id: sutherland-2025-mare-simulant-volatile-loss::sutherland_2025_oprl2n_total_mass_loss_150_1300_c::T=1573.15:h=3e91578768b6
+  experiment_id: 10.1016/j.chemgeo.2025.123115::experiment::oprl2n-tga-dsc-ega
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: OPRL2N
+      phase:
+        tag: unknown
+        reason: phase string 'OPRL2N mare simulant' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / composition_mole_fraction
+        / composition_mass_percent / sample_oxide_composition_wt_pct / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO
+        Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.00331'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: Printed sample mass accuracy ±0.1 μg and temperature accuracy ±5 °C; confidence level not stated. No uncertainty
+      is printed for the mass-loss value.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: printed numeric mass-loss cell with page locator
+    decided_by:
+      worker: suth25
+      date: '2026-10-12'
+      evidence:
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        table: '1'
+        note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature
+          varying.
+  notices: []
+  source_id: sutherland-2025-mare-simulant-volatile-loss
+  locator:
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    table: '1'
+    note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature varying.
+  read_from: pdf:sutherland-2025-mare-simulant-volatile-loss
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        table: '1'
+        note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature
+          varying.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 5
+              published_page: 5
+              pdf_page_index: 4
+              table: '1'
+              note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature
+                varying.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 5
+              pdf_page_index: 4
+              table: '1'
+              note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature
+                varying.
+        output_unit: K
+    atmosphere:
+      state:
+        tag: value
+        value: N2 5.0 purge at 100 mL/min (99.999% guaranteed purity); near-inert external conditions; empty-baseline analyses
+          indicated up to 200 ppm O2.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+    time_min:
+      state:
+        tag: value
+        value: '200'
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+        note: Each analysis took ca. 200 min.
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:sutherland-2025-mare-simulant-volatile-loss
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.331'
+        locator:
+          page: 5
+          published_page: 5
+          pdf_page_index: 4
+          table: '1'
+          note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature
+            varying.
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 5
+          published_page: 5
+          pdf_page_index: 4
+          table: '1'
+          note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature
+            varying.
+    output_unit: dimensionless
+- observation_id: sutherland-2025-mare-simulant-volatile-loss::sutherland_2025_oprl2nt_total_mass_loss_150_1300_c::T=1573.15:h=addecbfa1c00
+  experiment_id: 10.1016/j.chemgeo.2025.123115::experiment::oprl2nt-tga-dsc-ega
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: OPRL2NT
+      phase:
+        tag: unknown
+        reason: phase string 'OPRL2NT mare simulant' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / composition_mole_fraction
+        / composition_mass_percent / sample_oxide_composition_wt_pct / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO
+        Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.0067'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: Printed sample mass accuracy ±0.1 μg and temperature accuracy ±5 °C; confidence level not stated. No uncertainty
+      is printed for the mass-loss value.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: printed numeric mass-loss cell with page locator
+    decided_by:
+      worker: suth25
+      date: '2026-10-12'
+      evidence:
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        table: '1'
+        note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature
+          varying.
+  notices: []
+  source_id: sutherland-2025-mare-simulant-volatile-loss
+  locator:
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    table: '1'
+    note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature varying.
+  read_from: pdf:sutherland-2025-mare-simulant-volatile-loss
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        table: '1'
+        note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature
+          varying.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 5
+              published_page: 5
+              pdf_page_index: 4
+              table: '1'
+              note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature
+                varying.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 5
+              pdf_page_index: 4
+              table: '1'
+              note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature
+                varying.
+        output_unit: K
+    atmosphere:
+      state:
+        tag: value
+        value: N2 5.0 purge at 100 mL/min (99.999% guaranteed purity); near-inert external conditions; empty-baseline analyses
+          indicated up to 200 ppm O2.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+    time_min:
+      state:
+        tag: value
+        value: '200'
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+        note: Each analysis took ca. 200 min.
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:sutherland-2025-mare-simulant-volatile-loss
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.67'
+        locator:
+          page: 5
+          published_page: 5
+          pdf_page_index: 4
+          table: '1'
+          note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature
+            varying.
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 5
+          published_page: 5
+          pdf_page_index: 4
+          table: '1'
+          note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature
+            varying.
+    output_unit: dimensionless
+- observation_id: sutherland-2025-mare-simulant-volatile-loss::sutherland_2025_tubs_m_total_mass_loss_150_1300_c::T=1573.15:h=3ce5cdf1bdae
+  experiment_id: 10.1016/j.chemgeo.2025.123115::experiment::tubs-m-tga-dsc-ega
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: TUBS-M
+      phase:
+        tag: unknown
+        reason: phase string 'TUBS-M mare simulant' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / composition_mole_fraction
+        / composition_mass_percent / sample_oxide_composition_wt_pct / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO
+        Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.00979'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: Printed sample mass accuracy ±0.1 μg and temperature accuracy ±5 °C; confidence level not stated. No uncertainty
+      is printed for the mass-loss value.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: printed numeric mass-loss cell with page locator
+    decided_by:
+      worker: suth25
+      date: '2026-10-12'
+      evidence:
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        table: '1'
+        note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature
+          varying.
+  notices: []
+  source_id: sutherland-2025-mare-simulant-volatile-loss
+  locator:
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    table: '1'
+    note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature varying.
+  read_from: pdf:sutherland-2025-mare-simulant-volatile-loss
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        table: '1'
+        note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature
+          varying.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 5
+              published_page: 5
+              pdf_page_index: 4
+              table: '1'
+              note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature
+                varying.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 5
+              pdf_page_index: 4
+              table: '1'
+              note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature
+                varying.
+        output_unit: K
+    atmosphere:
+      state:
+        tag: value
+        value: N2 5.0 purge at 100 mL/min (99.999% guaranteed purity); near-inert external conditions; empty-baseline analyses
+          indicated up to 200 ppm O2.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+    time_min:
+      state:
+        tag: value
+        value: '200'
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+        note: Each analysis took ca. 200 min.
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:sutherland-2025-mare-simulant-volatile-loss
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.979'
+        locator:
+          page: 5
+          published_page: 5
+          pdf_page_index: 4
+          table: '1'
+          note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature
+            varying.
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 5
+          published_page: 5
+          pdf_page_index: 4
+          table: '1'
+          note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature
+            varying.
+    output_unit: dimensionless

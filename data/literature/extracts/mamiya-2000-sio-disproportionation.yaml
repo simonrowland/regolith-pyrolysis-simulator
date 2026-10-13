@@ -1,0 +1,612 @@
+schema_version: literature_extract.v1
+source_id: mamiya-2000-sio-disproportionation
+source:
+  citation: Mamiya M. (2000). Thermoanalytical study on the disproportionation reaction of silicon monoxide. Osaka University doctoral dissertation.
+  doi: 10.11501/3169166
+  url: https://ir.library.osaka-u.ac.jp/repo/ouka/all/863/15204_Dissertation.pdf
+  version: doctoral dissertation; repository VoR
+  year: 2000
+  sha256: 3df5de0559c6e0452023b65a3f648fde773e8e1d5c0d805fa225722c6ea8f1e0
+extraction:
+  method: Manual transcription from the repository PDF; figures digitized from 200 dpi rendered pages with linear or logarithmic axis calibration as applicable. No measured data tables cover the disproportionation kinetics.
+  date: '2026-10-12'
+  worker: mamiya00
+review_status: draft
+fidelity_samples:
+  - species: SiO2
+    observation_id: mamiya_2000_cristobalite_dta_heating_endotherm
+    field: T_C
+    value: 246
+    locator: {page: 63, published_page: 57, pdf_page_index: 62, figure: '3-16'}
+  - species: SiO2
+    observation_id: mamiya_2000_cristobalite_dta_cooling_exotherm
+    field: T_C
+    value: 242
+    locator: {page: 63, published_page: 57, pdf_page_index: 62, figure: '3-16'}
+  - species: SiO
+    observation_id: mamiya_2000_fig4_12_kinetic_fit_and_activation_energy
+    field: fitted_equation_as_printed
+    value: 'log k = 9.190 - 9884.7 x (1/T)'
+    locator: {page: 99, published_page: 93, pdf_page_index: 98, section: '4.6'}
+    note: Printed least-squares fitted equation.
+  - species: SiO
+    observation_id: mamiya_2000_fig4_12_kinetic_fit_and_activation_energy
+    field: fitted_parameter_as_printed
+    value: 'E* = 82.2 kJ mol-1'
+    locator: {page: 99, published_page: 93, pdf_page_index: 98, section: '4.6'}
+    note: Printed fitted activation energy.
+  - species: SiO2
+    observation_id: mamiya_2000_cristobalite_htxrd_transition_bracket
+    field: transition_interval_as_printed
+    value: between 200 and 300 C
+    locator: {page: 62, published_page: 56, pdf_page_index: 61, section: '3.5 In situ observation of the high-low transformation in cristobalite'}
+    note: HT-XRD heating bracket; no midpoint is inferred.
+  - species: SiO
+    observation_id: mamiya_2000_fig3_8_cristobalite_reaction_times
+    field: points
+    value:
+      - T_C: 1000
+        time_hr: 20
+        point_conditions:
+          temperature: {state: {tag: value, value: 1000}, locator: {page: 53, published_page: 47, pdf_page_index: 52, figure: '3-8'}}
+      - T_C: 1100
+        time_hr: 20
+        point_conditions:
+          temperature: {state: {tag: value, value: 1100}, locator: {page: 53, published_page: 47, pdf_page_index: 52, figure: '3-8'}}
+      - T_C: 1200
+        time_hr: 10
+        point_conditions:
+          temperature: {state: {tag: value, value: 1200}, locator: {page: 53, published_page: 47, pdf_page_index: 52, figure: '3-8'}}
+      - T_C: 1300
+        time_hr: 2
+        point_conditions:
+          temperature: {state: {tag: value, value: 1300}, locator: {page: 53, published_page: 47, pdf_page_index: 52, figure: '3-8'}}
+      - T_C: 1350
+        time_hr: 1
+        point_conditions:
+          temperature: {state: {tag: value, value: 1350}, locator: {page: 53, published_page: 47, pdf_page_index: 52, figure: '3-8'}}
+      - T_C: 1400
+        time_hr: 0.1
+        point_conditions:
+          temperature: {state: {tag: value, value: 1400}, locator: {page: 53, published_page: 47, pdf_page_index: 52, figure: '3-8'}}
+    locator: {page: 53, published_page: 47, pdf_page_index: 52, figure: '3-8'}
+  - species: SiO
+    observation_id: mamiya_2000_fig4_14_rate_constants
+    field: points
+    value:
+      - T_C: 900
+        k_as_digitized: 0.58
+        point_conditions:
+          temperature: {state: {tag: value, value: 900}, locator: {page: 102, published_page: 96, pdf_page_index: 101, figure: '4-14'}}
+      - T_C: 1000
+        k_as_digitized: 4.2
+        point_conditions:
+          temperature: {state: {tag: value, value: 1000}, locator: {page: 102, published_page: 96, pdf_page_index: 101, figure: '4-14'}}
+      - T_C: 1100
+        k_as_digitized: 6.7
+        point_conditions:
+          temperature: {state: {tag: value, value: 1100}, locator: {page: 102, published_page: 96, pdf_page_index: 101, figure: '4-14'}}
+      - T_C: 1200
+        k_as_digitized: 12
+        point_conditions:
+          temperature: {state: {tag: value, value: 1200}, locator: {page: 102, published_page: 96, pdf_page_index: 101, figure: '4-14'}}
+      - T_C: 1300
+        k_as_digitized: 20
+        point_conditions:
+          temperature: {state: {tag: value, value: 1300}, locator: {page: 102, published_page: 96, pdf_page_index: 101, figure: '4-14'}}
+    locator: {page: 102, published_page: 96, pdf_page_index: 101, figure: '4-14'}
+species:
+  SiO:
+    observations: []
+    context:
+      - observation_id: mamiya_2000_sio_disproportionation_run_conditions
+        type: laboratory_conditions
+        locator:
+          page: 38
+          published_page: 32
+          pdf_page_index: 37
+          section: 3.2 Experimental
+        units: as printed
+        values:
+          quantity: disproportionation_run_conditions
+          method_class: method_only
+          sample_as_printed: amorphous SiO grains with 99.9% purity, synthesized by reduction of pure SiO2 powder, supplied by Nacalai Tesque Co.; Si/O atomic ratio very close to stoichiometric 1.0 by TG; detailed reagent properties are referred to Chapter 2
+          preparation_as_printed: dark-brown glass grains with mean diameter of several mm pulverized, evacuated in a rubber tube, and hydrostatically pressed at 7 ton/cm2 into a pellet about 8 mm in diameter
+          sample_form_note: Section 3.3 separately describes specimens as pressed and formed into spheres as previously described in Chapter 2; Section 3.2 calls them pellets about 8 mm in diameter. The descriptions are retained without reconciliation.
+          sample_form_note_locator: {page: 45, published_page: 39, pdf_page_index: 44, section: 3.3 Analytical results on reaction process of the disproportionation reaction}
+          crucible_as_printed: tamman crucible of alumina
+          furnace_as_printed: vertical MoSi2 furnace; sample transferred from the upper room-temperature position to the preheated central region within 5 minutes
+          atmosphere_as_printed: pure Ar gas with 99.99% purity flowing at 30 ml/hr
+          temperature_range_C_as_printed: 900 to 1400
+          duration_range_hr_as_printed: 0.1 to 20
+          heating_rate: {state: {tag: unknown, reason: not_reported}, locator: {page: 38, published_page: 32, pdf_page_index: 37, section: 3.2 Experimental}}
+          total_pressure: {state: {tag: unknown, reason: not_reported}, locator: {page: 38, published_page: 32, pdf_page_index: 37, section: 3.2 Experimental}}
+          cooling_as_printed: rapidly pulled back to the upper starting position, kept there for more than 30 minutes without changing the condition, then opened after cooling was complete to avoid oxidation of quenched specimens
+      - observation_id: mamiya_2000_fig4_12_intensity_ratio_900c
+        type: experiment_series
+        locator:
+          page: 97
+          published_page: 91
+          pdf_page_index: 96
+          figure: '4-12'
+          note: Figure-digitized; marker centers read against the linear axes on the 200 dpi page render. Values approximate to about 0.1 ratio unit and 0.1 hour; no table prints these points.
+        units: plotted normalized intensity ratio (Si/NiO); time in hour
+        values:
+          quantity: normalized Si(111)-to-NiO(200) XRD intensity ratio versus annealing time, as printed
+          method_class: figure_only
+          method: figure_digitized
+          read_method: Linear calibration of graph axes from the 200 dpi page render; marker centers read to approximately 0.1 hour and 0.1 ratio unit.
+          T_C: 900
+          points:
+            - {time_hr: 1, ratio_as_digitized: 0.8}
+            - {time_hr: 2, ratio_as_digitized: 1.6}
+            - {time_hr: 4, ratio_as_digitized: 1.9}
+        point_conditions: &run_conditions
+          temperature:
+            state: {tag: value, value: 900}
+            locator: {page: 97, published_page: 91, pdf_page_index: 96, figure: '4-12'}
+          pressure:
+            state: {tag: unknown, reason: not_reported}
+            locator: {page: 38, published_page: 32, pdf_page_index: 37, section: 3.2 Experimental}
+          sample:
+            state: {tag: value, value: paper pointer to amorphous SiO reagent in Chapter 3.2 and detailed properties in Chapter 2}
+            locator: {page: 38, published_page: 32, pdf_page_index: 37, section: 3.2 Experimental}
+          gas:
+            state: {tag: value, value: 99.99% pure Ar at 30 ml/hr}
+            locator: {page: 39, published_page: 33, pdf_page_index: 38, section: 3.2 Experimental}
+          container:
+            state: {tag: value, value: tamman crucible of alumina}
+            locator: {page: 38, published_page: 32, pdf_page_index: 37, section: 3.2 Experimental}
+          heating_method:
+            state: {tag: value, value: sample transferred into preheated central region of vertical MoSi2 furnace within 5 minutes}
+            locator: {page: 38, published_page: 32, pdf_page_index: 37, section: 3.2 Experimental}
+      - observation_id: mamiya_2000_fig4_11_xrd_internal_standard
+        type: laboratory_conditions
+        locator:
+          page: 94
+          published_page: 88
+          pdf_page_index: 93
+          figure: '4-11'
+          section: 4.5 Amount of Si nanocrystals estimated from integrated intensities of XRD peaks
+        units: wt% as printed
+        values:
+          quantity: XRD internal standard and integrated-intensity method
+          method_class: method_only
+          addition_as_printed: all powdered samples were mixed with 10 wt% NiO as internal standard after annealing
+          peak_ratio_as_printed: Si(111) to NiO(200)
+          example_as_printed: at 1100 C for 1 hour, net peak areas A and B were 33574 and 8349 and ratio A/B was 4.021
+      - observation_id: mamiya_2000_fig3_3_disproportionation_progress_1350c
+        type: experiment_series
+        locator:
+          page: 44
+          published_page: 38
+          pdf_page_index: 43
+          section: 3.3 Analytical results on reaction process of the disproportionation reaction
+          figure: '3-4'
+          note: Printed narrative accompanying the time-dependent XRD patterns; qualitative outcomes retained as printed.
+        units: reaction time in hour; XRD/IR phase observations as described
+        values:
+          quantity: Si and cristobalite appearance and reaction-progress observations at 1350 C, as printed
+          method_class: figure_only
+          method: source narrative accompanying Fig. 3-4 and Fig. 3-7
+          T_C: 1350
+          observations_as_printed:
+            - Si XRD peaks appeared clearly after 0.1 hour and almost all changes in Si patterns were finished in this short time.
+            - No further change in Si XRD patterns was observed above 2 hours.
+            - Crystallization of amorphous SiO2 to cristobalite was detected when the sample was kept over 1 hour.
+            - IR patterns were unchanged for specimens annealed more than 4 hours; the author interprets this as the disproportionation reaction ending at this temperature.
+        point_conditions:
+          <<: *run_conditions
+          temperature:
+            state: {tag: value, value: 1350}
+            locator: {page: 44, published_page: 38, pdf_page_index: 43, section: 3.3 Analytical results on reaction process of the disproportionation reaction}
+      - observation_id: mamiya_2000_fig3_6_pressed_unpressed_1400c
+        type: experiment_series
+        locator:
+          page: 51
+          published_page: 45
+          pdf_page_index: 50
+          figure: '3-6'
+          note: XRD comparison of pressed and unpressed samples annealed simultaneously at 1400 C for 1 hour.
+        units: XRD phase-pattern observations as described
+        values:
+          quantity: disproportionation products versus sample compaction at 1400 C for 1 hour, as printed
+          method_class: figure_only
+          T_C: 1400
+          hold_time_hr: 1
+          pressed_sample_result: Si and cristobalite crystallization; reaction nearly finished within 1 hour; no amorphous halo was observed.
+          unpressed_sample_result: Si and cristobalite peaks plus a pronounced halo attributed to amorphous SiO2; crystallization progress and product crystallinity were scattered between treatments.
+          interpretation_as_printed: Compression is stated to enhance cristobalite crystallization in the amorphous SiO2 reaction product.
+        point_conditions:
+          <<: *run_conditions
+          temperature:
+            state: {tag: value, value: 1400}
+            locator: {page: 51, published_page: 45, pdf_page_index: 50, figure: '3-6'}
+          duration:
+            state: {tag: value, value: 1 hour}
+            locator: {page: 51, published_page: 45, pdf_page_index: 50, figure: '3-6'}
+          sample:
+            state: {tag: value, value: simultaneous pressed-sphere and unpressed-powder specimens}
+            locator: {page: 51, published_page: 45, pdf_page_index: 50, figure: '3-6'}
+      - observation_id: mamiya_2000_fig3_8_cristobalite_reaction_times
+        type: experiment_series
+        locator:
+          page: 53
+          published_page: 47
+          pdf_page_index: 52
+          figure: '3-8'
+          note: Reaction-time values are printed as labels beside the plotted bars; read from the 200 dpi page render.
+        units: hour to crystallization of cristobalite
+        values:
+          quantity: reaction times needed for crystallization of cristobalite at each temperature, as printed
+          method_class: figure_only
+          method: transcribed printed labels in figure
+          T_C: [1000, 1100, 1200, 1300, 1350, 1400]
+          points:
+            - T_C: 1000
+              time_hr: 20
+              point_conditions:
+                temperature: {state: {tag: value, value: 1000}, locator: {page: 53, published_page: 47, pdf_page_index: 52, figure: '3-8'}}
+            - T_C: 1100
+              time_hr: 20
+              point_conditions:
+                temperature: {state: {tag: value, value: 1100}, locator: {page: 53, published_page: 47, pdf_page_index: 52, figure: '3-8'}}
+            - T_C: 1200
+              time_hr: 10
+              point_conditions:
+                temperature: {state: {tag: value, value: 1200}, locator: {page: 53, published_page: 47, pdf_page_index: 52, figure: '3-8'}}
+            - T_C: 1300
+              time_hr: 2
+              point_conditions:
+                temperature: {state: {tag: value, value: 1300}, locator: {page: 53, published_page: 47, pdf_page_index: 52, figure: '3-8'}}
+            - T_C: 1350
+              time_hr: 1
+              point_conditions:
+                temperature: {state: {tag: value, value: 1350}, locator: {page: 53, published_page: 47, pdf_page_index: 52, figure: '3-8'}}
+            - T_C: 1400
+              time_hr: 0.1
+              point_conditions:
+                temperature: {state: {tag: value, value: 1400}, locator: {page: 53, published_page: 47, pdf_page_index: 52, figure: '3-8'}}
+        point_conditions:
+          <<: *run_conditions
+          temperature: {state: {tag: unknown, reason: temperature varies by plotted point}, locator: {page: 53, published_page: 47, pdf_page_index: 52, figure: '3-8'}}
+      - observation_id: mamiya_2000_fig4_12_intensity_ratio_1000c
+        type: experiment_series
+        locator: {page: 97, published_page: 91, pdf_page_index: 96, figure: '4-12', note: Figure-digitized from rendered page; approximate to about 0.1 ratio unit and 0.1 hour.}
+        units: plotted normalized intensity ratio (Si/NiO); time in hour
+        values:
+          quantity: normalized Si(111)-to-NiO(200) XRD intensity ratio versus annealing time, as printed
+          method_class: figure_only
+          method: figure_digitized
+          read_method: Linear axis calibration; marker centers read to approximately 0.1 hour and 0.1 ratio unit.
+          T_C: 1000
+          points:
+            - {time_hr: 0.1, ratio_as_digitized: 0.9}
+            - {time_hr: 0.2, ratio_as_digitized: 2.1}
+            - {time_hr: 1, ratio_as_digitized: 3.2}
+            - {time_hr: 2, ratio_as_digitized: 3.5}
+            - {time_hr: 4, ratio_as_digitized: 3.0}
+        point_conditions:
+          <<: *run_conditions
+          temperature:
+            state: {tag: value, value: 1000}
+            locator: {page: 97, published_page: 91, pdf_page_index: 96, figure: '4-12'}
+      - observation_id: mamiya_2000_fig4_12_intensity_ratio_1100c
+        type: experiment_series
+        locator: {page: 97, published_page: 91, pdf_page_index: 96, figure: '4-12', note: Figure-digitized from rendered page; approximate to about 0.1 ratio unit and 0.1 hour.}
+        units: plotted normalized intensity ratio (Si/NiO); time in hour
+        values:
+          quantity: normalized Si(111)-to-NiO(200) XRD intensity ratio versus annealing time, as printed
+          method_class: figure_only
+          method: figure_digitized
+          read_method: Linear axis calibration; marker centers read to approximately 0.1 hour and 0.1 ratio unit.
+          T_C: 1100
+          points:
+            - {time_hr: 0.1, ratio_as_digitized: 1.5}
+            - {time_hr: 0.2, ratio_as_digitized: 3.1}
+            - {time_hr: 1, ratio_as_digitized: 3.3}
+            - {time_hr: 2, ratio_as_digitized: 4.0}
+            - {time_hr: 4, ratio_as_digitized: 3.9}
+        point_conditions:
+          <<: *run_conditions
+          temperature:
+            state: {tag: value, value: 1100}
+            locator: {page: 97, published_page: 91, pdf_page_index: 96, figure: '4-12'}
+      - observation_id: mamiya_2000_fig4_12_intensity_ratio_1200c
+        type: experiment_series
+        locator: {page: 97, published_page: 91, pdf_page_index: 96, figure: '4-12', note: Figure-digitized from rendered page; approximate to about 0.1 ratio unit and 0.1 hour.}
+        units: plotted normalized intensity ratio (Si/NiO); time in hour
+        values:
+          quantity: normalized Si(111)-to-NiO(200) XRD intensity ratio versus annealing time, as printed
+          method_class: figure_only
+          method: figure_digitized
+          read_method: Linear axis calibration; marker centers read to approximately 0.1 hour and 0.1 ratio unit.
+          T_C: 1200
+          points:
+            - {time_hr: 0, ratio_as_digitized: 0.0}
+            - {time_hr: 0.1, ratio_as_digitized: 2.1}
+            - {time_hr: 0.2, ratio_as_digitized: 2.4}
+            - {time_hr: 1, ratio_as_digitized: 2.6}
+            - {time_hr: 2, ratio_as_digitized: 2.9}
+            - {time_hr: 4, ratio_as_digitized: 3.0}
+        point_conditions:
+          <<: *run_conditions
+          temperature:
+            state: {tag: value, value: 1200}
+            locator: {page: 97, published_page: 91, pdf_page_index: 96, figure: '4-12'}
+      - observation_id: mamiya_2000_fig4_12_intensity_ratio_1300c
+        type: experiment_series
+        locator: {page: 97, published_page: 91, pdf_page_index: 96, figure: '4-12', note: Figure-digitized from rendered page; approximate to about 0.1 ratio unit and 0.1 hour.}
+        units: plotted normalized intensity ratio (Si/NiO); time in hour
+        values:
+          quantity: normalized Si(111)-to-NiO(200) XRD intensity ratio versus annealing time, as printed
+          method_class: figure_only
+          method: figure_digitized
+          read_method: Linear axis calibration; marker centers read to approximately 0.1 hour and 0.1 ratio unit.
+          T_C: 1300
+          points:
+            - {time_hr: 0.1, ratio_as_digitized: 3.1}
+            - {time_hr: 0.2, ratio_as_digitized: 3.2}
+            - {time_hr: 1, ratio_as_digitized: 3.6}
+            - {time_hr: 2, ratio_as_digitized: 3.7}
+            - {time_hr: 4, ratio_as_digitized: 3.5}
+        point_conditions:
+          <<: *run_conditions
+          temperature:
+            state: {tag: value, value: 1300}
+            locator: {page: 97, published_page: 91, pdf_page_index: 96, figure: '4-12'}
+      - observation_id: mamiya_2000_fig4_14_rate_constants
+        type: experiment_series
+        locator:
+          page: 102
+          published_page: 96
+          pdf_page_index: 101
+          figure: '4-14'
+          note: Figure-digitized fitted k points; marker centers read against the logarithmic y axis and linear inverse-temperature x axis on the 200 dpi rendered page.
+        units: s-1 as printed on the figure
+        values:
+          quantity: first-order Si-crystallization velocity constant k versus temperature, as plotted
+          method_class: figure_only
+          method: figure_digitized
+          read_method: Linear calibration of inverse-temperature axis and logarithmic calibration of k axis; marker centers read to approximately two significant figures.
+          digitization_tolerance: Approximately ±0.05 s-1 at 900 C; approximately ±5% for the other marker centers.
+          T_C: [900, 1000, 1100, 1200, 1300]
+          fit_data_source: Fig. 4-12 time-series intensity ratios
+          plotted_error_bars: Vertical bars on calculated k in Fig. 4-14 are stated to be estimated from standard deviation; numerical widths and confidence level are not stated.
+          time_unit_note: Fig. 4-14 labels k in s-1 while Fig. 4-12 and Fig. 4-13 time axes are in hours; no conversion is stated, so both printed forms are retained without conversion.
+          points:
+            - T_C: 900
+              k_as_digitized: 0.58
+              point_conditions:
+                temperature: {state: {tag: value, value: 900}, locator: {page: 102, published_page: 96, pdf_page_index: 101, figure: '4-14'}}
+            - T_C: 1000
+              k_as_digitized: 4.2
+              point_conditions:
+                temperature: {state: {tag: value, value: 1000}, locator: {page: 102, published_page: 96, pdf_page_index: 101, figure: '4-14'}}
+            - T_C: 1100
+              k_as_digitized: 6.7
+              point_conditions:
+                temperature: {state: {tag: value, value: 1100}, locator: {page: 102, published_page: 96, pdf_page_index: 101, figure: '4-14'}}
+            - T_C: 1200
+              k_as_digitized: 12
+              point_conditions:
+                temperature: {state: {tag: value, value: 1200}, locator: {page: 102, published_page: 96, pdf_page_index: 101, figure: '4-14'}}
+            - T_C: 1300
+              k_as_digitized: 20
+              point_conditions:
+                temperature: {state: {tag: value, value: 1300}, locator: {page: 102, published_page: 96, pdf_page_index: 101, figure: '4-14'}}
+        point_conditions:
+          <<: *run_conditions
+          temperature: {state: {tag: unknown, reason: temperature varies by plotted point}, locator: {page: 102, published_page: 96, pdf_page_index: 101, figure: '4-14'}}
+      - observation_id: mamiya_2000_fig4_12_kinetic_fit_and_activation_energy
+        type: thermodynamic_example
+        locator:
+          page: 99
+          published_page: 93
+          pdf_page_index: 98
+          section: 4.6 Arrhenius plot on the Si crystallization
+          equation: unnumbered
+          note: Fitted relation and activation energy from Fig. 4-12 data; 900 C omitted from the 1000-1300 C fit.
+        units: k unit as Fig. 4-14 (s-1); activation energy in kJ mol-1
+        values:
+          quantity: first-order Si crystallization rate constant and fitted activation energy, as printed
+          method_class: derived_least_squares
+          reaction_as_printed: 2SiO(amorphous) -> Si(crystal) + SiO2(amorphous)
+          kinetic_relation_as_printed: (I/Imax) = 1 - exp(-k t); I is XRD intensity; Imax is its maximum; k is velocity constant; t is reaction time
+          arrhenius_relation_as_printed: k = A exp(-E*/RT); log k = log A - (E*/R)(1/T)
+          fitted_equation_as_printed: log k = 9.190 - 9884.7 x (1/T)
+          fitted_parameter_as_printed: E* = 82.2 kJ mol-1
+          fit_method_as_printed: least squares method
+          fit_temperature_range_C: 1000 to 1300
+          fit_data_source: time dependence of crystallized Si amount from Fig. 4-12 represented by first-order curves in Fig. 4-13
+          excluded_data_as_printed: 900 C data; authors state crystallization was incomplete after 10 hours and omit these data from kinetic analysis
+          uncertainty_as_printed: vertical bars on calculated k in Fig. 4-14 estimated from standard deviation; no numerical widths or confidence level stated
+          limitations_as_printed: authors note different maximum I/Imax values and possible oxidation by intermigrated oxygen in flowing gas
+        point_conditions:
+          <<: *run_conditions
+          temperature: {state: {tag: value, value: fit range 1000 to 1300 C}, locator: {page: 99, published_page: 93, pdf_page_index: 98, section: 4.6 Arrhenius plot on the Si crystallization}}
+      - observation_id: mamiya_2000_tg_air_1420c_characterization
+        type: characterization
+        locator: {page: 21, published_page: 15, pdf_page_index: 20, figure: '2-4', section: 2.3 Results of characterization}
+        units: as printed
+        values:
+          quantity: quantitative_TG_characterization_in_air
+          method_class: characterization_only
+          sample_as_printed: pulverized SiO reagent; starting mass recorded separately
+          starting_mass_mg: 20.70
+          oxidation_mass_gain_mg: 7.56
+          oxidation_weight_gain_started_about_C: 600
+          x_in_SiOx_as_printed: 0.9944
+          composition_note: The printed x is retained in SiO_x; no inversion or conversion is made.
+          oxidation_completion_temperature_C: 1420
+          oxidation_completion_time_hr: 18
+          atmosphere_as_printed: air
+          crucible_as_printed: platinum crucibles
+          reference_as_printed: alumina powder
+          instrument_as_printed: Mac Science TG-DTA 2000
+          heating_rate_C_min_as_printed: 10
+          heating_as_printed: heating to maximum temperature and holding until oxidation weight gain finished
+          sample_mass_and_condition_locator: {page: 18, published_page: 12, pdf_page_index: 17, section: 2.2 Characterization of the SiO}
+          interpretation_note: The weight change is an oxidation gain, not a mass loss; the low-temperature weight-gain trend is oxidation, not a disproportionation onset.
+      - observation_id: mamiya_2000_tg_air_1030c_characterization
+        type: characterization
+        locator: {page: 21, published_page: 15, pdf_page_index: 20, figure: '2-4', section: 2.3 Results of characterization}
+        units: as printed
+        values:
+          quantity: quantitative_TG_characterization_in_air
+          method_class: characterization_only
+          sample_as_printed: pulverized SiO reagent; starting mass for this run not stated
+          holding_temperature_C: 1030
+          change_almost_finished_after_hr: 15
+          tentative_composition_as_printed: SiO1.4
+          oxidation_completion_status_as_printed: almost finished; tentative composition indicates incomplete oxidation
+          atmosphere_as_printed: air
+          crucible_as_printed: platinum crucibles
+          reference_as_printed: alumina powder
+          instrument_as_printed: Mac Science TG-DTA 2000
+          heating_rate_C_min_as_printed: 10
+          heating_as_printed: heating to maximum temperature and holding
+          conditions_locator: {page: 18, published_page: 12, pdf_page_index: 17, section: 2.2 Characterization of the SiO}
+      - observation_id: mamiya_2000_crystallite_size_1300c_1h
+        type: characterization
+        locator: {page: 87, published_page: 81, pdf_page_index: 86, section: 4.4 Changes in particle size of Si}
+        units: nm
+        values:
+          quantity: Si nanocrystallite size by XRD and TEM
+          method_class: characterization_only
+          annealing_temperature_C: 1300
+          annealing_duration_hr: 1
+          XRD_mean_size_nm: 13.6
+          TEM_size_as_printed: about 11 nm
+          sample_as_printed: SiO specimens; sample preparation referred to Chapter 3
+          annealing_conditions_as_printed: Ar gas flow; numeric annealing conditions are recorded in the separate fields
+          conditions_locator: {page: 74, published_page: 68, pdf_page_index: 73, section: 4.2 Experimental}
+          method_as_printed: XRD particle-size estimate compared with direct lattice-image diameters in TEM
+      - observation_id: mamiya_2000_crystallite_size_1000c_1h
+        type: characterization
+        locator: {page: 88, published_page: 82, pdf_page_index: 87, section: 4.4 Changes in particle size of Si}
+        units: nm
+        values:
+          quantity: Si nanocrystallite size by XRD and TEM
+          method_class: characterization_only
+          annealing_temperature_C: 1000
+          annealing_duration_hr: 1
+          XRD_mean_size_nm: 3.67
+          TEM_size_as_printed: about 4 nm
+          sample_as_printed: SiO specimens; sample preparation referred to Chapter 3
+          annealing_conditions_as_printed: Ar gas flow; numeric annealing conditions are recorded in the separate fields
+          conditions_locator: {page: 74, published_page: 68, pdf_page_index: 73, section: 4.2 Experimental}
+          method_as_printed: XRD particle-size estimate compared with direct lattice-image diameters in TEM
+  SiO2:
+    observations:
+      - observation_id: mamiya_2000_cristobalite_dta_heating_endotherm
+        type: phase_transition
+        locator: {page: 63, published_page: 57, pdf_page_index: 62, figure: '3-16', section: 3.5 In situ observation of the high-low transformation in cristobalite}
+        phase: cr
+        regime: dta_dsc
+        experiment: mamiya_cristobalite_dta_heating
+        units: degC
+        values:
+          quantity: dta_transition_temperatures
+          property_kind: phase_transition
+          method_class: measured_direct
+          method: thermogravimetry and differential thermal analysis (TG-DTA)
+          transition_as_printed: cristobalite high-low transformation
+          phase_as_printed: cristobalite
+          peak_as_printed: endothermic peak
+          scan_direction: heating
+          T_C: 246
+          uncertainty_as_printed: not stated
+        point_conditions:
+          total_pressure_Pa: {state: {tag: unknown, reason: not_reported}, locator: {page: 63, published_page: 57, pdf_page_index: 62, section: 3.5}}
+      - observation_id: mamiya_2000_cristobalite_dta_cooling_exotherm
+        type: phase_transition
+        locator: {page: 63, published_page: 57, pdf_page_index: 62, figure: '3-16', section: 3.5 In situ observation of the high-low transformation in cristobalite}
+        phase: cr
+        regime: dta_dsc
+        experiment: mamiya_cristobalite_dta_cooling
+        units: degC
+        values:
+          quantity: dta_transition_temperatures
+          property_kind: phase_transition
+          method_class: measured_direct
+          method: thermogravimetry and differential thermal analysis (TG-DTA)
+          transition_as_printed: cristobalite high-low transformation
+          phase_as_printed: cristobalite
+          peak_as_printed: exothermic peak
+          scan_direction: cooling
+          T_C: 242
+          uncertainty_as_printed: not stated
+        point_conditions:
+          total_pressure_Pa: {state: {tag: unknown, reason: not_reported}, locator: {page: 63, published_page: 57, pdf_page_index: 62, section: 3.5}}
+    context:
+      - observation_id: mamiya_2000_cristobalite_htxrd_transition_bracket
+        type: characterization
+        locator: {page: 62, published_page: 56, pdf_page_index: 61, section: '3.5 In situ observation of the high-low transformation in cristobalite'}
+        units: degC as printed
+        values:
+          quantity: HT-XRD heating transition interval
+          method_class: measured_direct
+          method: in situ high-temperature X-ray powder diffraction (HT-XRD)
+          transition_as_printed: cristobalite high-low transformation
+          scan_direction: heating
+          transition_interval_as_printed: between 200 and 300 C
+          note: Patterns unchanged below 200 C, changed considerably between 200 and 300 C, and showed no further change above 300 C; interval retained without a midpoint. Section 3.6 separately summarizes the transition as around 265 C, while section 3.5 reports DTA peaks at 246 C on heating and 242 C on cooling; these source statements are preserved as distinct results.
+          conditions_as_printed: successive heating at 100, 200, 300, 500, 650 and 800 C; 15 C/min between holding points; air atmosphere; cristobalite powder synthesized by heating silica glass at 1400 C for 20 hours.
+          conditions_locator: {page: 40, published_page: 34, pdf_page_index: 39, section: '3.2 Experimental'}
+      - observation_id: mamiya_2000_cristobalite_transition_summary
+        type: characterization
+        locator: {page: 69, published_page: 63, pdf_page_index: 68, section: 3.6 Summary}
+        units: degC as printed
+        values:
+          quantity: chapter_summary_of_cristobalite_high_low_transition
+          method_class: method_only
+          temperature_as_printed: around 265 C
+          note: Section 3.5 gives explicit DTA peak temperatures that do not align with the Fig. 3-16 trace peak positions. Preserve source disagreement.
+experiments:
+  - experiment_id: mamiya_cristobalite_dta_heating
+    method: dta_dsc
+    locator: {page: 63, published_page: 57, pdf_page_index: 62, section: 3.5 In situ observation of the high-low transformation in cristobalite}
+    sample:
+      form:
+        state: {tag: value, value: cristobalite}
+        locator: {page: 63, published_page: 57, pdf_page_index: 62, section: 3.5}
+      container:
+        state: {tag: unknown, reason: not_reported}
+        locator: {page: 63, published_page: 57, pdf_page_index: 62, section: 3.5}
+    conditions:
+      temperature_K:
+        state: {tag: unknown, reason: scan temperature varies; measured peak is recorded as the observation value}
+        locator: {page: 63, published_page: 57, pdf_page_index: 62, section: 3.5}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_reported}
+        locator: {page: 63, published_page: 57, pdf_page_index: 62, section: 3.5}
+      sweep_gas:
+        state: {tag: unknown, reason: not_reported}
+        locator: {page: 63, published_page: 57, pdf_page_index: 62, section: 3.5}
+      regime:
+        regime_class: {tag: unknown, reason: not_reported}
+  - experiment_id: mamiya_cristobalite_dta_cooling
+    method: dta_dsc
+    locator: {page: 63, published_page: 57, pdf_page_index: 62, section: 3.5 In situ observation of the high-low transformation in cristobalite}
+    sample:
+      form:
+        state: {tag: value, value: cristobalite}
+        locator: {page: 63, published_page: 57, pdf_page_index: 62, section: 3.5}
+      container:
+        state: {tag: unknown, reason: not_reported}
+        locator: {page: 63, published_page: 57, pdf_page_index: 62, section: 3.5}
+    conditions:
+      temperature_K:
+        state: {tag: unknown, reason: scan temperature varies; measured peak is recorded as the observation value}
+        locator: {page: 63, published_page: 57, pdf_page_index: 62, section: 3.5}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_reported}
+        locator: {page: 63, published_page: 57, pdf_page_index: 62, section: 3.5}
+      sweep_gas:
+        state: {tag: unknown, reason: not_reported}
+        locator: {page: 63, published_page: 57, pdf_page_index: 62, section: 3.5}
+      regime:
+        regime_class: {tag: unknown, reason: not_reported}

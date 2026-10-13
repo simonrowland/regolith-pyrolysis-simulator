@@ -57,6 +57,7 @@ from simulator.battery.polymorph_dictionary import (
     is_generic_polymorph_name,
     resolve_formula_polymorph,
 )
+from simulator.battery.extract_context import iter_extract_context_containers
 from simulator.battery.enums import (
     AdmissionStatus,
     AmountBasis,
@@ -9342,17 +9343,12 @@ def _hit_from_value(
     if kind == "composition" or _lab_kind(entry.field) == "composition":
         return None
     units = entry.unit
-    loc = parent_locator
-    raw = value
-    mapping: Mapping[str, Any] | None = None
+    raw, loc, mapping = _unwrap_located_equipment_value(value, parent_locator)
     if isinstance(value, Mapping):
-        mapping = value
         if "value" not in value or value.get("value") is None:
             return None
-        raw = value.get("value")
         if value.get("units") not in (None, ""):
             units = str(value.get("units"))
-        loc = locator_from_mapping(value.get("locator")) or loc
     if loc is None:
         return None
     nested_value = raw if isinstance(raw, Mapping) else None
@@ -9444,6 +9440,21 @@ def _hit_from_value(
         path=path,
         mapping=mapping,
     )
+
+
+def _unwrap_located_equipment_value(
+    value: object,
+    parent_locator: Locator | None = None,
+) -> tuple[object, Locator | None, Mapping[str, Any] | None]:
+    """Read the validator's ``value`` wrapper while retaining its locator."""
+
+    if isinstance(value, Mapping) and "value" in value and value.get("value") is not None:
+        return (
+            value.get("value"),
+            locator_from_mapping(value.get("locator")) or parent_locator,
+            value,
+        )
+    return value, parent_locator, value if isinstance(value, Mapping) else None
 
 
 def _walk_lab_hits(
@@ -9834,9 +9845,12 @@ def _printed_composition_candidates(
             for key, value in obj.items():
                 name = str(key)
                 if name in names and isinstance(value, Mapping):
-                    fingerprint = _printed_fingerprint(value)
-                    if fingerprint is not None and loc is not None:
-                        found.append((fingerprint, loc, name))
+                    raw_value, value_loc, _mapping = _unwrap_located_equipment_value(
+                        value, loc
+                    )
+                    fingerprint = _printed_fingerprint(raw_value)
+                    if fingerprint is not None and value_loc is not None:
+                        found.append((fingerprint, value_loc, name))
                 if name not in _WALK_SKIP_KEYS and name != "locator":
                     walk(value, loc, depth + 1)
         elif isinstance(obj, list):
@@ -9985,22 +9999,22 @@ def _form_and_container(
     raw_sample = equipment.get("sample")
     if not isinstance(raw_sample, Mapping):
         return None, None
-    loc = locator_from_mapping(raw_sample.get("locator"))
-    form = raw_sample.get("form")
-    container = raw_sample.get("container")
+    raw_sample, sample_locator, _mapping = _unwrap_located_equipment_value(
+        raw_sample
+    )
+    if not isinstance(raw_sample, Mapping):
+        return None, None
+    loc = locator_from_mapping(raw_sample.get("locator")) or sample_locator
+    form, form_locator, _form_mapping = _unwrap_located_equipment_value(
+        raw_sample.get("form"), loc
+    )
+    container, container_locator, _container_mapping = _unwrap_located_equipment_value(
+        raw_sample.get("container"), loc
+    )
     if isinstance(form, str) and form:
-        form_located = located_value(form, loc)
-    elif isinstance(form, Mapping) and form.get("value") is not None:
-        form_located = located_value(
-            str(form["value"]), locator_from_mapping(form.get("locator")) or loc
-        )
+        form_located = located_value(form, form_locator)
     if isinstance(container, str) and container:
-        container_located = located_value(container, loc)
-    elif isinstance(container, Mapping) and container.get("value") is not None:
-        container_located = located_value(
-            str(container["value"]),
-            locator_from_mapping(container.get("locator")) or loc,
-        )
+        container_located = located_value(container, container_locator)
     return form_located, container_located
 
 
@@ -11333,6 +11347,7 @@ class Migrator:
             self.literature / "works" / "ALIASES.yaml"
         )
         self.aliases.update(REVIEWED_ALIASES)
+        self._carried_aliases = dict(self.aliases)
         self.result = MigrationResult(aliases=dict(self.aliases))
         self._vocab = _vocab_for_root(self.root)
         self._work_citations: dict[str, str] = {}
@@ -12175,13 +12190,7 @@ class Migrator:
         source_id: str,
         experiment_refs: Mapping[str, str],
     ) -> None:
-        species = doc.get("species")
-        if not isinstance(species, Mapping):
-            return
-        for formula, body in species.items():
-            if not isinstance(body, Mapping):
-                continue
-            rows = body.get("context")
+        for formula, rows in iter_extract_context_containers(doc):
             if rows is None:
                 continue
             if not isinstance(rows, (list, tuple)):
@@ -17083,6 +17092,10 @@ class Migrator:
         self.migrate_extracts()
         self.migrate_named_sources()
         self.migrate_compilations()
+        _prune_carried_doi_aliases_to_live_works(
+            self.result, self._carried_aliases
+        )
+        self.aliases = dict(self.result.aliases)
         self.finalize()
         return self.result
 
@@ -17283,8 +17296,8 @@ def write_outputs(result: MigrationResult, root: Path | None = None) -> None:
     observations_v2.mkdir(parents=True, exist_ok=True)
     battery.mkdir(parents=True, exist_ok=True)
 
-    live_work_ids = set(result.works)
-    result.aliases = {k: v for k, v in result.aliases.items() if v in live_work_ids}
+    live_work_ids = _live_work_ids(result)
+    _prune_aliases_to_live_works(result)
     dump_yaml(
         {
             "schema_version": "battery_work_aliases.v1",
@@ -17584,6 +17597,46 @@ def write_report(result: MigrationResult, path: Path) -> None:
         for kind, n in sorted(census.items(), key=lambda kv: (-kv[1], kv[0])):
             lines.append(f"| `{kind}` | {n} |")
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def _live_work_ids(result: MigrationResult) -> set[str]:
+    return set(result.works)
+
+
+def _prune_aliases_to_live_works(result: MigrationResult) -> None:
+    live_work_ids = _live_work_ids(result)
+    result.aliases = {
+        alias: work_id
+        for alias, work_id in result.aliases.items()
+        if work_id in live_work_ids
+    }
+
+
+def _prune_carried_doi_aliases_to_live_works(
+    result: MigrationResult, carried_aliases: Mapping[str, str]
+) -> None:
+    live_work_ids = _live_work_ids(result)
+    carried_doi_aliases = {
+        alias: work_id
+        for alias, work_id in carried_aliases.items()
+        if extract_doi(alias) is not None and work_id in live_work_ids
+    }
+    result.aliases = {
+        alias: work_id
+        for alias, work_id in result.aliases.items()
+        if extract_doi(alias) is None
+    }
+    # Preserve only live carried choices. `_ensure_work` may have populated
+    # an initially absent DOI alias from whichever source was discovered first.
+    # Recompute those choices in source-ID order so discovery order cannot win.
+    result.aliases.update(carried_doi_aliases)
+    works_by_source_id = sorted(
+        result.works.values(),
+        key=lambda work: (min(work.source_ids, default=work.work_id), work.work_id),
+    )
+    for work in works_by_source_id:
+        if work.doi and work.doi not in carried_doi_aliases:
+            result.aliases.setdefault(work.doi, work.work_id)
 
 
 def migrate(

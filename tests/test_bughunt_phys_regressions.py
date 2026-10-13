@@ -295,6 +295,85 @@ def test_refusal_snapshot_does_not_patch_global_deepcopy_dispatch() -> None:
     )
 
 
+def test_refusal_snapshot_reuses_immutable_scalar_leaves_only() -> None:
+    immutable_leaves = {
+        "none": None,
+        "bool": True,
+        "int": 1_000_000_000,
+        "float": 1.25,
+        "complex": 2 + 3j,
+        "str": "immutable-leaf",
+        "bytes": bytes(bytearray(b"immutable-leaf")),
+    }
+    source = {
+        **immutable_leaves,
+        "list": [6, {"nested": [1]}],
+        "tuple": (2, [{"nested": [3]}]),
+        "proxy": MappingProxyType({"scalar": 4, "nested": [{"value": 5}]}),
+    }
+
+    copied = _deepcopy_refusal_state(source, {})
+
+    # Exact built-in scalar leaves cannot be mutated; sharing them preserves
+    # deepcopy's identity result without entering the recursive copier.
+    for key, value in immutable_leaves.items():
+        assert copied[key] is value
+        copied_key = next(output_key for output_key in copied if output_key == key)
+        assert copied_key is key
+    assert copied["list"] is not source["list"]
+    assert copied["tuple"] is not source["tuple"]
+    assert copied["proxy"] is not source["proxy"]
+    assert copied["list"][0] is source["list"][0]
+    assert copied["tuple"][0] is source["tuple"][0]
+    assert copied["proxy"]["scalar"] is source["proxy"]["scalar"]
+    assert next(iter(copied["proxy"])) is next(iter(source["proxy"]))
+
+    copied["list"][1]["nested"].append(2)
+    copied["tuple"][1][0]["nested"].append(4)
+    copied["proxy"]["nested"][0]["value"] = 6
+
+    assert source["list"] == [6, {"nested": [1]}]
+    assert source["tuple"] == (2, [{"nested": [3]}])
+    assert source["proxy"]["nested"] == [{"value": 5}]
+
+    memoized_scalar = 2_000_000_000
+    memo_replacement = object()
+    memoized_copy = _deepcopy_refusal_state(
+        {
+            "scalar": memoized_scalar,
+            "list": [memoized_scalar],
+            "tuple": (memoized_scalar,),
+            "proxy": MappingProxyType({"scalar": memoized_scalar}),
+        },
+        {id(memoized_scalar): memo_replacement},
+    )
+    assert memoized_copy["scalar"] is memo_replacement
+    assert memoized_copy["list"][0] is memo_replacement
+    assert memoized_copy["tuple"][0] is memo_replacement
+    assert memoized_copy["proxy"]["scalar"] is memo_replacement
+
+
+def test_refusal_dict_copy_preserves_value_before_key_memo_order() -> None:
+    key = "scalar-key"
+
+    class MemoizesKey:
+        def __deepcopy__(self, memo):
+            memo[id(key)] = "replacement-key"
+            return "copied-value"
+
+    source = {key: MemoizesKey()}
+    expected = copy.deepcopy(source)
+
+    assert _deepcopy_refusal_state(source, {}) == expected
+    assert expected == {"replacement-key": "copied-value"}
+
+    proxy_copy = _deepcopy_refusal_state(
+        MappingProxyType({key: MemoizesKey()}),
+        {},
+    )
+    assert dict(proxy_copy) == {"replacement-key": "copied-value"}
+
+
 def test_terminal_refusal_restores_copied_roots_byte_identically() -> None:
     class ImmutableOwner:
         def __deepcopy__(self, _memo):

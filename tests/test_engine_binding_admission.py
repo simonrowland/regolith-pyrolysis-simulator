@@ -620,6 +620,99 @@ def test_alpha_python_api_probe_refuses_resolved_transport_mismatch(
         )
 
 
+def test_magemin_binding_probe_forwards_redox_state_to_request(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator import backends, config
+    from simulator.accounting.ledger import AtomLedger
+    from simulator.chemistry.kernel import (
+        CapabilityProfile,
+        ChemistryIntent,
+        IntentResult,
+    )
+    from simulator.fe_redox import RedoxState
+
+    identity = next(
+        identity
+        for identity, artifact in admission.known_binding_assessment_targets()
+        if identity.engine_id == 'magemin' and artifact == 'freeze_gate_curve'
+    )
+    state = RedoxState.absolute(-9.0)
+    captured = []
+
+    class RecordingProvider:
+        def capability_profile(self):
+            return CapabilityProfile(
+                provider_id='probe-magemin',
+                intents=frozenset({ChemistryIntent.GATE_LIQUID_FRACTION}),
+                is_authoritative_for=frozenset({
+                    ChemistryIntent.GATE_LIQUID_FRACTION
+                }),
+                declared_accounts=frozenset({'process.cleaned_melt'}),
+            )
+
+        def dispatch(self, request):
+            captured.append(request)
+            return IntentResult(
+                intent=request.intent,
+                status='ok',
+                transition=None,
+            )
+
+    class FakeSimulator:
+        melt = SimpleNamespace(temperature_C=1000.0, p_total_mbar=1000.0)
+        atom_ledger = AtomLedger()
+        species_formula_registry = {}
+
+        def load_batch(self, *_args, **_kwargs):
+            return None
+
+        def start_campaign(self, *_args, **_kwargs):
+            return None
+
+        def _dispatch_only(self, *_args, **_kwargs):
+            return None
+
+        def _freeze_gate_curve(self):
+            return self._dispatch_only(
+                ChemistryIntent.GATE_LIQUID_FRACTION,
+                control_inputs={},
+                fO2_log=-9.0,
+                redox_state=state,
+            )
+
+    class FakeMAGEMinProvider(RecordingProvider):
+        def __init__(self):
+            self._backend = object()
+
+    monkeypatch.setattr(backends, 'resolve_backend', lambda *_a, **_k: object())
+    monkeypatch.setattr(backends, 'build_simulator', lambda _cfg: FakeSimulator())
+    monkeypatch.setattr(
+        config,
+        'load_config_bundle',
+        lambda: SimpleNamespace(
+            setpoints={}, feedstocks={}, vapor_pressures={}
+        ),
+    )
+    monkeypatch.setattr(
+        admission,
+        'selected_binding_provenance',
+        lambda *_args: {'binding_provenance_verifiable': True},
+    )
+    monkeypatch.setattr(
+        'engines.magemin.provider.MAGEMinShadowProvider',
+        FakeMAGEMinProvider,
+    )
+
+    admission._run_binding_probe(
+        identity,
+        'freeze_gate_curve',
+        {'active_backend': 'magemin'},
+    )
+
+    assert captured[0].redox_state is state
+
+
 def test_direct_replay_only_constructor_uses_receipt_authorizer(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

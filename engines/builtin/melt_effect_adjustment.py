@@ -1801,7 +1801,16 @@ def evaluate_verdict_b(
     # only for the gate input; the returned stripped wt% and provenance keep the
     # honest post-strip sub-100 mass record.
     domain_oxide_wt_pct = _oxide_ratios_for_domain_check(stripped.oxide_wt_pct)
-    if hasattr(gate, "validate_with_reason"):
+    outside_certified_band = False
+    if gate is AlphaMELTSDomainGate:
+        assessment = gate.assess(domain_oxide_wt_pct)
+        stripped_valid = assessment.valid
+        domain_warnings = list(assessment.warnings)
+        stripped_reason = assessment.reason
+        outside_certified_band = (
+            assessment.valid and assessment.outside_certified_band
+        )
+    elif hasattr(gate, "validate_with_reason"):
         stripped_valid, domain_warnings, stripped_reason = (
             gate.validate_with_reason(domain_oxide_wt_pct)
         )
@@ -1846,7 +1855,7 @@ def evaluate_verdict_b(
     # the gate was never the problem. An operator reading in_domain beside
     # hard_gate_failed=True and backend_status=unavailable is being told exactly
     # what happened: the melt is fine, the engine was not there.
-    if not stripped_valid:
+    if not stripped_valid or outside_certified_band:
         layer_a_state = "out_of_domain"
         offending_species = tuple(sorted(stripped.oxide_wt_pct))
     elif stripped.stripped_mass_kg > 0.0:

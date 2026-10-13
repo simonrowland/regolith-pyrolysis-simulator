@@ -347,9 +347,67 @@ def test_pin_worker_env_sets_single_thread_vars_idempotently(monkeypatch) -> Non
     }
 
 
-def test_pin_worker_env_leaves_loaded_openblas_pool_unchanged() -> None:
-    # Startup commit 2 is expected to move the caller-pool assertion from four to one;
-    # the child and grandchild checks keep this pin independent of host core count.
+def test_pin_worker_env_restores_inherited_defaults_in_fresh_process() -> None:
+    names = THREAD_ENV_VARS
+    env = os.environ.copy()
+    env.update({name: "1" for name in names})
+    code = r'''
+import json
+import os
+from simulator.optimize.determinism import THREAD_ENV_VARS, pin_worker_env
+for name in THREAD_ENV_VARS:
+    os.environ.pop(name, None)
+pin_worker_env()
+pin_worker_env()
+print(json.dumps({name: os.environ.get(name) for name in THREAD_ENV_VARS}, sort_keys=True))
+'''
+    completed = subprocess.run(
+        [sys.executable, "-c", code],
+        capture_output=True,
+        text=True,
+        env=env,
+        timeout=90,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    assert json.loads(completed.stdout) == {name: "1" for name in names}
+
+
+def test_pin_worker_env_keeps_inherited_omp_value_in_fresh_process() -> None:
+    names = THREAD_ENV_VARS
+    env = os.environ.copy()
+    env.update({name: "1" for name in names})
+    env["OMP_NUM_THREADS"] = "2"
+    code = r'''
+import json
+import os
+from simulator.optimize.determinism import pin_worker_env
+os.environ.pop("OPENBLAS_NUM_THREADS", None)
+os.environ.pop("MKL_NUM_THREADS", None)
+pin_worker_env()
+print(json.dumps({name: os.environ.get(name) for name in (
+    "OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS"
+)}, sort_keys=True))
+'''
+    completed = subprocess.run(
+        [sys.executable, "-c", code],
+        capture_output=True,
+        text=True,
+        env=env,
+        timeout=90,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    assert json.loads(completed.stdout) == {
+        "OMP_NUM_THREADS": "2",
+        "OPENBLAS_NUM_THREADS": None,
+        "MKL_NUM_THREADS": None,
+    }
+
+
+def test_simulator_startup_limits_loaded_openblas_pool_to_one() -> None:
+    # Startup intentionally moves the caller pool from four to one; child checks
+    # keep this pin independent of host core count.
     code = r'''
 import json
 import os
@@ -412,7 +470,7 @@ print(json.dumps({
     print(f"BLAS_POLICY_POOLS {json.dumps(report, sort_keys=True)}")
     assert report["environment"] == {name: "1" for name in THREAD_ENV_VARS}
     assert report["before"]["num_threads"] == 4
-    assert report["after"]["num_threads"] == 4
+    assert report["after"]["num_threads"] == 1
     assert report["grandchild"]["num_threads"] == 1
 
 
@@ -427,41 +485,123 @@ def test_thread_env_vars_contains_exactly_the_existing_five_names() -> None:
     )
 
 
-def test_thread_env_vars_have_one_production_literal_owner() -> None:
-    from simulator import _blas_policy
-    from simulator.optimize import determinism
-
-    expected = (
-        "OMP_NUM_THREADS",
-        "OPENBLAS_NUM_THREADS",
-        "MKL_NUM_THREADS",
-        "NUMEXPR_NUM_THREADS",
-        "VECLIB_MAXIMUM_THREADS",
-    )
-    assert determinism.THREAD_ENV_VARS is _blas_policy.THREAD_ENV_VARS
-
-    root = Path(__file__).resolve().parents[1]
-    production_files = [
-        *root.glob("*.py"),
-        *(path for directory in ("simulator", "engines", "scripts")
-          for path in (root / directory).rglob("*.py")),
-    ]
+def _thread_env_literal_owners(production_files, root: Path, thread_names: set[str]):
     literals = []
+    owner_path = root / "simulator" / "_blas_policy.py"
     for path in sorted(production_files):
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        parents = {
+            child: parent
+            for parent in ast.walk(tree)
+            for child in ast.iter_child_nodes(parent)
+        }
+        assignments = {}
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Assign) and isinstance(node.value, (ast.Tuple, ast.List)):
+                assignments.update(
+                    (node.value, target.id)
+                    for target in node.targets
+                    if isinstance(target, ast.Name)
+                )
+            elif isinstance(node, ast.AnnAssign) and isinstance(node.value, (ast.Tuple, ast.List)):
+                if isinstance(node.target, ast.Name):
+                    assignments[node.value] = node.target.id
+        owner_containers = {
+            node
+            for node, name in assignments.items()
+            if path == owner_path
+            and name in {"THREAD_ENV_VARS", "_RUNTIME_CONTROLS"}
+        }
         for node in ast.walk(tree):
             if not isinstance(node, (ast.Tuple, ast.List)):
+                continue
+            parent = parents.get(node)
+            while parent is not None:
+                if parent in owner_containers:
+                    break
+                parent = parents.get(parent)
+            else:
+                parent = None
+            if parent is not None:
                 continue
             try:
                 value = ast.literal_eval(node)
             except (ValueError, TypeError):
                 continue
-            if isinstance(value, (tuple, list)) and any(
-                isinstance(item, str) and item in expected for item in value
-            ):
-                literals.append((path.relative_to(root).as_posix(), node.lineno, tuple(value)))
+            flattened = set()
+            stack = [value]
+            while stack:
+                item = stack.pop()
+                if isinstance(item, (tuple, list)):
+                    stack.extend(item)
+                elif isinstance(item, str) and item in thread_names:
+                    flattened.add(item)
+            if flattened:
+                literals.append(
+                    (path.relative_to(root).as_posix(), assignments.get(node), flattened)
+                )
+    return sorted(literals, key=lambda item: (item[0], item[1] or ""))
 
-    assert literals == [("simulator/_blas_policy.py", 3, expected)]
+
+def test_thread_env_vars_have_one_production_literal_owner() -> None:
+    from simulator import _blas_policy
+    from simulator.optimize import determinism
+
+    assert determinism.THREAD_ENV_VARS is _blas_policy.THREAD_ENV_VARS
+
+    root = Path(__file__).resolve().parents[1]
+    production_files = [
+        *root.glob("*.py"),
+        *(path for directory in ("simulator", "engines", "scripts", "tools", "web", "benchmarks")
+          for path in (root / directory).rglob("*.py")),
+    ]
+    thread_names = set(_blas_policy.THREAD_ENV_VARS)
+    literals = _thread_env_literal_owners(production_files, root, thread_names)
+
+    assert literals == [
+        (
+            "simulator/_blas_policy.py",
+            "THREAD_ENV_VARS",
+            thread_names,
+        ),
+        (
+            "simulator/_blas_policy.py",
+            "_RUNTIME_CONTROLS",
+            thread_names,
+        ),
+    ]
+
+
+def test_thread_env_literal_guard_inspects_nested_literals_in_each_production_area(tmp_path: Path) -> None:
+    root = tmp_path
+    cases = {
+        "simulator/nested.py": (
+            "COMPLETE = ('OPENBLAS_NUM_THREADS', 'OMP_NUM_THREADS')\n"
+            "REORDERED = ['OMP_NUM_THREADS', 'OPENBLAS_NUM_THREADS']\n"
+            "PARTIAL = ('OPENBLAS_NUM_THREADS',)\n"
+            "NESTED = (('OPENBLAS_NUM_THREADS', 'OMP_NUM_THREADS'), object())\n"
+            "# ('OPENBLAS_NUM_THREADS', 'OMP_NUM_THREADS')\n"
+            "\"\"\"('OPENBLAS_NUM_THREADS', 'OMP_NUM_THREADS')\"\"\"\n"
+        ),
+        "scripts/nested.py": (
+            "NESTED = (('OPENBLAS_NUM_THREADS', 'OMP_NUM_THREADS'), object())\n"
+        ),
+        "production.py": (
+            "NESTED = (('OPENBLAS_NUM_THREADS', 'OMP_NUM_THREADS'), object())\n"
+        ),
+    }
+    for relative, source in cases.items():
+        path = root / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(source, encoding="utf-8")
+
+    literals = _thread_env_literal_owners(
+        [root / relative for relative in cases],
+        root,
+        {"OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS"},
+    )
+    assert {path for path, _owner, _names in literals} == set(cases)
+    assert len(literals) == 6
 
 
 def test_pin_seeds_is_deterministic() -> None:

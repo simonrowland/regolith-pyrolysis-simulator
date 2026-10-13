@@ -16,6 +16,8 @@ from enum import Enum
 import math
 from typing import Any, ClassVar, Dict, List, Mapping, Optional, Sequence
 
+from simulator.melt_regime import liquid_fraction_invalidity
+
 
 BACKEND_CAPABILITY_KEYS = (
     'silicate_melt',
@@ -541,11 +543,7 @@ class EquilibriumResult:
             raise LiquidFractionInvalidError(
                 f'liquid_fraction_invalid: {self.liquid_fraction!r}'
             ) from exc
-        if (
-            not math.isfinite(liquid_fraction)
-            or liquid_fraction < 0.0
-            or liquid_fraction > 1.0
-        ):
+        if liquid_fraction_invalidity(liquid_fraction) is not None:
             raise LiquidFractionInvalidError(
                 f'liquid_fraction_invalid: {self.liquid_fraction!r}'
             )

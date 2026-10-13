@@ -13,6 +13,7 @@ from simulator.melt_backend.base import (
     MeltBackendError,
 )
 from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.melt_regime import liquid_fraction_invalidity
 
 
 # MAGEMin-facing default only - the generic finder stays unbounded so
@@ -1088,7 +1089,7 @@ def _validate_optional_fraction(value: Optional[float], name: str) -> None:
     if value is None:
         return
     _validate_optional_finite(value, name)
-    if not 0.0 <= float(value) <= 1.0:
+    if liquid_fraction_invalidity(float(value)) is not None:
         raise ValueError(f'{name} must be in [0, 1]')
 
 

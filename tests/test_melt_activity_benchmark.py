@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from types import SimpleNamespace
 
+import csv
 import json
 import math
 
@@ -87,6 +88,89 @@ def _run_tiny_full_benchmark(output_dir, monkeypatch, **overrides):
     )
     kwargs.update(overrides)
     return benchmark.run_benchmark(**kwargs)
+
+
+def _solid_activity_reference(point):
+    from decimal import Decimal
+
+    from simulator.battery.enums import (
+        AdmissionStatus,
+        EvidenceClass,
+        PerBasis,
+        Phase,
+        Quantity,
+        ReferenceStateConvention,
+        UncertaintyKind,
+    )
+    from simulator.battery.identity import Identity
+    from simulator.battery.records import (
+        Admission,
+        Evidence,
+        Observation,
+        Species,
+        StandardState,
+        Uncertainty,
+        Value,
+    )
+    from simulator.state_types import State
+
+    oxide = str(point["parent_oxide"])
+    identity = Identity(
+        quantity=Quantity.ACTIVITY,
+        species=Species(oxide, Phase.L),
+        temperature_K=State.of(Decimal(str(point["temperature_K"]))),
+        per=State.of(PerBasis.DIMENSIONLESS),
+        reference_state=State.of(
+            StandardState(
+                convention=ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
+                endmember=Species(oxide, Phase.CR),
+                component_basis=oxide,
+                reference_pressure_bar=Decimal("1"),
+            )
+        ),
+    )
+    return Observation(
+        observation_id=str(point["id"]),
+        experiment_id="melt-activity-benchmark-test",
+        identity=identity,
+        value=Value.point_of(point["measured"]),
+        uncertainty=Uncertainty(kind=UncertaintyKind.NONE),
+        evidence=Evidence(class_=State.of(EvidenceClass.MEASURED_DIRECT)),
+        admission=Admission(status=AdmissionStatus.ADMITTED, reason="test row"),
+        notices=(),
+    )
+
+
+@pytest.mark.parametrize("oxide", ("CaO", "MgO", "Al2O3", "SiO2"))
+def test_pure_solid_activity_rows_score_after_battery_conversion(oxide):
+    from simulator.battery.score import fusion_comparison_reference
+
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    point = next(
+        row
+        for row in fixture["points"]
+        if row["observable"] == "activity"
+        and row["parent_oxide"] == oxide
+        and row.get("score", True)
+        and benchmark.measured_activity_basis(row) == "pure_solid"
+    )
+    expected = fusion_comparison_reference(_solid_activity_reference(point))
+    assert expected.value.point is not None
+
+    class _ConvertedActivityEngine:
+        name = "converted-activity"
+
+        def evaluate(self, composition_wt_pct, temperature_K, fO2_bar):
+            del composition_wt_pct, temperature_K, fO2_bar
+            return benchmark.EngineResult(
+                status="ok", activities={oxide: float(expected.value.point)}
+            )
+
+    rows = benchmark.run_points(
+        {**fixture, "points": [point]}, [_ConvertedActivityEngine()]
+    )
+
+    assert rows[0]["residual_dex"] == pytest.approx(0.0, abs=1e-12)
 
 
 def test_regeneration_without_live_check_refuses_to_drop_anchor_csv(
@@ -292,7 +376,7 @@ def test_imcc_benchmark_uses_openimcc():
     assert result.details["model_id"] == "IMCC-SF04"
 
 
-def test_coverage_map_records_melts_refusal_below_30_sio2():
+def test_coverage_map_reports_silicate_band_miss_below_30_sio2():
     fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
     rows = benchmark.run_coverage_map(
         fixture, [benchmark.AlphaMeltsEngine()], steps=11
@@ -301,7 +385,14 @@ def test_coverage_map_records_melts_refusal_below_30_sio2():
 
     assert low_silica
     assert all(row["alphamelts_status"] == "out_of_domain" for row in low_silica)
-    assert all("SiO2" in row["alphamelts_reason"] for row in low_silica)
+    assert all(
+        "SiO2" in row["alphamelts_reason"]
+        for row in low_silica
+    )
+    direct = benchmark.AlphaMeltsEngine().coverage(
+        {"SiO2": 10.0, "MgO": 90.0}, 1900.0
+    )
+    assert "silicate_network_band" in direct.details["failed_constraints"]
     assert all("alphamelts_finite_prediction" not in row for row in rows)
     assert all("alphamelts_n_pressures" not in row for row in rows)
     assert {row["composition_id"] for row in rows} == {
@@ -310,6 +401,86 @@ def test_coverage_map_records_melts_refusal_below_30_sio2():
         "sf04_komatiite",
         "sf04_dunite",
     }
+
+
+def test_tracked_alphamelts_coverage_projection_matches_status_and_reason():
+    coverage_path = benchmark.DEFAULT_OUTPUT_DIR / "coverage-map.csv"
+    with coverage_path.open(newline="", encoding="utf-8") as stream:
+        rows = list(csv.DictReader(stream))
+
+    engine = benchmark.AlphaMeltsEngine()
+    mismatches = []
+    for row in rows:
+        composition = json.loads(row["composition_json"])
+        projection = engine.coverage(composition, 1900.0)
+        if (
+            projection.status != row["alphamelts_status"]
+            or projection.reason != row["alphamelts_reason"]
+        ):
+            mismatches.append(
+                (
+                    row["composition_id"],
+                    row["trajectory"],
+                    row["step"],
+                    projection.status,
+                    row["alphamelts_status"],
+                    projection.reason,
+                    row["alphamelts_reason"],
+                )
+            )
+
+    assert len(rows) == 168
+    assert not mismatches, (
+        f"coverage-map status/reason mismatches={len(mismatches)}: {mismatches}"
+    )
+
+
+def test_alphamelt_report_labels_band_misses_as_out_of_domain_not_refusal():
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+
+    def report_for(coverage_rows):
+        return benchmark.generate_report(fixture, [], [], coverage_rows)
+
+    band_miss_report = report_for(
+        [
+            {
+                "composition_id": "admitted-band-miss",
+                "trajectory": "remove_silica",
+                "step": 6,
+                "SiO2_wt_pct": 29.5,
+                "alphamelts_status": "out_of_domain",
+            }
+        ]
+    )
+    in_band_report = report_for(
+        [
+            {
+                "composition_id": "in-band",
+                "trajectory": "hold",
+                "step": 0,
+                "SiO2_wt_pct": 50.0,
+                "alphamelts_status": "ok",
+            }
+        ]
+    )
+
+    for report in (band_miss_report, in_band_report):
+        boundary_start = report.index("AlphaMELTS trajectory boundaries:")
+        boundary_end = report.index("The CSV preserves", boundary_start)
+        boundary = report[boundary_start:boundary_end]
+        closing_sentence = next(
+            line for line in report.splitlines() if "normalized step below" in line
+        )
+        assert "refus" not in (boundary + closing_sentence).lower()
+        assert "reject" not in (boundary + closing_sentence).lower()
+
+    assert "first out-of-domain step: step 6, SiO2=29.500 wt%." in band_miss_report
+    assert "no out-of-domain step in sweep." in in_band_report
+    assert (
+        "Every normalized step below 30 wt% SiO2 is outside the AlphaMELTS "
+        "certified band, and the adapter admits such melts with a notice and "
+        "extrapolated authority."
+    ) in band_miss_report
 
 
 def test_coverage_empty_pressure_dict_is_not_typed_ok():
@@ -808,12 +979,12 @@ def test_provider_crash_diagnostic_overrides_out_of_domain_status():
     assert "SIGSEGV" in result.reason
 
 
-def test_coverage_silicate_band_is_rail_owned():
+def test_coverage_silicate_band_status_tracks_rail_band():
     # UPDATED 2026-08-16: was SiO2 10.0 with band (0, 100). That asserted the
     # rail could open alphaMELTS down to 10 wt%; the rump-hotwire measurement
     # found it SIGABRTs on all 40 multi-component sub-30 points, so a band
-    # below the 34.0 wt% crash floor is now refused. Widening is still
-    # rail-owned -- it goes UPWARD past the default 80 wt% max.
+    # below the 30.0 wt% certified minimum is outside the band. Widening is
+    # still rail-owned -- it goes UPWARD past the default 80 wt% max.
     composition = {"SiO2": 85.0, "MgO": 7.5, "FeO": 7.5}
     default = benchmark.AlphaMeltsEngine()
     widened = benchmark.AlphaMeltsEngine(silicate_network_band=(34.0, 100.0))
@@ -2536,14 +2707,14 @@ def test_run_benchmark_passes_producer_close_marker_to_point_and_probe_detectors
     assert result["metadata"]["thermoengine_probe_latch"] is None
 
 
-def test_tracked_melt_activity_report_marks_thermoengine_narrative_stale():
+def test_tracked_melt_activity_report_excludes_retired_thermoengine_narrative():
+    # 65a8273a4 added the stale 32/110 passage; regeneration ebf488e12 removed it.
     text = (
         benchmark.DEFAULT_OUTPUT_DIR / "report.md"
     ).read_text(encoding="utf-8")
-    assert "STALE (t-681" in text
-    assert "isolated-mode ceiling" in text
-    assert "retired" in text.lower()
-    assert "adapter not available" in text
+    assert "STALE (t-681" not in text
+    assert "isolated-mode ceiling" not in text
+    assert "Combined **32/110** is an" not in text
 
 
 def test_run_benchmark_rebuilds_engines_before_probes(tmp_path, monkeypatch):
