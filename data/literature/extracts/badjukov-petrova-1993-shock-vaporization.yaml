@@ -46,7 +46,7 @@ species:
         evidence_class: printed_author_calculation
         gas_species: Na and Al, elemental atomic ratio
         atomic_Na_over_Al: 1.3
-        attribution_as_printed: The calculated atomic Na/Al ratio in vapor phase for albite and jadeite glasses is equal to 1.3 and for fused pyrex glass is equal to 26
+        attribution_as_printed: The calculated atomic Na/Al ratio in the vapor is equal to 1.3 for the albite and jadeite glasses and to 26 for the fused pyrex glass.
     - observation_id: badj93_albite_shock_loading_method_and_pressure_conditions
       type: method
       locator: {page: 1, pdf_page_index: 0, published_page: 51, section: 'Experimental study', note: 'Paragraph beginning “Powder samples of pure albite and jadeite were shocked”.'}
@@ -77,7 +77,7 @@ species:
         - mass_loss_pct: 4.0
           approximate: true
           T_C: 5000
-          starting_composition_as_printed: pure jadeite
+          starting_composition_as_printed: pure albite and jadeite
           mass_loss_as_printed: about 4 wt. %
           assumption_as_printed: Assuming that Si was not lost during the shock fusion
           point_conditions:
@@ -98,7 +98,7 @@ species:
         evidence_class: printed_author_calculation
         gas_species: Na and Al, elemental atomic ratio
         atomic_Na_over_Al: 1.3
-        attribution_as_printed: The calculated atomic Na/Al ratio in vapor phase for albite and jadeite glasses is equal to 1.3 and for fused pyrex glass is equal to 26
+        attribution_as_printed: The calculated atomic Na/Al ratio in the vapor is equal to 1.3 for the albite and jadeite glasses and to 26 for the fused pyrex glass.
     - observation_id: badj93_jadeite_shock_loading_method_and_pressure_conditions
       type: method
       locator: {page: 1, pdf_page_index: 0, published_page: 51, section: 'Experimental study', note: 'Paragraph beginning “Powder samples of pure albite and jadeite were shocked”.'}
@@ -148,7 +148,7 @@ species:
         evidence_class: printed_author_calculation
         gas_species: Na and Al, elemental atomic ratio
         atomic_Na_over_Al: 26
-        attribution_as_printed: The calculated atomic Na/Al ratio in vapor phase for albite and jadeite glasses is equal to 1.3 and for fused pyrex glass is equal to 26
+        attribution_as_printed: The calculated atomic Na/Al ratio in the vapor is equal to 1.3 for the albite and jadeite glasses and to 26 for the fused pyrex glass.
     - observation_id: badj93_pyrex_starting_and_fused_glass_analysis_totals
       type: characterization
       locator: {page: 1, pdf_page_index: 0, published_page: 51, figure: '1', note: 'Paragraph immediately before the discussion of Figure 1; starting and shock-fused pyrex glass analyses.'}
@@ -233,7 +233,7 @@ fidelity_samples:
 - species: Albite
   observation_id: badj93_albite_atomic_vapor_na_al_ratio
   field: attribution_as_printed
-  value: The calculated atomic Na/Al ratio in vapor phase for albite and jadeite glasses is equal to 1.3 and for fused pyrex glass is equal to 26
+  value: The calculated atomic Na/Al ratio in the vapor is equal to 1.3 for the albite and jadeite glasses and to 26 for the fused pyrex glass.
   locator: {page: 1, pdf_page_index: 0, published_page: 51, figure: '2'}
 - species: Albite
   observation_id: badj93_albite_shock_loading_method_and_pressure_conditions
@@ -247,7 +247,7 @@ fidelity_samples:
   - mass_loss_pct: 4.0
     approximate: true
     T_C: 5000
-    starting_composition_as_printed: pure jadeite
+    starting_composition_as_printed: pure albite and jadeite
     mass_loss_as_printed: about 4 wt. %
     assumption_as_printed: Assuming that Si was not lost during the shock fusion
     point_conditions:
@@ -264,7 +264,7 @@ fidelity_samples:
 - species: Jadeite
   observation_id: badj93_jadeite_atomic_vapor_na_al_ratio
   field: attribution_as_printed
-  value: The calculated atomic Na/Al ratio in vapor phase for albite and jadeite glasses is equal to 1.3 and for fused pyrex glass is equal to 26
+  value: The calculated atomic Na/Al ratio in the vapor is equal to 1.3 for the albite and jadeite glasses and to 26 for the fused pyrex glass.
   locator: {page: 1, pdf_page_index: 0, published_page: 51, figure: '2'}
 - species: Jadeite
   observation_id: badj93_jadeite_shock_loading_method_and_pressure_conditions
@@ -293,7 +293,7 @@ fidelity_samples:
 - species: Pyrex glass
   observation_id: badj93_pyrex_atomic_vapor_na_al_ratio
   field: attribution_as_printed
-  value: The calculated atomic Na/Al ratio in vapor phase for albite and jadeite glasses is equal to 1.3 and for fused pyrex glass is equal to 26
+  value: The calculated atomic Na/Al ratio in the vapor is equal to 1.3 for the albite and jadeite glasses and to 26 for the fused pyrex glass.
   locator: {page: 1, pdf_page_index: 0, published_page: 51, figure: '2'}
 - species: Pyrex glass
   observation_id: badj93_shock_loading_method_and_pressure_conditions
