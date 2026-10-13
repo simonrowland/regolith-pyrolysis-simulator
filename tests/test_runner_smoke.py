@@ -37,6 +37,8 @@ from simulator.accounting.run_artifact import build_run_artifact
 from simulator.chemistry.kernel import ProviderUnavailableError
 from simulator.campaigns import CampaignManager
 from simulator.core import PoisonedHourError
+from simulator.condensation import CondensationModel
+from simulator.core import CondensationTrain, EvaporationFlux, MeltState
 from simulator.optimize.recipe import (
     C3_ALKALI_DOSING_K_KG_PATH,
     C3_ALKALI_DOSING_NA_KG_PATH,
@@ -2660,6 +2662,73 @@ def test_per_hour_summary_includes_pressure_and_mass_balance():
         assert entry["O2_metric_label"] == (
             "source-side O2 potential (emitted; not recovered)"
         )
+
+
+def test_hourly_metadata_keeps_alpha_only_fe_edge_hold_flag() -> None:
+    train = CondensationTrain.create_default()
+    model = CondensationModel(train, wall_temperature_C=1426.85)
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={"Fe": 1.0},
+        stage_area_m2_by_stage={
+            str(stage.stage_number): 1.0 for stage in train.stages
+        },
+        campaign_name="C0",
+    )
+    route = model.route(
+        EvaporationFlux(species_kg_hr={"Fe": 1.0}, total_kg_hr=1.0),
+        MeltState(temperature_C=1700.0),
+    )
+    assert route.wall_deposit_by_species["Fe"] > 0.0
+    assert not any(
+        model.last_sticking_alpha_provenance_notice.get(key)
+        for key in (
+            "wall_saturation_pressure_extrapolations_by_species",
+            "wall_saturation_pressure_refusals_by_species",
+            "evaporation_transport_notices_by_species",
+        )
+    )
+
+    snapshot = HourSnapshot(hour=1, campaign=CampaignPhase.C0)
+    snapshot.temperature_C = 1700.0
+    snapshot.overhead.pressure_mbar = 10.0
+    snapshot.wall_deposit_by_segment_species_delta = {
+        (segment, species): kg
+        for segment, by_species in route.wall_deposit_by_segment_species.items()
+        for species, kg in by_species.items()
+    }
+    sim = SimpleNamespace(
+        product_ledger=lambda: {},
+        campaign_mgr=SimpleNamespace(last_pO2_enforcement=None),
+        record=SimpleNamespace(snapshots=(snapshot,)),
+        condensation_model=model,
+        _last_vapour_batch_report={
+            "n_requested": 1,
+            "n_flux_active": 1,
+            "n_refused": 0,
+            "solve_bundle_ids": [],
+            "channels_by_species": {},
+            "metadata": {},
+        },
+    )
+    summary = build_per_hour_summary(
+        sim,
+        snapshot,
+        include_fe_redox_split=False,
+    )
+
+    authority = summary["vapour_batch_summary"]["metadata"][
+        "wall_deposit_sticking_authority"
+    ]
+    alpha = authority["alpha_s_provenance_by_species"]["Fe"][
+        "stage_0_to_stage_1"
+    ]
+    assert alpha["alpha_s_valid_range_K"] == [1443.0, 1633.0]
+    assert alpha["alpha_s_temperature_above_valid_range"] is True
+    assert alpha["alpha_s_extrapolation_method"] == (
+        "hold_nearest_certified_band_edge"
+    )
+    assert alpha["output_status"] == "status_bearing"
 
 
 def test_session_per_hour_summary_event_uses_runner_builder():

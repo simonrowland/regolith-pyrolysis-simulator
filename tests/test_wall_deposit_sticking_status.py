@@ -6,6 +6,7 @@ import pickle
 from types import SimpleNamespace
 
 import pytest
+import yaml
 
 from simulator.diagnostics import _coating_wall_deposit_selection
 
@@ -249,6 +250,79 @@ def _materials_with_liner_alpha(
         species
     ] = dict(entry)
     return materials
+
+
+@pytest.mark.parametrize("temperature_K", [1200.0, 1523.15])
+@pytest.mark.parametrize("entrypoint", ["stage", "wall"])
+@pytest.mark.parametrize(
+    "invalid_case",
+    [
+        "missing_A",
+        "nan_A",
+        "negative_A",
+        "zero_edge_hold",
+        "high_edge_hold",
+        "invalid_status",
+    ],
+)
+def test_fe_condensation_edge_hold_refuses_invalid_explicit_material_specs(
+    temperature_K: float,
+    entrypoint: str,
+    invalid_case: str,
+) -> None:
+    spec = copy.deepcopy(
+        condensation_module.STICKING_DATA["species"]["Fe"]["condensation"][
+            "value"
+        ]
+    )
+    if invalid_case == "missing_A":
+        del spec["A"]
+    elif invalid_case == "nan_A":
+        spec["A"] = float("nan")
+    elif invalid_case == "negative_A":
+        spec["A"] = -1.0
+    elif invalid_case == "zero_edge_hold":
+        spec["edge_hold_values"] = [0.0, 0.92]
+    elif invalid_case == "high_edge_hold":
+        spec["edge_hold_values"] = [0.83, 1.01]
+    else:
+        spec["status"] = "INVALID"
+    entry = {
+        "value": spec,
+        "source": "test::explicit_fe_condensation_alpha",
+        "source_class": "cited_pure_fe_condensation_kinetics",
+        "status": "CITED",
+        "output_status": "sourced_with_surface_proxy",
+    }
+    if entrypoint == "stage":
+        materials = _materials_with_stage_alpha(1, "Fe", entry)
+        with pytest.raises(ValueError):
+            condensation_module._stage_alpha_record(
+                CondensationTrain.create_default().stages[1],
+                "Fe",
+                materials,
+                T_K=temperature_K,
+            )
+    else:
+        materials = _materials_with_wall_alpha("Fe", entry)
+        with pytest.raises(ValueError):
+            condensation_module._wall_alpha_record(
+                "Fe",
+                materials,
+                T_K=temperature_K,
+            )
+
+
+def test_fe_condensation_sidecar_loader_validates_nested_arrhenius_spec(
+    tmp_path,
+) -> None:
+    raw = copy.deepcopy(condensation_module.STICKING_DATA)
+    del raw["species"]["Fe"]["condensation"]["value"]["A"]
+    path = tmp_path / "sticking.yaml"
+    path.write_text(yaml.safe_dump(raw), encoding="utf-8")
+
+    with pytest.raises(ValueError):
+        condensation_module._load_sticking_data(path)
 
 
 def _analytical_value_ref_entry(source_class: str) -> dict[str, object]:
