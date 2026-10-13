@@ -189,6 +189,7 @@ def test_condensation_efficiency_refuses_nonfinite_eta(monkeypatch):
             residence_s=5.0,
             available_kg=1.0,
             alpha_s_value=0.5,
+            inlet_partial_pressure_pa=100.0,
         )
 
 

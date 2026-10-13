@@ -63,14 +63,19 @@ def test_declared_non_sio_extension_preserves_physical_zeros(case):
     if case == "zero_area":
         model.stage_area_m2_by_stage = {"4": 0.0}
     outcomes = []
-    eta = model._condensation_efficiency(
-        stage=stage, species="Na2", T_cond_C=1000.0, residence_s=1.0,
-        available_kg=1.0, alpha_s_value=1.0, efficiency_outcomes=outcomes,
-    )
     if case == "positive":
-        assert 0.0 < eta <= 1.0
-        assert any(item["authority_level"] == "extrapolated" for item in outcomes)
+        # A source-reaction pressure is not a wall saturation curve. The
+        # removed numerical budget must not invent a positive capture.
+        with pytest.raises(condensation.WallSaturationPressureRefusal):
+            model._condensation_efficiency(
+                stage=stage, species="Na2", T_cond_C=1000.0, residence_s=1.0,
+                available_kg=1.0, alpha_s_value=1.0, efficiency_outcomes=outcomes,
+            )
     else:
+        eta = model._condensation_efficiency(
+            stage=stage, species="Na2", T_cond_C=1000.0, residence_s=1.0,
+            available_kg=1.0, alpha_s_value=1.0, efficiency_outcomes=outcomes,
+        )
         assert eta == 0.0
         assert any(item["status"] == "pass_through" for item in outcomes)
 
@@ -115,16 +120,16 @@ def test_declared_non_sio_extension_noncollector_has_topology_evidence(stage_num
     }
 
 
-def test_declared_non_sio_extension_explicit_noncollector_area_captures():
+def test_declared_non_sio_extension_area_does_not_supply_missing_wall_pressure():
     model = _stage3_unavailable_psat_model()
     model.wall_species_partial_pressures_pa = {"Na2": 100.0}
     model.stage_area_m2_by_stage = {"stage_5": 1.0}
     stage = next(stage for stage in model.train.stages if stage.stage_number == 5)
-    eta = model._condensation_efficiency(
-        stage=stage, species="Na2", T_cond_C=1000.0, residence_s=1.0,
-        available_kg=1.0, alpha_s_value=1.0,
-    )
-    assert 0.0 < eta <= 1.0
+    with pytest.raises(condensation.WallSaturationPressureRefusal):
+        model._condensation_efficiency(
+            stage=stage, species="Na2", T_cond_C=1000.0, residence_s=1.0,
+            available_kg=1.0, alpha_s_value=1.0,
+        )
 
 
 def test_declared_non_sio_extension_invalid_area_aborts_hour(monkeypatch):

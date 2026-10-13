@@ -598,7 +598,7 @@ def test_new_simulator_uses_reloaded_materials_without_module_reload(tmp_path):
 
 @pytest.mark.parametrize(
     "subpath",
-    ["cold_spot_diagnostic", "pressure_isolated_capture_budget"],
+    ["cold_spot_diagnostic", "stage_efficiency"],
 )
 def test_instance_temperature_override_reaches_all_route_subpaths(subpath):
     CONDENSATION_TEMPS_C['SiO'] = 1300.0
@@ -608,6 +608,8 @@ def test_instance_temperature_override_reaches_all_route_subpaths(subpath):
         wall_temperature_C=1000.0,
     )
     _configure_knudsen_policy(default_model)
+    if subpath == "stage_efficiency":
+        default_model.pipe_segments = []
     default_result = default_model.route(
         EvaporationFlux(species_kg_hr={'SiO': 1.0}, total_kg_hr=1.0),
         MeltState(temperature_C=1500.0),
@@ -619,6 +621,8 @@ def test_instance_temperature_override_reaches_all_route_subpaths(subpath):
     )
     overridden_model.condensation_temperatures_C['SiO'] = 900.0
     _configure_knudsen_policy(overridden_model)
+    if subpath == "stage_efficiency":
+        overridden_model.pipe_segments = []
     overridden_result = overridden_model.route(
         EvaporationFlux(species_kg_hr={'SiO': 1.0}, total_kg_hr=1.0),
         MeltState(temperature_C=1500.0),
@@ -628,11 +632,8 @@ def test_instance_temperature_override_reaches_all_route_subpaths(subpath):
         assert default_model.last_cold_spot_diagnostic["has_cold_spot"]
         assert not overridden_model.last_cold_spot_diagnostic["has_cold_spot"]
     else:
-        # T-dependent alpha_s(T) narrows the cold-stage contrast versus the old
-        # fixed 0.04 pin, but the instance override still reaches the budget path.
-        assert overridden_result.remaining_by_species["SiO"] > (
-            default_result.remaining_by_species["SiO"] + 0.03
-        )
+        assert default_result.condensed_by_stage_species[1]["SiO"] > 0.0
+        assert "SiO" not in overridden_result.condensed_by_stage_species.get(1, {})
 
 
 def test_custom_vapor_pressure_bundle_reaches_condensation_route_with_fallback():
@@ -666,18 +667,15 @@ def test_custom_vapor_pressure_bundle_reaches_condensation_route_with_fallback()
         },
         "oxide_vapors": {},
     }
-    custom_vapor_pressures["metals"]["Ca"]["antoine"]["A"] += 8.0
+    custom_vapor_pressures["metals"]["Ca"]["pure_component_antoine"]["A"] += 8.0
 
     default_route = route_calcium()
     custom_route = route_calcium(custom_vapor_pressures)
 
     default_stage4 = default_route.condensed_by_stage_species[4]["Ca"]
-    default_stage5 = default_route.condensed_by_stage_species[5]["Ca"]
-    custom_stage4 = custom_route.condensed_by_stage_species[4]["Ca"]
-    custom_stage5 = custom_route.condensed_by_stage_species[5]["Ca"]
-
-    assert custom_stage4 > default_stage4
-    assert custom_stage5 < default_stage5 * 0.8
+    custom_stage4 = custom_route.condensed_by_stage_species.get(4, {}).get("Ca", 0.0)
+    # Raising the owning wall saturation curve reduces supersaturation.
+    assert custom_stage4 < default_stage4
 
     with pytest.raises(condensation_module.WallSaturationPressureRefusal) as default:
         condensation_module._antoine_psat_pa("SiO", 1700.0)
@@ -743,7 +741,7 @@ def test_configured_stage_area_scales_baffle_capture(monkeypatch):
     available_kg = (
         condensation_module._molecular_mass_kg_per_molecule("SiO")
         * condensation_module.AVOGADRO_MOL
-        * 10.0
+        * 10.0 * 3600.0
     )
 
     def efficiency(area_m2: float) -> float:
@@ -755,10 +753,11 @@ def test_configured_stage_area_scales_baffle_capture(monkeypatch):
             residence_s=1.0,
             available_kg=available_kg,
             alpha_s_value=1.0,
+            inlet_partial_pressure_pa=100.0,
         )
 
-    assert efficiency(0.25) == pytest.approx(0.05)
-    assert efficiency(1.0) == pytest.approx(0.2)
+    assert efficiency(0.25) == pytest.approx(-math.expm1(-0.05))
+    assert efficiency(1.0) == pytest.approx(-math.expm1(-0.2))
 
 
 def test_missing_stage_area_cannot_make_flux_ratio_a_rate_constant(monkeypatch):
@@ -785,14 +784,11 @@ def test_missing_stage_area_cannot_make_flux_ratio_a_rate_constant(monkeypatch):
         * 10.0
     )
 
-    missing_area_efficiency = model._condensation_efficiency(
-        stage=stage,
-        species="SiO",
-        T_cond_C=1050.0,
-        residence_s=10.0,
-        available_kg=available_kg,
-        alpha_s_value=1.0,
-    )
+    with pytest.raises(condensation_module.DepositionInputRefusal, match="stage_area_m2"):
+        model._condensation_efficiency(
+            stage=stage, species="SiO", T_cond_C=1050.0, residence_s=10.0,
+            available_kg=available_kg, alpha_s_value=1.0, inlet_partial_pressure_pa=100.0,
+        )
     model.stage_area_m2_by_stage = {"sio_stage3": 1.0}
     configured_area_efficiency = model._condensation_efficiency(
         stage=stage,
@@ -801,10 +797,10 @@ def test_missing_stage_area_cannot_make_flux_ratio_a_rate_constant(monkeypatch):
         residence_s=1.0,
         available_kg=available_kg,
         alpha_s_value=1.0,
+        inlet_partial_pressure_pa=100.0,
     )
 
-    assert missing_area_efficiency == pytest.approx(0.0)
-    assert configured_area_efficiency == pytest.approx(0.2)
+    assert configured_area_efficiency == pytest.approx(0.99)
 
 
 # ---------------------------------------------------------------------------

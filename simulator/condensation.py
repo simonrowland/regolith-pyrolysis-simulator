@@ -25,16 +25,9 @@ Train topology (metals train, active C2A onward):
     Stage 3  SiO zone (900-1200°C)   — fused silica on removable baffles.
              SiO capture here is *operator-controlled*.
              ``stir_state.radial`` is mapped to a heuristic
-             Sherwood multiplier, but that multiplier does not guarantee
-             Stage-3 capture: the route still passes SiO through when its
-             saturation-pressure contract is unavailable. On the current
-             SiO catalog row that contract is unavailable on the stage
-             path, so Stage 3 and Stage 4 both collect zero there
-             (1 kg/h SiO at 10 mbar with configured areas). Retuning
-             Stage 3 temperatures changes the sampled cold-wall driving
-             pressure only when that P_sat contract exists.
-             The absolute total capture remains rate-cap-driven by
-             ``_pressure_isolated_capture_budget_kg``.
+             Sherwood multiplier. The shared wall-pressure owner supplies
+             the reactive Si/SiO2 product limit at or below the declared
+             SiO routing temperature; unavailable inputs remain refusals.
              Sub-laminar ``stir_state.axial`` or pO₂ hold suppresses
              Stage 3 capture and passes SiO downstream (silica fume)
              or holds it in the melt.
@@ -47,18 +40,14 @@ A separate volatiles train handles C0/C0b products and is sealed
 by a gate valve after devolatilisation.
 
 Key physics:
-    Live stage efficiency averages 33 series-resistance deposition-flux
-    samples over the stage temperature band, then computes:             [COND-1]
-        n_capture = J_band * A_stage * t_res
-        η_stage = clip(n_capture / n_available, 0, 1)
-    Premise: J_band is mol m^-2 s^-1. Unit check:
-    (mol m^-2 s^-1)(m^2)(s) = mol, and mol/mol makes η dimensionless.
-    Sanity: no configured stage area means no physical capture area, so
-    η_stage = 0; enough area or residence time saturates at η_stage = 1.
-
-    A separate total-capture regularizer uses
-    ``1 - exp(-t_res / tau_s)``. It allocates a capture budget and is not
-    the live per-stage flux efficiency above.
+    At the stage midpoint and measured inlet partial pressure,          [COND-1]
+        f_eq = max(0, 1 - P_sat / p_in)
+        k_s = J_series * A_stage / N_stage
+        η_stage = min(f_eq, 1 - exp(-k_s * t_res))
+    N_stage is the residence-sized inventory from molar throughput, not
+    an hourly mass. The derivation is in _condensation_efficiency.
+    Walls and stages remove vapor in physical order; every capture stays
+    at its location and the remainder goes to terminal offgas.
 
 The Fe → SiO separation (Stage 1 → Stage 3):
     Default Stage 1 window is 1100-1400°C; Stage 3 is 900-1200°C
@@ -70,7 +59,7 @@ The Fe → SiO separation (Stage 1 → Stage 3):
     separator, or a radiation-gap thermal break.
     The SiO routing-temperature band 900-1200°C overlaps Stage 1
     1100-1400°C by 100 K. The live gate is the point routing
-    temperature plus the per-sample P_sat contract, not a claim that
+    temperature plus the midpoint P_sat contract, not a claim that
     the SiO band sits entirely below Stage 1.
     Capture and impurity fractions are outputs of flux, physical area,
     residence time, pressure, and inlet rate; this module does not impose
@@ -154,7 +143,6 @@ from simulator.state import (
 # to the prior local literals (1.380649e-23 / 6.02214076e23).
 BOLTZMANN_CONSTANT_J_K = BOLTZMANN
 AVOGADRO_MOL = AVOGADRO
-HKL_BAND_SAMPLES = 33
 DATA_DIR = Path(__file__).resolve().parent.parent / 'data'
 WALL_DEPOSIT_ACCOUNT = 'process.wall_deposit'
 WALL_DEPOSIT_SEGMENT_ACCOUNTS = PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS
@@ -2670,21 +2658,15 @@ class CondensationModel:
         return segments
 
     def _stage_area_m2_for_stage_number(self, stage_number: int) -> float | None:
-        key = STAGE_AREA_KEY_BY_STAGE_NUMBER.get(int(stage_number))
-        raw = None if key is None else self.stage_area_m2_by_stage.get(key)
-        if raw is None:
-            raw = self.stage_area_m2_by_stage.get(f'stage_{stage_number}')
-        if raw is None:
-            raw = self.stage_area_m2_by_stage.get(str(stage_number))
-        if raw is None:
-            return None
-        try:
-            area_m2 = float(raw)
-        except (TypeError, ValueError):
-            return None
-        if not math.isfinite(area_m2) or area_m2 < 0.0:
-            return None
-        return area_m2
+        for key in (STAGE_AREA_KEY_BY_STAGE_NUMBER.get(int(stage_number)),
+                    f'stage_{stage_number}', str(stage_number)):
+            if key is None or key not in self.stage_area_m2_by_stage:
+                continue
+            area_m2 = _deposition_finite_scalar('stage_area_m2', self.stage_area_m2_by_stage[key])
+            if area_m2 < 0.0:
+                raise DepositionInputRefusal('stage_area_m2', area_m2, 'must be nonnegative')
+            return area_m2
+        return None
 
     def _apply_stage_area_m2_to_pipe_segments(self) -> None:
         if not self.pipe_segments:
@@ -2960,7 +2942,6 @@ class CondensationModel:
         # VR-11 / B3: stage-local efficiency zeros mint typed pass-through
         # outcomes (no longer silent return 0.0 without a consumer channel).
         efficiency_outcomes_by_species: dict[str, list[dict[str, Any]]] = {}
-        used_capture_budget_regularizer = False
         self.wall_species_partial_pressures_pa = (
             _flowing_species_partial_pressures_pa(
                 evap_flux.species_kg_hr,
@@ -2990,107 +2971,29 @@ class CondensationModel:
             self.operating_history[-1]['cold_spot_warnings'] = cold_spot_warnings
 
         stage_route_by_species: dict[str, dict[str, Any]] = {}
-        for species, rate_kg_hr in evap_flux.species_kg_hr.items():
+        for species in evap_flux.species_kg_hr:
             if (
                 carrier_authority_status_by_species.get(species)
                 in non_debiting_carrier_statuses
                 or species in cleanup_offgas_authorization
+                or not _species_has_antoine_data(
+                    species, vapor_pressure_data=self.vapor_pressure_data,
+                )
             ):
                 continue
-            if not _species_has_antoine_data(
-                species,
-                vapor_pressure_data=self.vapor_pressure_data,
-            ):
-                continue
-            T_cond = _species_condensation_temperature_C(
-                species,
-                temps=self.condensation_temperatures_C,
-                vapor_pressure_data=self.vapor_pressure_data,
-            )
-            remaining_kg = rate_kg_hr
-            hkl_condensed_by_stage: Dict[int, float] = {}
-            remaining_after_stage: Dict[int, float] = {}
-            stage_alpha_records_by_stage: Dict[int, dict[str, Any]] = {}
-            for stage in self.train.stages:
-                if remaining_kg <= 1e-15:
-                    break
-                if _cr_stage_isolation_blocks(stage, species):
-                    continue
-                stage_alpha_record = _stage_alpha_record(
-                    stage,
-                    species,
-                    self.materials,
-                )
-                # Every evaluated stage controls how much vapor reaches the
-                # wall, so its alpha provenance influences wall-deposit
-                # authority even when that stage condenses nearly zero mass.
-                stage_alpha_records_by_stage[stage.stage_number] = dict(
-                    stage_alpha_record
-                )
-                eta = self._condensation_efficiency(
-                    stage=stage,
-                    species=species,
-                    T_cond_C=T_cond,
-                    residence_s=self.residence_time_s.get(
-                        stage.stage_number, 1.0
-                    ),
-                    available_kg=remaining_kg,
-                    alpha_s_value=_required_record_alpha_s(
-                        stage_alpha_record,
-                        species=species,
-                        site='stage_deposition',
-                    ),
-                    alpha_record=stage_alpha_record,
-                    antoine_extrapolations=antoine_extrapolations,
-                    antoine_extrapolation_warnings=(
-                        antoine_extrapolation_warnings
-                    ),
-                    efficiency_outcomes=efficiency_outcomes_by_species.setdefault(
-                        species, []
-                    ),
-                )
-                condensed_kg = remaining_kg * eta
-                if condensed_kg > 1e-15:
-                    hkl_condensed_by_stage[stage.stage_number] = (
-                        hkl_condensed_by_stage.get(stage.stage_number, 0.0)
-                        + condensed_kg
-                    )
-                remaining_kg -= condensed_kg
-                remaining_after_stage[stage.stage_number] = max(
-                    0.0, remaining_kg
-                )
-            segment_supply = self._segment_supply_by_name(
-                rate_kg_hr,
-                remaining_after_stage,
-            )
-            capture_budget_alpha_record: dict[str, Any] = {}
-            capture_budget_kg = _pressure_isolated_capture_budget_kg(
-                species,
-                rate_kg_hr,
-                self.train.stages,
-                self.residence_time_s,
-                temps=self.condensation_temperatures_C,
-                vapor_pressure_data=self.vapor_pressure_data,
-                alpha_record_out=capture_budget_alpha_record,
-            )
             stage_route_by_species[species] = {
-                'T_cond_C': T_cond,
-                'hkl_condensed_by_stage': hkl_condensed_by_stage,
-                'remaining_after_stage': remaining_after_stage,
-                'stage_alpha_records_by_stage': stage_alpha_records_by_stage,
-                'segment_supply': segment_supply,
-                'capture_budget_kg': capture_budget_kg,
-                'capture_budget_alpha_record': capture_budget_alpha_record,
+                'T_cond_C': _species_condensation_temperature_C(
+                    species, temps=self.condensation_temperatures_C,
+                    vapor_pressure_data=self.vapor_pressure_data,
+                ),
+                'hkl_condensed_by_stage': {},
+                'stage_alpha_records_by_stage': {},
             }
 
-        positive_wall_species = {
-            species
-            for species, rate_kg_hr in evap_flux.species_kg_hr.items()
-            if float(rate_kg_hr) > 0.0 and species in stage_route_by_species
-        }
         missing_partial_species = sorted(
-            positive_wall_species
-            - set(self.wall_species_partial_pressures_pa)
+            species for species, rate in evap_flux.species_kg_hr.items()
+            if rate > 0.0 and species in stage_route_by_species
+            and species not in self.wall_species_partial_pressures_pa
         )
         if missing_partial_species:
             raise ValueError(
@@ -3098,17 +3001,115 @@ class CondensationModel:
                 'positive condensable vapor species; missing '
                 + ', '.join(missing_partial_species)
             )
-        wall_hkl_by_species = (
-            self._resolve_wall_deposit_candidates_by_species_segment_kg(
-                evap_flux=evap_flux,
-                melt=melt,
-                stage_route_by_species=stage_route_by_species,
-                antoine_extrapolations=antoine_extrapolations,
-                antoine_extrapolation_warnings=(
-                    antoine_extrapolation_warnings
-                ),
-            )
-        )
+        inlet_rates = dict(evap_flux.species_kg_hr)
+        flowing_rates = dict(inlet_rates)
+        wall_hkl_by_species: dict[str, dict[str, float]] = {}
+        self.wall_species_partial_pressures_pa_by_segment = {}
+        self.last_wall_capture_fixed_point_iterations = 0
+        # The train is causal: each entering wall and then its stage consume
+        # one shared inlet mixture. Recompute Dalton partials only AFTER all
+        # species at that location have been evaluated, preserving carrier flow.
+        for stage in sorted(self.train.stages, key=lambda item: item.stage_number):
+            # Validate this destination's coefficient before its incoming wall
+            # can consume the supply; a clean stage cannot hide missing alpha.
+            for species, route in stage_route_by_species.items():
+                if flowing_rates.get(species, 0.0) <= 1e-15 or _cr_stage_isolation_blocks(stage, species):
+                    continue
+                record = _stage_alpha_record(stage, species, self.materials)
+                _required_record_alpha_s(record, species=species, site='stage_deposition')
+                route['stage_alpha_records_by_stage'][stage.stage_number] = record
+            for segment in self.pipe_segments:
+                if (
+                    not (
+                        _segment_stage_number(segment.downstream_stage) == stage.stage_number
+                        or (self.lab_geometry is not None and stage.stage_number == 1
+                            and _segment_stage_number(segment.downstream_stage) is None)
+                    )
+                ):
+                    continue
+                partials = _segment_species_partial_pressures_pa(
+                    self.wall_species_partial_pressures_pa,
+                    self.overhead_pressure_mbar * 100.0,
+                    inlet_rates, {segment.name: flowing_rates},
+                )[segment.name]
+                self.wall_species_partial_pressures_pa_by_segment[segment.name] = partials
+                wall_removed: dict[str, float] = {}
+                for species, route in stage_route_by_species.items():
+                    supply = flowing_rates.get(species, 0.0)
+                    if supply <= 1e-15:
+                        continue
+                    # Reuse the existing wall owner and its refusal handling.
+                    # Only this segment receives supply, so its result cannot
+                    # be rescaled against another wall's candidate.
+                    candidates = self._wall_deposit_candidates_by_segment_kg(
+                        species=species, rate_kg_hr=supply,
+                        T_cond_C=route['T_cond_C'],
+                        melt_temperature_C=float(melt.temperature_C),
+                        supply_by_segment_kg={
+                            item.name: supply if item.name == segment.name else 0.0
+                            for item in self.pipe_segments
+                        },
+                        antoine_extrapolations=antoine_extrapolations,
+                        antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+                    )
+                    deposit = candidates.get(segment.name, 0.0)
+                    if deposit > 0.0:
+                        wall_hkl_by_species.setdefault(species, {})[segment.name] = deposit
+                        wall_removed[species] = deposit
+                for species, deposit in wall_removed.items():
+                    flowing_rates[species] = max(0.0, flowing_rates[species] - deposit)
+
+            stage_key = f'stage_{stage.stage_number}'
+            partials = _segment_species_partial_pressures_pa(
+                self.wall_species_partial_pressures_pa,
+                self.overhead_pressure_mbar * 100.0,
+                inlet_rates, {stage_key: flowing_rates},
+            )[stage_key]
+            stage_removed: dict[str, float] = {}
+            for species, route in stage_route_by_species.items():
+                supply = flowing_rates.get(species, 0.0)
+                if supply <= 1e-15 or _cr_stage_isolation_blocks(stage, species):
+                    continue
+                alpha_record = route['stage_alpha_records_by_stage'][stage.stage_number]
+                try:
+                    eta = self._condensation_efficiency(
+                        stage=stage, species=species, T_cond_C=route['T_cond_C'],
+                        residence_s=self.residence_time_s.get(stage.stage_number, 1.0),
+                        available_kg=supply,
+                        inlet_partial_pressure_pa=partials.get(species),
+                        alpha_s_value=_required_record_alpha_s(
+                            alpha_record, species=species, site='stage_deposition',
+                        ),
+                        alpha_record=alpha_record,
+                        antoine_extrapolations=antoine_extrapolations,
+                        antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+                        efficiency_outcomes=efficiency_outcomes_by_species.setdefault(species, []),
+                    )
+                except WallSaturationPressureRefusal as exc:
+                    # The shared wall owner has no capture quantity. Reuse the
+                    # existing source-retention refusal, never a zero capture
+                    # or a fabricated wall Psat. A later refusal after capture
+                    # cannot undo a mixture already consumed by other sinks.
+                    if route['hkl_condensed_by_stage'] or wall_hkl_by_species.get(species):
+                        raise
+                    retained_in_source_by_species[species] = inlet_rates[species]
+                    flowing_rates[species] = 0.0
+                    non_debiting_reason_by_species[species] = 'wall_saturation_pressure_out_of_domain'
+                    condensation_authority_by_species[species].update({
+                        'status': VAPOUR_CARRIER_AUTHORITY_REFUSED,
+                        'authoritative_for_condensation': False,
+                    })
+                    efficiency_outcomes_by_species.setdefault(species, []).append({
+                        'status': 'refused', 'reason': str(exc), 'output_status': 'refused',
+                        'species': species, 'stage_number': stage.stage_number, 'eta': None,
+                    })
+                    continue
+                deposit = supply * eta
+                if deposit > 1e-15:
+                    route['hkl_condensed_by_stage'][stage.stage_number] = deposit
+                    stage_removed[species] = deposit
+            for species, deposit in stage_removed.items():
+                flowing_rates[species] = max(0.0, flowing_rates[species] - deposit)
         wall_saturation_pressure_refusals_by_species: dict[
             str, dict[str, dict[str, Any]]
         ] = {}
@@ -3175,7 +3176,7 @@ class CondensationModel:
             carrier_status = carrier_authority_status_by_species.get(
                 species, VAPOUR_CARRIER_AUTHORITY_MISSING
             )
-            if carrier_status in non_debiting_carrier_statuses:
+            if carrier_status in non_debiting_carrier_statuses or species in retained_in_source_by_species:
                 retained_source_mass = max(0.0, float(rate_kg_hr))
                 remaining_by_species[species] = 0.0
                 retained_in_source_by_species[species] = retained_source_mass
@@ -3211,7 +3212,6 @@ class CondensationModel:
             wall_deposit_account_fractions_by_species[species] = {}
 
             stage_route = stage_route_by_species[species]
-            T_cond = float(stage_route['T_cond_C'])
             hkl_condensed_by_stage = dict(
                 stage_route['hkl_condensed_by_stage']
             )
@@ -3256,85 +3256,27 @@ class CondensationModel:
                     transport_parameter_notice_by_species[species] = (
                         transport_notice)
             wall_hkl_kg = sum(wall_hkl_by_segment.values())
-            hkl_sink_total_kg = hkl_condensed_total_kg + wall_hkl_kg
-            capture_budget_alpha_record = dict(
-                stage_route['capture_budget_alpha_record']
-            )
-            # Stage and capture-budget alpha records control the absence of a
-            # wall sink as well as a positive sink.  Preserve that evidence
-            # before any numerical-zero branch so a zero cannot erase a
-            # status-bearing coefficient evaluation.
-            alpha_provenance = (
-                wall_sticking_alpha_provenance_by_species
-                .setdefault(species, {})
-            )
+            alpha_provenance = wall_sticking_alpha_provenance_by_species.setdefault(species, {})
             for stage_number, record in stage_alpha_records_by_stage.items():
-                alpha_provenance[f'stage_{stage_number}'] = copy.deepcopy(
-                    record
-                )
-            if capture_budget_alpha_record:
-                alpha_provenance['capture_budget'] = copy.deepcopy(
-                    capture_budget_alpha_record
-                )
-            capture_budget_kg = float(stage_route['capture_budget_kg'])
-            if hkl_sink_total_kg <= 1e-15:
-                capture_budget_kg = 0.0
-            elif capture_budget_kg > 0.0:
-                used_capture_budget_regularizer = True
-                wall_deposit_kg = capture_budget_kg * (
-                    wall_hkl_kg / hkl_sink_total_kg
-                )
-                if wall_deposit_kg > 1e-15:
-                    wall_deposit_by_species[species] = (
-                        wall_deposit_by_species.get(species, 0.0)
-                        + wall_deposit_kg
-                    )
-                    segment_deposits = _allocate_total_by_weights(
-                        wall_deposit_kg,
-                        wall_hkl_by_segment,
-                    )
-                    for segment_name, segment_kg in segment_deposits.items():
-                        if segment_kg <= 1e-15:
-                            continue
-                        segment_species = (
-                            wall_deposit_by_segment_species.setdefault(
-                                segment_name, {}))
-                        segment_species[species] = (
-                            segment_species.get(species, 0.0) + segment_kg)
-                wall_fraction = (
-                    wall_deposit_kg / capture_budget_kg
-                    if capture_budget_kg > 0.0 else 0.0
-                )
-                segment_fractions = _wall_segment_account_fractions(
-                    wall_deposit_by_segment_species,
-                    species,
-                    wall_deposit_kg,
-                    self.pipe_segments,
-                )
-                wall_deposit_fraction_by_species[species] = wall_fraction
-                wall_deposit_account_fractions_by_species[species] = dict(
-                    segment_fractions)
+                alpha_provenance[f'stage_{stage_number}'] = copy.deepcopy(record)
 
-                baffle_budget_kg = max(0.0, capture_budget_kg - wall_deposit_kg)
-                if hkl_condensed_total_kg > 1e-15 and baffle_budget_kg > 0.0:
-                    scale = baffle_budget_kg / hkl_condensed_total_kg
-                    for stage_number, hkl_stage_kg in hkl_condensed_by_stage.items():
-                        condensed_kg = hkl_stage_kg * scale
-                        if condensed_kg <= 1e-15:
-                            continue
-                        stage_species = condensed_by_stage_species.setdefault(
-                            stage_number, {})
-                        stage_species[species] = (
-                            stage_species.get(species, 0.0) + condensed_kg)
-                        if not is_designated_for_stage(species, stage_number):
-                            stage_impurity = (
-                                impurity_by_stage_species.setdefault(
-                                    stage_number, {}))
-                            stage_impurity[species] = (
-                                stage_impurity.get(species, 0.0)
-                                + condensed_kg)
-            remaining_by_species[species] = max(
-                0.0, rate_kg_hr - capture_budget_kg)
+            if wall_hkl_kg > 1e-15:
+                wall_deposit_by_species[species] = wall_hkl_kg
+                for segment_name, deposit in wall_hkl_by_segment.items():
+                    wall_deposit_by_segment_species.setdefault(segment_name, {})[species] = deposit
+                wall_deposit_fraction_by_species[species] = (
+                    wall_hkl_kg / (wall_hkl_kg + hkl_condensed_total_kg)
+                )
+                wall_deposit_account_fractions_by_species[species] = (
+                    _wall_segment_account_fractions(
+                        wall_deposit_by_segment_species, species, wall_hkl_kg, self.pipe_segments,
+                    )
+                )
+            for stage_number, deposit in hkl_condensed_by_stage.items():
+                condensed_by_stage_species.setdefault(stage_number, {})[species] = deposit
+                if not is_designated_for_stage(species, stage_number):
+                    impurity_by_stage_species.setdefault(stage_number, {})[species] = deposit
+            remaining_by_species[species] = flowing_rates[species]
 
         from simulator.diagnostics import (
             _status_bearing_alpha_record,
@@ -3552,10 +3494,8 @@ class CondensationModel:
                 'transport_parameter_notice'
             ] = copy.deepcopy(transport_notice)
 
-        capture_notice = (
-            dict(CAPTURE_BUDGET_REGULARIZER_NOTICE)
-            if used_capture_budget_regularizer else {}
-        )
+        # Preserve the existing result/report field without an active regularizer.
+        capture_notice = {}
         self.last_capture_budget_regularizer_notice = copy.deepcopy(
             capture_notice
         )
@@ -4359,347 +4299,148 @@ class CondensationModel:
         residence_s: float,
         available_kg: float,
         alpha_s_value: float,
+        inlet_partial_pressure_pa: float | None = None,
         alpha_record: MutableMapping[str, Any] | None = None,
         antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
         antoine_extrapolation_warnings: list[str] | None = None,
         efficiency_outcomes: list[dict[str, Any]] | None = None,
     ) -> float:
-        """
-        Condensation efficiency for one species in one stage.
-
-        Wall deposition uses ``_series_resistance_deposition_flux_mol_m2_s``:
-        HKL surface uptake in series with gas-side mass transfer, with
-        ``f = Kn/(Kn+0.01)`` removing boundary-layer resistance as flow
-        becomes free molecular.
-
-        Reactive wall products use the product-P_sat floor in the shared
-        driving-pressure helper instead of the vapor species' Antoine P_sat.
-
-        Chunk A keeps the existing stage residence-time surrogate for
-        geometry and integrates the H-K-L driving force across the actual
-        stage T-band. Chunk C replaces the constant regime factor with
-        pressure/Knudsen coupling.
-
-        VR-11 / B3: the finite early-zero exits (non-positive residence
-        or alpha, nonpositive local pressure,
-        nonpositive reference flux) mint typed pass-through outcomes
-        into ``efficiency_outcomes`` (when provided) rather than
-        returning a silent 0.0 with no consumer channel. Non-finite
-        ``residence_s`` or ``alpha_s_value`` raise; a later
-        available_kg / molar-mass non-finite or non-positive check
-        returns 0.0 without minting. Numeric eta for finite valid
-        inputs is unchanged. Unavailable SiO wall saturation uses the declared
-        reactive-product route and measured flowing pressure, with an
-        extrapolated outcome; missing or invalid inputs remain terminal.
-        """
+        """Equilibrium-capped kinetic capture at the stage midpoint."""
         def _mint_zero(reason: str, **detail: Any) -> float:
             if efficiency_outcomes is not None:
-                record: dict[str, Any] = {
+                efficiency_outcomes.append({
                     'status': 'pass_through',
                     'reason': reason,
                     'output_status': 'status_bearing',
                     'species': species,
-                    'stage_number': int(getattr(stage, 'stage_number', -1)),
+                    'stage_number': int(stage.stage_number),
                     'T_cond_C': float(T_cond_C),
                     'eta': 0.0,
-                }
-                record.update(detail)
-                efficiency_outcomes.append(record)
+                    **detail,
+                })
             return 0.0
 
         if not math.isfinite(float(residence_s)):
             raise ValueError('residence_s must be finite')
         if not math.isfinite(float(alpha_s_value)):
             raise ValueError('alpha_s_value must be finite')
-
-        if residence_s <= 0.0 or alpha_s_value <= 0.0:
-            return _mint_zero(
-                'zero_residence_or_alpha',
-                residence_s=float(residence_s),
-                alpha_s_value=float(alpha_s_value),
+        if residence_s < 0.0 or not 0.0 <= alpha_s_value <= 1.0:
+            raise DepositionInputRefusal(
+                'stage_capture', (residence_s, alpha_s_value),
+                'residence and sticking must be within physical bounds',
             )
+        if residence_s == 0.0 or alpha_s_value == 0.0:
+            return _mint_zero('zero_residence_or_alpha',
+                              residence_s=residence_s, alpha_s_value=alpha_s_value)
+        available_kg = _deposition_finite_scalar('available_kg', available_kg)
+        if available_kg < 0.0:
+            raise DepositionInputRefusal('available_kg', available_kg, 'must be nonnegative')
+        if available_kg == 0.0:
+            return _mint_zero('no_available_mass')
+        area = self._stage_area_m2_for_stage_number(stage.stage_number)
+        if area is None and (
+            self.lab_geometry is not None
+            or (stage.stage_number in (0, 5, 6) and not stage.target_species)
+        ):
+            return _mint_zero(
+                'no_capture_surface_in_train_topology',
+                applicability_evidence={'stage_number': stage.stage_number,
+                                        'target_species': list(stage.target_species),
+                                        'configured_capture_surface': False},
+            )
+        if area is None:
+            raise DepositionInputRefusal('stage_area_m2', None, 'collector area is required')
+        if area == 0.0:
+            return _mint_zero('no_configured_capture_area')
 
-        # Resolve Antoine (or catalog) Psat at T_cond; uncovered segments and
-        # range errors are typed refusals (b-127), never a fabricated 100 Pa.
-        psat_notices = antoine_extrapolations if antoine_extrapolations is not None else {}
-        P_local_pa, psat_refused = _try_antoine_psat_pa(
-            species,
-            T_cond_C + CELSIUS_TO_KELVIN_OFFSET,
+        # Direct diagnostic callers use the declared flow map; runtime routing
+        # supplies the local pressure AFTER preceding wall and stage removal.
+        p_in = _deposition_finite_scalar(
+            'flowing_pressure_pa',
+            inlet_partial_pressure_pa if inlet_partial_pressure_pa is not None
+            else self.wall_species_partial_pressures_pa.get(species),
+        )
+        if p_in < 0.0:
+            raise DepositionInputRefusal('flowing_pressure_pa', p_in, 'must be nonnegative')
+        if p_in == 0.0:
+            return _mint_zero('nonpositive_local_pressure', P_local_pa=p_in)
+        T_surface_K = _stage_midpoint_temperature_K(stage)
+        T_surface_C = T_surface_K - CELSIUS_TO_KELVIN_OFFSET
+        if _reactive_product_backstop_authorized(species) and T_surface_C > T_cond_C:
+            return _mint_zero('above_reactive_product_condensation_temperature')
+        notices = antoine_extrapolations if antoine_extrapolations is not None else {}
+        diagnostic: dict[str, Any] = {}
+        pressure_options = dict(
             vapor_pressure_data=self.vapor_pressure_data,
-            antoine_extrapolations=psat_notices,
+            reactive_product_backstop=(
+                _reactive_product_backstop_authorized(species)
+                and T_surface_C <= T_cond_C
+            ),
+            stable_condensation_product_backstop=(
+                _stable_condensation_product_backstop_authorized(species)
+            ),
+            antoine_extrapolations=notices,
             antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+            diagnostic_out=diagnostic,
         )
-        domain_outcome = None
-        if psat_refused or P_local_pa is None:
-            notice = psat_notices.get(
-                f'{species}#wall:{T_cond_C + CELSIUS_TO_KELVIN_OFFSET}', {}
-            )
-            if notice.get('refusal_type') == 'CatalogCompileError':
-                raise DepositionInputRefusal(
-                    'vapor_pressure_data', species, str(notice.get('reason')),
-                )
-            if _valid_temperature_range_K(notice.get('valid_range_K')) is None:
-                raise DepositionInputRefusal(
-                    'valid_range_K', notice.get('valid_range_K'),
-                    'declared source band required for extrapolated routing',
-                )
-            declared_temperature = _deposition_finite_scalar(
-                'condensation_temperatures_C', _species_condensation_temperature_C(
-                    species, temps=self.condensation_temperatures_C,
-                    vapor_pressure_data=self.vapor_pressure_data,
-                ),
-            )
-            if declared_temperature <= -CELSIUS_TO_KELVIN_OFFSET:
-                raise DepositionInputRefusal(
-                    'condensation_temperatures_C', declared_temperature,
-                    'declared routing temperature must be above absolute zero',
-                )
-            P_local_pa = _deposition_finite_scalar(
-                'flowing_pressure_pa', self.wall_species_partial_pressures_pa.get(species)
-                if self._species_partial_pressures_configured else None,
-            )
-            if P_local_pa < 0.0:
-                raise DepositionInputRefusal(
-                    'flowing_pressure_pa', P_local_pa, 'pressure must be nonnegative',
-                )
-            if P_local_pa == 0.0:
-                return _mint_zero('nonpositive_flowing_pressure', flowing_pressure_pa=0.0)
-            # The existing Si/SiO2 reactive-product limit supplies P_sat ~= 0
-            # below the declared routing temperature. Flow supplies pressure;
-            # the 1 mbar routing reference never substitutes for measured flow.
-            domain_outcome = {
-                **notice,
-                'status': 'extrapolated',
-                'authority_level': 'extrapolated',
-                'reason': 'antoine_psat_unavailable_at_T',
-                'original_reason': notice.get('reason', 'uncovered_antoine_segment'),
-                'valid_range_K': notice.get('valid_range_K'),
-                'output_status': 'status_bearing',
-                'species': species,
-                'stage_number': int(stage.stage_number),
-                'T_cond_C': float(T_cond_C),
-                'flowing_pressure_pa': P_local_pa,
-                'routing_reference_temperature_C': declared_temperature,
-                'routing_reference_source': 'condensation_train.condensation_temperatures_C',
-                'saturation_pressure_policy': 'reactive_product_backstop',
-                'eta': 0.0,
-            }
-            if efficiency_outcomes is not None:
-                efficiency_outcomes.append(domain_outcome)
-            if species != 'SiO':
-                domain_outcome['saturation_pressure_policy'] = 'declared_pressure_isolated_stage_efficiency'
-                available_kg = _deposition_finite_scalar('available_kg', available_kg)
-                if available_kg < 0.0:
-                    raise DepositionInputRefusal('available_kg', available_kg, 'mass must be nonnegative')
-                if available_kg == 0.0:
-                    return _mint_zero('no_available_mass')
-                # The default hot duct, dust filter and turbine declare no
-                # condenser surface. Explicit area overrides still need validation.
-                if (
-                    stage.stage_number in (0, 5, 6)
-                    and not stage.target_species
-                    and f'stage_{stage.stage_number}' not in self.stage_area_m2_by_stage
-                    and str(stage.stage_number) not in self.stage_area_m2_by_stage
-                ):
-                    return _mint_zero(
-                        'no_capture_surface_in_train_topology',
-                        applicability_evidence={
-                            'stage_number': stage.stage_number,
-                            'target_species': [],
-                            'configured_capture_surface': False,
-                        },
-                    )
-                stage_area_m2 = _deposition_finite_scalar(
-                    'stage_area_m2',
-                    self._stage_area_m2_for_stage_number(stage.stage_number),
-                )
-                if stage_area_m2 == 0.0:
-                    return _mint_zero('no_configured_capture_area')
-                domain_outcome['eta'] = _pressure_isolated_stage_efficiency(
-                    stage, T_cond_C, residence_s, alpha_s_value,
-                )
-                domain_outcome['capture_budget_regularizer_notice'] = dict(CAPTURE_BUDGET_REGULARIZER_NOTICE)
-                return domain_outcome['eta']
-        if P_local_pa <= 0.0:
-            return _mint_zero(
-                'nonpositive_local_pressure',
-                P_local_pa=float(P_local_pa),
-            )
-
-        T_ref_K = max(T_cond_C + CELSIUS_TO_KELVIN_OFFSET, 1.0)
-        reference_flux = _hkl_impingement_flux_mol_m2_s(
-            species,
-            P_local_pa,
-            T_ref_K,
-            vapor_pressure_data=self.vapor_pressure_data,
+        driving_pressure = _wall_deposition_driving_pressure_pa(
+            species, p_in, T_surface_K, **pressure_options,
         )
-        if reference_flux <= 0.0:
-            return _mint_zero(
-                'nonpositive_reference_flux',
-                P_local_pa=float(P_local_pa),
-                reference_flux=float(reference_flux),
+        if diagnostic.get('wall_saturation_pressure_refused'):
+            raise WallSaturationPressureRefusal(
+                species, T_surface_K,
+                diagnostic.get('wall_saturation_pressure_refusal_reason', 'saturation_pressure_unavailable'),
             )
+        if driving_pressure <= 0.0:
+            return _mint_zero('no_supersaturation', P_local_pa=p_in)
 
-        lo_C, hi_C = _stage_temp_band_C(stage)
-        if hi_C < lo_C:
-            lo_C, hi_C = hi_C, lo_C
-
-        band_flux_mol_m2_s = 0.0
-        width_C = hi_C - lo_C
-        spec = (
-            alpha_record.get('alpha_s_coefficient_spec')
-            if isinstance(alpha_record, Mapping)
-            else None
+        flux = _series_resistance_deposition_flux_mol_m2_s(
+            species, p_in, T_surface_K, alpha_s_value,
+            pipe_diameter_m=self.pipe_diameter_m,
+            stir_factor=self.stir_factor,
+            radial_stir_factor=self.radial_stir_factor,
+            regime_factor=self.regime_factor,
+            T_gas_K=float(self.gas_temperature_C) + CELSIUS_TO_KELVIN_OFFSET,
+            overhead_pressure_pa=float(self.overhead_pressure_mbar) * 100.0,
+            carrier_gas=self.carrier_gas,
+            **pressure_options,
         )
-        sample_extrapolated = False
-        for sample in range(HKL_BAND_SAMPLES):
-            if width_C <= 0.0:
-                T_surface_C = lo_C
-            else:
-                T_surface_C = (
-                    lo_C + width_C * (sample + 0.5) / HKL_BAND_SAMPLES
-                )
-            T_surface_K = max(T_surface_C + CELSIUS_TO_KELVIN_OFFSET, 1.0)
-            sample_alpha_s = alpha_s_value
-            if isinstance(spec, Mapping):
-                alpha_context: dict[str, Any] = {'coefficient_spec': spec}
-                sample_alpha_s = _condensation_alpha_s(
-                    species,
-                    T_surface_K,
-                    alpha_context,
-                )
-                sample_eval = alpha_context.get('alpha_s_evaluation', {})
-                sample_extrapolated = sample_extrapolated or bool(
-                    sample_eval.get('alpha_s_extrapolated')
-                )
-            # 0.5.2 Phase B (series-resistance + stir-Sherwood): same
-            # series-resistance form as the wall-deposit candidate path so
-            # the stage-condensation band integration honors the canonical
-            # mass-transfer composition (Bird/Stewart/Lightfoot) rather
-            # than the v1 additive blend. T_surface_K (stage T-band
-            # sample) drives P_sat; T_gas_K (bulk gas) drives the
-            # ideal-gas denominator. overhead_pressure_pa feeds the
-            # Chapman-Enskog D_AB(T, P) per Phase A1. stir_factor
-            # amplifies the boundary-layer Sherwood per the operator's
-            # induction-stirring power.
-            T_gas_K = max(
-                float(self.gas_temperature_C) + CELSIUS_TO_KELVIN_OFFSET,
-                1.0,
-            )
-            overhead_pressure_pa = float(self.overhead_pressure_mbar) * 100.0
-            rate_diagnostic: dict[str, Any] = {}
-            flux = _series_resistance_deposition_flux_mol_m2_s(
-                species, P_local_pa, T_surface_K, sample_alpha_s,
-                pipe_diameter_m=self.pipe_diameter_m,
-                # 0.5.3 Phase B: pass both axes (see twin call above
-                # in ``_wall_deposit_candidate_for_surface_kg`` for the
-                # precedence rationale; the helper reads radial as the
-                # Sh driver, legacy stir_factor as audit-history).
-                stir_factor=self.stir_factor,
-                radial_stir_factor=self.radial_stir_factor,
-                regime_factor=self.regime_factor,
-                T_gas_K=T_gas_K,
-                overhead_pressure_pa=overhead_pressure_pa,
-                carrier_gas=self.carrier_gas,
-                vapor_pressure_data=self.vapor_pressure_data,
-                # Standard-reaction SiO rows intentionally have no pure-SiO
-                # wall P_sat.  At and below the declared condensation
-                # temperature, baffles materialize the disproportionation
-                # product instead of silently disabling capture when the melt
-                # reaction term is rejected as a wall pressure.  The
-                # temperature gate preserves colder downstream carryover
-                # without admitting hotter upstream stages.
-                reactive_product_backstop=(
-                    _reactive_product_backstop_authorized(species)
-                    and T_surface_C <= T_cond_C
-                ),
-                # Stable product class (CrO2 today) materializes the declared
-                # irreversible oxide route instead of reversible pure-species Psat.
-                stable_condensation_product_backstop=(
-                    _stable_condensation_product_backstop_authorized(species)
-                ),
-                antoine_extrapolations=antoine_extrapolations,
-                antoine_extrapolation_warnings=antoine_extrapolation_warnings,
-                diagnostic_out=rate_diagnostic,
-            )
-            if (
-                bool(rate_diagnostic.get('wall_saturation_pressure_refused'))
-                and flux > 0.0
-            ):
-                raise RuntimeError(
-                    "wall saturation-pressure refusal produced positive flux"
-                )
-            band_flux_mol_m2_s += flux
-        band_flux_mol_m2_s /= HKL_BAND_SAMPLES
-        if isinstance(alpha_record, MutableMapping) and isinstance(spec, Mapping):
-            alpha_record['alpha_s_sample_temperature_range_K'] = [
-                max(lo_C + CELSIUS_TO_KELVIN_OFFSET, 1.0),
-                max(hi_C + CELSIUS_TO_KELVIN_OFFSET, 1.0),
-            ]
-            alpha_record['alpha_s_sample_extrapolated'] = sample_extrapolated
-
-        stage_area_m2 = self._stage_area_m2_for_stage_number(stage.stage_number)
-        if stage_area_m2 is not None:
-            molar_mass_kg_mol = (
-                _molecular_mass_kg_per_molecule(
-                    species,
-                    vapor_pressure_data=self.vapor_pressure_data,
-                )
-                * AVOGADRO_MOL
-            )
-            if (
-                not math.isfinite(available_kg)
-                or available_kg <= 0.0
-                or molar_mass_kg_mol <= 0.0
-            ):
-                return 0.0
-            available_mol = available_kg / molar_mass_kg_mol
-            # HKL/transport flux is mol m^-2 s^-1. Integrating over physical
-            # baffle area and residence time gives capturable mol:
-            # (mol m^-2 s^-1)(m^2)(s) = mol. Dividing by available vapor mol
-            # makes eta dimensionless and lets configured Stage-3 area affect
-            # capture without inventing an area-normalized rate constant.
-            capturable_mol = (
-                max(0.0, band_flux_mol_m2_s)
-                * stage_area_m2
-                * residence_s
-            )
-            eta = capturable_mol / available_mol
-        else:
-            # Premise: ``band_flux_fraction = flux / reference_flux`` is
-            # dimensionless. Algebra requires capturable mol =
-            # flux(mol m^-2 s^-1) * area(m^2) * residence(s), then
-            # eta = capturable_mol / available_mol. Unit check: without a
-            # configured area there is no m^2 term, so treating the ratio as
-            # s^-1 invents a rate constant. Sanity: leave vapor un-baffled
-            # rather than create synthetic capture.
-            eta = 0.0
-        if not math.isfinite(eta):
+        if not math.isfinite(flux) or flux < 0.0:
             raise ValueError(
-                f'condensation efficiency for {species} in stage '
-                f'{int(getattr(stage, "stage_number", -1))} is not finite'
+                f'condensation efficiency for {species} in stage {stage.stage_number} is not finite'
             )
-        # Supply-limited capture: band flux * area * time can exceed available
-        # vapour. Cap eta at 1 and surface a typed notice (Ferry V / V1-S13 P3).
-        eta_uncapped = float(eta)
-        eta = max(0.0, min(1.0, eta))
-        supply_limited = eta_uncapped > 1.0
-        if domain_outcome is not None:
-            domain_outcome['eta'] = eta
-            if supply_limited:
-                domain_outcome['capture_supply_limited'] = True
-                domain_outcome['eta_uncapped'] = eta_uncapped
-        if supply_limited and efficiency_outcomes is not None:
-            efficiency_outcomes.append(
-                {
-                    'status': 'capture_supply_limited',
-                    'reason': 'capture_supply_limited',
-                    'species': species,
-                    'stage_number': int(getattr(stage, 'stage_number', -1)),
-                    'eta': eta,
-                    'eta_uncapped': eta_uncapped,
-                }
-            )
+        if flux == 0.0:
+            return _mint_zero('nonpositive_reference_flux', reference_flux=flux)
+        molar_mass = (
+            _molecular_mass_kg_per_molecule(species, vapor_pressure_data=self.vapor_pressure_data)
+            * AVOGADRO_MOL
+        )
+        # Premise: available_kg is kg/h throughput, NOT gas inventory. With
+        # molar flow n_dot=(available_kg/M)/3600 (mol/s), N_stage=n_dot*tau
+        # (mol). The existing series law gives J=K_series*(p_in-P_sat)
+        # (mol/m2/s), including HKL alpha, gas transport and Kn continuity.
+        # Algebra: dN/dt=-k_s*N, k_s=J*A/N_stage; integrating gives
+        # f_kin=1-exp(-k_s*tau). Units: (mol/m2/s)*m2/mol = 1/s.
+        # At fixed flow/area/pressure, tau cancels because N_stage grows with
+        # tau; no reference time is introduced. Alpha->0 gives J->0 and f->0;
+        # large k_s*tau gives f_kin->1; p_in<=P_sat gives J=f_eq=0.
+        # The equilibrium ceiling prevents an outlet below saturation.
+        inventory_mol = available_kg / molar_mass / 3600.0 * residence_s
+        k_s = flux * area / inventory_mol
+        f_kin = -math.expm1(-k_s * residence_s)
+        f_eq = driving_pressure / p_in
+        eta = min(f_eq, f_kin)
+        notice = notices.get(f'{species}#wall:{T_surface_K}')
+        if isinstance(notice, Mapping) and efficiency_outcomes is not None:
+            efficiency_outcomes.append({
+                **notice, 'status': 'extrapolated', 'authority_level': 'extrapolated',
+                'reason': 'antoine_psat_unavailable_at_T' if notice.get('status') == 'refused'
+                          else notice.get('reason', 'outside_source_temperature_band'),
+                'original_reason': notice.get('reason'),
+                'output_status': 'status_bearing', 'species': species,
+                'stage_number': int(stage.stage_number), 'T_cond_C': T_cond_C,
+                'flowing_pressure_pa': p_in, 'eta': eta,
+            })
         return eta
 
 
@@ -5380,7 +5121,12 @@ def _stage_temp_band_C(stage: CondensationStage) -> tuple[float, float]:
 
 def _stage_midpoint_temperature_K(stage: CondensationStage) -> float:
     lo_C, hi_C = _stage_temp_band_C(stage)
-    return max(((lo_C + hi_C) / 2.0) + CELSIUS_TO_KELVIN_OFFSET, 1.0)
+    if not all(math.isfinite(value) for value in (lo_C, hi_C)) or lo_C > hi_C:
+        raise DepositionInputRefusal('stage_temperature', (lo_C, hi_C), 'finite ordered band required')
+    temperature_K = (lo_C + hi_C) / 2.0 + CELSIUS_TO_KELVIN_OFFSET
+    if temperature_K <= 0.0:
+        raise DepositionInputRefusal('T_surface_K', temperature_K, 'must be above absolute zero')
+    return temperature_K
 
 
 def _stage_alpha_s(

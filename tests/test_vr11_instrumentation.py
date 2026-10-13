@@ -276,7 +276,10 @@ def test_finite_live_pressure_map_refuses_nonfinite_silent_drop() -> None:
 
 
 def _efficiency_model() -> CondensationModel:
-    return CondensationModel(CondensationTrain.create_default())
+    model = CondensationModel(CondensationTrain.create_default())
+    model.stage_area_m2_by_stage = {"sio_stage3": 1.0}
+    model.wall_species_partial_pressures_pa = {"SiO": 100.0, "Na": 100.0}
+    return model
 
 
 def test_b112_zero_residence_mints_typed_pass_through_outcome() -> None:
@@ -304,13 +307,7 @@ def test_b112_nonpositive_local_pressure_mints_typed_outcome(monkeypatch) -> Non
 
     model = _efficiency_model()
     stage = next(s for s in model.train.stages if s.stage_number == 3)
-    # Force a non-refused but nonpositive pressure so the nonpositive branch
-    # (not antoine_psat_unavailable_at_T) is the one that mints.
-    monkeypatch.setattr(
-        condensation_module,
-        "_try_antoine_psat_pa",
-        lambda *args, **kwargs: (0.0, False),
-    )
+    model.wall_species_partial_pressures_pa["SiO"] = 0.0
     outcomes: list[dict[str, Any]] = []
     eta = model._condensation_efficiency(
         stage=stage,
@@ -443,7 +440,7 @@ def test_b112_positive_efficiency_does_not_mint_outcome(monkeypatch) -> None:
     available_kg = (
         condensation_module._molecular_mass_kg_per_molecule("SiO")
         * condensation_module.AVOGADRO_MOL
-        * 10.0
+        * 10.0 * 3600.0
     )
     model.stage_area_m2_by_stage = {"sio_stage3": 1.0}
     outcomes: list[dict[str, Any]] = []
@@ -456,7 +453,7 @@ def test_b112_positive_efficiency_does_not_mint_outcome(monkeypatch) -> None:
         alpha_s_value=1.0,
         efficiency_outcomes=outcomes,
     )
-    assert eta == pytest.approx(0.2)
+    assert eta == pytest.approx(-math.expm1(-0.2))
     assert outcomes == []
 
 

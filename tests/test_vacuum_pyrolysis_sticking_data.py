@@ -29,15 +29,16 @@ def _assert_synthetic_sio_route_authority(route) -> None:
     stage_outcomes = route.condensation_refusals_by_species.get("SiO", {}).get(
         "stage_outcomes", []
     )
-    assert authority["status"] == "authoritative"
+    # Source pressure remains authoritative; colder collectors extrapolate
+    # the synthetic curve's 1323-1324 K support and cannot inherit that claim.
+    assert authority["status"] == "status_bearing"
+    assert authority["authoritative_for_condensation"] is False
     assert authority["carrier_authority"]["pressure"] == {
         "kind": "value",
         "pa": 100.0,
         "valid_range_K": [1323.0, 1324.0],
     }
-    assert {
-        outcome["reason"] for outcome in stage_outcomes
-    }.isdisjoint({"antoine_psat_unavailable_at_T"})
+    assert any(outcome["reason"] == "antoine_psat_unavailable_at_T" for outcome in stage_outcomes)
 
 
 def _configure_knudsen_policy(model: CondensationModel) -> CondensationModel:
@@ -405,7 +406,7 @@ def test_legacy_by_feel_sticking_constant_text_is_gone():
     assert "STICKING_COEFF/default alpha_s values are ungrounded" not in materials
 
 
-def test_grounded_sio_alpha_drives_wall_deposit_direction(monkeypatch):
+def test_grounded_sio_wall_alpha_reaches_supply_ceiling(monkeypatch):
     model = CondensationModel(
         CondensationTrain.create_default(),
         wall_temperature_C=900.0,
@@ -430,15 +431,10 @@ def test_grounded_sio_alpha_drives_wall_deposit_direction(monkeypatch):
     grounded = float(grounded_route.wall_deposit_by_species["SiO"])
     legacy = float(legacy_route.wall_deposit_by_species["SiO"])
 
-    # Explicit stage area makes restored predicted baffle capture compete with
-    # wall capture. The grounded lower-alpha case still leaves more vapor for
-    # the wall sink, while the missing Antoine authority stays visible.
-    # Restored Stage-3 reactive-product backstop (170b9faf) takes mass from
-    # the wall, not remaining: new_wall == old_wall - stage
-    # (0.9572497806398499 - 0.0191108354895643 = 0.9381389451502856;
-    # legacy analog). Conservation is wall + stage + remaining == 1, not a
-    # copied 12-digit pin of current output.
-    assert grounded > legacy
+    # The incoming wall consumes the full supply before baffles. Both alpha
+    # cases reach the physical supply ceiling; later stages get no vapor.
+    assert grounded == pytest.approx(1.0)
+    assert legacy == pytest.approx(1.0)
     for route in (grounded_route, legacy_route):
         authority = route.condensation_authority_by_species["SiO"]
         refusal = route.condensation_refusals_by_species["SiO"]
@@ -446,15 +442,13 @@ def test_grounded_sio_alpha_drives_wall_deposit_direction(monkeypatch):
         stage = float(authority["stage_condensed_mass_kg_hr"])
         remaining = float(route.remaining_by_species["SiO"])
         assert authority["status"] == "missing"
-        assert authority["authority_level"] == "extrapolated"
-        assert stage > 0.0
+        assert authority["authoritative_for_condensation"] is False
+        assert route.antoine_extrapolations
+        assert stage == 0.0
+        assert remaining == 0.0
         assert wall + stage + remaining == pytest.approx(1.0, rel=0.0, abs=1e-12)
         assert authority["mass_closure_error_kg_hr"] == pytest.approx(0.0)
         assert refusal["upstream_authority_status"] == "missing"
-        assert any(
-            outcome["reason"] == "antoine_psat_unavailable_at_T"
-            for outcome in refusal["stage_outcomes"]
-        )
 
 
 def test_capture_budget_regularizer_is_marked_numerical_uncertified():
