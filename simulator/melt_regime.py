@@ -99,7 +99,7 @@ def melt_regime(
             if legacy_predicate:
                 divergence["legacy_predicate"] = legacy_predicate
             if liquid_fraction is not None:
-                invalidity = _liquid_fraction_invalidity(liquid_fraction)
+                invalidity = liquid_fraction_invalidity(liquid_fraction)
                 if invalidity is None:
                     divergence["liquid_fraction"] = float(liquid_fraction)
                 else:
@@ -130,7 +130,7 @@ def _classify_melt_regime(
         try:
             fraction = _finite_float(liquid_fraction, "liquid_fraction")
         except (TypeError, ValueError):
-            invalidity = _liquid_fraction_invalidity(liquid_fraction)
+            invalidity = liquid_fraction_invalidity(liquid_fraction)
             if (
                 invalid_liquid_fraction_regime is not None
                 and invalidity != "not_numeric"
@@ -187,7 +187,7 @@ def _finite_nonnegative(value: float, name: str) -> float:
     return number
 
 
-def _liquid_fraction_invalidity(value: float) -> str | None:
+def liquid_fraction_invalidity(value: float) -> str | None:
     if not is_declared_real_scalar(value, allow_numeric_str=True):
         return "not_numeric"
     try:

@@ -431,7 +431,11 @@ from simulator.fe_redox import (
     kress91_split,
     melt_mol_fractions_for_kress91,
 )
-from simulator.melt_regime import MeltRegime, melt_regime
+from simulator.melt_regime import (
+    MeltRegime,
+    liquid_fraction_invalidity,
+    melt_regime,
+)
 from simulator.config_flags import bool_feature_flag
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.lab_geometry import LabGeometryError, parse_lab_geometry
@@ -9422,11 +9426,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'Authoritative VAPOR_PRESSURE liquid_fraction_invalid: '
                     f'{raw_liquid_fraction!r}'
                 ) from exc
-            if (
-                not math.isfinite(liquid_fraction)
-                or liquid_fraction < 0.0
-                or liquid_fraction > 1.0
-            ):
+            if liquid_fraction_invalidity(liquid_fraction) is not None:
                 raise RuntimeError(
                     'Authoritative VAPOR_PRESSURE liquid_fraction_invalid: '
                     f'{raw_liquid_fraction!r}'
