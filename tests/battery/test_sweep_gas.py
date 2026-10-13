@@ -153,6 +153,10 @@ def test_ts1985_keeps_printed_alternatives_and_absences(tmp_path) -> None:
     assert activity.identity.total_pressure_Pa.is_value
     assert activity.identity.total_pressure_Pa.value == Decimal("101325")
     assert activity.identity.fO2_Pa.is_value
+    # Golden pin before sharing the existing log-fO2-to-Pa conversion.
+    assert activity.identity.fO2_Pa.value == Decimal(
+        "2.7984086093147045631324272098798262102922900122648E-7"
+    )
     assert activity.identity.fO2_Pa.value > 0
     assert activity.derivation is not None
     assert "experiment.pressure_environment.total_pressure_Pa" in activity.derivation.relation

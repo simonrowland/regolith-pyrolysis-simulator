@@ -11224,7 +11224,15 @@ def test_residue_cells_keep_run_identity_and_printed_conditions(
         )
         assert identity.exposure.value.duration_s.value == run_key[2] * Decimal("60")
         assert identity.total_pressure_Pa.value == Decimal("101325")
-        assert identity.fO2_Pa.value == Decimal("100000") * (Decimal(10) ** expected_fO2)
+        # Golden pin for the existing printed-log-to-Pa conversion before it
+        # is shared with redox identity binding.  -0.68 log10(bar) is the
+        # published value for the first Sossi 2019 table-2 residue row.
+        if expected_fO2 == Decimal("-0.68"):
+            assert identity.fO2_Pa.value == Decimal("20892.96130854039483122233736")
+        else:
+            assert identity.fO2_Pa.value == Decimal("100000") * (
+                Decimal(10) ** expected_fO2
+            )
         assert "experiment_id" not in profile_for(identity).required
         assert obs.experiment_id.endswith(f"::experiment::{run_key[3]}")
         assert profile_for(identity).required == frozenset(
