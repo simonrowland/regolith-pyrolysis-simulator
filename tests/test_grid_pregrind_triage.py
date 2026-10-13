@@ -170,6 +170,22 @@ def test_liquid_regime_triage_keeps_strict_positive_and_exact_zero():
     assert classify_non_eval(faithful_zero) == FAITHFUL_RUMP
 
 
+def test_invalid_persisted_liquid_fractions_get_their_own_triage_category():
+    base = {
+        "status": "out_of_domain",
+        "status_kind": "refusal",
+        "refusal_reason": "no_convergence",
+        "failure_reason_code": None,
+        "finder_liquid_fraction": None,
+        "raw_payload": json.dumps({"engine_invoked": True}),
+    }
+
+    for fraction in (-0.1, 1.2, float("nan")):
+        assert classify_non_eval(
+            {**base, "generic_liquid_fraction": fraction}
+        ) == "invalid-liquid-fraction"
+
+
 def test_report_ignores_success_and_uses_unassigned_feedstock_bucket():
     report = build_triage_report(
         [
