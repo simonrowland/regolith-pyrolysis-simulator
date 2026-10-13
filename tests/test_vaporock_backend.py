@@ -688,6 +688,10 @@ def test_system_entrypoint_marks_pressure_non_authoritative(monkeypatch):
 def test_vaporock_adapter_invalid_fraction_is_rejected_by_battery_classifier(
     monkeypatch,
 ):
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        classify_equilibrate_outcome,
+    )
+
     class FakeSystem:
         def set_melt_comp(self, composition):
             self.composition = dict(composition)
@@ -709,10 +713,6 @@ def test_vaporock_adapter_invalid_fraction_is_rejected_by_battery_classifier(
     assert result.status == "non_authoritative"
     assert result.phase_assemblage_available is False
     assert result.liquid_fraction == 1.2
-
-    from simulator.diagnostic_helpers.binary_pot_battery import (
-        classify_equilibrate_outcome,
-    )
 
     assert classify_equilibrate_outcome(result)[:2] == (
         "refusal",
