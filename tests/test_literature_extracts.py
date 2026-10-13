@@ -2537,9 +2537,7 @@ def _assert_halwax_figure_only_pressure_transcription(doc: dict) -> None:
         assert row["experiment"] == experiment
         assert gas == gas_species
         assert values["condensed_phase"] == oxide
-        assert values["temperature_K"] == temperature
         assert row["T_range_K"] == [temperature, temperature]
-        assert values["partial_pressure_pa"] is None
         assert values["evidence_class"] == "figure_only"
         assert row["locator"] == {
             "page": 826,
@@ -2548,6 +2546,22 @@ def _assert_halwax_figure_only_pressure_transcription(doc: dict) -> None:
             "figure": "7",
             "note": row["locator"]["note"],
         }
+        if row["observation_id"] in {
+            "halwax_2024_cao_isothermal_ca_pressure_figure_only",
+            "halwax_2024_mgo_isothermal_o_pressure_figure_only",
+        }:
+            panel = "upper" if species == "Ca" else "lower"
+            assert row["locator"]["note"] == f"d-129; {panel} panel"
+            assert row["units"] == "p_i [Pa] versus Time [h]"
+            assert values["admission_status"] == "figure_only"
+            assert values["caption"] == "Fig. 7—Isothermal measurement of CaO and MgO."
+            assert values["note"].endswith("Not digitised.")
+            assert "points" not in values
+            assert "temperature_K" not in values
+            assert "partial_pressure_pa" not in values
+        else:
+            assert values["temperature_K"] == temperature
+            assert values["partial_pressure_pa"] is None
 
     geometry = next(
         row["values"]
