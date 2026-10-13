@@ -206,7 +206,9 @@ def _configure_magemin_origin_evidence(
         name='MAGEMinBackend',
         get_engine_version=lambda: 'fixture-runtime',
     )
-    sim._chem_registry = None
+    from simulator.chemistry.kernel import ProviderRegistry
+
+    sim._chem_registry = ProviderRegistry()
     monkeypatch.setattr(
         admission_module,
         'binding_identity_for_backend',
