@@ -1727,18 +1727,24 @@ def test_effusion_pressure_reservoir_requires_stated_phase_and_pressure() -> Non
         components=(("Fe", Decimal("1")),),
         amount_basis=AmountBasis.MOLE_FRACTION,
     )
-    cases = (
-        ("condensed_solid", Quantity.P_SAT, Phase.CR),
-        (None, Quantity.P_SAT, None),
-        ("condensed_solid", Quantity.EVAPORATION_RATE, None),
+    mixed_composition = Composition(
+        basis="mole_fraction",
+        components=(("Fe", Decimal("0.5")), ("Ni", Decimal("0.5"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
     )
-    for index, (form, quantity, expected_phase) in enumerate(cases):
+    cases = (
+        ("condensed_solid", composition, Quantity.P_SAT, Phase.CR),
+        (None, composition, Quantity.P_SAT, None),
+        ("condensed_solid", composition, Quantity.EVAPORATION_RATE, None),
+        ("condensed_solid", mixed_composition, Quantity.P_SAT, None),
+    )
+    for index, (form, initial_composition, quantity, expected_phase) in enumerate(cases):
         experiment = F.kems_experiment(experiment_id=f"effusion-{index}")
         experiment = replace(
             experiment,
             sample=Sample(
                 form=F.located(form) if form is not None else None,
-                initial_composition=F.located(composition),
+                initial_composition=F.located(initial_composition),
             ),
         )
         migrator = Migrator()
@@ -1764,6 +1770,124 @@ def test_effusion_pressure_reservoir_requires_stated_phase_and_pressure() -> Non
             assert identity.reservoir.is_value
             assert identity.reservoir.value.phase.is_value
             assert identity.reservoir.value.phase.value is expected_phase
+
+
+def test_ferguson_effusion_pressure_migrates_point_phase_reservoirs(
+    tmp_path: Path,
+) -> None:
+    from collections import Counter
+
+    phase_labels = ["Fe(s)"] * 18 + ["Fe(l)"] * 26 + ["Fe(s)/Fe(l)"]
+    points = []
+    expected_temperatures = []
+    for index, phase_as_published in enumerate(phase_labels):
+        temperature_C = (
+            Decimal("1300") + index
+            if index < 18
+            else Decimal("1550") + index - 18
+            if index < 44
+            else Decimal("1537.85")
+        )
+        expected_temperatures.append(temperature_C + Decimal("273.15"))
+        points.append(
+            {
+                "T_C": float(temperature_C),
+                "P_Pa": float(Decimal("0.1") + Decimal(index) / Decimal("100")),
+                "phase_as_published": phase_as_published,
+                "locator": {"table": "1", "row": index + 1, "page": 3},
+                "point_conditions": {
+                    "starting_composition": {
+                        "state": {
+                            "tag": "value",
+                            "value": {
+                                "kind": "categorical",
+                                "categorical": "99.97% purity iron",
+                            },
+                        },
+                        "locator": {"page": 2, "section": "Experimental Procedure"},
+                    }
+                },
+            }
+        )
+
+    extract = {
+        "schema_version": "literature_extract.v1",
+        "source_id": "fixture-source",
+        "source": {
+            "citation": "Ferguson et al. (2004), iron vapor pressure",
+            "doi": "10.1234/FIXTURE",
+        },
+        "species": {
+            "Fe": {
+                "observations": [
+                    {
+                        "observation_id": "ferguson_2004_table1_iron_vapor_pressure",
+                        "type": "psat_series",
+                        "regime": "knudsen_effusion",
+                        "units": "Pa",
+                        "locator": {"table": "1", "page": 3},
+                        "values": {
+                            "quantity": "vapor_pressure",
+                            "method_class": "measured_tabulated",
+                            "gas_species": "Fe(g)",
+                            "phase_assignment_note": (
+                                "phase_as_published is inferred from each row's "
+                                "temperature and the accepted iron melting point."
+                            ),
+                            "points": points,
+                        },
+                    }
+                ]
+            }
+        },
+    }
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    rows = [
+        observation
+        for observation in result.observations.values()
+        if "ferguson_2004_table1_iron_vapor_pressure"
+        in observation.observation_id
+    ]
+
+    assert len(rows) == 45
+    assert all(row.identity.species.phase.is_value for row in rows)
+    assert all(row.identity.species.phase.value is Phase.G for row in rows)
+    reservoirs = Counter(
+        row.identity.reservoir.value.phase.value
+        if row.identity.reservoir.is_value
+        else "unknown"
+        for row in rows
+    )
+    assert reservoirs == {Phase.CR: 18, Phase.L: 26, "unknown": 1}
+
+    known_rows = [row for row in rows if row.identity.reservoir.is_value]
+    assert len(known_rows) == 44
+    identity_unknown = [
+        (
+            row.observation_id,
+            identity_equal(row.identity, row.identity).fields,
+        )
+        for row in known_rows
+        if identity_equal(row.identity, row.identity).kind
+        is IdentityEqualKind.IDENTITY_UNKNOWN
+    ]
+    assert not identity_unknown, identity_unknown[0] if identity_unknown else None
+    ambiguous = next(row for row in rows if row.identity.reservoir.is_unknown)
+    assert "ambiguous" in (ambiguous.identity.reservoir.reason or "").casefold()
+    for index, row in enumerate(rows):
+        assert row.identity.temperature_K.is_value
+        assert row.identity.temperature_K.value == expected_temperatures[index]
+        starting_composition = (row.point_conditions or {}).get(
+            "starting_composition"
+        )
+        assert starting_composition is not None
+        assert starting_composition.state.is_value
+        assert starting_composition.state.value["categorical"] == (
+            "99.97% purity iron"
+        )
+        assert starting_composition.locator is not None
+        assert "inferred" in str(row.derivation).casefold()
 
 
 def test_h09_quantity_not_applicable_is_not_unknown() -> None:
