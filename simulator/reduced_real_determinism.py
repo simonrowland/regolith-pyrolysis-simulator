@@ -2330,6 +2330,8 @@ def _resolved_backend_for_cache_identity(
             is RealBackendFamily.MAGEMIN
         ):
             return provider
+        if provider is not None and intent is ChemistryIntent.GATE_LIQUID_FRACTION:
+            return None
     backend = getattr(sim, "backend", None)
     return getattr(backend, "_live_backend", None) or backend
 

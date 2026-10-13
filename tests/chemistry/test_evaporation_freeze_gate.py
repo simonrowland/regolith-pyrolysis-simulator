@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections import Counter
 from copy import deepcopy
+from dataclasses import replace
 import json
 import math
 import os
@@ -101,6 +102,22 @@ class _FakeMAGEMinGateFallbackProvider(ChemistryProvider):
         )
 
 
+class _OpaqueGateSupplier(_FakeMAGEMinGateFallbackProvider):
+    def __init__(self, liquidus: float) -> None:
+        super().__init__()
+        self.liquidus = liquidus
+
+    def dispatch(self, request) -> IntentResult:
+        result = super().dispatch(request)
+        return replace(
+            result,
+            diagnostic={
+                **result.diagnostic,
+                'liquidus_T_C': self.liquidus,
+            },
+        )
+
+
 class _UnavailableGateProvider(ChemistryProvider):
     name = 'alphamelts-gate-unavailable'
 
@@ -156,6 +173,28 @@ def _build_freeze_gate_sim(
         feedstocks_data,
         _set_freeze_gate(setpoints_data, enabled=enabled),
     )
+
+
+def _build_opaque_gate_supplier_sim(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    liquidus: float,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    sim.melt.temperature_C = 1600.0
+    sim.melt.p_total_mbar = 10.0
+    supplier = _OpaqueGateSupplier(liquidus)
+    sim._chem_registry.register(
+        supplier,
+        [ChemistryIntent.GATE_LIQUID_FRACTION],
+    )
+    return sim, supplier
 
 
 def _configure_tick_authority_retry_sim(
@@ -2901,6 +2940,72 @@ def test_shared_freeze_gate_curve_cache_uses_registered_authoritative_supplier(
     assert actual['curve'] == expected['curve']
     assert actual['curve']['liquidus_T_C'] == 1500.0
     assert backends[1].finder_calls
+
+
+def test_registered_opaque_gate_supplier_is_unproven(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim, supplier = _build_opaque_gate_supplier_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        1300.0,
+    )
+
+    record = sim._freeze_gate_curve_record()
+
+    assert supplier.requests
+    assert record['origin']['producer_evidence'] == 'unproven'
+
+
+def test_registered_opaque_gate_suppliers_cannot_share_foreign_curve(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    from simulator.engine_binding_admission import binding_admission_run_notice
+
+    first, _ = _build_opaque_gate_supplier_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        1300.0,
+    )
+    receiver, supplier = _build_opaque_gate_supplier_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        1500.0,
+    )
+    first_record = first._freeze_gate_curve_record()
+    expected = receiver._freeze_gate_curve_record()
+    assert first_record['curve']['liquidus_T_C'] == 1300.0
+    assert expected['curve']['liquidus_T_C'] == 1500.0
+    assert (
+        first_record['origin']['producer_configuration']
+        == expected['origin']['producer_configuration']
+    )
+
+    receiver._freeze_gate_liquid_fraction_cache = None
+    supplier.requests.clear()
+    key = _freeze_gate_key_for_current_state(receiver)
+    receiver._freeze_gate_shared_curve_cache = {key: first_record}
+
+    actual = receiver._freeze_gate_curve_record()
+    notice = binding_admission_run_notice(receiver)
+
+    assert actual['curve']['liquidus_T_C'] == 1500.0
+    assert actual['origin']['producer_evidence'] == 'unproven'
+    assert supplier.requests
+    assert notice is not None
+    assert notice['notices'][0]['identity'] == {
+        'engine_id': 'unproven-gate-producer',
+        'model_id': 'unknown',
+        'binding_revision': 'unproven-r1',
+        'transport': 'unknown',
+    }
 
 
 @pytest.mark.parametrize('memo_scope', ['local', 'shared'])
