@@ -228,6 +228,9 @@ def pytest_sessionfinish(
 
 
 def _assert_no_live_magemin_warm_pools() -> None:
+    import gc
+
+    gc.collect()
     from simulator.engine_pool import _LIVE_ENGINE_POOLS
 
     live_workers = [
