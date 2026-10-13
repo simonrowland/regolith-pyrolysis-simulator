@@ -309,7 +309,16 @@ def test_activity_coefficient_uses_the_same_contract():
         formula="SiO2",
     )
     results = _melt(experiment, bench, observation)
-    assert all(item.readiness.status is ReadinessStatus.READY for item in results)
+    internal_analytical = next(
+        item for item in results if item.readiness.engine == "internal-analytical"
+    )
+    assert internal_analytical.readiness.status is ReadinessStatus.NOT_APPLICABLE
+    assert internal_analytical.payload is None
+    assert all(
+        item.readiness.status is ReadinessStatus.READY
+        for item in results
+        if item.readiness.engine != "internal-analytical"
+    )
     assert results[0].payload["quantity"] == "activity_coefficient"
     assert results[0].payload["reference_state"] == "raoultian_pure_liquid_endmember"
     activity = _melt(*_case(
