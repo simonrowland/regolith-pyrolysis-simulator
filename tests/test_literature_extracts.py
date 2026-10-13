@@ -133,6 +133,172 @@ _SATO_1973_SAMPLE_FORMS = {
     for observation_id, (sample, material, _logs) in _SATO_1973_TABLE_PINS.items()
 }
 
+_OHTA_SUITO_1995_TABLE_II_ATTRIBUTIONS = {
+    **{
+        observation_id: "Table II, reference [4] (Rein and Chipman, 1965)"
+        for observation_id in (
+            "ohta_suito_1995_table2_ac_alumina_activity",
+            "ohta_suito_1995_table2_ca_alumina_activity",
+            "ohta_suito_1995_table2_acs2_alumina_activity",
+            "ohta_suito_1995_table2_acs4_alumina_activity",
+            "ohta_suito_1995_table2_acs5_alumina_activity",
+            "ohta_suito_1995_table2_cas5_alumina_activity",
+            "ohta_suito_1995_table2_cas9_alumina_activity",
+            "ohta_suito_1995_table2_cas10_alumina_activity",
+            "ohta_suito_1995_table2_cas11_alumina_activity",
+            "ohta_suito_1995_table2_acs2_silica_activity",
+            "ohta_suito_1995_table2_acs4_silica_activity",
+            "ohta_suito_1995_table2_acs5_silica_activity",
+            "ohta_suito_1995_table2_cas5_silica_activity",
+            "ohta_suito_1995_table2_cas8_silica_activity",
+            "ohta_suito_1995_table2_cas9_silica_activity",
+            "ohta_suito_1995_table2_cas10_silica_activity",
+            "ohta_suito_1995_table2_cas11_silica_activity",
+        )
+    },
+    "ohta_suito_1995_table2_cas8_alumina_activity": (
+        "Table II, reference [1] (Lee and Suito, 1994)"
+    ),
+    "ohta_suito_1995_table2_cs_silica_activity": (
+        "Table II, reference [7] (Inoue and Suito, 1992)"
+    ),
+}
+_OHTA_SUITO_1995_TABLE_III = """i | j | e_i^j (r_i^j)
+Al | Al | 0.045 (-0.001)
+Al | Si | 0.056
+Al | O | -6.6
+Si | Al | 0.058
+Si | Si | 0.11 (-0.0021)
+Si | O | -0.23
+Si | Mn | 0.002
+O | Al | -3.9 (1.7)
+O | Si | -0.131
+O | O | -0.20
+O | Mn | -0.021
+Mn | Si | 0
+Mn | O | -0.083
+Mn | Mn | 0"""
+
+
+def _assert_ohta_suito_1995_review_pins(extract: dict) -> None:
+    rows = {
+        row["observation_id"]: row
+        for species in ("Al2O3", "SiO2")
+        for row in extract["species"][species]["observations"]
+    }
+    assert set(rows) == set(_OHTA_SUITO_1995_TABLE_II_ATTRIBUTIONS)
+    for observation_id, attribution in _OHTA_SUITO_1995_TABLE_II_ATTRIBUTIONS.items():
+        row = rows[observation_id]
+        assert "regime" not in row
+        assert row["values"]["attribution"] == attribution
+
+    procedure = next(
+        row for row in extract["species"]["MnO"]["context"]
+        if row["observation_id"] == "ohta_suito_1995_experimental_conditions"
+    )
+    assert procedure["values"]["quench_method_as_printed"] == (
+        "the crucible was pulled out of the furnace and quenched rapidly in a He "
+        "gas stream, followed by water quenching"
+    )
+
+    table_iii_observation_id = "ohta_suito_1995_table3_interaction_parameters"
+    expected_table_iii_locator = {
+        "page": 298, "published_page": 298, "pdf_page_index": 3, "table": "III"
+    }
+    table_iii_locators = [
+        row["locator"]
+        for species in extract["species"].values()
+        for row in species.get("context", [])
+        if row.get("locator", {}).get("table") == "III"
+    ]
+    table_iii_locators.extend(
+        sample["locator"]
+        for sample in extract["fidelity_samples"]
+        if sample.get("observation_id") == table_iii_observation_id
+    )
+    assert table_iii_locators
+    assert all(locator == expected_table_iii_locator for locator in table_iii_locators)
+    table_iii = next(
+        row for row in extract["species"]["MnO"]["context"]
+        if row["observation_id"] == table_iii_observation_id
+    )
+    assert table_iii["values"]["table_transcription"] == _OHTA_SUITO_1995_TABLE_III
+
+    table_i = next(
+        row for row in extract["species"]["MnO"]["context"]
+        if row["observation_id"] == "ohta_suito_1995_table1_compositions_and_equilibrium_analyses"
+    )
+    assert table_i["units"] == (
+        "mass percent except soluble Al, insoluble Al, and O (mass ppm); "
+        "dash as printed means blank/not reported"
+    )
+
+
+def test_ohta_suito_1995_source_pins_reject_each_review_regression() -> None:
+    source = EXTRACTS / "ohta-suito-1995-mno-activity-slags.yaml"
+    extract = yaml.load(source.read_text(), Loader=_DuplicateRejectingLoader)
+    _assert_ohta_suito_1995_review_pins(extract)
+    migrator = battery_migrate.Migrator(
+        root=REPO_ROOT,
+        index={source.stem: dict(extract["source"], source_id=source.stem)},
+        aliases={},
+    )
+    migrator._migrate_extract(source)
+    migrator.finalize()
+    assert len(migrator.result.experiments) == 11
+    assert all(
+        experiment.method.tag.value == "unknown"
+        and experiment.method.reason == "source does not state method"
+        for experiment in migrator.result.experiments.values()
+    )
+
+    mutations = (
+        "quoted_method",
+        "cas8_alumina_reference",
+        "table_iii_indices",
+        "table_iii_temperature_fidelity_locator",
+        "table_i_units",
+    )
+    for mutation in mutations:
+        extract = yaml.load(source.read_text(), Loader=_DuplicateRejectingLoader)
+        context = extract["species"]["MnO"]["context"]
+        if mutation == "quoted_method":
+            extract["species"]["Al2O3"]["observations"][0]["regime"] = (
+                "quench_equilibration"
+            )
+        elif mutation == "cas8_alumina_reference":
+            extract["species"]["Al2O3"]["observations"][6]["values"][
+                "attribution"
+            ] = "Table II, reference [4] (Rein and Chipman, 1965)"
+        elif mutation == "table_iii_indices":
+            table = next(
+                row for row in context
+                if row["observation_id"] == "ohta_suito_1995_table3_interaction_parameters"
+            )
+            table["values"]["table_transcription"] = table[
+                "values"
+            ]["table_transcription"].replace("e_i^j (r_i^j)", "e_j^i")
+        elif mutation == "table_iii_temperature_fidelity_locator":
+            sample = next(
+                sample for sample in extract["fidelity_samples"]
+                if sample["observation_id"] == "ohta_suito_1995_table3_interaction_parameters"
+                and sample["field"] == "temperature_K"
+            )
+            sample["locator"] = {
+                "page": 297, "published_page": 297, "pdf_page_index": 2, "table": "III"
+            }
+        else:
+            table = next(
+                row for row in context
+                if row["observation_id"] == "ohta_suito_1995_table1_compositions_and_equilibrium_analyses"
+            )
+            table["units"] = (
+                "mass percent except metal oxygen (mass ppm); "
+                "dash as printed means blank/not reported"
+            )
+        with pytest.raises(AssertionError):
+            _assert_ohta_suito_1995_review_pins(extract)
+
 
 def _assert_sato_1973_table_pins(extract: dict) -> None:
     bench = extract["benches"][0]
@@ -1076,6 +1242,98 @@ def test_minimal_extract_valid():
         _minimal_extract(), expected_source_id="fixture-source"
     )
     assert errs == []
+
+
+def test_refuses_context_container_outside_species_block():
+    doc = _minimal_extract()
+    row = {
+        "observation_id": "apparatus_note",
+        "type": "apparatus",
+        "locator": {"page": 1},
+        "values": {"apparatus": "fixture"},
+        "units": "text",
+    }
+    doc["context"] = [row]
+
+    errors = vle.validate_extract_document(
+        doc,
+        path=Path("fixture-source.yaml"),
+        expected_source_id="fixture-source",
+    )
+
+    assert any(
+        "fixture-source.yaml:context" in error
+        and "species.<formula>.context" in error
+        and "not lifted by the migrator" in error
+        for error in errors
+    )
+
+
+def test_validator_help_works_without_pythonpath():
+    import os
+    import subprocess
+
+    env = os.environ.copy()
+    env.pop("PYTHONPATH", None)
+    result = subprocess.run(
+        [sys.executable, str(TOOLS / "validate_literature_extracts.py"), "--help"],
+        cwd=REPO_ROOT,
+        env=env,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
+    assert "usage:" in result.stdout.lower()
+
+
+def test_accepts_scalar_context_description_inside_row():
+    doc = _minimal_extract()
+    doc["species"]["Fe"]["observations"][0]["values"]["context"] = (
+        "validation comparison with another source"
+    )
+
+    errors = vle.validate_extract_document(
+        doc, expected_source_id="fixture-source"
+    )
+
+    assert not any("context container is not lifted" in error for error in errors)
+
+
+def test_species_context_validates_and_migrator_lifts_context_id(tmp_path: Path):
+    from simulator.battery.migrate import migrate
+
+    doc = _minimal_extract()
+    row = {
+        "observation_id": "apparatus_note",
+        "type": "apparatus",
+        "locator": {"page": 1},
+        "values": {"apparatus": "fixture"},
+        "units": "text",
+    }
+    doc["species"]["Fe"]["context"] = [row]
+    assert vle.validate_extract_document(
+        doc, expected_source_id="fixture-source"
+    ) == []
+
+    literature = tmp_path / "data" / "literature"
+    extracts = literature / "extracts"
+    extracts.mkdir(parents=True)
+    (literature / "compilations").mkdir()
+    (literature / "INDEX.yaml").write_text(
+        "schema_version: literature_index.v1\nsources: []\n", encoding="utf-8"
+    )
+    _write_extract(extracts, doc)
+    result = migrate(tmp_path, write=False)
+
+    lifted = [
+        context
+        for rows in result.context_by_work.values()
+        for context in rows
+    ]
+    assert [context["context_id"] for context in lifted] == [
+        "fixture-source::context::apparatus_note"
+    ]
 
 
 def test_refuses_bad_schema_version():
@@ -4009,3 +4267,37 @@ def test_printed_experiment_bench_links_carry_locator(tmp_path: Path):
     mo = experiment_named(allibert, "allibert-1981-mo-kems")
     assert all(item.experiment_id != mo.experiment_id for item in emf)
     assert allibert.experiments[emf[0].experiment_id].bench_id is None
+
+
+def test_offer10_extract_locators_use_physical_pdf_pages() -> None:
+    source_ids = (
+        "sesko-2022-tum-thesis",
+        "sutherland-2025-mare-simulant-volatile-loss",
+        "ewing-1963-sodium-potassium-properties",
+        "suzuki-2026-vacuum-oxygen-extraction",
+        "mamiya-2000-sio-disproportionation",
+    )
+
+    def walk(value):
+        if isinstance(value, dict):
+            if "page" in value or "pdf_page_index" in value:
+                assert value["page"] == value["pdf_page_index"] + 1
+            for child in value.values():
+                walk(child)
+        elif isinstance(value, list):
+            for child in value:
+                walk(child)
+
+    for source_id in source_ids:
+        document = yaml.safe_load((EXTRACTS / f"{source_id}.yaml").read_text())
+        walk(document)
+
+    ewing = yaml.safe_load(
+        (EXTRACTS / "ewing-1963-sodium-potassium-properties.yaml").read_text()
+    )
+    assert ewing["fidelity_samples"][0]["locator"] == {
+        "page": 12,
+        "published_page": 7,
+        "pdf_page_index": 11,
+        "figure": "6",
+    }

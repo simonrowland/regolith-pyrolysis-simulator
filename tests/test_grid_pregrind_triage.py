@@ -103,6 +103,7 @@ def test_classify_non_eval_uses_real_producer_payloads_and_preserves_unknown():
             FAITHFUL_RUMP: 1,
             CALCULATION_BUG: 1,
             MELTS_VS_FREEZE: 0,
+            "invalid-liquid-fraction": 0,
             ENGINE_REFUSAL: 1,
             PRE_ENGINE_INPUT: 1,
             UNCLASSIFIED: 1,
@@ -112,6 +113,7 @@ def test_classify_non_eval_uses_real_producer_payloads_and_preserves_unknown():
                 FAITHFUL_RUMP: 0,
                 CALCULATION_BUG: 0,
                 MELTS_VS_FREEZE: 0,
+                "invalid-liquid-fraction": 0,
                 ENGINE_REFUSAL: 1,
                 PRE_ENGINE_INPUT: 1,
                 UNCLASSIFIED: 1,
@@ -120,6 +122,7 @@ def test_classify_non_eval_uses_real_producer_payloads_and_preserves_unknown():
                 FAITHFUL_RUMP: 1,
                 CALCULATION_BUG: 1,
                 MELTS_VS_FREEZE: 0,
+                "invalid-liquid-fraction": 0,
                 ENGINE_REFUSAL: 0,
                 PRE_ENGINE_INPUT: 0,
                 UNCLASSIFIED: 0,
@@ -148,6 +151,43 @@ def test_melts_vs_freeze_requires_both_recorded_fraction_signals():
 
     assert classify_non_eval(recorded_disagreement) == MELTS_VS_FREEZE
     assert classify_non_eval(producer_shaped_row) == ENGINE_REFUSAL
+
+
+def test_liquid_regime_triage_keeps_strict_positive_and_exact_zero():
+    disagreement = {
+        "status": "out_of_domain",
+        "status_kind": "refusal",
+        "refusal_reason": "no_convergence",
+        "failure_reason_code": None,
+        "generic_liquid_fraction": 1e-15,
+        "finder_liquid_fraction": 0.0,
+        "raw_payload": json.dumps({"engine_invoked": True}),
+    }
+    faithful_zero = {
+        **disagreement,
+        "generic_liquid_fraction": 0.0,
+        "finder_liquid_fraction": None,
+    }
+
+    assert classify_non_eval(disagreement) == MELTS_VS_FREEZE
+    assert classify_non_eval(faithful_zero) == FAITHFUL_RUMP
+
+
+def test_invalid_persisted_liquid_fractions_get_their_own_triage_category():
+    base = {
+        "status": "out_of_domain",
+        "status_kind": "refusal",
+        "refusal_reason": "no_convergence",
+        "failure_reason_code": None,
+        "finder_liquid_fraction": None,
+        "raw_payload": json.dumps({"engine_invoked": True}),
+    }
+
+    for key in ("generic_liquid_fraction", "finder_liquid_fraction"):
+        for fraction in (-0.1, 1.2, float("nan")):
+            assert classify_non_eval({**base, key: fraction}) == (
+                "invalid-liquid-fraction"
+            )
 
 
 def test_report_ignores_success_and_uses_unassigned_feedstock_bucket():

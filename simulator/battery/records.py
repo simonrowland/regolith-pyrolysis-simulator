@@ -116,7 +116,7 @@ def as_fraction(value: object) -> Fraction:
 
 @dataclass(frozen=True)
 class Locator:
-    """Extract SCHEMA locator; nonempty page/table/figure/equation/record/etc."""
+    """Extract SCHEMA locator; page is one-based physical PDF page, pdf_page_index is zero-based, and published_page is the printed folio (which may be absent or non-numeric)."""
 
     page: str | int | None = None
     published_page: str | int | None = None

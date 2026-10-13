@@ -14,6 +14,7 @@ from engines.alphamelts.thermoengine import (
 from simulator.melt_backend.liquidus import (
     LiquidusSampleError,
     LiquidusSolidusResult,
+    MeltFractionSample,
     build_equilibrium_crystallization_path,
     find_liquidus_solidus_by_fraction,
 )
@@ -603,6 +604,9 @@ def test_liquidus_result_rejects_contradictory_success_fields():
             liquid_fraction=1.5,
             status='ok',
         )
+
+    with pytest.raises(ValueError, match=r'\[0, 1\]'):
+        MeltFractionSample(temperature_C=1000.0, frac_M=1.5)
 
     with pytest.raises(ValueError, match='absolute zero'):
         LiquidusSolidusResult(

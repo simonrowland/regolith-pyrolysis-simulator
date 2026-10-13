@@ -1,0 +1,291 @@
+schema_version: literature_extract.v1
+source_id: kassis-frischat-1981-silicate-glass-vapour
+source:
+  citation: "Kassis N. and Frischat G.H. (1981). Vapor Pressures of Simple Silicate Glass Melts. Journal of the American Ceramic Society 64:C28–C29."
+  doi: 10.1111/j.1151-2916.1981.tb09566.x
+  url: https://doi.org/10.1111/j.1151-2916.1981.tb09566.x
+  year: 1981
+extraction:
+  method: >-
+    Manual extraction from the two-page scan. Figure 2 was rendered at 600 dpi and
+    redigitized from its printed axis ticks. It reports the elemental partial
+    pressures pNa and pRb and the total pressures of the two glass systems;
+    the Kroeger and Soerstroem comparison curve is excluded. Figure readings are
+    approximate, retained to two significant figures, and marked figure_only.
+    Figure 1's specific vaporization-rate series is not extracted. The abstract's
+    rate envelope and Figure 2's printed thermochemical values are preserved as
+    context below. No equation fit, extrapolation, or uncertainty width is added.
+  date: '2026-10-13'
+  worker: codex
+review_status: draft
+fidelity_samples:
+  - path: species.Na.observations[kassis_1981_fig2_pna].values.points[0].partial_pressure_pa
+    value: 0.52
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Na.observations[kassis_1981_fig2_pna].values.points[3].partial_pressure_pa
+    value: 0.039
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Na2O.observations[kassis_1981_fig2_p_total_na_melt].values.points[0].pressure_Pa
+    value: 0.67
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Na2O.observations[kassis_1981_fig2_p_total_na_melt].values.points[3].pressure_Pa
+    value: 0.051
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Rb.observations[kassis_1981_fig2_prb].values.points[0].partial_pressure_pa
+    value: 2.5
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Rb.observations[kassis_1981_fig2_prb].values.points[3].partial_pressure_pa
+    value: 0.18
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Rb2O.observations[kassis_1981_fig2_p_total_rb_melt].values.points[0].pressure_Pa
+    value: 3.0
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Rb2O.observations[kassis_1981_fig2_p_total_rb_melt].values.points[3].pressure_Pa
+    value: 0.21
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - species: Na2O
+    observation_id: kassis_1981_total_pressure_thermochemistry
+    field: delta_H_kJ_per_mol
+    value: 316
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - species: Na2O
+    observation_id: kassis_1981_total_pressure_thermochemistry
+    field: delta_S_J_per_K
+    value: 102
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - species: Rb2O
+    observation_id: kassis_1981_total_pressure_thermochemistry_rb
+    field: delta_H_kJ_per_mol
+    value: 328
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - species: Rb2O
+    observation_id: kassis_1981_total_pressure_thermochemistry_rb
+    field: delta_S_J_per_K
+    value: 122
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+benches:
+  - id: platinum-knudsen-cell
+    identity:
+      basis: described_in_this_work
+    apparatus_family:
+      state: {tag: value, value: Knudsen-effusion cell on a balance}
+      locator: {page: 2, published_page: 'C-29', section: 'Experimental method'}
+    cell_material_and_liner:
+      state: {tag: value, value: Pt}
+      locator: {page: 2, published_page: 'C-29', section: 'Experimental method'}
+    cell_materials:
+      - state: {tag: value, value: Pt}
+        locator: {page: 2, published_page: 'C-29', section: 'Experimental method'}
+    detector:
+      state: {tag: value, value: Weight loss recorded continuously}
+      locator: {page: 2, published_page: 'C-29', section: 'Experimental method'}
+    geometry:
+      cell_internal_dimensions:
+        diameter_m:
+          state: {tag: value, value: {kind: point, point: '0.015'}}
+          locator: {page: 2, published_page: 'C-29', section: 'Experimental method', note: 'Printed 15 mm; unit conversion only'}
+        height_m:
+          state: {tag: value, value: {kind: point, point: '0.020'}}
+          locator: {page: 2, published_page: 'C-29', section: 'Experimental method', note: 'Printed 20 mm; unit conversion only'}
+      orifice_diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.0008'}}
+        locator: {page: 2, published_page: 'C-29', section: 'Experimental method', note: 'Printed 0.8 mm; unit conversion only'}
+    other_facts:
+      - name: cell_wall_thickness
+        unit: mm
+        value:
+          state: {tag: value, value: {kind: point, point: '0.2'}}
+          locator: {page: 2, published_page: 'C-29', section: 'Experimental method'}
+      - name: calibration_reference
+        unit: material_grade
+        value:
+          state: {tag: value, value: {kind: categorical, categorical: '99.998% Cu'}}
+          locator: {page: 2, published_page: 'C-29', section: 'Experimental method'}
+      - name: balance_model
+        unit: instrument
+        value:
+          state: {tag: value, value: {kind: categorical, categorical: 'Mettler Model TA-I'}}
+          locator: {page: 2, published_page: 'C-29', note: 'Footnote to balance in experimental-method paragraph'}
+experiments:
+  - experiment_id: sodium-silicate-melt
+    bench_id: platinum-knudsen-cell
+    method: knudsen_effusion
+    locator: {page: 2, published_page: 'C-29', section: 'Experimental method', note: 'Na2O·3SiO2 melt'}
+    sample:
+      mass_kg:
+        state: {tag: value, value: {kind: point, point: '0.002', approximate: true}}
+        locator: {page: 2, published_page: 'C-29', section: 'Experimental method', note: 'Printed approximately 2 g; unit conversion only'}
+      printed_composition:
+        state: {tag: value, value: Na2O.3SiO2}
+        locator: {page: 2, published_page: 'C-29', section: 'Experimental method'}
+      form:
+        state: {tag: value, value: glass melt}
+        locator: {page: 2, published_page: 'C-29', section: 'Experimental method'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.00066'}}
+        locator: {page: 2, published_page: 'C-29', section: 'Experimental method', note: 'Printed chamber vacuum 6.6×10^-4 Pa; not an in-cell vapour pressure'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {page: 2, published_page: 'C-29', section: 'Experimental method'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+      pumping:
+        base_pressure_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 2, published_page: 'C-29', section: 'Experimental method', note: 'Only the chamber vacuum is stated'}
+  - experiment_id: rubidium-silicate-melt
+    bench_id: platinum-knudsen-cell
+    method: knudsen_effusion
+    locator: {page: 2, published_page: 'C-29', section: 'Experimental method', note: 'Rb2O·3SiO2 melt'}
+    sample:
+      mass_kg:
+        state: {tag: value, value: {kind: point, point: '0.002', approximate: true}}
+        locator: {page: 2, published_page: 'C-29', section: 'Experimental method', note: 'Printed approximately 2 g; unit conversion only'}
+      printed_composition:
+        state: {tag: value, value: Rb2O.3SiO2}
+        locator: {page: 2, published_page: 'C-29', section: 'Experimental method'}
+      form:
+        state: {tag: value, value: glass melt}
+        locator: {page: 2, published_page: 'C-29', section: 'Experimental method'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.00066'}}
+        locator: {page: 2, published_page: 'C-29', section: 'Experimental method', note: 'Printed chamber vacuum 6.6×10^-4 Pa; not an in-cell vapour pressure'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {page: 2, published_page: 'C-29', section: 'Experimental method'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+      pumping:
+        base_pressure_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 2, published_page: 'C-29', section: 'Experimental method', note: 'Only the chamber vacuum is stated'}
+species:
+  Na:
+    observations:
+      - observation_id: kassis_1981_fig2_pna
+        experiment: sodium-silicate-melt
+        type: partial_pressure
+        regime: knudsen_effusion
+        locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+        phase: gas
+        units: Pa, figure-digitized
+        values:
+          quantity: partial_pressure
+          method_class: figure_only
+          evidence_class: figure_only
+          pressure_species: Na(g)
+          melt_composition_as_printed: Na2O.3SiO2
+          figure_read_method: Log-pressure axis read at printed 10^3/T and Celsius ticks
+          points:
+            - {T_C: 1300, partial_pressure_pa: 0.52, point_conditions: {temperature_C: {state: {tag: value, value: 1300}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
+            - {T_C: 1250, partial_pressure_pa: 0.22, point_conditions: {temperature_C: {state: {tag: value, value: 1250}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
+            - {T_C: 1200, partial_pressure_pa: 0.096, point_conditions: {temperature_C: {state: {tag: value, value: 1200}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
+            - {T_C: 1150, partial_pressure_pa: 0.039, point_conditions: {temperature_C: {state: {tag: value, value: 1150}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
+    context:
+      - observation_id: kassis_1981_abstract_specific_vaporization_rate
+        type: method
+        locator: {page: 1, published_page: 'C-28', pdf_page_index: 0, section: 'Abstract'}
+        units: g cm^-2 s^-1 as printed
+        values:
+          quantity: specific vaporization rate envelope
+          method_class: method_only
+          rate_range_g_cm2_s_as_printed: approximately 3×10^-6 to 3×10^-4
+          scope: Figure 1's per-temperature rate series is not extracted.
+  Na2O:
+    observations:
+      - observation_id: kassis_1981_fig2_p_total_na_melt
+        experiment: sodium-silicate-melt
+        type: psat_series
+        regime: knudsen_effusion
+        locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+        phase: gas
+        units: Pa, figure-digitized
+        values:
+          quantity: p_sat
+          gas_basis: TOTAL_PRESSURE_not_species
+          method_class: figure_only
+          evidence_class: figure_only
+          admission_status: admitted
+          pressure_label_as_printed: total vapor pressure of the Na2O.3SiO2 system
+          melt_composition_as_printed: Na2O.3SiO2
+          figure_read_method: Log-pressure axis read at printed 10^3/T and Celsius ticks
+          points:
+            - {T_C: 1300, pressure_Pa: 0.67, point_conditions: {temperature_C: {state: {tag: value, value: 1300}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
+            - {T_C: 1250, pressure_Pa: 0.28, point_conditions: {temperature_C: {state: {tag: value, value: 1250}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
+            - {T_C: 1200, pressure_Pa: 0.13, point_conditions: {temperature_C: {state: {tag: value, value: 1200}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
+            - {T_C: 1150, pressure_Pa: 0.051, point_conditions: {temperature_C: {state: {tag: value, value: 1150}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
+    context:
+      - observation_id: kassis_1981_total_pressure_thermochemistry
+        type: method
+        locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+        units: kJ mol^-1; J K^-1 as printed
+        values:
+          statement_as_printed: 'ΔH = 316 (Na2O.3SiO2) and 328 kJmol−1 (Rb2O.3SiO2) and ΔS = 102 (Na2O.3SiO2) and 122 JK−1 (Rb2O.3SiO2), respectively.'
+          reference_pressure_footnote_as_printed: 'p = 1.013×10^5 Pa.'
+          delta_H_kJ_per_mol: 316
+          delta_S_J_per_K: 102
+          reference_pressure_as_printed: 'p = 1.013×10^5 Pa'
+      - observation_id: kassis_1981_stoichiometric_vapor_assumption
+        type: method
+        locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, equation: '4'}
+        units: method statement as printed
+        values:
+          statement_as_printed: 'Assuming dissociation of Na2O to be predominant in the gas phase ...; if stoichiometric vapor composition is assumed. The same was assumed for the Rb2O.3SiO2 system.'
+          equation_basis: source-stated vapor-speciation assumption, not a measured molecular-oxide partial pressure
+  Rb:
+    observations:
+      - observation_id: kassis_1981_fig2_prb
+        experiment: rubidium-silicate-melt
+        type: partial_pressure
+        regime: knudsen_effusion
+        locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+        phase: gas
+        units: Pa, figure-digitized
+        values:
+          quantity: partial_pressure
+          method_class: figure_only
+          evidence_class: figure_only
+          pressure_species: Rb(g)
+          melt_composition_as_printed: Rb2O.3SiO2
+          figure_read_method: Log-pressure axis read at printed 10^3/T and Celsius ticks
+          points:
+            - {T_C: 1300, partial_pressure_pa: 2.5, point_conditions: {temperature_C: {state: {tag: value, value: 1300}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
+            - {T_C: 1250, partial_pressure_pa: 1.0, point_conditions: {temperature_C: {state: {tag: value, value: 1250}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
+            - {T_C: 1200, partial_pressure_pa: 0.45, point_conditions: {temperature_C: {state: {tag: value, value: 1200}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
+            - {T_C: 1150, partial_pressure_pa: 0.18, point_conditions: {temperature_C: {state: {tag: value, value: 1150}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
+  Rb2O:
+    observations:
+      - observation_id: kassis_1981_fig2_p_total_rb_melt
+        experiment: rubidium-silicate-melt
+        type: psat_series
+        regime: knudsen_effusion
+        locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+        phase: gas
+        units: Pa, figure-digitized
+        values:
+          quantity: p_sat
+          gas_basis: TOTAL_PRESSURE_not_species
+          method_class: figure_only
+          evidence_class: figure_only
+          admission_status: admitted
+          pressure_label_as_printed: total vapor pressure of the Rb2O.3SiO2 system
+          melt_composition_as_printed: Rb2O.3SiO2
+          figure_read_method: Log-pressure axis read at printed 10^3/T and Celsius ticks
+          points:
+            - {T_C: 1300, pressure_Pa: 3.0, point_conditions: {temperature_C: {state: {tag: value, value: 1300}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
+            - {T_C: 1250, pressure_Pa: 1.2, point_conditions: {temperature_C: {state: {tag: value, value: 1250}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
+            - {T_C: 1200, pressure_Pa: 0.53, point_conditions: {temperature_C: {state: {tag: value, value: 1200}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
+            - {T_C: 1150, pressure_Pa: 0.21, point_conditions: {temperature_C: {state: {tag: value, value: 1150}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
+    context:
+      - observation_id: kassis_1981_total_pressure_thermochemistry_rb
+        type: method
+        locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+        units: kJ mol^-1; J K^-1 as printed
+        values:
+          statement_as_printed: 'ΔH = 316 (Na2O.3SiO2) and 328 kJmol−1 (Rb2O.3SiO2) and ΔS = 102 (Na2O.3SiO2) and 122 JK−1 (Rb2O.3SiO2), respectively.'
+          reference_pressure_footnote_as_printed: 'p = 1.013×10^5 Pa.'
+          delta_H_kJ_per_mol: 328
+          delta_S_J_per_K: 122
+          reference_pressure_as_printed: 'p = 1.013×10^5 Pa'

@@ -1812,7 +1812,7 @@ def test_next_tick_p_bulk_uses_upstream_headspace_after_near_total_capture(
 
     seen = {}
 
-    def _capture_dispatch(_intent, *, control_inputs):
+    def _capture_dispatch(_intent, *, control_inputs, redox_state=None):
         seen.update(control_inputs)
         return types.SimpleNamespace(
             status="ok",

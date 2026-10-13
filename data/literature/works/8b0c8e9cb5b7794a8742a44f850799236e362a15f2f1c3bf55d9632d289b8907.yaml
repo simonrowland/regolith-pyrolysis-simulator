@@ -1,0 +1,236 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907
+  citation: Ewing C.T. et al. (1963) High temperature properties of sodium and potassium. DTIC AD0405673.
+  source_ids:
+  - ewing-1963-sodium-potassium-properties
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+    files:
+    - asset_id: pdf:ewing-1963-sodium-potassium-properties
+      role: pdf
+      path: raw/ewing-1963-sodium-potassium-properties/ewing-1963-sodium-potassium-properties.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:ewing-1963-sodium-potassium-properties
+      role: pdftotext
+      path: text/ewing-1963-sodium-potassium-properties
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:ewing-1963-sodium-potassium-properties
+      role: table_csv
+      path: tables/ewing-1963-sodium-potassium-properties
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: unknown:ewing-1963-sodium-potassium-properties
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: elemental
+          components:
+          - - Na
+            - '1'
+          amount_basis: mole_fraction
+      locator:
+        page: 11
+        published_page: 6
+        pdf_page_index: 10
+        section: Pressure-Volume-Temperature
+        note: The report states, "Distilled sodium was introduced into small, tared, closed-end tubes of the columbium alloy."
+    form:
+      state:
+        tag: value
+        value: liquid sodium
+      locator:
+        page: 12
+        published_page: 7
+        pdf_page_index: 11
+        figure: '6'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907
+  locator:
+    page: 7
+    published_page: 2
+    pdf_page_index: 6
+    section: Pressure-Volume-Temperature
+    note: The source states, "The position of the diaphragm is monitored with an electrical continuity circuit and controlled
+      by balancing the internal and external pressures" and "A measurement of the vapor pressure of the alkali metal is then
+      made externally with calibrated Bourdon-tube gages." Figure 6 combines five null-point experiments; its individual points
+      are not assigned to runs.
+context:
+- observation_id: ewing_1963_k_properties_not_yet_measured
+  type: method
+  locator:
+    page: 6
+    published_page: 1
+    pdf_page_index: 5
+    section: Summary of Experimental Program
+  units: as printed
+  values:
+    quantity: potassium_measurement_status
+    status: Potassium vapor-pressure and heat-capacity measurements were future work in this report. No potassium measurement
+      values are included.
+  context_id: ewing-1963-sodium-potassium-properties::context::ewing_1963_k_properties_not_yet_measured
+  work_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907
+  source_id: ewing-1963-sodium-potassium-properties
+  species: K
+- observation_id: ewing_1963_na_method_apparatus_context
+  type: method
+  locator:
+    page: 7
+    published_page: 2
+    pdf_page_index: 6
+    figure: '1'
+    section: Pressure-Volume-Temperature
+  units: as printed
+  values:
+    quantity: sodium_null_point_method_and_apparatus
+    method_class: method_only
+    method: Closed null-point chamber of known volume with a flexible 5 mil diaphragm, electrical-continuity probe, and external
+      calibrated Bourdon-tube pressure gauges. Sodium pressure was balanced against external pressure. The cell was heated
+      in a pressure furnace; two calibrated Pt-6%Rh/Pt-30%Rh thermocouples measured each end, with readings taken under isothermal
+      conditions.
+    sample_and_charge: Distilled sodium was introduced in small tared closed-end tubes made from Cb-1% Zr alloy; filling and
+      weighing occurred in a vacuum-inert gas box. Five null-point experiments used a nominal 57 cc chamber. The report gives
+      a 28.14 mg charge for Experiment 4 and 307.59 mg for Experiment 7; per-point run assignments are not given in Figure
+      6.
+    pressure_and_gas: Reported sodium vapour pressures span 1 to 25 atm. The chamber was checked for residual gas after each
+      experiment with an evacuated manometer; gas pressures as low as 0.01 psi could have been detected. No carrier gas is
+      reported during measurement.
+    duration: Pressure-temperature measurements covered at least one complete heating and cooling cycle per experiment; each
+      cycle required continuous equipment operation for 52 to 60 hours.
+    measurement_reproducibility: Equilibrium pressures were generally reproduced to better than ±0.1 psi before, during, and
+      after cycling; the paper does not state a confidence level.
+  context_id: ewing-1963-sodium-potassium-properties::context::ewing_1963_na_method_apparatus_context
+  work_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907
+  source_id: ewing-1963-sodium-potassium-properties
+  species: Na
+- observation_id: ewing_1963_na_table1_cp_context
+  type: characterization
+  locator:
+    page: 13
+    published_page: 8
+    pdf_page_index: 12
+    table: '1'
+  units: temperature °C; specific heat cal/gm °C as printed
+  values:
+    quantity: sodium_specific_heat_table_as_printed
+    d126_reason: No closed specific-heat observation type exists, and specific heat is outside the nine rails.
+    method_and_conditions: 'Saturated liquid sodium measured by NRL high-temperature calorimetry: an Inconel bucket was equilibrated
+      in a known-temperature furnace and dropped into a calorimeter; heat evolved on cooling to 30°C was measured, with filled
+      and empty bucket runs used to derive sample heat capacity. The report describes the probable error of the NRL measurement
+      as ±3%; no confidence level is stated.'
+    nrl_measured_points:
+    - T_C: '315.9'
+      specific_heat_cal_g_C: '0.314'
+    - T_C: '599.5'
+      specific_heat_cal_g_C: '0.301'
+    - T_C: '723.9'
+      specific_heat_cal_g_C: '0.291'
+    - T_C: '826.4'
+      specific_heat_cal_g_C: '0.297'
+    - T_C: '920.5'
+      specific_heat_cal_g_C: '0.313'
+    - T_C: '1008.9'
+      specific_heat_cal_g_C: '0.324'
+    - T_C: '1109.6'
+      specific_heat_cal_g_C: '0.325'
+    exclusion: NBS comparator column is not measurement data from this work.
+  context_id: ewing-1963-sodium-potassium-properties::context::ewing_1963_na_table1_cp_context
+  work_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907
+  source_id: ewing-1963-sodium-potassium-properties
+  species: Na
+- observation_id: ewing_1963_na_table3_cp_context
+  type: characterization
+  locator:
+    page: 15
+    published_page: 10
+    pdf_page_index: 14
+    table: '3'
+  units: temperature °C; specific heat cal/gm °C as printed
+  values:
+    quantity: sodium_specific_heat_table_as_printed
+    d126_reason: No closed specific-heat observation type exists, and specific heat is outside the nine rails.
+    method_and_conditions: Saturated liquid sodium measured in earlier NRL low-temperature iron-bucket calorimetry. The source
+      reports a mean deviation of ±0.5% against NBS values; this is a comparison statistic, not pointwise measurement uncertainty.
+      No confidence level is stated.
+    nrl_measured_points:
+    - T_C: '155.2'
+      specific_heat_cal_g_C: '0.325'
+    - T_C: '255.3'
+      specific_heat_cal_g_C: '0.315'
+    - T_C: '352'
+      specific_heat_cal_g_C: '0.312'
+    - T_C: '449.7'
+      specific_heat_cal_g_C: '0.304'
+    - T_C: '555.3'
+      specific_heat_cal_g_C: '0.297'
+    - T_C: '652.6'
+      specific_heat_cal_g_C: '0.3'
+    exclusion: NBS comparator column is not measurement data from this work.
+  context_id: ewing-1963-sodium-potassium-properties::context::ewing_1963_na_table3_cp_context
+  work_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907
+  source_id: ewing-1963-sodium-potassium-properties
+  species: Na
+- observation_id: ewing_1963_sodium_properties_context
+  type: characterization
+  locator:
+    page: 6
+    published_page: 1
+    pdf_page_index: 5
+    section: Summary of Experimental Program
+  units: as printed
+  values:
+    quantity: sodium_potassium_measurement_scope
+    sodium_density: High-temperature sodium density had been reported previously in references 1 and 2; additional density
+      work is described as in progress. No sodium density table or points are reported in this document.
+    potassium: Potassium vapor-pressure and heat-capacity measurements are described as future work. No measured potassium
+      vapour pressure, density, heat capacity, enthalpy, or vapour-composition series is reported here.
+    vapour_composition_and_thermodynamics: The preliminary sodium PVT discussion identifies dimer and trimer molecular species
+      but reports no measured mole fractions, equilibrium constants, or enthalpy values. The report says these thermodynamic
+      results will be obtained after additional experiments and treatment.
+    scope: This is the complete Ninth Progress Report for 1 October to 31 December 1962, not a fragment of that report; the
+      work is explicitly interim and continuing.
+  context_id: ewing-1963-sodium-potassium-properties::context::ewing_1963_sodium_properties_context
+  work_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907
+  source_id: ewing-1963-sodium-potassium-properties
+  species: Na

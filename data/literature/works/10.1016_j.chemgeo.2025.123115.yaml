@@ -1,0 +1,1139 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/j.chemgeo.2025.123115
+  citation: Sutherland J. et al. (2025) Volatile loss during heating of lunar mare simulants and related compositions. Chemical
+    Geology 698, 123115.
+  source_ids:
+  - sutherland-2025-mare-simulant-volatile-loss
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+    files:
+    - asset_id: pdf:sutherland-2025-mare-simulant-volatile-loss
+      role: pdf
+      path: raw/sutherland-2025-mare-simulant-volatile-loss/sutherland-2025-mare-simulant-volatile-loss.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:sutherland-2025-mare-simulant-volatile-loss
+      role: pdftotext
+      path: text/sutherland-2025-mare-simulant-volatile-loss
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:sutherland-2025-mare-simulant-volatile-loss
+      role: table_csv
+      path: tables/sutherland-2025-mare-simulant-volatile-loss
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: unknown:sutherland-2025-mare-simulant-volatile-loss
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1016/j.chemgeo.2025.123115
+experiments:
+- experiment_id: 10.1016/j.chemgeo.2025.123115::experiment::eac-1a-tga-dsc-ega
+  kind: literature
+  method:
+    tag: value
+    value: tga
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000025'
+          interval_high: '0.000125'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+        note: 25–125 mg per run; measured mass accuracy ±0.1 μg as printed.
+    printed_composition:
+      state:
+        tag: value
+        value: EAC-1A mare simulant obtained from basanite in the Siebengebirge Volcanic Field, Germany; bulk chemical data
+          referred to supplementary Table S1.
+      locator:
+        page: 2
+        published_page: 2
+        pdf_page_index: 1
+        section: 2.1.1
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        table: '1'
+        note: Applied furnace upper limit is 1300 °C; maximum sample temperature varies. K conversion only.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: N2
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.chemgeo.2025.123115
+  locator:
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    table: '1'
+    note: EAC-1A row; total mass loss for the 150–1300 °C applied range including 10-min hold. The 1300 °C upper limit is
+      applied furnace temperature; maximum sample temperature varies.
+  bench_id: 10.1016/j.chemgeo.2025.123115::bench::simultaneous-tga-dsc-ega-ms
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '12000'
+          approximate: true
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+- experiment_id: 10.1016/j.chemgeo.2025.123115::experiment::jsc-1a-tga-dsc-ega
+  kind: literature
+  method:
+    tag: value
+    value: tga
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000025'
+          interval_high: '0.000125'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+        note: 25–125 mg per run; measured mass accuracy ±0.1 μg as printed.
+    printed_composition:
+      state:
+        tag: value
+        value: JSC-1A mare simulant from ash deposit related to Merriam Crater in the San Francisco Volcano Field, Arizona;
+          the supplied sample lacked its finest grain fraction after prior mechanical testing; bulk chemical data referred
+          to supplementary Table S1.
+      locator:
+        page: 2
+        published_page: 2
+        pdf_page_index: 1
+        section: 2.1.1
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        table: '1'
+        note: Applied furnace upper limit is 1300 °C; maximum sample temperature varies. K conversion only.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: N2
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.chemgeo.2025.123115
+  locator:
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    table: '1'
+    note: JSC-1A row; total mass loss for the 150–1300 °C applied range including 10-min hold. The 1300 °C upper limit is
+      applied furnace temperature; maximum sample temperature varies.
+  bench_id: 10.1016/j.chemgeo.2025.123115::bench::simultaneous-tga-dsc-ega-ms
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '12000'
+          approximate: true
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+- experiment_id: 10.1016/j.chemgeo.2025.123115::experiment::lms-1-tga-dsc-ega
+  kind: literature
+  method:
+    tag: value
+    value: tga
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000025'
+          interval_high: '0.000125'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+        note: 25–125 mg per run; measured mass accuracy ±0.1 μg as printed.
+    printed_composition:
+      state:
+        tag: value
+        value: LMS-1 second manufacture batch; 32.0 wt% Butler Arts basalt of undisclosed provenance, 19.8 wt% GreenSpar anorthosite
+          from Kangerlussuaq, Greenland, 32.8 wt% pyroxene from Stillwater Mine, Montana, 11.1 wt% olivine from Sisters Mining
+          District, Washington, and 4.3 wt% unspecified commercial ilmenite from Long-Fox et al. (2023); bulk chemical data
+          referred to supplementary Table S1.
+      locator:
+        page: 2
+        published_page: 2
+        pdf_page_index: 1
+        section: 2.1.1
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        table: '1'
+        note: Applied furnace upper limit is 1300 °C; maximum sample temperature varies. K conversion only.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: N2
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.chemgeo.2025.123115
+  locator:
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    table: '1'
+    note: LMS-1 row; total mass loss for the 150–1300 °C applied range including 10-min hold. The 1300 °C upper limit is applied
+      furnace temperature; maximum sample temperature varies.
+  bench_id: 10.1016/j.chemgeo.2025.123115::bench::simultaneous-tga-dsc-ega-ms
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '12000'
+          approximate: true
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+- experiment_id: 10.1016/j.chemgeo.2025.123115::experiment::oprl2n-tga-dsc-ega
+  kind: literature
+  method:
+    tag: value
+    value: tga
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000025'
+          interval_high: '0.000125'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+        note: 25–125 mg per run; measured mass accuracy ±0.1 μg as printed.
+    printed_composition:
+      state:
+        tag: value
+        value: OPRL2N matched 90.0 wt% to the San Francisco Volcano Field and 10.0 wt% from the Shawmere Anorthosite Complex,
+          Ontario; bulk chemical data referred to supplementary Table S1.
+      locator:
+        page: 2
+        published_page: 2
+        pdf_page_index: 1
+        section: 2.1.1
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        table: '1'
+        note: Applied furnace upper limit is 1300 °C; maximum sample temperature varies. K conversion only.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: N2
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.chemgeo.2025.123115
+  locator:
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    table: '1'
+    note: OPRL2N row; total mass loss for the 150–1300 °C applied range including 10-min hold. The 1300 °C upper limit is
+      applied furnace temperature; maximum sample temperature varies.
+  bench_id: 10.1016/j.chemgeo.2025.123115::bench::simultaneous-tga-dsc-ega-ms
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '12000'
+          approximate: true
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+- experiment_id: 10.1016/j.chemgeo.2025.123115::experiment::oprl2nt-tga-dsc-ega
+  kind: literature
+  method:
+    tag: value
+    value: tga
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000025'
+          interval_high: '0.000125'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+        note: 25–125 mg per run; measured mass accuracy ±0.1 μg as printed.
+    printed_composition:
+      state:
+        tag: value
+        value: OPRL2NT is the high-titanium version of OPRL2N with 14.4 wt% ilmenite, reducing the mare component by a corresponding
+          fraction; bulk chemical data referred to supplementary Table S1.
+      locator:
+        page: 2
+        published_page: 2
+        pdf_page_index: 1
+        section: 2.1.1
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        table: '1'
+        note: Applied furnace upper limit is 1300 °C; maximum sample temperature varies. K conversion only.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: N2
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.chemgeo.2025.123115
+  locator:
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    table: '1'
+    note: OPRL2NT row; total mass loss for the 150–1300 °C applied range including 10-min hold. The 1300 °C upper limit is
+      applied furnace temperature; maximum sample temperature varies.
+  bench_id: 10.1016/j.chemgeo.2025.123115::bench::simultaneous-tga-dsc-ega-ms
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '12000'
+          approximate: true
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+- experiment_id: 10.1016/j.chemgeo.2025.123115::experiment::tubs-m-tga-dsc-ega
+  kind: literature
+  method:
+    tag: value
+    value: tga
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000025'
+          interval_high: '0.000125'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+        note: 25–125 mg per run; measured mass accuracy ±0.1 μg as printed.
+    printed_composition:
+      state:
+        tag: value
+        value: TUBS-M mare simulant sourced from a basalt complex west of Göttingen, Germany; bulk chemical data referred
+          to supplementary Table S1.
+      locator:
+        page: 2
+        published_page: 2
+        pdf_page_index: 1
+        section: 2.1.1
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        table: '1'
+        note: Applied furnace upper limit is 1300 °C; maximum sample temperature varies. K conversion only.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: N2
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.chemgeo.2025.123115
+  locator:
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    table: '1'
+    note: TUBS-M row; total mass loss for the 150–1300 °C applied range including 10-min hold. The 1300 °C upper limit is
+      applied furnace temperature; maximum sample temperature varies.
+  bench_id: 10.1016/j.chemgeo.2025.123115::bench::simultaneous-tga-dsc-ega-ms
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '12000'
+          approximate: true
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+benches:
+- id: 10.1016/j.chemgeo.2025.123115::bench::simultaneous-tga-dsc-ega-ms
+  work_id: 10.1016/j.chemgeo.2025.123115
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Mettler Toledo TGA/DSC 3+ with high-temperature furnace, linked to ThermoStar Pfeiffer Vacuum GSD 320 EGA-MS
+    locator:
+      page: 3
+      published_page: 3
+      pdf_page_index: 2
+      section: 2.2.1
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: alumina crucible
+    locator:
+      page: 3
+      published_page: 3
+      pdf_page_index: 2
+      section: 2.2.1
+  detector:
+    state:
+      tag: value
+      value: ThermoStar Pfeiffer Vacuum GSD 320 EGA-MS
+    locator:
+      page: 3
+      published_page: 3
+      pdf_page_index: 2
+      section: 2.2.1
+  heating_method:
+    state:
+      tag: value
+      value: 'Pretreatment: room temperature (ca. 30 °C) to 150 °C at 2 °C/min to purge the furnace, remove adsorbed water,
+        and stabilise the baseline gas concentration; mass losses are normalised to the dried sample mass at 150 °C. Then
+        150–1300 °C ramp at 15 °C/min, 10-min isothermal hold at 1300 °C, then cooling at 30 °C/min.'
+    locator:
+      page: 3
+      published_page: 3
+      pdf_page_index: 2
+      section: 2.2.1
+  other_facts:
+  - name: evolved_gas_transfer_line
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: heated at 150 °C to prevent gas condensation
+          approximate: false
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+    unit: as published
+  - name: gas_analysis_vacuum
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000000001'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        section: 2.2.1
+        note: Printed 10⁻⁹ bar; this is the integrated pump retrieving gases from the STA furnace, not the sample furnace
+          pressure.
+    unit: bar
+context:
+- observation_id: sutherland_2025_eac_1a_interval_mass_loss
+  experiment: eac-1a-tga-dsc-ega
+  type: laboratory_conditions
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 5
+    table: '1'
+    note: Measured interval mass losses, normalized to dried mass at 150 °C. TAS is the apparent solidus TM1; bounds and hold
+      are stated per interval below.
+  units: wt_percent
+  values:
+    quantity: interval_mass_loss_contributions_as_published
+    method_class: measured_direct
+    d-126_reason: no typed interval mass-loss basis; t-1221
+    interval_losses:
+    - lower_temperature_C: 150
+      upper_temperature_C: 500
+      mass_loss_wt_pct: '0.681'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 5
+        table: '1'
+        note: 150–500 °C; normalized to dry mass at 150 °C.
+    - lower_temperature_C: 500
+      upper_temperature_C: 1000
+      mass_loss_wt_pct: '1.042'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 5
+        table: '1'
+        note: 500–1000 °C; normalized to dry mass at 150 °C.
+    - lower_temperature_C: 1000
+      upper_temperature_C: 1300
+      hold_min: 10
+      mass_loss_wt_pct: '0.0611'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 5
+        table: '1'
+        note: 1000–1300 °C with 10 min hold; normalized to dry mass at 150 °C.
+    - lower_temperature_C: 150
+      upper_temperature_C: 1072
+      mass_loss_wt_pct: '1.743'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 5
+        table: '1'
+        note: 150 °C–TAS; TAS = 1072 °C (apparent solidus, TM1); normalized to dry mass at 150 °C.
+    - lower_temperature_C: 1072
+      upper_temperature_C: 1300
+      hold_min: 10
+      mass_loss_wt_pct: '0.042'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 5
+        table: '1'
+        note: TAS–1300 °C with 10 min hold; TAS = 1072 °C (apparent solidus, TM1); normalized to dry mass at 150 °C.
+  context_id: sutherland-2025-mare-simulant-volatile-loss::context::sutherland_2025_eac_1a_interval_mass_loss
+  work_id: 10.1016/j.chemgeo.2025.123115
+  source_id: sutherland-2025-mare-simulant-volatile-loss
+  species: EAC-1A
+- observation_id: sutherland_2025_jsc_1a_integrated_gas_releases
+  experiment: jsc-1a-tga-dsc-ega
+  type: laboratory_conditions
+  locator:
+    page: 14
+    pdf_page_index: 13
+    published_page: 14
+    table: '2'
+    note: Integrated concentrations for JSC-1A; units and parenthetical element contributions as printed.
+  units: integrated_ppm_as_published
+  values:
+    quantity: integrated_gas_release_concentrations
+    method_class: measured_direct
+    temperature_ranges_as_printed:
+    - 150–1300 °C
+    - 1000–1300 °C
+    - TAS–1300 °C
+    H2O_ppm:
+    - 1564
+    - 47
+    - 2
+    H2O_wt_percent_as_printed:
+    - '0.16'
+    - null
+    - null
+    CO2_ppm_with_C_contribution_in_parentheses:
+    - 244 (67)
+    - 59 (16)
+    - 67 (18)
+    SO2_ppm_with_S_contribution_in_parentheses:
+    - 5 (3)
+    - 29 (15)
+    - 36 (18)
+    table_note: Integrated ppm is calculated from relative gas fractions normalized against measured mass loss; starred narrow
+      intervals neglect O2 and assume similar gas behaviour across the full range.
+  context_id: sutherland-2025-mare-simulant-volatile-loss::context::sutherland_2025_jsc_1a_integrated_gas_releases
+  work_id: 10.1016/j.chemgeo.2025.123115
+  source_id: sutherland-2025-mare-simulant-volatile-loss
+  species: JSC-1A
+- observation_id: sutherland_2025_jsc_1a_interval_mass_loss
+  experiment: jsc-1a-tga-dsc-ega
+  type: laboratory_conditions
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 5
+    table: '1'
+    note: Measured interval mass losses, normalized to dried mass at 150 °C. TAS is the apparent solidus TM1; bounds and hold
+      are stated per interval below.
+  units: wt_percent
+  values:
+    quantity: interval_mass_loss_contributions_as_published
+    method_class: measured_direct
+    d-126_reason: no typed interval mass-loss basis; t-1221
+    interval_losses:
+    - lower_temperature_C: 150
+      upper_temperature_C: 500
+      mass_loss_wt_pct: '0.072'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 5
+        table: '1'
+        note: 150–500 °C; normalized to dry mass at 150 °C.
+    - lower_temperature_C: 500
+      upper_temperature_C: 1000
+      mass_loss_wt_pct: '0.074'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 5
+        table: '1'
+        note: 500–1000 °C; normalized to dry mass at 150 °C.
+    - lower_temperature_C: 1000
+      upper_temperature_C: 1300
+      hold_min: 10
+      mass_loss_wt_pct: '0.015'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 5
+        table: '1'
+        note: 1000–1300 °C with 10 min hold; normalized to dry mass at 150 °C.
+    - lower_temperature_C: 150
+      upper_temperature_C: 1051
+      mass_loss_wt_pct: '0.15'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 5
+        table: '1'
+        note: 150 °C–TAS; TAS = 1051 °C (apparent solidus, TM1); normalized to dry mass at 150 °C.
+    - lower_temperature_C: 1051
+      upper_temperature_C: 1300
+      hold_min: 10
+      mass_loss_wt_pct: '0.011'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 5
+        table: '1'
+        note: TAS–1300 °C with 10 min hold; TAS = 1051 °C (apparent solidus, TM1); normalized to dry mass at 150 °C.
+  context_id: sutherland-2025-mare-simulant-volatile-loss::context::sutherland_2025_jsc_1a_interval_mass_loss
+  work_id: 10.1016/j.chemgeo.2025.123115
+  source_id: sutherland-2025-mare-simulant-volatile-loss
+  species: JSC-1A
+- observation_id: sutherland_2025_lms_1_interval_mass_loss
+  experiment: lms-1-tga-dsc-ega
+  type: laboratory_conditions
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 5
+    table: '1'
+    note: Measured interval mass losses, normalized to dried mass at 150 °C. TAS is the apparent solidus TM1; bounds and hold
+      are stated per interval below.
+  units: wt_percent
+  values:
+    quantity: interval_mass_loss_contributions_as_published
+    method_class: measured_direct
+    d-126_reason: no typed interval mass-loss basis; t-1221
+    interval_losses:
+    - lower_temperature_C: 150
+      upper_temperature_C: 500
+      mass_loss_wt_pct: '0.315'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 5
+        table: '1'
+        note: 150–500 °C; normalized to dry mass at 150 °C.
+    - lower_temperature_C: 500
+      upper_temperature_C: 1000
+      mass_loss_wt_pct: '0.751'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 5
+        table: '1'
+        note: 500–1000 °C; normalized to dry mass at 150 °C.
+    - lower_temperature_C: 1000
+      upper_temperature_C: 1300
+      hold_min: 10
+      mass_loss_wt_pct: '0.036'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 5
+        table: '1'
+        note: 1000–1300 °C with 10 min hold; normalized to dry mass at 150 °C.
+    - lower_temperature_C: 150
+      upper_temperature_C: 1035
+      mass_loss_wt_pct: '1.074'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 5
+        table: '1'
+        note: 150 °C–TAS; TAS = 1035 °C (apparent solidus, TM1); normalized to dry mass at 150 °C.
+    - lower_temperature_C: 1035
+      upper_temperature_C: 1300
+      hold_min: 10
+      mass_loss_wt_pct: '0.028'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 5
+        table: '1'
+        note: TAS–1300 °C with 10 min hold; TAS = 1035 °C (apparent solidus, TM1); normalized to dry mass at 150 °C.
+  context_id: sutherland-2025-mare-simulant-volatile-loss::context::sutherland_2025_lms_1_interval_mass_loss
+  work_id: 10.1016/j.chemgeo.2025.123115
+  source_id: sutherland-2025-mare-simulant-volatile-loss
+  species: LMS-1
+- observation_id: sutherland_2025_oprl2n_interval_mass_loss
+  experiment: oprl2n-tga-dsc-ega
+  type: laboratory_conditions
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 5
+    table: '1'
+    note: Measured interval mass losses, normalized to dried mass at 150 °C. TAS is the apparent solidus TM1; bounds and hold
+      are stated per interval below.
+  units: wt_percent
+  values:
+    quantity: interval_mass_loss_contributions_as_published
+    method_class: measured_direct
+    d-126_reason: no typed interval mass-loss basis; t-1221
+    interval_losses:
+    - lower_temperature_C: 150
+      upper_temperature_C: 500
+      mass_loss_wt_pct: '0.103'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 5
+        table: '1'
+        note: 150–500 °C; normalized to dry mass at 150 °C.
+    - lower_temperature_C: 500
+      upper_temperature_C: 1000
+      mass_loss_wt_pct: '0.212'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 5
+        table: '1'
+        note: 500–1000 °C; normalized to dry mass at 150 °C.
+    - lower_temperature_C: 1000
+      upper_temperature_C: 1300
+      hold_min: 10
+      mass_loss_wt_pct: '0.017'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 5
+        table: '1'
+        note: 1000–1300 °C with 10 min hold; normalized to dry mass at 150 °C.
+    - lower_temperature_C: 150
+      upper_temperature_C: 1049
+      mass_loss_wt_pct: '0.32'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 5
+        table: '1'
+        note: 150 °C–TAS; TAS = 1049 °C (apparent solidus, TM1); normalized to dry mass at 150 °C.
+    - lower_temperature_C: 1049
+      upper_temperature_C: 1300
+      hold_min: 10
+      mass_loss_wt_pct: '0.011'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 5
+        table: '1'
+        note: TAS–1300 °C with 10 min hold; TAS = 1049 °C (apparent solidus, TM1); normalized to dry mass at 150 °C.
+  context_id: sutherland-2025-mare-simulant-volatile-loss::context::sutherland_2025_oprl2n_interval_mass_loss
+  work_id: 10.1016/j.chemgeo.2025.123115
+  source_id: sutherland-2025-mare-simulant-volatile-loss
+  species: OPRL2N
+- observation_id: sutherland_2025_oprl2nt_interval_mass_loss
+  experiment: oprl2nt-tga-dsc-ega
+  type: laboratory_conditions
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 5
+    table: '1'
+    note: Measured interval mass losses, normalized to dried mass at 150 °C. TAS is the apparent solidus TM1; bounds and hold
+      are stated per interval below.
+  units: wt_percent
+  values:
+    quantity: interval_mass_loss_contributions_as_published
+    method_class: measured_direct
+    d-126_reason: no typed interval mass-loss basis; t-1221
+    interval_losses:
+    - lower_temperature_C: 150
+      upper_temperature_C: 500
+      mass_loss_wt_pct: '0.373'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 5
+        table: '1'
+        note: 150–500 °C; normalized to dry mass at 150 °C.
+    - lower_temperature_C: 500
+      upper_temperature_C: 1000
+      mass_loss_wt_pct: '0.271'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 5
+        table: '1'
+        note: 500–1000 °C; normalized to dry mass at 150 °C.
+    - lower_temperature_C: 1000
+      upper_temperature_C: 1300
+      hold_min: 10
+      mass_loss_wt_pct: '0.026'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 5
+        table: '1'
+        note: 1000–1300 °C with 10 min hold; normalized to dry mass at 150 °C.
+    - lower_temperature_C: 150
+      upper_temperature_C: 1066
+      mass_loss_wt_pct: '0.652'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 5
+        table: '1'
+        note: 150 °C–TAS; TAS = 1066 °C (apparent solidus, TM1); normalized to dry mass at 150 °C.
+    - lower_temperature_C: 1066
+      upper_temperature_C: 1300
+      hold_min: 10
+      mass_loss_wt_pct: '0.018'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 5
+        table: '1'
+        note: TAS–1300 °C with 10 min hold; TAS = 1066 °C (apparent solidus, TM1); normalized to dry mass at 150 °C.
+  context_id: sutherland-2025-mare-simulant-volatile-loss::context::sutherland_2025_oprl2nt_interval_mass_loss
+  work_id: 10.1016/j.chemgeo.2025.123115
+  source_id: sutherland-2025-mare-simulant-volatile-loss
+  species: OPRL2NT
+- observation_id: sutherland_2025_supplementary_and_residue_data_pointer
+  experiment: jsc-1a-tga-dsc-ega
+  type: characterization
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 2
+    section: 2.1.1
+    note: Table S1 is cited for bulk chemistry but is not included in the supplied PDF.
+  units: as published
+  values:
+    quantity: composition_and_residue_data_availability
+    method_class: method_only
+    supplementary_table_S1: Bulk chemical data for samples; cited in sample-origins section, not present in supplied PDF.
+    supplementary_table_S2: Apollo vacuum-pyrolysis studies; cited in discussion, not present in supplied PDF.
+    residue_chemical_composition: not printed for the mare-simulant heating runs in this PDF.
+    element_losses: Na, K, and Fe losses are not printed; Table 2 reports integrated H2O, CO2, and SO2 for JSC-1A.
+    residue_characterization: NPD identifies structural changes and crystalline phases for JSC-1A and TUBS-M; it does not
+      report chemical residue compositions.
+  context_id: sutherland-2025-mare-simulant-volatile-loss::context::sutherland_2025_supplementary_and_residue_data_pointer
+  work_id: 10.1016/j.chemgeo.2025.123115
+  source_id: sutherland-2025-mare-simulant-volatile-loss
+  species: JSC-1A
+- observation_id: sutherland_2025_tubs_m_interval_mass_loss
+  experiment: tubs-m-tga-dsc-ega
+  type: laboratory_conditions
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 5
+    table: '1'
+    note: Measured interval mass losses, normalized to dried mass at 150 °C. TAS is the apparent solidus TM1; bounds and hold
+      are stated per interval below.
+  units: wt_percent
+  values:
+    quantity: interval_mass_loss_contributions_as_published
+    method_class: measured_direct
+    d-126_reason: no typed interval mass-loss basis; t-1221
+    interval_losses:
+    - lower_temperature_C: 150
+      upper_temperature_C: 500
+      mass_loss_wt_pct: '0.797'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 5
+        table: '1'
+        note: 150–500 °C; normalized to dry mass at 150 °C.
+    - lower_temperature_C: 500
+      upper_temperature_C: 1000
+      mass_loss_wt_pct: '0.169'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 5
+        table: '1'
+        note: 500–1000 °C; normalized to dry mass at 150 °C.
+    - lower_temperature_C: 1000
+      upper_temperature_C: 1300
+      hold_min: 10
+      mass_loss_wt_pct: '0.012'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 5
+        table: '1'
+        note: 1000–1300 °C with 10 min hold; normalized to dry mass at 150 °C.
+    - lower_temperature_C: 150
+      upper_temperature_C: 1161
+      mass_loss_wt_pct: '0.978'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 5
+        table: '1'
+        note: 150 °C–TAS; TAS = 1161 °C (apparent solidus, TM1); normalized to dry mass at 150 °C.
+    - lower_temperature_C: 1161
+      upper_temperature_C: 1300
+      hold_min: 10
+      mass_loss_wt_pct: '0.001'
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 5
+        table: '1'
+        note: TAS–1300 °C with 10 min hold; TAS = 1161 °C (apparent solidus, TM1); normalized to dry mass at 150 °C.
+  context_id: sutherland-2025-mare-simulant-volatile-loss::context::sutherland_2025_tubs_m_interval_mass_loss
+  work_id: 10.1016/j.chemgeo.2025.123115
+  source_id: sutherland-2025-mare-simulant-volatile-loss
+  species: TUBS-M

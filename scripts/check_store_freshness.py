@@ -63,6 +63,16 @@ CODE_INPUTS = (
 # can exist to follow them, and they would read as STALE forever. Each entry
 # needs that receipt (regen run, no store diff). Short shas, 9 characters,
 # matching the keys stale_input_commits() emits.
+#   09c498b65: b-851 renames the private scorer helper _fusion_comparison_reference
+#     in simulator/battery/score.py to the public fusion_comparison_reference so the
+#     melt-activity benchmark shares the one owner. Name and docstring only: no
+#     expression, branch or literal changes. Migration imports only the unchanged
+#     parse_species_formula from score.py (simulator/battery/migrate.py), and the
+#     series changes nothing under scripts/battery_migrate.py, migrate.py,
+#     validate.py or data/. Store receipt to be confirmed by the landing gate's full
+#     regen on the merge with green (expected: 0 files changed under data/). This acknowledges
+#     STORE outputs only; the benchmark shift is covered by the series' tests and
+#     owner decision d-135.
 #   1b78b5697, 574800443, 149df2858: bench payload and ledger/sticking changes
 #     not consumed by battery_migrate or build_index (R17).
 #   9bb0a22ce, 1d254d51e, b8be6d576: kems-041 misprint notes and compilation
@@ -116,6 +126,7 @@ CODE_INPUTS = (
 #     candidate merged onto green a8daa610f (7b61b78de, studio-2, engines live)
 #     changed 0 tracked or untracked paths.
 STORE_NEUTRAL_INPUT_COMMITS = frozenset({
+    "09c498b65",
     "1b78b5697", "574800443", "149df2858",
     "9bb0a22ce", "1d254d51e", "b8be6d576",
     "d47e84bec", "6c3b40660",

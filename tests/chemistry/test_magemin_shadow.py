@@ -22,6 +22,16 @@ tests that exercise the binary.
 
 from __future__ import annotations
 
+import gc
+import multiprocessing
+import os
+import signal
+import subprocess
+import sys
+import threading
+import textwrap
+from pathlib import Path
+
 import pytest
 
 from engines.magemin import (
@@ -44,6 +54,7 @@ from simulator.chemistry.kernel import (
     ProviderRegistry,
 )
 from simulator.chemistry.kernel.planner import Planner
+from simulator.engine_pool import EngineWorkerPool, WarmEngineWorker
 
 
 # ---------------------------------------------------------------------------
@@ -159,6 +170,254 @@ class _FakeMAGEMinBackend:
         return self._equilibrium
 
 
+def _provider_lifecycle_worker_bootstrap():
+    return None, 'ready'
+
+
+def _provider_lifecycle_worker_handler(_resource, request, _errlog):
+    return request
+
+
+def _provider_lifecycle_worker(_index):
+    return WarmEngineWorker(
+        name='magemin-provider-lifecycle-test',
+        bootstrap=_provider_lifecycle_worker_bootstrap,
+        handler=_provider_lifecycle_worker_handler,
+        startup_timeout_s=3.0,
+        call_timeout_s=1.0,
+    )
+
+
+def _provider_callback_worker_handler(_resource, request, _errlog):
+    # Keep the request in flight long enough for the parent to attach a
+    # Future callback before the pool's consumer thread completes it.
+    import time
+
+    time.sleep(0.2)
+    return request
+
+
+def _provider_callback_worker(_index):
+    return WarmEngineWorker(
+        name='magemin-provider-callback-test',
+        bootstrap=_provider_lifecycle_worker_bootstrap,
+        handler=_provider_callback_worker_handler,
+        startup_timeout_s=3.0,
+        call_timeout_s=1.0,
+    )
+
+
+class _PooledFakeMAGEMinBackend(_FakeMAGEMinBackend):
+    """Fake result backend with the real warm-pool child lifecycle."""
+
+    def __init__(self):
+        super().__init__(equilibrium=_FakeEquilibriumResult())
+        self.pool = None
+        self.pool_child_pid = None
+        self.close_calls = 0
+
+    def initialize(self, config: dict) -> bool:
+        available = super().initialize(config)
+        self.pool = EngineWorkerPool(_provider_lifecycle_worker, size=1)
+        self.pool_child_pid = self.pool.workers[0].process.pid
+        return available
+
+    def close(self):
+        if self.pool is not None:
+            self.close_calls += 1
+            self.pool.close(cancel_pending=True)
+            self.pool = None
+
+
+def _run_provider_finalizer_probe(scenario: str, *, consumer_callback=False):
+    """Run GC/lock reentry probes in a process group with a hard timeout."""
+    repo_root = Path(__file__).resolve().parents[2]
+    chemistry_tests = Path(__file__).resolve().parent
+    consumer_setup = (
+        'test_module._provider_lifecycle_worker = '
+        'test_module._provider_callback_worker\n'
+        if consumer_callback else ''
+    )
+    setup = textwrap.dedent(
+        f'''
+        import atexit
+        import gc
+        import multiprocessing
+        import os
+        import sys
+        import threading
+
+        gc.disable()
+        sys.path.insert(0, {str(chemistry_tests)!r})
+        import test_magemin_shadow as test_module
+        from simulator import engine_pool
+        from simulator.engine_pool import EngineWorkerPool
+        from simulator.melt_backend import magemin as magemin_module
+        '''
+    )
+    setup += consumer_setup
+    setup += textwrap.dedent(
+        '''
+        backend = test_module._PooledFakeMAGEMinBackend()
+        magemin_module.MAGEMinBackend = lambda: backend
+        provider = test_module.MAGEMinShadowProvider()
+        assert provider._ensure_backend() is backend
+        pool = backend.pool
+        child_pid = backend.pool_child_pid
+        provider._cycle = provider
+
+        def child_is_alive(pid):
+            return any(
+                child.pid == pid and child.is_alive()
+                for child in multiprocessing.active_children()
+            )
+
+        def cleanup_workers():
+            for worker in pool.workers:
+                worker.close()
+
+        atexit.register(cleanup_workers)
+
+        def run_child_reaper_marker():
+            marker_ran = threading.Event()
+
+            class MarkerBackend:
+                def initialize(self, _config):
+                    return True
+
+                def close(self):
+                    marker_ran.set()
+
+            marker_backend = MarkerBackend()
+            magemin_module.MAGEMinBackend = lambda: marker_backend
+            trigger = test_module.MAGEMinShadowProvider()
+            assert trigger._ensure_backend() is marker_backend
+            del trigger
+            gc.collect()
+            if not marker_ran.wait(3.0):
+                os._exit(19)
+            os.write(1, b'child reaper marker ran\\n')
+        '''
+    )
+    script = setup + '\n' + textwrap.dedent(scenario)
+    process = subprocess.Popen(
+        [sys.executable, '-c', script],
+        cwd=repo_root,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        start_new_session=True,
+    )
+    try:
+        stdout, stderr = process.communicate(timeout=8.0)
+    except subprocess.TimeoutExpired:
+        os.killpg(process.pid, signal.SIGKILL)
+        stdout, stderr = process.communicate()
+        pytest.fail(
+            'provider finalizer probe deadlocked past 8 seconds\n'
+            f'stdout: {stdout}\nstderr: {stderr}'
+        )
+    assert process.returncode == 0, (
+        f'provider finalizer probe exited {process.returncode}\n'
+        f'stdout: {stdout}\nstderr: {stderr}'
+    )
+
+
+def _run_provider_after_fork_probe():
+    """Probe automatic collection during the real threading fork hook."""
+    repo_root = Path(__file__).resolve().parents[2]
+    script = textwrap.dedent(
+        f'''
+        import gc
+        import os
+        import sys
+        import threading
+        import weakref
+
+        from engines.magemin import provider as provider_module
+        from simulator.melt_backend import magemin as magemin_module
+
+        gc.disable()
+        closed = threading.Event()
+
+        class Backend:
+            def initialize(self, _config):
+                return True
+
+            def close(self):
+                closed.set()
+
+        backend = Backend()
+        magemin_module.MAGEMinBackend = lambda: backend
+        provider = provider_module.MAGEMinShadowProvider()
+        assert provider._ensure_backend() is backend
+        provider.cycle = provider
+        provider_ref = weakref.ref(provider)
+        del provider
+
+        def arm_collection_inside_after_fork(frame, event, _arg):
+            if (
+                frame.f_code.co_name == '_after_fork'
+                and event == 'line'
+                and threading._active_limbo_lock._is_owned()
+            ):
+                sys.settrace(None)
+                gc.set_threshold(gc.get_count()[0], 1_000_000, 1_000_000)
+                gc.enable()
+            return arm_collection_inside_after_fork
+
+        sys.settrace(arm_collection_inside_after_fork)
+        child_pid = os.fork()
+        if child_pid:
+            sys.settrace(None)
+            _, child_status = os.waitpid(child_pid, 0)
+            gc.enable()
+            gc.collect()
+            if not closed.wait(2.0):
+                raise SystemExit('parent close did not drain')
+            raise SystemExit(os.waitstatus_to_exitcode(child_status))
+
+        sys.settrace(None)
+        provider_collected = provider_ref() is None
+        # Collection in the child must not enqueue the parent's backend close.
+        # Its first _ensure_backend still starts the child's own reaper.
+        trigger = provider_module.MAGEMinShadowProvider()
+        trigger._ensure_backend()
+        child_close_ran = closed.is_set()
+        os.write(
+            1,
+            f'provider_collected={{provider_collected}} '
+            f'child_close_ran={{child_close_ran}}\\n'.encode(),
+        )
+        os._exit(0 if provider_collected and not child_close_ran else 1)
+        '''
+    )
+    process = subprocess.Popen(
+        [sys.executable, '-c', script],
+        cwd=repo_root,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        start_new_session=True,
+    )
+    try:
+        stdout, stderr = process.communicate(timeout=8.0)
+    except subprocess.TimeoutExpired:
+        os.killpg(process.pid, signal.SIGKILL)
+        stdout, stderr = process.communicate()
+        pytest.fail(
+            'provider after-fork probe exceeded 8 seconds\n'
+            f'stdout: {stdout}\nstderr: {stderr}'
+        )
+    assert process.returncode == 0, (
+        f'provider after-fork probe exited {process.returncode}\n'
+        f'stdout: {stdout}\nstderr: {stderr}'
+    )
+    assert 'provider_collected=True child_close_ran=False' in stdout
+    assert 'KeyError' not in stderr
+    assert 'Exception ignored in thread' not in stderr
+
+
 class _RaisingMAGEMinBackend(_FakeMAGEMinBackend):
     def __init__(self):
         super().__init__(
@@ -246,6 +505,265 @@ def _make_request(
         fO2_log=fO2_log,
         control_inputs={},
     )
+
+
+def test_provider_closes_warm_pool_when_provider_lifetime_ends(monkeypatch):
+    from simulator.melt_backend import magemin as magemin_module
+
+    backends = []
+
+    def make_backend():
+        backend = _PooledFakeMAGEMinBackend()
+        backends.append(backend)
+        return backend
+
+    monkeypatch.setattr(magemin_module, 'MAGEMinBackend', make_backend)
+    initial_children = {
+        child.pid
+        for child in multiprocessing.active_children()
+        if child.pid is not None and child.is_alive()
+    }
+
+    try:
+        for _ in range(3):
+            provider = MAGEMinShadowProvider()
+            result = provider.dispatch(
+                _make_request(ChemistryIntent.SILICATE_EQUILIBRIUM)
+            )
+            assert result.status == 'ok'
+            assert backends[-1].pool_child_pid in {
+                child.pid for child in multiprocessing.active_children()
+            }
+            pool = backends[-1].pool
+            child_pid = backends[-1].pool_child_pid
+            del provider
+            gc.collect()
+            assert pool._close_complete.wait(timeout=5.0), (
+                'provider finalizer did not close its pool within 5 seconds'
+            )
+            assert child_pid not in {
+                child.pid for child in multiprocessing.active_children()
+            }
+
+        live_children = {
+            child.pid
+            for child in multiprocessing.active_children()
+            if child.pid is not None and child.is_alive()
+        }
+        assert not (live_children - initial_children)
+        assert len(backends) == 3
+        assert all(backend.close_calls == 1 for backend in backends)
+    finally:
+        for backend in backends:
+            backend.close()
+
+
+def test_provider_finalizer_does_not_deadlock_registry_lock():
+    _run_provider_finalizer_probe(
+        '''
+        dummy_pool = object.__new__(EngineWorkerPool)
+        registry_locked_during_gc = []
+
+        def observe_collection(phase, _info):
+            if phase == 'start':
+                acquired = engine_pool._ENGINE_POOL_REGISTRY_LOCK.acquire(
+                    blocking=False
+                )
+                if acquired:
+                    engine_pool._ENGINE_POOL_REGISTRY_LOCK.release()
+                else:
+                    registry_locked_during_gc.append(True)
+
+        gc.callbacks.append(observe_collection)
+        del provider
+        current_count = gc.get_count()[0]
+        gc.set_threshold(current_count, 1000000, 1000000)
+        gc.enable()
+        engine_pool._register_engine_pool(dummy_pool)
+        engine_pool._discard_engine_pool(dummy_pool)
+        gc.callbacks.remove(observe_collection)
+        assert registry_locked_during_gc, 'GC did not run under registry lock'
+        assert pool._close_complete.wait(timeout=5.0)
+        assert not child_is_alive(child_pid), 'provider child survived close'
+        '''
+    )
+
+
+def test_provider_finalizer_does_not_deadlock_pool_lifecycle_lock():
+    _run_provider_finalizer_probe(
+        '''
+        lifecycle_locked_during_gc = []
+
+        def observe_collection(phase, _info):
+            if phase == 'start':
+                acquired = pool._lifecycle_lock.acquire(blocking=False)
+                if acquired:
+                    pool._lifecycle_lock.release()
+                else:
+                    lifecycle_locked_during_gc.append(True)
+
+        gc.callbacks.append(observe_collection)
+        del provider
+        pool._lifecycle_lock.acquire()
+        try:
+            gc.collect()
+        finally:
+            pool._lifecycle_lock.release()
+        gc.enable()
+        gc.callbacks.remove(observe_collection)
+        assert lifecycle_locked_during_gc, 'GC did not run under lifecycle lock'
+        assert pool._close_complete.wait(timeout=5.0)
+        assert not child_is_alive(child_pid), 'provider child survived close'
+        '''
+    )
+
+
+def test_provider_finalizer_reaps_when_collection_runs_on_consumer_thread():
+    _run_provider_finalizer_probe(
+        '''
+        collection_on_consumer = []
+        unraisable = []
+        collection_done = threading.Event()
+        sys.unraisablehook = lambda error: unraisable.append(error)
+
+        def observe_collection(phase, _info):
+            if phase == 'start':
+                collection_on_consumer.append(
+                    threading.current_thread() is pool._threads[0]
+                )
+
+        gc.callbacks.append(observe_collection)
+        provider_box = [provider]
+
+        def collect_provider(_future):
+            provider_box.clear()
+            gc.enable()
+            gc.collect()
+            collection_done.set()
+
+        future = pool.submit('consumer-thread', timeout_s=1.0)
+        future.add_done_callback(collect_provider)
+        del provider
+        try:
+            assert future.result(timeout=5.0) == 'consumer-thread'
+            assert collection_done.wait(timeout=2.0)
+            assert collection_on_consumer and any(collection_on_consumer)
+            assert pool._close_complete.wait(timeout=5.0)
+            assert not unraisable, f'unraisable finalizer errors: {unraisable!r}'
+            assert not pool.workers[0]._pending_reap
+            assert not child_is_alive(child_pid), 'provider child survived close'
+        finally:
+            gc.callbacks.remove(observe_collection)
+            cleanup_workers()
+        ''',
+        consumer_callback=True,
+    )
+
+
+def test_provider_finalizer_queues_close_across_automatic_gc_during_fork():
+    _run_provider_after_fork_probe()
+
+
+def test_child_reaper_drops_parent_queued_provider_close_after_fork():
+    _run_provider_finalizer_probe(
+        '''
+        parent_pid = os.getpid()
+        blocker_started = threading.Event()
+        release_parent_close = threading.Event()
+
+        class BlockingBackend:
+            def initialize(self, _config):
+                return True
+
+            def close(self):
+                if os.getpid() == parent_pid:
+                    blocker_started.set()
+                    release_parent_close.wait(8.0)
+
+        blocker = BlockingBackend()
+        magemin_module.MAGEMinBackend = lambda: blocker
+        blocking_provider = test_module.MAGEMinShadowProvider()
+        assert blocking_provider._ensure_backend() is blocker
+        del blocking_provider
+        gc.collect()
+        assert blocker_started.wait(3.0), 'parent reaper did not become busy'
+        atexit.register(release_parent_close.set)
+
+        worker_process = pool.workers[0].process
+        provider._cycle = None
+        del provider
+        gc.collect()
+
+        fork_pid = os.fork()
+        if fork_pid == 0:
+            run_child_reaper_marker()
+            os._exit(0)
+
+        _, child_status = os.waitpid(fork_pid, 0)
+        assert os.WIFEXITED(child_status) and os.WEXITSTATUS(child_status) == 0
+        assert worker_process.is_alive(), 'child reaper killed the parent worker'
+        release_parent_close.set()
+        assert pool._close_complete.wait(timeout=5.0)
+        assert backend.close_calls == 1
+        assert not worker_process.is_alive()
+        '''
+    )
+
+
+def test_child_provider_finalizer_does_not_close_parent_backend_after_fork():
+    _run_provider_finalizer_probe(
+        '''
+        worker_process = pool.workers[0].process
+        fork_pid = os.fork()
+        if fork_pid == 0:
+            del provider
+            gc.collect()
+            run_child_reaper_marker()
+            os._exit(0)
+
+        _, child_status = os.waitpid(fork_pid, 0)
+        assert os.WIFEXITED(child_status) and os.WEXITSTATUS(child_status) == 0
+        assert worker_process.is_alive(), 'child finalizer closed the parent worker'
+        provider._cycle = None
+        del provider
+        gc.collect()
+        assert pool._close_complete.wait(timeout=5.0)
+        assert backend.close_calls == 1
+        assert not worker_process.is_alive()
+        '''
+    )
+
+
+def test_provider_close_reaper_continues_after_close_raises(monkeypatch, caplog):
+    from engines.magemin import provider as provider_module
+    from simulator.melt_backend import magemin as magemin_module
+
+    backend = _FakeMAGEMinBackend(equilibrium=_FakeEquilibriumResult())
+    backend.close = lambda: None
+    monkeypatch.setattr(magemin_module, 'MAGEMinBackend', lambda: backend)
+    caplog.set_level('ERROR', logger=provider_module.__name__)
+
+    provider = MAGEMinShadowProvider()
+    assert provider._ensure_backend() is backend
+
+    close_order = []
+    next_close_ran = threading.Event()
+
+    def raising_close():
+        close_order.append('raising')
+        raise RuntimeError('synthetic close failure')
+
+    def next_close():
+        close_order.append('next')
+        next_close_ran.set()
+
+    owner_pid = os.getpid()
+    provider_module._CLOSE_QUEUE.put((owner_pid, raising_close))
+    provider_module._CLOSE_QUEUE.put((owner_pid, next_close))
+
+    assert next_close_ran.wait(timeout=2.0)
+    assert close_order == ['raising', 'next']
+    assert 'MAGEMin provider backend close failed' in caplog.text
 
 
 # ---------------------------------------------------------------------------
