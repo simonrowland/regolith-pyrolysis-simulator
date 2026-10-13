@@ -8346,6 +8346,18 @@ def fe3_fe2_ratio_reduction(
     return evidence, derivation
 
 
+def fe3_fe2_ratio_parent_lineage(
+    selection: SourceSelection,
+    derived_from: tuple[str, ...] | None,
+    read_from: str,
+) -> tuple[str, ...] | None:
+    """Apply the ferric-fraction reduction's source-parent fallback."""
+
+    if selection.reduction is not None and selection.field_name in FERRIC_FRACTION_FIELDS:
+        return derived_from or (read_from,)
+    return derived_from
+
+
 def _selection_from_named_field(
     payload: Mapping[str, Any],
     q_token: Quantity,
@@ -13087,15 +13099,17 @@ class Migrator:
                 choose_read_from(work, locator),
             )
         if value_sel.reduction is not None:
+            read_from = choose_read_from(work, locator)
             evidence, value_derivation = fe3_fe2_ratio_reduction(
                 value_sel,
                 evidence,
                 locator,
-                choose_read_from(work, locator),
+                read_from,
                 source_derivation,
             )
-            if value_sel.field_name in FERRIC_FRACTION_FIELDS:
-                derived_from = derived_from or (choose_read_from(work, locator),)
+            derived_from = fe3_fe2_ratio_parent_lineage(
+                value_sel, derived_from, read_from
+            )
         if malformed_composition_amount is not None:
             ident_kwargs["composition"] = State.unknown(malformed_composition_amount)
         elif omitted_components:
@@ -14637,8 +14651,9 @@ class Migrator:
             evidence, derivation = fe3_fe2_ratio_reduction(
                 value_sel, evidence, point_locator, read_from, source_derivation
             )
-            if value_sel.field_name in FERRIC_FRACTION_FIELDS:
-                derived_from = derived_from or (read_from,)
+            derived_from = fe3_fe2_ratio_parent_lineage(
+                value_sel, derived_from, read_from
+            )
         if phase_provenance is not None and emitted.kind is not ValueKind.UNAVAILABLE:
             if derivation is None:
                 derivation = Derivation(
