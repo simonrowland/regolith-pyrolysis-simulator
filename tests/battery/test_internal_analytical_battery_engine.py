@@ -18,7 +18,7 @@ from simulator.battery.enums import (
     AdmissionStatus,
 )
 from simulator.battery.identity import Identity
-from simulator.battery.records import Composition, Species
+from simulator.battery.records import Composition, Species, State
 from simulator.battery.score import predict_with_engine
 from simulator.diagnostic_helpers.binary_pot_battery import (
     BinaryPot,
@@ -33,6 +33,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
 )
 from simulator.chemistry.melt_activity import single_cation_mole_fractions
 from tests.battery import factories as F
+from tests.battery.test_melt_activity_requirements import _case, _composition
 
 
 def test_internal_analytical_cell_reports_activity_not_gamma() -> None:
@@ -85,6 +86,79 @@ def test_internal_analytical_cell_reports_activity_not_gamma() -> None:
     assert field_value == pytest.approx(benchmark_value, rel=1e-12)
     assert field_value != pytest.approx(benchmark_value / x_sio2, rel=0.1)
     assert cell.activities_standard_state == benchmark_standard_state
+
+
+@pytest.mark.parametrize("formula", ["SiO2", "Na2O"])
+def test_internal_analytical_scores_parent_oxide_activity(formula: str) -> None:
+    experiment, bench, observation = _case(
+        composition=_composition(("SiO2", "0.6"), ("Na2O", "0.4")),
+        oxygen=Decimal("-10"),
+        formula=formula,
+    )
+    observation = replace(
+        observation,
+        identity=replace(
+            observation.identity, fO2_Pa=State.of(Decimal("0.00001")),
+        ),
+    )
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        observation,
+        experiment=experiment,
+        bench=bench,
+        handles={},
+        isolated=False,
+    )
+
+    assert prediction.value is not None, prediction.refusal_detail
+    assert prediction.identity.species.formula == formula
+    assert prediction.refusal_reason is None
+
+
+def test_internal_analytical_forwards_supplied_oxygen_without_redox() -> None:
+    experiment, bench, observation = _case(
+        composition=_composition(("SiO2", "0.6"), ("Na2O", "0.4")),
+        oxygen=Decimal("-10"),
+        formula="SiO2",
+    )
+    observation = replace(
+        observation,
+        identity=replace(
+            observation.identity, fO2_Pa=State.of(Decimal("0.00001")),
+        ),
+    )
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        observation,
+        experiment=experiment,
+        bench=bench,
+        handles={},
+        isolated=False,
+    )
+
+    assert prediction.value is not None, prediction.refusal_detail
+    assert prediction.refusal_reason is None
+
+
+def test_internal_analytical_without_oxygen_is_typed_refusal() -> None:
+    experiment, bench, observation = _case(
+        composition=_composition(("SiO2", "0.6"), ("Na2O", "0.4")),
+        formula="SiO2",
+    )
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        observation,
+        experiment=experiment,
+        bench=bench,
+        handles={},
+        isolated=False,
+    )
+
+    assert prediction.value is None
+    assert prediction.refusal_reason is not None
+    assert prediction.refusal_detail["engine_reason"] == (
+        "internal_analytical_missing_oxygen_condition"
+    )
 
 
 def _hand_built_observation() -> tuple[object, Identity]:
