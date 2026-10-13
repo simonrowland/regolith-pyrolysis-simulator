@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/ewing-1963-sodium-potassium-properties.yaml
 observations:
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1165.55:h=88a36d3ecc31
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -41,8 +41,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -67,7 +77,7 @@ observations:
   value:
     kind: point
     point: '108417.75'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -164,7 +174,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1170.95:h=0c6a3fc0a6b7
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -202,8 +212,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -228,7 +248,7 @@ observations:
   value:
     kind: point
     point: '113484'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -325,7 +345,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1176.45:h=3100d9addb5a
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -363,8 +383,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -389,7 +419,7 @@ observations:
   value:
     kind: point
     point: '118550.25'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -486,7 +516,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1180.65:h=062fbc502ce6
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -524,8 +554,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -550,7 +590,7 @@ observations:
   value:
     kind: point
     point: '121590'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -647,7 +687,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1199.05:h=c719a22d96d4
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -685,8 +725,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -711,7 +761,7 @@ observations:
   value:
     kind: point
     point: '142868.25'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -808,7 +858,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1207.75:h=f8510f02cd77
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -846,8 +896,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -872,7 +932,7 @@ observations:
   value:
     kind: point
     point: '153000.75'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -969,7 +1029,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1210.65:h=f7e45d930dc3
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -1007,8 +1067,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -1033,7 +1103,7 @@ observations:
   value:
     kind: point
     point: '160093.5'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -1130,7 +1200,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1222.45:h=23516c48dac0
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -1168,8 +1238,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -1194,7 +1274,7 @@ observations:
   value:
     kind: point
     point: '172252.5'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -1291,7 +1371,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1226.95:h=b8fe85e32b60
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -1329,8 +1409,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -1355,7 +1445,7 @@ observations:
   value:
     kind: point
     point: '180358.5'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -1452,7 +1542,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1236.05:h=9048c0449967
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -1490,8 +1580,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -1516,7 +1616,7 @@ observations:
   value:
     kind: point
     point: '193530.75'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -1613,7 +1713,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1242.25:h=7b838f13cc58
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -1651,8 +1751,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -1677,7 +1787,7 @@ observations:
   value:
     kind: point
     point: '206703'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -1774,7 +1884,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1253.15:h=ee0ec59a63cf
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -1812,8 +1922,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -1838,7 +1958,7 @@ observations:
   value:
     kind: point
     point: '221901.75'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -1935,7 +2055,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1264.25:h=8c423f4ad88d
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -1973,8 +2093,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -1999,7 +2129,7 @@ observations:
   value:
     kind: point
     point: '243180'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -2096,7 +2226,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1269.05:h=ed877437dcfe
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -2134,8 +2264,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -2160,7 +2300,7 @@ observations:
   value:
     kind: point
     point: '248246.25'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -2257,7 +2397,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1287.05:h=3292275b01ba
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -2295,8 +2435,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -2321,7 +2471,7 @@ observations:
   value:
     kind: point
     point: '285736.5'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -2418,7 +2568,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1297.05:h=d790e0a068d7
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -2456,8 +2606,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -2482,7 +2642,7 @@ observations:
   value:
     kind: point
     point: '306001.5'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -2579,7 +2739,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1305.45:h=08c54c0fb9d6
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -2617,8 +2777,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -2643,7 +2813,7 @@ observations:
   value:
     kind: point
     point: '320187'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -2740,7 +2910,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1315.75:h=e1af5b5cb5b7
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -2778,8 +2948,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -2804,7 +2984,7 @@ observations:
   value:
     kind: point
     point: '351597.75'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -2901,7 +3081,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1329.75:h=d3c7385ea7b9
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -2939,8 +3119,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -2965,7 +3155,7 @@ observations:
   value:
     kind: point
     point: '385035'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -3062,7 +3252,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1340.45:h=da9d71a30d38
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -3100,8 +3290,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -3126,7 +3326,7 @@ observations:
   value:
     kind: point
     point: '412392.75'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -3223,7 +3423,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1345.85:h=66c070cee8e7
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -3261,8 +3461,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -3287,7 +3497,7 @@ observations:
   value:
     kind: point
     point: '432657.75'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -3384,7 +3594,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1358.65:h=ec56a1f37284
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -3422,8 +3632,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -3448,7 +3668,7 @@ observations:
   value:
     kind: point
     point: '463055.25'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -3545,7 +3765,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1379.35:h=55d33e7daedf
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -3583,8 +3803,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -3609,7 +3839,7 @@ observations:
   value:
     kind: point
     point: '531956.25'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -3706,7 +3936,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1396.65:h=cc65915a6b20
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -3744,8 +3974,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -3770,7 +4010,7 @@ observations:
   value:
     kind: point
     point: '582618.75'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -3867,7 +4107,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1408.45:h=e9d63212bfb9
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -3905,8 +4145,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -3931,7 +4181,7 @@ observations:
   value:
     kind: point
     point: '625175.25'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -4028,7 +4278,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1410.45:h=a3b8c55c3beb
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -4066,8 +4316,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -4092,7 +4352,7 @@ observations:
   value:
     kind: point
     point: '654559.5'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -4189,7 +4449,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1453.45:h=edc2b0cad1c8
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -4227,8 +4487,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -4253,7 +4523,7 @@ observations:
   value:
     kind: point
     point: '823772.25'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -4350,7 +4620,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1459.85:h=86a2d3f877d7
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -4388,8 +4658,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -4414,7 +4694,7 @@ observations:
   value:
     kind: point
     point: '843024'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -4511,7 +4791,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1466.25:h=957f3ded8e55
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -4549,8 +4829,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -4575,7 +4865,7 @@ observations:
   value:
     kind: point
     point: '882540.75'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -4672,7 +4962,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1481.45:h=351818cdb7d7
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -4710,8 +5000,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -4736,7 +5036,7 @@ observations:
   value:
     kind: point
     point: '945362.25'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -4833,7 +5133,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1492.55:h=2876298831ef
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -4871,8 +5171,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -4897,7 +5207,7 @@ observations:
   value:
     kind: point
     point: '1033515'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -4994,7 +5304,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1517.45:h=10524b823366
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -5032,8 +5342,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -5058,7 +5378,7 @@ observations:
   value:
     kind: point
     point: '1165237.5'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -5155,7 +5475,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1536.05:h=c68c3dd86cc9
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -5193,8 +5513,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -5219,7 +5549,7 @@ observations:
   value:
     kind: point
     point: '1276695'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -5316,7 +5646,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1564.95:h=1770652ce9a2
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -5354,8 +5684,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -5380,7 +5720,7 @@ observations:
   value:
     kind: point
     point: '1469212.5'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -5477,7 +5817,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1574.85:h=b5bd5208e9c6
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -5515,8 +5855,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -5541,7 +5891,7 @@ observations:
   value:
     kind: point
     point: '1530007.5'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -5638,7 +5988,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1597.45:h=a031d2723e6e
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -5676,8 +6026,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -5702,7 +6062,7 @@ observations:
   value:
     kind: point
     point: '1722525'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -5799,7 +6159,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1610.35:h=035bac4dabde
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -5837,8 +6197,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -5863,7 +6233,7 @@ observations:
   value:
     kind: point
     point: '1803585'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -5960,7 +6330,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1633.95:h=241ca71467ad
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -5998,8 +6368,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -6024,7 +6404,7 @@ observations:
   value:
     kind: point
     point: '2026500'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -6121,7 +6501,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1650.15:h=b0dbd242596c
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -6159,8 +6539,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -6185,7 +6575,7 @@ observations:
   value:
     kind: point
     point: '2117692.5'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -6282,7 +6672,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1663.85:h=9345d8f557a0
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -6320,8 +6710,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -6346,7 +6746,7 @@ observations:
   value:
     kind: point
     point: '2269680'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -6443,7 +6843,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1669.45:h=a1744e65b13e
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -6481,8 +6881,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -6507,7 +6917,7 @@ observations:
   value:
     kind: point
     point: '2320342.5'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -6604,7 +7014,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1677.85:h=c8f1cca2e618
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -6642,8 +7052,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -6668,7 +7088,7 @@ observations:
   value:
     kind: point
     point: '2371005'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
@@ -6765,7 +7185,7 @@ observations:
           figure: '6'
     output_unit: Pa
 - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1683.55:h=d02231bb139c
-  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+  experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   identity:
     quantity:
       tag: value
@@ -6803,8 +7223,18 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use reference_state
     reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
+      tag: value
+      value:
+        formula: Na
+        phase:
+          tag: value
+          value: l
+        polymorph:
+          tag: not_applicable
+          reason: not crystal
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: not_applicable
       reason: profile p_sat does not use composition
@@ -6829,7 +7259,7 @@ observations:
   value:
     kind: point
     point: '2431800'
-    approximate: false
+    approximate: true
   uncertainty:
     kind: printed
     verbatim:
