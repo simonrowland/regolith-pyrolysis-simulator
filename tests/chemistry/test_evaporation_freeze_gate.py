@@ -4638,14 +4638,31 @@ def test_gate_memo_origin_unproven_is_miss_and_noticed(
 
     assert result['curve'] == curve
     assert notice is not None
-    assert [
-        item['reason']
-        for item in notice['notices']
-        if item['reason'].startswith('unproven gate producer;')
-    ] == [
+    reason = (
         'unproven gate producer; register its adapter; in-process reuse '
         "of this producer's gate curves is off"
-    ]
+    )
+    identity = admission_module.BindingIdentity(
+        'unproven-gate-producer',
+        'unknown',
+        'unproven-r1',
+        'unknown',
+    )
+    assert notice == {
+        'notices': [
+            {
+                'type': 'typed_notice',
+                'kind': 'engine_binding_not_admitted',
+                'identity': identity.as_dict(),
+                'reason': reason,
+                'message': (
+                    'binding not admitted on this host '
+                    f'({reason}); replay and capture disabled; '
+                    'run scripts/assess_engine_bindings.py'
+                ),
+            }
+        ]
+    }
 
 
 @pytest.mark.parametrize('evidence_case', ['provenance-raises', 'null-digest'])
