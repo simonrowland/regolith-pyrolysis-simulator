@@ -1357,10 +1357,10 @@ def _b1259_tridymite_cristobalite_delta_g(
     return delta_h - temperature_K * delta_s, lower, upper, extrapolated
 
 
-def _fusion_comparison_reference(
+def fusion_comparison_reference(
     reference: Observation, *, engine: Engine | None = None
 ) -> Observation:
-    """Return the liquid-reference comparison view for a solid activity row."""
+    """Single owner of solid/liquid reference selection for both the battery scorer and melt-activity benchmark."""
 
     identity = reference.identity
     if (
@@ -5734,7 +5734,7 @@ def compile_residual(
 ) -> tuple[Residual, Observation | None]:
     _require_score_engine(engine)
     source_reference = reference
-    reference = _fusion_comparison_reference(reference, engine=engine)
+    reference = fusion_comparison_reference(reference, engine=engine)
     identity = reference.identity
     quantity = quantity_token(identity) if isinstance(identity, Identity) else None
     formula = identity.species.formula if isinstance(identity, Identity) else ""
@@ -6524,7 +6524,7 @@ def _score_store_with_decisions(
                 refs.append(obs)
                 seen.add(obs.observation_id)
         for obs in context.observations.values():
-            converted = _fusion_comparison_reference(obs)
+            converted = fusion_comparison_reference(obs)
             if converted is not obs:
                 if any(
                     _is_fusion_conversion_notice(notice) for notice in converted.notices

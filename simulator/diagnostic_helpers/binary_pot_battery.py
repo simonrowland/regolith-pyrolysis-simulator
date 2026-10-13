@@ -43,6 +43,7 @@ from simulator.physical_constants import (
     MELT_DISSOCIATION_PO2_MIN_BAR,
     PA_PER_BAR,
 )
+from simulator.melt_regime import legacy_raw_liquid_fraction_is_nonpositive
 from simulator.battery.enums import NoticeKind
 from simulator.yaml_cache import load_cached_safe_yaml
 from simulator.vapour_rail.engine_crosscheck import divergence_label
@@ -1384,7 +1385,11 @@ def classify_equilibrate_outcome(
     if engine_status in {"ok", "non_authoritative"}:
         liquid_fraction = _finite_float(getattr(result, "liquid_fraction", None))
         assemblage = getattr(result, "phase_assemblage_available", True)
-        if assemblage and liquid_fraction is not None and liquid_fraction <= 0.0:
+        if (
+            assemblage
+            and liquid_fraction is not None
+            and legacy_raw_liquid_fraction_is_nonpositive(liquid_fraction)
+        ):
             return "refusal", REFUSAL_NO_LIQUID, engine_reason or "liquid_fraction<=0"
         return "ok", None, None
 

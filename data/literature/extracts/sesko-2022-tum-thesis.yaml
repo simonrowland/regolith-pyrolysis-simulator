@@ -1,0 +1,739 @@
+schema_version: literature_extract.v1
+source_id: sesko-2022-tum-thesis
+source:
+  citation: 'Šeško R. (2022) Solar-vapor pyrolysis of lunar regolith for oxygen production in high vacuum: An experimental investigation and thermochemical modeling. Technical University of Munich, M.Sc. thesis RT-MA 2022/01.'
+  url: https://mediatum.ub.tum.de/doc/1730482/1730482.pdf
+  version: thesis
+  year: 2022
+  sha256: 22ca3c77e3e84f398b8b9ced101a3d1e927f6d70ca0c42962cbecd692937075c
+extraction:
+  method: Manual transcription of Tables 3.1–3.3 and A.1–A.2 from rendered pages, checked independently by row and by column; experimental-condition prose and plot values read from rendered figures; values from the thermochemical-modeling chapter excluded.
+  date: '2026-10-12'
+  worker: sesko22
+review_status: draft
+fidelity_samples:
+  - species: EAC-1A
+    observable: experiment_series
+    observation_id: sesko_2022_table3_3_exposure_1
+    field: mass_of_melted_regolith_sample_g
+    value: '0.39'
+    locator: {page: 42, pdf_page_index: 41, table: '3.3'}
+  - species: EAC-1A
+    observable: experiment_series
+    observation_id: sesko_2022_table3_3_exposure_1
+    field: duration_hms
+    value: '00:02:20'
+    locator: {page: 42, pdf_page_index: 41, table: '3.3'}
+  - species: EAC-1A
+    observable: experiment_series
+    observation_id: sesko_2022_table3_3_exposure_1
+    field: initial_pressure_mbar_as_published
+    value: '7.0 × 10^-6'
+    locator: {page: 42, pdf_page_index: 41, table: '3.3'}
+  - species: EAC-1A
+    observable: experiment_series
+    observation_id: sesko_2022_table3_3_exposure_11
+    field: mass_of_melted_regolith_sample_g
+    value: '0.66'
+    locator: {page: 42, pdf_page_index: 41, table: '3.3'}
+  - species: EAC-1A
+    observable: experiment_series
+    observation_id: sesko_2022_table3_3_exposure_11
+    field: duration_hms
+    value: '00:10:00'
+    locator: {page: 42, pdf_page_index: 41, table: '3.3'}
+  - species: EAC-1A
+    observable: experiment_series
+    observation_id: sesko_2022_table3_3_exposure_11
+    field: chamber_pressure_mbar_as_published
+    value: '2 × 10^-4 to 2 × 10^-2'
+    locator: {page: 42, pdf_page_index: 41, table: '3.3'}
+  - species: EAC-1A
+    observable: experimental_conditions_context
+    observation_id: sesko_2022_table3_1_exposure_9
+    field: dni_W_m2
+    value: '1020'
+    locator: {page: 41, pdf_page_index: 40, table: '3.1'}
+  - species: EAC-1A
+    observable: calibration_measurements_context
+    observation_id: sesko_2022_appendix_a2_set_6
+    field: delta_T_C
+    value: '-42.2'
+    locator: {page: 94, pdf_page_index: 93, table: A.2}
+species:
+  EAC-1A:
+    observations: []
+    context:
+      - observation_id: sesko_2022_table3_1_exposure_1
+        type: experimental_conditions_context
+        experiment: sesko_2022_exposure_1
+        locator: {page: 41, published_page: 26, pdf_page_index: 40, table: '3.1'}
+        units: degrees and W m^-2 as printed
+        values: {quantity: solar_conditions_context, exposure: 1, date: '23/03/2022', solar_elevation_angle_deg: '36.8', dni_W_m2: '960', dni_status: measured}
+      - observation_id: sesko_2022_table3_1_exposure_2
+        type: experimental_conditions_context
+        experiment: sesko_2022_exposure_2
+        locator: {page: 41, published_page: 26, pdf_page_index: 40, table: '3.1'}
+        units: degrees and W m^-2 as printed
+        values: {quantity: solar_conditions_context, exposure: 2, date: '23/03/2022', solar_elevation_angle_deg: '37.5', dni_W_m2: '900', dni_status: measured}
+      - observation_id: sesko_2022_table3_1_exposure_3
+        type: experimental_conditions_context
+        experiment: sesko_2022_exposure_3
+        locator: {page: 41, published_page: 26, pdf_page_index: 40, table: '3.1'}
+        units: degrees and W m^-2 as printed
+        values: {quantity: solar_conditions_context, exposure: 3, date: '25/03/2022', solar_elevation_angle_deg: '38.0', dni_W_m2: '965', dni_status: measured}
+      - observation_id: sesko_2022_table3_1_exposure_4
+        type: experimental_conditions_context
+        experiment: sesko_2022_exposure_4
+        locator: {page: 41, published_page: 26, pdf_page_index: 40, table: '3.1'}
+        units: degrees and W m^-2 as printed
+        values: {quantity: solar_conditions_context, exposure: 4, date: '25/03/2022', solar_elevation_angle_deg: '40.7', dni_W_m2: '958', dni_status: measured}
+      - observation_id: sesko_2022_table3_1_exposure_5
+        type: experimental_conditions_context
+        experiment: sesko_2022_exposure_5
+        locator: {page: 41, published_page: 26, pdf_page_index: 40, table: '3.1'}
+        units: degrees and W m^-2 as printed
+        values: {quantity: solar_conditions_context, exposure: 5, date: '25/03/2022', solar_elevation_angle_deg: '40.6', dni_W_m2: '995', dni_status: measured}
+      - observation_id: sesko_2022_table3_1_exposure_6
+        type: experimental_conditions_context
+        experiment: sesko_2022_exposure_6
+        locator: {page: 41, published_page: 26, pdf_page_index: 40, table: '3.1'}
+        units: degrees and W m^-2 as printed
+        values: {quantity: solar_conditions_context, exposure: 6, date: '25/03/2022', solar_elevation_angle_deg: '36.8', dni_W_m2: '920', dni_status: measured}
+      - observation_id: sesko_2022_table3_1_exposure_7
+        type: experimental_conditions_context
+        experiment: sesko_2022_exposure_7
+        locator: {page: 41, published_page: 26, pdf_page_index: 40, table: '3.1'}
+        units: degrees and W m^-2 as printed
+        values: {quantity: solar_conditions_context, exposure: 7, date: '25/03/2022', solar_elevation_angle_deg: '30.7', dni_W_m2: '860', dni_status: measured}
+      - observation_id: sesko_2022_table3_1_exposure_8
+        type: experimental_conditions_context
+        experiment: sesko_2022_exposure_8
+        locator: {page: 41, published_page: 26, pdf_page_index: 40, table: '3.1'}
+        units: degrees and W m^-2 as printed
+        values: {quantity: solar_conditions_context, exposure: 8, date: '20/04/2022', solar_elevation_angle_deg: '43.1', dni_W_m2: '1008', dni_status: measured}
+      - observation_id: sesko_2022_table3_1_exposure_9
+        type: experimental_conditions_context
+        experiment: sesko_2022_exposure_9
+        locator: {page: 41, published_page: 26, pdf_page_index: 40, table: '3.1'}
+        units: degrees and W m^-2 as printed
+        values: {quantity: solar_conditions_context, exposure: 9, date: '20/04/2022', solar_elevation_angle_deg: '48.4', dni_W_m2: '1020', dni_status: measured}
+      - observation_id: sesko_2022_table3_1_exposure_10
+        type: experimental_conditions_context
+        experiment: sesko_2022_exposure_10
+        locator: {page: 41, published_page: 26, pdf_page_index: 40, table: '3.1'}
+        units: degrees and W m^-2 as printed
+        values: {quantity: solar_conditions_context, exposure: 10, date: '20/04/2022', solar_elevation_angle_deg: '50.6', dni_W_m2: '1030', dni_status: measured}
+      - observation_id: sesko_2022_table3_1_exposure_11
+        type: experimental_conditions_context
+        experiment: sesko_2022_exposure_11
+        locator: {page: 41, published_page: 26, pdf_page_index: 40, table: '3.1'}
+        units: degrees and W m^-2 as printed
+        values: {quantity: solar_conditions_context, exposure: 11, date: '20/04/2022', solar_elevation_angle_deg: '45.5', dni_W_m2: '955', dni_status: measured}
+      - observation_id: sesko_2022_table3_1_exposure_12
+        type: experimental_conditions_context
+        experiment: sesko_2022_exposure_12
+        locator: {page: 41, published_page: 26, pdf_page_index: 40, table: '3.1'}
+        units: degrees and W m^-2 as printed
+        values: {quantity: solar_conditions_context, exposure: 12, date: '28/04/2022', solar_elevation_angle_deg: '46.2', dni_W_m2: '950', dni_status: measured}
+      - observation_id: sesko_2022_table3_2_exposure_1
+        type: experimental_conditions_context
+        experiment: sesko_2022_exposure_1
+        locator: {page: 41, published_page: 26, pdf_page_index: 40, table: '3.2'}
+        units: W m^-2, m^2, and W as printed
+        values: {quantity: solar_flux_estimate_context, exposure: 1, lens_irradiation_W_m2: '818', effective_collection_area_m2: '0.1143', lens_flux_W: '93.4', regolith_flux_W: '74.0', absorbed_flux_low_W: '29.3', absorbed_flux_high_W: '44.0', status: source_calculated_estimates}
+      - observation_id: sesko_2022_table3_2_exposure_2
+        type: experimental_conditions_context
+        experiment: sesko_2022_exposure_2
+        locator: {page: 41, published_page: 26, pdf_page_index: 40, table: '3.2'}
+        units: W m^-2, m^2, and W as printed
+        values: {quantity: solar_flux_estimate_context, exposure: 2, lens_irradiation_W_m2: '768', effective_collection_area_m2: '0.1121', lens_flux_W: '86.1', regolith_flux_W: '68.1', absorbed_flux_low_W: '26.9', absorbed_flux_high_W: '40.5', status: source_calculated_estimates}
+      - observation_id: sesko_2022_table3_2_exposure_3
+        type: experimental_conditions_context
+        experiment: sesko_2022_exposure_3
+        locator: {page: 41, published_page: 26, pdf_page_index: 40, table: '3.2'}
+        units: W m^-2, m^2, and W as printed
+        values: {quantity: solar_flux_estimate_context, exposure: 3, lens_irradiation_W_m2: '830', effective_collection_area_m2: '0.1107', lens_flux_W: '91.8', regolith_flux_W: '72.7', absorbed_flux_low_W: '28.7', absorbed_flux_high_W: '43.2', status: source_calculated_estimates}
+      - observation_id: sesko_2022_table3_2_exposure_4
+        type: experimental_conditions_context
+        experiment: sesko_2022_exposure_4
+        locator: {page: 41, published_page: 26, pdf_page_index: 40, table: '3.2'}
+        units: W m^-2, m^2, and W as printed
+        values: {quantity: solar_flux_estimate_context, exposure: 4, lens_irradiation_W_m2: '813', effective_collection_area_m2: '0.1022', lens_flux_W: '83.0', regolith_flux_W: '65.7', absorbed_flux_low_W: '26.0', absorbed_flux_high_W: '39.1', status: source_calculated_estimates}
+      - observation_id: sesko_2022_table3_2_exposure_5
+        type: experimental_conditions_context
+        experiment: sesko_2022_exposure_5
+        locator: {page: 41, published_page: 26, pdf_page_index: 40, table: '3.2'}
+        units: W m^-2, m^2, and W as printed
+        values: {quantity: solar_flux_estimate_context, exposure: 5, lens_irradiation_W_m2: '838', effective_collection_area_m2: '0.1025', lens_flux_W: '85.9', regolith_flux_W: '68.0', absorbed_flux_low_W: '26.9', absorbed_flux_high_W: '40.4', status: source_calculated_estimates}
+      - observation_id: sesko_2022_table3_2_exposure_6
+        type: experimental_conditions_context
+        experiment: sesko_2022_exposure_6
+        locator: {page: 41, published_page: 26, pdf_page_index: 40, table: '3.2'}
+        units: W m^-2, m^2, and W as printed
+        values: {quantity: solar_flux_estimate_context, exposure: 6, lens_irradiation_W_m2: '783', effective_collection_area_m2: '0.1144', lens_flux_W: '89.5', regolith_flux_W: '70.9', absorbed_flux_low_W: '28.0', absorbed_flux_high_W: '42.2', status: source_calculated_estimates}
+      - observation_id: sesko_2022_table3_2_exposure_7
+        type: experimental_conditions_context
+        experiment: sesko_2022_exposure_7
+        locator: {page: 41, published_page: 26, pdf_page_index: 40, table: '3.2'}
+        units: W m^-2, m^2, and W as printed
+        values: {quantity: solar_flux_estimate_context, exposure: 7, lens_irradiation_W_m2: '753', effective_collection_area_m2: '0.1332', lens_flux_W: '100.3', regolith_flux_W: '79.4', absorbed_flux_low_W: '31.4', absorbed_flux_high_W: '47.2', status: source_calculated_estimates}
+      - observation_id: sesko_2022_table3_2_exposure_8
+        type: experimental_conditions_context
+        experiment: sesko_2022_exposure_8
+        locator: {page: 41, published_page: 26, pdf_page_index: 40, table: '3.2'}
+        units: W m^-2, m^2, and W as printed
+        values: {quantity: solar_flux_estimate_context, exposure: 8, lens_irradiation_W_m2: '860', effective_collection_area_m2: '0.0943', lens_flux_W: '81.1', regolith_flux_W: '64.2', absorbed_flux_low_W: '25.4', absorbed_flux_high_W: '38.2', status: source_calculated_estimates}
+      - observation_id: sesko_2022_table3_2_exposure_9
+        type: experimental_conditions_context
+        experiment: sesko_2022_exposure_9
+        locator: {page: 41, published_page: 26, pdf_page_index: 40, table: '3.2'}
+        units: W m^-2, m^2, and W as printed
+        values: {quantity: solar_flux_estimate_context, exposure: 9, lens_irradiation_W_m2: '868', effective_collection_area_m2: '0.0048', lens_flux_W: '67.2', regolith_flux_W: '8.7', absorbed_flux_low_W: '3.4', absorbed_flux_high_W: '5.2', status: source_calculated_estimates}
+      - observation_id: sesko_2022_table3_2_exposure_10
+        type: experimental_conditions_context
+        experiment: sesko_2022_exposure_10
+        locator: {page: 41, published_page: 26, pdf_page_index: 40, table: '3.2'}
+        units: W m^-2, m^2, and W as printed
+        values: {quantity: solar_flux_estimate_context, exposure: 10, lens_irradiation_W_m2: '854', effective_collection_area_m2: '0.0706', lens_flux_W: '60.3', regolith_flux_W: '47.7', absorbed_flux_low_W: '18.9', absorbed_flux_high_W: '28.4', status: source_calculated_estimates}
+      - observation_id: sesko_2022_table3_2_exposure_11
+        type: experimental_conditions_context
+        experiment: sesko_2022_exposure_11
+        locator: {page: 41, published_page: 26, pdf_page_index: 40, table: '3.2'}
+        units: W m^-2, m^2, and W as printed
+        values: {quantity: solar_flux_estimate_context, exposure: 11, lens_irradiation_W_m2: '797', effective_collection_area_m2: '0.0866', lens_flux_W: '69.0', regolith_flux_W: '54.6', absorbed_flux_low_W: '21.6', absorbed_flux_high_W: '32.5', status: source_calculated_estimates}
+      - observation_id: sesko_2022_table3_2_exposure_12
+        type: experimental_conditions_context
+        experiment: sesko_2022_exposure_12
+        locator: {page: 41, published_page: 26, pdf_page_index: 40, table: '3.2'}
+        units: W m^-2, m^2, and W as printed
+        values: {quantity: solar_flux_estimate_context, exposure: 12, lens_irradiation_W_m2: '807', effective_collection_area_m2: '0.0845', lens_flux_W: '68.2', regolith_flux_W: '54.0', absorbed_flux_low_W: '21.4', absorbed_flux_high_W: '32.1', status: source_calculated_estimates}
+      - observation_id: sesko_2022_appendix_a1_set_1
+        type: calibration_measurements_context
+        locator: {page: 94, published_page: 79, pdf_page_index: 93, table: A.1}
+        units: W m^-2 and fraction as printed
+        values: {quantity: irradiance_measurement_set, set: '1', ambient_irradiance_Es: '960', front_after_mirror_E1: '795', back_after_mirror_E2: '840', average_after_mirror: '817.5', irradiance_loss_fraction: '0.1484', derived_fields: [average_after_mirror, irradiance_loss_fraction]}
+      - observation_id: sesko_2022_appendix_a1_set_2a
+        type: calibration_measurements_context
+        locator: {page: 94, published_page: 79, pdf_page_index: 93, table: A.1}
+        units: W m^-2 and fraction as printed
+        values: {quantity: irradiance_measurement_set, set: '2a', ambient_irradiance_Es: '900', front_after_mirror_E1: '740', back_after_mirror_E2: '795', average_after_mirror: '767.5', irradiance_loss_fraction: '0.1472', derived_fields: [average_after_mirror, irradiance_loss_fraction]}
+      - observation_id: sesko_2022_appendix_a1_set_2b
+        type: calibration_measurements_context
+        locator: {page: 94, published_page: 79, pdf_page_index: 93, table: A.1}
+        units: W m^-2 and fraction as printed
+        values: {quantity: irradiance_measurement_set, set: '2b', ambient_irradiance_Es: '930', front_after_mirror_E1: '765', back_after_mirror_E2: '804', average_after_mirror: '784.5', irradiance_loss_fraction: '0.1565', derived_fields: [average_after_mirror, irradiance_loss_fraction]}
+      - observation_id: sesko_2022_appendix_a1_set_3a
+        type: calibration_measurements_context
+        locator: {page: 94, published_page: 79, pdf_page_index: 93, table: A.1}
+        units: W m^-2 and fraction as printed
+        values: {quantity: irradiance_measurement_set, set: '3a', ambient_irradiance_Es: '965', front_after_mirror_E1: '804', back_after_mirror_E2: '855', average_after_mirror: '829.5', irradiance_loss_fraction: '0.1404', derived_fields: [average_after_mirror, irradiance_loss_fraction]}
+      - observation_id: sesko_2022_appendix_a1_set_3b
+        type: calibration_measurements_context
+        locator: {page: 94, published_page: 79, pdf_page_index: 93, table: A.1}
+        units: W m^-2 and fraction as printed
+        values: {quantity: irradiance_measurement_set, set: '3b', ambient_irradiance_Es: '940', front_after_mirror_E1: '777', back_after_mirror_E2: '820', average_after_mirror: '798.5', irradiance_loss_fraction: '0.1505', derived_fields: [average_after_mirror, irradiance_loss_fraction]}
+      - observation_id: sesko_2022_appendix_a1_set_4a
+        type: calibration_measurements_context
+        locator: {page: 94, published_page: 79, pdf_page_index: 93, table: A.1}
+        units: W m^-2 and fraction as printed
+        values: {quantity: irradiance_measurement_set, set: '4a', ambient_irradiance_Es: '954', front_after_mirror_E1: '805', back_after_mirror_E2: '840', average_after_mirror: '822.5', irradiance_loss_fraction: '0.1378', derived_fields: [average_after_mirror, irradiance_loss_fraction]}
+      - observation_id: sesko_2022_appendix_a1_set_4b
+        type: calibration_measurements_context
+        locator: {page: 94, published_page: 79, pdf_page_index: 93, table: A.1}
+        units: W m^-2 and fraction as printed
+        values: {quantity: irradiance_measurement_set, set: '4b', ambient_irradiance_Es: '958', front_after_mirror_E1: '795', back_after_mirror_E2: '830', average_after_mirror: '812.5', irradiance_loss_fraction: '0.1519', derived_fields: [average_after_mirror, irradiance_loss_fraction]}
+      - observation_id: sesko_2022_appendix_a1_set_5a
+        type: calibration_measurements_context
+        locator: {page: 94, published_page: 79, pdf_page_index: 93, table: A.1}
+        units: W m^-2 and fraction as printed
+        values: {quantity: irradiance_measurement_set, set: '5a', ambient_irradiance_Es: '995', front_after_mirror_E1: '826', back_after_mirror_E2: '850', average_after_mirror: '838', irradiance_loss_fraction: '0.1578', derived_fields: [average_after_mirror, irradiance_loss_fraction]}
+      - observation_id: sesko_2022_appendix_a1_set_5b
+        type: calibration_measurements_context
+        locator: {page: 94, published_page: 79, pdf_page_index: 93, table: A.1}
+        units: W m^-2 and fraction as printed
+        values: {quantity: irradiance_measurement_set, set: '5b', ambient_irradiance_Es: '1002', front_after_mirror_E1: '822', back_after_mirror_E2: '862', average_after_mirror: '842', irradiance_loss_fraction: '0.1597', derived_fields: [average_after_mirror, irradiance_loss_fraction]}
+      - observation_id: sesko_2022_appendix_a1_set_6a
+        type: calibration_measurements_context
+        locator: {page: 94, published_page: 79, pdf_page_index: 93, table: A.1}
+        units: W m^-2 and fraction as printed
+        values: {quantity: irradiance_measurement_set, set: '6a', ambient_irradiance_Es: '920', front_after_mirror_E1: '773', back_after_mirror_E2: '792', average_after_mirror: '782.5', irradiance_loss_fraction: '0.1495', derived_fields: [average_after_mirror, irradiance_loss_fraction]}
+      - observation_id: sesko_2022_appendix_a1_set_6b
+        type: calibration_measurements_context
+        locator: {page: 94, published_page: 79, pdf_page_index: 93, table: A.1}
+        units: W m^-2 and fraction as printed
+        values: {quantity: irradiance_measurement_set, set: '6b', ambient_irradiance_Es: '925', front_after_mirror_E1: '767', back_after_mirror_E2: '806', average_after_mirror: '786.5', irradiance_loss_fraction: '0.1497', derived_fields: [average_after_mirror, irradiance_loss_fraction]}
+      - observation_id: sesko_2022_appendix_a1_set_7
+        type: calibration_measurements_context
+        locator: {page: 94, published_page: 79, pdf_page_index: 93, table: A.1}
+        units: W m^-2 and fraction as printed
+        values: {quantity: irradiance_measurement_set, set: '7', ambient_irradiance_Es: '860', front_after_mirror_E1: '739', back_after_mirror_E2: '767', average_after_mirror: '753', irradiance_loss_fraction: '0.1244', derived_fields: [average_after_mirror, irradiance_loss_fraction]}
+      - observation_id: sesko_2022_appendix_a1_set_8
+        type: calibration_measurements_context
+        locator: {page: 94, published_page: 79, pdf_page_index: 93, table: A.1}
+        units: W m^-2 and fraction as printed
+        values: {quantity: irradiance_measurement_set, set: '8', ambient_irradiance_Es: '1008', front_after_mirror_E1: '840', back_after_mirror_E2: '880', average_after_mirror: '860', irradiance_loss_fraction: '0.1468', derived_fields: [average_after_mirror, irradiance_loss_fraction]}
+      - observation_id: sesko_2022_appendix_a1_set_9
+        type: calibration_measurements_context
+        locator: {page: 94, published_page: 79, pdf_page_index: 93, table: A.1}
+        units: W m^-2 and fraction as printed
+        values: {quantity: irradiance_measurement_set, set: '9', ambient_irradiance_Es: '1020', front_after_mirror_E1: '840', back_after_mirror_E2: '895', average_after_mirror: '867.5', irradiance_loss_fraction: '0.1495', derived_fields: [average_after_mirror, irradiance_loss_fraction]}
+      - observation_id: sesko_2022_appendix_a1_set_10
+        type: calibration_measurements_context
+        locator: {page: 94, published_page: 79, pdf_page_index: 93, table: A.1}
+        units: W m^-2 and fraction as printed
+        values: {quantity: irradiance_measurement_set, set: '10', ambient_irradiance_Es: '1030', front_after_mirror_E1: '840', back_after_mirror_E2: '868', average_after_mirror: '854', irradiance_loss_fraction: '0.1709', derived_fields: [average_after_mirror, irradiance_loss_fraction]}
+      - observation_id: sesko_2022_appendix_a1_set_11
+        type: calibration_measurements_context
+        locator: {page: 94, published_page: 79, pdf_page_index: 93, table: A.1}
+        units: W m^-2 and fraction as printed
+        values: {quantity: irradiance_measurement_set, set: '11', ambient_irradiance_Es: '955', front_after_mirror_E1: '787', back_after_mirror_E2: '806', average_after_mirror: '796.5', irradiance_loss_fraction: '0.1660', derived_fields: [average_after_mirror, irradiance_loss_fraction]}
+      - observation_id: sesko_2022_appendix_a2_set_1
+        type: calibration_measurements_context
+        locator: {page: 94, published_page: 79, pdf_page_index: 93, table: A.2}
+        units: degrees C as printed
+        values: {quantity: camera_window_calibration_set, set: 1, T1_C: '1018.5', Tw_C: '1020', T2_C: '1040.3', Tave_C: '1029.4', delta_T_C: '9.4', derived_fields: [Tave_C, delta_T_C], target_temperature_stability: stable}
+      - observation_id: sesko_2022_appendix_a2_set_2
+        type: calibration_measurements_context
+        locator: {page: 94, published_page: 79, pdf_page_index: 93, table: A.2}
+        units: degrees C as printed
+        values: {quantity: camera_window_calibration_set, set: 2, T1_C: '1156.8', Tw_C: '1156.3', T2_C: '1174.5', Tave_C: '1165.65', delta_T_C: '9.4', derived_fields: [Tave_C, delta_T_C], target_temperature_stability: stable}
+      - observation_id: sesko_2022_appendix_a2_set_3
+        type: calibration_measurements_context
+        locator: {page: 94, published_page: 79, pdf_page_index: 93, table: A.2}
+        units: degrees C as printed
+        values: {quantity: camera_window_calibration_set, set: 3, T1_C: '1146.3', Tw_C: '1125', T2_C: '1132.9', Tave_C: '1139.6', delta_T_C: '14.6', derived_fields: [Tave_C, delta_T_C], target_temperature_stability: stable}
+      - observation_id: sesko_2022_appendix_a2_set_4
+        type: calibration_measurements_context
+        locator: {page: 94, published_page: 79, pdf_page_index: 93, table: A.2}
+        units: degrees C as printed
+        values: {quantity: camera_window_calibration_set, set: 4, T1_C: '1219.5', Tw_C: '1222.7', T2_C: '1239.9', Tave_C: '1229.7', delta_T_C: '7.0', derived_fields: [Tave_C, delta_T_C], target_temperature_stability: stable}
+      - observation_id: sesko_2022_appendix_a2_set_5
+        type: calibration_measurements_context
+        locator: {page: 94, published_page: 79, pdf_page_index: 93, table: A.2}
+        units: degrees C as printed
+        values: {quantity: camera_window_calibration_set, set: 5, T1_C: '1373.5', Tw_C: '1365', T2_C: '1401.1', Tave_C: '1387.3', delta_T_C: '22.3', derived_fields: [Tave_C, delta_T_C], target_temperature_stability: unstable}
+      - observation_id: sesko_2022_appendix_a2_set_6
+        type: calibration_measurements_context
+        locator: {page: 94, published_page: 79, pdf_page_index: 93, table: A.2}
+        units: degrees C as printed
+        values: {quantity: camera_window_calibration_set, set: 6, T1_C: '1437', Tw_C: '1429.7', T2_C: '1338.1', Tave_C: '1387.55', delta_T_C: '-42.2', derived_fields: [Tave_C, delta_T_C], target_temperature_stability: unstable}
+      - observation_id: sesko_2022_appendix_a2_set_7
+        type: calibration_measurements_context
+        locator: {page: 94, published_page: 79, pdf_page_index: 93, table: A.2}
+        units: degrees C as printed
+        values: {quantity: camera_window_calibration_set, set: 7, T1_C: '1469.2', Tw_C: '1410.7', T2_C: '1515.9', Tave_C: '1492.55', delta_T_C: '81.9', derived_fields: [Tave_C, delta_T_C], target_temperature_stability: unstable}
+      - observation_id: sesko_2022_appendix_a2_set_8
+        type: calibration_measurements_context
+        locator: {page: 94, published_page: 79, pdf_page_index: 93, table: A.2}
+        units: degrees C as printed
+        values: {quantity: camera_window_calibration_set, set: 8, T1_C: '1449.2', Tw_C: '1435.6', T2_C: '1450.1', Tave_C: '1449.65', delta_T_C: '14.1', derived_fields: [Tave_C, delta_T_C], target_temperature_stability: stable}
+      - observation_id: sesko_2022_table3_3_exposure_1
+        type: experiment_series
+        experiment: sesko_2022_exposure_1
+        locator: {page: 42, published_page: 27, pdf_page_index: 41, table: '3.3'}
+        units: as printed
+        values:
+          quantity: measured_solar_exposure_conditions
+          exposure: 1
+          duration_hms: '00:02:20'
+          mass_of_melted_regolith_sample_g: '0.39'
+          initial_pressure_mbar_as_published: '7.0 × 10^-6'
+          chamber_pressure_mbar_as_published: '2 × 10^-1 to 7 × 10^-1'
+          setup_version: 1
+          sample_as_published: EAC-1A
+          sample_composition_pointer: 'Table 4.1, EAC-1A column; composition used for thermochemical simulations'
+          temperature: not plotted for exposures 1–2; no per-exposure value in Table 3.3
+          temperature_measurement: Optris IR camera peak surface measurement; thermocouples were not useful during solar exposure
+          container_as_published: Regolith in crucible; Table 3.3 does not identify crucible material for this exposure
+          heating_method_as_published: Focused sunlight; shade manually removed to start and replaced to end the exposure
+          heating_rate: not reported
+          note: 'm is the mass of melted regolith sample, not initial sample mass or measured mass loss'
+      - observation_id: sesko_2022_table3_3_exposure_2
+        type: experiment_series
+        experiment: sesko_2022_exposure_2
+        locator: {page: 42, published_page: 27, pdf_page_index: 41, table: '3.3'}
+        units: as printed
+        values:
+          quantity: measured_solar_exposure_conditions
+          exposure: 2
+          duration_hms: '00:05:00'
+          mass_of_melted_regolith_sample_g: '0.82'
+          initial_pressure_mbar_as_published: '7.0 × 10^-6'
+          chamber_pressure_mbar_as_published: '3 × 10^-1 to 1.2'
+          setup_version: 1
+          sample_as_published: EAC-1A
+          sample_composition_pointer: 'Table 4.1, EAC-1A column; composition used for thermochemical simulations'
+          temperature: not plotted for exposures 1–2; no per-exposure value in Table 3.3
+          temperature_measurement: Optris IR camera peak surface measurement; thermocouples were not useful during solar exposure
+          container_as_published: Regolith in crucible; Table 3.3 does not identify crucible material for this exposure
+          heating_method_as_published: Focused sunlight; shade manually removed to start and replaced to end the exposure
+          heating_rate: not reported
+          note: 'm is the mass of melted regolith sample, not initial sample mass or measured mass loss'
+      - observation_id: sesko_2022_table3_3_exposure_3
+        type: experiment_series
+        experiment: sesko_2022_exposure_3
+        locator: {page: 42, published_page: 27, pdf_page_index: 41, table: '3.3'}
+        units: as printed
+        values:
+          quantity: measured_solar_exposure_conditions
+          exposure: 3
+          duration_hms: '00:00:30'
+          mass_of_melted_regolith_sample_g: '0.10'
+          initial_pressure_mbar_as_published: '1.2 × 10^-7'
+          chamber_pressure_mbar_as_published: '2 × 10^-2 to 3 × 10^-2'
+          setup_version: 2
+          sample_as_published: EAC-1A
+          sample_composition_pointer: 'Table 4.1, EAC-1A column; composition used for thermochemical simulations'
+          temperature_measurement: Optris IR camera peak surface measurement; thermocouples were not useful during solar exposure
+          container_as_published: Regolith in crucible; Table 3.3 does not identify crucible material for this exposure
+          heating_method_as_published: Focused sunlight; shade manually removed to start and replaced to end the exposure
+          heating_rate: not reported
+          note: 'm is the mass of melted regolith sample, not initial sample mass or measured mass loss'
+      - observation_id: sesko_2022_exposure_3_temperature_figure_read
+        type: experiment_series
+        experiment: sesko_2022_exposure_3
+        locator: {page: 43, published_page: 28, pdf_page_index: 42, figure: '3.9b'}
+        units: K
+        values:
+          quantity: figure_digitized_surface_temperature
+          method_class: figure_digitized
+          read_method: Approximate operating range read from the plotted temperature trace and right-hand Kelvin axis, rounded to about 50 K; no temperature table is printed.
+          surface_temperature_range_K_approximate: '1550 to 1700'
+          temperature_measurement: Optris IR camera, peak surface temperature, emissivity 0.98
+      - observation_id: sesko_2022_table3_3_exposure_4
+        type: experiment_series
+        experiment: sesko_2022_exposure_4
+        locator: {page: 42, published_page: 27, pdf_page_index: 41, table: '3.3'}
+        units: as printed
+        values:
+          quantity: measured_solar_exposure_conditions
+          exposure: 4
+          duration_hms: '00:00:15'
+          mass_of_melted_regolith_sample_g: '0.00'
+          initial_pressure_mbar_as_published: '2.6 × 10^-6'
+          chamber_pressure_mbar_as_published: '2 × 10^-2 to 3 × 10^-2'
+          setup_version: 2
+          sample_as_published: EAC-1A
+          sample_composition_pointer: 'Table 4.1, EAC-1A column; composition used for thermochemical simulations'
+          temperature_measurement: Optris IR camera peak surface measurement; thermocouples were not useful during solar exposure
+          container_as_published: Regolith in crucible; Table 3.3 does not identify crucible material for this exposure
+          heating_method_as_published: Focused sunlight; shade manually removed to start and replaced to end the exposure
+          heating_rate: not reported
+          note: 'm is the mass of melted regolith sample, not initial sample mass or measured mass loss'
+      - observation_id: sesko_2022_exposure_4_temperature_figure_read
+        type: experiment_series
+        experiment: sesko_2022_exposure_4
+        locator: {page: 43, published_page: 28, pdf_page_index: 42, figure: '3.9a'}
+        units: K
+        values:
+          quantity: figure_digitized_surface_temperature
+          method_class: figure_digitized
+          read_method: Approximate operating range read from the plotted temperature trace and right-hand Kelvin axis, rounded to about 50 K; no temperature table is printed.
+          surface_temperature_range_K_approximate: '1500 to 1600'
+          temperature_measurement: Optris IR camera, peak surface temperature, emissivity 0.98
+      - observation_id: sesko_2022_table3_3_exposure_5
+        type: experiment_series
+        experiment: sesko_2022_exposure_5
+        locator: {page: 42, published_page: 27, pdf_page_index: 41, table: '3.3'}
+        units: as printed
+        values:
+          quantity: measured_solar_exposure_conditions
+          exposure: 5
+          duration_hms: '00:00:45'
+          mass_of_melted_regolith_sample_g: '0.20'
+          initial_pressure_mbar_as_published: '2.7 × 10^-6'
+          chamber_pressure_mbar_as_published: '2 × 10^-2 to 3 × 10^-2'
+          setup_version: 2
+          sample_as_published: EAC-1A
+          sample_composition_pointer: 'Table 4.1, EAC-1A column; composition used for thermochemical simulations'
+          temperature_measurement: Optris IR camera peak surface measurement; thermocouples were not useful during solar exposure
+          container_as_published: Regolith in crucible; Table 3.3 does not identify crucible material for this exposure
+          heating_method_as_published: Focused sunlight; shade manually removed to start and replaced to end the exposure
+          heating_rate: not reported
+          note: 'm is the mass of melted regolith sample, not initial sample mass or measured mass loss'
+      - observation_id: sesko_2022_exposure_5_temperature_figure_read
+        type: experiment_series
+        experiment: sesko_2022_exposure_5
+        locator: {page: 43, published_page: 28, pdf_page_index: 42, figure: '3.9c'}
+        units: K
+        values:
+          quantity: figure_digitized_surface_temperature
+          method_class: figure_digitized
+          read_method: Approximate operating range read from the plotted temperature trace and right-hand Kelvin axis, rounded to about 50 K; no temperature table is printed.
+          surface_temperature_range_K_approximate: '1400 to 1650'
+          temperature_measurement: Optris IR camera, peak surface temperature, emissivity 0.98
+      - observation_id: sesko_2022_table3_3_exposure_6
+        type: experiment_series
+        experiment: sesko_2022_exposure_6
+        locator: {page: 42, published_page: 27, pdf_page_index: 41, table: '3.3'}
+        units: as printed
+        values:
+          quantity: measured_solar_exposure_conditions
+          exposure: 6
+          duration_hms: '00:02:30'
+          mass_of_melted_regolith_sample_g: '0.39'
+          initial_pressure_mbar_as_published: '3.3 × 10^-6'
+          chamber_pressure_mbar_as_published: '2 × 10^-2 to 3 × 10^-2'
+          setup_version: 2
+          sample_as_published: EAC-1A
+          sample_composition_pointer: 'Table 4.1, EAC-1A column; composition used for thermochemical simulations'
+          temperature_measurement: Optris IR camera peak surface measurement; thermocouples were not useful during solar exposure
+          container_as_published: Regolith in crucible; Table 3.3 does not identify crucible material for this exposure
+          heating_method_as_published: Focused sunlight; shade manually removed to start and replaced to end the exposure
+          heating_rate: not reported
+          note: 'm is the mass of melted regolith sample, not initial sample mass or measured mass loss'
+      - observation_id: sesko_2022_exposure_6_temperature_figure_read
+        type: experiment_series
+        experiment: sesko_2022_exposure_6
+        locator: {page: 43, published_page: 28, pdf_page_index: 42, figure: '3.9d'}
+        units: K
+        values:
+          quantity: figure_digitized_surface_temperature
+          method_class: figure_digitized
+          read_method: Approximate operating range read from the plotted temperature trace and right-hand Kelvin axis, rounded to about 50 K; no temperature table is printed.
+          surface_temperature_range_K_approximate: '1550 to 2000'
+          temperature_measurement: Optris IR camera, peak surface temperature, emissivity 0.98
+      - observation_id: sesko_2022_table3_3_exposure_7
+        type: experiment_series
+        experiment: sesko_2022_exposure_7
+        locator: {page: 42, published_page: 27, pdf_page_index: 41, table: '3.3'}
+        units: as printed
+        values:
+          quantity: measured_solar_exposure_conditions
+          exposure: 7
+          duration_hms: '00:00:30'
+          mass_of_melted_regolith_sample_g: '0.17'
+          initial_pressure_mbar_as_published: '6.4 × 10^-6'
+          chamber_pressure_mbar_as_published: '2 × 10^-2 to 3 × 10^-2'
+          setup_version: 2
+          sample_as_published: EAC-1A
+          sample_composition_pointer: 'Table 4.1, EAC-1A column; composition used for thermochemical simulations'
+          temperature: no per-exposure numeric temperature published in Table 3.3; exposure 7 is not plotted in Figures 3.9–3.11
+          temperature_measurement: Optris IR camera peak surface measurement; thermocouples were not useful during solar exposure
+          container_as_published: Regolith in crucible; Table 3.3 does not identify crucible material for this exposure
+          heating_method_as_published: Focused sunlight; shade manually removed to start and replaced to end the exposure
+          heating_rate: not reported
+          note: 'm is the mass of melted regolith sample, not initial sample mass or measured mass loss'
+      - observation_id: sesko_2022_table3_3_exposure_8
+        type: experiment_series
+        experiment: sesko_2022_exposure_8
+        locator: {page: 42, published_page: 27, pdf_page_index: 41, table: '3.3'}
+        units: as printed
+        values:
+          quantity: measured_solar_exposure_conditions
+          exposure: 8
+          duration_hms: '00:00:30'
+          mass_of_melted_regolith_sample_g: '0.09'
+          initial_pressure_mbar_as_published: '1.1 × 10^-7'
+          chamber_pressure_mbar_as_published: '2 × 10^-3 to 4 × 10^-3'
+          setup_version: 3
+          sample_as_published: EAC-1A
+          sample_composition_pointer: 'Table 4.1, EAC-1A column; composition used for thermochemical simulations'
+          temperature: no per-exposure numeric temperature published in Table 3.3; exposure 8 is not plotted in Figures 3.9–3.11
+          temperature_measurement: Optris IR camera peak surface measurement; thermocouples were not useful during solar exposure
+          container_as_published: Regolith in crucible; Table 3.3 does not identify crucible material for this exposure
+          heating_method_as_published: Focused sunlight; shade manually removed to start and replaced to end the exposure
+          heating_rate: not reported
+          note: 'm is the mass of melted regolith sample, not initial sample mass or measured mass loss'
+      - observation_id: sesko_2022_table3_3_exposure_9
+        type: experiment_series
+        experiment: sesko_2022_exposure_9
+        locator: {page: 42, published_page: 27, pdf_page_index: 41, table: '3.3'}
+        units: as printed
+        values:
+          quantity: measured_solar_exposure_conditions
+          exposure: 9
+          duration_hms: '00:38:00'
+          mass_of_melted_regolith_sample_g: '0.00'
+          initial_pressure_mbar_as_published: '1.0 × 10^-6'
+          chamber_pressure_mbar_as_published: '2 × 10^-5 to 3 × 10^-4'
+          setup_version: 3
+          sample_as_published: EAC-1A
+          sample_composition_pointer: 'Table 4.1, EAC-1A column; composition used for thermochemical simulations'
+          temperature_K_as_published: '1400 to 1450'
+          temperature_locator: {page: 44, published_page: 29, pdf_page_index: 43, paragraph: 'Sample 9 temperature description in section 3.3.1'}
+          temperature_measurement: Optris IR camera peak surface measurement; thermocouples were not useful during solar exposure
+          container_as_published: Regolith in crucible; Table 3.3 does not identify crucible material for this exposure
+          heating_method_as_published: Focused sunlight; shade manually removed to start and replaced to end the exposure
+          heating_rate: not reported
+          note: 'partially sintered sample; below melting temperature; m is melted regolith mass, not initial sample mass or measured mass loss'
+      - observation_id: sesko_2022_table3_3_exposure_10
+        type: experiment_series
+        experiment: sesko_2022_exposure_10
+        locator: {page: 42, published_page: 27, pdf_page_index: 41, table: '3.3'}
+        units: as printed
+        values:
+          quantity: measured_solar_exposure_conditions
+          exposure: 10
+          duration_hms: '00:31:00'
+          mass_of_melted_regolith_sample_g: '1.03'
+          initial_pressure_mbar_as_published: '1.5 × 10^-6'
+          chamber_pressure_mbar_as_published: '5 × 10^-5 to 8 × 10^-3'
+          setup_version: 3
+          sample_as_published: EAC-1A
+          sample_composition_pointer: 'Table 4.1, EAC-1A column; composition used for thermochemical simulations'
+          temperature_measurement: Optris IR camera peak surface measurement; thermocouples were not useful during solar exposure
+          container_as_published: Regolith in crucible; Table 3.3 does not identify crucible material for this exposure
+          heating_method_as_published: Focused sunlight; shade manually removed to start and replaced to end the exposure
+          heating_rate: not reported
+          note: 'm is the mass of melted regolith sample, not initial sample mass or measured mass loss'
+      - observation_id: sesko_2022_exposure_10_temperature_figure_read
+        type: experiment_series
+        experiment: sesko_2022_exposure_10
+        locator: {page: 43, published_page: 28, pdf_page_index: 42, figure: '3.10a'}
+        units: K
+        values:
+          quantity: figure_digitized_surface_temperature
+          method_class: figure_digitized
+          read_method: Approximate operating range read from the plotted temperature trace and right-hand Kelvin axis, rounded to about 50 K; no temperature table is printed.
+          surface_temperature_range_K_approximate: '1750 to 2050'
+          temperature_measurement: Optris IR camera, peak surface temperature, emissivity 0.98
+      - observation_id: sesko_2022_table3_3_exposure_11
+        type: experiment_series
+        experiment: sesko_2022_exposure_11
+        locator: {page: 42, published_page: 27, pdf_page_index: 41, table: '3.3'}
+        units: as printed
+        values:
+          quantity: measured_solar_exposure_conditions
+          exposure: 11
+          duration_hms: '00:10:00'
+          mass_of_melted_regolith_sample_g: '0.66'
+          initial_pressure_mbar_as_published: '5.0 × 10^-7'
+          chamber_pressure_mbar_as_published: '2 × 10^-4 to 2 × 10^-2'
+          setup_version: 3
+          sample_as_published: EAC-1A
+          sample_composition_pointer: 'Table 4.1, EAC-1A column; composition used for thermochemical simulations'
+          temperature_measurement: Optris IR camera peak surface measurement; thermocouples were not useful during solar exposure
+          container_as_published: Regolith in crucible; Table 3.3 does not identify crucible material for this exposure
+          heating_method_as_published: Focused sunlight; shade manually removed to start and replaced to end the exposure
+          heating_rate: not reported
+          note: 'm is the mass of melted regolith sample, not initial sample mass or measured mass loss'
+      - observation_id: sesko_2022_exposure_11_temperature_figure_read
+        type: experiment_series
+        experiment: sesko_2022_exposure_11
+        locator: {page: 43, published_page: 28, pdf_page_index: 42, figure: '3.10b'}
+        units: K
+        values:
+          quantity: figure_digitized_surface_temperature
+          method_class: figure_digitized
+          read_method: Approximate operating range read from the plotted temperature trace and right-hand Kelvin axis, rounded to about 50 K; no temperature table is printed.
+          surface_temperature_range_K_approximate: '1750 to 2000'
+          temperature_measurement: Optris IR camera, peak surface temperature, emissivity 0.98
+      - observation_id: sesko_2022_exposure_12_temperature_figure_read
+        type: experiment_series
+        experiment: sesko_2022_exposure_12
+        locator: {page: 44, published_page: 29, pdf_page_index: 43, figure: '3.11'}
+        units: K
+        values:
+          quantity: figure_digitized_surface_temperature
+          sample_as_published: EAC-1A
+          sample_composition_pointer: 'Table 4.1, EAC-1A column; composition used for thermochemical simulations'
+          method_class: figure_digitized
+          read_method: Approximate range read from the plotted temperature trace and right-hand Kelvin axis; no temperature table is printed.
+          surface_temperature_range_K_approximate: '1600 to 2100'
+          temperature_measurement: Optris IR camera, peak surface temperature, emissivity 0.98
+          container_as_published: Crucible; the thesis identifies pure alumina ceramic for the crucible used after exposure 12
+          heating_method_as_published: Focused sunlight; shade manually removed to start and replaced to end the exposure
+          heating_rate: not reported
+          overlap_note: Table 3.3 duration, melt mass, and pressure for exposure 12 are already held as conditions in kems-036-sesko-2024 and are not repeated here.
+      - observation_id: sesko_2022_temperature_measurement_conditions
+        type: method
+        locator: {page: 37, published_page: 22, pdf_page_index: 36, section: '3.1.3 Sensors and measurement'}
+        units: as printed
+        values:
+          quantity: temperature_and_pressure_measurement_methods
+          pressure: KJL CCPG-H2-6 cold-cathode/Pirani combination gauge connected directly to the chamber
+          heating_method: concentrated sunlight from heliostat mirror and Fresnel lens; manual shade removal starts and ends each exposure
+          heating_rate: not reported
+          holding_time: no separate isothermal hold; exposure duration is listed per run in Table 3.3
+      - observation_id: sesko_2022_temperature_camera_calibration_method
+        type: method
+        locator: {page: 38, published_page: 23, pdf_page_index: 37, section: '3.1.3 Sensors and measurement'}
+        units: as printed
+        values:
+          quantity: temperature_measurement_and_camera_window_error
+          temperature: Optris IR camera through the solar window; logged peak surface temperature at emissivity 0.98; Type-K thermocouples were not useful during solar exposure
+          camera_window_error_C: '14.5 average over 1000 °C to 1450 °C, based on eight measurement sets'
+          camera_calibration_pointer: Table A.2
+      - observation_id: sesko_2022_edx_melt_residue_qualitative
+        type: characterization
+        locator: {page: 50, published_page: 35, pdf_page_index: 49, figure: '3.19'}
+        units: qualitative EDX, silicon-normalized counts
+        values:
+          quantity: qualitative_residue_composition_context
+          samples: [10, 11, 12]
+          method: Point EDX on selected melt and condensation-skin surfaces; no quantitative composition table is printed.
+          melt_surface: Oxygen signal lower than the bulk EAC-1A reference for all three samples; no significant difference in other major elements was resolved.
+          condensation_skin: Oxygen signal appears lower than bulk, with larger variation in other elements; magnesium signal elevated at sample 11 point 2 and sample 12 points 1 and 2.
+          sample_11_skin_point_1: Strong iron and oxygen signal, excluded from Figure 3.19b to avoid skewing the graph; source suggests a high-iron-oxide particle.
+          limitation: EDX depth and condensate thickness are unknown; no composition of the melt beneath the surface is established.
+          composition_basis: Recorded qualitatively; plotted silicon-normalized counts are not reported as composition percentages.
+      - observation_id: sesko_2022_exposure_12_condensate_edx_distinction
+        type: characterization
+        experiment: sesko_2022_exposure_12
+        locator: {page: 51, published_page: 36, pdf_page_index: 50, figure: '3.20'}
+        units: qualitative EDX
+        values:
+          quantity: qualitative_condensate_composition_context
+          figure_observations: Figure 3.20 shows EDX spectra for regions A and B; no quantitative composition table is printed.
+          overlap_note: 'The exposure-12 condensate EDX measurement is held in kems-036-sesko-2024; this row retains only the thesis-specific A/B layering and relative-signal description not represented there.'
+      - observation_id: sesko_2022_exposure_12_condensate_explanation
+        type: characterization
+        experiment: sesko_2022_exposure_12
+        locator: {page: 50, published_page: 35, pdf_page_index: 49, section: '3.3.2 Condensate'}
+        units: qualitative EDX
+        values:
+          quantity: qualitative_condensate_composition_context
+          regions: [A, B]
+          relation: Region A appears to have deposited first; region B is layered over it.
+          region_A: Aluminum and oxygen are present; the thesis attributes aluminum to the alumina crucible seen through a thin condensate layer.
+          region_B: Aluminum peak absent; sodium signal is stronger relative to potassium than in region A.
+          overlap_note: 'The exposure-12 condensate EDX measurement is held in kems-036-sesko-2024; this row retains only the thesis-specific A/B layering and relative-signal description not represented there.'
+      - observation_id: sesko_2022_measured_yield_absence
+        type: experiment_series
+        locator: {page: 44, published_page: 29, pdf_page_index: 43, section: '3.3.1 Pressure and temperature measurements'}
+        units: as printed
+        values:
+          quantity: measured_gas_and_mass_loss_results
+          oxygen_yield: no quantitative oxygen or gas yield reported; RGA produced no significant gas-composition results
+          mass_loss: no mass-loss value reported; Table 3.3 m is mass of melted regolith samples, not initial-minus-final sample mass
+          heating_rate: not reported
+          source_note: All exposures exceeded the RGA measurement limit of 10^-5 mbar; source attributes much of the gas to desorbed volatiles and says the amount of vaporization products is undetermined.
+experiments:
+  - experiment_id: sesko_2022_exposure_1
+    method: solar_furnace_pyrolysis
+    locator: {page: 42, published_page: 27, pdf_page_index: 41, table: '3.3'}
+  - experiment_id: sesko_2022_exposure_2
+    method: solar_furnace_pyrolysis
+    locator: {page: 42, published_page: 27, pdf_page_index: 41, table: '3.3'}
+  - experiment_id: sesko_2022_exposure_3
+    method: solar_furnace_pyrolysis
+    locator: {page: 42, published_page: 27, pdf_page_index: 41, table: '3.3'}
+  - experiment_id: sesko_2022_exposure_4
+    method: solar_furnace_pyrolysis
+    locator: {page: 42, published_page: 27, pdf_page_index: 41, table: '3.3'}
+  - experiment_id: sesko_2022_exposure_5
+    method: solar_furnace_pyrolysis
+    locator: {page: 42, published_page: 27, pdf_page_index: 41, table: '3.3'}
+  - experiment_id: sesko_2022_exposure_6
+    method: solar_furnace_pyrolysis
+    locator: {page: 42, published_page: 27, pdf_page_index: 41, table: '3.3'}
+  - experiment_id: sesko_2022_exposure_7
+    method: solar_furnace_pyrolysis
+    locator: {page: 42, published_page: 27, pdf_page_index: 41, table: '3.3'}
+  - experiment_id: sesko_2022_exposure_8
+    method: solar_furnace_pyrolysis
+    locator: {page: 42, published_page: 27, pdf_page_index: 41, table: '3.3'}
+  - experiment_id: sesko_2022_exposure_9
+    method: solar_furnace_pyrolysis
+    locator: {page: 42, published_page: 27, pdf_page_index: 41, table: '3.3'}
+  - experiment_id: sesko_2022_exposure_10
+    method: solar_furnace_pyrolysis
+    locator: {page: 42, published_page: 27, pdf_page_index: 41, table: '3.3'}
+  - experiment_id: sesko_2022_exposure_11
+    method: solar_furnace_pyrolysis
+    locator: {page: 42, published_page: 27, pdf_page_index: 41, table: '3.3'}
+  - experiment_id: sesko_2022_exposure_12
+    method: solar_furnace_pyrolysis
+    locator: {page: 44, published_page: 29, pdf_page_index: 43, figure: '3.11'}

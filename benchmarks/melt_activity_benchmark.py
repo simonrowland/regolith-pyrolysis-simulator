@@ -1393,6 +1393,116 @@ def measured_activity_basis(point: Mapping[str, Any]) -> str:
     return "unstated"
 
 
+def _liquid_standard_measured_activity(
+    point: Mapping[str, Any],
+) -> tuple[float, str]:
+    """Return a pure-liquid comparison value for a solid-standard activity."""
+
+    measured = float(point["measured"])
+    if (
+        str(point.get("observable")) != "activity"
+        or measured_activity_basis(point) != "pure_solid"
+    ):
+        return measured, ""
+
+    from decimal import Decimal
+
+    from simulator.battery.enums import (
+        AdmissionStatus,
+        EvidenceClass,
+        PerBasis,
+        Phase,
+        Quantity,
+        ReferenceStateConvention,
+        UncertaintyKind,
+    )
+    from simulator.battery.identity import Identity
+    from simulator.battery.records import (
+        Admission,
+        Evidence,
+        Observation,
+        Species,
+        StandardState,
+        Uncertainty,
+        Value,
+    )
+    from simulator.battery.score import fusion_comparison_reference
+    from simulator.state_types import State
+
+    oxide = str(point["parent_oxide"])
+    solid_activity = Decimal(str(point["measured"]))
+    identity = Identity(
+        quantity=Quantity.ACTIVITY,
+        species=Species(oxide, Phase.L),
+        temperature_K=State.of(Decimal(str(point["temperature_K"]))),
+        per=State.of(PerBasis.DIMENSIONLESS),
+        reference_state=State.of(
+            StandardState(
+                convention=ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
+                endmember=Species(oxide, Phase.CR),
+                component_basis=oxide,
+                reference_pressure_bar=Decimal("1"),
+            )
+        ),
+    )
+    reference = Observation(
+        observation_id=str(point["id"]),
+        experiment_id="melt-activity-benchmark",
+        identity=identity,
+        value=Value.point_of(solid_activity),
+        uncertainty=Uncertainty(kind=UncertaintyKind.NONE),
+        evidence=Evidence(class_=State.of(EvidenceClass.MEASURED_DIRECT)),
+        admission=Admission(status=AdmissionStatus.ADMITTED, reason="bench source row"),
+        notices=(),
+    )
+    liquid_reference = fusion_comparison_reference(reference)
+    conversion_notice = next(
+        (
+            notice
+            for notice in liquid_reference.notices
+            if "DeltaG_fus=" in notice.reason
+        ),
+        None,
+    )
+    if liquid_reference.value.point is None or conversion_notice is None:
+        raise ValueError(
+            f"{point['id']}: battery scorer did not convert the solid activity reference"
+        )
+
+    conversion_details = dict(
+        field.split("=", 1)
+        for field in conversion_notice.reason.split("; ")
+        if "=" in field
+    )
+    delta_g_fus_kJ_per_mol = conversion_details["DeltaG_fus"].removesuffix(
+        " kJ/mol"
+    )
+    factor = liquid_reference.value.point / solid_activity
+    inference_notice = next(
+        (
+            notice
+            for notice in liquid_reference.notices
+            if notice.reason.startswith("reference_polymorph_inferred_from_stability: ")
+        ),
+        None,
+    )
+    inference = "polymorph_inference_flag=not_emitted_by_battery_scorer"
+    if inference_notice is not None:
+        _, _, payload = inference_notice.reason.partition(":")
+        inferred = json.loads(payload.strip())
+        inference = (
+            f"polymorph_inference_flag=true; "
+            f"chosen_polymorph={inferred['chosen_polymorph']}; "
+            f"stability_bound_dex={inferred['bound_dex']}"
+        )
+    reason = (
+        "solid_to_liquid_reference_conversion: "
+        f"DeltaG_fus={delta_g_fus_kJ_per_mol} kJ/mol; "
+        f"factor={factor}; JANAF_tables={conversion_details['tables']}; {inference}"
+    )
+    return float(liquid_reference.value.point), reason
+
+
 def engine_activity_basis(details: Mapping[str, Any] | None) -> str | None:
     """The reference state the ENGINE declares, or None when it declares none.
 
@@ -1428,6 +1538,7 @@ def run_points(
         composition_id = str(point["composition_id"])
         composition = composition_wt_pct_for_point(point, compositions)
         temperature_K = float(point["temperature_K"])
+        measured, conversion_reason = _liquid_standard_measured_activity(point)
         activity_observable = str(point["observable"]) in {
             "activity",
             "activity_coefficient",
@@ -1459,7 +1570,6 @@ def run_points(
                 if result.status == "ok" and prediction is None
                 else result.status
             )
-            measured = float(point["measured"])
             residual = (
                 math.log10(prediction / measured)
                 if prediction is not None and measured > 0.0 and bool(point.get("score", True))
@@ -1482,7 +1592,11 @@ def run_points(
                     "prediction": prediction,
                     "residual_dex": residual,
                     "score": bool(point.get("score", True)),
-                    "reason": prediction_reason or result.reason,
+                    "reason": "; ".join(
+                        reason
+                        for reason in (prediction_reason or result.reason, conversion_reason)
+                        if reason
+                    ),
                     # b-205 (diagnostic only, owner ruling 2026-08-18): whether
                     # this row's measurement and prediction share a declared
                     # activity reference state. Nothing refuses on it yet.
