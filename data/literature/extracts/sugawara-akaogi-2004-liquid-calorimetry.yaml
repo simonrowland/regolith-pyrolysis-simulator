@@ -5,7 +5,6 @@ source:
   doi: 10.2138/am-2004-11-1202
   url: https://libgen.li/file.php?id=52571282
   year: 2004
-  sha256: dfbc23f1e1c02efe073f9264db9b5229ca23a7981374e35bd44eed6ecfcbc316
 extraction:
   method: >-
     Manual transcription of the published PDF. Table 1 was read from its 200 dpi rendered page image twice, first by rows and then by columns; the two reads agreed. The abstract, equations 4, 8, 9, 11, 15, 17, Tables 3–5, and calorimetry methods were checked against rendered page images and layout text. Figures 6 and 8 were rendered at 600 dpi; both axes were calibrated from labelled ticks, and plotted point centres were read twice independently. Figure-read coordinates, axis fits, and both read values are recorded in the worker report.
@@ -14,176 +13,164 @@ extraction:
 review_status: draft
 fidelity_samples:
   - path: species.Na2SiO3.observations[suga04_t1_nf_drop_enthalpy].values.series[0]
-    value: {sample: NF-1, Na2SiO3: 1.000, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 210.6, uncertainty_kJ_mol: 7.9, experiments: 9}
+    value: {sample: NF-1, Na2SiO3: 1.000, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment: 210.6, uncertainty_kJ_mol: 7.9, experiments: 9}
     locator: {page: 3, pdf_page_index: 2, published_page: 1588, table: '1'}
   - path: species.Na2SiO3.observations[suga04_t1_nf_drop_enthalpy].values.series[1]
-    value: {sample: NF-2, Na2SiO3: 0.880, Fe2O3: 0.120, SiO2: 0.000, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 213.4, uncertainty_kJ_mol: 6.0, experiments: 8}
+    value: {sample: NF-2, Na2SiO3: 0.880, Fe2O3: 0.120, SiO2: 0.000, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment: 213.4, uncertainty_kJ_mol: 6.0, experiments: 8}
     locator: {page: 3, pdf_page_index: 2, published_page: 1588, table: '1'}
   - path: species.Na2SiO3.observations[suga04_t1_nf_drop_enthalpy].values.series[2]
-    value: {sample: NF-3, Na2SiO3: 0.780, Fe2O3: 0.220, SiO2: 0.000, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 212.3, uncertainty_kJ_mol: 10.7, experiments: 8}
+    value: {sample: NF-3, Na2SiO3: 0.780, Fe2O3: 0.220, SiO2: 0.000, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment: 212.3, uncertainty_kJ_mol: 10.7, experiments: 8}
     locator: {page: 3, pdf_page_index: 2, published_page: 1588, table: '1'}
   - path: species.Na2SiO3.observations[suga04_t1_nf_drop_enthalpy].values.series[3]
-    value: {sample: NF-4, Na2SiO3: 0.680, Fe2O3: 0.320, SiO2: 0.000, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 221.5, uncertainty_kJ_mol: 9.6, experiments: 13}
+    value: {sample: NF-4, Na2SiO3: 0.680, Fe2O3: 0.320, SiO2: 0.000, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment: 221.5, uncertainty_kJ_mol: 9.6, experiments: 13}
     locator: {page: 3, pdf_page_index: 2, published_page: 1588, table: '1'}
   - path: species.Na2SiO3.observations[suga04_t1_nf_drop_enthalpy].values.series[4]
-    value: {sample: NF-5, Na2SiO3: 0.580, Fe2O3: 0.420, SiO2: 0.000, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 219.8, uncertainty_kJ_mol: 7.4, experiments: 9}
+    value: {sample: NF-5, Na2SiO3: 0.580, Fe2O3: 0.420, SiO2: 0.000, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment: 219.8, uncertainty_kJ_mol: 7.4, experiments: 9}
     locator: {page: 3, pdf_page_index: 2, published_page: 1588, table: '1'}
   - path: species.Na2SiO3.observations[suga04_t1_ns_drop_enthalpy].values.series[0]
-    value: {sample: NS-1, Na2SiO3: 0.700, Fe2O3: 0.000, SiO2: 0.300, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 168.5, uncertainty_kJ_mol: 10.9, experiments: 5}
+    value: {sample: NS-1, Na2SiO3: 0.700, Fe2O3: 0.000, SiO2: 0.300, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment: 168.5, uncertainty_kJ_mol: 10.9, experiments: 5}
     locator: {page: 3, pdf_page_index: 2, published_page: 1588, table: '1'}
   - path: species.Na2SiO3.observations[suga04_t1_ns_drop_enthalpy].values.series[1]
-    value: {sample: NS-2, Na2SiO3: 0.500, Fe2O3: 0.000, SiO2: 0.500, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 141.7, uncertainty_kJ_mol: 8.5, experiments: 6}
+    value: {sample: NS-2, Na2SiO3: 0.500, Fe2O3: 0.000, SiO2: 0.500, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment: 141.7, uncertainty_kJ_mol: 8.5, experiments: 6}
     locator: {page: 3, pdf_page_index: 2, published_page: 1588, table: '1'}
   - path: species.Na2SiO3.observations[suga04_t1_ns_drop_enthalpy].values.series[2]
-    value: {sample: NS-3, Na2SiO3: 0.300, Fe2O3: 0.000, SiO2: 0.700, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 117.8, uncertainty_kJ_mol: 8.4, experiments: 6}
+    value: {sample: NS-3, Na2SiO3: 0.300, Fe2O3: 0.000, SiO2: 0.700, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment: 117.8, uncertainty_kJ_mol: 8.4, experiments: 6}
     locator: {page: 3, pdf_page_index: 2, published_page: 1588, table: '1'}
   - path: species.Na2SiO3.observations[suga04_t1_nfs_drop_enthalpy].values.series[0]
-    value: {sample: NFS-1, Na2SiO3: 0.692, Fe2O3: 0.077, SiO2: 0.231, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 187.2, uncertainty_kJ_mol: 7.9, experiments: 6}
+    value: {sample: NFS-1, Na2SiO3: 0.692, Fe2O3: 0.077, SiO2: 0.231, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment: 187.2, uncertainty_kJ_mol: 7.9, experiments: 6}
     locator: {page: 3, pdf_page_index: 2, published_page: 1588, table: '1'}
   - path: species.Na2SiO3.observations[suga04_t1_nfs_drop_enthalpy].values.series[1]
-    value: {sample: NFS-2, Na2SiO3: 0.429, Fe2O3: 0.143, SiO2: 0.429, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 153.7, uncertainty_kJ_mol: 9.8, experiments: 5}
+    value: {sample: NFS-2, Na2SiO3: 0.429, Fe2O3: 0.143, SiO2: 0.429, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment: 153.7, uncertainty_kJ_mol: 9.8, experiments: 5}
     locator: {page: 3, pdf_page_index: 2, published_page: 1588, table: '1'}
   - path: species.Na2SiO3.observations[suga04_t1_nfs_drop_enthalpy].values.series[2]
-    value: {sample: NFS-3, Na2SiO3: 0.273, Fe2O3: 0.182, SiO2: 0.546, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 139.5, uncertainty_kJ_mol: 8.7, experiments: 6}
+    value: {sample: NFS-3, Na2SiO3: 0.273, Fe2O3: 0.182, SiO2: 0.546, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment: 139.5, uncertainty_kJ_mol: 8.7, experiments: 6}
     locator: {page: 3, pdf_page_index: 2, published_page: 1588, table: '1'}
   - path: species.Na2SiO3.observations[suga04_t1_nfs_drop_enthalpy].values.series[3]
-    value: {sample: NFS-4, Na2SiO3: 0.499, Fe2O3: 0.270, SiO2: 0.231, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 180.3, uncertainty_kJ_mol: 14.1, experiments: 6}
+    value: {sample: NFS-4, Na2SiO3: 0.499, Fe2O3: 0.270, SiO2: 0.231, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment: 180.3, uncertainty_kJ_mol: 14.1, experiments: 6}
     locator: {page: 3, pdf_page_index: 2, published_page: 1588, table: '1'}
   - path: species.NaFeSi2O6.observations[suga04_t1_nac_drop_enthalpy].values.series[0]
-    value: {sample: NAc-1, Na2SiO3: 0.800, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 0.200, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 237.7, uncertainty_kJ_mol: 10.1, experiments: 11}
+    value: {sample: NAc-1, Na2SiO3: 0.800, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 0.200, T_K: 1373, state: Liquid, enthalpy_increment: 237.7, uncertainty_kJ_mol: 10.1, experiments: 11}
     locator: {page: 3, pdf_page_index: 2, published_page: 1588, table: '1'}
   - path: species.NaFeSi2O6.observations[suga04_t1_nac_drop_enthalpy].values.series[1]
-    value: {sample: NAc-2, Na2SiO3: 0.650, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 0.350, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 249.1, uncertainty_kJ_mol: 12.0, experiments: 9}
+    value: {sample: NAc-2, Na2SiO3: 0.650, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 0.350, T_K: 1373, state: Liquid, enthalpy_increment: 249.1, uncertainty_kJ_mol: 12.0, experiments: 9}
     locator: {page: 3, pdf_page_index: 2, published_page: 1588, table: '1'}
   - path: species.NaFeSi2O6.observations[suga04_t1_nac_drop_enthalpy].values.series[2]
-    value: {sample: NAc-3, Na2SiO3: 0.500, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 0.500, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 275.0, uncertainty_kJ_mol: 8.5, experiments: 8}
+    value: {sample: NAc-3, Na2SiO3: 0.500, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 0.500, T_K: 1373, state: Liquid, enthalpy_increment: 275.0, uncertainty_kJ_mol: 8.5, experiments: 8}
     locator: {page: 3, pdf_page_index: 2, published_page: 1588, table: '1'}
   - path: species.NaFeSi2O6.observations[suga04_t1_nac_drop_enthalpy].values.series[3]
-    value: {sample: NAc-4, Na2SiO3: 0.350, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 0.650, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 291.9, uncertainty_kJ_mol: 11.7, experiments: 10}
+    value: {sample: NAc-4, Na2SiO3: 0.350, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 0.650, T_K: 1373, state: Liquid, enthalpy_increment: 291.9, uncertainty_kJ_mol: 11.7, experiments: 10}
     locator: {page: 3, pdf_page_index: 2, published_page: 1588, table: '1'}
   - path: species.NaFeSi2O6.observations[suga04_t1_nac_drop_enthalpy].values.series[4]
-    value: {sample: NAc-5, Na2SiO3: 0.200, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 0.800, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 297.5, uncertainty_kJ_mol: 6.7, experiments: 11}
+    value: {sample: NAc-5, Na2SiO3: 0.200, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 0.800, T_K: 1373, state: Liquid, enthalpy_increment: 297.5, uncertainty_kJ_mol: 6.7, experiments: 11}
     locator: {page: 3, pdf_page_index: 2, published_page: 1588, table: '1'}
   - path: species.NaFeSi2O6.observations[suga04_t1_acmite_solid_drop_enthalpy].values.series[0]
-    value: {sample: Ac-1, Na2SiO3: 0.000, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 1.000, T_K: 923, state: Solid, enthalpy_increment_kJ_mol: 130.8, uncertainty_kJ_mol: 6.6, experiments: 5}
+    value: {sample: Ac-1, Na2SiO3: 0.000, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 1.000, T_K: 923, state: Solid, enthalpy_increment: 130.8, uncertainty_kJ_mol: 6.6, experiments: 5}
     locator: {page: 3, pdf_page_index: 2, published_page: 1588, table: '1'}
   - path: species.NaFeSi2O6.observations[suga04_t1_acmite_solid_drop_enthalpy].values.series[1]
-    value: {sample: Ac-2, Na2SiO3: 0.000, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 1.000, T_K: 1023, state: Solid, enthalpy_increment_kJ_mol: 168.8, uncertainty_kJ_mol: 8.4, experiments: 5}
+    value: {sample: Ac-2, Na2SiO3: 0.000, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 1.000, T_K: 1023, state: Solid, enthalpy_increment: 168.8, uncertainty_kJ_mol: 8.4, experiments: 5}
     locator: {page: 3, pdf_page_index: 2, published_page: 1588, table: '1'}
   - path: species.NaFeSi2O6.observations[suga04_t1_acmite_solid_drop_enthalpy].values.series[2]
-    value: {sample: Ac-3, Na2SiO3: 0.000, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 1.000, T_K: 1123, state: Solid, enthalpy_increment_kJ_mol: 194.8, uncertainty_kJ_mol: 10.7, experiments: 4}
+    value: {sample: Ac-3, Na2SiO3: 0.000, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 1.000, T_K: 1123, state: Solid, enthalpy_increment: 194.8, uncertainty_kJ_mol: 10.7, experiments: 4}
     locator: {page: 3, pdf_page_index: 2, published_page: 1588, table: '1'}
   - path: species.NaFeSi2O6.observations[suga04_t1_acmite_solid_drop_enthalpy].values.series[3]
-    value: {sample: Ac-4, Na2SiO3: 0.000, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 1.000, T_K: 1223, state: Solid, enthalpy_increment_kJ_mol: 216.2, uncertainty_kJ_mol: 12.8, experiments: 5}
+    value: {sample: Ac-4, Na2SiO3: 0.000, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 1.000, T_K: 1223, state: Solid, enthalpy_increment: 216.2, uncertainty_kJ_mol: 12.8, experiments: 5}
     locator: {page: 3, pdf_page_index: 2, published_page: 1588, table: '1'}
   - path: species.Fe2O3.observations[suga04_t1_hematite_drop_enthalpy].values.series[0]
-    value: {sample: Hematite, Na2SiO3: 0.000, Fe2O3: 1.000, SiO2: 0.000, NaFeSi2O6: 0.000, T_K: 1373, state: Solid, enthalpy_increment_kJ_mol: 152.2, uncertainty_kJ_mol: 6.4, experiments: 10}
+    value: {sample: Hematite, Na2SiO3: 0.000, Fe2O3: 1.000, SiO2: 0.000, NaFeSi2O6: 0.000, T_K: 1373, state: Solid, enthalpy_increment: 152.2, uncertainty_kJ_mol: 6.4, experiments: 10}
     locator: {page: 3, pdf_page_index: 2, published_page: 1588, table: '1'}
   - path: species.Na2SiO3.observations[suga04_t1_ns_drop_enthalpy].values.series
     value:
-      - {sample: NS-1, Na2SiO3: 0.700, Fe2O3: 0.000, SiO2: 0.300, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 168.5, uncertainty_kJ_mol: 10.9, experiments: 5}
-      - {sample: NS-2, Na2SiO3: 0.500, Fe2O3: 0.000, SiO2: 0.500, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 141.7, uncertainty_kJ_mol: 8.5, experiments: 6}
-      - {sample: NS-3, Na2SiO3: 0.300, Fe2O3: 0.000, SiO2: 0.700, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 117.8, uncertainty_kJ_mol: 8.4, experiments: 6}
+      - {sample: NS-1, Na2SiO3: 0.700, Fe2O3: 0.000, SiO2: 0.300, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment: 168.5, uncertainty_kJ_mol: 10.9, experiments: 5}
+      - {sample: NS-2, Na2SiO3: 0.500, Fe2O3: 0.000, SiO2: 0.500, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment: 141.7, uncertainty_kJ_mol: 8.5, experiments: 6}
+      - {sample: NS-3, Na2SiO3: 0.300, Fe2O3: 0.000, SiO2: 0.700, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment: 117.8, uncertainty_kJ_mol: 8.4, experiments: 6}
     locator: {page: 3, pdf_page_index: 2, published_page: 1588, table: '1'}
   - path: species.Na2SiO3.observations[suga04_t1_nfs_drop_enthalpy].values.series
     value:
-      - {sample: NFS-1, Na2SiO3: 0.692, Fe2O3: 0.077, SiO2: 0.231, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 187.2, uncertainty_kJ_mol: 7.9, experiments: 6}
-      - {sample: NFS-2, Na2SiO3: 0.429, Fe2O3: 0.143, SiO2: 0.429, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 153.7, uncertainty_kJ_mol: 9.8, experiments: 5}
-      - {sample: NFS-3, Na2SiO3: 0.273, Fe2O3: 0.182, SiO2: 0.546, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 139.5, uncertainty_kJ_mol: 8.7, experiments: 6}
-      - {sample: NFS-4, Na2SiO3: 0.499, Fe2O3: 0.270, SiO2: 0.231, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 180.3, uncertainty_kJ_mol: 14.1, experiments: 6}
+      - {sample: NFS-1, Na2SiO3: 0.692, Fe2O3: 0.077, SiO2: 0.231, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment: 187.2, uncertainty_kJ_mol: 7.9, experiments: 6}
+      - {sample: NFS-2, Na2SiO3: 0.429, Fe2O3: 0.143, SiO2: 0.429, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment: 153.7, uncertainty_kJ_mol: 9.8, experiments: 5}
+      - {sample: NFS-3, Na2SiO3: 0.273, Fe2O3: 0.182, SiO2: 0.546, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment: 139.5, uncertainty_kJ_mol: 8.7, experiments: 6}
+      - {sample: NFS-4, Na2SiO3: 0.499, Fe2O3: 0.270, SiO2: 0.231, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment: 180.3, uncertainty_kJ_mol: 14.1, experiments: 6}
     locator: {page: 3, pdf_page_index: 2, published_page: 1588, table: '1'}
   - path: species.NaFeSi2O6.observations[suga04_t1_nac_drop_enthalpy].values.series
     value:
-      - {sample: NAc-1, Na2SiO3: 0.800, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 0.200, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 237.7, uncertainty_kJ_mol: 10.1, experiments: 11}
-      - {sample: NAc-2, Na2SiO3: 0.650, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 0.350, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 249.1, uncertainty_kJ_mol: 12.0, experiments: 9}
-      - {sample: NAc-3, Na2SiO3: 0.500, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 0.500, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 275.0, uncertainty_kJ_mol: 8.5, experiments: 8}
-      - {sample: NAc-4, Na2SiO3: 0.350, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 0.650, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 291.9, uncertainty_kJ_mol: 11.7, experiments: 10}
-      - {sample: NAc-5, Na2SiO3: 0.200, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 0.800, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 297.5, uncertainty_kJ_mol: 6.7, experiments: 11}
+      - {sample: NAc-1, Na2SiO3: 0.800, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 0.200, T_K: 1373, state: Liquid, enthalpy_increment: 237.7, uncertainty_kJ_mol: 10.1, experiments: 11}
+      - {sample: NAc-2, Na2SiO3: 0.650, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 0.350, T_K: 1373, state: Liquid, enthalpy_increment: 249.1, uncertainty_kJ_mol: 12.0, experiments: 9}
+      - {sample: NAc-3, Na2SiO3: 0.500, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 0.500, T_K: 1373, state: Liquid, enthalpy_increment: 275.0, uncertainty_kJ_mol: 8.5, experiments: 8}
+      - {sample: NAc-4, Na2SiO3: 0.350, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 0.650, T_K: 1373, state: Liquid, enthalpy_increment: 291.9, uncertainty_kJ_mol: 11.7, experiments: 10}
+      - {sample: NAc-5, Na2SiO3: 0.200, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 0.800, T_K: 1373, state: Liquid, enthalpy_increment: 297.5, uncertainty_kJ_mol: 6.7, experiments: 11}
     locator: {page: 3, pdf_page_index: 2, published_page: 1588, table: '1'}
   - path: species.NaFeSi2O6.observations[suga04_t1_acmite_solid_drop_enthalpy].values.series
     value:
-      - {sample: Ac-1, Na2SiO3: 0.000, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 1.000, T_K: 923, state: Solid, enthalpy_increment_kJ_mol: 130.8, uncertainty_kJ_mol: 6.6, experiments: 5}
-      - {sample: Ac-2, Na2SiO3: 0.000, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 1.000, T_K: 1023, state: Solid, enthalpy_increment_kJ_mol: 168.8, uncertainty_kJ_mol: 8.4, experiments: 5}
-      - {sample: Ac-3, Na2SiO3: 0.000, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 1.000, T_K: 1123, state: Solid, enthalpy_increment_kJ_mol: 194.8, uncertainty_kJ_mol: 10.7, experiments: 4}
-      - {sample: Ac-4, Na2SiO3: 0.000, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 1.000, T_K: 1223, state: Solid, enthalpy_increment_kJ_mol: 216.2, uncertainty_kJ_mol: 12.8, experiments: 5}
+      - {sample: Ac-1, Na2SiO3: 0.000, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 1.000, T_K: 923, state: Solid, enthalpy_increment: 130.8, uncertainty_kJ_mol: 6.6, experiments: 5}
+      - {sample: Ac-2, Na2SiO3: 0.000, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 1.000, T_K: 1023, state: Solid, enthalpy_increment: 168.8, uncertainty_kJ_mol: 8.4, experiments: 5}
+      - {sample: Ac-3, Na2SiO3: 0.000, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 1.000, T_K: 1123, state: Solid, enthalpy_increment: 194.8, uncertainty_kJ_mol: 10.7, experiments: 4}
+      - {sample: Ac-4, Na2SiO3: 0.000, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 1.000, T_K: 1223, state: Solid, enthalpy_increment: 216.2, uncertainty_kJ_mol: 12.8, experiments: 5}
     locator: {page: 3, pdf_page_index: 2, published_page: 1588, table: '1'}
   - path: species.Na2SiO3.observations[suga04_t3_nfs_excess_enthalpy].values.series
     value:
-      - {sample: NFS-1, Na2SiO3: 0.692, Fe2O3: 0.077, SiO2: 0.231, measured_H_kJ_mol: 187.2, calculated_H_kJ_mol: 181.6, excess_enthalpy_kJ_mol: 5.6}
-      - {sample: NFS-2, Na2SiO3: 0.429, Fe2O3: 0.143, SiO2: 0.429, measured_H_kJ_mol: 153.7, calculated_H_kJ_mol: 156.7, excess_enthalpy_kJ_mol: -3.0}
-      - {sample: NFS-3, Na2SiO3: 0.273, Fe2O3: 0.182, SiO2: 0.546, measured_H_kJ_mol: 139.5, calculated_H_kJ_mol: 142.0, excess_enthalpy_kJ_mol: -2.5}
-      - {sample: NFS-4, Na2SiO3: 0.499, Fe2O3: 0.270, SiO2: 0.231, measured_H_kJ_mol: 180.3, calculated_H_kJ_mol: 186.4, excess_enthalpy_kJ_mol: -6.1}
+      - {sample: NFS-1, Na2SiO3: 0.692, Fe2O3: 0.077, SiO2: 0.231, measured_H_kJ_mol: 187.2, calculated_H_kJ_mol: 181.6, enthalpy_increment: 5.6}
+      - {sample: NFS-2, Na2SiO3: 0.429, Fe2O3: 0.143, SiO2: 0.429, measured_H_kJ_mol: 153.7, calculated_H_kJ_mol: 156.7, enthalpy_increment: -3.0}
+      - {sample: NFS-3, Na2SiO3: 0.273, Fe2O3: 0.182, SiO2: 0.546, measured_H_kJ_mol: 139.5, calculated_H_kJ_mol: 142.0, enthalpy_increment: -2.5}
+      - {sample: NFS-4, Na2SiO3: 0.499, Fe2O3: 0.270, SiO2: 0.231, measured_H_kJ_mol: 180.3, calculated_H_kJ_mol: 186.4, enthalpy_increment: -6.1}
     locator: {page: 7, pdf_page_index: 6, published_page: 1592, table: '3'}
   - path: species.Mg2Si2O6.observations[suga04_t4_quoted_enstatite_fusion].values
-    value: {quantity: H_minus_H298, method_class: quoted_attributed, melting_temperature_K: 1834, fusion_enthalpy_kJ_mol: 146.4, fusion_entropy_J_mol_K: 79.8, enthalpy_uncertainty_kJ_mol: 12.0, entropy_uncertainty_J_mol_K: 6.5, attribution: Richet and Bottinga (1986), method: unknown}
+    value: {quantity: H_minus_H298, method_class: quoted_attributed, melting_temperature_K: 1834, enthalpy_increment: 146.4, entropy: 79.8, enthalpy_uncertainty_kJ_mol: 12.0, entropy_uncertainty_J_mol_K: 6.5, attribution: Richet and Bottinga (1986), method: unknown}
     locator: {page: 7, pdf_page_index: 6, published_page: 1592, table: '4'}
   - path: species.CaMgSi2O6.observations[suga04_t4_quoted_diopside_fusion].values
-    value: {quantity: H_minus_H298, method_class: quoted_attributed, melting_temperature_K: 1665, fusion_enthalpy_kJ_mol: 137.7, fusion_entropy_J_mol_K: 82.7, enthalpy_uncertainty_kJ_mol: 2.4, entropy_uncertainty_J_mol_K: 1.4, attribution: Lange et al. (1991), method: unknown}
+    value: {quantity: H_minus_H298, method_class: quoted_attributed, melting_temperature_K: 1665, enthalpy_increment: 137.7, entropy: 82.7, enthalpy_uncertainty_kJ_mol: 2.4, entropy_uncertainty_J_mol_K: 1.4, attribution: Lange et al. (1991), method: unknown}
     locator: {page: 7, pdf_page_index: 6, published_page: 1592, table: '4'}
   - path: species.Ca2Si2O6.observations[suga04_t4_quoted_wollastonite_fusion].values
-    value: {quantity: H_minus_H298, method_class: quoted_attributed, melting_temperature_K: 1770, fusion_enthalpy_kJ_mol: 122.4, fusion_entropy_J_mol_K: 69.2, enthalpy_uncertainty_kJ_mol: 8.0, entropy_uncertainty_J_mol_K: 4.5, attribution: Richet and Bottinga (1984b), method: unknown}
+    value: {quantity: H_minus_H298, method_class: quoted_attributed, melting_temperature_K: 1770, enthalpy_increment: 122.4, entropy: 69.2, enthalpy_uncertainty_kJ_mol: 8.0, entropy_uncertainty_J_mol_K: 4.5, attribution: Richet and Bottinga (1984b), method: unknown}
     locator: {page: 7, pdf_page_index: 6, published_page: 1592, table: '4'}
   - path: species.NaAlSi2O6.observations[suga04_t4_quoted_jadeite_fusion].values
-    value: {quantity: H_minus_H298, method_class: quoted_attributed, melting_temperature_K: 1100, melting_temperature_semantics: metastable_congruent_melting, fusion_enthalpy_kJ_mol: 59.3, fusion_entropy_J_mol_K: 53.9, enthalpy_uncertainty_kJ_mol: 3.0, entropy_uncertainty_J_mol_K: 2.7, attribution: Richet and Bottinga (1984a), method: unknown}
+    value: {quantity: H_minus_H298, method_class: quoted_attributed, melting_temperature_K: 1100, melting_temperature_semantics: metastable_congruent_melting, enthalpy_increment: 59.3, entropy: 53.9, enthalpy_uncertainty_kJ_mol: 3.0, entropy_uncertainty_J_mol_K: 2.7, attribution: Richet and Bottinga (1984a), method: unknown}
     locator: {page: 7, pdf_page_index: 6, published_page: 1592, table: '4'}
   - path: species.NaFeSi2O6.observations[suga04_t4_acmite_fusion].values
-    value: {quantity: H_minus_H298, method_class: model_derived, melting_temperature_K: 1373, melting_temperature_semantics: metastable_congruent_melting, fusion_enthalpy_kJ_mol: 70.5, fusion_entropy_J_mol_K: 51.3, enthalpy_uncertainty_kJ_mol: 9.4, entropy_uncertainty_J_mol_K: 6.8, stated_inputs: Equation 11 extrapolation of drop calorimetry; crystalline acmite heat capacity from Berman and Brown (1985)}
+    value: {quantity: H_minus_H298, method_class: model_derived, enthalpy_increment: 70.5, derived_from: [suga04_eq11_na2sio3_acmite_enthalpy_fit, suga04_t1_acmite_solid_drop_enthalpy], derivation: {relation: liquid acmite enthalpy minus crystalline acmite enthalpy at 1373 K, inputs: [suga04_eq11_na2sio3_acmite_enthalpy_fit, suga04_t1_acmite_solid_drop_enthalpy]}, melting_temperature_K: 1373, melting_temperature_semantics: metastable_congruent_melting, entropy: 51.3, enthalpy_uncertainty_kJ_mol: 9.4, entropy_uncertainty_J_mol_K: 6.8, stated_inputs: Equation 11 extrapolation of drop calorimetry; crystalline acmite heat capacity from Berman and Brown (1985)}
     locator: {page: 7, pdf_page_index: 6, published_page: 1592, table: '4'}
   - path: species.SiO2.observations[suga04_quartz_fusion_at_1373K].values
-    value: {quantity: H_minus_H298, method_class: model_derived, heat_of_fusion_kJ_mol: 6.6, uncertainty_kJ_mol: 8.9, temperature_K: 1373, stated_inputs: Table 1 Na2SiO3-SiO2 calorimetry; solid heat capacities from Berman and Brown (1985)}
+    value: {quantity: H_minus_H298, method_class: model_derived, enthalpy_increment: 6.6, derived_from: [suga04_eq4_na2sio3_sio2_enthalpy_fit, suga04_t1_ns_drop_enthalpy], derivation: {relation: liquid quartz enthalpy minus solid quartz enthalpy at 1373 K, inputs: [suga04_eq4_na2sio3_sio2_enthalpy_fit, suga04_t1_ns_drop_enthalpy]}, uncertainty_kJ_mol: 8.9, temperature_K: 1373, stated_inputs: Table 1 Na2SiO3-SiO2 calorimetry; solid heat capacities from Berman and Brown (1985)}
     locator: {page: 4, pdf_page_index: 3, published_page: 1589, paragraph: fusion_enthalpies}
   - path: species.Fe2O3.observations[suga04_hematite_fusion_at_1373K].values
-    value: {quantity: H_minus_H298, method_class: model_derived, heat_of_fusion_kJ_mol: 83.3, uncertainty_kJ_mol: 10.5, temperature_K: 1373, derivation_as_printed: '[H1373(L) − H298(S)] − [H1373(S) − H298(S)]', stated_inputs: Equation 8 liquid enthalpy extrapolated to pure Fe2O3; measured Table 1 hematite solid enthalpy; Berman and Brown (1985) heat capacity}
+    value: {quantity: H_minus_H298, method_class: model_derived, enthalpy_increment: 83.3, derived_from: [suga04_eq8_hematite_liquid_enthalpy_fit, suga04_t1_hematite_drop_enthalpy], derivation: {relation: liquid hematite enthalpy minus solid hematite enthalpy at 1373 K, inputs: [suga04_eq8_hematite_liquid_enthalpy_fit, suga04_t1_hematite_drop_enthalpy]}, uncertainty_kJ_mol: 10.5, temperature_K: 1373, stated_inputs: Equation 8 liquid enthalpy extrapolated to pure Fe2O3; measured Table 1 hematite solid enthalpy; Berman and Brown (1985) heat capacity}
     locator: {page: 5, pdf_page_index: 4, published_page: 1590, equation: '8'}
   - path: species.Fe2O3.observations[suga04_hematite_fusion_at_1895K].values
-    value: {quantity: H_minus_H298, method_class: model_derived, heat_of_fusion_kJ_mol: 133.4, uncertainty_kJ_mol: 10.5, temperature_K: 1895, stated_inputs: Table 1 enthalpy at 1373 K; hematite heat capacity from Berman and Brown (1985); liquid Fe2O3 heat capacity 240.9 J/K from Lange and Navrotsky (1992)}
+    value: {quantity: H_minus_H298, method_class: model_derived, enthalpy_increment: 133.4, derived_from: [suga04_eq8_hematite_liquid_enthalpy_fit, suga04_t1_hematite_drop_enthalpy], derivation: {relation: liquid hematite enthalpy minus solid hematite enthalpy at 1895 K, inputs: [suga04_eq8_hematite_liquid_enthalpy_fit, suga04_t1_hematite_drop_enthalpy]}, uncertainty_kJ_mol: 10.5, temperature_K: 1895, stated_inputs: Table 1 enthalpy at 1373 K; hematite heat capacity from Berman and Brown (1985); liquid Fe2O3 heat capacity 240.9 J/K from Lange and Navrotsky (1992)}
     locator: {page: 5, pdf_page_index: 4, published_page: 1590, equation: '9'}
-  - path: species.Fe2O3.observations[suga04_quoted_liquid_fe2o3_heat_capacity].values
-    value: {quantity: CP, method_class: quoted_attributed, heat_capacity_J_mol_K: 240.9, attribution: Lange and Navrotsky (1992), method: unknown}
+  - species: Fe2O3
+    observation_id: suga04_quoted_liquid_fe2o3_heat_capacity
+    field: heat_capacity_J_mol_K
+    value: 240.9
     locator: {page: 5, pdf_page_index: 4, published_page: 1590, equation: '9'}
   - species: Fe2O3
     observation_id: suga04_t5_fe_redox_reaction_thermochemistry
     field: rows
     value:
-      - {reference: This study, composition: not_applicable, T0_K: 1573, delta_H_16: 105.2, delta_S_16: 49.1, delta_CP_16: null, method_class: model_derived, method: equations_17_and_18}
+      - {reference: This study, composition: not_applicable, T0_K: 1573, delta_H_16: 105.2, delta_S_16: 49.1, method_class: model_derived, method: equations_17_and_18}
       - {reference: Tangeman et al. (2001), composition: K2O-Fe2O3-FeO-SiO2, T0_K: 1573, delta_H_16: 133.9, delta_S_16: 62, delta_CP_16: 0, method_class: quoted_attributed, method: unknown}
       - {reference: Lange and Carmichael (1989), composition: Na2O-Fe2O3-FeO-SiO2, T0_K: 1573, delta_H_16: 133.9, delta_S_16: 67.53, delta_CP_16: 0, method_class: quoted_attributed, method: unknown}
       - {reference: Kress and Carmichael(1989), composition: CaO-Fe2O3-FeO-SiO2, T0_K: '1566-1817‡', delta_H_16: 145.9, delta_S_16: 64.6, delta_CP_16: 0, method_class: quoted_attributed, method: unknown}
       - {reference: Kress and Carmichael (1991), composition: Natural composition, T0_K: 1673, delta_H_16: 106.2, delta_S_16: 55.1, delta_CP_16: 31.86, method_class: quoted_attributed, method: unknown}
     locator: {page: 9, pdf_page_index: 8, published_page: 1594, table: '5'}
   - path: species.NaFeSi2O6.observations[suga04_eq11_na2sio3_acmite_enthalpy_fit].values
-    value: {quantity: H_minus_H298, method_class: model_derived, relation_as_printed: 'H1373(L) − H298(S) = 212.9(±9.4) + 1.136 XNaFeSi2O6; R = 0.989', intercept_kJ_mol: 212.9, intercept_uncertainty_kJ_mol: 9.4, slope_kJ_mol_per_mol_fraction: 1.136, T_K: 1373, stated_inputs: Table 1 Na2SiO3-NaFeSi2O6 drop-calorimetry measurements}
+    value: {quantity: H_minus_H298, method_class: model_derived, enthalpy_increment: 212.9, derived_from: [suga04_t1_nac_drop_enthalpy], derivation: {relation: linear fit of H1373(L)-H298(S) against NaFeSi2O6 mol fraction, inputs: [suga04_t1_nac_drop_enthalpy]}, relation_as_printed: 'H1373(L) − H298(S) = 212.9(±9.4) + 1.136 XNaFeSi2O6; R = 0.989', intercept_kJ_mol: 212.9, intercept_uncertainty_kJ_mol: 9.4, slope_kJ_mol_per_mol_fraction: 1.136, T_K: 1373, stated_inputs: Table 1 Na2SiO3-NaFeSi2O6 drop-calorimetry measurements}
     locator: {page: 6, pdf_page_index: 5, published_page: 1591, equation: '11'}
   - path: species.Na2SiO3.observations[suga04_quoted_na2sio3_fusion_enthalpy].values
-    value: {quantity: H_minus_H298, method_class: quoted_attributed, fusion_enthalpy_kJ_mol: 51.8, attribution: Chase et al. (1985), method: unknown}
+    value: {quantity: H_minus_H298, method_class: quoted_attributed, enthalpy_increment: 51.8, attribution: Chase et al. (1985), method: unknown}
     locator: {page: 4, pdf_page_index: 3, published_page: 1589, figure: '3'}
   - path: species.SiO2.observations[suga04_quoted_quartz_fusion_enthalpy].values
-    value: {quantity: H_minus_H298, method_class: quoted_attributed, fusion_enthalpy_kJ_mol: 9.4, temperature_K: 1700, metastable: true, attribution: Richet et al. (1982), method: unknown}
+    value: {quantity: H_minus_H298, method_class: quoted_attributed, enthalpy_increment: 9.4, temperature_K: 1700, metastable: true, attribution: Richet et al. (1982), method: unknown}
     locator: {page: 4, pdf_page_index: 3, published_page: 1589, figure: '3'}
   - path: species.Fe2O3.observations[suga04_quoted_hematite_fusion_entropy_gs1995].values
-    value: {quantity: S, method_class: quoted_attributed, fusion_entropy_J_mol_K: 60.41, melting_temperature_K: 1895, attribution: Ghiorso and Sack (1995), method: unknown}
+    value: {quantity: S, method_class: quoted_attributed, entropy: 60.41, melting_temperature_K: 1895, attribution: Ghiorso and Sack (1995), method: unknown}
     locator: {page: 5, pdf_page_index: 4, published_page: 1590, equation: '9'}
   - path: species.NaFeSi2O6.observations[suga04_figure8_ko_drop_enthalpy].values.series
     value:
-      - {T_K: 900, enthalpy_increment_kJ_mol: 130}
-      - {T_K: 1000, enthalpy_increment_kJ_mol: 160}
-      - {T_K: 1100, enthalpy_increment_kJ_mol: 180}
-      - {T_K: 1200, enthalpy_increment_kJ_mol: 210}
+      - {T_K: 900, enthalpy_increment: 130, attribution: Ko et al. (1977), method: unknown}
+      - {T_K: 1000, enthalpy_increment: 160, attribution: Ko et al. (1977), method: unknown}
+      - {T_K: 1100, enthalpy_increment: 180, attribution: Ko et al. (1977), method: unknown}
+      - {T_K: 1200, enthalpy_increment: 210, attribution: Ko et al. (1977), method: unknown}
     locator: {page: 7, pdf_page_index: 6, published_page: 1592, figure: '8'}
-  - path: species.Fe2O3.observations[suga04_figure6_hematite_fusion_entropy].values.series[0]
-    value: {Fe_O_ratio: 0.67, fusion_entropy_J_K_atom: 14}
-    locator: {page: 6, pdf_page_index: 5, published_page: 1591, figure: '6'}
-  - path: species.Fe3O4.observations[suga04_figure6_magnetite_fusion_entropy].values.series[0]
-    value: {Fe_O_ratio: 0.75, fusion_entropy_J_K_atom: 11}
-    locator: {page: 6, pdf_page_index: 5, published_page: 1591, figure: '6'}
-  - species: Fe0.947O
-    observation_id: suga04_figure6_wustite_fusion_entropy
-    field: series
-    value: [{Fe_O_ratio: 0.95, fusion_entropy_J_K_atom: 9.8}]
-    locator: {page: 6, pdf_page_index: 5, published_page: 1591, figure: '6'}
-  - path: species.FeO.observations[suga04_figure6_feo_fusion_entropy].values.series[0]
-    value: {Fe_O_ratio: 1.0, fusion_entropy_J_K_atom: 7.3}
-    locator: {page: 6, pdf_page_index: 5, published_page: 1591, figure: '6'}
 species:
   Na2SiO3:
     observations:
@@ -191,17 +178,17 @@ species:
         type: heat_capacity_and_heat_content_series
         locator: {page: 3, pdf_page_index: 2, published_page: 1588, table: '1'}
         phase: condensed_liquid
-        regime: transposed_temperature_drop_calorimetry
-        units: 'T in K; enthalpy increment in kJ/mol'
+        regime: drop_calorimetry_and_compiled_calorimetry
+        units: kJ_per_mol
         values:
           quantity: H_minus_H298
           method_class: measured_direct
           series:
-            - {sample: NF-1, Na2SiO3: 1.000, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 210.6, uncertainty_kJ_mol: 7.9, experiments: 9}
-            - {sample: NF-2, Na2SiO3: 0.880, Fe2O3: 0.120, SiO2: 0.000, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 213.4, uncertainty_kJ_mol: 6.0, experiments: 8}
-            - {sample: NF-3, Na2SiO3: 0.780, Fe2O3: 0.220, SiO2: 0.000, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 212.3, uncertainty_kJ_mol: 10.7, experiments: 8}
-            - {sample: NF-4, Na2SiO3: 0.680, Fe2O3: 0.320, SiO2: 0.000, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 221.5, uncertainty_kJ_mol: 9.6, experiments: 13}
-            - {sample: NF-5, Na2SiO3: 0.580, Fe2O3: 0.420, SiO2: 0.000, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 219.8, uncertainty_kJ_mol: 7.4, experiments: 9}
+            - {sample: NF-1, Na2SiO3: 1.000, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment: 210.6, uncertainty_kJ_mol: 7.9, experiments: 9}
+            - {sample: NF-2, Na2SiO3: 0.880, Fe2O3: 0.120, SiO2: 0.000, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment: 213.4, uncertainty_kJ_mol: 6.0, experiments: 8}
+            - {sample: NF-3, Na2SiO3: 0.780, Fe2O3: 0.220, SiO2: 0.000, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment: 212.3, uncertainty_kJ_mol: 10.7, experiments: 8}
+            - {sample: NF-4, Na2SiO3: 0.680, Fe2O3: 0.320, SiO2: 0.000, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment: 221.5, uncertainty_kJ_mol: 9.6, experiments: 13}
+            - {sample: NF-5, Na2SiO3: 0.580, Fe2O3: 0.420, SiO2: 0.000, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment: 219.8, uncertainty_kJ_mol: 7.4, experiments: 9}
         uncertainty:
           reported_status: printed
           value_semantics: printed plus-or-minus widths as shown
@@ -210,23 +197,26 @@ species:
         type: heat_capacity_and_heat_content_series
         locator: {page: 4, pdf_page_index: 3, published_page: 1589, figure: '3'}
         phase: condensed_liquid
-        regime: quoted_fusion_enthalpy_method_unknown
-        units: kJ/mol
+        regime: cited_literature_comparison
+        units: kJ_per_mol
         values:
           quantity: H_minus_H298
           method_class: quoted_attributed
-          fusion_enthalpy_kJ_mol: 51.8
+          enthalpy_increment: 51.8
           attribution: Chase et al. (1985)
           method: unknown
       - observation_id: suga04_eq4_na2sio3_sio2_enthalpy_fit
         type: heat_capacity_and_heat_content_series
         locator: {page: 4, pdf_page_index: 3, published_page: 1589, equation: '4'}
         phase: condensed_liquid
-        regime: linear_fit_to_transposed_temperature_drop_calorimetry
-        units: 'kJ/mol; XSiO2 in mol%'
+        regime: drop_calorimetry_and_compiled_calorimetry
+        units: kJ_per_mol
         values:
           quantity: H_minus_H298
           method_class: model_derived
+          enthalpy_increment: 209.5
+          derived_from: [suga04_t1_nf_drop_enthalpy, suga04_t1_ns_drop_enthalpy]
+          derivation: {relation: linear fit of H1373(L)-H298(S) against SiO2 mol%, inputs: [suga04_t1_nf_drop_enthalpy, suga04_t1_ns_drop_enthalpy]}
           relation_as_printed: 'H1373(L) − H298(S) = 209.5(±8.9) − 1.331 XSiO2; R = 0.999'
           intercept_kJ_mol: 209.5
           intercept_uncertainty_kJ_mol: 8.9
@@ -239,48 +229,50 @@ species:
         type: heat_capacity_and_heat_content_series
         locator: {page: 3, pdf_page_index: 2, published_page: 1588, table: '1'}
         phase: condensed_liquid
-        regime: transposed_temperature_drop_calorimetry
-        units: 'T in K; enthalpy increment in kJ/mol'
+        regime: drop_calorimetry_and_compiled_calorimetry
+        units: kJ_per_mol
         values:
           quantity: H_minus_H298
           method_class: measured_direct
           series:
-            - {sample: NS-1, Na2SiO3: 0.700, Fe2O3: 0.000, SiO2: 0.300, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 168.5, uncertainty_kJ_mol: 10.9, experiments: 5}
-            - {sample: NS-2, Na2SiO3: 0.500, Fe2O3: 0.000, SiO2: 0.500, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 141.7, uncertainty_kJ_mol: 8.5, experiments: 6}
-            - {sample: NS-3, Na2SiO3: 0.300, Fe2O3: 0.000, SiO2: 0.700, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 117.8, uncertainty_kJ_mol: 8.4, experiments: 6}
+            - {sample: NS-1, Na2SiO3: 0.700, Fe2O3: 0.000, SiO2: 0.300, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment: 168.5, uncertainty_kJ_mol: 10.9, experiments: 5}
+            - {sample: NS-2, Na2SiO3: 0.500, Fe2O3: 0.000, SiO2: 0.500, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment: 141.7, uncertainty_kJ_mol: 8.5, experiments: 6}
+            - {sample: NS-3, Na2SiO3: 0.300, Fe2O3: 0.000, SiO2: 0.700, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment: 117.8, uncertainty_kJ_mol: 8.4, experiments: 6}
         uncertainty: {reported_status: printed, value_semantics: printed plus-or-minus widths as shown, confidence_level: two standard deviations of the mean}
       - observation_id: suga04_t1_nfs_drop_enthalpy
         type: heat_capacity_and_heat_content_series
         locator: {page: 3, pdf_page_index: 2, published_page: 1588, table: '1'}
         phase: condensed_liquid
-        regime: transposed_temperature_drop_calorimetry
-        units: 'T in K; enthalpy increment in kJ/mol'
+        regime: drop_calorimetry_and_compiled_calorimetry
+        units: kJ_per_mol
         values:
           quantity: H_minus_H298
           method_class: measured_direct
           series:
-            - {sample: NFS-1, Na2SiO3: 0.692, Fe2O3: 0.077, SiO2: 0.231, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 187.2, uncertainty_kJ_mol: 7.9, experiments: 6}
-            - {sample: NFS-2, Na2SiO3: 0.429, Fe2O3: 0.143, SiO2: 0.429, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 153.7, uncertainty_kJ_mol: 9.8, experiments: 5}
-            - {sample: NFS-3, Na2SiO3: 0.273, Fe2O3: 0.182, SiO2: 0.546, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 139.5, uncertainty_kJ_mol: 8.7, experiments: 6}
-            - {sample: NFS-4, Na2SiO3: 0.499, Fe2O3: 0.270, SiO2: 0.231, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 180.3, uncertainty_kJ_mol: 14.1, experiments: 6}
+            - {sample: NFS-1, Na2SiO3: 0.692, Fe2O3: 0.077, SiO2: 0.231, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment: 187.2, uncertainty_kJ_mol: 7.9, experiments: 6}
+            - {sample: NFS-2, Na2SiO3: 0.429, Fe2O3: 0.143, SiO2: 0.429, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment: 153.7, uncertainty_kJ_mol: 9.8, experiments: 5}
+            - {sample: NFS-3, Na2SiO3: 0.273, Fe2O3: 0.182, SiO2: 0.546, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment: 139.5, uncertainty_kJ_mol: 8.7, experiments: 6}
+            - {sample: NFS-4, Na2SiO3: 0.499, Fe2O3: 0.270, SiO2: 0.231, NaFeSi2O6: 0.000, T_K: 1373, state: Liquid, enthalpy_increment: 180.3, uncertainty_kJ_mol: 14.1, experiments: 6}
         uncertainty: {reported_status: printed, value_semantics: printed plus-or-minus widths as shown, confidence_level: two standard deviations of the mean}
       - observation_id: suga04_t3_nfs_excess_enthalpy
         type: heat_capacity_and_heat_content_series
         locator: {page: 7, pdf_page_index: 6, published_page: 1592, table: '3'}
         phase: condensed_liquid
-        regime: excess_enthalpy_derived_from_transposed_temperature_drop_calorimetry
-        units: kJ/mol
+        regime: drop_calorimetry_and_compiled_calorimetry
+        units: kJ_per_mol
         values:
           quantity: H_minus_H298
-          method_class: measured_derived
+          method_class: model_derived
+          derived_from: [suga04_t1_nfs_drop_enthalpy, suga04_t1_nf_drop_enthalpy, suga04_t1_ns_drop_enthalpy]
           derivation:
             definition_as_printed: measured H minus calculated H
-            stated_inputs: Table 1 measured mixture and end-member enthalpies; calculated by linear combination of end-member enthalpies
+            relation: measured mixture enthalpy minus linear combination of end-member enthalpies
+            inputs: [suga04_t1_nfs_drop_enthalpy, suga04_t1_nf_drop_enthalpy, suga04_t1_ns_drop_enthalpy]
           series:
-            - {sample: NFS-1, Na2SiO3: 0.692, Fe2O3: 0.077, SiO2: 0.231, measured_H_kJ_mol: 187.2, calculated_H_kJ_mol: 181.6, excess_enthalpy_kJ_mol: 5.6}
-            - {sample: NFS-2, Na2SiO3: 0.429, Fe2O3: 0.143, SiO2: 0.429, measured_H_kJ_mol: 153.7, calculated_H_kJ_mol: 156.7, excess_enthalpy_kJ_mol: -3.0}
-            - {sample: NFS-3, Na2SiO3: 0.273, Fe2O3: 0.182, SiO2: 0.546, measured_H_kJ_mol: 139.5, calculated_H_kJ_mol: 142.0, excess_enthalpy_kJ_mol: -2.5}
-            - {sample: NFS-4, Na2SiO3: 0.499, Fe2O3: 0.270, SiO2: 0.231, measured_H_kJ_mol: 180.3, calculated_H_kJ_mol: 186.4, excess_enthalpy_kJ_mol: -6.1}
+            - {sample: NFS-1, Na2SiO3: 0.692, Fe2O3: 0.077, SiO2: 0.231, measured_H_kJ_mol: 187.2, calculated_H_kJ_mol: 181.6, enthalpy_increment: 5.6}
+            - {sample: NFS-2, Na2SiO3: 0.429, Fe2O3: 0.143, SiO2: 0.429, measured_H_kJ_mol: 153.7, calculated_H_kJ_mol: 156.7, enthalpy_increment: -3.0}
+            - {sample: NFS-3, Na2SiO3: 0.273, Fe2O3: 0.182, SiO2: 0.546, measured_H_kJ_mol: 139.5, calculated_H_kJ_mol: 142.0, enthalpy_increment: -2.5}
+            - {sample: NFS-4, Na2SiO3: 0.499, Fe2O3: 0.270, SiO2: 0.231, measured_H_kJ_mol: 180.3, calculated_H_kJ_mol: 186.4, enthalpy_increment: -6.1}
         uncertainty: {reported_status: not_reported_for_derived_values}
   NaFeSi2O6:
     observations:
@@ -288,46 +280,48 @@ species:
         type: heat_capacity_and_heat_content_series
         locator: {page: 3, pdf_page_index: 2, published_page: 1588, table: '1'}
         phase: condensed_liquid
-        regime: transposed_temperature_drop_calorimetry
-        units: 'T in K; enthalpy increment in kJ/mol'
+        regime: drop_calorimetry_and_compiled_calorimetry
+        units: kJ_per_mol
         values:
           quantity: H_minus_H298
           method_class: measured_direct
           series:
-            - {sample: NAc-1, Na2SiO3: 0.800, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 0.200, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 237.7, uncertainty_kJ_mol: 10.1, experiments: 11}
-            - {sample: NAc-2, Na2SiO3: 0.650, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 0.350, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 249.1, uncertainty_kJ_mol: 12.0, experiments: 9}
-            - {sample: NAc-3, Na2SiO3: 0.500, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 0.500, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 275.0, uncertainty_kJ_mol: 8.5, experiments: 8}
-            - {sample: NAc-4, Na2SiO3: 0.350, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 0.650, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 291.9, uncertainty_kJ_mol: 11.7, experiments: 10}
-            - {sample: NAc-5, Na2SiO3: 0.200, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 0.800, T_K: 1373, state: Liquid, enthalpy_increment_kJ_mol: 297.5, uncertainty_kJ_mol: 6.7, experiments: 11}
+            - {sample: NAc-1, Na2SiO3: 0.800, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 0.200, T_K: 1373, state: Liquid, enthalpy_increment: 237.7, uncertainty_kJ_mol: 10.1, experiments: 11}
+            - {sample: NAc-2, Na2SiO3: 0.650, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 0.350, T_K: 1373, state: Liquid, enthalpy_increment: 249.1, uncertainty_kJ_mol: 12.0, experiments: 9}
+            - {sample: NAc-3, Na2SiO3: 0.500, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 0.500, T_K: 1373, state: Liquid, enthalpy_increment: 275.0, uncertainty_kJ_mol: 8.5, experiments: 8}
+            - {sample: NAc-4, Na2SiO3: 0.350, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 0.650, T_K: 1373, state: Liquid, enthalpy_increment: 291.9, uncertainty_kJ_mol: 11.7, experiments: 10}
+            - {sample: NAc-5, Na2SiO3: 0.200, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 0.800, T_K: 1373, state: Liquid, enthalpy_increment: 297.5, uncertainty_kJ_mol: 6.7, experiments: 11}
         uncertainty: {reported_status: printed, value_semantics: printed plus-or-minus widths as shown, confidence_level: two standard deviations of the mean}
       - observation_id: suga04_t1_acmite_solid_drop_enthalpy
         type: heat_capacity_and_heat_content_series
         locator: {page: 3, pdf_page_index: 2, published_page: 1588, table: '1'}
         phase: condensed_solid
-        regime: transposed_temperature_drop_calorimetry
-        units: 'T in K; enthalpy increment in kJ/mol'
+        regime: drop_calorimetry_and_compiled_calorimetry
+        units: kJ_per_mol
         values:
           quantity: H_minus_H298
           method_class: measured_direct
           series:
-            - {sample: Ac-1, Na2SiO3: 0.000, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 1.000, T_K: 923, state: Solid, enthalpy_increment_kJ_mol: 130.8, uncertainty_kJ_mol: 6.6, experiments: 5}
-            - {sample: Ac-2, Na2SiO3: 0.000, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 1.000, T_K: 1023, state: Solid, enthalpy_increment_kJ_mol: 168.8, uncertainty_kJ_mol: 8.4, experiments: 5}
-            - {sample: Ac-3, Na2SiO3: 0.000, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 1.000, T_K: 1123, state: Solid, enthalpy_increment_kJ_mol: 194.8, uncertainty_kJ_mol: 10.7, experiments: 4}
-            - {sample: Ac-4, Na2SiO3: 0.000, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 1.000, T_K: 1223, state: Solid, enthalpy_increment_kJ_mol: 216.2, uncertainty_kJ_mol: 12.8, experiments: 5}
+            - {sample: Ac-1, Na2SiO3: 0.000, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 1.000, T_K: 923, state: Solid, enthalpy_increment: 130.8, uncertainty_kJ_mol: 6.6, experiments: 5}
+            - {sample: Ac-2, Na2SiO3: 0.000, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 1.000, T_K: 1023, state: Solid, enthalpy_increment: 168.8, uncertainty_kJ_mol: 8.4, experiments: 5}
+            - {sample: Ac-3, Na2SiO3: 0.000, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 1.000, T_K: 1123, state: Solid, enthalpy_increment: 194.8, uncertainty_kJ_mol: 10.7, experiments: 4}
+            - {sample: Ac-4, Na2SiO3: 0.000, Fe2O3: 0.000, SiO2: 0.000, NaFeSi2O6: 1.000, T_K: 1223, state: Solid, enthalpy_increment: 216.2, uncertainty_kJ_mol: 12.8, experiments: 5}
         uncertainty: {reported_status: printed, value_semantics: printed plus-or-minus widths as shown, confidence_level: two standard deviations of the mean}
       - observation_id: suga04_t4_acmite_fusion
         type: heat_capacity_and_heat_content_series
         locator: {page: 7, pdf_page_index: 6, published_page: 1592, table: '4'}
         phase: condensed_liquid
-        regime: derived_fusion_enthalpy_from_transposed_temperature_drop_calorimetry
-        units: 'T in K; fusion enthalpy in kJ/mol; fusion entropy in J mol−1 K−1'
+        regime: drop_calorimetry_and_compiled_calorimetry
+        units: kJ_per_mol
         values:
           quantity: H_minus_H298
           method_class: model_derived
+          enthalpy_increment: 70.5
+          derived_from: [suga04_eq11_na2sio3_acmite_enthalpy_fit, suga04_t1_acmite_solid_drop_enthalpy]
+          derivation: {relation: liquid acmite enthalpy minus crystalline acmite enthalpy at 1373 K, inputs: [suga04_eq11_na2sio3_acmite_enthalpy_fit, suga04_t1_acmite_solid_drop_enthalpy]}
           melting_temperature_K: 1373
           melting_temperature_semantics: metastable_congruent_melting
-          fusion_enthalpy_kJ_mol: 70.5
-          fusion_entropy_J_mol_K: 51.3
+          entropy: 51.3
           enthalpy_uncertainty_kJ_mol: 9.4
           entropy_uncertainty_J_mol_K: 6.8
           stated_inputs: Equation 11 extrapolation of drop calorimetry; crystalline acmite heat capacity from Berman and Brown (1985)
@@ -336,11 +330,14 @@ species:
         type: heat_capacity_and_heat_content_series
         locator: {page: 6, pdf_page_index: 5, published_page: 1591, equation: '11'}
         phase: condensed_liquid
-        regime: linear_fit_to_transposed_temperature_drop_calorimetry
-        units: 'kJ/mol; XNaFeSi2O6 in mol fraction'
+        regime: drop_calorimetry_and_compiled_calorimetry
+        units: kJ_per_mol
         values:
           quantity: H_minus_H298
           method_class: model_derived
+          enthalpy_increment: 212.9
+          derived_from: [suga04_t1_nac_drop_enthalpy]
+          derivation: {relation: linear fit of H1373(L)-H298(S) against NaFeSi2O6 mol fraction, inputs: [suga04_t1_nac_drop_enthalpy]}
           relation_as_printed: 'H1373(L) − H298(S) = 212.9(±9.4) + 1.136 XNaFeSi2O6; R = 0.989'
           intercept_kJ_mol: 212.9
           intercept_uncertainty_kJ_mol: 9.4
@@ -352,87 +349,45 @@ species:
         type: heat_capacity_and_heat_content_series
         locator: {page: 7, pdf_page_index: 6, published_page: 1592, figure: '8'}
         phase: condensed_solid
-        regime: figure_digitized_quoted_calorimetry_method_unknown
-        units: 'T in K; enthalpy increment in kJ/mol'
+        regime: cited_literature_comparison
+        units: kJ_per_mol
         values:
           quantity: H_minus_H298
-          method_class: figure_only
+          method_class: quoted_attributed
           attribution: Ko et al. (1977)
           method: unknown
           figure_digitization: {read_method: two independent point-centre reads; axes linear; calibration and pixel reads documented in worker report}
           series:
-            - {T_K: 900, enthalpy_increment_kJ_mol: 130}
-            - {T_K: 1000, enthalpy_increment_kJ_mol: 160}
-            - {T_K: 1100, enthalpy_increment_kJ_mol: 180}
-            - {T_K: 1200, enthalpy_increment_kJ_mol: 210}
-  Fe3O4:
-    observations:
-      - observation_id: suga04_figure6_magnetite_fusion_entropy
-        type: heat_capacity_and_heat_content_series
-        locator: {page: 6, pdf_page_index: 5, published_page: 1591, figure: '6'}
-        phase: condensed_solid
-        regime: figure_digitized_quoted_entropy_fusion_method_unknown
-        units: 'entropy of fusion in J K−1 atom−1'
-        values:
-          quantity: S
-          method_class: figure_only
-          attribution: Darken and Gurry (1946)
-          method: unknown
-          figure_digitization: {read_method: two independent point-centre reads; axes linear; calibration and pixel reads documented in worker report}
-          series: [{Fe_O_ratio: 0.75, fusion_entropy_J_K_atom: 11}]
-  Fe0.947O:
-    observations:
-      - observation_id: suga04_figure6_wustite_fusion_entropy
-        type: heat_capacity_and_heat_content_series
-        locator: {page: 6, pdf_page_index: 5, published_page: 1591, figure: '6'}
-        phase: condensed_solid
-        regime: figure_digitized_quoted_entropy_fusion_method_unknown
-        units: 'entropy of fusion in J K−1 atom−1'
-        values:
-          quantity: S
-          method_class: figure_only
-          attribution: Coughlin et al. (1951)
-          method: unknown
-          figure_digitization: {read_method: two independent point-centre reads; axes linear; calibration and pixel reads documented in worker report}
-          series: [{Fe_O_ratio: 0.95, fusion_entropy_J_K_atom: 9.8}]
-  FeO:
-    observations:
-      - observation_id: suga04_figure6_feo_fusion_entropy
-        type: heat_capacity_and_heat_content_series
-        locator: {page: 6, pdf_page_index: 5, published_page: 1591, figure: '6'}
-        phase: condensed_solid
-        regime: figure_digitized_quoted_entropy_fusion_method_unknown
-        units: 'entropy of fusion in J K−1 atom−1'
-        values:
-          quantity: S
-          method_class: figure_only
-          attribution: Chase et al. (1985)
-          method: unknown
-          figure_digitization: {read_method: two independent point-centre reads; axes linear; calibration and pixel reads documented in worker report}
-          series: [{Fe_O_ratio: 1.0, fusion_entropy_J_K_atom: 7.3}]
+            - {T_K: 900, enthalpy_increment: 130, attribution: Ko et al. (1977), method: unknown}
+            - {T_K: 1000, enthalpy_increment: 160, attribution: Ko et al. (1977), method: unknown}
+            - {T_K: 1100, enthalpy_increment: 180, attribution: Ko et al. (1977), method: unknown}
+            - {T_K: 1200, enthalpy_increment: 210, attribution: Ko et al. (1977), method: unknown}
   Fe2O3:
     observations:
       - observation_id: suga04_t1_hematite_drop_enthalpy
         type: heat_capacity_and_heat_content_series
         locator: {page: 3, pdf_page_index: 2, published_page: 1588, table: '1'}
         phase: condensed_solid
-        regime: transposed_temperature_drop_calorimetry
-        units: 'T in K; enthalpy increment in kJ/mol'
+        regime: drop_calorimetry_and_compiled_calorimetry
+        units: kJ_per_mol
         values:
           quantity: H_minus_H298
           method_class: measured_direct
           series:
-            - {sample: Hematite, Na2SiO3: 0.000, Fe2O3: 1.000, SiO2: 0.000, NaFeSi2O6: 0.000, T_K: 1373, state: Solid, enthalpy_increment_kJ_mol: 152.2, uncertainty_kJ_mol: 6.4, experiments: 10}
+            - {sample: Hematite, Na2SiO3: 0.000, Fe2O3: 1.000, SiO2: 0.000, NaFeSi2O6: 0.000, T_K: 1373, state: Solid, enthalpy_increment: 152.2, uncertainty_kJ_mol: 6.4, experiments: 10}
         uncertainty: {reported_status: printed, value_semantics: printed plus-or-minus widths as shown, confidence_level: two standard deviations of the mean}
       - observation_id: suga04_eq8_hematite_liquid_enthalpy_fit
         type: heat_capacity_and_heat_content_series
         locator: {page: 5, pdf_page_index: 4, published_page: 1590, equation: '8'}
         phase: condensed_liquid
-        regime: linear_fit_to_transposed_temperature_drop_calorimetry
-        units: 'kJ/mol; XFe2O3 in mol%'
+        regime: drop_calorimetry_and_compiled_calorimetry
+        units: kJ_per_mol
         values:
           quantity: H_minus_H298
           method_class: model_derived
+          enthalpy_increment: 210.0
+          derived_from: [suga04_t1_nf_drop_enthalpy, suga04_t1_hematite_drop_enthalpy]
+          derivation: {relation: linear fit of H1373(L)-H298(S) against Fe2O3 mol%, inputs: [suga04_t1_nf_drop_enthalpy, suga04_t1_hematite_drop_enthalpy]}
           relation_as_printed: 'H1373(L) − H298(S) = 210.0(±8.3) + 0.255 XFe2O3; R = 0.869'
           intercept_kJ_mol: 210.0
           intercept_uncertainty_kJ_mol: 8.3
@@ -444,69 +399,47 @@ species:
         type: heat_capacity_and_heat_content_series
         locator: {page: 5, pdf_page_index: 4, published_page: 1590, equation: '8'}
         phase: condensed_liquid
-        regime: derived_fusion_enthalpy_from_drop_calorimetry_and_solid_heat_content
-        units: kJ/mol
+        regime: drop_calorimetry_and_compiled_calorimetry
+        units: kJ_per_mol
         values:
           quantity: H_minus_H298
           method_class: model_derived
-          heat_of_fusion_kJ_mol: 83.3
+          enthalpy_increment: 83.3
+          derived_from: [suga04_eq8_hematite_liquid_enthalpy_fit, suga04_t1_hematite_drop_enthalpy]
+          derivation: {relation: liquid hematite enthalpy minus solid hematite enthalpy at 1373 K, inputs: [suga04_eq8_hematite_liquid_enthalpy_fit, suga04_t1_hematite_drop_enthalpy]}
           uncertainty_kJ_mol: 10.5
           temperature_K: 1373
-          derivation_as_printed: '[H1373(L) − H298(S)] − [H1373(S) − H298(S)]'
           stated_inputs: Equation 8 liquid enthalpy extrapolated to pure Fe2O3; measured Table 1 hematite solid enthalpy; Berman and Brown (1985) heat capacity
         uncertainty: {reported_status: printed, value_kJ_mol: 10.5}
       - observation_id: suga04_hematite_fusion_at_1895K
         type: heat_capacity_and_heat_content_series
         locator: {page: 5, pdf_page_index: 4, published_page: 1590, equation: '9'}
         phase: condensed_liquid
-        regime: derived_fusion_enthalpy_from_drop_calorimetry_and_heat_capacities
-        units: kJ/mol
+        regime: drop_calorimetry_and_compiled_calorimetry
+        units: kJ_per_mol
         values:
           quantity: H_minus_H298
           method_class: model_derived
-          heat_of_fusion_kJ_mol: 133.4
+          enthalpy_increment: 133.4
+          derived_from: [suga04_eq8_hematite_liquid_enthalpy_fit, suga04_t1_hematite_drop_enthalpy]
+          derivation: {relation: liquid hematite enthalpy minus solid hematite enthalpy at 1895 K, inputs: [suga04_eq8_hematite_liquid_enthalpy_fit, suga04_t1_hematite_drop_enthalpy]}
           uncertainty_kJ_mol: 10.5
           temperature_K: 1895
           stated_inputs: Table 1 enthalpy at 1373 K; hematite heat capacity from Berman and Brown (1985); liquid Fe2O3 heat capacity 240.9 J/K from Lange and Navrotsky (1992)
         uncertainty: {reported_status: printed, value_kJ_mol: 10.5}
-      - observation_id: suga04_quoted_liquid_fe2o3_heat_capacity
-        type: heat_capacity_and_heat_content_series
-        locator: {page: 5, pdf_page_index: 4, published_page: 1590, equation: '9'}
-        phase: condensed_liquid
-        regime: cited_heat_capacity_value
-        units: J mol−1 K−1
-        values:
-          quantity: CP
-          method_class: quoted_attributed
-          heat_capacity_J_mol_K: 240.9
-          attribution: Lange and Navrotsky (1992)
-          method: unknown
       - observation_id: suga04_quoted_hematite_fusion_entropy_gs1995
         type: heat_capacity_and_heat_content_series
         locator: {page: 5, pdf_page_index: 4, published_page: 1590, figure: '6'}
         phase: condensed_solid
-        regime: quoted_fusion_entropy_method_unknown
-        units: J mol−1 K−1
+        regime: cited_literature_comparison
+        units: J_per_mol_K
         values:
           quantity: S
           method_class: quoted_attributed
-          fusion_entropy_J_mol_K: 60.41
+          entropy: 60.41
           melting_temperature_K: 1895
           attribution: Ghiorso and Sack (1995)
           method: unknown
-      - observation_id: suga04_figure6_hematite_fusion_entropy
-        type: heat_capacity_and_heat_content_series
-        locator: {page: 6, pdf_page_index: 5, published_page: 1591, figure: '6'}
-        phase: condensed_solid
-        regime: figure_digitized_entropy_of_fusion
-        units: 'ΔS_Tm in J K−1 atom−1'
-        values:
-          quantity: S
-          method_class: figure_only
-          attribution: This study
-          method: unknown
-          figure_digitization: {read_method: two independent point-centre reads; axes linear; calibration and pixel reads documented in worker report}
-          series: [{Fe_O_ratio: 0.67, fusion_entropy_J_K_atom: 14}]
     context:
       - observation_id: suga04_t5_fe_redox_reaction_thermochemistry
         type: calorimetric_redox_reaction_comparison
@@ -518,7 +451,7 @@ species:
           printed_units: {delta_H: kJ, delta_S: kJ, delta_CP: J/K}
           note: 'The ΔS unit is retained exactly as printed in the Table 5 heading. ΔH and ΔS are reaction changes; no closed reaction-property type exists.'
           rows:
-            - {reference: This study, composition: not_applicable, T0_K: 1573, delta_H_16: 105.2, delta_S_16: 49.1, delta_CP_16: null, method_class: model_derived, method: equations_17_and_18}
+            - {reference: This study, composition: not_applicable, T0_K: 1573, delta_H_16: 105.2, delta_S_16: 49.1, method_class: model_derived, method: equations_17_and_18}
             - {reference: Tangeman et al. (2001), composition: K2O-Fe2O3-FeO-SiO2, T0_K: 1573, delta_H_16: 133.9, delta_S_16: 62, delta_CP_16: 0, method_class: quoted_attributed, method: unknown}
             - {reference: Lange and Carmichael (1989), composition: Na2O-Fe2O3-FeO-SiO2, T0_K: 1573, delta_H_16: 133.9, delta_S_16: 67.53, delta_CP_16: 0, method_class: quoted_attributed, method: unknown}
             - {reference: Kress and Carmichael(1989), composition: CaO-Fe2O3-FeO-SiO2, T0_K: '1566-1817‡', delta_H_16: 145.9, delta_S_16: 64.6, delta_CP_16: 0, method_class: quoted_attributed, method: unknown}
@@ -528,20 +461,42 @@ species:
             - '|| ΔH of the solid standard state reaction calculated from thermodynamic data of Robie et al. (1978).'
             - '# Assumed as zero.'
             - '** Assumed as temperature independent.'
+      - observation_id: suga04_figure6_entropy_fusion_comparison
+        type: thermodynamic_example
+        locator: {page: 6, pdf_page_index: 5, published_page: 1591, figure: '6'}
+        units: 'ΔS_Tm in J K−1 atom−1'
+        values:
+          quantity: entropy_of_fusion_per_atom
+          method_class: mixed_figure_only_and_quoted_attributed
+          points:
+            - {species: Fe2O3, Fe_O_ratio: 0.67, entropy: 14, attribution: This study, method_class: figure_only, method: unknown}
+            - {species: Fe3O4, Fe_O_ratio: 0.75, entropy: 11, attribution: Darken and Gurry (1946), method_class: quoted_attributed, method: unknown}
+            - {species: Fe0.947O, Fe_O_ratio: 0.95, entropy: 9.8, attribution: Coughlin et al. (1951), method_class: quoted_attributed, method: unknown}
+            - {species: FeO, Fe_O_ratio: 1.0, entropy: 7.3, attribution: Chase et al. (1985), method_class: quoted_attributed, method: unknown}
+      - observation_id: suga04_quoted_liquid_fe2o3_heat_capacity
+        type: thermodynamic_example
+        locator: {page: 5, pdf_page_index: 4, published_page: 1590, equation: '9'}
+        units: J/mol/K
+        values:
+          quantity: CP
+          method_class: quoted_attributed
+          heat_capacity_J_mol_K: 240.9
+          attribution: Lange and Navrotsky (1992)
+          method: unknown
   Mg2Si2O6:
     observations:
       - observation_id: suga04_t4_quoted_enstatite_fusion
         type: heat_capacity_and_heat_content_series
         locator: {page: 7, pdf_page_index: 6, published_page: 1592, table: '4'}
         phase: condensed_liquid
-        regime: quoted_fusion_data_method_unknown
-        units: 'T in K; fusion enthalpy in kJ/mol; fusion entropy in J mol−1 K−1'
+        regime: cited_literature_comparison
+        units: kJ_per_mol
         values:
           quantity: H_minus_H298
           method_class: quoted_attributed
           melting_temperature_K: 1834
-          fusion_enthalpy_kJ_mol: 146.4
-          fusion_entropy_J_mol_K: 79.8
+          enthalpy_increment: 146.4
+          entropy: 79.8
           enthalpy_uncertainty_kJ_mol: 12.0
           entropy_uncertainty_J_mol_K: 6.5
           attribution: Richet and Bottinga (1986)
@@ -553,14 +508,14 @@ species:
         type: heat_capacity_and_heat_content_series
         locator: {page: 7, pdf_page_index: 6, published_page: 1592, table: '4'}
         phase: condensed_liquid
-        regime: quoted_fusion_data_method_unknown
-        units: 'T in K; fusion enthalpy in kJ/mol; fusion entropy in J mol−1 K−1'
+        regime: cited_literature_comparison
+        units: kJ_per_mol
         values:
           quantity: H_minus_H298
           method_class: quoted_attributed
           melting_temperature_K: 1665
-          fusion_enthalpy_kJ_mol: 137.7
-          fusion_entropy_J_mol_K: 82.7
+          enthalpy_increment: 137.7
+          entropy: 82.7
           enthalpy_uncertainty_kJ_mol: 2.4
           entropy_uncertainty_J_mol_K: 1.4
           attribution: Lange et al. (1991)
@@ -572,14 +527,14 @@ species:
         type: heat_capacity_and_heat_content_series
         locator: {page: 7, pdf_page_index: 6, published_page: 1592, table: '4'}
         phase: condensed_liquid
-        regime: quoted_fusion_data_method_unknown
-        units: 'T in K; fusion enthalpy in kJ/mol; fusion entropy in J mol−1 K−1'
+        regime: cited_literature_comparison
+        units: kJ_per_mol
         values:
           quantity: H_minus_H298
           method_class: quoted_attributed
           melting_temperature_K: 1770
-          fusion_enthalpy_kJ_mol: 122.4
-          fusion_entropy_J_mol_K: 69.2
+          enthalpy_increment: 122.4
+          entropy: 69.2
           enthalpy_uncertainty_kJ_mol: 8.0
           entropy_uncertainty_J_mol_K: 4.5
           attribution: Richet and Bottinga (1984b)
@@ -591,15 +546,15 @@ species:
         type: heat_capacity_and_heat_content_series
         locator: {page: 7, pdf_page_index: 6, published_page: 1592, table: '4'}
         phase: condensed_liquid
-        regime: quoted_fusion_data_method_unknown
-        units: 'T in K; fusion enthalpy in kJ/mol; fusion entropy in J mol−1 K−1'
+        regime: cited_literature_comparison
+        units: kJ_per_mol
         values:
           quantity: H_minus_H298
           method_class: quoted_attributed
           melting_temperature_K: 1100
           melting_temperature_semantics: metastable_congruent_melting
-          fusion_enthalpy_kJ_mol: 59.3
-          fusion_entropy_J_mol_K: 53.9
+          enthalpy_increment: 59.3
+          entropy: 53.9
           enthalpy_uncertainty_kJ_mol: 3.0
           entropy_uncertainty_J_mol_K: 2.7
           attribution: Richet and Bottinga (1984a)
@@ -611,12 +566,12 @@ species:
         type: heat_capacity_and_heat_content_series
         locator: {page: 4, pdf_page_index: 3, published_page: 1589, figure: '3'}
         phase: condensed_liquid
-        regime: quoted_fusion_enthalpy_method_unknown
-        units: kJ/mol
+        regime: cited_literature_comparison
+        units: kJ_per_mol
         values:
           quantity: H_minus_H298
           method_class: quoted_attributed
-          fusion_enthalpy_kJ_mol: 9.4
+          enthalpy_increment: 9.4
           temperature_K: 1700
           metastable: true
           attribution: Richet et al. (1982)
@@ -625,12 +580,14 @@ species:
         type: heat_capacity_and_heat_content_series
         locator: {page: 4, pdf_page_index: 3, published_page: 1589, paragraph: fusion_enthalpies}
         phase: condensed_liquid
-        regime: derived_fusion_enthalpy_from_calorimetry_and_published_heat_capacity
-        units: kJ/mol
+        regime: drop_calorimetry_and_compiled_calorimetry
+        units: kJ_per_mol
         values:
           quantity: H_minus_H298
           method_class: model_derived
-          heat_of_fusion_kJ_mol: 6.6
+          enthalpy_increment: 6.6
+          derived_from: [suga04_eq4_na2sio3_sio2_enthalpy_fit, suga04_t1_ns_drop_enthalpy]
+          derivation: {relation: liquid quartz enthalpy minus solid quartz enthalpy at 1373 K, inputs: [suga04_eq4_na2sio3_sio2_enthalpy_fit, suga04_t1_ns_drop_enthalpy]}
           uncertainty_kJ_mol: 8.9
           temperature_K: 1373
           stated_inputs: Table 1 Na2SiO3-SiO2 calorimetry; solid heat capacities from Berman and Brown (1985)

@@ -54,7 +54,7 @@ def test_table1_fidelity_pin_fails_after_enthalpy_mutation() -> None:
     first = mutated["species"]["Na2SiO3"]["observations"][0]["values"][
         "series"
     ][0]
-    first["enthalpy_increment_kJ_mol"] = 210.7
+    first["enthalpy_increment"] = 210.7
 
     errors = validate_extract_document(
         mutated,
