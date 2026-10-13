@@ -1411,7 +1411,7 @@ def test_equilibrate_cell_payload_round_trip_keeps_flags() -> None:
     ].startswith("antoine_fallback_from_vaporock")
 
 
-def test_equilibrate_cell_payload_shape_before_activity_metadata() -> None:
+def test_equilibrate_cell_payload_shape_includes_activity_metadata() -> None:
     payload = _ok_cell(engine="internal-analytical", gas={}).as_payload()
     assert set(payload) == {
         "pot_id",
@@ -1426,6 +1426,7 @@ def test_equilibrate_cell_payload_shape_before_activity_metadata() -> None:
         "melt_activities",
         "melt_activity_coefficients",
         "melt_activity_coefficient_details",
+        "activities_standard_state",
         "gas_partial_pressures_Pa",
         "invalid_gas_partial_pressure_components",
         "liquid_fraction",
