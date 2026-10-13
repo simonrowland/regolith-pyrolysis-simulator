@@ -7,7 +7,7 @@ source:
   year: 1996
   version: published original 20-page article plus publisher cover; 21 PDF pages
 extraction:
-  method: Manual transcription from rendered source PDF pages, cross-checked against pdftotext -layout. Tables I and II read independently by rows and by columns; no discrepancies. Figure 7 retained as caption-only because its smooth curves have no data markers.
+  method: Manual transcription from rendered source PDF pages, cross-checked against pdftotext -layout. Tables I and II read independently by rows and by columns; no discrepancies. Figure 7 retained as caption-only because its smooth curves have no data markers. Table I prints the logarithms of the measured ion-current ratio directly; no values are reduced from other printed rows.
   date: '2026-10-13'
   worker: codex-resume-22915-1791907429
 review_status: draft
@@ -83,7 +83,7 @@ species:
         units: ln ion-intensity ratio dimensionless; slope in K as printed; mole fraction
         values:
           quantity: ion_current_ratio
-          method_class: measured_reduced
+          method_class: measured
           ion_pair: I_133Cs/I_23Na
           ratio_as_published: 'ln(I_133Cs / I_23Na)'
           composition_basis: mole_fraction
@@ -103,7 +103,7 @@ species:
         units: ln ion-intensity ratio dimensionless; slope in K as printed; mole fraction
         values:
           quantity: ion_current_ratio
-          method_class: measured_reduced
+          method_class: measured
           ion_pair: I_133Cs/I_23Na
           ratio_as_published: 'ln(I_133Cs / I_23Na)'
           composition_basis: mole_fraction
@@ -123,7 +123,7 @@ species:
         units: ln ion-intensity ratio dimensionless; slope in K as printed; mole fraction
         values:
           quantity: ion_current_ratio
-          method_class: measured_reduced
+          method_class: measured
           ion_pair: I_133Cs/I_23Na
           ratio_as_published: 'ln(I_133Cs / I_23Na)'
           composition_basis: mole_fraction
@@ -147,7 +147,7 @@ species:
         units: ln ion-intensity ratio dimensionless; slope in K as printed; mole fraction
         values:
           quantity: ion_current_ratio
-          method_class: measured_reduced
+          method_class: measured
           ion_pair: I_133Cs/I_23Na
           ratio_as_published: 'ln(I_133Cs / I_23Na)'
           composition_basis: mole_fraction

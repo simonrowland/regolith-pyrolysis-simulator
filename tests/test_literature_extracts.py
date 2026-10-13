@@ -3756,7 +3756,7 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
     assert errs == [], "\n".join(errs)
 
 
-def test_bennour_1996_table_i_measurements_keep_printed_ln_data_and_conditions():
+def test_bennour_1996_table_i_measurements_keep_printed_ln_data_and_conditions(tmp_path):
     """Table I's measured ln ratios, slopes, formula and row maps stay source-bound."""
     path = EXTRACTS / "bennour-1996-ternary-cs-na-silicate.yaml"
     doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
@@ -3840,6 +3840,15 @@ def test_bennour_1996_table_i_measurements_keep_printed_ln_data_and_conditions()
         if "bennour_1996_table_i_" in row.observation_id
     ]
     assert len(migrated) == 23
+    assert all(
+        row.evidence.class_.value is battery_migrate.EvidenceClass.MEASURED_DIRECT
+        for row in migrated
+    )
+    assert not any(
+        issue.reason.value == "conditional_field"
+        and "bennour_1996_table_i_" in issue.path
+        for issue in migrator.result.validation.hard_issues
+    )
     assert all(row.value.kind.value == "unavailable" for row in migrated)
     assert all(row.identity.species.phase.is_value for row in migrated)
     assert all(row.identity.species.phase.value.value == "l" for row in migrated)
@@ -3864,6 +3873,22 @@ def test_bennour_1996_table_i_measurements_keep_printed_ln_data_and_conditions()
     # Table I gives no per-row uncertainty column, so the migration must not
     # manufacture an uncertainty width or turn the printed logarithm linear.
     assert all(row.uncertainty.kind.value == "none" for row in migrated)
+
+    # Reverting the four Table I classes must restore conditional_field issues.
+    mutated = copy.deepcopy(doc)
+    for row in mutated["species"]["Cs2O"]["observations"]:
+        if row["observation_id"].startswith("bennour_1996_table_i_"):
+            row["values"]["method_class"] = "measured_reduced"
+    mutated_path = tmp_path / path.name
+    mutated_path.write_text(yaml.safe_dump(mutated, sort_keys=False), encoding="utf-8")
+    reverted = battery_migrate.Migrator(REPO_ROOT, index={}, aliases={})
+    reverted._migrate_extract(mutated_path)
+    reverted.finalize()
+    assert any(
+        issue.reason.value == "conditional_field"
+        and "bennour_1996_table_i_" in issue.path
+        for issue in reverted.result.validation.hard_issues
+    )
 
 
 def test_bencze_supplement_fidelity_sample_rejects_mutated_value():
