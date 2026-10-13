@@ -10525,6 +10525,12 @@ class PrintedOxygenFacts:
     oxygen_partial_pressure_Pa: Located[Value] | None = None
 
 
+def _log_fO2_bar_to_pa(log10_fO2_bar: Decimal) -> Decimal:
+    # fO2_Pa = 10^(log10 fO2 [bar]) × 1e5 Pa/bar; bar cancels, leaving Pa.
+    # Sanity check: log10 fO2 = 0 means 1 bar = 1e5 Pa.
+    return _BAR_PA * (Decimal(10) ** log10_fO2_bar)
+
+
 def _normalize_printed_token(raw: object) -> str:
     return str(raw).strip().replace("−", "-").replace("–", "-").replace(" ", "")
 
@@ -14909,9 +14915,7 @@ class Migrator:
                     )
                     log_fO2 = _as_dec_or_none(raw_item.get("log10_fO2"))
                     if log_fO2 is not None:
-                        oxygen = State.of(
-                            Decimal("100000") * (Decimal(10) ** log_fO2)
-                        )
+                        oxygen = State.of(_log_fO2_bar_to_pa(log_fO2))
                     elif (
                         isinstance(parent_values, Mapping)
                         and isinstance(parent_values.get("fO2_control"), Mapping)
