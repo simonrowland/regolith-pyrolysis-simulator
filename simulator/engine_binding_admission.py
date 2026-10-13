@@ -421,23 +421,6 @@ def _authorize_selected_bindings(
         authorize_binding(identity, provenance)
 
 
-def _gate_curve_producer_backend(sim: Any, provider_role: str | None) -> Any:
-    backend = getattr(sim, "backend", None)
-    if provider_role == "fallback":
-        from simulator.chemistry.kernel import ChemistryIntent
-
-        registry = getattr(sim, "_chem_registry", None)
-        provider = (
-            registry.fallback_for(ChemistryIntent.GATE_LIQUID_FRACTION)
-            if registry is not None
-            else None
-        )
-        return getattr(provider, "_backend", None)
-    if getattr(backend, "config", None) is not None:
-        return getattr(backend, "_live_backend", None) or backend
-    return backend
-
-
 def _gate_curve_evidence(
     sim: Any,
     identity: BindingIdentity,
@@ -468,10 +451,19 @@ def _unresolved_gate_curve_evidence(
     refusal_reason: str | None = None,
 ) -> GateCurveEvidence:
     from simulator.melt_backend.base import InternalAnalyticalBackend
+    from simulator.chemistry.kernel import ChemistryIntent
+    from simulator.reduced_real_determinism import (
+        _resolved_backend_for_cache_identity,
+    )
 
     state = (
         "no-external-install"
-        if isinstance(_gate_curve_producer_backend(sim, provider_role), InternalAnalyticalBackend)
+        if isinstance(
+            _resolved_backend_for_cache_identity(
+                sim, ChemistryIntent.GATE_LIQUID_FRACTION, provider_role
+            ),
+            InternalAnalyticalBackend,
+        )
         else "unproven"
     )
     return GateCurveEvidence(state, eligible, refusal_reason=refusal_reason)
@@ -584,16 +576,22 @@ def _live_binding_cache_evidence(
             eligible=primary_eligible and selected,
         )
 
-    if provider_role == "fallback":
-        from simulator.chemistry.kernel import ChemistryIntent
+    from simulator.chemistry.kernel import ChemistryIntent
+    from simulator.reduced_real_determinism import (
+        _resolved_backend_for_cache_identity,
+    )
 
+    backend = _resolved_backend_for_cache_identity(
+        sim, ChemistryIntent.GATE_LIQUID_FRACTION, provider_role
+    )
+    if provider_role == "fallback":
         registry = getattr(sim, "_chem_registry", None)
         provider = (
             registry.fallback_for(ChemistryIntent.GATE_LIQUID_FRACTION)
             if registry is not None
             else None
         )
-        live_backend = getattr(provider, "_backend", None)
+        live_backend = backend
         if provider is None or live_backend is None:
             eligible = selected_bindings_eligible()
             return _unresolved_gate_curve_evidence(
@@ -849,9 +847,17 @@ def gate_curve_memo_origin_matches(
     producer_evidence = origin.get("producer_evidence")
     if producer_evidence == "no-external-install":
         from simulator.melt_backend.base import InternalAnalyticalBackend
+        from simulator.chemistry.kernel import ChemistryIntent
+        from simulator.reduced_real_determinism import (
+            _resolved_backend_for_cache_identity,
+        )
 
         if not isinstance(
-            _gate_curve_producer_backend(sim, _gate_curve_provider_role(curve)),
+            _resolved_backend_for_cache_identity(
+                sim,
+                ChemistryIntent.GATE_LIQUID_FRACTION,
+                _gate_curve_provider_role(curve),
+            ),
             InternalAnalyticalBackend,
         ):
             return False

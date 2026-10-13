@@ -206,6 +206,7 @@ def _configure_magemin_origin_evidence(
         name='MAGEMinBackend',
         get_engine_version=lambda: 'fixture-runtime',
     )
+    sim._chem_registry = None
     monkeypatch.setattr(
         admission_module,
         'binding_identity_for_backend',
@@ -2823,6 +2824,79 @@ def test_shared_freeze_gate_curve_cache_reuses_same_analytical_producer(
     assert len(shared_cache) == 1
 
 
+def test_shared_freeze_gate_curve_cache_uses_registered_authoritative_supplier(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    from engines.alphamelts import AlphaMELTSProvider
+    from simulator.melt_backend.base import RealBackendAuthority, RealBackendFamily
+    from simulator.melt_backend.liquidus import LiquidusSolidusResult
+    from tests.test_alphamelts_provider import (
+        _FakeAlphaMELTSBackend,
+        _build_equilibrium_for_basalt,
+    )
+
+    class RegisteredAlphaBackend(_FakeAlphaMELTSBackend, RealBackendAuthority):
+        real_backend_family = RealBackendFamily.ALPHAMELTS
+
+        def get_engine_version(self):
+            return f'fake-alphamelts {self._finder_result.liquidus_T_C}'
+
+    sims = []
+    backends = []
+    for liquidus in (1300.0, 1500.0):
+        sim = _build_freeze_gate_sim(
+            vapor_pressure_data,
+            feedstocks_data,
+            setpoints_data,
+            enabled=True,
+        )
+        sim.melt.temperature_C = 1600.0
+        sim.melt.p_total_mbar = 10.0
+        backend = RegisteredAlphaBackend(
+            mode='python_api',
+            equilibrium=_build_equilibrium_for_basalt(),
+            finder_result=LiquidusSolidusResult(
+                liquidus_T_C=liquidus,
+                solidus_T_C=1000.0,
+                liquid_fraction=1.0,
+                status='ok',
+            ),
+        )
+        sim._chem_registry.register(
+            AlphaMELTSProvider(backend),
+            [ChemistryIntent.GATE_LIQUID_FRACTION],
+        )
+        assert isinstance(sim.backend, InternalAnalyticalBackend)
+        sims.append(sim)
+        backends.append(backend)
+
+    first = sims[0]._freeze_gate_curve_record()
+    expected = sims[1]._freeze_gate_curve_record()
+    assert backends[0].finder_calls
+    assert backends[1].finder_calls
+    assert first['curve']['liquidus_T_C'] == 1300.0
+    assert expected['curve']['liquidus_T_C'] == 1500.0
+    assert (
+        first['origin']['producer_configuration']
+        == expected['origin']['producer_configuration']
+    )
+
+    receiver = sims[1]
+    receiver._freeze_gate_liquid_fraction_cache = None
+    backends[1].finder_calls.clear()
+    backends[1].calls.clear()
+    key = _freeze_gate_key_for_current_state(receiver)
+    receiver._freeze_gate_shared_curve_cache = {key: first}
+
+    actual = receiver._freeze_gate_curve_record()
+
+    assert actual['curve'] == expected['curve']
+    assert actual['curve']['liquidus_T_C'] == 1500.0
+    assert backends[1].finder_calls
+
+
 @pytest.mark.parametrize('memo_scope', ['local', 'shared'])
 def test_gate_curve_memo_reuses_without_receipt_and_emits_notice_once(
     memo_scope,
@@ -4660,10 +4734,7 @@ def test_gate_memo_evidence_unavailable_is_a_miss(
             'install provenance unverifiable'
         ]
     else:
-        assert notice is not None
-        assert [item['reason'] for item in notice['notices']] == [
-            'live binding was not admitted after initialization'
-        ]
+        assert notice is None
 
 
 def test_gate_memo_reuses_live_curve_without_metadata_receipt_digests(
