@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 297
-  extracts: 295
+  sources: 301
+  extracts: 299
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 59
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 295
+  extracts_without_pdf: 299
   alias_groups_needing_resolution: 36
 gaps:
   pdfs_without_extract: []
@@ -83,6 +83,7 @@ gaps:
   - jsc-a16-special-samples
   - jsc-lunar-catalog-12023
   - kang-2007-sio2-activity-cas-low-silica
+  - kassis-frischat-1981-silicate-glass-vapour
   - kems-001-homma-1966
   - kems-002-ohno-1967
   - kems-003-pound-1972
@@ -218,8 +219,10 @@ gaps:
   - ntrs-19730008085
   - ntrs-20250004626
   - ohta-1996-cao-mgo-al2o3-activities
+  - ohta-suito-1995-mno-activity-slags
   - okazaki-2022-ryugu-gas-treasure-box
   - oneill-2002-feo-activity-coefficients-cmas
+  - oneill-2005-alkali-oxide-activities
   - pahlevan-2026-protolunar-volatile-outflows
   - pending-as2o3-second-primary
   - pending-bi2o3-kems
@@ -309,6 +312,7 @@ gaps:
   - vanbuchem-2023-lavatmos
   - vanbuchem-2025-lavatmos2
   - visscher-fegley-2013-debris-disks
+  - wadhwa-2008-redox-small-bodies
   - wetzel-gail-2013-sio-arrhenius
   - wilkerson-2021-jsc1a-tga-ms-poster
   - wilkerson-2023-jsc1a-outgassing
@@ -4393,6 +4397,64 @@ sources:
       matches_simulator: null
     ledger:
       path: ledger/kang-2007-sio2-activity-cas-low-silica.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: kassis-frischat-1981-silicate-glass-vapour
+  aliases: []
+  citation: Kassis N. and Frischat G.H. (1981). Vapor Pressures of Simple Silicate Glass Melts. Journal
+    of the American Ceramic Society 64:C28–C29.
+  doi: 10.1111/j.1151-2916.1981.tb09566.x
+  report_number: null
+  identifier: 10.1111/j.1151-2916.1981.tb09566.x
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kassis-frischat-1981-silicate-glass-vapour.yaml
+    review_status: draft
+    rows: 4
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kassis-frischat-1981-silicate-glass-vapour/kassis-frischat-1981-silicate-glass-vapour.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/kassis-frischat-1981-silicate-glass-vapour/sidecar.yaml
+      present: false
+    text:
+      path: text/kassis-frischat-1981-silicate-glass-vapour
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/kassis-frischat-1981-silicate-glass-vapour
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/kassis-frischat-1981-silicate-glass-vapour.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/kassis-frischat-1981-silicate-glass-vapour.yaml
       present: false
       error: null
       last_stage: null
@@ -12254,6 +12316,64 @@ sources:
       last_stage: null
       date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: ohta-suito-1995-mno-activity-slags
+  aliases: []
+  citation: Ohta H. and Suito H. (1995). Activities of MnO in CaO–SiO2–Al2O3–MnO(<10Pct)–FetO(<3Pct) slags
+    saturated with liquid iron. Metallurgical and Materials Transactions B26:295–303.
+  doi: 10.1007/BF02660972
+  report_number: null
+  identifier: 10.1007/BF02660972
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/ohta-suito-1995-mno-activity-slags.yaml
+    review_status: draft
+    rows: 19
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/ohta-suito-1995-mno-activity-slags/ohta-suito-1995-mno-activity-slags.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/ohta-suito-1995-mno-activity-slags/sidecar.yaml
+      present: false
+    text:
+      path: text/ohta-suito-1995-mno-activity-slags
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/ohta-suito-1995-mno-activity-slags
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/ohta-suito-1995-mno-activity-slags.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/ohta-suito-1995-mno-activity-slags.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: okazaki-2022-ryugu-gas-treasure-box
   aliases: []
   citation: 'Okazaki, R., Miura, Y. N., Takano, Y., Sawada, H., Sakamoto, K., Yada, T., Yamada, K., Kawagucci,
@@ -12367,6 +12487,65 @@ sources:
       matches_simulator: null
     ledger:
       path: ledger/oneill-2002-feo-activity-coefficients-cmas.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: oneill-2005-alkali-oxide-activities
+  aliases: []
+  citation: O’Neill H.St.C. (2005). A method for controlling alkali-metal oxide activities in one-atmosphere
+    experiments and its application to measuring the relative activity coefficients of NaO0.5 in silicate
+    melts. American Mineralogist90:497–501.
+  doi: 10.2138/am.2005.1792
+  report_number: null
+  identifier: 10.2138/am.2005.1792
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/oneill-2005-alkali-oxide-activities.yaml
+    review_status: draft
+    rows: 3
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/oneill-2005-alkali-oxide-activities/oneill-2005-alkali-oxide-activities.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/oneill-2005-alkali-oxide-activities/sidecar.yaml
+      present: false
+    text:
+      path: text/oneill-2005-alkali-oxide-activities
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/oneill-2005-alkali-oxide-activities
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/oneill-2005-alkali-oxide-activities.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/oneill-2005-alkali-oxide-activities.yaml
       present: false
       error: null
       last_stage: null
@@ -17566,6 +17745,64 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: wadhwa-2008-redox-small-bodies
+  aliases: []
+  citation: Wadhwa M. (2008). Redox Conditions on Small Bodies, the Moon and Mars. Reviews in Mineralogy
+    and Geochemistry68:493–510, chapter17.
+  doi: 10.2138/rmg.2008.68.17
+  report_number: null
+  identifier: 10.2138/rmg.2008.68.17
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/wadhwa-2008-redox-small-bodies.yaml
+    review_status: draft
+    rows: 1
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/wadhwa-2008-redox-small-bodies/wadhwa-2008-redox-small-bodies.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/wadhwa-2008-redox-small-bodies/sidecar.yaml
+      present: false
+    text:
+      path: text/wadhwa-2008-redox-small-bodies
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/wadhwa-2008-redox-small-bodies
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/wadhwa-2008-redox-small-bodies.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/wadhwa-2008-redox-small-bodies.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: wetzel-gail-2013-sio-arrhenius
   aliases:
