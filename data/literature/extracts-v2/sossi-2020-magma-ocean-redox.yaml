@@ -1,0 +1,1413 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/sossi-2020-magma-ocean-redox.yaml
+observations:
+- observation_id: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_10_xanes
+  experiment_id: 10.1126/sciadv.abd1387::experiment::sossi-per-f-o2-10
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched peridotite glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '2173.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.04712041884816753926701570681'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.015 (as printed; SD per Fig. 2 caption)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_10_xanes
+  source_id: sossi-2020-magma-ocean-redox
+  locator:
+    page: 14
+    table: S4
+  read_from: pdf:sossi-2020-magma-ocean-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2173.15'
+      locator:
+        page: 14
+        table: S4
+    fO2_log:
+      state:
+        tag: value
+        value: '-5.32'
+      locator:
+        page: 14
+        table: S4
+  derivation:
+    relation: fe3_fe2_ratio = r/(1 - r); r = Fe3+/sum Fe as printed
+    inputs:
+    - pdf:sossi-2020-magma-ocean-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.045'
+        locator:
+          page: 14
+          table: S4
+    output_unit: dimensionless
+- observation_id: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_11_xanes
+  experiment_id: 10.1126/sciadv.abd1387::experiment::sossi-per-f-o2-11
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched peridotite glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '2169.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.01936799184505606523955147808'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.010 (as printed; SD per Fig. 2 caption)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_11_xanes
+  source_id: sossi-2020-magma-ocean-redox
+  locator:
+    page: 14
+    table: S4
+  read_from: pdf:sossi-2020-magma-ocean-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2169.15'
+      locator:
+        page: 14
+        table: S4
+    fO2_log:
+      state:
+        tag: value
+        value: '-6.74'
+      locator:
+        page: 14
+        table: S4
+  derivation:
+    relation: fe3_fe2_ratio = r/(1 - r); r = Fe3+/sum Fe as printed
+    inputs:
+    - pdf:sossi-2020-magma-ocean-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.019'
+        locator:
+          page: 14
+          table: S4
+    output_unit: dimensionless
+- observation_id: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_12_xanes
+  experiment_id: 10.1126/sciadv.abd1387::experiment::sossi-per-f-o2-12
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched peridotite glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '2112.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.01419878296146044624746450304'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.009 (as printed; SD per Fig. 2 caption)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_12_xanes
+  source_id: sossi-2020-magma-ocean-redox
+  locator:
+    page: 14
+    table: S4
+  read_from: pdf:sossi-2020-magma-ocean-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2112.15'
+      locator:
+        page: 14
+        table: S4
+    fO2_log:
+      state:
+        tag: value
+        value: '-7.86'
+      locator:
+        page: 14
+        table: S4
+  derivation:
+    relation: fe3_fe2_ratio = r/(1 - r); r = Fe3+/sum Fe as printed
+    inputs:
+    - pdf:sossi-2020-magma-ocean-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.014'
+        locator:
+          page: 14
+          table: S4
+    output_unit: dimensionless
+- observation_id: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_1_xanes
+  experiment_id: 10.1126/sciadv.abd1387::experiment::sossi-per-f-o2-1
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched peridotite glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '2173.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.7857142857142857142857142857'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      confidence_level: one_sigma
+      Fe3_over_FeT: ±0.008 (as printed; SD per Fig. 2 caption)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_1_xanes
+  source_id: sossi-2020-magma-ocean-redox
+  locator:
+    page: 14
+    published_page: Supplementary Materials PDF p. 14
+    table: S4
+  read_from: pdf:sossi-2020-magma-ocean-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2173.15'
+      locator:
+        page: 14
+        published_page: Supplementary Materials PDF p. 14
+        table: S4
+    fO2_log:
+      state:
+        tag: value
+        value: '0'
+      locator:
+        page: 14
+        published_page: Supplementary Materials PDF p. 14
+        table: S4
+  derivation:
+    relation: fe3_fe2_ratio = r/(1 - r); r = Fe3+/sum Fe as printed
+    inputs:
+    - pdf:sossi-2020-magma-ocean-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.44'
+        locator:
+          page: 14
+          published_page: Supplementary Materials PDF p. 14
+          table: S4
+    output_unit: dimensionless
+- observation_id: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_2_xanes
+  experiment_id: 10.1126/sciadv.abd1387::experiment::sossi-per-f-o2-2
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched peridotite glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '2166.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.383125864453665283540802213'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.013 (as printed; SD per Fig. 2 caption)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_2_xanes
+  source_id: sossi-2020-magma-ocean-redox
+  locator:
+    page: 14
+    table: S4
+  read_from: pdf:sossi-2020-magma-ocean-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2166.15'
+      locator:
+        page: 14
+        table: S4
+    fO2_log:
+      state:
+        tag: value
+        value: '-2.49'
+      locator:
+        page: 14
+        table: S4
+  derivation:
+    relation: fe3_fe2_ratio = r/(1 - r); r = Fe3+/sum Fe as printed
+    inputs:
+    - pdf:sossi-2020-magma-ocean-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.277'
+        locator:
+          page: 14
+          table: S4
+    output_unit: dimensionless
+- observation_id: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_3_xanes
+  experiment_id: 10.1126/sciadv.abd1387::experiment::sossi-per-f-o2-3
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched peridotite glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '2134.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.3679890560875512995896032832'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.015 (as printed; SD per Fig. 2 caption)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_3_xanes
+  source_id: sossi-2020-magma-ocean-redox
+  locator:
+    page: 14
+    table: S4
+  read_from: pdf:sossi-2020-magma-ocean-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2134.15'
+      locator:
+        page: 14
+        table: S4
+    fO2_log:
+      state:
+        tag: value
+        value: '-2.53'
+      locator:
+        page: 14
+        table: S4
+  derivation:
+    relation: fe3_fe2_ratio = r/(1 - r); r = Fe3+/sum Fe as printed
+    inputs:
+    - pdf:sossi-2020-magma-ocean-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.269'
+        locator:
+          page: 14
+          table: S4
+    output_unit: dimensionless
+- observation_id: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_6_xanes
+  experiment_id: 10.1126/sciadv.abd1387::experiment::sossi-per-f-o2-6
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched peridotite glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '2151.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.2919896640826873385012919897'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.013 (as printed; SD per Fig. 2 caption)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_6_xanes
+  source_id: sossi-2020-magma-ocean-redox
+  locator:
+    page: 14
+    table: S4
+  read_from: pdf:sossi-2020-magma-ocean-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2151.15'
+      locator:
+        page: 14
+        table: S4
+    fO2_log:
+      state:
+        tag: value
+        value: '-2.58'
+      locator:
+        page: 14
+        table: S4
+  derivation:
+    relation: fe3_fe2_ratio = r/(1 - r); r = Fe3+/sum Fe as printed
+    inputs:
+    - pdf:sossi-2020-magma-ocean-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.226'
+        locator:
+          page: 14
+          table: S4
+    output_unit: dimensionless
+- observation_id: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_7_xanes
+  experiment_id: 10.1126/sciadv.abd1387::experiment::sossi-per-f-o2-7
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched peridotite glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '2139.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.3157894736842105263157894737'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.013 (as printed; SD per Fig. 2 caption)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_7_xanes
+  source_id: sossi-2020-magma-ocean-redox
+  locator:
+    page: 14
+    table: S4
+  read_from: pdf:sossi-2020-magma-ocean-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2139.15'
+      locator:
+        page: 14
+        table: S4
+    fO2_log:
+      state:
+        tag: value
+        value: '-2.72'
+      locator:
+        page: 14
+        table: S4
+  derivation:
+    relation: fe3_fe2_ratio = r/(1 - r); r = Fe3+/sum Fe as printed
+    inputs:
+    - pdf:sossi-2020-magma-ocean-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.24'
+        locator:
+          page: 14
+          table: S4
+    output_unit: dimensionless
+- observation_id: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_8_xanes
+  experiment_id: 10.1126/sciadv.abd1387::experiment::sossi-per-f-o2-8
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched peridotite glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '2197.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.2077294685990338164251207729'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.006 (as printed; SD per Fig. 2 caption)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_8_xanes
+  source_id: sossi-2020-magma-ocean-redox
+  locator:
+    page: 14
+    table: S4
+  read_from: pdf:sossi-2020-magma-ocean-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2197.15'
+      locator:
+        page: 14
+        table: S4
+    fO2_log:
+      state:
+        tag: value
+        value: '-3'
+      locator:
+        page: 14
+        table: S4
+  derivation:
+    relation: fe3_fe2_ratio = r/(1 - r); r = Fe3+/sum Fe as printed
+    inputs:
+    - pdf:sossi-2020-magma-ocean-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.172'
+        locator:
+          page: 14
+          table: S4
+    output_unit: dimensionless
+- observation_id: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_9_xanes
+  experiment_id: 10.1126/sciadv.abd1387::experiment::sossi-per-f-o2-9
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched peridotite glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '2175.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.1415525114155251141552511416'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.006 (as printed; SD per Fig. 2 caption)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_9_xanes
+  source_id: sossi-2020-magma-ocean-redox
+  locator:
+    page: 14
+    table: S4
+  read_from: pdf:sossi-2020-magma-ocean-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2175.15'
+      locator:
+        page: 14
+        table: S4
+    fO2_log:
+      state:
+        tag: value
+        value: '-3.92'
+      locator:
+        page: 14
+        table: S4
+  derivation:
+    relation: fe3_fe2_ratio = r/(1 - r); r = Fe3+/sum Fe as printed
+    inputs:
+    - pdf:sossi-2020-magma-ocean-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.124'
+        locator:
+          page: 14
+          table: S4
+    output_unit: dimensionless
+- observation_id: sossi-2020-magma-ocean-redox::sossi_2020_per_ts1_xanes
+  experiment_id: 10.1126/sciadv.abd1387::experiment::sossi-per-ts1
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched peridotite glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '2124.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.3642564802182810368349249659'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.013 (as printed; SD per Fig. 2 caption)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sossi-2020-magma-ocean-redox::sossi_2020_per_ts1_xanes
+  source_id: sossi-2020-magma-ocean-redox
+  locator:
+    page: 14
+    table: S4
+  read_from: pdf:sossi-2020-magma-ocean-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2124.15'
+      locator:
+        page: 14
+        table: S4
+    fO2_log:
+      state:
+        tag: value
+        value: '-2.72'
+      locator:
+        page: 14
+        table: S4
+  derivation:
+    relation: fe3_fe2_ratio = r/(1 - r); r = Fe3+/sum Fe as printed
+    inputs:
+    - pdf:sossi-2020-magma-ocean-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.267'
+        locator:
+          page: 14
+          table: S4
+    output_unit: dimensionless
+- observation_id: sossi-2020-magma-ocean-redox::sossi_2020_per_ts2_xanes
+  experiment_id: 10.1126/sciadv.abd1387::experiment::sossi-per-ts2
+  identity:
+    quantity:
+      tag: value
+      value: fe3_fe2_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched peridotite glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '2148.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
+  value:
+    kind: point
+    point: '0.2771392081736909323116219668'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.012 (as printed; SD per Fig. 2 caption)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sossi-2020-magma-ocean-redox::sossi_2020_per_ts2_xanes
+  source_id: sossi-2020-magma-ocean-redox
+  locator:
+    page: 14
+    table: S4
+  read_from: pdf:sossi-2020-magma-ocean-redox
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2148.15'
+      locator:
+        page: 14
+        table: S4
+    fO2_log:
+      state:
+        tag: value
+        value: '-2.72'
+      locator:
+        page: 14
+        table: S4
+  derivation:
+    relation: fe3_fe2_ratio = r/(1 - r); r = Fe3+/sum Fe as printed
+    inputs:
+    - pdf:sossi-2020-magma-ocean-redox
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.217'
+        locator:
+          page: 14
+          table: S4
+    output_unit: dimensionless

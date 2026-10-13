@@ -1143,9 +1143,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: model_derived
-    original_method_class: model_derived
-    model: model_derived
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Bischof et al. (2023), quoting Petsalakis et al. (2004) and FactSage
   admission:
     status: superseded
     reason: superseded by a later observation in the same extract
@@ -1204,9 +1204,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: model_derived
-    original_method_class: model
-    model: model
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Bischof et al. (2023), quoting Petsalakis et al. (2004) and FactSage
   admission:
     status: pending
     reason: no observation admission_status mapped from source
@@ -1859,9 +1859,10 @@ observations:
   evidence:
     class:
       tag: value
-      value: model_derived
-    original_method_class: model_derived
-    model: model_derived
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Bischof et al. (2023), quoting the HCM778 FactSage result based on Hultgren et al. [39], Chaplygin [37],
+      and Medvedev et al. [38]
   admission:
     status: pending
     reason: no observation admission_status mapped from source

@@ -83,6 +83,16 @@ observations:
               table: '3'
               note: Table 3. Interaction parameter of sulfur in liquid iron
         output_unit: K
+  derived_from:
+  - kems-088-ichise-1975::ichise_1975_fig7_log_gamma_S_figure_only
+  derivation:
+    relation: The interaction parameters were obtained by differentiating the integrated sulfur activity coefficients (Eq.
+      10), converting c_S^(S) to e_S^(S) (Eq. 11), and fitting the temperature dependence (Eq. 12), as reported with Table
+      3 (published pp. 117-118).
+    inputs:
+    - kems-088-ichise-1975::ichise_1975_fig7_log_gamma_S_figure_only
+    parameters: []
+    output_unit: as_published
 - observation_id: kems-088-ichise-1975::ichise_1975_epsilon_e_table3::T=1873.15:h=4e9b2cc85838
   experiment_id: 10.2355/isijinternational1966.15.115::kems-088-ichise-1975
   identity:
@@ -164,6 +174,16 @@ observations:
               table: '3'
               note: Table 3. Interaction parameter of sulfur in liquid iron
         output_unit: K
+  derived_from:
+  - kems-088-ichise-1975::ichise_1975_fig7_log_gamma_S_figure_only
+  derivation:
+    relation: The interaction parameters were obtained by differentiating the integrated sulfur activity coefficients (Eq.
+      10), converting c_S^(S) to e_S^(S) (Eq. 11), and fitting the temperature dependence (Eq. 12), as reported with Table
+      3 (published pp. 117-118).
+    inputs:
+    - kems-088-ichise-1975::ichise_1975_fig7_log_gamma_S_figure_only
+    parameters: []
+    output_unit: as_published
 - observation_id: kems-088-ichise-1975::ichise_1975_epsilon_e_table3::T=1923.15:h=f1825beb3c1b
   experiment_id: 10.2355/isijinternational1966.15.115::kems-088-ichise-1975
   identity:
@@ -245,6 +265,16 @@ observations:
               table: '3'
               note: Table 3. Interaction parameter of sulfur in liquid iron
         output_unit: K
+  derived_from:
+  - kems-088-ichise-1975::ichise_1975_fig7_log_gamma_S_figure_only
+  derivation:
+    relation: The interaction parameters were obtained by differentiating the integrated sulfur activity coefficients (Eq.
+      10), converting c_S^(S) to e_S^(S) (Eq. 11), and fitting the temperature dependence (Eq. 12), as reported with Table
+      3 (published pp. 117-118).
+    inputs:
+    - kems-088-ichise-1975::ichise_1975_fig7_log_gamma_S_figure_only
+    parameters: []
+    output_unit: as_published
 - observation_id: kems-088-ichise-1975::ichise_1975_fe_heat_of_vaporization_fig8
   experiment_id: 10.2355/isijinternational1966.15.115::kems-088-ichise-1975
   identity:
@@ -291,6 +321,15 @@ observations:
     figure: '8'
     note: ln(I_Fe+ T) vs 1/T for pure iron; slope gives 82.4 kcal/g-atom from 1484 to 1584 C
   read_from: pdf:kems-088-ichise-1975
+  derived_from:
+  - kems-088-ichise-1975::ichise_1975_fig8_pure_iron_figure_only
+  derivation:
+    relation: The Fe heat of vaporization is the slope of the fitted ln(I_Fe+ T) versus 1/T line in Fig. 8, with no inflection
+      at the Fe melting point (published p. 118).
+    inputs:
+    - kems-088-ichise-1975::ichise_1975_fig8_pure_iron_figure_only
+    parameters: []
+    output_unit: as_published
 - observation_id: kems-088-ichise-1975::ichise_1975_fig10_e_S_comparison_figure_only
   experiment_id: 10.2355/isijinternational1966.15.115::kems-088-ichise-1975
   identity:
@@ -513,6 +552,15 @@ observations:
     figure: '4'
     note: Fig. 4. Integration curve for the Fe-S system at 1550 C
   read_from: pdf:kems-088-ichise-1975
+  derived_from:
+  - kems-088-ichise-1975::ichise_1975_ls_integrand_equations_7_to_9
+  derivation:
+    relation: This is the 1550 C integration curve from the least-squares line in Eq. (7), integrated according to Eq. (6)
+      (published pp. 115, 117).
+    inputs:
+    - kems-088-ichise-1975::ichise_1975_ls_integrand_equations_7_to_9
+    parameters: []
+    output_unit: as_published
 - observation_id: kems-088-ichise-1975::ichise_1975_fig5_integration_1600C_figure_only
   experiment_id: 10.2355/isijinternational1966.15.115::kems-088-ichise-1975
   identity:
@@ -558,6 +606,15 @@ observations:
     figure: '5'
     note: Fig. 5. Integration curve for the Fe-S system at 1600 C
   read_from: pdf:kems-088-ichise-1975
+  derived_from:
+  - kems-088-ichise-1975::ichise_1975_ls_integrand_equations_7_to_9
+  derivation:
+    relation: This is the 1600 C integration curve from the least-squares line in Eq. (8), integrated according to Eq. (6)
+      (published pp. 115, 117).
+    inputs:
+    - kems-088-ichise-1975::ichise_1975_ls_integrand_equations_7_to_9
+    parameters: []
+    output_unit: as_published
 - observation_id: kems-088-ichise-1975::ichise_1975_fig6_integration_1650C_figure_only
   experiment_id: 10.2355/isijinternational1966.15.115::kems-088-ichise-1975
   identity:
@@ -603,6 +660,15 @@ observations:
     figure: '6'
     note: Fig. 6. Integration curve for the Fe-S system at 1650 C
   read_from: pdf:kems-088-ichise-1975
+  derived_from:
+  - kems-088-ichise-1975::ichise_1975_ls_integrand_equations_7_to_9
+  derivation:
+    relation: This is the 1650 C integration curve from the least-squares line in Eq. (9), integrated according to Eq. (6)
+      (published pp. 115, 117).
+    inputs:
+    - kems-088-ichise-1975::ichise_1975_ls_integrand_equations_7_to_9
+    parameters: []
+    output_unit: as_published
 - observation_id: kems-088-ichise-1975::ichise_1975_fig7_log_gamma_S_figure_only
   experiment_id: 10.2355/isijinternational1966.15.115::kems-088-ichise-1975
   identity:
@@ -648,6 +714,19 @@ observations:
     figure: '7'
     note: Fig. 7. Activity coefficient of sulfur in liquid iron
   read_from: pdf:kems-088-ichise-1975
+  derived_from:
+  - kems-088-ichise-1975::ichise_1975_fig4_integration_1550C_figure_only
+  - kems-088-ichise-1975::ichise_1975_fig5_integration_1600C_figure_only
+  - kems-088-ichise-1975::ichise_1975_fig6_integration_1650C_figure_only
+  derivation:
+    relation: The sulfur activity-coefficient curves were obtained by integrating the temperature-specific curves using Eq.
+      (6) (published pp. 115-117).
+    inputs:
+    - kems-088-ichise-1975::ichise_1975_fig4_integration_1550C_figure_only
+    - kems-088-ichise-1975::ichise_1975_fig5_integration_1600C_figure_only
+    - kems-088-ichise-1975::ichise_1975_fig6_integration_1650C_figure_only
+    parameters: []
+    output_unit: as_published
 - observation_id: kems-088-ichise-1975::ichise_1975_fig8_pure_iron_figure_only
   experiment_id: 10.2355/isijinternational1966.15.115::kems-088-ichise-1975
   identity:
@@ -1508,6 +1587,7 @@ observations:
     kind: printed
     verbatim:
       note: 'SD of slope a: 0.00242 (1550 C), 0.00226 (1600 C), 0.00250 (1650 C); ratio of residual SS 0.10 to 0.08.'
+      confidence_level: one_sigma
   evidence:
     class:
       tag: value
@@ -1525,6 +1605,29 @@ observations:
     equation: 7-9
     note: LS fits of (1-N_S)/(2-N_S) vs ln(I_Fe+ N_S^2 / I_S2+ N_Fe)
   read_from: pdf:kems-088-ichise-1975
+  derived_from:
+  - kems-088-ichise-1975::ichise_1975_ion_ratio_table2::points:h=1025327dd720
+  - kems-088-ichise-1975::ichise_1975_ion_ratio_table2::points:h=37cf613629ad
+  - kems-088-ichise-1975::ichise_1975_ion_ratio_table2::points:h=39742dcd109b
+  - kems-088-ichise-1975::ichise_1975_ion_ratio_table2::points:h=5cf5e8b0c795
+  - kems-088-ichise-1975::ichise_1975_ion_ratio_table2::points:h=896fb761cc0c
+  - kems-088-ichise-1975::ichise_1975_ion_ratio_table2::points:h=a5f781710581
+  - kems-088-ichise-1975::ichise_1975_ion_ratio_table2::points:h=f1c8b6d32a02
+  - kems-088-ichise-1975::ichise_1975_ion_ratio_table2::points:h=f4d5b6ef7756
+  derivation:
+    relation: The authors fitted Eqs. (7)-(9) by least squares to their Table 2 ion-intensity ratios at 1550, 1600, and 1650
+      C (published p. 117).
+    inputs:
+    - kems-088-ichise-1975::ichise_1975_ion_ratio_table2::points:h=1025327dd720
+    - kems-088-ichise-1975::ichise_1975_ion_ratio_table2::points:h=37cf613629ad
+    - kems-088-ichise-1975::ichise_1975_ion_ratio_table2::points:h=39742dcd109b
+    - kems-088-ichise-1975::ichise_1975_ion_ratio_table2::points:h=5cf5e8b0c795
+    - kems-088-ichise-1975::ichise_1975_ion_ratio_table2::points:h=896fb761cc0c
+    - kems-088-ichise-1975::ichise_1975_ion_ratio_table2::points:h=a5f781710581
+    - kems-088-ichise-1975::ichise_1975_ion_ratio_table2::points:h=f1c8b6d32a02
+    - kems-088-ichise-1975::ichise_1975_ion_ratio_table2::points:h=f4d5b6ef7756
+    parameters: []
+    output_unit: as_published
 - observation_id: kems-088-ichise-1975::ichise_1975_table1_pure_iron_composition
   experiment_id: 10.2355/isijinternational1966.15.115::kems-088-ichise-1975
   identity:

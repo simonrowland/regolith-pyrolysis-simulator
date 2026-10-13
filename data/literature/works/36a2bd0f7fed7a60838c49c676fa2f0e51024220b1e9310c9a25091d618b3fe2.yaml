@@ -90,6 +90,22 @@ experiments:
         pdf_page_index: 3
         table: '1'
         note: Table includes Zn, FeTiO3, MgSiO3, Al2O3, and MLS-1A; no one series composition
+    form:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 3
+        table: '1'
+        note: Samples are named, but their form is not stated
+    surface_area_m2:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 3
+        table: '1'
+        note: No per-run exposed area or sample geometry is stated
   conditions:
     temperature_K:
       state:
@@ -290,6 +306,15 @@ benches:
       pdf_page_index: 4
       section: RESULTS
       note: Used only for the last MLS-1A test
+  temperature_measurement:
+    sensor:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 3
+        table: '1'
+        note: Max Temp is tabulated, but the sensor and measurement target are not stated
   heating_method:
     state:
       tag: value
@@ -320,3 +345,143 @@ benches:
       section: REDUCED PRESSURE TESTING
       note: Proof-of-principle tests at Pennsylvania State University Sintering Lab
   other_facts: []
+context:
+- observation_id: cardiff_2007_fresnel_condensation_and_measurement_context
+  experiment: fresnel-pyrolysis-series
+  type: apparatus
+  locator:
+    pdf_page_index: 3
+    section: RESULTS
+    note: Prototype run table and condensate/RGA discussion
+  units: as printed; qualitative context
+  values:
+    quantity: prototype_condensation_and_measurement_context
+    method_class: method_only
+    pressure_semantics:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '1'
+        pdf_page_index: 3
+        note: Initial Pressure and Testing Pressure are the printed headings; gauge and total-pressure semantics are not stated
+    gas_environment:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '1'
+        pdf_page_index: 3
+        note: No fill or sweep gas is stated for these runs
+    collector_and_cooling:
+      state:
+        tag: value
+        value: Passive cooling on pieces of witness material above the crucible
+      locator:
+        pdf_page_index: 4
+        section: RESULTS
+        note: Condensation occurs within a few centimeters of the crucible
+    collector_distance:
+      state:
+        tag: value
+        value: within a few centimeters of the crucible
+      locator:
+        pdf_page_index: 4
+        section: RESULTS
+        note: Qualitative distance as printed; no exact distance
+    collector_temperature:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 4
+        section: RESULTS
+        note: Witness material is passively cooled; no temperature is reported
+    deposit_location:
+      state:
+        tag: value
+        value: pieces of witness material above the crucible
+      locator:
+        pdf_page_index: 4
+        section: RESULTS
+        note: Condensation description
+    deposit_phase_per_element:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 4
+        section: RESULTS
+        note: No deposit phases by element are identified
+    deposit_identification_method:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 4
+        section: RESULTS
+        note: SEM is reported for the remaining slag surface, not for witness deposits
+    deposit_air_exposure_before_analysis:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 4
+        section: RESULTS
+        note: No air-exposure history before analysis is stated
+    oxygen_measurement:
+      state:
+        tag: value
+        value: Relative oxygen partial-pressure increase detected by an MKS residual gas analyzer during test 12
+      locator:
+        pdf_page_index: 4
+        section: RESULTS
+        figure: '4'
+        note: RGA signal increased as the simulant boiled; no integrated or calibrated oxygen yield is reported
+    oxygen_yield:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '1'
+        pdf_page_index: 3
+        note: O2 yield not_reported; the RGA observation is qualitative/relative and is not a calibrated total
+    oxygen_calibration:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 4
+        section: RESULTS
+        figure: '4'
+        note: No calibration or integration method for total oxygen is reported
+    mass_vaporized_by_element:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '1'
+        pdf_page_index: 3
+        note: Mass loss is a percentage; run input masses and element-resolved vaporized masses are not reported
+    residue_composition:
+      state:
+        tag: value
+        value: SEM analysis found reduced oxygen at the remaining sample surface; Figure 5 prints Fe/O and Ti/O ratios for
+          ilmenite
+      locator:
+        pdf_page_index: 4
+        section: RESULTS
+        figure: '5'
+        note: The paper does not assign the SEM/EDS surface comparison to a specific Table 1 run
+    quench_or_staged_collector:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 4
+        section: RESULTS
+        note: Passive witness pieces are described; no quench or staged collector is reported
+  context_id: cardiff-2007-vacuum-pyrolysis-gsfc::context::cardiff_2007_fresnel_condensation_and_measurement_context
+  work_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2
+  source_id: cardiff-2007-vacuum-pyrolysis-gsfc
+  species: MLS-1A
