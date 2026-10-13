@@ -70,20 +70,22 @@ def _migrate(path: Path):
     return migrator.result
 
 
-def _aithala_fe_rows():
-    result = _migrate(AITHALA)
-    return {
-        oid[len(PREFIX):]: obs
-        for oid, obs in result.observations.items()
-        if oid[len(PREFIX):] in AITHALA_S1_FE3_OVER_FET
-    }
-
-
 def test_aithala_s1_rows_migrate_to_fe3_fe2_ratio_measured_reduced() -> None:
     # b-686 change. Pin (006e13b70): quantity unknown ("unsupported quantity
     # 'Fe3+/FeT'"), value UNAVAILABLE, evidence measured_direct.
-    rows = _aithala_fe_rows()
+    result = _migrate(AITHALA)
+    rows = {
+        oid[len(PREFIX):]: obs
+        for oid, obs in result.observations.items()
+        if oid.startswith(PREFIX)
+        and oid[len(PREFIX):] in AITHALA_S1_FE3_OVER_FET
+    }
     assert set(rows) == set(AITHALA_S1_FE3_OVER_FET)
+    asset_ids = {
+        asset.asset_id
+        for work in result.works.values()
+        for asset in work.source_files.files
+    }
     for oid, obs in rows.items():
         r = Decimal(AITHALA_S1_FE3_OVER_FET[oid])
         assert obs.identity.quantity.value is Quantity.FE3_FE2_RATIO, oid
@@ -97,6 +99,13 @@ def test_aithala_s1_rows_migrate_to_fe3_fe2_ratio_measured_reduced() -> None:
         assert name == "original_Fe3_over_FeT", oid
         assert printed.state.value == r, oid
         assert printed.locator.table == "S-1", oid
+        assert obs.derived_from == obs.derivation.inputs, oid
+        assert obs.derived_from and set(obs.derived_from).issubset(asset_ids), oid
+        assert not [
+            issue for issue in result.validation.hard_issues
+            if issue.reason.value == "conditional_field"
+            and issue.path.startswith(f"observation[{obs.observation_id}].")
+        ], oid
 
 
 def test_aithala_s3_recalculated_rows_are_not_declared_fe3_fe2_ratio() -> None:
@@ -184,18 +193,33 @@ def test_migrator_reduces_ferric_fraction_series_points(tmp_path: Path) -> None:
             ],
         },
     }])
+    result = _migrate(path)
     points = {
-        oid: obs for oid, obs in _migrate(path).observations.items()
+        oid: obs for oid, obs in result.observations.items()
         if oid.startswith(PREFIX + "fixture_series::")
     }
+    assert len(points) == 2
     assert sorted(obs.value.point for obs in points.values()) == [
         Decimal("0.25") / Decimal("0.75"), Decimal(1)
     ]
+    asset_ids = {
+        asset.asset_id
+        for work in result.works.values()
+        for asset in work.source_files.files
+    }
     for obs in points.values():
         assert obs.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
         assert obs.derivation.relation == FERRIC_FRACTION_RELATION
         (name, _), = obs.derivation.parameters
         assert name == "original_Fe3_over_FeT"
+        assert obs.derived_from
+        assert obs.derived_from == obs.derivation.inputs
+        assert set(obs.derived_from).issubset(asset_ids)
+        assert not [
+            issue for issue in result.validation.hard_issues
+            if issue.reason.value == "conditional_field"
+            and issue.path.startswith(f"observation[{obs.observation_id}].")
+        ]
 
 
 def test_migrated_ferric_fraction_has_resolvable_lineage_and_derivation(tmp_path: Path) -> None:
