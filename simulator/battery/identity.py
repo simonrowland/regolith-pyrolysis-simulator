@@ -84,6 +84,7 @@ from simulator.battery.enums import (
     CONDENSED_PHASES,
     EQUILIBRIUM_FIT_QUANTITIES,
     EXTENSIVE_YIELD_QUANTITIES,
+    FUSION_QUANTITIES,
     FORMATION_QUANTITIES,
     KINETIC_YIELD_QUANTITIES,
     MELT_ACTIVITY_QUANTITIES,
@@ -514,6 +515,23 @@ def profile_for(identity: Identity) -> QuantityProfile:
             "reaction",
             "formation_elements",
             "total_pressure_Pa",
+        )
+    elif q in FUSION_QUANTITIES:
+        req("temperature_K", "subtype")
+        na(
+            "per",
+            "standard_pressure_Pa",
+            "reaction",
+            "formation_elements",
+            "reference_state",
+            "reservoir",
+            "composition",
+            "fO2_Pa",
+            "total_pressure_Pa",
+            "sweep_gas",
+            "exposure",
+            "sample_mass_kg",
+            "wall",
         )
     elif q is Quantity.PARTIAL_MOLAR_ENTHALPY:
         req("per", "temperature_K", "standard_pressure_Pa", "composition", "total_pressure_Pa", "reference_state")

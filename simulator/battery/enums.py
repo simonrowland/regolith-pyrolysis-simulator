@@ -75,6 +75,8 @@ class Quantity(StrEnum):
     DELTA_FH = "delta_fH"
     DELTA_FG = "delta_fG"
     H_MINUS_H298 = "H_minus_H298"
+    ENTHALPY_OF_FUSION = "heat_of_fusion"
+    ENTROPY_OF_FUSION = "entropy_of_fusion"
     PARTIAL_MOLAR_ENTHALPY = "partial_molar_enthalpy"
     ENTHALPY_OF_VAPORIZATION_2ND_LAW = "enthalpy_of_vaporization_2nd_law"
     ENTHALPY_OF_VAPORIZATION_3RD_LAW = "enthalpy_of_vaporization_3rd_law"
@@ -477,11 +479,14 @@ QUANTITY_UNITS: dict[Quantity, str] = {
     Quantity.DELTA_FH: "kJ_per_declared_mol_basis",
     Quantity.DELTA_FG: "kJ_per_declared_mol_basis",
     Quantity.H_MINUS_H298: "kJ_per_declared_mol_basis",
+    # Unit check: (kJ/mol) × (1000 J/kJ) / K = J/(mol·K).
+    Quantity.ENTHALPY_OF_FUSION: "kJ_per_declared_mol_basis",
     Quantity.PARTIAL_MOLAR_ENTHALPY: "kJ_per_declared_mol_basis",
     Quantity.ENTHALPY_OF_VAPORIZATION_2ND_LAW: "kJ_per_declared_mol_basis",
     Quantity.ENTHALPY_OF_VAPORIZATION_3RD_LAW: "kJ_per_declared_mol_basis",
     Quantity.CP: "J_per_declared_mol_basis_per_K",
     Quantity.S: "J_per_declared_mol_basis_per_K",
+    Quantity.ENTROPY_OF_FUSION: "J_per_declared_mol_basis_per_K",
     Quantity.EVAPORATION_RATE: "kg_per_s",
     Quantity.MASS_LOSS_RATE: "kg_per_s",
     Quantity.WALL_DEPOSIT_MASS: "kg",
@@ -512,6 +517,9 @@ FORMATION_QUANTITIES = frozenset(
 EQUILIBRIUM_FIT_QUANTITIES = frozenset({Quantity.LOG10_K_STAR})
 PURE_STANDARD_THERMO = frozenset(
     {Quantity.CP, Quantity.S, Quantity.H_MINUS_H298}
+)
+FUSION_QUANTITIES = frozenset(
+    {Quantity.ENTHALPY_OF_FUSION, Quantity.ENTROPY_OF_FUSION}
 )
 VAPORIZATION_ENTHALPIES = frozenset(
     {
