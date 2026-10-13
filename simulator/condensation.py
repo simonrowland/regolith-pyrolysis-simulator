@@ -436,12 +436,10 @@ def _validate_sticking_entry(path: Path, name: str, entry: Any) -> None:
             raise ValueError(
                 f'{path}: {name}.condensation.value must be arrhenius'
             )
-        _validate_range_pair(
+        _validate_sticking_spec(
             path,
-            f'{name}.condensation.value.edge_hold_values',
-            condensation_value.get('edge_hold_values'),
-            lower_bound=0.0,
-            upper_bound=1.0,
+            f'{name}.condensation.value',
+            condensation_value,
         )
     cold_wall = entry.get('cold_wall_condensation')
     if cold_wall is not None:
@@ -499,6 +497,17 @@ def _validate_sticking_spec(path: Path, name: str, value: Any) -> None:
                          value.get('uncertainty_envelope'),
                          lower_bound=0.0,
                          upper_bound=1.0)
+    if 'edge_hold_values' in value:
+        edge_values = value.get('edge_hold_values')
+        if not isinstance(edge_values, (list, tuple)) or len(edge_values) != 2:
+            raise ValueError(
+                f'{path}: {name}.edge_hold_values must be two probabilities'
+            )
+        for index, edge_value in enumerate(edge_values):
+            edge_name = f'{name}.edge_hold_values[{index}]'
+            _validate_sticking_value(path, edge_name, edge_value)
+            if float(edge_value) <= 0.0:
+                raise ValueError(f'{path}: {edge_name} must be in (0, 1]')
     if str(value.get('status', '')).upper() not in STICKING_STATUSES:
         raise ValueError(f'{path}: {name}.status must be CITED or UNCERTIFIED')
     if not value.get('cite'):
@@ -748,36 +757,29 @@ def _fe_condensation_edge_hold(
 ) -> tuple[float, dict[str, Any]] | None:
     if not isinstance(spec, Mapping) or 'edge_hold_values' not in spec:
         return None
-    valid_range = spec.get('valid_range_K')
-    edge_values = spec.get('edge_hold_values')
-    if (
-        not isinstance(valid_range, (list, tuple))
-        or len(valid_range) != 2
-        or not isinstance(edge_values, (list, tuple))
-        or len(edge_values) != 2
-    ):
-        raise ValueError('alpha_s(Fe): malformed condensation edge-hold metadata')
     try:
         temperature = float(T_K)
-        valid_low, valid_high = (float(value) for value in valid_range)
-        low_alpha, high_alpha = (float(value) for value in edge_values)
-    except (TypeError, ValueError) as exc:
-        raise ValueError('alpha_s(Fe): malformed condensation edge-hold metadata') from exc
-    if not all(
-        math.isfinite(value)
-        for value in (temperature, valid_low, valid_high, low_alpha, high_alpha)
-    ):
-        raise ValueError('alpha_s(Fe): non-finite condensation edge-hold metadata')
-    if temperature <= 0.0:
+    except (TypeError, ValueError):
         return None
+    if not math.isfinite(temperature) or temperature <= 0.0:
+        return None
+    valid_low, valid_high = (float(value) for value in spec['valid_range_K'])
+    low_alpha, high_alpha = (float(value) for value in spec['edge_hold_values'])
     if temperature < valid_low:
         held_alpha = low_alpha
         side = 'below'
+        executable_temperature = valid_low
     elif temperature > valid_high:
         held_alpha = high_alpha
         side = 'above'
+        executable_temperature = valid_high
     else:
         return None
+
+    # Check the Arrhenius implementation at the band edge being held. Evaluating
+    # the raw fit farther out could underflow or exceed one even though the
+    # declared edge hold remains a valid flagged extension.
+    _alpha_s_evaluation('Fe', executable_temperature, spec)
 
     # Tachibana et al. inferred pure-Fe condensation from Fe-vapour backreaction,
     # assuming alpha_c = alpha_e at that same interface and temperature. The
@@ -812,15 +814,16 @@ def _condensation_alpha_s(
     spec = (
         context.get('coefficient_spec')
         if 'coefficient_spec' in context
-        else (
-            _sticking_species_entry(species_name)
-            .get('condensation', {})
-            .get('value')
-            if species_name == 'Fe'
-            else _sticking_species_entry(species_name).get('value')
-        )
+        else None
     )
-    if species_name == 'Fe':
+    if species_name == 'Fe' and isinstance(spec, Mapping) and (
+        spec.get('form') == 'arrhenius' or 'edge_hold_values' in spec
+    ):
+        _validate_sticking_spec(
+            STICKING_DATA_PATH,
+            'species.Fe.condensation.value',
+            spec,
+        )
         edge_hold = _fe_condensation_edge_hold(T_K, spec)
         if edge_hold is not None:
             value, evaluation = edge_hold
@@ -853,10 +856,6 @@ def _condensation_alpha_s(
         value, evaluation = override
         context['alpha_s_evaluation'] = dict(evaluation)
     return value
-
-
-def _sticking_alpha_s(species: str, T_K: float) -> float:
-    return _condensation_alpha_s(species, T_K, {})
 
 
 def _sticking_reactivity_class(species: str) -> str | None:

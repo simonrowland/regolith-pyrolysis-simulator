@@ -2717,15 +2717,20 @@ def build_per_hour_summary(
         metadata = dict(summary["vapour_batch_summary"].get("metadata") or {})
         if pressure_notices:
             metadata["extrapolation_notices_by_species"] = _json_safe(pressure_notices)
-        if any(wall_notice.get(key) for key in (
-            "wall_saturation_pressure_extrapolations_by_species",
-            "wall_saturation_pressure_refusals_by_species",
-            "evaporation_transport_notices_by_species",
-        )):
+        wall_authority = wall_deposit_sticking_authority_status(
+            summary["wall_deposit_cumulative_kg"], wall_notice,
+        )
+        if (
+            any(wall_notice.get(key) for key in (
+                "wall_saturation_pressure_extrapolations_by_species",
+                "wall_saturation_pressure_refusals_by_species",
+                "evaporation_transport_notices_by_species",
+            ))
+            or wall_authority.get("out_of_domain_alpha_count")
+            or wall_authority.get("status_bearing_alpha_count")
+        ):
             metadata["wall_deposit_sticking_authority"] = _json_safe(
-                wall_deposit_sticking_authority_status(
-                    summary["wall_deposit_cumulative_kg"], wall_notice,
-                )
+                wall_authority
             )
         if metadata:
             summary["vapour_batch_summary"]["metadata"] = metadata
