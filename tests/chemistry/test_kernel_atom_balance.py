@@ -132,6 +132,12 @@ def test_mol_lot_materialization_keeps_nonzero_species_or_refuses_underflow():
             {"Si": 1e-323},
         )
 
+    with pytest.raises(AccountingError, match="non-negative"):
+        AtomLedger().credit_mol(
+            "process.metal_phase_bottom_pool",
+            {"Si": -si_mol},
+        )
+
 
 # ---------------------------------------------------------------------------
 # A mock provider whose proposal is balanced -- the commit path actually
