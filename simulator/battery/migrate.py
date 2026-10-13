@@ -11751,10 +11751,10 @@ class Migrator:
 
         An observation may omit conditions that its declared experiment records
         once. Pressure inherits only an exact experiment-scope value; a static
-        p_sat row also gets a pure reservoir when the sample's printed form and
-        single-component composition agree. The C–CO route is resolved through
-        the same guarded waypoint used by consumers, with derived pressure
-        provenance retained.
+        or effusion p_sat row also gets a pure reservoir when the sample's
+        printed form and single-component composition agree. The C–CO route is
+        resolved through the same guarded waypoint used by consumers, with
+        derived pressure provenance retained.
         """
 
         experiment = self.result.experiments.get(experiment_id)
@@ -11772,8 +11772,17 @@ class Migrator:
             quantity is Quantity.P_SAT
             and species_formula is not None
             and effective_method.is_value
-            and effective_method.value is MethodToken.STATIC_EQUILIBRIUM
+            and effective_method.value
+            in {
+                MethodToken.STATIC_EQUILIBRIUM,
+                MethodToken.KNUDSEN_EFFUSION,
+            }
         ):
+            # Knudsen effusion qualifies only for a reported pressure: the
+            # orifice is sized so the cell remains near equilibrium with the
+            # condensed sample, and p_sat reports that equilibrium pressure.
+            # A flux/evaporation rate is kinetic, and an unstated condensed
+            # phase cannot supply a reservoir identity.
             sample = experiment.sample
             form = (
                 sample.form.state.value.strip().casefold()

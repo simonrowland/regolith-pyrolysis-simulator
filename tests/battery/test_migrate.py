@@ -1718,6 +1718,54 @@ def test_g01_sidecar_without_phase_is_unknown(tmp_path: Path) -> None:
     assert kems.identity.species.phase.is_unknown
 
 
+def test_effusion_pressure_reservoir_requires_stated_phase_and_pressure() -> None:
+    from simulator.battery.enums import AmountBasis
+    from simulator.battery.records import Composition, Sample
+
+    composition = Composition(
+        basis="mole_fraction",
+        components=(("Fe", Decimal("1")),),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    cases = (
+        ("condensed_solid", Quantity.P_SAT, Phase.CR),
+        (None, Quantity.P_SAT, None),
+        ("condensed_solid", Quantity.EVAPORATION_RATE, None),
+    )
+    for index, (form, quantity, expected_phase) in enumerate(cases):
+        experiment = F.kems_experiment(experiment_id=f"effusion-{index}")
+        experiment = replace(
+            experiment,
+            sample=Sample(
+                form=F.located(form) if form is not None else None,
+                initial_composition=F.located(composition),
+            ),
+        )
+        migrator = Migrator()
+        migrator.result.experiments[experiment.experiment_id] = experiment
+        missing_reservoir = State.unknown("source condensed reservoir not grounded")
+        inferred, _ = migrator._experiment_identity_fields(
+            experiment.experiment_id,
+            {"reservoir": missing_reservoir},
+            method=experiment.method,
+            quantity=quantity,
+            species_formula="Fe",
+        )
+
+        identity = replace(
+            F.psat_identity("Fe"),
+            reservoir=missing_reservoir,
+        )
+        if "reservoir" in inferred:
+            identity = replace(identity, reservoir=inferred["reservoir"])
+        if expected_phase is None:
+            assert identity.reservoir.is_unknown
+        else:
+            assert identity.reservoir.is_value
+            assert identity.reservoir.value.phase.is_value
+            assert identity.reservoir.value.phase.value is expected_phase
+
+
 def test_h09_quantity_not_applicable_is_not_unknown() -> None:
     from dataclasses import replace
 
