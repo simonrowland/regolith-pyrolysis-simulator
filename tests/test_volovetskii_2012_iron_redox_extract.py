@@ -8,7 +8,11 @@ import yaml
 
 from simulator.battery.enums import IdentityEqualKind, Quantity, UncertaintyKind
 from simulator.battery.identity import identity_equal
-from simulator.battery.migrate import Migrator, fe3_fe2_ratio_from_ferric_fraction
+from simulator.battery.migrate import (
+    Migrator,
+    fe3_fe2_ratio_from_ferric_fraction,
+    wt_pct_to_mole_fraction,
+)
 from tools.validate_literature_extracts import resolve_fidelity_sample
 
 
@@ -42,6 +46,21 @@ def test_volovetskii_extract_migrates_measured_redox_and_run_conditions():
     )
     expected = fe3_fe2_ratio_from_ferric_fraction(Decimal("0.72"))
     assert table1_i2.value.point == expected
+    assert table1_i2.identity.composition.is_value
+    assert table1_i2.identity.composition.value.as_map() == wt_pct_to_mole_fraction(
+        {
+            "SiO2": Decimal("70.46"),
+            "TiO2": Decimal("0.06"),
+            "Al2O3": Decimal("15.28"),
+            "FeO": Decimal("3.41"),
+            "MgO": Decimal("0.14"),
+            "CaO": Decimal("2.06"),
+            "Na2O": Decimal("4.07"),
+            "K2O": Decimal("3.95"),
+        }
+    ).as_map()
+    assert table1_i2.identity.total_pressure_Pa.value == Decimal("101325")
+    assert table1_i2.point_conditions["fO2_log"].state.value == Decimal("-0.7")
     assert table1_i2.point_conditions["T_C"].state.value == Decimal("1350")
     assert table1_i2.point_conditions["T_C"].locator.table == "1"
     assert table1_i2.point_conditions["fO2_log"].state.value == Decimal("-0.7")
@@ -54,6 +73,24 @@ def test_volovetskii_extract_migrates_measured_redox_and_run_conditions():
         )
     ]
     assert len(run_observations) == 29
+    assert all(
+        o.identity.total_pressure_Pa.is_value
+        and o.identity.total_pressure_Pa.value == Decimal("101325")
+        for o in run_observations
+    )
+    assert all(
+        o.identity.composition is not None and o.identity.composition.is_value
+        for o in observations
+    )
+    numeric_fugacity_rows = [
+        o for o in run_observations
+        if isinstance(o.point_conditions["fO2_log"].state.value, Decimal)
+    ]
+    assert len(numeric_fugacity_rows) == 28
+    assert all(
+        o.point_conditions["fO2_log"].locator is not None
+        for o in numeric_fugacity_rows
+    )
     assert all(
         all(
             key in o.point_conditions and o.point_conditions[key].locator is not None
