@@ -26,6 +26,7 @@ import numpy as np
 import pytest
 
 from simulator.engine_pool import (
+    close_all_engine_pools,
     EngineWorkerDied,
     EngineWorkerPoolLifecycleError,
     EngineWorkerRemoteError,
@@ -51,6 +52,12 @@ from simulator.melt_backend.magemin import (
 # not assert a latency. Any test that means to claim "within N seconds" should
 # use its own explicit figure and say so, rather than borrowing this one.
 _RENDEZVOUS_TIMEOUT_S = 30.0
+
+
+@pytest.fixture(autouse=True)
+def _close_test_owned_engine_pools():
+    yield
+    close_all_engine_pools(cancel_pending=True)
 
 
 def _disable_configured_magemin_path(monkeypatch):
