@@ -1,0 +1,1193 @@
+schema_version: literature_extract.v1
+source_id: hartley-2017-melt-inclusions-redox
+source:
+  citation: "Hartley, M.E., Shorttle, O., Maclennan, J., Moussallam, Y., and Edmonds, M. (2017). Olivine-hosted melt inclusions as an archive of redox heterogeneity in magmatic systems. Earth and Planetary Science Letters, 479, 192–205."
+  doi: 10.1016/j.epsl.2017.09.029
+  url: https://web.archive.org/web/20180719233800id_/http://eprints.esc.cam.ac.uk/4099/1/1-s2.0-S0012821X17305319-main.pdf
+  year: 2017
+extraction:
+  method: "Manual transcription from the published PDF; plotted values digitized from 600 dpi page renders."
+  date: '2026-10-13'
+  worker: hart17-1013
+review_status: draft
+fidelity_samples:
+  - species: Fe
+    observation_id: hartley_2017_fig3a_xanes_readable_markers
+    field: points
+    value:
+      - 
+        H2O_wt_percent: 0.26
+        Fe3_over_sum_Fe: 0.29
+      - 
+        H2O_wt_percent: 0.1
+        Fe3_over_sum_Fe: 0.27
+      - 
+        H2O_wt_percent: 0.68
+        Fe3_over_sum_Fe: 0.24
+      - 
+        H2O_wt_percent: 0.069
+        Fe3_over_sum_Fe: 0.24
+      - 
+        H2O_wt_percent: 0.76
+        Fe3_over_sum_Fe: 0.23
+      - 
+        H2O_wt_percent: 0.61
+        Fe3_over_sum_Fe: 0.22
+      - 
+        H2O_wt_percent: 0.69
+        Fe3_over_sum_Fe: 0.22
+      - 
+        H2O_wt_percent: 0.6
+        Fe3_over_sum_Fe: 0.22
+      - 
+        H2O_wt_percent: 0.58
+        Fe3_over_sum_Fe: 0.22
+      - 
+        H2O_wt_percent: 0.45
+        Fe3_over_sum_Fe: 0.22
+      - 
+        H2O_wt_percent: 0.5
+        Fe3_over_sum_Fe: 0.21
+      - 
+        H2O_wt_percent: 0.54
+        Fe3_over_sum_Fe: 0.21
+      - 
+        H2O_wt_percent: 0.49
+        Fe3_over_sum_Fe: 0.21
+      - 
+        H2O_wt_percent: 0.51
+        Fe3_over_sum_Fe: 0.21
+      - 
+        H2O_wt_percent: 0.55
+        Fe3_over_sum_Fe: 0.21
+      - 
+        H2O_wt_percent: 0.5
+        Fe3_over_sum_Fe: 0.21
+      - 
+        H2O_wt_percent: 0.54
+        Fe3_over_sum_Fe: 0.21
+      - 
+        H2O_wt_percent: 0.51
+        Fe3_over_sum_Fe: 0.2
+      - 
+        H2O_wt_percent: 0.5
+        Fe3_over_sum_Fe: 0.2
+      - 
+        H2O_wt_percent: 0.48
+        Fe3_over_sum_Fe: 0.2
+      - 
+        H2O_wt_percent: 0.43
+        Fe3_over_sum_Fe: 0.2
+      - 
+        H2O_wt_percent: 0.51
+        Fe3_over_sum_Fe: 0.19
+      - 
+        H2O_wt_percent: 0.34
+        Fe3_over_sum_Fe: 0.18
+      - 
+        H2O_wt_percent: 0.13
+        Fe3_over_sum_Fe: 0.18
+      - 
+        H2O_wt_percent: 0.34
+        Fe3_over_sum_Fe: 0.18
+      - 
+        H2O_wt_percent: 0.081
+        Fe3_over_sum_Fe: 0.18
+      - 
+        H2O_wt_percent: 0.08
+        Fe3_over_sum_Fe: 0.17
+      - 
+        H2O_wt_percent: 0.06
+        Fe3_over_sum_Fe: 0.16
+      - 
+        H2O_wt_percent: 0.31
+        Fe3_over_sum_Fe: 0.15
+      - 
+        H2O_wt_percent: 0.075
+        Fe3_over_sum_Fe: 0.15
+      - 
+        H2O_wt_percent: 0.064
+        Fe3_over_sum_Fe: 0.14
+      - 
+        H2O_wt_percent: 0.071
+        Fe3_over_sum_Fe: 0.14
+    locator:
+      page: 4
+      published_page: 195
+      pdf_page_index: 3
+      figure: "3a"
+      note: "Figure-digitized colored XANES markers with individually readable centres; 32 points. Unresolved overlapping markers are omitted rather than separated by guesswork."
+  - species: Fe
+    observation_id: hartley_2017_fig3c_qfm_readable_markers
+    field: points
+    value:
+      - 
+        gained_H2O_wt_percent: -0.3
+        delta_QFM: 1.6
+      - 
+        gained_H2O_wt_percent: -0.71
+        delta_QFM: 1.6
+      - 
+        gained_H2O_wt_percent: -0.73
+        delta_QFM: 1.3
+      - 
+        gained_H2O_wt_percent: 0.27
+        delta_QFM: 0.96
+      - 
+        gained_H2O_wt_percent: 0.055
+        delta_QFM: 0.89
+      - 
+        gained_H2O_wt_percent: 0.021
+        delta_QFM: 0.86
+      - 
+        gained_H2O_wt_percent: 0.08
+        delta_QFM: 0.83
+      - 
+        gained_H2O_wt_percent: 0.053
+        delta_QFM: 0.84
+      - 
+        gained_H2O_wt_percent: 0.37
+        delta_QFM: 0.79
+      - 
+        gained_H2O_wt_percent: 0.32
+        delta_QFM: 0.79
+      - 
+        gained_H2O_wt_percent: 0.3
+        delta_QFM: 0.75
+      - 
+        gained_H2O_wt_percent: -0.076
+        delta_QFM: 0.7
+      - 
+        gained_H2O_wt_percent: 0.27
+        delta_QFM: 0.65
+      - 
+        gained_H2O_wt_percent: 0.3
+        delta_QFM: 0.68
+      - 
+        gained_H2O_wt_percent: 0.2
+        delta_QFM: 0.6
+      - 
+        gained_H2O_wt_percent: -0.05
+        delta_QFM: 0.6
+      - 
+        gained_H2O_wt_percent: 0.15
+        delta_QFM: 0.52
+      - 
+        gained_H2O_wt_percent: -0.5
+        delta_QFM: 0.46
+      - 
+        gained_H2O_wt_percent: 0.22
+        delta_QFM: 0.44
+      - 
+        gained_H2O_wt_percent: -0.31
+        delta_QFM: 0.4
+      - 
+        gained_H2O_wt_percent: -0.72
+        delta_QFM: 0.29
+      - 
+        gained_H2O_wt_percent: -0.52
+        delta_QFM: 0.14
+      - 
+        gained_H2O_wt_percent: -0.38
+        delta_QFM: 0.08
+      - 
+        gained_H2O_wt_percent: -0.56
+        delta_QFM: -0.031
+      - 
+        gained_H2O_wt_percent: -0.64
+        delta_QFM: -0.048
+      - 
+        gained_H2O_wt_percent: -0.07
+        delta_QFM: -0.13
+      - 
+        gained_H2O_wt_percent: -0.53
+        delta_QFM: -0.11
+      - 
+        gained_H2O_wt_percent: -0.66
+        delta_QFM: -0.19
+      - 
+        gained_H2O_wt_percent: -0.54
+        delta_QFM: -0.29
+      - 
+        gained_H2O_wt_percent: -0.53
+        delta_QFM: -0.39
+    locator:
+      page: 4
+      published_page: 195
+      pdf_page_index: 3
+      figure: "3c"
+      note: "Figure-digitized readable sample markers; values are ΔQFM, not absolute log fO2."
+  - species: Fe
+    observation_id: hartley_2017_fig10a_qfm_readable_markers
+    field: points
+    value:
+      - 
+        host_olivine_Fo_mol_percent: 73
+        delta_QFM_PEC: 0.89
+      - 
+        host_olivine_Fo_mol_percent: 74
+        delta_QFM_PEC: 0.87
+      - 
+        host_olivine_Fo_mol_percent: 75
+        delta_QFM_PEC: 0.86
+      - 
+        host_olivine_Fo_mol_percent: 74
+        delta_QFM_PEC: 0.84
+      - 
+        host_olivine_Fo_mol_percent: 74
+        delta_QFM_PEC: 0.8
+      - 
+        host_olivine_Fo_mol_percent: 86
+        delta_QFM_PEC: 0.8
+      - 
+        host_olivine_Fo_mol_percent: 86
+        delta_QFM_PEC: 0.79
+      - 
+        host_olivine_Fo_mol_percent: 75
+        delta_QFM_PEC: 0.77
+      - 
+        host_olivine_Fo_mol_percent: 83
+        delta_QFM_PEC: 0.76
+      - 
+        host_olivine_Fo_mol_percent: 75
+        delta_QFM_PEC: 0.73
+      - 
+        host_olivine_Fo_mol_percent: 75
+        delta_QFM_PEC: 0.72
+      - 
+        host_olivine_Fo_mol_percent: 74
+        delta_QFM_PEC: 0.71
+      - 
+        host_olivine_Fo_mol_percent: 71
+        delta_QFM_PEC: 0.71
+      - 
+        host_olivine_Fo_mol_percent: 84
+        delta_QFM_PEC: 0.7
+      - 
+        host_olivine_Fo_mol_percent: 83
+        delta_QFM_PEC: 0.67
+      - 
+        host_olivine_Fo_mol_percent: 79
+        delta_QFM_PEC: 0.63
+      - 
+        host_olivine_Fo_mol_percent: 74
+        delta_QFM_PEC: 0.62
+      - 
+        host_olivine_Fo_mol_percent: 80
+        delta_QFM_PEC: 0.61
+      - 
+        host_olivine_Fo_mol_percent: 80
+        delta_QFM_PEC: 0.53
+      - 
+        host_olivine_Fo_mol_percent: 83
+        delta_QFM_PEC: 0.45
+    locator:
+      page: 10
+      published_page: 201
+      pdf_page_index: 9
+      figure: "10a"
+      note: "Figure-digitized Laki tephra inclusion markers; model curves are not digitized."
+  - species: Fe
+    observation_id: hartley_2017_fig3b_pec_xanes_readable_markers
+    field: points
+    value:
+      - {S_ppm: 490, Fe3_over_sum_Fe_PEC: 0.21, symbol: melt_inclusion_tephra}
+      - {S_ppm: 550, Fe3_over_sum_Fe_PEC: 0.21, symbol: melt_inclusion_tephra}
+      - {S_ppm: 580, Fe3_over_sum_Fe_PEC: 0.21, symbol: melt_inclusion_tephra}
+      - {S_ppm: 650, Fe3_over_sum_Fe_PEC: 0.20, symbol: melt_inclusion_tephra}
+      - {S_ppm: 740, Fe3_over_sum_Fe_PEC: 0.21, symbol: melt_inclusion_tephra}
+      - {S_ppm: 810, Fe3_over_sum_Fe_PEC: 0.22, symbol: melt_inclusion_tephra}
+      - {S_ppm: 820, Fe3_over_sum_Fe_PEC: 0.21, symbol: melt_inclusion_tephra}
+      - {S_ppm: 850, Fe3_over_sum_Fe_PEC: 0.21, symbol: melt_inclusion_tephra}
+      - {S_ppm: 870, Fe3_over_sum_Fe_PEC: 0.22, symbol: melt_inclusion_tephra}
+      - {S_ppm: 920, Fe3_over_sum_Fe_PEC: 0.21, symbol: melt_inclusion_tephra}
+      - {S_ppm: 950, Fe3_over_sum_Fe_PEC: 0.21, symbol: melt_inclusion_tephra}
+      - {S_ppm: 960, Fe3_over_sum_Fe_PEC: 0.21, symbol: melt_inclusion_tephra}
+      - {S_ppm: 1000.0, Fe3_over_sum_Fe_PEC: 0.22, symbol: melt_inclusion_tephra}
+      - {S_ppm: 1000.0, Fe3_over_sum_Fe_PEC: 0.21, symbol: melt_inclusion_tephra}
+      - {S_ppm: 940, Fe3_over_sum_Fe_PEC: 0.16, symbol: melt_inclusion_lava}
+      - {S_ppm: 1000.0, Fe3_over_sum_Fe_PEC: 0.17, symbol: melt_inclusion_lava}
+      - {S_ppm: 1100.0, Fe3_over_sum_Fe_PEC: 0.18, symbol: melt_inclusion_lava}
+      - {S_ppm: 1200.0, Fe3_over_sum_Fe_PEC: 0.17, symbol: melt_inclusion_lava}
+      - {S_ppm: 860, Fe3_over_sum_Fe_PEC: 0.16, symbol: melt_inclusion_lava}
+      - {S_ppm: 900, Fe3_over_sum_Fe_PEC: 0.16, symbol: melt_inclusion_lava}
+      - {S_ppm: 1100.0, Fe3_over_sum_Fe_PEC: 0.16, symbol: melt_inclusion_lava}
+      - {S_ppm: 1200.0, Fe3_over_sum_Fe_PEC: 0.14, symbol: melt_inclusion_lava}
+      - {S_ppm: 65, Fe3_over_sum_Fe_PEC: 0.27, symbol: glass}
+      - {S_ppm: 370, Fe3_over_sum_Fe_PEC: 0.24, symbol: glass}
+      - {S_ppm: 290, Fe3_over_sum_Fe_PEC: 0.18, symbol: glass}
+      - {S_ppm: 120, Fe3_over_sum_Fe_PEC: 0.15, symbol: glass}
+      - {S_ppm: 230, Fe3_over_sum_Fe_PEC: 0.15, symbol: glass}
+      - {S_ppm: 370, Fe3_over_sum_Fe_PEC: 0.17, symbol: glass}
+      - {S_ppm: 170, Fe3_over_sum_Fe_PEC: 0.16, symbol: glass}
+      - {S_ppm: 170, Fe3_over_sum_Fe_PEC: 0.14, symbol: glass}
+    locator:
+      page: 4
+      published_page: 195
+      pdf_page_index: 3
+      figure: "3b"
+      note: "Figure-digitized individually readable marker centres; overlapping marker clusters omitted."
+  - species: Fe
+    observation_id: hartley_2017_table_a1_xanes_steps
+    field: points
+    value:
+      - 
+        energy_range_eV: "7000.0–7100.0"
+        step_size_eV: 10
+        dwell_time_s: 1
+      - 
+        energy_range_eV: "7101.0–7104.0"
+        step_size_eV: 1
+        dwell_time_s: 2
+      - 
+        energy_range_eV: "7104.1–7110.0"
+        step_size_eV: 0.1
+        dwell_time_s: 5
+      - 
+        energy_range_eV: "7110.1–7118.0"
+        step_size_eV: 0.1
+        dwell_time_s: 10
+      - 
+        energy_range_eV: "7118.1–7119.4"
+        step_size_eV: 0.1
+        dwell_time_s: 5
+      - 
+        energy_range_eV: "7119.5–7127.0"
+        step_size_eV: 0.5
+        dwell_time_s: 2
+      - 
+        energy_range_eV: "7128.0–7144.0"
+        step_size_eV: 1
+        dwell_time_s: 2
+      - 
+        energy_range_eV: "7148.0–7410.0"
+        step_size_eV: 4
+        dwell_time_s: 2
+      - 
+        energy_range_eV: "7410.0–7500.0"
+        step_size_eV: 10
+        dwell_time_s: 1
+    locator:
+      page: 10
+      published_page: 201
+      pdf_page_index: 9
+      table: "A.1"
+      note: "Step sizes and dwell times used for XANES Fe K-edge analyses."
+  - species: Fe
+    observation_id: hartley_2017_table_a2_source_melt_compositions
+    field: points
+    value:
+      -
+        source_melt: Enriched
+        La_Yb: 3.812
+        La_Yb_attribution: "Shorttle et al. (2014)"
+        Nb_Zr: 0.155
+        Nb_Zr_attribution: "No cell-level source is stated in Table A.2 or the Fig. 10 caption."
+        Fe2O3_Fo90_wt_percent: "1.8–2.0"
+        Fe2O3_Fo90_attribution: "No cell-level source is stated in Table A.2 or the Fig. 10 caption."
+        delta_QFM: 0.9
+        delta_QFM_attribution: "Shorttle et al. (2015)"
+      -
+        source_melt: Depleted
+        La_Yb: 0.821
+        La_Yb_attribution: "Shorttle et al. (2014)"
+        Nb_Zr: 0.034
+        Nb_Zr_attribution: "No cell-level source is stated in Table A.2 or the Fig. 10 caption."
+        Fe2O3_Fo90_wt_percent: 1.5
+        Fe2O3_Fo90_attribution: "No cell-level source is stated in Table A.2 or the Fig. 10 caption."
+        delta_QFM: 0.1
+        delta_QFM_attribution: "Shorttle et al. (2015)"
+    locator:
+      page: 10
+      published_page: 201
+      pdf_page_index: 9
+      table: "A.2"
+      note: "Quoted enriched and depleted mantle source-melt values; Table A.2 gives La/Yb, Nb/Zr, Fe2O3(Fo90), and ΔQFM. Procedure is unknown here because the cited sources' procedures are not in hand."
+  - species: Fe
+    observation_id: hartley_2017_fig_a1_xanes_spectra_caption
+    value:
+      method_class: "figure_only"
+      caption: "Fig. A.1. (a) Edge step-normalised intensity vs. energy for standards from the NMNH 117393 reference block (Cottrell et al., 2009), showing the spectra over the energy range of the pre-edge region used in fitting both standards and samples. Spectra for the standards are coloured by their reference Fe3+/ΣFe values as determined by Mössbauer spectroscopy. Inset: Raw, un-normalised spectrum of one standard glass over the full energy range analysed, with the energy range used for normalisation shaded in grey. (b) Edge step-normalised intensity vs. energy for representative Laki melt inclusions, coloured by their measured Fe3+/ΣFe values as calibrated using the NMNH standards. The black line labelled ‘olv’ is a melt inclusion analysis contaminated by the host olivine. Inset: Raw, un-normalised spectra for the same Laki melt inclusions, showing the post-edge shoulder. Note the structure at ∼7140 eV in the olivine-contaminated spectrum. (For interpretation of the colours in this figure, the reader is referred to the web version of this article.)"
+      axes: "x: Energy (eV); y: Normalised intensity"
+      not_digitised: "Continuous XANES spectra have no discrete data markers."
+    locator:
+      page: 11
+      published_page: 202
+      pdf_page_index: 10
+      figure: "A.1"
+  - species: Fe
+    observation_id: hartley_2017_fig_a3_cited_volatile_trace_data_caption
+    value:
+      method_class: "unknown"
+      caption: "Fig. A.3. Sulfur and trace element variability in Laki melt inclusions. Correlations and correlation coefficients are shown for tephra-hosted melt inclusions."
+      axes: "S (ppm) versus Sm (ppm); S (ppm) versus Dy (ppm); S/Sm versus La/Yb"
+      not_digitised: "This historical volatile and trace-element data is attributed to Hartley et al. (2014) in the Fig. 3 caption and belongs to that primary source."
+      fetch_candidates:
+        - "Hartley et al. (2014)"
+    locator:
+      page: 11
+      published_page: 202
+      pdf_page_index: 10
+      figure: "A.3"
+  - species: Fe
+    observation_id: hartley_2017_results_summary_p195
+    value:
+      quantity: "fe3_fe2_ratio"
+      XANES_melt_inclusions: 65
+      matrix_glass_measurements: 9
+      melt_inclusion_Fe3_over_sum_Fe_raw_range:
+        - 0.135
+        - 0.234
+      exceptional_melt_inclusion_Fe3_over_sum_Fe: 0.286
+      matrix_glass_Fe3_over_sum_Fe_range:
+        - 0.141
+        - 0.177
+      lava_matrix_glass_more_oxidized_values:
+        - 0.238
+        - 0.271
+      visible_sulfide_bearing_inclusions: 22
+      post_entrapment_crystallization_tephra_mean_percent: 1.5
+      post_entrapment_crystallization_tephra_range_percent:
+        - 0.2
+        - 4.1
+      post_entrapment_crystallization_lava_mean_percent: 1.9
+      post_entrapment_crystallization_lava_range_percent:
+        - 0.8
+        - 4.8
+      largest_post_entrapment_correction_absolute_percent: 4.2
+      XANES_external_precision: "0.8% (absolute), 2σ"
+    locator:
+      page: 4
+      published_page: 195
+      pdf_page_index: 3
+      figure: "3a"
+      section: "Results"
+  - species: Fe
+    observation_id: hartley_2017_results_summary_p196
+    value:
+      quantity: "fe3_fe2_ratio"
+      tephra_PEC_corrected_Fe3_over_sum_Fe_mean: 0.206
+      tephra_PEC_corrected_Fe3_over_sum_Fe_uncertainty: "±0.008"
+      tephra_uncertainty_confidence: "1 sigma"
+      lava_PEC_corrected_Fe3_over_sum_Fe_range:
+        - 0.133
+        - 0.177
+      lava_PEC_corrected_Fe3_over_sum_Fe_mean: 0.147
+      lava_PEC_corrected_Fe3_over_sum_Fe_uncertainty: "±0.012"
+      lava_uncertainty_confidence: "1 sigma"
+      tephra_delta_QFM_mean: 0.7
+      tephra_delta_QFM_uncertainty: "±0.1"
+      tephra_delta_QFM_confidence: "1 sigma"
+      lava_inclusion_delta_QFM_range:
+        - -0.5
+        - -0.1
+      maximum_tephra_to_lava_Fe3_over_sum_Fe_difference: 0.08
+      maximum_tephra_to_lava_log_fO2_difference: 1.3
+      primary_melt_Fe3_over_sum_Fe_at_10_wt_percent_MgO: 0.18
+      primary_melt_uncertainty: "±0.02"
+      commonly_assumed_Icelandic_basalt_Fe3_over_sum_Fe: 0.1
+      commonly_assumed_Icelandic_basalt_delta_QFM: -1
+      MORB_Fe3_over_sum_Fe_range:
+        - 0.1
+        - 0.16
+    locator:
+      page: 5
+      published_page: 196
+      pdf_page_index: 4
+      figure: "3b"
+      section: "3.1"
+  - species: Fe
+    observation_id: hartley_2017_natural_sample_context
+    value:
+      sample_description: "AD 1783 Laki eruption, Iceland; olivine-hosted melt inclusions and matrix glasses from tephra and lava selvages."
+      host_sample_examples: "MHL-05 and MHL-18"
+      major_element_composition_pointer: "Hartley et al. (2014); full sample-level data are in the absent supplementary material."
+      sample_class: "natural quenched samples, not experimental charges"
+      per_sample_host_and_composition_identifiers: "not supplied in this PDF"
+      raw_measurement_temperature_pressure_and_gas: "not reported for each natural sample"
+    locator:
+      page: 3
+      published_page: 194
+      pdf_page_index: 2
+      figure: "2"
+  - species: Fe
+    observation_id: hartley_2017_xanes_method_conditions
+    value:
+      beamline: "I18, Diamond Light Source"
+      analytical_session: "single four-day session in September 2014"
+      storage_ring_energy_GeV: 3
+      storage_ring_current_mA: 200
+      beam_size_um: "5 × 3"
+      energy_range_eV: "7000–7500"
+      energy_step_eV: 0.1
+      counting_time_s: 10
+      monochromator: "Si(111), 333 reflection"
+      sample_incident_angle_degrees: 45
+      sample_collector_angle_degrees: 45
+      incident_to_fluoresced_angle_degrees: 90
+      ionisation_chamber_length_cm: 1.5
+      detector: "nine-element germanium detector"
+      attenuator_Al_thickness_mm:
+        - 0.05
+        - 0.1
+      photon_flux_per_s: "~10^9"
+      reference_glass_repeat_analyses: 3
+      reference_glass_reproducibility: "~0.3% at 2σ"
+      rejected_inclusion_analyses: 10
+      successfully_reanalysed_inclusions: 6
+      rejected_matrix_glass_analyses: 5
+    locator:
+      page: 3
+      published_page: 194
+      pdf_page_index: 2
+      section: "2.1"
+  - species: Fe
+    observation_id: hartley_2017_fo2_method_and_conditions
+    value:
+      Fe3_over_sum_Fe_correction: "The effect of PEC on melt inclusion Fe3+/sumFe was corrected by diluting the Fe3+ measured by XANES by the calculated extent of PEC, and re-calculating Fe3+/sumFe according to the PEC-corrected major element composition of the inclusion."
+      PEC_model: "Petrolog3 (Danyushevsky and Plechov, 2011)"
+      olivine_liquid_equilibrium_model: "Gaetani and Watson (2002)"
+      Fe3_partition_assumption: "assuming that Fe3+ is perfectly incompatible in olivine"
+      fO2_model: "Equation (7) of Kress and Carmichael (1991)"
+      fO2_model_inputs: "PEC-corrected Fe3+/sumFe and major-element composition"
+      melt_inclusion_temperature_C: 1150
+      melt_inclusion_pressure_kbar: 1.5
+      matrix_glass_temperature_C: 1120
+      matrix_glass_pressure: "atmospheric pressure"
+      QFM_buffer_reference: "Frost (1991)"
+      melt_inclusion_conditions_interpretation: "representative pre-eruptive storage and final crystal-melt equilibration conditions"
+      matrix_glass_conditions_interpretation: "representative magmatic conditions at eruption"
+    locator:
+      page: 4
+      published_page: 195
+      pdf_page_index: 3
+      figure: "3c"
+      section: "Results"
+  - species: Fe
+    observation_id: hartley_2017_fig10b_cited_comparison
+    value:
+      method_class: "figure_only"
+      caption: "(b) Comparison of fO2 and trace element variability in Laki tephra-hosted inclusions, both corrected to 10 wt.% MgO, with that expected from mixing of enriched and depleted primary melts of the Icelandic mantle source. Endmember enriched and depleted melt La/Yb is from Shorttle et al. (2014) and fO2 from Shorttle et al. (2015); values are provided in Table A.2. In red we show calculated instantaneous fractional melt compositions from lherzolitic mantle (Workman and Hart, 2005) at a mantle potential temperature of 1390 °C; points indicate pressure intervals of 0.05 GPa during decompression melting. Calculations were performed using the pMELTS model (Ghiorso et al., 2002) implemented through alphaMELTS (Smith and Asimow, 2005; Thompson et al., 2007)."
+      axes: "fO2 and trace element variability versus La/Yb"
+      not_digitised: "cited historical data and modelled curves; source values belong to cited primary works"
+      fetch_candidates:
+        - "Shorttle et al. (2014)"
+        - "Shorttle et al. (2015)"
+        - "Workman and Hart (2005)"
+    locator:
+      page: 10
+      published_page: 201
+      pdf_page_index: 9
+      figure: "10b"
+species:
+  Fe:
+    observations: []
+    context:
+      - observation_id: hartley_2017_fig3a_xanes_readable_markers
+        type: characterization
+        locator:
+          page: 4
+          published_page: 195
+          pdf_page_index: 3
+          figure: "3a"
+          note: "Figure-digitized colored XANES markers with individually readable centres; 32 points. Unresolved overlapping markers are omitted rather than separated by guesswork."
+        units: "fraction (Fe3+/sumFe); H2O in wt.%"
+        values:
+          method_class: "figure_only"
+          quantity: "fe3_fe2_ratio"
+          analytical_method: "XANES"
+          points:
+            - 
+              H2O_wt_percent: 0.26
+              Fe3_over_sum_Fe: 0.29
+            - 
+              H2O_wt_percent: 0.1
+              Fe3_over_sum_Fe: 0.27
+            - 
+              H2O_wt_percent: 0.68
+              Fe3_over_sum_Fe: 0.24
+            - 
+              H2O_wt_percent: 0.069
+              Fe3_over_sum_Fe: 0.24
+            - 
+              H2O_wt_percent: 0.76
+              Fe3_over_sum_Fe: 0.23
+            - 
+              H2O_wt_percent: 0.61
+              Fe3_over_sum_Fe: 0.22
+            - 
+              H2O_wt_percent: 0.69
+              Fe3_over_sum_Fe: 0.22
+            - 
+              H2O_wt_percent: 0.6
+              Fe3_over_sum_Fe: 0.22
+            - 
+              H2O_wt_percent: 0.58
+              Fe3_over_sum_Fe: 0.22
+            - 
+              H2O_wt_percent: 0.45
+              Fe3_over_sum_Fe: 0.22
+            - 
+              H2O_wt_percent: 0.5
+              Fe3_over_sum_Fe: 0.21
+            - 
+              H2O_wt_percent: 0.54
+              Fe3_over_sum_Fe: 0.21
+            - 
+              H2O_wt_percent: 0.49
+              Fe3_over_sum_Fe: 0.21
+            - 
+              H2O_wt_percent: 0.51
+              Fe3_over_sum_Fe: 0.21
+            - 
+              H2O_wt_percent: 0.55
+              Fe3_over_sum_Fe: 0.21
+            - 
+              H2O_wt_percent: 0.5
+              Fe3_over_sum_Fe: 0.21
+            - 
+              H2O_wt_percent: 0.54
+              Fe3_over_sum_Fe: 0.21
+            - 
+              H2O_wt_percent: 0.51
+              Fe3_over_sum_Fe: 0.2
+            - 
+              H2O_wt_percent: 0.5
+              Fe3_over_sum_Fe: 0.2
+            - 
+              H2O_wt_percent: 0.48
+              Fe3_over_sum_Fe: 0.2
+            - 
+              H2O_wt_percent: 0.43
+              Fe3_over_sum_Fe: 0.2
+            - 
+              H2O_wt_percent: 0.51
+              Fe3_over_sum_Fe: 0.19
+            - 
+              H2O_wt_percent: 0.34
+              Fe3_over_sum_Fe: 0.18
+            - 
+              H2O_wt_percent: 0.13
+              Fe3_over_sum_Fe: 0.18
+            - 
+              H2O_wt_percent: 0.34
+              Fe3_over_sum_Fe: 0.18
+            - 
+              H2O_wt_percent: 0.081
+              Fe3_over_sum_Fe: 0.18
+            - 
+              H2O_wt_percent: 0.08
+              Fe3_over_sum_Fe: 0.17
+            - 
+              H2O_wt_percent: 0.06
+              Fe3_over_sum_Fe: 0.16
+            - 
+              H2O_wt_percent: 0.31
+              Fe3_over_sum_Fe: 0.15
+            - 
+              H2O_wt_percent: 0.075
+              Fe3_over_sum_Fe: 0.15
+            - 
+              H2O_wt_percent: 0.064
+              Fe3_over_sum_Fe: 0.14
+            - 
+              H2O_wt_percent: 0.071
+              Fe3_over_sum_Fe: 0.14
+          uncertainty: "The paper reports external XANES precision 0.8% (absolute), 2σ; no separate per-point width is printed."
+      - observation_id: hartley_2017_fig3b_pec_xanes_readable_markers
+        type: characterization
+        locator:
+          page: 4
+          published_page: 195
+          pdf_page_index: 3
+          figure: "3b"
+          note: "Figure-digitized individually readable marker centres; overlapping marker clusters omitted."
+        units: "S (ppm); Fe3+/sumFe (PEC-corrected fraction)"
+        values:
+          method_class: "figure_only"
+          quantity: "fe3_fe2_ratio"
+          analytical_method: "XANES"
+          derivation:
+            method: "The paper corrects measured Fe3+/sumFe for post-entrapment crystallisation using Petrolog3 (Danyushevsky and Plechov, 2011)."
+            inputs: "Measured XANES Fe3+/sumFe, calculated PEC extent, and PEC-corrected major-element composition."
+          points:
+            - {S_ppm: 490, Fe3_over_sum_Fe_PEC: 0.21, symbol: melt_inclusion_tephra}
+            - {S_ppm: 550, Fe3_over_sum_Fe_PEC: 0.21, symbol: melt_inclusion_tephra}
+            - {S_ppm: 580, Fe3_over_sum_Fe_PEC: 0.21, symbol: melt_inclusion_tephra}
+            - {S_ppm: 650, Fe3_over_sum_Fe_PEC: 0.20, symbol: melt_inclusion_tephra}
+            - {S_ppm: 740, Fe3_over_sum_Fe_PEC: 0.21, symbol: melt_inclusion_tephra}
+            - {S_ppm: 810, Fe3_over_sum_Fe_PEC: 0.22, symbol: melt_inclusion_tephra}
+            - {S_ppm: 820, Fe3_over_sum_Fe_PEC: 0.21, symbol: melt_inclusion_tephra}
+            - {S_ppm: 850, Fe3_over_sum_Fe_PEC: 0.21, symbol: melt_inclusion_tephra}
+            - {S_ppm: 870, Fe3_over_sum_Fe_PEC: 0.22, symbol: melt_inclusion_tephra}
+            - {S_ppm: 920, Fe3_over_sum_Fe_PEC: 0.21, symbol: melt_inclusion_tephra}
+            - {S_ppm: 950, Fe3_over_sum_Fe_PEC: 0.21, symbol: melt_inclusion_tephra}
+            - {S_ppm: 960, Fe3_over_sum_Fe_PEC: 0.21, symbol: melt_inclusion_tephra}
+            - {S_ppm: 1000.0, Fe3_over_sum_Fe_PEC: 0.22, symbol: melt_inclusion_tephra}
+            - {S_ppm: 1000.0, Fe3_over_sum_Fe_PEC: 0.21, symbol: melt_inclusion_tephra}
+            - {S_ppm: 940, Fe3_over_sum_Fe_PEC: 0.16, symbol: melt_inclusion_lava}
+            - {S_ppm: 1000.0, Fe3_over_sum_Fe_PEC: 0.17, symbol: melt_inclusion_lava}
+            - {S_ppm: 1100.0, Fe3_over_sum_Fe_PEC: 0.18, symbol: melt_inclusion_lava}
+            - {S_ppm: 1200.0, Fe3_over_sum_Fe_PEC: 0.17, symbol: melt_inclusion_lava}
+            - {S_ppm: 860, Fe3_over_sum_Fe_PEC: 0.16, symbol: melt_inclusion_lava}
+            - {S_ppm: 900, Fe3_over_sum_Fe_PEC: 0.16, symbol: melt_inclusion_lava}
+            - {S_ppm: 1100.0, Fe3_over_sum_Fe_PEC: 0.16, symbol: melt_inclusion_lava}
+            - {S_ppm: 1200.0, Fe3_over_sum_Fe_PEC: 0.14, symbol: melt_inclusion_lava}
+            - {S_ppm: 65, Fe3_over_sum_Fe_PEC: 0.27, symbol: glass}
+            - {S_ppm: 370, Fe3_over_sum_Fe_PEC: 0.24, symbol: glass}
+            - {S_ppm: 290, Fe3_over_sum_Fe_PEC: 0.18, symbol: glass}
+            - {S_ppm: 120, Fe3_over_sum_Fe_PEC: 0.15, symbol: glass}
+            - {S_ppm: 230, Fe3_over_sum_Fe_PEC: 0.15, symbol: glass}
+            - {S_ppm: 370, Fe3_over_sum_Fe_PEC: 0.17, symbol: glass}
+            - {S_ppm: 170, Fe3_over_sum_Fe_PEC: 0.16, symbol: glass}
+            - {S_ppm: 170, Fe3_over_sum_Fe_PEC: 0.14, symbol: glass}
+          uncertainty: "No per-point uncertainty is printed for these digitized markers."
+      - observation_id: hartley_2017_fig3c_qfm_readable_markers
+        type: characterization
+        locator:
+          page: 4
+          published_page: 195
+          pdf_page_index: 3
+          figure: "3c"
+          note: "Figure-digitized readable sample markers; values are ΔQFM, not absolute log fO2."
+        units: "log10(fO2/QFM)"
+        values:
+          method_class: "figure_only"
+          quantity: "delta_QFM_log_fO2"
+          derivation:
+            model: "Equation (7) of Kress and Carmichael (1991)"
+            inputs: "PEC-corrected Fe3+/sumFe and major-element composition"
+            conditions: "Melt inclusions at 1150 °C and 1.5 kbar; matrix glasses at 1120 °C and atmospheric pressure."
+          points:
+            - 
+              gained_H2O_wt_percent: -0.3
+              delta_QFM: 1.6
+            - 
+              gained_H2O_wt_percent: -0.71
+              delta_QFM: 1.6
+            - 
+              gained_H2O_wt_percent: -0.73
+              delta_QFM: 1.3
+            - 
+              gained_H2O_wt_percent: 0.27
+              delta_QFM: 0.96
+            - 
+              gained_H2O_wt_percent: 0.055
+              delta_QFM: 0.89
+            - 
+              gained_H2O_wt_percent: 0.021
+              delta_QFM: 0.86
+            - 
+              gained_H2O_wt_percent: 0.08
+              delta_QFM: 0.83
+            - 
+              gained_H2O_wt_percent: 0.053
+              delta_QFM: 0.84
+            - 
+              gained_H2O_wt_percent: 0.37
+              delta_QFM: 0.79
+            - 
+              gained_H2O_wt_percent: 0.32
+              delta_QFM: 0.79
+            - 
+              gained_H2O_wt_percent: 0.3
+              delta_QFM: 0.75
+            - 
+              gained_H2O_wt_percent: -0.076
+              delta_QFM: 0.7
+            - 
+              gained_H2O_wt_percent: 0.27
+              delta_QFM: 0.65
+            - 
+              gained_H2O_wt_percent: 0.3
+              delta_QFM: 0.68
+            - 
+              gained_H2O_wt_percent: 0.2
+              delta_QFM: 0.6
+            - 
+              gained_H2O_wt_percent: -0.05
+              delta_QFM: 0.6
+            - 
+              gained_H2O_wt_percent: 0.15
+              delta_QFM: 0.52
+            - 
+              gained_H2O_wt_percent: -0.5
+              delta_QFM: 0.46
+            - 
+              gained_H2O_wt_percent: 0.22
+              delta_QFM: 0.44
+            - 
+              gained_H2O_wt_percent: -0.31
+              delta_QFM: 0.4
+            - 
+              gained_H2O_wt_percent: -0.72
+              delta_QFM: 0.29
+            - 
+              gained_H2O_wt_percent: -0.52
+              delta_QFM: 0.14
+            - 
+              gained_H2O_wt_percent: -0.38
+              delta_QFM: 0.08
+            - 
+              gained_H2O_wt_percent: -0.56
+              delta_QFM: -0.031
+            - 
+              gained_H2O_wt_percent: -0.64
+              delta_QFM: -0.048
+            - 
+              gained_H2O_wt_percent: -0.07
+              delta_QFM: -0.13
+            - 
+              gained_H2O_wt_percent: -0.53
+              delta_QFM: -0.11
+            - 
+              gained_H2O_wt_percent: -0.66
+              delta_QFM: -0.19
+            - 
+              gained_H2O_wt_percent: -0.54
+              delta_QFM: -0.29
+            - 
+              gained_H2O_wt_percent: -0.53
+              delta_QFM: -0.39
+      - observation_id: hartley_2017_fig10a_qfm_readable_markers
+        type: characterization
+        locator:
+          page: 10
+          published_page: 201
+          pdf_page_index: 9
+          figure: "10a"
+          note: "Figure-digitized Laki tephra inclusion markers; model curves are not digitized."
+        units: "log10(fO2/QFM); host olivine Fo in mol.%"
+        values:
+          method_class: "figure_only"
+          quantity: "delta_QFM_log_fO2"
+          derivation:
+            model: "Equation (7) of Kress and Carmichael (1991)"
+            inputs: "PEC-corrected Fe3+/sumFe and major-element composition"
+            note: "The caption states the plotted fO2 is corrected for post-entrapment crystallisation."
+          points:
+            - 
+              host_olivine_Fo_mol_percent: 73
+              delta_QFM_PEC: 0.89
+            - 
+              host_olivine_Fo_mol_percent: 74
+              delta_QFM_PEC: 0.87
+            - 
+              host_olivine_Fo_mol_percent: 75
+              delta_QFM_PEC: 0.86
+            - 
+              host_olivine_Fo_mol_percent: 74
+              delta_QFM_PEC: 0.84
+            - 
+              host_olivine_Fo_mol_percent: 74
+              delta_QFM_PEC: 0.8
+            - 
+              host_olivine_Fo_mol_percent: 86
+              delta_QFM_PEC: 0.8
+            - 
+              host_olivine_Fo_mol_percent: 86
+              delta_QFM_PEC: 0.79
+            - 
+              host_olivine_Fo_mol_percent: 75
+              delta_QFM_PEC: 0.77
+            - 
+              host_olivine_Fo_mol_percent: 83
+              delta_QFM_PEC: 0.76
+            - 
+              host_olivine_Fo_mol_percent: 75
+              delta_QFM_PEC: 0.73
+            - 
+              host_olivine_Fo_mol_percent: 75
+              delta_QFM_PEC: 0.72
+            - 
+              host_olivine_Fo_mol_percent: 74
+              delta_QFM_PEC: 0.71
+            - 
+              host_olivine_Fo_mol_percent: 71
+              delta_QFM_PEC: 0.71
+            - 
+              host_olivine_Fo_mol_percent: 84
+              delta_QFM_PEC: 0.7
+            - 
+              host_olivine_Fo_mol_percent: 83
+              delta_QFM_PEC: 0.67
+            - 
+              host_olivine_Fo_mol_percent: 79
+              delta_QFM_PEC: 0.63
+            - 
+              host_olivine_Fo_mol_percent: 74
+              delta_QFM_PEC: 0.62
+            - 
+              host_olivine_Fo_mol_percent: 80
+              delta_QFM_PEC: 0.61
+            - 
+              host_olivine_Fo_mol_percent: 80
+              delta_QFM_PEC: 0.53
+            - 
+              host_olivine_Fo_mol_percent: 83
+              delta_QFM_PEC: 0.45
+      - observation_id: hartley_2017_table_a1_xanes_steps
+        type: method
+        locator:
+          page: 10
+          published_page: 201
+          pdf_page_index: 9
+          table: "A.1"
+          note: "Step sizes and dwell times used for XANES Fe K-edge analyses."
+        units: "as printed"
+        values:
+          points:
+            - 
+              energy_range_eV: "7000.0–7100.0"
+              step_size_eV: 10
+              dwell_time_s: 1
+            - 
+              energy_range_eV: "7101.0–7104.0"
+              step_size_eV: 1
+              dwell_time_s: 2
+            - 
+              energy_range_eV: "7104.1–7110.0"
+              step_size_eV: 0.1
+              dwell_time_s: 5
+            - 
+              energy_range_eV: "7110.1–7118.0"
+              step_size_eV: 0.1
+              dwell_time_s: 10
+            - 
+              energy_range_eV: "7118.1–7119.4"
+              step_size_eV: 0.1
+              dwell_time_s: 5
+            - 
+              energy_range_eV: "7119.5–7127.0"
+              step_size_eV: 0.5
+              dwell_time_s: 2
+            - 
+              energy_range_eV: "7128.0–7144.0"
+              step_size_eV: 1
+              dwell_time_s: 2
+            - 
+              energy_range_eV: "7148.0–7410.0"
+              step_size_eV: 4
+              dwell_time_s: 2
+            - 
+              energy_range_eV: "7410.0–7500.0"
+              step_size_eV: 10
+              dwell_time_s: 1
+      - observation_id: hartley_2017_results_summary_p195
+        type: characterization
+        locator:
+          page: 4
+          published_page: 195
+          pdf_page_index: 3
+          figure: "3a"
+          section: "Results"
+        units: "as printed"
+        values:
+          quantity: "fe3_fe2_ratio"
+          XANES_melt_inclusions: 65
+          matrix_glass_measurements: 9
+          melt_inclusion_Fe3_over_sum_Fe_raw_range:
+            - 0.135
+            - 0.234
+          exceptional_melt_inclusion_Fe3_over_sum_Fe: 0.286
+          matrix_glass_Fe3_over_sum_Fe_range:
+            - 0.141
+            - 0.177
+          lava_matrix_glass_more_oxidized_values:
+            - 0.238
+            - 0.271
+          visible_sulfide_bearing_inclusions: 22
+          post_entrapment_crystallization_tephra_mean_percent: 1.5
+          post_entrapment_crystallization_tephra_range_percent:
+            - 0.2
+            - 4.1
+          post_entrapment_crystallization_lava_mean_percent: 1.9
+          post_entrapment_crystallization_lava_range_percent:
+            - 0.8
+            - 4.8
+          largest_post_entrapment_correction_absolute_percent: 4.2
+          XANES_external_precision: "0.8% (absolute), 2σ"
+      - observation_id: hartley_2017_results_summary_p196
+        type: characterization
+        locator:
+          page: 5
+          published_page: 196
+          pdf_page_index: 4
+          figure: "3b"
+          section: "3.1"
+        units: "as printed"
+        values:
+          quantity: "fe3_fe2_ratio"
+          tephra_PEC_corrected_Fe3_over_sum_Fe_mean: 0.206
+          tephra_PEC_corrected_Fe3_over_sum_Fe_uncertainty: "±0.008"
+          tephra_uncertainty_confidence: "1 sigma"
+          lava_PEC_corrected_Fe3_over_sum_Fe_range:
+            - 0.133
+            - 0.177
+          lava_PEC_corrected_Fe3_over_sum_Fe_mean: 0.147
+          lava_PEC_corrected_Fe3_over_sum_Fe_uncertainty: "±0.012"
+          lava_uncertainty_confidence: "1 sigma"
+          tephra_delta_QFM_mean: 0.7
+          tephra_delta_QFM_uncertainty: "±0.1"
+          tephra_delta_QFM_confidence: "1 sigma"
+          lava_inclusion_delta_QFM_range:
+            - -0.5
+            - -0.1
+          maximum_tephra_to_lava_Fe3_over_sum_Fe_difference: 0.08
+          maximum_tephra_to_lava_log_fO2_difference: 1.3
+          primary_melt_Fe3_over_sum_Fe_at_10_wt_percent_MgO: 0.18
+          primary_melt_uncertainty: "±0.02"
+          commonly_assumed_Icelandic_basalt_Fe3_over_sum_Fe: 0.1
+          commonly_assumed_Icelandic_basalt_delta_QFM: -1
+          MORB_Fe3_over_sum_Fe_range:
+            - 0.1
+            - 0.16
+      - observation_id: hartley_2017_natural_sample_context
+        type: characterization
+        locator:
+          page: 3
+          published_page: 194
+          pdf_page_index: 2
+          figure: "2"
+        units: "as printed"
+        values:
+          sample_description: "AD 1783 Laki eruption, Iceland; olivine-hosted melt inclusions and matrix glasses from tephra and lava selvages."
+          host_sample_examples: "MHL-05 and MHL-18"
+          major_element_composition_pointer: "Hartley et al. (2014); full sample-level data are in the absent supplementary material."
+          sample_class: "natural quenched samples, not experimental charges"
+          per_sample_host_and_composition_identifiers: "not supplied in this PDF"
+          raw_measurement_temperature_pressure_and_gas: "not reported for each natural sample"
+      - observation_id: hartley_2017_xanes_method_conditions
+        type: method
+        locator:
+          page: 3
+          published_page: 194
+          pdf_page_index: 2
+          section: "2.1"
+        units: "as printed"
+        values:
+          beamline: "I18, Diamond Light Source"
+          analytical_session: "single four-day session in September 2014"
+          storage_ring_energy_GeV: 3
+          storage_ring_current_mA: 200
+          beam_size_um: "5 × 3"
+          energy_range_eV: "7000–7500"
+          energy_step_eV: 0.1
+          counting_time_s: 10
+          monochromator: "Si(111), 333 reflection"
+          sample_incident_angle_degrees: 45
+          sample_collector_angle_degrees: 45
+          incident_to_fluoresced_angle_degrees: 90
+          ionisation_chamber_length_cm: 1.5
+          detector: "nine-element germanium detector"
+          attenuator_Al_thickness_mm:
+            - 0.05
+            - 0.1
+          photon_flux_per_s: "~10^9"
+          reference_glass_repeat_analyses: 3
+          reference_glass_reproducibility: "~0.3% at 2σ"
+          rejected_inclusion_analyses: 10
+          successfully_reanalysed_inclusions: 6
+          rejected_matrix_glass_analyses: 5
+      - observation_id: hartley_2017_fo2_method_and_conditions
+        type: method
+        locator:
+          page: 4
+          published_page: 195
+          pdf_page_index: 3
+          figure: "3c"
+          section: "Results"
+        units: "as printed"
+        values:
+          Fe3_over_sum_Fe_correction: "The effect of PEC on melt inclusion Fe3+/sumFe was corrected by diluting the Fe3+ measured by XANES by the calculated extent of PEC, and re-calculating Fe3+/sumFe according to the PEC-corrected major element composition of the inclusion."
+          PEC_model: "Petrolog3 (Danyushevsky and Plechov, 2011)"
+          olivine_liquid_equilibrium_model: "Gaetani and Watson (2002)"
+          Fe3_partition_assumption: "assuming that Fe3+ is perfectly incompatible in olivine"
+          fO2_model: "Equation (7) of Kress and Carmichael (1991)"
+          fO2_model_inputs: "PEC-corrected Fe3+/sumFe and major-element composition"
+          melt_inclusion_temperature_C: 1150
+          melt_inclusion_pressure_kbar: 1.5
+          matrix_glass_temperature_C: 1120
+          matrix_glass_pressure: "atmospheric pressure"
+          QFM_buffer_reference: "Frost (1991)"
+          melt_inclusion_conditions_interpretation: "representative pre-eruptive storage and final crystal-melt equilibration conditions"
+          matrix_glass_conditions_interpretation: "representative magmatic conditions at eruption"
+      - observation_id: hartley_2017_fig10b_cited_comparison
+        type: characterization
+        locator:
+          page: 10
+          published_page: 201
+          pdf_page_index: 9
+          figure: "10b"
+        units: "as printed"
+        values:
+          method_class: "figure_only"
+          caption: "(b) Comparison of fO2 and trace element variability in Laki tephra-hosted inclusions, both corrected to 10 wt.% MgO, with that expected from mixing of enriched and depleted primary melts of the Icelandic mantle source. Endmember enriched and depleted melt La/Yb is from Shorttle et al. (2014) and fO2 from Shorttle et al. (2015); values are provided in Table A.2. In red we show calculated instantaneous fractional melt compositions from lherzolitic mantle (Workman and Hart, 2005) at a mantle potential temperature of 1390 °C; points indicate pressure intervals of 0.05 GPa during decompression melting. Calculations were performed using the pMELTS model (Ghiorso et al., 2002) implemented through alphaMELTS (Smith and Asimow, 2005; Thompson et al., 2007)."
+          axes: "fO2 and trace element variability versus La/Yb"
+          not_digitised: "cited historical data and modelled curves; source values belong to cited primary works"
+          fetch_candidates:
+            - "Shorttle et al. (2014)"
+            - "Shorttle et al. (2015)"
+            - "Workman and Hart (2005)"
+      - observation_id: hartley_2017_table_a2_source_melt_compositions
+        type: characterization
+        locator:
+          page: 10
+          published_page: 201
+          pdf_page_index: 9
+          table: "A.2"
+          note: "Quoted enriched and depleted mantle source-melt values; attribution by cell follows the Fig. 10 caption where supplied."
+        units: "La/Yb, Nb/Zr, Fe2O3(Fo90) wt.%, and ΔQFM as printed"
+        values:
+          method_class: "unknown"
+          evidence_class: "quoted"
+          points:
+            -
+              source_melt: Enriched
+              La_Yb: 3.812
+              La_Yb_attribution: "Shorttle et al. (2014)"
+              Nb_Zr: 0.155
+              Nb_Zr_attribution: "No cell-level source is stated in Table A.2 or the Fig. 10 caption."
+              Fe2O3_Fo90_wt_percent: "1.8–2.0"
+              Fe2O3_Fo90_attribution: "No cell-level source is stated in Table A.2 or the Fig. 10 caption."
+              delta_QFM: 0.9
+              delta_QFM_attribution: "Shorttle et al. (2015)"
+            -
+              source_melt: Depleted
+              La_Yb: 0.821
+              La_Yb_attribution: "Shorttle et al. (2014)"
+              Nb_Zr: 0.034
+              Nb_Zr_attribution: "No cell-level source is stated in Table A.2 or the Fig. 10 caption."
+              Fe2O3_Fo90_wt_percent: 1.5
+              Fe2O3_Fo90_attribution: "No cell-level source is stated in Table A.2 or the Fig. 10 caption."
+              delta_QFM: 0.1
+              delta_QFM_attribution: "Shorttle et al. (2015)"
+          attribution_and_method: "The Fig. 10 caption attributes La/Yb to Shorttle et al. (2014) and fO2 to Shorttle et al. (2015). No cell-level attribution is stated for Nb/Zr or Fe2O3(Fo90). Method is unknown because the cited sources' own procedures are not in hand."
+      - observation_id: hartley_2017_fig_a1_xanes_spectra_caption
+        type: characterization
+        locator:
+          page: 11
+          published_page: 202
+          pdf_page_index: 10
+          figure: "A.1"
+        units: "x: Energy (eV); y: Normalised intensity"
+        values:
+          method_class: "figure_only"
+          caption: "Fig. A.1. (a) Edge step-normalised intensity vs. energy for standards from the NMNH 117393 reference block (Cottrell et al., 2009), showing the spectra over the energy range of the pre-edge region used in fitting both standards and samples. Spectra for the standards are coloured by their reference Fe3+/ΣFe values as determined by Mössbauer spectroscopy. Inset: Raw, un-normalised spectrum of one standard glass over the full energy range analysed, with the energy range used for normalisation shaded in grey. (b) Edge step-normalised intensity vs. energy for representative Laki melt inclusions, coloured by their measured Fe3+/ΣFe values as calibrated using the NMNH standards. The black line labelled ‘olv’ is a melt inclusion analysis contaminated by the host olivine. Inset: Raw, un-normalised spectra for the same Laki melt inclusions, showing the post-edge shoulder. Note the structure at ∼7140 eV in the olivine-contaminated spectrum. (For interpretation of the colours in this figure, the reader is referred to the web version of this article.)"
+          axes: "x: Energy (eV); y: Normalised intensity"
+          not_digitised: "Continuous XANES spectra have no discrete data markers."
+      - observation_id: hartley_2017_fig_a3_cited_volatile_trace_data_caption
+        type: characterization
+        locator:
+          page: 11
+          published_page: 202
+          pdf_page_index: 10
+          figure: "A.3"
+        units: "S (ppm), Sm (ppm), Dy (ppm), S/Sm, La/Yb"
+        values:
+          method_class: "unknown"
+          caption: "Fig. A.3. Sulfur and trace element variability in Laki melt inclusions. Correlations and correlation coefficients are shown for tephra-hosted melt inclusions."
+          axes: "S (ppm) versus Sm (ppm); S (ppm) versus Dy (ppm); S/Sm versus La/Yb"
+          not_digitised: "This historical volatile and trace-element data is attributed to Hartley et al. (2014) in the Fig. 3 caption and belongs to that primary source."
+          fetch_candidates:
+            - "Hartley et al. (2014)"
