@@ -1,8 +1,10 @@
 from __future__ import annotations
 
-from copy import deepcopy
+from dataclasses import replace
+from decimal import Decimal
 from pathlib import Path
 
+import pytest
 import yaml
 
 from simulator.battery.migrate import REPO_ROOT
@@ -28,40 +30,50 @@ CONDITION_KEYS = {
 }
 
 
+def _assert_migrated_table_values(document: dict, result) -> None:
+    points = document["species"]["Fe"]["observations"][0]["values"]["points"]
+    table_rows = [
+        observation
+        for observation_id, observation in result.observations.items()
+        if observation_id.startswith(TABLE_ROW_PREFIX)
+    ]
+    assert len(table_rows) == len(points) == 45
+
+    by_row = {
+        int(observation_id.split(":row=", 1)[1].split(":", 1)[0]): observation
+        for observation_id, observation in result.observations.items()
+        if observation_id.startswith(TABLE_ROW_PREFIX)
+    }
+    assert len(by_row) == len(points)
+
+    for point in points:
+        observation = by_row[point["row"]]
+        assert observation.value.point == Decimal(str(point["P_Pa"]))
+        assert observation.identity.temperature_K.is_value
+        assert observation.identity.temperature_K.value == Decimal(
+            str(point["T_K_as_printed"])
+        )
+        assert observation.uncertainty.kind.value == "printed"
+        assert Decimal(str(observation.uncertainty.verbatim["sigma"])) == Decimal(
+            str(point["P_uncertainty_Pa_as_printed"])
+        )
+        assert observation.uncertainty.value is None
+        assert observation.uncertainty.basis is None
+
+        conditions = observation.point_conditions or {}
+        assert CONDITION_KEYS <= conditions.keys()
+        assert all(conditions[key].state.is_value for key in CONDITION_KEYS)
+        assert all(conditions[key].locator is not None for key in CONDITION_KEYS)
+
+
 def test_ferguson_2004_pressure_points_and_fidelity_survive_migration(
     tmp_path: Path,
 ) -> None:
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     assert check_all_fidelity_samples_match(document, label=str(EXTRACT)) == []
 
-    mutated = deepcopy(document)
-    mutated["species"]["Fe"]["observations"][0]["values"]["points"][0][
-        "P_Pa"
-    ] += 1
-    assert check_all_fidelity_samples_match(mutated, label=str(EXTRACT))
-
-    mutated_context = deepcopy(document)
-    next(
-        item
-        for item in mutated_context["species"]["Fe"]["context"]
-        if item["observation_id"] == "ferguson_2004_third_law_enthalpy_vaporization"
-    )["values"]["value_kJ_mol"] += 1
-    assert check_all_fidelity_samples_match(mutated_context, label=str(EXTRACT))
-
     result = _migrate_real_extract(tmp_path, EXTRACT_NAME)
-    table_rows = [
-        observation
-        for observation_id, observation in result.observations.items()
-        if observation_id.startswith(TABLE_ROW_PREFIX)
-    ]
-    assert len(table_rows) == 45
-    for observation in table_rows:
-        temperature = observation.identity.temperature_K
-        assert temperature.is_value
-        conditions = observation.point_conditions or {}
-        assert CONDITION_KEYS <= conditions.keys()
-        assert all(conditions[key].state.is_value for key in CONDITION_KEYS)
-        assert all(conditions[key].locator is not None for key in CONDITION_KEYS)
+    _assert_migrated_table_values(document, result)
 
     validation = validate_corpus(
         result.works,
@@ -70,3 +82,18 @@ def test_ferguson_2004_pressure_points_and_fidelity_survive_migration(
         residuals=None,
     )
     assert validation.hard_issues == ()
+
+    by_row = {
+        int(observation_id.split(":row=", 1)[1].split(":", 1)[0]): observation
+        for observation_id, observation in result.observations.items()
+        if observation_id.startswith(TABLE_ROW_PREFIX)
+    }
+    mutated = by_row[1]
+    original = result.observations[mutated.observation_id]
+    result.observations[mutated.observation_id] = replace(
+        original,
+        value=replace(original.value, point=original.value.point + Decimal("1")),
+    )
+    with pytest.raises(AssertionError):
+        _assert_migrated_table_values(document, result)
+    result.observations[mutated.observation_id] = original
