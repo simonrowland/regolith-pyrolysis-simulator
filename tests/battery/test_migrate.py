@@ -2837,6 +2837,76 @@ def test_source_derivation_reports_relation_and_inputs_independently() -> None:
     ]
 
 
+@pytest.mark.parametrize(
+    ("extract_name", "observation_id", "expected_details"),
+    [
+        (
+            "shornikov-1994-mullite-kems.yaml",
+            "shornikov_1994_al2o3_activity_1833k",
+            (),
+        ),
+        (
+            "wimpenny-2019-zn-isotope-evaporation-extreme-t.yaml",
+            "wimpenny_2019_zn_fractionation_summary",
+            (),
+        ),
+        (
+            "no27-fegley-cameron-1987-epsl.yaml",
+            "fegley_cameron_1987_model_setup_initial_oxide_magma",
+            (),
+        ),
+        (
+            "kems-012-sossi-2019.yaml",
+            "sossi_2019_k_table5_experimental",
+            (
+                "invalid derivation annotation: Derivation.inputs is required unless raw_inputs is located not_printed",
+                "invalid derivation annotation: derivation relation (author method) is required",
+            ),
+        ),
+        (
+            "kems-ms2000-044.yaml",
+            "ms2000_044_sio2_activity_na_system_xsio2_0805_t1473_class_quote_r2",
+            (
+                "invalid derivation annotation: Derivation.inputs is required unless raw_inputs is located not_printed",
+                "invalid derivation annotation: derivation relation (author method) is required",
+            ),
+        ),
+        (
+            "okazaki-2022-ryugu-gas-treasure-box.yaml",
+            "okazaki_2022_fragmentation_assumptions_and_model_output",
+            (
+                "invalid derivation annotation: Derivation.inputs is required unless raw_inputs is located not_printed",
+                "invalid derivation annotation: derivation relation (author method) is required",
+            ),
+        ),
+        (
+            "busemann-2024-noble-gases-ryugu-bennu.yaml",
+            "busemann_2024_preliminary_ryugu_exposure_ages",
+            (
+                "invalid derivation annotation: Derivation.inputs is required unless raw_inputs is located not_printed",
+            ),
+        ),
+    ],
+)
+def test_offer7_derivation_issue_classification_is_pinned(
+    tmp_path: Path,
+    extract_name: str,
+    observation_id: str,
+    expected_details: tuple[str, ...],
+) -> None:
+    result = _migrate_real_extract(tmp_path, extract_name)
+    source_id = extract_name.removesuffix(".yaml")
+    path_prefix = f"observations.{source_id}::{observation_id}."
+    details = tuple(
+        issue.detail
+        for issue in result.validation.hard_issues
+        if issue.path.startswith(path_prefix)
+        and issue.reason is RefusalReason.INVALID_SOURCE
+    )
+
+    assert details == expected_details
+
+
 @pytest.mark.parametrize("location", ["values", "observation"])
 @pytest.mark.parametrize("relation", ["missing", None, ""])
 def test_calculated_child_without_author_relation_stays_unknown(
