@@ -245,6 +245,7 @@ class _Sim:
         reasons: list[str],
         *,
         fO2_log: float,
+        redox_state: object | None = None,
         temperature_C: float | None = None,
         pressure_bar: float | None = None,
         composition_mol_by_account: dict[str, dict[str, float]] | None = None,

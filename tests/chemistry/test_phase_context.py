@@ -11,6 +11,7 @@ import pytest
 from simulator.chemistry.phase_context import (
     InvalidLiquidFractionError,
     PhaseContext,
+    _optional_fraction,
 )
 from simulator.state import MOLAR_MASS
 
@@ -268,6 +269,14 @@ def test_scalar_liquid_fraction_boundaries_are_valid(
     assert context["SiO2"]["provenance"]["selected_tier"] == (
         "kress_scalar_liquid_fraction"
     )
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [(None, None), (0.0, 0.0), (0.25, 0.25), (1.0, 1.0), (-0.1, None), (1.1, None)],
+)
+def test_optional_cache_liquid_fraction_projection(value, expected):
+    assert _optional_fraction(value) == expected
 
 
 def test_phase_context_module_has_no_upward_simulator_imports():

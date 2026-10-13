@@ -658,6 +658,10 @@ def test_canonical_system_entrypoint_converts_log10_bar_to_pa(monkeypatch):
 
 
 def test_system_entrypoint_marks_pressure_non_authoritative(monkeypatch):
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        classify_equilibrate_outcome,
+    )
+
     class FakeSystem:
         def set_melt_comp(self, composition):
             self.composition = dict(composition)
@@ -675,14 +679,21 @@ def test_system_entrypoint_marks_pressure_non_authoritative(monkeypatch):
         composition_mol={"Na2O": 1.0},
         fO2_log=-8.0,
         pressure_bar=42.0,
+        liquid_fraction=1.2,
     )
 
     assert result.status == "non_authoritative"
+    assert result.phase_assemblage_available is False
+    assert result.liquid_fraction == 1.2
     assert result.vapor_pressures_Pa == {}
     assert result.pressure_bar == pytest.approx(42.0)
     assert result.diagnostics["pressure_control_authoritative"] is False
     assert result.diagnostics["requested_pressure_bar"] == pytest.approx(42.0)
     assert any("without the optional P argument" in w for w in result.warnings)
+    assert classify_equilibrate_outcome(result)[:2] == (
+        "refusal",
+        "liquid_fraction_invalid",
+    )
 
 
 def test_core_does_not_consume_non_authoritative_vaporock_pressures(monkeypatch):
@@ -706,7 +717,7 @@ def test_core_does_not_consume_non_authoritative_vaporock_pressures(monkeypatch)
     sim._commanded_pO2_bar = lambda: 1e-6
     sim._compute_intrinsic_melt_fO2 = lambda: -8.0
 
-    def dispatch_only(intent, *, control_inputs, fO2_log):
+    def dispatch_only(intent, *, control_inputs, fO2_log, redox_state=None):
         request = IntentRequest(
             intent=intent,
             account_view=ProviderAccountView(

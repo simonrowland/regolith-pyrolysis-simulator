@@ -1,0 +1,513 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1111/j.1151-2916.1981.tb09566.x
+  citation: Kassis N. and Frischat G.H. (1981). Vapor Pressures of Simple Silicate Glass Melts. Journal of the American Ceramic
+    Society 64:C28–C29.
+  source_ids:
+  - kassis-frischat-1981-silicate-glass-vapour
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+    files:
+    - asset_id: pdf:kassis-frischat-1981-silicate-glass-vapour
+      role: pdf
+      path: raw/kassis-frischat-1981-silicate-glass-vapour/kassis-frischat-1981-silicate-glass-vapour.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:kassis-frischat-1981-silicate-glass-vapour
+      role: pdftotext
+      path: text/kassis-frischat-1981-silicate-glass-vapour
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kassis-frischat-1981-silicate-glass-vapour
+      role: table_csv
+      path: tables/kassis-frischat-1981-silicate-glass-vapour
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: unknown:kassis-frischat-1981-silicate-glass-vapour
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1111/j.1151-2916.1981.tb09566.x
+experiments:
+- experiment_id: 10.1111/j.1151-2916.1981.tb09566.x::experiment::rubidium-silicate-melt
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.002'
+          approximate: true
+      locator:
+        page: 2
+        published_page: C-29
+        section: Experimental method
+        note: Printed approximately 2 g; unit conversion only
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2'
+            locator:
+              page: 2
+              published_page: C-29
+              section: Experimental method
+              note: Printed approximately 2 g; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 2
+              published_page: C-29
+              section: Experimental method
+              note: Printed approximately 2 g; unit conversion only
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value: Rb2O.3SiO2
+      locator:
+        page: 2
+        published_page: C-29
+        section: Experimental method
+    form:
+      state:
+        tag: value
+        value: glass melt
+      locator:
+        page: 2
+        published_page: C-29
+        section: Experimental method
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00066'
+          approximate: false
+      locator:
+        page: 2
+        published_page: C-29
+        section: Experimental method
+        note: Printed chamber vacuum 6.6×10^-4 Pa; not an in-cell vapour pressure
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 2
+        published_page: C-29
+        section: Experimental method
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 2
+          published_page: C-29
+          section: Experimental method
+          note: Only the chamber vacuum is stated
+  work_id: 10.1111/j.1151-2916.1981.tb09566.x
+  locator:
+    page: 2
+    published_page: C-29
+    section: Experimental method
+    note: Rb2O·3SiO2 melt
+  bench_id: 10.1111/j.1151-2916.1981.tb09566.x::bench::platinum-knudsen-cell
+- experiment_id: 10.1111/j.1151-2916.1981.tb09566.x::experiment::sodium-silicate-melt
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.002'
+          approximate: true
+      locator:
+        page: 2
+        published_page: C-29
+        section: Experimental method
+        note: Printed approximately 2 g; unit conversion only
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2'
+            locator:
+              page: 2
+              published_page: C-29
+              section: Experimental method
+              note: Printed approximately 2 g; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 2
+              published_page: C-29
+              section: Experimental method
+              note: Printed approximately 2 g; unit conversion only
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value: Na2O.3SiO2
+      locator:
+        page: 2
+        published_page: C-29
+        section: Experimental method
+    form:
+      state:
+        tag: value
+        value: glass melt
+      locator:
+        page: 2
+        published_page: C-29
+        section: Experimental method
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00066'
+          approximate: false
+      locator:
+        page: 2
+        published_page: C-29
+        section: Experimental method
+        note: Printed chamber vacuum 6.6×10^-4 Pa; not an in-cell vapour pressure
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 2
+        published_page: C-29
+        section: Experimental method
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 2
+          published_page: C-29
+          section: Experimental method
+          note: Only the chamber vacuum is stated
+  work_id: 10.1111/j.1151-2916.1981.tb09566.x
+  locator:
+    page: 2
+    published_page: C-29
+    section: Experimental method
+    note: Na2O·3SiO2 melt
+  bench_id: 10.1111/j.1151-2916.1981.tb09566.x::bench::platinum-knudsen-cell
+benches:
+- id: 10.1111/j.1151-2916.1981.tb09566.x::bench::platinum-knudsen-cell
+  work_id: 10.1111/j.1151-2916.1981.tb09566.x
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Knudsen-effusion cell on a balance
+    locator:
+      page: 2
+      published_page: C-29
+      section: Experimental method
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Pt
+    locator:
+      page: 2
+      published_page: C-29
+      section: Experimental method
+  cell_materials:
+  - state:
+      tag: value
+      value: Pt
+    locator:
+      page: 2
+      published_page: C-29
+      section: Experimental method
+  geometry:
+    orifice_diameter_m:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0008'
+          approximate: false
+      locator:
+        page: 2
+        published_page: C-29
+        section: Experimental method
+        note: Printed 0.8 mm; unit conversion only
+      inference:
+        relation: mm_to_m
+        inputs:
+        - L_m = L_mm / 1000
+        - original_unit=mm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.8'
+            locator:
+              page: 2
+              published_page: C-29
+              section: Experimental method
+              note: Printed 0.8 mm; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 2
+              published_page: C-29
+              section: Experimental method
+              note: Printed 0.8 mm; unit conversion only
+        output_unit: m
+    cell_internal_dimensions:
+      diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.015'
+            approximate: false
+        locator:
+          page: 2
+          published_page: C-29
+          section: Experimental method
+          note: Printed 15 mm; unit conversion only
+        inference:
+          relation: mm_to_m
+          inputs:
+          - L_m = L_mm / 1000
+          - original_unit=mm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '15'
+              locator:
+                page: 2
+                published_page: C-29
+                section: Experimental method
+                note: Printed 15 mm; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '1000'
+              locator:
+                page: 2
+                published_page: C-29
+                section: Experimental method
+                note: Printed 15 mm; unit conversion only
+          output_unit: m
+      height_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.02'
+            approximate: false
+        locator:
+          page: 2
+          published_page: C-29
+          section: Experimental method
+          note: Printed 20 mm; unit conversion only
+        inference:
+          relation: mm_to_m
+          inputs:
+          - L_m = L_mm / 1000
+          - original_unit=mm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '20'
+              locator:
+                page: 2
+                published_page: C-29
+                section: Experimental method
+                note: Printed 20 mm; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '1000'
+              locator:
+                page: 2
+                published_page: C-29
+                section: Experimental method
+                note: Printed 20 mm; unit conversion only
+          output_unit: m
+  detector:
+    state:
+      tag: value
+      value: Weight loss recorded continuously
+    locator:
+      page: 2
+      published_page: C-29
+      section: Experimental method
+  other_facts:
+  - name: cell_wall_thickness
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.2'
+          approximate: false
+      locator:
+        page: 2
+        published_page: C-29
+        section: Experimental method
+    unit: mm
+  - name: calibration_reference
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: 99.998% Cu
+          approximate: false
+      locator:
+        page: 2
+        published_page: C-29
+        section: Experimental method
+    unit: material_grade
+  - name: balance_model
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: Mettler Model TA-I
+          approximate: false
+      locator:
+        page: 2
+        published_page: C-29
+        note: Footnote to balance in experimental-method paragraph
+    unit: instrument
+context:
+- observation_id: kassis_1981_abstract_specific_vaporization_rate
+  type: method
+  locator:
+    page: 1
+    published_page: C-28
+    pdf_page_index: 0
+    section: Abstract
+  units: g cm^-2 s^-1 as printed
+  values:
+    quantity: specific vaporization rate envelope
+    method_class: method_only
+    rate_range_g_cm2_s_as_printed: approximately 3×10^-6 to 3×10^-4
+    scope: Figure 1's per-temperature rate series is not extracted.
+  context_id: kassis-frischat-1981-silicate-glass-vapour::context::kassis_1981_abstract_specific_vaporization_rate
+  work_id: 10.1111/j.1151-2916.1981.tb09566.x
+  source_id: kassis-frischat-1981-silicate-glass-vapour
+  species: Na
+- observation_id: kassis_1981_stoichiometric_vapor_assumption
+  type: method
+  locator:
+    page: 2
+    published_page: C-29
+    pdf_page_index: 1
+    equation: '4'
+  units: method statement as printed
+  values:
+    statement_as_printed: Assuming dissociation of Na2O to be predominant in the gas phase ...; if stoichiometric vapor composition
+      is assumed. The same was assumed for the Rb2O.3SiO2 system.
+    equation_basis: source-stated vapor-speciation assumption, not a measured molecular-oxide partial pressure
+  context_id: kassis-frischat-1981-silicate-glass-vapour::context::kassis_1981_stoichiometric_vapor_assumption
+  work_id: 10.1111/j.1151-2916.1981.tb09566.x
+  source_id: kassis-frischat-1981-silicate-glass-vapour
+  species: Na2O
+- observation_id: kassis_1981_total_pressure_thermochemistry
+  type: method
+  locator:
+    page: 2
+    published_page: C-29
+    pdf_page_index: 1
+    figure: '2'
+  units: kJ mol^-1; J K^-1 as printed
+  values:
+    statement_as_printed: ΔH = 316 (Na2O.3SiO2) and 328 kJmol−1 (Rb2O.3SiO2) and ΔS = 102 (Na2O.3SiO2) and 122 JK−1 (Rb2O.3SiO2),
+      respectively.
+    reference_pressure_footnote_as_printed: p = 1.013×10^5 Pa.
+    delta_H_kJ_per_mol: 316
+    delta_S_J_per_K: 102
+    reference_pressure_as_printed: p = 1.013×10^5 Pa
+  context_id: kassis-frischat-1981-silicate-glass-vapour::context::kassis_1981_total_pressure_thermochemistry
+  work_id: 10.1111/j.1151-2916.1981.tb09566.x
+  source_id: kassis-frischat-1981-silicate-glass-vapour
+  species: Na2O
+- observation_id: kassis_1981_total_pressure_thermochemistry_rb
+  type: method
+  locator:
+    page: 2
+    published_page: C-29
+    pdf_page_index: 1
+    figure: '2'
+  units: kJ mol^-1; J K^-1 as printed
+  values:
+    statement_as_printed: ΔH = 316 (Na2O.3SiO2) and 328 kJmol−1 (Rb2O.3SiO2) and ΔS = 102 (Na2O.3SiO2) and 122 JK−1 (Rb2O.3SiO2),
+      respectively.
+    reference_pressure_footnote_as_printed: p = 1.013×10^5 Pa.
+    delta_H_kJ_per_mol: 328
+    delta_S_J_per_K: 122
+    reference_pressure_as_printed: p = 1.013×10^5 Pa
+  context_id: kassis-frischat-1981-silicate-glass-vapour::context::kassis_1981_total_pressure_thermochemistry_rb
+  work_id: 10.1111/j.1151-2916.1981.tb09566.x
+  source_id: kassis-frischat-1981-silicate-glass-vapour
+  species: Rb2O

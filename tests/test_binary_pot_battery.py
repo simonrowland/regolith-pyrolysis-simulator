@@ -248,14 +248,18 @@ def test_classify_out_of_domain_and_no_liquid() -> None:
 @pytest.mark.parametrize(
     ("liquid_fraction", "expected"),
     [
+        (None, ("refusal", "liquid_fraction_missing")),
+        (math.nan, ("refusal", "liquid_fraction_invalid")),
+        (math.inf, ("refusal", "liquid_fraction_invalid")),
+        (-0.1, ("refusal", "liquid_fraction_invalid")),
+        (1.2, ("refusal", "liquid_fraction_invalid")),
         (0.0, ("refusal", "no_liquid")),
-        (-0.25, ("refusal", "no_liquid")),
-        (1.0e-15, ("ok", None)),
-        (1.1, ("ok", None)),
-        (math.nan, ("ok", None)),
+        (1.0, ("ok", None)),
+        (0.5, ("ok", None)),
     ],
 )
-def test_classify_legacy_no_liquid_boundary_values(liquid_fraction, expected):
+def test_classify_legacy_liquid_fraction_boundary_values(liquid_fraction, expected):
+    """b-870: missing/invalid fractions refuse; valid boundaries stay distinct."""
     result = SimpleNamespace(
         status="ok",
         diagnostics={},
@@ -267,6 +271,75 @@ def test_classify_legacy_no_liquid_boundary_values(liquid_fraction, expected):
     status, reason, _ = classify_equilibrate_outcome(result)
 
     assert (status, reason) == expected
+
+
+@pytest.mark.parametrize("liquid_fraction", [1.2, math.nan, -0.1])
+def test_classify_invalid_supplied_fraction_without_assemblage_refuses(
+    liquid_fraction,
+):
+    result = SimpleNamespace(
+        status="non_authoritative",
+        diagnostics={},
+        warnings=[],
+        liquid_fraction=liquid_fraction,
+        phase_assemblage_available=False,
+    )
+
+    assert classify_equilibrate_outcome(result)[:2] == (
+        "refusal",
+        "liquid_fraction_invalid",
+    )
+
+
+def test_classify_missing_fraction_without_assemblage_remains_permitted():
+    result = SimpleNamespace(
+        status="non_authoritative",
+        diagnostics={},
+        warnings=[],
+        liquid_fraction=None,
+        phase_assemblage_available=False,
+    )
+
+    assert classify_equilibrate_outcome(result) == ("ok", None, None)
+
+
+def test_equilibrate_cell_refuses_invalid_fraction_without_assemblage():
+    class _Backend:
+        def equilibrate(self, **_kwargs):
+            return SimpleNamespace(
+                status="non_authoritative",
+                diagnostics={},
+                warnings=[],
+                activity_coefficients={},
+                vapor_pressures_Pa={},
+                liquid_fraction=1.2,
+                phase_assemblage_available=False,
+            )
+
+    handle = EngineHandle(
+        name="vaporock",
+        backend=_Backend(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=True,
+    )
+    pot = BinaryPot(
+        pot_id="invalid-fraction-no-assemblage",
+        kato_1993_table4_system=None,
+        why="invalid reported fraction",
+        composition_wt_pct={"Na2O": 100.0},
+    )
+
+    cell = equilibrate_cell(
+        handle,
+        pot,
+        temperature_K=1600.0,
+        po2=Po2Request(mode="commanded", po2_bar=1e-8),
+    )
+
+    assert cell.status == "refusal"
+    assert cell.refusal_reason == "liquid_fraction_invalid"
 
 
 def test_classify_composition_projected_is_typed_refusal() -> None:

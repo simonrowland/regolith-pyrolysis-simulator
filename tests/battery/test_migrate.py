@@ -4283,6 +4283,25 @@ def test_h01_explicit_T_K_pressure_atm_still_converts(tmp_path: Path) -> None:
     )
 
 
+def test_point_selection_preserves_approximate_flag(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    row["values"].pop("series")
+    row["values"].update(
+        {"T_K": 1200, "pressure_atm": 1.0, "approximate": True}
+    )
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    obs = result.observations["fixture-source::na_psat"]
+
+    assert obs.value.kind is ValueKind.POINT
+    assert obs.value.point == 101325
+    assert obs.value.approximate is True
+    assert obs.identity.temperature_K is not None
+    assert obs.identity.temperature_K.is_value
+    assert obs.identity.temperature_K.value == 1200
+
+
 def test_h01_blank_sample_area_units_queued_and_sample_transferred(tmp_path: Path) -> None:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     extract["species"]["Na"]["observations"][0]["equipment"] = {
@@ -7508,6 +7527,7 @@ def test_kume_experiment_temperatures_have_table_locators(tmp_path: Path) -> Non
         "kume-2000-table2-1823k": (Decimal("1823"), "2", 563),
         "kume-2000-table3-1873k": (Decimal("1873"), "3", 564),
         "kume-2000-table4-1873k": (Decimal("1873"), "4", 565),
+        "kume-2000-table4-rein-chipman-1873k": (Decimal("1873"), "4", 565),
     }
     seen = set()
     for experiment in result.experiments.values():

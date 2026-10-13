@@ -40,6 +40,12 @@ from engines.magemin import (
 )
 import engines.magemin.provider as provider_module
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
+from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
+from simulator.fe_redox import (
+    FE_FEO_BUFFER_STANDARD,
+    REDOX_STATE_REFERENCE_T_K,
+    RedoxState,
+)
 
 
 # ----------------------------------------------------------------------
@@ -354,6 +360,35 @@ def test_provider_parity_threads_control_audit_state_points() -> None:
         for warning in report.warnings
     )
     assert not any("missing" in warning for warning in report.warnings)
+
+
+def test_liquidus_finder_forwards_normalized_redox_state():
+    state = RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, 0.2)
+    request = IntentRequest(
+        intent=ChemistryIntent.SILICATE_LIQUIDUS,
+        account_view=ProviderAccountView(accounts={}, species_formula_registry={}),
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+        redox_state=state,
+    )
+    calls = []
+
+    class FakeBackend:
+        def find_liquidus_solidus(self, **kwargs):
+            calls.append(kwargs)
+            return {'status': 'ok'}
+
+    provider = MAGEMinShadowProvider(backend=FakeBackend())
+    provider._run_liquidus_finder(
+        provider._backend,
+        request,
+        composition_mol_by_account={'process.cleaned_melt': {'SiO2': 1.0}},
+    )
+
+    assert calls[0]['redox_state'] is state
+    assert calls[0]['fO2_log'] == pytest.approx(
+        state.log_fO2_at(REDOX_STATE_REFERENCE_T_K)
+    )
 
 
 def test_provider_parity_accepts_equal_optional_fo2_state_points() -> None:

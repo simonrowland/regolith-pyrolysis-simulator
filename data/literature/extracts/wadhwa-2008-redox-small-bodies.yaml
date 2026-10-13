@@ -1,0 +1,480 @@
+schema_version: literature_extract.v1
+source_id: wadhwa-2008-redox-small-bodies
+source:
+  citation: 'Wadhwa M. (2008). Redox Conditions on Small Bodies, the Moon and Mars. Reviews in Mineralogy and Geochemistry68:493–510, chapter17.'
+  doi: 10.2138/rmg.2008.68.17
+  year: 2008
+extraction:
+  method: >-
+    Manual transcription of the review's quoted redox estimates and figure-only
+    comparisons. Figures 3, 4, and 6 were read from rendered pages. No primary
+    reference was fetched or read; no experimental conditions are reported here
+    because the chapter compiles other studies rather than reporting experiments.
+  date: '2026-10-12'
+  worker: wadh08-1012
+review_status: draft
+fidelity_samples:
+  - species: FeO
+    observation_id: wadh08_solar_nebula_redox
+    value: {estimate_as_published: '~5 orders of magnitude below the IW buffer'}
+    locator: {pdf_page_index: 1, page: 2, published_page: 494}
+  - species: FeO
+    observation_id: wadh08_nebula_interaction_redox
+    value: {estimate_as_published: 'close to IW'}
+    locator: {pdf_page_index: 1, page: 2, published_page: 494}
+  - species: FeO
+    observation_id: wadh08_enstatite_chondrite_redox
+    value: {estimate_as_published: '~5 log units below IW (or IW-5)'}
+    locator: {pdf_page_index: 1, page: 2, published_page: 494}
+  - species: FeO
+    observation_id: wadh08_carbonaceous_chondrite_redox
+    value: {estimate_as_published: '~1-3 log units above the IW buffer'}
+    locator: {pdf_page_index: 1, page: 2, published_page: 494}
+  - species: FeO
+    observation_id: wadh08_winonaite_iab_redox
+    value: {estimate_as_published: '~2-3 log units below IW'}
+    locator: {pdf_page_index: 2, page: 3, published_page: 495}
+  - species: FeO
+    observation_id: wadh08_acapulcoite_redox
+    value: {estimate_as_published: '~IW-2'}
+    locator: {pdf_page_index: 2, page: 3, published_page: 495}
+  - species: FeO
+    observation_id: wadh08_ureilite_fo2_temperatures
+    value:
+      method_class: review_compilation
+      quantity: fugacity
+      cited_primary: Berkley and Jones (1982)
+      attribution: 'Berkley and Jones (1982) report approximately ~10−18 at 1200 K and ~10−12 at 1600 K.'
+      points:
+        - temperature_K: '1200'
+          fugacity: '1e-18'
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '1200'}
+              locator: {pdf_page_index: 3, page: 4, published_page: 496, note: 1200 K}
+        - temperature_K: '1600'
+          fugacity: '1e-12'
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '1600'}
+              locator: {pdf_page_index: 3, page: 4, published_page: 496, note: 1600 K}
+    locator: {pdf_page_index: 3, page: 4, published_page: 496}
+  - species: FeO
+    observation_id: wadh08_angra_dos_reis_redox
+    value: {estimate_as_published: 'between IW and ~IW+2'}
+    locator: {pdf_page_index: 3, page: 4, published_page: 496}
+  - species: FeO
+    observation_id: wadh08_dorbigny_sahara_redox
+    value: {estimate_as_published: '~IW+1'}
+    locator: {pdf_page_index: 3, page: 4, published_page: 496}
+  - species: FeO
+    observation_id: wadh08_lew86010_redox
+    value: {estimate_as_published: '~IW+1'}
+    locator: {pdf_page_index: 3, page: 4, published_page: 496}
+  - species: FeO
+    observation_id: wadh08_angrite_group_redox
+    value: {estimate_as_published: '~IW to ~IW+1'}
+    locator: {pdf_page_index: 3, page: 4, published_page: 496}
+  - species: FeO
+    observation_id: wadh08_eucrite_stolper_redox
+    value: {estimate_as_published: 'close to IW; approximately IW–1'}
+    locator: {pdf_page_index: 3, page: 4, published_page: 496}
+  - species: FeO
+    observation_id: wadh08_eucrite_jurewicz_redox
+    value: {estimate_as_published: 'IW–1'}
+    locator: {pdf_page_index: 3, page: 4, published_page: 496}
+  - species: FeO
+    observation_id: wadh08_lunar_nash_hausel_redox
+    value: {estimate_as_published: 'IW–1 to IW–2, T-dependent'}
+    locator: {pdf_page_index: 4, page: 5, published_page: 497}
+  - species: FeO
+    observation_id: wadh08_lunar_steele_glasses_redox
+    value: {estimate_as_published: '~IW–2'}
+    locator: {pdf_page_index: 4, page: 5, published_page: 497}
+  - species: FeO
+    observation_id: wadh08_lunar_oxide_mineral_redox
+    value: {subsolidus_as_published: 'close to IW', magmatic_estimate_as_published: '~IW–1'}
+    locator: {pdf_page_index: 4, page: 5, published_page: 497}
+  - species: FeO
+    observation_id: wadh08_lunar_sato_measurements
+    value: {estimate_as_published: 'IW+0.2 to IW–1'}
+    locator: {pdf_page_index: 4, page: 5, published_page: 497}
+  - species: FeO
+    observation_id: wadh08_lunar_fogel_jones
+    value: {Fogel_Rutherford_upper_bound: '≤IW–0.5', Jones_estimate: 'close to IW–1'}
+    locator: {pdf_page_index: 4, page: 5, published_page: 497}
+  - species: FeO
+    observation_id: wadh08_lunar_karner_glasses
+    value: {orange_glasses: '~IW–2', very_low_Ti_glasses: '~IW–1', yellow_green_average: '~IW–1.7'}
+    locator: {pdf_page_index: 4, page: 5, published_page: 497}
+  - species: FeO
+    observation_id: wadh08_lunar_figure1_range
+    value: {range_as_published: 'spanning ~2 log units, from ~IW to ~IW–2'}
+    locator: {pdf_page_index: 5, page: 6, published_page: 498, figure: '1'}
+  - species: FeO
+    observation_id: wadh08_lunar_magma_best_estimate
+    value: {estimate_as_published: '~IW–1'}
+    locator: {pdf_page_index: 5, page: 6, published_page: 498}
+  - species: FeO
+    observation_id: wadh08_lunar_mantle_summary
+    value: {estimate_as_published: '~IW–1'}
+    locator: {pdf_page_index: 12, page: 13, published_page: 505}
+  - species: FeO
+    observation_id: wadh08_mars_wadhwa_shergotty_que
+    value: {Shergotty_relative_to_QFM: '~1 log unit below QFM', QUE_94201_relative_to_IW: '~1 log unit below IW'}
+    locator: {pdf_page_index: 6, page: 7, published_page: 499}
+  - species: FeO
+    observation_id: wadh08_mars_enriched_source
+    value: {estimate_as_published: 'close to or slightly above QFM'}
+    locator: {pdf_page_index: 7, page: 8, published_page: 500}
+  - species: FeO
+    observation_id: wadh08_mars_herd_range
+    value: {range_as_published: '~2-3 log units in oxygen fugacity'}
+    locator: {pdf_page_index: 7, page: 8, published_page: 500}
+  - species: FeO
+    observation_id: wadh08_mars_goodrich_range
+    value: {low_end_as_published: 'slightly below IW (or ~QFM–3.8 for SaU 005 and Dhofar 019)', high_end_as_published: '~IW+2 (or ~QFM–1.7 for NWA 1110)'}
+    locator: {pdf_page_index: 9, page: 10, published_page: 502}
+  - species: FeO
+    observation_id: wadh08_mars_herd_fe_ti_range
+    value: {low_end_as_published: '~IW+0.5 (or ~QFM–3 for QUE 94201)', high_end_as_published: '~IW+2.5 (or ~QFM-1 for Shergotty)'}
+    locator: {pdf_page_index: 9, page: 10, published_page: 502}
+  - species: FeO
+    observation_id: wadh08_mars_shearer_karner_range
+    value: {range_as_published: '~IW to IW+1', QUE_94201_Cr_as_published: '~IW', QUE_94201_V_as_published: '~IW+1'}
+    locator: {pdf_page_index: 9, page: 10, published_page: 502}
+  - species: FeO
+    observation_id: wadh08_nakhlite_chassignite_redox
+    value: {estimate_as_published: 'close to the QFM buffer'}
+    locator: {pdf_page_index: 10, page: 11, published_page: 503}
+  - species: FeO
+    observation_id: wadh08_alh84001_redox
+    value: {estimate_as_published: 'close to IW'}
+    locator: {pdf_page_index: 10, page: 11, published_page: 503}
+  - species: FeO
+    observation_id: wadh08_mars_summary_depleted_mantle
+    value: {estimate_as_published: 'close to or slightly below IW'}
+    locator: {pdf_page_index: 12, page: 13, published_page: 505}
+  - species: FeO
+    observation_id: wadh08_mars_summary_nakhlite_chassignite
+    value: {estimate_as_published: '~3-4 log units above IW'}
+    locator: {pdf_page_index: 12, page: 13, published_page: 505}
+  - species: FeO
+    observation_id: wadh08_fig3_shergottite_comparisons
+    value:
+      axes: 'x = Fe-Ti oxide and olivine-pyroxene-spinel equilibria; y = Eu/Gd augite oxybarometer'
+      plotted_points_read_to_about_0_1_log_unit:
+        - {sample: Shergotty, x: '-1.2', y: '-1.6'}
+        - {sample: Zagami, x: '-1.2', y: '-3.1'}
+        - {sample: Los Angeles, x: '-1.4', y: '-3.3'}
+        - {sample: EETA 79001A, x: '-1.7', y: '-3.2'}
+        - {sample: EETA 79001B, x: '-1.9', y: '-4.2'}
+        - {sample: DaG 476, x: '-2.3', y: '-4.1'}
+        - {sample: QUE 94201, x: '-3.0', y: '-4.5'}
+    locator: {pdf_page_index: 8, page: 9, published_page: 501, figure: '3'}
+  - species: FeO
+    observation_id: wadh08_fig4_angrite_augite_comparison
+    value:
+      axes: 'x = Eu/Sm pigeonite oxybarometer; y = angrite augite oxybarometer'
+      plotted_points_read_to_about_0_1_log_unit:
+        - {sample: QUE 94201, x: '-0.6', y: '-1.0'}
+        - {sample: Zagami, x: '0.2', y: '0.5'}
+        - {sample: EETA 79001B, x: '0.4', y: '-0.7'}
+        - {sample: EETA 79001A, x: '1.1', y: '0.3'}
+        - {sample: Shergotty, x: '1.9', y: '2.0'}
+    locator: {pdf_page_index: 9, page: 10, published_page: 502, figure: '4A'}
+  - species: FeO
+    observation_id: wadh08_fig4_shergottite_augite_comparison
+    value:
+      axes: 'x = Eu/Sm pigeonite oxybarometer; y = shergottite augite oxybarometer'
+      plotted_points_read_to_about_0_1_log_unit:
+        - {sample: QUE 94201, x: '-0.5', y: '-1.5'}
+        - {sample: Zagami, x: '0.3', y: '0.8'}
+        - {sample: EETA 79001B, x: '0.3', y: '-0.7'}
+        - {sample: EETA 79001A, x: '1.2', y: '0.7'}
+        - {sample: Shergotty, x: '1.9', y: '2.6'}
+    locator: {pdf_page_index: 9, page: 10, published_page: 502, figure: '4B'}
+  - species: FeO
+    observation_id: wadh08_fig6_small_bodies_band
+    value: {band_read_from_axis: ['-5', '+1'], eucrite_label: '~IW–1'}
+    locator: {pdf_page_index: 13, page: 14, published_page: 506, figure: '6'}
+  - species: FeO
+    observation_id: wadh08_fig6_moon_band
+    value: {band_read_from_axis: ['-2', 'slightly above 0'], lunar_mantle_label: '~IW–1'}
+    locator: {pdf_page_index: 13, page: 14, published_page: 506, figure: '6'}
+  - species: FeO
+    observation_id: wadh08_fig6_mars_band
+    value: {band_read_from_axis: ['slightly below -1', '+4'], groups_shown: 'depleted shergottites, enriched shergottites, nakhlites'}
+    locator: {pdf_page_index: 13, page: 14, published_page: 506, figure: '6'}
+species:
+  FeO:
+    observations:
+      - observation_id: wadh08_ureilite_fo2_temperatures
+        regime: review_compilation
+        type: partial_pressure
+        locator: {pdf_page_index: 3, page: 4, published_page: 496}
+        units: fO2 as published; pressure unit not stated
+        values:
+          method_class: review_compilation
+          quantity: fugacity
+          cited_primary: Berkley and Jones (1982)
+          attribution: 'Berkley and Jones (1982) report approximately ~10−18 at 1200 K and ~10−12 at 1600 K.'
+          points:
+            - temperature_K: '1200'
+              fugacity: '1e-18'
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: '1200'}
+                  locator: {pdf_page_index: 3, page: 4, published_page: 496, note: 1200 K}
+            - temperature_K: '1600'
+              fugacity: '1e-12'
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: '1600'}
+                  locator: {pdf_page_index: 3, page: 4, published_page: 496, note: 1600 K}
+    context:
+      - observation_id: wadh08_enstatite_chondrite_redox
+        type: compiled_redox_estimate
+        locator: {pdf_page_index: 1, page: 2, published_page: 494}
+        units: log10 fO2 relative to IW
+        values: {estimate_as_published: '~5 log units below IW (or IW-5)'}
+        context: 'method_class: compiled; body/sample: enstatite chondrites; oxybarometer: distribution of Fe among minerals as a record of formation or high-temperature equilibration fO2; original reference cited for ordering chondrite classes: "Rubin et al. (1998)". The summary sentence does not give a more specific source for this estimate.'
+      - observation_id: wadh08_solar_nebula_redox
+        type: compiled_redox_estimate
+        locator: {pdf_page_index: 1, page: 2, published_page: 494}
+        units: log10 fO2 relative to IW
+        values: {estimate_as_published: '~5 orders of magnitude below the IW buffer'}
+        context: 'method_class: compiled; body/sample: canonical solar-nebula bulk-composition precursor materials for chondritic meteorites; oxybarometer: oxygen fugacity estimated for solar bulk composition; original references: "Rubin et al. (1988); Jurewicz et al. (1995a)".'
+      - observation_id: wadh08_nebula_interaction_redox
+        type: compiled_redox_estimate
+        locator: {pdf_page_index: 1, page: 2, published_page: 494}
+        units: log10 fO2 relative to IW
+        values: {estimate_as_published: 'close to IW'}
+        context: 'method_class: compiled; body/sample: meteorite-forming regions of the nebula after interaction with a more oxidizing environment; oxybarometer: not named; original reference: "Ebel and Grossman (2000)".'
+      - observation_id: wadh08_carbonaceous_chondrite_redox
+        type: compiled_redox_estimate
+        locator: {pdf_page_index: 1, page: 2, published_page: 494}
+        units: log10 fO2 relative to IW
+        values: {estimate_as_published: '~1-3 log units above the IW buffer'}
+        context: 'method_class: compiled; body/sample: carbonaceous chondrites; oxybarometer: distribution of Fe among minerals as a record of formation or high-temperature equilibration fO2; original reference cited for ordering chondrite classes: "Rubin et al. (1998)". The summary sentence does not give a more specific source for this estimate.'
+      - observation_id: wadh08_winonaite_iab_redox
+        type: compiled_redox_estimate
+        locator: {pdf_page_index: 2, page: 3, published_page: 495}
+        units: log10 fO2 relative to IW
+        values: {estimate_as_published: '~2-3 log units below IW'}
+        context: 'method_class: compiled; body/sample: winonaite (Winona) and several IAB silicate inclusions; oxybarometer: olivine-orthopyroxene-chromite assemblages; original reference: "Benedix et al. (2005)".'
+      - observation_id: wadh08_acapulcoite_redox
+        type: compiled_redox_estimate
+        locator: {pdf_page_index: 2, page: 3, published_page: 495}
+        units: log10 fO2 relative to IW
+        values: {estimate_as_published: '~IW-2'}
+        context: 'method_class: compiled; body/sample: acapulcoites; oxybarometer: olivine-orthopyroxene-chromite assemblages (similar methodology, as stated); original reference: "Benedix and Lauretta (2006)".'
+      - observation_id: wadh08_angra_dos_reis_redox
+        type: compiled_redox_estimate
+        locator: {pdf_page_index: 3, page: 4, published_page: 496}
+        units: log10 fO2 relative to IW
+        values: {estimate_as_published: 'between IW and ~IW+2'}
+        context: 'method_class: compiled; body/sample: Angra dos Reis angrite; oxybarometer: intrinsic oxygen fugacity measured by solid-electrolyte oxygen cell; original reference: "Brett et al. (1977)"; temperature-dependent trend is reported in prose without tabulated coordinates.'
+      - observation_id: wadh08_dorbigny_sahara_redox
+        type: compiled_redox_estimate
+        locator: {pdf_page_index: 3, page: 4, published_page: 496}
+        units: log10 fO2 relative to IW
+        values: {estimate_as_published: '~IW+1'}
+        context: 'method_class: compiled; body/sample: D’Orbigny and Sahara 99555 angrites; oxybarometer: composition of partial melts of CV chondrites; original reference: "Jurewicz et al. (1993, 2004)".'
+      - observation_id: wadh08_lew86010_redox
+        type: compiled_redox_estimate
+        locator: {pdf_page_index: 3, page: 4, published_page: 496}
+        units: log10 fO2 relative to IW
+        values: {estimate_as_published: '~IW+1'}
+        context: 'method_class: compiled; body/sample: LEW 86010 angrite; oxybarometer: Eu partitioning between angritic pyroxenes and plagioclase; original reference: "McKay et al. (1994)".'
+      - observation_id: wadh08_angrite_group_redox
+        type: compiled_redox_estimate
+        locator: {pdf_page_index: 3, page: 4, published_page: 496}
+        units: log10 fO2 relative to IW
+        values: {estimate_as_published: '~IW to ~IW+1'}
+        context: 'method_class: compiled; body/sample: LEW 86010, LEW 87051, Asuka 881371, D’Orbigny, and Sahara 99555 angrites; oxybarometer: Eu/ Gd partitioning between plagioclase and pyroxene; original reference: "Floss et al. (2003)".'
+      - observation_id: wadh08_eucrite_stolper_redox
+        type: compiled_redox_estimate
+        locator: {pdf_page_index: 3, page: 4, published_page: 496}
+        units: log10 fO2 relative to IW
+        values: {estimate_as_published: 'close to IW; approximately IW–1'}
+        context: 'method_class: compiled; body/sample: basaltic eucrites; oxybarometer: multiple saturation of pigeonite, plagioclase, olivine, metal, and spinel in melting experiments; original reference: "Stolper (1977)".'
+      - observation_id: wadh08_eucrite_jurewicz_redox
+        type: compiled_redox_estimate
+        locator: {pdf_page_index: 3, page: 4, published_page: 496}
+        units: log10 fO2 relative to IW
+        values: {estimate_as_published: 'IW–1'}
+        context: 'method_class: compiled; body/sample: low-temperature partial melts of CM chondrite, used in comparison with basaltic eucrite composition; oxybarometer: starting-composition-dependent experimental partial-melting comparison; original reference: "Jurewicz et al. (1993, 1995b)".'
+      - observation_id: wadh08_lunar_nash_hausel_redox
+        type: compiled_redox_estimate
+        locator: {pdf_page_index: 4, page: 5, published_page: 497}
+        units: log10 fO2 relative to IW
+        values: {estimate_as_published: 'IW–1 to IW–2, T-dependent'}
+        context: 'method_class: compiled; body/sample: lunar magmas; oxybarometer: theoretical calculations based on mineral equilibria relevant to lunar basalts; original reference: "Nash and Hausel (1973)".'
+      - observation_id: wadh08_lunar_steele_glasses_redox
+        type: compiled_redox_estimate
+        locator: {pdf_page_index: 4, page: 5, published_page: 497}
+        units: log10 fO2 relative to IW
+        values: {estimate_as_published: '~IW–2'}
+        context: 'method_class: compiled; body/sample: Apollo 15 green glasses; oxybarometer: Ni and Co partitioning between lunar magmas and mantle phases; original reference: "Steele et al. (1992)".'
+      - observation_id: wadh08_lunar_oxide_mineral_redox
+        type: compiled_redox_estimate
+        locator: {pdf_page_index: 4, page: 5, published_page: 497}
+        units: log10 fO2 relative to IW
+        values: {subsolidus_as_published: 'close to IW', magmatic_estimate_as_published: '~IW–1'}
+        context: 'method_class: compiled; body/sample: lunar basalts; oxybarometer: oxide-metal mineral assemblages at subsolidus conditions; magmatic estimate extrapolates the ulvöspinel breakdown (Ulvöspinel-Ilmenite-Iron) buffer curve to liquidus temperatures; original references: "Haggerty and Meyer (1970); El Goresy (1976)".'
+      - observation_id: wadh08_lunar_sato_measurements
+        type: compiled_redox_estimate
+        locator: {pdf_page_index: 4, page: 5, published_page: 497}
+        units: log10 fO2 relative to IW
+        values: {estimate_as_published: 'IW+0.2 to IW–1'}
+        context: 'method_class: compiled; body/sample: Apollo 12 and 15 basalts and Apollo 17 orange glasses; oxybarometer: intrinsic fO2 measured as a function of temperature by solid-electrolyte oxygen cell; original references: "Sato et al. (1973); Sato (1976, 1979)". The review reports its temperature interval as 900-1200° C.'
+      - observation_id: wadh08_lunar_fogel_jones
+        type: compiled_redox_estimate
+        locator: {pdf_page_index: 4, page: 5, published_page: 497}
+        units: log10 fO2 relative to IW
+        values: {Fogel_Rutherford_upper_bound: '≤IW–0.5', Jones_estimate: 'close to IW–1'}
+        context: 'method_class: compiled; body/sample: Apollo 15 green and yellow glasses (Fogel and Rutherford) and lunar basalts (Jones); oxybarometers: dissolved-carbon FTIR detection limit and FeO contents interpreted with partial-melting experiments; original references: "Fogel and Rutherford (1995); Jones (2004); Stolper (1977)".'
+      - observation_id: wadh08_lunar_karner_glasses
+        type: compiled_redox_estimate
+        locator: {pdf_page_index: 4, page: 5, published_page: 497}
+        units: log10 fO2 relative to IW
+        values: {orange_glasses: '~IW–2', very_low_Ti_glasses: '~IW–1', yellow_green_average: '~IW–1.7'}
+        context: 'method_class: compiled; body/sample: Apollo 15 and 17 pyroclastic glasses; oxybarometer: vanadium valence measured by synchrotron X-ray absorption near-edge structure (XANES); original reference: "Karner et al. (2006)".'
+      - observation_id: wadh08_lunar_figure1_range
+        type: compiled_redox_estimate
+        locator: {pdf_page_index: 5, page: 6, published_page: 498, figure: '1'}
+        units: log10 fO2 relative to IW
+        values: {range_as_published: 'spanning ~2 log units, from ~IW to ~IW–2'}
+        context: 'method_class: compiled; body/sample: lunar basalts and glasses; oxybarometer: multiple estimates summarized in Figure 1; original references: sources cited for each approach in the lunar section. This is the review’s prose description of the figure band, not a digitized point series.'
+      - observation_id: wadh08_lunar_magma_best_estimate
+        type: compiled_redox_estimate
+        locator: {pdf_page_index: 5, page: 6, published_page: 498}
+        units: log10 fO2 relative to IW
+        values: {estimate_as_published: '~IW–1'}
+        context: 'method_class: compiled synthesis; body/sample: lunar magmas; oxybarometer: synthesis of mineral equilibria, oxygen-cell measurements, glass chemistry, and partitioning estimates discussed above; original references: "Nash and Hausel (1973); Sato et al. (1973); Sato (1976, 1979); Karner et al. (2006)".'
+      - observation_id: wadh08_lunar_mantle_summary
+        type: compiled_redox_estimate
+        locator: {pdf_page_index: 12, page: 13, published_page: 505}
+        units: log10 fO2 relative to IW
+        values: {estimate_as_published: '~IW–1'}
+        context: 'method_class: compiled synthesis; body/sample: lunar mantle; oxybarometer: inferred from oxygen fugacities of lunar basalts and glasses; original references: "Delano (1990); Jones (2004)".'
+      - observation_id: wadh08_mars_wadhwa_shergotty_que
+        type: compiled_redox_estimate
+        locator: {pdf_page_index: 6, page: 7, published_page: 499}
+        units: log10 fO2 relative to named buffer
+        values: {Shergotty_relative_to_QFM: '~1 log unit below QFM', QUE_94201_relative_to_IW: '~1 log unit below IW'}
+        context: 'method_class: compiled; body/sample: basaltic shergottites Shergotty and QUE 94201, respectively; oxybarometer: Eu/Gd augite partitioning calibrated for angrite compositions; original reference: "Wadhwa (2001)"; the chapter describes the remaining basaltic shergottites as intermediate without individual printed values.'
+      - observation_id: wadh08_mars_enriched_source
+        type: compiled_redox_estimate
+        locator: {pdf_page_index: 7, page: 8, published_page: 500}
+        units: log10 fO2 relative to QFM
+        values: {estimate_as_published: 'close to or slightly above QFM'}
+        context: 'method_class: compiled; body/sample: enriched component mixed with depleted mantle partial melts in basaltic shergottites, interpreted as most likely martian crust; oxybarometer: Eu/Gd augite partitioning correlated with initial Nd and Sr isotopic ratios; original reference: "Wadhwa (2001)".'
+      - observation_id: wadh08_mars_herd_range
+        type: compiled_redox_estimate
+        locator: {pdf_page_index: 7, page: 8, published_page: 500}
+        units: log10 fO2
+        values: {range_as_published: '~2-3 log units in oxygen fugacity'}
+        context: 'method_class: compiled; body/sample: basaltic shergottites; oxybarometer: Fe-Ti oxide mineral equilibria; original references: "Herd et al. (2001, 2002)".'
+      - observation_id: wadh08_mars_goodrich_range
+        type: compiled_redox_estimate
+        locator: {pdf_page_index: 9, page: 10, published_page: 502}
+        units: log10 fO2 relative to named buffer
+        values: {low_end_as_published: 'slightly below IW (or ~QFM–3.8 for SaU 005 and Dhofar 019)', high_end_as_published: '~IW+2 (or ~QFM–1.7 for NWA 1110)'}
+        context: 'method_class: compiled; body/sample: olivine-phyric shergottites SaU 005, Dhofar 019, and NWA 1110; oxybarometer: olivine-pyroxene-spinel assemblage equilibrated at near-magmatic temperatures; original reference: "Goodrich et al. (2003)".'
+      - observation_id: wadh08_mars_herd_fe_ti_range
+        type: compiled_redox_estimate
+        locator: {pdf_page_index: 9, page: 10, published_page: 502}
+        units: log10 fO2 relative to named buffer
+        values: {low_end_as_published: '~IW+0.5 (or ~QFM–3 for QUE 94201)', high_end_as_published: '~IW+2.5 (or ~QFM-1 for Shergotty)'}
+        context: 'method_class: compiled; body/sample: basaltic shergottites; oxybarometer: Fe-Ti oxide equilibria; original references: "Herd et al. (2001, 2002)".'
+      - observation_id: wadh08_mars_shearer_karner_range
+        type: compiled_redox_estimate
+        locator: {pdf_page_index: 9, page: 10, published_page: 502}
+        units: log10 fO2 relative to IW
+        values: {range_as_published: '~IW to IW+1', QUE_94201_Cr_as_published: '~IW', QUE_94201_V_as_published: '~IW+1'}
+        context: 'method_class: compiled; body/sample: shergottites Y 980459 and QUE 94201; oxybarometers: mineral-melt partitioning of V and Cr; original references: "Shearer et al. (2006b); Karner et al. (2007)". The chapter states application uncertainties of at least one log unit.'
+      - observation_id: wadh08_nakhlite_chassignite_redox
+        type: compiled_redox_estimate
+        locator: {pdf_page_index: 10, page: 11, published_page: 503}
+        units: log10 fO2 relative to QFM
+        values: {estimate_as_published: 'close to the QFM buffer'}
+        context: 'method_class: compiled; body/sample: nakhlites and Chassigny; oxybarometers: Fe-Ti oxide and chromite compositions, plus Eu partitioning in augite compared with experiments on analogous nakhlite parent melts; original references: "Oe et al. (2002); Wadhwa et al. (2004)".'
+      - observation_id: wadh08_alh84001_redox
+        type: compiled_redox_estimate
+        locator: {pdf_page_index: 10, page: 11, published_page: 503}
+        units: log10 fO2 relative to IW
+        values: {estimate_as_published: 'close to IW'}
+        context: 'method_class: compiled; body/sample: ALH 84001 orthopyroxenite; oxybarometer: Eu partitioning in orthopyroxene; original reference: "Wadhwa and Borg (2006)". The review says uncertainties may be large because the oxybarometer is not calibrated for orthopyroxene.'
+      - observation_id: wadh08_mars_summary_depleted_mantle
+        type: compiled_redox_estimate
+        locator: {pdf_page_index: 12, page: 13, published_page: 505}
+        units: log10 fO2 relative to IW
+        values: {estimate_as_published: 'close to or slightly below IW'}
+        context: 'method_class: compiled synthesis; body/sample: depleted martian mantle, including sources of ALH 84001 and QUE 94201; oxybarometer: compilation of SNC meteorite redox evidence; original references cited in the synthesis: "Wadhwa (2001); Herd et al. (2002); Wadhwa and Borg (2006)".'
+      - observation_id: wadh08_mars_summary_nakhlite_chassignite
+        type: compiled_redox_estimate
+        locator: {pdf_page_index: 12, page: 13, published_page: 505}
+        units: log10 fO2 relative to IW
+        values: {estimate_as_published: '~3-4 log units above IW'}
+        context: 'method_class: compiled synthesis; body/sample: cumulate nakhlites and chassignites; oxybarometer: compilation of mineral and Eu-partitioning evidence; original reference cited in the synthesis: "Wadhwa et al. (2004)".'
+      - observation_id: wadh08_fig3_shergottite_comparisons
+        type: figure_only_redox_estimates
+        locator: {pdf_page_index: 8, page: 9, published_page: 501, figure: '3'}
+        units: ΔQFM, log units
+        values:
+          axes: 'x = Fe-Ti oxide and olivine-pyroxene-spinel equilibria; y = Eu/Gd augite oxybarometer'
+          plotted_points_read_to_about_0_1_log_unit:
+            - {sample: Shergotty, x: '-1.2', y: '-1.6'}
+            - {sample: Zagami, x: '-1.2', y: '-3.1'}
+            - {sample: Los Angeles, x: '-1.4', y: '-3.3'}
+            - {sample: EETA 79001A, x: '-1.7', y: '-3.2'}
+            - {sample: EETA 79001B, x: '-1.9', y: '-4.2'}
+            - {sample: DaG 476, x: '-2.3', y: '-4.1'}
+            - {sample: QUE 94201, x: '-3.0', y: '-4.5'}
+        context: 'method_class: figure_only; body/sample: named basaltic shergottites; oxybarometers as labeled on axes; original references in caption: "Wadhwa (2001); Herd et al. (2002)". Values are visual point-center estimates only; plotted error-bar extents were not converted to numeric widths.'
+      - observation_id: wadh08_fig4_angrite_augite_comparison
+        type: figure_only_redox_estimates
+        locator: {pdf_page_index: 9, page: 10, published_page: 502, figure: '4A'}
+        units: ΔIW, log units
+        values:
+          axes: 'x = Eu/Sm pigeonite oxybarometer; y = angrite augite oxybarometer'
+          plotted_points_read_to_about_0_1_log_unit:
+            - {sample: QUE 94201, x: '-0.6', y: '-1.0'}
+            - {sample: Zagami, x: '0.2', y: '0.5'}
+            - {sample: EETA 79001B, x: '0.4', y: '-0.7'}
+            - {sample: EETA 79001A, x: '1.1', y: '0.3'}
+            - {sample: Shergotty, x: '1.9', y: '2.0'}
+        context: 'method_class: figure_only; body/sample: basaltic shergottites; original references in caption: "McCanta et al. (2004); McKay et al. (1994)". Values are visual point-center estimates only; plotted error-bar extents were not converted to numeric widths.'
+      - observation_id: wadh08_fig4_shergottite_augite_comparison
+        type: figure_only_redox_estimates
+        locator: {pdf_page_index: 9, page: 10, published_page: 502, figure: '4B'}
+        units: ΔIW, log units
+        values:
+          axes: 'x = Eu/Sm pigeonite oxybarometer; y = shergottite augite oxybarometer'
+          plotted_points_read_to_about_0_1_log_unit:
+            - {sample: QUE 94201, x: '-0.5', y: '-1.5'}
+            - {sample: Zagami, x: '0.3', y: '0.8'}
+            - {sample: EETA 79001B, x: '0.3', y: '-0.7'}
+            - {sample: EETA 79001A, x: '1.2', y: '0.7'}
+            - {sample: Shergotty, x: '1.9', y: '2.6'}
+        context: 'method_class: figure_only; body/sample: basaltic shergottites; original references in caption: "McCanta et al. (2004); Musselwhite and Jones (2002)". Values are visual point-center estimates only; plotted error-bar extents were not converted to numeric widths.'
+      - observation_id: wadh08_fig6_small_bodies_band
+        type: figure_only_redox_range
+        locator: {pdf_page_index: 13, page: 14, published_page: 506, figure: '6'}
+        units: ΔIW, log units
+        values: {band_read_from_axis: ['-5', '+1'], eucrite_label: '~IW–1'}
+        context: 'method_class: figure_only; body/sample: differentiated meteorite parent bodies, including aubrite, eucrite, angrite; oxybarometer: review synthesis, not specified in figure; original references: no source-specific citation in Figure 6; the prose attributes the extremes and midpoint to the chapter synthesis.'
+      - observation_id: wadh08_fig6_moon_band
+        type: figure_only_redox_range
+        locator: {pdf_page_index: 13, page: 14, published_page: 506, figure: '6'}
+        units: ΔIW, log units
+        values: {band_read_from_axis: ['-2', 'slightly above 0'], lunar_mantle_label: '~IW–1'}
+        context: 'method_class: figure_only; body/sample: lunar samples and lunar mantle; oxybarometer: review synthesis, not specified in figure; original references: no source-specific citation in Figure 6; the prose cites primary estimates in the lunar section.'
+      - observation_id: wadh08_fig6_mars_band
+        type: figure_only_redox_range
+        locator: {pdf_page_index: 13, page: 14, published_page: 506, figure: '6'}
+        units: ΔIW, log units
+        values: {band_read_from_axis: ['slightly below -1', '+4'], groups_shown: 'depleted shergottites, enriched shergottites, nakhlites'}
+        context: 'method_class: figure_only; body/sample: SNC meteorites; oxybarometer: review synthesis, not specified in figure; original references: no source-specific citation in Figure 6; the prose cites primary estimates in the Mars section.'

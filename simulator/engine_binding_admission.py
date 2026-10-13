@@ -976,6 +976,7 @@ def _run_binding_probe(
                 temperature_C=float(simulator.melt.temperature_C),
                 pressure_bar=float(simulator.melt.p_total_mbar) / 1000.0,
                 fO2_log=kwargs.get("fO2_log"),
+                redox_state=kwargs.get("redox_state"),
                 fe_redox_policy=str(kwargs.get("fe_redox_policy", "intrinsic")),
                 control_inputs=kwargs.get("control_inputs", {}),
             )

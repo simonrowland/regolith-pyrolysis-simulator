@@ -1,23 +1,23 @@
 # Battery v2.1 migration report
 
-rows in: 48396
-records out (observations): 122810
-works: 299
-experiments: 3654
-queue size: 77786
+rows in: 48423
+records out (observations): 122850
+works: 303
+experiments: 3672
+queue size: 77822
 identical-payload dedupe aliases: 342
 metadata files: 44
-index sources: 297
+index sources: 301
 hard issues: 3383
 
 ## Spec vs measured
 
 | count | spec | measured |
 |---|---:|---:|
-| citations | 147 | 296 (mismatch) |
-| doi_works | 56 | 145 (mismatch) |
+| citations | 147 | 300 (mismatch) |
+| doi_works | 56 | 149 (mismatch) |
 | no_doi_works | 91 | 154 (mismatch) |
-| admission_statuses | 374 | 1496 (mismatch) |
+| admission_statuses | 374 | 1501 (mismatch) |
 | supersedes | 422 | 649 (mismatch) |
 | series | 60 | 604 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1635 (mismatch) |
@@ -25,11 +25,11 @@ hard issues: 3383
 | gibbs_reference_101325 | 594 | 594 |
 | formulas | 1625 | 2063 (mismatch) |
 | equipment_payloads | 670 | 955 (mismatch) |
-| absent_admissions | 3511 | 5281 (mismatch) |
+| absent_admissions | 3511 | 5303 (mismatch) |
 | absent_classes | 2174 | 2104 (mismatch) |
 | range_only_T | 3125 | 2561 (mismatch) |
 | system_like_phases | 1065 | 2630 (mismatch) |
-| missing_phases | 237 | 507 (mismatch) |
+| missing_phases | 237 | 508 (mismatch) |
 | tabulated_lists | — | 6 |
 
 ## Evidence-class fall-throughs
@@ -18029,6 +18029,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/jsc-a16-special-samples.yaml` | 3 | 18 | 27 |
 | `data/literature/extracts/jsc-lunar-catalog-12023.yaml` | 12 | 16 | 52 |
 | `data/literature/extracts/kang-2007-sio2-activity-cas-low-silica.yaml` | 66 | 66 | 110 |
+| `data/literature/extracts/kassis-frischat-1981-silicate-glass-vapour.yaml` | 4 | 16 | 10 |
 | `data/literature/extracts/kems-001-homma-1966.yaml` | 32 | 72 | 226 |
 | `data/literature/extracts/kems-002-ohno-1967.yaml` | 12 | 25 | 83 |
 | `data/literature/extracts/kems-003-pound-1972.yaml` | 18 | 18 | 65 |
@@ -18164,8 +18165,10 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/ntrs-19730008085.yaml` | 2 | 30 | 66 |
 | `data/literature/extracts/ntrs-20250004626.yaml` | 5 | 15 | 36 |
 | `data/literature/extracts/ohta-1996-cao-mgo-al2o3-activities.yaml` | 11 | 20 | 36 |
+| `data/literature/extracts/ohta-suito-1995-mno-activity-slags.yaml` | 19 | 19 | 19 |
 | `data/literature/extracts/okazaki-2022-ryugu-gas-treasure-box.yaml` | 13 | 13 | 57 |
 | `data/literature/extracts/oneill-2002-feo-activity-coefficients-cmas.yaml` | 5 | 91 | 91 |
+| `data/literature/extracts/oneill-2005-alkali-oxide-activities.yaml` | 3 | 3 | 3 |
 | `data/literature/extracts/pahlevan-2026-protolunar-volatile-outflows.yaml` | 8 | 51 | 16 |
 | `data/literature/extracts/pending-as2o3-second-primary.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/pending-bi2o3-kems.yaml` | 1 | 1 | 5 |
@@ -18255,6 +18258,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/vanbuchem-2023-lavatmos.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/vanbuchem-2025-lavatmos2.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/visscher-fegley-2013-debris-disks.yaml` | 13 | 13 | 59 |
+| `data/literature/extracts/wadhwa-2008-redox-small-bodies.yaml` | 1 | 2 | 4 |
 | `data/literature/extracts/wetzel-gail-2013-sio-arrhenius.yaml` | 1 | 1 | 6 |
 | `data/literature/extracts/wilkerson-2021-jsc1a-tga-ms-poster.yaml` | 17 | 17 | 69 |
 | `data/literature/extracts/wilkerson-2023-jsc1a-outgassing.yaml` | 15 | 15 | 64 |
@@ -18335,8 +18339,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 219420
+advisory issues: 219439
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 219420 |
+| `identity_incomplete` | 219439 |

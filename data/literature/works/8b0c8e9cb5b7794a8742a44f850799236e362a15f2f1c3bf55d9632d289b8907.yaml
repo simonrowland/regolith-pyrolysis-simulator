@@ -35,17 +35,41 @@ work:
         tag: unknown
         reason: INDEX does not give an unmatched-layer asset
 experiments:
-- experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::ewing-1963-sodium-potassium-properties
+- experiment_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907::experiment::na-sodium-vapor-pressure
   kind: literature
   method:
-    tag: unknown
-    reason: source does not state method
-  sample: {}
+    tag: value
+    value: static_equilibrium
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: elemental
+          components:
+          - - Na
+            - '1'
+          amount_basis: mole_fraction
+      locator:
+        page: 11
+        published_page: 6
+        pdf_page_index: 10
+        section: Pressure-Volume-Temperature
+        note: The report states, "Distilled sodium was introduced into small, tared, closed-end tubes of the columbium alloy."
+    form:
+      state:
+        tag: value
+        value: liquid sodium
+      locator:
+        page: 12
+        published_page: 7
+        pdf_page_index: 11
+        figure: '6'
   conditions:
     temperature_K:
       state:
         tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+        reason: experiment temperature not published
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -64,10 +88,14 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907
   locator:
-    page: 12
-    published_page: 7
-    pdf_page_index: 11
-    figure: '6'
+    page: 7
+    published_page: 2
+    pdf_page_index: 6
+    section: Pressure-Volume-Temperature
+    note: The source states, "The position of the diaphragm is monitored with an electrical continuity circuit and controlled
+      by balancing the internal and external pressures" and "A measurement of the vapor pressure of the alkali metal is then
+      made externally with calibrated Bourdon-tube gages." Figure 6 combines five null-point experiments; its individual points
+      are not assigned to runs.
 context:
 - observation_id: ewing_1963_k_properties_not_yet_measured
   type: method
