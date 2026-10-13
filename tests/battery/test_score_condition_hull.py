@@ -222,8 +222,8 @@ def test_pin_headline_statistics_unchanged_by_hull() -> None:
     thermochemistry = compilation["decision_strata"][0]
     assert compilation["match_rate_label"] == "band membership"
     assert thermochemistry["band_value"] == []
-    assert thermochemistry["band_derived_n"] == 2
-    assert thermochemistry["no_band_reason"] == "derived_band_insufficient_n"
+    assert thermochemistry["band_derived_n"] is None
+    assert thermochemistry["no_band_reason"] is None
     assert hashlib.sha256(blob.encode("utf-8")).hexdigest() == PIN_SUMMARY_SHA256
 
 
@@ -235,6 +235,8 @@ def test_pin_measured_headline_table_unchanged_by_hull() -> None:
 
 
 # Values recorded on origin/work-v064-green e702b2551 before the hull change.
+# Summary digest re-pinned for offer-7 P2: no-band reason and derived source
+# count now come only from the source-band owner, never residual-row counts.
 # PIN_RECORD_KEYS and PIN_SUMMARY_SHA256 re-recorded on
 # review/empirical-ror-batch2 c9fd86c9c (still before the hull): its b-693
 # dual headline puts the all_numeric records first in summary["records"].
@@ -246,7 +248,7 @@ PIN_RECORD_KEYS = [
     "n_inside_band", "n_no_band", "n_score_eligible", "rail", "rms_dex",
     "sources", "tier",
 ]
-PIN_SUMMARY_SHA256 = "62b895c1ddcd1aedb1face2fc92bd3ee5a52a3ceb6dfae05f7a7d838755de446"
+PIN_SUMMARY_SHA256 = "30345d844ade8f69a341c7b7f99ca2400ca340244cf4c39a9ff96aef9f625588"
 PIN_HEADLINE_LINES = (
     "| melt_activity | internal-analytical | 4 | 1 | 3 | 3 | 2 | "
     "0.3162277660168379331998893544 | 0.10 | 0.20 | 0.3 | "

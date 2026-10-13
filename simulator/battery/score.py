@@ -276,8 +276,6 @@ DECISION_BAND_POLICY_VERSION = "q6-v1"
 DECISION_BAND_RATCHET_RELATIVE_PATH = Path("data/battery/decision-band-ratchet.yaml")
 # Minimum n for a descriptive residual bias/scatter ratio; it does not gate bands.
 MIN_RESIDUAL_SUMMARY_N = 10
-# Minimum derived-band sample size; smaller no-band groups retain their reason.
-MIN_DERIVED_BAND_N = 10
 _ALIGNMENT_AXES = (
     "subtype",
     "per",
@@ -1577,8 +1575,17 @@ def _fusion_comparison_reference(
                         reference.value.point,
                         source_observation=reference,
                     )
+                    if row_band.notice is not None:
+                        reference = replace(
+                            reference,
+                            notices=union_notices(
+                                reference.notices, (row_band.notice,)
+                            ),
+                        )
                     bound_exceeds_row_band = (
-                        None if row_band is None else bound_dex > row_band.value
+                        None
+                        if row_band.band is None
+                        else bound_dex > row_band.band.value
                     )
                     inference_detail = {
                         "oxide": formula,
@@ -1595,7 +1602,14 @@ def _fusion_comparison_reference(
                             "table": max_table,
                         },
                         "row_decision_band_dex": (
-                            None if row_band is None else str(row_band.value)
+                            None
+                            if row_band.band is None
+                            else str(row_band.band.value)
+                        ),
+                        "row_decision_band_refusal": (
+                            None
+                            if row_band.refusal is None
+                            else dict(row_band.refusal)
                         ),
                         "bound_exceeds_row_band": bound_exceeds_row_band,
                         "authority": Authority.CERTIFIED.value,
@@ -3051,7 +3065,10 @@ def _source_band_catalog(
     records: list[dict[str, object]] = []
     no_band_reasons: dict[str, str] = {}
     for key, by_source in sources.items():
-        if len(by_source) < 2 or any(len(row["values"]) != 1 for row in by_source.values()):
+        if len(by_source) < 2:
+            no_band_reasons[key] = "derived_band_insufficient_sources"
+            continue
+        if any(len(row["values"]) != 1 for row in by_source.values()):
             continue
         source_ids = sorted(by_source)
         source_values = [next(iter(by_source[source]["values"])) for source in source_ids]
@@ -7212,7 +7229,6 @@ def _compilation_decision_strata(
     )
 
     strata: dict[tuple[str, str, str, str], list[Residual]] = defaultdict(list)
-    derived_ns: dict[tuple[str, str, str], int] = defaultdict(int)
     for residual in residuals:
         if residual.numeric is None or residual.status is ResidualStatus.REFUSED or any(
             _is_flagged_stratum_notice(notice)
@@ -7234,8 +7250,6 @@ def _compilation_decision_strata(
         )
         engine = _engine_of(residual)
         key = (family, quantity.value, engine)
-        if residual.numeric.decision_band is None:
-            derived_ns[key] += 1
         strata[(*key, residual.source_relation.value)].append(residual)
 
     rendered = []
@@ -7251,11 +7265,10 @@ def _compilation_decision_strata(
             int(band.rule.rsplit("n_sources=", 1)[1].split(";", 1)[0])
             for band in bands if "n_sources=" in band.rule
         })
-        band_fields = _compilation_band_value_fields(
-            widths,
-            band_n,
-            unbanded_count=derived_ns[(family, quantity, engine)],
+        no_band_reasons = _owner_no_band_reasons(
+            notice for residual in bucket for notice in residual.notices
         )
+        band_fields = _compilation_band_value_fields(widths, band_n, no_band_reasons)
         rendered.append({
             "family": family,
             "quantity": quantity,
@@ -7283,22 +7296,37 @@ def _compilation_decision_strata(
 
 
 def _compilation_band_value_fields(
-    widths: Sequence[str], derived_n: Sequence[int], *, unbanded_count: int
+    widths: Sequence[str], derived_n: Sequence[int], no_band_reasons: Sequence[str]
 ) -> dict[str, object]:
     """Serialize compilation band values consistently across report paths."""
 
     recorded_n = list(derived_n)
-    if not recorded_n and not widths and unbanded_count:
-        recorded_n = [unbanded_count]
     return {
         "band_value": widths[0] if len(widths) == 1 else widths,
-        "band_derived_n": recorded_n[0] if len(recorded_n) == 1 else recorded_n,
+        "band_derived_n": (
+            recorded_n[0]
+            if len(recorded_n) == 1
+            else recorded_n or None
+        ),
         "no_band_reason": (
-            "derived_band_insufficient_n"
-            if not widths and 0 < unbanded_count < MIN_DERIVED_BAND_N
+            no_band_reasons[0]
+            if not widths and len(no_band_reasons) == 1
             else None
         ),
     }
+
+
+def _owner_no_band_reasons(
+    notices: Iterable[Notice | Mapping[str, object]],
+) -> tuple[str, ...]:
+    reasons = set()
+    for notice in notices:
+        kind = notice.kind.value if isinstance(notice, Notice) else notice.get("kind")
+        origin = notice.origin if isinstance(notice, Notice) else notice.get("origin")
+        reason = notice.reason if isinstance(notice, Notice) else notice.get("reason")
+        if kind == NoticeKind.FALLBACK.value and origin == "decision-band" and reason:
+            reasons.add(str(reason))
+    return tuple(sorted(reasons))
 
 
 def _headline_band_width(bucket: Sequence[Residual]) -> Decimal | None:
@@ -9695,7 +9723,6 @@ def headline_payload_records(
         )
 
         payload_groups: dict[tuple[str, str, str, str, str], dict[str, object]] = {}
-        derived_ns: dict[tuple[str, str, str], int] = defaultdict(int)
         for row in compilation_rows:
             reference = str(row.get("reference") or "")
             observation = compilation_row_observation(reference, observations, origins)
@@ -9721,8 +9748,6 @@ def headline_payload_records(
             flagged = bool(_flagged_payload_strata(row))
             if flagged:
                 continue
-            if band is None:
-                derived_ns[key] += 1
             rail = str(row.get("rail") or "")
             group = payload_groups.setdefault(
                 (*key, relation, rail),
@@ -9732,6 +9757,7 @@ def headline_payload_records(
                     "widths": set(),
                     "units": set(),
                     "band_derived_n": set(),
+                    "no_band_reasons": set(),
                     "match_count": 0,
                     "mismatch_count": 0,
                     "no_band_count": 0,
@@ -9746,6 +9772,9 @@ def headline_payload_records(
                 group["mismatch_count"] = int(group["mismatch_count"]) + 1
             elif status == ResidualStatus.NO_BAND.value:
                 group["no_band_count"] = int(group["no_band_count"]) + 1
+            group["no_band_reasons"].update(  # type: ignore[union-attr]
+                _owner_no_band_reasons(row.get("notices", ()))
+            )
             if band is None:
                 continue
             band_kind = _decision_band_kind(band)
@@ -9785,7 +9814,7 @@ def headline_payload_records(
                 band_fields = _compilation_band_value_fields(
                     widths,
                     derived_n,
-                    unbanded_count=derived_ns[(family, quantity, engine)],
+                    sorted(group["no_band_reasons"]),
                 )
                 strata.append({
                     "family": family, "quantity": quantity, "engine": engine, "relation": relation,
@@ -9886,7 +9915,6 @@ class _ScorePayloadAccumulator:
         self.compilation_groups: dict[
             tuple[str, str, str, str, str], dict[str, object]
         ] = {}
-        self.derived_ns: dict[tuple[str, str, str], int] = defaultdict(int)
         self.refusal_counts: dict[str, int] = defaultdict(int)
         self.admission_with = 0
         self.admission_alone = 0
@@ -10001,8 +10029,6 @@ class _ScorePayloadAccumulator:
         if flagged:
             return
         key = (family, quantity.value, engine)
-        if not isinstance(band_data, Mapping):
-            self.derived_ns[key] += 1
         relation = str(row.get("source_relation") or SourceRelation.UNKNOWN.value)
         rail = str(row.get("rail") or "")
         group_key = (*key, relation, rail)
@@ -10014,6 +10040,7 @@ class _ScorePayloadAccumulator:
                 "widths": set(),
                 "units": set(),
                 "band_derived_n": set(),
+                "no_band_reasons": set(),
                 "match_count": 0,
                 "mismatch_count": 0,
                 "no_band_count": 0,
@@ -10029,6 +10056,9 @@ class _ScorePayloadAccumulator:
             group["mismatch_count"] = int(group["mismatch_count"]) + 1
         elif status == ResidualStatus.NO_BAND.value:
             group["no_band_count"] = int(group["no_band_count"]) + 1
+        group["no_band_reasons"].update(  # type: ignore[union-attr]
+            _owner_no_band_reasons(row.get("notices", ()))
+        )
         if not isinstance(band_data, Mapping):
             return
         band_kind = _decision_band_kind(band_data)
@@ -10356,7 +10386,7 @@ class _ScorePayloadAccumulator:
                 band_fields = _compilation_band_value_fields(
                     widths,
                     derived_n,
-                    unbanded_count=self.derived_ns[(family, quantity, engine)],
+                    sorted(group["no_band_reasons"]),
                 )
                 strata.append(
                     {
