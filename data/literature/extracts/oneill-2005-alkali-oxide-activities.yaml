@@ -34,6 +34,15 @@ experiments:
         locator: {page: 2, published_page: 498, pdf_page_index: 1, figure: '1', note: 'Printed 118 hours; converted to seconds.'}
 fidelity_samples:
   - species: NaO0.5
+    observation_id: oneill_2005_fig1_sodium_exchange_figure_only
+    field: log_fO2
+    value:
+      value: '-12'
+      units: log10(bar)
+      quote: 'fO2 = 10^-12 bars'
+      locator: {page: 2, published_page: 498, pdf_page_index: 1, figure: '1'}
+    locator: {page: 2, published_page: 498, pdf_page_index: 1, figure: '1'}
+  - species: NaO0.5
     observation_id: oneill_2005_fig1_run_conditions_as_printed
     field: run_id_as_printed
     value: B26/3/02
@@ -133,6 +142,11 @@ species:
           method_class: figure_only
           admission_status: figure_only
           semantics: bound_not_point_ordering
+          log_fO2:
+            value: '-12'
+            units: log10(bar)
+            quote: 'fO2 = 10^-12 bars'
+            locator: {page: 2, published_page: 498, pdf_page_index: 1, figure: '1'}
           caption: >-
             FIGURE 1. Sodium exchange among compositions from a conventional
             wire-loop experiment (B26/3/02) on the join ADeu–Na2SiO3, run at 1400
