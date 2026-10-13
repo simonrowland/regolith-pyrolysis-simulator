@@ -94,6 +94,7 @@ from simulator.battery.migrate import (
     resolve_equipment_context,
     select_declared_source,
     to_plain,
+    observation_from_plain,
     work_id_for,
     write_outputs,
 
@@ -1263,6 +1264,40 @@ def test_to_plain_state_serialization_omits_absent_keys() -> None:
 
     assert unknown_bytes == b'{"reason":"not recorded","tag":"unknown"}'
     assert value_bytes == b'{"tag":"value","value":"fixture"}'
+
+
+@pytest.mark.parametrize(
+    ("value_payload", "expected_status"),
+    [
+        ({"kind": "point", "point": "0"}, AdmissionStatus.ADMITTED),
+        ({"kind": "series", "series": [["1", "0"]]}, AdmissionStatus.ADMITTED),
+        ({"kind": "bound", "bound_operator": "<", "bound_value": "0"}, AdmissionStatus.ADMITTED),
+        ({"kind": "interval", "interval_low": "0", "interval_high": "1"}, AdmissionStatus.ADMITTED),
+        ({"kind": "relative_series", "relative_series": [["1", "0"]], "relative_normalization": "initial"}, AdmissionStatus.ADMITTED),
+        ({"kind": "ordering", "ordering": ["a", "b"]}, AdmissionStatus.PENDING),
+        ({"kind": "categorical", "categorical": "present"}, AdmissionStatus.PENDING),
+        ({"kind": "expression", "expression_text": "x"}, AdmissionStatus.PENDING),
+        ({"kind": "unavailable", "unavailable_reason": "not reported"}, AdmissionStatus.PENDING),
+    ],
+)
+def test_numeric_value_kind_plain_admission_pin(
+    tmp_path: Path,
+    value_payload: dict[str, object],
+    expected_status: AdmissionStatus,
+) -> None:
+    observation = next(iter(migrate(_write_min_tree(tmp_path), write=False).observations.values()))
+    payload = to_plain(observation)
+    payload["value"] = value_payload
+    payload["admission"] = {"status": "pending"}
+
+    decoded = observation_from_plain(payload)
+
+    assert decoded.value.kind.value == value_payload["kind"]
+    assert to_plain(decoded)["value"] == {**value_payload, "approximate": False}
+    assert decoded.admission.status is expected_status
+    assert any(notice.kind is NoticeKind.ADMISSION_DEFAULTED for notice in decoded.notices) is (
+        expected_status is AdmissionStatus.ADMITTED
+    )
 
 
 def test_missing_admission_status_keeps_unmeasured_row_pending(tmp_path: Path) -> None:
