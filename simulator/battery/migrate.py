@@ -11766,6 +11766,14 @@ class Migrator:
         known: dict[str, Any] = {}
         provenance: list[str] = []
 
+        def has_pure_component_composition(state: State[Any] | None) -> bool:
+            return (
+                state is not None
+                and state.is_value
+                and isinstance(state.value, Composition)
+                and state.value.components == ((species_formula, Decimal("1")),)
+            )
+
         effective_method = (
             method
             if method is not None and method.is_value
@@ -11794,12 +11802,8 @@ class Migrator:
             )
             sample_phase = PHASE_MAP.get(form) if form is not None else None
             initial = sample.initial_composition
-            pure_sample = (
-                initial is not None
-                and initial.state.is_value
-                and isinstance(initial.state.value, Composition)
-                and initial.state.value.components
-                == ((species_formula, Decimal("1")),)
+            pure_sample = has_pure_component_composition(
+                initial.state if initial is not None else None
             )
             existing_reservoir = existing.get("reservoir")
             reservoir_can_fill = "reservoir" not in existing or (
@@ -11832,12 +11836,18 @@ class Migrator:
                     if isinstance(point_conditions, Mapping)
                     else None
                 )
-                starting_text = _extract_text(starting_composition).casefold()
-                if (
-                    (initial is None or initial.state.is_unknown)
-                    and gas_formula == species_formula
-                ):
-                    pure_sample = "purity" in starting_text
+                if starting_composition is not None:
+                    point_composition = _point_condition_from_plain(
+                        starting_composition, key="starting_composition"
+                    )
+                    if point_composition.state.is_unknown:
+                        pure_sample = False
+                    elif point_composition.state.is_value and isinstance(
+                        point_composition.state.value, Composition
+                    ):
+                        pure_sample = has_pure_component_composition(
+                            point_composition.state
+                        )
 
                 raw_phase = point_values.get("phase_as_published")
                 phase_options = (
