@@ -301,11 +301,10 @@ def test_captured_volatiles_include_condensation_train_account():
     result = classify_products(sim)
 
     assert result['captured_volatiles']['kg_by_species'] == {
-        'H2O': 1.0,
         'K': 4.0,
         'Na': 3.0,
     }
-    assert result['captured_volatiles']['class_total_kg'] == pytest.approx(8.0)
+    assert result['captured_volatiles']['class_total_kg'] == pytest.approx(7.0)
 
 
 def test_spent_reductant_residue_surfaces_as_process_inventory_bucket():

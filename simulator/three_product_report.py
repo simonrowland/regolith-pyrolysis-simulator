@@ -73,10 +73,9 @@ O2_PRODUCT_SPECIES: tuple[str, ...] = ('O2',)
 disproportionation by-product that motivates the whole refinery)."""
 
 CAPTURED_VOLATILE_ACCOUNTS: tuple[str, ...] = (
-    'terminal.offgas',
     'process.condensation_train',
 )
-"""Terminal volatile trap accounts that should surface as product output."""
+"""Captured volatile accounts; terminal escape is an offgas_vented loss."""
 
 PROCESS_INVENTORY_SPENT_REDUCTANT_ACCOUNTS: tuple[str, ...] = (
     SPENT_REDUCTANT_RESIDUE_ACCOUNT,

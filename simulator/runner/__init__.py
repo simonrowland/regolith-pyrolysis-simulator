@@ -2542,9 +2542,9 @@ def build_per_hour_summary(
         # ``process.reagent_inventory``. This includes C3 alkali shuttle and
         # C6 Mg recovery transfers; it does not write to the ledger.
         # For Na/K in the C2A_STAGED replay, the exact closure is
-        # ``gross = product + recycled - terminal.offgas`` because the product
-        # projection also includes that named non-train product account; the
-        # other product accounts are zero for these species on this route. The
+        # ``gross = product + recycled``: terminal.offgas is escaped loss,
+        # excluded from the product projection. The other product accounts
+        # are zero for these species on this route. The
         # identity is scoped to this C3 Na/K route, not C6 Mg or other routes.
         condensation_train_kg_cumulative = (
             queries.condensation_train_kg_cumulative()

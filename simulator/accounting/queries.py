@@ -62,7 +62,6 @@ FREE_ANALYZER_OXYGEN_ACCOUNTS = (
 )
 PLUME_PRODUCT_SIO2_SPECIES = "SiO2"
 PRODUCT_LEDGER_ACCOUNTS = (
-    "terminal.offgas",
     "terminal.stage0_salt_phase",
     "terminal.stage0_chloride_salt_phase",
     "terminal.stage0_sulfide_matte",
