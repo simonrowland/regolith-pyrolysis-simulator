@@ -49,9 +49,10 @@ def test_toggle_off_existing_path_keeps_mass_balance_closed():
     # 2026-10-13 b-850 round 2: parent-oxide alkali-dimer pressures no longer
     # leave the prior 1.994e-20 kg Na roundoff parcel. The remaining SiO2_gas
     # residual shifts from 9.409239450400745e-14 to 9.409239449650439e-14 kg.
-    expected_overhead: dict[str, float] = {
-        "SiO2_gas": 9.409239449650439e-14,
-    }
+    # 2026-10-13 t-1236: the hour-18 overhead_bleed debit now keeps its
+    # 1.5660402193050345e-12 mol SiO2_gas (9.409239449650439e-14 kg) mol-lot
+    # entry, so it consumes the residual that the old lot materialization lost.
+    expected_overhead: dict[str, float] = {}
     assert sim.atom_ledger.kg_by_account("process.overhead_gas") == pytest.approx(
         expected_overhead,
         rel=1.0e-12,
