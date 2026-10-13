@@ -82,6 +82,7 @@ from simulator.melt_backend.liquidus import (
     build_equilibrium_crystallization_path,
     liquidus_sample_error_from_exception,
 )
+from simulator.melt_regime import MeltRegime, liquid_fraction_invalidity, melt_regime
 
 
 # Intent set: AlphaMELTS-owned silicate diagnostic intents. MAGEMin shadows
@@ -841,15 +842,11 @@ class AlphaMELTSProvider(ChemistryProvider):
                 getattr(result, 'liquid_composition_wt_pct', {}) or {}
             )
             raw_liquid_fraction = getattr(result, 'liquid_fraction', None)
-            if not _is_finite(raw_liquid_fraction):
+            if liquid_fraction_invalidity(raw_liquid_fraction) is not None:
                 raise LiquidFractionInvalidError(
                     f'liquid_fraction_invalid: {raw_liquid_fraction!r}'
                 )
             liquid_fraction = float(raw_liquid_fraction)
-            if liquid_fraction < 0.0 or liquid_fraction > 1.0:
-                raise LiquidFractionInvalidError(
-                    f'liquid_fraction_invalid: {raw_liquid_fraction!r}'
-                )
             # Autoreview r7 P2 (2026-05-27): the EC path samples the
             # solidus-to-liquidus grid INCLUDING endpoints.  Post r4
             # ThermoEngine fix (the bulk_wt fabrication for subsolidus
@@ -865,7 +862,14 @@ class AlphaMELTSProvider(ChemistryProvider):
             # reports residual liquid; zero-liquid endpoints pass
             # through with an empty composition dict and the
             # downstream path-builder handles them.
-            if not composition and liquid_fraction > 0.0:
+            if (
+                not composition
+                and melt_regime(
+                    liquid_fraction=liquid_fraction,
+                    epsilon=0.0,
+                )
+                != MeltRegime.FROZEN
+            ):
                 message = (
                     'AlphaMELTS EC sample lacks residual liquid '
                     f'composition despite liquid_fraction={liquid_fraction!r}'

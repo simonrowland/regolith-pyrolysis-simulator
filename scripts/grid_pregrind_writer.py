@@ -25,7 +25,7 @@ import yaml
 from simulator.accounting.formulas import load_species_formulas
 from simulator.config import ENGINE_MODEL_UNAVAILABLE, resolve_grid_engine_model
 from simulator.fidelity_vocabulary import EvidenceClass
-from simulator.melt_regime import MeltRegime
+from simulator.melt_regime import MeltRegime, melt_regime
 from simulator.yaml_cache import load_cached_safe_yaml
 
 
@@ -3250,7 +3250,10 @@ class GridCacheWriter:
         liquid_fraction = float(generic.get("liquid_fraction") or 0.0)
         pressures = dict(generic.get("vapor_pressures_Pa") or {})
         sources = dict(generic.get("vapor_pressures_source") or {})
-        if liquid_fraction > 0.0 and (
+        if melt_regime(
+            liquid_fraction=liquid_fraction,
+            epsilon=0.0,
+        ) != MeltRegime.FROZEN and (
             not pressures or set(pressures) != set(sources)
         ):
             raise ValueError(
