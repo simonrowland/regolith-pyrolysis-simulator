@@ -4831,22 +4831,47 @@ def test_gate_capture_rejects_foreign_origin_with_valid_consumer_receipt(
         identity,
         provenance,
     )
-    admission_module.publish_live_backend_admission(sim.backend)
+    from simulator.chemistry.kernel import ProviderRegistry
+    from tests.binding_admission_fixtures import (
+        register_synthetic_gate_curve_producer,
+    )
+
+    sim._chem_registry = ProviderRegistry()
+    register_synthetic_gate_curve_producer(sim)
     curve = {
-        'source': 'gate_liquid_fraction:authoritative:test',
+        'source': 'gate_liquid_fraction:fallback:test',
         'status': 'ok',
         'solidus_T_C': 1000.0,
         'liquidus_T_C': 1300.0,
     }
     record = engine_binding_admission.write_gate_curve_memo_record(sim, curve)
-    record['origin']['producer_configuration']['model']['model'] = (
-        'foreign-producer-model'
-    )
     sim._freeze_gate_liquid_fraction_cache = {
         'key': _freeze_gate_key_for_current_state(sim),
         **record,
     }
-    store = PT0DeterminismStore('capture', db_path=tmp_path / 'foreign-origin.db')
+
+    control_store = PT0DeterminismStore(
+        'capture', db_path=tmp_path / 'same-origin.db'
+    )
+    control_store.capture_gate_curve(
+        sim,
+        fO2_log=sim._compute_intrinsic_melt_fO2(),
+        curve=curve,
+    )
+    assert control_store.summary()['entries'] == 1
+    assert control_store.summary()['capture_calls'] == 1
+
+    foreign_record = deepcopy(record)
+    foreign_record['origin']['producer_configuration']['model']['model'] = (
+        'foreign-producer-model'
+    )
+    sim._freeze_gate_liquid_fraction_cache = {
+        'key': _freeze_gate_key_for_current_state(sim),
+        **foreign_record,
+    }
+    store = PT0DeterminismStore(
+        'capture', db_path=tmp_path / 'foreign-origin.db'
+    )
 
     store.capture_gate_curve(
         sim,
