@@ -7,7 +7,6 @@ source:
   url: https://doi.org/10.1016/S0016-7037(01)00751-7
   year: 2002
   version: published original journal PDF
-  sha256: 0f3b3ac1f985bbb80b027b59799753243a9df13e0cc08128e8c88742329189de
 extraction:
   method: >-
     Manual transcription of the model-method, standard-state and numerical
@@ -71,7 +70,7 @@ fidelity_samples:
     observation_id: beckett_2002_cao_model_method
     observable: method
     field: method_detail_quote
-    value: 'The basic idea is to use calorimetric data and exchange reactions between coexisting solids and liquids or pairs of liquids to constrain the excess free energy, Gexcess, of the liquid. The activity coefficient of a specific oxide component relative to its standard state can be derived from Gexcess through suitable differentiation.'
+    value: 'The basic idea is to use calorimetric data and exchange reactions between coexisting solids and liquids or pairs of liquids to constrain the excess free energy, Gexcess, of the liquid. The activity coefficient of a specific oxide component relative to its standard state can be derived from Gexcess through suitable differentiation and the resulting expression for the functional form used by Berman (1983) is given by Berman and Brown (1984).'
     locator: {page: 2, published_page: 94, pdf_page_index: 1, section: 2.1}
   - species: CaO
     observation_id: beckett_2002_cao_printed_numerical_context
@@ -83,13 +82,13 @@ fidelity_samples:
     observation_id: beckett_2002_cao_cmas_composition_ranges
     observable: thermodynamic_context
     field: quote
-    value: 'A temperature of 1600°C was selected for most calculations because liquids are stable over much of the system but the temperature is not so high that extrapolation of Berman’s (1983) model, which is based mostly on phase equilibria acquired at temperatures at or below 1600°C, becomes excessive. For 1600°C, accepted liquids have mole fractions of oxides in the range of 0 to 0.71 for CaO, 0 to 0.55 for MgO, 0 to 0.45 for Al2O3, and 0 to 0.95 for SiO2.'
+    value: 'A temperature of 1600°C was selected for most calculations because liquids are stable over much of the system but the temperature is not so high that extrapolation of Berman’s model, which is based mostly on phase equilibria acquired at temperatures at or below 1600°C, becomes excessive. [...] For 1600°C, accepted liquids have mole fractions of oxides in the range of 0 to 0.71 for CaO, 0 to 0.55 for MgO, 0 to 0.45 for Al2O3, and 0 to 0.95 for SiO2.'
     locator: {page: 3, published_page: 95, pdf_page_index: 2, section: 2.3}
   - species: CaO
     observation_id: beckett_2002_cao_temperature_dependence_context
     observable: thermodynamic_context
     field: quote
-    value: 'For optical basicities near Λ = 0.54, ln(γCaO^Liq) increases with temperature, rising by as much as a factor of twenty over 400°C. On the other hand, the temperature effect is quite modest for Λ > ~0.65 at NBO/T = 0.'
+    value: 'For optical basicities near Λ = 0.54, ln(γCaO^Liq) increases with temperature, rising by as much as a factor of twenty over 400°C. [...] On the other hand, the temperature effect is quite modest for Λ > ~0.65 at NBO/T = 0 and reconnaissance calculations for other values of NBO/T show that a small temperature dependence is characteristic for Λ > ~0.65 to 0.70.'
     locator: {page: 5, published_page: 97, pdf_page_index: 4, section: 2.3}
   - species: CaO
     observation_id: beckett_2002_cao_stable_nbot_context
@@ -101,7 +100,7 @@ fidelity_samples:
     observation_id: beckett_2002_cao_and_mgo_minima_context
     observable: thermodynamic_context
     field: quote
-    value: 'For NBO/T = 0, there is a minimum in ln(γCaO^Liq) at XSiO2^Liq/XAl2O3^Liq ~ 4 to 6, in ln(γCaO^Liq γAl2O3^Liq) at XSiO2^Liq/XAl2O3^Liq ~ 5 to 7, and in ln(γMgO^Liq γAl2O3^Liq) at XSiO2^Liq/XAl2O3^Liq ~ 7 to 10.'
+    value: 'For NBO/T = 0, which is the pertinent value for these joins, there is a minimum in ln(γCaO^Liq) at XSiO2^Liq/XAl2O3^Liq ~ 4 to 6 (cf. Figs. 1a and 1b), in ln(γCaO^Liq γAl2O3^Liq) at XSiO2^Liq/XAl2O3^Liq ~ 5 to 7 (Fig. 5a), and in ln(γMgO^Liq γAl2O3^Liq) at XSiO2^Liq/XAl2O3^Liq ~ 7 to 10 (Fig. 6a), which may be distant reflections of the same phenomenon.'
     locator: {page: 11, published_page: 103, pdf_page_index: 10, section: 2.5}
   - species: MgO
     observation_id: beckett_2002_mgo_standard_state
@@ -336,7 +335,7 @@ species:
           quantity: activity_coefficient_model_method
           method_class: method_only
           method_quote: 'In this study, the model of Berman (1983) is used to evaluate the activities of end-member oxides in the system CaO-MgO-Al2O3-SiO2 (CMAS).'
-          method_detail_quote: 'The basic idea is to use calorimetric data and exchange reactions between coexisting solids and liquids or pairs of liquids to constrain the excess free energy, Gexcess, of the liquid. The activity coefficient of a specific oxide component relative to its standard state can be derived from Gexcess through suitable differentiation.'
+          method_detail_quote: 'The basic idea is to use calorimetric data and exchange reactions between coexisting solids and liquids or pairs of liquids to constrain the excess free energy, Gexcess, of the liquid. The activity coefficient of a specific oxide component relative to its standard state can be derived from Gexcess through suitable differentiation and the resulting expression for the functional form used by Berman (1983) is given by Berman and Brown (1984).'
           method_as_printed: calculated model outputs; no experiments or measurement procedure are reported in this paper
       - observation_id: beckett_2002_cao_printed_numerical_context
         type: thermodynamic_context
@@ -358,7 +357,7 @@ species:
         values:
           quantity: accepted_cmas_liquid_composition_ranges
           method_class: model_derived
-          quote: 'A temperature of 1600°C was selected for most calculations because liquids are stable over much of the system but the temperature is not so high that extrapolation of Berman’s (1983) model, which is based mostly on phase equilibria acquired at temperatures at or below 1600°C, becomes excessive. For 1600°C, accepted liquids have mole fractions of oxides in the range of 0 to 0.71 for CaO, 0 to 0.55 for MgO, 0 to 0.45 for Al2O3, and 0 to 0.95 for SiO2.'
+          quote: 'A temperature of 1600°C was selected for most calculations because liquids are stable over much of the system but the temperature is not so high that extrapolation of Berman’s model, which is based mostly on phase equilibria acquired at temperatures at or below 1600°C, becomes excessive. [...] For 1600°C, accepted liquids have mole fractions of oxides in the range of 0 to 0.71 for CaO, 0 to 0.55 for MgO, 0 to 0.45 for Al2O3, and 0 to 0.95 for SiO2.'
       - observation_id: beckett_2002_cao_temperature_dependence_context
         type: thermodynamic_context
         locator: {page: 5, published_page: 97, pdf_page_index: 4, section: 2.3}
@@ -366,7 +365,7 @@ species:
         values:
           quantity: CaO_activity_coefficient_temperature_dependence
           method_class: model_derived
-          quote: 'For optical basicities near Λ = 0.54, ln(γCaO^Liq) increases with temperature, rising by as much as a factor of twenty over 400°C. On the other hand, the temperature effect is quite modest for Λ > ~0.65 at NBO/T = 0.'
+          quote: 'For optical basicities near Λ = 0.54, ln(γCaO^Liq) increases with temperature, rising by as much as a factor of twenty over 400°C. [...] On the other hand, the temperature effect is quite modest for Λ > ~0.65 at NBO/T = 0 and reconnaissance calculations for other values of NBO/T show that a small temperature dependence is characteristic for Λ > ~0.65 to 0.70.'
       - observation_id: beckett_2002_cao_stable_nbot_context
         type: thermodynamic_context
         locator: {page: 8, published_page: 100, pdf_page_index: 7, section: 2.4}
@@ -382,7 +381,7 @@ species:
         values:
           quantity: oxide_activity_coefficient_composition_minima
           method_class: model_derived
-          quote: 'For NBO/T = 0, there is a minimum in ln(γCaO^Liq) at XSiO2^Liq/XAl2O3^Liq ~ 4 to 6, in ln(γCaO^Liq γAl2O3^Liq) at XSiO2^Liq/XAl2O3^Liq ~ 5 to 7, and in ln(γMgO^Liq γAl2O3^Liq) at XSiO2^Liq/XAl2O3^Liq ~ 7 to 10.'
+          quote: 'For NBO/T = 0, which is the pertinent value for these joins, there is a minimum in ln(γCaO^Liq) at XSiO2^Liq/XAl2O3^Liq ~ 4 to 6 (cf. Figs. 1a and 1b), in ln(γCaO^Liq γAl2O3^Liq) at XSiO2^Liq/XAl2O3^Liq ~ 5 to 7 (Fig. 5a), and in ln(γMgO^Liq γAl2O3^Liq) at XSiO2^Liq/XAl2O3^Liq ~ 7 to 10 (Fig. 6a), which may be distant reflections of the same phenomenon.'
       - observation_id: beckett_2002_cao_unstated_uncertainty
         type: thermodynamic_context
         locator: {page: 3, published_page: 95, pdf_page_index: 2, section: 2.3}
