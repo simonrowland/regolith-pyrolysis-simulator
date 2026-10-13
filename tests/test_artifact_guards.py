@@ -286,6 +286,8 @@ def test_melt_regime_guard_roots_include_engine_and_script_layers():
         "if liquid_fraction_value < 0.0: pass",
         "if liquid_fraction_value > 1.0: pass",
         "if liquid_fraction_at(temperature_C) > 0.0: pass",
+        "if melts_fraction > 0.0: pass",
+        "if freeze_fraction == 0.0: pass",
     ],
 )
 def test_melt_regime_ast_guard_detects_liquid_fraction_aliases(source):
