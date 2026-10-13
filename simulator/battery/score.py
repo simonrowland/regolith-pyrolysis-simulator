@@ -2433,6 +2433,14 @@ def _uncertainty_unit(
 ) -> str:
     if mapped_unit:
         return mapped_unit
+    unit_texts = [raw_text]
+    if isinstance(uncertainty.verbatim, Mapping):
+        unit_texts = [
+            str(value)
+            for key, value in uncertainty.verbatim.items()
+            if key not in {"confidence_level", "locator", "parent", "k"}
+            and isinstance(value, str)
+        ] or [raw_text]
     basis = uncertainty.basis or ""
     if basis:
         basis = basis.replace("_", " ")
@@ -2452,9 +2460,28 @@ def _uncertainty_unit(
         else {source_value}
     )
     if isinstance(source_value, tuple):
-        range_match = _UNCERTAINTY_RANGE_RE.search(raw_text) or _UNCERTAINTY_PAIR_RE.search(raw_text)
-        if range_match is not None:
-            unit = raw_text[range_match.end() :].strip().strip(" ,;[]()")
+        for text in unit_texts:
+            range_match = _UNCERTAINTY_RANGE_RE.search(text) or _UNCERTAINTY_PAIR_RE.search(text)
+            if range_match is not None:
+                unit = text[range_match.end() :].strip().strip(" ,;[]()")
+                unit = re.sub(
+                    r"\s*\(?\s*(?:95\s*%?\s*(?:ci|confidence interval)|[12]\s*-?\s*(?:sigma|σ)|range|limits?|maximum error|maximum deviation)\s*\)?\s*$",
+                    "",
+                    unit,
+                    flags=re.IGNORECASE,
+                ).strip()
+                if unit and re.search(r"[A-Za-z°µμ%]", unit):
+                    return unit
+    suffix_re = re.compile(r"(" + _UNCERTAINTY_NUMBER + r")\s*([^\d\s].*)$")
+    for text in unit_texts:
+        for suffix in reversed(tuple(suffix_re.finditer(text))):
+            try:
+                suffix_value = abs(as_decimal(suffix.group(1)))
+            except (TypeError, ValueError, ArithmeticError, InvalidOperation):
+                continue
+            if suffix_value not in source_values:
+                continue
+            unit = suffix.group(2).strip().strip(" ,;[]()")
             unit = re.sub(
                 r"\s*\(?\s*(?:95\s*%?\s*(?:ci|confidence interval)|[12]\s*-?\s*(?:sigma|σ)|range|limits?|maximum error|maximum deviation)\s*\)?\s*$",
                 "",
@@ -2463,23 +2490,6 @@ def _uncertainty_unit(
             ).strip()
             if unit and re.search(r"[A-Za-z°µμ%]", unit):
                 return unit
-    suffix_re = re.compile(r"(" + _UNCERTAINTY_NUMBER + r")\s*([^\d\s].*)$")
-    for suffix in reversed(tuple(suffix_re.finditer(raw_text))):
-        try:
-            suffix_value = abs(as_decimal(suffix.group(1)))
-        except (TypeError, ValueError, ArithmeticError, InvalidOperation):
-            continue
-        if suffix_value not in source_values:
-            continue
-        unit = suffix.group(2).strip().strip(" ,;[]()")
-        unit = re.sub(
-            r"\s*\(?\s*(?:95\s*%?\s*(?:ci|confidence interval)|[12]\s*-?\s*(?:sigma|σ)|range|limits?|maximum error|maximum deviation)\s*\)?\s*$",
-            "",
-            unit,
-            flags=re.IGNORECASE,
-        ).strip()
-        if unit and re.search(r"[A-Za-z°µμ%]", unit):
-            return unit
     if observation is not None:
         locator = observation.locator
         note = None if locator is None else locator.note
@@ -2641,15 +2651,8 @@ def _printed_uncertainty_band(
         return _PrintedBandResolution(
             refusal={"reason": "uncertainty_metric_missing", "original": raw_text}
         )
-    unit_text = raw_text
-    if isinstance(uncertainty.verbatim, Mapping):
-        unit_text = " ".join(
-            str(value)
-            for key, value in uncertainty.verbatim.items()
-            if key != "confidence_level" and isinstance(value, str)
-        ) or raw_text
     source_unit = _uncertainty_unit(
-        quantity, uncertainty, source_observation, mapped_unit, source_value, unit_text
+        quantity, uncertainty, source_observation, mapped_unit, source_value, raw_text
     )
     if confidence_level in {"two_sigma", "ci95"}:
         kind = "printed_2sigma"
