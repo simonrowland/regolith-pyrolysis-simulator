@@ -198,6 +198,48 @@ def test_migrator_reduces_ferric_fraction_series_points(tmp_path: Path) -> None:
         assert name == "original_Fe3_over_FeT"
 
 
+def test_migrated_ferric_fraction_has_resolvable_lineage_and_derivation(tmp_path: Path) -> None:
+    path = _fixture_extract(tmp_path, [{
+        "observation_id": "fixture_lineage",
+        "values": {
+            "method_class": "measured_direct",
+            "quantity": "fe3_fe2_ratio",
+            "Fe3_over_FeT": "0.72",
+        },
+    }])
+    result = _migrate(path)
+    obs = result.observations[PREFIX + "fixture_lineage"]
+    assert obs.value.point == Decimal("2.571428571428571428571428571")
+    assert obs.derivation is not None
+    assert obs.derivation.relation == FERRIC_FRACTION_RELATION
+    assert obs.derived_from == obs.derivation.inputs
+    assert set(obs.derived_from).issubset({
+        asset.asset_id
+        for work in result.works.values()
+        for asset in work.source_files.files
+    })
+    assert not [
+        issue for issue in result.validation.hard_issues
+        if issue.reason.value == "conditional_field"
+        and issue.path.startswith(f"observation[{obs.observation_id}].")
+    ]
+
+
+def test_migrator_refuses_ferric_fraction_one_without_infinity(tmp_path: Path) -> None:
+    path = _fixture_extract(tmp_path, [{
+        "observation_id": "fixture_no_fe2",
+        "values": {
+            "method_class": "measured_direct",
+            "quantity": "fe3_fe2_ratio",
+            "Fe3_over_FeT": "1",
+        },
+    }])
+    obs = _migrate(path).observations[PREFIX + "fixture_no_fe2"]
+    assert obs.value.kind is ValueKind.UNAVAILABLE
+    assert "undefined" in obs.value.unavailable_reason
+    assert obs.value.point is None
+
+
 def test_declared_ratio_from_ferric_fraction_is_r_over_one_minus_r() -> None:
     # b-686 change: was unavailable ("no mapped fe3_fe2_ratio field selected").
     sel = select_declared_source(

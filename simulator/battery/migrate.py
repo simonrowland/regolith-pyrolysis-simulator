@@ -8172,9 +8172,12 @@ def _interval_selection(
 #
 # (1) Ferric fraction r = Fe3+/sum Fe = n3/(n2 + n3) (XANES, Moessbauer):
 #         n3 = r (n2 + n3)  =>  n3 (1 - r) = r n2  =>  R = r/(1 - r).
-#     Defined only for 0 < r < 1: r = 1 leaves no Fe2+ (R infinite) and r = 0
-#     gives R = 0, outside the log10 metric domain. Both are refused with a
-#     reason, never clipped.
+#     This ratio is dimensionless because both numerator and denominator are
+#     amounts of iron. Sanity checks: r = 0.5 gives R = 1; as r approaches 1,
+#     R approaches infinity. At r = 1 the denominator is zero and no Fe2+
+#     remains, so refuse the conversion instead of emitting infinity. The
+#     domain is 0 < r < 1; r = 0 also gives R = 0, outside the log10 metric
+#     domain, and is refused rather than clipped.
 # (2) Kress-style oxide wt % of ONE analysis, w3 = wt % Fe2O3, w2 = wt % FeO
 #     (Fe2O3 printed as such, not FeO* total iron). Per 100 g: n(Fe2O3) =
 #     w3/M(Fe2O3), n(FeO) = w2/M(FeO); each Fe2O3 carries two Fe3+ and each
@@ -8195,7 +8198,7 @@ FE3_FE2_RATIO_PRINTED_FIELDS: tuple[str, ...] = ("fe3_fe2_ratio", "Fe3_over_Fe2"
 FERRIC_FRACTION_FIELDS: tuple[str, ...] = ("Fe3_over_FeT", "Fe3_over_sum_Fe")
 KRESS_FE2O3_WT_PCT_FIELD = "Fe2O3_wt_pct"
 KRESS_FEO_WT_PCT_FIELD = "FeO_wt_pct"
-FERRIC_FRACTION_RELATION = "fe3_fe2_ratio = r/(1 - r); r = Fe3+/sum Fe as printed"
+FERRIC_FRACTION_RELATION = "Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed"
 
 
 def kress_wt_pct_relation() -> str:
@@ -13091,6 +13094,8 @@ class Migrator:
                 choose_read_from(work, locator),
                 source_derivation,
             )
+            if value_sel.field_name in FERRIC_FRACTION_FIELDS:
+                derived_from = derived_from or (choose_read_from(work, locator),)
         if malformed_composition_amount is not None:
             ident_kwargs["composition"] = State.unknown(malformed_composition_amount)
         elif omitted_components:
@@ -14632,6 +14637,8 @@ class Migrator:
             evidence, derivation = fe3_fe2_ratio_reduction(
                 value_sel, evidence, point_locator, read_from, source_derivation
             )
+            if value_sel.field_name in FERRIC_FRACTION_FIELDS:
+                derived_from = derived_from or (read_from,)
         if phase_provenance is not None and emitted.kind is not ValueKind.UNAVAILABLE:
             if derivation is None:
                 derivation = Derivation(
