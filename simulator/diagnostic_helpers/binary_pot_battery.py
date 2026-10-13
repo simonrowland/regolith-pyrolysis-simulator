@@ -1386,13 +1386,16 @@ def classify_equilibrate_outcome(
 
     timeout_bucket = _bucket_from_text(haystack)
     if engine_status in {"ok", "non_authoritative"}:
+        raw_liquid_fraction = getattr(result, "liquid_fraction", None)
+        if (
+            raw_liquid_fraction is not None
+            and liquid_fraction_invalidity(raw_liquid_fraction) is not None
+        ):
+            return "refusal", "liquid_fraction_invalid", engine_reason
         assemblage = getattr(result, "phase_assemblage_available", True)
         if assemblage:
-            raw_liquid_fraction = getattr(result, "liquid_fraction", None)
             if raw_liquid_fraction is None:
                 return "refusal", "liquid_fraction_missing", engine_reason
-            if liquid_fraction_invalidity(raw_liquid_fraction) is not None:
-                return "refusal", "liquid_fraction_invalid", engine_reason
             liquid_fraction = _finite_float(raw_liquid_fraction)
             if legacy_raw_liquid_fraction_is_zero(liquid_fraction):
                 return (
