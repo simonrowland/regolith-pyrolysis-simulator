@@ -4,9 +4,12 @@ from pathlib import Path
 
 import pytest
 
-from simulator.battery.enums import Engine, MethodToken, Rail, ResidualStatus
+from simulator.battery.enums import Engine, FO2Channel, MethodToken, Rail, ResidualStatus
+from simulator.battery.records import SweepGas
 from simulator.battery.score import ScoreContext, score_store
+from simulator.battery.waypoints import GapReason, oxygen_condition
 from tests.battery.test_migrate import _migrate_real_extract
+from tests.battery.test_waypoints import _bench
 
 
 @pytest.mark.parametrize(
@@ -114,3 +117,69 @@ def test_rein_chipman_quote_keeps_unknown_method_refusal(tmp_path: Path) -> None
     assert residual.status is ResidualStatus.REFUSED
     assert residual.refusal is not None
     assert residual.refusal.reason.value == "method_unknown"
+
+
+def test_kume_own_experiments_keep_published_deoxidized_argon_control(
+    tmp_path: Path,
+) -> None:
+    migrated = _migrate_real_extract(tmp_path, "kume-2000-cao-activities.yaml")
+    experiments = {
+        experiment.experiment_id.rsplit("::", 1)[-1]: experiment
+        for experiment in migrated.experiments.values()
+    }
+    own_experiments = (
+        "kume-2000-table2-1823k",
+        "kume-2000-table3-1873k",
+        "kume-2000-table4-1873k",
+    )
+
+    for experiment_id in own_experiments:
+        experiment = experiments[experiment_id]
+        assert experiment.fO2_control is not None
+        control = experiment.fO2_control
+        assert control.channel.is_value
+        assert control.channel.value is FO2Channel.GAS_MIX
+        assert control.oxygen_partial_pressure_Pa is not None
+        assert control.oxygen_partial_pressure_Pa.state.is_unknown
+        assert control.oxygen_partial_pressure_Pa.state.reason == "not_published"
+        assert control.oxygen_partial_pressure_Pa.locator is not None
+        assert control.oxygen_partial_pressure_Pa.locator.published_page == 555
+
+        environment = experiment.pressure_environment
+        assert environment.total_pressure_Pa is not None
+        assert environment.total_pressure_Pa.state.is_unknown
+        assert environment.total_pressure_Pa.state.reason == "not_published"
+        sweep = environment.sweep_gas
+        assert sweep.state.is_value
+        assert isinstance(sweep.state.value, SweepGas)
+        assert sweep.state.value.species == "Ar"
+        assert sweep.state.value.flow_sccm.is_unknown
+        assert sweep.state.value.flow_sccm.reason == "not_published"
+        assert sweep.state.value.partial_pressure_Pa.is_unknown
+        assert sweep.state.value.partial_pressure_Pa.reason == "not_published"
+        assert sweep.locator is not None
+        assert sweep.locator.published_page == 555
+        assert '"equilibrated under a deoxidized argon atmosphere"' in sweep.locator.note
+
+    own_experiment_ids = {experiment.experiment_id for experiment in experiments.values()
+                          if experiment.experiment_id.rsplit("::", 1)[-1] in own_experiments}
+    linked_observations = [
+        observation
+        for observation in migrated.observations.values()
+        if observation.experiment_id in own_experiment_ids
+    ]
+    assert linked_observations
+    for observation in linked_observations:
+        experiment = migrated.experiments[observation.experiment_id]
+        oxygen = oxygen_condition(experiment, _bench(), observation)
+        assert oxygen.selected is None
+        assert oxygen.absence is not None
+        assert oxygen.absence.reason is GapReason.MISSING_EVIDENCE
+
+    excluded_experiments = (
+        "kume-2000-table1-1823k",
+        "kume-2000-table1-1873k",
+        "kume-2000-table4-rein-chipman-1873k",
+    )
+    for experiment_id in excluded_experiments:
+        assert experiments[experiment_id].fO2_control is None

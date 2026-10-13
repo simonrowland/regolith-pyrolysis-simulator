@@ -58,7 +58,17 @@ experiments:
         Equilibration time was determined to be 18 h by preliminary experiments. After equilibration,
         the sample was quenched in a flushing argon gas and subjected to chemical analysis.
       note: 'Kume et al. refer the procedure to ref. 3, Morita, Kume and Sano (2000).'
-    conditions: {temperature_K: {state: {tag: value, value: 1823}, locator: {page: 563, table: "2", note: "Table 2 reports at 1823 K"}}, system: CaO-SiO2-AlO1.5, crucible: {state: {tag: unknown, reason: in_cited_source}, locator: {page: 562, section: '2.1 Experimental Procedure', note: 'Ref. 3 supports the method; this condition detail remains unresolved.'}}, atmosphere: {state: {tag: unknown, reason: in_cited_source}, locator: {page: 562, section: '2.1 Experimental Procedure', note: 'Ref. 3 supports the method; this condition detail remains unresolved.'}}, equilibration_time: {state: {tag: unknown, reason: in_cited_source}, locator: {page: 562, section: '2.1 Experimental Procedure', note: 'Ref. 3 supports the method; this condition detail remains unresolved.'}}, quench: {state: {tag: unknown, reason: in_cited_source}, locator: {page: 562, section: '2.1 Experimental Procedure', note: 'Ref. 3 supports the method; this condition detail remains unresolved.'}}, chemical_analysis: {state: {tag: unknown, reason: in_cited_source}, locator: {page: 562, section: '2.1 Experimental Procedure', note: 'Ref. 3 supports the method; this condition detail remains unresolved.'}}}
+    conditions: {temperature_K: {state: {tag: value, value: 1823}, locator: {page: 563, table: "2", note: "Table 2 reports at 1823 K"}}, system: CaO-SiO2-AlO1.5, crucible: {state: {tag: unknown, reason: in_cited_source}, locator: {page: 562, section: '2.1 Experimental Procedure', note: 'Ref. 3 supports the method; this condition detail remains unresolved.'}}, equilibration_time: {state: {tag: unknown, reason: in_cited_source}, locator: {page: 562, section: '2.1 Experimental Procedure', note: 'Ref. 3 supports the method; this condition detail remains unresolved.'}}, quench: {state: {tag: unknown, reason: in_cited_source}, locator: {page: 562, section: '2.1 Experimental Procedure', note: 'Ref. 3 supports the method; this condition detail remains unresolved.'}}, chemical_analysis: {state: {tag: unknown, reason: in_cited_source}, locator: {page: 562, section: '2.1 Experimental Procedure', note: 'Ref. 3 supports the method; this condition detail remains unresolved.'}}}
+    fO2_control:
+      channel: gas_mix
+      oxygen_partial_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 555, published_page: 555, section: '2. Experimental Procedure', note: 'No numeric oxygen partial pressure is printed.'}}
+    pressure_environment:
+      total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 555, published_page: 555, section: '2. Experimental Procedure'}}
+      sweep_gas:
+        state: {tag: value, value: {species: Ar, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
+        locator: {page: 555, published_page: 555, section: '2. Experimental Procedure', note: 'Morita, Kume and Sano (2000), d-129: "equilibrated under a deoxidized argon atmosphere"; no gas ratio or flow is printed.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
   - experiment_id: kume-2000-table3-1873k
     method: quench_equilibration
     locator:
@@ -70,7 +80,17 @@ experiments:
         Equilibration time was determined to be 18 h by preliminary experiments. After equilibration,
         the sample was quenched in a flushing argon gas and subjected to chemical analysis.
       note: 'Kume et al. refer the procedure to ref. 3, Morita, Kume and Sano (2000).'
-    conditions: {temperature_K: {state: {tag: value, value: 1873}, locator: {page: 564, table: "3", note: "Table 3 reports at 1873 K"}}, system: CaO-SiO2-MgO, crucible: {state: {tag: unknown, reason: in_cited_source}, locator: {page: 562, section: '2.1 Experimental Procedure', note: 'Ref. 3 supports the method; this condition detail remains unresolved.'}}, atmosphere: {state: {tag: unknown, reason: in_cited_source}, locator: {page: 562, section: '2.1 Experimental Procedure', note: 'Ref. 3 supports the method; this condition detail remains unresolved.'}}, equilibration_time: {state: {tag: unknown, reason: in_cited_source}, locator: {page: 562, section: '2.1 Experimental Procedure', note: 'Ref. 3 supports the method; this condition detail remains unresolved.'}}, quench: {state: {tag: unknown, reason: in_cited_source}, locator: {page: 562, section: '2.1 Experimental Procedure', note: 'Ref. 3 supports the method; this condition detail remains unresolved.'}}, chemical_analysis: {state: {tag: unknown, reason: in_cited_source}, locator: {page: 562, section: '2.1 Experimental Procedure', note: 'Ref. 3 supports the method; this condition detail remains unresolved.'}}}
+    conditions: {temperature_K: {state: {tag: value, value: 1873}, locator: {page: 564, table: "3", note: "Table 3 reports at 1873 K"}}, system: CaO-SiO2-MgO, crucible: {state: {tag: unknown, reason: in_cited_source}, locator: {page: 562, section: '2.1 Experimental Procedure', note: 'Ref. 3 supports the method; this condition detail remains unresolved.'}}, equilibration_time: {state: {tag: unknown, reason: in_cited_source}, locator: {page: 562, section: '2.1 Experimental Procedure', note: 'Ref. 3 supports the method; this condition detail remains unresolved.'}}, quench: {state: {tag: unknown, reason: in_cited_source}, locator: {page: 562, section: '2.1 Experimental Procedure', note: 'Ref. 3 supports the method; this condition detail remains unresolved.'}}, chemical_analysis: {state: {tag: unknown, reason: in_cited_source}, locator: {page: 562, section: '2.1 Experimental Procedure', note: 'Ref. 3 supports the method; this condition detail remains unresolved.'}}}
+    fO2_control:
+      channel: gas_mix
+      oxygen_partial_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 555, published_page: 555, section: '2. Experimental Procedure', note: 'No numeric oxygen partial pressure is printed.'}}
+    pressure_environment:
+      total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 555, published_page: 555, section: '2. Experimental Procedure'}}
+      sweep_gas:
+        state: {tag: value, value: {species: Ar, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
+        locator: {page: 555, published_page: 555, section: '2. Experimental Procedure', note: 'Morita, Kume and Sano (2000), d-129: "equilibrated under a deoxidized argon atmosphere"; no gas ratio or flow is printed.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
   - experiment_id: kume-2000-table4-1873k
     method: quench_equilibration
     locator:
@@ -82,7 +102,17 @@ experiments:
         Equilibration time was determined to be 18 h by preliminary experiments. After equilibration,
         the sample was quenched in a flushing argon gas and subjected to chemical analysis.
       note: 'Kume et al. refer the procedure to ref. 3, Morita, Kume and Sano (2000).'
-    conditions: {temperature_K: {state: {tag: value, value: 1873}, locator: {page: 565, table: "4", note: "Table 4 reports at 1873 K"}}, system: CaO-SiO2-AlO1.5-MgO with 10 mass% MgO, crucible: {state: {tag: unknown, reason: in_cited_source}, locator: {page: 562, section: '2.1 Experimental Procedure', note: 'Ref. 3 supports the method; this condition detail remains unresolved.'}}, atmosphere: {state: {tag: unknown, reason: in_cited_source}, locator: {page: 562, section: '2.1 Experimental Procedure', note: 'Ref. 3 supports the method; this condition detail remains unresolved.'}}, equilibration_time: {state: {tag: unknown, reason: in_cited_source}, locator: {page: 562, section: '2.1 Experimental Procedure', note: 'Ref. 3 supports the method; this condition detail remains unresolved.'}}, quench: {state: {tag: unknown, reason: in_cited_source}, locator: {page: 562, section: '2.1 Experimental Procedure', note: 'Ref. 3 supports the method; this condition detail remains unresolved.'}}, chemical_analysis: {state: {tag: unknown, reason: in_cited_source}, locator: {page: 562, section: '2.1 Experimental Procedure', note: 'Ref. 3 supports the method; this condition detail remains unresolved.'}}}
+    conditions: {temperature_K: {state: {tag: value, value: 1873}, locator: {page: 565, table: "4", note: "Table 4 reports at 1873 K"}}, system: CaO-SiO2-AlO1.5-MgO with 10 mass% MgO, crucible: {state: {tag: unknown, reason: in_cited_source}, locator: {page: 562, section: '2.1 Experimental Procedure', note: 'Ref. 3 supports the method; this condition detail remains unresolved.'}}, equilibration_time: {state: {tag: unknown, reason: in_cited_source}, locator: {page: 562, section: '2.1 Experimental Procedure', note: 'Ref. 3 supports the method; this condition detail remains unresolved.'}}, quench: {state: {tag: unknown, reason: in_cited_source}, locator: {page: 562, section: '2.1 Experimental Procedure', note: 'Ref. 3 supports the method; this condition detail remains unresolved.'}}, chemical_analysis: {state: {tag: unknown, reason: in_cited_source}, locator: {page: 562, section: '2.1 Experimental Procedure', note: 'Ref. 3 supports the method; this condition detail remains unresolved.'}}}
+    fO2_control:
+      channel: gas_mix
+      oxygen_partial_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 555, published_page: 555, section: '2. Experimental Procedure', note: 'No numeric oxygen partial pressure is printed.'}}
+    pressure_environment:
+      total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 555, published_page: 555, section: '2. Experimental Procedure'}}
+      sweep_gas:
+        state: {tag: value, value: {species: Ar, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
+        locator: {page: 555, published_page: 555, section: '2. Experimental Procedure', note: 'Morita, Kume and Sano (2000), d-129: "equilibrated under a deoxidized argon atmosphere"; no gas ratio or flow is printed.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
   - experiment_id: kume-2000-table4-rein-chipman-1873k
     method: {tag: unknown, reason: quoted_source_method_not_reported}
     locator: {page: 565, published_page: 565, section: '3. Results and Discussion', note: 'The SiO2 activities are quoted from Rein & Chipman (ref. 4); their experimental method is not reported here.'}
