@@ -29,6 +29,7 @@ from simulator.melt_backend.base import MeltCompositionError
 from simulator.melt_regime import (
     MeltRegime,
     legacy_raw_liquid_fraction_is_zero,
+    liquid_fraction_invalidity,
     melt_regime,
 )
 from simulator.state import (
@@ -2883,7 +2884,7 @@ class EvaporationMixin:
                 if repair_notices is not None and notice not in repair_notices:
                     repair_notices.append(notice)
                 continue
-            if liquid_fraction < 0.0 or liquid_fraction > 1.0:
+            if liquid_fraction_invalidity(liquid_fraction) == 'out_of_range':
                 notice = {
                     'type': 'typed_notice',
                     'kind': 'freeze_gate_curve_point_repaired',
