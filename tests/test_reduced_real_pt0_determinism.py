@@ -557,7 +557,7 @@ def _run_capped_c2a_with_equilibrium_counter(
         "liquidus_T_C": 1320.0,
         "path": ((1210.0, 0.0), (1320.0, 1.0)),
     }
-    sim._freeze_gate_curve_from_gate_dispatch = lambda reasons, *, fO2_log: dict(freeze_curve)
+    sim._freeze_gate_curve_from_gate_dispatch = lambda reasons, *, fO2_log, redox_state=None: dict(freeze_curve)
     original_equilibrate = sim.backend.equilibrate
     calls = 0
 
@@ -3274,7 +3274,7 @@ def test_pt0_gate_memo_hit_does_not_capture_without_receipt(
     }
     provider_calls = []
     sim._freeze_gate_curve_from_gate_dispatch = (
-        lambda reasons, *, fO2_log: provider_calls.append(fO2_log)
+        lambda reasons, *, fO2_log, redox_state=None: provider_calls.append(fO2_log)
         or dict(curve)
     )
     store_calls = []
@@ -3328,7 +3328,7 @@ def test_pt0_gate_capture_with_receipt_covers_fresh_curve_and_memo_hit(
     }
     provider_calls = []
     sim._freeze_gate_curve_from_gate_dispatch = (
-        lambda reasons, *, fO2_log: provider_calls.append(fO2_log)
+        lambda reasons, *, fO2_log, redox_state=None: provider_calls.append(fO2_log)
         or dict(curve)
     )
     capture_calls = []
