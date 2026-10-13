@@ -7871,8 +7871,8 @@ def _convert_compilation_amount(
     token = token.replace(".", "").replace("deg-", "deg").replace("_", "")
     if quantity in FUSION_QUANTITIES:
         token = token.split(";", 1)[0]
-    token = token.replace("mol−1", "/mol").replace("mol-1", "/mol")
-    token = token.replace("k−1", "/k").replace("k-1", "/k")
+        token = token.replace("mol−1", "/mol").replace("mol-1", "/mol")
+        token = token.replace("k−1", "/k").replace("k-1", "/k")
     energy = quantity in {
         Quantity.H_MINUS_H298,
         Quantity.DELTA_FH,
@@ -7886,13 +7886,19 @@ def _convert_compilation_amount(
         ctx.prec = 80
         if heat and token in {"cal/mol/k", "cal/molk", "cal/deg-mole", "cal/degmole"}:
             return amount * Decimal("4.184"), "thermochemical_calorie_to_J_exact"
-        if heat and token in {
-            "j/mol/k",
-            "j/molk",
-            "jpermolk",
-            "j/deg-mole",
-            "j/degmole",
-        }:
+        if heat and (
+            token
+            in {
+                "j/mol/k",
+                "j/molk",
+                "j/deg-mole",
+                "j/degmole",
+            }
+            or (
+                quantity is Quantity.ENTROPY_OF_FUSION
+                and token == "jpermolk"
+            )
+        ):
             return amount, "identity:J_per_mol_K"
         if energy and token in {"kcal/mol", "kcal/mole"}:
             return amount * Decimal("4.184"), "thermochemical_kcal_to_kJ_exact"
