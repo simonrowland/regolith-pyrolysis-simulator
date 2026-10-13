@@ -366,6 +366,9 @@ WALL_REACTIVITY_MATRIX_PATH = (
 STICKING_VALUE_REF_PREFIX = (
     'data/literature/vacuum_pyrolysis_sticking.yaml::species.'
 )
+STICKING_FE_CONDENSATION_VALUE_REF = (
+    f'{STICKING_VALUE_REF_PREFIX}Fe.condensation.value'
+)
 STICKING_UNKNOWN_REF = (
     'data/literature/vacuum_pyrolysis_sticking.yaml::unknown_species_default'
 )
@@ -421,6 +424,25 @@ def _validate_sticking_entry(path: Path, name: str, entry: Any) -> None:
     if not isinstance(entry, Mapping):
         raise ValueError(f'{path}: {name} must be a mapping')
     _validate_sticking_spec(path, f'{name}.value', entry.get('value'))
+    condensation = entry.get('condensation')
+    if condensation is not None:
+        if not isinstance(condensation, Mapping):
+            raise ValueError(f'{path}: {name}.condensation must be a mapping')
+        condensation_value = condensation.get('value')
+        if (
+            not isinstance(condensation_value, Mapping)
+            or condensation_value.get('form') != 'arrhenius'
+        ):
+            raise ValueError(
+                f'{path}: {name}.condensation.value must be arrhenius'
+            )
+        _validate_range_pair(
+            path,
+            f'{name}.condensation.value.edge_hold_values',
+            condensation_value.get('edge_hold_values'),
+            lower_bound=0.0,
+            upper_bound=1.0,
+        )
     cold_wall = entry.get('cold_wall_condensation')
     if cold_wall is not None:
         _validate_cold_wall_condensation_spec(
@@ -720,6 +742,67 @@ def _sio_cold_wall_condensation_override(
     return value, override
 
 
+def _fe_condensation_edge_hold(
+    T_K: float,
+    spec: Any,
+) -> tuple[float, dict[str, Any]] | None:
+    if not isinstance(spec, Mapping) or 'edge_hold_values' not in spec:
+        return None
+    valid_range = spec.get('valid_range_K')
+    edge_values = spec.get('edge_hold_values')
+    if (
+        not isinstance(valid_range, (list, tuple))
+        or len(valid_range) != 2
+        or not isinstance(edge_values, (list, tuple))
+        or len(edge_values) != 2
+    ):
+        raise ValueError('alpha_s(Fe): malformed condensation edge-hold metadata')
+    try:
+        temperature = float(T_K)
+        valid_low, valid_high = (float(value) for value in valid_range)
+        low_alpha, high_alpha = (float(value) for value in edge_values)
+    except (TypeError, ValueError) as exc:
+        raise ValueError('alpha_s(Fe): malformed condensation edge-hold metadata') from exc
+    if not all(
+        math.isfinite(value)
+        for value in (temperature, valid_low, valid_high, low_alpha, high_alpha)
+    ):
+        raise ValueError('alpha_s(Fe): non-finite condensation edge-hold metadata')
+    if temperature <= 0.0:
+        return None
+    if temperature < valid_low:
+        held_alpha = low_alpha
+        side = 'below'
+    elif temperature > valid_high:
+        held_alpha = high_alpha
+        side = 'above'
+    else:
+        return None
+
+    # Tachibana et al. inferred pure-Fe condensation from Fe-vapour backreaction,
+    # assuming alpha_c = alpha_e at that same interface and temperature. The
+    # record stores their ln(alpha) = a - b/T fit as alpha = A*exp(-B/T), with
+    # A = exp(a) and B = b. A has no units and B/T is K/K, so alpha is
+    # dimensionless; the Stage-1 midpoint (1523.15 K) gives 0.878. The downward
+    # Arrhenius limit is zero, contrary to Tatsumi et al.'s direct ~0.8 growth
+    # coefficient at 688 K (the fit gives ~0.36), so outside the certified band
+    # this resolver holds the nearest measured edge and flags it.
+    evaluation = {
+        'species': 'Fe',
+        'alpha_s': held_alpha,
+        'alpha_s_form': 'arrhenius_edge_hold',
+        'alpha_s_temperature_K': temperature,
+        'alpha_s_valid_range_K': [valid_low, valid_high],
+        'alpha_s_extrapolated': True,
+        'alpha_s_uncertainty_envelope': list(spec['uncertainty_envelope']),
+        'alpha_s_cite': str(spec['cite']),
+        'alpha_s_status': str(spec['status']).upper(),
+        f'alpha_s_temperature_{side}_valid_range': True,
+        'alpha_s_extrapolation_method': 'hold_nearest_certified_band_edge',
+    }
+    return held_alpha, evaluation
+
+
 def _condensation_alpha_s(
     species: str,
     T_K: float,
@@ -729,8 +812,20 @@ def _condensation_alpha_s(
     spec = (
         context.get('coefficient_spec')
         if 'coefficient_spec' in context
-        else _sticking_species_entry(species_name).get('value')
+        else (
+            _sticking_species_entry(species_name)
+            .get('condensation', {})
+            .get('value')
+            if species_name == 'Fe'
+            else _sticking_species_entry(species_name).get('value')
+        )
     )
+    if species_name == 'Fe':
+        edge_hold = _fe_condensation_edge_hold(T_K, spec)
+        if edge_hold is not None:
+            value, evaluation = edge_hold
+            context['alpha_s_evaluation'] = evaluation
+            return value
     try:
         value = alpha_s(species_name, T_K, context)
     except _ArrheniusAlphaUnderflow:
@@ -761,8 +856,7 @@ def _condensation_alpha_s(
 
 
 def _sticking_alpha_s(species: str, T_K: float) -> float:
-    context = {'coefficient_spec': _sticking_species_entry(species).get('value')}
-    return _condensation_alpha_s(species, T_K, context)
+    return _condensation_alpha_s(species, T_K, {})
 
 
 def _sticking_reactivity_class(species: str) -> str | None:
@@ -818,6 +912,9 @@ def _sticking_ref_record(species: str, ref: Any) -> Mapping[str, Any] | None:
     if not ref.startswith(STICKING_VALUE_REF_PREFIX):
         return None
     suffix = ref.removeprefix(STICKING_VALUE_REF_PREFIX)
+    if species == 'Fe' and suffix == 'Fe.condensation.value':
+        condensation = _sticking_species_entry(species).get('condensation')
+        return condensation if isinstance(condensation, Mapping) else None
     if not suffix.endswith('.value'):
         return None
     ref_species = suffix[:-len('.value')]
@@ -5037,15 +5134,20 @@ def _wall_alpha_s(
 
 
 def _sidecar_alpha_record(species: str, T_K: float | None = None) -> dict[str, Any]:
+    value_ref = (
+        STICKING_FE_CONDENSATION_VALUE_REF
+        if str(species) == 'Fe'
+        else (
+            f'{STICKING_VALUE_REF_PREFIX}{species}.value'
+            if species in STICKING_COEFF
+            else STICKING_UNKNOWN_REF
+        )
+    )
     return _alpha_record(
         species=species,
         entry={
             'species': species,
-            'value_ref': (
-                f'{STICKING_VALUE_REF_PREFIX}{species}.value'
-                if species in STICKING_COEFF
-                else STICKING_UNKNOWN_REF
-            ),
+            'value_ref': value_ref,
         },
         source=(
             'data/literature/vacuum_pyrolysis_sticking.yaml::species.'

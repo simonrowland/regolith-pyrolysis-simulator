@@ -64,6 +64,24 @@ species:
     envelope: [0.011, 0.020]
     uncertainty_flag: collector_surface_proxy_not_cold_wall_measurement
     output_status: sourced_with_surface_proxy
+    condensation:
+      value:
+        form: arrhenius
+        A: 1.84043139878164
+        B: 1127.0
+        valid_range_K: [1443.0, 1633.0]
+        uncertainty_envelope: [0.5, 1.0]
+        cite: "Tachibana, Nagahara & Ozawa 2001, LPSC XXXII #1767, p. 2 Fig. 1"
+        status: CITED
+        edge_hold_values: [0.83, 0.92]
+      status: CITED
+      source_class: cited_pure_fe_condensation_kinetics
+      source: "Tachibana, Nagahara & Ozawa 2001, LPSC XXXII #1767, p. 2 Fig. 1: pure-Fe condensation coefficient inferred from Fe-pellet backreaction; their fit assumes alpha_c = alpha_e at the measured interface. Envelope spans direct growth values in Tatsumi et al. 2004, LPSC XXXV #2013, p. 2 and Tachibana et al. 2011, ApJ 736:16."
+      source_url: "https://www.lpi.usra.edu/meetings/lpsc2001/pdf/1767.pdf"
+      temperature_range_K: [1443.0, 1633.0]
+      envelope: [0.5, 1.0]
+      uncertainty_flag: "pure-Fe interface; first Fe layer on an oxide liner is unsourced"
+      output_status: sourced_with_surface_proxy
   SiO:
     value:
       form: arrhenius

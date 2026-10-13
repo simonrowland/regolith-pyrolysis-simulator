@@ -10,7 +10,7 @@
 
 default_alpha_s_by_species: &default_alpha_s_by_species
   Fe: &alpha_Fe
-    value_ref: data/literature/vacuum_pyrolysis_sticking.yaml::species.Fe.value
+    value_ref: data/literature/vacuum_pyrolysis_sticking.yaml::species.Fe.condensation.value
   SiO: &alpha_SiO
     value_ref: data/literature/vacuum_pyrolysis_sticking.yaml::species.SiO.value
   CrO2: &alpha_CrO2
