@@ -897,6 +897,49 @@ def test_kems_partial_pressure_band_survives_unparseable_cell_notes(
     assert numeric.decision_band == band
 
 
+def test_plante_kems_pressure_envelope_reports_unstated_confidence(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.enums import NoticeKind, Quantity
+    from simulator.battery.score import (
+        _printed_uncertainty_band,
+        derive_kems_partial_pressure_band,
+        point_magnitude,
+    )
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    plante = _migrate_real_extract(
+        tmp_path / "plante", "kems-042-plante-1979.yaml"
+    )
+    observations = plante.observations
+    experiments = plante.experiments
+    observation = observations[
+        "kems-042-plante-1979::plante1979_table2_s1104_r001_quoted"
+    ]
+    pressure = point_magnitude(observation.value)
+    assert pressure is not None
+
+    band = derive_kems_partial_pressure_band(
+        observations, experiments, benches=plante.benches
+    )
+    assert band is not None
+    assert band.value == Decimal("0.1461280356782380259259551535")
+
+    printed = _printed_uncertainty_band(
+        Quantity.P_PARTIAL,
+        observation.uncertainty,
+        pressure,
+        source_observation=observation,
+        method=experiments[observation.experiment_id].method.value,
+    )
+    assert printed.band is None
+    assert printed.notice is not None
+    assert printed.notice.kind is NoticeKind.INPUT_OMITTED
+    assert printed.notice.reason == "confidence_level_not_stated"
+    assert "temperature error probably does not exceed 20 K" in printed.notice.band
+    assert '"published_page": 276' in printed.notice.band
+
+
 
 
 def test_zhang_alpha_gamma_bound_uses_implied_alpha_verdict() -> None:

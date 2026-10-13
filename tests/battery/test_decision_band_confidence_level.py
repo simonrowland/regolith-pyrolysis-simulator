@@ -21,3 +21,33 @@ def test_sigma_field_name_does_not_supply_confidence_level() -> None:
     assert resolved.band.value == Decimal("0.1")
     assert resolved.notice is not None
     assert resolved.notice.reason == "confidence_level_not_stated"
+
+
+def test_confidence_metadata_preserves_units_printed_in_scalar_value() -> None:
+    resolved = _printed_uncertainty_band(
+        Quantity.P_PARTIAL,
+        Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim={"value": "1 kPa", "confidence_level": "two_sigma"},
+        ),
+        Decimal("100000"),
+    )
+
+    assert resolved.band is not None
+    assert resolved.band.value == Decimal("0.004364805402450084659744222203")
+    assert resolved.band.unit == "dimensionless"
+
+
+def test_confidence_metadata_does_not_hide_an_unmapped_printed_unit() -> None:
+    resolved = _printed_uncertainty_band(
+        Quantity.P_PARTIAL,
+        Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim={"value": "1 furlong", "confidence_level": "two_sigma"},
+        ),
+        Decimal("100000"),
+    )
+
+    assert resolved.band is None
+    assert resolved.refusal is not None
+    assert resolved.refusal["reason"] == "printed_uncertainty_unit_unmapped"
