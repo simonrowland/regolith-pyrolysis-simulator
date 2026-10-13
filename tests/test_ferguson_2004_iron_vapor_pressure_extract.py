@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
@@ -46,7 +47,19 @@ def _assert_migrated_table_values(document: dict, result) -> None:
     }
     assert len(by_row) == len(points)
 
+    phase_counts = {"Fe(s)": 0, "Fe(l)": 0, "Fe(s)/Fe(l)": 0}
+
     for point in points:
+        temperature = point["T_K_as_printed"]
+        expected_phase = (
+            "Fe(s)/Fe(l)"
+            if point["row"] == 40
+            else "Fe(s)"
+            if temperature < 1811
+            else "Fe(l)"
+        )
+        assert point["phase_as_published"] == expected_phase
+        phase_counts[expected_phase] += 1
         observation = by_row[point["row"]]
         assert observation.value.point == Decimal(str(point["P_Pa"]))
         assert observation.identity.temperature_K.is_value
@@ -65,6 +78,8 @@ def _assert_migrated_table_values(document: dict, result) -> None:
         assert all(conditions[key].state.is_value for key in CONDITION_KEYS)
         assert all(conditions[key].locator is not None for key in CONDITION_KEYS)
 
+    assert phase_counts == {"Fe(s)": 18, "Fe(l)": 26, "Fe(s)/Fe(l)": 1}
+
 
 def test_ferguson_2004_pressure_points_and_fidelity_survive_migration(
     tmp_path: Path,
@@ -74,6 +89,13 @@ def test_ferguson_2004_pressure_points_and_fidelity_survive_migration(
 
     result = _migrate_real_extract(tmp_path, EXTRACT_NAME)
     _assert_migrated_table_values(document, result)
+
+    changed_phase = deepcopy(document)
+    changed_phase["species"]["Fe"]["observations"][0]["values"]["points"][0][
+        "phase_as_published"
+    ] = "Fe(s)"
+    with pytest.raises(AssertionError):
+        _assert_migrated_table_values(changed_phase, result)
 
     validation = validate_corpus(
         result.works,
