@@ -320,6 +320,24 @@ class AccountingQueries:
         consumed_getter = getattr(self.sim, "_consumed_additive_reagents_kg", None)
         if callable(consumed_getter):
             _merge_masses(products, consumed_getter())
+        # A measured escape identifies a zero-recovery channel only if capture
+        # was available throughout the run. A later valid route cannot certify
+        # an earlier parcel whose capture input was missing.
+        model = getattr(self.sim, "_condensation_model", None)
+        capture_refusals = [
+            item.get("condensation_refusals_by_species", {})
+            for item in getattr(model, "operating_history", ())
+        ]
+        capture_refusals.append(getattr(model, "last_condensation_refusals_by_species", {}))
+        unavailable_species = {
+            species
+            for refusals in capture_refusals
+            for species, refusal in refusals.items()
+            if refusal.get("status") == "refused"
+        }
+        for species in self.ledger.project_account_kg(TERMINAL_ESCAPE_ACCOUNT):
+            if species != OXYGEN_SPECIES and species not in unavailable_species:
+                products.setdefault(species, 0.0)
         return products
 
     def _incremental_prefix_state(

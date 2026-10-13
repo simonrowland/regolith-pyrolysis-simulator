@@ -574,14 +574,16 @@ def test_sio_yield_restored_capture_keeps_provenance_and_closure(feedstock):
     # therefore re-grounds the two cancellation residuals, not a free tuning
     # parameter; canonical atom-ledger closure remains independently bounded
     # at 5e-12 percent.
-    # t-1217: inlet-driven equilibrium-capped capture re-grounds the SiO closure residual.
+    # Restored source debit removes r3's spurious residual reduction; causal
+    # capture changes only the bulk-inventory subtraction's roundoff path.
     expected_closure_error_pct = {
-        "lunar_mare_low_ti": 8.342660133683346e-8,
-        "mars_basalt": 2.017246221546194e-7,
+        "lunar_mare_low_ti": 5.717403115079557e-7,
+        "mars_basalt": 6.65641860494811e-7,
     }
     assert diagnostics["closure_error_pct"] == pytest.approx(
         expected_closure_error_pct[feedstock], rel=1.0e-9, abs=1.0e-15
     )
+    assert abs(diagnostics["mass_balance_error_pct"]) <= 5e-12
     assert report["sio_to_silica_fume_kg"]["stage_3_sio_zone_product"] > 0.0
     authority = report["fouling_rate"]["sticking_alpha_authority"]
     extrapolations = authority["wall_saturation_pressure_extrapolations_by_species"]

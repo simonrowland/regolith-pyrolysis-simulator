@@ -977,11 +977,9 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
 
     snapshot = sim.step()
 
-    # t-1217: source-only oxide carriers stay in the melt without executable wall saturation.
-    ceiling_flux_species = {"Ca", "Ti"}
+    ceiling_flux_species = {"Ca", "CaO_gas", "Ti", "TiO", "TiO2_gas"}
     p_flux = sum(snapshot.evap_flux.species_kg_hr[species] for species in ("PO", "PO2", "P2"))
-    # t-1217: source-only carriers without executable wall saturation retain their mass.
-    assert snapshot.evap_flux.total_kg_hr - p_flux == pytest.approx(2.6537091727221362, rel=1e-12, abs=1e-12)
+    assert snapshot.evap_flux.total_kg_hr - p_flux == pytest.approx(3.203221602697998, rel=1e-12, abs=1e-12)
     assert ceiling_flux_species <= set(
         snapshot.evap_flux.alpha_authority_status_by_species
     )
@@ -1175,13 +1173,12 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         # t-766 restores explicitly authorized P cleanup: +0.0023652560335202
         # kg/h entirely PO/PO2/P2. Fresh executable probe, with unchanged
         # non-P flux, moves transport and the P2O5 source debit accordingly.
-        # t-1217: source-only oxides without executable wall saturation stay in melt, lowering total debit to 2.6561 kg/hr.
         (
             1,
             1550.0,
-            2.6560744287556566,
-            1177449.107416865,
-            996.1063824484958,
+            3.205586858731518,
+            1300047.6164859626,
+            995.5566881453749,
         ),
         rel=1.0e-12,
         abs=1.0e-12,
@@ -1224,8 +1221,8 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     # ledger-commit floor, so evaporate_Al2O commits again. Not a refusal
     # drop: no channel is withdrawn.
     # t-766: three admitted P evaporations and nine flagged capture transitions.
-    # t-1217: source-only oxide carriers without executable wall saturation do not commit evaporation/capture transitions.
-    assert len(sim.atom_ledger.transitions) == 21
+    # Missing wall curves withhold capture, while every authorized source debits.
+    assert len(sim.atom_ledger.transitions) == 33
     ca_ti_reasons = {
         transition.reason for transition in sim.atom_ledger.transitions
     }
@@ -1234,23 +1231,22 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     # the single-transition regression guard for 149df2858.
     assert "condense_Si" in ca_ti_reasons
     assert {"evaporate_P2", "evaporate_PO", "evaporate_PO2"} <= ca_ti_reasons
-    # t-1217: SiO remains executable; source-only oxides without wall saturation stay in melt.
     assert {"condense_SiO"} <= ca_ti_reasons
     assert "evaporate_Ti" in ca_ti_reasons
     assert {
         "evaporate_CaO_gas",
         "evaporate_TiO",
         "evaporate_TiO2_gas",
-    }.isdisjoint(ca_ti_reasons)
+    } <= ca_ti_reasons
     assert "condense_Ca" in ca_ti_reasons
     assert "evaporate_Ca" in ca_ti_reasons
-    # t-1217: held source-only oxide carriers leave Si, Ti, redox, and bleed transitions at the hour tail.
+    # Capture unavailability must not truncate the titanium source debit tail.
     assert tuple(
         transition.reason for transition in sim.atom_ledger.transitions[-5:]
     ) == (
-        "evaporate_Si",
-        "condense_Si",
         "evaporate_Ti",
+        "evaporate_TiO",
+        "evaporate_TiO2_gas",
         "fe_redox_respeciation",
         "overhead_bleed",
     )

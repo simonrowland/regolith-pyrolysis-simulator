@@ -39,16 +39,11 @@ def test_toggle_off_existing_path_keeps_mass_balance_closed():
     )
 
     assert max(abs(s.mass_balance_error_pct) for s in snapshots) <= 1.0e-12
-    # 2026-08-05 carrier batch 1a1ab47: the added carrier route leaves
-    # +3.988089247730642e-20 kg Na roundoff in overhead. The exact audit and
-    # outward projection agree, while HI-2 above remains well inside contract.
-    # 2026-08-05 MC-4 wave 1B (a34318c): the composed Na carrier set routes
-    # the tick flux exactly; the residual Na roundoff dust is gone and the
-    # audited overhead is now empty. HI-2 above remains <= 1e-12 %.
-    # Restored flagged routing leaves only these identified roundoff parcels.
+    # Causal capture leaves Fe subtraction dust below the 1e-12 kg bleed
+    # transition floor. It exceeds the per-species projection tolerance,
+    # so both audit and outward projection must continue to expose it.
     expected_overhead: dict[str, float] = {
-        "Na": 1.994044623865321e-20,
-        "SiO2_gas": 9.409239450400745e-14,
+        "Fe": 5.930423585471155e-13,
     }
     assert sim.atom_ledger.kg_by_account("process.overhead_gas") == pytest.approx(
         expected_overhead,

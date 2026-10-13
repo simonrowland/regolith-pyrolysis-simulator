@@ -1405,18 +1405,21 @@ def test_b1_oxide_row_requires_activity_for_condensation_without_antoine() -> No
         EvaporationFlux(species_kg_hr={"K": 1.0}, total_kg_hr=1.0),
         melt,
     )
-    # Historical gate nodeid retained: pressure-isolated condensation now uses
-    # explicit stage geometry and preserves its extrapolated authority status.
+    # A source-reaction pressure is not a wall saturation curve. Refuse that
+    # capture quantity while preserving the independently evaluated source.
     k_refusal = route.condensation_refusals_by_species.get("K")
     assert k_refusal is not None
-    assert k_refusal.get("status") == "extrapolated"
+    assert k_refusal.get("status") == "refused"
     authority = route.condensation_authority_by_species["K"]
     assert authority["status"] == "missing"
-    assert authority["authority_level"] == "extrapolated"
+    assert authority["authoritative_for_condensation"] is False
     assert k_refusal["upstream_authority_status"] == "missing"
-    assert authority["stage_condensed_mass_kg_hr"] > 0.0
+    assert authority["stage_condensed_mass_kg_hr"] == 0.0
+    assert any(item["eta"] is None and item["refusal_type"] == "WallSaturationPressureRefusal"
+               for item in k_refusal["stage_outcomes"] if item["status"] == "refused")
     assert "K" not in route.wall_deposit_by_species
-    assert 0.0 < route.remaining_by_species["K"] < 1.0
+    assert route.remaining_by_species["K"] == 1.0
+    assert not route.retained_in_source_by_species
     assert route.remaining_by_species["K"] + authority[
         "stage_condensed_mass_kg_hr"
     ] == pytest.approx(1.0)

@@ -3027,23 +3027,26 @@ class CondensationModel:
                         antoine_extrapolation_warnings=antoine_extrapolation_warnings,
                         efficiency_outcomes=efficiency_outcomes_by_species.setdefault(species, []),
                     )
-                except WallSaturationPressureRefusal as exc:
-                    # The shared wall owner has no capture quantity. Reuse the
-                    # existing source-retention refusal, never a zero capture
-                    # or a fabricated wall Psat. A later refusal after capture
-                    # cannot undo a mixture already consumed by other sinks.
-                    if route['hkl_condensed_by_stage'] or wall_hkl_by_species.get(species):
+                except (WallSaturationPressureRefusal, DepositionInputRefusal) as exc:
+                    if isinstance(exc, DepositionInputRefusal) and exc.value is not None:
                         raise
-                    retained_in_source_by_species[species] = inlet_rates[species]
-                    flowing_rates[species] = 0.0
-                    non_debiting_reason_by_species[species] = 'wall_saturation_pressure_out_of_domain'
+                    # A missing capture input does not revoke the upstream
+                    # evaporation authority or undo earlier measured capture.
+                    # Keep the uncaptured parcel in flow, with eta unavailable;
+                    # neither a fabricated saturation curve nor proven zero.
                     condensation_authority_by_species[species].update({
-                        'status': VAPOUR_CARRIER_AUTHORITY_REFUSED,
+                        'status': (
+                            VAPOUR_CARRIER_AUTHORITY_MISSING
+                            if carrier_authority_status_by_species[species] == VAPOUR_CARRIER_AUTHORITY_MISSING
+                            else VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING
+                        ),
                         'authoritative_for_condensation': False,
                     })
                     efficiency_outcomes_by_species.setdefault(species, []).append({
                         'status': 'refused', 'reason': str(exc), 'output_status': 'refused',
                         'species': species, 'stage_number': stage.stage_number, 'eta': None,
+                        'refusal_type': type(exc).__name__,
+                        **({'parameter': exc.parameter} if isinstance(exc, DepositionInputRefusal) else {}),
                     })
                     continue
                 deposit = supply * eta
@@ -3446,11 +3449,15 @@ class CondensationModel:
         for species, outcomes in efficiency_outcomes_by_species.items():
             if not outcomes:
                 continue
+            refused_outcome = next(
+                (item for item in outcomes if item.get('status') == 'refused'),
+                None,
+            )
             domain_outcome = next(
                 (item for item in outcomes if item.get('status') == 'extrapolated'),
                 None,
             )
-            if domain_outcome is not None:
+            if domain_outcome is not None and refused_outcome is None:
                 authority = condensation_authority_by_species.get(species)
                 if authority is not None:
                     authority.update({
@@ -3474,11 +3481,11 @@ class CondensationModel:
                     existing['stage_outcomes'] = stage_list
                     condensation_refusals_by_species[species] = existing
                 continue
-            primary = domain_outcome or outcomes[0]
+            primary = refused_outcome or domain_outcome or outcomes[0]
             condensation_refusals_by_species[species] = {
-                'status': 'extrapolated' if domain_outcome else 'pass_through',
+                'status': primary['status'],
                 'reason': str(primary.get('reason') or 'condensation_efficiency_zero'),
-                'output_status': 'status_bearing',
+                'output_status': 'refused' if refused_outcome else 'status_bearing',
                 'stage_outcomes': list(outcomes),
             }
 
@@ -3962,6 +3969,15 @@ class CondensationModel:
             raise DepositionInputRefusal('available_kg', available_kg, 'must be nonnegative')
         if available_kg == 0.0:
             return _mint_zero('no_available_mass')
+        p_in = _deposition_finite_scalar(
+            'flowing_pressure_pa',
+            inlet_partial_pressure_pa if inlet_partial_pressure_pa is not None
+            else self.wall_species_partial_pressures_pa.get(species),
+        )
+        if p_in < 0.0:
+            raise DepositionInputRefusal('flowing_pressure_pa', p_in, 'must be nonnegative')
+        if p_in == 0.0:
+            return _mint_zero('nonpositive_local_pressure', P_local_pa=p_in)
         area = self._stage_area_m2_for_stage_number(stage.stage_number)
         if area is None and (
             self.lab_geometry is not None
@@ -3978,17 +3994,6 @@ class CondensationModel:
         if area == 0.0:
             return _mint_zero('no_configured_capture_area')
 
-        # Direct diagnostic callers use the declared flow map; runtime routing
-        # supplies the local pressure AFTER preceding wall and stage removal.
-        p_in = _deposition_finite_scalar(
-            'flowing_pressure_pa',
-            inlet_partial_pressure_pa if inlet_partial_pressure_pa is not None
-            else self.wall_species_partial_pressures_pa.get(species),
-        )
-        if p_in < 0.0:
-            raise DepositionInputRefusal('flowing_pressure_pa', p_in, 'must be nonnegative')
-        if p_in == 0.0:
-            return _mint_zero('nonpositive_local_pressure', P_local_pa=p_in)
         T_surface_K = _stage_midpoint_temperature_K(stage)
         T_surface_C = T_surface_K - CELSIUS_TO_KELVIN_OFFSET
         if _reactive_product_backstop_authorized(species) and T_surface_C > T_cond_C:

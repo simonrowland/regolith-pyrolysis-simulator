@@ -8,6 +8,11 @@ import pytest
 import yaml
 
 from simulator.backends import BackendSelectionPolicy
+from simulator.condensation import (
+    _required_record_alpha_s,
+    _series_resistance_deposition_flux_mol_m2_s,
+    _wall_alpha_record,
+)
 from simulator.session import SimSession, SimSessionConfig
 from simulator.state import (
     EvaporationFlux,
@@ -140,36 +145,11 @@ def test_cold_wall_segment_attribution_matches_configured_geometry_values():
 
     attribution = _route_cold_wall_sio_tick(session)
 
-    # Premise: the configured 0.06 m throat radius and downstream area ratios
-    # give A1 = pi*(0.06 m)^2*4.0 and A2 = pi*(0.06 m)^2*4.5; the configured
-    # operating point gives SiO wall flux J = 0.062461400479484286 mol/m^2/s.
-    # 2026-07-23 re-pin (stale-pin correction): 07fa3fe gated the SiO
-    # reactive-product backstop at the wall deposition site (T_surface <=
-    # T_cond), moving J from the 37cf443-ratified 0.062743751473665094 to the
-    # value below; re-derived from the executable cold-wall path on
-    # compose-0.6.3 @ 32a3a5c and verified byte-identical across repeated
-    # in-process runs and fresh processes. The area-proportional attribution
-    # (A2/A1 = 4.5/4.0) and the disproportionation split are unchanged.
-    # Algebra: m_i = J*A_i*M_SiO*3600, so A2/A1 = m2/m1 = 4.5/4.0.
-    # Unit check: (mol/m^2/s)*(m^2)*(kg/mol)*(s/h) = kg/h.
-    # Sanity: the attributed total is conserved and the larger area deposits
-    # more mass.
-    # 2026-07-30 re-pin (t-475): wall deposition now takes its driving force
-    # from the species PARTIAL pressure in the flowing gas against saturation
-    # at the wall temperature, replacing the pure-component P_sat(T_melt) that
-    # was not an admissible partial pressure.
-    # 2026-08-04 re-pin (b-118/b-127 coating-cluster): the continuation became
-    # coating-conservative and uncovered Antoine segments refuse rather than
-    # invent 100 Pa. Cold-wall SiO J moves
-    # 0.062205888833975716 -> the value below (+0.865 %), i.e. MORE wall flux
-    # — the physically correct direction for the coating failure mode (prior
-    # under-reporting path removed). Re-derived from the executable cold-wall
-    # path by inverting this test's own algebra,
-    # J = Si_kg/(0.5*A1*M_Si/1000*3600), and cross-checked against the SiO2
-    # leg — both legs agree to 1e-12 relative. Area ratio A2/A1 = 4.5/4.0
-    # unchanged. The later t-523 correction restores extrapolated inventory
-    # debit without changing this coating-conservative continuation or its pin.
-    sio_flux_mol_m2_s = 0.06274375148239172
+    # Premise: each local wall consumes J*A*M*3600 from its entering parcel;
+    # a later collector cannot rescale an earlier wall. Units are kg/h.
+    # These equal-temperature, equal-pressure walls below the supply limit
+    # preserve the configured area ratio A2/A1 = 4.5/4.0.
+    model = session.simulator.condensation_model
     segment_areas_m2 = {
         "process.wall_deposit_segment_stage_0_to_stage_1": (
             math.pi * 0.06**2 * 4.0
@@ -180,22 +160,35 @@ def test_cold_wall_segment_attribution_matches_configured_geometry_values():
     }
     expected_sio_kg = {
         account: (
-            sio_flux_mol_m2_s
+            _series_resistance_deposition_flux_mol_m2_s(
+                "SiO", model.wall_species_partial_pressures_pa_by_segment[segment.name]["SiO"],
+                segment.wall_temperature_C + 273.15,
+                _required_record_alpha_s(
+                    _wall_alpha_record("SiO", model.materials, segment=segment),
+                    species="SiO", site="wall_segment_alpha",
+                ),
+                pipe_diameter_m=segment.inner_diameter_m,
+                stir_factor=model.stir_factor,
+                radial_stir_factor=model.radial_stir_factor,
+                regime_factor=model.regime_factor,
+                T_gas_K=model.gas_temperature_C + 273.15,
+                overhead_pressure_pa=model.overhead_pressure_mbar * 100.0,
+                carrier_gas=model.carrier_gas,
+                vapor_pressure_data=model.vapor_pressure_data,
+            )
             * area_m2
             * (MOLAR_MASS["SiO"] / 1000.0)
             * 3600.0
         )
+        for segment in model.pipe_segments
         for account, area_m2 in segment_areas_m2.items()
+        if account == "process.wall_deposit_segment_" + segment.name
     }
 
-    # Restored stage capture shares the same finite vapor budget with walls.
     stage_capture_kg = sum(session.simulator.atom_ledger.kg_by_account(
         "process.condensation_train"
     ).values())
     assert stage_capture_kg > 0.0
-    capture_budget_kg = sum(expected_sio_kg.values())
-    wall_fraction = (capture_budget_kg - stage_capture_kg) / capture_budget_kg
-    expected_sio_kg = {account: kg * wall_fraction for account, kg in expected_sio_kg.items()}
 
     assert set(attribution) == set(expected_sio_kg)
     for account, sio_kg in expected_sio_kg.items():

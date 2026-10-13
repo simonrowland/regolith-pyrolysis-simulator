@@ -3106,7 +3106,7 @@ def test_invalid_recipe_local_furnace_field_is_rejected(
         )
 
 
-def test_in_window_c2a_run_captures_na_product() -> None:
+def test_in_window_c2a_run_reports_zero_na_recovery_and_terminal_loss() -> None:
     _, run_config = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
@@ -3129,7 +3129,8 @@ def test_in_window_c2a_run_captures_na_product() -> None:
     result = run._run_session(session)
 
     assert result["status"] == "ok"
-    assert session.simulator.product_ledger()["Na"] > 0.0
+    assert session.simulator.product_ledger()["Na"] == 0.0
+    assert session.simulator.atom_ledger.kg_by_account("terminal.offgas")["Na"] > 0.0
 
 
 def test_lab_schedule_profile_schedules_declared_piecewise_temperature_pressure() -> None:

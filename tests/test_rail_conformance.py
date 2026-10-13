@@ -106,7 +106,7 @@ def _yaml(path: Path) -> dict[str, Any]:
 
 def _source_debited_rates(sim, candidate_rates: dict[str, float]) -> dict[str, float]:
     authority = sim.condensation_model.last_condensation_authority_by_species
-    # t-1217: route-retained candidates have no source debit without executable wall saturation.
+    # Only upstream source refusals withhold evaporation, not missing capture inputs.
     return {
         species: rate
         for species, rate in candidate_rates.items()
@@ -2080,8 +2080,7 @@ def test_c6_shared_si_reservoir_conserves_independent_carrier_sum(
     sim._configure_condensation_operating_conditions(smoothed)
     sim._route_to_condensation(smoothed)
     debited_rates = _source_debited_rates(sim, smoothed.species_kg_hr)
-    # t-1217: only the Si/SiO carrier subset has source authority in this probe.
-    assert set(debited_rates) == set(requested_rates) & {"Si", "SiO"}
+    assert set(debited_rates) == set(requested_rates)
     sim._update_melt_composition(smoothed)
 
     carrier_formulas = {
@@ -2143,8 +2142,7 @@ def test_c6_shared_ti_reservoir_conserves_three_carrier_sum_once() -> None:
     sim._configure_condensation_operating_conditions(smoothed)
     sim._route_to_condensation(smoothed)
     debited_rates = _source_debited_rates(sim, smoothed.species_kg_hr)
-    # t-1217: Ti is the only admitted carrier in this synthetic source probe.
-    assert set(debited_rates) == {"Ti"}
+    assert set(debited_rates) == set(requested_rates)
     sim._update_melt_composition(smoothed)
     carrier_mol = {
         species_id: rate_kg_hr
@@ -2210,8 +2208,7 @@ def test_c6_shared_al_reservoir_conserves_seven_carrier_sum_once() -> None:
     releasing_debited_rates = _source_debited_rates(
         sim, smoothed_releasing.species_kg_hr
     )
-    # t-1217: the admitted bare Al carrier keeps the shared-reservoir check active.
-    assert "Al" in releasing_debited_rates
+    assert set(releasing_debited_rates) == set(releasing_rates)
     sim._update_melt_composition(smoothed_releasing)
 
     # AlO2 consumes O2, so evaluate it after the co-carriers have populated
@@ -2219,8 +2216,7 @@ def test_c6_shared_al_reservoir_conserves_seven_carrier_sum_once() -> None:
     smoothed_oxidizing = sim._apply_analytic_evaporation_depletion(
         _flux({"AlO2": requested_rates["AlO2"]})
     )
-    # t-1217: retained source carriers released no O2, leaving AlO2's O2 draw unavailable.
-    assert smoothed_oxidizing.species_kg_hr == {}
+    assert set(smoothed_oxidizing.species_kg_hr) == {"AlO2"}
     sim._configure_condensation_operating_conditions(smoothed_oxidizing)
     sim._route_to_condensation(smoothed_oxidizing)
     oxidizing_debited_rates = _source_debited_rates(

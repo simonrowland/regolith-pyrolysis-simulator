@@ -336,13 +336,11 @@ def test_low_voltage_debug_feedstock_exercises_mre_electrolysis(monkeypatch):
     ) == pytest.approx(0.0)
     assert sim.atom_ledger.kg_by_account("process.overhead_gas")[
         "Na"
-    ] == pytest.approx(0.8571653495845415)
-    # 2026-07-30 7d42b4f rebaseline: bounded flowing p_Na stays below the
-    # 1500 C wall saturation pressure, so dew-point-undersaturated Na reaches
-    # the condensation train instead of depositing on the hot pipe walls.
+    ] == pytest.approx(2.0217140897425274)
+    # The equilibrium cap reduces Na capture without changing its Faraday source.
     assert sim.atom_ledger.kg_by_account("process.condensation_train")[
         "Na"
-    ] == pytest.approx(1.4777109062199472)
+    ] == pytest.approx(0.31316216606196157)
     wall_na_kg = sum(
         sim.atom_ledger.kg_by_account(account).get("Na", 0.0)
         for account in PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS

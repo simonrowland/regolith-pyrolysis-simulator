@@ -55,6 +55,25 @@ def test_stage3_unavailable_psat_missing_flow_refuses():
         )
 
 
+def test_missing_collector_area_refuses_capture_quantity_without_aborting_route():
+    model = _stage3_unavailable_psat_model()
+    model.stage_area_m2_by_stage = {}
+    result = model.route(
+        EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0),
+        MeltState(temperature_C=1500.0),
+    )
+    refusal = result.condensation_refusals_by_species["SiO"]
+    assert refusal["status"] == "refused"
+    outcomes = refusal["stage_outcomes"]
+    missing_area = [item for item in outcomes
+                    if item.get("refusal_type") == "DepositionInputRefusal"]
+    assert missing_area
+    assert all(item["parameter"] == "stage_area_m2" and item["eta"] is None
+               for item in missing_area)
+    assert result.retained_in_source_by_species.get("SiO", 0.0) == 0.0
+    assert result.remaining_by_species["SiO"] == pytest.approx(1.0)
+
+
 @pytest.mark.parametrize("case", ["positive", "zero_flow", "zero_area"])
 def test_declared_non_sio_extension_preserves_physical_zeros(case):
     model = _stage3_unavailable_psat_model()
@@ -141,7 +160,7 @@ def test_declared_non_sio_extension_invalid_area_aborts_hour(monkeypatch):
     def missing_area(self, **kwargs):
         areas = self.stage_area_m2_by_stage
         if kwargs["species"] != "SiO":
-            self.stage_area_m2_by_stage = {}
+            self.stage_area_m2_by_stage = {str(kwargs["stage"].stage_number): -1.0}
         try:
             return original(self, **kwargs)
         finally:
