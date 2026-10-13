@@ -16,6 +16,7 @@ import hashlib
 import math
 import sys
 from collections import Counter
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
@@ -52,6 +53,483 @@ if str(TOOLS) not in sys.path:
 import extract_merge as em  # noqa: E402
 import migrate_pilot_extracts as mig  # noqa: E402
 import validate_literature_extracts as vle  # noqa: E402
+from simulator.battery import migrate as battery_migrate  # noqa: E402
+from simulator.battery.waypoints import oxygen_condition  # noqa: E402
+
+
+class _DuplicateRejectingLoader(yaml.SafeLoader):
+    def construct_mapping(self, node, deep=False):
+        mapping = {}
+        for key_node, value_node in node.value:
+            key = self.construct_object(key_node, deep=deep)
+            if key in mapping:
+                raise yaml.constructor.ConstructorError(
+                    "while constructing a mapping",
+                    node.start_mark,
+                    f"duplicate key {key!r}",
+                    key_node.start_mark,
+                )
+            mapping[key] = self.construct_object(value_node, deep=deep)
+        return mapping
+
+
+# Independent full-matrix literals transcribed from Table 1's page image,
+# published p. 1063. Each tuple is sample number, material, then printed
+# −log fO2 (atm) at 1000, 1050, 1100, 1150 and 1200 °C.
+_SATO_1973_TABLE_PINS = {
+    "sato73_12009_35_bulk_rock": (
+        "12009,35", "bulk rock", ("15.6", "14.8", "14.0", "13.4", "12.8")
+    ),
+    "sato73_12009_35_olivine": (
+        "12009,35", "olivine", ("15.5", "14.6", "13.9", "13.2", "12.4")
+    ),
+    "sato73_12009_35_groundmass": (
+        "12009,35", "groundmass", ("16.0", "15.0", "14.3", "13.6", "12.8")
+    ),
+    "sato73_12009_35_bulk_plus_fe": (
+        "12009,35", "bulk + Fe", ("16.0", "15.2", "14.4", "13.7", "13.0")
+    ),
+    "sato73_12022_36_bulk_plus_fe": (
+        "12022,36", "bulk + Fe", ("15.7", "14.8", "14.0", "13.4", "12.7")
+    ),
+    "sato73_12053_89_bulk_rock": (
+        "12053,89", "bulk rock", ("15.4", "14.6", "13.8", "13.0", "12.3")
+    ),
+    "sato73_12053_89_pyroxenes": (
+        "12053,89", "pyroxenes", ("15.3", "14.4", "13.6", "12.8", "12.1")
+    ),
+    "sato73_12053_89_bulk_plus_fe": (
+        "12053,89", "bulk + Fe", ("16.0", "15.2", "14.5", "13.8", "13.1")
+    ),
+    "sato73_14310_195_bulk_rock": (
+        "14310,195", "bulk rock", ("15.4", "14.5", "13.8", "13.3", "11.5")
+    ),
+    "sato73_14310_207_bulk_rock": (
+        "14310,207", "bulk rock", ("15.3", "14.5", "13.9", "13.2", "10.9")
+    ),
+    "sato73_14321_105_bulk_rock": (
+        "14321,105", "bulk rock", ("15.6", "14.6", "13.9", "13.0", "12.3")
+    ),
+    "sato73_15058_81_bulk_rock": (
+        "15058,81", "bulk rock", ("15.7", "14.9", "14.0", "13.3", "12.6")
+    ),
+    "sato73_15058_88_bulk_rock": (
+        "15058,88", "bulk rock", ("15.7", "14.9", "14.0", "13.3", "12.5")
+    ),
+    "sato73_15595_25_bulk_rock": (
+        "15595,25", "bulk rock", ("15.7", "14.9", "14.1", "13.2", "12.4")
+    ),
+    "sato73_15595_25_bulk_plus_fe": (
+        "15595,25", "bulk + Fe", ("16.0", "15.1", "14.2", "13.4", "12.7")
+    ),
+}
+_SATO_1973_TABLE_TEMPERATURES_C = ("1000", "1050", "1100", "1150", "1200")
+_SATO_1973_SAMPLE_FORMS = {
+    observation_id: (
+        f"Lunar sample {sample}; bulk rock plus iron foil"
+        if material == "bulk + Fe"
+        else f"Lunar sample {sample}; {material}"
+    )
+    for observation_id, (sample, material, _logs) in _SATO_1973_TABLE_PINS.items()
+}
+
+_OHTA_SUITO_1995_TABLE_II_ATTRIBUTIONS = {
+    **{
+        observation_id: "Table II, reference [4] (Rein and Chipman, 1965)"
+        for observation_id in (
+            "ohta_suito_1995_table2_ac_alumina_activity",
+            "ohta_suito_1995_table2_ca_alumina_activity",
+            "ohta_suito_1995_table2_acs2_alumina_activity",
+            "ohta_suito_1995_table2_acs4_alumina_activity",
+            "ohta_suito_1995_table2_acs5_alumina_activity",
+            "ohta_suito_1995_table2_cas5_alumina_activity",
+            "ohta_suito_1995_table2_cas9_alumina_activity",
+            "ohta_suito_1995_table2_cas10_alumina_activity",
+            "ohta_suito_1995_table2_cas11_alumina_activity",
+            "ohta_suito_1995_table2_acs2_silica_activity",
+            "ohta_suito_1995_table2_acs4_silica_activity",
+            "ohta_suito_1995_table2_acs5_silica_activity",
+            "ohta_suito_1995_table2_cas5_silica_activity",
+            "ohta_suito_1995_table2_cas8_silica_activity",
+            "ohta_suito_1995_table2_cas9_silica_activity",
+            "ohta_suito_1995_table2_cas10_silica_activity",
+            "ohta_suito_1995_table2_cas11_silica_activity",
+        )
+    },
+    "ohta_suito_1995_table2_cas8_alumina_activity": (
+        "Table II, reference [1] (Lee and Suito, 1994)"
+    ),
+    "ohta_suito_1995_table2_cs_silica_activity": (
+        "Table II, reference [7] (Inoue and Suito, 1992)"
+    ),
+}
+_OHTA_SUITO_1995_TABLE_III = """i | j | e_i^j (r_i^j)
+Al | Al | 0.045 (-0.001)
+Al | Si | 0.056
+Al | O | -6.6
+Si | Al | 0.058
+Si | Si | 0.11 (-0.0021)
+Si | O | -0.23
+Si | Mn | 0.002
+O | Al | -3.9 (1.7)
+O | Si | -0.131
+O | O | -0.20
+O | Mn | -0.021
+Mn | Si | 0
+Mn | O | -0.083
+Mn | Mn | 0"""
+
+
+def _assert_ohta_suito_1995_review_pins(extract: dict) -> None:
+    rows = {
+        row["observation_id"]: row
+        for species in ("Al2O3", "SiO2")
+        for row in extract["species"][species]["observations"]
+    }
+    assert set(rows) == set(_OHTA_SUITO_1995_TABLE_II_ATTRIBUTIONS)
+    for observation_id, attribution in _OHTA_SUITO_1995_TABLE_II_ATTRIBUTIONS.items():
+        row = rows[observation_id]
+        assert "regime" not in row
+        assert row["values"]["attribution"] == attribution
+
+    procedure = next(
+        row for row in extract["species"]["MnO"]["context"]
+        if row["observation_id"] == "ohta_suito_1995_experimental_conditions"
+    )
+    assert procedure["values"]["quench_method_as_printed"] == (
+        "the crucible was pulled out of the furnace and quenched rapidly in a He "
+        "gas stream, followed by water quenching"
+    )
+
+    table_iii_observation_id = "ohta_suito_1995_table3_interaction_parameters"
+    expected_table_iii_locator = {
+        "page": 298, "published_page": 298, "pdf_page_index": 3, "table": "III"
+    }
+    table_iii_locators = [
+        row["locator"]
+        for species in extract["species"].values()
+        for row in species.get("context", [])
+        if row.get("locator", {}).get("table") == "III"
+    ]
+    table_iii_locators.extend(
+        sample["locator"]
+        for sample in extract["fidelity_samples"]
+        if sample.get("observation_id") == table_iii_observation_id
+    )
+    assert table_iii_locators
+    assert all(locator == expected_table_iii_locator for locator in table_iii_locators)
+    table_iii = next(
+        row for row in extract["species"]["MnO"]["context"]
+        if row["observation_id"] == table_iii_observation_id
+    )
+    assert table_iii["values"]["table_transcription"] == _OHTA_SUITO_1995_TABLE_III
+
+    table_i = next(
+        row for row in extract["species"]["MnO"]["context"]
+        if row["observation_id"] == "ohta_suito_1995_table1_compositions_and_equilibrium_analyses"
+    )
+    assert table_i["units"] == (
+        "mass percent except soluble Al, insoluble Al, and O (mass ppm); "
+        "dash as printed means blank/not reported"
+    )
+
+
+def test_ohta_suito_1995_source_pins_reject_each_review_regression() -> None:
+    source = EXTRACTS / "ohta-suito-1995-mno-activity-slags.yaml"
+    extract = yaml.load(source.read_text(), Loader=_DuplicateRejectingLoader)
+    _assert_ohta_suito_1995_review_pins(extract)
+    migrator = battery_migrate.Migrator(
+        root=REPO_ROOT,
+        index={source.stem: dict(extract["source"], source_id=source.stem)},
+        aliases={},
+    )
+    migrator._migrate_extract(source)
+    migrator.finalize()
+    assert len(migrator.result.experiments) == 11
+    assert all(
+        experiment.method.tag.value == "unknown"
+        and experiment.method.reason == "source does not state method"
+        for experiment in migrator.result.experiments.values()
+    )
+
+    mutations = (
+        "quoted_method",
+        "cas8_alumina_reference",
+        "table_iii_indices",
+        "table_iii_temperature_fidelity_locator",
+        "table_i_units",
+    )
+    for mutation in mutations:
+        extract = yaml.load(source.read_text(), Loader=_DuplicateRejectingLoader)
+        context = extract["species"]["MnO"]["context"]
+        if mutation == "quoted_method":
+            extract["species"]["Al2O3"]["observations"][0]["regime"] = (
+                "quench_equilibration"
+            )
+        elif mutation == "cas8_alumina_reference":
+            extract["species"]["Al2O3"]["observations"][6]["values"][
+                "attribution"
+            ] = "Table II, reference [4] (Rein and Chipman, 1965)"
+        elif mutation == "table_iii_indices":
+            table = next(
+                row for row in context
+                if row["observation_id"] == "ohta_suito_1995_table3_interaction_parameters"
+            )
+            table["values"]["table_transcription"] = table[
+                "values"
+            ]["table_transcription"].replace("e_i^j (r_i^j)", "e_j^i")
+        elif mutation == "table_iii_temperature_fidelity_locator":
+            sample = next(
+                sample for sample in extract["fidelity_samples"]
+                if sample["observation_id"] == "ohta_suito_1995_table3_interaction_parameters"
+                and sample["field"] == "temperature_K"
+            )
+            sample["locator"] = {
+                "page": 297, "published_page": 297, "pdf_page_index": 2, "table": "III"
+            }
+        else:
+            table = next(
+                row for row in context
+                if row["observation_id"] == "ohta_suito_1995_table1_compositions_and_equilibrium_analyses"
+            )
+            table["units"] = (
+                "mass percent except metal oxygen (mass ppm); "
+                "dash as printed means blank/not reported"
+            )
+        with pytest.raises(AssertionError):
+            _assert_ohta_suito_1995_review_pins(extract)
+
+
+def _assert_sato_1973_table_pins(extract: dict) -> None:
+    bench = extract["benches"][0]
+    assert bench["temperature_measurement"]["increments"]["state"]["value"] == (
+        "About 20 °C during heating and about 40 °C during cooling, "
+        "after equilibration periods of about 1 h"
+    )
+    context = extract["species"]["O2"]["context"][0]["values"]
+    assert context["measurement_atmosphere_as_printed"] == (
+        "Furnace atmosphere was N2 diluent with about 1% CO2 and variable H2, "
+        "servo-controlled to keep its fO2 within about 0.1 log fO2 unit of the sample."
+    )
+    assert context["iron_wustite_buffer_relation_as_printed"] == (
+        "log fO2 = 6.824 − 27470/T"
+    )
+    assert context["iron_wustite_buffer_temperature_range_as_printed"] == "850–1300 °C"
+    assert context["iron_wustite_buffer_temperature_unit"] == "T in K (absolute temperature)"
+
+    rows = {
+        row["observation_id"]: row
+        for row in extract["species"]["O2"]["observations"]
+    }
+    assert set(rows) == set(_SATO_1973_TABLE_PINS)
+    for observation_id, (sample, material, printed_logs) in _SATO_1973_TABLE_PINS.items():
+        row = rows[observation_id]
+        assert row["values"]["sample_no_as_printed"] == sample
+        assert row["values"]["material_as_printed"] == material
+        points = row["values"]["points"]
+        assert tuple(point["temperature_C_as_printed"] for point in points) == (
+            _SATO_1973_TABLE_TEMPERATURES_C
+        )
+        assert tuple(point["neg_log_fO2_as_printed"] for point in points) == printed_logs
+        for point, printed_log in zip(points, printed_logs, strict=True):
+            temperature = point["temperature_C_as_printed"]
+            expected_pa = Decimal("101325") * (Decimal(10) ** -Decimal(printed_log))
+            relative_error = abs(
+                Decimal(point["fugacity_Pa"]) / expected_pa - Decimal(1)
+            )
+            assert relative_error <= Decimal("1e-6"), (observation_id, temperature)
+
+
+def test_sato_1973_independently_pins_all_table_1_cells_and_equation() -> None:
+    source = EXTRACTS / "sato-hickling-mclane-1973-lunar-fo2.yaml"
+    extract = yaml.load(source.read_text(), Loader=_DuplicateRejectingLoader)
+    _assert_sato_1973_table_pins(extract)
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "pressure_x10",
+        "printed_log_plus_001",
+        "coordinated_interior_log",
+        "coordinated_interior_temperature",
+        "coordinated_sample_identity",
+        "eq5_coefficient",
+        "eq5_range",
+    ],
+)
+def test_sato_1973_source_pins_reject_mutations(mutation: str) -> None:
+    source = EXTRACTS / "sato-hickling-mclane-1973-lunar-fo2.yaml"
+    extract = yaml.load(source.read_text(), Loader=_DuplicateRejectingLoader)
+    rows = extract["species"]["O2"]["observations"]
+    row = rows[6]
+    point = row["values"]["points"][0]
+    if mutation == "pressure_x10":
+        point["fugacity_Pa"] = str(Decimal(point["fugacity_Pa"]) * 10)
+    elif mutation == "printed_log_plus_001":
+        point["neg_log_fO2_as_printed"] = str(
+            Decimal(point["neg_log_fO2_as_printed"]) + Decimal("0.01")
+        )
+    elif mutation == "coordinated_interior_log":
+        point = rows[6]["values"]["points"][1]
+        point["neg_log_fO2_as_printed"] = "14.5"
+        point["log_fO2_as_signed"] = "-14.5"
+        point["point_conditions"]["fO2_log"]["state"]["value"] = "-14.5"
+        point["fugacity_Pa"] = str(Decimal("101325") * Decimal(10) ** Decimal("-14.5"))
+    elif mutation == "coordinated_interior_temperature":
+        point = rows[6]["values"]["points"][1]
+        point["temperature_C_as_printed"] = "1060"
+        point["temperature_K"] = "1333.15"
+        point["point_conditions"]["temperature_K"]["state"]["value"] = "1333.15"
+    elif mutation == "coordinated_sample_identity":
+        row["values"]["sample_no_as_printed"] = "12053,98"
+        experiment = next(
+            item for item in extract["experiments"]
+            if item["experiment_id"] == row["observation_id"]
+        )
+        experiment["sample"]["form"]["state"]["value"] = "Lunar sample 12053,98; pyroxenes"
+    elif mutation == "eq5_coefficient":
+        extract["species"]["O2"]["context"][0]["values"][
+            "iron_wustite_buffer_relation_as_printed"
+        ] = "log fO2 = 6.824 − 27471/T"
+    else:
+        extract["species"]["O2"]["context"][0]["values"][
+            "iron_wustite_buffer_temperature_range_as_printed"
+        ] = "850–1400 °C"
+    with pytest.raises(AssertionError):
+        _assert_sato_1973_table_pins(extract)
+
+
+def test_sato_1973_all_75_conversions_and_migration_consistency() -> None:
+    source = EXTRACTS / "sato-hickling-mclane-1973-lunar-fo2.yaml"
+    extract = battery_migrate.load_yaml(source)
+    rows = extract["species"]["O2"]["observations"]
+    assert len(rows) == 15
+    assert sum(len(row["values"]["points"]) for row in rows) == 75
+    _assert_sato_1973_table_pins(extract)
+
+    migrator = battery_migrate.Migrator(root=REPO_ROOT)
+    migrator._migrate_extract(source)
+    migrator.finalize()
+    result = migrator.result
+    observations = [
+        obs for obs in result.observations.values()
+        if "sato73_" in obs.observation_id
+    ]
+    assert len(observations) == 75
+    assert len([obs for obs in observations if obs.value.kind.value == "point"]) == 75
+    assert not result.validation.hard_issues
+    assert len(result.experiments) == 15
+
+    migrated = {obs.observation_id: obs for obs in observations}
+    assert all(obs.uncertainty.kind.value == "printed" for obs in observations)
+    assert all(
+        "Basis: log10(fO2/atm)" in obs.uncertainty.verbatim
+        for obs in observations
+    )
+    assert all(
+        "Apollo 12" in obs.uncertainty.verbatim
+        and "excepted from the reported within-0.2-log-unit scatter" in obs.uncertainty.verbatim
+        and "anomalously high initial first-heating readings were omitted from the fitted curves"
+        in obs.uncertainty.verbatim
+        for obs in observations
+        if any(sample in obs.observation_id for sample in ("12009", "12022", "12053"))
+    )
+    assert all(
+        result.experiments[obs.experiment_id].method.value.value == "emf_cell"
+        for obs in observations
+    )
+    extract_experiments = {
+        item["experiment_id"]: item for item in extract["experiments"]
+    }
+    for observation_id, (sample_no, _material, _logs) in _SATO_1973_TABLE_PINS.items():
+        method = extract_experiments[observation_id]["thermal_schedule"]["method"]
+        history_state = method["state"]
+        assert history_state["tag"] == "value"
+        history = history_state["value"]
+        locator_page = method["locator"]["published_page"]
+        if sample_no.startswith(("12009", "12022", "12053")):
+            assert "initial first-heating readings" in history
+            assert "omitted from the visually fitted curves" in history
+            assert locator_page == 1063
+        elif sample_no.startswith("14310"):
+            assert "Table 1 values for the two 14310 chips are from the first heating cycle" in history
+            assert "irreversible, reproducible abrupt rise" in history
+            assert locator_page == 1067
+        elif sample_no.startswith("14321"):
+            assert "irregular fO2 values" in history
+            assert locator_page == 1067
+        elif sample_no.startswith("15058"):
+            assert "almost identical results" in history
+            assert locator_page == 1063
+        else:
+            assert "heating and cooling results" in history
+            assert "first heating cycle" not in history.casefold()
+            assert locator_page == 1063
+    resolved_count = 0
+    for row in rows:
+        observation_id = row["observation_id"]
+        _sample_no, _material, expected_logs = _SATO_1973_TABLE_PINS[observation_id]
+        assert row["measurement_basis_as_printed"] == (
+            "measured_tabulated is the nearest existing method_class; no class distinguishes author-smoothed or curve-fitted measured values. Each Table 1 value is read from the authors' visually drawn best-fit curve through their measured points, not an individual reading (published p. 1063)."
+        )
+        assert row["values"]["method_class"] == "measured_tabulated"
+        expected_count = 0
+        for point, expected_log, expected_temperature in zip(
+            row["values"]["points"],
+            expected_logs,
+            _SATO_1973_TABLE_TEMPERATURES_C,
+            strict=True,
+        ):
+            assert point["neg_log_fO2_as_printed"] == expected_log
+            assert point["temperature_C_as_printed"] == expected_temperature
+            assert Decimal(point["temperature_K"]) == (
+                Decimal(expected_temperature) + Decimal("273.15")
+            )
+            expected_pa = Decimal("101325") * (
+                Decimal(10) ** -Decimal(point["neg_log_fO2_as_printed"])
+            )
+            consumed_pa = Decimal(point["fugacity_Pa"])
+            relative_error = abs(consumed_pa / expected_pa - Decimal(1))
+            assert relative_error <= Decimal("1e-6"), (
+                row["observation_id"], point["temperature_C_as_printed"]
+            )
+            matches = [
+                obs for observation_id, obs in migrated.items()
+                if row["observation_id"] in observation_id
+                and obs.point_conditions.get("temperature_K") is not None
+                and obs.point_conditions["temperature_K"].state.value
+                == Decimal(point["temperature_K"])
+            ]
+            assert len(matches) == 1, (
+                row["observation_id"], point["temperature_C_as_printed"]
+            )
+            observation = matches[0]
+            assert observation.value.point == consumed_pa
+            experiment = result.experiments[observation.experiment_id]
+            assert experiment.sample.form.state.value == _SATO_1973_SAMPLE_FORMS[observation_id]
+            assert experiment.sample.characterization.state.value
+            bench = result.benches[experiment.bench_id]
+            resolved = oxygen_condition(experiment, bench, observation)
+            assert resolved.selected is not None
+            assert resolved.selected.value.point == Decimal(
+                point["log_fO2_as_signed"]
+            )
+            resolved_count += 1
+            expected_count += 1
+        assert expected_count == 5
+        sample_form = experiment.sample.form.state.value
+        sample_description = experiment.sample.characterization.state.value
+        assert sample_form == _SATO_1973_SAMPLE_FORMS[row["observation_id"]]
+        sample_number = _SATO_1973_TABLE_PINS[row["observation_id"]][0]
+        if sample_number.startswith("14310"):
+            assert "“Igneous” rock" in sample_description
+            assert "irreversible, reproducible abrupt rise" in experiment.thermal_schedule.method.state.value
+        elif sample_number.startswith("14321"):
+            assert "Microbreccia" in sample_description
+        else:
+            assert "Basaltic igneous rock" in sample_description
+    assert resolved_count == 75
 
 
 def test_norris_starting_composition_is_pinned_to_online_extended_table() -> None:
@@ -76,6 +554,77 @@ def test_norris_starting_composition_is_pinned_to_online_extended_table() -> Non
         assert composition["locator"]["table"] == "Extended Data Table 1"
         assert composition["locator"].get("pdf_page_index") is None
         assert "PMC6485635 online" in composition["locator"]["note"]
+
+
+def test_okazaki_container_helium_ratio_uncertainty_is_pinned() -> None:
+    doc = yaml.safe_load(
+        (EXTRACTS / "okazaki-2022-ryugu-gas-treasure-box.yaml").read_text()
+    )
+    observation = next(
+        item
+        for item in doc["species"]["He"]["observations"]
+        if item["observation_id"] == "okazaki_2022_container_helium_isotope_ratio"
+    )
+
+    # Source article p. 3, Fig. 2A (also cited to Table S1) prints ±0.010 × 10−4.
+    printed_uncertainty = "+/- 0.010 x 10^-4 (1 sigma)"
+    assert observation["uncertainty"]["ratio_3He_4He"] == printed_uncertainty
+    assert "(1 sigma)" in printed_uncertainty
+
+
+def test_banya_watanabe_1977_row_conditions_and_feto_reference_migrate() -> None:
+    from simulator.battery.enums import Quantity
+    from simulator.battery.migrate import Migrator
+
+    path = EXTRACTS / "banya-watanabe-1977-feto-p2o5-solid-iron.yaml"
+    source = yaml.safe_load(path.read_text(encoding="utf-8"))
+    source_table4 = next(
+        row
+        for row in source["species"]["Fe_tO"]["observations"]
+        if row["observation_id"].endswith("xp2o5_0_00")
+    )
+    assert source_table4["values"]["X_P2O5_as_printed"] == 0.00
+    assert (
+        source_table4["point_conditions"]["X_P2O5_as_printed"]["state"]["value"]["point"]
+        == "0.00"
+    )
+
+    migrator = Migrator(REPO_ROOT, index={}, aliases={})
+    migrator._migrate_extract(path)
+    migrator.finalize()
+    result = migrator.result
+
+    assert len(result.observations) == 87
+    assert not result.validation.hard_issues
+    table3 = [
+        row
+        for row in result.observations.values()
+        if "banya77_t3_run_" in row.observation_id
+    ]
+    table4 = [
+        row
+        for row in result.observations.values()
+        if "banya77_t4_xp2o5_" in row.observation_id
+    ]
+    assert len(table3) == 75
+    assert len(table4) == 12
+    assert all(
+        row.point_conditions["temperature_K"].state.is_value for row in table3 + table4
+    )
+    assert all(
+        row.point_conditions["composition"].state.is_value for row in table3
+    )
+
+    first_activity = next(
+        row for row in table4 if row.observation_id.endswith("xp2o5_0_00")
+    )
+    assert first_activity.identity.quantity.value == Quantity.ACTIVITY
+    assert first_activity.identity.species.formula == "Fe_tO"
+    reference = first_activity.identity.reference_state
+    assert reference is not None and reference.is_value
+    assert reference.value.convention.value == "raoultian_pure_endmember"
+    assert reference.value.endmember.formula == "Fe_tO"
+    assert first_activity.evidence.class_.value.value == "model_derived"
 
 
 def test_norris_split_runs_retain_shared_sample_and_quench_facts() -> None:
@@ -650,6 +1199,39 @@ def _write_extract(directory: Path, doc: dict) -> Path:
     return path
 
 
+def _write_companion_table(
+    tmp_path: Path,
+    *,
+    filename: str = "fixture-source-table-s1.yaml",
+    parent_exists: bool = True,
+    parent_links: bool = True,
+) -> Path:
+    directory = tmp_path / "data" / "literature" / "extracts"
+    directory.mkdir(parents=True, exist_ok=True)
+    table_path = directory / filename
+    table_path.write_text(
+        yaml.safe_dump(
+            {
+                "schema_version": "literature_extract_table.v1",
+                "source_id": "fixture-source",
+                "rows": [{"value": 1}],
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    if parent_exists:
+        parent_doc = _minimal_extract()
+        if parent_links:
+            parent_doc["species"]["Fe"]["observations"][0]["values"][
+                "table_transcription"
+            ] = table_path.relative_to(tmp_path).as_posix()
+        (directory / "fixture-source.yaml").write_text(
+            yaml.safe_dump(parent_doc, sort_keys=False), encoding="utf-8"
+        )
+    return table_path
+
+
 # ---------------------------------------------------------------------------
 # Validator unit tests
 # ---------------------------------------------------------------------------
@@ -660,6 +1242,98 @@ def test_minimal_extract_valid():
         _minimal_extract(), expected_source_id="fixture-source"
     )
     assert errs == []
+
+
+def test_refuses_context_container_outside_species_block():
+    doc = _minimal_extract()
+    row = {
+        "observation_id": "apparatus_note",
+        "type": "apparatus",
+        "locator": {"page": 1},
+        "values": {"apparatus": "fixture"},
+        "units": "text",
+    }
+    doc["context"] = [row]
+
+    errors = vle.validate_extract_document(
+        doc,
+        path=Path("fixture-source.yaml"),
+        expected_source_id="fixture-source",
+    )
+
+    assert any(
+        "fixture-source.yaml:context" in error
+        and "species.<formula>.context" in error
+        and "not lifted by the migrator" in error
+        for error in errors
+    )
+
+
+def test_validator_help_works_without_pythonpath():
+    import os
+    import subprocess
+
+    env = os.environ.copy()
+    env.pop("PYTHONPATH", None)
+    result = subprocess.run(
+        [sys.executable, str(TOOLS / "validate_literature_extracts.py"), "--help"],
+        cwd=REPO_ROOT,
+        env=env,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
+    assert "usage:" in result.stdout.lower()
+
+
+def test_accepts_scalar_context_description_inside_row():
+    doc = _minimal_extract()
+    doc["species"]["Fe"]["observations"][0]["values"]["context"] = (
+        "validation comparison with another source"
+    )
+
+    errors = vle.validate_extract_document(
+        doc, expected_source_id="fixture-source"
+    )
+
+    assert not any("context container is not lifted" in error for error in errors)
+
+
+def test_species_context_validates_and_migrator_lifts_context_id(tmp_path: Path):
+    from simulator.battery.migrate import migrate
+
+    doc = _minimal_extract()
+    row = {
+        "observation_id": "apparatus_note",
+        "type": "apparatus",
+        "locator": {"page": 1},
+        "values": {"apparatus": "fixture"},
+        "units": "text",
+    }
+    doc["species"]["Fe"]["context"] = [row]
+    assert vle.validate_extract_document(
+        doc, expected_source_id="fixture-source"
+    ) == []
+
+    literature = tmp_path / "data" / "literature"
+    extracts = literature / "extracts"
+    extracts.mkdir(parents=True)
+    (literature / "compilations").mkdir()
+    (literature / "INDEX.yaml").write_text(
+        "schema_version: literature_index.v1\nsources: []\n", encoding="utf-8"
+    )
+    _write_extract(extracts, doc)
+    result = migrate(tmp_path, write=False)
+
+    lifted = [
+        context
+        for rows in result.context_by_work.values()
+        for context in rows
+    ]
+    assert [context["context_id"] for context in lifted] == [
+        "fixture-source::context::apparatus_note"
+    ]
 
 
 def test_refuses_bad_schema_version():
@@ -674,6 +1348,88 @@ def test_refuses_source_id_filename_mismatch(tmp_extracts: Path):
     path.write_text(yaml.safe_dump(doc), encoding="utf-8")
     errs = vle.validate_extract_file(path)
     assert any("does not match filename stem" in e for e in errs)
+
+
+def test_accepts_linked_companion_table(tmp_path: Path, monkeypatch):
+    monkeypatch.setattr(vle, "ROOT", tmp_path)
+    path = _write_companion_table(tmp_path)
+
+    assert vle.validate_extract_file(path) == []
+
+
+def test_refuses_absolute_locator_path_on_companion(tmp_path: Path, monkeypatch):
+    monkeypatch.setattr(vle, "ROOT", tmp_path)
+    path = _write_companion_table(tmp_path)
+    doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+    doc["rows"][0]["locator"] = {"source_path": "/private/tmp/not-portable.pdf"}
+    path.write_text(yaml.safe_dump(doc, sort_keys=False), encoding="utf-8")
+
+    errors = vle.validate_extract_file(path)
+
+    assert any(
+        "locator.source_path must be repository-relative" in error
+        and "/private/tmp/not-portable.pdf" in error
+        for error in errors
+    )
+
+
+def test_refuses_companion_table_with_unprefixed_filename(
+    tmp_path: Path, monkeypatch
+):
+    monkeypatch.setattr(vle, "ROOT", tmp_path)
+    path = _write_companion_table(tmp_path, filename="other-table-s1.yaml")
+
+    errs = vle.validate_extract_file(path)
+
+    assert any("filename stem must start with source_id" in error for error in errs)
+    assert not any("parent extract does not link" in error for error in errs)
+
+
+def test_refuses_companion_table_without_parent_extract(
+    tmp_path: Path, monkeypatch
+):
+    monkeypatch.setattr(vle, "ROOT", tmp_path)
+    path = _write_companion_table(tmp_path, parent_exists=False)
+
+    errs = vle.validate_extract_file(path)
+
+    assert any("companion parent extract does not exist" in error for error in errs)
+
+
+def test_refuses_companion_table_not_linked_by_parent(
+    tmp_path: Path, monkeypatch
+):
+    monkeypatch.setattr(vle, "ROOT", tmp_path)
+    path = _write_companion_table(tmp_path, parent_links=False)
+
+    errs = vle.validate_extract_file(path)
+
+    assert any(
+        "parent extract does not link companion table" in error for error in errs
+    )
+
+
+def test_main_reports_all_source_id_filename_mismatches(tmp_path: Path, capsys):
+    first = tmp_path / "wrong-one.yaml"
+    second = tmp_path / "wrong-two.yaml"
+    text = yaml.safe_dump(_minimal_extract(), sort_keys=False)
+    first.write_text(text, encoding="utf-8")
+    second.write_text(text, encoding="utf-8")
+
+    status = vle.main(
+        [
+            "--skip-priority",
+            "--skip-fidelity-policy",
+            str(first),
+            str(second),
+        ]
+    )
+    stderr = capsys.readouterr().err
+
+    assert status == 1
+    assert f"{first}: source_id" in stderr
+    assert f"{second}: source_id" in stderr
+    assert stderr.count("does not match filename stem") == 2
 
 
 def test_refuses_unknown_observation_type():
@@ -3000,6 +3756,24 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
     assert errs == [], "\n".join(errs)
 
 
+def test_bencze_supplement_fidelity_sample_rejects_mutated_value():
+    path = EXTRACTS / "bencze-yazhenskikh-2016.yaml"
+    doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+    sample = doc["fidelity_samples"][0]
+
+    assert sample["locator"]["page"] == 1
+    assert sample["locator"]["table"] == "S-I"
+    assert sample["value"] == "1.70·10-2"
+    assert vle.check_all_fidelity_samples_match(doc, label=path.stem) == []
+
+    doc["species"]["Na"]["observations"][0]["values"]["rows"][0][
+        "p_Na_at_1273_K_Pa"
+    ] = "1.71·10-2"
+    errors = vle.check_all_fidelity_samples_match(doc, label=path.stem)
+
+    assert any("fidelity_samples[0]" in error and "mismatch" in error for error in errors)
+
+
 def test_fidelity_sample_mutation_reds():
     """Prove the gate: mutate one extract value in memory → match test REDS.
 
@@ -3037,6 +3811,278 @@ def test_fidelity_sample_mutation_reds():
         f"original={original!r}"
     )
     assert any("mismatch" in e for e in errs), errs
+
+    # Every Jones and Lange sample is independently mutation-sensitive.
+    jones_path = EXTRACTS / "1997jonesthermo.yaml"
+    jones_samples = load_cached_safe_yaml(
+        jones_path.read_text(encoding="utf-8")
+    ).get("fidelity_samples") or []
+    assert jones_samples, "Jones extract must carry fidelity samples"
+    for index, sample in enumerate(jones_samples):
+        jones_doc = load_cached_safe_yaml(jones_path.read_text(encoding="utf-8"))
+        assert vle.check_all_fidelity_samples_match(jones_doc, label="jones-owner") == []
+        row = next(
+            row
+            for container in ("observations", "context")
+            for row in jones_doc["species"][sample["species"]].get(container, [])
+            if row.get("observation_id") == sample["observation_id"]
+        )
+        row["values"][sample["field"]] += 1
+        errors = vle.check_all_fidelity_samples_match(
+            jones_doc, label="jones-owner-mutated"
+        )
+        assert any(
+            f"fidelity_samples[{index}]" in error and "mismatch" in error
+            for error in errors
+        ), errors
+
+    lange_path = EXTRACTS / "ammin-76-904.yaml"
+    lange_samples = load_cached_safe_yaml(
+        lange_path.read_text(encoding="utf-8")
+    ).get("fidelity_samples") or []
+    assert len(lange_samples) >= 3, "Lange extract must carry table-spread samples"
+    for index, sample in enumerate(lange_samples):
+        lange_doc = load_cached_safe_yaml(lange_path.read_text(encoding="utf-8"))
+        assert vle.check_all_fidelity_samples_match(lange_doc, label="lange-owner") == []
+        resolved = vle.resolve_fidelity_sample(lange_doc, sample)
+        if isinstance(resolved, list):
+            resolved[0] += 1
+        else:
+            resolved["crystal"]["SiO2"]["value"] += 1
+        errors = vle.check_all_fidelity_samples_match(
+            lange_doc, label="lange-owner-mutated"
+        )
+        assert any(
+            f"fidelity_samples[{index}]" in error and "mismatch" in error
+            for error in errors
+        ), errors
+
+
+def test_shaw_surface_fidelity_mutation_reds():
+    """Pin Shaw run and source claims; each reviewed reversal must turn red."""
+    path = EXTRACTS / "shaw-2023-vacuum-thermal-sublimation-thesis.yaml"
+    assert path.is_file()
+
+    def assert_pins(candidate):
+        assert vle.check_all_fidelity_samples_match(candidate, label="shaw-2023") == []
+        expected_runs = [
+            "blank-high-vacuum",
+            "td1-nanophase-iron-oxide",
+            "td2-nanophase-iron-oxide",
+            "td3-ilmenite-concentrate",
+            "td4-lms1-atmosphere",
+            "td5-lms1",
+            "td6-lms1",
+            "td7-reacted-td6-feed",
+        ]
+        assert len(candidate["experiments"]) == 8
+        assert [run["experiment_id"] for run in candidate["experiments"]] == expected_runs
+        expected_result_runs = [
+            ("shaw_2023_blank_results", "blank-high-vacuum"),
+            ("shaw_2023_td1_results", "td1-nanophase-iron-oxide"),
+            ("shaw_2023_td2_results", "td2-nanophase-iron-oxide"),
+            ("shaw_2023_td3_results", "td3-ilmenite-concentrate"),
+            ("shaw_2023_td4_results", "td4-lms1-atmosphere"),
+            ("shaw_2023_td5_results", "td5-lms1"),
+            ("shaw_2023_td6_results", "td6-lms1"),
+            ("shaw_2023_td7_results", "td7-reacted-td6-feed"),
+        ]
+        results = [
+            (row["observation_id"], row["experiment"])
+            for species in candidate["species"].values()
+            for row in species.get("context", [])
+            if row.get("observation_id", "").endswith("_results")
+        ]
+        assert len(results) == 8
+        assert sorted(results) == sorted(expected_result_runs)
+        result_rows = {
+            row["observation_id"]: row
+            for species in candidate["species"].values()
+            for row in species.get("context", [])
+            if row.get("observation_id", "").endswith("_results")
+        }
+        vacuum_vent_reason = (
+            "reactor_was_vented_to_atmospheric_pressure_before_removal_but_"
+            "vent_gas_air_contact_and_duration_are_not_stated"
+        )
+        for result_id in (
+            "shaw_2023_blank_results",
+            "shaw_2023_td2_results",
+            "shaw_2023_td3_results",
+            "shaw_2023_td5_results",
+            "shaw_2023_td6_results",
+            "shaw_2023_td7_results",
+        ):
+            assert (
+                result_rows[result_id]["values"]["saw_air_before_analysis"]["reason"]
+                == vacuum_vent_reason
+            )
+        assert result_rows["shaw_2023_td1_results"]["values"]["saw_air_before_analysis"] == {
+            "state": "unknown",
+            "reason": "reactor_was_vented_slowly_to_atmospheric_pressure_via_vacuum_pump_before_sample_removal; post_test_air_contact_and_duration_not_reported",
+        }
+        assert result_rows["shaw_2023_td4_results"]["values"]["saw_air_before_analysis"] == {
+            "state": "unknown",
+            "reason": "TD4_ran_at_atmospheric_pressure_with_pump_detached_and_reactor_flange_open; post_test_air_contact_and_duration_not_reported",
+        }
+        td7_sample = candidate["experiments"][-1]["sample"]
+        assert td7_sample["printed_composition"]["state"] == {
+            "tag": "value",
+            "value": "LMS-1",
+        }
+        assert td7_sample["form"]["state"] == {
+            "tag": "value",
+            "value": "Processed TD4",
+        }
+        for run in candidate["experiments"]:
+            schedule = run["thermal_schedule"]
+            assert schedule["total_duration_s"]["state"]["tag"] == "unknown"
+            hold = schedule["setpoints_and_holds"][0]
+            assert hold["hold_duration_s"]["state"]["tag"] == "value"
+            assert hold["temperature_K"]["state"]["tag"] == "unknown"
+
+        context = candidate["species"]["vacuum_reactor_blank"]["context"]
+        blank_rows = [
+            row for row in context
+            if row.get("observation_id") == "shaw_2023_blank_results"
+        ]
+        assert blank_rows, "blank control context must survive YAML loading"
+        blank = blank_rows[0]
+        assert blank["values"]["deposit_location"] == "Reactor tube glass; general frosting"
+        assert blank["values"]["sample_mass_loss"] == {
+            "state": "unknown",
+            "reason": "blank_test_had_no_sample",
+        }
+        assert "mass_loss" not in blank["values"]
+        handling = next(
+            row for row in context
+            if row.get("observation_id") == "shaw_2023_ch8_sample_preparation"
+        )["values"]
+        assert handling["reactor_moved_from_furnace_below_C"] == 300
+        assert "greater than 1000 C" in handling["high_temperature_definition"]
+        inventory = next(
+            row for row in context
+            if row.get("observation_id") == "shaw_2023_ch8_deposit_surface_inventory"
+        )["values"]["runs"]
+        assert list(inventory) == ["blank", *expected_runs[1:]]
+        assert all("exposure_and_handling" in run for run in inventory.values())
+        td4_handling = inventory["td4-lms1-atmosphere"]["exposure_and_handling"]
+        assert "pump was detached" in td4_handling["apparatus"]
+        assert "flange was left open" in td4_handling["apparatus"]
+        assert td4_handling["vacuum_pump_venting"]["state"] == "unknown"
+        analysis_limits = next(
+            row for row in context
+            if row.get("observation_id") == "shaw_2023_ch8_deposit_surface_inventory"
+        )["values"]["common_analysis_limitations"]
+        assert "TD1 used a smear" in analysis_limits
+        assert "TD4 had no SEM/EDS analysis" in analysis_limits
+        assert inventory["td1-nanophase-iron-oxide"]["wall"]["qualification"] == (
+            "Minor Zn, Ca, and P are presumed by the author to be outside contamination "
+            "associated with the smear sampling; the swab method caused significantly more "
+            "contamination than later fractured-glass analysis"
+        )
+        assert inventory["td3-ilmenite-concentrate"]["wall"]["author_identification"].startswith(
+            "The thesis calls the structures “ZnO nano-rods”"
+        )
+        assert inventory["td5-lms1"]["wall"]["zone_findings"]["b"].startswith(
+            "Consistent Na and Cl layer"
+        )
+        td5_a = inventory["td5-lms1"]["wall"]
+        assert td5_a["band_level_composition"] == (
+            "The initial deposition band (a) was composed predominantly of Na, P, and Cu."
+        )
+        assert td5_a["distinct_crystals"] == "Distinct crystals were composed of Na, P, and Mo."
+        assert td5_a["band_level_composition_locator"]["published_page"] == 212
+        assert td5_a["distinct_crystals_locator"]["published_page"] == 212
+        assert inventory["td6-lms1"]["wall"]["zone_findings"]["a"] == (
+            "Additional crystals were reported as composed of Na and O according to EDS."
+        )
+        assert inventory["td7-reacted-td6-feed"]["wall"]["scan_duration_min"] == 5
+
+        for species in ("Fe", "Na", "K"):
+            feed = candidate["species"][species]["context"][0]["values"]
+            assert "Apollo #12022 feed system named in Table 7.5" in feed["inputs"]
+            assert "selected Al2O3" not in feed["inputs"]
+            assert "Apollo #12022" in feed["vapor_pressure_source"]
+
+        zn = candidate["species"]["Ilmenite"]["context"][0]["values"]
+        feed_assay = zn.get("feed_composition", {})
+        assert feed_assay.get("Zn_wt_pct") == 0.028
+        assert feed_assay.get("basis", "").startswith("feed-material XRF")
+        assert zn.get("residue_composition", {}).get("state") == "unknown"
+
+        visual_index = next(
+            row for row in candidate["species"]["LMS-1"]["context"]
+            if row.get("observation_id") == "shaw_2023_unextracted_ch7_ch8_visual_data_index"
+        )
+        assert "only material not extracted" in visual_index["units"]
+        fig814 = next(
+            fig for fig in visual_index["values"]["figures"] if fig["id"] == "8.14"
+        )
+        assert "Full SEM image not extracted" in fig814["note"]
+        assert "summarized in the extract" in fig814["note"]
+
+    doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+    assert_pins(doc)
+
+    # Four independent source-backed mutations requested by the confirm review.
+    mutations = []
+
+    candidate = copy.deepcopy(doc)
+    candidate["experiments"] = [
+        run for run in candidate["experiments"]
+        if run["experiment_id"] != "td2-nanophase-iron-oxide"
+    ]
+    mutations.append(("TD2 deleted", candidate))
+
+    candidate = copy.deepcopy(doc)
+    candidate["species"]["FeO/Fe2O3"]["context"].pop(1)
+    mutations.append(("TD2 results context deleted", candidate))
+
+    candidate = copy.deepcopy(doc)
+    candidate["experiments"][-1]["sample"]["printed_composition"]["state"]["value"] = "Processed TD4"
+    mutations.append(("TD7 feed material merged into feed form", candidate))
+
+    candidate = copy.deepcopy(doc)
+    candidate["experiments"][1]["thermal_schedule"]["total_duration_s"]["state"] = {
+        "tag": "value",
+        "value": {"kind": "point", "point": "6480"},
+    }
+    mutations.append(("numeric total duration restored", candidate))
+
+    candidate = copy.deepcopy(doc)
+    candidate["species"]["Na"]["context"][0]["values"]["inputs"] = (
+        "FactSage pressure from the selected Al2O3-CaO-Na2O system"
+    )
+    mutations.append(("Na attributed to wrong feed system", candidate))
+
+    candidate = copy.deepcopy(doc)
+    zn = candidate["species"]["Ilmenite"]["context"][0]["values"]
+    zn["residue_composition"] = zn.pop("feed_composition")
+    mutations.append(("Zn feed assay moved to residue", candidate))
+
+    for label, candidate in mutations:
+        try:
+            assert_pins(candidate)
+        except AssertionError:
+            continue
+        raise AssertionError(f"{label} mutation survived the Shaw regression pins")
+
+    inventory_record = next(
+        row for row in doc["species"]["vacuum_reactor_blank"]["context"]
+        if row.get("observation_id") == "shaw_2023_ch8_deposit_surface_inventory"
+    )
+    inventory_record["values"]["runs"]["td7-reacted-td6-feed"]["wall"]["scan_duration_min"] = 4
+    with pytest.raises(AssertionError):
+        assert_pins(doc)
+
+    doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+    doc["species"]["vacuum_reactor_blank"]["context"] = [
+        row for row in doc["species"]["vacuum_reactor_blank"]["context"]
+        if row.get("observation_id") != "shaw_2023_blank_results"
+    ]
+    with pytest.raises(AssertionError):
+        assert_pins(doc)
 
 
 def test_costa_fe_summary_key_is_retired_to_owner_series():
@@ -3221,3 +4267,37 @@ def test_printed_experiment_bench_links_carry_locator(tmp_path: Path):
     mo = experiment_named(allibert, "allibert-1981-mo-kems")
     assert all(item.experiment_id != mo.experiment_id for item in emf)
     assert allibert.experiments[emf[0].experiment_id].bench_id is None
+
+
+def test_offer10_extract_locators_use_physical_pdf_pages() -> None:
+    source_ids = (
+        "sesko-2022-tum-thesis",
+        "sutherland-2025-mare-simulant-volatile-loss",
+        "ewing-1963-sodium-potassium-properties",
+        "suzuki-2026-vacuum-oxygen-extraction",
+        "mamiya-2000-sio-disproportionation",
+    )
+
+    def walk(value):
+        if isinstance(value, dict):
+            if "page" in value or "pdf_page_index" in value:
+                assert value["page"] == value["pdf_page_index"] + 1
+            for child in value.values():
+                walk(child)
+        elif isinstance(value, list):
+            for child in value:
+                walk(child)
+
+    for source_id in source_ids:
+        document = yaml.safe_load((EXTRACTS / f"{source_id}.yaml").read_text())
+        walk(document)
+
+    ewing = yaml.safe_load(
+        (EXTRACTS / "ewing-1963-sodium-potassium-properties.yaml").read_text()
+    )
+    assert ewing["fidelity_samples"][0]["locator"] == {
+        "page": 12,
+        "published_page": 7,
+        "pdf_page_index": 11,
+        "figure": "6",
+    }

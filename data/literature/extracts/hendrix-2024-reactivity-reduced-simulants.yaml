@@ -12,10 +12,7 @@ extraction:
 review_status: draft
 corrections: []
 fidelity_samples:
-- species: JSC-1A
-  observable: rate_series
-  observation_id: hendrix_2024_table1_jsc1a_composition_and_mineralogy
-  field: composition_wt_pct
+- path: species.JSC-1A.observations[hendrix_2024_table1_jsc1a_composition_and_mineralogy].values.composition_wt_pct.SiO2
   value: 46.2
   locator:
     pdf_page_index: 4

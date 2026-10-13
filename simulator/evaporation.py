@@ -20,8 +20,10 @@ from simulator.chemistry.kernel import (
 from simulator.fe_redox import (
     KRESS91_LIQUID_CALIBRATION_MAX_T_C,
     KRESS91_LIQUID_CALIBRATION_MIN_T_C,
+    RedoxState,
     _kress91_gate_key_referenced_log_fO2,
     kress91_temperature_band_case,
+    normalize_redox_state,
 )
 from simulator.melt_backend.base import MeltCompositionError
 from simulator.melt_regime import (
@@ -2053,10 +2055,20 @@ class EvaporationMixin:
             },
         )
 
-    def _freeze_gate_curve(self) -> dict[str, Any]:
-        return self._freeze_gate_curve_record()['curve']
+    def _freeze_gate_curve(
+        self,
+        *,
+        redox_state: RedoxState | None = None,
+    ) -> dict[str, Any]:
+        if redox_state is None:
+            return self._freeze_gate_curve_record()['curve']
+        return self._freeze_gate_curve_record(redox_state=redox_state)['curve']
 
-    def _freeze_gate_curve_record(self) -> dict[str, Any]:
+    def _freeze_gate_curve_record(
+        self,
+        *,
+        redox_state: RedoxState | None = None,
+    ) -> dict[str, Any]:
         from simulator.reduced_real_determinism import (
             gate_curve_memo_record,
             _is_cacheable_gate_curve,
@@ -2070,6 +2082,7 @@ class EvaporationMixin:
         fO2_log = self._freeze_gate_liquidus_fO2_log(
             float(self._current_melt_redox_fO2_log())
         )
+        fO2_log, redox_state = normalize_redox_state(fO2_log, redox_state)
         redox_key_fO2_log = self._freeze_gate_redox_key_fO2_log(
             fO2_log=fO2_log,
         )
@@ -2210,6 +2223,7 @@ class EvaporationMixin:
                 reasons,
                 fO2_log=fO2_log,
                 repair_notices=repair_notices,
+                redox_state=redox_state,
             )
             if curve is None:
                 if not uncacheable_replay_disposition(self):
@@ -2224,6 +2238,7 @@ class EvaporationMixin:
                     pressure_bar=pressure_bar,
                     fO2_log=fO2_log,
                     repair_notices=repair_notices,
+                    redox_state=redox_state,
                 )
                 if (
                     curve is None
@@ -2236,6 +2251,7 @@ class EvaporationMixin:
                     reasons,
                     fO2_log=fO2_log,
                     repair_notices=repair_notices,
+                    redox_state=redox_state,
                 )
             # Invalid projected bounds are not a liquidus. A later ladder
             # bound wins; otherwise the Kress floor is the prediction and
@@ -2470,11 +2486,16 @@ class EvaporationMixin:
         *,
         fO2_log: float,
         repair_notices: list[dict[str, Any]] | None = None,
+        redox_state: RedoxState | None = None,
     ) -> dict[str, Any] | None:
         from simulator.reduced_real_determinism import (
             mark_uncacheable_replay_disposition,
         )
 
+        fO2_log, redox_state = normalize_redox_state(
+            fO2_log,
+            redox_state,
+        )
         register_gate_providers = getattr(
             self,
             '_register_freeze_gate_liquid_fraction_providers',
@@ -2494,6 +2515,7 @@ class EvaporationMixin:
                 ChemistryIntent.GATE_LIQUID_FRACTION,
                 control_inputs={},
                 fO2_log=fO2_log,
+                redox_state=redox_state,
                 fe_redox_policy='intrinsic',
             )
         except ProviderUnavailableError as exc:
@@ -2562,11 +2584,16 @@ class EvaporationMixin:
         pressure_bar: float,
         fO2_log: float,
         repair_notices: list[dict[str, Any]] | None = None,
+        redox_state: RedoxState | None = None,
     ) -> dict[str, Any] | None:
         from simulator.reduced_real_determinism import (
             mark_uncacheable_replay_disposition,
         )
 
+        fO2_log, redox_state = normalize_redox_state(
+            fO2_log,
+            redox_state,
+        )
         finder = getattr(self.backend, 'find_liquidus_solidus', None)
         if not callable(finder):
             reasons.append('backend liquidus finder unavailable')
@@ -2578,6 +2605,7 @@ class EvaporationMixin:
             result = finder(
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
+                redox_state=redox_state,
                 composition_mol_by_account={
                     _FREEZE_GATE_ACCOUNT: composition_mol
                 },
@@ -2606,6 +2634,7 @@ class EvaporationMixin:
         reasons: list[str],
         *,
         fO2_log: float,
+        redox_state: RedoxState | None = None,
         temperature_C: float | None = None,
         pressure_bar: float | None = None,
         composition_mol_by_account: Mapping[str, Mapping[str, float]] | None = None,
@@ -2616,6 +2645,10 @@ class EvaporationMixin:
             mark_uncacheable_replay_disposition,
         )
 
+        fO2_log, redox_state = normalize_redox_state(
+            fO2_log,
+            redox_state,
+        )
         composition_derived = bool(composition_mol_by_account)
         try:
             if composition_derived:
@@ -2632,6 +2665,7 @@ class EvaporationMixin:
                         else float(pressure_bar)
                     ),
                     fO2_log=fO2_log,
+                    redox_state=redox_state,
                     fe_redox_policy='intrinsic',
                     control_inputs={
                         'composition_source': 'out_of_domain_crash_point',
@@ -2643,6 +2677,7 @@ class EvaporationMixin:
                     ChemistryIntent.SILICATE_LIQUIDUS,
                     control_inputs={},
                     fO2_log=fO2_log,
+                    redox_state=redox_state,
                     fe_redox_policy='intrinsic',
                 )
         except ProviderUnavailableError as exc:

@@ -33,6 +33,14 @@ benches:
     value:
       state: {tag: value, value: {kind: bound, bound_operator: '<=', bound_value: '5'}}
       locator: {pdf_page_index: 8, section: '2.1 Experiments', note: 'Temperature variation over ampoule length estimated not to exceed +/-5 C'}
+fidelity_samples:
+- path: species.Hg.observations[boulliung_2025_hg_retention_1300c].values.after_5_min_ppm
+  value: '~2.3'
+  locator:
+    source_path: corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+    pdf_page_index: 13
+    figure: '2A'
+    section: 3.1 Element loss as a function of time
 experiments:
 - experiment_id: ssas-hg-volatile-series
   bench_id: ssas-muffle-furnace
@@ -271,18 +279,26 @@ species:
         sample_container:
           value: alumina crucible
           locator: {pdf_page_index: 8, section: '2.1 Experiments'}
-        crucible_material: alumina
+        crucible_material:
+          value: alumina
+          locator: {pdf_page_index: 8, section: '2.1 Experiments'}
         chamber_pressure:
           value: '~2.7'
           units: mbar
           locator: {pdf_page_index: 9, section: '2.1 Experiments'}
-        cell_material: silica tube
-        chamber_length_cm:
+        cell_material:
+          value: silica tube
+          locator: {pdf_page_index: 8, section: '2.1 Experiments'}
+        chamber_dimensions:
           value: '~9'
           units: cm
           locator: {pdf_page_index: 9, section: '2.1 Experiments'}
-        ampoule_volume_m3:
-          value: '4.4 x 10^-6'
+        other_facts:
+          value:
+          - name: ampoule_volume_m3
+            unit: m3
+            value: '4.4 x 10^-6'
+            locator: {pdf_page_index: 9, section: '2.1 Experiments'}
           locator: {pdf_page_index: 9, section: '2.1 Experiments'}
         thermocouple:
           value: thermocouple; temperature variation not exceeding +/- 5 C over ampoule length

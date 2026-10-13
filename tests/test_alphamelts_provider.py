@@ -28,6 +28,7 @@ from __future__ import annotations
 import ast
 import inspect
 import math
+from dataclasses import replace
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -56,6 +57,12 @@ from simulator.chemistry.kernel.dto import (
     IntentResultStatusError,
     ProviderAccountView,
 )
+from simulator.fe_redox import (
+    FE_FEO_BUFFER_STANDARD,
+    REDOX_STATE_REFERENCE_T_K,
+    RedoxState,
+)
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 
 
 # ---------------------------------------------------------------------------
@@ -137,12 +144,16 @@ def _make_request(
     pressure_bar: float = 1.0,
     fO2_log: float | None = -9.0,
     fe_redox_policy: str = 'intrinsic',
+    redox_state: RedoxState | None = None,
 ) -> IntentRequest:
     """Build an IntentRequest with a ``process.cleaned_melt``-only view."""
     view = ProviderAccountView(
         accounts={'process.cleaned_melt': dict(composition_mol)},
         species_formula_registry={},
     )
+    request_fields = {}
+    if redox_state is not None:
+        request_fields['redox_state'] = redox_state
     return IntentRequest(
         intent=intent,
         account_view=view,
@@ -151,6 +162,7 @@ def _make_request(
         fO2_log=fO2_log,
         fe_redox_policy=fe_redox_policy,
         control_inputs={},
+        **request_fields,
     )
 
 
@@ -353,14 +365,19 @@ def test_domain_gate_rejects_sulfide():
 
 
 def test_domain_gate_rejects_low_sio2():
-    """SiO2 outside [30, 80] wt% must fail the silicate-network criterion."""
+    """An out-of-band silicate is admitted with its band miss reported."""
     composition = {
         'SiO2': 10.0, 'TiO2': 1.0, 'Al2O3': 30.0,
         'FeO': 20.0, 'MgO': 25.0, 'CaO': 14.0,
     }
-    valid, warnings = AlphaMELTSDomainGate.validate(composition)
-    assert valid is False
-    assert any('SiO2' in w and 'outside' in w for w in warnings)
+    # 2026-09-13 ruling, applied by 171858b63: band misses no longer veto.
+    assessment = AlphaMELTSDomainGate.assess(composition)
+    assert assessment.valid is True
+    assert 'silicate_network_band' in assessment.failed_constraints
+    assert any(
+        'SiO2' in warning and 'outside' in warning
+        for warning in assessment.warnings
+    )
 
 
 def test_domain_gate_rejects_empty_composition():
@@ -428,6 +445,169 @@ def test_provider_returns_liquidus_diagnostics_for_thermoengine_path():
     assert diagnostic['mode'] == 'thermoengine'
     assert diagnostic['liquidus_T_C'] == pytest.approx(1305.0)
     assert backend.finder_calls
+
+
+def test_liquidus_finder_receives_normalized_redox_state():
+    state = RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, 0.2)
+    backend = _FakeAlphaMELTSBackend(
+        mode='thermoengine',
+        equilibrium=_build_equilibrium_for_basalt(),
+    )
+
+    result = AlphaMELTSProvider(backend=backend).dispatch(
+        _make_request(
+            ChemistryIntent.SILICATE_LIQUIDUS,
+            composition_mol=_basalt_species_mol(),
+            fO2_log=None,
+            redox_state=state,
+        )
+    )
+
+    assert result.status == 'ok'
+    assert backend.finder_calls[0]['redox_state'] == state
+    assert backend.finder_calls[0]['fO2_log'] == pytest.approx(
+        state.log_fO2_at(REDOX_STATE_REFERENCE_T_K)
+    )
+
+
+def test_control_audit_keeps_buffer_offset_request_as_applied_fO2():
+    state = RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, 0.2)
+    provider = AlphaMELTSProvider(backend=None)
+    request = _make_request(
+        ChemistryIntent.SILICATE_LIQUIDUS,
+        composition_mol=_basalt_species_mol(),
+        fO2_log=None,
+        redox_state=state,
+    )
+
+    audit = provider._build_control_audit(
+        request,
+        equilibrium=SimpleNamespace(
+            diagnostics={'engine_reported_fO2_log': -5.0}
+        ),
+    )
+
+    requested = state.log_fO2_at(REDOX_STATE_REFERENCE_T_K)
+    assert audit.requested['fO2_log'] == pytest.approx(requested)
+    assert audit.applied['fO2_log'] == pytest.approx(requested)
+
+
+def test_redox_diagnostic_does_not_treat_buffer_reference_as_intrinsic():
+    provider = AlphaMELTSProvider(backend=None)
+    state = RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, 0.2)
+    reference_fO2_log = state.log_fO2_at(REDOX_STATE_REFERENCE_T_K)
+    request = _make_request(
+        ChemistryIntent.SILICATE_EQUILIBRIUM,
+        composition_mol=_basalt_species_mol(),
+        fO2_log=reference_fO2_log,
+        redox_state=state,
+    )
+
+    diagnostic = provider._redox_diagnostic(
+        request,
+        _basalt_species_mol(),
+    )
+    assert diagnostic['intrinsic_fO2_log'] is None
+
+    explicit_request = replace(
+        request,
+        control_inputs={'intrinsic_fO2_log': -8.25},
+    )
+    assert provider._redox_diagnostic(
+        explicit_request,
+        _basalt_species_mol(),
+    )['intrinsic_fO2_log'] == pytest.approx(-8.25)
+
+    for redox_state in (None, RedoxState.absolute(-9.0)):
+        scalar_request = _make_request(
+            ChemistryIntent.SILICATE_EQUILIBRIUM,
+            composition_mol=_basalt_species_mol(),
+            fO2_log=-9.0,
+            redox_state=redox_state,
+        )
+        assert provider._redox_diagnostic(
+            scalar_request,
+            _basalt_species_mol(),
+        )['intrinsic_fO2_log'] == pytest.approx(-9.0)
+
+
+def test_ec_samples_evaluate_redox_state_at_each_sample_temperature(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    import engines.alphamelts.provider as provider_module
+
+    state = RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, 0.2)
+    backend = _FakeAlphaMELTSBackend(
+        mode='python_api',
+        equilibrium=_build_equilibrium_for_basalt(),
+        finder_result=LiquidusSolidusResult(
+            liquidus_T_C=1300.0,
+            solidus_T_C=1000.0,
+            liquid_fraction=1.0,
+            status='ok',
+        ),
+    )
+    samples = []
+
+    def equilibrate(_backend, *, temperature_C, fO2_log, **_kwargs):
+        samples.append((temperature_C, fO2_log))
+        fraction = min(1.0, max(0.0, (temperature_C - 1000.0) / 300.0))
+        return SimpleNamespace(
+            status='ok',
+            liquid_fraction=fraction,
+            liquid_composition_wt_pct=(
+                _basalt_wt_pct() if fraction > 0.0 else {}
+            ),
+            warnings=(),
+        )
+
+    monkeypatch.setattr(provider_module, 'python_api_available', lambda _b: True)
+    monkeypatch.setattr(
+        provider_module,
+        'equilibrate_via_python_api',
+        equilibrate,
+    )
+
+    AlphaMELTSProvider(backend=backend).dispatch(
+        _make_request(
+            ChemistryIntent.GATE_LIQUID_FRACTION,
+            composition_mol=_basalt_species_mol(),
+            fO2_log=None,
+            redox_state=state,
+        )
+    )
+
+    assert samples
+    assert [fO2 for _, fO2 in samples] == pytest.approx([
+        state.log_fO2_at(temperature_C + CELSIUS_TO_KELVIN_OFFSET)
+        for temperature_C, _ in samples
+    ])
+
+
+def test_ec_preserves_redox_state_unavailable_reason_from_bounds():
+    state = RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, 0.2)
+    backend = _FakeAlphaMELTSBackend(
+        mode='python_api',
+        equilibrium=_build_equilibrium_for_basalt(),
+        finder_result=LiquidusSolidusResult(
+            status='unavailable',
+            diagnostics={'reason': 'redox_state_not_expressible'},
+        ),
+    )
+
+    result = AlphaMELTSProvider(backend=backend).dispatch(
+        _make_request(
+            ChemistryIntent.GATE_LIQUID_FRACTION,
+            composition_mol=_basalt_species_mol(),
+            fO2_log=None,
+            redox_state=state,
+        )
+    )
+
+    assert result.status == 'unavailable'
+    assert result.diagnostic['backend_diagnostics']['reason'] == (
+        'redox_state_not_expressible'
+    )
 
 
 def test_provider_legacy_thermoengine_none_uses_imposed_minus_nine():

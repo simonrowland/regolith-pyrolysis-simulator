@@ -131,6 +131,12 @@ def _materialize_refusal_snapshot_history(state: Mapping[str, Any]) -> None:
 
 
 _REFUSAL_MISSING = object()
+# deepcopy's atomic dispatch returns these exact built-in scalar types as-is.
+# Retain inline checks at list items, tuple items, dict keys and dict values:
+# a helper call per leaf costs more across ~5 million leaves per 24 h run.
+_REFUSAL_IMMUTABLE_LEAF_TYPES = frozenset({
+    type(None), bool, int, float, complex, str, bytes,
+})
 
 
 def _mappingproxy_referent(proxy: MappingProxyType) -> Any:
@@ -152,14 +158,30 @@ def _deepcopy_refusal_list(
 ) -> list[Any]:
     copied: list[Any] = []
     memo[id(value)] = copied
-    copied.extend(_deepcopy_refusal_value(item, memo) for item in value)
+    copied.extend(
+        item
+        if (
+            type(item) in _REFUSAL_IMMUTABLE_LEAF_TYPES
+            and id(item) not in memo
+        )
+        else _deepcopy_refusal_value(item, memo)
+        for item in value
+    )
     return copied
 
 
 def _deepcopy_refusal_tuple(
     value: tuple[Any, ...], memo: Dict[int, Any],
 ) -> tuple[Any, ...]:
-    copied_items = [_deepcopy_refusal_value(item, memo) for item in value]
+    copied_items = [
+        item
+        if (
+            type(item) in _REFUSAL_IMMUTABLE_LEAF_TYPES
+            and id(item) not in memo
+        )
+        else _deepcopy_refusal_value(item, memo)
+        for item in value
+    ]
     try:
         return memo[id(value)]
     except KeyError:
@@ -175,12 +197,30 @@ def _deepcopy_refusal_tuple(
 def _deepcopy_refusal_dict(
     value: dict[Any, Any], memo: Dict[int, Any],
 ) -> dict[Any, Any]:
-    copied: dict[Any, Any] = {}
-    memo[id(value)] = copied
+    copied = memo.get(id(value), _REFUSAL_MISSING)
+    if copied is _REFUSAL_MISSING:
+        copied = {}
+        memo[id(value)] = copied
     for key, item in value.items():
-        copied[_deepcopy_refusal_value(key, memo)] = _deepcopy_refusal_value(
-            item, memo,
+        # Match dict deepcopy's RHS-before-target order: a value's __deepcopy__
+        # can memoize a replacement for this key before its copy is resolved.
+        copied_item = (
+            item
+            if (
+                type(item) in _REFUSAL_IMMUTABLE_LEAF_TYPES
+                and id(item) not in memo
+            )
+            else _deepcopy_refusal_value(item, memo)
         )
+        copied_key = (
+            key
+            if (
+                type(key) in _REFUSAL_IMMUTABLE_LEAF_TYPES
+                and id(key) not in memo
+            )
+            else _deepcopy_refusal_value(key, memo)
+        )
+        copied[copied_key] = copied_item
     return copied
 
 
@@ -227,11 +267,7 @@ def _deepcopy_refusal_mappingproxy(
         copied_referent = MappingProxyType(copied_referent)
         memo[id(layer)] = copied_referent
     if base_backing is not None:
-        copied_backing = memo[id(backing)]
-        for key, item in base_backing.items():
-            copied_backing[_deepcopy_refusal_value(key, memo)] = (
-                _deepcopy_refusal_value(item, memo)
-            )
+        _deepcopy_refusal_dict(base_backing, memo)
     return memo[id(proxy)]
 
 
@@ -385,6 +421,8 @@ from simulator.feedstock_composition import (
 )
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR, feedstock_body
 from simulator.fe_redox import (
+    RedoxState,
+    _reanchor_redox_state,
     calphad_ferrous_feo_activity_diagnostic,
     feo_iw_log10_fO2_bar,
     feot_equivalent_wt_pct,
@@ -394,8 +432,13 @@ from simulator.fe_redox import (
     kress91_ln_fO2_temperature_delta,
     kress91_split,
     melt_mol_fractions_for_kress91,
+    normalize_redox_state,
 )
-from simulator.melt_regime import MeltRegime, melt_regime
+from simulator.melt_regime import (
+    MeltRegime,
+    liquid_fraction_invalidity,
+    melt_regime,
+)
 from simulator.config_flags import bool_feature_flag
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.lab_geometry import LabGeometryError, parse_lab_geometry
@@ -2371,6 +2414,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         *,
         control_inputs: Mapping[str, Any],
         fO2_log: Optional[float] = None,
+        redox_state: RedoxState | None = None,
         fe_redox_policy: str = 'intrinsic',
         temperature_C_override: float | None = None,
         include_diagnostic_shadows: bool = True,
@@ -2389,6 +2433,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         split.  Use :meth:`_dispatch_and_commit` instead when the site
         does NOT need bookkeeping between dispatch and commit.
         """
+        fO2_log, redox_state = normalize_redox_state(
+            fO2_log,
+            redox_state,
+        )
         kernel = self._require_chem_kernel()
         control_inputs = dict(control_inputs)
         temperature_C = (
@@ -2405,6 +2453,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 temperature_C = float(controls['temperature_C'])
             pressure_bar = float(controls['pressure_bar'])
             fO2_log = controls['fO2_log']
+            redox_state = _reanchor_redox_state(redox_state, fO2_log)
+            fO2_log, redox_state = normalize_redox_state(
+                fO2_log,
+                redox_state,
+            )
             if fO2_log is not None and 'melt_fO2_log' in control_inputs:
                 control_inputs['melt_fO2_log'] = float(fO2_log)
             canonicalizer = getattr(
@@ -2471,6 +2524,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             temperature_C=temperature_C,
             pressure_bar=pressure_bar,
             fO2_log=fO2_log,
+            redox_state=redox_state,
             fe_redox_policy=fe_redox_policy,
             control_inputs=control_inputs,
             account_mol_overrides=account_mol_overrides,
@@ -9568,11 +9622,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'Authoritative VAPOR_PRESSURE liquid_fraction_invalid: '
                     f'{raw_liquid_fraction!r}'
                 ) from exc
-            if (
-                not math.isfinite(liquid_fraction)
-                or liquid_fraction < 0.0
-                or liquid_fraction > 1.0
-            ):
+            if liquid_fraction_invalidity(liquid_fraction) is not None:
                 raise RuntimeError(
                     'Authoritative VAPOR_PRESSURE liquid_fraction_invalid: '
                     f'{raw_liquid_fraction!r}'

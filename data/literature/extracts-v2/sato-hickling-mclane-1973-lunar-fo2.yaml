@@ -1,0 +1,6417 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/sato-hickling-mclane-1973-lunar-fo2.yaml
+observations:
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12009_35_bulk_plus_fe::T=1273.15:h=09cf2ae59b68
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12009_35_bulk_plus_fe
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1273.15'
+  value:
+    kind: point
+    point: '0.0000000000101325'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1273.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1000 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 3
+              table: '1'
+              note: 1000 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1000 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-16'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 16.0; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12009_35_bulk_plus_fe::T=1323.15:h=5f06d60cf665
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12009_35_bulk_plus_fe
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: point
+    point: '0.000000000063931753'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1050 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              page: 3
+              table: '1'
+              note: 1050 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1050 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-15.2'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 15.2; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12009_35_bulk_plus_fe::T=1373.15:h=85a8b2068f92
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12009_35_bulk_plus_fe
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1373.15'
+  value:
+    kind: point
+    point: '0.00000000040338209'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1100 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1100'
+            locator:
+              page: 3
+              table: '1'
+              note: 1100 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1100 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-14.4'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 14.4; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12009_35_bulk_plus_fe::T=1423.15:h=8357f3f37435
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12009_35_bulk_plus_fe
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1423.15'
+  value:
+    kind: point
+    point: '0.0000000020216995'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1423.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1150 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1150'
+            locator:
+              page: 3
+              table: '1'
+              note: 1150 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1150 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-13.7'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 13.7; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12009_35_bulk_plus_fe::T=1473.15:h=f0551f74999b
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12009_35_bulk_plus_fe
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473.15'
+  value:
+    kind: point
+    point: '0.0000000101325'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1200 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 3
+              table: '1'
+              note: 1200 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1200 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-13'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 13.0; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12009_35_bulk_rock::T=1273.15:h=6624abf57576
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12009_35_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1273.15'
+  value:
+    kind: point
+    point: '0.000000000025451689'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+    note: Average −log fO2 (atm) read from visually drawn curve
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1273.15'
+      locator:
+        page: 3
+        published_page: 1063
+        table: '1'
+        note: 1000 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 3
+              published_page: 1063
+              table: '1'
+              note: 1000 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 1063
+              table: '1'
+              note: 1000 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-15.6'
+      locator:
+        page: 3
+        published_page: 1063
+        table: '1'
+        note: Printed −log fO2 = 15.6; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12009_35_bulk_rock::T=1323.15:h=00546dbb02d5
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12009_35_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: point
+    point: '0.0000000001605893'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+    note: Average −log fO2 (atm) read from visually drawn curve
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        page: 3
+        published_page: 1063
+        table: '1'
+        note: 1050 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              page: 3
+              published_page: 1063
+              table: '1'
+              note: 1050 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 1063
+              table: '1'
+              note: 1050 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-14.8'
+      locator:
+        page: 3
+        published_page: 1063
+        table: '1'
+        note: Printed −log fO2 = 14.8; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12009_35_bulk_rock::T=1373.15:h=6979aca0148d
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12009_35_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1373.15'
+  value:
+    kind: point
+    point: '0.00000000101325'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+    note: Average −log fO2 (atm) read from visually drawn curve
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373.15'
+      locator:
+        page: 3
+        published_page: 1063
+        table: '1'
+        note: 1100 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1100'
+            locator:
+              page: 3
+              published_page: 1063
+              table: '1'
+              note: 1100 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 1063
+              table: '1'
+              note: 1100 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-14'
+      locator:
+        page: 3
+        published_page: 1063
+        table: '1'
+        note: Printed −log fO2 = 14.0; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12009_35_bulk_rock::T=1423.15:h=eade0e1d10e8
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12009_35_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1423.15'
+  value:
+    kind: point
+    point: '0.0000000040338209'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+    note: Average −log fO2 (atm) read from visually drawn curve
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1423.15'
+      locator:
+        page: 3
+        published_page: 1063
+        table: '1'
+        note: 1150 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1150'
+            locator:
+              page: 3
+              published_page: 1063
+              table: '1'
+              note: 1150 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 1063
+              table: '1'
+              note: 1150 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-13.4'
+      locator:
+        page: 3
+        published_page: 1063
+        table: '1'
+        note: Printed −log fO2 = 13.4; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12009_35_bulk_rock::T=1473.15:h=dd20fe031dca
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12009_35_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473.15'
+  value:
+    kind: point
+    point: '0.00000001605893'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+    note: Average −log fO2 (atm) read from visually drawn curve
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 3
+        published_page: 1063
+        table: '1'
+        note: 1200 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 3
+              published_page: 1063
+              table: '1'
+              note: 1200 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 1063
+              table: '1'
+              note: 1200 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-12.8'
+      locator:
+        page: 3
+        published_page: 1063
+        table: '1'
+        note: Printed −log fO2 = 12.8; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12009_35_groundmass::T=1273.15:h=09cf2ae59b68
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12009_35_groundmass
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1273.15'
+  value:
+    kind: point
+    point: '0.0000000000101325'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1273.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1000 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 3
+              table: '1'
+              note: 1000 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1000 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-16'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 16.0; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12009_35_groundmass::T=1323.15:h=0ded98df1503
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12009_35_groundmass
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: point
+    point: '0.000000000101325'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1050 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              page: 3
+              table: '1'
+              note: 1050 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1050 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-15'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 15.0; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12009_35_groundmass::T=1373.15:h=1991b9beda63
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12009_35_groundmass
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1373.15'
+  value:
+    kind: point
+    point: '0.00000000050782796'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1100 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1100'
+            locator:
+              page: 3
+              table: '1'
+              note: 1100 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1100 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-14.3'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 14.3; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12009_35_groundmass::T=1423.15:h=c98be0b7cb42
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12009_35_groundmass
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1423.15'
+  value:
+    kind: point
+    point: '0.0000000025451689'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1423.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1150 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1150'
+            locator:
+              page: 3
+              table: '1'
+              note: 1150 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1150 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-13.6'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 13.6; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12009_35_groundmass::T=1473.15:h=d1aeb2061b93
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12009_35_groundmass
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473.15'
+  value:
+    kind: point
+    point: '0.00000001605893'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1200 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 3
+              table: '1'
+              note: 1200 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1200 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-12.8'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 12.8; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12009_35_olivine::T=1273.15:h=1d9c7e45ef8d
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12009_35_olivine
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1273.15'
+  value:
+    kind: point
+    point: '0.000000000032041778'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1273.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1000 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 3
+              table: '1'
+              note: 1000 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1000 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-15.5'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 15.5; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12009_35_olivine::T=1323.15:h=93860dd8b0de
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12009_35_olivine
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: point
+    point: '0.00000000025451689'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1050 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              page: 3
+              table: '1'
+              note: 1050 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1050 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-14.6'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 14.6; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12009_35_olivine::T=1373.15:h=15c419d786f1
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12009_35_olivine
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1373.15'
+  value:
+    kind: point
+    point: '0.0000000012756062'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1100 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1100'
+            locator:
+              page: 3
+              table: '1'
+              note: 1100 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1100 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-13.9'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 13.9; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12009_35_olivine::T=1423.15:h=a87fc28e4d3d
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12009_35_olivine
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1423.15'
+  value:
+    kind: point
+    point: '0.0000000063931753'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1423.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1150 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1150'
+            locator:
+              page: 3
+              table: '1'
+              note: 1150 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1150 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-13.2'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 13.2; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12009_35_olivine::T=1473.15:h=0c78bf648618
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12009_35_olivine
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473.15'
+  value:
+    kind: point
+    point: '0.000000040338209'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1200 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 3
+              table: '1'
+              note: 1200 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1200 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-12.4'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 12.4; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12022_36_bulk_plus_fe::T=1273.15:h=4e244fba6012
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12022_36_bulk_plus_fe
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1273.15'
+  value:
+    kind: point
+    point: '0.000000000020216995'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1273.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1000 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 3
+              table: '1'
+              note: 1000 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1000 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-15.7'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 15.7; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12022_36_bulk_plus_fe::T=1323.15:h=808d55579cd8
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12022_36_bulk_plus_fe
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: point
+    point: '0.0000000001605893'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1050 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              page: 3
+              table: '1'
+              note: 1050 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1050 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-14.8'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 14.8; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12022_36_bulk_plus_fe::T=1373.15:h=1aa11901767d
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12022_36_bulk_plus_fe
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1373.15'
+  value:
+    kind: point
+    point: '0.00000000101325'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1100 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1100'
+            locator:
+              page: 3
+              table: '1'
+              note: 1100 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1100 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-14'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 14.0; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12022_36_bulk_plus_fe::T=1423.15:h=949762f703bd
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12022_36_bulk_plus_fe
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1423.15'
+  value:
+    kind: point
+    point: '0.0000000040338209'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1423.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1150 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1150'
+            locator:
+              page: 3
+              table: '1'
+              note: 1150 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1150 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-13.4'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 13.4; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12022_36_bulk_plus_fe::T=1473.15:h=58310d322c2d
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12022_36_bulk_plus_fe
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473.15'
+  value:
+    kind: point
+    point: '0.000000020216995'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1200 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 3
+              table: '1'
+              note: 1200 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1200 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-12.7'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 12.7; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12053_89_bulk_plus_fe::T=1273.15:h=09cf2ae59b68
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12053_89_bulk_plus_fe
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1273.15'
+  value:
+    kind: point
+    point: '0.0000000000101325'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1273.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1000 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 3
+              table: '1'
+              note: 1000 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1000 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-16'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 16.0; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12053_89_bulk_plus_fe::T=1323.15:h=5f06d60cf665
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12053_89_bulk_plus_fe
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: point
+    point: '0.000000000063931753'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1050 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              page: 3
+              table: '1'
+              note: 1050 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1050 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-15.2'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 15.2; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12053_89_bulk_plus_fe::T=1373.15:h=2ac20c056aeb
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12053_89_bulk_plus_fe
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1373.15'
+  value:
+    kind: point
+    point: '0.00000000032041778'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1100 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1100'
+            locator:
+              page: 3
+              table: '1'
+              note: 1100 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1100 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-14.5'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 14.5; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12053_89_bulk_plus_fe::T=1423.15:h=474aefe3631a
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12053_89_bulk_plus_fe
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1423.15'
+  value:
+    kind: point
+    point: '0.000000001605893'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1423.15'
+      locator:
+        page: 3
+        table: '1'
+    fO2_log:
+      state:
+        tag: value
+        value: '-13.8'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 13.8; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12053_89_bulk_plus_fe::T=1473.15:h=edc801477489
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12053_89_bulk_plus_fe
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473.15'
+  value:
+    kind: point
+    point: '0.0000000080485308'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1200 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 3
+              table: '1'
+              note: 1200 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1200 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-13.1'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 13.1; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12053_89_bulk_rock::T=1273.15:h=49d6531784c9
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12053_89_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1273.15'
+  value:
+    kind: point
+    point: '0.000000000040338209'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1273.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1000 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 3
+              table: '1'
+              note: 1000 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1000 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-15.4'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 15.4; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12053_89_bulk_rock::T=1323.15:h=93860dd8b0de
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12053_89_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: point
+    point: '0.00000000025451689'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1050 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              page: 3
+              table: '1'
+              note: 1050 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1050 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-14.6'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 14.6; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12053_89_bulk_rock::T=1373.15:h=703a49873fe4
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12053_89_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1373.15'
+  value:
+    kind: point
+    point: '0.000000001605893'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1100 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1100'
+            locator:
+              page: 3
+              table: '1'
+              note: 1100 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1100 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-13.8'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 13.8; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12053_89_bulk_rock::T=1423.15:h=ffc424f941e9
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12053_89_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1423.15'
+  value:
+    kind: point
+    point: '0.0000000101325'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1423.15'
+      locator:
+        page: 3
+        table: '1'
+    fO2_log:
+      state:
+        tag: value
+        value: '-13'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 13.0; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12053_89_bulk_rock::T=1473.15:h=f7afdc67ca53
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12053_89_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473.15'
+  value:
+    kind: point
+    point: '0.000000050782796'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1200 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 3
+              table: '1'
+              note: 1200 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1200 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-12.3'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 12.3; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12053_89_pyroxenes::T=1273.15:h=7940d2b27fd9
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12053_89_pyroxenes
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1273.15'
+  value:
+    kind: point
+    point: '0.000000000050782796'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1273.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1000 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 3
+              table: '1'
+              note: 1000 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1000 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-15.3'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 15.3; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12053_89_pyroxenes::T=1323.15:h=b3f88ea77fe2
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12053_89_pyroxenes
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: point
+    point: '0.00000000040338209'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1050 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              page: 3
+              table: '1'
+              note: 1050 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1050 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-14.4'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 14.4; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12053_89_pyroxenes::T=1373.15:h=3821d735beef
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12053_89_pyroxenes
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1373.15'
+  value:
+    kind: point
+    point: '0.0000000025451689'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1100 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1100'
+            locator:
+              page: 3
+              table: '1'
+              note: 1100 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1100 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-13.6'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 13.6; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12053_89_pyroxenes::T=1423.15:h=d99464178e5c
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12053_89_pyroxenes
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1423.15'
+  value:
+    kind: point
+    point: '0.00000001605893'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1423.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1150 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1150'
+            locator:
+              page: 3
+              table: '1'
+              note: 1150 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1150 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-12.8'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 12.8; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12053_89_pyroxenes::T=1473.15:h=b5c553193fcc
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_12053_89_pyroxenes
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473.15'
+  value:
+    kind: point
+    point: '0.000000080485308'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; Apollo 12 first-heating measurements are excepted
+      from the reported within-0.2-log-unit scatter, and anomalously high initial first-heating readings were omitted from
+      the fitted curves (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1200 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 3
+              table: '1'
+              note: 1200 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1200 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-12.1'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 12.1; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_14310_195_bulk_rock::T=1273.15:h=49d6531784c9
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_14310_195_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1273.15'
+  value:
+    kind: point
+    point: '0.000000000040338209'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; first-heating values for 14310 rose irreversibly
+      above about 1170 °C and are distinguished from cooling-cycle values (published pages 1063 and 1067). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1273.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1000 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 3
+              table: '1'
+              note: 1000 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1000 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-15.4'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 15.4; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_14310_195_bulk_rock::T=1323.15:h=0dd7beb87122
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_14310_195_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: point
+    point: '0.00000000032041778'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; first-heating values for 14310 rose irreversibly
+      above about 1170 °C and are distinguished from cooling-cycle values (published pages 1063 and 1067). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1050 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              page: 3
+              table: '1'
+              note: 1050 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1050 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-14.5'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 14.5; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_14310_195_bulk_rock::T=1373.15:h=dc5f54251090
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_14310_195_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1373.15'
+  value:
+    kind: point
+    point: '0.000000001605893'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; first-heating values for 14310 rose irreversibly
+      above about 1170 °C and are distinguished from cooling-cycle values (published pages 1063 and 1067). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373.15'
+      locator:
+        page: 3
+        table: '1'
+    fO2_log:
+      state:
+        tag: value
+        value: '-13.8'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 13.8; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_14310_195_bulk_rock::T=1423.15:h=88396655b4ff
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_14310_195_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1423.15'
+  value:
+    kind: point
+    point: '0.0000000050782796'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; first-heating values for 14310 rose irreversibly
+      above about 1170 °C and are distinguished from cooling-cycle values (published pages 1063 and 1067). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1423.15'
+      locator:
+        page: 3
+        table: '1'
+    fO2_log:
+      state:
+        tag: value
+        value: '-13.3'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 13.3; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_14310_195_bulk_rock::T=1473.15:h=751b542a5693
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_14310_195_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473.15'
+  value:
+    kind: point
+    point: '0.00000032041778'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; first-heating values for 14310 rose irreversibly
+      above about 1170 °C and are distinguished from cooling-cycle values (published pages 1063 and 1067). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1200 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 3
+              table: '1'
+              note: 1200 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1200 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-11.5'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 11.5; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_14310_207_bulk_rock::T=1273.15:h=7940d2b27fd9
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_14310_207_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1273.15'
+  value:
+    kind: point
+    point: '0.000000000050782796'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; first-heating values for 14310 rose irreversibly
+      above about 1170 °C and are distinguished from cooling-cycle values (published pages 1063 and 1067). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1273.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1000 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 3
+              table: '1'
+              note: 1000 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1000 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-15.3'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 15.3; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_14310_207_bulk_rock::T=1323.15:h=0dd7beb87122
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_14310_207_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: point
+    point: '0.00000000032041778'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; first-heating values for 14310 rose irreversibly
+      above about 1170 °C and are distinguished from cooling-cycle values (published pages 1063 and 1067). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1050 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              page: 3
+              table: '1'
+              note: 1050 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1050 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-14.5'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 14.5; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_14310_207_bulk_rock::T=1373.15:h=15c419d786f1
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_14310_207_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1373.15'
+  value:
+    kind: point
+    point: '0.0000000012756062'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; first-heating values for 14310 rose irreversibly
+      above about 1170 °C and are distinguished from cooling-cycle values (published pages 1063 and 1067). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1100 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1100'
+            locator:
+              page: 3
+              table: '1'
+              note: 1100 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1100 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-13.9'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 13.9; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_14310_207_bulk_rock::T=1423.15:h=a87fc28e4d3d
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_14310_207_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1423.15'
+  value:
+    kind: point
+    point: '0.0000000063931753'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; first-heating values for 14310 rose irreversibly
+      above about 1170 °C and are distinguished from cooling-cycle values (published pages 1063 and 1067). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1423.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1150 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1150'
+            locator:
+              page: 3
+              table: '1'
+              note: 1150 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1150 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-13.2'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 13.2; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_14310_207_bulk_rock::T=1473.15:h=7e7e52e89ca9
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_14310_207_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473.15'
+  value:
+    kind: point
+    point: '0.0000012756062'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; first-heating values for 14310 rose irreversibly
+      above about 1170 °C and are distinguished from cooling-cycle values (published pages 1063 and 1067). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1200 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 3
+              table: '1'
+              note: 1200 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1200 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-10.9'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 10.9; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_14321_105_bulk_rock::T=1273.15:h=0c242934b8df
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_14321_105_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1273.15'
+  value:
+    kind: point
+    point: '0.000000000025451689'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1273.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1000 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 3
+              table: '1'
+              note: 1000 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1000 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-15.6'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 15.6; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_14321_105_bulk_rock::T=1323.15:h=93860dd8b0de
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_14321_105_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: point
+    point: '0.00000000025451689'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1050 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              page: 3
+              table: '1'
+              note: 1050 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1050 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-14.6'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 14.6; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_14321_105_bulk_rock::T=1373.15:h=4ca891c3539b
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_14321_105_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1373.15'
+  value:
+    kind: point
+    point: '0.0000000012756062'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373.15'
+      locator:
+        page: 3
+        table: '1'
+    fO2_log:
+      state:
+        tag: value
+        value: '-13.9'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 13.9; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_14321_105_bulk_rock::T=1423.15:h=3304b5cc0167
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_14321_105_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1423.15'
+  value:
+    kind: point
+    point: '0.0000000101325'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1423.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1150 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1150'
+            locator:
+              page: 3
+              table: '1'
+              note: 1150 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1150 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-13'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 13.0; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_14321_105_bulk_rock::T=1473.15:h=de9f70d668c0
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_14321_105_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473.15'
+  value:
+    kind: point
+    point: '0.000000050782796'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 3
+        table: '1'
+    fO2_log:
+      state:
+        tag: value
+        value: '-12.3'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 12.3; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_15058_81_bulk_rock::T=1273.15:h=4e244fba6012
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_15058_81_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1273.15'
+  value:
+    kind: point
+    point: '0.000000000020216995'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1273.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1000 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 3
+              table: '1'
+              note: 1000 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1000 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-15.7'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 15.7; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_15058_81_bulk_rock::T=1323.15:h=cfd87e43d65a
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_15058_81_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: point
+    point: '0.00000000012756062'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1050 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              page: 3
+              table: '1'
+              note: 1050 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1050 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-14.9'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 14.9; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_15058_81_bulk_rock::T=1373.15:h=ff493977d3ce
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_15058_81_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1373.15'
+  value:
+    kind: point
+    point: '0.00000000101325'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373.15'
+      locator:
+        page: 3
+        table: '1'
+    fO2_log:
+      state:
+        tag: value
+        value: '-14'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 14.0; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_15058_81_bulk_rock::T=1423.15:h=88396655b4ff
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_15058_81_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1423.15'
+  value:
+    kind: point
+    point: '0.0000000050782796'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1423.15'
+      locator:
+        page: 3
+        table: '1'
+    fO2_log:
+      state:
+        tag: value
+        value: '-13.3'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 13.3; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_15058_81_bulk_rock::T=1473.15:h=b773d446464c
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_15058_81_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473.15'
+  value:
+    kind: point
+    point: '0.000000025451689'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 3
+        table: '1'
+    fO2_log:
+      state:
+        tag: value
+        value: '-12.6'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 12.6; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_15058_88_bulk_rock::T=1273.15:h=4e244fba6012
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_15058_88_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1273.15'
+  value:
+    kind: point
+    point: '0.000000000020216995'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1273.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1000 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 3
+              table: '1'
+              note: 1000 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1000 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-15.7'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 15.7; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_15058_88_bulk_rock::T=1323.15:h=cfd87e43d65a
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_15058_88_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: point
+    point: '0.00000000012756062'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1050 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              page: 3
+              table: '1'
+              note: 1050 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1050 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-14.9'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 14.9; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_15058_88_bulk_rock::T=1373.15:h=1aa11901767d
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_15058_88_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1373.15'
+  value:
+    kind: point
+    point: '0.00000000101325'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1100 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1100'
+            locator:
+              page: 3
+              table: '1'
+              note: 1100 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1100 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-14'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 14.0; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_15058_88_bulk_rock::T=1423.15:h=88396655b4ff
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_15058_88_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1423.15'
+  value:
+    kind: point
+    point: '0.0000000050782796'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1423.15'
+      locator:
+        page: 3
+        table: '1'
+    fO2_log:
+      state:
+        tag: value
+        value: '-13.3'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 13.3; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_15058_88_bulk_rock::T=1473.15:h=960d6be6fefa
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_15058_88_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473.15'
+  value:
+    kind: point
+    point: '0.000000032041778'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit (published pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1200 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 3
+              table: '1'
+              note: 1200 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1200 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-12.5'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 12.5; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_15595_25_bulk_plus_fe::T=1273.15:h=09cf2ae59b68
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_15595_25_bulk_plus_fe
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1273.15'
+  value:
+    kind: point
+    point: '0.0000000000101325'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; heating and cooling results agreed for 15595 (published
+      pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1273.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1000 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 3
+              table: '1'
+              note: 1000 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1000 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-16'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 16.0; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_15595_25_bulk_plus_fe::T=1323.15:h=8c3fcfb1d25e
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_15595_25_bulk_plus_fe
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: point
+    point: '0.000000000080485308'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; heating and cooling results agreed for 15595 (published
+      pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1050 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              page: 3
+              table: '1'
+              note: 1050 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1050 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-15.1'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 15.1; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_15595_25_bulk_plus_fe::T=1373.15:h=80581d1b09cb
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_15595_25_bulk_plus_fe
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1373.15'
+  value:
+    kind: point
+    point: '0.00000000063931753'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; heating and cooling results agreed for 15595 (published
+      pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373.15'
+      locator:
+        page: 3
+        table: '1'
+    fO2_log:
+      state:
+        tag: value
+        value: '-14.2'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 14.2; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_15595_25_bulk_plus_fe::T=1423.15:h=949762f703bd
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_15595_25_bulk_plus_fe
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1423.15'
+  value:
+    kind: point
+    point: '0.0000000040338209'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; heating and cooling results agreed for 15595 (published
+      pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1423.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1150 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1150'
+            locator:
+              page: 3
+              table: '1'
+              note: 1150 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1150 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-13.4'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 13.4; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_15595_25_bulk_plus_fe::T=1473.15:h=58310d322c2d
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_15595_25_bulk_plus_fe
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473.15'
+  value:
+    kind: point
+    point: '0.000000020216995'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; heating and cooling results agreed for 15595 (published
+      pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1200 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 3
+              table: '1'
+              note: 1200 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1200 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-12.7'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 12.7; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_15595_25_bulk_rock::T=1273.15:h=4e244fba6012
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_15595_25_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1273.15'
+  value:
+    kind: point
+    point: '0.000000000020216995'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; heating and cooling results agreed for 15595 (published
+      pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1273.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1000 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 3
+              table: '1'
+              note: 1000 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1000 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-15.7'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 15.7; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_15595_25_bulk_rock::T=1323.15:h=cfd87e43d65a
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_15595_25_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: point
+    point: '0.00000000012756062'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; heating and cooling results agreed for 15595 (published
+      pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1050 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              page: 3
+              table: '1'
+              note: 1050 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1050 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-14.9'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 14.9; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_15595_25_bulk_rock::T=1373.15:h=c473ee5c3388
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_15595_25_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1373.15'
+  value:
+    kind: point
+    point: '0.00000000080485308'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; heating and cooling results agreed for 15595 (published
+      pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373.15'
+      locator:
+        page: 3
+        table: '1'
+    fO2_log:
+      state:
+        tag: value
+        value: '-14.1'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 14.1; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_15595_25_bulk_rock::T=1423.15:h=044a16b248ea
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_15595_25_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1423.15'
+  value:
+    kind: point
+    point: '0.0000000063931753'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; heating and cooling results agreed for 15595 (published
+      pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1423.15'
+      locator:
+        page: 3
+        table: '1'
+    fO2_log:
+      state:
+        tag: value
+        value: '-13.2'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 13.2; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa
+- observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_15595_25_bulk_rock::T=1473.15:h=0c78bf648618
+  experiment_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c::experiment::sato73_15595_25_bulk_rock
+  identity:
+    quantity:
+      tag: value
+      value: fugacity
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473.15'
+  value:
+    kind: point
+    point: '0.000000040338209'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: 'Measurement accuracy mostly better than 0.2 log fO2 unit; heating and cooling results agreed for 15595 (published
+      pages 1061 and 1063). Basis: log10(fO2/atm).'
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sato-hickling-mclane-1973-lunar-fo2
+  locator:
+    page: 3
+    published_page: 1063
+    table: '1'
+  read_from: pdf:sato-hickling-mclane-1973-lunar-fo2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 3
+        table: '1'
+        note: 1200 °C converted to K
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 3
+              table: '1'
+              note: 1200 °C converted to K
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              table: '1'
+              note: 1200 °C converted to K
+        output_unit: K
+    fO2_log:
+      state:
+        tag: value
+        value: '-12.4'
+      locator:
+        page: 3
+        table: '1'
+        note: Printed −log fO2 = 12.4; signed log fO2 retained for oxygen_condition resolution
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:sato-hickling-mclane-1973-lunar-fo2
+    parameters: []
+    output_unit: Pa

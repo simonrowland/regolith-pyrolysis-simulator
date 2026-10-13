@@ -10,6 +10,14 @@ extraction:
   worker: i1-bencze-yazhenskikh-2016
   provenance_path: corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf
 review_status: draft
+fidelity_samples:
+- path: species.Na.observations[bencze_2016_table_s1_na_all_subsamples].values.rows[0].p_Na_at_1273_K_Pa
+  value: '1.70·10-2'
+  locator:
+    source_path: corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf
+    page: 1
+    table: S-I
+  note: Table S-I, S1-1 subsample 1 run 1; sodium vapor pressure at 1273 K.
 scope_assessment:
   document_type: supplemental parameter tables from a primary Knudsen-effusion mass-spectrometry study of alkali vaporization from solidified gasifier slags
   measured_direct_observations: 0

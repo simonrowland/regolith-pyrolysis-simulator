@@ -17,7 +17,7 @@ import math
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from types import MappingProxyType
-from typing import Any, Literal, Optional, get_args
+from typing import Any, Literal, Optional, Protocol, get_args
 
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.scalar_boundary import is_declared_real_scalar
@@ -122,6 +122,14 @@ _DECLARED_REAL_SCALAR_CONTROL_INPUTS = frozenset(
         "wall_temperature_K",
     }
 )
+
+
+class RedoxStateLike(Protocol):
+    """Structural redox-state contract for the layer-zero request DTO."""
+
+    kind: str
+
+    def log_fO2_at(self, T_K: float) -> float: ...
 
 
 def _validate_control_input_real_scalars(
@@ -357,6 +365,7 @@ class IntentRequest:
     fO2_log: Optional[float] = None
     fe_redox_policy: str = "intrinsic"
     control_inputs: Mapping[str, Any] = field(default_factory=dict)
+    redox_state: Optional[RedoxStateLike] = None
 
     def __post_init__(self) -> None:
         if not isinstance(self.intent, ChemistryIntent):

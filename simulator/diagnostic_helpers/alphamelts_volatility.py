@@ -310,6 +310,7 @@ def _analytical_vapor_pressures_from_activities(
         if sp_data.get("reference_pressure_model") or sp_data.get("liquid_oxide_standard_reaction"):
             if catalog is None:
                 raise RuntimeError(f"{species} requires its melt-source catalog reaction")
+            # b-189-exempt: diagnostic pressure comparison, not a hot-train read.
             evaluator = catalog.evaluator_for(species)
             activity = float(activities.get(parent_oxide, 0.0) or 0.0)
             wt_activity = max(0.0, float(comp_wt.get(parent_oxide, 0.0) or 0.0) / 100.0)
@@ -744,9 +745,11 @@ def _alphamelts_domain_diagnostic(
     temperature_C: float,
     pressure_bar: float,
 ) -> dict[str, Any]:
-    valid, warnings, reason = AlphaMELTSDomainGate.validate_with_reason(
-        composition_wt_pct
-    )
+    assessment = AlphaMELTSDomainGate.assess(composition_wt_pct)
+    valid = assessment.valid
+    warnings = assessment.warnings
+    reason = assessment.reason
+    extrapolation_limited = not valid or assessment.outside_certified_band
     crash_point = {
         "temperature_C": float(temperature_C),
         "pressure_bar": float(pressure_bar),
@@ -754,11 +757,11 @@ def _alphamelts_domain_diagnostic(
     }
     status = "diagnostic"
     reason_code = reason_value(reason)
-    if not valid:
+    if extrapolation_limited:
         status = "extrapolation_limited"
     return {
         "status": status,
-        "extrapolation_limited": not valid,
+        "extrapolation_limited": extrapolation_limited,
         "backend_status_reason": reason_code,
         "warnings": tuple(warnings),
         "out_of_domain_crash_point": crash_point if not valid else None,

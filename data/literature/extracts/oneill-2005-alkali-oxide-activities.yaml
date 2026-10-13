@@ -1,0 +1,306 @@
+schema_version: literature_extract.v1
+source_id: oneill-2005-alkali-oxide-activities
+source:
+  citation: O’Neill H.St.C. (2005). A method for controlling alkali-metal oxide activities in one-atmosphere experiments and its application to measuring the relative activity coefficients of NaO0.5 in silicate melts. American Mineralogist90:497–501.
+  doi: 10.2138/am.2005.1792
+  year: 2005
+extraction:
+  method: Manual transcription from the supplied five-page published PDF; Table 1 values read from the rendered page and independently checked by rows and columns.
+  date: '2026-10-12'
+  worker: onei05b-1012
+review_status: draft
+benches:
+  - id: oneill-2005-wire-loop
+    identity: {basis: described_in_this_work}
+    apparatus_family:
+      state: {tag: value, value: conventional wire-loop experiment}
+      locator: {page: 2, published_page: 498, pdf_page_index: 1, figure: '1'}
+experiments:
+  - experiment_id: B26/3/02
+    bench_id: oneill-2005-wire-loop
+    locator: {page: 2, published_page: 498, pdf_page_index: 1, figure: '1'}
+    conditions:
+      temperature_K:
+        state: {tag: value, value: {kind: point, point: '1673.15'}}
+        locator: {page: 2, published_page: 498, pdf_page_index: 1, figure: '1', note: 'Printed 1400 °C; converted to K.'}
+        method_class: calculated
+        inference:
+          relation: celsius_to_kelvin
+          inputs: [Printed 1400 °C]
+          output_unit: K
+    thermal_schedule:
+      total_duration_s:
+        state: {tag: value, value: {kind: point, point: '424800'}}
+        locator: {page: 2, published_page: 498, pdf_page_index: 1, figure: '1', note: 'Printed 118 hours; converted to seconds.'}
+fidelity_samples:
+  - species: NaO0.5
+    observation_id: oneill_2005_fig1_sodium_exchange_figure_only
+    field: log_fO2
+    value:
+      value: '-12'
+      units: log10(bar)
+      quote: 'fO2 = 10^-12 bars'
+      locator: {page: 2, published_page: 498, pdf_page_index: 1, figure: '1'}
+    locator: {page: 2, published_page: 498, pdf_page_index: 1, figure: '1'}
+  - species: NaO0.5
+    observation_id: oneill_2005_fig1_run_conditions_as_printed
+    field: run_id_as_printed
+    value: B26/3/02
+    locator: {page: 2, published_page: 498, pdf_page_index: 1, figure: '1'}
+  - species: NaO0.5
+    observation_id: oneill_2005_fig1_run_conditions_as_printed
+    field: join_as_printed
+    value: ADeu–Na2SiO3
+    locator: {page: 2, published_page: 498, pdf_page_index: 1, figure: '1'}
+  - species: NaO0.5
+    observation_id: oneill_2005_fig1_run_conditions_as_printed
+    field: oxygen_fugacity_as_printed
+    value: fO2 = 10^-12 bars
+    locator: {page: 2, published_page: 498, pdf_page_index: 1, figure: '1'}
+  - species: NaO0.5
+    observation_id: oneill_2005_fig1_run_conditions_as_printed
+    field: duration_as_printed
+    value: 118 hours
+    locator: {page: 2, published_page: 498, pdf_page_index: 1, figure: '1'}
+  - species: NaO0.5
+    observation_id: oneill_2005_fig1_run_conditions_as_printed
+    field: temperature_as_printed
+    value: 1400 °C
+    locator: {page: 2, published_page: 498, pdf_page_index: 1, figure: '1'}
+  - species: NaO0.5
+    observation_id: oneill_2005_fig1_sodium_exchange_figure_only
+    field: caption
+    value: >-
+      FIGURE 1. Sodium exchange among compositions from a conventional
+      wire-loop experiment (B26/3/02) on the join ADeu–Na2SiO3, run at 1400
+      ºC, fO2 = 10–12 bars, 118 hours. Compositions are the means of six
+      analyses, error bars are ±2σ, and SiO2 is plotted renormalized to an
+      Na-free basis ([SiO2]º). The intended compositions would fall on the
+      dashed curve. Final compositions show both Na gain (the two samples
+      lowest in SiO2) and Na loss. The remarkably regular correlation between
+      final [NaO0.5] and [SiO2]º is explained by assuming constant aNaO0.5
+      among the samples, with the correlation caused by decreasing γNaO0.5
+      with increasing SiO2.
+    locator: {page: 2, published_page: 498, pdf_page_index: 1, figure: '1'}
+  - species: NaO0.5
+    observation_id: oneill_2005_table1_relative_log_coefficients
+    field: points
+    value:
+      - {series: AD6, melt: AD+En, ln_relative_gamma_as_printed: '-0.144(19)', reduced_chi_squared_as_printed: '2.0', composition_pointer: 'O’Neill and Mavrogenes (2002) and O’Neill and Eggins (2002)'}
+      - {series: AD6, melt: AD+Fo, ln_relative_gamma_as_printed: '0.155(18)', reduced_chi_squared_as_printed: '0.7', composition_pointer: 'O’Neill and Mavrogenes (2002) and O’Neill and Eggins (2002)'}
+      - {series: AD6, melt: AD+Wo, ln_relative_gamma_as_printed: '0.405(21)', reduced_chi_squared_as_printed: '2.5', composition_pointer: 'O’Neill and Mavrogenes (2002) and O’Neill and Eggins (2002)'}
+      - {series: AD6, melt: AD+Qz, ln_relative_gamma_as_printed: '-0.830(21)', reduced_chi_squared_as_printed: '1.8', composition_pointer: 'O’Neill and Mavrogenes (2002) and O’Neill and Eggins (2002)'}
+      - {series: AD6, melt: AD+TiO2, ln_relative_gamma_as_printed: '-0.248(19)', reduced_chi_squared_as_printed: '1.1', composition_pointer: 'O’Neill and Mavrogenes (2002) and O’Neill and Eggins (2002)'}
+      - {series: CMAS7, melt: A, ln_relative_gamma_as_printed: '-0.44(4)', reduced_chi_squared_as_printed: '2.9', composition_pointer: 'O’Neill and Mavrogenes (2002) and O’Neill and Eggins (2002)'}
+      - {series: CMAS7, melt: B, ln_relative_gamma_as_printed: '-0.50(9)', reduced_chi_squared_as_printed: '1.9', composition_pointer: 'O’Neill and Mavrogenes (2002) and O’Neill and Eggins (2002)'}
+      - {series: CMAS7, melt: C, ln_relative_gamma_as_printed: '-0.21(4)', reduced_chi_squared_as_printed: '0.6', composition_pointer: 'O’Neill and Mavrogenes (2002) and O’Neill and Eggins (2002)'}
+      - {series: CMAS7, melt: D, ln_relative_gamma_as_printed: '-0.17(4)', reduced_chi_squared_as_printed: '1.3', composition_pointer: 'O’Neill and Mavrogenes (2002) and O’Neill and Eggins (2002)'}
+      - {series: CMAS7, melt: E, ln_relative_gamma_as_printed: '0.30(4)', reduced_chi_squared_as_printed: '1.7', composition_pointer: 'O’Neill and Mavrogenes (2002) and O’Neill and Eggins (2002)'}
+      - {series: CMAS7, melt: F, ln_relative_gamma_as_printed: '-0.44(4)', reduced_chi_squared_as_printed: '1.7', composition_pointer: 'O’Neill and Mavrogenes (2002) and O’Neill and Eggins (2002)'}
+      - {series: CMAS7, melt: G, ln_relative_gamma_as_printed: '-0.42(4)', reduced_chi_squared_as_printed: '0.8', composition_pointer: 'O’Neill and Mavrogenes (2002) and O’Neill and Eggins (2002)'}
+      - {series: Di-Co, melt: Di, ln_relative_gamma_as_printed: '0.14(3)', reduced_chi_squared_as_printed: '3.0', composition_as_printed: 'CaMgSi2O6'}
+      - {series: Di-Co, melt: Di95Co5, ln_relative_gamma_as_printed: '0.09(3)', reduced_chi_squared_as_printed: '2.7', composition_as_printed: '95 wt% CaMgSi2O6 and 5 wt% AlO1.5'}
+      - {series: Di-Co, melt: Di90Co10, ln_relative_gamma_as_printed: '0.08(3)', reduced_chi_squared_as_printed: '4.2', composition_as_printed: '90 wt% CaMgSi2O6 and 10 wt% AlO1.5'}
+      - {series: Di-Co, melt: Di85Co15, ln_relative_gamma_as_printed: '0.04(3)', reduced_chi_squared_as_printed: '3.9', composition_as_printed: '85 wt% CaMgSi2O6 and 15 wt% AlO1.5'}
+      - {series: Di-Co, melt: Di80Co20, ln_relative_gamma_as_printed: '0.09(3)', reduced_chi_squared_as_printed: '1.1', composition_as_printed: '80 wt% CaMgSi2O6 and 20 wt% AlO1.5'}
+    locator: {page: 4, published_page: 500, pdf_page_index: 3, table: '1'}
+  - species: NaO0.5
+    observation_id: oneill_2005_fig2_measured_solubility_figure_only
+    field: caption
+    value: >-
+      FIGURE 2. Solubility of NaO0.5 in AD6 compositions relative to that in
+      the ADeu “reference” composition. The experiment with the highest
+      NaO0.5 was produced with pure Na2SiO3 in the reservoir at fO2 = 10−6.7
+      bars; most other runs were done in air. Solid curves are best fits for
+      AD + Qz and AD + Wo compositions to Equation 5, omitting the highest
+      Na datum. The dashed curves are from Equation 6, and include the
+      highest Na datum.
+    locator: {page: 3, published_page: 499, pdf_page_index: 2, figure: '2'}
+  - species: NaO0.5
+    observation_id: oneill_2005_fig3_measured_solubility_figure_only
+    field: caption
+    value: >-
+      FIGURE 3. The effect of AlO1.5 on the solubility of NaO0.5 in
+      compositions on the join Di-Cor. The transition from melts with molar
+      Na/Al < 1 (peraluminous) to Na/Al > 1 (peralkaline) is indicated by
+      the dashed curve. There appears to be no effect on the solubility of
+      NaO0.5 on crossing this compositional threshold. Two compositions
+      from B18/6/03 were lost.
+    locator: {page: 4, published_page: 500, pdf_page_index: 3, figure: '3'}
+species:
+  NaO0.5:
+    observations:
+      - observation_id: oneill_2005_fig1_sodium_exchange_figure_only
+        experiment: B26/3/02
+        type: concentration_series
+        locator: {page: 2, published_page: 498, pdf_page_index: 1, figure: '1'}
+        T_range_K: [1673.15, 1673.15]
+        phase: condensed_liquid
+        regime: quench_equilibration
+        units: NaO0.5 wt% and SiO2 wt% renormalized to an Na-free basis, as printed
+        values:
+          method_class: figure_only
+          admission_status: figure_only
+          semantics: bound_not_point_ordering
+          log_fO2:
+            value: '-12'
+            units: log10(bar)
+            quote: 'fO2 = 10^-12 bars'
+            locator: {page: 2, published_page: 498, pdf_page_index: 1, figure: '1'}
+          caption: >-
+            FIGURE 1. Sodium exchange among compositions from a conventional
+            wire-loop experiment (B26/3/02) on the join ADeu–Na2SiO3, run at 1400
+            ºC, fO2 = 10–12 bars, 118 hours. Compositions are the means of six
+            analyses, error bars are ±2σ, and SiO2 is plotted renormalized to an
+            Na-free basis ([SiO2]º). The intended compositions would fall on the
+            dashed curve. Final compositions show both Na gain (the two samples
+            lowest in SiO2) and Na loss. The remarkably regular correlation between
+            final [NaO0.5] and [SiO2]º is explained by assuming constant aNaO0.5
+            among the samples, with the correlation caused by decreasing γNaO0.5
+            with increasing SiO2.
+          note: >-
+            Axes: NaO0.5 content (wt%) against SiO2 content (wt%) renormalized
+            to an Na-free basis, [SiO2]º. Each plotted composition is the mean
+            of six analyses; error bars are ±2σ. Not digitised.
+      - observation_id: oneill_2005_fig2_measured_solubility_figure_only
+        type: concentration_series
+        locator: {page: 3, published_page: 499, pdf_page_index: 2, figure: '2'}
+        T_range_K: [1673.15, 1673.15]
+        phase: condensed_liquid
+        regime: quench_equilibration
+        units: mole fraction as printed on axes
+        values:
+          method_class: figure_only
+          admission_status: figure_only
+          semantics: bound_not_point_ordering
+          caption: >-
+            FIGURE 2. Solubility of NaO0.5 in AD6 compositions relative to that in
+            the ADeu “reference” composition. The experiment with the highest
+            NaO0.5 was produced with pure Na2SiO3 in the reservoir at fO2 = 10−6.7
+            bars; most other runs were done in air. Solid curves are best fits for
+            AD + Qz and AD + Wo compositions to Equation 5, omitting the highest
+            Na datum. The dashed curves are from Equation 6, and include the
+            highest Na datum.
+          note: >-
+            Axes: X_NaO0.5 (mole fraction) against X_NaO0.5^ADeu (mole fraction),
+            at 1400 °C. The highest-Na run used the stated Na2SiO3 reservoir and
+            fO2; most other runs were in air. Not digitised. T = 1400 °C is
+            converted as T_K = T_C + 273.15 = 1673.15 K.
+      - observation_id: oneill_2005_fig3_measured_solubility_figure_only
+        type: concentration_series
+        locator: {page: 4, published_page: 500, pdf_page_index: 3, figure: '3'}
+        T_range_K: [1673.15, 1673.15]
+        phase: condensed_liquid
+        regime: quench_equilibration
+        units: mole fraction as printed on axes
+        values:
+          method_class: figure_only
+          admission_status: figure_only
+          semantics: bound_not_point_ordering
+          caption: >-
+            FIGURE 3. The effect of AlO1.5 on the solubility of NaO0.5 in
+            compositions on the join Di-Cor. The transition from melts with molar
+            Na/Al < 1 (peraluminous) to Na/Al > 1 (peralkaline) is indicated by
+            the dashed curve. There appears to be no effect on the solubility of
+            NaO0.5 on crossing this compositional threshold. Two compositions
+            from B18/6/03 were lost.
+          note: >-
+            Axes: X_NaO0.5 (mole fraction) against X_AlO1.5^o (mole fraction in
+            the Na-free starting composition), at 1400 °C. Data were not
+            digitised. T = 1400 °C is converted as T_K = T_C + 273.15 = 1673.15 K.
+    context:
+      - observation_id: oneill_2005_fig1_run_conditions_as_printed
+        type: experiment_series
+        locator: {page: 2, published_page: 498, pdf_page_index: 1, figure: '1'}
+        units: as printed
+        values:
+          run_id_as_printed: B26/3/02
+          join_as_printed: ADeu–Na2SiO3
+          oxygen_fugacity_as_printed: fO2 = 10^-12 bars
+          duration_as_printed: 118 hours
+          temperature_as_printed: 1400 °C
+          method_as_printed: conventional wire-loop experiment
+      - observation_id: oneill_2005_table1_relative_log_coefficients
+        type: experiment_series
+        locator: {page: 4, published_page: 500, pdf_page_index: 3, table: '1'}
+        units: as printed
+        values:
+          quantity: signed logarithm of a relative activity-coefficient ratio
+          temperature_as_printed: 1400 °C
+          reference_as_printed: gamma_infinity(NaO0.5) in the anorthite-diopside eutectic (ADeu)
+          normalization_as_printed: gamma_infinity(NaO0.5) / gamma_infinity(NaO0.5, ADeu), at infinite dilution; Eq. 5
+          table_groups_as_printed: AD6 (11 runs); CMAS7 (5 runs); Di-Co (8 runs)
+          composition_basis_as_printed: AD6 and CMAS7 compositions are pointers to O’Neill and Mavrogenes (2002) and O’Neill and Eggins (2002); Di-Co compositions are weight-percent mixtures of CaMgSi2O6 and AlO1.5 as printed in footnote §.
+          fit_uncertainty_as_printed: >-
+            Table 1 footnote †: reduced chi-squared from fits assuming σ[Na2O] =
+            0.02[Na2O] + 0.1 wt%. Footnote ‡: the higher-scatter CMAS7 B data
+            were weighted with σ[Na2O] = 0.05[Na2O] + 0.1 wt%.
+          confidence_level: not stated for the parenthetical widths in Table 1
+          measured_inputs_as_printed: >-
+            NaO0.5 content in the melts was measured by electron microprobe in
+            EDS mode (CAMECA Camebax); operating conditions 15 kV, 6 nA, 100
+            live seconds, beam defocused to ~10 μm. The paper reports generally
+            ~2% (1σ) precision for [NaO0.5] > 2 wt%. Figure 2 plots measured
+            X_NaO0.5 against the ADeu-reference melt mole fraction for 11 runs
+            on six AD6 compositions; the analyzed Na-free compositions are
+            pointers to O’Neill and Mavrogenes (2002) and O’Neill and Eggins
+            (2002), not values copied into this extract. Figure 3 summarizes
+            five Di-Cor join compositions; two compositions from B18/6/03 were
+            lost. Numeric source inputs are plotted, with no source table.
+          experimental_conditions_as_printed: >-
+            Sodium-free silicate melts were prepared from oxides and carbonates
+            and mounted as beads on wire loops. An open Pt reservoir crucible
+            holding 5 to 10 g of NaO0.5-SiO2 melt was suspended about 10 cm
+            below the sample chandelier holding 6 to 8 samples. The assembly
+            was run in a vertical tube furnace: introduced at 600 °C and heated
+            at 6 °C/min to 1400 °C. Most runs were in air, usually flowing at
+            about 50 cm3/min; some had static air or an open furnace, and the
+            technique is also described for CO-CO2, CO-CO2-SO2, and O2-SO2 gas
+            mixtures without assignment to individual data. Reservoir NaO0.5/SiO2
+            ratios varied; the highest-Na experiment used pure Na2SiO3 at fO2 =
+            10^-6.7 bars. The paper reports steady state by 8.5 h in three air
+            replicates and maintenance for several days; per-run durations and
+            atmosphere/reservoir assignments are not given. The temperature
+            difference 10 cm below the hot spot is about 30 °C at 1400 °C.
+          points:
+            - {series: AD6, melt: AD+En, ln_relative_gamma_as_printed: '-0.144(19)', reduced_chi_squared_as_printed: '2.0', composition_pointer: 'O’Neill and Mavrogenes (2002) and O’Neill and Eggins (2002)'}
+            - {series: AD6, melt: AD+Fo, ln_relative_gamma_as_printed: '0.155(18)', reduced_chi_squared_as_printed: '0.7', composition_pointer: 'O’Neill and Mavrogenes (2002) and O’Neill and Eggins (2002)'}
+            - {series: AD6, melt: AD+Wo, ln_relative_gamma_as_printed: '0.405(21)', reduced_chi_squared_as_printed: '2.5', composition_pointer: 'O’Neill and Mavrogenes (2002) and O’Neill and Eggins (2002)'}
+            - {series: AD6, melt: AD+Qz, ln_relative_gamma_as_printed: '-0.830(21)', reduced_chi_squared_as_printed: '1.8', composition_pointer: 'O’Neill and Mavrogenes (2002) and O’Neill and Eggins (2002)'}
+            - {series: AD6, melt: AD+TiO2, ln_relative_gamma_as_printed: '-0.248(19)', reduced_chi_squared_as_printed: '1.1', composition_pointer: 'O’Neill and Mavrogenes (2002) and O’Neill and Eggins (2002)'}
+            - {series: CMAS7, melt: A, ln_relative_gamma_as_printed: '-0.44(4)', reduced_chi_squared_as_printed: '2.9', composition_pointer: 'O’Neill and Mavrogenes (2002) and O’Neill and Eggins (2002)'}
+            - {series: CMAS7, melt: B, ln_relative_gamma_as_printed: '-0.50(9)', reduced_chi_squared_as_printed: '1.9', composition_pointer: 'O’Neill and Mavrogenes (2002) and O’Neill and Eggins (2002)'}
+            - {series: CMAS7, melt: C, ln_relative_gamma_as_printed: '-0.21(4)', reduced_chi_squared_as_printed: '0.6', composition_pointer: 'O’Neill and Mavrogenes (2002) and O’Neill and Eggins (2002)'}
+            - {series: CMAS7, melt: D, ln_relative_gamma_as_printed: '-0.17(4)', reduced_chi_squared_as_printed: '1.3', composition_pointer: 'O’Neill and Mavrogenes (2002) and O’Neill and Eggins (2002)'}
+            - {series: CMAS7, melt: E, ln_relative_gamma_as_printed: '0.30(4)', reduced_chi_squared_as_printed: '1.7', composition_pointer: 'O’Neill and Mavrogenes (2002) and O’Neill and Eggins (2002)'}
+            - {series: CMAS7, melt: F, ln_relative_gamma_as_printed: '-0.44(4)', reduced_chi_squared_as_printed: '1.7', composition_pointer: 'O’Neill and Mavrogenes (2002) and O’Neill and Eggins (2002)'}
+            - {series: CMAS7, melt: G, ln_relative_gamma_as_printed: '-0.42(4)', reduced_chi_squared_as_printed: '0.8', composition_pointer: 'O’Neill and Mavrogenes (2002) and O’Neill and Eggins (2002)'}
+            - {series: Di-Co, melt: Di, ln_relative_gamma_as_printed: '0.14(3)', reduced_chi_squared_as_printed: '3.0', composition_as_printed: 'CaMgSi2O6'}
+            - {series: Di-Co, melt: Di95Co5, ln_relative_gamma_as_printed: '0.09(3)', reduced_chi_squared_as_printed: '2.7', composition_as_printed: '95 wt% CaMgSi2O6 and 5 wt% AlO1.5'}
+            - {series: Di-Co, melt: Di90Co10, ln_relative_gamma_as_printed: '0.08(3)', reduced_chi_squared_as_printed: '4.2', composition_as_printed: '90 wt% CaMgSi2O6 and 10 wt% AlO1.5'}
+            - {series: Di-Co, melt: Di85Co15, ln_relative_gamma_as_printed: '0.04(3)', reduced_chi_squared_as_printed: '3.9', composition_as_printed: '85 wt% CaMgSi2O6 and 15 wt% AlO1.5'}
+            - {series: Di-Co, melt: Di80Co20, ln_relative_gamma_as_printed: '0.09(3)', reduced_chi_squared_as_printed: '1.1', composition_as_printed: '80 wt% CaMgSi2O6 and 20 wt% AlO1.5'}
+          reference: gamma_infinity(NaO0.5) in the anorthite-diopside eutectic (ADeu)
+          normalization: relative to gamma_infinity(NaO0.5) in ADeu; see Eq. 5
+      - observation_id: oneill_2005_experimental_method_and_control_conditions
+        type: method
+        locator: {page: 2, published_page: 498, pdf_page_index: 1, section: 'Experimental details'}
+        units: as printed
+        values:
+          quantity: one-atmosphere wire-loop alkali activity control and Na analysis method
+          method_class: method_only
+          locator_notes:
+            - {page: 2, published_page: 498, pdf_page_index: 1, section: 'Experimental details'}
+            - {page: 3, published_page: 499, pdf_page_index: 2, section: 'Experimental details'}
+          details_as_printed: >-
+            Sodium-free melts were made from oxides and carbonates and mounted
+            as beads on wire loops. An open Pt crucible containing NaO0.5-SiO2
+            reservoir melt hung beneath the sample chandelier. The assembly
+            entered a vertical gas-mixing tube furnace at 600 °C and was heated
+            at 6 °C/min to 1400 °C; most experiments were in air at about
+            50 cm3/min, with some static-air and open-furnace variants. NaO0.5
+            content was analyzed with a CAMECA Camebax electron microprobe in
+            EDS mode at 15 kV, 6 nA, 100 live seconds, and a defocused beam of
+            about 10 μm. Generally reported analytical precision is ~2% (1σ)
+            for contents >2 wt%. The paper does not assign the atmosphere,
+            reservoir NaO0.5/SiO2 ratio, or duration to each Table 1 composition.

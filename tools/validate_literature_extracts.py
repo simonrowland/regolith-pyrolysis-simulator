@@ -4,7 +4,8 @@
 Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
 
 * ``schema_version`` must be ``literature_extract.v1``
-* ``source_id`` must match the filename stem
+* ``source_id`` must match the filename stem (companion tables instead use
+  the source-prefixed stem and a linked parent extract)
 * source citation + extraction method/date/worker + review_status required
 * observation ``type`` in the closed set
 * every observation has a locator with at least one location key
@@ -50,8 +51,14 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
+from simulator.battery.extract_context import (
+    SUPPORTED_EXTRACT_CONTEXT_PATH,
+    iter_unsupported_context_container_paths,
+)
+
 EXTRACTS_DIR = ROOT / "data" / "literature" / "extracts"
 SCHEMA_VERSION = "literature_extract.v1"
+TABLE_SCHEMA_VERSION = "literature_extract_table.v1"
 U0_MANIFEST = ROOT / "data" / "vapour_rail_u0_manifest.yaml"
 FIDELITY_POLICY_PATH = EXTRACTS_DIR / "_fidelity_pre_policy_allowlist.yaml"
 FIDELITY_POLICY_SCHEMA = "literature_extract_fidelity_policy.v1"
@@ -1562,6 +1569,13 @@ def validate_extract_document(
     if not isinstance(doc, Mapping):
         return [f"{label}: root must be a mapping"]
 
+    for key_path in iter_unsupported_context_container_paths(doc):
+        rendered_path = ".".join(key_path)
+        errors.append(
+            f"{label}:{rendered_path}: context container is not lifted by "
+            f"the migrator; supported location is {SUPPORTED_EXTRACT_CONTEXT_PATH}"
+        )
+
     if doc.get("schema_version") != SCHEMA_VERSION:
         errors.append(
             f"{label}: schema_version must be {SCHEMA_VERSION!r}, "
@@ -1679,6 +1693,70 @@ def validate_extract_file(
         doc = yaml.safe_load(text)
     except Exception as exc:  # noqa: BLE001 — surface parse failures as validation errors
         return [f"{path}: failed to load YAML: {exc}"]
+    if isinstance(doc, Mapping) and doc.get("schema_version") == TABLE_SCHEMA_VERSION:
+        errors: list[str] = []
+        errors.extend(_absolute_path_value_errors(doc, str(path)))
+        source_id = doc.get("source_id")
+        if not isinstance(source_id, str) or not source_id:
+            return [f"{path}: companion table source_id is required"]
+
+        if not path.stem.startswith(f"{source_id}-"):
+            errors.append(
+                f"{path}: companion filename stem must start with source_id "
+                f"{source_id!r} followed by '-'"
+            )
+
+        parent_filename = f"{source_id}.yaml"
+        if Path(parent_filename).name != parent_filename:
+            errors.append(
+                f"{path}: companion parent extract must be named in the same directory"
+            )
+            return errors
+        parent_path = path.with_name(parent_filename)
+        if not parent_path.is_file():
+            errors.append(
+                f"{path}: companion parent extract does not exist: {parent_path}"
+            )
+            return errors
+
+        try:
+            parent_doc = yaml.safe_load(parent_path.read_text(encoding="utf-8"))
+        except Exception as exc:  # noqa: BLE001 — surface parent parse failures
+            errors.append(f"{parent_path}: failed to load YAML: {exc}")
+            return errors
+
+        linked = False
+        species = parent_doc.get("species") if isinstance(parent_doc, Mapping) else None
+        if isinstance(species, Mapping):
+            for block in species.values():
+                if not isinstance(block, Mapping):
+                    continue
+                observations = block.get("observations")
+                if not isinstance(observations, list):
+                    continue
+                for observation in observations:
+                    if not isinstance(observation, Mapping):
+                        continue
+                    values = observation.get("values")
+                    reference = (
+                        values.get("table_transcription")
+                        if isinstance(values, Mapping)
+                        else None
+                    )
+                    if (
+                        isinstance(reference, str)
+                        and not Path(reference).is_absolute()
+                    ):
+                        if (ROOT / reference).resolve() == path.resolve():
+                            linked = True
+                            break
+                if linked:
+                    break
+        if not linked:
+            errors.append(
+                f"{parent_path}: parent extract does not link companion table {path}"
+            )
+        return errors
     return validate_extract_document(
         doc,
         path=path,

@@ -18,31 +18,31 @@ evidence_policy:
   model_generator: Authors' Wagner activity formalism with first- and second-order interaction parameters; least-squares/regression treatment of this work's concentration data.
   figure_policy: Figures 1, 3, 4, 5, 6, 7 and 8 were inspected. Plotted scatter/curves were not digitised; only printed labels and captions are retained.
 fidelity_samples:
-- species: Mg
-  observable: concentration_pair
-  observation_id: itoh_hino_banya_1997_table2_mg_o_concentrations
-  field: points[0]
-  value: 'Mg 2.0; O 6.8; both ×10^-4 mass%'
+- path: species.Mg.observations[itoh_hino_banya_1997_table2_mg_o_concentrations].values.points[0]
+  value: {row: 1, T_K: 1873, Mg_mass_pct_x10^-4: 2.0, O_mass_pct_x10^-4: 6.8, locator: {table: '2', row: 1, published_page: 625}}
   locator:
     published_page: 625
     pdf_page_index: 3
     table: '2'
     note: Table 2 row 1 under the [Mg] and [O] columns.
-- species: Mg
-  observable: concentration_pair
-  observation_id: itoh_hino_banya_1997_table2_mg_o_concentrations
-  field: points[28]
-  value: '2023 K; Mg 1.8; O 10.4; both ×10^-4 mass%'
+- path: species.Mg.observations[itoh_hino_banya_1997_table2_mg_o_concentrations].values.points[28]
+  value: {row: 29, T_K: 2023, Mg_mass_pct_x10^-4: 1.8, O_mass_pct_x10^-4: 10.4, locator: {table: '2', row: 29, published_page: 625}}
   locator:
     published_page: 625
     pdf_page_index: 3
     table: '2'
     note: Table 2 row 29 under the 2023 K [Mg] and [O] columns.
-- species: Mg
-  observable: interaction_parameter
-  observation_id: itoh_hino_banya_1997_present_work_parameters
-  field: values.present_work_1873K
-  value: 'log K_Mg -6.80; e^(Mg)_O -280; e^(O)_Mg -430; r^(O)_O -0.17; e^(Mg)_Mg 0; r^(Mg)_O -20,000; r^(O)_Mg 350,000; r^(Mg,O)_O 462,000; r^(O,Mg)_Mg -61,000'
+- path: species.Mg.observations[itoh_hino_banya_1997_present_work_parameters].values.present_work_1873K
+  value:
+    log_K_Mg: -6.80
+    e_Mg_O: -280
+    e_O_Mg: -430
+    r_O_O: -0.17
+    e_Mg_Mg: 0
+    r_Mg_O: -20000
+    r_O_Mg: 350000
+    r_MgO_O: 462000
+    r_OMg_Mg: -61000
   locator:
     published_page: 623
     pdf_page_index: 1
@@ -251,15 +251,20 @@ species:
       uncertainty:
         note: No numerical uncertainty is printed for the apparatus dimensions, concentrations, or analysis results in the cited section.
       equipment:
-        reaction_tube:
-          value: opaque quartz, 80 mm OD × 65 mm ID × 500 mm H
-          locator: {published_page: 624, pdf_page_index: 2, figure: '2', section: '2. Experimental method'}
-        crucibles:
+        crucible_material:
           value: MgO protective and melting crucibles; melting crucible 25 mm OD × 20 mm ID × 50 mm H
           locator: {published_page: 624, pdf_page_index: 2, figure: '2', section: '2. Experimental method'}
-        gas_inlet:
-          value: alumina tube, 13 mm OD × 9 mm ID
-          locator: {published_page: 624, pdf_page_index: 2, figure: '2', section: '2. Experimental method'}
-        temperature:
+        temperature_calibration:
           value: optical pyrometer corrected using iron melting temperature
           locator: {published_page: 624, pdf_page_index: 2, section: '2. Experimental method'}
+        other_facts:
+          value:
+          - name: reaction_tube
+            unit: mm
+            value: opaque quartz, 80 mm OD × 65 mm ID × 500 mm H
+            locator: {published_page: 624, pdf_page_index: 2, figure: '2', section: '2. Experimental method'}
+          - name: gas_inlet
+            unit: mm
+            value: alumina tube, 13 mm OD × 9 mm ID
+            locator: {published_page: 624, pdf_page_index: 2, figure: '2', section: '2. Experimental method'}
+          locator: {published_page: 624, pdf_page_index: 2, figure: '2', section: '2. Experimental method'}

@@ -110,7 +110,9 @@ MAX_CHAIN_CLOSURE_ERR_PCT = 6.0e-5
 # draw debit the same SiO2 pool used by the SiO-yield chain.
 # Moved with the 2026-09-22 Chapman-Enskog prefactor correction
 # (-1.103% on the C2A SiO ledger). Kept equal to BASELINE_SIO_EVOLVED_KG.
-PHASE3BIS_SIO_EVOLVED_KG = 1.0409922677e-05  # 2026-09-26 b-573 regen
+# 2026-10-13 b-850 round 2: same CLI regenerated pin after corrected alkali
+# dimer source activity; kept equal to BASELINE_SIO_EVOLVED_KG.
+PHASE3BIS_SIO_EVOLVED_KG = 1.04099076417e-05
 
 
 @lru_cache(maxsize=None)

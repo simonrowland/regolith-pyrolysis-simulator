@@ -2,46 +2,6 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/extracts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.yaml
 observations:
-- observation_id: rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts::rusiecka_wood_2025_model_outputs
-  experiment_id: 10.1016/j.gca.2025.01.020::experiment::icb-series
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'chloride_capacity_model'
-    species:
-      formula: Cl
-      phase:
-        tag: unknown
-        reason: phase string 'hydrous_basalt_melt' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-      charge:
-        tag: value
-        value: 0
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'chloride_capacity_model'; refusing to pick a number
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: model_derived
-    original_method_class: model_derived
-    model: model_derived
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
-  locator:
-    published_page: 213
-    section: Results
-    equation: '8'
-    source_path: corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf
-  read_from: pdf:rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
 - observation_id: rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts::rusiecka_wood_2025_table1_starting_compositions::rows:row=icb-2:h=ad1af57c31a7
   experiment_id: 10.1016/j.gca.2025.01.020::rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
   identity:

@@ -28,8 +28,11 @@ from simulator.evaporation import (
     _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE,
 )
 from simulator.fe_redox import (
+    FE_FEO_BUFFER_STANDARD,
     KRESS91_LIQUID_CALIBRATION_MAX_T_C,
     KRESS91_LIQUID_CALIBRATION_MIN_T_C,
+    REDOX_STATE_REFERENCE_T_K,
+    RedoxState,
     kress91_ln_fO2_temperature_delta,
 )
 from simulator.melt_backend.base import (
@@ -37,6 +40,7 @@ from simulator.melt_backend.base import (
     InternalAnalyticalBackend,
     MeltCompositionError,
 )
+from simulator.melt_backend.liquidus import LiquidusSolidusResult
 from simulator.reduced_real_determinism import (
     PT0DeterminismStore,
     canonical_json_bytes,
@@ -2108,7 +2112,7 @@ def test_projected_notice_survives_shared_cache_reuse_in_run_metadata(
     for index, sim in enumerate(sims):
         sim._freeze_gate_shared_curve_cache = shared_cache
         sim._freeze_gate_curve_from_gate_dispatch = (
-            lambda reasons, *, fO2_log, repair_notices=None, index=index: (
+            lambda reasons, *, fO2_log, repair_notices=None, redox_state=None, index=index: (
                 calls.append(index) or dict(curve)
             )
         )
@@ -2813,7 +2817,7 @@ def test_shared_freeze_gate_curve_cache_reuses_same_analytical_producer(
         sim.backend = analytical_backend
         sim._freeze_gate_shared_curve_cache = shared_cache
         sim._freeze_gate_curve_from_gate_dispatch = (
-            lambda reasons, *, fO2_log, repair_notices=None, index=index: (
+            lambda reasons, *, fO2_log, repair_notices=None, redox_state=None, index=index: (
                 calls.append(index) or dict(curve)
             )
         )
@@ -2963,7 +2967,7 @@ def test_gate_curve_memo_reuses_without_receipt_and_emits_notice_once(
         register_synthetic_gate_curve_producer(sim)
         sim._freeze_gate_shared_curve_cache = shared_cache
         sim._freeze_gate_curve_from_gate_dispatch = (
-            lambda reasons, *, fO2_log, repair_notices=None, index=index: (
+            lambda reasons, *, fO2_log, repair_notices=None, redox_state=None, index=index: (
                 calls.append(index) or dict(curve)
             )
         )
@@ -3036,7 +3040,7 @@ def test_uncacheable_gate_curve_never_enters_local_or_shared_memo(
     for index, sim in enumerate(sims):
         sim._freeze_gate_shared_curve_cache = shared_cache
         sim._freeze_gate_curve_from_gate_dispatch = (
-            lambda reasons, *, fO2_log, repair_notices=None, index=index: (
+            lambda reasons, *, fO2_log, repair_notices=None, redox_state=None, index=index: (
                 calls.append(index) or dict(curve)
             )
         )
@@ -3094,7 +3098,7 @@ def test_shared_freeze_gate_curve_cache_splits_validation_map_dose_states(
         )
         sim._freeze_gate_shared_curve_cache = shared_cache
         sim._freeze_gate_curve_from_gate_dispatch = (
-            lambda reasons, *, fO2_log, repair_notices=None, index=index: (
+            lambda reasons, *, fO2_log, repair_notices=None, redox_state=None, index=index: (
                 calls.append(index) or curves[index]
             )
         )
@@ -4021,7 +4025,7 @@ def test_gate_curve_memo_ignores_sulfur_input_drift_same_key(
         lambda: sulfur_input_ppm[0],
     )
     sim._freeze_gate_curve_from_gate_dispatch = (
-        lambda reasons, *, fO2_log, repair_notices=None: (
+        lambda reasons, *, fO2_log, repair_notices=None, redox_state=None: (
             provider_calls.append(fO2_log) or dict(curve)
         )
     )
@@ -4101,7 +4105,7 @@ def test_core_gate_curve_memo_reuses_local_slot_refused_curve(
     }
     provider_calls = []
     sim._freeze_gate_curve_from_gate_dispatch = (
-        lambda reasons, *, fO2_log, repair_notices=None: (
+        lambda reasons, *, fO2_log, repair_notices=None, redox_state=None: (
             provider_calls.append(fO2_log) or dict(curve)
         )
     )
@@ -4152,6 +4156,7 @@ def test_core_gate_curve_memo_keeps_r15_vetoed_live_curve(
         *,
         fO2_log,
         repair_notices=None,
+        redox_state=None,
     ):
         provider_calls.append(fO2_log)
         if sticky_reason is not None:
@@ -4225,7 +4230,7 @@ def test_core_gate_curve_memo_hit_skips_install_provenance(
         count_install_provenance,
     )
     sim._freeze_gate_curve_from_gate_dispatch = (
-        lambda reasons, *, fO2_log, repair_notices=None: (
+        lambda reasons, *, fO2_log, repair_notices=None, redox_state=None: (
             provider_calls.append(fO2_log) or dict(curve)
         )
     )
@@ -4490,7 +4495,7 @@ def test_gate_memo_origin_missing_is_a_miss(
     }
     producer_calls = []
     sim._freeze_gate_curve_from_gate_dispatch = (
-        lambda reasons, *, fO2_log, repair_notices=None: (
+        lambda reasons, *, fO2_log, repair_notices=None, redox_state=None: (
             producer_calls.append(fO2_log) or dict(curve)
         )
     )
@@ -4545,7 +4550,7 @@ def test_gate_memo_origin_rejects_install_fingerprint_change(
     }
     producer_calls = []
     sim._freeze_gate_curve_from_gate_dispatch = (
-        lambda reasons, *, fO2_log, repair_notices=None: (
+        lambda reasons, *, fO2_log, repair_notices=None, redox_state=None: (
             producer_calls.append(fO2_log) or dict(curve)
         )
     )
@@ -4632,7 +4637,7 @@ def test_gate_memo_origin_unproven_is_miss_and_noticed(
         **record,
     }
     sim._freeze_gate_curve_from_gate_dispatch = (
-        lambda reasons, *, fO2_log, repair_notices=None: dict(curve)
+        lambda reasons, *, fO2_log, repair_notices=None, redox_state=None: dict(curve)
     )
 
     result = sim._freeze_gate_curve_record()
@@ -4736,7 +4741,7 @@ def test_gate_memo_evidence_unavailable_is_a_miss(
     }
     producer_calls = []
     sim._freeze_gate_curve_from_gate_dispatch = (
-        lambda reasons, *, fO2_log, repair_notices=None: (
+        lambda reasons, *, fO2_log, repair_notices=None, redox_state=None: (
             producer_calls.append(fO2_log) or dict(curve)
         )
     )
@@ -5034,7 +5039,7 @@ def test_core_gate_curve_memo_rejects_foreign_pid_or_configuration(
     sim._freeze_gate_liquid_fraction_curve_memo[key] = record
     producer_calls = []
     sim._freeze_gate_curve_from_gate_dispatch = (
-        lambda reasons, *, fO2_log, repair_notices=None: (
+        lambda reasons, *, fO2_log, repair_notices=None, redox_state=None: (
             producer_calls.append(fO2_log) or dict(curve)
         )
     )
@@ -5079,7 +5084,7 @@ def test_per_tick_gate_authority_rejects_foreign_pid_or_configuration(
     sim._melt_redox_gate_authority_tick_hour = int(sim.melt.hour)
     producer_calls = []
     sim._freeze_gate_curve_from_gate_dispatch = (
-        lambda reasons, *, fO2_log, repair_notices=None: (
+        lambda reasons, *, fO2_log, repair_notices=None, redox_state=None: (
             producer_calls.append(fO2_log) or dict(curve)
         )
     )
@@ -5114,7 +5119,7 @@ def test_core_gate_curve_memo_reuses_fallback_curve_after_provider_unavailable(
     monkeypatch.setattr(
         sim,
         '_freeze_gate_curve_from_gate_dispatch',
-        lambda reasons, *, fO2_log, repair_notices=None: None,
+        lambda reasons, *, fO2_log, repair_notices=None, redox_state=None: None,
     )
     monkeypatch.setattr(
         sim.backend,
@@ -5755,3 +5760,124 @@ def test_unrecognised_engine_status_does_not_authorize_the_redox_floor_fallback(
         len(sim._melt_redox_liquidus_gate_fallback_diagnostics)
         == fallback_count
     )
+
+
+def test_freeze_gate_dispatches_its_absolute_redox_state(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    provider = _FakeMAGEMinGateFallbackProvider()
+    sim._chem_registry._authoritative[
+        ChemistryIntent.GATE_LIQUID_FRACTION
+    ] = provider
+    monkeypatch.setattr(
+        sim,
+        '_register_freeze_gate_liquid_fraction_providers',
+        lambda: None,
+    )
+
+    redox_state = RedoxState.absolute(
+        sim._freeze_gate_liquidus_fO2_log(
+            float(sim._current_melt_redox_fO2_log())
+        )
+    )
+    curve = sim._freeze_gate_curve(redox_state=redox_state)
+
+    assert curve['liquidus_T_C'] == pytest.approx(1300.0)
+    request = provider.requests[0]
+    assert isinstance(request.redox_state, RedoxState)
+    assert request.redox_state.kind == 'absolute'
+    assert request.redox_state is redox_state
+    assert request.fO2_log == pytest.approx(
+        request.redox_state.log_fO2_at(REDOX_STATE_REFERENCE_T_K)
+    )
+
+
+def test_freeze_gate_wrapper_passes_buffer_offset_redox_state(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    from simulator.fe_redox import _reanchor_redox_state
+
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    fO2_log = sim._freeze_gate_liquidus_fO2_log(
+        float(sim._current_melt_redox_fO2_log())
+    )
+    redox_state = _reanchor_redox_state(
+        RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, 0.2),
+        fO2_log,
+    )
+    provider = _FakeMAGEMinGateFallbackProvider()
+    sim._chem_registry._authoritative[
+        ChemistryIntent.GATE_LIQUID_FRACTION
+    ] = provider
+    monkeypatch.setattr(
+        sim,
+        '_register_freeze_gate_liquid_fraction_providers',
+        lambda: None,
+    )
+
+    curve = sim._freeze_gate_curve(redox_state=redox_state)
+
+    assert curve['liquidus_T_C'] == pytest.approx(1300.0)
+    request = provider.requests[0]
+    assert request.redox_state is redox_state
+    assert request.redox_state.kind == 'buffer_offset'
+    assert request.fO2_log == pytest.approx(fO2_log)
+
+
+def test_freeze_gate_backend_fallback_receives_redox_state(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    state = RedoxState.buffer_offset(
+        FE_FEO_BUFFER_STANDARD,
+        0.2,
+    )
+    calls = []
+
+    class FakeBackend:
+        def find_liquidus_solidus(self, **kwargs):
+            calls.append(kwargs)
+            return LiquidusSolidusResult(
+                liquidus_T_C=1300.0,
+                solidus_T_C=1000.0,
+                liquid_fraction=1.0,
+                status='ok',
+            )
+
+    sim.backend = FakeBackend()
+    reference_value = state.log_fO2_at(REDOX_STATE_REFERENCE_T_K)
+
+    curve = sim._freeze_gate_curve_from_backend_liquidus(
+        [],
+        pressure_bar=1.0,
+        fO2_log=reference_value,
+        redox_state=state,
+    )
+
+    assert curve['liquidus_T_C'] == pytest.approx(1300.0)
+    assert calls[0]['redox_state'] is state
+    assert calls[0]['fO2_log'] == pytest.approx(reference_value)

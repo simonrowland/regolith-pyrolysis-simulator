@@ -2309,17 +2309,6 @@ entries:
       figure: '2'
       section: Chemistry
       source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-  - observation_id: lpi-compendium-15013::lpi_15013_maturity_and_grain_size
-    locator:
-      pdf_page_index: 1
-      section: Petrography
-      source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-  - observation_id: lpi-compendium-15013::lpi_15013_sample_mass_and_collection
-    locator:
-      pdf_page_index: 1
-      figure: '1'
-      section: Introduction
-      source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
 - work_id: 0441adaa3f3f3a009e0eed4acf4fc17cb21c96a5ebd3aca5c767303a0c1c180f
   source: data/literature/extracts/lpi-compendium-15013.yaml
   why: declared quantity is unknown; unsupported quantity 'chemical_composition'; refusing to pick a number
@@ -2330,51 +2319,6 @@ entries:
     locator:
       pdf_page_index: 4
       table: '1'
-      source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-- work_id: 0441adaa3f3f3a009e0eed4acf4fc17cb21c96a5ebd3aca5c767303a0c1c180f
-  source: data/literature/extracts/lpi-compendium-15013.yaml
-  why: declared quantity is unknown; unsupported quantity 'grain_size_distribution'; refusing to pick a number
-  axes:
-  - value
-  observations:
-  - observation_id: lpi-compendium-15013::lpi_15013_grain_size_distribution_figure_only
-    locator:
-      pdf_page_index: 2
-      figure: '5'
-      source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-- work_id: 0441adaa3f3f3a009e0eed4acf4fc17cb21c96a5ebd3aca5c767303a0c1c180f
-  source: data/literature/extracts/lpi-compendium-15013.yaml
-  why: declared quantity is unknown; unsupported quantity 'low_temperature_vacuum_release_of_lm_exhaust_breakdown_products';
-    refusing to pick a number
-  axes:
-  - value
-  observations:
-  - observation_id: lpi-compendium-15013::lpi_15013_lm_exhaust_release_context
-    locator:
-      pdf_page_index: 3
-      figure: '6'
-      source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-- work_id: 0441adaa3f3f3a009e0eed4acf4fc17cb21c96a5ebd3aca5c767303a0c1c180f
-  source: data/literature/extracts/lpi-compendium-15013.yaml
-  why: declared quantity is unknown; unsupported quantity 'maturity_index_vs_carbon_content'; refusing to pick a number
-  axes:
-  - value
-  observations:
-  - observation_id: lpi-compendium-15013::lpi_15013_maturity_carbon_figure_only
-    locator:
-      pdf_page_index: 1
-      figure: '2'
-      source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-- work_id: 0441adaa3f3f3a009e0eed4acf4fc17cb21c96a5ebd3aca5c767303a0c1c180f
-  source: data/literature/extracts/lpi-compendium-15013.yaml
-  why: declared quantity is unknown; unsupported quantity 'rare_earth_element_pattern'; refusing to pick a number
-  axes:
-  - value
-  observations:
-  - observation_id: lpi-compendium-15013::lpi_15013_ree_normalized_pattern_figure_only
-    locator:
-      pdf_page_index: 2
-      figure: '4'
       source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
 - work_id: 0441adaa3f3f3a009e0eed4acf4fc17cb21c96a5ebd3aca5c767303a0c1c180f
   source: data/literature/extracts/lpi-compendium-15013.yaml
@@ -2389,17 +2333,6 @@ entries:
       source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
 - work_id: 0441adaa3f3f3a009e0eed4acf4fc17cb21c96a5ebd3aca5c767303a0c1c180f
   source: data/literature/extracts/lpi-compendium-15013.yaml
-  why: declared quantity is unknown; unsupported quantity 'volatile_release_curve'; refusing to pick a number
-  axes:
-  - value
-  observations:
-  - observation_id: lpi-compendium-15013::lpi_15013_volatile_release_curve_figure_only
-    locator:
-      pdf_page_index: 3
-      figure: '7'
-      source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-- work_id: 0441adaa3f3f3a009e0eed4acf4fc17cb21c96a5ebd3aca5c767303a0c1c180f
-  source: data/literature/extracts/lpi-compendium-15013.yaml
   why: missing phase
   axes:
   - phase
@@ -2410,37 +2343,6 @@ entries:
       figure: '2'
       section: Chemistry
       source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-  - observation_id: lpi-compendium-15013::lpi_15013_grain_size_distribution_figure_only
-    locator:
-      pdf_page_index: 2
-      figure: '5'
-      source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-  - observation_id: lpi-compendium-15013::lpi_15013_lm_exhaust_release_context
-    locator:
-      pdf_page_index: 3
-      figure: '6'
-      source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-  - observation_id: lpi-compendium-15013::lpi_15013_maturity_and_grain_size
-    locator:
-      pdf_page_index: 1
-      section: Petrography
-      source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-  - observation_id: lpi-compendium-15013::lpi_15013_maturity_carbon_figure_only
-    locator:
-      pdf_page_index: 1
-      figure: '2'
-      source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-  - observation_id: lpi-compendium-15013::lpi_15013_ree_normalized_pattern_figure_only
-    locator:
-      pdf_page_index: 2
-      figure: '4'
-      source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-  - observation_id: lpi-compendium-15013::lpi_15013_sample_mass_and_collection
-    locator:
-      pdf_page_index: 1
-      figure: '1'
-      section: Introduction
-      source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
   - observation_id: lpi-compendium-15013::lpi_15013_table1_major_oxide_composition
     locator:
       pdf_page_index: 4
@@ -2450,11 +2352,6 @@ entries:
     locator:
       pdf_page_index: 4
       table: '1'
-      source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-  - observation_id: lpi-compendium-15013::lpi_15013_volatile_release_curve_figure_only
-    locator:
-      pdf_page_index: 3
-      figure: '7'
       source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
 - work_id: 0441adaa3f3f3a009e0eed4acf4fc17cb21c96a5ebd3aca5c767303a0c1c180f
   source: data/literature/extracts/lpi-compendium-15013.yaml
@@ -2468,17 +2365,6 @@ entries:
       figure: '2'
       section: Chemistry
       source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-  - observation_id: lpi-compendium-15013::lpi_15013_maturity_and_grain_size
-    locator:
-      pdf_page_index: 1
-      section: Petrography
-      source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-  - observation_id: lpi-compendium-15013::lpi_15013_sample_mass_and_collection
-    locator:
-      pdf_page_index: 1
-      figure: '1'
-      section: Introduction
-      source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
 - work_id: 0441adaa3f3f3a009e0eed4acf4fc17cb21c96a5ebd3aca5c767303a0c1c180f
   source: data/literature/extracts/lpi-compendium-15013.yaml
   why: source does not state method
@@ -2491,37 +2377,6 @@ entries:
       figure: '2'
       section: Chemistry
       source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-  - observation_id: lpi-compendium-15013::lpi_15013_grain_size_distribution_figure_only
-    locator:
-      pdf_page_index: 2
-      figure: '5'
-      source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-  - observation_id: lpi-compendium-15013::lpi_15013_lm_exhaust_release_context
-    locator:
-      pdf_page_index: 3
-      figure: '6'
-      source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-  - observation_id: lpi-compendium-15013::lpi_15013_maturity_and_grain_size
-    locator:
-      pdf_page_index: 1
-      section: Petrography
-      source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-  - observation_id: lpi-compendium-15013::lpi_15013_maturity_carbon_figure_only
-    locator:
-      pdf_page_index: 1
-      figure: '2'
-      source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-  - observation_id: lpi-compendium-15013::lpi_15013_ree_normalized_pattern_figure_only
-    locator:
-      pdf_page_index: 2
-      figure: '4'
-      source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-  - observation_id: lpi-compendium-15013::lpi_15013_sample_mass_and_collection
-    locator:
-      pdf_page_index: 1
-      figure: '1'
-      section: Introduction
-      source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
   - observation_id: lpi-compendium-15013::lpi_15013_table1_major_oxide_composition
     locator:
       pdf_page_index: 4
@@ -2531,11 +2386,6 @@ entries:
     locator:
       pdf_page_index: 4
       table: '1'
-      source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-  - observation_id: lpi-compendium-15013::lpi_15013_volatile_release_curve_figure_only
-    locator:
-      pdf_page_index: 3
-      figure: '7'
       source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
 - work_id: 0441adaa3f3f3a009e0eed4acf4fc17cb21c96a5ebd3aca5c767303a0c1c180f
   source: data/literature/extracts/lpi-compendium-15013.yaml
@@ -2550,50 +2400,6 @@ entries:
       source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
 - work_id: 0441adaa3f3f3a009e0eed4acf4fc17cb21c96a5ebd3aca5c767303a0c1c180f
   source: data/literature/extracts/lpi-compendium-15013.yaml
-  why: unsupported quantity 'grain_size_distribution'
-  axes:
-  - quantity
-  observations:
-  - observation_id: lpi-compendium-15013::lpi_15013_grain_size_distribution_figure_only
-    locator:
-      pdf_page_index: 2
-      figure: '5'
-      source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-- work_id: 0441adaa3f3f3a009e0eed4acf4fc17cb21c96a5ebd3aca5c767303a0c1c180f
-  source: data/literature/extracts/lpi-compendium-15013.yaml
-  why: unsupported quantity 'low_temperature_vacuum_release_of_lm_exhaust_breakdown_products'
-  axes:
-  - quantity
-  observations:
-  - observation_id: lpi-compendium-15013::lpi_15013_lm_exhaust_release_context
-    locator:
-      pdf_page_index: 3
-      figure: '6'
-      source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-- work_id: 0441adaa3f3f3a009e0eed4acf4fc17cb21c96a5ebd3aca5c767303a0c1c180f
-  source: data/literature/extracts/lpi-compendium-15013.yaml
-  why: unsupported quantity 'maturity_index_vs_carbon_content'
-  axes:
-  - quantity
-  observations:
-  - observation_id: lpi-compendium-15013::lpi_15013_maturity_carbon_figure_only
-    locator:
-      pdf_page_index: 1
-      figure: '2'
-      source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-- work_id: 0441adaa3f3f3a009e0eed4acf4fc17cb21c96a5ebd3aca5c767303a0c1c180f
-  source: data/literature/extracts/lpi-compendium-15013.yaml
-  why: unsupported quantity 'rare_earth_element_pattern'
-  axes:
-  - quantity
-  observations:
-  - observation_id: lpi-compendium-15013::lpi_15013_ree_normalized_pattern_figure_only
-    locator:
-      pdf_page_index: 2
-      figure: '4'
-      source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-- work_id: 0441adaa3f3f3a009e0eed4acf4fc17cb21c96a5ebd3aca5c767303a0c1c180f
-  source: data/literature/extracts/lpi-compendium-15013.yaml
   why: unsupported quantity 'trace_element_composition'
   axes:
   - quantity
@@ -2602,17 +2408,6 @@ entries:
     locator:
       pdf_page_index: 4
       table: '1'
-      source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-- work_id: 0441adaa3f3f3a009e0eed4acf4fc17cb21c96a5ebd3aca5c767303a0c1c180f
-  source: data/literature/extracts/lpi-compendium-15013.yaml
-  why: unsupported quantity 'volatile_release_curve'
-  axes:
-  - quantity
-  observations:
-  - observation_id: lpi-compendium-15013::lpi_15013_volatile_release_curve_figure_only
-    locator:
-      pdf_page_index: 3
-      figure: '7'
       source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
 - work_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea
   source: data/literature/extracts/shornikov-1994-mullite-kems.yaml
@@ -6003,6 +5798,145 @@ entries:
       pdf_page_index: 3
       paragraph: 1
       section: Results and Discussion
+- work_id: 10.1007/bf02660972
+  source: data/literature/extracts/ohta-suito-1995-mno-activity-slags.yaml
+  why: source does not state method
+  axes:
+  - method
+  observations:
+  - observation_id: ohta-suito-1995-mno-activity-slags::ohta_suito_1995_table2_ac_alumina_activity
+    locator:
+      page: 298
+      published_page: 298
+      pdf_page_index: 3
+      table: II
+      record: AC
+  - observation_id: ohta-suito-1995-mno-activity-slags::ohta_suito_1995_table2_acs2_alumina_activity
+    locator:
+      page: 298
+      published_page: 298
+      pdf_page_index: 3
+      table: II
+      record: ACS-2
+  - observation_id: ohta-suito-1995-mno-activity-slags::ohta_suito_1995_table2_acs2_silica_activity
+    locator:
+      page: 298
+      published_page: 298
+      pdf_page_index: 3
+      table: II
+      record: ACS-2
+  - observation_id: ohta-suito-1995-mno-activity-slags::ohta_suito_1995_table2_acs4_alumina_activity
+    locator:
+      page: 298
+      published_page: 298
+      pdf_page_index: 3
+      table: II
+      record: ACS-4
+  - observation_id: ohta-suito-1995-mno-activity-slags::ohta_suito_1995_table2_acs4_silica_activity
+    locator:
+      page: 298
+      published_page: 298
+      pdf_page_index: 3
+      table: II
+      record: ACS-4
+  - observation_id: ohta-suito-1995-mno-activity-slags::ohta_suito_1995_table2_acs5_alumina_activity
+    locator:
+      page: 298
+      published_page: 298
+      pdf_page_index: 3
+      table: II
+      record: ACS-5
+  - observation_id: ohta-suito-1995-mno-activity-slags::ohta_suito_1995_table2_acs5_silica_activity
+    locator:
+      page: 298
+      published_page: 298
+      pdf_page_index: 3
+      table: II
+      record: ACS-5
+  - observation_id: ohta-suito-1995-mno-activity-slags::ohta_suito_1995_table2_ca_alumina_activity
+    locator:
+      page: 298
+      published_page: 298
+      pdf_page_index: 3
+      table: II
+      record: CA
+  - observation_id: ohta-suito-1995-mno-activity-slags::ohta_suito_1995_table2_cas10_alumina_activity
+    locator:
+      page: 298
+      published_page: 298
+      pdf_page_index: 3
+      table: II
+      record: CAS-10
+  - observation_id: ohta-suito-1995-mno-activity-slags::ohta_suito_1995_table2_cas10_silica_activity
+    locator:
+      page: 298
+      published_page: 298
+      pdf_page_index: 3
+      table: II
+      record: CAS-10
+  - observation_id: ohta-suito-1995-mno-activity-slags::ohta_suito_1995_table2_cas11_alumina_activity
+    locator:
+      page: 298
+      published_page: 298
+      pdf_page_index: 3
+      table: II
+      record: CAS-11
+  - observation_id: ohta-suito-1995-mno-activity-slags::ohta_suito_1995_table2_cas11_silica_activity
+    locator:
+      page: 298
+      published_page: 298
+      pdf_page_index: 3
+      table: II
+      record: CAS-11
+  - observation_id: ohta-suito-1995-mno-activity-slags::ohta_suito_1995_table2_cas5_alumina_activity
+    locator:
+      page: 298
+      published_page: 298
+      pdf_page_index: 3
+      table: II
+      record: CAS-5
+  - observation_id: ohta-suito-1995-mno-activity-slags::ohta_suito_1995_table2_cas5_silica_activity
+    locator:
+      page: 298
+      published_page: 298
+      pdf_page_index: 3
+      table: II
+      record: CAS-5
+  - observation_id: ohta-suito-1995-mno-activity-slags::ohta_suito_1995_table2_cas8_alumina_activity
+    locator:
+      page: 298
+      published_page: 298
+      pdf_page_index: 3
+      table: II
+      record: CAS-8
+  - observation_id: ohta-suito-1995-mno-activity-slags::ohta_suito_1995_table2_cas8_silica_activity
+    locator:
+      page: 298
+      published_page: 298
+      pdf_page_index: 3
+      table: II
+      record: CAS-8
+  - observation_id: ohta-suito-1995-mno-activity-slags::ohta_suito_1995_table2_cas9_alumina_activity
+    locator:
+      page: 298
+      published_page: 298
+      pdf_page_index: 3
+      table: II
+      record: CAS-9
+  - observation_id: ohta-suito-1995-mno-activity-slags::ohta_suito_1995_table2_cas9_silica_activity
+    locator:
+      page: 298
+      published_page: 298
+      pdf_page_index: 3
+      table: II
+      record: CAS-9
+  - observation_id: ohta-suito-1995-mno-activity-slags::ohta_suito_1995_table2_cs_silica_activity
+    locator:
+      page: 298
+      published_page: 298
+      pdf_page_index: 3
+      table: II
+      record: CS
 - work_id: 10.1007/s11663-024-02995-6
   source: data/literature/extracts/kems-031-halwax-2024.yaml
   why: PAGE method_class method_only
@@ -12147,45 +12081,6 @@ entries:
       source_path: corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf
 - work_id: 10.1016/j.chemgeo.2022.121269
   source: data/literature/extracts/thomas-2022-chlorine-bonding-silicate-melts.yaml
-  why: declared quantity is unknown; unsupported quantity 'chloride_capacity_model'; refusing to pick a number
-  axes:
-  - value
-  observations:
-  - observation_id: thomas-2022-chlorine-bonding-silicate-melts::thomas_2022_author_chloride_capacity_model
-    locator:
-      published_page: 121270
-      pdf_page_index: 2
-      section: 1.1 Chlorine incorporation in silicate melts and glasses
-      equation: '3'
-      source_path: corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf
-- work_id: 10.1016/j.chemgeo.2022.121269
-  source: data/literature/extracts/thomas-2022-chlorine-bonding-silicate-melts.yaml
-  why: derived evidence class with unstated ancestry; queued for page-grounding
-  axes:
-  - derived_from
-  observations:
-  - observation_id: thomas-2022-chlorine-bonding-silicate-melts::thomas_2022_author_chloride_capacity_model
-    locator:
-      published_page: 121270
-      pdf_page_index: 2
-      section: 1.1 Chlorine incorporation in silicate melts and glasses
-      equation: '3'
-      source_path: corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf
-- work_id: 10.1016/j.chemgeo.2022.121269
-  source: data/literature/extracts/thomas-2022-chlorine-bonding-silicate-melts.yaml
-  why: derived evidence class with unstated derivation; queued for page-grounding
-  axes:
-  - derivation
-  observations:
-  - observation_id: thomas-2022-chlorine-bonding-silicate-melts::thomas_2022_author_chloride_capacity_model
-    locator:
-      published_page: 121270
-      pdf_page_index: 2
-      section: 1.1 Chlorine incorporation in silicate melts and glasses
-      equation: '3'
-      source_path: corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf
-- work_id: 10.1016/j.chemgeo.2022.121269
-  source: data/literature/extracts/thomas-2022-chlorine-bonding-silicate-melts.yaml
   why: phase string 'experimentally_quenched_silicate_glass' is not in the closed automatic map
   axes:
   - phase
@@ -12212,32 +12107,6 @@ entries:
       table: '2'
       note: Table 2 continues on published page 121274 (PDF page 6); values shown are measured XAF parameters and tabulated
         run conditions.
-      source_path: corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf
-- work_id: 10.1016/j.chemgeo.2022.121269
-  source: data/literature/extracts/thomas-2022-chlorine-bonding-silicate-melts.yaml
-  why: phase string 'silicate_melt' is not in the closed automatic map
-  axes:
-  - phase
-  observations:
-  - observation_id: thomas-2022-chlorine-bonding-silicate-melts::thomas_2022_author_chloride_capacity_model
-    locator:
-      published_page: 121270
-      pdf_page_index: 2
-      section: 1.1 Chlorine incorporation in silicate melts and glasses
-      equation: '3'
-      source_path: corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf
-- work_id: 10.1016/j.chemgeo.2022.121269
-  source: data/literature/extracts/thomas-2022-chlorine-bonding-silicate-melts.yaml
-  why: regime 'author_regression' is not a closed method token (kems_effusion alone is insufficient)
-  axes:
-  - method
-  observations:
-  - observation_id: thomas-2022-chlorine-bonding-silicate-melts::thomas_2022_author_chloride_capacity_model
-    locator:
-      published_page: 121270
-      pdf_page_index: 2
-      section: 1.1 Chlorine incorporation in silicate melts and glasses
-      equation: '3'
       source_path: corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf
 - work_id: 10.1016/j.chemgeo.2022.121269
   source: data/literature/extracts/thomas-2022-chlorine-bonding-silicate-melts.yaml
@@ -13158,19 +13027,6 @@ entries:
       source_path: corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf
 - work_id: 10.1016/j.chemgeo.2022.121269
   source: data/literature/extracts/thomas-2022-chlorine-bonding-silicate-melts.yaml
-  why: unsupported quantity 'chloride_capacity_model'
-  axes:
-  - quantity
-  observations:
-  - observation_id: thomas-2022-chlorine-bonding-silicate-melts::thomas_2022_author_chloride_capacity_model
-    locator:
-      published_page: 121270
-      pdf_page_index: 2
-      section: 1.1 Chlorine incorporation in silicate melts and glasses
-      equation: '3'
-      source_path: corpus/raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf
-- work_id: 10.1016/j.chemgeo.2022.121269
-  source: data/literature/extracts/thomas-2022-chlorine-bonding-silicate-melts.yaml
   why: unsupported quantity 'chlorine_concentration_EPMA'
   axes:
   - quantity
@@ -13630,6 +13486,84 @@ entries:
       note: These are the printed prose values; the complete Table 2 and Supplementary Table S4 series are not present as
         readable tables in the supplied PDF.
       source_path: corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+- work_id: 10.1016/j.chemgeo.2025.123115
+  source: data/literature/extracts/sutherland-2025-mare-simulant-volatile-loss.yaml
+  why: phase string 'EAC-1A mare simulant' is not in the closed automatic map
+  axes:
+  - phase
+  observations:
+  - observation_id: sutherland-2025-mare-simulant-volatile-loss::sutherland_2025_eac_1a_total_mass_loss_150_1300_c::T=1573.15:h=1ea83e50e59c
+    locator:
+      page: 5
+      published_page: 5
+      pdf_page_index: 4
+      table: '1'
+      note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature varying.
+- work_id: 10.1016/j.chemgeo.2025.123115
+  source: data/literature/extracts/sutherland-2025-mare-simulant-volatile-loss.yaml
+  why: phase string 'JSC-1A mare simulant' is not in the closed automatic map
+  axes:
+  - phase
+  observations:
+  - observation_id: sutherland-2025-mare-simulant-volatile-loss::sutherland_2025_jsc_1a_total_mass_loss_150_1300_c::T=1573.15:h=43be52741ae1
+    locator:
+      page: 5
+      published_page: 5
+      pdf_page_index: 4
+      table: '1'
+      note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature varying.
+- work_id: 10.1016/j.chemgeo.2025.123115
+  source: data/literature/extracts/sutherland-2025-mare-simulant-volatile-loss.yaml
+  why: phase string 'LMS-1 mare simulant' is not in the closed automatic map
+  axes:
+  - phase
+  observations:
+  - observation_id: sutherland-2025-mare-simulant-volatile-loss::sutherland_2025_lms_1_total_mass_loss_150_1300_c::T=1573.15:h=0d8bce737fd6
+    locator:
+      page: 5
+      published_page: 5
+      pdf_page_index: 4
+      table: '1'
+      note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature varying.
+- work_id: 10.1016/j.chemgeo.2025.123115
+  source: data/literature/extracts/sutherland-2025-mare-simulant-volatile-loss.yaml
+  why: phase string 'OPRL2N mare simulant' is not in the closed automatic map
+  axes:
+  - phase
+  observations:
+  - observation_id: sutherland-2025-mare-simulant-volatile-loss::sutherland_2025_oprl2n_total_mass_loss_150_1300_c::T=1573.15:h=3e91578768b6
+    locator:
+      page: 5
+      published_page: 5
+      pdf_page_index: 4
+      table: '1'
+      note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature varying.
+- work_id: 10.1016/j.chemgeo.2025.123115
+  source: data/literature/extracts/sutherland-2025-mare-simulant-volatile-loss.yaml
+  why: phase string 'OPRL2NT mare simulant' is not in the closed automatic map
+  axes:
+  - phase
+  observations:
+  - observation_id: sutherland-2025-mare-simulant-volatile-loss::sutherland_2025_oprl2nt_total_mass_loss_150_1300_c::T=1573.15:h=addecbfa1c00
+    locator:
+      page: 5
+      published_page: 5
+      pdf_page_index: 4
+      table: '1'
+      note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature varying.
+- work_id: 10.1016/j.chemgeo.2025.123115
+  source: data/literature/extracts/sutherland-2025-mare-simulant-volatile-loss.yaml
+  why: phase string 'TUBS-M mare simulant' is not in the closed automatic map
+  axes:
+  - phase
+  observations:
+  - observation_id: sutherland-2025-mare-simulant-volatile-loss::sutherland_2025_tubs_m_total_mass_loss_150_1300_c::T=1573.15:h=3ce5cdf1bdae
+    locator:
+      page: 5
+      published_page: 5
+      pdf_page_index: 4
+      table: '1'
+      note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature varying.
 - work_id: 10.1016/j.gca.2003.08.019
   source: data/literature/extracts/murchison-hydropyrolysis-1990s-gca.yaml
   why: PAGE method_class method_only
@@ -26388,18 +26322,6 @@ entries:
       table: '8'
 - work_id: 10.1016/j.gca.2025.01.020
   source: data/literature/extracts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.yaml
-  why: declared quantity is unknown; unsupported quantity 'chloride_capacity_model'; refusing to pick a number
-  axes:
-  - value
-  observations:
-  - observation_id: rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts::rusiecka_wood_2025_model_outputs
-    locator:
-      published_page: 213
-      section: Results
-      equation: '8'
-      source_path: corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf
-- work_id: 10.1016/j.gca.2025.01.020
-  source: data/literature/extracts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.yaml
   why: declared quantity is unknown; unsupported quantity 'experimental_conditions_and_melt_composition'; refusing to pick
     a number
   axes:
@@ -26467,40 +26389,10 @@ entries:
       record: ICB-9
 - work_id: 10.1016/j.gca.2025.01.020
   source: data/literature/extracts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.yaml
-  why: derived evidence class with unstated ancestry; queued for page-grounding
-  axes:
-  - derived_from
-  observations:
-  - observation_id: rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts::rusiecka_wood_2025_model_outputs
-    locator:
-      published_page: 213
-      section: Results
-      equation: '8'
-      source_path: corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf
-- work_id: 10.1016/j.gca.2025.01.020
-  source: data/literature/extracts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.yaml
-  why: derived evidence class with unstated derivation; queued for page-grounding
-  axes:
-  - derivation
-  observations:
-  - observation_id: rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts::rusiecka_wood_2025_model_outputs
-    locator:
-      published_page: 213
-      section: Results
-      equation: '8'
-      source_path: corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf
-- work_id: 10.1016/j.gca.2025.01.020
-  source: data/literature/extracts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.yaml
   why: phase string 'hydrous_basalt_melt' is not in the closed automatic map
   axes:
   - phase
   observations:
-  - observation_id: rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts::rusiecka_wood_2025_model_outputs
-    locator:
-      published_page: 213
-      section: Results
-      equation: '8'
-      source_path: corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf
   - observation_id: rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts::rusiecka_wood_2025_table2_icb-1
     locator:
       published_page: 212
@@ -26579,12 +26471,6 @@ entries:
   axes:
   - method
   observations:
-  - observation_id: rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts::rusiecka_wood_2025_model_outputs
-    locator:
-      published_page: 213
-      section: Results
-      equation: '8'
-      source_path: corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf
   - observation_id: rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts::rusiecka_wood_2025_table1_starting_compositions::rows:row=icb-2:h=ad1af57c31a7
     locator:
       published_page: 210
@@ -26686,18 +26572,6 @@ entries:
       published_page: 210
       table: '1'
       section: Experimental procedure
-      source_path: corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf
-- work_id: 10.1016/j.gca.2025.01.020
-  source: data/literature/extracts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.yaml
-  why: unsupported quantity 'chloride_capacity_model'
-  axes:
-  - quantity
-  observations:
-  - observation_id: rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts::rusiecka_wood_2025_model_outputs
-    locator:
-      published_page: 213
-      section: Results
-      equation: '8'
       source_path: corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf
 - work_id: 10.1016/j.gca.2025.01.020
   source: data/literature/extracts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.yaml
@@ -44874,6 +44748,97 @@ entries:
       pdf_page_index: 5
       section: The Secondary Atmosphere
       note: Prose immediately after the discussion of Schaefer and Fegley (2007); values are attributed to that prior compilation.
+- work_id: 10.1111/j.1151-2916.1981.tb09566.x
+  source: data/literature/extracts/kassis-frischat-1981-silicate-glass-vapour.yaml
+  why: series point 0 stored with unknown value
+  axes:
+  - value
+  observations:
+  - observation_id: kassis-frischat-1981-silicate-glass-vapour::kassis_1981_fig2_p_total_na_melt::T=1573.15:h=73b7eb2b424a
+    locator:
+      page: 2
+      published_page: C-29
+      pdf_page_index: 1
+      figure: '2'
+  - observation_id: kassis-frischat-1981-silicate-glass-vapour::kassis_1981_fig2_p_total_rb_melt::T=1573.15:h=34e1c7697d10
+    locator:
+      page: 2
+      published_page: C-29
+      pdf_page_index: 1
+      figure: '2'
+- work_id: 10.1111/j.1151-2916.1981.tb09566.x
+  source: data/literature/extracts/kassis-frischat-1981-silicate-glass-vapour.yaml
+  why: series point 1 stored with unknown value
+  axes:
+  - value
+  observations:
+  - observation_id: kassis-frischat-1981-silicate-glass-vapour::kassis_1981_fig2_p_total_na_melt::T=1523.15:h=62632765c3c3
+    locator:
+      page: 2
+      published_page: C-29
+      pdf_page_index: 1
+      figure: '2'
+  - observation_id: kassis-frischat-1981-silicate-glass-vapour::kassis_1981_fig2_p_total_rb_melt::T=1523.15:h=ca5964619fc8
+    locator:
+      page: 2
+      published_page: C-29
+      pdf_page_index: 1
+      figure: '2'
+- work_id: 10.1111/j.1151-2916.1981.tb09566.x
+  source: data/literature/extracts/kassis-frischat-1981-silicate-glass-vapour.yaml
+  why: series point 2 stored with unknown value
+  axes:
+  - value
+  observations:
+  - observation_id: kassis-frischat-1981-silicate-glass-vapour::kassis_1981_fig2_p_total_na_melt::T=1473.15:h=d84c6c2bd178
+    locator:
+      page: 2
+      published_page: C-29
+      pdf_page_index: 1
+      figure: '2'
+  - observation_id: kassis-frischat-1981-silicate-glass-vapour::kassis_1981_fig2_p_total_rb_melt::T=1473.15:h=bfbcab95c5fa
+    locator:
+      page: 2
+      published_page: C-29
+      pdf_page_index: 1
+      figure: '2'
+- work_id: 10.1111/j.1151-2916.1981.tb09566.x
+  source: data/literature/extracts/kassis-frischat-1981-silicate-glass-vapour.yaml
+  why: series point 3 stored with unknown value
+  axes:
+  - value
+  observations:
+  - observation_id: kassis-frischat-1981-silicate-glass-vapour::kassis_1981_fig2_p_total_na_melt::T=1423.15:h=12488664ab06
+    locator:
+      page: 2
+      published_page: C-29
+      pdf_page_index: 1
+      figure: '2'
+  - observation_id: kassis-frischat-1981-silicate-glass-vapour::kassis_1981_fig2_p_total_rb_melt::T=1423.15:h=9f92a4fa1cd3
+    locator:
+      page: 2
+      published_page: C-29
+      pdf_page_index: 1
+      figure: '2'
+- work_id: 10.1111/j.1151-2916.1981.tb09566.x
+  source: data/literature/extracts/kassis-frischat-1981-silicate-glass-vapour.yaml
+  why: source states total vapour pressure over a multi-species vapour, not a single Sen monomer; v2.1 has no total-vapour-pressure
+    identity
+  axes:
+  - quantity
+  observations:
+  - observation_id: kassis-frischat-1981-silicate-glass-vapour::kassis_1981_fig2_p_total_na_melt::T=1423.15:h=12488664ab06
+    locator:
+      page: 2
+      published_page: C-29
+      pdf_page_index: 1
+      figure: '2'
+  - observation_id: kassis-frischat-1981-silicate-glass-vapour::kassis_1981_fig2_p_total_rb_melt::T=1423.15:h=9f92a4fa1cd3
+    locator:
+      page: 2
+      published_page: C-29
+      pdf_page_index: 1
+      figure: '2'
 - work_id: 10.1111/j.1151-2916.1981.tb09608.x
   source: data/literature/extracts/kems-051-allibert-1981.yaml
   why: derived_from 'melt/reference Al+ and O+ ion-intensity ratios; input intensities not published' is prose, not a resolvable
@@ -50201,10 +50166,10 @@ entries:
   observations:
   - observation_id: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_recovered_mass_density_size
     locator:
-      published_page: 5
-      section: Discussion, Mechanism liberating the SW gases from Ryugu grains
-      note: recovered sample mass, bulk density, and particle-size distribution are sample provenance/characterisation values;
-        cited size distribution and density are retained as quoted literature
+      published_page: 8
+      section: Estimate of the fresh SW layers generated by isotropic fragmentation of large particles
+      note: The 5.4 g total mass is also printed on published page 4, Timing and contribution of the terrestrial atmosphere
+        leakage.
 - work_id: 10.1126/sciadv.abo7239
   source: data/literature/extracts/okazaki-2022-ryugu-gas-treasure-box.yaml
   why: declared quantity is unknown; unsupported quantity 'released_gas_abundance'; refusing to pick a number
@@ -50327,10 +50292,10 @@ entries:
       note: methane and ethane were not detected; the detection limit and abundance bound are printed
   - observation_id: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_recovered_mass_density_size
     locator:
-      published_page: 5
-      section: Discussion, Mechanism liberating the SW gases from Ryugu grains
-      note: recovered sample mass, bulk density, and particle-size distribution are sample provenance/characterisation values;
-        cited size distribution and density are retained as quoted literature
+      published_page: 8
+      section: Estimate of the fresh SW layers generated by isotropic fragmentation of large particles
+      note: The 5.4 g total mass is also printed on published page 4, Timing and contribution of the terrestrial atmosphere
+        leakage.
   - observation_id: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_solar_wind_helium_abundance
     locator:
       published_page: 5
@@ -50461,10 +50426,10 @@ entries:
   observations:
   - observation_id: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_recovered_mass_density_size
     locator:
-      published_page: 5
-      section: Discussion, Mechanism liberating the SW gases from Ryugu grains
-      note: recovered sample mass, bulk density, and particle-size distribution are sample provenance/characterisation values;
-        cited size distribution and density are retained as quoted literature
+      published_page: 8
+      section: Estimate of the fresh SW layers generated by isotropic fragmentation of large particles
+      note: The 5.4 g total mass is also printed on published page 4, Timing and contribution of the terrestrial atmosphere
+        leakage.
 - work_id: 10.1126/sciadv.abo7239
   source: data/literature/extracts/okazaki-2022-ryugu-gas-treasure-box.yaml
   why: regime 'return_thermal_history' is not a closed method token (kems_effusion alone is insufficient)
@@ -50609,10 +50574,10 @@ entries:
   observations:
   - observation_id: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_recovered_mass_density_size
     locator:
-      published_page: 5
-      section: Discussion, Mechanism liberating the SW gases from Ryugu grains
-      note: recovered sample mass, bulk density, and particle-size distribution are sample provenance/characterisation values;
-        cited size distribution and density are retained as quoted literature
+      published_page: 8
+      section: Estimate of the fresh SW layers generated by isotropic fragmentation of large particles
+      note: The 5.4 g total mass is also printed on published page 4, Timing and contribution of the terrestrial atmosphere
+        leakage.
 - work_id: 10.1126/sciadv.abo7239
   source: data/literature/extracts/okazaki-2022-ryugu-gas-treasure-box.yaml
   why: unsupported quantity 'released_gas_abundance'
@@ -71299,6 +71264,74 @@ entries:
       note: path=source/atct-anl-1.222.html; html_row_id=s1n1c1 i3442 CAS12408-02-5; species_row=3442; byte_start=4267186;
         byte_end=4267919
       source_path: data/literature/compilations/atct/records/atct-1.222-3442.json
+- work_id: 10.2138/am.2005.1792
+  source: data/literature/extracts/oneill-2005-alkali-oxide-activities.yaml
+  why: missing quantity
+  axes:
+  - quantity
+  observations:
+  - observation_id: oneill-2005-alkali-oxide-activities::oneill_2005_fig1_sodium_exchange_figure_only
+    locator:
+      page: 2
+      published_page: 498
+      pdf_page_index: 1
+      figure: '1'
+  - observation_id: oneill-2005-alkali-oxide-activities::oneill_2005_fig2_measured_solubility_figure_only
+    locator:
+      page: 3
+      published_page: 499
+      pdf_page_index: 2
+      figure: '2'
+  - observation_id: oneill-2005-alkali-oxide-activities::oneill_2005_fig3_measured_solubility_figure_only
+    locator:
+      page: 4
+      published_page: 500
+      pdf_page_index: 3
+      figure: '3'
+- work_id: 10.2138/rmg.2008.68.17
+  source: data/literature/extracts/wadhwa-2008-redox-small-bodies.yaml
+  why: missing phase
+  axes:
+  - phase
+  observations:
+  - observation_id: wadhwa-2008-redox-small-bodies::wadh08_ureilite_fo2_temperatures::T=1200:h=8f05f500e547
+    locator:
+      page: 4
+      published_page: 496
+      pdf_page_index: 3
+- work_id: 10.2138/rmg.2008.68.17
+  source: data/literature/extracts/wadhwa-2008-redox-small-bodies.yaml
+  why: regime 'review_compilation' is not a closed method token (kems_effusion alone is insufficient)
+  axes:
+  - method
+  observations:
+  - observation_id: wadhwa-2008-redox-small-bodies::wadh08_ureilite_fo2_temperatures::T=1200:h=8f05f500e547
+    locator:
+      page: 4
+      published_page: 496
+      pdf_page_index: 3
+- work_id: 10.2138/rmg.2008.68.17
+  source: data/literature/extracts/wadhwa-2008-redox-small-bodies.yaml
+  why: series point 0 stored with unknown value
+  axes:
+  - value
+  observations:
+  - observation_id: wadhwa-2008-redox-small-bodies::wadh08_ureilite_fo2_temperatures::T=1200:h=8f05f500e547
+    locator:
+      page: 4
+      published_page: 496
+      pdf_page_index: 3
+- work_id: 10.2138/rmg.2008.68.17
+  source: data/literature/extracts/wadhwa-2008-redox-small-bodies.yaml
+  why: series point 1 stored with unknown value
+  axes:
+  - value
+  observations:
+  - observation_id: wadhwa-2008-redox-small-bodies::wadh08_ureilite_fo2_temperatures::T=1600:h=39ef9f26f323
+    locator:
+      page: 4
+      published_page: 496
+      pdf_page_index: 3
 - work_id: 10.2138/rmg.2018.84.11
   source: data/literature/extracts/arxiv-1902-05005.yaml
   why: phase string 'complex_silicate_melt' is not in the closed automatic map
@@ -101698,6 +101731,1656 @@ entries:
       pdf_page_index: 3
       table: '1'
       note: Table 1 chemical composition of Fe, V, Cr starting metals
+- work_id: 10.2355/tetsutohagane1955.63.12_1809
+  source: data/literature/extracts/banya-watanabe-1977-feto-p2o5-solid-iron.yaml
+  why: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+  axes:
+  - value
+  observations:
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_1
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 1.1
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_10
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 1.10
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_2
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 1.2
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_4
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 1.4
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_7
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 1.7
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_8
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 1.8
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_1
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 2.1
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_2
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 2.2
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_3
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 2.3
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_4
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 2.4
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_5
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 2.5
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_6
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 2.6
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_7
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 2.7
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_1
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.1
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_10
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.10
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_11
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.11
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_12
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.12
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_13
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.13
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_14
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.14
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_15
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.15
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_16
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.16
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_17
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.17
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_19
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.19
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_2
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.2
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_20
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.20
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_21
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.21
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_22
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.22
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_23
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.23
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_24
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.24
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_25
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.25
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_26
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.26
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_27
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.27
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_28
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.28
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_29
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.29
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_3
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.3
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_30
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.30
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_4
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.4
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_5
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.5
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_6
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.6
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_7
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.7
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_8
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.8
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_9
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.9
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_1
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.1
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_10
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.10
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_11
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.11
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_2
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.2
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_3
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.3
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_5
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.5
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_6
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.6
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_7
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.7
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_8
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.8
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_9
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.9
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_10
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.10
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_11
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.11
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_12
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.12
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_13
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.13
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_14
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.14
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_15
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.15
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_16
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.16
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_2
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.2
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_3
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.3
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_4
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.4
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_5
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.5
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_6
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.6
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_7
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.7
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_8
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.8
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_9
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.9
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_1
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 6.1
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_10
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 6.10
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_2
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 6.2
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_3
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 6.3
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_4
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 6.4
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_5
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 6.5
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_6
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 6.6
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_7
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 6.7
+- work_id: 10.2355/tetsutohagane1955.63.12_1809
+  source: data/literature/extracts/banya-watanabe-1977-feto-p2o5-solid-iron.yaml
+  why: missing quantity
+  axes:
+  - quantity
+  observations:
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_1
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 1.1
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_10
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 1.10
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_2
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 1.2
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_4
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 1.4
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_7
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 1.7
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_8
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 1.8
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_1
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 2.1
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_2
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 2.2
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_3
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 2.3
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_4
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 2.4
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_5
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 2.5
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_6
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 2.6
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_7
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 2.7
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_1
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.1
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_10
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.10
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_11
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.11
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_12
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.12
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_13
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.13
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_14
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.14
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_15
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.15
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_16
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.16
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_17
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.17
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_19
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.19
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_2
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.2
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_20
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.20
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_21
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.21
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_22
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.22
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_23
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.23
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_24
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.24
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_25
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.25
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_26
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.26
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_27
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.27
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_28
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.28
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_29
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.29
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_3
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.3
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_30
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.30
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_4
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.4
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_5
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.5
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_6
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.6
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_7
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.7
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_8
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.8
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_9
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.9
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_1
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.1
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_10
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.10
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_11
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.11
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_2
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.2
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_3
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.3
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_5
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.5
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_6
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.6
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_7
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.7
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_8
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.8
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_9
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.9
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_10
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.10
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_11
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.11
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_12
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.12
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_13
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.13
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_14
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.14
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_15
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.15
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_16
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.16
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_2
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.2
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_3
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.3
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_4
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.4
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_5
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.5
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_6
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.6
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_7
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.7
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_8
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.8
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_9
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.9
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_1
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 6.1
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_10
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 6.10
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_2
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 6.2
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_3
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 6.3
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_4
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 6.4
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_5
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 6.5
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_6
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 6.6
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_7
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 6.7
+- work_id: 10.2355/tetsutohagane1955.63.12_1809
+  source: data/literature/extracts/banya-watanabe-1977-feto-p2o5-solid-iron.yaml
+  why: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+  axes:
+  - phase
+  observations:
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_1
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 1.1
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_10
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 1.10
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_2
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 1.2
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_4
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 1.4
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_7
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 1.7
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_8
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 1.8
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_1
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 2.1
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_2
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 2.2
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_3
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 2.3
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_4
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 2.4
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_5
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 2.5
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_6
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 2.6
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_7
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 2.7
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_1
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.1
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_10
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.10
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_11
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.11
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_12
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.12
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_13
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.13
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_14
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.14
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_15
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.15
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_16
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.16
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_17
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.17
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_19
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.19
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_2
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.2
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_20
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.20
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_21
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.21
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_22
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.22
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_23
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.23
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_24
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.24
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_25
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.25
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_26
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.26
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_27
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.27
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_28
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.28
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_29
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.29
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_3
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.3
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_30
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.30
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_4
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.4
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_5
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.5
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_6
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.6
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_7
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.7
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_8
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.8
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_9
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.9
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_1
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.1
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_10
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.10
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_11
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.11
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_2
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.2
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_3
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.3
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_5
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.5
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_6
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.6
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_7
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.7
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_8
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.8
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_9
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.9
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_10
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.10
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_11
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.11
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_12
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.12
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_13
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.13
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_14
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.14
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_15
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.15
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_16
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.16
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_2
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.2
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_3
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.3
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_4
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.4
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_5
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.5
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_6
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.6
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_7
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.7
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_8
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.8
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_9
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.9
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_1
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 6.1
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_10
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 6.10
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_2
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 6.2
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_3
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 6.3
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_4
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 6.4
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_5
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 6.5
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_6
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 6.6
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_7
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 6.7
+- work_id: 10.2355/tetsutohagane1955.63.12_1809
+  source: data/literature/extracts/banya-watanabe-1977-feto-p2o5-solid-iron.yaml
+  why: phase string 'liquid FetO-P2O5 slag' is not in the closed automatic map
+  axes:
+  - phase
+  observations:
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_00
+    locator:
+      published_page: 1816
+      table: '4'
+      note: X_P2O5 0.00
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_01
+    locator:
+      published_page: 1816
+      table: '4'
+      note: X_P2O5 0.01
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_02
+    locator:
+      published_page: 1816
+      table: '4'
+      note: X_P2O5 0.02
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_04
+    locator:
+      published_page: 1816
+      table: '4'
+      note: X_P2O5 0.04
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_06
+    locator:
+      published_page: 1816
+      table: '4'
+      note: X_P2O5 0.06
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_08
+    locator:
+      published_page: 1816
+      table: '4'
+      note: X_P2O5 0.08
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_10
+    locator:
+      published_page: 1816
+      table: '4'
+      note: X_P2O5 0.10
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_12
+    locator:
+      published_page: 1816
+      table: '4'
+      note: X_P2O5 0.12
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_14
+    locator:
+      published_page: 1816
+      table: '4'
+      note: X_P2O5 0.14
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_16
+    locator:
+      published_page: 1816
+      table: '4'
+      note: X_P2O5 0.16
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_18
+    locator:
+      published_page: 1816
+      table: '4'
+      note: X_P2O5 0.18
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_20
+    locator:
+      published_page: 1816
+      table: '4'
+      note: X_P2O5 0.20
+- work_id: 10.2355/tetsutohagane1955.63.12_1809
+  source: data/literature/extracts/banya-watanabe-1977-feto-p2o5-solid-iron.yaml
+  why: source does not state method
+  axes:
+  - method
+  observations:
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_1
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 1.1
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_10
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 1.10
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_2
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 1.2
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_4
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 1.4
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_7
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 1.7
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_8
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 1.8
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_1
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 2.1
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_2
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 2.2
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_3
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 2.3
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_4
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 2.4
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_5
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 2.5
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_6
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 2.6
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_7
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 2.7
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_1
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.1
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_10
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.10
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_11
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.11
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_12
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.12
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_13
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.13
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_14
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.14
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_15
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.15
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_16
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.16
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_17
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.17
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_19
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.19
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_2
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.2
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_20
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.20
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_21
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.21
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_22
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.22
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_23
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.23
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_24
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.24
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_25
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.25
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_26
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.26
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_27
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.27
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_28
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.28
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_29
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.29
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_3
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.3
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_30
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.30
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_4
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.4
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_5
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.5
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_6
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.6
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_7
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.7
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_8
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.8
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_9
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 3.9
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_1
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.1
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_10
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.10
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_11
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.11
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_2
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.2
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_3
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.3
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_5
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.5
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_6
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.6
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_7
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.7
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_8
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.8
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_9
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 4.9
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_10
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.10
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_11
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.11
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_12
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.12
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_13
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.13
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_14
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.14
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_15
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.15
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_16
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.16
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_2
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.2
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_3
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.3
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_4
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.4
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_5
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.5
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_6
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.6
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_7
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.7
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_8
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.8
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_9
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 5.9
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_1
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 6.1
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_10
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 6.10
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_2
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 6.2
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_3
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 6.3
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_4
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 6.4
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_5
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 6.5
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_6
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 6.6
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_7
+    locator:
+      published_page: 1813
+      table: '3'
+      note: run 6.7
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_00
+    locator:
+      published_page: 1816
+      table: '4'
+      note: X_P2O5 0.00
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_01
+    locator:
+      published_page: 1816
+      table: '4'
+      note: X_P2O5 0.01
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_02
+    locator:
+      published_page: 1816
+      table: '4'
+      note: X_P2O5 0.02
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_04
+    locator:
+      published_page: 1816
+      table: '4'
+      note: X_P2O5 0.04
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_06
+    locator:
+      published_page: 1816
+      table: '4'
+      note: X_P2O5 0.06
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_08
+    locator:
+      published_page: 1816
+      table: '4'
+      note: X_P2O5 0.08
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_10
+    locator:
+      published_page: 1816
+      table: '4'
+      note: X_P2O5 0.10
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_12
+    locator:
+      published_page: 1816
+      table: '4'
+      note: X_P2O5 0.12
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_14
+    locator:
+      published_page: 1816
+      table: '4'
+      note: X_P2O5 0.14
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_16
+    locator:
+      published_page: 1816
+      table: '4'
+      note: X_P2O5 0.16
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_18
+    locator:
+      published_page: 1816
+      table: '4'
+      note: X_P2O5 0.18
+  - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_20
+    locator:
+      published_page: 1816
+      table: '4'
+      note: X_P2O5 0.20
 - work_id: 10.2355/tetsutohagane1955.63.3_417
   source: data/literature/extracts/kems-066-ichise-1977.yaml
   why: declared quantity is unknown; unsupported quantity 'activity_and_activity_coefficient'; refusing to pick a number
@@ -108526,16 +110209,6 @@ entries:
       paragraph: English Synopsis + Japanese 結言 (2)
       note: Synopsis and conclusions state the 1200 °C span; 60 mol% endpoint is not in Table 2 (Table 2 stops at X=0.55).
         5e-5 at 60 mol% is the authors' Fig. 4 reading, retained as prose, not re-digitized.
-  - observation_id: ts1985::ts1985_na2o_table2_log10_a_AT_B::rows:h=09c92b1c7b22
-    locator:
-      page: 7
-      published_page: 821
-      pdf_page_index: 7
-      table: '2'
-      figure: '4'
-      equation: log a_Na2O = A/T + B
-      note: Table 2 coefficients. Authors state (p.820) that A, B were obtained by reading Fig. 4 at X_Na2O = 0.40, 0.45,
-        0.50, 0.55 (「Fig.4の結果から読みとつた」). Evaluated a and γ below use the printed A, B; they are not independent figure reads.
 - work_id: 10.2355/tetsutohagane1955.71.7_815
   source: data/literature/extracts/ts1985.yaml
   why: unsupported quantity 'activity_and_raoultian_gamma'
@@ -112721,6 +114394,16 @@ entries:
       equation: '7'
       note: Values are attributed in the paper to Mizin et al. and Sponseller and Flinn, not measured in this paper.
       source_path: corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
+- work_id: 10.25916/sut.26297335.v1
+  source: data/literature/extracts/shaw-2023-vacuum-thermal-sublimation-thesis.yaml
+  why: extract yielded no observations
+  axes:
+  - document
+  observations:
+  - observation_id: shaw-2023-vacuum-thermal-sublimation-thesis::typed_absence
+    locator:
+      note: extract-level typed absence
+      source_path: data/literature/extracts/shaw-2023-vacuum-thermal-sublimation-thesis.yaml
 - work_id: 10.3390/min13010079
   source: data/literature/extracts/sublimation-kinetics-2023-minerals.yaml
   why: declared quantity is unknown; unsupported quantity 'bet_ssa_vs_T_figure'; refusing to pick a number
@@ -129322,7 +131005,7 @@ entries:
       pdf_page_index: 98
       section: Thermodynamic Discussion
 - work_id: 1b08ad1e65d798adfc92c70f855200a6dfe1b95bd0b717cd64da6d02449c5e7a
-  source: data/literature/extracts/1997jonesthermo-jones-1997.yaml
+  source: data/literature/extracts/1997jonesthermo.yaml
   why: declared quantity is unknown; unsupported quantity 'MgO_activity_vs_mole_fraction_relationship'; refusing to pick a
     number
   axes:
@@ -129336,7 +131019,7 @@ entries:
       note: Qualitative comparison only; curve coordinates and activity values are not digitized.
       source_path: corpus/raw/1997jonesthermo/1997jonesthermo.pdf
 - work_id: 1b08ad1e65d798adfc92c70f855200a6dfe1b95bd0b717cd64da6d02449c5e7a
-  source: data/literature/extracts/1997jonesthermo-jones-1997.yaml
+  source: data/literature/extracts/1997jonesthermo.yaml
   why: declared quantity is unknown; unsupported quantity 'manganese_vapor_pressure'; refusing to pick a number
   axes:
   - value
@@ -129349,27 +131032,7 @@ entries:
       note: Explicit value in prose; Figure 10 is not digitized.
       source_path: corpus/raw/1997jonesthermo/1997jonesthermo.pdf
 - work_id: 1b08ad1e65d798adfc92c70f855200a6dfe1b95bd0b717cd64da6d02449c5e7a
-  source: data/literature/extracts/1997jonesthermo-jones-1997.yaml
-  why: locator source_path 'corpus/raw/1997jonesthermo/1997jonesthermo.pdf' has no matching INDEX asset
-  axes:
-  - read_from
-  observations:
-  - observation_id: 1997jonesthermo::jones_1997_imcc_mgo_activity_comparison
-    locator:
-      published_page: 24
-      figure: '11'
-      section: 7.1 Ideal Mixing of Complex Components
-      note: Qualitative comparison only; curve coordinates and activity values are not digitized.
-      source_path: corpus/raw/1997jonesthermo/1997jonesthermo.pdf
-  - observation_id: 1997jonesthermo::jones_1997_mn_vapour_pressure_tabulation
-    locator:
-      published_page: 18
-      figure: '10'
-      section: 5.3 Example 5 – Vapour pressure of manganese
-      note: Explicit value in prose; Figure 10 is not digitized.
-      source_path: corpus/raw/1997jonesthermo/1997jonesthermo.pdf
-- work_id: 1b08ad1e65d798adfc92c70f855200a6dfe1b95bd0b717cd64da6d02449c5e7a
-  source: data/literature/extracts/1997jonesthermo-jones-1997.yaml
+  source: data/literature/extracts/1997jonesthermo.yaml
   why: phase string 'CaO-MgO-SiO2_ternary_slag' is not in the closed automatic map
   axes:
   - phase
@@ -129382,7 +131045,7 @@ entries:
       note: Qualitative comparison only; curve coordinates and activity values are not digitized.
       source_path: corpus/raw/1997jonesthermo/1997jonesthermo.pdf
 - work_id: 1b08ad1e65d798adfc92c70f855200a6dfe1b95bd0b717cd64da6d02449c5e7a
-  source: data/literature/extracts/1997jonesthermo-jones-1997.yaml
+  source: data/literature/extracts/1997jonesthermo.yaml
   why: phase string 'pure_condensed_manganese_plus_Mn_gas' is not in the closed automatic map
   axes:
   - phase
@@ -129395,7 +131058,7 @@ entries:
       note: Explicit value in prose; Figure 10 is not digitized.
       source_path: corpus/raw/1997jonesthermo/1997jonesthermo.pdf
 - work_id: 1b08ad1e65d798adfc92c70f855200a6dfe1b95bd0b717cd64da6d02449c5e7a
-  source: data/literature/extracts/1997jonesthermo-jones-1997.yaml
+  source: data/literature/extracts/1997jonesthermo.yaml
   why: regime 'IMCC_model_and_experimental_comparison' is not a closed method token (kems_effusion alone is insufficient)
   axes:
   - method
@@ -129408,7 +131071,7 @@ entries:
       note: Qualitative comparison only; curve coordinates and activity values are not digitized.
       source_path: corpus/raw/1997jonesthermo/1997jonesthermo.pdf
 - work_id: 1b08ad1e65d798adfc92c70f855200a6dfe1b95bd0b717cd64da6d02449c5e7a
-  source: data/literature/extracts/1997jonesthermo-jones-1997.yaml
+  source: data/literature/extracts/1997jonesthermo.yaml
   why: regime 'equilibrium_vapor_pressure' is not a closed method token (kems_effusion alone is insufficient)
   axes:
   - method
@@ -129421,7 +131084,7 @@ entries:
       note: Explicit value in prose; Figure 10 is not digitized.
       source_path: corpus/raw/1997jonesthermo/1997jonesthermo.pdf
 - work_id: 1b08ad1e65d798adfc92c70f855200a6dfe1b95bd0b717cd64da6d02449c5e7a
-  source: data/literature/extracts/1997jonesthermo-jones-1997.yaml
+  source: data/literature/extracts/1997jonesthermo.yaml
   why: unsupported quantity 'MgO_activity_vs_mole_fraction_relationship'
   axes:
   - quantity
@@ -129434,7 +131097,7 @@ entries:
       note: Qualitative comparison only; curve coordinates and activity values are not digitized.
       source_path: corpus/raw/1997jonesthermo/1997jonesthermo.pdf
 - work_id: 1b08ad1e65d798adfc92c70f855200a6dfe1b95bd0b717cd64da6d02449c5e7a
-  source: data/literature/extracts/1997jonesthermo-jones-1997.yaml
+  source: data/literature/extracts/1997jonesthermo.yaml
   why: unsupported quantity 'manganese_vapor_pressure'
   axes:
   - quantity
@@ -145085,17 +146748,6 @@ entries:
       source_path: corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
 - work_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b
   source: data/literature/extracts/cooper-2007-sintering-lunar-simulant.yaml
-  why: declared quantity is unknown; unsupported quantity 'fluidizing_fraction'; refusing to pick a number
-  axes:
-  - value
-  observations:
-  - observation_id: cooper-2007-sintering-lunar-simulant::cooper_2007_fluidization_fraction_1000c_model
-    locator:
-      pdf_page_index: 5
-      figure: '5'
-      section: A Wide Distribution of Grain Sizes Can Inhibit Fluidization
-- work_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b
-  source: data/literature/extracts/cooper-2007-sintering-lunar-simulant.yaml
   why: declared quantity is unknown; unsupported quantity 'particle_size_distribution'; refusing to pick a number
   axes:
   - value
@@ -145108,16 +146760,6 @@ entries:
     locator:
       pdf_page_index: 8
       section: Nomenclature
-- work_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b
-  source: data/literature/extracts/cooper-2007-sintering-lunar-simulant.yaml
-  why: declared quantity is unknown; unsupported quantity 'sintered_strength'; refusing to pick a number
-  axes:
-  - value
-  observations:
-  - observation_id: cooper-2007-sintering-lunar-simulant::cooper_2007_jsc1_sintered_brick_strength
-    locator:
-      pdf_page_index: 7
-      section: Sintered Construction Materials
 - work_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b
   source: data/literature/extracts/cooper-2007-sintering-lunar-simulant.yaml
   why: declared quantity is unknown; unsupported quantity 'sintering_onset_conditions'; refusing to pick a number
@@ -145140,11 +146782,6 @@ entries:
   axes:
   - derived_from
   observations:
-  - observation_id: cooper-2007-sintering-lunar-simulant::cooper_2007_fluidization_fraction_1000c_model
-    locator:
-      pdf_page_index: 5
-      figure: '5'
-      section: A Wide Distribution of Grain Sizes Can Inhibit Fluidization
   - observation_id: cooper-2007-sintering-lunar-simulant::cooper_2007_jsc1a_grain_size_statistics
     locator:
       pdf_page_index: 8
@@ -145159,11 +146796,6 @@ entries:
   axes:
   - derivation
   observations:
-  - observation_id: cooper-2007-sintering-lunar-simulant::cooper_2007_fluidization_fraction_1000c_model
-    locator:
-      pdf_page_index: 5
-      figure: '5'
-      section: A Wide Distribution of Grain Sizes Can Inhibit Fluidization
   - observation_id: cooper-2007-sintering-lunar-simulant::cooper_2007_jsc1a_grain_size_statistics
     locator:
       pdf_page_index: 8
@@ -145188,17 +146820,6 @@ entries:
       section: Nomenclature
 - work_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b
   source: data/literature/extracts/cooper-2007-sintering-lunar-simulant.yaml
-  why: phase string 'particulate_simulant' is not in the closed automatic map
-  axes:
-  - phase
-  observations:
-  - observation_id: cooper-2007-sintering-lunar-simulant::cooper_2007_fluidization_fraction_1000c_model
-    locator:
-      pdf_page_index: 5
-      figure: '5'
-      section: A Wide Distribution of Grain Sizes Can Inhibit Fluidization
-- work_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b
-  source: data/literature/extracts/cooper-2007-sintering-lunar-simulant.yaml
   why: phase string 'synthetic_apollo14_composition_glass' is not in the closed automatic map
   axes:
   - phase
@@ -145215,17 +146836,6 @@ entries:
       section: What Is Sintering, and Why Is It a Concern?
 - work_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b
   source: data/literature/extracts/cooper-2007-sintering-lunar-simulant.yaml
-  why: regime 'fluidization_model' is not a closed method token (kems_effusion alone is insufficient)
-  axes:
-  - method
-  observations:
-  - observation_id: cooper-2007-sintering-lunar-simulant::cooper_2007_fluidization_fraction_1000c_model
-    locator:
-      pdf_page_index: 5
-      figure: '5'
-      section: A Wide Distribution of Grain Sizes Can Inhibit Fluidization
-- work_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b
-  source: data/literature/extracts/cooper-2007-sintering-lunar-simulant.yaml
   why: regime 'simulant_characterisation' is not a closed method token (kems_effusion alone is insufficient)
   axes:
   - method
@@ -145238,16 +146848,6 @@ entries:
     locator:
       pdf_page_index: 8
       section: Nomenclature
-- work_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b
-  source: data/literature/extracts/cooper-2007-sintering-lunar-simulant.yaml
-  why: regime 'sintered_construction_material' is not a closed method token (kems_effusion alone is insufficient)
-  axes:
-  - method
-  observations:
-  - observation_id: cooper-2007-sintering-lunar-simulant::cooper_2007_jsc1_sintered_brick_strength
-    locator:
-      pdf_page_index: 7
-      section: Sintered Construction Materials
 - work_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b
   source: data/literature/extracts/cooper-2007-sintering-lunar-simulant.yaml
   why: regime 'sintering' is not a closed method token (kems_effusion alone is insufficient)
@@ -145288,17 +146888,6 @@ entries:
       section: What Is Sintering, and Why Is It a Concern?
 - work_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b
   source: data/literature/extracts/cooper-2007-sintering-lunar-simulant.yaml
-  why: unsupported quantity 'fluidizing_fraction'
-  axes:
-  - quantity
-  observations:
-  - observation_id: cooper-2007-sintering-lunar-simulant::cooper_2007_fluidization_fraction_1000c_model
-    locator:
-      pdf_page_index: 5
-      figure: '5'
-      section: A Wide Distribution of Grain Sizes Can Inhibit Fluidization
-- work_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b
-  source: data/literature/extracts/cooper-2007-sintering-lunar-simulant.yaml
   why: unsupported quantity 'particle_size_distribution'
   axes:
   - quantity
@@ -145311,16 +146900,6 @@ entries:
     locator:
       pdf_page_index: 8
       section: Nomenclature
-- work_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b
-  source: data/literature/extracts/cooper-2007-sintering-lunar-simulant.yaml
-  why: unsupported quantity 'sintered_strength'
-  axes:
-  - quantity
-  observations:
-  - observation_id: cooper-2007-sintering-lunar-simulant::cooper_2007_jsc1_sintered_brick_strength
-    locator:
-      pdf_page_index: 7
-      section: Sintered Construction Materials
 - work_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b
   source: data/literature/extracts/cooper-2007-sintering-lunar-simulant.yaml
   why: unsupported quantity 'sintering_onset_conditions'
@@ -184537,48 +186116,6 @@ entries:
   axes:
   - derived_from
   observations:
-  - observation_id: stolyarova-1996-cao-alumina-silica-kems::stolyarova_1996_fig1_al2o3_activity_figure_only
-    locator:
-      page: 21
-      published_page: 21
-      pdf_page_index: 6
-      figure: '1'
-      note: Figure 1 panel B; activity map continued on published p.22. Figure-only placeholder; no digitization.
-  - observation_id: stolyarova-1996-cao-alumina-silica-kems::stolyarova_1996_fig1_cao_activity_figure_only
-    locator:
-      page: 21
-      published_page: 21
-      pdf_page_index: 6
-      figure: '1'
-      note: Figure 1 panel A; activity map continued on published p.22. Figure-only placeholder; no digitization.
-  - observation_id: stolyarova-1996-cao-alumina-silica-kems::stolyarova_1996_fig1_sio2_activity_figure_only
-    locator:
-      page: 21
-      published_page: 21
-      pdf_page_index: 6
-      figure: '1'
-      note: Figure 1 panel C; activity map continued on published p.22. Figure-only placeholder; no digitization.
-  - observation_id: stolyarova-1996-cao-alumina-silica-kems::stolyarova_1996_fig2_al2o3_activity_figure_only
-    locator:
-      page: 26
-      published_page: 26
-      pdf_page_index: 11
-      figure: '2'
-      note: Figure 2 activity-comparison panels continue through published pp.26–29. Figure-only placeholder; no digitization.
-  - observation_id: stolyarova-1996-cao-alumina-silica-kems::stolyarova_1996_fig2_cao_activity_figure_only
-    locator:
-      page: 26
-      published_page: 26
-      pdf_page_index: 11
-      figure: '2'
-      note: Figure 2 activity-comparison panels continue through published pp.26–29. Figure-only placeholder; no digitization.
-  - observation_id: stolyarova-1996-cao-alumina-silica-kems::stolyarova_1996_fig2_sio2_activity_figure_only
-    locator:
-      page: 26
-      published_page: 26
-      pdf_page_index: 11
-      figure: '2'
-      note: Figure 2 activity-comparison panels continue through published pp.26–29. Figure-only placeholder; no digitization.
   - observation_id: stolyarova-1996-cao-alumina-silica-kems::stolyarova_1996_table2_pO_1933k::points:h=0308c11588ab
     locator:
       page: 20
@@ -185925,54 +187462,6 @@ entries:
       note: Table 3 row xA/xC=0.35, xS=0.50; activity column 5 (SiO2) cell=0.301
 - work_id: 46e00f6d80bff6f90992354a3203171b972f08e22cc679d8d1b207e5ea97d10f
   source: data/literature/extracts/stolyarova-1996-cao-alumina-silica-kems.yaml
-  why: derived evidence class with unstated derivation; queued for page-grounding
-  axes:
-  - derivation
-  observations:
-  - observation_id: stolyarova-1996-cao-alumina-silica-kems::stolyarova_1996_fig1_al2o3_activity_figure_only
-    locator:
-      page: 21
-      published_page: 21
-      pdf_page_index: 6
-      figure: '1'
-      note: Figure 1 panel B; activity map continued on published p.22. Figure-only placeholder; no digitization.
-  - observation_id: stolyarova-1996-cao-alumina-silica-kems::stolyarova_1996_fig1_cao_activity_figure_only
-    locator:
-      page: 21
-      published_page: 21
-      pdf_page_index: 6
-      figure: '1'
-      note: Figure 1 panel A; activity map continued on published p.22. Figure-only placeholder; no digitization.
-  - observation_id: stolyarova-1996-cao-alumina-silica-kems::stolyarova_1996_fig1_sio2_activity_figure_only
-    locator:
-      page: 21
-      published_page: 21
-      pdf_page_index: 6
-      figure: '1'
-      note: Figure 1 panel C; activity map continued on published p.22. Figure-only placeholder; no digitization.
-  - observation_id: stolyarova-1996-cao-alumina-silica-kems::stolyarova_1996_fig2_al2o3_activity_figure_only
-    locator:
-      page: 26
-      published_page: 26
-      pdf_page_index: 11
-      figure: '2'
-      note: Figure 2 activity-comparison panels continue through published pp.26–29. Figure-only placeholder; no digitization.
-  - observation_id: stolyarova-1996-cao-alumina-silica-kems::stolyarova_1996_fig2_cao_activity_figure_only
-    locator:
-      page: 26
-      published_page: 26
-      pdf_page_index: 11
-      figure: '2'
-      note: Figure 2 activity-comparison panels continue through published pp.26–29. Figure-only placeholder; no digitization.
-  - observation_id: stolyarova-1996-cao-alumina-silica-kems::stolyarova_1996_fig2_sio2_activity_figure_only
-    locator:
-      page: 26
-      published_page: 26
-      pdf_page_index: 11
-      figure: '2'
-      note: Figure 2 activity-comparison panels continue through published pp.26–29. Figure-only placeholder; no digitization.
-- work_id: 46e00f6d80bff6f90992354a3203171b972f08e22cc679d8d1b207e5ea97d10f
-  source: data/literature/extracts/stolyarova-1996-cao-alumina-silica-kems.yaml
   why: phase string 'vapor over CaO-Al2O3-SiO2 melt' is not in the closed automatic map
   axes:
   - phase
@@ -187301,30 +188790,10 @@ entries:
       note: Solid 1400 C series at Na2O=20 wt%; points digitized from the PDF plot
 - work_id: 494486a12e8ebacb2880ee0a1582fc723229718da96c49248ab29e9b6eaa5321
   source: data/literature/extracts/lpi-compendium-62231.yaml
-  why: declared quantity is unknown; unsupported quantity 'station_2_soil_composition_plot'; refusing to pick a number
-  axes:
-  - value
-  observations:
-  - observation_id: lpi-compendium-62231::lpi_2010_62231_figure_only_context
-    locator:
-      pdf_page_index: 1
-      figure: '2'
-      section: Chemistry
-      note: Figure 2 plots station 2 soil composition against Apollo soil samples; no coordinate values were printed and none
-        were digitised.
-- work_id: 494486a12e8ebacb2880ee0a1582fc723229718da96c49248ab29e9b6eaa5321
-  source: data/literature/extracts/lpi-compendium-62231.yaml
   why: phase string 'lunar_soil' is not in the closed automatic map
   axes:
   - phase
   observations:
-  - observation_id: lpi-compendium-62231::lpi_2010_62231_figure_only_context
-    locator:
-      pdf_page_index: 1
-      figure: '2'
-      section: Chemistry
-      note: Figure 2 plots station 2 soil composition against Apollo soil samples; no coordinate values were printed and none
-        were digitised.
   - observation_id: lpi-compendium-62231::lpi_2010_62231_table1_chemistry::rows:row=62231:h=aba4d5c66446
     locator:
       pdf_page_index: 3
@@ -187343,19 +188812,6 @@ entries:
       table: '1'
       note: Every numeric value below is in the printed 62231 row and under its named column; reference is Korotev82 and technique
         (a) is INAA.; row=62231
-- work_id: 494486a12e8ebacb2880ee0a1582fc723229718da96c49248ab29e9b6eaa5321
-  source: data/literature/extracts/lpi-compendium-62231.yaml
-  why: regime 'figure_only_lunar_chemical_context' is not a closed method token (kems_effusion alone is insufficient)
-  axes:
-  - method
-  observations:
-  - observation_id: lpi-compendium-62231::lpi_2010_62231_figure_only_context
-    locator:
-      pdf_page_index: 1
-      figure: '2'
-      section: Chemistry
-      note: Figure 2 plots station 2 soil composition against Apollo soil samples; no coordinate values were printed and none
-        were digitised.
 - work_id: 494486a12e8ebacb2880ee0a1582fc723229718da96c49248ab29e9b6eaa5321
   source: data/literature/extracts/lpi-compendium-62231.yaml
   why: series point 0 stored with unknown value
@@ -187380,19 +188836,6 @@ entries:
       table: '1'
       note: Every numeric value below is in the printed 62231 row and under its named column; reference is Korotev82 and technique
         (a) is INAA.; row=62231
-- work_id: 494486a12e8ebacb2880ee0a1582fc723229718da96c49248ab29e9b6eaa5321
-  source: data/literature/extracts/lpi-compendium-62231.yaml
-  why: unsupported quantity 'station_2_soil_composition_plot'
-  axes:
-  - quantity
-  observations:
-  - observation_id: lpi-compendium-62231::lpi_2010_62231_figure_only_context
-    locator:
-      pdf_page_index: 1
-      figure: '2'
-      section: Chemistry
-      note: Figure 2 plots station 2 soil composition against Apollo soil samples; no coordinate values were printed and none
-        were digitised.
 - work_id: 497a838a6ce24bdd4f1ed9c2a75abe90690a8dfc62d3105ed71fed3ad06eba98
   source: data/literature/extracts/pending-as2o3-second-primary.yaml
   why: absent method_class
@@ -213488,6 +214931,18 @@ entries:
       published_page: 3
       table: '1'
       section: Chemistry
+- work_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907
+  source: data/literature/extracts/ewing-1963-sodium-potassium-properties.yaml
+  why: source does not state method
+  axes:
+  - method
+  observations:
+  - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1165.55:h=88a36d3ecc31
+    locator:
+      page: 12
+      published_page: 7
+      pdf_page_index: 11
+      figure: '6'
 - work_id: 8b79bdb9022f5df4da0a30d1c4bc731d1e2bf5895fbebf188091571818833877
   source: data/literature/extracts/lpsc-2024-bennu-pyrolysis-vandam.yaml
   why: declared quantity is unknown; unsupported quantity 'relative_amino_acid_quantitation_signal_vs_murchison'; refusing
@@ -269790,6 +271245,88 @@ entries:
     locator:
       note: extract-level typed absence
       source_path: data/literature/extracts/morey-1964-usgs-pp440l-phase-equilibria.yaml
+- work_id: abe584e4055a6f9767f942308004b70e887bfce8d2dd234cb8cd4d8b2071977c
+  source: data/literature/extracts/sato-hickling-mclane-1973-lunar-fo2.yaml
+  why: missing phase
+  axes:
+  - phase
+  observations:
+  - observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12009_35_bulk_plus_fe::T=1273.15:h=09cf2ae59b68
+    locator:
+      page: 3
+      published_page: 1063
+      table: '1'
+  - observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12009_35_bulk_rock::T=1273.15:h=6624abf57576
+    locator:
+      page: 3
+      published_page: 1063
+      table: '1'
+      note: Average −log fO2 (atm) read from visually drawn curve
+  - observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12009_35_groundmass::T=1273.15:h=09cf2ae59b68
+    locator:
+      page: 3
+      published_page: 1063
+      table: '1'
+  - observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12009_35_olivine::T=1273.15:h=1d9c7e45ef8d
+    locator:
+      page: 3
+      published_page: 1063
+      table: '1'
+  - observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12022_36_bulk_plus_fe::T=1273.15:h=4e244fba6012
+    locator:
+      page: 3
+      published_page: 1063
+      table: '1'
+  - observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12053_89_bulk_plus_fe::T=1273.15:h=09cf2ae59b68
+    locator:
+      page: 3
+      published_page: 1063
+      table: '1'
+  - observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12053_89_bulk_rock::T=1273.15:h=49d6531784c9
+    locator:
+      page: 3
+      published_page: 1063
+      table: '1'
+  - observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_12053_89_pyroxenes::T=1273.15:h=7940d2b27fd9
+    locator:
+      page: 3
+      published_page: 1063
+      table: '1'
+  - observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_14310_195_bulk_rock::T=1273.15:h=49d6531784c9
+    locator:
+      page: 3
+      published_page: 1063
+      table: '1'
+  - observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_14310_207_bulk_rock::T=1273.15:h=7940d2b27fd9
+    locator:
+      page: 3
+      published_page: 1063
+      table: '1'
+  - observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_14321_105_bulk_rock::T=1273.15:h=0c242934b8df
+    locator:
+      page: 3
+      published_page: 1063
+      table: '1'
+  - observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_15058_81_bulk_rock::T=1273.15:h=4e244fba6012
+    locator:
+      page: 3
+      published_page: 1063
+      table: '1'
+  - observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_15058_88_bulk_rock::T=1273.15:h=4e244fba6012
+    locator:
+      page: 3
+      published_page: 1063
+      table: '1'
+  - observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_15595_25_bulk_plus_fe::T=1273.15:h=09cf2ae59b68
+    locator:
+      page: 3
+      published_page: 1063
+      table: '1'
+  - observation_id: sato-hickling-mclane-1973-lunar-fo2::sato73_15595_25_bulk_rock::T=1273.15:h=4e244fba6012
+    locator:
+      page: 3
+      published_page: 1063
+      table: '1'
 - work_id: b07d7a89ffd69528e74f4074666a32ffd3413b9eb14a1d20266b9072132fd89e
   source: data/literature/extracts/jsc-a16-special-samples.yaml
   why: declared quantity is unknown; unsupported quantity 'grain_size_and_stratigraphy'; refusing to pick a number
@@ -339257,6 +340794,16 @@ entries:
         liquid branch: NIST Chemistry WebBook SRD 69 ammonia Antoine (Stull 1947 lineage), ~164–240 K liquid — independent
         of the 2024 QCM ice fit.'
       record: Fray-Schmitt-2009#NH3
+- work_id: c732de60a8b7b7951ea3414fbaddeb3559dd52f9e3c65a084f3369c77143ad0d
+  source: data/literature/extracts/sesko-2022-tum-thesis.yaml
+  why: extract yielded no observations
+  axes:
+  - document
+  observations:
+  - observation_id: sesko-2022-tum-thesis::typed_absence
+    locator:
+      note: extract-level typed absence
+      source_path: data/literature/extracts/sesko-2022-tum-thesis.yaml
 - work_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b
   source: data/literature/extracts/kems-049-kato-1993-ms-review.yaml
   why: declared quantity is unknown; unsupported quantity 'activity_Al_and_pO2_from_oxide_equilibria'; refusing to pick a
@@ -341818,11 +343365,6 @@ entries:
       figure: '2.2'
       paragraph: Kapitel 2.1.2
       source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
-  - observation_id: kems-035-sauerborn-2005::sauerborn_2005_jsc1_composition_figure_only_blocked_deep2
-    locator:
-      page: 17
-      figure: '2.2'
-      paragraph: Kapitel 2.1.2
 - work_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356
   source: data/literature/extracts/kems-035-sauerborn-2005.yaml
   why: unmapped regime audit
@@ -341857,10 +343399,6 @@ entries:
     locator:
       page: 83
       figure: '5.23'
-  - observation_id: kems-035-sauerborn-2005::sauerborn_2005_fig523_ms1_epma_glass_deep2
-    locator:
-      page: 83
-      figure: '5.23'
   - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table56_ms5c_epma
     locator:
       page: 103
@@ -341885,10 +343423,6 @@ entries:
   - evidence.class
   observations:
   - observation_id: kems-035-sauerborn-2005::sauerborn_2005_fig532_rfa_oxide_ratio
-    locator:
-      page: 88
-      figure: '5.32'
-  - observation_id: kems-035-sauerborn-2005::sauerborn_2005_fig532_rfa_oxide_ratio_deep2
     locator:
       page: 88
       figure: '5.32'
@@ -341926,11 +343460,6 @@ entries:
       figure: '5.1'
       note: Abb. 5.1–5.3 and MS QMS/IR time series
       source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
-  - observation_id: kems-035-sauerborn-2005::sauerborn_2005_qms_traces_figure_only_blocked_deep2
-    locator:
-      page: 69
-      figure: '5.1'
-      note: Abb. 5.1–5.3 and MS QMS/IR time series
   - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table32_qms_masses
     locator:
       page: 44
@@ -341945,15 +343474,7 @@ entries:
     locator:
       page: 105
       figure: '5.55'
-  - observation_id: kems-035-sauerborn-2005::sauerborn_2005_fig555_o2_reference_normalized_deep2
-    locator:
-      page: 105
-      figure: '5.55'
   - observation_id: kems-035-sauerborn-2005::sauerborn_2005_fig556_o2_vs_T_normalized
-    locator:
-      page: 107
-      figure: '5.56'
-  - observation_id: kems-035-sauerborn-2005::sauerborn_2005_fig556_o2_vs_T_normalized_deep2
     locator:
       page: 107
       figure: '5.56'
@@ -342463,7 +343984,7 @@ entries:
       table: '5.2'
       note: unbehandelte Folie Standardabweichung
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
   axes:
   - value
@@ -342488,14 +344009,38 @@ entries:
       section: Abstract
       note: pdf_page=1
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
+- work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
+  source: data/literature/extracts/ammin-76-904.yaml
+  why: declared quantity is unknown; unsupported quantity 'heat_of_fusion'; refusing to pick a number
+  axes:
+  - value
+  observations:
+  - observation_id: ammin-76-904::ammin_76_904_quoted_adamkovicova_wollastonite_fusion
+    locator:
+      published_page: 911
+      section: Observations on incongruent melting and a preliminary crystallization study
+      note: pdf_page=8
+      source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
   - observation_id: ammin-76-904::ammin_76_904_quoted_comparator_enthalpy_values
     locator:
       published_page: 909
       section: Final capacity of crystal and liquid, enthalpy of fusion, and analysis of error
       note: pdf_page=6
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
+  - observation_id: ammin-76-904::ammin_76_904_quoted_ferrier_diopside_fusion
+    locator:
+      published_page: 909
+      section: Final capacity of crystal and liquid, enthalpy of fusion, and analysis of error
+      note: pdf_page=6
+      source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
+  - observation_id: ammin-76-904::ammin_76_904_quoted_richet_bottinga_diopside_fusion
+    locator:
+      published_page: 909
+      section: Final capacity of crystal and liquid, enthalpy of fusion, and analysis of error
+      note: pdf_page=6
+      source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: derived evidence class with unstated ancestry; queued for page-grounding
   axes:
   - derived_from
@@ -342508,7 +344053,7 @@ entries:
       note: pdf_page=6
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: derived evidence class with unstated derivation; queued for page-grounding
   axes:
   - derivation
@@ -342521,45 +344066,7 @@ entries:
       note: pdf_page=6
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
-  why: locator source_path 'corpus/raw/ammin-76-904/ammin-76-904.pdf' has no matching INDEX asset
-  axes:
-  - read_from
-  observations:
-  - observation_id: ammin-76-904::ammin_76_904_author_regression_liquid_heat_capacity
-    locator:
-      published_page: 909
-      section: Final capacity of crystal and liquid, enthalpy of fusion, and analysis of error
-      equation: '6'
-      note: pdf_page=6
-      source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
-  - observation_id: ammin-76-904::ammin_76_904_crystallization_repeated_runs
-    locator:
-      published_page: 910
-      figure: '6'
-      section: Observations on incongruent melting and preliminary crystallization study
-      note: pdf_page=7
-      source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
-  - observation_id: ammin-76-904::ammin_76_904_fusion_and_melting_transition
-    locator:
-      published_page: 904
-      section: Abstract
-      note: pdf_page=1
-      source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
-  - observation_id: ammin-76-904::ammin_76_904_quoted_comparator_enthalpy_values
-    locator:
-      published_page: 909
-      section: Final capacity of crystal and liquid, enthalpy of fusion, and analysis of error
-      note: pdf_page=6
-      source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
-  - observation_id: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:0
-    locator:
-      published_page: 908
-      table: '2'
-      note: pdf_page=5
-      source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
-- work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: missing quantity
   axes:
   - quantity
@@ -342584,12 +344091,6 @@ entries:
       section: Abstract
       note: pdf_page=1
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
-  - observation_id: ammin-76-904::ammin_76_904_quoted_comparator_enthalpy_values
-    locator:
-      published_page: 909
-      section: Final capacity of crystal and liquid, enthalpy of fusion, and analysis of error
-      note: pdf_page=6
-      source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
   - observation_id: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:0
     locator:
       published_page: 908
@@ -342597,7 +344098,7 @@ entries:
       note: pdf_page=5
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic map
   axes:
   - phase
@@ -342609,7 +344110,7 @@ entries:
       note: pdf_page=5
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: phase string 'crystalline_diopside_to_liquid_diopside' is not in the closed automatic map
   axes:
   - phase
@@ -342621,7 +344122,7 @@ entries:
       note: pdf_page=1
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: phase string 'diopside' is not in the closed automatic map
   axes:
   - phase
@@ -342632,8 +344133,20 @@ entries:
       section: Final capacity of crystal and liquid, enthalpy of fusion, and analysis of error
       note: pdf_page=6
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
+  - observation_id: ammin-76-904::ammin_76_904_quoted_ferrier_diopside_fusion
+    locator:
+      published_page: 909
+      section: Final capacity of crystal and liquid, enthalpy of fusion, and analysis of error
+      note: pdf_page=6
+      source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
+  - observation_id: ammin-76-904::ammin_76_904_quoted_richet_bottinga_diopside_fusion
+    locator:
+      published_page: 909
+      section: Final capacity of crystal and liquid, enthalpy of fusion, and analysis of error
+      note: pdf_page=6
+      source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: phase string 'diopside_liquid_to_clinopyroxene_solid_solution_and_wollastonite' is not in the closed automatic map
   axes:
   - phase
@@ -342646,7 +344159,7 @@ entries:
       note: pdf_page=7
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: phase string 'liquid_diopside' is not in the closed automatic map
   axes:
   - phase
@@ -342658,20 +344171,74 @@ entries:
       equation: '6'
       note: pdf_page=6
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
-- work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
-  why: regime 'cited_literature_comparison' is not a closed method token (kems_effusion alone is insufficient)
-  axes:
-  - method
-  observations:
-  - observation_id: ammin-76-904::ammin_76_904_quoted_comparator_enthalpy_values
+  - observation_id: ammin-76-904::ammin_76_904_quoted_richet_bottinga_liquid_heat_capacity
+    locator:
+      published_page: 909
+      section: Final capacity of crystal and liquid, enthalpy of fusion, and analysis of error
+      note: pdf_page=6
+      source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
+  - observation_id: ammin-76-904::ammin_76_904_quoted_stebbins_1984_liquid_heat_capacity
     locator:
       published_page: 909
       section: Final capacity of crystal and liquid, enthalpy of fusion, and analysis of error
       note: pdf_page=6
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
+  why: phase string 'wollastonite' is not in the closed automatic map
+  axes:
+  - phase
+  observations:
+  - observation_id: ammin-76-904::ammin_76_904_quoted_adamkovicova_wollastonite_fusion
+    locator:
+      published_page: 911
+      section: Observations on incongruent melting and a preliminary crystallization study
+      note: pdf_page=8
+      source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
+- work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
+  source: data/literature/extracts/ammin-76-904.yaml
+  why: regime 'cited_literature_comparison' is not a closed method token (kems_effusion alone is insufficient)
+  axes:
+  - method
+  observations:
+  - observation_id: ammin-76-904::ammin_76_904_quoted_adamkovicova_wollastonite_fusion
+    locator:
+      published_page: 911
+      section: Observations on incongruent melting and a preliminary crystallization study
+      note: pdf_page=8
+      source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
+  - observation_id: ammin-76-904::ammin_76_904_quoted_comparator_enthalpy_values
+    locator:
+      published_page: 909
+      section: Final capacity of crystal and liquid, enthalpy of fusion, and analysis of error
+      note: pdf_page=6
+      source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
+  - observation_id: ammin-76-904::ammin_76_904_quoted_ferrier_diopside_fusion
+    locator:
+      published_page: 909
+      section: Final capacity of crystal and liquid, enthalpy of fusion, and analysis of error
+      note: pdf_page=6
+      source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
+  - observation_id: ammin-76-904::ammin_76_904_quoted_richet_bottinga_diopside_fusion
+    locator:
+      published_page: 909
+      section: Final capacity of crystal and liquid, enthalpy of fusion, and analysis of error
+      note: pdf_page=6
+      source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
+  - observation_id: ammin-76-904::ammin_76_904_quoted_richet_bottinga_liquid_heat_capacity
+    locator:
+      published_page: 909
+      section: Final capacity of crystal and liquid, enthalpy of fusion, and analysis of error
+      note: pdf_page=6
+      source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
+  - observation_id: ammin-76-904::ammin_76_904_quoted_stebbins_1984_liquid_heat_capacity
+    locator:
+      published_page: 909
+      section: Final capacity of crystal and liquid, enthalpy of fusion, and analysis of error
+      note: pdf_page=6
+      source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
+- work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
+  source: data/literature/extracts/ammin-76-904.yaml
   why: regime 'regression_of_integrated_enthalpy_data' is not a closed method token (kems_effusion alone is insufficient)
   axes:
   - method
@@ -342684,7 +344251,7 @@ entries:
       note: pdf_page=6
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: regime 'scanning_calorimetry_constant_cooling' is not a closed method token (kems_effusion alone is insufficient)
   axes:
   - method
@@ -342697,7 +344264,7 @@ entries:
       note: pdf_page=7
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: regime 'step_scan_calorimetry' is not a closed method token (kems_effusion alone is insufficient)
   axes:
   - method
@@ -342715,7 +344282,7 @@ entries:
       note: pdf_page=5
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: series point 0 stored with unknown value
   axes:
   - value
@@ -342727,7 +344294,7 @@ entries:
       note: pdf_page=5
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: series point 1 stored with unknown value
   axes:
   - value
@@ -342739,7 +344306,7 @@ entries:
       note: pdf_page=5
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: series point 10 stored with unknown value
   axes:
   - value
@@ -342751,7 +344318,7 @@ entries:
       note: pdf_page=5
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: series point 11 stored with unknown value
   axes:
   - value
@@ -342763,7 +344330,7 @@ entries:
       note: pdf_page=5
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: series point 12 stored with unknown value
   axes:
   - value
@@ -342775,7 +344342,7 @@ entries:
       note: pdf_page=5
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: series point 13 stored with unknown value
   axes:
   - value
@@ -342787,7 +344354,7 @@ entries:
       note: pdf_page=5
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: series point 14 stored with unknown value
   axes:
   - value
@@ -342799,7 +344366,7 @@ entries:
       note: pdf_page=5
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: series point 15 stored with unknown value
   axes:
   - value
@@ -342811,7 +344378,7 @@ entries:
       note: pdf_page=5
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: series point 16 stored with unknown value
   axes:
   - value
@@ -342823,7 +344390,7 @@ entries:
       note: pdf_page=5
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: series point 17 stored with unknown value
   axes:
   - value
@@ -342835,7 +344402,7 @@ entries:
       note: pdf_page=5
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: series point 18 stored with unknown value
   axes:
   - value
@@ -342847,7 +344414,7 @@ entries:
       note: pdf_page=5
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: series point 19 stored with unknown value
   axes:
   - value
@@ -342859,7 +344426,7 @@ entries:
       note: pdf_page=5
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: series point 2 stored with unknown value
   axes:
   - value
@@ -342871,7 +344438,7 @@ entries:
       note: pdf_page=5
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: series point 20 stored with unknown value
   axes:
   - value
@@ -342883,7 +344450,7 @@ entries:
       note: pdf_page=5
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: series point 21 stored with unknown value
   axes:
   - value
@@ -342895,7 +344462,7 @@ entries:
       note: pdf_page=5
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: series point 22 stored with unknown value
   axes:
   - value
@@ -342907,7 +344474,7 @@ entries:
       note: pdf_page=5
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: series point 23 stored with unknown value
   axes:
   - value
@@ -342919,7 +344486,7 @@ entries:
       note: pdf_page=5
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: series point 24 stored with unknown value
   axes:
   - value
@@ -342931,7 +344498,7 @@ entries:
       note: pdf_page=5
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: series point 25 stored with unknown value
   axes:
   - value
@@ -342943,7 +344510,7 @@ entries:
       note: pdf_page=5
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: series point 26 stored with unknown value
   axes:
   - value
@@ -342955,7 +344522,7 @@ entries:
       note: pdf_page=5
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: series point 27 stored with unknown value
   axes:
   - value
@@ -342967,7 +344534,7 @@ entries:
       note: pdf_page=5
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: series point 28 stored with unknown value
   axes:
   - value
@@ -342979,7 +344546,7 @@ entries:
       note: pdf_page=5
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: series point 3 stored with unknown value
   axes:
   - value
@@ -342991,7 +344558,7 @@ entries:
       note: pdf_page=5
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: series point 4 stored with unknown value
   axes:
   - value
@@ -343003,7 +344570,7 @@ entries:
       note: pdf_page=5
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: series point 5 stored with unknown value
   axes:
   - value
@@ -343015,7 +344582,7 @@ entries:
       note: pdf_page=5
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: series point 6 stored with unknown value
   axes:
   - value
@@ -343027,7 +344594,7 @@ entries:
       note: pdf_page=5
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: series point 7 stored with unknown value
   axes:
   - value
@@ -343039,7 +344606,7 @@ entries:
       note: pdf_page=5
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: series point 8 stored with unknown value
   axes:
   - value
@@ -343051,7 +344618,7 @@ entries:
       note: pdf_page=5
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: series point 9 stored with unknown value
   axes:
   - value
@@ -343063,7 +344630,7 @@ entries:
       note: pdf_page=5
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
-  source: data/literature/extracts/ammin-76-904-lange-1991.yaml
+  source: data/literature/extracts/ammin-76-904.yaml
   why: source T_range_K [1403, 1762]; no midpoint invented
   axes:
   - temperature_K
@@ -343073,6 +344640,36 @@ entries:
       published_page: 908
       table: '2'
       note: pdf_page=5
+      source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
+- work_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91
+  source: data/literature/extracts/ammin-76-904.yaml
+  why: unsupported quantity 'heat_of_fusion'
+  axes:
+  - quantity
+  observations:
+  - observation_id: ammin-76-904::ammin_76_904_quoted_adamkovicova_wollastonite_fusion
+    locator:
+      published_page: 911
+      section: Observations on incongruent melting and a preliminary crystallization study
+      note: pdf_page=8
+      source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
+  - observation_id: ammin-76-904::ammin_76_904_quoted_comparator_enthalpy_values
+    locator:
+      published_page: 909
+      section: Final capacity of crystal and liquid, enthalpy of fusion, and analysis of error
+      note: pdf_page=6
+      source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
+  - observation_id: ammin-76-904::ammin_76_904_quoted_ferrier_diopside_fusion
+    locator:
+      published_page: 909
+      section: Final capacity of crystal and liquid, enthalpy of fusion, and analysis of error
+      note: pdf_page=6
+      source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
+  - observation_id: ammin-76-904::ammin_76_904_quoted_richet_bottinga_diopside_fusion
+    locator:
+      published_page: 909
+      section: Final capacity of crystal and liquid, enthalpy of fusion, and analysis of error
+      note: pdf_page=6
       source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - work_id: d3013bc9d0cb776b380c86753700462ec01829d40fc4b312d14edee7597b74cf
   source: data/literature/extracts/kems-050-gorokhov-1977.yaml
@@ -346907,121 +348504,14 @@ entries:
       table: '6'
 - work_id: e2ba786e518efc4bbd5d21214590d5091ab74b0bcb98fa5eef2407e5e96b149c
   source: data/literature/extracts/lpsc-2017-2171.yaml
-  why: PAGE method_class method_only
+  why: extract yielded no observations
   axes:
-  - evidence.class
+  - document
   observations:
-  - observation_id: lpsc-2017-2171::barber_2017_prospa_analysis_capability_and_status
+  - observation_id: lpsc-2017-2171::typed_absence
     locator:
-      page: 2
-      pdf_page_index: 2
-      section: Volatiles Analysis; Instrument Heritage; Current Status; Conclusions
-  - observation_id: lpsc-2017-2171::barber_2017_prospa_extraction_programmes
-    locator:
-      page: 2
-      pdf_page_index: 2
-      section: Evolved gas analysis; In Situ Resource Utilization demonstration; Stepped pyrolysis or combustion
-  - observation_id: lpsc-2017-2171::barber_2017_prospa_sample_preservation_and_oven
-    locator:
-      page: 1
-      pdf_page_index: 1
-      section: Volatiles Preservation
-- work_id: e2ba786e518efc4bbd5d21214590d5091ab74b0bcb98fa5eef2407e5e96b149c
-  source: data/literature/extracts/lpsc-2017-2171.yaml
-  why: declared quantity is unknown; unsupported quantity 'method_capability_window'; refusing to pick a number
-  axes:
-  - value
-  observations:
-  - observation_id: lpsc-2017-2171::barber_2017_prospa_analysis_capability_and_status
-    locator:
-      page: 2
-      pdf_page_index: 2
-      section: Volatiles Analysis; Instrument Heritage; Current Status; Conclusions
-  - observation_id: lpsc-2017-2171::barber_2017_prospa_extraction_programmes
-    locator:
-      page: 2
-      pdf_page_index: 2
-      section: Evolved gas analysis; In Situ Resource Utilization demonstration; Stepped pyrolysis or combustion
-  - observation_id: lpsc-2017-2171::barber_2017_prospa_sample_preservation_and_oven
-    locator:
-      page: 1
-      pdf_page_index: 1
-      section: Volatiles Preservation
-- work_id: e2ba786e518efc4bbd5d21214590d5091ab74b0bcb98fa5eef2407e5e96b149c
-  source: data/literature/extracts/lpsc-2017-2171.yaml
-  why: phase string 'instrument_design' is not in the closed automatic map
-  axes:
-  - phase
-  observations:
-  - observation_id: lpsc-2017-2171::barber_2017_prospa_analysis_capability_and_status
-    locator:
-      page: 2
-      pdf_page_index: 2
-      section: Volatiles Analysis; Instrument Heritage; Current Status; Conclusions
-  - observation_id: lpsc-2017-2171::barber_2017_prospa_extraction_programmes
-    locator:
-      page: 2
-      pdf_page_index: 2
-      section: Evolved gas analysis; In Situ Resource Utilization demonstration; Stepped pyrolysis or combustion
-  - observation_id: lpsc-2017-2171::barber_2017_prospa_sample_preservation_and_oven
-    locator:
-      page: 1
-      pdf_page_index: 1
-      section: Volatiles Preservation
-- work_id: e2ba786e518efc4bbd5d21214590d5091ab74b0bcb98fa5eef2407e5e96b149c
-  source: data/literature/extracts/lpsc-2017-2171.yaml
-  why: regime 'lunar_volatiles_sample_processing' is not a closed method token (kems_effusion alone is insufficient)
-  axes:
-  - method
-  observations:
-  - observation_id: lpsc-2017-2171::barber_2017_prospa_sample_preservation_and_oven
-    locator:
-      page: 1
-      pdf_page_index: 1
-      section: Volatiles Preservation
-- work_id: e2ba786e518efc4bbd5d21214590d5091ab74b0bcb98fa5eef2407e5e96b149c
-  source: data/literature/extracts/lpsc-2017-2171.yaml
-  why: regime 'mass_spectrometric_lunar_volatiles_analysis' is not a closed method token (kems_effusion alone is insufficient)
-  axes:
-  - method
-  observations:
-  - observation_id: lpsc-2017-2171::barber_2017_prospa_analysis_capability_and_status
-    locator:
-      page: 2
-      pdf_page_index: 2
-      section: Volatiles Analysis; Instrument Heritage; Current Status; Conclusions
-- work_id: e2ba786e518efc4bbd5d21214590d5091ab74b0bcb98fa5eef2407e5e96b149c
-  source: data/literature/extracts/lpsc-2017-2171.yaml
-  why: regime 'thermal_extraction_and_reduction' is not a closed method token (kems_effusion alone is insufficient)
-  axes:
-  - method
-  observations:
-  - observation_id: lpsc-2017-2171::barber_2017_prospa_extraction_programmes
-    locator:
-      page: 2
-      pdf_page_index: 2
-      section: Evolved gas analysis; In Situ Resource Utilization demonstration; Stepped pyrolysis or combustion
-- work_id: e2ba786e518efc4bbd5d21214590d5091ab74b0bcb98fa5eef2407e5e96b149c
-  source: data/literature/extracts/lpsc-2017-2171.yaml
-  why: unsupported quantity 'method_capability_window'
-  axes:
-  - quantity
-  observations:
-  - observation_id: lpsc-2017-2171::barber_2017_prospa_analysis_capability_and_status
-    locator:
-      page: 2
-      pdf_page_index: 2
-      section: Volatiles Analysis; Instrument Heritage; Current Status; Conclusions
-  - observation_id: lpsc-2017-2171::barber_2017_prospa_extraction_programmes
-    locator:
-      page: 2
-      pdf_page_index: 2
-      section: Evolved gas analysis; In Situ Resource Utilization demonstration; Stepped pyrolysis or combustion
-  - observation_id: lpsc-2017-2171::barber_2017_prospa_sample_preservation_and_oven
-    locator:
-      page: 1
-      pdf_page_index: 1
-      section: Volatiles Preservation
+      note: extract-level typed absence
+      source_path: data/literature/extracts/lpsc-2017-2171.yaml
 - work_id: e311b324e90ee458188b64996687603f54abb521b14239141d160ef932e23f32
   source: data/literature/extracts/lpsc-2019-2641.yaml
   why: declared quantity is unknown; unsupported quantity 'Murchison_run_conditions'; refusing to pick a number
@@ -391825,41 +393315,6 @@ entries:
       record: O-046
 - work_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d
   source: data/literature/extracts/kems-039-wolf-2023-vaporock.yaml
-  why: declared quantity is unknown; unsupported quantity 'model_accuracy_factor'; refusing to pick a number
-  axes:
-  - value
-  observations:
-  - observation_id: kems-039-wolf-2023-vaporock::wolf_2023_abstract_factor3_model_accuracy
-    locator:
-      published_page: 1
-      pdf_page_index: 1
-      section: abstract
-- work_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d
-  source: data/literature/extracts/kems-039-wolf-2023-vaporock.yaml
-  why: declared quantity is unknown; unsupported quantity 'model_elemental_vapor_abundance'; refusing to pick a number
-  axes:
-  - value
-  observations:
-  - observation_id: kems-039-wolf-2023-vaporock::wolf_2023_table3_vaporock_vs_magma22
-    locator:
-      published_page: 17
-      pdf_page_index: 17
-      table: '3'
-      section: '3.4'
-- work_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d
-  source: data/literature/extracts/kems-039-wolf-2023-vaporock.yaml
-  why: declared quantity is unknown; unsupported quantity 'model_system_and_vapor_species'; refusing to pick a number
-  axes:
-  - value
-  observations:
-  - observation_id: kems-039-wolf-2023-vaporock::wolf_2023_vaporock_system_and_species
-    locator:
-      published_page: 5
-      pdf_page_index: 5
-      table: '1'
-      section: '2.2'
-- work_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d
-  source: data/literature/extracts/kems-039-wolf-2023-vaporock.yaml
   why: declared quantity is unknown; unsupported quantity 'printed_major_oxide_composition'; refusing to pick a number
   axes:
   - value
@@ -391880,23 +393335,6 @@ entries:
   axes:
   - derived_from
   observations:
-  - observation_id: kems-039-wolf-2023-vaporock::wolf_2023_abstract_factor3_model_accuracy
-    locator:
-      published_page: 1
-      pdf_page_index: 1
-      section: abstract
-  - observation_id: kems-039-wolf-2023-vaporock::wolf_2023_bse_vapor_model_scope
-    locator:
-      published_page: 22
-      pdf_page_index: 22
-      figure: '4'
-      section: '4.3'
-  - observation_id: kems-039-wolf-2023-vaporock::wolf_2023_eq9_sio_sio2_fo2_proxy
-    locator:
-      published_page: 25
-      pdf_page_index: 25
-      section: '4.5'
-      equation: '9'
   - observation_id: kems-039-wolf-2023-vaporock::wolf_2023_illite_and_srm_activity_fits
     locator:
       published_page: 11
@@ -391907,41 +393345,12 @@ entries:
       published_page: 12
       pdf_page_index: 12
       section: '3.3'
-  - observation_id: kems-039-wolf-2023-vaporock::wolf_2023_table3_vaporock_vs_magma22
-    locator:
-      published_page: 17
-      pdf_page_index: 17
-      table: '3'
-      section: '3.4'
-  - observation_id: kems-039-wolf-2023-vaporock::wolf_2023_vaporock_system_and_species
-    locator:
-      published_page: 5
-      pdf_page_index: 5
-      table: '1'
-      section: '2.2'
 - work_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d
   source: data/literature/extracts/kems-039-wolf-2023-vaporock.yaml
   why: derived evidence class with unstated derivation; queued for page-grounding
   axes:
   - derivation
   observations:
-  - observation_id: kems-039-wolf-2023-vaporock::wolf_2023_abstract_factor3_model_accuracy
-    locator:
-      published_page: 1
-      pdf_page_index: 1
-      section: abstract
-  - observation_id: kems-039-wolf-2023-vaporock::wolf_2023_bse_vapor_model_scope
-    locator:
-      published_page: 22
-      pdf_page_index: 22
-      figure: '4'
-      section: '4.3'
-  - observation_id: kems-039-wolf-2023-vaporock::wolf_2023_eq9_sio_sio2_fo2_proxy
-    locator:
-      published_page: 25
-      pdf_page_index: 25
-      section: '4.5'
-      equation: '9'
   - observation_id: kems-039-wolf-2023-vaporock::wolf_2023_illite_and_srm_activity_fits
     locator:
       published_page: 11
@@ -391952,18 +393361,6 @@ entries:
       published_page: 12
       pdf_page_index: 12
       section: '3.3'
-  - observation_id: kems-039-wolf-2023-vaporock::wolf_2023_table3_vaporock_vs_magma22
-    locator:
-      published_page: 17
-      pdf_page_index: 17
-      table: '3'
-      section: '3.4'
-  - observation_id: kems-039-wolf-2023-vaporock::wolf_2023_vaporock_system_and_species
-    locator:
-      published_page: 5
-      pdf_page_index: 5
-      table: '1'
-      section: '2.2'
 - work_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d
   source: data/literature/extracts/kems-039-wolf-2023-vaporock.yaml
   why: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, generator, evidence_class, composition,
@@ -391987,57 +393384,6 @@ entries:
     locator:
       published_page: 11
       pdf_page_index: 11
-      section: '3.2'
-- work_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d
-  source: data/literature/extracts/kems-039-wolf-2023-vaporock.yaml
-  why: 'no mapped log10_Kf field selected; source fields: quantity, method_class, generator, evidence_class, gas_reaction,
-    logK_expression, proxy_expression'
-  axes:
-  - value
-  observations:
-  - observation_id: kems-039-wolf-2023-vaporock::wolf_2023_eq9_sio_sio2_fo2_proxy
-    locator:
-      published_page: 25
-      pdf_page_index: 25
-      section: '4.5'
-      equation: '9'
-- work_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d
-  source: data/literature/extracts/kems-039-wolf-2023-vaporock.yaml
-  why: no mapped numeric p_partial selected; temperature_range_K [1500, 3000] is a temperature domain, not the observable
-  axes:
-  - value
-  observations:
-  - observation_id: kems-039-wolf-2023-vaporock::wolf_2023_bse_vapor_model_scope
-    locator:
-      published_page: 22
-      pdf_page_index: 22
-      figure: '4'
-      section: '4.3'
-- work_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d
-  source: data/literature/extracts/kems-039-wolf-2023-vaporock.yaml
-  why: 'no mapped p_partial field selected; source fields: quantity, method_class, evidence_class, attribution, source_measurement,
-    samples, heated_to_K, pO2_determined_range_K, comparison_range_used_by_VapoRock_K, stated_uncertainty, raw_pressure_points'
-  axes:
-  - value
-  observations:
-  - observation_id: kems-039-wolf-2023-vaporock::wolf_2023_demaria_lunar_kems_scope
-    locator:
-      published_page: 12
-      pdf_page_index: 12
-      figure: '2'
-      section: '3.3'
-- work_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d
-  source: data/literature/extracts/kems-039-wolf-2023-vaporock.yaml
-  why: 'no mapped p_partial field selected; source fields: quantity, method_class, evidence_class, attribution, source_measurement,
-    temperature_ranges_K, stated_uncertainty, raw_pressure_points'
-  axes:
-  - value
-  observations:
-  - observation_id: kems-039-wolf-2023-vaporock::wolf_2023_hastie_kems_scope_and_uncertainty
-    locator:
-      published_page: 10
-      pdf_page_index: 10
-      figure: '1'
       section: '3.2'
 - work_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d
   source: data/literature/extracts/kems-039-wolf-2023-vaporock.yaml
@@ -392071,71 +393417,6 @@ entries:
       published_page: 14
       pdf_page_index: 14
       table: '2'
-- work_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d
-  source: data/literature/extracts/kems-039-wolf-2023-vaporock.yaml
-  why: regime 'quoted_literature' is not a closed method token (kems_effusion alone is insufficient)
-  axes:
-  - method
-  observations:
-  - observation_id: kems-039-wolf-2023-vaporock::wolf_2023_demaria_lunar_kems_scope
-    locator:
-      published_page: 12
-      pdf_page_index: 12
-      figure: '2'
-      section: '3.3'
-  - observation_id: kems-039-wolf-2023-vaporock::wolf_2023_hastie_kems_scope_and_uncertainty
-    locator:
-      published_page: 10
-      pdf_page_index: 10
-      figure: '1'
-      section: '3.2'
-- work_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d
-  source: data/literature/extracts/kems-039-wolf-2023-vaporock.yaml
-  why: source temperature_range_K [1500, 3000]; no midpoint invented
-  axes:
-  - temperature_K
-  observations:
-  - observation_id: kems-039-wolf-2023-vaporock::wolf_2023_bse_vapor_model_scope
-    locator:
-      published_page: 22
-      pdf_page_index: 22
-      figure: '4'
-      section: '4.3'
-- work_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d
-  source: data/literature/extracts/kems-039-wolf-2023-vaporock.yaml
-  why: unsupported quantity 'model_accuracy_factor'
-  axes:
-  - quantity
-  observations:
-  - observation_id: kems-039-wolf-2023-vaporock::wolf_2023_abstract_factor3_model_accuracy
-    locator:
-      published_page: 1
-      pdf_page_index: 1
-      section: abstract
-- work_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d
-  source: data/literature/extracts/kems-039-wolf-2023-vaporock.yaml
-  why: unsupported quantity 'model_elemental_vapor_abundance'
-  axes:
-  - quantity
-  observations:
-  - observation_id: kems-039-wolf-2023-vaporock::wolf_2023_table3_vaporock_vs_magma22
-    locator:
-      published_page: 17
-      pdf_page_index: 17
-      table: '3'
-      section: '3.4'
-- work_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d
-  source: data/literature/extracts/kems-039-wolf-2023-vaporock.yaml
-  why: unsupported quantity 'model_system_and_vapor_species'
-  axes:
-  - quantity
-  observations:
-  - observation_id: kems-039-wolf-2023-vaporock::wolf_2023_vaporock_system_and_species
-    locator:
-      published_page: 5
-      pdf_page_index: 5
-      table: '1'
-      section: '2.2'
 - work_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d
   source: data/literature/extracts/kems-039-wolf-2023-vaporock.yaml
   why: unsupported quantity 'printed_major_oxide_composition'

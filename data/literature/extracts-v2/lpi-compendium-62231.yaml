@@ -2,49 +2,6 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/extracts/lpi-compendium-62231.yaml
 observations:
-- observation_id: lpi-compendium-62231::lpi_2010_62231_figure_only_context
-  experiment_id: 494486a12e8ebacb2880ee0a1582fc723229718da96c49248ab29e9b6eaa5321::lpi-compendium-62231
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'station_2_soil_composition_plot'
-    species:
-      formula: lunar_sample_62231
-      phase:
-        tag: unknown
-        reason: phase string 'lunar_soil' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-      charge:
-        tag: value
-        value: 0
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'station_2_soil_composition_plot'; refusing to
-      pick a number
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: plotted uncertainty or error bars are not printed in extractable text
-  evidence:
-    class:
-      tag: value
-      value: figure_only
-    original_method_class: figure_only
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: lpi-compendium-62231
-  locator:
-    pdf_page_index: 1
-    figure: '2'
-    section: Chemistry
-    note: Figure 2 plots station 2 soil composition against Apollo soil samples; no coordinate values were printed and none
-      were digitised.
-  read_from: pdf:lpi-compendium-62231
 - observation_id: lpi-compendium-62231::lpi_2010_62231_table1_chemistry::rows:row=62231:h=aba4d5c66446
   experiment_id: 494486a12e8ebacb2880ee0a1582fc723229718da96c49248ab29e9b6eaa5321::lpi-compendium-62231
   identity:
