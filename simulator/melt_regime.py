@@ -22,17 +22,6 @@ def legacy_raw_liquid_fraction_is_zero(liquid_fraction: Any) -> bool:
     return liquid_fraction == 0.0
 
 
-def legacy_raw_liquid_fraction_is_nonpositive(liquid_fraction: Any) -> bool:
-    """Preserve legacy finite ``liquid_fraction <= 0`` decisions.
-
-    Callers that historically used non-positive semantics should use this
-    predicate; core and evaporation callers that require exact-zero semantics
-    continue to use :func:`legacy_raw_liquid_fraction_is_zero`. Non-finite
-    values are not non-positive.
-    """
-    return math.isfinite(liquid_fraction) and liquid_fraction <= 0.0
-
-
 def melt_regime(
     *,
     temperature_K: float | None = None,

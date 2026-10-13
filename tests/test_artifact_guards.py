@@ -398,9 +398,9 @@ def _forbidden_liquid_fraction_compare(
         return False
     return (
         _expr_mentions_liquid_fraction(left)
-        and _expr_is_zero_or_epsilon_boundary(right)
+        and _expr_is_liquid_fraction_boundary(right)
     ) or (
-        _expr_is_zero_or_epsilon_boundary(left)
+        _expr_is_liquid_fraction_boundary(left)
         and _expr_mentions_liquid_fraction(right)
     )
 
@@ -424,13 +424,23 @@ def _forbidden_solidus_compare(
 def _expr_mentions_liquid_fraction(expr: ast.expr) -> bool:
     expr = _unwrap_float_call(expr)
     if isinstance(expr, ast.Name):
-        return expr.id == "liquid_fraction"
+        return expr.id in {
+            "liquid_fraction",
+            "liquid_fraction_value",
+            "liquid_fraction_at",
+        }
     if isinstance(expr, ast.Attribute):
-        return expr.attr == "liquid_fraction"
+        return expr.attr in {"liquid_fraction", "liquid_fraction_value"}
     if isinstance(expr, ast.Subscript):
-        return _subscript_key(expr.slice) == "liquid_fraction"
+        return _subscript_key(expr.slice) in {
+            "liquid_fraction",
+            "liquid_fraction_value",
+        }
     if isinstance(expr, ast.Call):
-        return _call_reads_liquid_fraction(expr) or any(
+        return (
+            isinstance(expr.func, ast.Name)
+            and expr.func.id == "liquid_fraction_at"
+        ) or _call_reads_liquid_fraction(expr) or any(
             _expr_mentions_liquid_fraction(child)
             for child in ast.iter_child_nodes(expr)
             if isinstance(child, ast.expr)
@@ -468,13 +478,13 @@ def _expr_mentions_solidus_boundary(expr: ast.expr) -> bool:
     )
 
 
-def _expr_is_zero_or_epsilon_boundary(expr: ast.expr) -> bool:
+def _expr_is_liquid_fraction_boundary(expr: ast.expr) -> bool:
     expr = _unwrap_float_call(expr)
     if isinstance(expr, ast.Constant):
         return (
             isinstance(expr.value, (int, float))
             and not isinstance(expr.value, bool)
-            and float(expr.value) == 0.0
+            and float(expr.value) in {0.0, 1.0}
         )
     if isinstance(expr, ast.Name):
         return expr.id in {"_FREEZE_GATE_EPSILON", "MELT_REGIME_EPSILON"}
