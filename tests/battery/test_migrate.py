@@ -11752,3 +11752,49 @@ def test_fusion_temperature_join_preserves_matching_melting_point(tmp_path: Path
     assert temperature.state.value == Decimal("1200")
     assert temperature.locator is not None
     assert temperature.locator.table == "7"
+
+
+def test_fusion_temperature_does_not_join_polymorphic_transition(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["SiO2"] = {
+        "observations": [
+            {
+                "observation_id": "alpha_to_beta_quartz_transition",
+                "type": "transition_point",
+                "locator": {"table": "7", "row": "SiO2"},
+                "phase": "cr",
+                "condensed_form": {"polymorph": "alpha_quartz"},
+                "units": "K",
+                "values": {
+                    "quantity": "transition_temperature",
+                    "property_kind": "solid_solid_transition",
+                    "phase_from": "alpha quartz",
+                    "phase_to": "beta quartz",
+                    "value_K": 846,
+                },
+            },
+            {
+                "observation_id": "alpha_quartz_heat_of_fusion",
+                "type": "heat_capacity_and_heat_content_series",
+                "locator": {"table": "7", "row": "SiO2", "column": "delta_H_f"},
+                "phase": "cr",
+                "crystal_phase_as_stated": "alpha quartz",
+                "condensed_form": {"polymorph": "alpha_quartz"},
+                "units": "kJ/mol",
+                "values": {
+                    "quantity": "heat_of_fusion",
+                    "delta_H_fus_kJ_mol-1": 12.5,
+                },
+            },
+        ]
+    }
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    fusion = next(
+        obs
+        for obs in result.observations.values()
+        if obs.observation_id.endswith("::alpha_quartz_heat_of_fusion")
+    )
+
+    assert fusion.identity.temperature_K is not None
+    assert fusion.identity.temperature_K.is_unknown
