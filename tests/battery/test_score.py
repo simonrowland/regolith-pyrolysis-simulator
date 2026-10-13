@@ -8706,7 +8706,8 @@ def test_kume_real_migrated_activity_scores_numeric_with_openimcc(
     assert residual.numeric is not None
     assert residual.status is not ResidualStatus.REFUSED
     assert residual.score_eligible is False
-    assert any(
+    # t-1225 supports this Table 2 method, so no apparatus warning is expected.
+    assert not any(
         notice.kind is NoticeKind.UNVERIFIED_APPARATUS
         for notice in residual.notices
     )

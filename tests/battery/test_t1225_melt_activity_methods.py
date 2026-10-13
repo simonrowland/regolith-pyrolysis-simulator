@@ -14,7 +14,7 @@ from tests.battery.test_migrate import _migrate_real_extract
     [
         (
             "kume-2000-cao-activities.yaml",
-            ("kume_2000_table",),
+            ("kume_2000_table2_sample_101",),
             555,
             2,
         ),
@@ -48,7 +48,14 @@ def test_printed_quench_equilibration_reaches_melt_activity_rows(
     observations = [
         observation
         for observation in migrated.observations.values()
-        if any(selector in observation.observation_id for selector in observation_selectors)
+        if any(
+            selector in observation.observation_id
+            and (
+                filename == "seki-2011-ca-o-solubility-fe-cao-al2o3.yaml"
+                or observation.observation_id.endswith(f"::{selector}")
+            )
+            for selector in observation_selectors
+        )
     ]
     assert observations
     for observation in observations:
@@ -71,11 +78,39 @@ def test_printed_quench_equilibration_reaches_melt_activity_rows(
         context, rail=Rail.MELT_ACTIVITY, engines=(Engine.INTERNAL_ANALYTICAL,)
     )
     target_ids = {observation.observation_id for observation in observations}
-    assert not [
-        residual
-        for residual in residuals
-        if residual.reference in target_ids
-        and residual.status is ResidualStatus.REFUSED
-        and residual.refusal is not None
-        and residual.refusal.reason.value == "method_unknown"
-    ]
+    scored = {residual.reference: residual for residual in residuals}
+    assert target_ids <= scored.keys()
+    assert all(
+        residual.refusal is None or residual.refusal.reason.value != "method_unknown"
+        for residual in (scored[reference] for reference in target_ids)
+    )
+    if filename == "kume-2000-cao-activities.yaml":
+        own_row = scored[next(iter(target_ids))]
+        assert own_row.status is ResidualStatus.REFUSED
+        assert own_row.refusal is not None
+        assert own_row.refusal.reason.value == "unsupported"
+
+
+def test_rein_chipman_quote_keeps_unknown_method_refusal(tmp_path: Path) -> None:
+    migrated = _migrate_real_extract(tmp_path, "kume-2000-cao-activities.yaml")
+    observation = next(
+        row
+        for row in migrated.observations.values()
+        if row.observation_id.endswith("::kume_2000_table4_sample_301_sio2_activity")
+    )
+    experiment = migrated.experiments[observation.experiment_id]
+    assert not experiment.method.is_value
+
+    context = ScoreContext(
+        works=migrated.works,
+        experiments=migrated.experiments,
+        observations=migrated.observations,
+        benches=migrated.benches,
+    )
+    residuals, _ = score_store(
+        context, rail=Rail.MELT_ACTIVITY, engines=(Engine.INTERNAL_ANALYTICAL,)
+    )
+    residual = next(row for row in residuals if row.reference == observation.observation_id)
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason.value == "method_unknown"
