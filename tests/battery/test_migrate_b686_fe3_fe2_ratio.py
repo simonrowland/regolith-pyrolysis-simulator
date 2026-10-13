@@ -19,6 +19,7 @@ from __future__ import annotations
 import copy
 from decimal import Decimal
 from pathlib import Path
+from typing import Any
 
 import pytest
 import yaml
@@ -70,20 +71,22 @@ def _migrate(path: Path):
     return migrator.result
 
 
-def _aithala_fe_rows():
-    result = _migrate(AITHALA)
-    return {
-        oid[len(PREFIX):]: obs
-        for oid, obs in result.observations.items()
-        if oid[len(PREFIX):] in AITHALA_S1_FE3_OVER_FET
-    }
-
-
 def test_aithala_s1_rows_migrate_to_fe3_fe2_ratio_measured_reduced() -> None:
     # b-686 change. Pin (006e13b70): quantity unknown ("unsupported quantity
     # 'Fe3+/FeT'"), value UNAVAILABLE, evidence measured_direct.
-    rows = _aithala_fe_rows()
+    result = _migrate(AITHALA)
+    rows = {
+        oid[len(PREFIX):]: obs
+        for oid, obs in result.observations.items()
+        if oid.startswith(PREFIX)
+        and oid[len(PREFIX):] in AITHALA_S1_FE3_OVER_FET
+    }
     assert set(rows) == set(AITHALA_S1_FE3_OVER_FET)
+    asset_ids = {
+        asset.asset_id
+        for work in result.works.values()
+        for asset in work.source_files.files
+    }
     for oid, obs in rows.items():
         r = Decimal(AITHALA_S1_FE3_OVER_FET[oid])
         assert obs.identity.quantity.value is Quantity.FE3_FE2_RATIO, oid
@@ -97,6 +100,13 @@ def test_aithala_s1_rows_migrate_to_fe3_fe2_ratio_measured_reduced() -> None:
         assert name == "original_Fe3_over_FeT", oid
         assert printed.state.value == r, oid
         assert printed.locator.table == "S-1", oid
+        assert obs.derived_from == obs.derivation.inputs, oid
+        assert obs.derived_from and set(obs.derived_from).issubset(asset_ids), oid
+        assert not [
+            issue for issue in result.validation.hard_issues
+            if issue.reason.value == "conditional_field"
+            and issue.path.startswith(f"observation[{obs.observation_id}].")
+        ], oid
 
 
 def test_aithala_s3_recalculated_rows_are_not_declared_fe3_fe2_ratio() -> None:
@@ -150,6 +160,26 @@ def _fixture_extract(tmp_path: Path, rows: list[dict]) -> Path:
     return out
 
 
+def _ferric_fraction_row(
+    observation_id: str, method_class: str, *, series: bool
+) -> dict[str, Any]:
+    values: dict[str, Any] = {
+        "method_class": method_class,
+        "quantity": "fe3_fe2_ratio",
+    }
+    if series:
+        values["series"] = [
+            {"temperature_K": 1523.15, "Fe3_over_FeT": 0.5},
+            {"temperature_K": 1573.15, "Fe3_over_FeT": 0.25},
+        ]
+    else:
+        values["Fe3_over_FeT"] = "0.72"
+    row: dict[str, Any] = {"observation_id": observation_id, "values": values}
+    if series:
+        row["T_range_K"] = None
+    return row
+
+
 def test_migrator_reduces_kress_wt_pct_row(tmp_path: Path) -> None:
     path = _fixture_extract(tmp_path, [{
         "observation_id": "fixture_kress",
@@ -184,18 +214,143 @@ def test_migrator_reduces_ferric_fraction_series_points(tmp_path: Path) -> None:
             ],
         },
     }])
+    result = _migrate(path)
     points = {
-        oid: obs for oid, obs in _migrate(path).observations.items()
+        oid: obs for oid, obs in result.observations.items()
         if oid.startswith(PREFIX + "fixture_series::")
     }
+    assert len(points) == 2
     assert sorted(obs.value.point for obs in points.values()) == [
         Decimal("0.25") / Decimal("0.75"), Decimal(1)
     ]
+    asset_ids = {
+        asset.asset_id
+        for work in result.works.values()
+        for asset in work.source_files.files
+    }
     for obs in points.values():
         assert obs.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
         assert obs.derivation.relation == FERRIC_FRACTION_RELATION
         (name, _), = obs.derivation.parameters
         assert name == "original_Fe3_over_FeT"
+        assert obs.derived_from
+        assert obs.derived_from == obs.derivation.inputs
+        assert set(obs.derived_from).issubset(asset_ids)
+        assert not [
+            issue for issue in result.validation.hard_issues
+            if issue.reason.value == "conditional_field"
+            and issue.path.startswith(f"observation[{obs.observation_id}].")
+        ]
+
+
+def test_migrated_ferric_fraction_has_resolvable_lineage_and_derivation(tmp_path: Path) -> None:
+    path = _fixture_extract(tmp_path, [{
+        "observation_id": "fixture_lineage",
+        "values": {
+            "method_class": "measured_direct",
+            "quantity": "fe3_fe2_ratio",
+            "Fe3_over_FeT": "0.72",
+        },
+    }])
+    result = _migrate(path)
+    obs = result.observations[PREFIX + "fixture_lineage"]
+    assert obs.value.point == Decimal("2.571428571428571428571428571")
+    assert obs.derivation is not None
+    assert obs.derivation.relation == FERRIC_FRACTION_RELATION
+    assert obs.derived_from == obs.derivation.inputs
+    assert set(obs.derived_from).issubset({
+        asset.asset_id
+        for work in result.works.values()
+        for asset in work.source_files.files
+    })
+    assert not [
+        issue for issue in result.validation.hard_issues
+        if issue.reason.value == "conditional_field"
+        and issue.path.startswith(f"observation[{obs.observation_id}].")
+    ]
+
+
+@pytest.mark.parametrize("method_class", ["model_derived", "measured_reduced"])
+@pytest.mark.parametrize("series", [False, True], ids=["scalar", "series"])
+def test_already_derived_ferric_fraction_keeps_missing_lineage_diagnostic(
+    tmp_path: Path, method_class: str, series: bool
+) -> None:
+    child_id = f"fixture_{method_class}_{'series' if series else 'scalar'}"
+    path = _fixture_extract(
+        tmp_path,
+        [_ferric_fraction_row(child_id, method_class, series=series)],
+    )
+    result = _migrate(path)
+    child_prefix = PREFIX + child_id
+    observations = [
+        obs for oid, obs in result.observations.items()
+        if oid == child_prefix or oid.startswith(child_prefix + "::")
+    ]
+    assert len(observations) == (2 if series else 1)
+    for obs in observations:
+        assert obs.derived_from is None
+        assert any(
+            issue.reason.value == "conditional_field"
+            and issue.path == f"observation[{obs.observation_id}].derived_from"
+            for issue in result.validation.hard_issues
+        )
+
+
+@pytest.mark.parametrize("method_class", ["model_derived", "measured_reduced"])
+@pytest.mark.parametrize("series", [False, True], ids=["scalar", "series"])
+def test_already_derived_ferric_fraction_preserves_author_inputs(
+    tmp_path: Path, method_class: str, series: bool
+) -> None:
+    parent_id = "fixture_parent"
+    child_id = f"fixture_{method_class}_{'series' if series else 'scalar'}"
+    parent = {
+        "observation_id": parent_id,
+        "values": {
+            "method_class": "measured_direct",
+            "quantity": "fe3_fe2_ratio",
+            "fe3_fe2_ratio": "1",
+        },
+    }
+    child = _ferric_fraction_row(child_id, method_class, series=series)
+    child["derived_from"] = [parent_id]
+    child["derivation"] = {
+        "relation": "author reduction from the parent observation",
+        "inputs": [parent_id],
+        "output_unit": "dimensionless",
+    }
+    path = _fixture_extract(tmp_path, [parent, child])
+    result = _migrate(path)
+    child_prefix = PREFIX + child_id
+    observations = [
+        obs for oid, obs in result.observations.items()
+        if oid == child_prefix or oid.startswith(child_prefix + "::")
+    ]
+    assert len(observations) == (2 if series else 1)
+    expected_parent = (PREFIX + parent_id,)
+    for obs in observations:
+        assert obs.derived_from == expected_parent
+        assert obs.derivation is not None
+        assert obs.derivation.inputs == expected_parent
+        assert not [
+            issue for issue in result.validation.hard_issues
+            if issue.reason.value == "conditional_field"
+            and issue.path == f"observation[{obs.observation_id}].derived_from"
+        ]
+
+
+def test_migrator_refuses_ferric_fraction_one_without_infinity(tmp_path: Path) -> None:
+    path = _fixture_extract(tmp_path, [{
+        "observation_id": "fixture_no_fe2",
+        "values": {
+            "method_class": "measured_direct",
+            "quantity": "fe3_fe2_ratio",
+            "Fe3_over_FeT": "1",
+        },
+    }])
+    obs = _migrate(path).observations[PREFIX + "fixture_no_fe2"]
+    assert obs.value.kind is ValueKind.UNAVAILABLE
+    assert "undefined" in obs.value.unavailable_reason
+    assert obs.value.point is None
 
 
 def test_declared_ratio_from_ferric_fraction_is_r_over_one_minus_r() -> None:
