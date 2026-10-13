@@ -3893,6 +3893,7 @@ def test_bennour_1996_table_i_measurements_keep_printed_ln_data_and_conditions(t
 def test_richet_bottinga_1986_review_fixes_migrate_and_pin_table4() -> None:
     """Keep the reviewed provenance, pressure, widths, and context in migration."""
     from unittest.mock import patch
+    from simulator.battery.enums import Phase, Quantity
 
     source_path = EXTRACTS / "richet-bottinga-1986-silicate-thermochemistry.yaml"
     source = battery_migrate.load_yaml(source_path)
@@ -3991,6 +3992,16 @@ def test_richet_bottinga_1986_review_fixes_migrate_and_pin_table4() -> None:
         "rb86_1986_mgsio3_heat_of_fusion_table4": (Decimal("6.0"), "kJ/mol"),
         "rb86_1986_mgsio3_entropy_of_fusion_table4": (Decimal("3.3"), "J/mol K"),
     }
+    expected_fusion_values = {
+        "rb86_1986_na2si2o5_heat_of_fusion_table4": Decimal("37.7"),
+        "rb86_1986_na2si2o5_entropy_of_fusion_table4": Decimal("32.9"),
+        "rb86_1986_k2si2o5_heat_of_fusion_table4": Decimal("32.0"),
+        "rb86_1986_k2si2o5_entropy_of_fusion_table4": Decimal("24.3"),
+        "rb86_1986_k2sio3_heat_of_fusion_table4": Decimal("19.6"),
+        "rb86_1986_k2sio3_entropy_of_fusion_table4": Decimal("15.7"),
+        "rb86_1986_mgsio3_heat_of_fusion_table4": Decimal("73.2"),
+        "rb86_1986_mgsio3_entropy_of_fusion_table4": Decimal("39.9"),
+    }
 
     def assert_widths(migrated):
         rows = {
@@ -4032,7 +4043,19 @@ def test_richet_bottinga_1986_review_fixes_migrate_and_pin_table4() -> None:
         "rb86_1986_mgsio3_entropy_of_fusion_table4": ("model_derived", "entropy"),
     }.items():
         observation = observations[obs_id]
-        assert observation.value.kind.value == "unavailable"
+        assert observation.value.kind.value == "point"
+        assert observation.value.point == expected_fusion_values[obs_id]
+        expected_quantity = (
+            Quantity.ENTHALPY_OF_FUSION
+            if input_quantity == "heat"
+            else Quantity.ENTROPY_OF_FUSION
+        )
+        assert observation.identity.quantity.value is expected_quantity
+        assert observation.identity.species.phase.value is Phase.CR
+        assert observation.identity.subtype.is_value
+        assert observation.identity.subtype.value == "solid_to_liquid"
+        if source_observations[obs_id].get("condensed_form") is None:
+            assert observation.identity.species.polymorph.is_unknown
         assert observation.evidence.class_.value.value == expected_class
         if input_quantity == "heat":
             stated_model = source_observations[obs_id]["values"]["model"]
