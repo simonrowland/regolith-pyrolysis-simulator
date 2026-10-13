@@ -320,6 +320,8 @@ def _plante_score_context() -> ScoreContext:
              REPO_ROOT / "data/literature/extracts" / extract_file),
             (Path("data/literature/works") / coefficient_work_file,
              REPO_ROOT / "data/literature/works" / coefficient_work_file),
+            (Path("data/battery/decision-band-ratchet.yaml"),
+             REPO_ROOT / "data/battery/decision-band-ratchet.yaml"),
             (Path("data/literature/extracts-v2") / coefficient_extract_file,
              REPO_ROOT / "data/literature/extracts-v2" / coefficient_extract_file),
             (Path("data/literature/extracts") / coefficient_extract_file,
@@ -1241,8 +1243,13 @@ summary = next(
     row for row in headline_rows(residuals, context=context, engines=engines)
     if row["rail"] == "vapour" and row["engine"] == Engine.OPENIMCC.value
 )
-# b-728: two Plante rows flagged source_internally_inconsistent (printed misprints) leave the headline
-assert summary["n_score_eligible"] == 160
+# d-128 also flags all 162 rows: Plante states no confidence level for this band.
+assert summary["n_score_eligible"] == 0
+assert all(
+    any(notice.reason == "confidence_level_not_stated" for notice in residual.notices)
+    for residual, candidate in engine_rows
+    if candidate.observation_id.startswith("engine:openimcc:")
+)
 assert summary["n_inside_band"] == 56
 assert abs(float(summary["median_dex"]) - (-0.193144973432544415)) < 0.00000001
 assert abs(float(summary["rms_dex"]) - 0.2097386994979764836) < 0.00000001
@@ -1265,8 +1272,8 @@ print(json.dumps({"headline": summary, "lineage": "independent"}))
     )
     assert completed.returncode == 0, completed.stderr
     result = json.loads(completed.stdout.strip().splitlines()[-1])
-    # b-728: two Plante rows flagged source_internally_inconsistent (printed misprints) leave the headline
-    assert result["headline"]["n_score_eligible"] == 160
+    # d-128's confidence notice keeps the Plante rows diagnostic-only.
+    assert result["headline"]["n_score_eligible"] == 0
     assert result["headline"]["n_inside_band"] == 56
     assert float(result["headline"]["median_dex"]) == pytest.approx(
         -0.193144973432544415, abs=1e-8
@@ -1559,8 +1566,17 @@ def test_plante_solved_effusion_uses_the_prediction_engine_notice() -> None:
         if row["rail"] == "vapour"
     }
     openimcc = summary[Engine.OPENIMCC.value]
-    # b-728: two Plante rows flagged source_internally_inconsistent (printed misprints) leave the headline
-    assert openimcc["n_score_eligible"] == 160
+    # d-128 flags each printed band whose source does not state a confidence level.
+    openimcc_rows = [
+        residual for residual, candidate in rows
+        if candidate.engine is not None and candidate.engine.name is Engine.OPENIMCC
+    ]
+    assert openimcc["n_score_eligible"] == 0
+    assert len(openimcc_rows) == 162
+    assert all(
+        any(notice.reason == "confidence_level_not_stated" for notice in residual.notices)
+        for residual in openimcc_rows
+    )
     assert openimcc["n_inside_band"] == 56
     assert float(openimcc["band_width_dex"]) == pytest.approx(
         0.14612803567823803, abs=1e-12
