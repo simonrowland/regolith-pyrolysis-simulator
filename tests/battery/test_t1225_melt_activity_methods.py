@@ -4,7 +4,14 @@ from pathlib import Path
 
 import pytest
 
-from simulator.battery.enums import Engine, FO2Channel, MethodToken, Rail, ResidualStatus
+from simulator.battery.enums import (
+    Engine,
+    FO2Channel,
+    MethodToken,
+    Rail,
+    RefusalReason,
+    ResidualStatus,
+)
 from simulator.battery.records import SweepGas
 from simulator.battery.score import ScoreContext, score_store
 from simulator.battery.waypoints import GapReason, oxygen_condition
@@ -91,7 +98,12 @@ def test_printed_quench_equilibration_reaches_melt_activity_rows(
         own_row = scored[next(iter(target_ids))]
         assert own_row.status is ResidualStatus.REFUSED
         assert own_row.refusal is not None
-        assert own_row.refusal.reason.value == "unsupported"
+        # ia-act/t-1231 now requires numeric oxygen for internal-analytical.
+        assert own_row.refusal.reason is RefusalReason.ATTEMPTED_UNAVAILABLE
+        assert (
+            own_row.refusal.detail["engine_reason"]
+            == "internal_analytical_missing_oxygen_condition"
+        )
 
 
 def test_rein_chipman_quote_keeps_unknown_method_refusal(tmp_path: Path) -> None:
