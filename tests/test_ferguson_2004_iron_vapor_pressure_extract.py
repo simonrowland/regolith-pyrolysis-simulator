@@ -40,6 +40,14 @@ def test_ferguson_2004_pressure_points_and_fidelity_survive_migration(
     ] += 1
     assert check_all_fidelity_samples_match(mutated, label=str(EXTRACT))
 
+    mutated_context = deepcopy(document)
+    next(
+        item
+        for item in mutated_context["species"]["Fe"]["context"]
+        if item["observation_id"] == "ferguson_2004_third_law_enthalpy_vaporization"
+    )["values"]["value_kJ_mol"] += 1
+    assert check_all_fidelity_samples_match(mutated_context, label=str(EXTRACT))
+
     result = _migrate_real_extract(tmp_path, EXTRACT_NAME)
     table_rows = [
         observation

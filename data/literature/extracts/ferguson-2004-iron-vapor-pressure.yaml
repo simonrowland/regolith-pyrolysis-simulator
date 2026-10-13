@@ -6,7 +6,6 @@ source:
   url: "https://web.archive.org/web/20250617140641id_/http://electronicsandbooks.com/edt/manual/Magazine/J/Journal%20of%20Chemical%20&%20Engineering%20Data/48-50/je034152w.pdf"
   year: 2004
   corpus_asset: raw/ferguson-2004-iron-vapor-pressure/ferguson-2004-iron-vapor-pressure.pdf
-  corpus_sha256: d03caf212ba5c8c3bbe602d006ac882e8797c49c7a29739ebe1033d6687910a5
 extraction:
   method: "Manual transcription from the rendered page image for Table 1, checked independently by rows and columns; prose and equation checked against the page render."
   date: '2026-10-13'
@@ -76,6 +75,11 @@ fidelity_samples:
     locator: {equation: '6', page: 3, pdf_page_index: 2, published_page: 499}
   - species: Fe
     observation_id: ferguson_2004_fit_enthalpy_vaporization
+    field: quotation_as_printed
+    value: "On the basis of our fit to the data, we estimate the enthalpy of vaporization to be ΔH = 403 ± 8 kJ/mol over the experimental temperature range."
+    locator: {page: 4, pdf_page_index: 3, published_page: 500, section: Results}
+  - species: Fe
+    observation_id: ferguson_2004_fit_enthalpy_vaporization
     field: value_kJ_mol
     value: 403
     locator: {page: 4, pdf_page_index: 3, published_page: 500, section: Results}
@@ -85,9 +89,9 @@ fidelity_samples:
     value: 8
     locator: {page: 4, pdf_page_index: 3, published_page: 500, section: Results}
   - species: Fe
-    observation_id: ferguson_2004_fit_enthalpy_vaporization
-    field: temperature_range_K
-    value: [1573, 1973]
+    observation_id: ferguson_2004_third_law_enthalpy_vaporization
+    field: quotation_as_printed
+    value: "By assumption of negligible error in the thermodynamic data, the error levels for the individual data points shown in Figure 3 and Table 1 correspond to an approximately ±3 kJ/mol deviation in individual enthalpy calculations. [...] An inverse square of these individual error levels was used to calculate a mean enthalpy of vaporization at 298.15 K of ΔH = 431.2 ± 0.4 kJ/mol, where the error level is based on the standard deviation of this mean value."
     locator: {page: 4, pdf_page_index: 3, published_page: 500, section: Results}
   - species: Fe
     observation_id: ferguson_2004_third_law_enthalpy_vaporization
@@ -101,13 +105,18 @@ fidelity_samples:
     locator: {page: 4, pdf_page_index: 3, published_page: 500, section: Results}
   - species: Fe
     observation_id: ferguson_2004_third_law_enthalpy_vaporization
+    field: individual_enthalpy_deviation_kJ_mol_as_printed
+    value: "approximately ±3 kJ/mol"
+    locator: {page: 4, pdf_page_index: 3, published_page: 500, section: Results}
+  - species: Fe
+    observation_id: ferguson_2004_third_law_enthalpy_vaporization
     field: reference_temperature_K
     value: 298.15
     locator: {page: 4, pdf_page_index: 3, published_page: 500, section: Results}
   - species: Fe
-    observation_id: ferguson_2004_third_law_enthalpy_vaporization
-    field: individual_enthalpy_deviation_kJ_mol_as_printed
-    value: 3
+    observation_id: ferguson_2004_desai_quoted_enthalpy_vaporization
+    field: quotation_as_printed
+    value: "For comparison, Desai estimated this value to be 415 ±1 kJ/mol.⁶"
     locator: {page: 4, pdf_page_index: 3, published_page: 500, section: Results}
   - species: Fe
     observation_id: ferguson_2004_desai_quoted_enthalpy_vaporization
@@ -124,6 +133,11 @@ fidelity_samples:
     field: reference_temperature_K
     value: 298.15
     locator: {page: 4, pdf_page_index: 3, published_page: 500, section: Results}
+  - species: Fe
+    observation_id: ferguson_2004_figure4_curve_comparison
+    field: figure_caption_as_printed
+    value: "Figure 4. Comparison between the current experimental iron vapor-pressure data and available published data. Shown in the figure are experimental data from: ○, the current experimental work; ▼, Darken and Gurry,⁹ 1946; ◇, Mikulinskii and Umova,¹⁰ 1948; triangle pointing right, Wessel,¹¹ 1951; triangle pointing left, Vintaikin,¹² 1957; ×, Turkdogan and Leake,¹³ 1960; □, Smith and Shuttleworth,¹⁴ 1965; △, Karasev et al.,¹⁵ 1971; ▽, Yavoiskii et al.,¹⁶ 1971; and +, Lindscheid and Lange,¹⁷ 1975. Fits to experimentally measured data are shown for Zellars et al.,¹⁸ 1959 (bold dotted line); Chegodaev et al.,¹⁹ 1978 (solid line); Bodrov et al.,²⁰ 1982 (dotted line); and Zaitsev et al.,²¹ 1990 (bold solid line). The compilation of iron data by Desai,⁶ 1986 (dashed line) is also shown in the figure."
+    locator: {figure: '4', page: 4, pdf_page_index: 3, published_page: 500}
 species:
   Fe:
     observations:
@@ -188,62 +202,6 @@ species:
             - {row: 43, T_C: 1424.85, T_K_as_printed: 1698, temperature_uncertainty_K_as_printed: 3, P_Pa: 0.19, P_as_printed: '0.19 ± 0.03', P_uncertainty_Pa_as_printed: 0.03, effusion_orifice_diameter_mm: 3, duration_s: 2100, locator: {table: '1', row: 43, page: 3, pdf_page_index: 2, published_page: 499}, point_conditions: {starting_composition: {state: {tag: value, value: {kind: categorical, categorical: '99.97% purity iron'}}, locator: {page: 2, pdf_page_index: 1, published_page: 498, section: Experimental Procedure}}, chamber_pressure_Pa: {state: {tag: value, value: {kind: bound, bound_operator: '<', bound_value: '0.01'}}, locator: {page: 2, pdf_page_index: 1, published_page: 498, section: Experimental Procedure}}, atmosphere: {state: {tag: value, value: under vacuum}, locator: {page: 2, pdf_page_index: 1, published_page: 498, section: Experimental Equipment}}, container: {state: {tag: value, value: {kind: categorical, categorical: 'two nested closed-end 99.8% alumina tubes; inner tube orifice'}}, locator: {page: 1, pdf_page_index: 0, published_page: 497, section: Experimental Equipment}}, heating_method: {state: {tag: value, value: {kind: categorical, categorical: 'furnace heating with isothermal holds; CAHN TG 2171 balance'}}, locator: {page: 2, pdf_page_index: 1, published_page: 498, section: Experimental Procedure}}, orifice_diameter_mm: {state: {tag: value, value: 3}, locator: {table: '1', row: 43, page: 3, pdf_page_index: 2, published_page: 499}}, duration_s: {state: {tag: value, value: 2100}, locator: {table: '1', row: 43, page: 3, pdf_page_index: 2, published_page: 499}}}}
             - {row: 44, T_C: 1349.85, T_K_as_printed: 1623, temperature_uncertainty_K_as_printed: 3, P_Pa: 0.05, P_as_printed: '0.05 ± 0.01', P_uncertainty_Pa_as_printed: 0.01, effusion_orifice_diameter_mm: 3, duration_s: 4500, locator: {table: '1', row: 44, page: 3, pdf_page_index: 2, published_page: 499}, point_conditions: {starting_composition: {state: {tag: value, value: {kind: categorical, categorical: '99.97% purity iron'}}, locator: {page: 2, pdf_page_index: 1, published_page: 498, section: Experimental Procedure}}, chamber_pressure_Pa: {state: {tag: value, value: {kind: bound, bound_operator: '<', bound_value: '0.01'}}, locator: {page: 2, pdf_page_index: 1, published_page: 498, section: Experimental Procedure}}, atmosphere: {state: {tag: value, value: under vacuum}, locator: {page: 2, pdf_page_index: 1, published_page: 498, section: Experimental Equipment}}, container: {state: {tag: value, value: {kind: categorical, categorical: 'two nested closed-end 99.8% alumina tubes; inner tube orifice'}}, locator: {page: 1, pdf_page_index: 0, published_page: 497, section: Experimental Equipment}}, heating_method: {state: {tag: value, value: {kind: categorical, categorical: 'furnace heating with isothermal holds; CAHN TG 2171 balance'}}, locator: {page: 2, pdf_page_index: 1, published_page: 498, section: Experimental Procedure}}, orifice_diameter_mm: {state: {tag: value, value: 3}, locator: {table: '1', row: 44, page: 3, pdf_page_index: 2, published_page: 499}}, duration_s: {state: {tag: value, value: 4500}, locator: {table: '1', row: 44, page: 3, pdf_page_index: 2, published_page: 499}}}}
             - {row: 45, T_C: 1299.85, T_K_as_printed: 1573, temperature_uncertainty_K_as_printed: 3, P_Pa: 0.02, P_as_printed: '0.02 ± 0.01', P_uncertainty_Pa_as_printed: 0.01, effusion_orifice_diameter_mm: 3, duration_s: 4500, locator: {table: '1', row: 45, page: 3, pdf_page_index: 2, published_page: 499}, point_conditions: {starting_composition: {state: {tag: value, value: {kind: categorical, categorical: '99.97% purity iron'}}, locator: {page: 2, pdf_page_index: 1, published_page: 498, section: Experimental Procedure}}, chamber_pressure_Pa: {state: {tag: value, value: {kind: bound, bound_operator: '<', bound_value: '0.01'}}, locator: {page: 2, pdf_page_index: 1, published_page: 498, section: Experimental Procedure}}, atmosphere: {state: {tag: value, value: under vacuum}, locator: {page: 2, pdf_page_index: 1, published_page: 498, section: Experimental Equipment}}, container: {state: {tag: value, value: {kind: categorical, categorical: 'two nested closed-end 99.8% alumina tubes; inner tube orifice'}}, locator: {page: 1, pdf_page_index: 0, published_page: 497, section: Experimental Equipment}}, heating_method: {state: {tag: value, value: {kind: categorical, categorical: 'furnace heating with isothermal holds; CAHN TG 2171 balance'}}, locator: {page: 2, pdf_page_index: 1, published_page: 498, section: Experimental Procedure}}, orifice_diameter_mm: {state: {tag: value, value: 3}, locator: {table: '1', row: 45, page: 3, pdf_page_index: 2, published_page: 499}}, duration_s: {state: {tag: value, value: 4500}, locator: {table: '1', row: 45, page: 3, pdf_page_index: 2, published_page: 499}}}}
-      - observation_id: ferguson_2004_fit_enthalpy_vaporization
-        type: gibbs_table
-        derived_from: [ferguson_2004_table1_iron_vapor_pressure]
-        derivation:
-          relation: vaporization enthalpy estimated from measured vapor-pressure series
-          inputs: [ferguson_2004_table1_iron_vapor_pressure]
-          output_unit: kJ/mol
-        locator: {page: 4, pdf_page_index: 3, published_page: 500, section: Results}
-        T_range_K: [1573, 1973]
-        units: kJ/mol
-        values:
-          quantity: second_law_enthalpy_of_vaporization
-          method_class: model_derived
-          model: weighted least-squares fit to this work's pressure series
-          value_kJ_mol: 403
-          uncertainty_kJ_mol_as_printed: 8
-          temperature_range_K: [1573, 1973]
-          derivation_as_printed: "Estimated on the basis of the weighted least-squares fit to the vapor-pressure data."
-        uncertainty:
-          note: "The paper prints ±8 kJ/mol but does not state a confidence level."
-      - observation_id: ferguson_2004_third_law_enthalpy_vaporization
-        type: gibbs_table
-        derived_from: [ferguson_2004_table1_iron_vapor_pressure]
-        derivation:
-          relation: Third Law vaporization enthalpy from experimental vapor-pressure data
-          inputs: [ferguson_2004_table1_iron_vapor_pressure]
-          output_unit: kJ/mol
-        locator: {page: 4, pdf_page_index: 3, published_page: 500, section: Results}
-        units: kJ/mol
-        values:
-          quantity: enthalpy_of_vaporization_3rd_law
-          method_class: model_derived
-          model: Third Law calculation using this work's pressure series and Desai thermodynamic data
-          value_kJ_mol: 431.2
-          uncertainty_kJ_mol_as_printed: 0.4
-          reference_temperature_K: 298.15
-          individual_enthalpy_deviation_kJ_mol_as_printed: 3
-          uncertainty_basis_as_printed: standard deviation of the mean
-          derivation_as_printed: "Third Law calculation using the experimental vapor-pressure data and thermodynamic data from Desai; inverse-square weighting of individual enthalpy values."
-        uncertainty:
-          note: "The ±0.4 kJ/mol error level is based on the standard deviation of the mean; the paper does not state a confidence level such as 1 sigma or 95%."
-      - observation_id: ferguson_2004_desai_quoted_enthalpy_vaporization
-        type: gibbs_table
-        locator: {page: 4, pdf_page_index: 3, published_page: 500, section: Results}
-        units: kJ/mol
-        values:
-          quantity: enthalpy_of_vaporization_3rd_law
-          method_class: quoted_attributed
-          value_kJ_mol: 415
-          uncertainty_kJ_mol_as_printed: 1
-          reference_temperature_K: 298.15
-          attribution: "Desai, P. D. Thermodynamic Properties of Iron and Silicon. J. Phys. Chem. Ref. Data 1986, 15 967-983."
-          attribution_as_printed: "Desai estimated this value to be 415 ± 1 kJ/mol."
-          method: unknown
-        uncertainty:
-          note: "Quoted from Desai as Ferguson prints it; method is unknown because Desai's procedure was not checked. Confidence level is unstated."
     context:
       - observation_id: ferguson_2004_equation6_vapor_pressure_fit
         type: relation
@@ -260,5 +218,42 @@ species:
             inverse_temperature_coefficient_uncertainty_K: 500
             validity_range_K: [1573, 1973]
           method_as_printed: "Weighted, least-squares fit to the range of data."
-
-
+      - observation_id: ferguson_2004_fit_enthalpy_vaporization
+        type: relation
+        locator: {page: 4, pdf_page_index: 3, published_page: 500, section: Results}
+        units: kJ/mol
+        values:
+          method_class: model_derived
+          quotation_as_printed: "On the basis of our fit to the data, we estimate the enthalpy of vaporization to be ΔH = 403 ± 8 kJ/mol over the experimental temperature range."
+          value_kJ_mol: 403
+          uncertainty_kJ_mol_as_printed: 8
+      - observation_id: ferguson_2004_third_law_enthalpy_vaporization
+        type: relation
+        locator: {page: 4, pdf_page_index: 3, published_page: 500, section: Results}
+        units: kJ/mol
+        values:
+          method_class: model_derived
+          quotation_as_printed: "By assumption of negligible error in the thermodynamic data, the error levels for the individual data points shown in Figure 3 and Table 1 correspond to an approximately ±3 kJ/mol deviation in individual enthalpy calculations. [...] An inverse square of these individual error levels was used to calculate a mean enthalpy of vaporization at 298.15 K of ΔH = 431.2 ± 0.4 kJ/mol, where the error level is based on the standard deviation of this mean value."
+          value_kJ_mol: 431.2
+          uncertainty_kJ_mol_as_printed: 0.4
+          individual_enthalpy_deviation_kJ_mol_as_printed: "approximately ±3 kJ/mol"
+          reference_temperature_K: 298.15
+      - observation_id: ferguson_2004_desai_quoted_enthalpy_vaporization
+        type: relation
+        locator: {page: 4, pdf_page_index: 3, published_page: 500, section: Results}
+        units: kJ/mol
+        values:
+          method_class: quoted_attributed
+          quotation_as_printed: "For comparison, Desai estimated this value to be 415 ±1 kJ/mol.⁶"
+          value_kJ_mol: 415
+          uncertainty_kJ_mol_as_printed: 1
+          reference_temperature_K: 298.15
+          attribution: "Desai, P. D. Thermodynamic Properties of Iron and Silicon. J. Phys. Chem. Ref. Data 1986, 15 967-983."
+          method: unknown
+      - observation_id: ferguson_2004_figure4_curve_comparison
+        type: figure_only
+        locator: {figure: '4', page: 4, pdf_page_index: 3, published_page: 500}
+        units: as plotted
+        values:
+          method_class: figure_only
+          figure_caption_as_printed: "Figure 4. Comparison between the current experimental iron vapor-pressure data and available published data. Shown in the figure are experimental data from: ○, the current experimental work; ▼, Darken and Gurry,⁹ 1946; ◇, Mikulinskii and Umova,¹⁰ 1948; triangle pointing right, Wessel,¹¹ 1951; triangle pointing left, Vintaikin,¹² 1957; ×, Turkdogan and Leake,¹³ 1960; □, Smith and Shuttleworth,¹⁴ 1965; △, Karasev et al.,¹⁵ 1971; ▽, Yavoiskii et al.,¹⁶ 1971; and +, Lindscheid and Lange,¹⁷ 1975. Fits to experimentally measured data are shown for Zellars et al.,¹⁸ 1959 (bold dotted line); Chegodaev et al.,¹⁹ 1978 (solid line); Bodrov et al.,²⁰ 1982 (dotted line); and Zaitsev et al.,²¹ 1990 (bold solid line). The compilation of iron data by Desai,⁶ 1986 (dashed line) is also shown in the figure."
