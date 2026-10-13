@@ -1007,6 +1007,7 @@ def test_computed_carrier_authority_paths_close_actual_ledger(
     feedstocks_data,
     setpoints_data,
     status,
+    monkeypatch,
 ):
     sim = _build_sim(
         "lunar_mare_low_ti",
@@ -1015,6 +1016,10 @@ def test_computed_carrier_authority_paths_close_actual_ledger(
         setpoints_data,
     )
     rate_kg_hr = 1.0e-6
+    # Exercise both capture and escape authority independently of a physical
+    # route that can now capture this entire tiny parcel on its first wall.
+    monkeypatch.setattr(sim.condensation_model, "_wall_deposit_candidates_by_segment_kg", lambda **kwargs: {})
+    monkeypatch.setattr(sim.condensation_model, "_condensation_efficiency", lambda **kwargs: 0.5)
     carrier_authority = {}
     if status != "missing":
         authoritative = status == "authoritative"

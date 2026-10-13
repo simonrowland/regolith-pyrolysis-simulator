@@ -827,6 +827,7 @@ def test_wall_deposit_sticking_alpha_notice_tracks_cold_wall_gate():
         overhead_pressure_mbar=10.0,
         species_partial_pressures_mbar={"SiO": 1.0},
         campaign_name="C0",
+        stage_area_m2_by_stage={str(stage.stage_number): 1.0 for stage in model.train.stages},
     )
     melt = MeltState()
     melt.temperature_C = 1700.0
@@ -1020,6 +1021,7 @@ def test_low_pressure_free_molecular_regime_routes_continuously():
         species_partial_pressures_mbar={"SiO": 1.0},
         pipe_diameter_m=0.12,
         gas_temperature_C=1100.0,
+        stage_area_m2_by_stage={str(stage.stage_number): 1.0 for stage in train.stages},
     )
     ballistic = CondensationModel(train, wall_temperature_C=1100.0)
     ballistic.configure_operating_conditions(
@@ -1027,6 +1029,7 @@ def test_low_pressure_free_molecular_regime_routes_continuously():
         species_partial_pressures_mbar={"SiO": 1.0e-7},
         pipe_diameter_m=0.12,
         gas_temperature_C=1100.0,
+        stage_area_m2_by_stage={str(stage.stage_number): 1.0 for stage in train.stages},
     )
 
     viscous_route = viscous.route(flux, melt)

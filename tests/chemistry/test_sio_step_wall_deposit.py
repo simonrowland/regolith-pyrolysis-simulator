@@ -574,8 +574,10 @@ def test_wall_route_uses_segment_local_partial_pressure_after_capture() -> None:
         gas_temperature_C=1500.0,
         campaign_name="C2A",
         carrier_gas="N2",
+        # Keep this wall-depletion test independent of cold-stage Na fits.
         stage_area_m2_by_stage={
-            str(stage.stage_number): 1.0 for stage in model.train.stages
+            str(stage.stage_number): 1.0 if stage.stage_number in (1, 2, 3, 4) else 0.0
+            for stage in model.train.stages
         },
     )
     model.route(
@@ -592,7 +594,11 @@ def test_wall_route_uses_segment_local_partial_pressure_after_capture() -> None:
     ]
     assert sodium_by_segment
     assert max(sodium_by_segment) <= 1000.0
-    assert min(sodium_by_segment) < 100.0
+    # Na remains unsaturated here; removing Fe raises its Dalton fraction.
+    assert sodium_by_segment[0] == pytest.approx(100.0)
+    assert max(sodium_by_segment) > 100.0
+    iron_by_segment = [partials["Fe"] for partials in model.wall_species_partial_pressures_pa_by_segment.values()]
+    assert min(iron_by_segment) < 100.0
     for segment_name, species_records in (
         model.last_wall_deposition_rate_shadow_candidate.items()
     ):
@@ -661,7 +667,9 @@ def test_wall_route_depletes_partial_pressure_after_upstream_wall_capture(
     remaining_ratio = 1.0 - first_wall_deposit_kg / rate_kg_hr
     inlet_mole_fraction = partial_pressure_mbar / 10.0
     carrier_mole_fraction = 1.0 - inlet_mole_fraction
-    expected_second_partial_pa = (
+    # With complete wall capture and no carrier, no gas remains: p_Cr=0.
+    # Otherwise Dalton's fraction is n_Cr/(n_Cr+n_carrier), dimensionless.
+    expected_second_partial_pa = 0.0 if remaining_ratio == 0.0 else (
         1000.0
         * (inlet_mole_fraction * remaining_ratio)
         / (

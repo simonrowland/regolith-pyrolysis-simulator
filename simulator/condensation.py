@@ -3441,11 +3441,6 @@ class CondensationModel:
         self.last_capture_budget_regularizer_notice = copy.deepcopy(
             capture_notice
         )
-        if capture_notice and self.operating_history:
-            self.operating_history[-1][
-                'capture_budget_regularizer_notice'
-            ] = copy.deepcopy(capture_notice)
-
         # VR-11 / B3: fold stage-local efficiency pass-through outcomes into
         # condensation_refusals_by_species so B2 consumers can see them.
         for species, outcomes in efficiency_outcomes_by_species.items():

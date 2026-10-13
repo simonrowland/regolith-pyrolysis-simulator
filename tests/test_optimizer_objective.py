@@ -1544,7 +1544,7 @@ def test_pareto_front_keeps_nullable_objective_identity() -> None:
 
 class _FakeLedger:
     def kg_by_account(self, account: str) -> dict[str, float]:
-        if account == "terminal.offgas":
+        if account == "process.condensation_train":
             return {"H2O": 5.0}
         if account == "process.metal_phase":
             return {"Fe": 50.0}

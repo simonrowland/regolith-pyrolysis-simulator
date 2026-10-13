@@ -363,7 +363,8 @@ def test_load_batch_preserves_non_melt_feedstock_inventory():
     assert ledger["Fe"] == pytest.approx(55.045872)
     assert ledger["Ni"] == pytest.approx(9.174312)
     assert ledger["metallic_FeNi"] == pytest.approx(137.614679)
-    assert ledger["H2O"] == pytest.approx(45.871560)
+    assert "H2O" not in ledger
+    assert sim.atom_ledger.kg_by_account("terminal.offgas")["H2O"] == pytest.approx(45.871560)
     assert "ZrO2" not in ledger
 
     sim.melt.campaign = CampaignPhase.COMPLETE
