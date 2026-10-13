@@ -3756,6 +3756,141 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
     assert errs == [], "\n".join(errs)
 
 
+def test_bennour_1996_table_i_measurements_keep_printed_ln_data_and_conditions(tmp_path):
+    """Table I's measured ln ratios, slopes, formula and row maps stay source-bound."""
+    path = EXTRACTS / "bennour-1996-ternary-cs-na-silicate.yaml"
+    doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+    cs = doc["species"]["Cs2O"]
+    observations = {row["observation_id"]: row for row in cs["observations"]}
+    expected = {
+        "bennour_1996_table_i_x_sio2_0p5_log_ion_ratio": [
+            ("0.1", "-0.21", "5555"), ("0.3", "0.67", "6346"),
+            ("0.5", "1.58", "4484"), ("0.7", "2.33", "3274"), ("0.9", "3.64", "4399"),
+        ],
+        "bennour_1996_table_i_x_sio2_0p667_log_ion_ratio": [
+            ("0.1", "-0.79", "753"), ("0.3", "0.51", "1711"),
+            ("0.5", "1.28", "2155"), ("0.7", "2.21", "2871"), ("0.9", "3.11", "4041"),
+        ],
+        "bennour_1996_table_i_x_sio2_0p75_log_ion_ratio": [
+            ("0.1", "-1.27", "581"), ("0.2", "-0.69", "318"),
+            ("0.3", "-0.01", "682"), ("0.4", "0.49", "452"),
+            ("0.5", "0.83", "647"), ("0.6", "1.23", "1893"),
+            ("0.7", "1.86", "1317"), ("0.8", "2.31", "1954"), ("0.9", "2.90", "2218"),
+        ],
+        "bennour_1996_table_i_x_sio2_0p85_log_ion_ratio": [
+            ("0.3", "-1.21", "534"), ("0.5", "0.05", "2310"),
+            ("0.7", "1.24", "2930"), ("0.9", "2.13", "3533"),
+        ],
+    }
+    assert sum(len(points) for points in expected.values()) == 23
+    assert "sha256" not in doc["source"]
+    for observation_id, cells in expected.items():
+        row = observations[observation_id]
+        assert row["type"] == "rate_series"
+        assert row["values"]["quantity"] == "ion_current_ratio"
+        assert row["values"]["ratio_as_published"] == "ln(I_133Cs / I_23Na)"
+        assert [
+            (point["x_Cs2O_as_published"],
+             point["ln_ionic_intensity_ratio_as_published"],
+             point["slope_dln_ratio_d1_over_T_as_published"])
+            for point in row["values"]["points"]
+        ] == cells
+        assert row["locator"]["page"] == 13
+        assert row["locator"]["published_page"] == 240
+        assert row["locator"]["pdf_page_index"] == 12
+        for point in row["values"]["points"]:
+            assert point["T_C"] == "1299.85"
+            condition = point["point_conditions"]["composition"]
+            assert condition["state"]["tag"] == "value"
+            assert condition["state"]["value"]["amount_basis"] == "mole_fraction"
+            assert sum(
+                Decimal(amount)
+                for _oxide, amount in condition["state"]["value"]["components"]
+            ) == Decimal("1")
+            assert condition["locator"]["pdf_page_index"] == 12
+
+    context = {row["observation_id"]: row for row in cs["context"]}
+    fits = [key for key in context if "table_ii" in key]
+    assert len(fits) == 4
+    assert all(context[key]["type"] == "thermodynamic_example" for key in fits)
+    assert all(context[key]["locator"]["pdf_page_index"] == 12 for key in fits)
+    assert all(
+        context[key]["values"]["equation_as_published"]
+        == "ln(I^2_Cs X_Na2O / I^2_Na X_Cs2O) = A + B x_Cs2O"
+        for key in fits
+    )
+
+    figures = [row for rows in (cs["observations"], doc["species"]["Na2O"]["observations"])
+               for row in rows if row["observation_id"].startswith("bennour_1996_fig7_")]
+    assert len(figures) == 4
+    assert all(row["locator"]["pdf_page_index"] == 13 for row in figures)
+    assert {
+        row["values"]["section_as_published"] for row in figures
+    } == {"X = 0.85 (short-dashed curve)", "X = 0.5 (long-dashed curve)"}
+
+    assert context["bennour_1996_experimental_apparatus"]["locator"]["pdf_page_index"] == 2
+    assert context["bennour_1996_experimental_method"]["locator"]["pdf_page_index"] == 3
+    assert context["bennour_1996_experimental_temperature_limit"]["locator"]["pdf_page_index"] == 5
+
+    migrator = battery_migrate.Migrator(REPO_ROOT, index={}, aliases={})
+    migrator._migrate_extract(path)
+    migrator.finalize()
+    migrated = [
+        row for row in migrator.result.observations.values()
+        if "bennour_1996_table_i_" in row.observation_id
+    ]
+    assert len(migrated) == 23
+    assert all(
+        row.evidence.class_.value is battery_migrate.EvidenceClass.MEASURED_DIRECT
+        for row in migrated
+    )
+    assert not any(
+        issue.reason.value == "conditional_field"
+        and "bennour_1996_table_i_" in issue.path
+        for issue in migrator.result.validation.hard_issues
+    )
+    assert all(row.value.kind.value == "unavailable" for row in migrated)
+    assert all(row.identity.species.phase.is_value for row in migrated)
+    assert all(row.identity.species.phase.value.value == "l" for row in migrated)
+    assert all(
+        row.identity.reference_state is not None
+        and row.identity.reference_state.is_not_applicable
+        and row.identity.reservoir is not None
+        and row.identity.reservoir.is_not_applicable
+        for row in migrated
+    )
+    assert all(
+        row.identity.subtype is not None
+        and row.identity.subtype.is_unknown
+        and row.identity.subtype.reason == "no subtype mapped from source"
+        for row in migrated
+    )
+    assert all(
+        row.point_conditions["temperature_K"].state.value == Decimal("1573.00")
+        and row.point_conditions["composition"].state.is_value
+        for row in migrated
+    )
+    # Table I gives no per-row uncertainty column, so the migration must not
+    # manufacture an uncertainty width or turn the printed logarithm linear.
+    assert all(row.uncertainty.kind.value == "none" for row in migrated)
+
+    # Reverting the four Table I classes must restore conditional_field issues.
+    mutated = copy.deepcopy(doc)
+    for row in mutated["species"]["Cs2O"]["observations"]:
+        if row["observation_id"].startswith("bennour_1996_table_i_"):
+            row["values"]["method_class"] = "measured_reduced"
+    mutated_path = tmp_path / path.name
+    mutated_path.write_text(yaml.safe_dump(mutated, sort_keys=False), encoding="utf-8")
+    reverted = battery_migrate.Migrator(REPO_ROOT, index={}, aliases={})
+    reverted._migrate_extract(mutated_path)
+    reverted.finalize()
+    assert any(
+        issue.reason.value == "conditional_field"
+        and "bennour_1996_table_i_" in issue.path
+        for issue in reverted.result.validation.hard_issues
+    )
+
+
 def test_bencze_supplement_fidelity_sample_rejects_mutated_value():
     path = EXTRACTS / "bencze-yazhenskikh-2016.yaml"
     doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
