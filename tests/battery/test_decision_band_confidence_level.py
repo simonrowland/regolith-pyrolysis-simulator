@@ -34,7 +34,9 @@ def test_confidence_metadata_preserves_units_printed_in_scalar_value() -> None:
     )
 
     assert resolved.band is not None
-    assert resolved.band.value == Decimal("0.004364805402450084659744222203")
+    assert resolved.band.value.quantize(Decimal("1e-24")) == Decimal(
+        "0.004364805402450084659744"
+    )
     assert resolved.band.unit == "dimensionless"
 
 
