@@ -5,7 +5,6 @@ source:
   doi: 10.1007/BF02660972
   url: https://doi.org/10.1007/BF02660972
   year: 1995
-  sha256: b6c19829b95ad1aa38c169d9ca236c54f897a232f6a2bdc2002e7d3be7677067
 extraction:
   method: Manual transcription from 200 dpi rendered PDF pages; dense Tables I, II, III, IV, and V were independently read by rows and columns.
   date: '2026-10-12'
@@ -77,6 +76,22 @@ fidelity_samples:
       CAS-11-02 | 0 | 18.1 | 1.2 | 0.0608 | 0.964 | 9.7 | 28.7 | 21.0 | 49.9 | 0.585 | 0.202
       CAS-11-03 | 0 | 44.0 | 1.2 | 0.185 | 1.38 | 5.9 | 28.3 | 21.0 | 49.5 | 0.546 | 0.117
       CAS-11-04 | 0 | 62.1 | 1.3 | 0.311 | 1.40 | 5.5 | 28.5 | 21.2 | 50.2 | 0.328 | 0.104
+    locator: {page: 297, published_page: 297, pdf_page_index: 2, table: 'I'}
+  - species: MnO
+    observation_id: ohta_suito_1995_table1_compositions_and_equilibrium_analyses
+    field: group_to_run_mapping
+    value: |-
+      AC -> AC-01–AC-09 (9 Table I runs)
+      CA -> CA-01–CA-05 (5 Table I runs)
+      CS -> CS-01–CS-08 (8 Table I runs)
+      ACS-2 -> ACS-2-01–ACS-2-06 (6 Table I runs)
+      ACS-4 -> ACS-4-01–ACS-4-05 (5 Table I runs)
+      ACS-5 -> ACS-5-01–ACS-5-05 (5 Table I runs)
+      CAS-5 -> CAS-5-01–CAS-5-05 (5 Table I runs)
+      CAS-8 -> CAS-8-01–CAS-8-05 (5 Table I runs)
+      CAS-9 -> CAS-9-01–CAS-9-03 (3 Table I runs)
+      CAS-10 -> CAS-10-01–CAS-10-05 (5 Table I runs)
+      CAS-11 -> CAS-11-01–CAS-11-04 (4 Table I runs)
     locator: {page: 297, published_page: 297, pdf_page_index: 2, table: 'I'}
   - species: MnO
     observation_id: ohta_suito_1995_table4_log_gamma_MnO
@@ -283,6 +298,19 @@ species:
         values:
           quantity: measured_equilibrium_metal_and_slag_compositions
           method_class: method_only
+          group_to_run_mapping: |-
+            AC -> AC-01–AC-09 (9 Table I runs)
+            CA -> CA-01–CA-05 (5 Table I runs)
+            CS -> CS-01–CS-08 (8 Table I runs)
+            ACS-2 -> ACS-2-01–ACS-2-06 (6 Table I runs)
+            ACS-4 -> ACS-4-01–ACS-4-05 (5 Table I runs)
+            ACS-5 -> ACS-5-01–ACS-5-05 (5 Table I runs)
+            CAS-5 -> CAS-5-01–CAS-5-05 (5 Table I runs)
+            CAS-8 -> CAS-8-01–CAS-8-05 (5 Table I runs)
+            CAS-9 -> CAS-9-01–CAS-9-03 (3 Table I runs)
+            CAS-10 -> CAS-10-01–CAS-10-05 (5 Table I runs)
+            CAS-11 -> CAS-11-01–CAS-11-04 (4 Table I runs)
+          group_mapping_note: Table I prints compositions grouped under these slag-series labels but does not print individual run identifiers; the numbered row labels above are sequential transcription identifiers, not source identifiers.
           table_transcription: |-
             Initial_MnO_pct | soluble_Al_ppm | insoluble_Al_ppm | Si_pct | Mn_pct | O_ppm | Al2O3_pct | SiO2_pct | CaO_pct | MnO_pct | FetO_pct
             AC-01 | 2 | 14.3 | 2.8 | — | 0.740 | 22.1 | 64.8 | — | 33.0 | 2.22 | 0.989
