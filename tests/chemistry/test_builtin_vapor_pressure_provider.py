@@ -546,6 +546,21 @@ def _composition_sensitivity_request(
     )
 
 
+def _alkali_activity_pressure_samples(provider, parent_oxide: str):
+    samples = []
+    for parent_moles in (1.0 / 6.0, 0.5):
+        account = {"SiO2": 1.0, parent_oxide: parent_moles}
+        activity = melt_oxide_activity(
+            parent_oxide,
+            account,
+            temperature_K=1773.15,
+        )
+        assert activity is not None
+        result = provider.dispatch(_composition_sensitivity_request(account))
+        samples.append((activity, result.diagnostic["vapor_pressures_Pa"]))
+    return samples
+
+
 @pytest.mark.parametrize(
     "oxide,species",
     [
@@ -581,6 +596,73 @@ def test_runtime_p_eq_numerator_moves_with_parent_oxide_composition(
     assert high_provenance["P_eq_Pa"] == pytest.approx(high_p_eq)
     assert high_provenance["activity_factor"] > low_provenance["activity_factor"]
     assert high_provenance["pressure_kind"] == "effective_equilibrium"
+
+
+@pytest.mark.parametrize(
+    "parent_oxide,monatomic_species,composite_species",
+    [
+        ("Na2O", "Na", "Na2"),
+        ("Na2O", "Na", "Na2O_gas"),
+        ("K2O", "K", "K2"),
+        ("K2O", "K", "K2O_gas"),
+    ],
+    ids=("na2", "na2o-gas", "k2", "k2o-gas"),
+)
+def test_alkali_composite_pressure_uses_parent_activity(
+    vapor_pressure_data,
+    parent_oxide,
+    monatomic_species,
+    composite_species,
+):
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    (low_activity, low_pressures), (high_activity, high_pressures) = (
+        _alkali_activity_pressure_samples(provider, parent_oxide)
+    )
+
+    assert high_activity.activity == pytest.approx(2.0 * low_activity.activity)
+    assert high_activity.thermodynamic_parent_activity() == pytest.approx(
+        4.0 * low_activity.thermodynamic_parent_activity()
+    )
+    assert low_pressures[composite_species] / high_pressures[
+        composite_species
+    ] == pytest.approx(
+        low_activity.thermodynamic_parent_activity()
+        / high_activity.thermodynamic_parent_activity()
+    )
+    assert low_pressures[monatomic_species] / high_pressures[
+        monatomic_species
+    ] == pytest.approx(low_activity.activity / high_activity.activity)
+
+
+@pytest.mark.parametrize(
+    "parent_oxide,monatomic_species,composite_species",
+    [
+        ("Na2O", "Na", "Na2"),
+        ("Na2O", "Na", "Na2O_gas"),
+        ("K2O", "K", "K2"),
+        ("K2O", "K", "K2O_gas"),
+    ],
+    ids=("na2", "na2o-gas", "k2", "k2o-gas"),
+)
+def test_alkali_gas_exchange_ratio_is_independent_of_melt_composition(
+    vapor_pressure_data,
+    parent_oxide,
+    monatomic_species,
+    composite_species,
+):
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    (_, low_pressures), (_, high_pressures) = _alkali_activity_pressure_samples(
+        provider,
+        parent_oxide,
+    )
+
+    low_ratio = low_pressures[composite_species] / low_pressures[
+        monatomic_species
+    ] ** 2
+    high_ratio = high_pressures[composite_species] / high_pressures[
+        monatomic_species
+    ] ** 2
+    assert low_ratio == pytest.approx(high_ratio, rel=1e-10)
 
 
 def test_mg_high_t_uses_gas_fugacity_after_te_gas_rail_demotion(

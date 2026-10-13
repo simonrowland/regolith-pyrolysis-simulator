@@ -979,7 +979,8 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
 
     ceiling_flux_species = {"Ca", "CaO_gas", "Ti", "TiO", "TiO2_gas"}
     p_flux = sum(snapshot.evap_flux.species_kg_hr[species] for species in ("PO", "PO2", "P2"))
-    assert snapshot.evap_flux.total_kg_hr - p_flux == pytest.approx(3.203221602697998, rel=1e-12, abs=1e-12)
+    # b-850: alkali composite vapour rows now use the parent-oxide activity.
+    assert snapshot.evap_flux.total_kg_hr - p_flux == pytest.approx(3.1212881367580105, rel=1e-12, abs=1e-12)
     assert ceiling_flux_species <= set(
         snapshot.evap_flux.alpha_authority_status_by_species
     )
@@ -1173,12 +1174,13 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         # t-766 restores explicitly authorized P cleanup: +0.0023652560335202
         # kg/h entirely PO/PO2/P2. Fresh executable probe, with unchanged
         # non-P flux, moves transport and the P2O5 source debit accordingly.
+        # b-850: alkali composite vapour rows now use the parent-oxide activity.
         (
             1,
             1550.0,
-            3.205586858731518,
-            1300047.6164859626,
-            995.5566881453749,
+            3.123653392791531,
+            1390584.7638444814,
+            995.6386216113149,
         ),
         rel=1.0e-12,
         abs=1.0e-12,
