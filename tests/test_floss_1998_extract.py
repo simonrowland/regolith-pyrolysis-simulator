@@ -25,6 +25,33 @@ def _table_row(context: dict, run_id: str) -> dict:
     )
 
 
+def test_extract_locators_use_physical_pdf_pages() -> None:
+    doc = yaml.safe_load(EXTRACT.read_text())
+    expected = {
+        191: 1,
+        192: 2,
+        195: 5,
+        196: 6,
+        199: 9,
+        200: 10,
+        201: 11,
+    }
+
+    def check(value: object) -> None:
+        if isinstance(value, dict):
+            if "published_page" in value and "pdf_page_index" in value:
+                folio = value["published_page"]
+                assert value["page"] == expected[folio]
+                assert value["pdf_page_index"] == value["page"] - 1
+            for child in value.values():
+                check(child)
+        elif isinstance(value, list):
+            for child in value:
+                check(child)
+
+    check(doc)
+
+
 def test_corrected_trace_element_cells_are_pinned() -> None:
     doc = yaml.safe_load(EXTRACT.read_text())
     context = next(
