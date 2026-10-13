@@ -1669,6 +1669,7 @@ for line in sys.stdin:
         )
         child = subprocess.Popen([sys.executable, "-c", child_code])
         marker.with_suffix(".pid").write_text(str(child.pid))
+    if mode == "hang":
         time.sleep(30)
     po2_raw = request["po2"]
     cell = EquilibrateCell(
@@ -1801,15 +1802,23 @@ def test_isolated_cell_worker_timeout_kills_sleeping_grandchild(
     battery = _install_fake_isolated_cell_worker(monkeypatch)
     marker = tmp_path / "grandchild.sentinel"
     try:
+        started = _run_fake_isolated_cell(
+            battery,
+            pot_id="worker-timeout-grandchild-ready",
+            simulate_crash="grandchild",
+            why=str(marker),
+        )
+        assert started.status == "ok"
+        assert marker.with_suffix(".pid").is_file()
+
         timed_out = _run_fake_isolated_cell(
             battery,
             pot_id="worker-timeout",
-            simulate_crash="grandchild",
+            simulate_crash="hang",
             why=str(marker),
             timeout_s=0.001,
         )
         assert timed_out.refusal_reason == REFUSAL_TIMEOUT
-        assert marker.with_suffix(".pid").is_file()
         time.sleep(1.0)
         assert not marker.exists(), "worker timeout left its sleeping grandchild alive"
         recovered = _run_fake_isolated_cell(battery, pot_id="worker-after-timeout")
