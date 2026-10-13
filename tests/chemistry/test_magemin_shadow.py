@@ -24,6 +24,12 @@ from __future__ import annotations
 
 import gc
 import multiprocessing
+import os
+import signal
+import subprocess
+import sys
+import textwrap
+from pathlib import Path
 
 import pytest
 
@@ -181,6 +187,25 @@ def _provider_lifecycle_worker(_index):
     )
 
 
+def _provider_callback_worker_handler(_resource, request, _errlog):
+    # Keep the request in flight long enough for the parent to attach a
+    # Future callback before the pool's consumer thread completes it.
+    import time
+
+    time.sleep(0.2)
+    return request
+
+
+def _provider_callback_worker(_index):
+    return WarmEngineWorker(
+        name='magemin-provider-callback-test',
+        bootstrap=_provider_lifecycle_worker_bootstrap,
+        handler=_provider_callback_worker_handler,
+        startup_timeout_s=3.0,
+        call_timeout_s=1.0,
+    )
+
+
 class _PooledFakeMAGEMinBackend(_FakeMAGEMinBackend):
     """Fake result backend with the real warm-pool child lifecycle."""
 
@@ -201,6 +226,80 @@ class _PooledFakeMAGEMinBackend(_FakeMAGEMinBackend):
             self.close_calls += 1
             self.pool.close(cancel_pending=True)
             self.pool = None
+
+
+def _run_provider_finalizer_probe(scenario: str, *, consumer_callback=False):
+    """Run GC/lock reentry probes in a process group with a hard timeout."""
+    repo_root = Path(__file__).resolve().parents[2]
+    chemistry_tests = Path(__file__).resolve().parent
+    consumer_setup = (
+        'test_module._provider_lifecycle_worker = '
+        'test_module._provider_callback_worker\n'
+        if consumer_callback else ''
+    )
+    setup = textwrap.dedent(
+        f'''
+        import atexit
+        import gc
+        import multiprocessing
+        import os
+        import sys
+        import threading
+
+        gc.disable()
+        sys.path.insert(0, {str(chemistry_tests)!r})
+        import test_magemin_shadow as test_module
+        from simulator import engine_pool
+        from simulator.engine_pool import EngineWorkerPool
+        from simulator.melt_backend import magemin as magemin_module
+        '''
+    )
+    setup += consumer_setup
+    setup += textwrap.dedent(
+        '''
+        backend = test_module._PooledFakeMAGEMinBackend()
+        magemin_module.MAGEMinBackend = lambda: backend
+        provider = test_module.MAGEMinShadowProvider()
+        assert provider._ensure_backend() is backend
+        pool = backend.pool
+        child_pid = backend.pool_child_pid
+        provider._cycle = provider
+
+        def child_is_alive(pid):
+            return any(
+                child.pid == pid and child.is_alive()
+                for child in multiprocessing.active_children()
+            )
+
+        def cleanup_workers():
+            for worker in pool.workers:
+                worker.close()
+
+        atexit.register(cleanup_workers)
+        '''
+    )
+    script = setup + '\n' + textwrap.dedent(scenario)
+    process = subprocess.Popen(
+        [sys.executable, '-c', script],
+        cwd=repo_root,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        start_new_session=True,
+    )
+    try:
+        stdout, stderr = process.communicate(timeout=8.0)
+    except subprocess.TimeoutExpired:
+        os.killpg(process.pid, signal.SIGKILL)
+        stdout, stderr = process.communicate()
+        pytest.fail(
+            'provider finalizer probe deadlocked past 8 seconds\n'
+            f'stdout: {stdout}\nstderr: {stderr}'
+        )
+    assert process.returncode == 0, (
+        f'provider finalizer probe exited {process.returncode}\n'
+        f'stdout: {stdout}\nstderr: {stderr}'
+    )
 
 
 class _RaisingMAGEMinBackend(_FakeMAGEMinBackend):
@@ -319,8 +418,16 @@ def test_provider_closes_warm_pool_when_provider_lifetime_ends(monkeypatch):
             assert backends[-1].pool_child_pid in {
                 child.pid for child in multiprocessing.active_children()
             }
+            pool = backends[-1].pool
+            child_pid = backends[-1].pool_child_pid
             del provider
             gc.collect()
+            assert pool._close_complete.wait(timeout=5.0), (
+                'provider finalizer did not close its pool within 5 seconds'
+            )
+            assert child_pid not in {
+                child.pid for child in multiprocessing.active_children()
+            }
 
         live_children = {
             child.pid
@@ -333,6 +440,108 @@ def test_provider_closes_warm_pool_when_provider_lifetime_ends(monkeypatch):
     finally:
         for backend in backends:
             backend.close()
+
+
+def test_provider_finalizer_does_not_deadlock_registry_lock():
+    _run_provider_finalizer_probe(
+        '''
+        dummy_pool = object.__new__(EngineWorkerPool)
+        registry_locked_during_gc = []
+
+        def observe_collection(phase, _info):
+            if phase == 'start':
+                acquired = engine_pool._ENGINE_POOL_REGISTRY_LOCK.acquire(
+                    blocking=False
+                )
+                if acquired:
+                    engine_pool._ENGINE_POOL_REGISTRY_LOCK.release()
+                else:
+                    registry_locked_during_gc.append(True)
+
+        gc.callbacks.append(observe_collection)
+        del provider
+        current_count = gc.get_count()[0]
+        gc.set_threshold(current_count, 1000000, 1000000)
+        gc.enable()
+        engine_pool._register_engine_pool(dummy_pool)
+        engine_pool._discard_engine_pool(dummy_pool)
+        gc.callbacks.remove(observe_collection)
+        assert registry_locked_during_gc, 'GC did not run under registry lock'
+        assert pool._close_complete.wait(timeout=5.0)
+        assert not child_is_alive(child_pid), 'provider child survived close'
+        '''
+    )
+
+
+def test_provider_finalizer_does_not_deadlock_pool_lifecycle_lock():
+    _run_provider_finalizer_probe(
+        '''
+        lifecycle_locked_during_gc = []
+
+        def observe_collection(phase, _info):
+            if phase == 'start':
+                acquired = pool._lifecycle_lock.acquire(blocking=False)
+                if acquired:
+                    pool._lifecycle_lock.release()
+                else:
+                    lifecycle_locked_during_gc.append(True)
+
+        gc.callbacks.append(observe_collection)
+        del provider
+        pool._lifecycle_lock.acquire()
+        try:
+            gc.collect()
+        finally:
+            pool._lifecycle_lock.release()
+        gc.enable()
+        gc.callbacks.remove(observe_collection)
+        assert lifecycle_locked_during_gc, 'GC did not run under lifecycle lock'
+        assert pool._close_complete.wait(timeout=5.0)
+        assert not child_is_alive(child_pid), 'provider child survived close'
+        '''
+    )
+
+
+def test_provider_finalizer_reaps_when_collection_runs_on_consumer_thread():
+    _run_provider_finalizer_probe(
+        '''
+        collection_on_consumer = []
+        unraisable = []
+        collection_done = threading.Event()
+        sys.unraisablehook = lambda error: unraisable.append(error)
+
+        def observe_collection(phase, _info):
+            if phase == 'start':
+                collection_on_consumer.append(
+                    threading.current_thread() is pool._threads[0]
+                )
+
+        gc.callbacks.append(observe_collection)
+        provider_box = [provider]
+
+        def collect_provider(_future):
+            provider_box.clear()
+            gc.enable()
+            gc.collect()
+            collection_done.set()
+
+        future = pool.submit('consumer-thread', timeout_s=1.0)
+        future.add_done_callback(collect_provider)
+        del provider
+        try:
+            assert future.result(timeout=5.0) == 'consumer-thread'
+            assert collection_done.wait(timeout=2.0)
+            assert collection_on_consumer and any(collection_on_consumer)
+            assert pool._close_complete.wait(timeout=5.0)
+            assert not unraisable, f'unraisable finalizer errors: {unraisable!r}'
+            assert not pool.workers[0]._pending_reap
+            assert not child_is_alive(child_pid), 'provider child survived close'
+        finally:
+            gc.callbacks.remove(observe_collection)
+            cleanup_workers()
+        ''',
+        consumer_callback=True,
+    )
 
 
 # ---------------------------------------------------------------------------

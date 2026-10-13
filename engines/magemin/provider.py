@@ -46,6 +46,8 @@ Parity tolerances (binding spec §4 MAGEMin):
 
 from __future__ import annotations
 
+import sys
+import threading
 import weakref
 from typing import Any, Mapping, Optional
 
@@ -86,6 +88,18 @@ _FALLBACK_INTENTS = frozenset({ChemistryIntent.GATE_LIQUID_FRACTION})
 # every other account before dispatch.
 _DECLARED_ACCOUNT = 'process.cleaned_melt'
 _SHADOW_BACKEND_CONFIG = {'python_bridge': 'subprocess'}
+
+
+def _defer_backend_close(close: Any) -> None:
+    """Run blocking backend cleanup away from the provider's GC thread."""
+    close_thread = threading.Thread(target=close, daemon=True)
+    try:
+        close_thread.start()
+    except RuntimeError:
+        if not sys.is_finalizing():
+            raise
+        close()
+
 
 # Note attached to the ControlAudit for every dispatch. MAGEMin is
 # shadow-only -- it consumes T / P / fO2 as inputs but never enforces
@@ -460,7 +474,9 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
             backend = MAGEMinBackend()
             close = getattr(backend, 'close', None)
             if callable(close):
-                backend_finalizer = weakref.finalize(self, close)
+                backend_finalizer = weakref.finalize(
+                    self, _defer_backend_close, close
+                )
             backend.initialize(dict(_SHADOW_BACKEND_CONFIG))
         except Exception:
             if backend_finalizer is not None:
