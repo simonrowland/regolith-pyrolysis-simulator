@@ -211,14 +211,32 @@ species:
       - 1873.0
       - 1873.0
       phase: complex_silicate_melt_CMAS_0_55_Basicity_0_65_
-      standard_state: oxide activity coefficient as compiled by Sossi & Fegley 2018 from cited primaries
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: CaO
+              phase: {tag: value, value: cr}
+              polymorph: {tag: value, value: lime}
+            component_basis: CaO
+            reference_pressure_bar: 1.01325
+        inferred: false
+        note: Pure solid lime at T and 1 atm, per Beckett's stated oxide standard states.
+        locator:
+          page: 94
+          equation: '2'
+          note: Beckett 2002 defines lime as the CaO standard state at temperature and 1 atm.
+      derived_from: [tables:kems-041-sossi-fegley-2018]
       regime: compiled_melt_activity
       units: dimensionless γ as published range
       values:
         quantity: activity_coefficient_range
         rows:
           - oxide: CaO
-            method_class: measured_tabulated
+            method_class: model_derived
+            evidence_model: Berman silicate-melt model as reported by Beckett (2002)
             oxide_formula_as_published: CaO
             temperature_as_published: '1873'
             T_range_K:
@@ -227,6 +245,7 @@ species:
             gamma_as_published: ≈0.001–0.15
             melt_composition_as_published: CMAS(0.55 < Basicity < 0.65)
             references_as_published: Beckett 2002
+            quote: 'Beckett (2002), p. 94, Eq. 2: “In this work, lime, periclase, corundum, and high cristobalite at temperature and 1 atm are used as standard states for oxide components in the melt.”'
             range:
             - '.001'
             - '.15'
@@ -844,14 +863,32 @@ species:
       - 1873.0
       - 1873.0
       phase: complex_silicate_melt_CMAS_0_55_Basicity_0_65_
-      standard_state: oxide activity coefficient as compiled by Sossi & Fegley 2018 from cited primaries
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: MgO
+              phase: {tag: value, value: cr}
+              polymorph: {tag: value, value: periclase}
+            component_basis: MgO
+            reference_pressure_bar: 1.01325
+        inferred: false
+        note: Pure solid periclase at T and 1 atm, per Beckett's stated oxide standard states.
+        locator:
+          page: 94
+          equation: '2'
+          note: Beckett 2002 defines periclase as the MgO standard state at temperature and 1 atm.
+      derived_from: [tables:kems-041-sossi-fegley-2018]
       regime: compiled_melt_activity
       units: dimensionless γ as published range
       values:
         quantity: activity_coefficient_range
         rows:
           - oxide: MgO
-            method_class: measured_tabulated
+            method_class: model_derived
+            evidence_model: Berman silicate-melt model as reported by Beckett (2002)
             oxide_formula_as_published: MgO
             temperature_as_published: '1873'
             T_range_K:
@@ -860,6 +897,7 @@ species:
             gamma_as_published: ≈0.25–4
             melt_composition_as_published: CMAS(0.55 < Basicity < 0.65)
             references_as_published: Beckett 2002
+            quote: 'Beckett (2002), p. 94, Eq. 2: “In this work, lime, periclase, corundum, and high cristobalite at temperature and 1 atm are used as standard states for oxide components in the melt.”'
             range:
             - '0.25'
             - '4'
