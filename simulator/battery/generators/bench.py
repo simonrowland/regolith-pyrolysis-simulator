@@ -176,6 +176,12 @@ _ENGINE_REPORTED_ACTIVITY["openimcc"] = EngineReportedActivity(
     Phase.L,
     _PARENT_OXIDE_COMPONENT_BASES,
 )
+_ENGINE_REPORTED_ACTIVITY["internal-analytical"] = EngineReportedActivity(
+    "raoultian_pure_liquid_endmember",
+    ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
+    Phase.L,
+    _PARENT_OXIDE_COMPONENT_BASES,
+)
 
 
 def _oxide_lookup_key(name: str) -> str:
@@ -282,6 +288,12 @@ def _engine_reports_formula(engine: str, formula: str) -> tuple[bool, str]:
         return _melts_reports_oxide_endmember(formula)
     if engine == "openimcc":
         return _imcc_reports_parent_oxide(formula)
+    if engine == "internal-analytical":
+        from simulator.chemistry.melt_activity import MELT_OXIDE_CATIONS_PER_FORMULA
+
+        if formula in MELT_OXIDE_CATIONS_PER_FORMULA:
+            return True, "raoultian_pure_liquid_endmember"
+        return False, f"typed-refusal:unsupported_internal_analytical_oxide:{formula}"
     return False, "typed-refusal:engine_does_not_report_parent_oxide_activity"
 
 
@@ -521,6 +533,9 @@ def melt_activity_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]
     gap_tuple = tuple(dict.fromkeys(gaps))
     results = []
     for engine in MELT_ACTIVITY_ENGINES:
+        if engine == "internal-analytical" and inputs.activity_quantity != "activity":
+            results.append(_not_applicable(provenance, engine))
+            continue
         reported_activity = _ENGINE_REPORTED_ACTIVITY[engine]
         single_cation = (
             inputs.activity_quantity == "activity_coefficient"

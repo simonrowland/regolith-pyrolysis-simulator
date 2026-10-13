@@ -302,6 +302,7 @@ class EquilibrateCell:
         default_factory=dict
     )
     invalid_gas_partial_pressure_components: tuple[str, ...] = ()
+    activities_standard_state: dict[str, Any] | None = None
 
     def as_payload(self) -> dict[str, Any]:
         return {
@@ -320,6 +321,11 @@ class EquilibrateCell:
                 str(name): dict(row)
                 for name, row in self.melt_activity_coefficient_details.items()
             },
+            "activities_standard_state": (
+                None
+                if self.activities_standard_state is None
+                else dict(self.activities_standard_state)
+            ),
             "gas_partial_pressures_Pa": dict(self.gas_partial_pressures_Pa),
             "invalid_gas_partial_pressure_components": list(
                 self.invalid_gas_partial_pressure_components
@@ -399,6 +405,11 @@ class EquilibrateCell:
                 ).items()
                 if isinstance(value, Mapping)
             },
+            activities_standard_state=(
+                dict(payload["activities_standard_state"])
+                if isinstance(payload.get("activities_standard_state"), Mapping)
+                else None
+            ),
             liquid_fraction=_finite_float(payload.get("liquid_fraction")),
             wall_s=float(payload.get("wall_s") or 0.0),
             cpu_s=float(payload.get("cpu_s") or 0.0),
@@ -2469,6 +2480,8 @@ def _internal_analytical_vapor_pressure_adapter(
         status="ok",
         diagnostics=diagnostics,
         warnings=[],
+        # This core diagnostic is an activity map (a_i), despite the
+        # historical EquilibriumResult field name; gamma lives separately.
         activity_coefficients=dict(core_diagnostic.get("activities") or {}),
         vapor_pressures_Pa=dict(equilibrium.vapor_pressures_Pa or {}),
         vapor_pressures_source=dict(equilibrium.vapor_pressures_source or {}),
@@ -3556,6 +3569,13 @@ def equilibrate_cell(
         activities, pressures, invalid_pressure_components = (
             extract_reported_quantities(result)
         )
+        activity_standard_state = None
+        if handle.name == "internal-analytical":
+            vapor_diagnostic = diagnostics.get("vapor_pressure_diagnostic")
+            if isinstance(vapor_diagnostic, Mapping):
+                standard_state = vapor_diagnostic.get("activities_standard_state")
+                if isinstance(standard_state, Mapping):
+                    activity_standard_state = dict(standard_state)
         coefficients = reported_activity_coefficients(result)
         coefficient_details = dict(
             getattr(result, "activity_coefficient_details", None) or {}
@@ -3576,6 +3596,7 @@ def equilibrate_cell(
             engine_reason=engine_reason,
             engine_annotation=engine_annotation,
             melt_activities=activities,
+            activities_standard_state=activity_standard_state,
             melt_activity_coefficients=coefficients,
             melt_activity_coefficient_details=coefficient_details,
             gas_partial_pressures_Pa=pressures,

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import json
 import math
 from dataclasses import replace
 from decimal import Decimal
@@ -75,11 +76,15 @@ def test_internal_analytical_cell_reports_activity_not_gamma() -> None:
     )
     field_value = cell.melt_activities["SiO"]
     benchmark_value = float(benchmark["prediction"])
+    benchmark_standard_state = json.loads(benchmark["details"])[
+        "activity_standard_state"
+    ]
 
     assert cell.status == "ok"
     assert x_sio2 == pytest.approx(benchmark_value, rel=1e-12)
     assert field_value == pytest.approx(benchmark_value, rel=1e-12)
     assert field_value != pytest.approx(benchmark_value / x_sio2, rel=0.1)
+    assert cell.activities_standard_state == benchmark_standard_state
 
 
 def _hand_built_observation() -> tuple[object, Identity]:
