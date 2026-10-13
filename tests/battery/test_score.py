@@ -6855,7 +6855,7 @@ def test_stability_bound_is_reported_against_the_row_band_without_refusing() -> 
         ),
         notices=(),
     )
-    refused_comparison = _fusion_comparison_reference(
+    refused_comparison = fusion_comparison_reference(
         unmapped, engine=Engine.OPENIMCC
     )
     refused_inference = next(

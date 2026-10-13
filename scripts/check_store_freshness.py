@@ -63,7 +63,7 @@ CODE_INPUTS = (
 # can exist to follow them, and they would read as STALE forever. Each entry
 # needs that receipt (regen run, no store diff). Short shas, 9 characters,
 # matching the keys stale_input_commits() emits.
-#   09c498b65: b-851 renames the private scorer helper _fusion_comparison_reference
+#   09c498b65: b-851 renames the private scorer helper fusion_comparison_reference
 #     in simulator/battery/score.py to the public fusion_comparison_reference so the
 #     melt-activity benchmark shares the one owner. Name and docstring only: no
 #     expression, branch or literal changes. Migration imports only the unchanged
