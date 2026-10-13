@@ -7071,6 +7071,7 @@ def _compilation_decision_strata(
             int(band.rule.rsplit("n_sources=", 1)[1].split(";", 1)[0])
             for band in bands if "n_sources=" in band.rule
         })
+        band_fields = _compilation_band_value_fields(widths, band_n)
         rendered.append({
             "family": family,
             "quantity": quantity,
@@ -7085,10 +7086,9 @@ def _compilation_decision_strata(
                 else str(ratio)
             ),
             "max_abs_residual": None if not values else str(max(abs(value) for value in values)),
-            "band_value": widths[0] if len(widths) == 1 else widths or None,
+            **band_fields,
             "unit": units[0] if len(units) == 1 else units or QUANTITY_UNITS[Quantity(quantity)],
             "band_kind": kinds[0] if len(kinds) == 1 else kinds,
-            "band_derived_n": band_n[0] if len(band_n) == 1 else band_n or None,
             "match_count": sum(1 for r in bucket if r.status is ResidualStatus.MATCH),
             "mismatch_count": sum(1 for r in bucket if r.status is ResidualStatus.MISMATCH),
             "no_band_count": sum(1 for r in bucket if r.status is ResidualStatus.NO_BAND),
@@ -7097,6 +7097,17 @@ def _compilation_decision_strata(
             "no_band_reason": None,
         })
     return rendered
+
+
+def _compilation_band_value_fields(
+    widths: Sequence[str], derived_n: Sequence[int]
+) -> dict[str, object]:
+    """Serialize compilation band values consistently across report paths."""
+
+    return {
+        "band_value": widths[0] if len(widths) == 1 else widths or None,
+        "band_derived_n": derived_n[0] if len(derived_n) == 1 else derived_n or None,
+    }
 
 
 def _headline_band_width(bucket: Sequence[Residual]) -> Decimal | None:
@@ -9577,6 +9588,7 @@ def headline_payload_records(
                 derived_n = sorted(group["band_derived_n"])
                 widths = sorted(group["widths"])
                 units = sorted(group["units"])
+                band_fields = _compilation_band_value_fields(widths, derived_n)
                 strata.append({
                     "family": family, "quantity": quantity, "engine": engine, "relation": relation,
                     "n": len(values),
@@ -9588,10 +9600,9 @@ def headline_payload_records(
                         else str(ratio)
                     ),
                     "max_abs_residual": None if not values else str(max(abs(value) for value in values)),
-                    "band_value": widths[0] if len(widths) == 1 else widths or None,
+                    **band_fields,
                     "unit": units[0] if len(units) == 1 else units or QUANTITY_UNITS[Quantity(quantity)],
                     "band_kind": kinds[0] if len(kinds) == 1 else kinds,
-                    "band_derived_n": derived_n[0] if len(derived_n) == 1 else derived_n or None,
                     "match_count": group["match_count"],
                     "mismatch_count": group["mismatch_count"],
                     "no_band_count": group["no_band_count"],
@@ -10142,6 +10153,7 @@ class _ScorePayloadAccumulator:
                 derived_n = sorted(group["band_derived_n"])
                 widths = sorted(group["widths"])
                 units = sorted(group["units"])
+                band_fields = _compilation_band_value_fields(widths, derived_n)
                 strata.append(
                     {
                         "family": family,
@@ -10157,10 +10169,9 @@ class _ScorePayloadAccumulator:
                             else str(ratio)
                         ),
                         "max_abs_residual": None if not values else str(max(abs(value) for value in values)),
-                        "band_value": widths[0] if len(widths) == 1 else widths or None,
+                        **band_fields,
                         "unit": units[0] if len(units) == 1 else units or QUANTITY_UNITS[Quantity(quantity)],
                         "band_kind": kinds[0] if len(kinds) == 1 else kinds,
-                        "band_derived_n": derived_n[0] if len(derived_n) == 1 else derived_n or None,
                         "match_count": group["match_count"],
                         "mismatch_count": group["mismatch_count"],
                         "no_band_count": group["no_band_count"],
