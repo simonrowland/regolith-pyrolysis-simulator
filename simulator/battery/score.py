@@ -38,6 +38,7 @@ from simulator.battery.enums import (
     EvidenceClass,
     ExecutionState,
     FORMATION_QUANTITIES,
+    FUSION_QUANTITIES,
     KINETIC_YIELD_QUANTITIES,
     MEASURED_EVIDENCE,
     MELT_ACTIVITY_QUANTITIES,
@@ -595,6 +596,7 @@ def rail_for_quantity(quantity: Quantity | None, *, species_formula: str = "") -
         quantity in FORMATION_QUANTITIES
         or quantity in EQUILIBRIUM_FIT_QUANTITIES
         or quantity in PURE_STANDARD_THERMO
+        or quantity in FUSION_QUANTITIES
         or quantity in VAPORIZATION_ENTHALPIES
     ):
         return Rail.THERMOCHEMISTRY

@@ -12093,3 +12093,217 @@ def test_duplicate_guard_catches_measured_copy_but_not_ulp_or_different_value() 
 
     duplicate["value"] = {"kind": "point", "point": "0.3", "approximate": False}
     assert _same_work_observation_duplicate_pairs([owner, duplicate]) == []
+
+
+def test_fusion_quantities_migrate_with_phase_transition_identity(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    observations = extract["species"]["Na"]["observations"]
+    observations.extend(
+        [
+            {
+                "observation_id": "na_fusion_temperature",
+                "type": "transition_point",
+                "locator": {"table": "4", "row": "Na"},
+                "phase": "cr",
+                "units": "K",
+                "values": {"quantity": "transition_temperature", "T_m_K": 1200},
+            },
+            {
+                "observation_id": "na_heat_of_fusion",
+                "type": "heat_capacity_and_heat_content_series",
+                "locator": {"table": "4", "row": "Na", "column": "ΔH_f"},
+                "phase": "cr",
+                "units": "kJ mol−1",
+                "values": {
+                    "quantity": "heat_of_fusion",
+                    "delta_H_fus_kJ_mol-1": 12.5,
+                },
+            },
+            {
+                "observation_id": "na_entropy_of_fusion",
+                "type": "heat_capacity_and_heat_content_series",
+                "locator": {"table": "4", "row": "Na", "column": "ΔS_f"},
+                "phase": "cr",
+                "units": "J mol−1 K−1",
+                "values": {
+                    "quantity": "entropy_of_fusion",
+                    "delta_S_fus_J_mol-1_K-1": 18.0,
+                },
+            },
+            {
+                "observation_id": "na_heat_content",
+                "type": "heat_capacity_and_heat_content_series",
+                "locator": {"table": "3", "row": "Na"},
+                "phase": "cr",
+                "units": "kJ/mol",
+                "values": {
+                    "quantity": "H_minus_H298",
+                    "enthalpy_increment": 2.0,
+                    "T_K": 500,
+                },
+            },
+        ]
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    by_id = {
+        observation.observation_id.rsplit("::", 1)[-1]: observation
+        for observation in result.observations.values()
+    }
+
+    for observation_id, quantity, expected_value in (
+        ("na_heat_of_fusion", Quantity.ENTHALPY_OF_FUSION, Decimal("12.5")),
+        ("na_entropy_of_fusion", Quantity.ENTROPY_OF_FUSION, Decimal("18.0")),
+    ):
+        observation = by_id[observation_id]
+        identity = observation.identity
+        assert quantity_token(identity) is quantity
+        assert observation.value.kind is ValueKind.POINT
+        assert observation.value.point == expected_value
+        assert identity.species.formula == "Na"
+        assert identity.species.phase.is_value
+        assert identity.species.phase.value is Phase.CR
+        assert identity.temperature_K is not None
+        assert identity.temperature_K.is_unknown
+        assert identity.subtype is not None
+        assert identity.subtype.value == "solid_to_liquid"
+        assert identity.species.polymorph is not None
+        assert identity.species.polymorph.is_unknown
+        assert identity.species.polymorph.reason == "source does not state polymorph"
+        identity_outcome = identity_equal(identity, identity)
+        assert identity_outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+        if observation.point_conditions is not None:
+            temperature = observation.point_conditions.get("temperature_K")
+            assert temperature is None or temperature.state.is_unknown
+
+    heat_content = by_id["na_heat_content"]
+    assert quantity_token(heat_content.identity) is Quantity.H_MINUS_H298
+    assert heat_content.value.kind is ValueKind.POINT
+    assert heat_content.value.point == Decimal("2.0")
+
+
+def test_fusion_temperature_join_preserves_matching_melting_point(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["SiO2"] = {
+        "observations": [
+            {
+                "observation_id": "alpha_quartz_melting_point",
+                "type": "transition_point",
+                "locator": {"table": "7", "row": "SiO2"},
+                "phase": "cr",
+                "condensed_form": {"polymorph": "alpha_quartz"},
+                "units": "K",
+                "values": {
+                    "quantity": "transition_temperature",
+                    "property_kind": "melting_point",
+                    "phase_from": "alpha quartz",
+                    "phase_to": "liquid",
+                    "value_K": 1200,
+                },
+            },
+            {
+                "observation_id": "alpha_quartz_heat_of_fusion",
+                "type": "heat_capacity_and_heat_content_series",
+                "locator": {"table": "7", "row": "SiO2", "column": "delta_H_f"},
+                "phase": "cr",
+                "crystal_phase_as_stated": "alpha quartz",
+                "condensed_form": {"polymorph": "alpha_quartz"},
+                "units": "kJ/mol",
+                "values": {
+                    "quantity": "heat_of_fusion",
+                    "delta_H_fus_kJ_mol-1": 12.5,
+                },
+            },
+        ]
+    }
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    fusion = next(
+        obs
+        for obs in result.observations.values()
+        if obs.observation_id.endswith("::alpha_quartz_heat_of_fusion")
+    )
+
+    assert fusion.identity.temperature_K is not None
+    assert fusion.identity.temperature_K.value == Decimal("1200")
+    temperature = fusion.point_conditions["temperature_K"]
+    assert temperature.state.value == Decimal("1200")
+    assert temperature.locator is not None
+    assert temperature.locator.table == "7"
+
+
+@pytest.mark.parametrize(
+    "property_kind,phase_from,phase_to,transition_polymorph,fusion_polymorph,temperature_K",
+    [
+        (
+            "solid_solid_transition",
+            "alpha quartz",
+            "beta quartz",
+            "alpha_quartz",
+            "alpha_quartz",
+            846,
+        ),
+        (
+            "melting_point",
+            "alpha quartz",
+            "liquid",
+            "alpha_quartz",
+            "tridymite",
+            1200,
+        ),
+    ],
+)
+def test_fusion_temperature_requires_melting_and_matching_crystal_identity(
+    tmp_path: Path,
+    property_kind: str,
+    phase_from: str,
+    phase_to: str,
+    transition_polymorph: str,
+    fusion_polymorph: str,
+    temperature_K: int,
+) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["SiO2"] = {
+        "observations": [
+            {
+                "observation_id": "alpha_to_beta_quartz_transition",
+                "type": "transition_point",
+                "locator": {"table": "7", "row": "SiO2"},
+                "phase": "cr",
+                "condensed_form": {"polymorph": transition_polymorph},
+                "units": "K",
+                "values": {
+                    "quantity": "transition_temperature",
+                    "property_kind": property_kind,
+                    "phase_from": phase_from,
+                    "phase_to": phase_to,
+                    "value_K": temperature_K,
+                },
+            },
+            {
+                "observation_id": "alpha_quartz_heat_of_fusion",
+                "type": "heat_capacity_and_heat_content_series",
+                "locator": {"table": "7", "row": "SiO2", "column": "delta_H_f"},
+                "phase": "cr",
+                "crystal_phase_as_stated": fusion_polymorph,
+                "condensed_form": {"polymorph": fusion_polymorph},
+                "units": "kJ/mol",
+                "values": {
+                    "quantity": "heat_of_fusion",
+                    "delta_H_fus_kJ_mol-1": 12.5,
+                },
+            },
+        ]
+    }
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    fusion = next(
+        obs
+        for obs in result.observations.values()
+        if obs.observation_id.endswith("::alpha_quartz_heat_of_fusion")
+    )
+
+    assert fusion.identity.temperature_K is not None
+    assert fusion.identity.temperature_K.is_unknown
+    if fusion.point_conditions is not None:
+        temperature = fusion.point_conditions.get("temperature_K")
+        assert temperature is None or temperature.state.is_unknown
