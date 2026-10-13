@@ -559,13 +559,15 @@ def _live_binding_cache_evidence(
         )
 
     from simulator.chemistry.kernel import ChemistryIntent
-    from simulator.reduced_real_determinism import (
-        _resolved_backend_for_cache_identity,
-    )
 
-    backend = _resolved_backend_for_cache_identity(
-        sim, ChemistryIntent.GATE_LIQUID_FRACTION, provider_role
-    )
+    if artifact == "freeze_gate_curve":
+        from simulator.reduced_real_determinism import (
+            _resolved_backend_for_cache_identity,
+        )
+
+        backend = _resolved_backend_for_cache_identity(
+            sim, ChemistryIntent.GATE_LIQUID_FRACTION, provider_role
+        )
     if provider_role == "fallback":
         registry = getattr(sim, "_chem_registry", None)
         provider = (

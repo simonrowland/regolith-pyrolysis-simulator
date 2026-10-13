@@ -1300,6 +1300,136 @@ def test_equilibrium_binding_producers_follow_input_selected_dependencies(
     ) == ()
 
 
+def test_equilibrium_guard_does_not_borrow_gate_supplier_admission(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from engines.alphamelts import AlphaMELTSProvider
+    from simulator.chemistry.kernel import ChemistryIntent, ProviderRegistry
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+    from tests.binding_admission_fixtures import install_synthetic_binding_receipt
+
+    install_synthetic_binding_receipt(
+        tmp_path,
+        monkeypatch,
+        bind_direct_backend=True,
+    )
+    equilibrium_backend = AlphaMELTSBackend()
+    gate_backend = AlphaMELTSBackend()
+    admission.publish_live_backend_admission(gate_backend)
+    assert getattr(
+        equilibrium_backend, "_engine_binding_admission_fingerprint", None
+    ) is None
+    assert gate_backend._engine_binding_admission_fingerprint is not None
+    registry = ProviderRegistry()
+    registry.register(
+        AlphaMELTSProvider(gate_backend),
+        [ChemistryIntent.GATE_LIQUID_FRACTION],
+    )
+    sim = SimpleNamespace(backend=equilibrium_backend, _chem_registry=registry)
+
+    assert not admission.live_binding_cache_eligibility(
+        sim,
+        artifact="equilibrium_post_record",
+    )
+
+
+def test_equilibrium_guard_keeps_own_admission_when_gate_supplier_unadmitted(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from engines.alphamelts import AlphaMELTSProvider
+    from simulator.chemistry.kernel import ChemistryIntent, ProviderRegistry
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+    from tests.binding_admission_fixtures import install_synthetic_binding_receipt
+
+    install_synthetic_binding_receipt(
+        tmp_path,
+        monkeypatch,
+        bind_direct_backend=True,
+    )
+    equilibrium_backend = AlphaMELTSBackend()
+    gate_backend = AlphaMELTSBackend()
+    admission.publish_live_backend_admission(equilibrium_backend)
+    registry = ProviderRegistry()
+    registry.register(
+        AlphaMELTSProvider(gate_backend),
+        [ChemistryIntent.GATE_LIQUID_FRACTION],
+    )
+    sim = SimpleNamespace(backend=equilibrium_backend, _chem_registry=registry)
+
+    assert admission.live_binding_cache_eligibility(
+        sim,
+        artifact="equilibrium_post_record",
+    )
+
+
+def test_equilibrium_guard_does_not_use_gate_receipt_when_own_receipt_is_stale(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from engines.alphamelts import AlphaMELTSProvider
+    from simulator.chemistry.kernel import ChemistryIntent, ProviderRegistry
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+    from tests.binding_admission_fixtures import install_synthetic_binding_receipt
+
+    install_synthetic_binding_receipt(
+        tmp_path,
+        monkeypatch,
+        bind_direct_backend=True,
+    )
+    equilibrium_backend = AlphaMELTSBackend()
+    gate_backend = AlphaMELTSBackend()
+    identity = admission.binding_identity_for_backend(equilibrium_backend)
+    receipt_path = admission.binding_receipt_path()
+    receipt = json.loads(receipt_path.read_text())
+    base = receipt["entries"][0]["provenance"]
+    equilibrium_provenance = {
+        **base,
+        "runtime_artifacts": {
+            "alphamelts_selected_binary": {"sha256": "a" * 64}
+        },
+    }
+    gate_provenance = {
+        **base,
+        "runtime_artifacts": {
+            "alphamelts_selected_binary": {"sha256": "b" * 64}
+        },
+    }
+    monkeypatch.setattr(
+        admission,
+        "current_backend_provenance",
+        lambda _identity, backend: (
+            equilibrium_provenance
+            if backend is equilibrium_backend
+            else gate_provenance
+        ),
+    )
+    receipt["entries"][0]["provenance"] = equilibrium_provenance
+    receipt_path.write_text(json.dumps(receipt))
+    admission.publish_live_backend_admission(equilibrium_backend)
+    assert equilibrium_backend._engine_binding_admission_fingerprint == (
+        admission.admission_fingerprint(identity, equilibrium_provenance)
+    )
+    receipt["entries"][0]["provenance"] = gate_provenance
+    receipt_path.write_text(json.dumps(receipt))
+    admission.publish_live_backend_admission(gate_backend)
+    assert gate_backend._engine_binding_admission_fingerprint == (
+        admission.admission_fingerprint(identity, gate_provenance)
+    )
+    registry = ProviderRegistry()
+    registry.register(
+        AlphaMELTSProvider(gate_backend),
+        [ChemistryIntent.GATE_LIQUID_FRACTION],
+    )
+    sim = SimpleNamespace(backend=equilibrium_backend, _chem_registry=registry)
+
+    assert not admission.live_binding_cache_eligibility(
+        sim,
+        artifact="equilibrium_post_record",
+    )
+
+
 def test_missing_selected_contributor_disables_live_cache_and_replay(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
