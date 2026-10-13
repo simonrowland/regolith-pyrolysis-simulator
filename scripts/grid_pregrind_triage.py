@@ -17,13 +17,18 @@ from pathlib import Path
 from typing import Any
 
 from scripts.grid_pregrind import DEFAULT_FEEDSTOCK_ANCHORS
-from simulator.melt_regime import MeltRegime, melt_regime
+from simulator.melt_regime import (
+    MeltRegime,
+    liquid_fraction_invalidity,
+    melt_regime,
+)
 from simulator.yaml_cache import load_cached_safe_yaml
 
 
 FAITHFUL_RUMP = "faithful-rump"
 CALCULATION_BUG = "calculation-bug"
 MELTS_VS_FREEZE = "melts-vs-freeze"
+INVALID_LIQUID_FRACTION = "invalid-liquid-fraction"
 ENGINE_REFUSAL = "engine-refusal"
 PRE_ENGINE_INPUT = "pre-engine-input"
 UNCLASSIFIED = "unclassified"
@@ -31,6 +36,7 @@ TRIAGE_CLASSES = (
     FAITHFUL_RUMP,
     CALCULATION_BUG,
     MELTS_VS_FREEZE,
+    INVALID_LIQUID_FRACTION,
     ENGINE_REFUSAL,
     PRE_ENGINE_INPUT,
     UNCLASSIFIED,
@@ -144,6 +150,15 @@ def classify_non_eval(row: Mapping[str, Any]) -> str:
     """Classify one persisted non-eval row using explicit recorded signals."""
     payload = _decoded_payload(row.get("raw_payload"))
     tokens = _reason_tokens(row) | _reason_tokens(payload)
+    persisted_fractions = (
+        row.get("generic_liquid_fraction"),
+        row.get("finder_liquid_fraction"),
+    )
+    if any(
+        fraction is not None and liquid_fraction_invalidity(fraction) is not None
+        for fraction in persisted_fractions
+    ):
+        return INVALID_LIQUID_FRACTION
     melts_fraction = _recorded_number(row, "generic_liquid_fraction")
     freeze_fraction = _recorded_number(row, "finder_liquid_fraction")
     requested_temperature = _recorded_number(

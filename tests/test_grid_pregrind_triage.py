@@ -103,6 +103,7 @@ def test_classify_non_eval_uses_real_producer_payloads_and_preserves_unknown():
             FAITHFUL_RUMP: 1,
             CALCULATION_BUG: 1,
             MELTS_VS_FREEZE: 0,
+            "invalid-liquid-fraction": 0,
             ENGINE_REFUSAL: 1,
             PRE_ENGINE_INPUT: 1,
             UNCLASSIFIED: 1,
@@ -112,6 +113,7 @@ def test_classify_non_eval_uses_real_producer_payloads_and_preserves_unknown():
                 FAITHFUL_RUMP: 0,
                 CALCULATION_BUG: 0,
                 MELTS_VS_FREEZE: 0,
+                "invalid-liquid-fraction": 0,
                 ENGINE_REFUSAL: 1,
                 PRE_ENGINE_INPUT: 1,
                 UNCLASSIFIED: 1,
@@ -120,6 +122,7 @@ def test_classify_non_eval_uses_real_producer_payloads_and_preserves_unknown():
                 FAITHFUL_RUMP: 1,
                 CALCULATION_BUG: 1,
                 MELTS_VS_FREEZE: 0,
+                "invalid-liquid-fraction": 0,
                 ENGINE_REFUSAL: 0,
                 PRE_ENGINE_INPUT: 0,
                 UNCLASSIFIED: 0,
@@ -180,10 +183,11 @@ def test_invalid_persisted_liquid_fractions_get_their_own_triage_category():
         "raw_payload": json.dumps({"engine_invoked": True}),
     }
 
-    for fraction in (-0.1, 1.2, float("nan")):
-        assert classify_non_eval(
-            {**base, "generic_liquid_fraction": fraction}
-        ) == "invalid-liquid-fraction"
+    for key in ("generic_liquid_fraction", "finder_liquid_fraction"):
+        for fraction in (-0.1, 1.2, float("nan")):
+            assert classify_non_eval({**base, key: fraction}) == (
+                "invalid-liquid-fraction"
+            )
 
 
 def test_report_ignores_success_and_uses_unassigned_feedstock_bucket():
