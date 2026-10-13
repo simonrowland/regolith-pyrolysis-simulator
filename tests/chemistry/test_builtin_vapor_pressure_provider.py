@@ -1010,7 +1010,10 @@ def test_melt_activity_normalizes_pure_raoultian_component_to_unity(oxide):
     assert provenance["melt_oxide_activity_reference_state"] == (
         "single_cation_Raoultian_pure_liquid_reference"
     )
-    assert "melt_parent_oxide_activity" not in provenance
+    assert provenance["melt_oxide_parent_formula"] == oxide
+    assert provenance["melt_parent_oxide_activity"] == pytest.approx(
+        activity.thermodynamic_parent_activity()
+    )
     assert "melt_oxide_activity_authority_status" not in provenance
     assert "melt_oxide_gamma_valid_range_K" not in provenance
 
