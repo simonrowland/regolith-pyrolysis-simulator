@@ -77,6 +77,10 @@ def _assert_migrated_table_values(document: dict, result) -> None:
         assert CONDITION_KEYS <= conditions.keys()
         assert all(conditions[key].state.is_value for key in CONDITION_KEYS)
         assert all(conditions[key].locator is not None for key in CONDITION_KEYS)
+        starting_composition = conditions["starting_composition"].state.value
+        assert starting_composition.basis == "printed_species"
+        assert starting_composition.amount_basis.value == "mole_fraction"
+        assert starting_composition.components == (("Fe", Decimal("1.000000000000")),)
 
     assert phase_counts == {"Fe(s)": 18, "Fe(l)": 26, "Fe(s)/Fe(l)": 1}
 
@@ -86,6 +90,14 @@ def test_ferguson_2004_pressure_points_and_fidelity_survive_migration(
 ) -> None:
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     assert check_all_fidelity_samples_match(document, label=str(EXTRACT)) == []
+
+    changed_purity = deepcopy(document)
+    changed_purity["species"]["Fe"]["observations"][0]["values"]["points"][0][
+        "point_conditions"
+    ]["starting_composition"]["state"]["value"]["printed_quotes"][0] = (
+        "a sample of iron (99.96% purity)"
+    )
+    assert check_all_fidelity_samples_match(changed_purity, label=str(EXTRACT))
 
     result = _migrate_real_extract(tmp_path, EXTRACT_NAME)
     _assert_migrated_table_values(document, result)
