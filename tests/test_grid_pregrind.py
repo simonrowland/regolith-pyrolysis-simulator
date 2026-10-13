@@ -4113,3 +4113,16 @@ def test_grid_pregrind_drain_only_restores_imported_class_identities():
 
     assert fe_redox_module.Kress91InvalidControls is _ORIGINAL_KRESS91_INVALID_CONTROLS
     assert vaporock_module.VapoRockBackend is _ORIGINAL_VAPOROCK_BACKEND
+
+
+def test_cache_v2_vapor_map_requires_sources_only_for_positive_liquid():
+    GridCacheWriter._validate_cache_v2_vapor_maps(
+        {"liquid_fraction": 0.0}
+    )
+    with pytest.raises(
+        ValueError,
+        match="cache_v2 positive-liquid vapor map must be non-empty and sourced",
+    ):
+        GridCacheWriter._validate_cache_v2_vapor_maps(
+            {"liquid_fraction": 1.0e-15}
+        )
