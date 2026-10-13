@@ -6274,7 +6274,7 @@ def test_imcc_complex_saturation_routes_only_own_prediction() -> None:
 
 
 def test_non_allibert_typed_solid_activity_uses_fusion_conversion() -> None:
-    from simulator.battery.score import _fusion_comparison_reference
+    from simulator.battery.score import fusion_comparison_reference
 
     temperature = Decimal("2000")
     composition = Composition(
@@ -6302,7 +6302,7 @@ def test_non_allibert_typed_solid_activity_uses_fusion_conversion() -> None:
         source_id="another-source",
     )
 
-    converted = _fusion_comparison_reference(reference)
+    converted = fusion_comparison_reference(reference)
     # Premise: JANAF electronic records Ca-027 (CaO(cr)) and Ca-028 (CaO(l)),
     # 2000 K formation-Gibbs rows, give -401.713 and -372.176 kJ/mol; neither
     # record has a printed page number. Algebra: ΔG_fus=G_l°-G_s°=+29.537
@@ -6338,7 +6338,7 @@ def test_solid_activity_fusion_conversion_reports_positive_offset(
 ) -> None:
     from simulator.battery.enums import Polymorph
     from simulator.battery.generators.janaf import janaf_fusion_energy
-    from simulator.battery.score import _fusion_comparison_reference
+    from simulator.battery.score import fusion_comparison_reference
 
     temperature = Decimal("1933")
     experiment = F.kems_experiment()
@@ -6370,7 +6370,7 @@ def test_solid_activity_fusion_conversion_reports_positive_offset(
         source_id="synthetic-solid-reference-anchor",
     )
 
-    converted = _fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    converted = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
     if expected_offset is None:
         assert converted.value.point == reference.value.point
         assert converted.identity.reference_state.value.endmember.phase.value is Phase.CR
@@ -6397,7 +6397,7 @@ def test_solid_activity_fusion_conversion_reports_positive_offset(
 
 
 def test_periclase_fusion_conversion_uses_restored_janaf_rows() -> None:
-    from simulator.battery.score import _fusion_comparison_reference
+    from simulator.battery.score import fusion_comparison_reference
 
     temperature = Decimal("1873")
 
@@ -6419,7 +6419,7 @@ def test_periclase_fusion_conversion_uses_restored_janaf_rows() -> None:
         evidence=EvidenceClass.MEASURED_DIRECT,
         source_id="synthetic-mgo-solid-reference-anchor",
     )
-    converted = _fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    converted = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
     assert converted.value.point != reference.value.point
     assert converted.identity.reference_state.value.endmember.phase.value is Phase.L
     assert any(
@@ -6438,7 +6438,7 @@ def test_periclase_solid_activity_fusion_conversion_uses_janaf_nodes() -> None:
     Δlog10(a) = 28.47061*1000/(8.31441*1873*ln(10)) = +0.793984 dex.
     """
     from simulator.battery.generators.janaf import janaf_fusion_energy
-    from simulator.battery.score import _fusion_comparison_reference
+    from simulator.battery.score import fusion_comparison_reference
 
     temperature = Decimal("1873")
     fusion = janaf_fusion_energy("MgO", temperature)
@@ -6470,7 +6470,7 @@ def test_periclase_solid_activity_fusion_conversion_uses_janaf_nodes() -> None:
         evidence=EvidenceClass.MEASURED_DIRECT,
         source_id="synthetic-mgo-solid-reference-anchor",
     )
-    converted = _fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    converted = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
     notice = next(
         item
         for item in converted.notices
@@ -6484,7 +6484,7 @@ def test_periclase_solid_activity_fusion_conversion_uses_janaf_nodes() -> None:
         reference,
         identity=_with_activity_reference_polymorph(identity, "spinel"),
     )
-    refused = _fusion_comparison_reference(
+    refused = fusion_comparison_reference(
         wrong_polymorph, engine=Engine.OPENIMCC
     )
     assert refused.value.point == reference.value.point
@@ -6515,7 +6515,7 @@ def test_unknown_cao_polymorph_converts_via_unique_janaf_solid_table(
     sanity check, DeltaH_fus(1 - T/Tm), with Tm = 3200 K, gives 34.208 and
     32.966 kJ/mol at those temperatures, close to the JANAF interpolations.
     """
-    from simulator.battery.score import _fusion_comparison_reference
+    from simulator.battery.score import fusion_comparison_reference
 
     experiment = F.kems_experiment()
     identity = _with_activity_reference_polymorph(
@@ -6537,7 +6537,7 @@ def test_unknown_cao_polymorph_converts_via_unique_janaf_solid_table(
     )
     assert reference.admission.status is AdmissionStatus.ADMITTED
 
-    converted = _fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    converted = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
 
     assert converted.identity.reference_state.value.endmember.phase.value is Phase.L
     assert converted.value.point != reference.value.point
@@ -6630,14 +6630,14 @@ def test_solid_reference_without_temperature_remains_a_missing_input_refusal() -
 
 
 def test_kume_2000_silica_row_conversion_view_has_stability_inference_flag() -> None:
-    from simulator.battery.score import _fusion_comparison_reference
+    from simulator.battery.score import fusion_comparison_reference
 
     context = load_score_context(sources=("kume-2000-cao-activities",))
     reference = context.observations[
         "kume-2000-cao-activities::kume_2000_table1_sample_1_sio2_activity"
     ]
 
-    comparison = _fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
 
     assert comparison.value.point != reference.value.point
     assert any(
@@ -6764,7 +6764,7 @@ def test_inferred_solid_activity_above_crossing_is_converted_with_selected_pair(
     import json
 
     from simulator.battery.generators.janaf import janaf_fusion_energy
-    from simulator.battery.score import _fusion_comparison_reference
+    from simulator.battery.score import fusion_comparison_reference
 
     experiment = F.kems_experiment()
     identity = _with_activity_reference_polymorph(
@@ -6790,7 +6790,7 @@ def test_inferred_solid_activity_above_crossing_is_converted_with_selected_pair(
         source_id="synthetic-inferred-solid-reference",
     )
 
-    comparison = _fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
     inference = next(
         notice
         for notice in comparison.notices
@@ -6840,7 +6840,7 @@ def test_unknown_polymorph_with_multiple_solid_tables_uses_lowest_janaf_gibbs() 
         _fusion_table_points,
         _interpolate_formation_gibbs,
     )
-    from simulator.battery.score import _fusion_comparison_reference
+    from simulator.battery.score import fusion_comparison_reference
 
     experiment = F.kems_experiment()
     identity = _with_activity_reference_polymorph(
@@ -6861,7 +6861,7 @@ def test_unknown_polymorph_with_multiple_solid_tables_uses_lowest_janaf_gibbs() 
         source_id="synthetic-ambiguous-solid-reference",
     )
 
-    comparison = _fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
     inference = next(
         item
         for item in comparison.notices
@@ -6891,7 +6891,7 @@ def test_unknown_polymorph_with_multiple_solid_tables_uses_lowest_janaf_gibbs() 
 def test_stability_bound_is_reported_against_the_row_band_without_refusing() -> None:
     import json
 
-    from simulator.battery.score import _fusion_comparison_reference
+    from simulator.battery.score import fusion_comparison_reference
 
     experiment = F.kems_experiment()
     identity = _with_activity_reference_polymorph(
@@ -6921,7 +6921,7 @@ def test_stability_bound_is_reported_against_the_row_band_without_refusing() -> 
         ),
     )
 
-    comparison = _fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
     inference = next(
         item
         for item in comparison.notices
@@ -6936,7 +6936,7 @@ def test_stability_bound_is_reported_against_the_row_band_without_refusing() -> 
 
 
 def test_single_table_cao_conversion_keeps_its_value_and_flag_byte_identical() -> None:
-    from simulator.battery.score import _fusion_comparison_reference
+    from simulator.battery.score import fusion_comparison_reference
 
     experiment = F.kems_experiment()
     identity = _with_activity_reference_polymorph(
@@ -6957,7 +6957,7 @@ def test_single_table_cao_conversion_keeps_its_value_and_flag_byte_identical() -
         source_id="synthetic-cao-reference",
     )
 
-    comparison = _fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
 
     assert comparison.value.point == Decimal("0.03698396471321415622463886555")
     assert tuple(notice.reason for notice in comparison.notices) == (
@@ -6982,7 +6982,7 @@ def test_tridymite_fusion_conversion_extrapolation_is_flagged() -> None:
         JANAF_R_J_PER_MOL_K,
         janaf_fusion_energy,
     )
-    from simulator.battery.score import _fusion_comparison_reference
+    from simulator.battery.score import fusion_comparison_reference
 
     experiment = F.kems_experiment()
     base_identity = F.activity_identity(
@@ -7008,10 +7008,10 @@ def test_tridymite_fusion_conversion_extrapolation_is_flagged() -> None:
         source_id="synthetic-tridymite-reference",
     )
 
-    before_comparison = _fusion_comparison_reference(
+    before_comparison = fusion_comparison_reference(
         before, engine=Engine.OPENIMCC
     )
-    after_comparison = _fusion_comparison_reference(after, engine=Engine.OPENIMCC)
+    after_comparison = fusion_comparison_reference(after, engine=Engine.OPENIMCC)
 
     assert (
         before_comparison.identity.reference_state.value.endmember.phase.value
@@ -7056,7 +7056,7 @@ def test_tridymite_fusion_conversion_applies_b1259_offset_to_value() -> None:
     )
     from simulator.battery.score import (
         _b1259_tridymite_cristobalite_delta_g,
-        _fusion_comparison_reference,
+        fusion_comparison_reference,
     )
 
     temperature = Decimal("1900")
@@ -7079,7 +7079,7 @@ def test_tridymite_fusion_conversion_applies_b1259_offset_to_value() -> None:
         source_id="synthetic-tridymite-reference",
     )
 
-    converted = _fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    converted = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
     # B1259 p. 145/p. 144 prints ΔfG=-136.315/-136.324 kcal/mol at 1900 K.
     # For equal chemical potential, both that source offset and the production
     # JANAF fusion Gibbs energy multiply activity by exp(-ΔG/RT).
@@ -7164,7 +7164,7 @@ def test_tridymite_offset_real_predictor_scores_above_fusion() -> None:
 def test_solid_activity_with_unmatched_polymorph_refuses_conversion(
     polymorph: str | None,
 ) -> None:
-    from simulator.battery.score import _fusion_comparison_reference
+    from simulator.battery.score import fusion_comparison_reference
 
     experiment = F.kems_experiment()
     identity = _with_activity_reference_polymorph(
@@ -7185,7 +7185,7 @@ def test_solid_activity_with_unmatched_polymorph_refuses_conversion(
         source_id="synthetic-unmatched-solid-polymorph",
     )
 
-    comparison = _fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
     if polymorph is None:
         assert comparison.value.point != reference.value.point
         assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
@@ -7218,7 +7218,7 @@ def test_solid_activity_with_unmatched_polymorph_refuses_conversion(
 
 
 def test_silica_solid_activity_with_stated_quartz_refuses_conversion() -> None:
-    from simulator.battery.score import _fusion_comparison_reference
+    from simulator.battery.score import fusion_comparison_reference
 
     experiment = F.kems_experiment()
     identity = _with_activity_reference_polymorph(
@@ -7239,7 +7239,7 @@ def test_silica_solid_activity_with_stated_quartz_refuses_conversion() -> None:
         source_id="synthetic-unmatched-solid-polymorph",
     )
 
-    comparison = _fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
     assert comparison.value.point == reference.value.point
     assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
     assert any(
@@ -7347,7 +7347,7 @@ def test_fusion_comparison_skips_missing_node_outside_interpolation_bracket(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     from simulator.battery.generators import janaf
-    from simulator.battery.score import _fusion_comparison_reference
+    from simulator.battery.score import fusion_comparison_reference
 
     original_points = janaf._fusion_table_points
 
@@ -7377,7 +7377,7 @@ def test_fusion_comparison_skips_missing_node_outside_interpolation_bracket(
         source_id="synthetic-missing-janaf-grid-node",
     )
 
-    comparison = _fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
     assert comparison.value.point != reference.value.point
     assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
     assert any(
@@ -7413,7 +7413,7 @@ def test_silica_fusion_interpolates_from_restored_1700_row() -> None:
 
 
 def test_liquid_activity_reference_is_not_shifted() -> None:
-    from simulator.battery.score import _fusion_comparison_reference
+    from simulator.battery.score import fusion_comparison_reference
 
     experiment = F.kems_experiment()
     identity = F.activity_identity(
@@ -7431,12 +7431,12 @@ def test_liquid_activity_reference_is_not_shifted() -> None:
         source_id="synthetic-liquid-reference",
     )
 
-    assert _fusion_comparison_reference(reference, engine=Engine.OPENIMCC) is reference
+    assert fusion_comparison_reference(reference, engine=Engine.OPENIMCC) is reference
 
 
 def test_solid_activity_at_or_above_fusion_is_unshifted() -> None:
     from simulator.battery.generators.janaf import janaf_fusion_energy
-    from simulator.battery.score import _fusion_comparison_reference
+    from simulator.battery.score import fusion_comparison_reference
 
     temperature = Decimal("3300")
     fusion = janaf_fusion_energy("CaO", temperature)
@@ -7459,7 +7459,7 @@ def test_solid_activity_at_or_above_fusion_is_unshifted() -> None:
         source_id="synthetic-above-fusion",
     )
 
-    comparison = _fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
     assert comparison.value.point == reference.value.point
     assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
     assert any(
@@ -7469,7 +7469,7 @@ def test_solid_activity_at_or_above_fusion_is_unshifted() -> None:
     )
 
 def test_solid_activity_at_missing_fusion_node_is_refused() -> None:
-    from simulator.battery.score import _fusion_comparison_reference
+    from simulator.battery.score import fusion_comparison_reference
 
     temperature = Decimal("3300")
     experiment = F.kems_experiment()
@@ -7490,7 +7490,7 @@ def test_solid_activity_at_missing_fusion_node_is_refused() -> None:
         source_id="synthetic-above-fusion",
     )
 
-    comparison = _fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
     assert comparison.value.point == reference.value.point
     assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
     assert any(
@@ -7512,7 +7512,7 @@ def test_solid_activity_at_missing_fusion_node_is_refused() -> None:
 def test_melts_fusion_shift_uses_restored_alumina_rows(
     engine: Engine, formula: str
 ) -> None:
-    from simulator.battery.score import _fusion_comparison_reference
+    from simulator.battery.score import fusion_comparison_reference
 
     experiment = F.kems_experiment()
     reference = F.observation(
@@ -7532,7 +7532,7 @@ def test_melts_fusion_shift_uses_restored_alumina_rows(
         source_id="synthetic-melts-reference-gap",
     )
 
-    converted = _fusion_comparison_reference(reference, engine=engine)
+    converted = fusion_comparison_reference(reference, engine=engine)
     if formula == "SiO2":
         assert converted.value.point != reference.value.point
         assert any(
@@ -7562,7 +7562,7 @@ def test_melts_fusion_shift_uses_restored_alumina_rows(
 def test_melts_liquid_reference_gap_is_attached_to_fusion_shift(
     engine: Engine, formula: str, bound: str
 ) -> None:
-    from simulator.battery.score import _fusion_comparison_reference
+    from simulator.battery.score import fusion_comparison_reference
 
     experiment = F.kems_experiment()
     reference = F.observation(
@@ -7582,7 +7582,7 @@ def test_melts_liquid_reference_gap_is_attached_to_fusion_shift(
         source_id="synthetic-melts-reference-gap",
     )
 
-    converted = _fusion_comparison_reference(reference, engine=engine)
+    converted = fusion_comparison_reference(reference, engine=engine)
     assert converted.value.point != reference.value.point
     assert any(
         item.kind is NoticeKind.DERIVATION_USES_COMPILATION
@@ -7593,7 +7593,7 @@ def test_melts_liquid_reference_gap_is_attached_to_fusion_shift(
     )
 
 def test_unestablished_engine_reference_keeps_solid_value_and_notices_residual() -> None:
-    from simulator.battery.score import _fusion_comparison_reference
+    from simulator.battery.score import fusion_comparison_reference
 
     inference_notice = Notice(
         kind=NoticeKind.DERIVATION_USES_COMPILATION,
@@ -7618,7 +7618,7 @@ def test_unestablished_engine_reference_keeps_solid_value_and_notices_residual()
         notices=(inference_notice,),
     )
 
-    untouched = _fusion_comparison_reference(
+    untouched = fusion_comparison_reference(
         reference, engine=Engine.INTERNAL_ANALYTICAL
     )
     assert untouched.value.point == reference.value.point
@@ -7659,7 +7659,7 @@ def test_unestablished_engine_reference_keeps_solid_value_and_notices_residual()
 
 
 def test_fusion_conversion_without_janaf_pair_returns_typed_notice() -> None:
-    from simulator.battery.score import _fusion_comparison_reference
+    from simulator.battery.score import fusion_comparison_reference
 
     experiment = F.kems_experiment()
     identity = F.activity_identity(
@@ -7676,7 +7676,7 @@ def test_fusion_conversion_without_janaf_pair_returns_typed_notice() -> None:
         source_id="another-source",
     )
 
-    result = _fusion_comparison_reference(reference)
+    result = fusion_comparison_reference(reference)
 
     assert result.value.point == reference.value.point
     assert result.identity.reference_state.value.endmember.phase.value is Phase.CR
@@ -7690,7 +7690,7 @@ def test_fusion_conversion_without_unique_janaf_crossing_returns_typed_notice(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     from simulator.battery.generators import janaf
-    from simulator.battery.score import _fusion_comparison_reference
+    from simulator.battery.score import fusion_comparison_reference
 
     experiment = F.kems_experiment()
     identity = F.activity_identity(
@@ -7711,7 +7711,7 @@ def test_fusion_conversion_without_unique_janaf_crossing_returns_typed_notice(
         raise ValueError(f"{formula}: expected one JANAF cr/l crossing, got []")
 
     monkeypatch.setattr(janaf, "janaf_fusion_energy", no_unique_crossing)
-    result = _fusion_comparison_reference(reference)
+    result = fusion_comparison_reference(reference)
 
     assert result.value.point == reference.value.point
     assert result.identity.reference_state.value.endmember.phase.value is Phase.CR
@@ -7882,7 +7882,7 @@ def test_missing_janaf_fusion_input_refuses_activity_residual(
 ) -> None:
     from simulator.battery.score import (
         FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
-        _fusion_comparison_reference,
+        fusion_comparison_reference,
     )
 
     experiment = F.kems_experiment()
@@ -7901,7 +7901,7 @@ def test_missing_janaf_fusion_input_refuses_activity_residual(
         source_id="another-source",
     )
 
-    unconverted = _fusion_comparison_reference(reference)
+    unconverted = fusion_comparison_reference(reference)
     assert unconverted.value.point == reference.value.point
     assert unconverted.identity.reference_state.value.endmember.phase.value is Phase.CR
     assert not any(
@@ -7940,14 +7940,14 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
     )
     from simulator.battery.score import (
         FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
-        _fusion_comparison_reference,
+        fusion_comparison_reference,
         flagged_stratum_rows,
         headline_rows,
         render_score_report_from_payloads,
     )
 
     assert "kems-051-allibert-1981" not in inspect.getsource(
-        _fusion_comparison_reference
+        fusion_comparison_reference
     )
 
     temperature = Decimal("2000")
@@ -7991,7 +7991,7 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
         ),
     )
     assert (
-        _fusion_comparison_reference(at_melting_reference).value.point
+        fusion_comparison_reference(at_melting_reference).value.point
         == Decimal("1")
     )
     alumina_fusion = janaf_fusion_energy("Al2O3", Decimal("2060"))
@@ -8014,7 +8014,7 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
             "corundum",
         ),
     )
-    converted_alumina = _fusion_comparison_reference(alumina_reference)
+    converted_alumina = fusion_comparison_reference(alumina_reference)
     assert converted_alumina.value.point != alumina_reference.value.point
     assert converted_alumina.identity.reference_state.value.endmember.phase.value is Phase.L
     assert (
@@ -8047,7 +8047,7 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
         observation_id="allibert-cao-solid-activity-at-1933K",
         identity=replace(identity, temperature_K=State.of(Decimal("1933"))),
     )
-    converted_1933 = _fusion_comparison_reference(allibert_1933)
+    converted_1933 = fusion_comparison_reference(allibert_1933)
     # Premise: JANAF records Ca-027 (CaO(cr)) and Ca-028 (CaO(l)), each with
     # T=1900/2000 K formation-Gibbs rows and no printed page number. Linear
     # interpolation to 1933 K gives G_s°=-420.996+0.33*(-401.713+420.996)
@@ -8061,7 +8061,7 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
     assert float(converted_1933.value.point).hex() == "0x1.26cc279ce8c6cp-3"
     assert abs(converted_1933.value.point - expected) < Decimal("1e-27")
 
-    converted = _fusion_comparison_reference(reference)
+    converted = fusion_comparison_reference(reference)
     assert converted.identity.reference_state.value.endmember.phase.value is Phase.L
     assert converted.evidence.class_.is_unknown
     assert reference.value.point == Decimal("1")
@@ -8157,7 +8157,7 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
         ),
         point_conditions={"composition": Located(State.of(composition))},
     )
-    converted_source_point = _fusion_comparison_reference(
+    converted_source_point = fusion_comparison_reference(
         source_point_reference
     )
     assert not converted_source_point.identity.composition.is_value
@@ -8182,7 +8182,7 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
         ),
         point_conditions={"composition": Located(State.of(composition))},
     )
-    converted_alumina_source_point = _fusion_comparison_reference(
+    converted_alumina_source_point = fusion_comparison_reference(
         alumina_source_point
     )
     assert (
