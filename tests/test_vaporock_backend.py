@@ -685,6 +685,41 @@ def test_system_entrypoint_marks_pressure_non_authoritative(monkeypatch):
     assert any("without the optional P argument" in w for w in result.warnings)
 
 
+def test_vaporock_adapter_invalid_fraction_is_rejected_by_battery_classifier(
+    monkeypatch,
+):
+    class FakeSystem:
+        def set_melt_comp(self, composition):
+            self.composition = dict(composition)
+
+        def eval_gas_abundances(self, temperature, log_fO2):
+            return {"Na(g)": -2.0}
+
+    _install_fake_import(monkeypatch, types.SimpleNamespace(System=FakeSystem))
+    backend = VapoRockBackend()
+    assert backend.initialize({"warm_worker": False})
+    result = backend.equilibrate(
+        1600.0,
+        composition_mol={"Na2O": 1.0},
+        fO2_log=-8.0,
+        pressure_bar=42.0,
+        liquid_fraction=1.2,
+    )
+
+    assert result.status == "non_authoritative"
+    assert result.phase_assemblage_available is False
+    assert result.liquid_fraction == 1.2
+
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        classify_equilibrate_outcome,
+    )
+
+    assert classify_equilibrate_outcome(result)[:2] == (
+        "refusal",
+        "liquid_fraction_invalid",
+    )
+
+
 def test_core_does_not_consume_non_authoritative_vaporock_pressures(monkeypatch):
     class FakeSystem:
         def set_melt_comp(self, composition):
