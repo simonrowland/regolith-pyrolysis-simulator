@@ -414,10 +414,16 @@ class AlphaMELTSProvider(ChemistryProvider):
         request: IntentRequest,
         species_mol: Mapping[str, float],
     ) -> dict:
-        intrinsic_fO2_log = request.control_inputs.get(
-            'intrinsic_fO2_log',
-            request.fO2_log,
-        )
+        if (
+            request.redox_state is not None
+            and request.redox_state.kind == 'buffer_offset'
+        ):
+            intrinsic_fO2_log = request.control_inputs.get('intrinsic_fO2_log')
+        else:
+            intrinsic_fO2_log = request.control_inputs.get(
+                'intrinsic_fO2_log',
+                request.fO2_log,
+            )
         return {
             'fe_redox_policy': request.fe_redox_policy,
             'applied_fe3fet': self._applied_fe3fet(species_mol),

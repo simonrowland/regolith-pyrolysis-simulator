@@ -28,6 +28,7 @@ from __future__ import annotations
 import ast
 import inspect
 import math
+from dataclasses import replace
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -484,6 +485,45 @@ def test_control_audit_keeps_buffer_offset_request_as_applied_fO2():
     requested = state.log_fO2_at(REDOX_STATE_REFERENCE_T_K)
     assert audit.requested['fO2_log'] == pytest.approx(requested)
     assert audit.applied['fO2_log'] == pytest.approx(requested)
+
+
+def test_redox_diagnostic_does_not_treat_buffer_reference_as_intrinsic():
+    provider = AlphaMELTSProvider(backend=None)
+    state = RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, 0.2)
+    reference_fO2_log = state.log_fO2_at(REDOX_STATE_REFERENCE_T_K)
+    request = _make_request(
+        ChemistryIntent.SILICATE_EQUILIBRIUM,
+        composition_mol=_basalt_species_mol(),
+        fO2_log=reference_fO2_log,
+        redox_state=state,
+    )
+
+    diagnostic = provider._redox_diagnostic(
+        request,
+        _basalt_species_mol(),
+    )
+    assert diagnostic['intrinsic_fO2_log'] is None
+
+    explicit_request = replace(
+        request,
+        control_inputs={'intrinsic_fO2_log': -8.25},
+    )
+    assert provider._redox_diagnostic(
+        explicit_request,
+        _basalt_species_mol(),
+    )['intrinsic_fO2_log'] == pytest.approx(-8.25)
+
+    for redox_state in (None, RedoxState.absolute(-9.0)):
+        scalar_request = _make_request(
+            ChemistryIntent.SILICATE_EQUILIBRIUM,
+            composition_mol=_basalt_species_mol(),
+            fO2_log=-9.0,
+            redox_state=redox_state,
+        )
+        assert provider._redox_diagnostic(
+            scalar_request,
+            _basalt_species_mol(),
+        )['intrinsic_fO2_log'] == pytest.approx(-9.0)
 
 
 def test_ec_samples_evaluate_redox_state_at_each_sample_temperature(
