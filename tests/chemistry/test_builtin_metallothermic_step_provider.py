@@ -79,6 +79,21 @@ from simulator.state import (
 from tests.chemistry.conftest import _atom_check, _build_sim
 
 
+@pytest.fixture(scope="module", autouse=True)
+def _close_magemin_pools_created_by_module(
+    _assert_magemin_warm_pools_closed_at_module_teardown,
+):
+    from conftest import _live_magemin_warm_pools
+
+    preexisting_pools = {
+        pool for pool, _worker_names in _live_magemin_warm_pools()
+    }
+    yield
+    for pool, _worker_names in _live_magemin_warm_pools():
+        if pool not in preexisting_pools:
+            pool.close(cancel_pending=True)
+
+
 def _hkl_only_setpoints(setpoints_data):
     """Keep downstream metallothermic smoke tests on an evaluable flux path."""
     patched = dict(setpoints_data)
@@ -2404,9 +2419,11 @@ def test_c6_static_hold_exercises_c6_proceed_decision_path(
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
+    request,
 ):
     readiness_timeout_s = 10.0
     magemin = MAGEMinBackend()
+    request.addfinalizer(magemin.close)
     if not magemin.initialize({}):
         pytest.skip("MAGEMin live backend unavailable: binary not located")
     readiness = magemin.equilibrate(

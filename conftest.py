@@ -227,19 +227,32 @@ def pytest_sessionfinish(
         _SESSION_WATCHDOG = None
 
 
-def _assert_no_live_magemin_warm_pools() -> None:
+def _live_magemin_warm_pools():
+    from simulator.engine_pool import _LIVE_ENGINE_POOLS
+
+    pools = []
+    for pool in tuple(_LIVE_ENGINE_POOLS):
+        worker_names = tuple(
+            str(getattr(worker, "name", ""))
+            for worker in tuple(getattr(pool, "workers", ()))
+            if str(getattr(worker, "name", "")).startswith(
+                "MAGEMin subprocess pool slot "
+            )
+        )
+        if worker_names:
+            pools.append((pool, worker_names))
+    return tuple(pools)
+
+
+def _assert_no_live_magemin_warm_pools(preexisting_pools=frozenset()) -> None:
     import gc
 
     gc.collect()
-    from simulator.engine_pool import _LIVE_ENGINE_POOLS
-
     live_workers = [
-        str(getattr(worker, "name", ""))
-        for pool in tuple(_LIVE_ENGINE_POOLS)
-        for worker in tuple(getattr(pool, "workers", ()))
-        if str(getattr(worker, "name", "")).startswith(
-            "MAGEMin subprocess pool slot "
-        )
+        name
+        for pool, worker_names in _live_magemin_warm_pools()
+        if pool not in preexisting_pools
+        for name in worker_names
     ]
     assert not live_workers, (
         "test module left MAGEMin warm pools alive: "
@@ -249,8 +262,12 @@ def _assert_no_live_magemin_warm_pools() -> None:
 
 @pytest.fixture(scope="module", autouse=True)
 def _assert_magemin_warm_pools_closed_at_module_teardown():
+    # Pools owned by wider-scoped fixtures can outlive a module that uses them.
+    preexisting_pools = {
+        pool for pool, _worker_names in _live_magemin_warm_pools()
+    }
     yield
-    _assert_no_live_magemin_warm_pools()
+    _assert_no_live_magemin_warm_pools(preexisting_pools)
 
 
 @pytest.fixture
