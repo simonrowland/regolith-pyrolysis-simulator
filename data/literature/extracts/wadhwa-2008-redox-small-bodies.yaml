@@ -40,7 +40,25 @@ fidelity_samples:
     locator: {pdf_page_index: 2, page: 3, published_page: 495}
   - species: FeO
     observation_id: wadh08_ureilite_fo2_temperatures
-    value: {log10_fO2_at_1200_K: '~10−18', log10_fO2_at_1600_K: '~10−12'}
+    value:
+      method_class: review_compilation
+      quantity: fugacity
+      cited_primary: Berkley and Jones (1982)
+      points:
+        - temperature_K: '1200'
+          fugacity: '1e-18'
+          fO2_as_published: '~10−18'
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '1200'}
+              locator: {pdf_page_index: 3, page: 4, published_page: 496, note: 1200 K}
+        - temperature_K: '1600'
+          fugacity: '1e-12'
+          fO2_as_published: '~10−12'
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '1600'}
+              locator: {pdf_page_index: 3, page: 4, published_page: 496, note: 1600 K}
     locator: {pdf_page_index: 3, page: 4, published_page: 496}
   - species: FeO
     observation_id: wadh08_angra_dos_reis_redox
@@ -145,11 +163,11 @@ fidelity_samples:
   - species: FeO
     observation_id: wadh08_fig3_shergottite_comparisons
     value:
-      axes: 'x = Fe-Ti oxide and olivine-pyroxene-spinel equilibria (ΔQFM); y = Eu/Gd augite oxybarometer (ΔQFM)'
+      axes: 'x = Fe-Ti oxide and olivine-pyroxene-spinel equilibria; y = Eu/Gd augite oxybarometer'
       plotted_points_read_to_about_0_1_log_unit:
         - {sample: Shergotty, x: '-1.2', y: '-1.6'}
         - {sample: Zagami, x: '-1.2', y: '-3.1'}
-        - {sample: Los Angeles, x: '-1.4', y: '-2.6'}
+        - {sample: Los Angeles, x: '-1.4', y: '-3.3'}
         - {sample: EETA 79001A, x: '-1.7', y: '-3.2'}
         - {sample: EETA 79001B, x: '-1.9', y: '-4.2'}
         - {sample: DaG 476, x: '-2.3', y: '-4.1'}
@@ -158,7 +176,7 @@ fidelity_samples:
   - species: FeO
     observation_id: wadh08_fig4_angrite_augite_comparison
     value:
-      axes: 'x = Eu/Gd pigeonite oxybarometer (ΔIW); y = angrite augite oxybarometer (ΔIW)'
+      axes: 'x = Eu/Sm pigeonite oxybarometer; y = angrite augite oxybarometer'
       plotted_points_read_to_about_0_1_log_unit:
         - {sample: QUE 94201, x: '-0.6', y: '-1.0'}
         - {sample: Zagami, x: '0.2', y: '0.5'}
@@ -169,7 +187,7 @@ fidelity_samples:
   - species: FeO
     observation_id: wadh08_fig4_shergottite_augite_comparison
     value:
-      axes: 'x = Eu/Sm pigeonite oxybarometer (ΔIW); y = shergottite augite oxybarometer (ΔIW)'
+      axes: 'x = Eu/Sm pigeonite oxybarometer; y = shergottite augite oxybarometer'
       plotted_points_read_to_about_0_1_log_unit:
         - {sample: QUE 94201, x: '-0.5', y: '-1.5'}
         - {sample: Zagami, x: '0.3', y: '0.8'}
@@ -179,19 +197,43 @@ fidelity_samples:
     locator: {pdf_page_index: 9, page: 10, published_page: 502, figure: '4B'}
   - species: FeO
     observation_id: wadh08_fig6_small_bodies_band
-    value: {ΔIW_band_read_from_axis: ['-5', '+1'], midpoint_eucrite_label: '~IW–1'}
+    value: {band_read_from_axis: ['-5', '+1'], eucrite_label: '~IW–1'}
     locator: {pdf_page_index: 13, page: 14, published_page: 506, figure: '6'}
   - species: FeO
     observation_id: wadh08_fig6_moon_band
-    value: {ΔIW_band_read_from_axis: ['-2', 'slightly above 0'], lunar_mantle_label: '~IW–1'}
+    value: {band_read_from_axis: ['-2', 'slightly above 0'], lunar_mantle_label: '~IW–1'}
     locator: {pdf_page_index: 13, page: 14, published_page: 506, figure: '6'}
   - species: FeO
     observation_id: wadh08_fig6_mars_band
-    value: {ΔIW_band_read_from_axis: ['slightly below -1', '+4'], groups_shown: 'depleted shergottites, enriched shergottites, nakhlites'}
+    value: {band_read_from_axis: ['slightly below -1', '+4'], groups_shown: 'depleted shergottites, enriched shergottites, nakhlites'}
     locator: {pdf_page_index: 13, page: 14, published_page: 506, figure: '6'}
 species:
   FeO:
-    observations: []
+    observations:
+      - observation_id: wadh08_ureilite_fo2_temperatures
+        regime: review_compilation
+        type: partial_pressure
+        locator: {pdf_page_index: 3, page: 4, published_page: 496}
+        units: fO2 as published; pressure unit not stated
+        values:
+          method_class: review_compilation
+          quantity: fugacity
+          cited_primary: Berkley and Jones (1982)
+          points:
+            - temperature_K: '1200'
+              fugacity: '1e-18'
+              fO2_as_published: '~10−18'
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: '1200'}
+                  locator: {pdf_page_index: 3, page: 4, published_page: 496, note: 1200 K}
+            - temperature_K: '1600'
+              fugacity: '1e-12'
+              fO2_as_published: '~10−12'
+              point_conditions:
+                temperature_K:
+                  state: {tag: value, value: '1600'}
+                  locator: {pdf_page_index: 3, page: 4, published_page: 496, note: 1600 K}
     context:
       - observation_id: wadh08_enstatite_chondrite_redox
         type: compiled_redox_estimate
@@ -229,12 +271,6 @@ species:
         units: log10 fO2 relative to IW
         values: {estimate_as_published: '~IW-2'}
         context: 'method_class: compiled; body/sample: acapulcoites; oxybarometer: olivine-orthopyroxene-chromite assemblages (similar methodology, as stated); original reference: "Benedix and Lauretta (2006)".'
-      - observation_id: wadh08_ureilite_fo2_temperatures
-        type: compiled_redox_estimate
-        locator: {pdf_page_index: 3, page: 4, published_page: 496}
-        units: fO2 as published
-        values: {fO2_at_1200_K_as_published: '~10−18', fO2_at_1600_K_as_published: '~10−12'}
-        context: 'method_class: compiled; body/sample: ureilite parent magma; oxybarometer: ureilite olivine compositions with assumed C-CO/CO2 equilibria; original reference: "Berkley and Jones (1982)". The chapter calls 1200 and 1600 K petrologically relevant temperatures.'
       - observation_id: wadh08_angra_dos_reis_redox
         type: compiled_redox_estimate
         locator: {pdf_page_index: 3, page: 4, published_page: 496}
@@ -394,7 +430,7 @@ species:
           plotted_points_read_to_about_0_1_log_unit:
             - {sample: Shergotty, x: '-1.2', y: '-1.6'}
             - {sample: Zagami, x: '-1.2', y: '-3.1'}
-            - {sample: Los Angeles, x: '-1.4', y: '-2.6'}
+            - {sample: Los Angeles, x: '-1.4', y: '-3.3'}
             - {sample: EETA 79001A, x: '-1.7', y: '-3.2'}
             - {sample: EETA 79001B, x: '-1.9', y: '-4.2'}
             - {sample: DaG 476, x: '-2.3', y: '-4.1'}
@@ -405,7 +441,7 @@ species:
         locator: {pdf_page_index: 9, page: 10, published_page: 502, figure: '4A'}
         units: ΔIW, log units
         values:
-          axes: 'x = Eu/Gd pigeonite oxybarometer; y = angrite augite oxybarometer'
+          axes: 'x = Eu/Sm pigeonite oxybarometer; y = angrite augite oxybarometer'
           plotted_points_read_to_about_0_1_log_unit:
             - {sample: QUE 94201, x: '-0.6', y: '-1.0'}
             - {sample: Zagami, x: '0.2', y: '0.5'}
