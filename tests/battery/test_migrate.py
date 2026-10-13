@@ -11702,3 +11702,53 @@ def test_fusion_quantities_migrate_with_phase_transition_identity(tmp_path: Path
     assert quantity_token(heat_content.identity) is Quantity.H_MINUS_H298
     assert heat_content.value.kind is ValueKind.POINT
     assert heat_content.value.point == Decimal("2.0")
+
+
+def test_fusion_temperature_join_preserves_matching_melting_point(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["SiO2"] = {
+        "observations": [
+            {
+                "observation_id": "alpha_quartz_melting_point",
+                "type": "transition_point",
+                "locator": {"table": "7", "row": "SiO2"},
+                "phase": "cr",
+                "condensed_form": {"polymorph": "alpha_quartz"},
+                "units": "K",
+                "values": {
+                    "quantity": "transition_temperature",
+                    "property_kind": "melting_point",
+                    "phase_from": "alpha quartz",
+                    "phase_to": "liquid",
+                    "value_K": 1200,
+                },
+            },
+            {
+                "observation_id": "alpha_quartz_heat_of_fusion",
+                "type": "heat_capacity_and_heat_content_series",
+                "locator": {"table": "7", "row": "SiO2", "column": "delta_H_f"},
+                "phase": "cr",
+                "crystal_phase_as_stated": "alpha quartz",
+                "condensed_form": {"polymorph": "alpha_quartz"},
+                "units": "kJ/mol",
+                "values": {
+                    "quantity": "heat_of_fusion",
+                    "delta_H_fus_kJ_mol-1": 12.5,
+                },
+            },
+        ]
+    }
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    fusion = next(
+        obs
+        for obs in result.observations.values()
+        if obs.observation_id.endswith("::alpha_quartz_heat_of_fusion")
+    )
+
+    assert fusion.identity.temperature_K is not None
+    assert fusion.identity.temperature_K.value == Decimal("1200")
+    temperature = fusion.point_conditions["temperature_K"]
+    assert temperature.state.value == Decimal("1200")
+    assert temperature.locator is not None
+    assert temperature.locator.table == "7"
