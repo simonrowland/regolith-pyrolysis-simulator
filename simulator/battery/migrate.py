@@ -11845,15 +11845,18 @@ class Migrator:
         method: State[MethodToken] | None = None,
         quantity: Quantity | None = None,
         species_formula: str | None = None,
+        source_values: Mapping[str, Any] | None = None,
+        point_values: Mapping[str, Any] | None = None,
     ) -> tuple[dict[str, Any], tuple[str, ...]]:
         """Lift printed experiment conditions into an observation identity.
 
         An observation may omit conditions that its declared experiment records
         once. Pressure inherits only an exact experiment-scope value; a static
-        p_sat row also gets a pure reservoir when the sample's printed form and
-        single-component composition agree. The C–CO route is resolved through
-        the same guarded waypoint used by consumers, with derived pressure
-        provenance retained.
+        p_sat row gets a pure reservoir when the sample's printed form and
+        single-component composition agree. Point-scoped effusion phases are
+        resolved here from their own source rows. The C–CO route is resolved
+        through the same guarded waypoint used by consumers, with derived
+        pressure provenance retained.
         """
 
         experiment = self.result.experiments.get(experiment_id)
@@ -11861,6 +11864,14 @@ class Migrator:
             return {}, ()
         known: dict[str, Any] = {}
         provenance: list[str] = []
+
+        def has_pure_component_composition(state: State[Any] | None) -> bool:
+            return (
+                state is not None
+                and state.is_value
+                and isinstance(state.value, Composition)
+                and state.value.components == ((species_formula, Decimal("1")),)
+            )
 
         effective_method = (
             method
@@ -11871,8 +11882,17 @@ class Migrator:
             quantity is Quantity.P_SAT
             and species_formula is not None
             and effective_method.is_value
-            and effective_method.value is MethodToken.STATIC_EQUILIBRIUM
+            and effective_method.value
+            in {
+                MethodToken.STATIC_EQUILIBRIUM,
+                MethodToken.KNUDSEN_EFFUSION,
+            }
         ):
+            # Knudsen effusion qualifies only for a reported pressure: the
+            # orifice is sized so the cell remains near equilibrium with the
+            # condensed sample, and p_sat reports that equilibrium pressure.
+            # A flux/evaporation rate is kinetic, and an unstated condensed
+            # phase cannot supply a reservoir identity.
             sample = experiment.sample
             form = (
                 sample.form.state.value.strip().casefold()
@@ -11881,20 +11901,104 @@ class Migrator:
             )
             sample_phase = PHASE_MAP.get(form) if form is not None else None
             initial = sample.initial_composition
-            pure_sample = (
-                initial is not None
-                and initial.state.is_value
-                and isinstance(initial.state.value, Composition)
-                and initial.state.value.components
-                == ((species_formula, Decimal("1")),)
+            pure_sample = has_pure_component_composition(
+                initial.state if initial is not None else None
             )
             existing_reservoir = existing.get("reservoir")
             reservoir_can_fill = "reservoir" not in existing or (
                 isinstance(existing_reservoir, State)
                 and existing_reservoir.is_unknown
             )
-            if (
-                reservoir_can_fill
+            source_points = (
+                source_values.get("points")
+                if isinstance(source_values, Mapping)
+                else None
+            )
+            source_has_point_phases = isinstance(source_points, (list, tuple)) and any(
+                isinstance(point, Mapping) and "phase_as_published" in point
+                for point in source_points
+            )
+            source_uses_point_reservoirs = source_has_point_phases or (
+                isinstance(source_points, (list, tuple))
+                and str(source_values.get("method_class") or "")
+                .strip()
+                .casefold()
+                == "measured_tabulated"
+            )
+            if point_values is not None and isinstance(source_values, Mapping):
+                gas_formula = _extract_formula_token(
+                    source_values.get("gas_species")
+                )
+                point_conditions = point_values.get("point_conditions")
+                starting_composition = (
+                    point_conditions.get("starting_composition")
+                    if isinstance(point_conditions, Mapping)
+                    else None
+                )
+                if starting_composition is not None:
+                    point_composition = _point_condition_from_plain(
+                        starting_composition, key="starting_composition"
+                    )
+                    pure_sample = has_pure_component_composition(
+                        point_composition.state
+                    )
+
+                raw_phase = point_values.get("phase_as_published")
+                phase_options = (
+                    ("s", Phase.CR),
+                    ("l", Phase.L),
+                )
+                point_phases = []
+                for source_phase, reservoir_phase in phase_options:
+                    declared = _source_standard_state_phase(raw_phase, source_phase)
+                    if declared is not None:
+                        point_phases.append(
+                            (declared.split("(", 1)[0], reservoir_phase)
+                        )
+                method_class = str(
+                    source_values.get("method_class") or ""
+                ).strip().casefold()
+                point_effusion_psat = (
+                    effective_method.is_value
+                    and effective_method.value is MethodToken.KNUDSEN_EFFUSION
+                    and method_class == "measured_tabulated"
+                    and gas_formula == species_formula
+                )
+                if reservoir_can_fill and pure_sample and point_effusion_psat:
+                    # A Knudsen cell in equilibrium with a stated pure condensed
+                    # phase measures that phase's p_sat. If the source phase
+                    # assignment spans solid and liquid at the melting boundary,
+                    # neither phase's p_sat is uniquely identified; keep it unknown.
+                    phase_note = source_values.get("phase_assignment_note")
+                    note_provenance = (
+                        f"; source phase assignment: {phase_note}"
+                        if isinstance(phase_note, str) and phase_note.strip()
+                        else ""
+                    )
+                    if len(point_phases) == 1:
+                        condensed_formula, reservoir_phase = point_phases[0]
+                        if condensed_formula == gas_formula:
+                            known["reservoir"] = State.of(
+                                make_species(gas_formula, reservoir_phase)
+                            )
+                            provenance.append(
+                                "identity.reservoir=point phase_as_published "
+                                f"{raw_phase!r}; source phase assignment is inferred"
+                                f"{note_provenance}"
+                            )
+                    elif len(point_phases) > 1:
+                        known["reservoir"] = State.unknown(
+                            f"point phase_as_published {raw_phase!r} is ambiguous "
+                            "between condensed phases"
+                        )
+                        provenance.append(
+                            "identity.reservoir remains unknown because point "
+                            "phase_as_published is ambiguous"
+                            f"{note_provenance}"
+                        )
+            elif (
+                not source_uses_point_reservoirs
+                and reservoir_can_fill
                 and sample_phase
                 in {Phase.CR, Phase.L, Phase.GLASS, Phase.SUPERCOOLED_L}
                 and pure_sample
@@ -12805,6 +12909,12 @@ class Migrator:
         phase_raw = compilation_phase_text(values) or compilation_phase_text(obs)
         phase_provenance: str | None = None
         transition_reason = transition_phase_reason(obs_type, values)
+        method_class = str(values.get("method_class") or "").strip().casefold()
+        measured_tabulated_gas_formula = (
+            _extract_formula_token(values.get("gas_species"))
+            if q_token is Quantity.P_SAT and method_class == "measured_tabulated"
+            else None
+        )
         if (phase_raw is None or phase_raw == "") and transition_reason:
             phase, unmapped_phase = State.unknown(transition_reason), None
         else:
@@ -12823,12 +12933,12 @@ class Migrator:
                 q_token, source_standard_state
             )
             # Derived/reduced pressure rows may identify a gas species even
-            # when the source phase names its condensed system; measured rows
-            # keep an explicit, missing, or unmapped source phase.
-            method_class = str(values.get("method_class") or "").strip().casefold()
+            # when the source phase names its condensed system. For a measured
+            # tabulated p_sat row, the explicit gas_species field identifies the
+            # pressure species; the per-point phase remains its condensed reservoir.
             source_declares_gas_phase = _source_standard_state_phase(
                 source_standard_state, "g"
-            ) is not None
+            ) is not None or measured_tabulated_gas_formula is not None
             inferred_pressure_phase = (
                 source_declares_gas_phase
                 or method_class
@@ -12844,9 +12954,17 @@ class Migrator:
             ):
                 phase = State.of(Phase.G)
                 unmapped_phase = None
+                if measured_tabulated_gas_formula is not None:
+                    phase_provenance = (
+                        "species.phase=gas declared by source values.gas_species "
+                        f"{values.get('gas_species')}"
+                    )
             if not (phase.is_value and phase.value is Phase.G):
                 phase_provenance = None
-        if phase_raw is None or phase_raw == "":
+        if (
+            (phase_raw is None or phase_raw == "")
+            and measured_tabulated_gas_formula is None
+        ):
             measured.missing_phases += 1
             self.result.add_queue(
                 work.work_id,
@@ -12866,11 +12984,18 @@ class Migrator:
                 source=source_key,
                 observation_id=obs_id,
             )
-        species_formula = str(values.get("formula") or formula)
+        species_formula = measured_tabulated_gas_formula or str(
+            values.get("formula") or formula
+        )
         if values.get("formula"):
             measured.formulas += 1
+        species_polymorph = (
+            None
+            if measured_tabulated_gas_formula is not None
+            else polymorph_from_extract(obs)
+        )
         species = make_species(
-            species_formula, phase, polymorph=polymorph_from_extract(obs)
+            species_formula, phase, polymorph=species_polymorph
         )
         suffix_formula, suffix_derivation, suffix_reference = (None, None, None)
         raw_quantity = values.get("quantity") if isinstance(values, Mapping) else None
@@ -12879,9 +13004,9 @@ class Migrator:
             suffix_formula, suffix_derivation, suffix_reference = parse_quantity_suffix(
                 suffix
             )
-            if suffix_formula:
+            if suffix_formula and measured_tabulated_gas_formula is None:
                 species = make_species(
-                    suffix_formula, phase, polymorph=polymorph_from_extract(obs)
+                    suffix_formula, phase, polymorph=species_polymorph
                 )
         composition_refusal: list[str] = []
         initial_oxide_map = _initial_oxide_map_from_values(
@@ -13613,6 +13738,7 @@ class Migrator:
             method=method,
             quantity=q_token,
             species_formula=species.formula,
+            source_values=values if isinstance(values, Mapping) else None,
         )
         identity_for_profile = (
             Identity(
@@ -14646,6 +14772,35 @@ class Migrator:
                 ident_kwargs["composition"] = State.unknown(
                     composition_unknown_reason(composition_refusal)
                 )
+        if (
+            q_token_point is Quantity.P_SAT
+            and isinstance(raw_item, Mapping)
+            and isinstance(parent_values, Mapping)
+            and str(parent_values.get("method_class") or "")
+            .strip()
+            .casefold()
+            == "measured_tabulated"
+        ):
+            experiment = self.result.experiments.get(experiment_id)
+            if experiment is not None:
+                point_identity, point_identity_provenance = (
+                    self._experiment_identity_fields(
+                        experiment_id,
+                        ident_kwargs,
+                        method=experiment.method,
+                        quantity=q_token_point,
+                        species_formula=species.formula,
+                        source_values=parent_values,
+                        point_values=raw_item,
+                    )
+                )
+                if "reservoir" in point_identity:
+                    ident_kwargs["reservoir"] = point_identity["reservoir"]
+                    identity_provenance += tuple(
+                        item
+                        for item in point_identity_provenance
+                        if item.startswith("identity.reservoir")
+                    )
         printed_phase_text = (
             _printed_point_phase_text(raw_item)
             if isinstance(raw_item, Mapping)
