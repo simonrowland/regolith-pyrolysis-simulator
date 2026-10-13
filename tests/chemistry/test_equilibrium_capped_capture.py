@@ -17,6 +17,27 @@ def efficiency(model, pressure, *, alpha=0.02, residence=5.0, flow=1.0):
     )
 
 
+def _integrated_pressure_driven_capture(
+    *, pressure, psat, temperature, coefficient, area, inventory, residence,
+):
+    """Numerically integrate dN/dt=-K*A*(p(N)-P_sat), independent of the closed form."""
+    volume = inventory * condensation.GAS_CONSTANT_J_MOL_K * temperature / pressure
+
+    def derivative(moles):
+        local_pressure = moles * condensation.GAS_CONSTANT_J_MOL_K * temperature / volume
+        return -coefficient * (local_pressure - psat) * area
+
+    moles = inventory
+    dt = residence / 10_000
+    for _ in range(10_000):
+        k1 = derivative(moles)
+        k2 = derivative(moles + dt * k1 / 2)
+        k3 = derivative(moles + dt * k2 / 2)
+        k4 = derivative(moles + dt * k3)
+        moles += dt * (k1 + 2 * k2 + 2 * k3 + k4) / 6
+    return 1 - moles / inventory
+
+
 @pytest.mark.parametrize("alpha,residence", [(0.0, 5.0), (0.02, 0.0)])
 def test_zero_surface_uptake_or_residence(alpha, residence):
     assert efficiency(_configured_model(), 27.18, alpha=alpha, residence=residence) == 0.0
@@ -39,6 +60,39 @@ def test_large_capture_rate_stops_at_equilibrium():
     assert efficiency(model, 27.18) == pytest.approx(1 - psat / 27.18)
 
 
+@pytest.mark.parametrize(
+    ("sat_ratio", "integrated_capture"),
+    [(0.5, 0.3160602794), (0.9, 0.06321205588)],
+)
+def test_capture_matches_numerical_excess_inventory_ode(sat_ratio, integrated_capture):
+    model = _configured_model()
+    model.regime_factor = 1.0
+    area = 0.045238934
+    model.stage_area_m2_by_stage = {"1": area}
+    psat, refused = condensation._try_antoine_psat_pa("Fe", 1523.15)
+    assert not refused
+    pressure = psat / sat_ratio
+    molar_mass = condensation.MOLAR_MASS["Fe"] / 1000
+    temperature = model.gas_temperature_C + 273.15
+    coefficient = 0.02 / math.sqrt(
+        2 * math.pi * molar_mass * condensation.GAS_CONSTANT_J_MOL_K * temperature
+    )
+    flow = coefficient * pressure * area * molar_mass * 3600
+    inventory = flow / molar_mass / 3600 * 5
+    integrated = _integrated_pressure_driven_capture(
+        pressure=pressure, psat=psat, temperature=temperature,
+        coefficient=coefficient, area=area, inventory=inventory, residence=5,
+    )
+    assert integrated == pytest.approx(integrated_capture, rel=1e-8)
+
+    actual = model._condensation_efficiency(
+        stage=model.train.stages[1], species="Fe", T_cond_C=1250,
+        residence_s=5, available_kg=flow, alpha_s_value=0.02,
+        inlet_partial_pressure_pa=pressure,
+    )
+    assert actual == pytest.approx(integrated, rel=1e-8)
+
+
 def test_free_molecular_rate_uses_actual_flow_inventory():
     model = _configured_model()
     model.regime_factor = 1.0
@@ -49,8 +103,14 @@ def test_free_molecular_rate_uses_actual_flow_inventory():
     # M from the species registry; flow is kg/h, so n_dot=flow/M/3600.
     mass = condensation.MOLAR_MASS["Fe"] / 1000
     gas_K = model.gas_temperature_C + 273.15
-    flux = 0.02 * (27.18 - psat) / math.sqrt(2 * math.pi * mass * 8.314462618 * gas_K)
-    expected = -math.expm1(-flux * 1e-5 / (1.0 / mass / 3600))
+    coefficient = 0.02 / math.sqrt(
+        2 * math.pi * mass * condensation.GAS_CONSTANT_J_MOL_K * gas_K
+    )
+    inventory = 1.0 / mass / 3600 * 5
+    expected = _integrated_pressure_driven_capture(
+        pressure=27.18, psat=psat, temperature=gas_K, coefficient=coefficient,
+        area=1e-5, inventory=inventory, residence=5,
+    )
     assert efficiency(model, 27.18) == pytest.approx(expected, rel=1e-8)
     # N_stage=n_dot*tau, so tau cancels for fixed flow/area/pressure.
     assert efficiency(model, 27.18, residence=50.0) == pytest.approx(expected, rel=1e-8)
