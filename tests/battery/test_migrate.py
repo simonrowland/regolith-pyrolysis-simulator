@@ -3391,7 +3391,7 @@ def test_h01_explicit_T_K_pressure_atm_still_converts(tmp_path: Path) -> None:
     )
 
 
-def test_point_selection_baseline_drops_approximate_flag(tmp_path: Path) -> None:
+def test_point_selection_preserves_approximate_flag(tmp_path: Path) -> None:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     row = extract["species"]["Na"]["observations"][0]
     row["values"].pop("series")
@@ -3404,7 +3404,10 @@ def test_point_selection_baseline_drops_approximate_flag(tmp_path: Path) -> None
 
     assert obs.value.kind is ValueKind.POINT
     assert obs.value.point == 101325
-    assert obs.value.approximate is False
+    assert obs.value.approximate is True
+    assert obs.identity.temperature_K is not None
+    assert obs.identity.temperature_K.is_value
+    assert obs.identity.temperature_K.value == 1200
 
 
 def test_h01_blank_sample_area_units_queued_and_sample_transferred(tmp_path: Path) -> None:
