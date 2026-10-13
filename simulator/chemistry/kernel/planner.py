@@ -684,7 +684,7 @@ class ChemistryKernel:
         temperature_C: float,
         pressure_bar: float,
         fO2_log: Optional[float],
-        redox_state: RedoxState | None,
+        redox_state: RedoxState | None = None,
         fe_redox_policy: str,
         control_inputs: Optional[Mapping[str, Any]],
         declared_accounts: Optional[frozenset[str]],

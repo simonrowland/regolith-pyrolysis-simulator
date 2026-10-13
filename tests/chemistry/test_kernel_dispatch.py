@@ -12,6 +12,8 @@ Tested:
 
 from __future__ import annotations
 
+import inspect
+
 import pytest
 
 from simulator.accounting.ledger import AtomLedger
@@ -567,3 +569,11 @@ def test_kernel_redox_state_survives_fallback_and_is_cleared_for_nonconsumer():
 
     assert nonconsumer.requests[0].redox_state is None
     assert nonconsumer.requests[0].fO2_log is None
+
+
+def test_dispatch_through_provider_redox_state_defaults_to_none():
+    redox_state = inspect.signature(
+        ChemistryKernel._dispatch_through_provider
+    ).parameters['redox_state']
+
+    assert redox_state.default is None
