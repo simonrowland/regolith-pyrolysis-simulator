@@ -19,6 +19,7 @@ from __future__ import annotations
 import copy
 from decimal import Decimal
 from pathlib import Path
+from typing import Any
 
 import pytest
 import yaml
@@ -159,6 +160,26 @@ def _fixture_extract(tmp_path: Path, rows: list[dict]) -> Path:
     return out
 
 
+def _ferric_fraction_row(
+    observation_id: str, method_class: str, *, series: bool
+) -> dict[str, Any]:
+    values: dict[str, Any] = {
+        "method_class": method_class,
+        "quantity": "fe3_fe2_ratio",
+    }
+    if series:
+        values["series"] = [
+            {"temperature_K": 1523.15, "Fe3_over_FeT": 0.5},
+            {"temperature_K": 1573.15, "Fe3_over_FeT": 0.25},
+        ]
+    else:
+        values["Fe3_over_FeT"] = "0.72"
+    row: dict[str, Any] = {"observation_id": observation_id, "values": values}
+    if series:
+        row["T_range_K"] = None
+    return row
+
+
 def test_migrator_reduces_kress_wt_pct_row(tmp_path: Path) -> None:
     path = _fixture_extract(tmp_path, [{
         "observation_id": "fixture_kress",
@@ -247,6 +268,74 @@ def test_migrated_ferric_fraction_has_resolvable_lineage_and_derivation(tmp_path
         if issue.reason.value == "conditional_field"
         and issue.path.startswith(f"observation[{obs.observation_id}].")
     ]
+
+
+@pytest.mark.parametrize("method_class", ["model_derived", "measured_reduced"])
+@pytest.mark.parametrize("series", [False, True], ids=["scalar", "series"])
+def test_already_derived_ferric_fraction_keeps_missing_lineage_diagnostic(
+    tmp_path: Path, method_class: str, series: bool
+) -> None:
+    child_id = f"fixture_{method_class}_{'series' if series else 'scalar'}"
+    path = _fixture_extract(
+        tmp_path,
+        [_ferric_fraction_row(child_id, method_class, series=series)],
+    )
+    result = _migrate(path)
+    child_prefix = PREFIX + child_id
+    observations = [
+        obs for oid, obs in result.observations.items()
+        if oid == child_prefix or oid.startswith(child_prefix + "::")
+    ]
+    assert len(observations) == (2 if series else 1)
+    for obs in observations:
+        assert obs.derived_from is None
+        assert any(
+            issue.reason.value == "conditional_field"
+            and issue.path == f"observation[{obs.observation_id}].derived_from"
+            for issue in result.validation.hard_issues
+        )
+
+
+@pytest.mark.parametrize("method_class", ["model_derived", "measured_reduced"])
+@pytest.mark.parametrize("series", [False, True], ids=["scalar", "series"])
+def test_already_derived_ferric_fraction_preserves_author_inputs(
+    tmp_path: Path, method_class: str, series: bool
+) -> None:
+    parent_id = "fixture_parent"
+    child_id = f"fixture_{method_class}_{'series' if series else 'scalar'}"
+    parent = {
+        "observation_id": parent_id,
+        "values": {
+            "method_class": "measured_direct",
+            "quantity": "fe3_fe2_ratio",
+            "fe3_fe2_ratio": "1",
+        },
+    }
+    child = _ferric_fraction_row(child_id, method_class, series=series)
+    child["derived_from"] = [parent_id]
+    child["derivation"] = {
+        "relation": "author reduction from the parent observation",
+        "inputs": [parent_id],
+        "output_unit": "dimensionless",
+    }
+    path = _fixture_extract(tmp_path, [parent, child])
+    result = _migrate(path)
+    child_prefix = PREFIX + child_id
+    observations = [
+        obs for oid, obs in result.observations.items()
+        if oid == child_prefix or oid.startswith(child_prefix + "::")
+    ]
+    assert len(observations) == (2 if series else 1)
+    expected_parent = (PREFIX + parent_id,)
+    for obs in observations:
+        assert obs.derived_from == expected_parent
+        assert obs.derivation is not None
+        assert obs.derivation.inputs == expected_parent
+        assert not [
+            issue for issue in result.validation.hard_issues
+            if issue.reason.value == "conditional_field"
+            and issue.path == f"observation[{obs.observation_id}].derived_from"
+        ]
 
 
 def test_migrator_refuses_ferric_fraction_one_without_infinity(tmp_path: Path) -> None:

@@ -11,7 +11,7 @@ from simulator.battery import migrate
 
 
 source = textwrap.dedent(inspect.getsource(migrate.fe3_fe2_ratio_parent_lineage))
-needle = "return derived_from or (read_from,)"
+needle = "return (read_from,)"
 assert source.count(needle) == 1
 mutated = source.replace(needle, "return derived_from")
 namespace: dict[str, object] = {}

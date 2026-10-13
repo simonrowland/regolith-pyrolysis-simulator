@@ -8348,13 +8348,22 @@ def fe3_fe2_ratio_reduction(
 
 def fe3_fe2_ratio_parent_lineage(
     selection: SourceSelection,
+    evidence: Evidence,
     derived_from: tuple[str, ...] | None,
     read_from: str,
+    source_derivation: Derivation | None,
 ) -> tuple[str, ...] | None:
-    """Apply the ferric-fraction reduction's source-parent fallback."""
+    """Add source lineage only for a direct measured ferric-fraction reduction."""
 
-    if selection.reduction is not None and selection.field_name in FERRIC_FRACTION_FIELDS:
-        return derived_from or (read_from,)
+    if (
+        selection.reduction is not None
+        and selection.field_name in FERRIC_FRACTION_FIELDS
+        and evidence.class_.is_value
+        and evidence.class_.value is EvidenceClass.MEASURED_DIRECT
+        and not derived_from
+        and source_derivation is None
+    ):
+        return (read_from,)
     return derived_from
 
 
@@ -13100,15 +13109,15 @@ class Migrator:
             )
         if value_sel.reduction is not None:
             read_from = choose_read_from(work, locator)
+            derived_from = fe3_fe2_ratio_parent_lineage(
+                value_sel, evidence, derived_from, read_from, source_derivation
+            )
             evidence, value_derivation = fe3_fe2_ratio_reduction(
                 value_sel,
                 evidence,
                 locator,
                 read_from,
                 source_derivation,
-            )
-            derived_from = fe3_fe2_ratio_parent_lineage(
-                value_sel, derived_from, read_from
             )
         if malformed_composition_amount is not None:
             ident_kwargs["composition"] = State.unknown(malformed_composition_amount)
@@ -14648,11 +14657,11 @@ class Migrator:
                 source_derivation, converted, read_from
             )
         if value_sel is not None and value_sel.reduction is not None:
+            derived_from = fe3_fe2_ratio_parent_lineage(
+                value_sel, evidence, derived_from, read_from, source_derivation
+            )
             evidence, derivation = fe3_fe2_ratio_reduction(
                 value_sel, evidence, point_locator, read_from, source_derivation
-            )
-            derived_from = fe3_fe2_ratio_parent_lineage(
-                value_sel, derived_from, read_from
             )
         if phase_provenance is not None and emitted.kind is not ValueKind.UNAVAILABLE:
             if derivation is None:
