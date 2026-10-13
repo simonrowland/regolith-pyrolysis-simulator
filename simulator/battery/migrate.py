@@ -11880,7 +11880,7 @@ class Migrator:
                 ):
                     with localcontext() as ctx:
                         ctx.prec = 50
-                        f_o2 = Decimal("100000") * (Decimal(10) ** value.point)
+                        f_o2 = _log_fO2_bar_to_pa(value.point)
                     known["fO2_Pa"] = State.of(f_o2)
                     provenance.append(
                         "identity.fO2_Pa=derived via oxygen_condition "
