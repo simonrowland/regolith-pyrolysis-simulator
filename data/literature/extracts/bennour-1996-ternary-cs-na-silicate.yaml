@@ -1,0 +1,280 @@
+schema_version: literature_extract.v1
+source_id: bennour-1996-ternary-cs-na-silicate
+source:
+  citation: Bennour F., Chastel R., Mathieu J.-C., Coutures J.-P., and Bergman C. (1996). Determination of the Excess Thermodynamic Functions in Ternary Cs2O–SiO2–Na2O Melts by Knudsen Effusion Mass Spectrometry. Physics and Chemistry of Liquids33(4):229–248.
+  doi: 10.1080/00319109608039824
+  url: https://web.archive.org/web/20250623030342id_/http://electronicsandbooks.com/edt/manual/Magazine/P/Physics%20and%20Chemistry%20of%20Liquids/1996%20Volume%2033/4/229-248.pdf
+  year: 1996
+  sha256: dc927ff7b7175da5094652aa08738549c25ca9b4d6faa3eae756d965fe065ab1
+  access_basis: public third-party journal mirror recovered through Wayback; cover labels Free Access; hosting license not established
+  version: published original 20-page article plus publisher cover; 21 PDF pages
+extraction:
+  method: Manual transcription from rendered source PDF pages, cross-checked against pdftotext -layout. Tables I and II read independently by rows and by columns; no discrepancies. Figure 7 retained as caption-only because its smooth curves have no data markers.
+  date: '2026-10-13'
+  worker: codex-resume-22915-1791907429
+review_status: draft
+fidelity_samples:
+  - species: Cs2O
+    observation_id: bennour_1996_table_i_x_sio2_0p5_log_ion_ratio
+    field: points
+    value:
+    - {X_Cs2O_as_published: '0.1', ln_ionic_intensity_ratio_as_published: '-0.21', slope_dln_ratio_d1_over_T_as_published: '5555', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.5', X_Cs2O: '0.1'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(a)'}}}}
+    - {X_Cs2O_as_published: '0.3', ln_ionic_intensity_ratio_as_published: '0.67', slope_dln_ratio_d1_over_T_as_published: '6346', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.5', X_Cs2O: '0.3'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(a)'}}}}
+    - {X_Cs2O_as_published: '0.5', ln_ionic_intensity_ratio_as_published: '1.58', slope_dln_ratio_d1_over_T_as_published: '4484', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.5', X_Cs2O: '0.5'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(a)'}}}}
+    - {X_Cs2O_as_published: '0.7', ln_ionic_intensity_ratio_as_published: '2.33', slope_dln_ratio_d1_over_T_as_published: '3274', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.5', X_Cs2O: '0.7'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(a)'}}}}
+    - {X_Cs2O_as_published: '0.9', ln_ionic_intensity_ratio_as_published: '3.64', slope_dln_ratio_d1_over_T_as_published: '4399', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.5', X_Cs2O: '0.9'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(a)'}}}}
+    locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I'}
+  - species: Cs2O
+    observation_id: bennour_1996_table_i_x_sio2_0p667_log_ion_ratio
+    field: points
+    value:
+    - {X_Cs2O_as_published: '0.1', ln_ionic_intensity_ratio_as_published: '-0.79', slope_dln_ratio_d1_over_T_as_published: '753', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.667', X_Cs2O: '0.1'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(b)'}}}}
+    - {X_Cs2O_as_published: '0.3', ln_ionic_intensity_ratio_as_published: '0.51', slope_dln_ratio_d1_over_T_as_published: '1711', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.667', X_Cs2O: '0.3'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(b)'}}}}
+    - {X_Cs2O_as_published: '0.5', ln_ionic_intensity_ratio_as_published: '1.28', slope_dln_ratio_d1_over_T_as_published: '2155', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.667', X_Cs2O: '0.5'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(b)'}}}}
+    - {X_Cs2O_as_published: '0.7', ln_ionic_intensity_ratio_as_published: '2.21', slope_dln_ratio_d1_over_T_as_published: '2871', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.667', X_Cs2O: '0.7'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(b)'}}}}
+    - {X_Cs2O_as_published: '0.9', ln_ionic_intensity_ratio_as_published: '3.11', slope_dln_ratio_d1_over_T_as_published: '4041', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.667', X_Cs2O: '0.9'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(b)'}}}}
+    locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I'}
+  - species: Cs2O
+    observation_id: bennour_1996_table_i_x_sio2_0p75_log_ion_ratio
+    field: points
+    value:
+    - {X_Cs2O_as_published: '0.1', ln_ionic_intensity_ratio_as_published: '-1.27', slope_dln_ratio_d1_over_T_as_published: '581', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.75', X_Cs2O: '0.1'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(c)'}}}}
+    - {X_Cs2O_as_published: '0.2', ln_ionic_intensity_ratio_as_published: '-0.69', slope_dln_ratio_d1_over_T_as_published: '318', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.75', X_Cs2O: '0.2'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(c)'}}}}
+    - {X_Cs2O_as_published: '0.3', ln_ionic_intensity_ratio_as_published: '-0.01', slope_dln_ratio_d1_over_T_as_published: '682', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.75', X_Cs2O: '0.3'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(c)'}}}}
+    - {X_Cs2O_as_published: '0.4', ln_ionic_intensity_ratio_as_published: '0.49', slope_dln_ratio_d1_over_T_as_published: '452', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.75', X_Cs2O: '0.4'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(c)'}}}}
+    - {X_Cs2O_as_published: '0.5', ln_ionic_intensity_ratio_as_published: '0.83', slope_dln_ratio_d1_over_T_as_published: '647', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.75', X_Cs2O: '0.5'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(c)'}}}}
+    - {X_Cs2O_as_published: '0.6', ln_ionic_intensity_ratio_as_published: '1.23', slope_dln_ratio_d1_over_T_as_published: '1893', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.75', X_Cs2O: '0.6'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(c)'}}}}
+    - {X_Cs2O_as_published: '0.7', ln_ionic_intensity_ratio_as_published: '1.86', slope_dln_ratio_d1_over_T_as_published: '1317', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.75', X_Cs2O: '0.7'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(c)'}}}}
+    - {X_Cs2O_as_published: '0.8', ln_ionic_intensity_ratio_as_published: '2.31', slope_dln_ratio_d1_over_T_as_published: '1954', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.75', X_Cs2O: '0.8'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(c)'}}}}
+    - {X_Cs2O_as_published: '0.9', ln_ionic_intensity_ratio_as_published: '2.90', slope_dln_ratio_d1_over_T_as_published: '2218', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.75', X_Cs2O: '0.9'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(c)'}}}}
+    locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I'}
+  - species: Cs2O
+    observation_id: bennour_1996_table_i_x_sio2_0p85_log_ion_ratio
+    field: points
+    value:
+    - {X_Cs2O_as_published: '0.3', ln_ionic_intensity_ratio_as_published: '-1.21', slope_dln_ratio_d1_over_T_as_published: '534', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.85', X_Cs2O: '0.3'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(d)'}}}}
+    - {X_Cs2O_as_published: '0.5', ln_ionic_intensity_ratio_as_published: '0.05', slope_dln_ratio_d1_over_T_as_published: '2310', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.85', X_Cs2O: '0.5'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(d)'}}}}
+    - {X_Cs2O_as_published: '0.7', ln_ionic_intensity_ratio_as_published: '1.24', slope_dln_ratio_d1_over_T_as_published: '2930', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.85', X_Cs2O: '0.7'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(d)'}}}}
+    - {X_Cs2O_as_published: '0.9', ln_ionic_intensity_ratio_as_published: '2.13', slope_dln_ratio_d1_over_T_as_published: '3533', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.85', X_Cs2O: '0.9'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(d)'}}}}
+    locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I'}
+  - species: Cs2O
+    observation_id: bennour_1996_table_ii_x_sio2_0p5_fit
+    field: fit
+    value: {X_SiO2_as_published: '0.5', A_as_published: '1.1', B_as_published: '4.12', T_K_as_published: '1573', sampled_X_Cs2O_as_published: ['0.1', '0.9']}
+    locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'II'}
+  - species: Cs2O
+    observation_id: bennour_1996_table_ii_x_sio2_0p667_fit
+    field: fit
+    value: {X_SiO2_as_published: '0.667', A_as_published: '0.39', B_as_published: '4.27', T_K_as_published: '1573', sampled_X_Cs2O_as_published: ['0.1', '0.9']}
+    locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'II'}
+  - species: Cs2O
+    observation_id: bennour_1996_table_ii_x_sio2_0p75_fit
+    field: fit
+    value: {X_SiO2_as_published: '0.75', A_as_published: '-0.82', B_as_published: '5.05', T_K_as_published: '1573', sampled_X_Cs2O_as_published: ['0.1', '0.9']}
+    locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'II'}
+  - species: Cs2O
+    observation_id: bennour_1996_table_ii_x_sio2_0p85_fit
+    field: fit
+    value: {X_SiO2_as_published: '0.85', A_as_published: '-2.80', B_as_published: '5.60', T_K_as_published: '1573', sampled_X_Cs2O_as_published: ['0.3', '0.9']}
+    locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'II'}
+  - species: Cs2O
+    observation_id: bennour_1996_fig7_cs2o_x_sio2_0p85
+    field: caption
+    value: 'FIGURE 7 Variation of the activities of the components in: XSiO2 + (1 - X) [(1 - x)Na2O + xCs2O] vs. the mole fraction xCs2O at 1573 K: ------ X = 0.85; - - - X = 0.5.'
+    locator: {page: 15, published_page: 241, pdf_page_index: 14, figure: '7'}
+  - species: Cs2O
+    observation_id: bennour_1996_fig7_cs2o_x_sio2_0p5
+    field: caption
+    value: 'FIGURE 7 Variation of the activities of the components in: XSiO2 + (1 - X) [(1 - x)Na2O + xCs2O] vs. the mole fraction xCs2O at 1573 K: ------ X = 0.85; - - - X = 0.5.'
+    locator: {page: 15, published_page: 241, pdf_page_index: 14, figure: '7'}
+  - species: Na2O
+    observation_id: bennour_1996_fig7_na2o_x_sio2_0p85
+    field: caption
+    value: 'FIGURE 7 Variation of the activities of the components in: XSiO2 + (1 - X) [(1 - x)Na2O + xCs2O] vs. the mole fraction xCs2O at 1573 K: ------ X = 0.85; - - - X = 0.5.'
+    locator: {page: 15, published_page: 241, pdf_page_index: 14, figure: '7'}
+  - species: Na2O
+    observation_id: bennour_1996_fig7_na2o_x_sio2_0p5
+    field: caption
+    value: 'FIGURE 7 Variation of the activities of the components in: XSiO2 + (1 - X) [(1 - x)Na2O + xCs2O] vs. the mole fraction xCs2O at 1573 K: ------ X = 0.85; - - - X = 0.5.'
+    locator: {page: 15, published_page: 241, pdf_page_index: 14, figure: '7'}
+  - species: Cs2O
+    observation_id: bennour_1996_experimental_conditions
+    field: conditions
+    value: {ionizing_electron_energy_eV: '14', magnetic_sector_degrees: '90', deflection_radius_cm: '21', thermocouple_rhodium_percent_as_published: '10%', temperature_range_K: '950-1600', high_temperature_limit: 'T > 1400 K for X_SiO2 = 0.5'}
+    locator: {page: 5, published_page: 231, pdf_page_index: 4, section: '2. Experimental Procedure'}
+species:
+  Cs2O:
+    observations:
+    - observation_id: bennour_1996_fig7_cs2o_x_sio2_0p85
+      type: activity_coefficient
+      locator: {figure: '7', page: 15, published_page: 241, pdf_page_index: 14, note: 'X_SiO2 = 0.85 curve; caption as published'}
+      T_K: 1573
+      phase: ternary_liquid_silicate_melt
+      standard_state: second reference state; authors state oxide activities are related to square of ionic intensities
+      regime: kems_effusion
+      units: dimensionless activity as plotted
+      values:
+        quantity: 'FIGURE 7 Variation of the activities of the components in: XSiO2 + (1 - X) [(1 - x)Na2O + xCs2O] vs. the mole fraction xCs2O at 1573 K: ------ X = 0.85; - - - X = 0.5.'
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        section_as_published: 'X = 0.85 (solid curve)'
+        caption: 'FIGURE 7 Variation of the activities of the components in: XSiO2 + (1 - X) [(1 - x)Na2O + xCs2O] vs. the mole fraction xCs2O at 1573 K: ------ X = 0.85; - - - X = 0.5.'
+        axes_as_published: {x: 'mole fraction xCs2O', y: 'activity of aCs2O; dimensionless'}
+        component_as_published: aCs2O
+        note: Not digitised; smooth, unmarked curve. Qualitative activity variation only.
+    - observation_id: bennour_1996_fig7_cs2o_x_sio2_0p5
+      type: activity_coefficient
+      locator: {figure: '7', page: 15, published_page: 241, pdf_page_index: 14, note: 'X_SiO2 = 0.5 curve; caption as published'}
+      T_K: 1573
+      phase: ternary_liquid_silicate_melt
+      standard_state: second reference state; authors state oxide activities are related to square of ionic intensities
+      regime: kems_effusion
+      units: dimensionless activity as plotted
+      values:
+        quantity: 'FIGURE 7 Variation of the activities of the components in: XSiO2 + (1 - X) [(1 - x)Na2O + xCs2O] vs. the mole fraction xCs2O at 1573 K: ------ X = 0.85; - - - X = 0.5.'
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        section_as_published: 'X = 0.5 (dashed curve)'
+        caption: 'FIGURE 7 Variation of the activities of the components in: XSiO2 + (1 - X) [(1 - x)Na2O + xCs2O] vs. the mole fraction xCs2O at 1573 K: ------ X = 0.85; - - - X = 0.5.'
+        axes_as_published: {x: 'mole fraction xCs2O', y: 'activity of aCs2O; dimensionless'}
+        component_as_published: aCs2O
+        note: Not digitised; smooth, unmarked curve. Qualitative activity variation only.
+    context:
+    - observation_id: bennour_1996_table_i_x_sio2_0p5_log_ion_ratio
+      type: table_data
+      locator: {table: 'I', page: 14, published_page: 240, pdf_page_index: 13, note: 'Section (a), row order as printed'}
+      T_range_K: [1573, 1573]
+      phase: ternary_liquid_silicate_melt
+      units: X_Cs2O; natural logarithm of ionic-intensity ratio; slope in K as printed
+      values:
+        quantity: logarithmic_ionic_intensity_ratio_and_inverse_temperature_slope_as_published
+        method_class: measured_reduced
+        d-126_reason: no closed quantity retains the paper's natural-log ratio and its inverse-temperature slope without transforming the printed values
+        ratio_as_published: 'ln(I_133Cs^2 X_Na2O / I_23Na^2 X_Cs2O)'
+        composition_rule_as_published: 'X SiO2 + (1 - X) [(1 - x) Na2O + x Cs2O]'
+        points:
+        - {X_Cs2O_as_published: '0.1', ln_ionic_intensity_ratio_as_published: '-0.21', slope_dln_ratio_d1_over_T_as_published: '5555', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.5', X_Cs2O: '0.1'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(a)'}}}}
+        - {X_Cs2O_as_published: '0.3', ln_ionic_intensity_ratio_as_published: '0.67', slope_dln_ratio_d1_over_T_as_published: '6346', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.5', X_Cs2O: '0.3'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(a)'}}}}
+        - {X_Cs2O_as_published: '0.5', ln_ionic_intensity_ratio_as_published: '1.58', slope_dln_ratio_d1_over_T_as_published: '4484', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.5', X_Cs2O: '0.5'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(a)'}}}}
+        - {X_Cs2O_as_published: '0.7', ln_ionic_intensity_ratio_as_published: '2.33', slope_dln_ratio_d1_over_T_as_published: '3274', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.5', X_Cs2O: '0.7'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(a)'}}}}
+        - {X_Cs2O_as_published: '0.9', ln_ionic_intensity_ratio_as_published: '3.64', slope_dln_ratio_d1_over_T_as_published: '4399', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.5', X_Cs2O: '0.9'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(a)'}}}}
+    - observation_id: bennour_1996_table_i_x_sio2_0p667_log_ion_ratio
+      type: table_data
+      locator: {table: 'I', page: 14, published_page: 240, pdf_page_index: 13, note: 'Section (b), row order as printed'}
+      T_range_K: [1573, 1573]
+      phase: ternary_liquid_silicate_melt
+      units: X_Cs2O; natural logarithm of ionic-intensity ratio; slope in K as printed
+      values:
+        quantity: logarithmic_ionic_intensity_ratio_and_inverse_temperature_slope_as_published
+        method_class: measured_reduced
+        d-126_reason: no closed quantity retains the paper's natural-log ratio and its inverse-temperature slope without transforming the printed values
+        ratio_as_published: 'ln(I_133Cs^2 X_Na2O / I_23Na^2 X_Cs2O)'
+        composition_rule_as_published: 'X SiO2 + (1 - X) [(1 - x) Na2O + x Cs2O]'
+        points:
+        - {X_Cs2O_as_published: '0.1', ln_ionic_intensity_ratio_as_published: '-0.79', slope_dln_ratio_d1_over_T_as_published: '753', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.667', X_Cs2O: '0.1'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(b)'}}}}
+        - {X_Cs2O_as_published: '0.3', ln_ionic_intensity_ratio_as_published: '0.51', slope_dln_ratio_d1_over_T_as_published: '1711', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.667', X_Cs2O: '0.3'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(b)'}}}}
+        - {X_Cs2O_as_published: '0.5', ln_ionic_intensity_ratio_as_published: '1.28', slope_dln_ratio_d1_over_T_as_published: '2155', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.667', X_Cs2O: '0.5'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(b)'}}}}
+        - {X_Cs2O_as_published: '0.7', ln_ionic_intensity_ratio_as_published: '2.21', slope_dln_ratio_d1_over_T_as_published: '2871', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.667', X_Cs2O: '0.7'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(b)'}}}}
+        - {X_Cs2O_as_published: '0.9', ln_ionic_intensity_ratio_as_published: '3.11', slope_dln_ratio_d1_over_T_as_published: '4041', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.667', X_Cs2O: '0.9'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(b)'}}}}
+    - observation_id: bennour_1996_table_i_x_sio2_0p75_log_ion_ratio
+      type: table_data
+      locator: {table: 'I', page: 14, published_page: 240, pdf_page_index: 13, note: 'Section (c), row order as printed'}
+      T_range_K: [1573, 1573]
+      phase: ternary_liquid_silicate_melt
+      units: X_Cs2O; natural logarithm of ionic-intensity ratio; slope in K as printed
+      values:
+        quantity: logarithmic_ionic_intensity_ratio_and_inverse_temperature_slope_as_published
+        method_class: measured_reduced
+        d-126_reason: no closed quantity retains the paper's natural-log ratio and its inverse-temperature slope without transforming the printed values
+        ratio_as_published: 'ln(I_133Cs^2 X_Na2O / I_23Na^2 X_Cs2O)'
+        composition_rule_as_published: 'X SiO2 + (1 - X) [(1 - x) Na2O + x Cs2O]'
+        points:
+        - {X_Cs2O_as_published: '0.1', ln_ionic_intensity_ratio_as_published: '-1.27', slope_dln_ratio_d1_over_T_as_published: '581', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.75', X_Cs2O: '0.1'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(c)'}}}}
+        - {X_Cs2O_as_published: '0.2', ln_ionic_intensity_ratio_as_published: '-0.69', slope_dln_ratio_d1_over_T_as_published: '318', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.75', X_Cs2O: '0.2'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(c)'}}}}
+        - {X_Cs2O_as_published: '0.3', ln_ionic_intensity_ratio_as_published: '-0.01', slope_dln_ratio_d1_over_T_as_published: '682', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.75', X_Cs2O: '0.3'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(c)'}}}}
+        - {X_Cs2O_as_published: '0.4', ln_ionic_intensity_ratio_as_published: '0.49', slope_dln_ratio_d1_over_T_as_published: '452', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.75', X_Cs2O: '0.4'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(c)'}}}}
+        - {X_Cs2O_as_published: '0.5', ln_ionic_intensity_ratio_as_published: '0.83', slope_dln_ratio_d1_over_T_as_published: '647', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.75', X_Cs2O: '0.5'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(c)'}}}}
+        - {X_Cs2O_as_published: '0.6', ln_ionic_intensity_ratio_as_published: '1.23', slope_dln_ratio_d1_over_T_as_published: '1893', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.75', X_Cs2O: '0.6'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(c)'}}}}
+        - {X_Cs2O_as_published: '0.7', ln_ionic_intensity_ratio_as_published: '1.86', slope_dln_ratio_d1_over_T_as_published: '1317', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.75', X_Cs2O: '0.7'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(c)'}}}}
+        - {X_Cs2O_as_published: '0.8', ln_ionic_intensity_ratio_as_published: '2.31', slope_dln_ratio_d1_over_T_as_published: '1954', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.75', X_Cs2O: '0.8'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(c)'}}}}
+        - {X_Cs2O_as_published: '0.9', ln_ionic_intensity_ratio_as_published: '2.90', slope_dln_ratio_d1_over_T_as_published: '2218', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.75', X_Cs2O: '0.9'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(c)'}}}}
+    - observation_id: bennour_1996_table_i_x_sio2_0p85_log_ion_ratio
+      type: table_data
+      locator: {table: 'I', page: 14, published_page: 240, pdf_page_index: 13, note: 'Section (d), row order as printed'}
+      T_range_K: [1573, 1573]
+      phase: ternary_liquid_silicate_melt
+      units: X_Cs2O; natural logarithm of ionic-intensity ratio; slope in K as printed
+      values:
+        quantity: logarithmic_ionic_intensity_ratio_and_inverse_temperature_slope_as_published
+        method_class: measured_reduced
+        d-126_reason: no closed quantity retains the paper's natural-log ratio and its inverse-temperature slope without transforming the printed values
+        ratio_as_published: 'ln(I_133Cs^2 X_Na2O / I_23Na^2 X_Cs2O)'
+        composition_rule_as_published: 'X SiO2 + (1 - X) [(1 - x) Na2O + x Cs2O]'
+        points:
+        - {X_Cs2O_as_published: '0.3', ln_ionic_intensity_ratio_as_published: '-1.21', slope_dln_ratio_d1_over_T_as_published: '534', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.85', X_Cs2O: '0.3'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(d)'}}}}
+        - {X_Cs2O_as_published: '0.5', ln_ionic_intensity_ratio_as_published: '0.05', slope_dln_ratio_d1_over_T_as_published: '2310', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.85', X_Cs2O: '0.5'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(d)'}}}}
+        - {X_Cs2O_as_published: '0.7', ln_ionic_intensity_ratio_as_published: '1.24', slope_dln_ratio_d1_over_T_as_published: '2930', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.85', X_Cs2O: '0.7'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(d)'}}}}
+        - {X_Cs2O_as_published: '0.9', ln_ionic_intensity_ratio_as_published: '2.13', slope_dln_ratio_d1_over_T_as_published: '3533', T_K: '1573', point_conditions: {printed_composition: {state: {tag: value, value: {X_SiO2: '0.85', X_Cs2O: '0.9'}}, locator: {page: 14, published_page: 240, pdf_page_index: 13, table: 'I', note: '(d)'}}}}
+    - observation_id: bennour_1996_table_ii_x_sio2_0p5_fit
+      type: fitted_relationship
+      locator: {table: 'II', page: 14, published_page: 240, pdf_page_index: 13, note: 'X_SiO2 = 0.5'}
+      units: coefficient as printed
+      T_K: 1573
+      values: {quantity: fit_coefficients_for_composition_normalized_squared_ion_intensity_ratio, method_class: model_derived, d-126_reason: no closed quantity for these coefficients of a composition-dependent log ion-intensity ratio, fit: {X_SiO2_as_published: '0.5', A_as_published: '1.1', B_as_published: '4.12', T_K_as_published: '1573', sampled_X_Cs2O_as_published: ['0.1', '0.9']}, equation_as_published: 'ln(I^2_Cs X_Na2O / I^2_Na X_Cs2O) = A + B x_Cs2O'}
+    - observation_id: bennour_1996_table_ii_x_sio2_0p667_fit
+      type: fitted_relationship
+      locator: {table: 'II', page: 14, published_page: 240, pdf_page_index: 13, note: 'X_SiO2 = 0.667'}
+      units: coefficient as printed
+      T_K: 1573
+      values: {quantity: fit_coefficients_for_composition_normalized_squared_ion_intensity_ratio, method_class: model_derived, d-126_reason: no closed quantity for these coefficients of a composition-dependent log ion-intensity ratio, fit: {X_SiO2_as_published: '0.667', A_as_published: '0.39', B_as_published: '4.27', T_K_as_published: '1573', sampled_X_Cs2O_as_published: ['0.1', '0.9']}, equation_as_published: 'ln(I^2_Cs X_Na2O / I^2_Na X_Cs2O) = A + B x_Cs2O'}
+    - observation_id: bennour_1996_table_ii_x_sio2_0p75_fit
+      type: fitted_relationship
+      locator: {table: 'II', page: 14, published_page: 240, pdf_page_index: 13, note: 'X_SiO2 = 0.75'}
+      units: coefficient as printed
+      T_K: 1573
+      values: {quantity: fit_coefficients_for_composition_normalized_squared_ion_intensity_ratio, method_class: model_derived, d-126_reason: no closed quantity for these coefficients of a composition-dependent log ion-intensity ratio, fit: {X_SiO2_as_published: '0.75', A_as_published: '-0.82', B_as_published: '5.05', T_K_as_published: '1573', sampled_X_Cs2O_as_published: ['0.1', '0.9']}, equation_as_published: 'ln(I^2_Cs X_Na2O / I^2_Na X_Cs2O) = A + B x_Cs2O'}
+    - observation_id: bennour_1996_table_ii_x_sio2_0p85_fit
+      type: fitted_relationship
+      locator: {table: 'II', page: 14, published_page: 240, pdf_page_index: 13, note: 'X_SiO2 = 0.85'}
+      units: coefficient as printed
+      T_K: 1573
+      values: {quantity: fit_coefficients_for_composition_normalized_squared_ion_intensity_ratio, method_class: model_derived, d-126_reason: no closed quantity for these coefficients of a composition-dependent log ion-intensity ratio, fit: {X_SiO2_as_published: '0.85', A_as_published: '-2.80', B_as_published: '5.60', T_K_as_published: '1573', sampled_X_Cs2O_as_published: ['0.3', '0.9']}, equation_as_published: 'ln(I^2_Cs X_Na2O / I^2_Na X_Cs2O) = A + B x_Cs2O'}
+    - observation_id: bennour_1996_experimental_conditions
+      type: method
+      locator: {page: 5, published_page: 231, pdf_page_index: 4, section: '2. Experimental Procedure'}
+      units: apparatus and method as printed
+      values:
+        quantity: apparatus_and_method_as_published
+        method_class: method_only
+        method_quote_as_published: 'A molecular beam issued from the Pt Knudsen cell enters the ionization chamber through a movable shutter which separates vaporizing species from those due to the background.'
+        conditions: {ionizing_electron_energy_eV: '14', magnetic_sector_degrees: '90', deflection_radius_cm: '21', thermocouple_rhodium_percent_as_published: '10%', temperature_range_K: '950-1600', high_temperature_limit: 'T > 1400 K for X_SiO2 = 0.5'}
+        apparatus: 'Varian Mat type CH5 single focusing mass spectrometer; magnetic sector; secondary electron multiplier.'
+        cell_and_beam: 'Molecular beam issued from a Pt Knudsen cell into the ionization chamber through a movable shutter.'
+        heating_method: 'electronic bombardment from a tungsten filament'
+        temperature_measurement: 'platine-platine rhodium 10% thermocouple placed at the bottom of the cell'
+        temperature_calibration: 'ionic intensity plateau during fusion of known pure substances'
+        sample_preparation: 'sodium and caesium carbonates for Na2O and Cs2O respectively and tetraethoxysilane for SiO2 by the sol-gel process'
+        duration: not stated
+      note: 'The article describes the temperature interval as 950-1600 K in the abstract and experimental discussion.'
+  Na2O:
+    observations:
+    - observation_id: bennour_1996_fig7_na2o_x_sio2_0p85
+      type: activity_coefficient
+      locator: {figure: '7', page: 15, published_page: 241, pdf_page_index: 14, note: 'X_SiO2 = 0.85 curve; caption as published'}
+      T_K: 1573
+      phase: ternary_liquid_silicate_melt
+      standard_state: second reference state; authors state oxide activities are related to square of ionic intensities
+      regime: kems_effusion
+      units: dimensionless activity as plotted
+      values: {quantity: 'FIGURE 7 Variation of the activities of the components in: XSiO2 + (1 - X) [(1 - x)Na2O + xCs2O] vs. the mole fraction xCs2O at 1573 K: ------ X = 0.85; - - - X = 0.5.', method_class: model_derived, admission_status: figure_only, semantics: bound_not_point_ordering, section_as_published: 'X = 0.85 (solid curve)', caption: 'FIGURE 7 Variation of the activities of the components in: XSiO2 + (1 - X) [(1 - x)Na2O + xCs2O] vs. the mole fraction xCs2O at 1573 K: ------ X = 0.85; - - - X = 0.5.', axes_as_published: {x: 'mole fraction xCs2O', y: 'activity of aNa2O; dimensionless'}, component_as_published: aNa2O, note: 'Not digitised; smooth, unmarked curve. Qualitative activity variation only.'}
+    - observation_id: bennour_1996_fig7_na2o_x_sio2_0p5
+      type: activity_coefficient
+      locator: {figure: '7', page: 15, published_page: 241, pdf_page_index: 14, note: 'X_SiO2 = 0.5 curve; caption as published'}
+      T_K: 1573
+      phase: ternary_liquid_silicate_melt
+      standard_state: second reference state; authors state oxide activities are related to square of ionic intensities
+      regime: kems_effusion
+      units: dimensionless activity as plotted
+      values: {quantity: 'FIGURE 7 Variation of the activities of the components in: XSiO2 + (1 - X) [(1 - x)Na2O + xCs2O] vs. the mole fraction xCs2O at 1573 K: ------ X = 0.85; - - - X = 0.5.', method_class: model_derived, admission_status: figure_only, semantics: bound_not_point_ordering, section_as_published: 'X = 0.5 (dashed curve)', caption: 'FIGURE 7 Variation of the activities of the components in: XSiO2 + (1 - X) [(1 - x)Na2O + xCs2O] vs. the mole fraction xCs2O at 1573 K: ------ X = 0.85; - - - X = 0.5.', axes_as_published: {x: 'mole fraction xCs2O', y: 'activity of aNa2O; dimensionless'}, component_as_published: aNa2O, note: 'Not digitised; smooth, unmarked curve. Qualitative activity variation only.'}
