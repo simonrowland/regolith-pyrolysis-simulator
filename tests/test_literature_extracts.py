@@ -3756,6 +3756,215 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
     assert errs == [], "\n".join(errs)
 
 
+def test_richet_bottinga_1986_review_fixes_migrate_and_pin_table4() -> None:
+    """Keep the reviewed provenance, pressure, widths, and context in migration."""
+    from unittest.mock import patch
+
+    source_path = EXTRACTS / "richet-bottinga-1986-silicate-thermochemistry.yaml"
+    source = battery_migrate.load_yaml(source_path)
+    samples = source["fidelity_samples"]
+    targets = {
+        (sample["observation_id"], sample["field"])
+        for sample in samples
+    }
+    assert len(samples) == len(targets) == 37
+
+    def migrate(doc):
+        migrator = battery_migrate.Migrator(root=REPO_ROOT, index={}, aliases={})
+        original_load_yaml = battery_migrate.load_yaml
+
+        def load_one(path):
+            if Path(path) == source_path:
+                return copy.deepcopy(doc)
+            return original_load_yaml(path)
+
+        with patch.object(battery_migrate, "load_yaml", side_effect=load_one):
+            migrator._migrate_extract(source_path)
+        migrator.finalize()
+        return migrator.result
+
+    result = migrate(source)
+    source_observations = {
+        row["observation_id"]: row
+        for payload in source["species"].values()
+        for row in payload.get("observations", [])
+    }
+    observations = {
+        observation.observation_id.split("::")[-1]: observation
+        for observation in result.observations.values()
+    }
+    assert len(observations) == 24
+    assert len(result.experiments) == 1
+    assert len(result.works) == 1
+    assert sum(map(len, result.context_by_work.values())) == 12
+    assert not result.validation.hard_issues
+    assert result.unrecognised_polymorphs == {
+        "Cristobalite": 2,
+        "clinoenstatite": 3,
+        "High albite": 2,
+        "High sanidine": 2,
+        "Diopside": 2,
+    }
+
+    transition_values = {
+        "rb86_1986_cristobalite_transition_table5": 1999,
+        "rb86_1986_quartz_transition_table5": 1700,
+        "rb86_1986_high_albite_transition_table5": 1393,
+        "rb86_1986_high_sanidine_transition_table5": 1500,
+        "rb86_1986_anorthite_transition_table5": 1830,
+        "rb86_1986_diopside_transition_table5": 1670,
+        "rb86_1986_na2si2o5_transition_table4": 1147,
+        "rb86_1986_k2si2o5_transition_table4": 1318,
+        "rb86_1986_k2sio3_transition_table4": 1249,
+        "rb86_1986_mgsio3_transition_table4": 1834,
+    }
+    transition_observations = [observations[obs_id] for obs_id in transition_values]
+    assert len(transition_observations) == 10
+    for obs_id, expected_temperature in transition_values.items():
+        observation = observations[obs_id]
+        assert observation.value.point == Decimal(expected_temperature)
+        assert observation.identity.total_pressure_Pa.value == Decimal("100000")
+        source_row = source_observations[obs_id]
+        assert source_row["values"]["pressure_basis_Pa"] == 100000
+        assert source_row["pressure_basis_locator"]["page"] == 21
+    assert observations["rb86_1986_na2si2o5_transition_table4"].evidence.attribution == (
+        "Levin et al. [1964]"
+    )
+    assert observations["rb86_1986_k2si2o5_transition_table4"].evidence.attribution == (
+        "Levin et al. [1964]"
+    )
+    assert observations["rb86_1986_k2sio3_transition_table4"].evidence.attribution == (
+        "Levin et al. [1964]"
+    )
+    assert observations["rb86_1986_mgsio3_transition_table4"].evidence.attribution == (
+        "Bowen and Andersen [1914]"
+    )
+    assert source_observations["rb86_1986_mgsio3_transition_table4"]["values"][
+        "provenance_note"
+    ].endswith("that extrapolation.")
+    assert all(
+        observation.evidence.class_.value.value == "quoted_attributed"
+        for observation in transition_observations
+    )
+
+    expected_widths = {
+        "rb86_1986_na2si2o5_heat_of_fusion_table4": (Decimal("4.4"), "kJ/mol"),
+        "rb86_1986_na2si2o5_entropy_of_fusion_table4": (Decimal("3.8"), "J/mol K"),
+        "rb86_1986_k2si2o5_heat_of_fusion_table4": (Decimal("4.0"), "kJ/mol"),
+        "rb86_1986_k2si2o5_entropy_of_fusion_table4": (Decimal("3.0"), "J/mol K"),
+        "rb86_1986_k2sio3_heat_of_fusion_table4": (Decimal("4.0"), "kJ/mol"),
+        "rb86_1986_k2sio3_entropy_of_fusion_table4": (Decimal("3.2"), "J/mol K"),
+        "rb86_1986_mgsio3_heat_of_fusion_table4": (Decimal("6.0"), "kJ/mol"),
+        "rb86_1986_mgsio3_entropy_of_fusion_table4": (Decimal("3.3"), "J/mol K"),
+    }
+
+    def assert_widths(migrated):
+        rows = {
+            observation.observation_id.split("::")[-1]: observation
+            for observation in migrated.observations.values()
+        }
+        for obs_id, (expected_value, expected_units) in expected_widths.items():
+            uncertainty = rows[obs_id].uncertainty.verbatim
+            assert Decimal(str(uncertainty["value"])) == expected_value
+            assert uncertainty["units"] == expected_units
+
+    assert_widths(result)
+    expected_lineage = {
+        "rb86_1986_na2si2o5_entropy_of_fusion_table4": (
+            "rb86_1986_na2si2o5_heat_of_fusion_table4",
+            "rb86_1986_na2si2o5_transition_table4",
+        ),
+        "rb86_1986_k2si2o5_entropy_of_fusion_table4": (
+            "rb86_1986_k2si2o5_heat_of_fusion_table4",
+            "rb86_1986_k2si2o5_transition_table4",
+        ),
+        "rb86_1986_k2sio3_entropy_of_fusion_table4": (
+            "rb86_1986_k2sio3_heat_of_fusion_table4",
+            "rb86_1986_k2sio3_transition_table4",
+        ),
+        "rb86_1986_mgsio3_entropy_of_fusion_table4": (
+            "rb86_1986_mgsio3_heat_of_fusion_table4",
+            "rb86_1986_mgsio3_transition_table4",
+        ),
+    }
+    for obs_id, (expected_class, input_quantity) in {
+        "rb86_1986_na2si2o5_heat_of_fusion_table4": ("author_estimate", "heat"),
+        "rb86_1986_k2si2o5_heat_of_fusion_table4": ("author_estimate", "heat"),
+        "rb86_1986_k2sio3_heat_of_fusion_table4": ("author_estimate", "heat"),
+        "rb86_1986_mgsio3_heat_of_fusion_table4": ("author_estimate", "heat"),
+        "rb86_1986_na2si2o5_entropy_of_fusion_table4": ("model_derived", "entropy"),
+        "rb86_1986_k2si2o5_entropy_of_fusion_table4": ("model_derived", "entropy"),
+        "rb86_1986_k2sio3_entropy_of_fusion_table4": ("model_derived", "entropy"),
+        "rb86_1986_mgsio3_entropy_of_fusion_table4": ("model_derived", "entropy"),
+    }.items():
+        observation = observations[obs_id]
+        assert observation.value.kind.value == "unavailable"
+        assert observation.evidence.class_.value.value == expected_class
+        if input_quantity == "heat":
+            stated_model = source_observations[obs_id]["values"]["model"]
+            assert "equation (23)" in stated_model.lower()
+            assert "enthalpies of fusion" in stated_model.lower()
+        else:
+            assert observation.derivation.relation == "ΔS_f = ΔH_f/T_f"
+            expected_inputs = {
+                f"{source_path.stem}::{parent}"
+                for parent in expected_lineage[obs_id]
+            }
+            assert set(observation.derived_from) == expected_inputs
+            assert set(observation.derivation.inputs) == set(observation.derived_from)
+
+    contexts = [row for rows in result.context_by_work.values() for row in rows]
+    table1_contexts = [
+        row for row in contexts
+        if row.get("observation_id", "").endswith("_fictive_temperatures_table1")
+    ]
+    assert len(table1_contexts) == 5
+    assert all(
+        row["values"]["fast_cooling_caveat_ratio"] == 10000
+        and "equation (12)" in row["values"]["fast_cooling_caveat"]
+        for row in table1_contexts
+    )
+    configurational_contexts = [
+        row for row in contexts if row.get("observation_id", "").endswith("_entropy_context")
+    ]
+    assert len(configurational_contexts) == 6
+    assert all(
+        "Equations (26)-(27)" in row["values"]["model"]
+        and "Equation (25)" not in row["values"]["model"]
+        for row in configurational_contexts
+    )
+
+    table4_temperature_samples = [
+        sample for sample in samples
+        if sample["observation_id"].endswith("_transition_table4")
+    ]
+    assert len(table4_temperature_samples) == 4
+    for sample in table4_temperature_samples:
+        mutated = copy.deepcopy(source)
+        target = next(
+            row
+            for row in mutated["species"][sample["species"]]["observations"]
+            if row["observation_id"] == sample["observation_id"]
+        )
+        target["values"]["T_m_K"] += 1
+        assert vle.check_fidelity_sample_matches(mutated, sample)
+
+    for obs_id in expected_widths:
+        mutated = copy.deepcopy(source)
+        formula = next(
+            sample["species"]
+            for sample in samples
+            if sample["observation_id"] == obs_id
+        )
+        target = next(
+            row for row in mutated["species"][formula]["observations"]
+            if row["observation_id"] == obs_id
+        )
+        target["uncertainty"]["value"] += 1
+        with pytest.raises(AssertionError):
+            assert_widths(migrate(mutated))
+
+
 def test_bencze_supplement_fidelity_sample_rejects_mutated_value():
     path = EXTRACTS / "bencze-yazhenskikh-2016.yaml"
     doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
