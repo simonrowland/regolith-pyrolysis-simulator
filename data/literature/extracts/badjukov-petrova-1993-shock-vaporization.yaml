@@ -1,0 +1,332 @@
+schema_version: literature_extract.v1
+source_id: badjukov-petrova-1993-shock-vaporization
+source:
+  citation: 'Badjukov D.D. and Petrova T.L. (1993). Vaporization by shock loading of albite, jadeite, and pyrex glass: Experimental study. Lunar and Planetary Science XXIV, 51–52, abstract 1026.'
+  url: https://www.lpi.usra.edu/meetings/lpsc1993/pdf/1026.pdf
+  year: 1993
+extraction:
+  method: 'Manual transcription from rendered pages 1–2 (printed pp. 51–52). The abstract reports numerical shock-pressure estimates, total vaporized-matter estimates, and calculated atomic Na/Al vapor ratios in text. Figures 1 and 2 show bulk melt compositions; their plotted individual compositions are not transcribed here because they are not vapor or condensate compositions. Figure 3 compares tektites and proposed source rocks using data from references (8–11); no plotted values are transcribed.'
+  date: '2026-10-13'
+  worker: badj93-1013
+review_status: draft
+species:
+  Albite:
+    observations:
+    - observation_id: badj93_albite_shock_vaporized_mass
+      type: mass_loss
+      locator: {page: 1, pdf_page_index: 0, published_page: 51, figure: '2', note: 'Text paragraph beginning “The albite and jadeite glasses contain steel droplets”; loss estimate refers to albite glass.'}
+      phase: glass
+      regime: shock_fusion_vaporization
+      units: wt.%
+      values:
+        quantity: mass_loss_fraction
+        method_class: author_estimate
+        points:
+        - mass_loss_pct: 4.0
+          approximate: true
+          T_C: 5000
+          starting_composition_as_printed: pure albite
+          mass_loss_as_printed: about 4 wt. %
+          assumption_as_printed: Assuming that Si was not lost during the shock fusion
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: 5273.15}
+              locator: {page: 1, pdf_page_index: 0, published_page: 51, section: 'Experimental study', note: 'Unit conversion only from printed shock temperature about 5000 C.'}
+          locator: {page: 1, pdf_page_index: 0, published_page: 51, figure: '2', note: 'Text paragraph beginning “The albite and jadeite glasses contain steel droplets”; loss estimate refers to albite glass.'}
+      uncertainty:
+        note: No numerical uncertainty or confidence level is stated for this mass-loss estimate.
+    context:
+    - observation_id: badj93_albite_atomic_vapor_na_al_ratio
+      type: composition
+      locator: {page: 1, pdf_page_index: 0, published_page: 51, figure: '2', note: 'Text paragraph beginning “The albite and jadeite glasses contain steel droplets”; calculated atomic Na/Al ratio in vapor.'}
+      units: atomic ratio, as printed
+      values:
+        quantity: calculated_atomic_vapor_composition_ratio
+        method_class: author_derived
+        evidence_class: printed_author_calculation
+        gas_species: Na and Al, elemental atomic ratio
+        atomic_Na_over_Al: 1.3
+        attribution_as_printed: The calculated atomic Na/Al ratio in the vapor is equal to 1.3 for the albite and jadeite glasses and to 26 for the fused pyrex glass.
+    - observation_id: badj93_albite_shock_loading_method_and_pressure_conditions
+      type: method
+      locator: {page: 1, pdf_page_index: 0, published_page: 51, section: 'Experimental study', note: 'Paragraph beginning “Powder samples of pure albite and jadeite were shocked”.'}
+      units: GPa, °C, km/s, as printed
+      values:
+        quantity: shock_loading_method_and_conditions
+        method_class: method_only
+        setup_as_printed: Powder samples of pure albite and jadeite were shocked in steel cylindrical containers surrounded by high explosive. Due to a geometry of a shock wave propagation and a porosity of the samples, high pressure and temperature were generated in an area located along the sample cylinder axis.
+        peak_pressure_GPa_as_printed: about 70
+        shock_temperature_C_as_printed: about 5000
+        pressure_uncertainty_as_printed: Unfortunately, we cannot determine achieved shock parameters exactly
+        sample_condition_as_printed: chips of vesiculated glasses were picked up from central part of the samples
+        analysis_method_as_printed: electron probe with using the broad beam method
+        duration: not stated
+        ambient_pressure_or_gas: not stated
+  Jadeite:
+    observations:
+    - observation_id: badj93_jadeite_shock_vaporized_mass
+      type: mass_loss
+      locator: {page: 1, pdf_page_index: 0, published_page: 51, figure: '2', note: 'Text paragraph beginning “The albite and jadeite glasses contain steel droplets”; loss estimate refers to jadeite glass.'}
+      phase: glass
+      regime: shock_fusion_vaporization
+      units: wt.%
+      values:
+        quantity: mass_loss_fraction
+        method_class: author_estimate
+        points:
+        - mass_loss_pct: 4.0
+          approximate: true
+          T_C: 5000
+          starting_composition_as_printed: pure albite and jadeite
+          mass_loss_as_printed: about 4 wt. %
+          assumption_as_printed: Assuming that Si was not lost during the shock fusion
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: 5273.15}
+              locator: {page: 1, pdf_page_index: 0, published_page: 51, section: 'Experimental study', note: 'Unit conversion only from printed shock temperature about 5000 C.'}
+          locator: {page: 1, pdf_page_index: 0, published_page: 51, figure: '2', note: 'Text paragraph beginning “The albite and jadeite glasses contain steel droplets”; loss estimate refers to jadeite glass.'}
+      uncertainty:
+        note: No numerical uncertainty or confidence level is stated for this mass-loss estimate.
+    context:
+    - observation_id: badj93_jadeite_atomic_vapor_na_al_ratio
+      type: composition
+      locator: {page: 1, pdf_page_index: 0, published_page: 51, figure: '2', note: 'Text paragraph beginning “The albite and jadeite glasses contain steel droplets”; calculated atomic Na/Al ratio in vapor.'}
+      units: atomic ratio, as printed
+      values:
+        quantity: calculated_atomic_vapor_composition_ratio
+        method_class: author_derived
+        evidence_class: printed_author_calculation
+        gas_species: Na and Al, elemental atomic ratio
+        atomic_Na_over_Al: 1.3
+        attribution_as_printed: The calculated atomic Na/Al ratio in the vapor is equal to 1.3 for the albite and jadeite glasses and to 26 for the fused pyrex glass.
+    - observation_id: badj93_jadeite_shock_loading_method_and_pressure_conditions
+      type: method
+      locator: {page: 1, pdf_page_index: 0, published_page: 51, section: 'Experimental study', note: 'Paragraph beginning “Powder samples of pure albite and jadeite were shocked”.'}
+      units: GPa, °C, km/s, as printed
+      values:
+        quantity: shock_loading_method_and_conditions
+        method_class: method_only
+        setup_as_printed: Powder samples of pure albite and jadeite were shocked in steel cylindrical containers surrounded by high explosive. Due to a geometry of a shock wave propagation and a porosity of the samples, high pressure and temperature were generated in an area located along the sample cylinder axis.
+        peak_pressure_GPa_as_printed: about 70
+        shock_temperature_C_as_printed: about 5000
+        pressure_uncertainty_as_printed: Unfortunately, we cannot determine achieved shock parameters exactly
+        sample_condition_as_printed: chips of vesiculated glasses were picked up from central part of the samples
+        analysis_method_as_printed: electron probe with using the broad beam method
+        duration: not stated
+        ambient_pressure_or_gas: not stated
+  Pyrex glass:
+    observations:
+    - observation_id: badj93_pyrex_shock_vaporized_mass
+      type: mass_loss
+      locator: {page: 1, pdf_page_index: 0, published_page: 51, figure: '2', note: 'Text paragraph beginning “The albite and jadeite glasses contain steel droplets”; loss estimate refers to fused pyrex glass.'}
+      phase: glass
+      regime: shock_fusion_vaporization
+      units: wt.%
+      values:
+        quantity: mass_loss_fraction
+        method_class: author_estimate
+        points:
+        - mass_loss_pct: 3.6
+          starting_composition_as_printed: pyrex glass projectiles
+          mass_loss_as_printed: 3.6 wt. %
+          assumption_as_printed: Assuming that Si was not lost during the shock fusion
+          point_conditions:
+            temperature_K:
+              state: {tag: unknown, reason: not_stated}
+              locator: {page: 1, pdf_page_index: 0, published_page: 51, section: 'Experimental study', note: 'The pyrex projectile shock-pressure range is printed; its shock temperature is not stated.'}
+          locator: {page: 1, pdf_page_index: 0, published_page: 51, figure: '2', note: 'Text paragraph beginning “The albite and jadeite glasses contain steel droplets”; loss estimate refers to fused pyrex glass.'}
+      uncertainty:
+        note: No numerical uncertainty or confidence level is stated for this mass-loss estimate.
+    context:
+    - observation_id: badj93_pyrex_atomic_vapor_na_al_ratio
+      type: composition
+      locator: {page: 1, pdf_page_index: 0, published_page: 51, figure: '2', note: 'Text paragraph beginning “The albite and jadeite glasses contain steel droplets”; calculated atomic Na/Al ratio in vapor.'}
+      units: atomic ratio, as printed
+      values:
+        quantity: calculated_atomic_vapor_composition_ratio
+        method_class: author_derived
+        evidence_class: printed_author_calculation
+        gas_species: Na and Al, elemental atomic ratio
+        atomic_Na_over_Al: 26
+        attribution_as_printed: The calculated atomic Na/Al ratio in the vapor is equal to 1.3 for the albite and jadeite glasses and to 26 for the fused pyrex glass.
+    - observation_id: badj93_pyrex_starting_and_fused_glass_analysis_totals
+      type: characterization
+      locator: {page: 1, pdf_page_index: 0, published_page: 51, figure: '1', note: 'Paragraph immediately before the discussion of Figure 1; starting and shock-fused pyrex glass analyses.'}
+      units: wt.%, as printed
+      values:
+        quantity: analysis_totals_and_boron_loss
+        method_class: measured
+        initial_pyrex_analysis_total_wt_pct_as_printed: about 84.5
+        initial_analysis_total_explanation_as_printed: that should be due to presence of boron
+        shock_fused_pyrex_analysis_total_wt_pct_as_printed: about 86
+        shock_fused_analysis_interpretation_as_printed: that suggest a B loss during the impact fusion
+    - observation_id: badj93_steel_droplets_and_iron_in_glasses
+      type: characterization
+      locator: {page: 1, pdf_page_index: 0, published_page: 51, figure: '1', note: 'Paragraph beginning “The albite and jadeite glasses contain steel droplets”.'}
+      units: as printed
+      values:
+        quantity: sample_characterization
+        method_class: measured
+        albite_and_jadeite_glasses: contain steel droplets that could come into the melt from walls and bottoms of the containers
+        albite_black_areas: contain dissolved iron as a minor component
+        jadeite_glass: slightly enriched in Fe
+    - observation_id: badj93_pyrex_al_loss_uncertainty_statement
+      type: characterization
+      locator: {page: 1, pdf_page_index: 0, published_page: 51, figure: '2', note: 'Paragraph beginning “The albite and jadeite glasses contain steel droplets”; qualitative Al-loss comparison.'}
+      units: as printed
+      values:
+        quantity: qualitative_aluminum_loss_and_uncertainty
+        method_class: measured
+        result_as_printed: The Al loss for the pyrex glass appears to be smaller, although it lies out of the range of the analytical uncertainties.
+        numeric_uncertainty_width: not stated
+        confidence_level: not stated
+    - observation_id: badj93_figure3_cited_tektite_comparison
+      type: method
+      locator: {page: 2, pdf_page_index: 1, published_page: 52, figure: '3', note: 'Caption identifies data from references (8–11); panel compares tektites, irgizites, and proposed source rocks.'}
+      units: as printed
+      values:
+        quantity: cited_comparison_figure
+        method_class: figure_only
+        caption_as_printed: 'Fig.3. Na2O–Al2O3–SiO2 relationship among tektites, irgizites (open symbols) and their proposed source rocks (solid symbols). Data from (8–11).'
+        digitization_status: not digitised; plotted data are attributed to references (8–11)
+    - observation_id: badj93_shock_loading_method_and_pressure_conditions
+      type: method
+      locator: {page: 1, pdf_page_index: 0, published_page: 51, section: 'Experimental study', note: 'Paragraph beginning “Powder samples of pure albite and jadeite were shocked”.'}
+      units: GPa, °C, km/s, as printed
+      values:
+        quantity: shock_loading_method_and_conditions
+        method_class: method_only
+        pyrex_setup_as_printed: The experiments were carried out with pyrex glass projectiles, which were launched with velocity of 6 km/s onto a silicate target. The peak pressure depending on impedances of the targets varied from 51 to 65 GPa. Remelted projectile glasses adhering to the shock fused agglutinates were studied.
+        pyrex_projectile_velocity_km_s: 6
+        pyrex_projectile_peak_pressure_range_GPa: [51, 65]
+        pyrex_peak_pressure_condition_as_printed: depending on impedances of the targets
+        analysis_method_as_printed: electron probe with using the broad beam method
+        experimental_temperature_for_pyrex: not stated
+        duration: not stated
+        gas_or_ambient_pressure: not stated
+        container_for_pyrex: not stated
+        figure_1_caption_as_printed: 'Fig. 1. Bulk chemistry of melts for albite, jadeite (a), and pyrex glass experiments onto a Al2O3–SiO2–Na2O diagram.'
+        figure_2_caption_as_printed: 'Fig. 2. Na2O–Al2O3–SiO2 relationships among melts produced by shock experiments. The composition of the melts shows depletion both Na2O and Al2O3 relative to initial matter.'
+        figure_3_cited_sources_as_printed: '(8–11)'
+fidelity_samples:
+- species: Albite
+  observation_id: badj93_albite_shock_vaporized_mass
+  field: points
+  value:
+  - mass_loss_pct: 4.0
+    approximate: true
+    T_C: 5000
+    starting_composition_as_printed: pure albite
+    mass_loss_as_printed: about 4 wt. %
+    assumption_as_printed: Assuming that Si was not lost during the shock fusion
+    point_conditions:
+      temperature_K:
+        state: {tag: value, value: 5273.15}
+        locator: {page: 1, pdf_page_index: 0, published_page: 51, section: 'Experimental study', note: 'Unit conversion only from printed shock temperature about 5000 C.'}
+    locator: {page: 1, pdf_page_index: 0, published_page: 51, figure: '2', note: 'Text paragraph beginning “The albite and jadeite glasses contain steel droplets”; loss estimate refers to albite glass.'}
+  locator: {page: 1, pdf_page_index: 0, published_page: 51, figure: '2'}
+- species: Albite
+  observation_id: badj93_albite_atomic_vapor_na_al_ratio
+  field: atomic_Na_over_Al
+  value: 1.3
+  locator: {page: 1, pdf_page_index: 0, published_page: 51, figure: '2'}
+- species: Albite
+  observation_id: badj93_albite_atomic_vapor_na_al_ratio
+  field: attribution_as_printed
+  value: The calculated atomic Na/Al ratio in the vapor is equal to 1.3 for the albite and jadeite glasses and to 26 for the fused pyrex glass.
+  locator: {page: 1, pdf_page_index: 0, published_page: 51, figure: '2'}
+- species: Albite
+  observation_id: badj93_albite_shock_loading_method_and_pressure_conditions
+  field: pressure_uncertainty_as_printed
+  value: Unfortunately, we cannot determine achieved shock parameters exactly
+  locator: {page: 1, pdf_page_index: 0, published_page: 51, section: 'Experimental study'}
+- species: Jadeite
+  observation_id: badj93_jadeite_shock_vaporized_mass
+  field: points
+  value:
+  - mass_loss_pct: 4.0
+    approximate: true
+    T_C: 5000
+    starting_composition_as_printed: pure albite and jadeite
+    mass_loss_as_printed: about 4 wt. %
+    assumption_as_printed: Assuming that Si was not lost during the shock fusion
+    point_conditions:
+      temperature_K:
+        state: {tag: value, value: 5273.15}
+        locator: {page: 1, pdf_page_index: 0, published_page: 51, section: 'Experimental study', note: 'Unit conversion only from printed shock temperature about 5000 C.'}
+    locator: {page: 1, pdf_page_index: 0, published_page: 51, figure: '2', note: 'Text paragraph beginning “The albite and jadeite glasses contain steel droplets”; loss estimate refers to jadeite glass.'}
+  locator: {page: 1, pdf_page_index: 0, published_page: 51, figure: '2'}
+- species: Jadeite
+  observation_id: badj93_jadeite_atomic_vapor_na_al_ratio
+  field: atomic_Na_over_Al
+  value: 1.3
+  locator: {page: 1, pdf_page_index: 0, published_page: 51, figure: '2'}
+- species: Jadeite
+  observation_id: badj93_jadeite_atomic_vapor_na_al_ratio
+  field: attribution_as_printed
+  value: The calculated atomic Na/Al ratio in the vapor is equal to 1.3 for the albite and jadeite glasses and to 26 for the fused pyrex glass.
+  locator: {page: 1, pdf_page_index: 0, published_page: 51, figure: '2'}
+- species: Jadeite
+  observation_id: badj93_jadeite_shock_loading_method_and_pressure_conditions
+  field: pressure_uncertainty_as_printed
+  value: Unfortunately, we cannot determine achieved shock parameters exactly
+  locator: {page: 1, pdf_page_index: 0, published_page: 51, section: 'Experimental study'}
+- species: Pyrex glass
+  observation_id: badj93_pyrex_shock_vaporized_mass
+  field: points
+  value:
+  - mass_loss_pct: 3.6
+    starting_composition_as_printed: pyrex glass projectiles
+    mass_loss_as_printed: 3.6 wt. %
+    assumption_as_printed: Assuming that Si was not lost during the shock fusion
+    point_conditions:
+      temperature_K:
+        state: {tag: unknown, reason: not_stated}
+        locator: {page: 1, pdf_page_index: 0, published_page: 51, section: 'Experimental study', note: 'The pyrex projectile shock-pressure range is printed; its shock temperature is not stated.'}
+    locator: {page: 1, pdf_page_index: 0, published_page: 51, figure: '2', note: 'Text paragraph beginning “The albite and jadeite glasses contain steel droplets”; loss estimate refers to fused pyrex glass.'}
+  locator: {page: 1, pdf_page_index: 0, published_page: 51, figure: '2'}
+- species: Pyrex glass
+  observation_id: badj93_pyrex_atomic_vapor_na_al_ratio
+  field: atomic_Na_over_Al
+  value: 26
+  locator: {page: 1, pdf_page_index: 0, published_page: 51, figure: '2'}
+- species: Pyrex glass
+  observation_id: badj93_pyrex_atomic_vapor_na_al_ratio
+  field: attribution_as_printed
+  value: The calculated atomic Na/Al ratio in the vapor is equal to 1.3 for the albite and jadeite glasses and to 26 for the fused pyrex glass.
+  locator: {page: 1, pdf_page_index: 0, published_page: 51, figure: '2'}
+- species: Pyrex glass
+  observation_id: badj93_shock_loading_method_and_pressure_conditions
+  field: pyrex_setup_as_printed
+  value: The experiments were carried out with pyrex glass projectiles, which were launched with velocity of 6 km/s onto a silicate target. The peak pressure depending on impedances of the targets varied from 51 to 65 GPa. Remelted projectile glasses adhering to the shock fused agglutinates were studied.
+  locator: {page: 1, pdf_page_index: 0, published_page: 51, section: 'Experimental study'}
+- species: Albite
+  observation_id: badj93_albite_shock_loading_method_and_pressure_conditions
+  field: peak_pressure_GPa_as_printed
+  value: about 70
+  locator: {page: 1, pdf_page_index: 0, published_page: 51, section: 'Experimental study'}
+- species: Albite
+  observation_id: badj93_albite_shock_loading_method_and_pressure_conditions
+  field: shock_temperature_C_as_printed
+  value: about 5000
+  locator: {page: 1, pdf_page_index: 0, published_page: 51, section: 'Experimental study'}
+- species: Pyrex glass
+  observation_id: badj93_shock_loading_method_and_pressure_conditions
+  field: pyrex_projectile_peak_pressure_range_GPa
+  value: [51, 65]
+  locator: {page: 1, pdf_page_index: 0, published_page: 51, section: 'Experimental study'}
+- species: Pyrex glass
+  observation_id: badj93_shock_loading_method_and_pressure_conditions
+  field: pyrex_projectile_velocity_km_s
+  value: 6
+  locator: {page: 1, pdf_page_index: 0, published_page: 51, section: 'Experimental study'}
+- species: Pyrex glass
+  observation_id: badj93_pyrex_starting_and_fused_glass_analysis_totals
+  field: initial_pyrex_analysis_total_wt_pct_as_printed
+  value: about 84.5
+  locator: {page: 1, pdf_page_index: 0, published_page: 51, figure: '1'}
+- species: Pyrex glass
+  observation_id: badj93_pyrex_starting_and_fused_glass_analysis_totals
+  field: shock_fused_pyrex_analysis_total_wt_pct_as_printed
+  value: about 86
+  locator: {page: 1, pdf_page_index: 0, published_page: 51, figure: '1'}
