@@ -19,7 +19,7 @@ from tests.battery.test_waypoints import _bench
             "kume-2000-cao-activities.yaml",
             ("kume_2000_table2_sample_101",),
             555,
-            2,
+            1,
         ),
         (
             "ohta-1996-cao-mgo-al2o3-activities.yaml",

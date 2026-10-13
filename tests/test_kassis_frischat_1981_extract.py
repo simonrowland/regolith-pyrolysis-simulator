@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import EvidenceClass, Quantity
+from simulator.battery.enums import EvidenceClass, Quantity, ValueKind
 from simulator.battery.migrate import REPO_ROOT, Migrator
 from simulator.battery.validate import validate_corpus
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
@@ -19,15 +19,19 @@ FIGURE_TOLERANCE = 0.20
 SERIES = {
     ("Na", Quantity.P_PARTIAL): {1300: 0.52, 1150: 0.039},
     ("Rb", Quantity.P_PARTIAL): {1300: 2.5, 1150: 0.18},
-    ("Na2O", Quantity.P_SAT): {1300: 0.67, 1150: 0.051},
-    ("Rb2O", Quantity.P_SAT): {1300: 3.0, 1150: 0.21},
 }
 SERIES_EXPERIMENT = {
     "Na": "sodium-silicate-melt",
-    "Na2O": "sodium-silicate-melt",
     "Rb": "rubidium-silicate-melt",
-    "Rb2O": "rubidium-silicate-melt",
 }
+TOTAL_PRESSURE_IDS = {
+    "kassis_1981_fig2_p_total_na_melt",
+    "kassis_1981_fig2_p_total_rb_melt",
+}
+TOTAL_PRESSURE_REASON = (
+    "source states total vapour pressure over a multi-species vapour, "
+    "not a single Sen monomer; v2.1 has no total-vapour-pressure identity"
+)
 
 
 def test_kassis_frischat_source_facts_survive_migration() -> None:
@@ -37,7 +41,34 @@ def test_kassis_frischat_source_facts_survive_migration() -> None:
     migrator = Migrator(REPO_ROOT)
     migrator._migrate_extract(EXTRACT)
     result = migrator.result
-    assert result.queue == []
+    queued_total_pressure = [
+        entry for entry in result.queue if entry.why == TOTAL_PRESSURE_REASON
+    ]
+    assert len(queued_total_pressure) == 2
+    assert {
+        entry.observation_id.rsplit("::", 1)[-1]
+        for entry in queued_total_pressure
+    } == TOTAL_PRESSURE_IDS
+    total_pressure_rows = [
+        observation
+        for observation in result.observations.values()
+        if any(
+            observation.observation_id.startswith(f"{EXTRACT.stem}::{row_id}::")
+            for row_id in TOTAL_PRESSURE_IDS
+        )
+    ]
+    assert len(total_pressure_rows) == 8
+    assert all(
+        observation.identity.quantity.is_unknown
+        and observation.identity.quantity.reason == TOTAL_PRESSURE_REASON
+        for observation in total_pressure_rows
+    )
+    assert all(
+        observation.value.kind is ValueKind.UNAVAILABLE
+        and observation.evidence.class_.is_value
+        and observation.evidence.class_.value is EvidenceClass.FIGURE_ONLY
+        for observation in total_pressure_rows
+    )
     validation = validate_corpus(
         result.works, result.experiments, result.observations, residuals=None
     )
@@ -47,6 +78,8 @@ def test_kassis_frischat_source_facts_survive_migration() -> None:
         series: {} for series in SERIES
     }
     for observation in result.observations.values():
+        if not observation.identity.quantity.is_value:
+            continue
         assert observation.evidence.class_.is_value
         assert observation.evidence.class_.value is EvidenceClass.FIGURE_ONLY
         assert observation.identity.quantity.is_value
