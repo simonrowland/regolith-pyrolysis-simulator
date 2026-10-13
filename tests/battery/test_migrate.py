@@ -94,6 +94,7 @@ from simulator.battery.migrate import (
     resolve_equipment_context,
     select_declared_source,
     to_plain,
+    observation_from_plain,
     work_id_for,
     write_outputs,
 
@@ -1265,6 +1266,40 @@ def test_to_plain_state_serialization_omits_absent_keys() -> None:
     assert value_bytes == b'{"tag":"value","value":"fixture"}'
 
 
+@pytest.mark.parametrize(
+    ("value_payload", "expected_status"),
+    [
+        ({"kind": "point", "point": "0"}, AdmissionStatus.ADMITTED),
+        ({"kind": "series", "series": [["1", "0"]]}, AdmissionStatus.ADMITTED),
+        ({"kind": "bound", "bound_operator": "<", "bound_value": "0"}, AdmissionStatus.ADMITTED),
+        ({"kind": "interval", "interval_low": "0", "interval_high": "1"}, AdmissionStatus.ADMITTED),
+        ({"kind": "relative_series", "relative_series": [["1", "0"]], "relative_normalization": "initial"}, AdmissionStatus.ADMITTED),
+        ({"kind": "ordering", "ordering": ["a", "b"]}, AdmissionStatus.PENDING),
+        ({"kind": "categorical", "categorical": "present"}, AdmissionStatus.PENDING),
+        ({"kind": "expression", "expression_text": "x"}, AdmissionStatus.PENDING),
+        ({"kind": "unavailable", "unavailable_reason": "not reported"}, AdmissionStatus.PENDING),
+    ],
+)
+def test_numeric_value_kind_plain_admission_pin(
+    tmp_path: Path,
+    value_payload: dict[str, object],
+    expected_status: AdmissionStatus,
+) -> None:
+    observation = next(iter(migrate(_write_min_tree(tmp_path), write=False).observations.values()))
+    payload = to_plain(observation)
+    payload["value"] = value_payload
+    payload["admission"] = {"status": "pending"}
+
+    decoded = observation_from_plain(payload)
+
+    assert decoded.value.kind.value == value_payload["kind"]
+    assert to_plain(decoded)["value"] == {**value_payload, "approximate": False}
+    assert decoded.admission.status is expected_status
+    assert any(notice.kind is NoticeKind.ADMISSION_DEFAULTED for notice in decoded.notices) is (
+        expected_status is AdmissionStatus.ADMITTED
+    )
+
+
 def test_missing_admission_status_keeps_unmeasured_row_pending(tmp_path: Path) -> None:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     values = extract["species"]["Na"]["observations"][0]["values"]
@@ -2062,6 +2097,54 @@ def test_j02_model_derived_without_parent_is_conditional_field(tmp_path: Path) -
     assert any(
         "derived_from" in (e.axes or ()) or "derivation" in (e.axes or ())
         for e in result.queue
+    )
+
+
+@pytest.mark.parametrize(
+    ("source_status", "has_value", "categorical", "expects_lineage_issue"),
+    [
+        ("figure_only", False, False, False),
+        ("figure_only", False, True, False),
+        ("figure_only", True, False, True),
+        ("admitted", False, False, True),
+    ],
+)
+def test_b879_caption_only_figure_model_lineage_requirement(
+    tmp_path: Path,
+    source_status: str,
+    has_value: bool,
+    categorical: bool,
+    expects_lineage_issue: bool,
+) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    values = extract["species"]["Na"]["observations"][0]["values"]
+    values["method_class"] = "model_derived"
+    values["admission_status"] = source_status
+    if categorical:
+        values["semantics"] = "bound_not_point_ordering"
+    if not has_value:
+        values.pop("series", None)
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    observation = next(iter(result.observations.values()))
+    assert observation.value.kind is (
+        ValueKind.POINT
+        if has_value
+        else ValueKind.CATEGORICAL
+        if categorical
+        else ValueKind.UNAVAILABLE
+    )
+    report = validate_corpus(
+        result.works, result.experiments, result.observations, residuals=None
+    )
+    lineage_issues = [
+        issue
+        for issue in report.hard_issues
+        if issue.path.endswith((".derived_from", ".derivation"))
+    ]
+    assert bool(lineage_issues) is expects_lineage_issue
+    assert all(
+        issue.reason is RefusalReason.CONDITIONAL_FIELD for issue in lineage_issues
     )
 
 

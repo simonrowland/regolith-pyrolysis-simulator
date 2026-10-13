@@ -465,6 +465,15 @@ _VALUE_PAYLOAD = {
 _VALUE_PAYLOAD_FIELDS = frozenset(
     name for names in _VALUE_PAYLOAD.values() for name in names
 )
+_NUMERIC_VALUE_KINDS = frozenset(
+    {
+        ValueKind.POINT,
+        ValueKind.SERIES,
+        ValueKind.BOUND,
+        ValueKind.INTERVAL,
+        ValueKind.RELATIVE_SERIES,
+    }
+)
 
 
 def _require_finite(name: str, value: Decimal) -> None:
@@ -558,6 +567,10 @@ class Value:
     @classmethod
     def point_of(cls, value: object) -> "Value":
         return cls(ValueKind.POINT, point=as_decimal(value))
+
+
+def _value_has_numeric_value(value: Value) -> bool:
+    return value.kind in _NUMERIC_VALUE_KINDS
 
 
 def _located_value(value: Located[Value] | Located[Decimal] | None) -> Located[Value] | None:

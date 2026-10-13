@@ -142,6 +142,7 @@ from simulator.battery.records import (
     Value,
     Work,
     _is_source_internally_inconsistent,
+    _value_has_numeric_value,
     as_decimal,
 )
 from simulator.battery.enums import BenchIdentityBasis, CellMaterial
@@ -1512,15 +1513,6 @@ _DEFAULTABLE_PENDING_REASONS = {
     "source admission_status=pending",
     "source admission_status=pending_validation is not a closed v2.1 token",
 }
-_NUMERIC_OBSERVATION_VALUE_KINDS = frozenset(
-    {
-        "point",
-        "series",
-        "bound",
-        "interval",
-        "relative_series",
-    }
-)
 
 
 def _defaulted_admission(source_reason: str) -> Admission:
@@ -1571,7 +1563,7 @@ def _admission_from_plain(payload: object, *, value: Value) -> Admission:
     raw_status = payload.get("status")
     reason = str(payload.get("reason") or _NO_ADMISSION_STATUS_REASON)
     status_text = str(raw_status or "pending")
-    has_numeric_value = value.kind.value in _NUMERIC_OBSERVATION_VALUE_KINDS
+    has_numeric_value = _value_has_numeric_value(value)
     if (
         not payload.get("superseded_by")
         and decided is None
@@ -13037,7 +13029,7 @@ class Migrator:
         )
         if (
             admission.reason.startswith(_ADMISSION_DEFAULTED_PREFIX)
-            and value.kind.value not in _NUMERIC_OBSERVATION_VALUE_KINDS
+            and not _value_has_numeric_value(value)
         ):
             raw_source_admission = (
                 raw_adm
@@ -15424,7 +15416,7 @@ class Migrator:
             )
         admission = (
             _defaulted_admission(_NO_ADMISSION_STATUS_REASON)
-            if value.kind.value in _NUMERIC_OBSERVATION_VALUE_KINDS
+            if _value_has_numeric_value(value)
             else Admission(
                 status=AdmissionStatus.PENDING,
                 reason=_NO_ADMISSION_STATUS_REASON,

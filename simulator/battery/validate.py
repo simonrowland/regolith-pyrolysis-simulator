@@ -85,6 +85,7 @@ from simulator.battery.records import (
     Value,
     Work,
     _is_source_internally_inconsistent,
+    _value_has_numeric_value,
     as_decimal,
     phase_token,
     union_notices,
@@ -1070,22 +1071,30 @@ def validate_observation(
         EvidenceClass.MODEL_DERIVED,
         EvidenceClass.MEASURED_REDUCED,
     }:
-        if not observation.derived_from:
-            issues.append(
-                _issue(
-                    f"{path}.derived_from",
-                    RefusalReason.CONDITIONAL_FIELD,
-                    "derived observation requires derived_from",
+        # A caption-only figure admission with no numeric value is never scored,
+        # so there is no derived numeric value whose ancestry needs tracing.
+        figure_only_without_value = (
+            observation.admission.reason
+            == "source admission_status=figure_only is not a closed v2.1 token"
+            and not _value_has_numeric_value(observation.value)
+        )
+        if not figure_only_without_value:
+            if not observation.derived_from:
+                issues.append(
+                    _issue(
+                        f"{path}.derived_from",
+                        RefusalReason.CONDITIONAL_FIELD,
+                        "derived observation requires derived_from",
+                    )
                 )
-            )
-        if observation.derivation is None:
-            issues.append(
-                _issue(
-                    f"{path}.derivation",
-                    RefusalReason.CONDITIONAL_FIELD,
-                    "derived observation requires derivation",
+            if observation.derivation is None:
+                issues.append(
+                    _issue(
+                        f"{path}.derivation",
+                        RefusalReason.CONDITIONAL_FIELD,
+                        "derived observation requires derivation",
+                    )
                 )
-            )
     if observation.derived_from:
         for parent in observation.derived_from:
             if parent not in observations and parent not in asset_ids:
