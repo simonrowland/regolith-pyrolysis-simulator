@@ -176,3 +176,19 @@ def test_close_all_surfaces_bounded_shutdown_timeout():
 
     assert time.monotonic() - started_at < 0.5
     assert exc_info.value.phase == "shutdown"
+
+
+def test_module_teardown_guard_detects_live_magemin_pool():
+    class FakeWorker:
+        name = "MAGEMin subprocess pool slot 0"
+
+    class FakePool:
+        workers = (FakeWorker(),)
+
+    pool = FakePool()
+    engine_pool._LIVE_ENGINE_POOLS.add(pool)
+    try:
+        with pytest.raises(AssertionError, match="MAGEMin warm pools alive"):
+            conftest._assert_no_live_magemin_warm_pools()
+    finally:
+        engine_pool._LIVE_ENGINE_POOLS.discard(pool)

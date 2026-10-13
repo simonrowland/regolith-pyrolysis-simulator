@@ -227,6 +227,29 @@ def pytest_sessionfinish(
         _SESSION_WATCHDOG = None
 
 
+def _assert_no_live_magemin_warm_pools() -> None:
+    from simulator.engine_pool import _LIVE_ENGINE_POOLS
+
+    live_workers = [
+        str(getattr(worker, "name", ""))
+        for pool in tuple(_LIVE_ENGINE_POOLS)
+        for worker in tuple(getattr(pool, "workers", ()))
+        if str(getattr(worker, "name", "")).startswith(
+            "MAGEMin subprocess pool slot "
+        )
+    ]
+    assert not live_workers, (
+        "test module left MAGEMin warm pools alive: "
+        + ", ".join(sorted(live_workers))
+    )
+
+
+@pytest.fixture(scope="module", autouse=True)
+def _assert_magemin_warm_pools_closed_at_module_teardown():
+    yield
+    _assert_no_live_magemin_warm_pools()
+
+
 @pytest.fixture
 def production_configured_condensation_route(monkeypatch):
     """Auto-configure direct condensation routes from live transport state."""
