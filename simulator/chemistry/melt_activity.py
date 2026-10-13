@@ -281,8 +281,6 @@ class MeltOxideActivity:
             ),
             "melt_oxide_X_single_cation": self.x_single_cation,
             "melt_oxide_activity": self.activity,
-            "melt_oxide_parent_formula": self.parent_oxide,
-            "melt_parent_oxide_activity": self.thermodynamic_parent_activity(),
             "melt_oxide_gamma_tier": self.evidence_tier,
             "melt_oxide_activity_evidence_tier": self.evidence_tier,
             "melt_oxide_activity_model": self.activity_model,
@@ -302,6 +300,7 @@ class MeltOxideActivity:
                 payload["gamma_domain_authority"] = domain_authority
         # b-133 P-carrier overlay: catalog + evaporation evidence keys.
         if self.parent_oxide == "P2O5":
+            payload["melt_parent_oxide_activity"] = self.thermodynamic_parent_activity()
             payload["melt_oxide_activity_authority_status"] = self.authority_status
             if self.valid_range_K is not None:
                 payload["melt_oxide_gamma_valid_range_K"] = self.valid_range_K

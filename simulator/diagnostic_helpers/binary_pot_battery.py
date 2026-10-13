@@ -2494,15 +2494,51 @@ def _internal_analytical_vapor_pressure_adapter(
         "imcc_notices": oxygen_notices,
     }
     activities = dict(core_diagnostic.get("activities") or {})
+    from simulator.chemistry.melt_activity import (
+        MELT_OXIDE_CATIONS_PER_FORMULA,
+        melt_oxide_activity,
+    )
+
+    if composition_mol:
+        activity_composition_mol = composition_mol
+    else:
+        _composition_kg, activity_composition_mol = composition_kg_and_mol(
+            {
+                name: amount * 100.0
+                for name, amount in validated_melt_mass_kg_by_species.items()
+            }
+        )
+    parent_activity_by_component: dict[str, tuple[str, float] | None] = {}
     for provenance in dict(
         core_diagnostic.get("vapor_pressure_numerator_provenance") or {}
     ).values():
         if not isinstance(provenance, Mapping):
             continue
-        parent_formula = provenance.get("melt_oxide_parent_formula")
-        parent_activity = provenance.get("melt_parent_oxide_activity")
-        if isinstance(parent_formula, str) and parent_formula and parent_activity is not None:
-            activities[parent_formula] = parent_activity
+        component = provenance.get("melt_oxide_component")
+        if not isinstance(component, str) or not component:
+            continue
+        if component not in parent_activity_by_component:
+            for parent_formula in MELT_OXIDE_CATIONS_PER_FORMULA:
+                oxide_activity = melt_oxide_activity(
+                    parent_formula,
+                    activity_composition_mol,
+                    temperature_K=temperature + CELSIUS_TO_KELVIN_OFFSET,
+                )
+                if (
+                    oxide_activity is not None
+                    and oxide_activity.single_cation_component == component
+                ):
+                    resolved = (
+                        parent_formula,
+                        oxide_activity.thermodynamic_parent_activity(),
+                    )
+                    parent_activity_by_component[component] = resolved
+                    break
+            else:
+                parent_activity_by_component[component] = None
+        resolved = parent_activity_by_component[component]
+        if resolved is not None:
+            activities[resolved[0]] = resolved[1]
 
     return SimpleNamespace(
         status="ok",

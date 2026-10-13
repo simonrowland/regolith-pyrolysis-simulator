@@ -1393,7 +1393,12 @@ def fusion_comparison_reference(
     if engine is not None:
         from simulator.battery.waypoints import MELT_ACTIVITY_ENGINES
 
-        if engine.value not in MELT_ACTIVITY_ENGINES:
+        # Internal analytical now reports activities, but its solid reference
+        # conversion has not been established for this engine.
+        if (
+            engine.value not in MELT_ACTIVITY_ENGINES
+            or engine is Engine.INTERNAL_ANALYTICAL
+        ):
             notice = Notice(
                 kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
                 affected_quantities=(Quantity.ACTIVITY,),

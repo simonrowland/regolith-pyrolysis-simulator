@@ -31,7 +31,10 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     equilibrate_cell,
     open_battery_engine,
 )
-from simulator.chemistry.melt_activity import single_cation_mole_fractions
+from simulator.chemistry.melt_activity import (
+    melt_oxide_activity,
+    single_cation_mole_fractions,
+)
 from tests.battery import factories as F
 from tests.battery.test_melt_activity_requirements import _case, _composition
 
@@ -132,14 +135,18 @@ def test_internal_analytical_scores_multi_cation_parent_activity(monkeypatch) ->
     owner_record = next(
         record
         for record in diagnostic["vapor_pressure_numerator_provenance"].values()
-        if record.get("melt_oxide_parent_formula") == "Na2O"
+        if record.get("melt_oxide_component") == "NaO0.5"
     )
+    parent_activity = melt_oxide_activity("Na2O", request.payload["composition_mol"])
+    assert parent_activity is not None
+    assert "melt_oxide_parent_formula" not in owner_record
+    assert "melt_parent_oxide_activity" not in owner_record
     assert float(prediction.value) == pytest.approx(
-        owner_record["melt_parent_oxide_activity"], rel=1e-12,
+        parent_activity.thermodynamic_parent_activity(), rel=1e-12,
     )
-    assert owner_record["melt_parent_oxide_activity"] != owner_record[
-        "melt_oxide_activity"
-    ]
+    assert parent_activity.thermodynamic_parent_activity() != pytest.approx(
+        owner_record["melt_oxide_activity"]
+    )
 
 
 def test_internal_analytical_request_forwards_point_oxygen_without_redox() -> None:
