@@ -464,6 +464,7 @@ def test_step_mre_dispatch_uses_selected_runtime_max_voltage():
         *,
         control_inputs,
         fO2_log=None,
+        redox_state=None,
         fe_redox_policy="intrinsic",
     ):
         captured.update(control_inputs)
@@ -1157,7 +1158,14 @@ def test_c5_sio2_target_step_does_not_reduce_feo():
     )
     reductions: dict[str, float] = {}
 
-    def dispatch_with_provider(_intent, *, control_inputs, fO2_log, fe_redox_policy):
+    def dispatch_with_provider(
+        _intent,
+        *,
+        control_inputs,
+        fO2_log,
+        redox_state=None,
+        fe_redox_policy,
+    ):
         result = provider.dispatch(
             IntentRequest(
                 intent=ChemistryIntent.ELECTROLYSIS_STEP,

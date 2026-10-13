@@ -25,11 +25,15 @@ from simulator.evaporation import (
     _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE,
 )
 from simulator.fe_redox import (
+    FE_FEO_BUFFER_STANDARD,
     KRESS91_LIQUID_CALIBRATION_MAX_T_C,
     KRESS91_LIQUID_CALIBRATION_MIN_T_C,
+    REDOX_STATE_REFERENCE_T_K,
+    RedoxState,
     kress91_ln_fO2_temperature_delta,
 )
 from simulator.melt_backend.base import EquilibriumResult, MeltCompositionError
+from simulator.melt_backend.liquidus import LiquidusSolidusResult
 from simulator.runner import _attach_composition_projected_liquidus_notice
 from simulator.state import CampaignPhase, EvaporationFlux
 from tests.chemistry.conftest import _build_sim
@@ -1922,7 +1926,7 @@ def test_projected_notice_survives_shared_cache_reuse_in_run_metadata(
     for index, sim in enumerate(sims):
         sim._freeze_gate_shared_curve_cache = shared_cache
         sim._freeze_gate_curve_from_gate_dispatch = (
-            lambda reasons, *, fO2_log, index=index: (
+            lambda reasons, *, fO2_log, redox_state=None, index=index: (
                 calls.append(index) or dict(curve)
             )
         )
@@ -2638,7 +2642,7 @@ def test_shared_freeze_gate_curve_cache_uses_melt_input_only(
         )
         sim._freeze_gate_shared_curve_cache = shared_cache
         sim._freeze_gate_curve_from_gate_dispatch = (
-            lambda reasons, *, fO2_log, index=index: (
+            lambda reasons, *, fO2_log, redox_state=None, index=index: (
                 calls.append(index) or curves[index]
             )
         )
@@ -2712,7 +2716,7 @@ def test_gate_curve_memo_reuses_without_receipt_and_emits_notice_once(
     for index, sim in enumerate(sims):
         sim._freeze_gate_shared_curve_cache = shared_cache
         sim._freeze_gate_curve_from_gate_dispatch = (
-            lambda reasons, *, fO2_log, index=index: (
+            lambda reasons, *, fO2_log, redox_state=None, index=index: (
                 calls.append(index) or dict(curve)
             )
         )
@@ -2785,7 +2789,7 @@ def test_uncacheable_gate_curve_never_enters_local_or_shared_memo(
     for index, sim in enumerate(sims):
         sim._freeze_gate_shared_curve_cache = shared_cache
         sim._freeze_gate_curve_from_gate_dispatch = (
-            lambda reasons, *, fO2_log, index=index: (
+            lambda reasons, *, fO2_log, redox_state=None, index=index: (
                 calls.append(index) or dict(curve)
             )
         )
@@ -2843,7 +2847,7 @@ def test_shared_freeze_gate_curve_cache_splits_validation_map_dose_states(
         )
         sim._freeze_gate_shared_curve_cache = shared_cache
         sim._freeze_gate_curve_from_gate_dispatch = (
-            lambda reasons, *, fO2_log, index=index: (
+            lambda reasons, *, fO2_log, redox_state=None, index=index: (
                 calls.append(index) or curves[index]
             )
         )
@@ -3915,3 +3919,78 @@ def test_unrecognised_engine_status_does_not_authorize_the_redox_floor_fallback(
         len(sim._melt_redox_liquidus_gate_fallback_diagnostics)
         == fallback_count
     )
+
+
+def test_freeze_gate_dispatches_its_absolute_redox_state(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    provider = _FakeMAGEMinGateFallbackProvider()
+    sim._chem_registry._authoritative[
+        ChemistryIntent.GATE_LIQUID_FRACTION
+    ] = provider
+    monkeypatch.setattr(
+        sim,
+        '_register_freeze_gate_liquid_fraction_providers',
+        lambda: None,
+    )
+
+    curve = sim._freeze_gate_curve()
+
+    assert curve['liquidus_T_C'] == pytest.approx(1300.0)
+    request = provider.requests[0]
+    assert isinstance(request.redox_state, RedoxState)
+    assert request.redox_state.kind == 'absolute'
+    assert request.fO2_log == pytest.approx(
+        request.redox_state.log_fO2_at(REDOX_STATE_REFERENCE_T_K)
+    )
+
+
+def test_freeze_gate_backend_fallback_receives_redox_state(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    state = RedoxState.buffer_offset(
+        FE_FEO_BUFFER_STANDARD,
+        0.2,
+    )
+    calls = []
+
+    class FakeBackend:
+        def find_liquidus_solidus(self, **kwargs):
+            calls.append(kwargs)
+            return LiquidusSolidusResult(
+                liquidus_T_C=1300.0,
+                solidus_T_C=1000.0,
+                liquid_fraction=1.0,
+                status='ok',
+            )
+
+    sim.backend = FakeBackend()
+    reference_value = state.log_fO2_at(REDOX_STATE_REFERENCE_T_K)
+
+    curve = sim._freeze_gate_curve_from_backend_liquidus(
+        [],
+        pressure_bar=1.0,
+        fO2_log=reference_value,
+        redox_state=state,
+    )
+
+    assert curve['liquidus_T_C'] == pytest.approx(1300.0)
+    assert calls[0]['redox_state'] is state
+    assert calls[0]['fO2_log'] == pytest.approx(reference_value)

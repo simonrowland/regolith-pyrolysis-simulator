@@ -68,6 +68,7 @@ from simulator.chemistry.kernel.dto import (
     IntentResult,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
+from simulator.fe_redox import normalize_redox_state
 from simulator.alphamelts_reference_pressure import (
     ALPHAMELTS_CONDENSED_PHASE_REFERENCE_PRESSURE_BAR,
     alphamelts_condensed_phase_pressure_bar,
@@ -82,6 +83,7 @@ from simulator.melt_backend.liquidus import (
     build_equilibrium_crystallization_path,
     liquidus_sample_error_from_exception,
 )
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 
 
 # Intent set: AlphaMELTS-owned silicate diagnostic intents. MAGEMin shadows
@@ -156,6 +158,16 @@ class AlphaMELTSProvider(ChemistryProvider):
             :class:`LiquidusDiagnostics`.
         6. Returns the :class:`IntentResult` with ``transition=None``.
         """
+        fO2_log, redox_state = normalize_redox_state(
+            request.fO2_log,
+            request.redox_state,
+        )
+        if fO2_log != request.fO2_log or redox_state is not request.redox_state:
+            request = replace(
+                request,
+                fO2_log=fO2_log,
+                redox_state=redox_state,
+            )
         # Defence in depth: the registry routes only declared intents
         # here, but a future caller bypassing the registry must hit a
         # clean ``unsupported`` instead of a silent mis-answer.
@@ -333,11 +345,17 @@ class AlphaMELTSProvider(ChemistryProvider):
         didn't enforce.  A sub-bar physical overhead remains requested while
         the explicit condensed-phase model reference is recorded as applied.
         """
+        requested_fO2_log, _ = normalize_redox_state(
+            request.fO2_log,
+            request.redox_state,
+        )
         requested = {
             'temperature_C': float(request.temperature_C),
             'pressure_bar': float(request.pressure_bar),
             'fO2_log': (
-                float(request.fO2_log) if request.fO2_log is not None else None
+                float(requested_fO2_log)
+                if requested_fO2_log is not None
+                else None
             ),
             'fe_redox_policy': request.fe_redox_policy,
         }
@@ -362,7 +380,13 @@ class AlphaMELTSProvider(ChemistryProvider):
             engine_reported_fO2_log = diagnostics.get(
                 'engine_reported_fO2_log'
             )
-            if engine_reported_fO2_log is not None:
+            if (
+                engine_reported_fO2_log is not None
+                and not (
+                    request.redox_state is not None
+                    and request.redox_state.kind == 'buffer_offset'
+                )
+            ):
                 applied['fO2_log'] = float(engine_reported_fO2_log)
         if isinstance(diagnostics, Mapping) and (
             diagnostics.get('operating_point_clamped')
@@ -390,10 +414,16 @@ class AlphaMELTSProvider(ChemistryProvider):
         request: IntentRequest,
         species_mol: Mapping[str, float],
     ) -> dict:
-        intrinsic_fO2_log = request.control_inputs.get(
-            'intrinsic_fO2_log',
-            request.fO2_log,
-        )
+        if (
+            request.redox_state is not None
+            and request.redox_state.kind == 'buffer_offset'
+        ):
+            intrinsic_fO2_log = request.control_inputs.get('intrinsic_fO2_log')
+        else:
+            intrinsic_fO2_log = request.control_inputs.get(
+                'intrinsic_fO2_log',
+                request.fO2_log,
+            )
         return {
             'fe_redox_policy': request.fe_redox_policy,
             'applied_fe3fet': self._applied_fe3fet(species_mol),
@@ -619,6 +649,10 @@ class AlphaMELTSProvider(ChemistryProvider):
         *,
         composition_mol_by_account: dict,
     ) -> tuple:
+        fO2_log, redox_state = normalize_redox_state(
+            request.fO2_log,
+            getattr(request, 'redox_state', None),
+        )
         finder = getattr(self._backend, 'find_liquidus_solidus', None)
         if not callable(finder):
             return 'unavailable', LiquidusSolidusResult(
@@ -654,7 +688,8 @@ class AlphaMELTSProvider(ChemistryProvider):
         try:
             result = finder(
                 pressure_bar=evaluation_pressure_bar,
-                fO2_log=request.fO2_log if request.fO2_log is not None else -9.0,
+                fO2_log=fO2_log if fO2_log is not None else -9.0,
+                redox_state=redox_state,
                 composition_mol_by_account=composition_mol_by_account,
                 species_formula_registry=species_registry,
             )
@@ -702,6 +737,10 @@ class AlphaMELTSProvider(ChemistryProvider):
         *,
         composition_mol_by_account: dict,
     ) -> tuple:
+        fO2_log, redox_state = normalize_redox_state(
+            request.fO2_log,
+            getattr(request, 'redox_state', None),
+        )
         subprocess_required = self._subprocess_required()
         if not subprocess_required and python_api_available(self._backend):
             mode = 'petthermotools'
@@ -760,7 +799,8 @@ class AlphaMELTSProvider(ChemistryProvider):
         try:
             bounds = finder(
                 pressure_bar=evaluation_pressure_bar,
-                fO2_log=request.fO2_log if request.fO2_log is not None else -9.0,
+                fO2_log=fO2_log if fO2_log is not None else -9.0,
+                redox_state=redox_state,
                 composition_mol_by_account=composition_mol_by_account,
                 species_formula_registry=species_registry,
             )
@@ -783,6 +823,14 @@ class AlphaMELTSProvider(ChemistryProvider):
             or bounds.solidus_T_C is None
             or bounds.liquidus_T_C is None
         ):
+            diagnostics = {}
+            if (
+                redox_state is not None
+                and redox_state.kind == 'buffer_offset'
+                and (bounds.diagnostics or {}).get('reason')
+                == 'redox_state_not_expressible'
+            ):
+                diagnostics['reason'] = 'redox_state_not_expressible'
             return mode, completed(EquilibriumCrystallizationPathResult(
                 liquidus_T_C=bounds.liquidus_T_C,
                 liquidus_T_K=bounds.liquidus_T_K,
@@ -793,18 +841,24 @@ class AlphaMELTSProvider(ChemistryProvider):
                 ),
                 samples=bounds.samples,
                 iterations=bounds.iterations,
+                diagnostics=diagnostics,
             ))
 
         sample_warnings: list[str] = []
 
         def sample_liquid_state(temperature_C: float) -> tuple[float, dict]:
+            sample_fO2_log = (
+                fO2_log if fO2_log is not None else -9.0
+            )
+            if redox_state is not None:
+                sample_fO2_log = redox_state.log_fO2_at(
+                    float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET
+                )
             result = equilibrate_transport(
                 self._backend,
                 temperature_C=float(temperature_C),
                 pressure_bar=evaluation_pressure_bar,
-                fO2_log=(
-                    request.fO2_log if request.fO2_log is not None else -9.0
-                ),
+                fO2_log=sample_fO2_log,
                 composition_mol_by_account=composition_mol_by_account,
                 species_formula_registry=species_registry,
             )

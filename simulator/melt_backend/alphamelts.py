@@ -90,6 +90,7 @@ from simulator.melt_backend.alphamelts_contract import (
 from simulator.melt_backend.vaporock import VapoRockBackend
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
 from simulator.feedstock_composition import iron_oxide_values, total_fe
+from simulator.fe_redox import RedoxState, normalize_redox_state
 from simulator.melt_backend.liquidus import (
     LiquidusSampleError,
     LiquidusSolidusResult,
@@ -1629,8 +1630,19 @@ class _MELTSBackendSupport(MeltBackend):
                               max_T_C: float = 2200.0,
                               scan_step_C: float = 50.0,
                               tolerance_C: float = 2.0,
+                              redox_state: RedoxState | None = None,
                               ) -> LiquidusSolidusResult:
         """Find solidus/liquidus when a liquid-fraction transport is live."""
+        fO2_log, redox_state = normalize_redox_state(fO2_log, redox_state)
+        if (
+            self._mode in {'python_api', 'subprocess'}
+            and redox_state is not None
+            and redox_state.kind == 'buffer_offset'
+        ):
+            return LiquidusSolidusResult(
+                status='unavailable',
+                diagnostics={'reason': 'redox_state_not_expressible'},
+            )
         if not self.is_available():
             return LiquidusSolidusResult(
                 status='unavailable',
@@ -1758,10 +1770,17 @@ class _MELTSBackendSupport(MeltBackend):
         def sample_fraction(temperature_C: float) -> float:
             nonlocal sample_commissioning
             try:
+                sample_fO2_log = (
+                    redox_state.log_fO2_at(
+                        float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET
+                    )
+                    if self._mode == 'thermoengine' and redox_state is not None
+                    else fO2_log
+                )
                 result = self.equilibrate(
                     float(temperature_C),
                     composition_kg=composition_kg,
-                    fO2_log=fO2_log,
+                    fO2_log=sample_fO2_log,
                     pressure_bar=pressure_bar,
                     composition_mol=composition_mol,
                     composition_mol_by_account=composition_mol_by_account,
