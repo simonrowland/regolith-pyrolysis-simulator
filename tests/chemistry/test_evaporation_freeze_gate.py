@@ -4883,6 +4883,80 @@ def test_gate_capture_rejects_foreign_origin_with_valid_consumer_receipt(
     assert store.summary()['capture_calls'] == 0
 
 
+def test_gate_capture_requires_curve_associated_with_active_record(
+    monkeypatch,
+    tmp_path,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    provenance = {
+        'binding_provenance_verifiable': True,
+        'runtime_artifacts': {
+            'magemin_selected_binary': {'sha256': 'a' * 64},
+        },
+    }
+    identity = _configure_magemin_origin_evidence(
+        sim,
+        monkeypatch,
+        lambda: dict(provenance),
+    )
+    _write_gate_receipt_for_test(
+        monkeypatch,
+        tmp_path,
+        identity,
+        provenance,
+    )
+    from simulator.chemistry.kernel import ProviderRegistry
+    from tests.binding_admission_fixtures import (
+        register_synthetic_gate_curve_producer,
+    )
+
+    sim._chem_registry = ProviderRegistry()
+    register_synthetic_gate_curve_producer(sim)
+    curve = {
+        'source': 'gate_liquid_fraction:fallback:test',
+        'status': 'ok',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1300.0,
+    }
+    record = engine_binding_admission.write_gate_curve_memo_record(sim, curve)
+    sim._freeze_gate_liquid_fraction_cache = {
+        'key': _freeze_gate_key_for_current_state(sim),
+        **record,
+    }
+    fO2_log = sim._compute_intrinsic_melt_fO2()
+
+    control_store = PT0DeterminismStore(
+        'capture', db_path=tmp_path / 'associated-curve.db'
+    )
+    control_store.capture_gate_curve(
+        sim,
+        fO2_log=fO2_log,
+        curve=curve,
+    )
+    assert control_store.summary()['capture_calls'] == 1
+    assert control_store.summary()['entries'] == 1
+
+    different_curve = {**curve, 'liquidus_T_C': 1500.0}
+    mismatch_store = PT0DeterminismStore(
+        'capture', db_path=tmp_path / 'unassociated-curve.db'
+    )
+    mismatch_store.capture_gate_curve(
+        sim,
+        fO2_log=fO2_log,
+        curve=different_curve,
+    )
+    assert mismatch_store.summary()['capture_calls'] == 0
+    assert mismatch_store.summary()['entries'] == 0
+
+
 def test_gate_memo_replay_return_is_not_written_to_core_memo(
     monkeypatch,
     vapor_pressure_data,
