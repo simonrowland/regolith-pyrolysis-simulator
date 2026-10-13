@@ -1,0 +1,260 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/mamiya-2000-sio-disproportionation.yaml
+observations:
+- observation_id: mamiya-2000-sio-disproportionation::mamiya_2000_cristobalite_dta_cooling_exotherm
+  experiment_id: 10.11501/3169166::experiment::mamiya_cristobalite_dta_cooling
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: phase_transition
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not_reported
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '515.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: mamiya-2000-sio-disproportionation::mamiya_2000_cristobalite_dta_cooling_exotherm
+  source_id: mamiya-2000-sio-disproportionation
+  locator:
+    page: 63
+    published_page: 57
+    pdf_page_index: 62
+    figure: 3-16
+    section: 3.5 In situ observation of the high-low transformation in cristobalite
+  read_from: pdf:mamiya-2000-sio-disproportionation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '515.15'
+      locator:
+        page: 63
+        published_page: 57
+        pdf_page_index: 62
+        figure: 3-16
+        section: 3.5 In situ observation of the high-low transformation in cristobalite
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '242'
+            locator:
+              page: 63
+              published_page: 57
+              pdf_page_index: 62
+              figure: 3-16
+              section: 3.5 In situ observation of the high-low transformation in cristobalite
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 63
+              published_page: 57
+              pdf_page_index: 62
+              figure: 3-16
+              section: 3.5 In situ observation of the high-low transformation in cristobalite
+        output_unit: K
+- observation_id: mamiya-2000-sio-disproportionation::mamiya_2000_cristobalite_dta_heating_endotherm
+  experiment_id: 10.11501/3169166::experiment::mamiya_cristobalite_dta_heating
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: phase_transition
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not_reported
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '519.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: mamiya-2000-sio-disproportionation::mamiya_2000_cristobalite_dta_heating_endotherm
+  source_id: mamiya-2000-sio-disproportionation
+  locator:
+    page: 63
+    published_page: 57
+    pdf_page_index: 62
+    figure: 3-16
+    section: 3.5 In situ observation of the high-low transformation in cristobalite
+  read_from: pdf:mamiya-2000-sio-disproportionation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '519.15'
+      locator:
+        page: 63
+        published_page: 57
+        pdf_page_index: 62
+        figure: 3-16
+        section: 3.5 In situ observation of the high-low transformation in cristobalite
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '246'
+            locator:
+              page: 63
+              published_page: 57
+              pdf_page_index: 62
+              figure: 3-16
+              section: 3.5 In situ observation of the high-low transformation in cristobalite
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 63
+              published_page: 57
+              pdf_page_index: 62
+              figure: 3-16
+              section: 3.5 In situ observation of the high-low transformation in cristobalite
+        output_unit: K

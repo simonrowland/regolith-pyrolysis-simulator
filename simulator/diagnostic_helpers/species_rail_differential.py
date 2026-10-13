@@ -1128,8 +1128,10 @@ def _evaluate_rail_pressure_Pa(species_id: str, T_K: float, catalog=None) -> flo
         return sidecar
     catalog = catalog or vapour_rail_catalog()
     compiled = catalog.species.get(species_id)
+    # b-189-exempt: diagnostic P_sat comparison, not a hot-train read.
     if compiled is None or compiled.evaluator is None:
         return "rail_row_absent"
+    # b-189-exempt: see the diagnostic intent above; this is not a train read.
     ev = compiled.evaluator
     if (
         ev.pressure_observable
@@ -2547,7 +2549,9 @@ def _psat_nbp_hand_computation() -> dict[str, Any]:
         pref_P = None
         pref_obs = None
         spec = catalog.species.get(formula)
+        # b-189-exempt: diagnostic Pref comparison, not a hot-train read.
         if spec is not None and spec.evaluator is not None:
+            # b-189-exempt: see the diagnostic intent above; this is not a train read.
             ev = spec.evaluator
             pref_obs = str(ev.pressure_observable)
             kwargs: dict[str, Any] = {}

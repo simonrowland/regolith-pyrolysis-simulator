@@ -329,6 +329,12 @@ A locator is a mapping with at least one non-empty location key among:
 - `note` (prose locator when the above do not apply — allowed, but prefer structured keys)
 - `source_path`, `record`
 
+`page` is the one-based physical page in the PDF. `pdf_page_index` is the
+zero-based PDF page index (the first PDF page is 0). `published_page` is the
+folio printed on the page; it may be absent, Roman-numeral, or non-numeric.
+Example: a figure on the 12th PDF page with printed folio 7 has `page: 12`,
+`pdf_page_index: 11`, and `published_page: 7`.
+
 Every **observation** requires a `locator`.  
 Every **equipment-metadata field** that is present requires its **own** `locator`
 (often experimental-section prose or apparatus figures, not result tables).  
