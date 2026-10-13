@@ -955,7 +955,7 @@ def test_runtime_tripwire_records_zero_flux_context_compatibility_reads() -> Non
         captured.update(kwargs)
         return batch
 
-    def _dispatch(_intent, *, control_inputs):
+    def _dispatch(_intent, *, control_inputs, redox_state=None):
         captured_controls.update(control_inputs)
         return SimpleNamespace(
             status="ok",

@@ -1362,10 +1362,10 @@ def _b1259_tridymite_cristobalite_delta_g(
     return delta_h - temperature_K * delta_s, lower, upper, extrapolated
 
 
-def _fusion_comparison_reference(
+def fusion_comparison_reference(
     reference: Observation, *, engine: Engine | None = None
 ) -> Observation:
-    """Return the liquid-reference comparison view for a solid activity row."""
+    """Single owner of solid/liquid reference selection for both the battery scorer and melt-activity benchmark."""
 
     identity = reference.identity
     if (
@@ -5036,6 +5036,33 @@ def _sossi_residue_prediction(
                 band=str(band),
             ),
         ]
+        activity_extensions = provenance.get("melt_activity_extensions")
+        mno_activity_extension = (
+            activity_extensions.get("MnO")
+            if isinstance(activity_extensions, Mapping)
+            else None
+        )
+        if isinstance(mno_activity_extension, Mapping):
+            authority_level = str(
+                mno_activity_extension.get("authority_level") or "unknown"
+            )
+            certified_band = mno_activity_extension.get("certified_band_K")
+            notices.append(
+                Notice(
+                    kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                    affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+                    reason=str(
+                        mno_activity_extension.get("reason")
+                        or "MnO activity uses an uncertified extension"
+                    ),
+                    origin="sossi-residue-r5",
+                    band=(
+                        f"authority_level={authority_level}; "
+                        "certified_band_K="
+                        f"{certified_band if certified_band is not None else 'none'}"
+                    ),
+                )
+            )
         if any(
             details.get("status") == "unconverged_at_cap"
             for details in (provenance.get("integration") or {}).values()
@@ -5165,7 +5192,7 @@ def compile_residual(
 ) -> tuple[Residual, Observation | None]:
     _require_score_engine(engine)
     source_reference = reference
-    reference = _fusion_comparison_reference(reference, engine=engine)
+    reference = fusion_comparison_reference(reference, engine=engine)
     identity = reference.identity
     quantity = quantity_token(identity) if isinstance(identity, Identity) else None
     formula = identity.species.formula if isinstance(identity, Identity) else ""
@@ -5925,7 +5952,7 @@ def _score_store_with_decisions(
                 refs.append(obs)
                 seen.add(obs.observation_id)
         for obs in context.observations.values():
-            converted = _fusion_comparison_reference(obs)
+            converted = fusion_comparison_reference(obs)
             if converted is not obs:
                 if any(
                     _is_fusion_conversion_notice(notice) for notice in converted.notices

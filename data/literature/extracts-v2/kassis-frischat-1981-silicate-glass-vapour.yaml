@@ -1,0 +1,2036 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kassis-frischat-1981-silicate-glass-vapour.yaml
+observations:
+- observation_id: kassis-frischat-1981-silicate-glass-vapour::kassis_1981_fig2_p_total_na_melt::T=1423.15:h=12488664ab06
+  experiment_id: 10.1111/j.1151-2916.1981.tb09566.x::experiment::sodium-silicate-melt
+  identity:
+    quantity:
+      tag: unknown
+      reason: source states total vapour pressure over a multi-species vapour, not a single Sen monomer; v2.1 has no total-vapour-pressure
+        identity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1423.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-10-13'
+      evidence:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+  notices: []
+  source_id: kassis-frischat-1981-silicate-glass-vapour
+  locator:
+    page: 2
+    published_page: C-29
+    pdf_page_index: 1
+    figure: '2'
+  read_from: pdf:kassis-frischat-1981-silicate-glass-vapour
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1423.15'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1150'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '0.051'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+      inference:
+        relation: identity:Pa
+        inputs:
+        - as_published=0.051 Pa
+        - printed=pressure_Pa
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.051'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        output_unit: Pa
+    temperature_C:
+      state:
+        tag: value
+        value: '1150'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+- observation_id: kassis-frischat-1981-silicate-glass-vapour::kassis_1981_fig2_p_total_na_melt::T=1473.15:h=d84c6c2bd178
+  experiment_id: 10.1111/j.1151-2916.1981.tb09566.x::experiment::sodium-silicate-melt
+  identity:
+    quantity:
+      tag: unknown
+      reason: source states total vapour pressure over a multi-species vapour, not a single Sen monomer; v2.1 has no total-vapour-pressure
+        identity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-10-13'
+      evidence:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+  notices: []
+  source_id: kassis-frischat-1981-silicate-glass-vapour
+  locator:
+    page: 2
+    published_page: C-29
+    pdf_page_index: 1
+    figure: '2'
+  read_from: pdf:kassis-frischat-1981-silicate-glass-vapour
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '0.13'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+      inference:
+        relation: identity:Pa
+        inputs:
+        - as_published=0.13 Pa
+        - printed=pressure_Pa
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.13'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        output_unit: Pa
+    temperature_C:
+      state:
+        tag: value
+        value: '1200'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+- observation_id: kassis-frischat-1981-silicate-glass-vapour::kassis_1981_fig2_p_total_na_melt::T=1523.15:h=62632765c3c3
+  experiment_id: 10.1111/j.1151-2916.1981.tb09566.x::experiment::sodium-silicate-melt
+  identity:
+    quantity:
+      tag: unknown
+      reason: source states total vapour pressure over a multi-species vapour, not a single Sen monomer; v2.1 has no total-vapour-pressure
+        identity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1523.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-10-13'
+      evidence:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+  notices: []
+  source_id: kassis-frischat-1981-silicate-glass-vapour
+  locator:
+    page: 2
+    published_page: C-29
+    pdf_page_index: 1
+    figure: '2'
+  read_from: pdf:kassis-frischat-1981-silicate-glass-vapour
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523.15'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1250'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '0.28'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+      inference:
+        relation: identity:Pa
+        inputs:
+        - as_published=0.28 Pa
+        - printed=pressure_Pa
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.28'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        output_unit: Pa
+    temperature_C:
+      state:
+        tag: value
+        value: '1250'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+- observation_id: kassis-frischat-1981-silicate-glass-vapour::kassis_1981_fig2_p_total_na_melt::T=1573.15:h=73b7eb2b424a
+  experiment_id: 10.1111/j.1151-2916.1981.tb09566.x::experiment::sodium-silicate-melt
+  identity:
+    quantity:
+      tag: unknown
+      reason: source states total vapour pressure over a multi-species vapour, not a single Sen monomer; v2.1 has no total-vapour-pressure
+        identity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1573.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-10-13'
+      evidence:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+  notices: []
+  source_id: kassis-frischat-1981-silicate-glass-vapour
+  locator:
+    page: 2
+    published_page: C-29
+    pdf_page_index: 1
+    figure: '2'
+  read_from: pdf:kassis-frischat-1981-silicate-glass-vapour
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '0.67'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+      inference:
+        relation: identity:Pa
+        inputs:
+        - as_published=0.67 Pa
+        - printed=pressure_Pa
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.67'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        output_unit: Pa
+    temperature_C:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+- observation_id: kassis-frischat-1981-silicate-glass-vapour::kassis_1981_fig2_p_total_rb_melt::T=1423.15:h=9f92a4fa1cd3
+  experiment_id: 10.1111/j.1151-2916.1981.tb09566.x::experiment::rubidium-silicate-melt
+  identity:
+    quantity:
+      tag: unknown
+      reason: source states total vapour pressure over a multi-species vapour, not a single Sen monomer; v2.1 has no total-vapour-pressure
+        identity
+    species:
+      formula: Rb2O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1423.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-10-13'
+      evidence:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+  notices: []
+  source_id: kassis-frischat-1981-silicate-glass-vapour
+  locator:
+    page: 2
+    published_page: C-29
+    pdf_page_index: 1
+    figure: '2'
+  read_from: pdf:kassis-frischat-1981-silicate-glass-vapour
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1423.15'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1150'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '0.21'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+      inference:
+        relation: identity:Pa
+        inputs:
+        - as_published=0.21 Pa
+        - printed=pressure_Pa
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.21'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        output_unit: Pa
+    temperature_C:
+      state:
+        tag: value
+        value: '1150'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+- observation_id: kassis-frischat-1981-silicate-glass-vapour::kassis_1981_fig2_p_total_rb_melt::T=1473.15:h=bfbcab95c5fa
+  experiment_id: 10.1111/j.1151-2916.1981.tb09566.x::experiment::rubidium-silicate-melt
+  identity:
+    quantity:
+      tag: unknown
+      reason: source states total vapour pressure over a multi-species vapour, not a single Sen monomer; v2.1 has no total-vapour-pressure
+        identity
+    species:
+      formula: Rb2O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-10-13'
+      evidence:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+  notices: []
+  source_id: kassis-frischat-1981-silicate-glass-vapour
+  locator:
+    page: 2
+    published_page: C-29
+    pdf_page_index: 1
+    figure: '2'
+  read_from: pdf:kassis-frischat-1981-silicate-glass-vapour
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '0.53'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+      inference:
+        relation: identity:Pa
+        inputs:
+        - as_published=0.53 Pa
+        - printed=pressure_Pa
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.53'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        output_unit: Pa
+    temperature_C:
+      state:
+        tag: value
+        value: '1200'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+- observation_id: kassis-frischat-1981-silicate-glass-vapour::kassis_1981_fig2_p_total_rb_melt::T=1523.15:h=ca5964619fc8
+  experiment_id: 10.1111/j.1151-2916.1981.tb09566.x::experiment::rubidium-silicate-melt
+  identity:
+    quantity:
+      tag: unknown
+      reason: source states total vapour pressure over a multi-species vapour, not a single Sen monomer; v2.1 has no total-vapour-pressure
+        identity
+    species:
+      formula: Rb2O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1523.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-10-13'
+      evidence:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+  notices: []
+  source_id: kassis-frischat-1981-silicate-glass-vapour
+  locator:
+    page: 2
+    published_page: C-29
+    pdf_page_index: 1
+    figure: '2'
+  read_from: pdf:kassis-frischat-1981-silicate-glass-vapour
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523.15'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1250'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '1.2'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+      inference:
+        relation: identity:Pa
+        inputs:
+        - as_published=1.2 Pa
+        - printed=pressure_Pa
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1.2'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        output_unit: Pa
+    temperature_C:
+      state:
+        tag: value
+        value: '1250'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+- observation_id: kassis-frischat-1981-silicate-glass-vapour::kassis_1981_fig2_p_total_rb_melt::T=1573.15:h=34e1c7697d10
+  experiment_id: 10.1111/j.1151-2916.1981.tb09566.x::experiment::rubidium-silicate-melt
+  identity:
+    quantity:
+      tag: unknown
+      reason: source states total vapour pressure over a multi-species vapour, not a single Sen monomer; v2.1 has no total-vapour-pressure
+        identity
+    species:
+      formula: Rb2O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1573.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-10-13'
+      evidence:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+  notices: []
+  source_id: kassis-frischat-1981-silicate-glass-vapour
+  locator:
+    page: 2
+    published_page: C-29
+    pdf_page_index: 1
+    figure: '2'
+  read_from: pdf:kassis-frischat-1981-silicate-glass-vapour
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '3'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+      inference:
+        relation: identity:Pa
+        inputs:
+        - as_published=3.0 Pa
+        - printed=pressure_Pa
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '3'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        output_unit: Pa
+    temperature_C:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+- observation_id: kassis-frischat-1981-silicate-glass-vapour::kassis_1981_fig2_pna::T=1423.15:h=8e64630528ba
+  experiment_id: 10.1111/j.1151-2916.1981.tb09566.x::experiment::sodium-silicate-melt
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1423.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.039'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kassis-frischat-1981-silicate-glass-vapour
+  locator:
+    page: 2
+    published_page: C-29
+    pdf_page_index: 1
+    figure: '2'
+  read_from: pdf:kassis-frischat-1981-silicate-glass-vapour
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1423.15'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1150'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1150'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kassis-frischat-1981-silicate-glass-vapour
+    parameters: []
+    output_unit: Pa
+- observation_id: kassis-frischat-1981-silicate-glass-vapour::kassis_1981_fig2_pna::T=1473.15:h=0a7dd7f2fa48
+  experiment_id: 10.1111/j.1151-2916.1981.tb09566.x::experiment::sodium-silicate-melt
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.096'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kassis-frischat-1981-silicate-glass-vapour
+  locator:
+    page: 2
+    published_page: C-29
+    pdf_page_index: 1
+    figure: '2'
+  read_from: pdf:kassis-frischat-1981-silicate-glass-vapour
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1200'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kassis-frischat-1981-silicate-glass-vapour
+    parameters: []
+    output_unit: Pa
+- observation_id: kassis-frischat-1981-silicate-glass-vapour::kassis_1981_fig2_pna::T=1523.15:h=308de1f8d8ac
+  experiment_id: 10.1111/j.1151-2916.1981.tb09566.x::experiment::sodium-silicate-melt
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1523.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.22'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kassis-frischat-1981-silicate-glass-vapour
+  locator:
+    page: 2
+    published_page: C-29
+    pdf_page_index: 1
+    figure: '2'
+  read_from: pdf:kassis-frischat-1981-silicate-glass-vapour
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523.15'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1250'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1250'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kassis-frischat-1981-silicate-glass-vapour
+    parameters: []
+    output_unit: Pa
+- observation_id: kassis-frischat-1981-silicate-glass-vapour::kassis_1981_fig2_pna::T=1573.15:h=67fe263a5d5d
+  experiment_id: 10.1111/j.1151-2916.1981.tb09566.x::experiment::sodium-silicate-melt
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.52'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kassis-frischat-1981-silicate-glass-vapour
+  locator:
+    page: 2
+    published_page: C-29
+    pdf_page_index: 1
+    figure: '2'
+  read_from: pdf:kassis-frischat-1981-silicate-glass-vapour
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kassis-frischat-1981-silicate-glass-vapour
+    parameters: []
+    output_unit: Pa
+- observation_id: kassis-frischat-1981-silicate-glass-vapour::kassis_1981_fig2_prb::T=1423.15:h=e40bc5a20e79
+  experiment_id: 10.1111/j.1151-2916.1981.tb09566.x::experiment::rubidium-silicate-melt
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Rb
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1423.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.18'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kassis-frischat-1981-silicate-glass-vapour
+  locator:
+    page: 2
+    published_page: C-29
+    pdf_page_index: 1
+    figure: '2'
+  read_from: pdf:kassis-frischat-1981-silicate-glass-vapour
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1423.15'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1150'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1150'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kassis-frischat-1981-silicate-glass-vapour
+    parameters: []
+    output_unit: Pa
+- observation_id: kassis-frischat-1981-silicate-glass-vapour::kassis_1981_fig2_prb::T=1473.15:h=cbe49b99c8b1
+  experiment_id: 10.1111/j.1151-2916.1981.tb09566.x::experiment::rubidium-silicate-melt
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Rb
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.45'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kassis-frischat-1981-silicate-glass-vapour
+  locator:
+    page: 2
+    published_page: C-29
+    pdf_page_index: 1
+    figure: '2'
+  read_from: pdf:kassis-frischat-1981-silicate-glass-vapour
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1200'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kassis-frischat-1981-silicate-glass-vapour
+    parameters: []
+    output_unit: Pa
+- observation_id: kassis-frischat-1981-silicate-glass-vapour::kassis_1981_fig2_prb::T=1523.15:h=3f52c0c73c70
+  experiment_id: 10.1111/j.1151-2916.1981.tb09566.x::experiment::rubidium-silicate-melt
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Rb
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1523.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '1'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kassis-frischat-1981-silicate-glass-vapour
+  locator:
+    page: 2
+    published_page: C-29
+    pdf_page_index: 1
+    figure: '2'
+  read_from: pdf:kassis-frischat-1981-silicate-glass-vapour
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523.15'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1250'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1250'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kassis-frischat-1981-silicate-glass-vapour
+    parameters: []
+    output_unit: Pa
+- observation_id: kassis-frischat-1981-silicate-glass-vapour::kassis_1981_fig2_prb::T=1573.15:h=054bef67ea3b
+  experiment_id: 10.1111/j.1151-2916.1981.tb09566.x::experiment::rubidium-silicate-melt
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Rb
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '2.5'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kassis-frischat-1981-silicate-glass-vapour
+  locator:
+    page: 2
+    published_page: C-29
+    pdf_page_index: 1
+    figure: '2'
+  read_from: pdf:kassis-frischat-1981-silicate-glass-vapour
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 2
+              published_page: C-29
+              pdf_page_index: 1
+              figure: '2'
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 2
+        published_page: C-29
+        pdf_page_index: 1
+        figure: '2'
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kassis-frischat-1981-silicate-glass-vapour
+    parameters: []
+    output_unit: Pa

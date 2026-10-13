@@ -574,11 +574,13 @@ def test_sio_yield_restored_capture_keeps_provenance_and_closure(feedstock):
     # therefore re-grounds the two cancellation residuals, not a free tuning
     # parameter; canonical atom-ledger closure remains independently bounded
     # at 5e-12 percent.
-    # Restored source debit removes r3's spurious residual reduction; causal
-    # capture changes only the bulk-inventory subtraction's roundoff path.
+    # t-1217 restores source-preserving causal capture and changes the bulk-
+    # inventory subtraction's roundoff path; b-850 parent-oxide alkali-dimer
+    # activities shift the SiO route, yielding merged 24-hour closure residuals
+    # of 6.164333585288513e-7% (lunar) and 2.2716051402658465e-7% (Mars).
     expected_closure_error_pct = {
-        "lunar_mare_low_ti": 5.717403115079557e-7,
-        "mars_basalt": 6.65641860494811e-7,
+        "lunar_mare_low_ti": 6.164333585288513e-7,
+        "mars_basalt": 2.2716051402658465e-7,
     }
     assert diagnostics["closure_error_pct"] == pytest.approx(
         expected_closure_error_pct[feedstock], rel=1.0e-9, abs=1.0e-15

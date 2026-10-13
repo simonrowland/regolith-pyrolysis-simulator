@@ -18,6 +18,15 @@ fidelity_samples:
   value: 0.81
   note: Table 3 CaO-crucible run 6 aCaO
   locator: {published_page: 1373, pdf_page_index: 5, table: '3', row: '6'}
+experiments:
+  - experiment_id: seki-2011-calculated-cao-activity
+    method: quench_equilibration
+    locator:
+      page: 1370
+      pdf_page_index: 2
+      published_page: 1370
+      section: Experimental Procedure
+      paragraph: 'The lower part of the reaction tube was dipped in a water bath in order to quench sample.'
 species:
   CaO:
     context:
@@ -128,6 +137,7 @@ species:
         quote: Abstract and section 3.1 slag compositions and phases.
     observations:
     - observation_id: seki_2011_table3_calculated_a_CaO
+      experiment: seki-2011-calculated-cao-activity
       type: activity_coefficient
       locator:
         published_page: 1373

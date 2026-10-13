@@ -77,6 +77,7 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
 
     import simulator.battery.residue as residue
     from simulator.melt_backend import openimcc_bridge
+    from simulator.chemistry.melt_activity import melt_oxide_activity
 
     monkeypatch.setattr(
         openimcc_bridge, "DEFAULT_BACKEND_PACK_NAME", "published-core"
@@ -97,6 +98,31 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
         ]
         for element in ("Mn", "Ti")
     }
+    initial_inventory, _, _ = residue._sossi_initial_inventory(
+        experiment, starting_trace
+    )
+    temperature_K = residue._hashimoto_point_value(
+        experiment["thermal_schedule"]["setpoints_and_holds"][0]["temperature_K"]
+    )
+    expected_mno_activity = melt_oxide_activity(
+        "MnO", initial_inventory, temperature_K=temperature_K
+    )
+    assert expected_mno_activity is not None
+    evaluated_compositions: list[dict[str, float]] = []
+    gas_activity_inputs: list[dict[str, float]] = []
+    original_melt_evaluate = openimcc_bridge.evaluate
+    original_gas_evaluate = openimcc.evaluate_gas
+
+    def capture_melt_evaluate(**kwargs):
+        evaluated_compositions.append(dict(kwargs["composition_mol"]))
+        return original_melt_evaluate(**kwargs)
+
+    def capture_gas_evaluate(activities, *args, **kwargs):
+        gas_activity_inputs.append(dict(activities))
+        return original_gas_evaluate(activities, *args, **kwargs)
+
+    monkeypatch.setattr(openimcc_bridge, "evaluate", capture_melt_evaluate)
+    monkeypatch.setattr(openimcc, "evaluate_gas", capture_gas_evaluate)
     catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
     prediction = residue._predict_sossi_residue_cohort(
         [experiment],
@@ -120,10 +146,25 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
     assert prediction.provenance["engine_binding_identity"] == expected_identity
     assert "gas_pack_digest" not in prediction.provenance
     assert "liquid_pack_digest" not in prediction.provenance
+    assert evaluated_compositions
+    assert all("MnO" not in composition for composition in evaluated_compositions)
+    assert gas_activity_inputs
+    assert gas_activity_inputs[0]["MnO"] == pytest.approx(
+        expected_mno_activity.thermodynamic_parent_activity()
+    )
+    mno_extension = prediction.provenance["melt_activity_extensions"]["MnO"]
+    assert mno_extension["authority_level"] == expected_mno_activity.evidence_tier
+    assert mno_extension["certified_band_K"] is None
+    assert mno_extension["activity_provenance"] == expected_mno_activity.provenance()
 
 
 def test_sossi_scorer_projects_mn_and_types_unsupported_elements(monkeypatch) -> None:
-    from simulator.battery.enums import Engine, MetricOperation, RefusalReason
+    from simulator.battery.enums import (
+        Engine,
+        MetricOperation,
+        NoticeKind,
+        RefusalReason,
+    )
     from simulator.battery.score import (
         _sossi_residue_prediction,
         load_score_context,
@@ -155,6 +196,13 @@ def test_sossi_scorer_projects_mn_and_types_unsupported_elements(monkeypatch) ->
                 provenance={
                     "integration": {"primary": {"status": "converged"}},
                     "code_revision": "fixture-revision",
+                    "melt_activity_extensions": {
+                        "MnO": {
+                            "reason": "MnO is outside the IMCC-SF04 melt-activity domain",
+                            "authority_level": "UNCERTIFIED",
+                            "certified_band_K": None,
+                        }
+                    },
                 },
             )
             for item in experiments
@@ -175,6 +223,13 @@ def test_sossi_scorer_projects_mn_and_types_unsupported_elements(monkeypatch) ->
     assert prediction.identity == manganese.identity
     assert any(
         notice.reason == "bc_open_furnace_langmuir_limit_diagnostic"
+        for notice in prediction.notices
+    )
+    assert any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.reason == "MnO is outside the IMCC-SF04 melt-activity domain"
+        and "authority_level=UNCERTIFIED" in notice.band
+        and "certified_band_K=none" in notice.band
         for notice in prediction.notices
     )
     assert metric_operation_for_identity(manganese.identity) is MetricOperation.DEX

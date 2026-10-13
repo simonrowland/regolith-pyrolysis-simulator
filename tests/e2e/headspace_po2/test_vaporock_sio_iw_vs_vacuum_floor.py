@@ -103,7 +103,8 @@ SIO_ANCHOR_HOUR = 6
 # Same alkali-coupled class as t-383; SiO Antoine row bit-identical; not a
 # mass-balance artifact (AtomLedger closes). Pin = executed probe value;
 # never hand-pasted. See docs-private/research/2026-08-09-b151-disposition/.
-EXPECTED_SIO_DECADE_DRIFT = 0.21947209153015898
+# b-850: alkali composite vapour rows now use the parent-oxide activity.
+EXPECTED_SIO_DECADE_DRIFT = 0.2090602025512069
 
 
 def test_vaporock_sio_iw_vs_vacuum_floor_hot_c2a_anchor():

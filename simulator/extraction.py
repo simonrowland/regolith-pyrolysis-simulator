@@ -25,6 +25,7 @@ from simulator.condensation_routing import (
     product_stage_number,
 )
 from simulator.config_flags import bool_feature_flag
+from simulator.melt_regime import MeltRegime, melt_regime
 from simulator.state import (
     FARADAY,
     GAS_CONSTANT,
@@ -2418,7 +2419,10 @@ class ExtractionMixin:
         first_positive_liquid_temperature_C: float | None = None
         if (
                 margin_low_C > solidus_temperature_C
-                and liquid_fraction_at(margin_low_C) > 0.0
+                and melt_regime(
+                    liquid_fraction=liquid_fraction_at(margin_low_C),
+                    epsilon=0.0,
+                ) != MeltRegime.FROZEN
         ):
             liquid_low_C = solidus_temperature_C
             liquid_high_C = margin_low_C
@@ -2426,7 +2430,10 @@ class ExtractionMixin:
                 if liquid_high_C - liquid_low_C <= boundary_tolerance_C:
                     break
                 midpoint_C = (liquid_low_C + liquid_high_C) / 2.0
-                if liquid_fraction_at(midpoint_C) > 0.0:
+                if melt_regime(
+                    liquid_fraction=liquid_fraction_at(midpoint_C),
+                    epsilon=0.0,
+                ) != MeltRegime.FROZEN:
                     liquid_high_C = midpoint_C
                 else:
                     liquid_low_C = midpoint_C

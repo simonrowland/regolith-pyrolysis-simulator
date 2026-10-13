@@ -25,6 +25,9 @@ from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.corpus_version import current_corpus_version
 from simulator.fe_redox import (
     KRESS91_FO2_KEY_REFERENCE_T_K,
+    FE_FEO_BUFFER_STANDARD,
+    REDOX_STATE_REFERENCE_T_K,
+    RedoxState,
     kress91_referenced_log_fO2,
 )
 from simulator.config import (
@@ -222,6 +225,34 @@ def test_dispatch_only_quantizes_mre_melt_fo2_control_with_request() -> None:
         expected
     )
     assert kernel.kwargs["fe_redox_policy"] == "kress91_live"
+
+
+def test_dispatch_only_reanchors_redox_state_after_pt0_fO2_quantization() -> None:
+    store = PT0DeterminismStore("capture")
+    sim = _build_pt0_sim(store)
+    state = RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, 0.2)
+    raw_reference = state.log_fO2_at(REDOX_STATE_REFERENCE_T_K)
+    expected_reference = store.quantized_controls(
+        sim,
+        fO2_log=raw_reference,
+    )["fO2_log"]
+    kernel = _CaptureDispatchKernel()
+    sim._chem_kernel = kernel
+
+    sim._dispatch_only(
+        ChemistryIntent.SILICATE_LIQUIDUS,
+        control_inputs={},
+        fO2_log=raw_reference,
+        redox_state=state,
+    )
+
+    forwarded_state = kernel.kwargs["redox_state"]
+    assert forwarded_state.log_fO2_at(REDOX_STATE_REFERENCE_T_K) == pytest.approx(
+        expected_reference
+    )
+    assert forwarded_state.log_fO2_at(1900.0) == pytest.approx(
+        state.log_fO2_at(1900.0) + expected_reference - raw_reference
+    )
 
 
 def test_pt0_supplied_finite_fo2_quantization_is_golden_neutral() -> None:
@@ -526,7 +557,7 @@ def _run_capped_c2a_with_equilibrium_counter(
         "liquidus_T_C": 1320.0,
         "path": ((1210.0, 0.0), (1320.0, 1.0)),
     }
-    sim._freeze_gate_curve_from_gate_dispatch = lambda reasons, *, fO2_log: dict(freeze_curve)
+    sim._freeze_gate_curve_from_gate_dispatch = lambda reasons, *, fO2_log, redox_state=None: dict(freeze_curve)
     original_equilibrate = sim.backend.equilibrate
     calls = 0
 
@@ -3243,7 +3274,7 @@ def test_pt0_gate_memo_hit_does_not_capture_without_receipt(
     }
     provider_calls = []
     sim._freeze_gate_curve_from_gate_dispatch = (
-        lambda reasons, *, fO2_log: provider_calls.append(fO2_log)
+        lambda reasons, *, fO2_log, redox_state=None: provider_calls.append(fO2_log)
         or dict(curve)
     )
     store_calls = []
@@ -3297,7 +3328,7 @@ def test_pt0_gate_capture_with_receipt_covers_fresh_curve_and_memo_hit(
     }
     provider_calls = []
     sim._freeze_gate_curve_from_gate_dispatch = (
-        lambda reasons, *, fO2_log: provider_calls.append(fO2_log)
+        lambda reasons, *, fO2_log, redox_state=None: provider_calls.append(fO2_log)
         or dict(curve)
     )
     capture_calls = []

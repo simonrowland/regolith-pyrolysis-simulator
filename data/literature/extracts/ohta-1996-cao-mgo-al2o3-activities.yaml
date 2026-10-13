@@ -49,6 +49,15 @@ fidelity_samples:
   value: {C: 1.0, Cr: 1.4, Mn: 0.4, Si: 0.3, Al: 0.02}
   note: p. 989 bearing-steel example carbon content
   locator: {published_page: 989, pdf_page_index: 7, section: '4'}
+experiments:
+  - experiment_id: ohta-1996-activity-quench-equilibration
+    method: quench_equilibration
+    locator:
+      page: 983
+      pdf_page_index: 1
+      published_page: 983
+      section: Experimental
+      paragraph: 'After equilibration, the crucible was taken out of the furnace and quenched rapidly in a He gas stream, followed by water quenching.'
 species:
   CaO:
     observations: []
@@ -219,6 +228,7 @@ species:
   Al2O3:
     observations:
     - observation_id: ohta_1996_al2o3_activity_mgo_spinel_saturation_1873
+      experiment: ohta-1996-activity-quench-equilibration
       type: activity_coefficient
       locator: {published_page: 985, pdf_page_index: 3, section: '3.1', mark: A}
       T_range_K: [1873.0, 1873.0]
@@ -240,6 +250,7 @@ species:
         admission_status: admitted
         activity: 0.14
     - observation_id: ohta_1996_al2o3_activity_mgo_spinel_saturation_1823
+      experiment: ohta-1996-activity-quench-equilibration
       type: activity_coefficient
       locator: {published_page: 985, pdf_page_index: 3, section: '3.1', mark: A'}
       T_range_K: [1823.0, 1823.0]
@@ -261,6 +272,7 @@ species:
         admission_status: admitted
         activity: 0.13
     - observation_id: ohta_1996_al2o3_activity_ca2_spinel_saturation_1873
+      experiment: ohta-1996-activity-quench-equilibration
       type: activity_coefficient
       locator: {published_page: 985, pdf_page_index: 3, section: '3.1', mark: B}
       T_range_K: [1873.0, 1873.0]
@@ -282,6 +294,7 @@ species:
         admission_status: admitted
         activity: 0.83
     - observation_id: ohta_1996_al2o3_activity_ca2_spinel_saturation_1823
+      experiment: ohta-1996-activity-quench-equilibration
       type: activity_coefficient
       locator: {published_page: 985, pdf_page_index: 3, section: '3.1', mark: B'}
       T_range_K: [1823.0, 1823.0]

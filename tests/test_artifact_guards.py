@@ -261,13 +261,40 @@ def test_species_catalog_loads_case_sensitive_species_ids():
 def test_no_direct_melt_regime_membership_comparisons_outside_helper():
     repo = Path(__file__).parent.parent
     violations = []
-    for root in (repo / "simulator", repo / "engines" / "builtin"):
+    for root in _melt_regime_guard_roots(repo):
         for path in root.rglob("*.py"):
             if path.relative_to(repo).as_posix() == "simulator/melt_regime.py":
                 continue
             violations.extend(_melt_regime_membership_ast_violations(path, repo))
 
     assert not violations, "\n".join(violations)
+
+
+def test_melt_regime_guard_roots_include_engine_and_script_layers():
+    repo = Path(__file__).parent.parent
+
+    assert {root.relative_to(repo).as_posix() for root in _melt_regime_guard_roots(repo)} == {
+        "simulator",
+        "engines",
+        "scripts",
+    }
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        "if liquid_fraction_value < 0.0: pass",
+        "if liquid_fraction_value > 1.0: pass",
+        "if liquid_fraction_at(temperature_C) > 0.0: pass",
+        "if melts_fraction > 0.0: pass",
+        "if freeze_fraction == 0.0: pass",
+    ],
+)
+def test_melt_regime_ast_guard_detects_liquid_fraction_aliases(source):
+    assert _melt_regime_membership_ast_violations_from_source(
+        source,
+        "engines/fixture.py",
+    )
 
 
 def test_pressure_channel_consumers_declare_intent():
@@ -336,6 +363,10 @@ def _melt_regime_membership_ast_violations(
     )
 
 
+def _melt_regime_guard_roots(repo: Path) -> tuple[Path, ...]:
+    return (repo / "simulator", repo / "engines", repo / "scripts")
+
+
 def _melt_regime_membership_ast_violations_from_source(
     source: str,
     label: str,
@@ -365,13 +396,13 @@ def _forbidden_liquid_fraction_compare(
     op: ast.cmpop,
     right: ast.expr,
 ) -> bool:
-    if not isinstance(op, (ast.Eq, ast.LtE, ast.GtE)):
+    if not isinstance(op, (ast.Eq, ast.Lt, ast.LtE, ast.Gt, ast.GtE)):
         return False
     return (
         _expr_mentions_liquid_fraction(left)
-        and _expr_is_zero_or_epsilon_boundary(right)
+        and _expr_is_liquid_fraction_boundary(right)
     ) or (
-        _expr_is_zero_or_epsilon_boundary(left)
+        _expr_is_liquid_fraction_boundary(left)
         and _expr_mentions_liquid_fraction(right)
     )
 
@@ -395,13 +426,25 @@ def _forbidden_solidus_compare(
 def _expr_mentions_liquid_fraction(expr: ast.expr) -> bool:
     expr = _unwrap_float_call(expr)
     if isinstance(expr, ast.Name):
-        return expr.id == "liquid_fraction"
+        return expr.id in {
+            "liquid_fraction",
+            "liquid_fraction_value",
+            "liquid_fraction_at",
+            "melts_fraction",
+            "freeze_fraction",
+        }
     if isinstance(expr, ast.Attribute):
-        return expr.attr == "liquid_fraction"
+        return expr.attr in {"liquid_fraction", "liquid_fraction_value"}
     if isinstance(expr, ast.Subscript):
-        return _subscript_key(expr.slice) == "liquid_fraction"
+        return _subscript_key(expr.slice) in {
+            "liquid_fraction",
+            "liquid_fraction_value",
+        }
     if isinstance(expr, ast.Call):
-        return _call_reads_liquid_fraction(expr) or any(
+        return (
+            isinstance(expr.func, ast.Name)
+            and expr.func.id == "liquid_fraction_at"
+        ) or _call_reads_liquid_fraction(expr) or any(
             _expr_mentions_liquid_fraction(child)
             for child in ast.iter_child_nodes(expr)
             if isinstance(child, ast.expr)
@@ -439,13 +482,13 @@ def _expr_mentions_solidus_boundary(expr: ast.expr) -> bool:
     )
 
 
-def _expr_is_zero_or_epsilon_boundary(expr: ast.expr) -> bool:
+def _expr_is_liquid_fraction_boundary(expr: ast.expr) -> bool:
     expr = _unwrap_float_call(expr)
     if isinstance(expr, ast.Constant):
         return (
             isinstance(expr.value, (int, float))
             and not isinstance(expr.value, bool)
-            and float(expr.value) == 0.0
+            and float(expr.value) in {0.0, 1.0}
         )
     if isinstance(expr, ast.Name):
         return expr.id in {"_FREEZE_GATE_EPSILON", "MELT_REGIME_EPSILON"}
@@ -520,6 +563,21 @@ if (float(T_K) - 273.15) > solidus_T_C:
 
     assert len(violations) == 7
     assert all("legacy_predicate" not in violation for violation in violations)
+
+
+def test_melt_regime_ast_guard_detects_strict_liquid_fraction_comparisons():
+    violations = _melt_regime_membership_ast_violations_from_source(
+        "if liquid_fraction < 0.0:\n    pass\n"
+        "if 0 < result.liquid_fraction:\n    pass\n"
+        "if liquid_fraction > MELT_REGIME_EPSILON:\n    pass\n",
+        "sample.py",
+    )
+
+    assert violations == [
+        "sample.py:1: liquid_fraction < 0.0",
+        "sample.py:3: 0 < result.liquid_fraction",
+        "sample.py:5: liquid_fraction > MELT_REGIME_EPSILON",
+    ]
 
 
 def test_ok_equilibrium_result_constructors_do_not_hardcode_liquid_fraction():

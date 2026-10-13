@@ -244,9 +244,12 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux(monkeypatch):
         # p_SiO = P_total * n_SiO / (n_carrier + sum(n_vapor)); mol/mol is
         # dimensionless and an absent parcel contributes zero to the sum.
         # Reverting only _route to its pre-21f065338 version recovers the old
-        # 8.428322859789999e-06 kg pin; preserving flow gives the value below.
+        # 8.428322859789999e-06 kg pin; preserving flow gives the measured value below.
+        # With t-1217 causal capture and b-850 parent-oxide alkali-dimer
+        # activity both active, the merged unavailable-MAGEMin run measures
+        # 8.42832285937e-06 kg at 1050 C.
         assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
-            8.4283265756e-06, rel=1e-9
+            8.42832285937e-06, rel=1e-9
         )
         assert _sio_wall_product_deposit_kg(1400.0) == pytest.approx(
             0.0, rel=1e-9

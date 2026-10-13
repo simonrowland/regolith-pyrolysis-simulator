@@ -43,6 +43,10 @@ from simulator.physical_constants import (
     MELT_DISSOCIATION_PO2_MIN_BAR,
     PA_PER_BAR,
 )
+from simulator.melt_regime import (
+    legacy_raw_liquid_fraction_is_zero,
+    liquid_fraction_invalidity,
+)
 from simulator.battery.enums import NoticeKind
 from simulator.yaml_cache import load_cached_safe_yaml
 from simulator.vapour_rail.engine_crosscheck import divergence_label
@@ -1382,10 +1386,23 @@ def classify_equilibrate_outcome(
 
     timeout_bucket = _bucket_from_text(haystack)
     if engine_status in {"ok", "non_authoritative"}:
-        liquid_fraction = _finite_float(getattr(result, "liquid_fraction", None))
+        raw_liquid_fraction = getattr(result, "liquid_fraction", None)
+        if (
+            raw_liquid_fraction is not None
+            and liquid_fraction_invalidity(raw_liquid_fraction) is not None
+        ):
+            return "refusal", "liquid_fraction_invalid", engine_reason
         assemblage = getattr(result, "phase_assemblage_available", True)
-        if assemblage and liquid_fraction is not None and liquid_fraction <= 0.0:
-            return "refusal", REFUSAL_NO_LIQUID, engine_reason or "liquid_fraction<=0"
+        if assemblage:
+            if raw_liquid_fraction is None:
+                return "refusal", "liquid_fraction_missing", engine_reason
+            liquid_fraction = _finite_float(raw_liquid_fraction)
+            if legacy_raw_liquid_fraction_is_zero(liquid_fraction):
+                return (
+                    "refusal",
+                    REFUSAL_NO_LIQUID,
+                    engine_reason or "liquid_fraction=0",
+                )
         return "ok", None, None
 
     if timeout_bucket == REFUSAL_TIMEOUT or engine_status in {"timeout", "engine_timeout"}:

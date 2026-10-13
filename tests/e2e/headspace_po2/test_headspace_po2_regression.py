@@ -39,11 +39,12 @@ def test_toggle_off_existing_path_keeps_mass_balance_closed():
     )
 
     assert max(abs(s.mass_balance_error_pct) for s in snapshots) <= 1.0e-12
-    # Causal capture leaves Fe subtraction dust below the 1e-12 kg bleed
-    # transition floor. It exceeds the per-species projection tolerance,
-    # so both audit and outward projection must continue to expose it.
+    # With t-1217 causal capture and b-850 parent-oxide alkali-dimer activity
+    # active, the merged run leaves only Fe subtraction dust at
+    # 2.9782141520250497e-15 kg; it is below the 1e-12 kg bleed floor but above
+    # per-species projection tolerance, so both ledger views retain it.
     expected_overhead: dict[str, float] = {
-        "Fe": 5.930423585471155e-13,
+        "Fe": 2.9782141520250497e-15,
     }
     assert sim.atom_ledger.kg_by_account("process.overhead_gas") == pytest.approx(
         expected_overhead,
