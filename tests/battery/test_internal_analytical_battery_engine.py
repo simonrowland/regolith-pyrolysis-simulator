@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import csv
 import math
 from dataclasses import replace
 from decimal import Decimal
+from pathlib import Path
 
 import pytest
 
@@ -18,13 +20,66 @@ from simulator.battery.identity import Identity
 from simulator.battery.records import Composition, Species
 from simulator.battery.score import predict_with_engine
 from simulator.diagnostic_helpers.binary_pot_battery import (
+    BinaryPot,
     PO2_COMMANDED,
     Po2Request,
     _InternalAnalyticalInputRefusal,
     _new_internal_analytical_core,
     _internal_analytical_vapor_pressure_adapter,
+    composition_kg_and_mol,
+    equilibrate_cell,
+    open_battery_engine,
 )
+from simulator.chemistry.melt_activity import single_cation_mole_fractions
 from tests.battery import factories as F
+
+
+def test_internal_analytical_cell_reports_activity_not_gamma() -> None:
+    point_id = "tsaplin2000_a_sio2_x0805_1473"
+    benchmark_path = (
+        Path(__file__).resolve().parents[2]
+        / "benchmarks"
+        / "results"
+        / "melt_activity"
+        / "benchmark-results.csv"
+    )
+    with benchmark_path.open(newline="", encoding="utf-8") as stream:
+        benchmark = next(
+            row
+            for row in csv.DictReader(stream)
+            if row["point_id"] == point_id
+            and row["engine"] == "internal_analytic"
+        )
+
+    pot = BinaryPot(
+        pot_id=point_id,
+        kato_1993_table4_system=None,
+        why="battery activity versus benchmark check",
+        composition_wt_pct={"SiO2": 80.007793, "Na2O": 19.992207},
+    )
+    cell = equilibrate_cell(
+        open_battery_engine("internal-analytical"),
+        pot,
+        temperature_K=1473.0,
+        po2=Po2Request(mode=PO2_COMMANDED, po2_bar=1e-10),
+        timeout_s=30.0,
+        isolated=False,
+    )
+    _, composition_mol = composition_kg_and_mol(pot.composition_wt_pct)
+    x_sio2 = single_cation_mole_fractions(composition_mol)["SiO2"]
+    assert "SiO" in cell.melt_activities, (
+        cell.status,
+        cell.refusal_reason,
+        cell.engine_reason,
+        cell.melt_activities,
+    )
+    field_value = cell.melt_activities["SiO"]
+    benchmark_value = float(benchmark["prediction"])
+
+    assert cell.status == "ok"
+    assert x_sio2 == pytest.approx(benchmark_value, rel=1e-12)
+    assert field_value == pytest.approx(benchmark_value, rel=1e-12)
+    assert field_value != pytest.approx(benchmark_value / x_sio2, rel=0.1)
 
 
 def _hand_built_observation() -> tuple[object, Identity]:

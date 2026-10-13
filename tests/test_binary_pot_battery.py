@@ -1313,6 +1313,41 @@ def test_equilibrate_cell_payload_round_trip_keeps_flags() -> None:
     ].startswith("antoine_fallback_from_vaporock")
 
 
+def test_equilibrate_cell_payload_shape_before_activity_metadata() -> None:
+    payload = _ok_cell(engine="internal-analytical", gas={}).as_payload()
+    assert set(payload) == {
+        "pot_id",
+        "engine",
+        "temperature_K",
+        "po2",
+        "status",
+        "refusal_reason",
+        "engine_status",
+        "engine_reason",
+        "engine_annotation",
+        "melt_activities",
+        "melt_activity_coefficients",
+        "melt_activity_coefficient_details",
+        "gas_partial_pressures_Pa",
+        "invalid_gas_partial_pressure_components",
+        "liquid_fraction",
+        "wall_s",
+        "cpu_s",
+        "hostname",
+        "vapor_pressures_source",
+        "vapor_pressure_backend_status",
+        "vapor_pressure_backend_status_reason",
+        "authoritative_for_requested_vapor_pressure",
+        "arm",
+        "notices",
+        "authority",
+        "certified_band",
+        "exit_signal",
+        "exit_code",
+        "model_id",
+    }
+
+
 def test_openimcc_cell_round_trips_through_harness() -> None:
     pot = BinaryPot(
         pot_id="mgo_sio2_40_60",
