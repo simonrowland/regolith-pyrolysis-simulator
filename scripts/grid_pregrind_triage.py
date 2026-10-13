@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import Any
 
 from scripts.grid_pregrind import DEFAULT_FEEDSTOCK_ANCHORS
+from simulator.melt_regime import MeltRegime, melt_regime
 from simulator.yaml_cache import load_cached_safe_yaml
 
 
@@ -152,14 +153,25 @@ def classify_non_eval(row: Mapping[str, Any]) -> str:
     status_kind = _normalise_token(row.get("status_kind", ""))
     # Evidence precedence: dual recorded fractions, then physical rump evidence,
     # then producer reason tokens. Tokens never mask evidence-bearing rows.
-    if melts_fraction is not None and freeze_fraction is not None and (
-        (melts_fraction > 0.0) != (freeze_fraction > 0.0)
-    ):
-        return MELTS_VS_FREEZE
+    if melts_fraction is not None and freeze_fraction is not None:
+        melts_has_liquid = (
+            melt_regime(liquid_fraction=melts_fraction, epsilon=0.0)
+            != MeltRegime.FROZEN
+        )
+        freeze_has_liquid = (
+            melt_regime(liquid_fraction=freeze_fraction, epsilon=0.0)
+            != MeltRegime.FROZEN
+        )
+        if melts_has_liquid != freeze_has_liquid:
+            return MELTS_VS_FREEZE
     if (
         status_kind == "refusal"
         and (
-            melts_fraction == 0.0
+            (
+                melts_fraction is not None
+                and melt_regime(liquid_fraction=melts_fraction, epsilon=0.0)
+                == MeltRegime.FROZEN
+            )
             or (
                 requested_temperature is not None
                 and liquidus_temperature is not None

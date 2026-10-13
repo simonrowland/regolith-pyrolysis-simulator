@@ -430,6 +430,8 @@ def _expr_mentions_liquid_fraction(expr: ast.expr) -> bool:
             "liquid_fraction",
             "liquid_fraction_value",
             "liquid_fraction_at",
+            "melts_fraction",
+            "freeze_fraction",
         }
     if isinstance(expr, ast.Attribute):
         return expr.attr in {"liquid_fraction", "liquid_fraction_value"}
