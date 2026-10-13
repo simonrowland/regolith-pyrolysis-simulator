@@ -90,6 +90,53 @@ def test_wall_sticking_coefficients_are_cited_or_uncertified():
             assert row["source_url"], species
 
 
+def test_fe_stage_one_capture_uses_the_condensation_fit_at_its_midpoint():
+    stage = next(
+        stage
+        for stage in CondensationTrain.create_default().stages
+        if stage.stage_number == 1
+    )
+
+    record = condensation._stage_alpha_record(stage, "Fe")
+
+    assert record["alpha_s_temperature_K"] == pytest.approx(1523.15)
+    assert record["alpha_s"] == pytest.approx(0.878170956)
+    assert record["alpha_s_valid_range_K"] == [1443.0, 1633.0]
+    assert record["citation_status"] == "CITED"
+
+
+def test_fe_wall_below_condensation_band_holds_and_flags_the_lower_edge():
+    record = condensation._wall_alpha_record("Fe", T_K=1200.0)
+
+    assert record["alpha_s"] == pytest.approx(0.83)
+    assert record["alpha_s_extrapolated"] is True
+    assert record["alpha_s_valid_range_K"] == [1443.0, 1633.0]
+    assert record["alpha_s_uncertainty_envelope"] == pytest.approx([0.5, 1.0])
+    assert record["uncertainty_flag"] == (
+        "pure-Fe interface; first Fe layer on an oxide liner is unsourced"
+    )
+    assert record["alpha_s_domain_status"] == "out_of_domain"
+    assert record["output_status"] == "status_bearing"
+
+
+def test_fe_wall_above_condensation_band_holds_the_upper_edge():
+    record = condensation._wall_alpha_record("Fe", T_K=1700.0)
+    spec = _load_sticking_data()["species"]["Fe"]["condensation"]["value"]
+
+    assert record["alpha_s"] == pytest.approx(spec["edge_hold_values"][1])
+    assert record["alpha_s_extrapolated"] is True
+    assert record["alpha_s_temperature_above_valid_range"] is True
+
+
+def test_fe_root_value_and_default_alpha_resolver_remain_the_evaporation_proxy():
+    fe = _load_sticking_data()["species"]["Fe"]
+    context: dict[str, object] = {}
+
+    assert fe["value"] == pytest.approx(0.02)
+    assert condensation.alpha_s("Fe", 1750.0, context) == pytest.approx(0.02)
+    assert context["alpha_s_evaluation"]["alpha_s_form"] == "scalar"
+
+
 def test_sio_sticking_alpha_s_uses_uncertified_growth_proxy_form():
     block = _load_sticking_data()["species"]["SiO"]
     assert block["status"] == "UNCERTIFIED"
@@ -311,7 +358,11 @@ def test_material_defaults_reference_sticking_sidecar():
         assert set(entry) == {"value_ref"}
         assert entry["value_ref"] == (
             "data/literature/vacuum_pyrolysis_sticking.yaml::"
-            f"species.{species}.value"
+            + (
+                "species.Fe.condensation.value"
+                if species == "Fe"
+                else f"species.{species}.value"
+            )
         )
 
 

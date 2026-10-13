@@ -589,25 +589,28 @@ def test_scalar_alpha_s_range_extrapolation_is_honest_without_value_change():
     assert "alpha_s_extrapolation_warning" not in in_eval
 
 
-def test_scalar_alpha_s_range_travels_through_stage_provenance():
+def test_fe_condensation_edge_hold_range_travels_through_stage_provenance():
     stage = CondensationStage(
         stage_number=1,
-        label="Fe below source range",
-        temp_range_C=(1326.85, 1326.85),
+        label="Fe below condensation-fit range",
+        temp_range_C=(1100.0, 1100.0),
         target_species=["Fe"],
     )
 
     record = condensation._stage_alpha_record(stage, "Fe")
 
-    assert record["alpha_s"].hex() == float(0.02).hex()
-    assert record["temperature_range_K"] == [1700, 1800]
-    assert record["alpha_s_valid_range_K"] == [1700.0, 1800.0]
+    assert record["alpha_s"] == pytest.approx(
+        condensation._wall_alpha_record("Fe", T_K=1373.15)["alpha_s"]
+    )
+    assert record["temperature_range_K"] == [1443.0, 1633.0]
+    assert record["alpha_s_valid_range_K"] == [1443.0, 1633.0]
     assert record["alpha_s_extrapolated"] is True
+    assert record["alpha_s_temperature_below_valid_range"] is True
     assert record["alpha_s_domain_status"] == "out_of_domain"
     assert record["output_status"] == "status_bearing"
-    assert "Fe alpha_s scalar coefficient extrapolated" in record[
-        "alpha_s_extrapolation_warning"
-    ]
+    assert record["alpha_s_extrapolation_method"] == (
+        "hold_nearest_certified_band_edge"
+    )
 
 
 def test_wall_antoine_applied_path_reports_extrapolation_without_value_change():

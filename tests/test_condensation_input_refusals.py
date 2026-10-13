@@ -560,9 +560,11 @@ def test_wall_alpha_s_wrapper_refuses_metadata_only_entry():
 
 
 def test_wall_alpha_s_wrapper_healthy_and_explicit_zero():
-    """Same wrapper: the cited sidecar Fe value loads, and an explicitly
+    """Same wrapper: the cited Fe condensation edge hold loads, and an explicitly
     configured 0.0 stays the category-3 real limit (no refusal)."""
-    assert condensation._wall_alpha_s("Fe", T_K=1200.0) == pytest.approx(0.02)
+    assert condensation._wall_alpha_s("Fe", T_K=1200.0) == pytest.approx(
+        condensation._wall_alpha_record("Fe", T_K=1200.0)["alpha_s"]
+    )
     assert (
         condensation._wall_alpha_s(
             "Fe",
