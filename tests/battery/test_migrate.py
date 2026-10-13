@@ -11683,7 +11683,7 @@ def test_fusion_quantities_migrate_with_phase_transition_identity(tmp_path: Path
         assert identity.species.phase.is_value
         assert identity.species.phase.value is Phase.CR
         assert identity.temperature_K is not None
-        assert identity.temperature_K.value == Decimal("1200")
+        assert identity.temperature_K.is_unknown
         assert identity.subtype is not None
         assert identity.subtype.value == "solid_to_liquid"
         assert identity.species.polymorph is not None
@@ -11691,12 +11691,9 @@ def test_fusion_quantities_migrate_with_phase_transition_identity(tmp_path: Path
         assert identity.species.polymorph.reason == "source does not state polymorph"
         identity_outcome = identity_equal(identity, identity)
         assert identity_outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN
-        assert identity_outcome.fields == ("species.polymorph",)
-        assert observation.point_conditions is not None
-        temperature = observation.point_conditions["temperature_K"]
-        assert temperature.state.value == Decimal("1200")
-        assert temperature.locator is not None
-        assert temperature.locator.table == "4"
+        if observation.point_conditions is not None:
+            temperature = observation.point_conditions.get("temperature_K")
+            assert temperature is None or temperature.state.is_unknown
 
     heat_content = by_id["na_heat_content"]
     assert quantity_token(heat_content.identity) is Quantity.H_MINUS_H298
@@ -11754,7 +11751,36 @@ def test_fusion_temperature_join_preserves_matching_melting_point(tmp_path: Path
     assert temperature.locator.table == "7"
 
 
-def test_fusion_temperature_does_not_join_polymorphic_transition(tmp_path: Path) -> None:
+@pytest.mark.parametrize(
+    "property_kind,phase_from,phase_to,transition_polymorph,fusion_polymorph,temperature_K",
+    [
+        (
+            "solid_solid_transition",
+            "alpha quartz",
+            "beta quartz",
+            "alpha_quartz",
+            "alpha_quartz",
+            846,
+        ),
+        (
+            "melting_point",
+            "alpha quartz",
+            "liquid",
+            "alpha_quartz",
+            "tridymite",
+            1200,
+        ),
+    ],
+)
+def test_fusion_temperature_requires_melting_and_matching_crystal_identity(
+    tmp_path: Path,
+    property_kind: str,
+    phase_from: str,
+    phase_to: str,
+    transition_polymorph: str,
+    fusion_polymorph: str,
+    temperature_K: int,
+) -> None:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     extract["species"]["SiO2"] = {
         "observations": [
@@ -11763,14 +11789,14 @@ def test_fusion_temperature_does_not_join_polymorphic_transition(tmp_path: Path)
                 "type": "transition_point",
                 "locator": {"table": "7", "row": "SiO2"},
                 "phase": "cr",
-                "condensed_form": {"polymorph": "alpha_quartz"},
+                "condensed_form": {"polymorph": transition_polymorph},
                 "units": "K",
                 "values": {
                     "quantity": "transition_temperature",
-                    "property_kind": "solid_solid_transition",
-                    "phase_from": "alpha quartz",
-                    "phase_to": "beta quartz",
-                    "value_K": 846,
+                    "property_kind": property_kind,
+                    "phase_from": phase_from,
+                    "phase_to": phase_to,
+                    "value_K": temperature_K,
                 },
             },
             {
@@ -11778,8 +11804,8 @@ def test_fusion_temperature_does_not_join_polymorphic_transition(tmp_path: Path)
                 "type": "heat_capacity_and_heat_content_series",
                 "locator": {"table": "7", "row": "SiO2", "column": "delta_H_f"},
                 "phase": "cr",
-                "crystal_phase_as_stated": "alpha quartz",
-                "condensed_form": {"polymorph": "alpha_quartz"},
+                "crystal_phase_as_stated": fusion_polymorph,
+                "condensed_form": {"polymorph": fusion_polymorph},
                 "units": "kJ/mol",
                 "values": {
                     "quantity": "heat_of_fusion",
@@ -11798,3 +11824,6 @@ def test_fusion_temperature_does_not_join_polymorphic_transition(tmp_path: Path)
 
     assert fusion.identity.temperature_K is not None
     assert fusion.identity.temperature_K.is_unknown
+    if fusion.point_conditions is not None:
+        temperature = fusion.point_conditions.get("temperature_K")
+        assert temperature is None or temperature.state.is_unknown

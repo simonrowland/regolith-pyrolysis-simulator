@@ -9838,6 +9838,11 @@ def test_transition_temperature_refuses_before_generic_engine_pot(
     [Quantity.ENTHALPY_OF_FUSION, Quantity.ENTROPY_OF_FUSION],
 )
 def test_fusion_quantities_are_cleanly_refused_by_engine_scorer(quantity) -> None:
+    from simulator.battery.score import rail_for_quantity, score_store
+
+    experiment = F.tabulation_experiment(
+        experiment_id="fusion-exp", work_id="fusion-work"
+    )
     identity = Identity(
         quantity=quantity,
         species=Species("Na", Phase.CR),
@@ -9845,15 +9850,43 @@ def test_fusion_quantities_are_cleanly_refused_by_engine_scorer(quantity) -> Non
         subtype=State.of("solid_to_liquid"),
     )
     observation = F.observation(
-        f"fusion::{quantity.value}", "fusion-work", identity, Decimal("12")
+        f"fusion::{quantity.value}",
+        experiment.experiment_id,
+        identity,
+        Decimal("12"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="fixture-fusion",
     )
 
+    assert rail_for_quantity(quantity) is Rail.THERMOCHEMISTRY
     prediction = predict_with_engine(Engine.MAGEMIN, observation)
 
     assert prediction.value is None
     assert prediction.execution.state is ExecutionState.UNSUPPORTED
     assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
     assert prediction.refusal_detail == {
+        "reason": "quantity_not_predicted",
+        "quantity": quantity.value,
+    }
+
+    residuals, _candidates = score_store(
+        _context(
+            F.work("fusion-work"),
+            experiment,
+            observation,
+            review="reviewed",
+        ),
+        engines=(Engine.MAGEMIN,),
+        rail=Rail.THERMOCHEMISTRY,
+        include_diagnostics=False,
+    )
+    assert len(residuals) == 1
+    residual = residuals[0]
+    assert residual.rail is Rail.THERMOCHEMISTRY
+    assert residual.execution.state is ExecutionState.UNSUPPORTED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.UNSUPPORTED
+    assert residual.refusal.detail == {
         "reason": "quantity_not_predicted",
         "quantity": quantity.value,
     }
