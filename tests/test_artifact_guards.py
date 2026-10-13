@@ -365,7 +365,7 @@ def _forbidden_liquid_fraction_compare(
     op: ast.cmpop,
     right: ast.expr,
 ) -> bool:
-    if not isinstance(op, (ast.Eq, ast.LtE, ast.GtE)):
+    if not isinstance(op, (ast.Eq, ast.Lt, ast.LtE, ast.Gt, ast.GtE)):
         return False
     return (
         _expr_mentions_liquid_fraction(left)
@@ -520,6 +520,21 @@ if (float(T_K) - 273.15) > solidus_T_C:
 
     assert len(violations) == 7
     assert all("legacy_predicate" not in violation for violation in violations)
+
+
+def test_melt_regime_ast_guard_detects_strict_liquid_fraction_comparisons():
+    violations = _melt_regime_membership_ast_violations_from_source(
+        "if liquid_fraction < 0.0:\n    pass\n"
+        "if 0 < result.liquid_fraction:\n    pass\n"
+        "if liquid_fraction > MELT_REGIME_EPSILON:\n    pass\n",
+        "sample.py",
+    )
+
+    assert violations == [
+        "sample.py:1: liquid_fraction < 0.0",
+        "sample.py:3: 0 < result.liquid_fraction",
+        "sample.py:5: liquid_fraction > MELT_REGIME_EPSILON",
+    ]
 
 
 def test_ok_equilibrium_result_constructors_do_not_hardcode_liquid_fraction():
