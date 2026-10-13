@@ -22,6 +22,9 @@ tests that exercise the binary.
 
 from __future__ import annotations
 
+import gc
+import multiprocessing
+
 import pytest
 
 from engines.magemin import (
@@ -44,6 +47,7 @@ from simulator.chemistry.kernel import (
     ProviderRegistry,
 )
 from simulator.chemistry.kernel.planner import Planner
+from simulator.engine_pool import EngineWorkerPool, WarmEngineWorker
 
 
 # ---------------------------------------------------------------------------
@@ -159,6 +163,46 @@ class _FakeMAGEMinBackend:
         return self._equilibrium
 
 
+def _provider_lifecycle_worker_bootstrap():
+    return None, 'ready'
+
+
+def _provider_lifecycle_worker_handler(_resource, request, _errlog):
+    return request
+
+
+def _provider_lifecycle_worker(_index):
+    return WarmEngineWorker(
+        name='magemin-provider-lifecycle-test',
+        bootstrap=_provider_lifecycle_worker_bootstrap,
+        handler=_provider_lifecycle_worker_handler,
+        startup_timeout_s=3.0,
+        call_timeout_s=1.0,
+    )
+
+
+class _PooledFakeMAGEMinBackend(_FakeMAGEMinBackend):
+    """Fake result backend with the real warm-pool child lifecycle."""
+
+    def __init__(self):
+        super().__init__(equilibrium=_FakeEquilibriumResult())
+        self.pool = None
+        self.pool_child_pid = None
+        self.close_calls = 0
+
+    def initialize(self, config: dict) -> bool:
+        available = super().initialize(config)
+        self.pool = EngineWorkerPool(_provider_lifecycle_worker, size=1)
+        self.pool_child_pid = self.pool.workers[0].process.pid
+        return available
+
+    def close(self):
+        if self.pool is not None:
+            self.close_calls += 1
+            self.pool.close(cancel_pending=True)
+            self.pool = None
+
+
 class _RaisingMAGEMinBackend(_FakeMAGEMinBackend):
     def __init__(self):
         super().__init__(
@@ -246,6 +290,53 @@ def _make_request(
         fO2_log=fO2_log,
         control_inputs={},
     )
+
+
+@pytest.mark.xfail(
+    strict=True,
+    reason='MAGEMin shadow provider leaves its warm backend pool open',
+)
+def test_provider_closes_warm_pool_when_provider_lifetime_ends(monkeypatch):
+    from simulator.melt_backend import magemin as magemin_module
+
+    backends = []
+
+    def make_backend():
+        backend = _PooledFakeMAGEMinBackend()
+        backends.append(backend)
+        return backend
+
+    monkeypatch.setattr(magemin_module, 'MAGEMinBackend', make_backend)
+    initial_children = {
+        child.pid
+        for child in multiprocessing.active_children()
+        if child.pid is not None and child.is_alive()
+    }
+
+    try:
+        for _ in range(3):
+            provider = MAGEMinShadowProvider()
+            result = provider.dispatch(
+                _make_request(ChemistryIntent.SILICATE_EQUILIBRIUM)
+            )
+            assert result.status == 'ok'
+            assert backends[-1].pool_child_pid in {
+                child.pid for child in multiprocessing.active_children()
+            }
+            del provider
+            gc.collect()
+
+        live_children = {
+            child.pid
+            for child in multiprocessing.active_children()
+            if child.pid is not None and child.is_alive()
+        }
+        assert not (live_children - initial_children)
+        assert len(backends) == 3
+        assert all(backend.close_calls == 1 for backend in backends)
+    finally:
+        for backend in backends:
+            backend.close()
 
 
 # ---------------------------------------------------------------------------
