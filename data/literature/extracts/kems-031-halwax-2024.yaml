@@ -944,26 +944,21 @@ species:
     observations:
     - observation_id: halwax_2024_cao_isothermal_ca_pressure_figure_only
       type: partial_pressure
-      locator: {page: 826, published_page: 826, pdf_page_index: 5, figure: '7', note: 'Upper panel: isothermal Ca(g) partial pressure over pure CaO at 2077 ± 5 K; pressure plotted against time, no numeric point table.'}
+      locator: {page: 826, published_page: 826, pdf_page_index: 5, figure: '7', note: 'd-129; upper panel'}
       T_range_K: [2077.0, 2077.0]
       phase: gas
       experiment: cao-series
       regime: kems_effusion
-      units: Pa as plotted; not digitised
+      units: p_i [Pa] versus Time [h]
       values:
         quantity: partial_pressure
         method_class: figure_only
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: figure_only
         gas_species: Ca(g)
         condensed_phase: pure CaO(s)
-        temperature_K: 2077.0
-        temperature_uncertainty_K: 5.0
-        partial_pressure_pa: null
-        partial_pressure_value_note: figure_only_not_digitized
-        figure_description: Figure 7 plots measured Ca(g) partial pressure against elapsed time during the CaO isothermal measurement; no values are tabulated and the plotted points are not digitised.
-        oxygen_pressure: {tag: unknown, reason: not_established}
-        oxygen_pressure_note: The paper warns that residual-gas oxygen may affect the 16O+ and 16O2+ signals; it does not establish an oxygen partial pressure for this run.
+        caption: Fig. 7—Isothermal measurement of CaO and MgO.
+        note: Ca(g) partial pressure over pure CaO at 2077 ± 5 K. Not digitised.
       uncertainty:
         temperature_K: 5.0
         quote: a systematic error of ± 5 K is estimated
@@ -1052,27 +1047,22 @@ species:
         locator: {page: 825, section: 'III. Experimental'}
     - observation_id: halwax_2024_mgo_isothermal_o_pressure_figure_only
       type: partial_pressure
-      locator: {page: 826, published_page: 826, pdf_page_index: 5, figure: '7', note: 'Lower panel: isothermal O(g) partial pressure over pure MgO at 1926 ± 5 K; pressure plotted against time, no numeric point table.'}
+      locator: {page: 826, published_page: 826, pdf_page_index: 5, figure: '7', note: 'd-129; lower panel'}
       T_range_K: [1926.0, 1926.0]
       phase: gas
       experiment: mgo-series
       regime: kems_effusion
-      units: Pa as plotted; not digitised
+      units: p_i [Pa] versus Time [h]
       values:
         quantity: partial_pressure
         method_class: figure_only
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: figure_only
         gas_species: O(g)
         formula: O
         condensed_phase: pure MgO(s)
-        temperature_K: 1926.0
-        temperature_uncertainty_K: 5.0
-        partial_pressure_pa: null
-        partial_pressure_value_note: figure_only_not_digitized
-        figure_description: Figure 7 plots measured O(g) partial pressure against elapsed time during the MgO isothermal measurement; no values are tabulated and the plotted points are not digitised.
-        oxygen_pressure: {tag: unknown, reason: not_established}
-        oxygen_pressure_note: The paper warns that residual-gas oxygen may affect the 16O+ and 16O2+ signals; it does not establish an oxygen partial pressure for this run.
+        caption: Fig. 7—Isothermal measurement of CaO and MgO.
+        note: O(g) partial pressure over pure MgO at 1926 ± 5 K. Not digitised.
       uncertainty:
         temperature_K: 5.0
         quote: a systematic error of ± 5 K is estimated
