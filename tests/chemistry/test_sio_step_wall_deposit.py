@@ -237,9 +237,12 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux(monkeypatch):
     # b-732: fixed unavailable-MAGEMin scenario. The default report with real
     # MAGEMin yields 8.191905995448e-06 kg through its liquid-fraction/redox
     # inputs; this wall-step pin now passes with either engine config.
+    # 2026-10-13 b-850 round 2: parent-oxide activity for the four alkali
+    # dimers changes the melt activity and the small SiO/SiO2 wall budget:
+    # 8.191796266986e-06 -> 8.191792965091e-06 kg.
     try:
         assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
-            8.191796266986e-06, rel=1e-9
+            8.191792965091e-06, rel=1e-9
         )
         assert _sio_wall_product_deposit_kg(1400.0) == pytest.approx(
             0.0, rel=1e-9
