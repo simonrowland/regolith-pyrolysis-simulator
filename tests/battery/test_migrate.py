@@ -6663,6 +6663,7 @@ def test_kume_experiment_temperatures_have_table_locators(tmp_path: Path) -> Non
         "kume-2000-table2-1823k": (Decimal("1823"), "2", 563),
         "kume-2000-table3-1873k": (Decimal("1873"), "3", 564),
         "kume-2000-table4-1873k": (Decimal("1873"), "4", 565),
+        "kume-2000-table4-rein-chipman-1873k": (Decimal("1873"), "4", 565),
     }
     seen = set()
     for experiment in result.experiments.values():
