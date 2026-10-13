@@ -238,9 +238,15 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux(monkeypatch):
     # MAGEMin yields 8.191905995448e-06 kg through its liquid-fraction/redox
     # inputs; this wall-step pin now passes with either engine config.
     try:
-        # t-1217: direct wall capture without the aggregate regularizer raises the cold-wall deposit.
+        # t-1217: direct wall capture without the aggregate regularizer raises
+        # the cold-wall deposit. The subsequent source-preservation fix keeps
+        # refused capture parcels in flow. Dalton dilution then uses
+        # p_SiO = P_total * n_SiO / (n_carrier + sum(n_vapor)); mol/mol is
+        # dimensionless and an absent parcel contributes zero to the sum.
+        # Reverting only _route to its pre-21f065338 version recovers the old
+        # 8.428322859789999e-06 kg pin; preserving flow gives the value below.
         assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
-            8.428322859789999e-06, rel=1e-9
+            8.4283265756e-06, rel=1e-9
         )
         assert _sio_wall_product_deposit_kg(1400.0) == pytest.approx(
             0.0, rel=1e-9

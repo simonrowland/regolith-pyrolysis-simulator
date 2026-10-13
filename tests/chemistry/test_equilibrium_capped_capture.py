@@ -165,7 +165,7 @@ def test_hot_sio_passes_to_its_reactive_product_stage():
     assert result.condensed_by_stage_species[3]["SiO"] > 0.0
 
 
-def test_unavailable_wall_pressure_retains_source_with_typed_refusal(monkeypatch):
+def test_unavailable_wall_pressure_preserves_flow_with_typed_refusal(monkeypatch):
     model = _configured_model()
     model.pipe_segments = []
     model.species_partial_pressures_mbar = {"Na": 1.0}
@@ -174,10 +174,18 @@ def test_unavailable_wall_pressure_retains_source_with_typed_refusal(monkeypatch
 
     monkeypatch.setattr(condensation, "_wall_deposition_driving_pressure_pa", unavailable)
     result = model.route(EvaporationFlux(species_kg_hr={"Na": 1.0}), MeltState(temperature_C=1700.0))
-    assert result.retained_in_source_by_species["Na"] == 1.0
-    assert result.remaining_by_species["Na"] == 0.0
-    assert result.condensation_authority_by_species["Na"]["status"] == "refused"
+    # Missing capture pressure cannot undo the independently supplied vapor.
+    # With no upstream verdict, neither capture nor terminal offgas is certified.
+    assert result.retained_in_source_by_species == {}
+    assert result.remaining_by_species["Na"] == 1.0
+    authority = result.condensation_authority_by_species["Na"]
+    assert authority["status"] == "missing"
+    assert authority["authoritative_for_condensation"] is False
+    assert authority["authoritative_for_terminal_offgas"] is False
+    assert authority["condensed_mass_kg_hr"] == 0.0
+    assert authority["mass_closure_error_kg_hr"] == 0.0
     refusal = result.condensation_refusals_by_species["Na"]
     assert refusal["status"] == "refused"
     refused_stage = next(item for item in refusal["stage_outcomes"] if item["status"] == "refused")
     assert refused_stage["eta"] is None
+    assert refused_stage["refusal_type"] == "WallSaturationPressureRefusal"
