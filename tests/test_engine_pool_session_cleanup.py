@@ -192,3 +192,24 @@ def test_module_teardown_guard_detects_live_magemin_pool():
             conftest._assert_no_live_magemin_warm_pools()
     finally:
         engine_pool._LIVE_ENGINE_POOLS.discard(pool)
+
+
+def test_module_teardown_cleanup_closes_only_new_magemin_pools(monkeypatch):
+    class FakePool:
+        def __init__(self):
+            self.close_kwargs = None
+
+        def close(self, **kwargs):
+            self.close_kwargs = kwargs
+
+    existing, new = FakePool(), FakePool()
+    monkeypatch.setattr(
+        conftest,
+        "_live_magemin_warm_pools",
+        lambda: ((existing, ("existing",)), (new, ("new",))),
+    )
+
+    conftest._close_new_magemin_warm_pools({existing})
+
+    assert existing.close_kwargs is None
+    assert new.close_kwargs == {"cancel_pending": True}
