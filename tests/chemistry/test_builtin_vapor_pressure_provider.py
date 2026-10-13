@@ -1081,7 +1081,7 @@ def test_single_cation_mole_fraction_uses_mol_ledger_not_wt_proxy():
     assert activity.activity_model == MELT_OXIDE_TABLE_GAMMA_MODEL
 
 
-@pytest.mark.parametrize("oxide", ["Cr2O3", "MnO", "TiO2", "Na2O"])
+@pytest.mark.parametrize("oxide", ["Cr2O3", "MnO", "TiO2", "Na2O", "P2O5"])
 def test_melt_activity_normalizes_pure_raoultian_component_to_unity(oxide):
     activity = melt_oxide_activity(oxide, {oxide: 1.0})
 
@@ -1092,8 +1092,15 @@ def test_melt_activity_normalizes_pure_raoultian_component_to_unity(oxide):
     assert provenance["melt_oxide_activity_reference_state"] == (
         "single_cation_Raoultian_pure_liquid_reference"
     )
-    assert "melt_parent_oxide_activity" not in provenance
-    assert "melt_oxide_activity_authority_status" not in provenance
+    if oxide == "P2O5":
+        assert provenance["melt_parent_oxide_activity"] == pytest.approx(
+            activity.thermodynamic_parent_activity()
+        )
+        assert "melt_oxide_activity_authority_status" in provenance
+    else:
+        assert "melt_parent_oxide_activity" not in provenance
+        assert "melt_oxide_activity_authority_status" not in provenance
+    assert "melt_oxide_parent_formula" not in provenance
     assert "melt_oxide_gamma_valid_range_K" not in provenance
 
 

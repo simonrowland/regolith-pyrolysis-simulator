@@ -1388,6 +1388,9 @@ def fusion_comparison_reference(
     if engine is not None:
         from simulator.battery.waypoints import MELT_ACTIVITY_ENGINES
 
+        # Internal analytical registers a Raoultian pure liquid endmember basis;
+        # its solid Kume observations must therefore be shifted to liquid before
+        # comparing the predicted liquid activity.
         if engine.value not in MELT_ACTIVITY_ENGINES:
             notice = Notice(
                 kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
@@ -4603,7 +4606,19 @@ def predict_with_engine(
                 po2_bar=10.0 ** float(activity_payload["fO2_log"]),
             )
         else:
-            po2 = Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
+            decision = _oxygen_input_request(
+                engine=engine,
+                channel=channel,
+                sources=sources,
+                identity=identity,
+                requested=requested,
+                quantity=quantity,
+                composition_value=composition_value,
+                input_notices=input_notices,
+            )
+            if isinstance(decision, EnginePrediction):
+                return decision
+            po2 = decision
     elif oxygen_balance_effusion:
         cell_materials = bench.cell_materials if bench is not None else None
         material_class, modelled = _cell_oxygen_class(cell_materials)
