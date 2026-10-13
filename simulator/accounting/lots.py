@@ -183,6 +183,19 @@ def _thaw_meta(value: Any) -> Any:
     return value
 
 
+def _nonzero_mol_basis_species(meta: Mapping[str, Any]) -> frozenset[str]:
+    if meta.get("amount_basis") != "mol":
+        return frozenset()
+    species_mol = meta.get("species_mol", {})
+    if not isinstance(species_mol, Mapping):
+        return frozenset()
+    return frozenset(
+        str(species).strip()
+        for species, amount in species_mol.items()
+        if float(amount) != 0.0
+    )
+
+
 @dataclass(frozen=True)
 class MaterialLot:
     """Species masses associated with one account."""
@@ -200,6 +213,8 @@ class MaterialLot:
         if not account:
             raise AccountingError("account is required")
 
+        meta = dict(self.meta or {})
+        nonzero_mol_species = _nonzero_mol_basis_species(meta)
         normalized: dict[str, float] = {}
         for species, kg in dict(self.species_kg).items():
             name = str(species).strip()
@@ -210,14 +225,30 @@ class MaterialLot:
                 raise AccountingError(f"mass for species {name!r} must be finite")
             if value < -EMPTY_KG_TOLERANCE:
                 raise AccountingError(f"lot mass for species {name!r} must be non-negative")
-            if abs(value) <= EMPTY_KG_TOLERANCE:
+            if name in nonzero_mol_species and value < 0.0:
+                raise AccountingError(
+                    f"mol-basis lot mass for species {name!r} must be non-negative"
+                )
+            if abs(value) <= EMPTY_KG_TOLERANCE and name not in nonzero_mol_species:
                 value = 0.0
             normalized[name] = normalized.get(name, 0.0) + value
+
+        missing_mol_species = {
+            species
+            for species in nonzero_mol_species
+            if normalized.get(species, 0.0) == 0.0
+        }
+        if missing_mol_species:
+            names = ", ".join(sorted(missing_mol_species))
+            raise AccountingError(
+                "mol-basis lot cannot represent nonzero species mass for "
+                f"{names}"
+            )
 
         object.__setattr__(self, "account", account)
         object.__setattr__(self, "species_kg", MappingProxyType(dict(sorted(normalized.items()))))
         object.__setattr__(self, "source", str(self.source or ""))
-        object.__setattr__(self, "meta", _freeze_meta(dict(self.meta or {})))
+        object.__setattr__(self, "meta", _freeze_meta(meta))
         origin = None if self.material_origin is None else str(self.material_origin).strip()
         if origin not in MATERIAL_ORIGINS | {None}:
             raise AccountingError(
@@ -269,7 +300,12 @@ class MaterialLot:
         )
 
     def without_empty(self, tolerance_kg: float = EMPTY_KG_TOLERANCE) -> "MaterialLot":
-        kept = {species: kg for species, kg in self.species_kg.items() if abs(kg) > tolerance_kg}
+        nonzero_mol_species = _nonzero_mol_basis_species(self.meta)
+        kept = {
+            species: kg
+            for species, kg in self.species_kg.items()
+            if abs(kg) > tolerance_kg or species in nonzero_mol_species
+        }
         return MaterialLot(
             self.account,
             kept,
