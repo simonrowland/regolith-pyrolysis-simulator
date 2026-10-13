@@ -9,6 +9,7 @@ import yaml
 from simulator.battery.enums import IdentityEqualKind, Quantity, StateTag
 from simulator.battery.identity import identity_equal
 from simulator.battery.migrate import Migrator, REPO_ROOT
+from simulator.battery.validity import underdetermined_apparatus
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
 
 
@@ -37,6 +38,26 @@ def test_textual_shock_results_survive_real_migration_and_fidelity_mutation() ->
     assert set(observations) == set(expected)
     for observation_id, (fraction, approximate) in expected.items():
         observation = observations[observation_id]
+        experiment = migrator.result.experiments[observation.experiment_id]
+        assert document["species"][observation_id]["observations"][0]["regime"] == (
+            "shock_fusion_vaporization"
+        )
+        assert experiment.method.is_unknown
+        assert "shock_fusion_vaporization" in (experiment.method.reason or "")
+        method_queue = [
+            entry
+            for entry in migrator.result.queue
+            if entry.observation_id == observation.observation_id
+            and entry.axes == ["method"]
+        ]
+        assert len(method_queue) == 1
+        assert "shock_fusion_vaporization" in method_queue[0].why
+        assert (
+            underdetermined_apparatus(
+                experiment, observation.identity.quantity.value, observation=observation
+            ).reason.value
+            == "method_unknown"
+        )
         assert observation.identity.quantity.is_value
         assert observation.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
         assert observation.value.point == fraction
@@ -44,6 +65,15 @@ def test_textual_shock_results_survive_real_migration_and_fidelity_mutation() ->
         assert observation.uncertainty.verbatim["note"].startswith(
             "No numerical uncertainty or confidence level is stated"
         )
+    assert len(
+        [
+            entry
+            for entry in migrator.result.queue
+            if entry.observation_id
+            in {observation.observation_id for observation in observations.values()}
+            and entry.axes == ["method"]
+        ]
+    ) == 3
 
     for observation_id in (
         "Albite",
