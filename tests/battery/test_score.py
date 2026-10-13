@@ -2737,6 +2737,30 @@ def test_hastie_initial_charge_notice_reaches_residual() -> None:
     )
 
 
+def test_figure_only_evidence_adds_notice_to_scored_residual() -> None:
+    from simulator.battery.score import FLAGGED_STRATUM_FIGURE_ONLY, flagged_strata
+
+    experiment = F.kems_experiment()
+    identity = F.activity_identity()
+    reference = F.observation(
+        "figure-only-scored-point",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.FIGURE_ONLY,
+        source_id="kems-020-hastie-1981-nbsir",
+    )
+    residual, _ = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+        prediction=_predict(Decimal("0.3"), identity),
+    )
+
+    assert any(notice.kind is NoticeKind.FIGURE_ONLY for notice in residual.notices)
+    assert FLAGGED_STRATUM_FIGURE_ONLY in flagged_strata(residual.notices)
+
+
 def test_source_internal_inconsistency_is_flagged_reported_and_excluded() -> None:
     from simulator.battery.score import (
         FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,

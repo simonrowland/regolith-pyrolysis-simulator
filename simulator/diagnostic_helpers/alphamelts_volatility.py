@@ -310,6 +310,7 @@ def _analytical_vapor_pressures_from_activities(
         if sp_data.get("reference_pressure_model") or sp_data.get("liquid_oxide_standard_reaction"):
             if catalog is None:
                 raise RuntimeError(f"{species} requires its melt-source catalog reaction")
+            # b-189-exempt: diagnostic pressure comparison, not a hot-train read.
             evaluator = catalog.evaluator_for(species)
             activity = float(activities.get(parent_oxide, 0.0) or 0.0)
             wt_activity = max(0.0, float(comp_wt.get(parent_oxide, 0.0) or 0.0) / 100.0)

@@ -516,6 +516,12 @@ def test_hastie_initial_charges_bind_to_figure_points_as_proxies(
             in {Quantity.P_PARTIAL, Quantity.ACTIVITY_COEFFICIENT}
         ]
         assert len(rows) == expected_counts[series]
+        if series == "fig5_glass_Na_this_work_digitized":
+            assert all(
+                observation.evidence.class_.is_value
+                and observation.evidence.class_.value is EvidenceClass.FIGURE_ONLY
+                for observation in rows
+            )
         expected = wt_pct_to_mole_fraction(composition_wt_pct)
         for observation in rows:
             composition = observation.identity.composition
@@ -638,6 +644,87 @@ def test_hastie_initial_charges_bind_to_figure_points_as_proxies(
         and observation.identity.species.phase.value is Phase.G
         for observation in na_kms_migrated
     )
+
+
+def test_repaired_figure_read_sources_keep_figure_only_evidence(
+    tmp_path: Path,
+) -> None:
+    cases = (
+        (
+            "kems-025-markova-1983.yaml",
+            (
+                "markova_1983_fe_psat_figs",
+                "markova_1983_mg_psat_figs",
+                "markova_1983_feo_psat_figs",
+            ),
+        ),
+        (
+            "stolyarova-1996-cao-alumina-silica-kems.yaml",
+            (
+                "stolyarova_1996_fig1_sio2_activity_figure_only",
+                "stolyarova_1996_fig2_sio2_activity_figure_only",
+                "stolyarova_1996_fig1_cao_activity_figure_only",
+                "stolyarova_1996_fig2_cao_activity_figure_only",
+                "stolyarova_1996_fig1_al2o3_activity_figure_only",
+                "stolyarova_1996_fig2_al2o3_activity_figure_only",
+            ),
+        ),
+        (
+            "kems-035-sauerborn-2005.yaml",
+            (
+                "sauerborn_2005_jsc1_composition_figure_only_blocked_deep2",
+                "sauerborn_2005_fig523_ms1_epma_glass_deep2",
+                "sauerborn_2005_fig532_rfa_oxide_ratio_deep2",
+                "sauerborn_2005_qms_traces_figure_only_blocked_deep2",
+                "sauerborn_2005_fig555_o2_reference_normalized_deep2",
+                "sauerborn_2005_fig556_o2_vs_T_normalized_deep2",
+            ),
+        ),
+    )
+    for name, identifiers in cases:
+        migrated = _migrate_real_extract(tmp_path / name, name)
+        for identifier in identifiers:
+            matching = [
+                observation
+                for observation in migrated.observations.values()
+                if f"::{identifier}" in observation.observation_id
+            ]
+            assert matching, (name, identifier)
+            assert all(
+                observation.evidence.class_.is_value
+                and observation.evidence.class_.value is EvidenceClass.FIGURE_ONLY
+                for observation in matching
+            ), (name, identifier)
+
+
+def test_printed_value_exclusions_keep_their_migrated_refusals(
+    tmp_path: Path,
+) -> None:
+    tsukihashi = _migrate_real_extract(tmp_path / "ts1985", "ts1985.yaml")
+    coefficients = [
+        observation
+        for observation in tsukihashi.observations.values()
+        if "::ts1985_na2o_table2_log10_a_AT_B::" in observation.observation_id
+    ]
+    assert len(coefficients) == 4
+    assert all(
+        observation.evidence.class_.is_value
+        and observation.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
+        for observation in coefficients
+    )
+
+    mendybaev = _migrate_real_extract(
+        tmp_path / "mendybaev",
+        "mendybaev-2021-cai-low-pressure-h2-evap.yaml",
+    )
+    rates = [
+        observation
+        for observation in mendybaev.observations.values()
+        if "::mendybaev_2021_weight_loss_rates_by_arm" in observation.observation_id
+    ]
+    assert len(rates) == 1
+    assert rates[0].evidence.class_.is_unknown
+    assert rates[0].value.kind is ValueKind.UNAVAILABLE
 
 
 def _run_migrate_cli(args: list[str]) -> subprocess.CompletedProcess[str]:
@@ -3724,6 +3811,7 @@ _CENSUS_QUANTITY_ALIASES = {
     "pure_Psat": "p_sat",
     "vapor_pressure": "p_sat",
     "partial_pressure": "p_partial",
+    "partial_pressure_O2": "p_partial",
     "potassium_partial_pressure_as_published": "p_partial",
     "deltafG": "delta_fG",
     "delta_fG": "delta_fG",
@@ -4191,9 +4279,11 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     # p_partial 69->75, evaporation_coefficient_alpha 12->30, n_numeric 274->298.
     # The lunar DeMaria 1973 merge adds its 61 Table I p_partial cells as
     # run-labelled series: p_partial 75->136 and n_numeric 356->417.
+    # Suzuki 2026 adds 13 printed oxygen partial-pressure points via the
+    # independent partial_pressure_O2 alias: p_partial 136->149.
     # Re-pinned for t998: Zhang Table 4 Na/K alpha points add four printed
     # cells, evaporation_coefficient_alpha 30->34 and n_numeric 450->454.
-    assert census.get("p_partial") == 136
+    assert census.get("p_partial") == 149
     assert census.get("p_sat") == 21
     # Twelve repeated Fedkin table cells are no longer counted through the retired
     # mirror; the KEMS owner extract retains the cells (Fedkin et al. 2006, Table 3,
@@ -4236,6 +4326,7 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     }
     # Current total includes the 110 Markova 1984 residue components and omits
     # the 12 duplicate Fedkin mirror cells (b677: the pre-item24 total 1877->1865).
+    # The 13 Suzuki pO2 points now join p_partial, moving 1878->1891.
     # Item 24 adds 13 Abdul 2023 H_minus_H298 cells (Table 3 rankinite 7 + Table 4
     # belite 6), which moved 1877->1890 on the tree that still counted those 12
     # Fedkin mirror cells. Combined: 1865 + 13 = 1878 (equivalently 1890 - 12).
@@ -4243,7 +4334,7 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     # No check was relaxed and mismatches stay 0.
     assert census.get("H_minus_H298") == 13
     assert per_source.get("abdul-2023-cao-sio2-calphad") == {"H_minus_H298": 13}
-    assert n_numeric == 1878, (n_numeric, census, n_unavailable)
+    assert n_numeric == 1891, (n_numeric, census, n_unavailable)
 
 
 def test_residue_point_condition_values_keep_their_printed_types() -> None:
@@ -10033,6 +10124,232 @@ def _write_multi_extract_tree(root: Path, extracts: list[tuple[str, dict]]) -> P
         index["sources"].append(entry)
     index_path.write_text(yaml.safe_dump(index, sort_keys=False), encoding="utf-8")
     return root
+
+
+def test_stale_doi_alias_is_reassigned_in_one_pass_and_then_idempotent(
+    tmp_path: Path,
+) -> None:
+    doi = "10.1234/shared"
+    owner = _named_extract("aaa-owner", doi)
+    survivor = _named_extract("bbb-survivor", doi)
+    root = _write_multi_extract_tree(
+        tmp_path, [("aaa-owner", owner), ("bbb-survivor", survivor)]
+    )
+    works_dir = root / "data" / "literature" / "works"
+    aliases_path = works_dir / "ALIASES.yaml"
+    dump_yaml(
+        {
+            "schema_version": "battery_work_aliases.v1",
+            "aliases": {
+                "aaa-owner": "owner-work",
+                "bbb-survivor": "survivor-work",
+            },
+        },
+        aliases_path,
+    )
+
+    first = migrate(root, write=True)
+    owner_work = next(
+        work for work in first.works.values() if "aaa-owner" in work.source_ids
+    )
+    survivor_work = next(
+        work for work in first.works.values() if "bbb-survivor" in work.source_ids
+    )
+    assert owner_work.work_id != survivor_work.work_id
+    assert first.aliases[doi] == owner_work.work_id
+
+    aliases_doc = yaml.safe_load(aliases_path.read_text(encoding="utf-8"))
+    aliases_doc["aliases"]["manual-fixture-alias"] = survivor_work.work_id
+    aliases_path.write_text(
+        yaml.safe_dump(aliases_doc, sort_keys=False), encoding="utf-8"
+    )
+    (root / "data" / "literature" / "extracts" / "aaa-owner.yaml").unlink()
+    index_path = root / "data" / "literature" / "INDEX.yaml"
+    index_doc = yaml.safe_load(index_path.read_text(encoding="utf-8"))
+    index_doc["sources"] = [
+        row for row in index_doc["sources"] if row["source_id"] != "aaa-owner"
+    ]
+    index_path.write_text(
+        yaml.safe_dump(index_doc, sort_keys=False), encoding="utf-8"
+    )
+
+    second = migrate(root, write=True)
+    surviving_work_id = next(
+        work.work_id
+        for work in second.works.values()
+        if "bbb-survivor" in work.source_ids
+    )
+    second_aliases = yaml.safe_load(aliases_path.read_text(encoding="utf-8"))[
+        "aliases"
+    ]
+    assert second_aliases[doi] == surviving_work_id
+    assert second_aliases["manual-fixture-alias"] == surviving_work_id
+
+    output_dirs = (
+        works_dir,
+        root / "data" / "literature" / "extracts-v2",
+        root / "data" / "literature" / "observations-v2",
+        root / "data" / "battery",
+    )
+
+    def output_bytes() -> dict[Path, bytes]:
+        return {
+            path.relative_to(root): path.read_bytes()
+            for directory in output_dirs
+            for path in directory.rglob("*")
+            if path.is_file()
+        }
+
+    second_bytes = output_bytes()
+    migrate(root, write=True)
+    assert output_bytes() == second_bytes
+
+
+def test_live_target_doi_alias_is_preserved_for_later_sources(tmp_path: Path) -> None:
+    doi = "10.1234/shared"
+    extracts = [
+        ("a", _named_extract("a", doi)),
+        ("b", _named_extract("b", doi)),
+        ("c", _named_extract("c", "10.1234/primary")),
+    ]
+    root = _write_multi_extract_tree(tmp_path, extracts)
+    aliases_path = root / "data" / "literature" / "works" / "ALIASES.yaml"
+    dump_yaml(
+        {
+            "schema_version": "battery_work_aliases.v1",
+            "aliases": {"a": "A", "b": "B", "c": "C", doi: "C"},
+        },
+        aliases_path,
+    )
+
+    result = migrate(root, write=True)
+    assert set(result.works) == {"A", "B", "C"}
+    assert result.aliases[doi] == "C"
+    resolved, _ = work_id_for(
+        citation="New source sharing historical DOI",
+        doi=doi,
+        source_id="new-source",
+        aliases=result.aliases,
+    )
+    assert resolved == "C"
+
+
+def test_late_live_extract_keeps_carried_doi_alias(tmp_path: Path) -> None:
+    doi = "10.1234/shared"
+    extracts = [
+        ("a", _named_extract("a", doi)),
+        ("b", _named_extract("b", doi)),
+        ("c", _named_extract("c", "10.1234/primary")),
+    ]
+    root = _write_multi_extract_tree(tmp_path, extracts)
+    index_path = root / "data" / "literature" / "INDEX.yaml"
+    index_doc = yaml.safe_load(index_path.read_text(encoding="utf-8"))
+    index_doc["sources"] = [
+        row for row in index_doc["sources"] if row["source_id"] != "c"
+    ]
+    index_path.write_text(yaml.safe_dump(index_doc, sort_keys=False), encoding="utf-8")
+    aliases_path = root / "data" / "literature" / "works" / "ALIASES.yaml"
+    dump_yaml(
+        {
+            "schema_version": "battery_work_aliases.v1",
+            "aliases": {"a": "A", "b": "B", "c": "C", doi: "C"},
+        },
+        aliases_path,
+    )
+
+    result = migrate(root, write=False)
+
+    assert "C" in result.works
+    assert result.aliases[doi] == "C"
+
+
+def test_late_compilation_work_keeps_carried_doi_alias(tmp_path: Path) -> None:
+    doi = "10.1234/shared"
+    root = _write_multi_extract_tree(
+        tmp_path, [("a", _named_extract("a", "10.1234/primary"))]
+    )
+    manifest = (
+        root
+        / "data"
+        / "literature"
+        / "compilations"
+        / "fixture"
+        / "manifest.yaml"
+    )
+    manifest.parent.mkdir(parents=True)
+    manifest.write_text(
+        yaml.safe_dump(
+            {
+                "source_id": "compilation-source",
+                "source": {"citation": "Compilation fixture"},
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    aliases_path = root / "data" / "literature" / "works" / "ALIASES.yaml"
+    dump_yaml(
+        {
+            "schema_version": "battery_work_aliases.v1",
+            "aliases": {"a": "A", "compilation-source": "COMP", doi: "COMP"},
+        },
+        aliases_path,
+    )
+
+    result = migrate(root, write=False)
+
+    assert "COMP" in result.works
+    assert result.aliases[doi] == "COMP"
+
+
+def test_deleted_index_only_survivor_reclaims_doi_in_first_pass(tmp_path: Path) -> None:
+    doi = "10.1234/shared"
+    root = _write_multi_extract_tree(
+        tmp_path, [("bbb-survivor", _named_extract("bbb-survivor", doi))]
+    )
+    (root / "data" / "literature" / "extracts" / "bbb-survivor.yaml").unlink()
+    aliases_path = root / "data" / "literature" / "works" / "ALIASES.yaml"
+    dump_yaml(
+        {
+            "schema_version": "battery_work_aliases.v1",
+            "aliases": {
+                "aaa-deleted-owner": "owner-work",
+                "bbb-survivor": "survivor-work",
+                doi: "owner-work",
+            },
+        },
+        aliases_path,
+    )
+
+    result = migrate(root, write=False)
+
+    assert set(result.works) == {"survivor-work"}
+    assert result.aliases[doi] == "survivor-work"
+
+
+def test_shared_doi_claimant_is_independent_of_index_order(tmp_path: Path) -> None:
+    doi = "10.1234/shared"
+    for carried_doi_owner in (None, "deleted-owner"):
+        claimants = []
+        for order in (("a", "b"), ("b", "a")):
+            root = _write_multi_extract_tree(
+                tmp_path / f"{carried_doi_owner}-{''.join(order)}",
+                [(source_id, _named_extract(source_id, doi)) for source_id in order],
+            )
+            aliases_path = root / "data" / "literature" / "works" / "ALIASES.yaml"
+            aliases = {"a": "A", "b": "B"}
+            if carried_doi_owner is not None:
+                aliases[doi] = carried_doi_owner
+            dump_yaml(
+                {"schema_version": "battery_work_aliases.v1", "aliases": aliases},
+                aliases_path,
+            )
+
+            result = migrate(root, write=False)
+
+            claimants.append(result.aliases[doi])
+
+        assert claimants == ["A", "A"]
 
 
 def _equipment_context_row(observation_id: str, experiment: object) -> dict:
