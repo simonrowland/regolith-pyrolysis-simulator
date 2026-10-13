@@ -16,9 +16,11 @@ from simulator.battery.consumer_inputs import REQUIREMENTS, collect_consumer_inp
 from simulator.battery.enums import (
     AmountBasis,
     BenchIdentityBasis,
+    Engine,
     Phase,
     Quantity,
     ReferenceStateConvention,
+    RefusalReason,
     ValueKind,
 )
 from simulator.battery.generators import melt_activity_requests
@@ -462,6 +464,34 @@ def test_accepted_reference_is_named_on_the_payload():
     assert results[0].payload["reference_state"] == "raoultian_pure_liquid_endmember"
     assert results[0].payload["quantity"] == "activity"
     assert "fO2_log" not in results[0].payload
+
+
+def test_internal_analytical_activity_is_unsupported_before_registration(monkeypatch):
+    def _unexpected_open(*_args, **_kwargs):
+        raise AssertionError("unsupported activity must refuse before opening an engine")
+
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.open_battery_engine",
+        _unexpected_open,
+    )
+    experiment, _bench, observation = _case(
+        composition=_composition(("Na2O", "0.4"), ("SiO2", "0.6")),
+        formula="SiO2",
+    )
+
+    from simulator.battery.score import predict_with_engine
+
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        observation,
+        experiment=experiment,
+        isolated=False,
+    )
+
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+    assert prediction.refusal_detail["reason"] == "engine_does_not_report_melt_activity"
+    assert prediction.execution.state.value == "not_probed"
 
 
 def test_scorer_refuses_a_multivalent_gap_before_the_engine_default(monkeypatch):
