@@ -12955,12 +12955,75 @@ class Migrator:
                             transition_values,
                         )
                         if (
-                            selected_transition.available
-                            and selected_transition.amount is not None
+                            not selected_transition.available
+                            or selected_transition.amount is None
                         ):
-                            selected_transitions.append(
-                                (selected_transition.amount, transition_locator)
+                            continue
+                        property_kind = _printed_field_text(
+                            transition_values.get("property_kind")
+                        )
+                        phase_from = _printed_field_text(
+                            transition_values.get("phase_from")
+                        )
+                        phase_to = _printed_field_text(
+                            transition_values.get("phase_to")
+                        )
+                        if property_kind is not None:
+                            property_kind = property_kind.casefold()
+                            if not (
+                                property_kind == "melting_point"
+                                or property_kind.startswith("melting_point_")
+                            ):
+                                continue
+                        elif not (
+                            phase_from is not None
+                            and phase_to is not None
+                            or selected_transition.field_name in {"T_m_K", "T_fus_K"}
+                        ):
+                            continue
+                        if phase_from is not None:
+                            source_phase = PHASE_MAP.get(phase_from) or PHASE_MAP.get(
+                                phase_from.casefold()
                             )
+                            if source_phase in {Phase.L, Phase.G, Phase.AQ}:
+                                continue
+                        if phase_to is not None:
+                            target_phase = PHASE_MAP.get(phase_to) or PHASE_MAP.get(
+                                phase_to.casefold()
+                            )
+                            if (
+                                phase_to.casefold() not in {"liquid", "l", "condensed_liquid"}
+                                and target_phase is not Phase.L
+                            ):
+                                continue
+                        transition_polymorph = polymorph_from_extract(transition)
+                        fusion_polymorph = polymorph_from_extract(obs)
+                        if (
+                            transition_polymorph is None
+                            or fusion_polymorph is None
+                            or not transition_polymorph.is_value
+                            or not fusion_polymorph.is_value
+                        ):
+                            continue
+                        try:
+                            source_crystal = _polymorph_from_plain(
+                                transition_polymorph.value
+                            )
+                            fusion_crystal = _polymorph_from_plain(
+                                fusion_polymorph.value
+                            )
+                        except ValueError:
+                            source_crystal = " ".join(
+                                str(transition_polymorph.value).split()
+                            ).casefold()
+                            fusion_crystal = " ".join(
+                                str(fusion_polymorph.value).split()
+                            ).casefold()
+                        if source_crystal != fusion_crystal:
+                            continue
+                        selected_transitions.append(
+                            (selected_transition.amount, transition_locator)
+                        )
                     if len(selected_transitions) == 1:
                         fusion_temperature = selected_transitions[0]
                         t_payload["T_fus_K"] = fusion_temperature[0]
