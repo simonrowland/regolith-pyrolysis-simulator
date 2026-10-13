@@ -920,33 +920,6 @@ def test_production_annotation_boundary_reports_malformed_shapes(
             assert result.observations
 
 
-def test_derivation_input_requirement_message_comes_from_record_owner(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    from simulator.battery.records import Derivation as RecordDerivation
-
-    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
-    extract["species"]["Na"]["observations"][0]["values"]["derivation"] = {
-        "relation": "owner-validation-probe",
-        "output_unit": "Pa",
-    }
-    original_post_init = RecordDerivation.__post_init__
-
-    def owner_post_init(self) -> None:
-        if self.relation == "owner-validation-probe":
-            raise ValueError("owner-only Derivation input requirement")
-        original_post_init(self)
-
-    monkeypatch.setattr(RecordDerivation, "__post_init__", owner_post_init)
-    result = migrate(_write_min_tree(tmp_path, extract), write=False)
-
-    assert any(
-        issue.path.endswith(".values.derivation")
-        and "owner-only Derivation input requirement" in issue.detail
-        for issue in result.registry_issues
-    )
-
-
 @pytest.mark.parametrize("location", ["values.derivation", "registry.inference"])
 def test_string_derivation_inputs_keep_their_existing_meaning(
     tmp_path: Path, location: str
@@ -2836,6 +2809,20 @@ def test_source_derivation_reports_relation_and_inputs_independently() -> None:
         "Derivation.inputs is required unless raw_inputs is located not_printed"
     ]
 
+    accepted_with_lineage, no_lineage_errors = source_derivation_from_source(
+        {
+            "derivation": {
+                "relation": "author calculation",
+                "output_unit": "Pa",
+            }
+        },
+        {},
+        has_resolved_lineage=True,
+    )
+    assert accepted_with_lineage is not None
+    assert accepted_with_lineage.inputs == ()
+    assert no_lineage_errors == ()
+
 
 @pytest.mark.parametrize(
     ("extract_name", "observation_id", "expected_details"),
@@ -2859,24 +2846,24 @@ def test_source_derivation_reports_relation_and_inputs_independently() -> None:
             "kems-012-sossi-2019.yaml",
             "sossi_2019_k_table5_experimental",
             (
-                "invalid derivation annotation: Derivation.inputs is required unless raw_inputs is located not_printed",
                 "invalid derivation annotation: derivation relation (author method) is required",
+                "invalid derivation annotation: Derivation.inputs is required unless raw_inputs is located not_printed",
             ),
         ),
         (
             "kems-ms2000-044.yaml",
             "ms2000_044_sio2_activity_na_system_xsio2_0805_t1473_class_quote_r2",
             (
-                "invalid derivation annotation: Derivation.inputs is required unless raw_inputs is located not_printed",
                 "invalid derivation annotation: derivation relation (author method) is required",
+                "invalid derivation annotation: Derivation.inputs is required unless raw_inputs is located not_printed",
             ),
         ),
         (
             "okazaki-2022-ryugu-gas-treasure-box.yaml",
             "okazaki_2022_fragmentation_assumptions_and_model_output",
             (
-                "invalid derivation annotation: Derivation.inputs is required unless raw_inputs is located not_printed",
                 "invalid derivation annotation: derivation relation (author method) is required",
+                "invalid derivation annotation: Derivation.inputs is required unless raw_inputs is located not_printed",
             ),
         ),
         (

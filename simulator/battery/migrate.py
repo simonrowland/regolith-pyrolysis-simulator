@@ -936,6 +936,7 @@ def _derivation_from_plain(
     require_sequence_inputs: bool = False,
     require_relation: bool = False,
     allow_mapping_inputs: bool = False,
+    require_inputs: bool = True,
 ) -> Derivation | None:
     if not isinstance(payload, Mapping):
         raise _InvalidDerivationAnnotation("Derivation annotation must be a mapping")
@@ -987,7 +988,7 @@ def _derivation_from_plain(
     output_unit = payload.get("output_unit", "as_published")
     if not isinstance(output_unit, str):
         raise _InvalidDerivationAnnotation("Derivation.output_unit must be a string")
-    return Derivation(
+    derivation = Derivation(
         relation=relation,
         inputs=tuple(inputs),
         parameters=tuple(parameters),
@@ -995,6 +996,15 @@ def _derivation_from_plain(
         pure_substance_reference=raw_marker,
         raw_inputs=parsed_raw_inputs,
     )
+    if (
+        require_inputs
+        and not derivation.inputs
+        and not derivation.has_located_unprinted_raw_inputs
+    ):
+        raise ValueError(
+            "Derivation.inputs is required unless raw_inputs is located not_printed"
+        )
+    return derivation
 
 
 def _mass_percent_pairs(payload: object) -> list[tuple[str, Decimal]] | None:
@@ -6184,31 +6194,59 @@ _CONDITIONAL_REDUCED_METHODS = frozenset({"calculated", "author_derived"})
 
 
 def source_derivation_from_source(
-    obs: Mapping[str, Any], values: Mapping[str, Any]
+    obs: Mapping[str, Any],
+    values: Mapping[str, Any],
+    *,
+    has_resolved_lineage: bool = False,
 ) -> tuple[Derivation | None, tuple[tuple[str, str], ...]]:
     """Read an author-supplied derivation without inventing one."""
 
     derivation: Derivation | None = None
     invalid: list[tuple[str, str]] = []
-    for payload in (values, obs):
-        if "derivation" not in payload:
-            continue
-        raw = payload["derivation"]
-        field = "values.derivation" if payload is values else "derivation"
-        relation = raw.get("relation") if isinstance(raw, Mapping) else None
-        relation_missing = isinstance(raw, Mapping) and (
-            not isinstance(relation, str) or not relation.strip()
-        )
-        parsed, error = _decode_author_annotation(raw, _derivation_from_plain)
-        if error is not None:
-            invalid.append((field, error))
-        if relation_missing:
+    if "derivation" in obs:
+        payload, field = obs, "derivation"
+    elif "derivation" in values:
+        payload, field = values, "values.derivation"
+    else:
+        return None, ()
+
+    raw = payload["derivation"]
+    # SCHEMA.md lines 187-209 place normalized lineage on the observation and
+    # allow inputs to be omitted when derived_from resolves. A nested
+    # values.derivation map is descriptive in that case, not a second record.
+    if (
+        field == "values.derivation"
+        and has_resolved_lineage
+        and isinstance(raw, Mapping)
+        and not ("inputs" in raw or "raw_inputs" in raw)
+    ):
+        return None, ()
+
+    relation = raw.get("relation") if isinstance(raw, Mapping) else None
+    relation_missing = isinstance(raw, Mapping) and (
+        not isinstance(relation, str) or not relation.strip()
+    )
+    parsed, error = _decode_author_annotation(
+        raw,
+        lambda value: _derivation_from_plain(value, require_inputs=False),
+    )
+    if error is not None:
+        invalid.append((field, error))
+    if relation_missing:
+        invalid.append((field, "derivation relation (author method) is required"))
+    if error is None and parsed is not None:
+        if (
+            not parsed.inputs
+            and not parsed.has_located_unprinted_raw_inputs
+            and not has_resolved_lineage
+        ):
             invalid.append(
-                (field, "derivation relation (author method) is required")
+                (
+                    field,
+                    "Derivation.inputs is required unless raw_inputs is located not_printed",
+                )
             )
-        if error is not None or relation_missing:
-            continue
-        if derivation is None and parsed is not None:
+        if not relation_missing:
             derivation = parsed
     return derivation, tuple(invalid)
 
@@ -13186,7 +13224,7 @@ class Migrator:
             ))
         derived_from = derived_parents or None
         source_derivation, invalid_derivations = source_derivation_from_source(
-            obs, values
+            obs, values, has_resolved_lineage=bool(derived_parents)
         )
         for field_path, detail in invalid_derivations:
             self.result.registry_issues.append(

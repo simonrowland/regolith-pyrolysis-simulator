@@ -1417,7 +1417,7 @@ def test_derivation_parser_reads_located_raw_inputs_declaration() -> None:
     assert derivation.raw_inputs.locator == F.loc(page=164, section="3.3")
 
 
-def test_derivation_allows_empty_inputs_only_for_located_not_printed_declaration() -> None:
+def test_derivation_record_leaves_input_lineage_to_observation_validation() -> None:
     declaration = Located(
         State.of(RawInputStatus.NOT_PRINTED), locator=F.loc(page=164, section="3.3")
     )
@@ -1428,13 +1428,12 @@ def test_derivation_allows_empty_inputs_only_for_located_not_printed_declaration
         output_unit="dimensionless",
         raw_inputs=declaration,
     ).inputs == ()
-    with pytest.raises(ValueError, match="Derivation.inputs is required"):
-        Derivation(
-            relation="calculation",
-            inputs=(),
-            parameters=(),
-            output_unit="dimensionless",
-        )
+    assert Derivation(
+        relation="calculation",
+        inputs=(),
+        parameters=(),
+        output_unit="dimensionless",
+    ).inputs == ()
 
 
 def test_r08_nested_derived_from_parent_is_not_independent() -> None:
