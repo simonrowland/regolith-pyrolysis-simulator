@@ -142,6 +142,20 @@ def test_internal_analytical_scores_multi_cation_parent_activity(monkeypatch) ->
     ]
 
 
+def test_internal_analytical_request_forwards_point_oxygen_without_redox() -> None:
+    from simulator.battery.generators.bench import activity_request_for_engine
+
+    experiment, _bench, observation = _case(
+        composition=_composition(("SiO2", "0.6"), ("Na2O", "0.4")),
+        oxygen=Decimal("-10"),
+        formula="SiO2",
+    )
+    request = activity_request_for_engine(experiment, observation, "internal-analytical")
+
+    assert request is not None and request.payload is not None
+    assert request.payload["fO2_log"] == -10.0
+
+
 def test_internal_analytical_forwards_supplied_oxygen_without_redox(monkeypatch) -> None:
     monkeypatch.setattr(
         "simulator.diagnostic_helpers.binary_pot_battery._call_with_hard_timeout",
