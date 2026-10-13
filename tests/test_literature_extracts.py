@@ -201,13 +201,27 @@ def _assert_ohta_suito_1995_review_pins(extract: dict) -> None:
         "gas stream, followed by water quenching"
     )
 
-    table_iii = next(
-        row for row in extract["species"]["MnO"]["context"]
-        if row["observation_id"] == "ohta_suito_1995_table3_interaction_parameters"
-    )
-    assert table_iii["locator"] == {
+    table_iii_observation_id = "ohta_suito_1995_table3_interaction_parameters"
+    expected_table_iii_locator = {
         "page": 298, "published_page": 298, "pdf_page_index": 3, "table": "III"
     }
+    table_iii_locators = [
+        row["locator"]
+        for species in extract["species"].values()
+        for row in species.get("context", [])
+        if row.get("locator", {}).get("table") == "III"
+    ]
+    table_iii_locators.extend(
+        sample["locator"]
+        for sample in extract["fidelity_samples"]
+        if sample.get("observation_id") == table_iii_observation_id
+    )
+    assert table_iii_locators
+    assert all(locator == expected_table_iii_locator for locator in table_iii_locators)
+    table_iii = next(
+        row for row in extract["species"]["MnO"]["context"]
+        if row["observation_id"] == table_iii_observation_id
+    )
     assert table_iii["values"]["table_transcription"] == _OHTA_SUITO_1995_TABLE_III
 
     table_i = next(
@@ -242,7 +256,7 @@ def test_ohta_suito_1995_source_pins_reject_each_review_regression() -> None:
         "quoted_method",
         "cas8_alumina_reference",
         "table_iii_indices",
-        "table_iii_locator",
+        "table_iii_temperature_fidelity_locator",
         "table_i_units",
     )
     for mutation in mutations:
@@ -264,12 +278,15 @@ def test_ohta_suito_1995_source_pins_reject_each_review_regression() -> None:
             table["values"]["table_transcription"] = table[
                 "values"
             ]["table_transcription"].replace("e_i^j (r_i^j)", "e_j^i")
-        elif mutation == "table_iii_locator":
-            table = next(
-                row for row in context
-                if row["observation_id"] == "ohta_suito_1995_table3_interaction_parameters"
+        elif mutation == "table_iii_temperature_fidelity_locator":
+            sample = next(
+                sample for sample in extract["fidelity_samples"]
+                if sample["observation_id"] == "ohta_suito_1995_table3_interaction_parameters"
+                and sample["field"] == "temperature_K"
             )
-            table["locator"]["page"] = 297
+            sample["locator"] = {
+                "page": 297, "published_page": 297, "pdf_page_index": 2, "table": "III"
+            }
         else:
             table = next(
                 row for row in context
