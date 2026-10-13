@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import inspect
 
+import numpy as np
 import pytest
 
 from simulator.accounting.ledger import AtomLedger
@@ -56,6 +57,7 @@ class _AuthoritativeProvider(ChemistryProvider):
 
     def __init__(self) -> None:
         self.call_count = 0
+        self.requests: list[IntentRequest] = []
 
     def capability_profile(self) -> CapabilityProfile:
         return CapabilityProfile(
@@ -67,6 +69,7 @@ class _AuthoritativeProvider(ChemistryProvider):
 
     def dispatch(self, request: IntentRequest) -> IntentResult:
         self.call_count += 1
+        self.requests.append(request)
         return IntentResult(
             intent=request.intent,
             status="ok",
@@ -604,3 +607,57 @@ def test_dispatch_through_provider_redox_state_defaults_to_none():
     ).parameters['redox_state']
 
     assert redox_state.default is None
+
+
+@pytest.mark.parametrize(
+    'value',
+    [
+        pytest.param(np.bool_(True), id='numpy-bool-true'),
+        pytest.param(np.bool_(False), id='numpy-bool-false'),
+        pytest.param(np.array(True), id='zero-dimensional-bool-array'),
+        pytest.param(np.array([True]), id='one-element-bool-array'),
+        pytest.param(np.array([-9.0]), id='one-element-float-array'),
+    ],
+)
+def test_kernel_dispatch_rejects_numpy_bool_and_array_fO2_before_provider(
+    value: object,
+) -> None:
+    provider = _AuthoritativeProvider()
+    registry = ProviderRegistry()
+    registry.register(provider, [ChemistryIntent.VAPOR_PRESSURE])
+    kernel = ChemistryKernel(AtomLedger(), registry, species_formula_registry={})
+
+    with pytest.raises(TypeError):
+        kernel.dispatch(
+            ChemistryIntent.VAPOR_PRESSURE,
+            temperature_C=1400.0,
+            pressure_bar=1.0,
+            fO2_log=value,
+        )
+
+    assert provider.call_count == 0
+
+
+@pytest.mark.parametrize(
+    'value',
+    [
+        pytest.param(np.float64(-9.0), id='numpy-float64'),
+        pytest.param('-9.0', id='numeric-string'),
+    ],
+)
+def test_kernel_dispatch_keeps_compatible_numeric_fO2_inputs(value: object) -> None:
+    provider = _AuthoritativeProvider()
+    registry = ProviderRegistry()
+    registry.register(provider, [ChemistryIntent.VAPOR_PRESSURE])
+    kernel = ChemistryKernel(AtomLedger(), registry, species_formula_registry={})
+
+    result = kernel.dispatch(
+        ChemistryIntent.VAPOR_PRESSURE,
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+        fO2_log=value,
+    )
+
+    assert result.status == 'ok'
+    assert provider.call_count == 1
+    assert provider.requests[0].fO2_log == -9.0

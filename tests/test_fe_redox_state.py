@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import math
 
+import numpy as np
 import pytest
 
 from simulator.fe_redox import (
@@ -64,6 +65,36 @@ def test_buffer_offset_rejects_non_numeric_or_boolean_delta(delta: object) -> No
 def test_buffer_offset_rejects_non_finite_delta(delta: float) -> None:
     with pytest.raises(ValueError):
         RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, delta)
+
+
+@pytest.mark.parametrize(
+    'value',
+    [
+        pytest.param(np.bool_(True), id='numpy-bool-true'),
+        pytest.param(np.bool_(False), id='numpy-bool-false'),
+        pytest.param(np.array(True), id='zero-dimensional-bool-array'),
+        pytest.param(np.array([True]), id='one-element-bool-array'),
+        pytest.param(np.array([-9.0]), id='one-element-float-array'),
+    ],
+)
+def test_redox_state_constructors_reject_numpy_bool_and_array_scalars(
+    value: object,
+) -> None:
+    with pytest.raises(TypeError):
+        RedoxState.absolute(value)
+    with pytest.raises(TypeError):
+        RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, value)
+
+
+@pytest.mark.parametrize('value', [np.float64(-9.0), '-9.0'])
+def test_redox_state_constructors_keep_compatible_numeric_scalars(
+    value: object,
+) -> None:
+    assert RedoxState.absolute(value).log_fO2 == -9.0
+    assert RedoxState.buffer_offset(
+        FE_FEO_BUFFER_STANDARD,
+        value,
+    ).delta_log10 == -9.0
 
 
 def test_buffer_offset_rejects_unknown_line_and_inconsistent_fields() -> None:

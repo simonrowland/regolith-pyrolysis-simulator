@@ -11,6 +11,7 @@ from simulator.feedstock_composition import (
     feot_equivalent_wt_pct,
     iron_oxide_values,
 )
+from simulator.scalar_boundary import is_declared_real_scalar
 
 
 class Kress91InvalidControls(ValueError):
@@ -528,8 +529,8 @@ class RedoxStateInputError(ValueError):
 
 
 def _redox_state_finite_float(value: object, name: str) -> float:
-    if isinstance(value, bool):
-        raise TypeError(f'{name} must be numeric, not bool')
+    if not is_declared_real_scalar(value, allow_numeric_str=True):
+        raise TypeError(f'{name} must be numeric')
     try:
         number = float(value)
     except (TypeError, ValueError, OverflowError) as exc:
