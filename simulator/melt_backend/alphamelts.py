@@ -5186,6 +5186,12 @@ class _MELTSBackendSupport(MeltBackend):
         fallback; genuine library/solver contract failures remain labelled
         ``RuntimeError`` exceptions.
         """
+        from simulator.melt_regime import (
+            MeltRegime,
+            liquid_fraction_invalidity,
+            melt_regime,
+        )
+
         try:
             liquid_fraction_value = float(liquid_fraction)
         except (TypeError, ValueError) as exc:
@@ -5193,16 +5199,15 @@ class _MELTSBackendSupport(MeltBackend):
                 'VapoRock vapor bridge liquid_fraction_invalid: '
                 f'{liquid_fraction!r}'
             ) from exc
-        if (
-            not math.isfinite(liquid_fraction_value)
-            or liquid_fraction_value < 0.0
-            or liquid_fraction_value > 1.0
-        ):
+        if liquid_fraction_invalidity(liquid_fraction) is not None:
             raise RuntimeError(
                 'VapoRock vapor bridge liquid_fraction_invalid: '
                 f'{liquid_fraction!r}'
             )
-        if liquid_fraction_value == 0.0:
+        if melt_regime(
+            liquid_fraction=liquid_fraction_value,
+            epsilon=0.0,
+        ) == MeltRegime.FROZEN:
             return {}, 'no_liquid_phase'
 
         # Composition alphaMELTS actually solved, projected to the
