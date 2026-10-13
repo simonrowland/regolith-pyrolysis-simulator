@@ -215,6 +215,15 @@ def test_pin_headline_statistics_unchanged_by_hull() -> None:
     assert (melt["rms_dex"], melt["median_dex"], melt["median_abs_dex"]) == PIN_MELT_STATS
     assert (vapour["n"], vapour["rms_dex"], vapour["median_dex"]) == PIN_VAPOUR_STATS
     assert sorted(summary["records"][0]) == PIN_RECORD_KEYS
+    compilation = next(
+        r for r in summary["records"]
+        if r["tier"] == "compilation" and r["rail"] == "thermochemistry"
+    )
+    thermochemistry = compilation["decision_strata"][0]
+    assert compilation["match_rate_label"] == "band membership"
+    assert thermochemistry["band_value"] == []
+    assert thermochemistry["band_derived_n"] == 2
+    assert thermochemistry["no_band_reason"] == "derived_band_insufficient_n"
     assert hashlib.sha256(blob.encode("utf-8")).hexdigest() == PIN_SUMMARY_SHA256
 
 
@@ -237,7 +246,7 @@ PIN_RECORD_KEYS = [
     "n_inside_band", "n_no_band", "n_score_eligible", "rail", "rms_dex",
     "sources", "tier",
 ]
-PIN_SUMMARY_SHA256 = "4d69e72df3f0746eee27eae585d0a1142eb8b2d9bad5003ed190da1ea9478b49"
+PIN_SUMMARY_SHA256 = "62b895c1ddcd1aedb1face2fc92bd3ee5a52a3ceb6dfae05f7a7d838755de446"
 PIN_HEADLINE_LINES = (
     "| melt_activity | internal-analytical | 4 | 1 | 3 | 3 | 2 | "
     "0.3162277660168379331998893544 | 0.10 | 0.20 | 0.3 | "
