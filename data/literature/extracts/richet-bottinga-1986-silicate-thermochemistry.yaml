@@ -13,6 +13,86 @@ extraction:
 review_status: draft
 fidelity_samples:
   - species: SiO2
+    observation_id: rb86_1986_sio2_fictive_temperatures_table1
+    field: table1_values
+    value:
+      activation_energy_kJ_per_mol: 711
+      cooling_rate_ratios: [1, 100, 10000]
+      fictive_temperature_K: [1480, 1608, 1761]
+      q0_K_per_min: 20
+    locator:
+      pdf_page_index: 4
+      page: 5
+      published_page: 5
+      table: '1'
+      row: SiO2
+  - species: SiO2
+    observation_id: rb86_1986_sio2_fictive_temperatures_table1
+    field: method_statement
+    value: Assuming cooling rates in the glass transition region ranging from 20 to 2000 K/min (this interval should encompass laboratory rates obtained without special quenching devices), one calculates that the fictive temperatures of the glasses listed in Table 1 vary only from 50 to 130 K.
+    locator:
+      pdf_page_index: 4
+      page: 5
+      published_page: 5
+      table: '1'
+      row: SiO2
+  - species: K2Si4O9
+    observation_id: rb86_1986_k2si4o9_fictive_temperatures_table1
+    field: table1_values
+    value:
+      activation_energy_kJ_per_mol: 427
+      cooling_rate_ratios: [1, 100, 10000]
+      fictive_temperature_K: [720, 770, 827]
+      q0_K_per_min: 20
+    locator:
+      pdf_page_index: 4
+      page: 5
+      published_page: 5
+      table: '1'
+      row: K2Si4O9
+  - species: NaAlSi3O8
+    observation_id: rb86_1986_naalsi3o8_fictive_temperatures_table1
+    field: table1_values
+    value:
+      activation_energy_kJ_per_mol: 567
+      cooling_rate_ratios: [1, 100, 10000]
+      fictive_temperature_K: [1050, 1130, 1223]
+      q0_K_per_min: 20
+    locator:
+      pdf_page_index: 4
+      page: 5
+      published_page: 5
+      table: '1'
+      row: NaAlSi3O8
+  - species: CaAl2Si2O8
+    observation_id: rb86_1986_caal2si2o8_fictive_temperatures_table1
+    field: table1_values
+    value:
+      activation_energy_kJ_per_mol: 1046
+      cooling_rate_ratios: [1, 100, 10000]
+      fictive_temperature_K: [1129, 1178, 1231]
+      q0_K_per_min: 20
+    locator:
+      pdf_page_index: 4
+      page: 5
+      published_page: 5
+      table: '1'
+      row: CaAl2Si2O8
+  - species: CaMgSi2O6
+    observation_id: rb86_1986_camgsi2o6_fictive_temperatures_table1
+    field: table1_values
+    value:
+      activation_energy_kJ_per_mol: 900
+      cooling_rate_ratios: [1, 100, 10000]
+      fictive_temperature_K: [977, 1019, 1066]
+      q0_K_per_min: 20
+    locator:
+      pdf_page_index: 4
+      page: 5
+      published_page: 5
+      table: '1'
+      row: CaMgSi2O6
+  - species: SiO2
     observation_id: rb86_1986_sio2_cp_equation_19
     field: equation_as_printed
     value: Cp_SiO2 = 127.20 - 10.777×10^-3 T + 4.3127×10^5 T^-2 - 1463.8 T^-0.5
@@ -22,61 +102,45 @@ fidelity_samples:
       published_page: 10
       equation: '19'
   - species: Na2Si2O5
-    observation_id: rb86_1986_na2si2o5_table4_fusion_context
-    field: table4_fusion_values
-    value:
-      delta_H_f_kJ_per_mol: 37.7
-      delta_H_f_printed_width: 4.4
-      delta_S_f_J_per_mol_K: 32.9
-      delta_S_f_printed_width: 3.8
-    locator:
-      pdf_page_index: 14
-      page: 15
-      published_page: 15
-      table: '4'
-      row: Na2Si2O5
+    observation_id: rb86_1986_na2si2o5_heat_of_fusion_table4
+    field: delta_H_fus_kJ_mol-1
+    value: 37.7
+    locator: {pdf_page_index: 14, page: 15, published_page: 15, table: '4', row: Na2Si2O5, column: ΔH_f}
+  - species: Na2Si2O5
+    observation_id: rb86_1986_na2si2o5_entropy_of_fusion_table4
+    field: delta_S_fus_J_mol-1_K-1
+    value: 32.9
+    locator: {pdf_page_index: 14, page: 15, published_page: 15, table: '4', row: Na2Si2O5, column: ΔS_f}
   - species: K2Si2O5
-    observation_id: rb86_1986_k2si2o5_table4_fusion_context
-    field: table4_fusion_values
-    value:
-      delta_H_f_kJ_per_mol: 32.0
-      delta_H_f_printed_width: 4.0
-      delta_S_f_J_per_mol_K: 24.3
-      delta_S_f_printed_width: 3.0
-    locator:
-      pdf_page_index: 14
-      page: 15
-      published_page: 15
-      table: '4'
-      row: K2Si2O5
+    observation_id: rb86_1986_k2si2o5_heat_of_fusion_table4
+    field: delta_H_fus_kJ_mol-1
+    value: 32.0
+    locator: {pdf_page_index: 14, page: 15, published_page: 15, table: '4', row: K2Si2O5, column: ΔH_f}
+  - species: K2Si2O5
+    observation_id: rb86_1986_k2si2o5_entropy_of_fusion_table4
+    field: delta_S_fus_J_mol-1_K-1
+    value: 24.3
+    locator: {pdf_page_index: 14, page: 15, published_page: 15, table: '4', row: K2Si2O5, column: ΔS_f}
   - species: K2SiO3
-    observation_id: rb86_1986_k2sio3_table4_fusion_context
-    field: table4_fusion_values
-    value:
-      delta_H_f_kJ_per_mol: 19.6
-      delta_H_f_printed_width: 4.0
-      delta_S_f_J_per_mol_K: 15.7
-      delta_S_f_printed_width: 3.2
-    locator:
-      pdf_page_index: 14
-      page: 15
-      published_page: 15
-      table: '4'
-      row: K2SiO3
+    observation_id: rb86_1986_k2sio3_heat_of_fusion_table4
+    field: delta_H_fus_kJ_mol-1
+    value: 19.6
+    locator: {pdf_page_index: 14, page: 15, published_page: 15, table: '4', row: K2SiO3, column: ΔH_f}
+  - species: K2SiO3
+    observation_id: rb86_1986_k2sio3_entropy_of_fusion_table4
+    field: delta_S_fus_J_mol-1_K-1
+    value: 15.7
+    locator: {pdf_page_index: 14, page: 15, published_page: 15, table: '4', row: K2SiO3, column: ΔS_f}
   - species: MgSiO3
-    observation_id: rb86_1986_mgsio3_table4_fusion_context
-    field: table4_fusion_values
-    value:
-      delta_H_f_kJ_per_mol: 73.2
-      delta_H_f_printed_width: 6.0
-      delta_S_f_J_per_mol_K: 39.9
-      delta_S_f_printed_width: 3.3
-    locator:
-      pdf_page_index: 14
-      page: 15
-      published_page: 15
-      table: '4'
-      row: MgSiO3
+    observation_id: rb86_1986_mgsio3_heat_of_fusion_table4
+    field: delta_H_fus_kJ_mol-1
+    value: 73.2
+    locator: {pdf_page_index: 14, page: 15, published_page: 15, table: '4', row: MgSiO3, column: ΔH_f}
+  - species: MgSiO3
+    observation_id: rb86_1986_mgsio3_entropy_of_fusion_table4
+    field: delta_S_fus_J_mol-1_K-1
+    value: 39.9
+    locator: {pdf_page_index: 14, page: 15, published_page: 15, table: '4', row: MgSiO3, column: ΔS_f}
   - species: SiO2
     observation_id: rb86_1986_cristobalite_transition_table5
     field: T_m_K
@@ -139,76 +203,104 @@ fidelity_samples:
       row: Diopside
   - species: SiO2
     observation_id: rb86_1986_cristobalite_table5_entropy_context
-    field: table5_entropy_values
-    value:
-      delta_S_f_J_per_mol_K: 4.5
-      configurational_entropy_J_per_mol_K: 7.5
-    locator:
-      pdf_page_index: 15
-      page: 16
-      published_page: 16
-      table: '5'
-      row: Cristobalite
+    field: configurational_entropy_J_per_mol_K
+    value: 7.5
+    locator: {pdf_page_index: 15, page: 16, published_page: 16, table: '5', row: Cristobalite}
   - species: SiO2
     observation_id: rb86_1986_quartz_table5_entropy_context
-    field: table5_entropy_values
-    value:
-      delta_S_f_J_per_mol_K: 5.5
-      configurational_entropy_J_per_mol_K: 6.2
-    locator:
-      pdf_page_index: 15
-      page: 16
-      published_page: 16
-      table: '5'
-      row: Quartz
+    field: configurational_entropy_J_per_mol_K
+    value: 6.2
+    locator: {pdf_page_index: 15, page: 16, published_page: 16, table: '5', row: Quartz}
   - species: NaAlSi3O8
     observation_id: rb86_1986_high_albite_table5_entropy_context
-    field: table5_entropy_values
-    value:
-      delta_S_f_J_per_mol_K: 46.3
-      configurational_entropy_J_per_mol_K: 31.5
-    locator:
-      pdf_page_index: 15
-      page: 16
-      published_page: 16
-      table: '5'
-      row: High albite
+    field: configurational_entropy_J_per_mol_K
+    value: 31.5
+    locator: {pdf_page_index: 15, page: 16, published_page: 16, table: '5', row: High albite}
   - species: KAlSi3O8
     observation_id: rb86_1986_high_sanidine_table5_entropy_context
-    field: table5_entropy_values
-    value:
-      delta_S_f_J_per_mol_K: 36.0
-      configurational_entropy_J_per_mol_K: 22.2
-    locator:
-      pdf_page_index: 15
-      page: 16
-      published_page: 16
-      table: '5'
-      row: High sanidine
+    field: configurational_entropy_J_per_mol_K
+    value: 22.2
+    locator: {pdf_page_index: 15, page: 16, published_page: 16, table: '5', row: High sanidine}
   - species: CaAl2Si2O8
     observation_id: rb86_1986_anorthite_table5_entropy_context
-    field: table5_entropy_values
-    value:
-      delta_S_f_J_per_mol_K: 72.7
-      configurational_entropy_J_per_mol_K: 82.9
-    locator:
-      pdf_page_index: 15
-      page: 16
-      published_page: 16
-      table: '5'
-      row: Anorthite
+    field: configurational_entropy_J_per_mol_K
+    value: 82.9
+    locator: {pdf_page_index: 15, page: 16, published_page: 16, table: '5', row: Anorthite}
   - species: CaMgSi2O6
     observation_id: rb86_1986_diopside_table5_entropy_context
-    field: table5_entropy_values
-    value:
-      delta_S_f_J_per_mol_K: 82.5
-      configurational_entropy_J_per_mol_K: 63.4
-    locator:
-      pdf_page_index: 15
-      page: 16
-      published_page: 16
-      table: '5'
-      row: Diopside
+    field: configurational_entropy_J_per_mol_K
+    value: 63.4
+    locator: {pdf_page_index: 15, page: 16, published_page: 16, table: '5', row: Diopside}
+  - species: Na2Si2O5
+    observation_id: rb86_1986_na2si2o5_heat_of_fusion_table4
+    field: delta_H_fus_kJ_mol-1
+    value: 37.7
+    locator: {pdf_page_index: 14, page: 15, published_page: 15, table: '4', row: Na2Si2O5, column: ΔH_f}
+  - species: Na2Si2O5
+    observation_id: rb86_1986_na2si2o5_entropy_of_fusion_table4
+    field: delta_S_fus_J_mol-1_K-1
+    value: 32.9
+    locator: {pdf_page_index: 14, page: 15, published_page: 15, table: '4', row: Na2Si2O5, column: ΔS_f}
+  - species: K2Si2O5
+    observation_id: rb86_1986_k2si2o5_heat_of_fusion_table4
+    field: delta_H_fus_kJ_mol-1
+    value: 32.0
+    locator: {pdf_page_index: 14, page: 15, published_page: 15, table: '4', row: K2Si2O5, column: ΔH_f}
+  - species: K2Si2O5
+    observation_id: rb86_1986_k2si2o5_entropy_of_fusion_table4
+    field: delta_S_fus_J_mol-1_K-1
+    value: 24.3
+    locator: {pdf_page_index: 14, page: 15, published_page: 15, table: '4', row: K2Si2O5, column: ΔS_f}
+  - species: K2SiO3
+    observation_id: rb86_1986_k2sio3_heat_of_fusion_table4
+    field: delta_H_fus_kJ_mol-1
+    value: 19.6
+    locator: {pdf_page_index: 14, page: 15, published_page: 15, table: '4', row: K2SiO3, column: ΔH_f}
+  - species: K2SiO3
+    observation_id: rb86_1986_k2sio3_entropy_of_fusion_table4
+    field: delta_S_fus_J_mol-1_K-1
+    value: 15.7
+    locator: {pdf_page_index: 14, page: 15, published_page: 15, table: '4', row: K2SiO3, column: ΔS_f}
+  - species: MgSiO3
+    observation_id: rb86_1986_mgsio3_heat_of_fusion_table4
+    field: delta_H_fus_kJ_mol-1
+    value: 73.2
+    locator: {pdf_page_index: 14, page: 15, published_page: 15, table: '4', row: MgSiO3, column: ΔH_f}
+  - species: MgSiO3
+    observation_id: rb86_1986_mgsio3_entropy_of_fusion_table4
+    field: delta_S_fus_J_mol-1_K-1
+    value: 39.9
+    locator: {pdf_page_index: 14, page: 15, published_page: 15, table: '4', row: MgSiO3, column: ΔS_f}
+  - species: SiO2
+    observation_id: rb86_1986_cristobalite_entropy_of_fusion_table5
+    field: delta_S_fus_J_mol-1_K-1
+    value: 4.5
+    locator: {pdf_page_index: 15, page: 16, published_page: 16, table: '5', row: Cristobalite, column: ΔS_f}
+  - species: SiO2
+    observation_id: rb86_1986_quartz_entropy_of_fusion_table5
+    field: delta_S_fus_J_mol-1_K-1
+    value: 5.5
+    locator: {pdf_page_index: 15, page: 16, published_page: 16, table: '5', row: Quartz, column: ΔS_f}
+  - species: NaAlSi3O8
+    observation_id: rb86_1986_high_albite_entropy_of_fusion_table5
+    field: delta_S_fus_J_mol-1_K-1
+    value: 46.3
+    locator: {pdf_page_index: 15, page: 16, published_page: 16, table: '5', row: High albite, column: ΔS_f}
+  - species: KAlSi3O8
+    observation_id: rb86_1986_high_sanidine_entropy_of_fusion_table5
+    field: delta_S_fus_J_mol-1_K-1
+    value: 36.0
+    locator: {pdf_page_index: 15, page: 16, published_page: 16, table: '5', row: High sanidine, column: ΔS_f}
+  - species: CaAl2Si2O8
+    observation_id: rb86_1986_anorthite_entropy_of_fusion_table5
+    field: delta_S_fus_J_mol-1_K-1
+    value: 72.7
+    locator: {pdf_page_index: 15, page: 16, published_page: 16, table: '5', row: Anorthite, column: ΔS_f}
+  - species: CaMgSi2O6
+    observation_id: rb86_1986_diopside_entropy_of_fusion_table5
+    field: delta_S_fus_J_mol-1_K-1
+    value: 82.5
+    locator: {pdf_page_index: 15, page: 16, published_page: 16, table: '5', row: Diopside, column: ΔS_f}
 species:
   SiO2:
     observations:
@@ -221,7 +313,8 @@ species:
           table: '5'
           row: Cristobalite
           column: T_f (K)
-        phase: cristobalite
+        phase: cr
+        polymorph_as_stated: Cristobalite
         units: K
         values:
           quantity: transition_temperature
@@ -237,14 +330,68 @@ species:
           table: '5'
           row: Quartz
           column: T_f (K)
-        phase: quartz
+        phase: cr
+        condensed_form: {state: crystalline, polymorph: quartz, basis: explicit_author}
         units: K
         values:
           quantity: transition_temperature
           method_class: quoted_attributed
           T_m_K: 1700
           attribution: Richet et al. [1982]
+      - observation_id: rb86_1986_cristobalite_entropy_of_fusion_table5
+        type: heat_capacity_and_heat_content_series
+        locator:
+          pdf_page_index: 15
+          page: 16
+          published_page: 16
+          table: '5'
+          row: Cristobalite
+          column: ΔS_f
+        phase: cr
+        polymorph_as_stated: Cristobalite
+        units: J/mol K
+        values:
+          quantity: entropy_of_fusion
+          method_class: quoted_attributed
+          delta_S_fus_J_mol-1_K-1: 4.5
+          attribution: Richet et al. [1982]
+      - observation_id: rb86_1986_quartz_entropy_of_fusion_table5
+        type: heat_capacity_and_heat_content_series
+        locator:
+          pdf_page_index: 15
+          page: 16
+          published_page: 16
+          table: '5'
+          row: Quartz
+          column: ΔS_f
+        phase: cr
+        condensed_form: {state: crystalline, polymorph: quartz, basis: explicit_author}
+        units: J/mol K
+        values:
+          quantity: entropy_of_fusion
+          method_class: quoted_attributed
+          delta_S_fus_J_mol-1_K-1: 5.5
+          attribution: Richet et al. [1982]
     context:
+      - observation_id: rb86_1986_sio2_fictive_temperatures_table1
+        type: thermochemical_values
+        locator:
+          pdf_page_index: 4
+          page: 5
+          published_page: 5
+          table: '1'
+          row: SiO2
+        units: K
+        values:
+          method_class: model_derived
+          quantity: fictive temperatures calculated at cooling-rate ratios
+          table1_values:
+            activation_energy_kJ_per_mol: 711
+            cooling_rate_ratios: [1, 100, 10000]
+            fictive_temperature_K: [1480, 1608, 1761]
+            q0_K_per_min: 20
+          method_statement: Assuming cooling rates in the glass transition region ranging from 20 to 2000 K/min (this interval should encompass laboratory rates obtained without special quenching devices), one calculates that the fictive temperatures of the glasses listed in Table 1 vary only from 50 to 130 K.
+          activation_energy_attribution: Richet and Bottinga [1984a,b]
       - observation_id: rb86_1986_sio2_cp_equation_19
         type: heat_capacity_model
         locator:
@@ -276,10 +423,9 @@ species:
         units: J per mol K
         values:
           method_class: model_derived
-          quantity: entropy of fusion and liquid configurational entropy at T_f
-          table5_entropy_values:
-            delta_S_f_J_per_mol_K: 4.5
-            configurational_entropy_J_per_mol_K: 7.5
+          quantity: liquid configurational entropy at T_f
+          configurational_entropy_J_per_mol_K: 7.5
+          model: Equation (25); data sources are given in the caption of Figure 10.
           inputs: values and Cp data identified in Figure 10 caption
       - observation_id: rb86_1986_quartz_table5_entropy_context
         type: thermochemical_values
@@ -292,11 +438,31 @@ species:
         units: J per mol K
         values:
           method_class: model_derived
-          quantity: entropy of fusion and liquid configurational entropy at T_f
-          table5_entropy_values:
-            delta_S_f_J_per_mol_K: 5.5
-            configurational_entropy_J_per_mol_K: 6.2
+          quantity: liquid configurational entropy at T_f
+          configurational_entropy_J_per_mol_K: 6.2
+          model: Equation (25); data sources are given in the caption of Figure 10.
           inputs: values and Cp data identified in Figure 10 caption
+  K2Si4O9:
+    observations: []
+    context:
+      - observation_id: rb86_1986_k2si4o9_fictive_temperatures_table1
+        type: thermochemical_values
+        locator:
+          pdf_page_index: 4
+          page: 5
+          published_page: 5
+          table: '1'
+          row: K2Si4O9
+        units: K
+        values:
+          method_class: model_derived
+          quantity: fictive temperatures calculated at cooling-rate ratios
+          table1_values:
+            activation_energy_kJ_per_mol: 427
+            cooling_rate_ratios: [1, 100, 10000]
+            fictive_temperature_K: [720, 770, 827]
+            q0_K_per_min: 20
+          activation_energy_attribution: Richet and Bottinga [1984a,b]
   Na2Si2O5:
     observations:
       - observation_id: rb86_1986_na2si2o5_transition_table4
@@ -308,36 +474,47 @@ species:
           table: '4'
           row: Na2Si2O5
           column: T_f (K)
+        phase: cr
         units: K
         values:
           quantity: transition_temperature
-          method_class: model_derived
+          method_class: authors_estimate
           T_m_K: 1147
-          derived_from: [tables:richet-bottinga-1986-silicate-thermochemistry]
-          derivation:
-            relation: Equation (23) solution-calorimetry appendix calculation
-            inputs: [authors' appendix calculation, heat-capacity corrections]
-    context:
-      - observation_id: rb86_1986_na2si2o5_table4_fusion_context
-        type: thermochemical_values
+          model: In this appendix we use the model of Richet and Bottinga [1982] for Cpg and that of Richet and Bottinga [1985] for Cpl to calculate with equation (23) the enthalpies of fusion of some silicates of geological or theoretical interest.
+      - observation_id: rb86_1986_na2si2o5_heat_of_fusion_table4
+        type: heat_capacity_and_heat_content_series
         locator:
           pdf_page_index: 14
           page: 15
           published_page: 15
           table: '4'
           row: Na2Si2O5
-          columns: ΔH_f and ΔS_f
-        units: kJ per mol and J per mol K
+          column: ΔH_f
+        phase: cr
+        units: kJ/mol
         values:
-          method_class: model_derived
-          quantity: heat of fusion and entropy of fusion
-          table4_fusion_values:
-            delta_H_f_kJ_per_mol: 37.7
-            delta_H_f_printed_width: 4.4
-            delta_S_f_J_per_mol_K: 32.9
-            delta_S_f_printed_width: 3.8
-          procedure: drop calorimetry plus solution calorimetry, as indicated in Table 4
-          inputs: authors' appendix calculation with heat-capacity corrections
+          method_class: authors_estimate
+          quantity: heat_of_fusion
+          delta_H_fus_kJ_mol-1: 37.7
+          model: In this appendix we use the model of Richet and Bottinga [1982] for Cpg and that of Richet and Bottinga [1985] for Cpl to calculate with equation (23) the enthalpies of fusion of some silicates of geological or theoretical interest.
+        uncertainty: {reported_status: printed, value: 4.4, units: kJ/mol}
+      - observation_id: rb86_1986_na2si2o5_entropy_of_fusion_table4
+        type: heat_capacity_and_heat_content_series
+        locator:
+          pdf_page_index: 14
+          page: 15
+          published_page: 15
+          table: '4'
+          row: Na2Si2O5
+          column: ΔS_f
+        phase: cr
+        units: J/mol K
+        values:
+          method_class: authors_estimate
+          quantity: entropy_of_fusion
+          delta_S_fus_J_mol-1_K-1: 32.9
+          model: ΔS_f = ΔH_f/T_f
+        uncertainty: {reported_status: printed, value: 3.8, units: J/mol K}
   K2Si2O5:
     observations:
       - observation_id: rb86_1986_k2si2o5_transition_table4
@@ -349,36 +526,47 @@ species:
           table: '4'
           row: K2Si2O5
           column: T_f (K)
+        phase: cr
         units: K
         values:
           quantity: transition_temperature
-          method_class: model_derived
+          method_class: authors_estimate
           T_m_K: 1318
-          derived_from: [tables:richet-bottinga-1986-silicate-thermochemistry]
-          derivation:
-            relation: Equation (23) solution-calorimetry appendix calculation
-            inputs: [authors' appendix calculation, heat-capacity corrections]
-    context:
-      - observation_id: rb86_1986_k2si2o5_table4_fusion_context
-        type: thermochemical_values
+          model: In this appendix we use the model of Richet and Bottinga [1982] for Cpg and that of Richet and Bottinga [1985] for Cpl to calculate with equation (23) the enthalpies of fusion of some silicates of geological or theoretical interest.
+      - observation_id: rb86_1986_k2si2o5_heat_of_fusion_table4
+        type: heat_capacity_and_heat_content_series
         locator:
           pdf_page_index: 14
           page: 15
           published_page: 15
           table: '4'
           row: K2Si2O5
-          columns: ΔH_f and ΔS_f
-        units: kJ per mol and J per mol K
+          column: ΔH_f
+        phase: cr
+        units: kJ/mol
         values:
-          method_class: model_derived
-          quantity: heat of fusion and entropy of fusion
-          table4_fusion_values:
-            delta_H_f_kJ_per_mol: 32.0
-            delta_H_f_printed_width: 4.0
-            delta_S_f_J_per_mol_K: 24.3
-            delta_S_f_printed_width: 3.0
-          procedure: drop calorimetry plus solution calorimetry, as indicated in Table 4
-          inputs: authors' appendix calculation with heat-capacity corrections
+          method_class: authors_estimate
+          quantity: heat_of_fusion
+          delta_H_fus_kJ_mol-1: 32.0
+          model: In this appendix we use the model of Richet and Bottinga [1982] for Cpg and that of Richet and Bottinga [1985] for Cpl to calculate with equation (23) the enthalpies of fusion of some silicates of geological or theoretical interest.
+        uncertainty: {reported_status: printed, value: 4.0, units: kJ/mol}
+      - observation_id: rb86_1986_k2si2o5_entropy_of_fusion_table4
+        type: heat_capacity_and_heat_content_series
+        locator:
+          pdf_page_index: 14
+          page: 15
+          published_page: 15
+          table: '4'
+          row: K2Si2O5
+          column: ΔS_f
+        phase: cr
+        units: J/mol K
+        values:
+          method_class: authors_estimate
+          quantity: entropy_of_fusion
+          delta_S_fus_J_mol-1_K-1: 24.3
+          model: ΔS_f = ΔH_f/T_f
+        uncertainty: {reported_status: printed, value: 3.0, units: J/mol K}
   K2SiO3:
     observations:
       - observation_id: rb86_1986_k2sio3_transition_table4
@@ -390,36 +578,47 @@ species:
           table: '4'
           row: K2SiO3
           column: T_f (K)
+        phase: cr
         units: K
         values:
           quantity: transition_temperature
-          method_class: model_derived
+          method_class: authors_estimate
           T_m_K: 1249
-          derived_from: [tables:richet-bottinga-1986-silicate-thermochemistry]
-          derivation:
-            relation: Equation (23) solution-calorimetry appendix calculation
-            inputs: [authors' appendix calculation, heat-capacity corrections]
-    context:
-      - observation_id: rb86_1986_k2sio3_table4_fusion_context
-        type: thermochemical_values
+          model: In this appendix we use the model of Richet and Bottinga [1982] for Cpg and that of Richet and Bottinga [1985] for Cpl to calculate with equation (23) the enthalpies of fusion of some silicates of geological or theoretical interest.
+      - observation_id: rb86_1986_k2sio3_heat_of_fusion_table4
+        type: heat_capacity_and_heat_content_series
         locator:
           pdf_page_index: 14
           page: 15
           published_page: 15
           table: '4'
           row: K2SiO3
-          columns: ΔH_f and ΔS_f
-        units: kJ per mol and J per mol K
+          column: ΔH_f
+        phase: cr
+        units: kJ/mol
         values:
-          method_class: model_derived
-          quantity: heat of fusion and entropy of fusion
-          table4_fusion_values:
-            delta_H_f_kJ_per_mol: 19.6
-            delta_H_f_printed_width: 4.0
-            delta_S_f_J_per_mol_K: 15.7
-            delta_S_f_printed_width: 3.2
-          procedure: drop calorimetry plus solution calorimetry, as indicated in Table 4
-          inputs: authors' appendix calculation with heat-capacity corrections
+          method_class: authors_estimate
+          quantity: heat_of_fusion
+          delta_H_fus_kJ_mol-1: 19.6
+          model: In this appendix we use the model of Richet and Bottinga [1982] for Cpg and that of Richet and Bottinga [1985] for Cpl to calculate with equation (23) the enthalpies of fusion of some silicates of geological or theoretical interest.
+        uncertainty: {reported_status: printed, value: 4.0, units: kJ/mol}
+      - observation_id: rb86_1986_k2sio3_entropy_of_fusion_table4
+        type: heat_capacity_and_heat_content_series
+        locator:
+          pdf_page_index: 14
+          page: 15
+          published_page: 15
+          table: '4'
+          row: K2SiO3
+          column: ΔS_f
+        phase: cr
+        units: J/mol K
+        values:
+          method_class: authors_estimate
+          quantity: entropy_of_fusion
+          delta_S_fus_J_mol-1_K-1: 15.7
+          model: ΔS_f = ΔH_f/T_f
+        uncertainty: {reported_status: printed, value: 3.2, units: J/mol K}
   MgSiO3:
     observations:
       - observation_id: rb86_1986_mgsio3_transition_table4
@@ -431,37 +630,48 @@ species:
           table: '4'
           row: MgSiO3
           column: T_f (K)
-        phase: metastable congruent melting
+        phase: cr
+        phase_as_stated: metastable congruent melting
         units: K
         values:
           quantity: transition_temperature
-          method_class: model_derived
+          method_class: authors_estimate
           T_m_K: 1834
-          derived_from: [tables:richet-bottinga-1986-silicate-thermochemistry]
-          derivation:
-            relation: Equation (23) solution-calorimetry appendix calculation
-            inputs: [authors' appendix calculation, heat-capacity corrections]
-    context:
-      - observation_id: rb86_1986_mgsio3_table4_fusion_context
-        type: thermochemical_values
+          model: In this appendix we use the model of Richet and Bottinga [1982] for Cpg and that of Richet and Bottinga [1985] for Cpl to calculate with equation (23) the enthalpies of fusion of some silicates of geological or theoretical interest.
+      - observation_id: rb86_1986_mgsio3_heat_of_fusion_table4
+        type: heat_capacity_and_heat_content_series
         locator:
           pdf_page_index: 14
           page: 15
           published_page: 15
           table: '4'
           row: MgSiO3
-          columns: ΔH_f and ΔS_f
-        units: kJ per mol and J per mol K
+          column: ΔH_f
+        phase: cr
+        units: kJ/mol
         values:
-          method_class: model_derived
-          quantity: heat of fusion and entropy of fusion
-          table4_fusion_values:
-            delta_H_f_kJ_per_mol: 73.2
-            delta_H_f_printed_width: 6.0
-            delta_S_f_J_per_mol_K: 39.9
-            delta_S_f_printed_width: 3.3
-          procedure: drop calorimetry plus solution calorimetry, as indicated in Table 4
-          inputs: authors' appendix calculation with heat-capacity corrections
+          method_class: authors_estimate
+          quantity: heat_of_fusion
+          delta_H_fus_kJ_mol-1: 73.2
+          model: In this appendix we use the model of Richet and Bottinga [1982] for Cpg and that of Richet and Bottinga [1985] for Cpl to calculate with equation (23) the enthalpies of fusion of some silicates of geological or theoretical interest.
+        uncertainty: {reported_status: printed, value: 6.0, units: kJ/mol}
+      - observation_id: rb86_1986_mgsio3_entropy_of_fusion_table4
+        type: heat_capacity_and_heat_content_series
+        locator:
+          pdf_page_index: 14
+          page: 15
+          published_page: 15
+          table: '4'
+          row: MgSiO3
+          column: ΔS_f
+        phase: cr
+        units: J/mol K
+        values:
+          method_class: authors_estimate
+          quantity: entropy_of_fusion
+          delta_S_fus_J_mol-1_K-1: 39.9
+          model: ΔS_f = ΔH_f/T_f
+        uncertainty: {reported_status: printed, value: 3.3, units: J/mol K}
   NaAlSi3O8:
     observations:
       - observation_id: rb86_1986_high_albite_transition_table5
@@ -473,12 +683,30 @@ species:
           table: '5'
           row: High albite
           column: T_f (K)
-        phase: high albite
+        phase: cr
+        polymorph_as_stated: High albite
         units: K
         values:
           quantity: transition_temperature
           method_class: quoted_attributed
           T_m_K: 1393
+          attribution: Richet and Bottinga [1984a]
+      - observation_id: rb86_1986_high_albite_entropy_of_fusion_table5
+        type: heat_capacity_and_heat_content_series
+        locator:
+          pdf_page_index: 15
+          page: 16
+          published_page: 16
+          table: '5'
+          row: High albite
+          column: ΔS_f
+        phase: cr
+        polymorph_as_stated: High albite
+        units: J/mol K
+        values:
+          quantity: entropy_of_fusion
+          method_class: quoted_attributed
+          delta_S_fus_J_mol-1_K-1: 46.3
           attribution: Richet and Bottinga [1984a]
     context:
       - observation_id: rb86_1986_high_albite_table5_entropy_context
@@ -492,11 +720,28 @@ species:
         units: J per mol K
         values:
           method_class: model_derived
-          quantity: entropy of fusion and liquid configurational entropy at T_f
-          table5_entropy_values:
-            delta_S_f_J_per_mol_K: 46.3
-            configurational_entropy_J_per_mol_K: 31.5
+          quantity: liquid configurational entropy at T_f
+          configurational_entropy_J_per_mol_K: 31.5
+          model: Equation (25); data sources are given in the caption of Figure 10.
           inputs: values and Cp data identified in Figure 10 caption
+      - observation_id: rb86_1986_naalsi3o8_fictive_temperatures_table1
+        type: thermochemical_values
+        locator:
+          pdf_page_index: 4
+          page: 5
+          published_page: 5
+          table: '1'
+          row: NaAlSi3O8
+        units: K
+        values:
+          method_class: model_derived
+          quantity: fictive temperatures calculated at cooling-rate ratios
+          table1_values:
+            activation_energy_kJ_per_mol: 567
+            cooling_rate_ratios: [1, 100, 10000]
+            fictive_temperature_K: [1050, 1130, 1223]
+            q0_K_per_min: 20
+          activation_energy_attribution: Richet and Bottinga [1984a,b]
   KAlSi3O8:
     observations:
       - observation_id: rb86_1986_high_sanidine_transition_table5
@@ -508,12 +753,30 @@ species:
           table: '5'
           row: High sanidine
           column: T_f (K)
-        phase: high sanidine
+        phase: cr
+        polymorph_as_stated: High sanidine
         units: K
         values:
           quantity: transition_temperature
           method_class: quoted_attributed
           T_m_K: 1500
+          attribution: Richet and Bottinga [1984a]
+      - observation_id: rb86_1986_high_sanidine_entropy_of_fusion_table5
+        type: heat_capacity_and_heat_content_series
+        locator:
+          pdf_page_index: 15
+          page: 16
+          published_page: 16
+          table: '5'
+          row: High sanidine
+          column: ΔS_f
+        phase: cr
+        polymorph_as_stated: High sanidine
+        units: J/mol K
+        values:
+          quantity: entropy_of_fusion
+          method_class: quoted_attributed
+          delta_S_fus_J_mol-1_K-1: 36.0
           attribution: Richet and Bottinga [1984a]
     context:
       - observation_id: rb86_1986_high_sanidine_table5_entropy_context
@@ -527,10 +790,9 @@ species:
         units: J per mol K
         values:
           method_class: model_derived
-          quantity: entropy of fusion and liquid configurational entropy at T_f
-          table5_entropy_values:
-            delta_S_f_J_per_mol_K: 36.0
-            configurational_entropy_J_per_mol_K: 22.2
+          quantity: liquid configurational entropy at T_f
+          configurational_entropy_J_per_mol_K: 22.2
+          model: Equation (25); data sources are given in the caption of Figure 10.
           inputs: values and Cp data identified in Figure 10 caption
   CaAl2Si2O8:
     observations:
@@ -543,13 +805,31 @@ species:
           table: '5'
           row: Anorthite
           column: T_f (K)
-        phase: anorthite
+        phase: cr
+        condensed_form: {state: crystalline, polymorph: anorthite, basis: explicit_author}
         units: K
         values:
           quantity: transition_temperature
           method_class: quoted_attributed
           T_m_K: 1830
           attribution: Weill et al. [1980]
+      - observation_id: rb86_1986_anorthite_entropy_of_fusion_table5
+        type: heat_capacity_and_heat_content_series
+        locator:
+          pdf_page_index: 15
+          page: 16
+          published_page: 16
+          table: '5'
+          row: Anorthite
+          column: ΔS_f
+        phase: cr
+        condensed_form: {state: crystalline, polymorph: anorthite, basis: explicit_author}
+        units: J/mol K
+        values:
+          quantity: entropy_of_fusion
+          method_class: quoted_attributed
+          delta_S_fus_J_mol-1_K-1: 72.7
+          attribution: Richet and Bottinga [1984b]
     context:
       - observation_id: rb86_1986_anorthite_table5_entropy_context
         type: thermochemical_values
@@ -562,11 +842,28 @@ species:
         units: J per mol K
         values:
           method_class: model_derived
-          quantity: entropy of fusion and liquid configurational entropy at T_f
-          table5_entropy_values:
-            delta_S_f_J_per_mol_K: 72.7
-            configurational_entropy_J_per_mol_K: 82.9
+          quantity: liquid configurational entropy at T_f
+          configurational_entropy_J_per_mol_K: 82.9
+          model: Equation (25); data sources are given in the caption of Figure 10.
           inputs: values and Cp data identified in Figure 10 caption
+      - observation_id: rb86_1986_caal2si2o8_fictive_temperatures_table1
+        type: thermochemical_values
+        locator:
+          pdf_page_index: 4
+          page: 5
+          published_page: 5
+          table: '1'
+          row: CaAl2Si2O8
+        units: K
+        values:
+          method_class: model_derived
+          quantity: fictive temperatures calculated at cooling-rate ratios
+          table1_values:
+            activation_energy_kJ_per_mol: 1046
+            cooling_rate_ratios: [1, 100, 10000]
+            fictive_temperature_K: [1129, 1178, 1231]
+            q0_K_per_min: 20
+          activation_energy_attribution: Richet and Bottinga [1984a,b]
   CaMgSi2O6:
     observations:
       - observation_id: rb86_1986_diopside_transition_table5
@@ -578,12 +875,30 @@ species:
           table: '5'
           row: Diopside
           column: T_f (K)
-        phase: diopside
+        phase: cr
+        polymorph_as_stated: Diopside
         units: K
         values:
           quantity: transition_temperature
           method_class: quoted_attributed
           T_m_K: 1670
+          attribution: Richet and Bottinga [1984b]
+      - observation_id: rb86_1986_diopside_entropy_of_fusion_table5
+        type: heat_capacity_and_heat_content_series
+        locator:
+          pdf_page_index: 15
+          page: 16
+          published_page: 16
+          table: '5'
+          row: Diopside
+          column: ΔS_f
+        phase: cr
+        polymorph_as_stated: Diopside
+        units: J/mol K
+        values:
+          quantity: entropy_of_fusion
+          method_class: quoted_attributed
+          delta_S_fus_J_mol-1_K-1: 82.5
           attribution: Richet and Bottinga [1984b]
     context:
       - observation_id: rb86_1986_diopside_table5_entropy_context
@@ -597,8 +912,25 @@ species:
         units: J per mol K
         values:
           method_class: model_derived
-          quantity: entropy of fusion and liquid configurational entropy at T_f
-          table5_entropy_values:
-            delta_S_f_J_per_mol_K: 82.5
-            configurational_entropy_J_per_mol_K: 63.4
+          quantity: liquid configurational entropy at T_f
+          configurational_entropy_J_per_mol_K: 63.4
+          model: Equation (25); data sources are given in the caption of Figure 10.
           inputs: values and Cp data identified in Figure 10 caption
+      - observation_id: rb86_1986_camgsi2o6_fictive_temperatures_table1
+        type: thermochemical_values
+        locator:
+          pdf_page_index: 4
+          page: 5
+          published_page: 5
+          table: '1'
+          row: CaMgSi2O6
+        units: K
+        values:
+          method_class: model_derived
+          quantity: fictive temperatures calculated at cooling-rate ratios
+          table1_values:
+            activation_energy_kJ_per_mol: 900
+            cooling_rate_ratios: [1, 100, 10000]
+            fictive_temperature_K: [977, 1019, 1066]
+            q0_K_per_min: 20
+          activation_energy_attribution: Richet and Bottinga [1984a,b]
