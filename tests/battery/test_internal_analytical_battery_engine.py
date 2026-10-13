@@ -88,12 +88,15 @@ def test_internal_analytical_cell_reports_activity_not_gamma() -> None:
     assert cell.activities_standard_state == benchmark_standard_state
 
 
-@pytest.mark.parametrize("formula", ["SiO2", "Na2O"])
-def test_internal_analytical_scores_parent_oxide_activity(formula: str) -> None:
+def test_internal_analytical_scores_multi_cation_parent_activity(monkeypatch) -> None:
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery._call_with_hard_timeout",
+        lambda call, _timeout: call(),
+    )
     experiment, bench, observation = _case(
         composition=_composition(("SiO2", "0.6"), ("Na2O", "0.4")),
         oxygen=Decimal("-10"),
-        formula=formula,
+        formula="Na2O",
     )
     observation = replace(
         observation,
@@ -111,11 +114,39 @@ def test_internal_analytical_scores_parent_oxide_activity(formula: str) -> None:
     )
 
     assert prediction.value is not None, prediction.refusal_detail
-    assert prediction.identity.species.formula == formula
+    assert prediction.identity.species.formula == "Na2O"
     assert prediction.refusal_reason is None
 
+    from simulator.battery.generators.bench import activity_request_for_engine
 
-def test_internal_analytical_forwards_supplied_oxygen_without_redox() -> None:
+    request = activity_request_for_engine(experiment, observation, "internal-analytical")
+    assert request is not None and request.payload is not None
+    handle = open_battery_engine("internal-analytical")
+    direct = handle.backend.equilibrate(
+        temperature_C=request.payload["temperature_C"],
+        composition_mol=request.payload["composition_mol"],
+        fO2_log=request.payload["fO2_log"],
+        po2_request=Po2Request(mode=PO2_COMMANDED, po2_bar=1e-10),
+    )
+    diagnostic = direct.diagnostics["vapor_pressure_diagnostic"]
+    owner_record = next(
+        record
+        for record in diagnostic["vapor_pressure_numerator_provenance"].values()
+        if record.get("melt_oxide_parent_formula") == "Na2O"
+    )
+    assert float(prediction.value) == pytest.approx(
+        owner_record["melt_parent_oxide_activity"], rel=1e-12,
+    )
+    assert owner_record["melt_parent_oxide_activity"] != owner_record[
+        "melt_oxide_activity"
+    ]
+
+
+def test_internal_analytical_forwards_supplied_oxygen_without_redox(monkeypatch) -> None:
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery._call_with_hard_timeout",
+        lambda call, _timeout: call(),
+    )
     experiment, bench, observation = _case(
         composition=_composition(("SiO2", "0.6"), ("Na2O", "0.4")),
         oxygen=Decimal("-10"),
