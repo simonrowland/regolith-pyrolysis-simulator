@@ -32,9 +32,78 @@ fidelity_samples:
       - {series: Di-Co, melt: Di85Co15, ln_relative_gamma_as_printed: '0.04(3)', reduced_chi_squared_as_printed: '3.9', composition_as_printed: '85 wt% CaMgSi2O6 and 15 wt% AlO1.5'}
       - {series: Di-Co, melt: Di80Co20, ln_relative_gamma_as_printed: '0.09(3)', reduced_chi_squared_as_printed: '1.1', composition_as_printed: '80 wt% CaMgSi2O6 and 20 wt% AlO1.5'}
     locator: {page: 4, published_page: 500, pdf_page_index: 3, table: '1'}
+  - species: NaO0.5
+    observation_id: oneill_2005_fig2_measured_solubility_figure_only
+    field: caption
+    value: >-
+      FIGURE 2. Solubility of NaO0.5 in AD6 compositions relative to that in
+      the ADeu “reference” composition. The experiment with the highest
+      NaO0.5 was produced with pure Na2SiO3 in the reservoir at fO2 = 10−6.7
+      bars; most other runs were done in air. Solid curves are best fits for
+      AD + Qz and AD + Wo compositions to Equation 5, omitting the highest
+      Na datum. The dashed curves are from Equation 6, and include the
+      highest Na datum.
+    locator: {page: 3, published_page: 499, pdf_page_index: 2, figure: '2'}
+  - species: NaO0.5
+    observation_id: oneill_2005_fig3_measured_solubility_figure_only
+    field: caption
+    value: >-
+      FIGURE 3. The effect of AlO1.5 on the solubility of NaO0.5 in
+      compositions on the join Di-Cor. The transition from melts with molar
+      Na/Al < 1 (peraluminous) to Na/Al > 1 (peralkaline) is indicated by
+      the dashed curve. There appears to be no effect on the solubility of
+      NaO0.5 on crossing this compositional threshold. Two compositions
+      from B18/6/03 were lost.
+    locator: {page: 4, published_page: 500, pdf_page_index: 3, figure: '3'}
 species:
   NaO0.5:
-    observations: []
+    observations:
+      - observation_id: oneill_2005_fig2_measured_solubility_figure_only
+        type: concentration_series
+        locator: {page: 3, published_page: 499, pdf_page_index: 2, figure: '2'}
+        T_range_K: [1673.15, 1673.15]
+        phase: condensed_liquid
+        regime: quench_equilibration
+        units: mole fraction as printed on axes
+        values:
+          method_class: figure_only
+          admission_status: figure_only
+          semantics: bound_not_point_ordering
+          caption: >-
+            FIGURE 2. Solubility of NaO0.5 in AD6 compositions relative to that in
+            the ADeu “reference” composition. The experiment with the highest
+            NaO0.5 was produced with pure Na2SiO3 in the reservoir at fO2 = 10−6.7
+            bars; most other runs were done in air. Solid curves are best fits for
+            AD + Qz and AD + Wo compositions to Equation 5, omitting the highest
+            Na datum. The dashed curves are from Equation 6, and include the
+            highest Na datum.
+          note: >-
+            Axes: X_NaO0.5 (mole fraction) against X_NaO0.5^ADeu (mole fraction),
+            at 1400 °C. The highest-Na run used the stated Na2SiO3 reservoir and
+            fO2; most other runs were in air. Not digitised. T = 1400 °C is
+            converted as T_K = T_C + 273.15 = 1673.15 K.
+      - observation_id: oneill_2005_fig3_measured_solubility_figure_only
+        type: concentration_series
+        locator: {page: 4, published_page: 500, pdf_page_index: 3, figure: '3'}
+        T_range_K: [1673.15, 1673.15]
+        phase: condensed_liquid
+        regime: quench_equilibration
+        units: mole fraction as printed on axes
+        values:
+          method_class: figure_only
+          admission_status: figure_only
+          semantics: bound_not_point_ordering
+          caption: >-
+            FIGURE 3. The effect of AlO1.5 on the solubility of NaO0.5 in
+            compositions on the join Di-Cor. The transition from melts with molar
+            Na/Al < 1 (peraluminous) to Na/Al > 1 (peralkaline) is indicated by
+            the dashed curve. There appears to be no effect on the solubility of
+            NaO0.5 on crossing this compositional threshold. Two compositions
+            from B18/6/03 were lost.
+          note: >-
+            Axes: X_NaO0.5 (mole fraction) against X_AlO1.5^o (mole fraction in
+            the Na-free starting composition), at 1400 °C. Data were not
+            digitised. T = 1400 °C is converted as T_K = T_C + 273.15 = 1673.15 K.
     context:
       - observation_id: oneill_2005_table1_relative_log_coefficients
         type: experiment_series
