@@ -9802,6 +9802,7 @@ def test_transition_temperature_refuses_before_generic_engine_pot(
         "quantity": Quantity.TRANSITION_TEMPERATURE.value,
     }
 
+
     for prediction in predictions.values():
         assert prediction.value is None
         assert prediction.unit is None
@@ -9829,4 +9830,30 @@ def test_transition_temperature_refuses_before_generic_engine_pot(
     assert prediction.refusal_detail == {
         "reason": "quantity_not_predicted",
         "quantity": Quantity.TRANSITION_TEMPERATURE.value,
+    }
+
+
+@pytest.mark.parametrize(
+    "quantity",
+    [Quantity.ENTHALPY_OF_FUSION, Quantity.ENTROPY_OF_FUSION],
+)
+def test_fusion_quantities_are_cleanly_refused_by_engine_scorer(quantity) -> None:
+    identity = Identity(
+        quantity=quantity,
+        species=Species("Na", Phase.CR),
+        temperature_K=State.of(Decimal("1200")),
+        subtype=State.of("solid_to_liquid"),
+    )
+    observation = F.observation(
+        f"fusion::{quantity.value}", "fusion-work", identity, Decimal("12")
+    )
+
+    prediction = predict_with_engine(Engine.MAGEMIN, observation)
+
+    assert prediction.value is None
+    assert prediction.execution.state is ExecutionState.UNSUPPORTED
+    assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+    assert prediction.refusal_detail == {
+        "reason": "quantity_not_predicted",
+        "quantity": quantity.value,
     }

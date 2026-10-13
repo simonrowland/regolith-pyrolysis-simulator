@@ -65,6 +65,7 @@ from simulator.battery.enums import (
     Authority,
     EvidenceClass,
     ExperimentKind,
+    FUSION_QUANTITIES,
     FO2Channel,
     IdentityEqualKind,
     MEASURED_EVIDENCE,
@@ -7615,6 +7616,16 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
         "minus_delta_H_cool_kJ_mol-1",
         "value",
     ),
+    Quantity.ENTHALPY_OF_FUSION: (
+        "delta_H_fus_kJ_mol-1",
+        "delta_H_fusion_kJ_mol",
+        "value",
+    ),
+    Quantity.ENTROPY_OF_FUSION: (
+        "delta_S_fus_J_mol-1_K-1",
+        "delta_S_fusion_J_mol_K",
+        "value",
+    ),
     Quantity.DELTA_FH: (
         "delta_h",
         "delta_f_H",
@@ -7847,6 +7858,8 @@ def _convert_compilation_amount(
             Quantity.CP,
             Quantity.S,
             Quantity.H_MINUS_H298,
+            Quantity.ENTHALPY_OF_FUSION,
+            Quantity.ENTROPY_OF_FUSION,
             Quantity.DELTA_FH,
             Quantity.DELTA_FG,
         }:
@@ -7856,15 +7869,30 @@ def _convert_compilation_amount(
         return amount, "as_published"
     token = re.sub(r"\s+", "", str(unit).lower()).replace("·", "")
     token = token.replace(".", "").replace("deg-", "deg").replace("_", "")
-    energy = quantity in {Quantity.H_MINUS_H298, Quantity.DELTA_FH, Quantity.DELTA_FG}
-    heat = quantity in {Quantity.CP, Quantity.S}
+    if quantity in FUSION_QUANTITIES:
+        token = token.split(";", 1)[0]
+    token = token.replace("mol−1", "/mol").replace("mol-1", "/mol")
+    token = token.replace("k−1", "/k").replace("k-1", "/k")
+    energy = quantity in {
+        Quantity.H_MINUS_H298,
+        Quantity.DELTA_FH,
+        Quantity.DELTA_FG,
+        Quantity.ENTHALPY_OF_FUSION,
+    }
+    heat = quantity in {Quantity.CP, Quantity.S, Quantity.ENTROPY_OF_FUSION}
     if not energy and not heat:
         return amount, "as_published"
     with localcontext() as ctx:
         ctx.prec = 80
         if heat and token in {"cal/mol/k", "cal/molk", "cal/deg-mole", "cal/degmole"}:
             return amount * Decimal("4.184"), "thermochemical_calorie_to_J_exact"
-        if heat and token in {"j/mol/k", "j/molk", "j/deg-mole", "j/degmole"}:
+        if heat and token in {
+            "j/mol/k",
+            "j/molk",
+            "jpermolk",
+            "j/deg-mole",
+            "j/degmole",
+        }:
             return amount, "identity:J_per_mol_K"
         if energy and token in {"kcal/mol", "kcal/mole"}:
             return amount * Decimal("4.184"), "thermochemical_kcal_to_kJ_exact"
@@ -8613,7 +8641,9 @@ def select_declared_source(
         for key, unit in (
             ("T_K", "K"),
             ("T_K_as_published", "K"),
+            ("T_fus_K", "K"),
             ("temperature_K", "K"),
+            ("melting_temperature_K", "K"),
             ("Tmax_K", "K"),
             ("T_C", "C"),
             ("Tmax_C", "C"),
@@ -12435,6 +12465,7 @@ class Migrator:
             else None
         )
         rows = list(iter_extract_observations(doc))
+        fusion_temperatures = self._fusion_temperature_by_table_row(rows)
         pressure_identity_context = _pressure_identity_context(doc, rows)
         records = phase_field_records(doc)
         self._phase_field_records[source_id] = records
@@ -12496,6 +12527,7 @@ class Migrator:
                 declared_experiment_id=declared_experiment_id,
                 source_context=pressure_identity_context,
                 provenance=extract_provenance,
+                fusion_temperatures=fusion_temperatures,
             )
         # b-555: do not leave a silent extract — absence is fine, silence is not.
         self._record_silent_extract_if_needed(
@@ -12596,6 +12628,48 @@ class Migrator:
             observation_id=f"{path_stem}::typed_absence",
         )
 
+    @staticmethod
+    def _fusion_temperature_by_table_row(
+        rows: Sequence[tuple[str, Mapping[str, Any]]],
+    ) -> dict[tuple[str, str, str], tuple[Decimal, Locator]]:
+        """Read fusion temperature printed in the matching source table row."""
+
+        by_row: dict[tuple[str, str, str], tuple[Decimal, Locator]] = {}
+        ambiguous: set[tuple[str, str, str]] = set()
+        for formula, observation in rows:
+            if observation.get("type") != "transition_point":
+                continue
+            values = observation.get("values")
+            raw_locator = observation.get("locator")
+            if not isinstance(values, Mapping) or not isinstance(raw_locator, Mapping):
+                continue
+            quantity, _reason = map_quantity(
+                "transition_point", values, units=observation.get("units"), row=observation
+            )
+            if not quantity.is_value or quantity.value is not Quantity.TRANSITION_TEMPERATURE:
+                continue
+            selected = select_declared_source(
+                quantity.value, observation.get("units"), values
+            )
+            table, row = raw_locator.get("table"), raw_locator.get("row")
+            locator = locator_from_mapping(raw_locator)
+            if (
+                not selected.available
+                or selected.amount is None
+                or table in (None, "")
+                or row in (None, "")
+                or locator is None
+            ):
+                continue
+            key = (formula, str(table), str(row))
+            if key in by_row:
+                ambiguous.add(key)
+            else:
+                by_row[key] = (selected.amount, locator)
+        for key in ambiguous:
+            by_row.pop(key, None)
+        return by_row
+
     def _migrate_extract_observation(
         self,
         *,
@@ -12609,6 +12683,9 @@ class Migrator:
         declared_experiment_id: str | None = None,
         source_context: Mapping[str, Any] | None = None,
         provenance: Mapping[str, Any] | None = None,
+        fusion_temperatures: Mapping[
+            tuple[str, str, str], tuple[Decimal, Locator]
+        ] | None = None,
     ) -> None:
         measured = self.result.measured
         raw_obs_id = str(obs.get("observation_id") or "")
@@ -12680,6 +12757,7 @@ class Migrator:
                         provenance,
                         quantity=child_quantity,
                     ),
+                    fusion_temperatures=fusion_temperatures,
                 )
             return
         locator = locator_from_mapping(
@@ -12708,6 +12786,13 @@ class Migrator:
         transition_reason = transition_phase_reason(obs_type, values)
         if (phase_raw is None or phase_raw == "") and transition_reason:
             phase, unmapped_phase = State.unknown(transition_reason), None
+        elif (
+            q_token in FUSION_QUANTITIES
+            and isinstance(phase_raw, str)
+            and "crystal" in phase_raw.casefold()
+            and "melt" in phase_raw.casefold()
+        ):
+            phase, unmapped_phase = State.of(Phase.CR), None
         else:
             phase, unmapped_phase = map_phase(phase_raw)
             if unmapped_phase and source_id == "janaf-4th":
@@ -12845,6 +12930,25 @@ class Migrator:
         if obs.get("T_range_K") is not None:
             t_payload.setdefault("T_range_K", obs.get("T_range_K"))
         t_sel = select_declared_source(AXIS_TEMPERATURE_K, None, t_payload)
+        temperature_locator = locator
+        if (
+            q_token in FUSION_QUANTITIES
+            and t_sel.field_name is None
+            and not t_sel.condition_ranges
+        ):
+            raw_locator = obs.get("locator")
+            if isinstance(raw_locator, Mapping):
+                table, row = raw_locator.get("table"), raw_locator.get("row")
+                if table not in (None, "") and row not in (None, ""):
+                    fusion_temperature = (fusion_temperatures or {}).get(
+                        (formula, str(table), str(row))
+                    )
+                    if fusion_temperature is not None:
+                        t_payload["T_fus_K"] = fusion_temperature[0]
+                        temperature_locator = fusion_temperature[1]
+                        t_sel = select_declared_source(
+                            AXIS_TEMPERATURE_K, None, t_payload
+                        )
         t_known = t_sel.amount if t_sel.available else None
         if t_sel.condition_ranges and t_known is None and q_token is not Quantity.ACTIVITY_COEFFICIENT:
             measured.range_only_T += 1
@@ -13277,6 +13381,8 @@ class Migrator:
                             source=source_key,
                             observation_id=obs_id,
                         )
+        if q_token in FUSION_QUANTITIES:
+            ident_kwargs["subtype"] = State.of("solid_to_liquid")
         if q_token is Quantity.TRANSITION_TEMPERATURE and (
             value.kind in {ValueKind.UNAVAILABLE, ValueKind.INTERVAL}
         ):
@@ -13369,7 +13475,7 @@ class Migrator:
                     t_known,
                     t_sel.unit_trail,
                     _temperature_field_raw(t_payload, t_sel.field_name),
-                    locator,
+                    temperature_locator,
                 )
             }
         if composition_located is not None:
