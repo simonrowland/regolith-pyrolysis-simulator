@@ -150,6 +150,26 @@ def test_melts_vs_freeze_requires_both_recorded_fraction_signals():
     assert classify_non_eval(producer_shaped_row) == ENGINE_REFUSAL
 
 
+def test_liquid_regime_triage_keeps_strict_positive_and_exact_zero():
+    disagreement = {
+        "status": "out_of_domain",
+        "status_kind": "refusal",
+        "refusal_reason": "no_convergence",
+        "failure_reason_code": None,
+        "generic_liquid_fraction": 1e-15,
+        "finder_liquid_fraction": 0.0,
+        "raw_payload": json.dumps({"engine_invoked": True}),
+    }
+    faithful_zero = {
+        **disagreement,
+        "generic_liquid_fraction": 0.0,
+        "finder_liquid_fraction": None,
+    }
+
+    assert classify_non_eval(disagreement) == MELTS_VS_FREEZE
+    assert classify_non_eval(faithful_zero) == FAITHFUL_RUMP
+
+
 def test_report_ignores_success_and_uses_unassigned_feedstock_bucket():
     report = build_triage_report(
         [
