@@ -139,6 +139,49 @@ def _context(*observations, works=None, experiments=None, origins=None):
     )
 
 
+def test_compilation_no_band_label_uses_source_band_owners_reason() -> None:
+    from simulator.battery.score import (
+        _compilation_band_value_fields,
+        _source_band_catalog,
+    )
+
+    experiment = F.tabulation_experiment()
+    identity = replace(
+        _na2o_liquid(Quantity.CP),
+        reaction=State.not_applicable("not a formation quantity"),
+        formation_elements=State.not_applicable("not a formation quantity"),
+    )
+    observations = tuple(
+        F.observation(
+            f"source-band-{index}",
+            experiment.experiment_id,
+            identity,
+            Decimal(value),
+            evidence=EvidenceClass.COMPILATION_ASSESSED,
+            source_id=f"source-{index}",
+        )
+        for index, value in enumerate(("9", "10", "11"))
+    )
+    bands, _records, reasons = _source_band_catalog(_context(*observations), {})
+    assert len(bands) == 1
+    assert "n_sources=3" in next(iter(bands.values())).rule
+    assert reasons == {}
+    # The report probe has no emitted row band despite the owner's valid
+    # three-source band. Rendering must use the owner's reason, not row count.
+    assert _compilation_band_value_fields([], [], ())[
+        "no_band_reason"
+    ] is None
+
+    _bands, _records, insufficient = _source_band_catalog(
+        _context(observations[0]), {}
+    )
+    reason = next(iter(insufficient.values()))
+    assert reason == "derived_band_insufficient_sources"
+    assert _compilation_band_value_fields([], [], (reason,))[
+        "no_band_reason"
+    ] == reason
+
+
 def _mgo_janaf_observation():
     experiment = F.tabulation_experiment()
     identity = F.oxide_identity(
@@ -693,7 +736,12 @@ def test_compilation_series_score_pins_cell_results_and_partial_refusal(monkeypa
                 "Do not validate an engine against a compilation it consumes. "
                 "same-source compilation=nist-janaf-4th uncertainty=none",
                 row.reference,
-            )
+            ),
+            (
+                NoticeKind.FALLBACK,
+                "derived_band_insufficient_sources",
+                "decision-band",
+            ),
         ]
     refused = residuals[-1]
     assert refused.numeric is None
@@ -1246,8 +1294,8 @@ def test_census_keeps_unknown_relation_decision_when_band_exists(monkeypatch) ->
         audit_compile_residual=False,
     )["rows"][0]["decision_strata"][0]
     assert no_band["band_kind"] == "no_band"
-    assert no_band["no_band_reason"] == "derived_band_insufficient_n"
-    assert no_band["band_derived_n"] == 1
+    assert no_band["no_band_reason"] == "derived_band_insufficient_sources"
+    assert no_band["band_derived_n"] is None
     assert no_band["n"] == 1
     assert no_band["signed_median_residual"] == "1"
     assert no_band["mad"] == "0"
@@ -1373,7 +1421,7 @@ def test_census_strata_use_scorer_pool_for_refusals_and_observation_flags(monkey
     assert census_stratum["bias_to_scatter_ratio"] == "1.8"
     assert census_stratum["band_value"] == []
     assert census_stratum["band_kind"] == "no_band"
-    assert census_stratum["band_derived_n"] == 10
+    assert census_stratum["band_derived_n"] is None
     assert census_stratum["match_count"] == 0
     assert census_stratum["no_band_count"] == 10
 

@@ -6814,6 +6814,36 @@ def test_stability_bound_is_reported_against_the_row_band_without_refusing() -> 
 
     assert Decimal(detail["bound_dex"]) > Decimal("0.01")
     assert detail["row_decision_band_dex"] == "0.01"
+    assert detail["row_decision_band_refusal"] is None
+    assert any(
+        item.reason == "confidence_level_not_stated"
+        for item in comparison.notices
+    )
+
+    unmapped = replace(
+        reference,
+        observation_id="silica-inference-bound-unmapped-unit",
+        uncertainty=Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim="1 furlong",
+            value=Decimal("1"),
+            basis="furlong",
+        ),
+        notices=(),
+    )
+    refused_comparison = _fusion_comparison_reference(
+        unmapped, engine=Engine.OPENIMCC
+    )
+    refused_inference = next(
+        item
+        for item in refused_comparison.notices
+        if item.reason.startswith("reference_polymorph_inferred_from_stability: ")
+    )
+    refused_detail = json.loads(refused_inference.reason.split(": ", 1)[1])
+    assert refused_detail["row_decision_band_dex"] is None
+    assert refused_detail["row_decision_band_refusal"]["reason"] == (
+        "printed_uncertainty_unit_unmapped"
+    )
     assert detail["bound_exceeds_row_band"] is True
     assert comparison.value.point != reference.value.point
 
