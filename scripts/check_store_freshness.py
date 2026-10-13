@@ -109,6 +109,12 @@ CODE_INPUTS = (
 #     green ba62a746d (3dd98193c, studio-3) changed 0 files under data/.
 #     This acknowledges STORE outputs only; the scoring change (237 residual
 #     records, 94 new numeric candidates) is covered by the commits' tests.
+#   1a4b42f53: t-1217 removes the uncertified condensation capture-budget
+#     regularizer and its two provenance rows from
+#     data/literature/vacuum_pyrolysis_sticking.yaml. No migrate path reads those
+#     rows into a store record: the battery pregate's full regeneration at the
+#     candidate merged onto green a8daa610f (7b61b78de, studio-2, engines live)
+#     changed 0 tracked or untracked paths.
 STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "1b78b5697", "574800443", "149df2858",
     "9bb0a22ce", "1d254d51e", "b8be6d576",
@@ -116,6 +122,7 @@ STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "23df83343", "2bd2918e6", "34132a932",
     "8d90cc936",
     "f522e152c", "da3640753", "e84b44277",
+    "1a4b42f53",
 })
 
 
