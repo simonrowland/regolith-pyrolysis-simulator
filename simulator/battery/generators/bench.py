@@ -612,10 +612,15 @@ def melt_activity_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]
                     "engine_reports": reported,
                 },
             }
-            if redox:
-                oxygen_log = _point(inputs, "oxygen_condition")
-                payload["fO2_log"] = float(oxygen_log)
-                routes["fO2_log"] = {"waypoint": "oxygen_condition", "because": list(redox)}
+            if redox or engine == "internal-analytical":
+                oxygen_waypoint = inputs.waypoints["oxygen_condition"].selected
+                if oxygen_waypoint is not None:
+                    oxygen_log = _point(inputs, "oxygen_condition")
+                    payload["fO2_log"] = float(oxygen_log)
+                    routes["fO2_log"] = {
+                        "waypoint": "oxygen_condition",
+                        "because": list(redox),
+                    }
             results.append(GeneratedInput(readiness, payload, {**provenance, "output_routes": routes}))
         except UnsupportedValue as exc:
             results.append(_refused(readiness, provenance, str(exc)))

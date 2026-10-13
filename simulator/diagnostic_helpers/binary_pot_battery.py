@@ -2476,13 +2476,24 @@ def _internal_analytical_vapor_pressure_adapter(
         "vapor_pressure_diagnostic": core_diagnostic,
         "imcc_notices": oxygen_notices,
     }
+    activities = dict(core_diagnostic.get("activities") or {})
+    for provenance in dict(
+        core_diagnostic.get("vapor_pressure_numerator_provenance") or {}
+    ).values():
+        if not isinstance(provenance, Mapping):
+            continue
+        parent_formula = provenance.get("melt_oxide_parent_formula")
+        parent_activity = provenance.get("melt_parent_oxide_activity")
+        if isinstance(parent_formula, str) and parent_formula and parent_activity is not None:
+            activities[parent_formula] = parent_activity
+
     return SimpleNamespace(
         status="ok",
         diagnostics=diagnostics,
         warnings=[],
         # This core diagnostic is an activity map (a_i), despite the
         # historical EquilibriumResult field name; gamma lives separately.
-        activity_coefficients=dict(core_diagnostic.get("activities") or {}),
+        activity_coefficients=activities,
         vapor_pressures_Pa=dict(equilibrium.vapor_pressures_Pa or {}),
         vapor_pressures_source=dict(equilibrium.vapor_pressures_source or {}),
         vapor_pressure_backend_status=diagnostics["vapor_pressure_backend_status"],
