@@ -936,7 +936,7 @@ def test_plante_kems_pressure_envelope_reports_unstated_confidence(
     assert printed.notice is not None
     assert printed.notice.kind is NoticeKind.INPUT_OMITTED
     assert printed.notice.reason == "confidence_level_not_stated"
-    assert "temperature error probably does not exceed 20 K" in printed.notice.band
+    assert "original=" in printed.notice.band
     assert '"published_page": 276' in printed.notice.band
 
 

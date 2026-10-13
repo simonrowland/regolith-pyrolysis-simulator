@@ -2554,6 +2554,48 @@ def _metric_uncertainty_width(
     return None
 
 
+def _confidence_level_notice(
+    quantity: Quantity,
+    uncertainty: Uncertainty,
+    source_observation: Observation | None,
+    source_value: Decimal | tuple[Decimal, Decimal] | None,
+) -> Notice | None:
+    confidence_level = (
+        uncertainty.verbatim.get("confidence_level", "not_stated")
+        if isinstance(uncertainty.verbatim, Mapping)
+        else "not_stated"
+    )
+    if confidence_level != "not_stated":
+        return None
+    source_fields = (
+        [
+            str(key)
+            for key, value in uncertainty.verbatim.items()
+            if key not in {"note", "confidence_level", "locator", "parent", "k"}
+            and value is not None
+        ]
+        if isinstance(uncertainty.verbatim, Mapping)
+        else []
+    )
+    field = ", ".join(source_fields) if source_fields else "uncertainty"
+    locator = (
+        json.dumps(to_plain(source_observation.locator), ensure_ascii=False, sort_keys=True)
+        if source_observation is not None and source_observation.locator is not None
+        else "not available"
+    )
+    if source_value is None:
+        detail = f"original={_uncertainty_original(uncertainty)}"
+    else:
+        detail = f"printed_width={source_value}"
+    return Notice(
+        kind=NoticeKind.INPUT_OMITTED,
+        affected_quantities=(quantity,),
+        reason="confidence_level_not_stated",
+        origin="decision-band",
+        band=f"field={field}; {detail}; locator={locator}",
+    )
+
+
 def _printed_uncertainty_band(
     quantity: Quantity,
     uncertainty: Uncertainty | None,
@@ -2574,7 +2616,11 @@ def _printed_uncertainty_band(
     ):
         # This source-wide KEMS envelope is pooled by the registered resolver;
         # the generic per-cell parser would mistake its pressure label for a unit.
-        return _PrintedBandResolution()
+        return _PrintedBandResolution(
+            notice=_confidence_level_notice(
+                quantity, uncertainty, source_observation, None
+            )
+        )
     raw_text = _uncertainty_original(uncertainty)
     confidence_level = (
         uncertainty.verbatim.get("confidence_level", "not_stated")
@@ -2595,12 +2641,13 @@ def _printed_uncertainty_band(
         return _PrintedBandResolution(
             refusal={"reason": "uncertainty_metric_missing", "original": raw_text}
         )
-    unit_text = (
-        str(uncertainty.verbatim.get("note") or "")
-        if isinstance(uncertainty.verbatim, Mapping)
-        and "confidence_level" in uncertainty.verbatim
-        else raw_text
-    )
+    unit_text = raw_text
+    if isinstance(uncertainty.verbatim, Mapping):
+        unit_text = " ".join(
+            str(value)
+            for key, value in uncertainty.verbatim.items()
+            if key != "confidence_level" and isinstance(value, str)
+        ) or raw_text
     source_unit = _uncertainty_unit(
         quantity, uncertainty, source_observation, mapped_unit, source_value, unit_text
     )
@@ -2657,31 +2704,9 @@ def _printed_uncertainty_band(
         ticket *= NORMAL_95_TICKET_MULTIPLIER
     unit = "dimensionless" if operation in {MetricOperation.RELATIVE, MetricOperation.DEX} else QUANTITY_UNITS[quantity]
     rule = f"{kind}: source-printed uncertainty; original={raw_text}"
-    notice = None
-    if confidence_level == "not_stated":
-        source_fields = (
-            [
-                str(key)
-                for key, value in uncertainty.verbatim.items()
-                if key not in {"note", "confidence_level", "locator", "parent", "k"}
-                and value is not None
-            ]
-            if isinstance(uncertainty.verbatim, Mapping)
-            else []
-        )
-        field = ", ".join(source_fields) if source_fields else "uncertainty"
-        locator = (
-            json.dumps(to_plain(source_observation.locator), ensure_ascii=False, sort_keys=True)
-            if source_observation is not None and source_observation.locator is not None
-            else "not available"
-        )
-        notice = Notice(
-            kind=NoticeKind.INPUT_OMITTED,
-            affected_quantities=(quantity,),
-            reason="confidence_level_not_stated",
-            origin="decision-band",
-            band=f"field={field}; printed_width={source_value}; locator={locator}",
-        )
+    notice = _confidence_level_notice(
+        quantity, uncertainty, source_observation, source_value
+    )
     return _PrintedBandResolution(DecisionBand(ticket, unit, rule), notice=notice)
 
 
