@@ -109,10 +109,10 @@ observations:
   experiment_id: 10.1007/s11663-024-02995-6::experiment::cao-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'Fig. 7—Isothermal measurement of CaO and MgO.'
+      tag: value
+      value: p_partial
     species:
-      formula: Ca
+      formula: O2
       phase:
         tag: value
         value: g
@@ -122,12 +122,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '2077'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: categorical
-    categorical: bound_not_point_ordering
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, evidence_class, admission_status,
+      gas_species, formula, condensed_phase, caption, note'
     approximate: false
   uncertainty:
     kind: printed
@@ -171,10 +214,10 @@ observations:
   experiment_id: 10.1007/s11663-024-02995-6::experiment::cao-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'Fig. 7—Isothermal measurement of CaO and MgO.'
+      tag: value
+      value: p_partial
     species:
-      formula: Ca
+      formula: O
       phase:
         tag: value
         value: g
@@ -184,12 +227,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '2077'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: categorical
-    categorical: bound_not_point_ordering
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, evidence_class, admission_status,
+      gas_species, formula, condensed_phase, caption, note'
     approximate: false
   uncertainty:
     kind: printed
@@ -432,8 +518,8 @@ observations:
   experiment_id: 10.1007/s11663-024-02995-6::experiment::mgo-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'Fig. 7—Isothermal measurement of CaO and MgO.'
+      tag: value
+      value: p_partial
     species:
       formula: Mg
       phase:
@@ -445,12 +531,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '1926'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: categorical
-    categorical: bound_not_point_ordering
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, evidence_class, admission_status,
+      gas_species, formula, condensed_phase, caption, note'
     approximate: false
   uncertainty:
     kind: printed
@@ -494,10 +623,10 @@ observations:
   experiment_id: 10.1007/s11663-024-02995-6::experiment::mgo-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'Fig. 7—Isothermal measurement of CaO and MgO.'
+      tag: value
+      value: p_partial
     species:
-      formula: Mg
+      formula: O2
       phase:
         tag: value
         value: g
@@ -507,12 +636,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '1926'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: categorical
-    categorical: bound_not_point_ordering
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, evidence_class, admission_status,
+      gas_species, formula, condensed_phase, caption, note'
     approximate: false
   uncertainty:
     kind: printed

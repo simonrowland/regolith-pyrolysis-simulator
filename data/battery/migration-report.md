@@ -23,7 +23,7 @@ hard issues: 3650
 | gibbs_reference_pressures | 1617 | 1635 (mismatch) |
 | gibbs_reference_100000 | 1023 | 1029 (mismatch) |
 | gibbs_reference_101325 | 594 | 594 |
-| formulas | 1625 | 2064 (mismatch) |
+| formulas | 1625 | 2068 (mismatch) |
 | equipment_payloads | 670 | 955 (mismatch) |
 | absent_admissions | 3511 | 5365 (mismatch) |
 | absent_classes | 2174 | 2104 (mismatch) |
@@ -18349,8 +18349,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 221168
+advisory issues: 221180
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 221168 |
+| `identity_incomplete` | 221180 |

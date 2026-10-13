@@ -13273,6 +13273,38 @@ entries:
   axes:
   - value
   observations:
+  - observation_id: kems-031-halwax-2024::halwax_2024_cao_isothermal_o2_pressure_figure_only
+    locator:
+      page: 826
+      published_page: 826
+      pdf_page_index: 5
+      figure: '7'
+      note: 'Upper panel: isothermal O2(g) partial pressure over pure CaO at 2077 ± 5 K; pressure plotted against time, no
+        numeric point table.'
+  - observation_id: kems-031-halwax-2024::halwax_2024_cao_isothermal_o_pressure_figure_only
+    locator:
+      page: 826
+      published_page: 826
+      pdf_page_index: 5
+      figure: '7'
+      note: 'Upper panel: isothermal O(g) partial pressure over pure CaO at 2077 ± 5 K; pressure plotted against time, no
+        numeric point table.'
+  - observation_id: kems-031-halwax-2024::halwax_2024_mgo_isothermal_mg_pressure_figure_only
+    locator:
+      page: 826
+      published_page: 826
+      pdf_page_index: 5
+      figure: '7'
+      note: 'Lower panel: isothermal Mg(g) partial pressure over pure MgO at 1926 ± 5 K; pressure plotted against time, no
+        numeric point table.'
+  - observation_id: kems-031-halwax-2024::halwax_2024_mgo_isothermal_o2_pressure_figure_only
+    locator:
+      page: 826
+      published_page: 826
+      pdf_page_index: 5
+      figure: '7'
+      note: 'Lower panel: isothermal O2(g) partial pressure over pure MgO at 1926 ± 5 K; pressure plotted against time, no
+        numeric point table.'
   - observation_id: kems-031-halwax-2024::halwax_2024_mgo_isothermal_o_pressure_figure_only
     locator:
       page: 826
@@ -13737,44 +13769,6 @@ entries:
       line_range: 220-230
       note: Pure MgO vaporization in Ir Knudsen cell; lid orifice 0.3 mm
       source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
-- work_id: 10.1007/s11663-024-02995-6
-  source: data/literature/extracts/kems-031-halwax-2024.yaml
-  why: unsupported quantity 'Fig. 7—Isothermal measurement of CaO and MgO.'
-  axes:
-  - quantity
-  observations:
-  - observation_id: kems-031-halwax-2024::halwax_2024_cao_isothermal_o2_pressure_figure_only
-    locator:
-      page: 826
-      published_page: 826
-      pdf_page_index: 5
-      figure: '7'
-      note: 'Upper panel: isothermal O2(g) partial pressure over pure CaO at 2077 ± 5 K; pressure plotted against time, no
-        numeric point table.'
-  - observation_id: kems-031-halwax-2024::halwax_2024_cao_isothermal_o_pressure_figure_only
-    locator:
-      page: 826
-      published_page: 826
-      pdf_page_index: 5
-      figure: '7'
-      note: 'Upper panel: isothermal O(g) partial pressure over pure CaO at 2077 ± 5 K; pressure plotted against time, no
-        numeric point table.'
-  - observation_id: kems-031-halwax-2024::halwax_2024_mgo_isothermal_mg_pressure_figure_only
-    locator:
-      page: 826
-      published_page: 826
-      pdf_page_index: 5
-      figure: '7'
-      note: 'Lower panel: isothermal Mg(g) partial pressure over pure MgO at 1926 ± 5 K; pressure plotted against time, no
-        numeric point table.'
-  - observation_id: kems-031-halwax-2024::halwax_2024_mgo_isothermal_o2_pressure_figure_only
-    locator:
-      page: 826
-      published_page: 826
-      pdf_page_index: 5
-      figure: '7'
-      note: 'Lower panel: isothermal O2(g) partial pressure over pure MgO at 1926 ± 5 K; pressure plotted against time, no
-        numeric point table.'
 - work_id: 10.1007/s11663-024-02995-6
   source: data/literature/extracts/kems-031-halwax-2024.yaml
   why: unsupported quantity 'enthalpy_of_sublimation'
