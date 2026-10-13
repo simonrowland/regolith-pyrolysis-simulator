@@ -260,6 +260,12 @@ def _assert_no_live_magemin_warm_pools(preexisting_pools=frozenset()) -> None:
     )
 
 
+def _close_new_magemin_warm_pools(preexisting_pools=frozenset()) -> None:
+    for pool, _worker_names in _live_magemin_warm_pools():
+        if pool not in preexisting_pools:
+            pool.close(cancel_pending=True)
+
+
 @pytest.fixture(scope="module", autouse=True)
 def _assert_magemin_warm_pools_closed_at_module_teardown():
     # Pools owned by wider-scoped fixtures can outlive a module that uses them.
@@ -267,6 +273,7 @@ def _assert_magemin_warm_pools_closed_at_module_teardown():
         pool for pool, _worker_names in _live_magemin_warm_pools()
     }
     yield
+    _close_new_magemin_warm_pools(preexisting_pools)
     _assert_no_live_magemin_warm_pools(preexisting_pools)
 
 
