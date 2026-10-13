@@ -2250,11 +2250,6 @@ def _kems_replicate_groups(
         strata = _observation_flagged_strata(
             observation, experiments, point_observations_by_experiment, benches
         )
-        if FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED in strata:
-            # d-139: unknown ionisation sensitivity and multiplier gain make a
-            # printed pressure uncertainty precision, not absolute-pressure
-            # accuracy. Keep uncalibrated rows out of replicate scatter.
-            continue
         if strata:
             continue
         evidence = observation.evidence.class_
@@ -2322,11 +2317,6 @@ def _derive_kems_partial_pressure_band(
         strata = _observation_flagged_strata(
             observation, experiments, point_observations_by_experiment, benches
         )
-        if FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED in strata:
-            # d-139: unknown ionisation sensitivity and multiplier gain make a
-            # printed pressure uncertainty precision, not absolute-pressure
-            # accuracy. It cannot set a source-wide band for calibrated rows.
-            continue
         if strata:
             continue
         evidence = observation.evidence.class_
