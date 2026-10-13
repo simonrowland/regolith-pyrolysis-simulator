@@ -11147,7 +11147,9 @@ def test_residue_cells_keep_run_identity_and_printed_conditions(
         if expected_fO2 == Decimal("-0.68"):
             assert identity.fO2_Pa.value == Decimal("20892.96130854039483122233736")
         else:
-            assert identity.fO2_Pa.is_value and identity.fO2_Pa.value > 0
+            assert identity.fO2_Pa.value == Decimal("100000") * (
+                Decimal(10) ** expected_fO2
+            )
         assert "experiment_id" not in profile_for(identity).required
         assert obs.experiment_id.endswith(f"::experiment::{run_key[3]}")
         assert profile_for(identity).required == frozenset(

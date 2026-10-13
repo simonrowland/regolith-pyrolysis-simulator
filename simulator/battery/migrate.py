@@ -10498,16 +10498,18 @@ _AUTHOR_RATIO_REL_TOLERANCE = Decimal("1e-4")
 _CONGRUENT_VAPORIZATION_M_O2_G_MOL = Decimal("32.00")
 _CONGRUENT_VAPORIZATION_M_K_G_MOL = Decimal("39.10")
 _OXYGEN_TABLE_KEYS = frozenset({"series", "rows", "points"})
-_OXYGEN_LOG_UNITS = frozenset({
-    "",
-    "log10",
-    "log10(bar)",
-    "log10 bar",
-    "log10(atm)",
-    "log10 atm",
-    "log",
-    "dex",
-})
+_BAR_PA = Decimal("100000")
+# Bare and generic log labels retain their existing bar reference.
+_OXYGEN_LOG_REFERENCE_PA = {
+    "": _BAR_PA,
+    "log10": _BAR_PA,
+    "log10(bar)": _BAR_PA,
+    "log10 bar": _BAR_PA,
+    "log10(atm)": PA_PER_ATM_DEC,
+    "log10 atm": PA_PER_ATM_DEC,
+    "log": _BAR_PA,
+    "dex": _BAR_PA,
+}
 _POWER_OF_TEN = re.compile(r"^10\^([+-]?(?:\d+(?:\.\d+)?|\.\d+))$")
 _POINT_REJECT = re.compile(
     r"^\s*(?:[<>≤≥~≈]|10\s*\^\s*[+-]?\d.*\s+to\s+)",
@@ -10516,7 +10518,6 @@ _POINT_REJECT = re.compile(
 # Half a tenth of a dex: wide enough for the 0.0057 atm/bar offset and for
 # a one-decimal printed place, tight enough that -9.1 and -8 are not one fact.
 _OXYGEN_FRAME_TOLERANCE = Decimal("0.05")
-_BAR_PA = Decimal("100000")
 
 
 @dataclass(frozen=True)
@@ -10524,12 +10525,15 @@ class PrintedOxygenFacts:
     log_fO2: Located[Decimal] | None = None
     oxygen_partial_pressure_Pa: Located[Value] | None = None
     rejected_log_fO2: bool = False
+    log_fO2_reference_Pa: Decimal = _BAR_PA
 
 
-def _log_fO2_bar_to_pa(log10_fO2_bar: Decimal) -> Decimal:
-    # fO2_Pa = 10^(log10 fO2 [bar]) × 1e5 Pa/bar; bar cancels, leaving Pa.
-    # Sanity check: log10 fO2 = 0 means 1 bar = 1e5 Pa.
-    return _BAR_PA * (Decimal(10) ** log10_fO2_bar)
+def _log_fO2_to_pa(
+    log10_fO2: Decimal, reference_pressure_pa: Decimal = _BAR_PA
+) -> Decimal:
+    # fO2_Pa = 10^L × P_ref, where P_ref is 1e5 Pa (bar) or 101325 Pa (atm).
+    # Unit check: 10^L is dimensionless, so multiplying by P_ref leaves Pa.
+    return reference_pressure_pa * (Decimal(10) ** log10_fO2)
 
 
 def _normalize_printed_token(raw: object) -> str:
@@ -10682,7 +10686,7 @@ def _frames_agree(log_value: Decimal, pressure_pa: Decimal) -> bool:
 def _walk_printed_oxygen(
     obj: object,
     fallback: Locator | None,
-    logs: list[tuple[Decimal, Located[Decimal]]],
+    logs: list[tuple[Decimal, Located[Decimal], Decimal]],
     pressures: list[tuple[Decimal, Located[Value], str]],
     rejected_logs: list[bool],
     *,
@@ -10708,20 +10712,46 @@ def _walk_printed_oxygen(
             continue
         if name == "point_conditions" and isinstance(value, Mapping):
             condition = value.get("fO2_log")
-            state = condition.get("state") if isinstance(condition, Mapping) else None
-            raw_condition = state.get("value") if isinstance(state, Mapping) else None
-            if isinstance(raw_condition, Mapping):
-                if raw_condition.get("kind") == "point":
-                    raw_condition = raw_condition.get("point")
+            if condition is not None:
+                try:
+                    located_condition = _point_condition_from_plain(
+                        condition, key="fO2_log"
+                    )
+                except (TypeError, ValueError, ArithmeticError):
+                    located_condition = None
+                condition_value = (
+                    located_condition.state.value
+                    if located_condition is not None
+                    and located_condition.state.is_value
+                    else None
+                )
+                if isinstance(condition_value, Value):
+                    condition_value = (
+                        condition_value.point
+                        if condition_value.kind is ValueKind.POINT
+                        else None
+                    )
+                if (
+                    buffer_relative
+                    or located_condition is None
+                    or not isinstance(condition_value, Decimal)
+                    or not condition_value.is_finite()
+                    or (
+                        isinstance(condition, Mapping)
+                        and _oxygen_node_rejected(condition, condition_value)
+                    )
+                ):
+                    rejected_logs.append(True)
                 else:
-                    raw_condition = None
-            if condition is not None and (
-                not isinstance(state, Mapping)
-                or state.get("tag") != "value"
-                or _printed_decimal(raw_condition) is None
-                or buffer_relative
-            ):
-                rejected_logs.append(True)
+                    logs.append((
+                        condition_value,
+                        Located(
+                            State.of(condition_value),
+                            locator=located_condition.locator or local,
+                            inference=located_condition.inference,
+                        ),
+                        _BAR_PA,
+                    ))
         if name in _PRINTED_LOG_FO2_KEYS or name in _PRINTED_PO2_KEYS:
             if name in _PRINTED_LOG_FO2_KEYS and buffer_relative:
                 rejected_logs.append(True)
@@ -10754,7 +10784,8 @@ def _walk_printed_oxygen(
                     rejected_logs.append(True)
                     continue
                 units = str(node.get("units") or node.get("unit") or "").strip().lower()
-                if units not in _OXYGEN_LOG_UNITS:
+                reference_pressure_pa = _OXYGEN_LOG_REFERENCE_PA.get(units)
+                if reference_pressure_pa is None:
                     rejected_logs.append(True)
                     continue
                 logs.append((
@@ -10766,6 +10797,7 @@ def _walk_printed_oxygen(
                         ),
                         inference=None,
                     ),
+                    reference_pressure_pa,
                 ))
             else:
                 units = str(node.get("units") or node.get("unit") or "").strip()
@@ -10928,7 +10960,7 @@ def collect_printed_oxygen(
     is landed. Bounds, ranges, and ``inferred: true`` stay refusals.
     """
 
-    logs: list[tuple[Decimal, Located[Decimal]]] = []
+    logs: list[tuple[Decimal, Located[Decimal], Decimal]] = []
     pressures: list[tuple[Decimal, Located[Value], str]] = []
     rejected_logs: list[bool] = []
     if fallback_locator is None:
@@ -10938,7 +10970,11 @@ def collect_printed_oxygen(
             payload, fallback_locator, logs, pressures, rejected_logs,
             skip_tables=skip_tables
         )
-    log_located = _unique_oxygen([(value, located) for value, located in logs])
+    log_frames = {(value, reference_pa) for value, _, reference_pa in logs}
+    if len(log_frames) == 1:
+        log_located, log_reference_pa = logs[0][1], logs[0][2]
+    else:
+        log_located, log_reference_pa = None, _BAR_PA
     if logs and log_located is None:
         rejected_logs.append(True)
     pressure_located = _unique_oxygen(
@@ -10959,6 +10995,7 @@ def collect_printed_oxygen(
             log_located = _annotate_atm_bar_offset(log_located, point, units)
     return PrintedOxygenFacts(
         log_fO2=log_located if isinstance(log_located, Located) else None,
+        log_fO2_reference_Pa=log_reference_pa,
         oxygen_partial_pressure_Pa=(
             pressure_located[0] if isinstance(pressure_located, tuple) else None
         ),
@@ -11761,7 +11798,10 @@ class Migrator:
         if ratio_oxygen is not None:
             # The nested oxygen_partial_pressure is Plante's derived
             # congruent-vaporization condition, not a printed pO2 cell.
-            facts = PrintedOxygenFacts(log_fO2=facts.log_fO2)
+            facts = PrintedOxygenFacts(
+                log_fO2=facts.log_fO2,
+                log_fO2_reference_Pa=facts.log_fO2_reference_Pa,
+            )
         elif facts.log_fO2 is None and facts.oxygen_partial_pressure_Pa is None:
             return point_conditions
         merged = dict(point_conditions or {})
@@ -11917,7 +11957,7 @@ class Migrator:
                 ):
                     with localcontext() as ctx:
                         ctx.prec = 50
-                        f_o2 = _log_fO2_bar_to_pa(value.point)
+                        f_o2 = _log_fO2_to_pa(value.point, _BAR_PA)
                     known["fO2_Pa"] = State.of(f_o2)
                     provenance.append(
                         "identity.fO2_Pa=derived via oxygen_condition "
@@ -14649,7 +14689,10 @@ class Migrator:
                 identity = replace(
                     identity,
                     fO2_Pa=State.of(
-                        _log_fO2_bar_to_pa(row_oxygen.log_fO2.state.value)
+                        _log_fO2_to_pa(
+                            row_oxygen.log_fO2.state.value,
+                            row_oxygen.log_fO2_reference_Pa,
+                        )
                     ),
                 )
         converted: Derivation | None = None
@@ -14974,7 +15017,7 @@ class Migrator:
                     )
                     log_fO2 = _as_dec_or_none(raw_item.get("log10_fO2"))
                     if log_fO2 is not None:
-                        oxygen = State.of(_log_fO2_bar_to_pa(log_fO2))
+                        oxygen = State.of(_log_fO2_to_pa(log_fO2, _BAR_PA))
                     elif (
                         isinstance(parent_values, Mapping)
                         and isinstance(parent_values.get("fO2_control"), Mapping)

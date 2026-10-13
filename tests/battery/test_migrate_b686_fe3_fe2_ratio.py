@@ -227,6 +227,89 @@ def test_redox_row_log_overrides_series_oxygen_and_inherits_when_absent(
 
 
 @pytest.mark.parametrize(
+    "row_fields,expected",
+    [
+        ({"log_fO2": {"value": -8, "units": "log10(bar)"}}, Decimal("0.001")),
+        ({"log_fO2": {"value": -8, "units": "log10(atm)"}}, Decimal("0.00101325")),
+    ],
+)
+def test_redox_row_log_identity_uses_declared_pressure_frame(
+    tmp_path: Path, row_fields: dict, expected: Decimal
+) -> None:
+    path = _fixture_extract(tmp_path, [{
+        "observation_id": "fixture_row_log_frame",
+        "experiment": "aithala-2026-vf271",
+        "T_range_K": None,
+        "values": {
+            "method_class": "measured_direct",
+            "quantity": "fe3_fe2_ratio",
+            "admission_status": "admitted",
+            "oxygen_partial_pressure": {"value": "1e-7", "units": "bar"},
+            "series": [{"T_C": 1250, "Fe3_over_FeT": 0.5, **row_fields}],
+        },
+    }])
+    rows = [
+        obs for obs in _migrate(path).observations.values()
+        if "fixture_row_log_frame::" in obs.observation_id
+    ]
+    assert len(rows) == 1
+    assert rows[0].identity.fO2_Pa.value == expected
+
+
+@pytest.mark.parametrize("with_series_pressure", [False, True])
+@pytest.mark.parametrize(
+    "typed_log",
+    [
+        "-8",
+        {"kind": "point", "point": "-8"},
+    ],
+    ids=["typed-scalar", "typed-point-value"],
+)
+def test_absolute_typed_row_log_overrides_series_oxygen(
+    tmp_path: Path, with_series_pressure: bool, typed_log: object
+) -> None:
+    values = {
+        "method_class": "measured_direct",
+        "quantity": "fe3_fe2_ratio",
+        "admission_status": "admitted",
+        "series": [{
+            "T_C": 1250,
+            "Fe3_over_FeT": 0.5,
+            "point_conditions": {
+                "fO2_log": {
+                    "state": {"tag": "value", "value": typed_log},
+                    "locator": {"published_page": 1},
+                }
+            },
+        }],
+    }
+    if with_series_pressure:
+        values["oxygen_partial_pressure"] = {"value": "1e-7", "units": "bar"}
+    path = _fixture_extract(tmp_path, [{
+        "observation_id": "fixture_typed_row_log",
+        "experiment": "aithala-2026-vf271",
+        "T_range_K": None,
+        "values": values,
+    }])
+    rows = [
+        obs for obs in _migrate(path).observations.values()
+        if "fixture_typed_row_log::" in obs.observation_id
+    ]
+    assert len(rows) == 1
+    obs = rows[0]
+    assert obs.identity.temperature_K.value == Decimal("1523.15")
+    assert obs.identity.fO2_Pa.value == Decimal("0.001")
+    located = obs.point_conditions["fO2_log"]
+    assert located.locator is not None
+    assert located.locator.published_page == 1
+    if isinstance(typed_log, str):
+        assert located.state.value == Decimal("-8")
+    else:
+        assert located.state.value.kind is ValueKind.POINT
+        assert located.state.value.point == Decimal("-8")
+
+
+@pytest.mark.parametrize(
     "row_fields",
     [
         {
@@ -244,7 +327,17 @@ def test_redox_row_log_overrides_series_oxygen_and_inherits_when_absent(
                 }
             }
         },
+        {
+            "point_conditions": {
+                "fO2_log": {
+                    "state": {"tag": "value", "value": "-8"},
+                    "locator": {"published_page": 1},
+                }
+            },
+            "oxygen_buffer_as_published": "IW",
+        },
         {"log_fO2": {"value": -2, "units": "log10(IW)"}},
+        {"log_fO2": {"value": -8, "units": "log10(Pa)"}},
         {"log_fO2": -10.5, "oxygen_buffer_as_published": "IW"},
     ],
 )
