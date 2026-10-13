@@ -1,0 +1,328 @@
+schema_version: literature_extract.v1
+source_id: kassis-frischat-1981-silicate-glass-vapour
+source:
+  citation: "Kassis N. and Frischat G.H. (1981). Vapor Pressures of Simple Silicate Glass Melts. Journal of the American Ceramic Society64:C28–C29."
+  doi: 10.1111/j.1151-2916.1981.tb09566.x
+  url: https://doi.org/10.1111/j.1151-2916.1981.tb09566.x
+  year: 1981
+extraction:
+  method: >-
+    Manual extraction from the two-page scan. No pressure table is printed;
+    Figure 2 was digitized at the four labelled temperatures 1300, 1250, 1200,
+    and 1150 °C using the logarithmic pressure axis. Values are approximate
+    readings in Pa and are marked figure_only. The plotted Kroeger and
+    Soerstroem comparison series is excluded because it belongs to the cited
+    work. The abstract's overall pressure envelope is ≈3×10^-2 to 3 Pa. The
+    paper gives total-pressure vaporization enthalpies and entropies but no
+    explicit log p = A - B/T fit or printed validity interval. No uncertainty
+    width or confidence level is stated.
+  date: '2026-10-12'
+  worker: codex
+review_status: draft
+fidelity_samples:
+  - path: species.Na.observations[kassis_1981_fig2_pna].values.points[0].T_C
+    value: 1300
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Na.observations[kassis_1981_fig2_pna].values.points[0].partial_pressure_pa
+    value: 0.25
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Na.observations[kassis_1981_fig2_pna].values.points[1].T_C
+    value: 1250
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Na.observations[kassis_1981_fig2_pna].values.points[1].partial_pressure_pa
+    value: 0.11
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Na.observations[kassis_1981_fig2_pna].values.points[2].T_C
+    value: 1200
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Na.observations[kassis_1981_fig2_pna].values.points[2].partial_pressure_pa
+    value: 0.045
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Na.observations[kassis_1981_fig2_pna].values.points[3].T_C
+    value: 1150
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Na.observations[kassis_1981_fig2_pna].values.points[3].partial_pressure_pa
+    value: 0.03
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Na2O.observations[kassis_1981_fig2_pna2o].values.points[0].T_C
+    value: 1300
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Na2O.observations[kassis_1981_fig2_pna2o].values.points[0].partial_pressure_pa
+    value: 0.42
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Na2O.observations[kassis_1981_fig2_pna2o].values.points[1].T_C
+    value: 1250
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Na2O.observations[kassis_1981_fig2_pna2o].values.points[1].partial_pressure_pa
+    value: 0.19
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Na2O.observations[kassis_1981_fig2_pna2o].values.points[2].T_C
+    value: 1200
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Na2O.observations[kassis_1981_fig2_pna2o].values.points[2].partial_pressure_pa
+    value: 0.075
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Na2O.observations[kassis_1981_fig2_pna2o].values.points[3].T_C
+    value: 1150
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Na2O.observations[kassis_1981_fig2_pna2o].values.points[3].partial_pressure_pa
+    value: 0.028
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Na2O.observations[kassis_1981_fig2_p_total_na_melt].values.points[0].T_C
+    value: 1300
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Na2O.observations[kassis_1981_fig2_p_total_na_melt].values.points[0].pressure_Pa
+    value: 0.65
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Na2O.observations[kassis_1981_fig2_p_total_na_melt].values.points[1].T_C
+    value: 1250
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Na2O.observations[kassis_1981_fig2_p_total_na_melt].values.points[1].pressure_Pa
+    value: 0.3
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Na2O.observations[kassis_1981_fig2_p_total_na_melt].values.points[2].T_C
+    value: 1200
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Na2O.observations[kassis_1981_fig2_p_total_na_melt].values.points[2].pressure_Pa
+    value: 0.12
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Na2O.observations[kassis_1981_fig2_p_total_na_melt].values.points[3].T_C
+    value: 1150
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Na2O.observations[kassis_1981_fig2_p_total_na_melt].values.points[3].pressure_Pa
+    value: 0.045
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Rb.observations[kassis_1981_fig2_prb].values.points[0].T_C
+    value: 1300
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Rb.observations[kassis_1981_fig2_prb].values.points[0].partial_pressure_pa
+    value: 0.75
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Rb.observations[kassis_1981_fig2_prb].values.points[1].T_C
+    value: 1250
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Rb.observations[kassis_1981_fig2_prb].values.points[1].partial_pressure_pa
+    value: 0.34
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Rb.observations[kassis_1981_fig2_prb].values.points[2].T_C
+    value: 1200
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Rb.observations[kassis_1981_fig2_prb].values.points[2].partial_pressure_pa
+    value: 0.13
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Rb.observations[kassis_1981_fig2_prb].values.points[3].T_C
+    value: 1150
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Rb.observations[kassis_1981_fig2_prb].values.points[3].partial_pressure_pa
+    value: 0.05
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Rb2O.observations[kassis_1981_fig2_prb2o].values.points[0].T_C
+    value: 1300
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Rb2O.observations[kassis_1981_fig2_prb2o].values.points[0].partial_pressure_pa
+    value: 2.4
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Rb2O.observations[kassis_1981_fig2_prb2o].values.points[1].T_C
+    value: 1250
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Rb2O.observations[kassis_1981_fig2_prb2o].values.points[1].partial_pressure_pa
+    value: 1.1
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Rb2O.observations[kassis_1981_fig2_prb2o].values.points[2].T_C
+    value: 1200
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Rb2O.observations[kassis_1981_fig2_prb2o].values.points[2].partial_pressure_pa
+    value: 0.43
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Rb2O.observations[kassis_1981_fig2_prb2o].values.points[3].T_C
+    value: 1150
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Rb2O.observations[kassis_1981_fig2_prb2o].values.points[3].partial_pressure_pa
+    value: 0.16
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Rb2O.observations[kassis_1981_fig2_p_total_rb_melt].values.points[0].T_C
+    value: 1300
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Rb2O.observations[kassis_1981_fig2_p_total_rb_melt].values.points[0].pressure_Pa
+    value: 3.0
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Rb2O.observations[kassis_1981_fig2_p_total_rb_melt].values.points[1].T_C
+    value: 1250
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Rb2O.observations[kassis_1981_fig2_p_total_rb_melt].values.points[1].pressure_Pa
+    value: 1.4
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Rb2O.observations[kassis_1981_fig2_p_total_rb_melt].values.points[2].T_C
+    value: 1200
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Rb2O.observations[kassis_1981_fig2_p_total_rb_melt].values.points[2].pressure_Pa
+    value: 0.55
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Rb2O.observations[kassis_1981_fig2_p_total_rb_melt].values.points[3].T_C
+    value: 1150
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Rb2O.observations[kassis_1981_fig2_p_total_rb_melt].values.points[3].pressure_Pa
+    value: 0.2
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Na.observations[kassis_1981_fig2_pna].values.experimental_conditions_as_printed
+    value: "Approximately 2 g of glass in a Pt Knudsen cell (15 mm diameter, 20 mm height, 0.2 mm wall thickness), with a 0.8 mm Knudsen hole; cell in a vacuum of 6.6×10^-4 Pa; calibration with 99.998% Cu; effusion weight loss recorded continuously. Run duration and heating method are not stated."
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Na2O.observations[kassis_1981_fig2_pna2o].values.experimental_conditions_as_printed
+    value: "Approximately 2 g of glass in a Pt Knudsen cell (15 mm diameter, 20 mm height, 0.2 mm wall thickness), with a 0.8 mm Knudsen hole; cell in a vacuum of 6.6×10^-4 Pa; calibration with 99.998% Cu; effusion weight loss recorded continuously. Run duration and heating method are not stated."
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Na2O.observations[kassis_1981_fig2_p_total_na_melt].values.experimental_conditions_as_printed
+    value: "Approximately 2 g of glass in a Pt Knudsen cell (15 mm diameter, 20 mm height, 0.2 mm wall thickness), with a 0.8 mm Knudsen hole; cell in a vacuum of 6.6×10^-4 Pa; calibration with 99.998% Cu; effusion weight loss recorded continuously. Run duration and heating method are not stated."
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Rb.observations[kassis_1981_fig2_prb].values.experimental_conditions_as_printed
+    value: "Approximately 2 g of glass in a Pt Knudsen cell (15 mm diameter, 20 mm height, 0.2 mm wall thickness), with a 0.8 mm Knudsen hole; cell in a vacuum of 6.6×10^-4 Pa; calibration with 99.998% Cu; effusion weight loss recorded continuously. Run duration and heating method are not stated."
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Rb2O.observations[kassis_1981_fig2_prb2o].values.experimental_conditions_as_printed
+    value: "Approximately 2 g of glass in a Pt Knudsen cell (15 mm diameter, 20 mm height, 0.2 mm wall thickness), with a 0.8 mm Knudsen hole; cell in a vacuum of 6.6×10^-4 Pa; calibration with 99.998% Cu; effusion weight loss recorded continuously. Run duration and heating method are not stated."
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - path: species.Rb2O.observations[kassis_1981_fig2_p_total_rb_melt].values.experimental_conditions_as_printed
+    value: "Approximately 2 g of glass in a Pt Knudsen cell (15 mm diameter, 20 mm height, 0.2 mm wall thickness), with a 0.8 mm Knudsen hole; cell in a vacuum of 6.6×10^-4 Pa; calibration with 99.998% Cu; effusion weight loss recorded continuously. Run duration and heating method are not stated."
+    locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+  - species: Na
+    observation_id: kassis_1981_abstract_pressure_envelope
+    field: pressure_range_Pa_as_printed
+    value: '≈3×10^-2 to 3 Pa'
+    locator: {page: 1, published_page: 'C-28', pdf_page_index: 0, section: Abstract}
+species:
+  Na:
+    observations:
+      - observation_id: kassis_1981_fig2_pna
+        type: partial_pressure
+        regime: knudsen_effusion
+        locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+        phase: gas
+        units: Pa, figure-digitized
+        values:
+          quantity: partial_pressure
+          method_class: figure_only
+          evidence_class: figure_only
+          experimental_conditions_as_printed: "Approximately 2 g of glass in a Pt Knudsen cell (15 mm diameter, 20 mm height, 0.2 mm wall thickness), with a 0.8 mm Knudsen hole; cell in a vacuum of 6.6×10^-4 Pa; calibration with 99.998% Cu; effusion weight loss recorded continuously. Run duration and heating method are not stated."
+          pressure_species: Na(g)
+          melt_composition_as_printed: Na2O·3SiO2
+          method_as_printed: Knudsen-effusion method; Pt Knudsen cell on microbalance
+          figure_read_method: read from logarithmic pressure axis at labelled temperature ticks
+          points:
+            - {T_C: 1300, partial_pressure_pa: 0.25, point_conditions: {temperature_C: {state: {tag: value, value: 1300}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
+            - {T_C: 1250, partial_pressure_pa: 0.11, point_conditions: {temperature_C: {state: {tag: value, value: 1250}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
+            - {T_C: 1200, partial_pressure_pa: 0.045, point_conditions: {temperature_C: {state: {tag: value, value: 1200}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
+            - {T_C: 1150, partial_pressure_pa: 0.03, point_conditions: {temperature_C: {state: {tag: value, value: 1150}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
+    context:
+      - observation_id: kassis_1981_abstract_pressure_envelope
+        type: method
+        locator: {page: 1, published_page: 'C-28', pdf_page_index: 0, section: Abstract}
+        units: Pa as printed
+        values:
+          quantity: abstract overall vapor-pressure envelope
+          method_class: method_only
+          pressure_range_Pa_as_printed: '≈3×10^-2 to 3 Pa'
+          applicability: overall range reported for the two melt systems, not species- or temperature-resolved
+  Na2O:
+    observations:
+      - observation_id: kassis_1981_fig2_pna2o
+        type: partial_pressure
+        regime: knudsen_effusion
+        locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+        phase: gas
+        units: Pa, figure-digitized
+        values:
+          quantity: partial_pressure
+          method_class: figure_only
+          evidence_class: figure_only
+          experimental_conditions_as_printed: "Approximately 2 g of glass in a Pt Knudsen cell (15 mm diameter, 20 mm height, 0.2 mm wall thickness), with a 0.8 mm Knudsen hole; cell in a vacuum of 6.6×10^-4 Pa; calibration with 99.998% Cu; effusion weight loss recorded continuously. Run duration and heating method are not stated."
+          pressure_species: Na2O(g)
+          melt_composition_as_printed: Na2O·3SiO2
+          method_as_printed: Knudsen-effusion method; Pt Knudsen cell on microbalance
+          figure_read_method: read from logarithmic pressure axis at labelled temperature ticks
+          points:
+            - {T_C: 1300, partial_pressure_pa: 0.42, point_conditions: {temperature_C: {state: {tag: value, value: 1300}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
+            - {T_C: 1250, partial_pressure_pa: 0.19, point_conditions: {temperature_C: {state: {tag: value, value: 1250}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
+            - {T_C: 1200, partial_pressure_pa: 0.075, point_conditions: {temperature_C: {state: {tag: value, value: 1200}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
+            - {T_C: 1150, partial_pressure_pa: 0.028, point_conditions: {temperature_C: {state: {tag: value, value: 1150}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
+      - observation_id: kassis_1981_fig2_p_total_na_melt
+        type: psat_series
+        regime: knudsen_effusion
+        locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+        phase: gas
+        units: Pa, figure-digitized
+        values:
+          quantity: p_sat
+          method_class: figure_only
+          evidence_class: figure_only
+          experimental_conditions_as_printed: "Approximately 2 g of glass in a Pt Knudsen cell (15 mm diameter, 20 mm height, 0.2 mm wall thickness), with a 0.8 mm Knudsen hole; cell in a vacuum of 6.6×10^-4 Pa; calibration with 99.998% Cu; effusion weight loss recorded continuously. Run duration and heating method are not stated."
+          admission_status: admitted
+          pressure_label_as_printed: total vapor pressure of Na2O·3SiO2 system
+          method_as_printed: Knudsen-effusion method; Pt Knudsen cell on microbalance
+          figure_read_method: read from logarithmic pressure axis at labelled temperature ticks
+          points:
+            - {T_C: 1300, pressure_Pa: 0.65, point_conditions: {temperature_C: {state: {tag: value, value: 1300}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
+            - {T_C: 1250, pressure_Pa: 0.30, point_conditions: {temperature_C: {state: {tag: value, value: 1250}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
+            - {T_C: 1200, pressure_Pa: 0.12, point_conditions: {temperature_C: {state: {tag: value, value: 1200}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
+            - {T_C: 1150, pressure_Pa: 0.045, point_conditions: {temperature_C: {state: {tag: value, value: 1150}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
+  Rb:
+    observations:
+      - observation_id: kassis_1981_fig2_prb
+        type: partial_pressure
+        regime: knudsen_effusion
+        locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+        phase: gas
+        units: Pa, figure-digitized
+        values:
+          quantity: partial_pressure
+          method_class: figure_only
+          evidence_class: figure_only
+          experimental_conditions_as_printed: "Approximately 2 g of glass in a Pt Knudsen cell (15 mm diameter, 20 mm height, 0.2 mm wall thickness), with a 0.8 mm Knudsen hole; cell in a vacuum of 6.6×10^-4 Pa; calibration with 99.998% Cu; effusion weight loss recorded continuously. Run duration and heating method are not stated."
+          pressure_species: Rb(g)
+          melt_composition_as_printed: Rb2O·3SiO2
+          method_as_printed: Knudsen-effusion method; Pt Knudsen cell on microbalance
+          figure_read_method: read from logarithmic pressure axis at labelled temperature ticks
+          points:
+            - {T_C: 1300, partial_pressure_pa: 0.75, point_conditions: {temperature_C: {state: {tag: value, value: 1300}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
+            - {T_C: 1250, partial_pressure_pa: 0.34, point_conditions: {temperature_C: {state: {tag: value, value: 1250}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
+            - {T_C: 1200, partial_pressure_pa: 0.13, point_conditions: {temperature_C: {state: {tag: value, value: 1200}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
+            - {T_C: 1150, partial_pressure_pa: 0.05, point_conditions: {temperature_C: {state: {tag: value, value: 1150}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
+  Rb2O:
+    observations:
+      - observation_id: kassis_1981_fig2_prb2o
+        type: partial_pressure
+        regime: knudsen_effusion
+        locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+        phase: gas
+        units: Pa, figure-digitized
+        values:
+          quantity: partial_pressure
+          method_class: figure_only
+          evidence_class: figure_only
+          experimental_conditions_as_printed: "Approximately 2 g of glass in a Pt Knudsen cell (15 mm diameter, 20 mm height, 0.2 mm wall thickness), with a 0.8 mm Knudsen hole; cell in a vacuum of 6.6×10^-4 Pa; calibration with 99.998% Cu; effusion weight loss recorded continuously. Run duration and heating method are not stated."
+          pressure_species: Rb2O(g)
+          melt_composition_as_printed: Rb2O·3SiO2
+          method_as_printed: Knudsen-effusion method; Pt Knudsen cell on microbalance
+          figure_read_method: read from logarithmic pressure axis at labelled temperature ticks
+          points:
+            - {T_C: 1300, partial_pressure_pa: 2.4, point_conditions: {temperature_C: {state: {tag: value, value: 1300}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
+            - {T_C: 1250, partial_pressure_pa: 1.1, point_conditions: {temperature_C: {state: {tag: value, value: 1250}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
+            - {T_C: 1200, partial_pressure_pa: 0.43, point_conditions: {temperature_C: {state: {tag: value, value: 1200}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
+            - {T_C: 1150, partial_pressure_pa: 0.16, point_conditions: {temperature_C: {state: {tag: value, value: 1150}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
+      - observation_id: kassis_1981_fig2_p_total_rb_melt
+        type: psat_series
+        regime: knudsen_effusion
+        locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}
+        phase: gas
+        units: Pa, figure-digitized
+        values:
+          quantity: p_sat
+          method_class: figure_only
+          evidence_class: figure_only
+          experimental_conditions_as_printed: "Approximately 2 g of glass in a Pt Knudsen cell (15 mm diameter, 20 mm height, 0.2 mm wall thickness), with a 0.8 mm Knudsen hole; cell in a vacuum of 6.6×10^-4 Pa; calibration with 99.998% Cu; effusion weight loss recorded continuously. Run duration and heating method are not stated."
+          admission_status: admitted
+          pressure_label_as_printed: total vapor pressure of Rb2O·3SiO2 system
+          method_as_printed: Knudsen-effusion method; Pt Knudsen cell on microbalance
+          figure_read_method: read from logarithmic pressure axis at labelled temperature ticks
+          points:
+            - {T_C: 1300, pressure_Pa: 3.0, point_conditions: {temperature_C: {state: {tag: value, value: 1300}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
+            - {T_C: 1250, pressure_Pa: 1.4, point_conditions: {temperature_C: {state: {tag: value, value: 1250}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
+            - {T_C: 1200, pressure_Pa: 0.55, point_conditions: {temperature_C: {state: {tag: value, value: 1200}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
+            - {T_C: 1150, pressure_Pa: 0.20, point_conditions: {temperature_C: {state: {tag: value, value: 1150}, locator: {page: 2, published_page: 'C-29', pdf_page_index: 1, figure: '2'}}}}
