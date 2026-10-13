@@ -11,6 +11,21 @@ extraction:
 review_status: draft
 fidelity_samples:
   - species: NaO0.5
+    observation_id: oneill_2005_fig1_sodium_exchange_figure_only
+    field: caption
+    value: >-
+      FIGURE 1. Sodium exchange among compositions from a conventional
+      wire-loop experiment (B26/3/02) on the join ADeu–Na2SiO3, run at 1400
+      ºC, fO2 = 10–12 bars, 118 hours. Compositions are the means of six
+      analyses, error bars are ±2σ, and SiO2 is plotted renormalized to an
+      Na-free basis ([SiO2]º). The intended compositions would fall on the
+      dashed curve. Final compositions show both Na gain (the two samples
+      lowest in SiO2) and Na loss. The remarkably regular correlation between
+      final [NaO0.5] and [SiO2]º is explained by assuming constant aNaO0.5
+      among the samples, with the correlation caused by decreasing γNaO0.5
+      with increasing SiO2.
+    locator: {page: 2, published_page: 498, pdf_page_index: 1, figure: '1'}
+  - species: NaO0.5
     observation_id: oneill_2005_table1_relative_log_coefficients
     field: points
     value:
@@ -58,6 +73,32 @@ fidelity_samples:
 species:
   NaO0.5:
     observations:
+      - observation_id: oneill_2005_fig1_sodium_exchange_figure_only
+        type: concentration_series
+        locator: {page: 2, published_page: 498, pdf_page_index: 1, figure: '1'}
+        T_range_K: [1673.15, 1673.15]
+        phase: condensed_liquid
+        regime: quench_equilibration
+        units: NaO0.5 wt% and SiO2 wt% renormalized to an Na-free basis, as printed
+        values:
+          method_class: figure_only
+          admission_status: figure_only
+          semantics: bound_not_point_ordering
+          caption: >-
+            FIGURE 1. Sodium exchange among compositions from a conventional
+            wire-loop experiment (B26/3/02) on the join ADeu–Na2SiO3, run at 1400
+            ºC, fO2 = 10–12 bars, 118 hours. Compositions are the means of six
+            analyses, error bars are ±2σ, and SiO2 is plotted renormalized to an
+            Na-free basis ([SiO2]º). The intended compositions would fall on the
+            dashed curve. Final compositions show both Na gain (the two samples
+            lowest in SiO2) and Na loss. The remarkably regular correlation between
+            final [NaO0.5] and [SiO2]º is explained by assuming constant aNaO0.5
+            among the samples, with the correlation caused by decreasing γNaO0.5
+            with increasing SiO2.
+          note: >-
+            Axes: NaO0.5 content (wt%) against SiO2 content (wt%) renormalized
+            to an Na-free basis, [SiO2]º. Each plotted composition is the mean
+            of six analyses; error bars are ±2σ. Not digitised.
       - observation_id: oneill_2005_fig2_measured_solubility_figure_only
         type: concentration_series
         locator: {page: 3, published_page: 499, pdf_page_index: 2, figure: '2'}
