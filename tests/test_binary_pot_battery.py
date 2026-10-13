@@ -248,14 +248,19 @@ def test_classify_out_of_domain_and_no_liquid() -> None:
 @pytest.mark.parametrize(
     ("liquid_fraction", "expected"),
     [
-        (0.0, ("refusal", "no_liquid")),
-        (-0.25, ("refusal", "no_liquid")),
-        (1.0e-15, ("ok", None)),
-        (1.1, ("ok", None)),
+        (None, ("ok", None)),
         (math.nan, ("ok", None)),
+        (math.inf, ("ok", None)),
+        (-0.1, ("refusal", "no_liquid")),
+        (1.2, ("ok", None)),
+        (0.0, ("refusal", "no_liquid")),
+        (1.0, ("ok", None)),
+        (0.5, ("ok", None)),
+        (1.0e-15, ("ok", None)),
     ],
 )
-def test_classify_legacy_no_liquid_boundary_values(liquid_fraction, expected):
+def test_classify_legacy_liquid_fraction_boundary_values(liquid_fraction, expected):
+    """Pin current classifier behavior before b-870 changes it."""
     result = SimpleNamespace(
         status="ok",
         diagnostics={},
