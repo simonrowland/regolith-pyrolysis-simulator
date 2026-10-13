@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 292
-  extracts: 290
+  sources: 297
+  extracts: 295
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 59
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 290
+  extracts_without_pdf: 295
   alias_groups_needing_resolution: 36
 gaps:
   pdfs_without_extract: []
@@ -53,6 +53,7 @@ gaps:
   - deffrennes-2020-ca-o-calphad
   - deguzman-2026-simulant-physicochemical
   - engelschion-2020-eac1a-simulant
+  - ewing-1963-sodium-potassium-properties
   - fdm879
   - fegley-2016-rock-steam-solubility
   - fegley-2023-chemical-equilibrium-calculations-bu
@@ -190,6 +191,7 @@ gaps:
   - lpsc-2019-2641
   - lpsc-2024-bennu-pyrolysis-vandam
   - lunarsurface-2020-5029
+  - mamiya-2000-sio-disproportionation
   - mendybaev-2017-fun-cai-lab-evaporation
   - mendybaev-2021-cai-low-pressure-h2-evap
   - metsoc-2019-6005
@@ -259,6 +261,7 @@ gaps:
   - senior-1991-solar-heating-jbis
   - senior-1991-vacuum-pyrolysis
   - senior-1992-vacuum-pyrolysis
+  - sesko-2022-tum-thesis
   - sf04-magma-companion-workbook
   - shaw-2023-vacuum-thermal-sublimation-thesis
   - shornikov-1994-mullite-kems
@@ -283,6 +286,8 @@ gaps:
   - stolyarova-1996-cao-alumina-silica-kems
   - street-2010-thermal-properties-simulants
   - sublimation-kinetics-2023-minerals
+  - sutherland-2025-mare-simulant-volatile-loss
+  - suzuki-2026-vacuum-oxygen-extraction
   - ta-badro-2021
   - ta-dacko-conradt-low-p-transpiration
   - ta-flemetakis-2024
@@ -2637,6 +2642,63 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: ewing-1963-sodium-potassium-properties
+  aliases: []
+  citation: Ewing C.T. et al. (1963) High temperature properties of sodium and potassium. DTIC AD0405673.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/ewing-1963-sodium-potassium-properties.yaml
+    review_status: draft
+    rows: 1
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/ewing-1963-sodium-potassium-properties/ewing-1963-sodium-potassium-properties.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/ewing-1963-sodium-potassium-properties/sidecar.yaml
+      present: false
+    text:
+      path: text/ewing-1963-sodium-potassium-properties
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/ewing-1963-sodium-potassium-properties
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/ewing-1963-sodium-potassium-properties.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/ewing-1963-sodium-potassium-properties.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: fdm879
   aliases: []
@@ -10544,6 +10606,64 @@ sources:
       last_stage: decoded
       date: '2026-09-06'
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: mamiya-2000-sio-disproportionation
+  aliases: []
+  citation: Mamiya M. (2000). Thermoanalytical study on the disproportionation reaction of silicon monoxide.
+    Osaka University doctoral dissertation.
+  doi: 10.11501/3169166
+  report_number: null
+  identifier: 10.11501/3169166
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/mamiya-2000-sio-disproportionation.yaml
+    review_status: draft
+    rows: 2
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/mamiya-2000-sio-disproportionation/mamiya-2000-sio-disproportionation.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/mamiya-2000-sio-disproportionation/sidecar.yaml
+      present: false
+    text:
+      path: text/mamiya-2000-sio-disproportionation
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/mamiya-2000-sio-disproportionation
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/mamiya-2000-sio-disproportionation.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/mamiya-2000-sio-disproportionation.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: mendybaev-2017-fun-cai-lab-evaporation
   aliases: []
   citation: 'Mendybaev, R. A., Williams, C. D., Spicuzza, M. J., Richter, F. M., Valley, J. W., Fedkin,
@@ -14642,6 +14762,65 @@ sources:
       last_stage: decoded
       date: '2026-09-06'
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: sesko-2022-tum-thesis
+  aliases: []
+  citation: 'Šeško R. (2022) Solar-vapor pyrolysis of lunar regolith for oxygen production in high vacuum:
+    An experimental investigation and thermochemical modeling. Technical University of Munich, M.Sc. thesis
+    RT-MA 2022/01.'
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/sesko-2022-tum-thesis.yaml
+    review_status: draft
+    rows: 0
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/sesko-2022-tum-thesis/sesko-2022-tum-thesis.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/sesko-2022-tum-thesis/sidecar.yaml
+      present: false
+    text:
+      path: text/sesko-2022-tum-thesis
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/sesko-2022-tum-thesis
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/sesko-2022-tum-thesis.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/sesko-2022-tum-thesis.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: sf04-magma-companion-workbook
   aliases:
   - kems-008-schaefer-fegley-2004
@@ -16041,6 +16220,123 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: sutherland-2025-mare-simulant-volatile-loss
+  aliases: []
+  citation: Sutherland J. et al. (2025) Volatile loss during heating of lunar mare simulants and related
+    compositions. Chemical Geology 698, 123115.
+  doi: 10.1016/j.chemgeo.2025.123115
+  report_number: null
+  identifier: 10.1016/j.chemgeo.2025.123115
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/sutherland-2025-mare-simulant-volatile-loss.yaml
+    review_status: draft
+    rows: 6
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/sutherland-2025-mare-simulant-volatile-loss/sutherland-2025-mare-simulant-volatile-loss.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/sutherland-2025-mare-simulant-volatile-loss/sidecar.yaml
+      present: false
+    text:
+      path: text/sutherland-2025-mare-simulant-volatile-loss
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/sutherland-2025-mare-simulant-volatile-loss
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/sutherland-2025-mare-simulant-volatile-loss.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/sutherland-2025-mare-simulant-volatile-loss.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: suzuki-2026-vacuum-oxygen-extraction
+  aliases: []
+  citation: 'Suzuki, Masanori; Sato, Yuji; Morisada, Yoshiaki; Aoki, Yasuhiro; Tsukamoto, Masahiro; Kirihara,
+    Soshu; Fujii, Hidetoshi (2026). Vacuum-induced oxygen extraction from Fe-bearing model minerals: implications
+    for lunar regolith processing. Scientific Reports .'
+  doi: 10.1038/s41598-026-70347-2
+  report_number: null
+  identifier: 10.1038/s41598-026-70347-2
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/suzuki-2026-vacuum-oxygen-extraction.yaml
+    review_status: draft
+    rows: 7
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/suzuki-2026-vacuum-oxygen-extraction/suzuki-2026-vacuum-oxygen-extraction.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/suzuki-2026-vacuum-oxygen-extraction/sidecar.yaml
+      present: false
+    text:
+      path: text/suzuki-2026-vacuum-oxygen-extraction
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/suzuki-2026-vacuum-oxygen-extraction
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/suzuki-2026-vacuum-oxygen-extraction.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/suzuki-2026-vacuum-oxygen-extraction.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: ta-badro-2021
   aliases: []
