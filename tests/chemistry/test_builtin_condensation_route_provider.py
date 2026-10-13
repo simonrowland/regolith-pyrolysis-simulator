@@ -175,28 +175,34 @@ EXPECTED_C4B_WALL_SEGMENT_DEPOSITS_KG = {
     "lunar_mare_low_ti": {
         # Partial-pressure caps remove Cr/Na/K capture; Fe depletes locally.
         # 0c56d99 pin 0.024262339673022347 -> SC-109 residual-path Fe below.
-        # b-114 restores CrO2's missing-alpha refusal. Removing its two
-        # prototype fallback debits changes the shared redox trajectory by a
-        # sub-ppb fraction; this Fe wall pin records that typed non-debit.
+        # b-878 replaces the olivine-evaporation proxy with the measured
+        # pure-Fe condensation fit. In the C0-C6 route this increases the
+        # first-segment Fe deposit from 0.44888461081988 kg at bf8560703 to
+        # 0.5894292120925236 kg at the executable tip.
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Fe": 0.02233913212821439,
+            "Fe": 0.5894292120925236,
         },
     },
     "mars_basalt": {
         # Na/K stay undersaturated; the limited Fe supply depletes locally.
         # 0c56d99 pin 0.02795693349498251 -> SC-109 residual-path Fe below.
+        # b-878's measured Fe condensation fit changes the executable C0-C6
+        # wall deposit from 0.018627917116189163 kg at bf8560703 to
+        # 0.023299288608275775 kg at this tip. The prior 0.025541 pin was
+        # already red at the base.
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Fe": 0.02554135495921052,
+            "Fe": 0.023299288608275775,
         },
     },
     "s_type_asteroid_silicate": {
         # Partial-pressure caps remove Cr/Na/K capture; Fe depletes locally.
         # 0c56d99 pin 0.04468148521030869 -> SC-109 residual-path Fe below.
-        # b-114 restores CrO2's missing-alpha refusal. Removing its prototype
-        # fallback debits shifts the shared redox trajectory by a sub-ppb
-        # fraction; this Fe wall pin records that typed non-debit.
+        # b-878's measured Fe condensation fit changes the executable C0-C6
+        # wall deposit from 0.22010473596741878 kg at bf8560703 to
+        # 0.28624695642910325 kg at this tip. The prior 0.013403 pin was
+        # already red at the base.
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Fe": 0.01340255688015776,
+            "Fe": 0.28624695642910325,
         },
     },
 }
