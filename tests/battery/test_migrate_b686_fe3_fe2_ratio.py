@@ -198,6 +198,83 @@ def test_migrator_reduces_ferric_fraction_series_points(tmp_path: Path) -> None:
         assert name == "original_Fe3_over_FeT"
 
 
+def test_redox_row_log_overrides_series_oxygen_and_inherits_when_absent(
+    tmp_path: Path,
+) -> None:
+    path = _fixture_extract(tmp_path, [{
+        "observation_id": "fixture_row_log",
+        "experiment": "aithala-2026-vf271",
+        "T_range_K": None,
+        "values": {
+            "method_class": "measured_direct",
+            "quantity": "fe3_fe2_ratio",
+            "admission_status": "admitted",
+            "oxygen_partial_pressure": {"value": "1e-7", "units": "bar"},
+            "series": [
+                {"T_C": 1250, "Fe3_over_FeT": 0.5},
+                {"T_C": 1260, "Fe3_over_FeT": 0.25, "log10_fO2": -8},
+            ],
+        },
+    }])
+    rows = [
+        obs
+        for obs in _migrate(path).observations.values()
+        if "fixture_row_log::" in obs.observation_id
+    ]
+    assert len(rows) == 2
+    assert rows[0].identity.fO2_Pa.value == Decimal("0.01")
+    assert rows[1].identity.fO2_Pa.value == Decimal("0.001")
+
+
+@pytest.mark.parametrize(
+    "row_fields",
+    [
+        {
+            "point_conditions": {
+                "fO2_log": {
+                    "state": {
+                        "tag": "value",
+                        "value": {
+                            "kind": "bound",
+                            "bound_operator": "<",
+                            "bound_value": "-8",
+                        },
+                    },
+                    "locator": {"published_page": 1},
+                }
+            }
+        },
+        {"log_fO2": {"value": -2, "units": "log10(IW)"}},
+        {"log_fO2": -10.5, "oxygen_buffer_as_published": "IW"},
+    ],
+)
+def test_bounded_or_buffer_relative_redox_row_does_not_inherit_series_fO2_point(
+    tmp_path: Path, row_fields: dict
+) -> None:
+    path = _fixture_extract(tmp_path, [{
+        "observation_id": "fixture_bounded_row",
+        "experiment": "aithala-2026-vf271",
+        "T_range_K": None,
+        "values": {
+            "method_class": "measured_direct",
+            "quantity": "fe3_fe2_ratio",
+            "admission_status": "admitted",
+            "oxygen_partial_pressure": {"value": "1e-7", "units": "bar"},
+            "series": [{
+                "T_C": 1250,
+                "Fe3_over_FeT": 0.5,
+                **row_fields,
+            }],
+        },
+    }])
+    rows = [
+        obs for obs in _migrate(path).observations.values()
+        if "fixture_bounded_row::" in obs.observation_id
+    ]
+    assert len(rows) == 1
+    assert rows[0].identity.fO2_Pa.is_unknown
+
+
 def test_declared_ratio_from_ferric_fraction_is_r_over_one_minus_r() -> None:
     # b-686 change: was unavailable ("no mapped fe3_fe2_ratio field selected").
     sel = select_declared_source(
