@@ -13347,6 +13347,84 @@ entries:
       note: These are the printed prose values; the complete Table 2 and Supplementary Table S4 series are not present as
         readable tables in the supplied PDF.
       source_path: corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+- work_id: 10.1016/j.chemgeo.2025.123115
+  source: data/literature/extracts/sutherland-2025-mare-simulant-volatile-loss.yaml
+  why: phase string 'EAC-1A mare simulant' is not in the closed automatic map
+  axes:
+  - phase
+  observations:
+  - observation_id: sutherland-2025-mare-simulant-volatile-loss::sutherland_2025_eac_1a_total_mass_loss_150_1300_c::T=1573.15:h=1ea83e50e59c
+    locator:
+      page: 5
+      published_page: 5
+      pdf_page_index: 4
+      table: '1'
+      note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature varying.
+- work_id: 10.1016/j.chemgeo.2025.123115
+  source: data/literature/extracts/sutherland-2025-mare-simulant-volatile-loss.yaml
+  why: phase string 'JSC-1A mare simulant' is not in the closed automatic map
+  axes:
+  - phase
+  observations:
+  - observation_id: sutherland-2025-mare-simulant-volatile-loss::sutherland_2025_jsc_1a_total_mass_loss_150_1300_c::T=1573.15:h=43be52741ae1
+    locator:
+      page: 5
+      published_page: 5
+      pdf_page_index: 4
+      table: '1'
+      note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature varying.
+- work_id: 10.1016/j.chemgeo.2025.123115
+  source: data/literature/extracts/sutherland-2025-mare-simulant-volatile-loss.yaml
+  why: phase string 'LMS-1 mare simulant' is not in the closed automatic map
+  axes:
+  - phase
+  observations:
+  - observation_id: sutherland-2025-mare-simulant-volatile-loss::sutherland_2025_lms_1_total_mass_loss_150_1300_c::T=1573.15:h=0d8bce737fd6
+    locator:
+      page: 5
+      published_page: 5
+      pdf_page_index: 4
+      table: '1'
+      note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature varying.
+- work_id: 10.1016/j.chemgeo.2025.123115
+  source: data/literature/extracts/sutherland-2025-mare-simulant-volatile-loss.yaml
+  why: phase string 'OPRL2N mare simulant' is not in the closed automatic map
+  axes:
+  - phase
+  observations:
+  - observation_id: sutherland-2025-mare-simulant-volatile-loss::sutherland_2025_oprl2n_total_mass_loss_150_1300_c::T=1573.15:h=3e91578768b6
+    locator:
+      page: 5
+      published_page: 5
+      pdf_page_index: 4
+      table: '1'
+      note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature varying.
+- work_id: 10.1016/j.chemgeo.2025.123115
+  source: data/literature/extracts/sutherland-2025-mare-simulant-volatile-loss.yaml
+  why: phase string 'OPRL2NT mare simulant' is not in the closed automatic map
+  axes:
+  - phase
+  observations:
+  - observation_id: sutherland-2025-mare-simulant-volatile-loss::sutherland_2025_oprl2nt_total_mass_loss_150_1300_c::T=1573.15:h=addecbfa1c00
+    locator:
+      page: 5
+      published_page: 5
+      pdf_page_index: 4
+      table: '1'
+      note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature varying.
+- work_id: 10.1016/j.chemgeo.2025.123115
+  source: data/literature/extracts/sutherland-2025-mare-simulant-volatile-loss.yaml
+  why: phase string 'TUBS-M mare simulant' is not in the closed automatic map
+  axes:
+  - phase
+  observations:
+  - observation_id: sutherland-2025-mare-simulant-volatile-loss::sutherland_2025_tubs_m_total_mass_loss_150_1300_c::T=1573.15:h=3ce5cdf1bdae
+    locator:
+      page: 5
+      published_page: 5
+      pdf_page_index: 4
+      table: '1'
+      note: −Δwt%, 150–1300 °C applied range, 10-min hold; applied furnace upper limit, with maximum sample temperature varying.
 - work_id: 10.1016/j.gca.2003.08.019
   source: data/literature/extracts/murchison-hydropyrolysis-1990s-gca.yaml
   why: PAGE method_class method_only
@@ -109833,16 +109911,6 @@ entries:
       paragraph: English Synopsis + Japanese 結言 (2)
       note: Synopsis and conclusions state the 1200 °C span; 60 mol% endpoint is not in Table 2 (Table 2 stops at X=0.55).
         5e-5 at 60 mol% is the authors' Fig. 4 reading, retained as prose, not re-digitized.
-  - observation_id: ts1985::ts1985_na2o_table2_log10_a_AT_B::rows:h=09c92b1c7b22
-    locator:
-      page: 7
-      published_page: 821
-      pdf_page_index: 7
-      table: '2'
-      figure: '4'
-      equation: log a_Na2O = A/T + B
-      note: Table 2 coefficients. Authors state (p.820) that A, B were obtained by reading Fig. 4 at X_Na2O = 0.40, 0.45,
-        0.50, 0.55 (「Fig.4の結果から読みとつた」). Evaluated a and γ below use the printed A, B; they are not independent figure reads.
 - work_id: 10.2355/tetsutohagane1955.71.7_815
   source: data/literature/extracts/ts1985.yaml
   why: unsupported quantity 'activity_and_raoultian_gamma'
@@ -185750,48 +185818,6 @@ entries:
   axes:
   - derived_from
   observations:
-  - observation_id: stolyarova-1996-cao-alumina-silica-kems::stolyarova_1996_fig1_al2o3_activity_figure_only
-    locator:
-      page: 21
-      published_page: 21
-      pdf_page_index: 6
-      figure: '1'
-      note: Figure 1 panel B; activity map continued on published p.22. Figure-only placeholder; no digitization.
-  - observation_id: stolyarova-1996-cao-alumina-silica-kems::stolyarova_1996_fig1_cao_activity_figure_only
-    locator:
-      page: 21
-      published_page: 21
-      pdf_page_index: 6
-      figure: '1'
-      note: Figure 1 panel A; activity map continued on published p.22. Figure-only placeholder; no digitization.
-  - observation_id: stolyarova-1996-cao-alumina-silica-kems::stolyarova_1996_fig1_sio2_activity_figure_only
-    locator:
-      page: 21
-      published_page: 21
-      pdf_page_index: 6
-      figure: '1'
-      note: Figure 1 panel C; activity map continued on published p.22. Figure-only placeholder; no digitization.
-  - observation_id: stolyarova-1996-cao-alumina-silica-kems::stolyarova_1996_fig2_al2o3_activity_figure_only
-    locator:
-      page: 26
-      published_page: 26
-      pdf_page_index: 11
-      figure: '2'
-      note: Figure 2 activity-comparison panels continue through published pp.26–29. Figure-only placeholder; no digitization.
-  - observation_id: stolyarova-1996-cao-alumina-silica-kems::stolyarova_1996_fig2_cao_activity_figure_only
-    locator:
-      page: 26
-      published_page: 26
-      pdf_page_index: 11
-      figure: '2'
-      note: Figure 2 activity-comparison panels continue through published pp.26–29. Figure-only placeholder; no digitization.
-  - observation_id: stolyarova-1996-cao-alumina-silica-kems::stolyarova_1996_fig2_sio2_activity_figure_only
-    locator:
-      page: 26
-      published_page: 26
-      pdf_page_index: 11
-      figure: '2'
-      note: Figure 2 activity-comparison panels continue through published pp.26–29. Figure-only placeholder; no digitization.
   - observation_id: stolyarova-1996-cao-alumina-silica-kems::stolyarova_1996_table2_pO_1933k::points:h=0308c11588ab
     locator:
       page: 20
@@ -187136,54 +187162,6 @@ entries:
       pdf_page_index: 8
       table: '3'
       note: Table 3 row xA/xC=0.35, xS=0.50; activity column 5 (SiO2) cell=0.301
-- work_id: 46e00f6d80bff6f90992354a3203171b972f08e22cc679d8d1b207e5ea97d10f
-  source: data/literature/extracts/stolyarova-1996-cao-alumina-silica-kems.yaml
-  why: derived evidence class with unstated derivation; queued for page-grounding
-  axes:
-  - derivation
-  observations:
-  - observation_id: stolyarova-1996-cao-alumina-silica-kems::stolyarova_1996_fig1_al2o3_activity_figure_only
-    locator:
-      page: 21
-      published_page: 21
-      pdf_page_index: 6
-      figure: '1'
-      note: Figure 1 panel B; activity map continued on published p.22. Figure-only placeholder; no digitization.
-  - observation_id: stolyarova-1996-cao-alumina-silica-kems::stolyarova_1996_fig1_cao_activity_figure_only
-    locator:
-      page: 21
-      published_page: 21
-      pdf_page_index: 6
-      figure: '1'
-      note: Figure 1 panel A; activity map continued on published p.22. Figure-only placeholder; no digitization.
-  - observation_id: stolyarova-1996-cao-alumina-silica-kems::stolyarova_1996_fig1_sio2_activity_figure_only
-    locator:
-      page: 21
-      published_page: 21
-      pdf_page_index: 6
-      figure: '1'
-      note: Figure 1 panel C; activity map continued on published p.22. Figure-only placeholder; no digitization.
-  - observation_id: stolyarova-1996-cao-alumina-silica-kems::stolyarova_1996_fig2_al2o3_activity_figure_only
-    locator:
-      page: 26
-      published_page: 26
-      pdf_page_index: 11
-      figure: '2'
-      note: Figure 2 activity-comparison panels continue through published pp.26–29. Figure-only placeholder; no digitization.
-  - observation_id: stolyarova-1996-cao-alumina-silica-kems::stolyarova_1996_fig2_cao_activity_figure_only
-    locator:
-      page: 26
-      published_page: 26
-      pdf_page_index: 11
-      figure: '2'
-      note: Figure 2 activity-comparison panels continue through published pp.26–29. Figure-only placeholder; no digitization.
-  - observation_id: stolyarova-1996-cao-alumina-silica-kems::stolyarova_1996_fig2_sio2_activity_figure_only
-    locator:
-      page: 26
-      published_page: 26
-      pdf_page_index: 11
-      figure: '2'
-      note: Figure 2 activity-comparison panels continue through published pp.26–29. Figure-only placeholder; no digitization.
 - work_id: 46e00f6d80bff6f90992354a3203171b972f08e22cc679d8d1b207e5ea97d10f
   source: data/literature/extracts/stolyarova-1996-cao-alumina-silica-kems.yaml
   why: phase string 'vapor over CaO-Al2O3-SiO2 melt' is not in the closed automatic map
@@ -214655,6 +214633,18 @@ entries:
       published_page: 3
       table: '1'
       section: Chemistry
+- work_id: 8b0c8e9cb5b7794a8742a44f850799236e362a15f2f1c3bf55d9632d289b8907
+  source: data/literature/extracts/ewing-1963-sodium-potassium-properties.yaml
+  why: source does not state method
+  axes:
+  - method
+  observations:
+  - observation_id: ewing-1963-sodium-potassium-properties::ewing_1963_na_fig6_vapour_pressure::T=1165.55:h=88a36d3ecc31
+    locator:
+      page: 12
+      published_page: 7
+      pdf_page_index: 11
+      figure: '6'
 - work_id: 8b79bdb9022f5df4da0a30d1c4bc731d1e2bf5895fbebf188091571818833877
   source: data/literature/extracts/lpsc-2024-bennu-pyrolysis-vandam.yaml
   why: declared quantity is unknown; unsupported quantity 'relative_amino_acid_quantitation_signal_vs_murchison'; refusing
@@ -340506,6 +340496,16 @@ entries:
         liquid branch: NIST Chemistry WebBook SRD 69 ammonia Antoine (Stull 1947 lineage), ~164–240 K liquid — independent
         of the 2024 QCM ice fit.'
       record: Fray-Schmitt-2009#NH3
+- work_id: c732de60a8b7b7951ea3414fbaddeb3559dd52f9e3c65a084f3369c77143ad0d
+  source: data/literature/extracts/sesko-2022-tum-thesis.yaml
+  why: extract yielded no observations
+  axes:
+  - document
+  observations:
+  - observation_id: sesko-2022-tum-thesis::typed_absence
+    locator:
+      note: extract-level typed absence
+      source_path: data/literature/extracts/sesko-2022-tum-thesis.yaml
 - work_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b
   source: data/literature/extracts/kems-049-kato-1993-ms-review.yaml
   why: declared quantity is unknown; unsupported quantity 'activity_Al_and_pO2_from_oxide_equilibria'; refusing to pick a
@@ -343067,11 +343067,6 @@ entries:
       figure: '2.2'
       paragraph: Kapitel 2.1.2
       source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
-  - observation_id: kems-035-sauerborn-2005::sauerborn_2005_jsc1_composition_figure_only_blocked_deep2
-    locator:
-      page: 17
-      figure: '2.2'
-      paragraph: Kapitel 2.1.2
 - work_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356
   source: data/literature/extracts/kems-035-sauerborn-2005.yaml
   why: unmapped regime audit
@@ -343106,10 +343101,6 @@ entries:
     locator:
       page: 83
       figure: '5.23'
-  - observation_id: kems-035-sauerborn-2005::sauerborn_2005_fig523_ms1_epma_glass_deep2
-    locator:
-      page: 83
-      figure: '5.23'
   - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table56_ms5c_epma
     locator:
       page: 103
@@ -343134,10 +343125,6 @@ entries:
   - evidence.class
   observations:
   - observation_id: kems-035-sauerborn-2005::sauerborn_2005_fig532_rfa_oxide_ratio
-    locator:
-      page: 88
-      figure: '5.32'
-  - observation_id: kems-035-sauerborn-2005::sauerborn_2005_fig532_rfa_oxide_ratio_deep2
     locator:
       page: 88
       figure: '5.32'
@@ -343175,11 +343162,6 @@ entries:
       figure: '5.1'
       note: Abb. 5.1–5.3 and MS QMS/IR time series
       source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
-  - observation_id: kems-035-sauerborn-2005::sauerborn_2005_qms_traces_figure_only_blocked_deep2
-    locator:
-      page: 69
-      figure: '5.1'
-      note: Abb. 5.1–5.3 and MS QMS/IR time series
   - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table32_qms_masses
     locator:
       page: 44
@@ -343194,15 +343176,7 @@ entries:
     locator:
       page: 105
       figure: '5.55'
-  - observation_id: kems-035-sauerborn-2005::sauerborn_2005_fig555_o2_reference_normalized_deep2
-    locator:
-      page: 105
-      figure: '5.55'
   - observation_id: kems-035-sauerborn-2005::sauerborn_2005_fig556_o2_vs_T_normalized
-    locator:
-      page: 107
-      figure: '5.56'
-  - observation_id: kems-035-sauerborn-2005::sauerborn_2005_fig556_o2_vs_T_normalized_deep2
     locator:
       page: 107
       figure: '5.56'

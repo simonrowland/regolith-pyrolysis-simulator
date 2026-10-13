@@ -1,0 +1,2734 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/suzuki-2026-vacuum-oxygen-extraction.yaml
+observations:
+- observation_id: suzuki-2026-vacuum-oxygen-extraction::suzuki_2026_fayalite_alumina_pO2_figure2::point:0
+  experiment_id: 10.1038/s41598-026-70347-2::experiment::fayalite-alumina-vacuum-heating-1500C
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '0.00101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0000060795'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty width or confidence level is stated; values are approximate figure reads.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: suzuki-2026-vacuum-oxygen-extraction
+  locator:
+    page: 4
+    published_page: Article in Press; no printed page number
+    pdf_page_index: 3
+    figure: '2'
+    section: Results
+    note: Figure 2b, Fayalite and alumina mixture; the trace starts after zero and no t=0 value is read; log-axis visual reads
+      at 30, 60 and 90 min.
+  read_from: pdf:suzuki-2026-vacuum-oxygen-extraction
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+        section: Results
+        note: Figure 2b, Fayalite and alumina mixture; the trace starts after zero and no t=0 value is read; log-axis visual
+          reads at 30, 60 and 90 min.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 4
+              published_page: Article in Press; no printed page number
+              pdf_page_index: 3
+              figure: '2'
+              section: Results
+              note: Figure 2b, Fayalite and alumina mixture; the trace starts after zero and no t=0 value is read; log-axis
+                visual reads at 30, 60 and 90 min.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: Article in Press; no printed page number
+              pdf_page_index: 3
+              figure: '2'
+              section: Results
+              note: Figure 2b, Fayalite and alumina mixture; the trace starts after zero and no t=0 value is read; log-axis
+                visual reads at 30, 60 and 90 min.
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '0.00101325'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+        section: Results
+        note: Figure 2b, Fayalite and alumina mixture; the trace starts after zero and no t=0 value is read; log-axis visual
+          reads at 30, 60 and 90 min.
+    time_min:
+      state:
+        tag: value
+        value: '30'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+  derivation:
+    relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - pdf:suzuki-2026-vacuum-oxygen-extraction
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000000006'
+        locator:
+          page: 4
+          published_page: Article in Press; no printed page number
+          pdf_page_index: 3
+          figure: '2'
+          section: Results
+          note: Figure 2b, Fayalite and alumina mixture; the trace starts after zero and no t=0 value is read; log-axis visual
+            reads at 30, 60 and 90 min.
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 4
+          published_page: Article in Press; no printed page number
+          pdf_page_index: 3
+          figure: '2'
+          section: Results
+          note: Figure 2b, Fayalite and alumina mixture; the trace starts after zero and no t=0 value is read; log-axis visual
+            reads at 30, 60 and 90 min.
+    output_unit: Pa
+- observation_id: suzuki-2026-vacuum-oxygen-extraction::suzuki_2026_fayalite_alumina_pO2_figure2::point:1
+  experiment_id: 10.1038/s41598-026-70347-2::experiment::fayalite-alumina-vacuum-heating-1500C
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '0.00101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.000002533125'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty width or confidence level is stated; values are approximate figure reads.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: suzuki-2026-vacuum-oxygen-extraction
+  locator:
+    page: 4
+    published_page: Article in Press; no printed page number
+    pdf_page_index: 3
+    figure: '2'
+    section: Results
+    note: Figure 2b, Fayalite and alumina mixture; the trace starts after zero and no t=0 value is read; log-axis visual reads
+      at 30, 60 and 90 min.
+  read_from: pdf:suzuki-2026-vacuum-oxygen-extraction
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+        section: Results
+        note: Figure 2b, Fayalite and alumina mixture; the trace starts after zero and no t=0 value is read; log-axis visual
+          reads at 30, 60 and 90 min.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 4
+              published_page: Article in Press; no printed page number
+              pdf_page_index: 3
+              figure: '2'
+              section: Results
+              note: Figure 2b, Fayalite and alumina mixture; the trace starts after zero and no t=0 value is read; log-axis
+                visual reads at 30, 60 and 90 min.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: Article in Press; no printed page number
+              pdf_page_index: 3
+              figure: '2'
+              section: Results
+              note: Figure 2b, Fayalite and alumina mixture; the trace starts after zero and no t=0 value is read; log-axis
+                visual reads at 30, 60 and 90 min.
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '0.00101325'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+        section: Results
+        note: Figure 2b, Fayalite and alumina mixture; the trace starts after zero and no t=0 value is read; log-axis visual
+          reads at 30, 60 and 90 min.
+    time_min:
+      state:
+        tag: value
+        value: '60'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+  derivation:
+    relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - pdf:suzuki-2026-vacuum-oxygen-extraction
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000000025'
+        locator:
+          page: 4
+          published_page: Article in Press; no printed page number
+          pdf_page_index: 3
+          figure: '2'
+          section: Results
+          note: Figure 2b, Fayalite and alumina mixture; the trace starts after zero and no t=0 value is read; log-axis visual
+            reads at 30, 60 and 90 min.
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 4
+          published_page: Article in Press; no printed page number
+          pdf_page_index: 3
+          figure: '2'
+          section: Results
+          note: Figure 2b, Fayalite and alumina mixture; the trace starts after zero and no t=0 value is read; log-axis visual
+            reads at 30, 60 and 90 min.
+    output_unit: Pa
+- observation_id: suzuki-2026-vacuum-oxygen-extraction::suzuki_2026_fayalite_alumina_pO2_figure2::point:2
+  experiment_id: 10.1038/s41598-026-70347-2::experiment::fayalite-alumina-vacuum-heating-1500C
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '0.00101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0000020265'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty width or confidence level is stated; values are approximate figure reads.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: suzuki-2026-vacuum-oxygen-extraction
+  locator:
+    page: 4
+    published_page: Article in Press; no printed page number
+    pdf_page_index: 3
+    figure: '2'
+    section: Results
+    note: Figure 2b, Fayalite and alumina mixture; the trace starts after zero and no t=0 value is read; log-axis visual reads
+      at 30, 60 and 90 min.
+  read_from: pdf:suzuki-2026-vacuum-oxygen-extraction
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+        section: Results
+        note: Figure 2b, Fayalite and alumina mixture; the trace starts after zero and no t=0 value is read; log-axis visual
+          reads at 30, 60 and 90 min.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 4
+              published_page: Article in Press; no printed page number
+              pdf_page_index: 3
+              figure: '2'
+              section: Results
+              note: Figure 2b, Fayalite and alumina mixture; the trace starts after zero and no t=0 value is read; log-axis
+                visual reads at 30, 60 and 90 min.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: Article in Press; no printed page number
+              pdf_page_index: 3
+              figure: '2'
+              section: Results
+              note: Figure 2b, Fayalite and alumina mixture; the trace starts after zero and no t=0 value is read; log-axis
+                visual reads at 30, 60 and 90 min.
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '0.00101325'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+        section: Results
+        note: Figure 2b, Fayalite and alumina mixture; the trace starts after zero and no t=0 value is read; log-axis visual
+          reads at 30, 60 and 90 min.
+    time_min:
+      state:
+        tag: value
+        value: '90'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+  derivation:
+    relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - pdf:suzuki-2026-vacuum-oxygen-extraction
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000000002'
+        locator:
+          page: 4
+          published_page: Article in Press; no printed page number
+          pdf_page_index: 3
+          figure: '2'
+          section: Results
+          note: Figure 2b, Fayalite and alumina mixture; the trace starts after zero and no t=0 value is read; log-axis visual
+            reads at 30, 60 and 90 min.
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 4
+          published_page: Article in Press; no printed page number
+          pdf_page_index: 3
+          figure: '2'
+          section: Results
+          note: Figure 2b, Fayalite and alumina mixture; the trace starts after zero and no t=0 value is read; log-axis visual
+            reads at 30, 60 and 90 min.
+    output_unit: Pa
+- observation_id: suzuki-2026-vacuum-oxygen-extraction::suzuki_2026_fayalite_melting_point
+  experiment_id: 10.1038/s41598-026-70347-2::experiment::fayalite-vacuum-heating-1500C
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Fe2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: value
+      value: '0.00101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1603.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: suzuki-2026-vacuum-oxygen-extraction::suzuki_2026_fayalite_melting_point
+  source_id: suzuki-2026-vacuum-oxygen-extraction
+  locator:
+    page: 4
+    published_page: Article in Press; no printed page number
+    pdf_page_index: 3
+    figure: '2'
+    section: Results
+  read_from: pdf:suzuki-2026-vacuum-oxygen-extraction
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1603.15'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+        section: Results
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1330'
+            locator:
+              page: 4
+              published_page: Article in Press; no printed page number
+              pdf_page_index: 3
+              figure: '2'
+              section: Results
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: Article in Press; no printed page number
+              pdf_page_index: 3
+              figure: '2'
+              section: Results
+        output_unit: K
+- observation_id: suzuki-2026-vacuum-oxygen-extraction::suzuki_2026_fayalite_pO2_figure2::point:0
+  experiment_id: 10.1038/s41598-026-70347-2::experiment::fayalite-vacuum-heating-1500C
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '0.00101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.00001317225'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty width or confidence level is stated; values are approximate figure reads.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: suzuki-2026-vacuum-oxygen-extraction
+  locator:
+    page: 4
+    published_page: Article in Press; no printed page number
+    pdf_page_index: 3
+    figure: '2'
+    section: Results
+    note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
+  read_from: pdf:suzuki-2026-vacuum-oxygen-extraction
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+        section: Results
+        note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 4
+              published_page: Article in Press; no printed page number
+              pdf_page_index: 3
+              figure: '2'
+              section: Results
+              note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: Article in Press; no printed page number
+              pdf_page_index: 3
+              figure: '2'
+              section: Results
+              note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '0.00101325'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+        section: Results
+        note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
+    time_min:
+      state:
+        tag: value
+        value: '0'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+  derivation:
+    relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - pdf:suzuki-2026-vacuum-oxygen-extraction
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000000013'
+        locator:
+          page: 4
+          published_page: Article in Press; no printed page number
+          pdf_page_index: 3
+          figure: '2'
+          section: Results
+          note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 4
+          published_page: Article in Press; no printed page number
+          pdf_page_index: 3
+          figure: '2'
+          section: Results
+          note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
+    output_unit: Pa
+- observation_id: suzuki-2026-vacuum-oxygen-extraction::suzuki_2026_fayalite_pO2_figure2::point:1
+  experiment_id: 10.1038/s41598-026-70347-2::experiment::fayalite-vacuum-heating-1500C
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '0.00101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0000020265'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty width or confidence level is stated; values are approximate figure reads.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: suzuki-2026-vacuum-oxygen-extraction
+  locator:
+    page: 4
+    published_page: Article in Press; no printed page number
+    pdf_page_index: 3
+    figure: '2'
+    section: Results
+    note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
+  read_from: pdf:suzuki-2026-vacuum-oxygen-extraction
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+        section: Results
+        note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 4
+              published_page: Article in Press; no printed page number
+              pdf_page_index: 3
+              figure: '2'
+              section: Results
+              note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: Article in Press; no printed page number
+              pdf_page_index: 3
+              figure: '2'
+              section: Results
+              note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '0.00101325'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+        section: Results
+        note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
+    time_min:
+      state:
+        tag: value
+        value: '30'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+  derivation:
+    relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - pdf:suzuki-2026-vacuum-oxygen-extraction
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000000002'
+        locator:
+          page: 4
+          published_page: Article in Press; no printed page number
+          pdf_page_index: 3
+          figure: '2'
+          section: Results
+          note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 4
+          published_page: Article in Press; no printed page number
+          pdf_page_index: 3
+          figure: '2'
+          section: Results
+          note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
+    output_unit: Pa
+- observation_id: suzuki-2026-vacuum-oxygen-extraction::suzuki_2026_fayalite_pO2_figure2::point:2
+  experiment_id: 10.1038/s41598-026-70347-2::experiment::fayalite-vacuum-heating-1500C
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '0.00101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0000012159'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty width or confidence level is stated; values are approximate figure reads.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: suzuki-2026-vacuum-oxygen-extraction
+  locator:
+    page: 4
+    published_page: Article in Press; no printed page number
+    pdf_page_index: 3
+    figure: '2'
+    section: Results
+    note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
+  read_from: pdf:suzuki-2026-vacuum-oxygen-extraction
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+        section: Results
+        note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 4
+              published_page: Article in Press; no printed page number
+              pdf_page_index: 3
+              figure: '2'
+              section: Results
+              note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: Article in Press; no printed page number
+              pdf_page_index: 3
+              figure: '2'
+              section: Results
+              note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '0.00101325'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+        section: Results
+        note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
+    time_min:
+      state:
+        tag: value
+        value: '60'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+  derivation:
+    relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - pdf:suzuki-2026-vacuum-oxygen-extraction
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000000012'
+        locator:
+          page: 4
+          published_page: Article in Press; no printed page number
+          pdf_page_index: 3
+          figure: '2'
+          section: Results
+          note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 4
+          published_page: Article in Press; no printed page number
+          pdf_page_index: 3
+          figure: '2'
+          section: Results
+          note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
+    output_unit: Pa
+- observation_id: suzuki-2026-vacuum-oxygen-extraction::suzuki_2026_fayalite_pO2_figure2::point:3
+  experiment_id: 10.1038/s41598-026-70347-2::experiment::fayalite-vacuum-heating-1500C
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '0.00101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0000009625875'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty width or confidence level is stated; values are approximate figure reads.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: suzuki-2026-vacuum-oxygen-extraction
+  locator:
+    page: 4
+    published_page: Article in Press; no printed page number
+    pdf_page_index: 3
+    figure: '2'
+    section: Results
+    note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
+  read_from: pdf:suzuki-2026-vacuum-oxygen-extraction
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+        section: Results
+        note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 4
+              published_page: Article in Press; no printed page number
+              pdf_page_index: 3
+              figure: '2'
+              section: Results
+              note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: Article in Press; no printed page number
+              pdf_page_index: 3
+              figure: '2'
+              section: Results
+              note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '0.00101325'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+        section: Results
+        note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
+    time_min:
+      state:
+        tag: value
+        value: '90'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+  derivation:
+    relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - pdf:suzuki-2026-vacuum-oxygen-extraction
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000000000095'
+        locator:
+          page: 4
+          published_page: Article in Press; no printed page number
+          pdf_page_index: 3
+          figure: '2'
+          section: Results
+          note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 4
+          published_page: Article in Press; no printed page number
+          pdf_page_index: 3
+          figure: '2'
+          section: Results
+          note: Figure 2b, Fayalite; log-axis visual reads at t = 0, 30, 60 and 90 min.
+    output_unit: Pa
+- observation_id: suzuki-2026-vacuum-oxygen-extraction::suzuki_2026_hematite_abstract_oxygen_removed
+  experiment_id: 10.1038/s41598-026-70347-2::experiment::hematite-vacuum-heating-1200C
+  identity:
+    quantity:
+      tag: value
+      value: yield_fraction
+    species:
+      formula: Fe2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile yield_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile yield_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile yield_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile yield_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile yield_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / composition_mole_fraction
+        / composition_mass_percent / sample_oxide_composition_wt_pct / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO
+        Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '0.00101325'
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile yield_fraction does not use wall
+  value:
+    kind: point
+    point: '0.03'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty width or confidence level is stated for the abstract oxygen result.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: suzuki26
+      date: '2026-10-12'
+      evidence:
+        page: 1
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 0
+        section: Abstract
+  notices: []
+  source_id: suzuki-2026-vacuum-oxygen-extraction
+  locator:
+    page: 1
+    published_page: Article in Press; no printed page number
+    pdf_page_index: 0
+    section: Abstract
+  read_from: pdf:suzuki-2026-vacuum-oxygen-extraction
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 1
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 0
+        section: Abstract
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 1
+              published_page: Article in Press; no printed page number
+              pdf_page_index: 0
+              section: Abstract
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 1
+              published_page: Article in Press; no printed page number
+              pdf_page_index: 0
+              section: Abstract
+        output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:suzuki-2026-vacuum-oxygen-extraction
+    parameters: []
+    output_unit: Pa
+- observation_id: suzuki-2026-vacuum-oxygen-extraction::suzuki_2026_hematite_mass_loss_1200C
+  experiment_id: 10.1038/s41598-026-70347-2::experiment::hematite-vacuum-heating-1200C
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: Fe2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / composition_mole_fraction
+        / composition_mass_percent / sample_oxide_composition_wt_pct / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO
+        Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '0.00101325'
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.035'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty width or confidence level is stated for the 3.5 wt% result; Methods reports a 0.1% balance uncertainty
+        without specifying its basis.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: suzuki-2026-vacuum-oxygen-extraction::suzuki_2026_hematite_mass_loss_1200C
+  source_id: suzuki-2026-vacuum-oxygen-extraction
+  locator:
+    page: 4
+    published_page: Article in Press; no printed page number
+    pdf_page_index: 3
+    figure: '2'
+    section: Results
+    equation: '1'
+  read_from: pdf:suzuki-2026-vacuum-oxygen-extraction
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+        section: Results
+        equation: '1'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 4
+              published_page: Article in Press; no printed page number
+              pdf_page_index: 3
+              figure: '2'
+              section: Results
+              equation: '1'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: Article in Press; no printed page number
+              pdf_page_index: 3
+              figure: '2'
+              section: Results
+              equation: '1'
+        output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:suzuki-2026-vacuum-oxygen-extraction
+    parameters: []
+    output_unit: Pa
+- observation_id: suzuki-2026-vacuum-oxygen-extraction::suzuki_2026_hematite_pO2_run01_figure2::point:0
+  experiment_id: 10.1038/s41598-026-70347-2::experiment::hematite-vacuum-heating-1200C
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '0.00101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0000028371'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty width or confidence level is stated; values are approximate figure reads.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: suzuki-2026-vacuum-oxygen-extraction
+  locator:
+    page: 4
+    published_page: Article in Press; no printed page number
+    pdf_page_index: 3
+    figure: '2'
+    section: Results
+    note: Figure 2a, Hematite (Run01); log-axis visual reads at t = 0 and 15 min.
+  read_from: pdf:suzuki-2026-vacuum-oxygen-extraction
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+        section: Results
+        note: Figure 2a, Hematite (Run01); log-axis visual reads at t = 0 and 15 min.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 4
+              published_page: Article in Press; no printed page number
+              pdf_page_index: 3
+              figure: '2'
+              section: Results
+              note: Figure 2a, Hematite (Run01); log-axis visual reads at t = 0 and 15 min.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: Article in Press; no printed page number
+              pdf_page_index: 3
+              figure: '2'
+              section: Results
+              note: Figure 2a, Hematite (Run01); log-axis visual reads at t = 0 and 15 min.
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '0.00101325'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+        section: Results
+        note: Figure 2a, Hematite (Run01); log-axis visual reads at t = 0 and 15 min.
+    time_min:
+      state:
+        tag: value
+        value: '0'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+  derivation:
+    relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - pdf:suzuki-2026-vacuum-oxygen-extraction
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000000028'
+        locator:
+          page: 4
+          published_page: Article in Press; no printed page number
+          pdf_page_index: 3
+          figure: '2'
+          section: Results
+          note: Figure 2a, Hematite (Run01); log-axis visual reads at t = 0 and 15 min.
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 4
+          published_page: Article in Press; no printed page number
+          pdf_page_index: 3
+          figure: '2'
+          section: Results
+          note: Figure 2a, Hematite (Run01); log-axis visual reads at t = 0 and 15 min.
+    output_unit: Pa
+- observation_id: suzuki-2026-vacuum-oxygen-extraction::suzuki_2026_hematite_pO2_run01_figure2::point:1
+  experiment_id: 10.1038/s41598-026-70347-2::experiment::hematite-vacuum-heating-1200C
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '0.00101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0000032424'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty width or confidence level is stated; values are approximate figure reads.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: suzuki-2026-vacuum-oxygen-extraction
+  locator:
+    page: 4
+    published_page: Article in Press; no printed page number
+    pdf_page_index: 3
+    figure: '2'
+    section: Results
+    note: Figure 2a, Hematite (Run01); log-axis visual reads at t = 0 and 15 min.
+  read_from: pdf:suzuki-2026-vacuum-oxygen-extraction
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+        section: Results
+        note: Figure 2a, Hematite (Run01); log-axis visual reads at t = 0 and 15 min.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 4
+              published_page: Article in Press; no printed page number
+              pdf_page_index: 3
+              figure: '2'
+              section: Results
+              note: Figure 2a, Hematite (Run01); log-axis visual reads at t = 0 and 15 min.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: Article in Press; no printed page number
+              pdf_page_index: 3
+              figure: '2'
+              section: Results
+              note: Figure 2a, Hematite (Run01); log-axis visual reads at t = 0 and 15 min.
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '0.00101325'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+        section: Results
+        note: Figure 2a, Hematite (Run01); log-axis visual reads at t = 0 and 15 min.
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+  derivation:
+    relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - pdf:suzuki-2026-vacuum-oxygen-extraction
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000000032'
+        locator:
+          page: 4
+          published_page: Article in Press; no printed page number
+          pdf_page_index: 3
+          figure: '2'
+          section: Results
+          note: Figure 2a, Hematite (Run01); log-axis visual reads at t = 0 and 15 min.
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 4
+          published_page: Article in Press; no printed page number
+          pdf_page_index: 3
+          figure: '2'
+          section: Results
+          note: Figure 2a, Hematite (Run01); log-axis visual reads at t = 0 and 15 min.
+    output_unit: Pa
+- observation_id: suzuki-2026-vacuum-oxygen-extraction::suzuki_2026_hematite_pO2_run02_figure2::point:0
+  experiment_id: 10.1038/s41598-026-70347-2::experiment::hematite-vacuum-heating-1200C
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '0.00101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0000303975'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty width or confidence level is stated; values are approximate figure reads.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: suzuki-2026-vacuum-oxygen-extraction
+  locator:
+    page: 4
+    published_page: Article in Press; no printed page number
+    pdf_page_index: 3
+    figure: '2'
+    section: Results
+    note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
+  read_from: pdf:suzuki-2026-vacuum-oxygen-extraction
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+        section: Results
+        note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 4
+              published_page: Article in Press; no printed page number
+              pdf_page_index: 3
+              figure: '2'
+              section: Results
+              note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: Article in Press; no printed page number
+              pdf_page_index: 3
+              figure: '2'
+              section: Results
+              note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '0.00101325'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+        section: Results
+        note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
+    time_min:
+      state:
+        tag: value
+        value: '0'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+  derivation:
+    relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - pdf:suzuki-2026-vacuum-oxygen-extraction
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000000003'
+        locator:
+          page: 4
+          published_page: Article in Press; no printed page number
+          pdf_page_index: 3
+          figure: '2'
+          section: Results
+          note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 4
+          published_page: Article in Press; no printed page number
+          pdf_page_index: 3
+          figure: '2'
+          section: Results
+          note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
+    output_unit: Pa
+- observation_id: suzuki-2026-vacuum-oxygen-extraction::suzuki_2026_hematite_pO2_run02_figure2::point:1
+  experiment_id: 10.1038/s41598-026-70347-2::experiment::hematite-vacuum-heating-1200C
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '0.00101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.000003546375'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty width or confidence level is stated; values are approximate figure reads.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: suzuki-2026-vacuum-oxygen-extraction
+  locator:
+    page: 4
+    published_page: Article in Press; no printed page number
+    pdf_page_index: 3
+    figure: '2'
+    section: Results
+    note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
+  read_from: pdf:suzuki-2026-vacuum-oxygen-extraction
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+        section: Results
+        note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 4
+              published_page: Article in Press; no printed page number
+              pdf_page_index: 3
+              figure: '2'
+              section: Results
+              note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: Article in Press; no printed page number
+              pdf_page_index: 3
+              figure: '2'
+              section: Results
+              note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '0.00101325'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+        section: Results
+        note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
+    time_min:
+      state:
+        tag: value
+        value: '30'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+  derivation:
+    relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - pdf:suzuki-2026-vacuum-oxygen-extraction
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000000035'
+        locator:
+          page: 4
+          published_page: Article in Press; no printed page number
+          pdf_page_index: 3
+          figure: '2'
+          section: Results
+          note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 4
+          published_page: Article in Press; no printed page number
+          pdf_page_index: 3
+          figure: '2'
+          section: Results
+          note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
+    output_unit: Pa
+- observation_id: suzuki-2026-vacuum-oxygen-extraction::suzuki_2026_hematite_pO2_run02_figure2::point:2
+  experiment_id: 10.1038/s41598-026-70347-2::experiment::hematite-vacuum-heating-1200C
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '0.00101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0000001317225'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty width or confidence level is stated; values are approximate figure reads.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: suzuki-2026-vacuum-oxygen-extraction
+  locator:
+    page: 4
+    published_page: Article in Press; no printed page number
+    pdf_page_index: 3
+    figure: '2'
+    section: Results
+    note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
+  read_from: pdf:suzuki-2026-vacuum-oxygen-extraction
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+        section: Results
+        note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 4
+              published_page: Article in Press; no printed page number
+              pdf_page_index: 3
+              figure: '2'
+              section: Results
+              note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: Article in Press; no printed page number
+              pdf_page_index: 3
+              figure: '2'
+              section: Results
+              note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '0.00101325'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+        section: Results
+        note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
+    time_min:
+      state:
+        tag: value
+        value: '60'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+  derivation:
+    relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - pdf:suzuki-2026-vacuum-oxygen-extraction
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000000000013'
+        locator:
+          page: 4
+          published_page: Article in Press; no printed page number
+          pdf_page_index: 3
+          figure: '2'
+          section: Results
+          note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 4
+          published_page: Article in Press; no printed page number
+          pdf_page_index: 3
+          figure: '2'
+          section: Results
+          note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
+    output_unit: Pa
+- observation_id: suzuki-2026-vacuum-oxygen-extraction::suzuki_2026_hematite_pO2_run02_figure2::point:3
+  experiment_id: 10.1038/s41598-026-70347-2::experiment::hematite-vacuum-heating-1200C
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '0.00101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.000000101325'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty width or confidence level is stated; values are approximate figure reads.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: suzuki-2026-vacuum-oxygen-extraction
+  locator:
+    page: 4
+    published_page: Article in Press; no printed page number
+    pdf_page_index: 3
+    figure: '2'
+    section: Results
+    note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
+  read_from: pdf:suzuki-2026-vacuum-oxygen-extraction
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+        section: Results
+        note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 4
+              published_page: Article in Press; no printed page number
+              pdf_page_index: 3
+              figure: '2'
+              section: Results
+              note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: Article in Press; no printed page number
+              pdf_page_index: 3
+              figure: '2'
+              section: Results
+              note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '0.00101325'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+        section: Results
+        note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
+    time_min:
+      state:
+        tag: value
+        value: '90'
+      locator:
+        page: 4
+        published_page: Article in Press; no printed page number
+        pdf_page_index: 3
+        figure: '2'
+  derivation:
+    relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - pdf:suzuki-2026-vacuum-oxygen-extraction
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000000001'
+        locator:
+          page: 4
+          published_page: Article in Press; no printed page number
+          pdf_page_index: 3
+          figure: '2'
+          section: Results
+          note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 4
+          published_page: Article in Press; no printed page number
+          pdf_page_index: 3
+          figure: '2'
+          section: Results
+          note: Figure 2a, Hematite (Run02); log-axis visual reads at t = 0, 30, 60 and 90 min.
+    output_unit: Pa
