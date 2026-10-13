@@ -498,6 +498,33 @@ def test_planner_forwards_redox_state_to_authoritative_and_shadow():
     )
 
 
+def test_nonconsuming_primary_preserves_redox_scalar_for_consuming_shadow():
+    registry = ProviderRegistry()
+    primary = _RedoxRecordingProvider(
+        'redox-nonconsumer-primary',
+        consumes_fO2=False,
+    )
+    shadow = _RedoxRecordingProvider('redox-consuming-shadow')
+    registry.register(primary, [ChemistryIntent.VAPOR_PRESSURE])
+    registry.register(
+        shadow,
+        [ChemistryIntent.VAPOR_PRESSURE],
+        shadow=True,
+    )
+
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(accounts={}, species_formula_registry={}),
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+    )
+    Planner(registry).dispatch(request)
+
+    assert primary.requests[0].fO2_log is None
+    assert shadow.requests[0].fO2_log == pytest.approx(-9.0)
+
+
 def test_kernel_redox_state_survives_fallback_and_is_cleared_for_nonconsumer():
     state = RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, 0.2)
     registry = ProviderRegistry()

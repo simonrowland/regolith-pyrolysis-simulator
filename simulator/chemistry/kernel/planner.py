@@ -169,8 +169,13 @@ class Planner:
             raise ProviderUnavailableError(
                 f"no authoritative provider registered for intent {request.intent.value!r}"
             )
+        authoritative_request = request
         if not authoritative.capability_profile().consumes_fO2:
-            request = replace(request, fO2_log=None, redox_state=None)
+            authoritative_request = replace(
+                request,
+                fO2_log=None,
+                redox_state=None,
+            )
 
         shadows = self._registry.shadows_for(request.intent)
         shadow_results: list[tuple[ChemistryProvider, str, IntentResult]] = []
@@ -234,7 +239,7 @@ class Planner:
             # path because the shadow isn't registered as
             # authoritative.
 
-        authoritative_result = authoritative.dispatch(request)
+        authoritative_result = authoritative.dispatch(authoritative_request)
 
         # Parity pass: each shadow that exposes ``parity_compare`` gets
         # to weigh its result against the authoritative one.  The
