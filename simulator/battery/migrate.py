@@ -1513,6 +1513,8 @@ _DEFAULTABLE_PENDING_REASONS = {
     "source admission_status=pending",
     "source admission_status=pending_validation is not a closed v2.1 token",
 }
+
+
 def _defaulted_admission(source_reason: str) -> Admission:
     return Admission(
         status=AdmissionStatus.ADMITTED,

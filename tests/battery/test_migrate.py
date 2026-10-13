@@ -2100,6 +2100,54 @@ def test_j02_model_derived_without_parent_is_conditional_field(tmp_path: Path) -
     )
 
 
+@pytest.mark.parametrize(
+    ("source_status", "has_value", "categorical", "expects_lineage_issue"),
+    [
+        ("figure_only", False, False, False),
+        ("figure_only", False, True, False),
+        ("figure_only", True, False, True),
+        ("admitted", False, False, True),
+    ],
+)
+def test_b879_caption_only_figure_model_lineage_requirement(
+    tmp_path: Path,
+    source_status: str,
+    has_value: bool,
+    categorical: bool,
+    expects_lineage_issue: bool,
+) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    values = extract["species"]["Na"]["observations"][0]["values"]
+    values["method_class"] = "model_derived"
+    values["admission_status"] = source_status
+    if categorical:
+        values["semantics"] = "bound_not_point_ordering"
+    if not has_value:
+        values.pop("series", None)
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    observation = next(iter(result.observations.values()))
+    assert observation.value.kind is (
+        ValueKind.POINT
+        if has_value
+        else ValueKind.CATEGORICAL
+        if categorical
+        else ValueKind.UNAVAILABLE
+    )
+    report = validate_corpus(
+        result.works, result.experiments, result.observations, residuals=None
+    )
+    lineage_issues = [
+        issue
+        for issue in report.hard_issues
+        if issue.path.endswith((".derived_from", ".derivation"))
+    ]
+    assert bool(lineage_issues) is expects_lineage_issue
+    assert all(
+        issue.reason is RefusalReason.CONDITIONAL_FIELD for issue in lineage_issues
+    )
+
+
 def test_dump_hard_issues_writes_complete_source_labeled_census(tmp_path: Path) -> None:
     from tools.dump_hard_issues import dump_hard_issues
 
