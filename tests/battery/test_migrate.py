@@ -3811,6 +3811,7 @@ _CENSUS_QUANTITY_ALIASES = {
     "pure_Psat": "p_sat",
     "vapor_pressure": "p_sat",
     "partial_pressure": "p_partial",
+    "partial_pressure_O2": "p_partial",
     "potassium_partial_pressure_as_published": "p_partial",
     "deltafG": "delta_fG",
     "delta_fG": "delta_fG",
@@ -4278,9 +4279,11 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     # p_partial 69->75, evaporation_coefficient_alpha 12->30, n_numeric 274->298.
     # The lunar DeMaria 1973 merge adds its 61 Table I p_partial cells as
     # run-labelled series: p_partial 75->136 and n_numeric 356->417.
+    # Suzuki 2026 adds 13 printed oxygen partial-pressure points via the
+    # independent partial_pressure_O2 alias: p_partial 136->149.
     # Re-pinned for t998: Zhang Table 4 Na/K alpha points add four printed
     # cells, evaporation_coefficient_alpha 30->34 and n_numeric 450->454.
-    assert census.get("p_partial") == 136
+    assert census.get("p_partial") == 149
     assert census.get("p_sat") == 21
     # Twelve repeated Fedkin table cells are no longer counted through the retired
     # mirror; the KEMS owner extract retains the cells (Fedkin et al. 2006, Table 3,
@@ -4323,6 +4326,7 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     }
     # Current total includes the 110 Markova 1984 residue components and omits
     # the 12 duplicate Fedkin mirror cells (b677: the pre-item24 total 1877->1865).
+    # The 13 Suzuki pO2 points now join p_partial, moving 1878->1891.
     # Item 24 adds 13 Abdul 2023 H_minus_H298 cells (Table 3 rankinite 7 + Table 4
     # belite 6), which moved 1877->1890 on the tree that still counted those 12
     # Fedkin mirror cells. Combined: 1865 + 13 = 1878 (equivalently 1890 - 12).
@@ -4330,7 +4334,7 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     # No check was relaxed and mismatches stay 0.
     assert census.get("H_minus_H298") == 13
     assert per_source.get("abdul-2023-cao-sio2-calphad") == {"H_minus_H298": 13}
-    assert n_numeric == 1878, (n_numeric, census, n_unavailable)
+    assert n_numeric == 1891, (n_numeric, census, n_unavailable)
 
 
 def test_residue_point_condition_values_keep_their_printed_types() -> None:
