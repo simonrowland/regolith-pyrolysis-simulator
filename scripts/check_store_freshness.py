@@ -63,6 +63,14 @@ CODE_INPUTS = (
 # can exist to follow them, and they would read as STALE forever. Each entry
 # needs that receipt (regen run, no store diff). Short shas, 9 characters,
 # matching the keys stale_input_commits() emits.
+#   80fad2bfa: the OpenIMCC af0f2a2 pin bump. The Sossi residue prediction path
+#     (simulator/battery/residue.py and score.py _sossi_residue_prediction) sends melt evaluation
+#     only the melt pack's oxides and passes the existing UNCERTIFIED MnO activity extension to the
+#     new Mn gas channel, with an OUT_OF_CERTIFIED_BAND notice. Migration does not execute the residue
+#     prediction path (see the 23df83343 entry), and its only score import is the unchanged
+#     parse_species_formula. Store receipt to be confirmed by the landing gate's full regen on the
+#     merge with green (expected: 0 files changed under data/). This acknowledges STORE outputs only;
+#     the residue scoring change is covered by the commit's tests.
 #   09c498b65: b-851 renames the private scorer helper _fusion_comparison_reference
 #     in simulator/battery/score.py to the public fusion_comparison_reference so the
 #     melt-activity benchmark shares the one owner. Name and docstring only: no
@@ -120,6 +128,7 @@ CODE_INPUTS = (
 #     This acknowledges STORE outputs only; the scoring change (237 residual
 #     records, 94 new numeric candidates) is covered by the commits' tests.
 STORE_NEUTRAL_INPUT_COMMITS = frozenset({
+    "80fad2bfa",
     "09c498b65",
     "1b78b5697", "574800443", "149df2858",
     "9bb0a22ce", "1d254d51e", "b8be6d576",
