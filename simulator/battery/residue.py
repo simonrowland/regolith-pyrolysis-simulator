@@ -1758,11 +1758,17 @@ def _predict_sossi_residue_cohort(
         )
         pressure_cache: dict[tuple[tuple[str, float], ...], Mapping[str, float]] = {}
         melt_pack_identity: dict[str, str] = {}
+        melt_activity_input_policy: dict[str, Any] = {}
+        melt_activity_extensions: dict[str, dict[str, Any]] = {}
         if engine == "openimcc":
             pO2_exponents = {
                 species: (1.0 if species == "O2" else -reaction_o2 / reaction_parent)
                 for species, _parent, reaction_parent, reaction_o2 in gas_channels
             }
+            mno_channel_active = any(
+                parent == "MnO"
+                for _species, parent, _reaction_parent, _reaction_o2 in gas_channels
+            )
 
             def pressure_model(
                 composition: Mapping[str, float], log10_pO2_bar: float
@@ -1771,20 +1777,67 @@ def _predict_sossi_residue_cohort(
                 base = pressure_cache.get(key)
                 if base is None:
                     try:
+                        activity_composition, activity_input_policy = (
+                            openimcc_bridge._cleaned_melt_policy(composition)
+                        )
+                        melt_activity_input_policy.update(activity_input_policy)
                         state = openimcc_bridge.evaluate(
-                            composition_mol=dict(composition),
+                            composition_mol=activity_composition,
                             temperature_K=temperature_K,
                             allow_extrapolation=True,
                             allow_out_of_envelope=True,
                         )
                     except ImccNonconvergenceError as exc:
                         raise ResidueEngineNonconvergence("openimcc", str(exc)) from exc
+                    gas_parent_oxide_activities = dict(
+                        state.parent_oxide_activities
+                    )
+                    gas_parent_oxides = tuple(state.parent_oxides)
+                    if mno_channel_active:
+                        from simulator.chemistry.melt_activity import (
+                            melt_oxide_activity,
+                        )
+
+                        mno_activity = melt_oxide_activity(
+                            "MnO", composition, temperature_K=temperature_K
+                        )
+                        if mno_activity is None:
+                            raise ResidueInventoryRefusal(
+                                "melt_activity_unavailable",
+                                "OpenIMCC Mn gas channel needs a caller-supplied MnO activity",
+                            )
+                        mno_parent_activity = (
+                            mno_activity.thermodynamic_parent_activity()
+                        )
+                        if (
+                            not math.isfinite(mno_parent_activity)
+                            or mno_parent_activity < 0.0
+                        ):
+                            raise ResidueInventoryRefusal(
+                                "melt_activity_invalid",
+                                f"MnO activity extension returned {mno_parent_activity!r}",
+                            )
+                        gas_parent_oxide_activities["MnO"] = mno_parent_activity
+                        gas_parent_oxides += ("MnO",)
+                        melt_activity_extensions.setdefault(
+                            "MnO",
+                            {
+                                "reason": (
+                                    "MnO is outside the IMCC-SF04 melt-activity domain; "
+                                    "the simulator constant-gamma extension supplies the "
+                                    "activity required by the new Mn gas channel"
+                                ),
+                                "authority_level": mno_activity.evidence_tier,
+                                "certified_band_K": mno_activity.valid_range_K,
+                                "activity_provenance": mno_activity.provenance(),
+                            },
+                        )
                     gas_result = evaluate_gas(
-                        state.parent_oxide_activities,
+                        gas_parent_oxide_activities,
                         temperature_K,
                         1.0,
                         gas_pack,
-                        parent_oxides=state.parent_oxides,
+                        parent_oxides=gas_parent_oxides,
                         allow_extrapolation=True,
                     )
                     melt_pack_identity.update(
@@ -2015,6 +2068,16 @@ def _predict_sossi_residue_cohort(
                     ),
                     "liquid_rows_used": liquid_rows_used,
                     "melt_pack_identity": dict(melt_pack_identity),
+                    **(
+                        {"melt_activity_input_policy": dict(melt_activity_input_policy)}
+                        if melt_activity_input_policy
+                        else {}
+                    ),
+                    **(
+                        {"melt_activity_extensions": dict(melt_activity_extensions)}
+                        if melt_activity_extensions
+                        else {}
+                    ),
                     "assumption_flags": {
                         "pt_wire_loop_bead_geometry_assumed": True,
                         "density_fallback_2700_kg_m3": True,

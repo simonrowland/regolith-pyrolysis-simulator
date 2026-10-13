@@ -5036,6 +5036,33 @@ def _sossi_residue_prediction(
                 band=str(band),
             ),
         ]
+        activity_extensions = provenance.get("melt_activity_extensions")
+        mno_activity_extension = (
+            activity_extensions.get("MnO")
+            if isinstance(activity_extensions, Mapping)
+            else None
+        )
+        if isinstance(mno_activity_extension, Mapping):
+            authority_level = str(
+                mno_activity_extension.get("authority_level") or "unknown"
+            )
+            certified_band = mno_activity_extension.get("certified_band_K")
+            notices.append(
+                Notice(
+                    kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                    affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+                    reason=str(
+                        mno_activity_extension.get("reason")
+                        or "MnO activity uses an uncertified extension"
+                    ),
+                    origin="sossi-residue-r5",
+                    band=(
+                        f"authority_level={authority_level}; "
+                        "certified_band_K="
+                        f"{certified_band if certified_band is not None else 'none'}"
+                    ),
+                )
+            )
         if any(
             details.get("status") == "unconverged_at_cap"
             for details in (provenance.get("integration") or {}).values()
