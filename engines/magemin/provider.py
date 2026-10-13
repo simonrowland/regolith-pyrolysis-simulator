@@ -111,7 +111,9 @@ if hasattr(os, 'register_at_fork'):
 def _reap_backend_closes() -> None:
     """Close queued provider backends outside finalizer callbacks."""
     while True:
-        close = _CLOSE_QUEUE.get()
+        owner_pid, close = _CLOSE_QUEUE.get()
+        if owner_pid != os.getpid():
+            continue
         try:
             close()
         except BaseException:
@@ -142,9 +144,10 @@ def _ensure_close_reaper() -> None:
         _CLOSE_REAPER_PID = pid
 
 
-def _enqueue_backend_close(close: Any) -> None:
+def _enqueue_backend_close(close: Any, owner_pid: int) -> None:
     """Queue blocking cleanup without taking locks in the GC callback."""
-    _CLOSE_QUEUE.put(close)
+    if owner_pid == os.getpid():
+        _CLOSE_QUEUE.put((owner_pid, close))
 
 
 # Note attached to the ControlAudit for every dispatch. MAGEMin is
@@ -522,7 +525,7 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
             close = getattr(backend, 'close', None)
             if callable(close):
                 backend_finalizer = weakref.finalize(
-                    self, _enqueue_backend_close, close
+                    self, _enqueue_backend_close, close, os.getpid()
                 )
             backend.initialize(dict(_SHADOW_BACKEND_CONFIG))
         except Exception:

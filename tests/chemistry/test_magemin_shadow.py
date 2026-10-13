@@ -277,6 +277,26 @@ def _run_provider_finalizer_probe(scenario: str, *, consumer_callback=False):
                 worker.close()
 
         atexit.register(cleanup_workers)
+
+        def run_child_reaper_marker():
+            marker_ran = threading.Event()
+
+            class MarkerBackend:
+                def initialize(self, _config):
+                    return True
+
+                def close(self):
+                    marker_ran.set()
+
+            marker_backend = MarkerBackend()
+            magemin_module.MAGEMinBackend = lambda: marker_backend
+            trigger = test_module.MAGEMinShadowProvider()
+            assert trigger._ensure_backend() is marker_backend
+            del trigger
+            gc.collect()
+            if not marker_ran.wait(3.0):
+                os._exit(19)
+            os.write(1, b'child reaper marker ran\\n')
         '''
     )
     script = setup + '\n' + textwrap.dedent(scenario)
@@ -359,17 +379,17 @@ def _run_provider_after_fork_probe():
 
         sys.settrace(None)
         provider_collected = provider_ref() is None
-        # In this child the finalizer ran before its first _ensure_backend.
-        # That call must start a fresh reaper and drain the inherited queue.
+        # Collection in the child must not enqueue the parent's backend close.
+        # Its first _ensure_backend still starts the child's own reaper.
         trigger = provider_module.MAGEMinShadowProvider()
         trigger._ensure_backend()
-        queued_close_ran = closed.wait(2.0)
+        child_close_ran = closed.is_set()
         os.write(
             1,
             f'provider_collected={{provider_collected}} '
-            f'queued_close_ran={{queued_close_ran}}\\n'.encode(),
+            f'child_close_ran={{child_close_ran}}\\n'.encode(),
         )
-        os._exit(0 if provider_collected and queued_close_ran else 1)
+        os._exit(0 if provider_collected and not child_close_ran else 1)
         '''
     )
     process = subprocess.Popen(
@@ -393,7 +413,7 @@ def _run_provider_after_fork_probe():
         f'provider after-fork probe exited {process.returncode}\n'
         f'stdout: {stdout}\nstderr: {stderr}'
     )
-    assert 'provider_collected=True queued_close_ran=True' in stdout
+    assert 'provider_collected=True child_close_ran=False' in stdout
     assert 'KeyError' not in stderr
     assert 'Exception ignored in thread' not in stderr
 
@@ -644,6 +664,76 @@ def test_provider_finalizer_queues_close_across_automatic_gc_during_fork():
     _run_provider_after_fork_probe()
 
 
+def test_child_reaper_drops_parent_queued_provider_close_after_fork():
+    _run_provider_finalizer_probe(
+        '''
+        parent_pid = os.getpid()
+        blocker_started = threading.Event()
+        release_parent_close = threading.Event()
+
+        class BlockingBackend:
+            def initialize(self, _config):
+                return True
+
+            def close(self):
+                if os.getpid() == parent_pid:
+                    blocker_started.set()
+                    release_parent_close.wait(8.0)
+
+        blocker = BlockingBackend()
+        magemin_module.MAGEMinBackend = lambda: blocker
+        blocking_provider = test_module.MAGEMinShadowProvider()
+        assert blocking_provider._ensure_backend() is blocker
+        del blocking_provider
+        gc.collect()
+        assert blocker_started.wait(3.0), 'parent reaper did not become busy'
+        atexit.register(release_parent_close.set)
+
+        worker_process = pool.workers[0].process
+        provider._cycle = None
+        del provider
+        gc.collect()
+
+        fork_pid = os.fork()
+        if fork_pid == 0:
+            run_child_reaper_marker()
+            os._exit(0)
+
+        _, child_status = os.waitpid(fork_pid, 0)
+        assert os.WIFEXITED(child_status) and os.WEXITSTATUS(child_status) == 0
+        assert worker_process.is_alive(), 'child reaper killed the parent worker'
+        release_parent_close.set()
+        assert pool._close_complete.wait(timeout=5.0)
+        assert backend.close_calls == 1
+        assert not worker_process.is_alive()
+        '''
+    )
+
+
+def test_child_provider_finalizer_does_not_close_parent_backend_after_fork():
+    _run_provider_finalizer_probe(
+        '''
+        worker_process = pool.workers[0].process
+        fork_pid = os.fork()
+        if fork_pid == 0:
+            del provider
+            gc.collect()
+            run_child_reaper_marker()
+            os._exit(0)
+
+        _, child_status = os.waitpid(fork_pid, 0)
+        assert os.WIFEXITED(child_status) and os.WEXITSTATUS(child_status) == 0
+        assert worker_process.is_alive(), 'child finalizer closed the parent worker'
+        provider._cycle = None
+        del provider
+        gc.collect()
+        assert pool._close_complete.wait(timeout=5.0)
+        assert backend.close_calls == 1
+        assert not worker_process.is_alive()
+        '''
+    )
+
+
 def test_provider_close_reaper_continues_after_close_raises(monkeypatch, caplog):
     from engines.magemin import provider as provider_module
     from simulator.melt_backend import magemin as magemin_module
@@ -667,8 +757,9 @@ def test_provider_close_reaper_continues_after_close_raises(monkeypatch, caplog)
         close_order.append('next')
         next_close_ran.set()
 
-    provider_module._CLOSE_QUEUE.put(raising_close)
-    provider_module._CLOSE_QUEUE.put(next_close)
+    owner_pid = os.getpid()
+    provider_module._CLOSE_QUEUE.put((owner_pid, raising_close))
+    provider_module._CLOSE_QUEUE.put((owner_pid, next_close))
 
     assert next_close_ran.wait(timeout=2.0)
     assert close_order == ['raising', 'next']
