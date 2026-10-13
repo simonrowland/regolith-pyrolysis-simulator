@@ -12471,7 +12471,7 @@ class Migrator:
             else None
         )
         rows = list(iter_extract_observations(doc))
-        fusion_temperatures = self._fusion_temperature_by_table_row(rows)
+        fusion_transition_rows = self._fusion_transition_rows_by_table_row(rows)
         pressure_identity_context = _pressure_identity_context(doc, rows)
         records = phase_field_records(doc)
         self._phase_field_records[source_id] = records
@@ -12533,7 +12533,7 @@ class Migrator:
                 declared_experiment_id=declared_experiment_id,
                 source_context=pressure_identity_context,
                 provenance=extract_provenance,
-                fusion_temperatures=fusion_temperatures,
+                fusion_transition_rows=fusion_transition_rows,
             )
         # b-555: do not leave a silent extract — absence is fine, silence is not.
         self._record_silent_extract_if_needed(
@@ -12635,13 +12635,12 @@ class Migrator:
         )
 
     @staticmethod
-    def _fusion_temperature_by_table_row(
+    def _fusion_transition_rows_by_table_row(
         rows: Sequence[tuple[str, Mapping[str, Any]]],
-    ) -> dict[tuple[str, str, str], tuple[Decimal, Locator]]:
-        """Read fusion temperature printed in the matching source table row."""
+    ) -> dict[tuple[str, str, str], tuple[Mapping[str, Any], ...]]:
+        """Index transition rows for fusion observations to resolve."""
 
-        by_row: dict[tuple[str, str, str], tuple[Decimal, Locator]] = {}
-        ambiguous: set[tuple[str, str, str]] = set()
+        by_row: dict[tuple[str, str, str], list[Mapping[str, Any]]] = defaultdict(list)
         for formula, observation in rows:
             if observation.get("type") != "transition_point":
                 continue
@@ -12654,27 +12653,17 @@ class Migrator:
             )
             if not quantity.is_value or quantity.value is not Quantity.TRANSITION_TEMPERATURE:
                 continue
-            selected = select_declared_source(
-                quantity.value, observation.get("units"), values
-            )
             table, row = raw_locator.get("table"), raw_locator.get("row")
             locator = locator_from_mapping(raw_locator)
             if (
-                not selected.available
-                or selected.amount is None
-                or table in (None, "")
+                table in (None, "")
                 or row in (None, "")
                 or locator is None
             ):
                 continue
             key = (formula, str(table), str(row))
-            if key in by_row:
-                ambiguous.add(key)
-            else:
-                by_row[key] = (selected.amount, locator)
-        for key in ambiguous:
-            by_row.pop(key, None)
-        return by_row
+            by_row[key].append(observation)
+        return {key: tuple(candidates) for key, candidates in by_row.items()}
 
     def _migrate_extract_observation(
         self,
@@ -12689,8 +12678,8 @@ class Migrator:
         declared_experiment_id: str | None = None,
         source_context: Mapping[str, Any] | None = None,
         provenance: Mapping[str, Any] | None = None,
-        fusion_temperatures: Mapping[
-            tuple[str, str, str], tuple[Decimal, Locator]
+        fusion_transition_rows: Mapping[
+            tuple[str, str, str], tuple[Mapping[str, Any], ...]
         ] | None = None,
     ) -> None:
         measured = self.result.measured
@@ -12763,7 +12752,7 @@ class Migrator:
                         provenance,
                         quantity=child_quantity,
                     ),
-                    fusion_temperatures=fusion_temperatures,
+                    fusion_transition_rows=fusion_transition_rows,
                 )
             return
         locator = locator_from_mapping(
@@ -12946,10 +12935,34 @@ class Migrator:
             if isinstance(raw_locator, Mapping):
                 table, row = raw_locator.get("table"), raw_locator.get("row")
                 if table not in (None, "") and row not in (None, ""):
-                    fusion_temperature = (fusion_temperatures or {}).get(
+                    transition_rows = (fusion_transition_rows or {}).get(
                         (formula, str(table), str(row))
                     )
-                    if fusion_temperature is not None:
+                    selected_transitions: list[tuple[Decimal, Locator]] = []
+                    for transition in transition_rows or ():
+                        transition_values = transition.get("values")
+                        transition_locator = locator_from_mapping(
+                            transition.get("locator")
+                        )
+                        if (
+                            not isinstance(transition_values, Mapping)
+                            or transition_locator is None
+                        ):
+                            continue
+                        selected_transition = select_declared_source(
+                            Quantity.TRANSITION_TEMPERATURE,
+                            transition.get("units"),
+                            transition_values,
+                        )
+                        if (
+                            selected_transition.available
+                            and selected_transition.amount is not None
+                        ):
+                            selected_transitions.append(
+                                (selected_transition.amount, transition_locator)
+                            )
+                    if len(selected_transitions) == 1:
+                        fusion_temperature = selected_transitions[0]
                         t_payload["T_fus_K"] = fusion_temperature[0]
                         temperature_locator = fusion_temperature[1]
                         t_sel = select_declared_source(
