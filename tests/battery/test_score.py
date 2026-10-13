@@ -924,6 +924,13 @@ def test_plante_kems_pressure_envelope_reports_unstated_confidence(
     )
     assert band is not None
     assert band.value == Decimal("0.1461280356782380259259551535")
+    assert "source-printed" in band.rule
+    assert "log10(1.40)" in band.rule
+    assert "page-280 1500 K sentence" in band.rule
+    assert "upper multiplicative edge" in band.rule
+    assert "[1/1.40, 1.40] (-28.6%..+40%)" in band.rule
+    assert "+/-40% relative band" in band.rule
+    assert "single 1500 K figure is applied across the tabulated T range" in band.rule
 
     printed = _printed_uncertainty_band(
         Quantity.P_PARTIAL,
@@ -1017,6 +1024,44 @@ def test_kems_band_prefers_printed_envelope_over_replicate_scatter() -> None:
     assert band is not None
     assert band.value == Decimal("1.4").ln() / Decimal("10").ln()
     assert "source-printed pressure envelope" in band.rule
+
+
+def test_kems_inter_source_catalog_pins_two_calibrated_sources() -> None:
+    from simulator.battery.score import _source_band_catalog
+
+    experiment = F.kems_experiment("calibrated-kems")
+    identity = replace(
+        _partial_identity(),
+        total_pressure_Pa=State.of(Decimal("1e-6")),
+        reaction=None,
+        reference_state=None,
+        reservoir=None,
+    )
+    rows = tuple(
+        F.observation(
+            f"calibrated-source-{index}",
+            experiment.experiment_id,
+            identity,
+            Decimal(value),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id=f"calibrated-source-{index}",
+        )
+        for index, value in enumerate(("10", "100"))
+    )
+    work = F.work()
+    context = ScoreContext(
+        works={work.work_id: work},
+        experiments={experiment.experiment_id: experiment},
+        observations={row.observation_id: row for row in rows},
+        hostname="test",
+    )
+
+    bands, _records, _no_band_reasons = _source_band_catalog(context, {})
+
+    assert len(bands) == 1
+    band = next(iter(bands.values()))
+    assert band.unit == "dimensionless"
+    assert band.value == Decimal("1.452923475835081740375596191")
 
 
 def test_uncalibrated_kems_partial_pressure_is_excluded_from_band_population() -> None:
