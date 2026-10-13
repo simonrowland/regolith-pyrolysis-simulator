@@ -20,10 +20,43 @@ fidelity_samples:
   - path: species.Na.observations[ewing_1963_na_fig6_vapour_pressure].values.points[0].pressure_atm
     value: 24
     locator: {page: 12, published_page: 7, pdf_page_index: 11, figure: '6'}
+experiments:
+  - experiment_id: na-sodium-vapor-pressure
+    method: static_equilibrium
+    locator:
+      page: 7
+      published_page: 2
+      pdf_page_index: 6
+      section: Pressure-Volume-Temperature
+      note: >-
+        The source states, "The position of the diaphragm is monitored with an electrical continuity circuit and
+        controlled by balancing the internal and external pressures" and "A measurement of the vapor pressure of the
+        alkali metal is then made externally with calibrated Bourdon-tube gages." Figure 6 combines five null-point
+        experiments; its individual points are not assigned to runs.
+    sample:
+      form:
+        state: {tag: value, value: liquid sodium}
+        locator: {page: 12, published_page: 7, pdf_page_index: 11, figure: '6'}
+      initial_composition:
+        state:
+          tag: value
+          value:
+            basis: elemental
+            amount_basis: mole_fraction
+            components:
+              - [Na, '1']
+        locator:
+          page: 11
+          published_page: 6
+          pdf_page_index: 10
+          section: Pressure-Volume-Temperature
+          note: >-
+            The report states, "Distilled sodium was introduced into small, tared, closed-end tubes of the columbium alloy."
 species:
   Na:
     observations:
       - observation_id: ewing_1963_na_fig6_vapour_pressure
+        experiment: na-sodium-vapor-pressure
         type: psat_series
         locator: {page: 12, published_page: 7, pdf_page_index: 11, figure: '6'}
         phase: liquid sodium
