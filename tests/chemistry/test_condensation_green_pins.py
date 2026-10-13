@@ -1,4 +1,4 @@
-"""Pre-t1217 output pins: evidence for the owner's physical golden shift."""
+"""Measured condensation-route pins for physical output shifts."""
 
 import json
 import hashlib

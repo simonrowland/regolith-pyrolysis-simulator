@@ -43,7 +43,7 @@ Key physics:
     At the stage midpoint and measured inlet partial pressure,          [COND-1]
         f_eq = max(0, 1 - P_sat / p_in)
         k_s = J_series * A_stage / N_stage
-        η_stage = min(f_eq, 1 - exp(-k_s * t_res))
+        η_stage = f_eq * (1 - exp(-k_s * t_res / f_eq))
     N_stage is the residence-sized inventory from molar throughput, not
     an hourly mass. The derivation is in _condensation_efficiency.
     Walls and stages remove vapor in physical order; every capture stays
@@ -4040,21 +4040,22 @@ class CondensationModel:
             _molecular_mass_kg_per_molecule(species, vapor_pressure_data=self.vapor_pressure_data)
             * AVOGADRO_MOL
         )
-        # Premise: available_kg is kg/h throughput, NOT gas inventory. With
-        # molar flow n_dot=(available_kg/M)/3600 (mol/s), N_stage=n_dot*tau
-        # (mol). The existing series law gives J=K_series*(p_in-P_sat)
-        # (mol/m2/s), including HKL alpha, gas transport and Kn continuity.
-        # Algebra: dN/dt=-k_s*N, k_s=J*A/N_stage; integrating gives
-        # f_kin=1-exp(-k_s*tau). Units: (mol/m2/s)*m2/mol = 1/s.
-        # At fixed flow/area/pressure, tau cancels because N_stage grows with
-        # tau; no reference time is introduced. Alpha->0 gives J->0 and f->0;
-        # large k_s*tau gives f_kin->1; p_in<=P_sat gives J=f_eq=0.
-        # The equilibrium ceiling prevents an outlet below saturation.
+        # Premise: the series law is J=K_series*(p-P_sat), and at fixed gas
+        # volume/temperature p=N*R*T/V. Thus the balance is on excess inventory:
+        # d(N-N_sat)/dt=-(K_series*A*R*T/V)*(N-N_sat). Integrating from the
+        # inlet gives f=f_eq*(1-exp(-lambda*tau)), with
+        # lambda=K_series*A*R*T/V=J_in*A/(N_stage*f_eq). Since
+        # k_s=J_in*A/N_stage, this is f=f_eq*(1-exp(-k_s*tau/f_eq)).
+        # Units: J_in*A/N_stage is 1/s, so lambda*tau and k_s*tau/f_eq are
+        # dimensionless. N_stage=(available_kg/M)/3600*tau; at fixed flow,
+        # area and pressure, k_s*tau therefore cancels tau. Alpha->0 gives
+        # f->0; large k_s*tau gives f->f_eq, and 0<=f<=f_eq. Numerical ODE
+        # checks at P_sat/p_in=0.5 and 0.9 with unit excess transfer give
+        # 31.6060% and 6.3212%, respectively; no supersaturation returns 0.
         inventory_mol = available_kg / molar_mass / 3600.0 * residence_s
         k_s = flux * area / inventory_mol
-        f_kin = -math.expm1(-k_s * residence_s)
         f_eq = driving_pressure / p_in
-        eta = min(f_eq, f_kin)
+        eta = f_eq * -math.expm1(-k_s * residence_s / f_eq)
         notice = notices.get(f'{species}#wall:{T_surface_K}')
         if isinstance(notice, Mapping) and efficiency_outcomes is not None:
             efficiency_outcomes.append({
