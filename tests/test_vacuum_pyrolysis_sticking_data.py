@@ -188,53 +188,8 @@ def test_sio_cold_wall_wall_alpha_uses_unity_condensation_gate():
     assert record["segment"] == "cold_spot"
 
 
-def test_sio_pressure_isolated_stage_eval_uses_cold_wall_gate():
-    stage = CondensationStage(
-        stage_number=1,
-        label="cold pressure stage",
-        temp_range_C=(500.0, 600.0),
-        target_species=["SiO"],
-    )
-    alpha_record: dict[str, object] = {}
-
-    captured = condensation._pressure_isolated_capture_budget_kg(
-        "SiO",
-        1.0,
-        [stage],
-        {1: 1.0},
-        temps={"SiO": 1000.0},
-        alpha_record_out=alpha_record,
-    )
-
-    assert captured > 0.0
-    stage_eval = alpha_record["alpha_s_stage_evaluations"]["1"]
-    assert stage_eval["alpha_s"] == pytest.approx(1.0)
-    assert stage_eval["alpha_s_form"] == "cold_wall_condensation"
-    assert stage_eval["alpha_s_cold_wall_condensation"] is True
 
 
-def test_pressure_isolated_efficiency_uses_declared_time_constant(monkeypatch):
-    stage = CondensationStage(
-        stage_number=1,
-        label="cold pressure stage",
-        temp_range_C=(400.0, 600.0),
-        target_species=["SiO"],
-    )
-    monkeypatch.setattr(
-        condensation,
-        "CAPTURE_BUDGET_REGULARIZER_TIME_S",
-        2.0,
-    )
-
-    efficiency = condensation._pressure_isolated_stage_efficiency(
-        stage,
-        T_cond_C=1000.0,
-        residence_s=2.0,
-        alpha_s=1.0,
-    )
-
-    # delta_T/T_cond = 0.5, so tau = 2.0 s / 0.5 = 4.0 s.
-    assert efficiency == pytest.approx(1.0 - math.exp(-2.0 / 4.0))
 
 
 def test_sticking_yaml_rejects_boolean_numeric_value(tmp_path: Path):
@@ -257,45 +212,8 @@ def test_runtime_arrhenius_rejects_nonpositive_coefficients():
         condensation._alpha_s_evaluation("SiO", 1000.0, spec)
 
 
-def test_pressure_isolated_efficiency_handles_zero_alpha_and_refuses_nonfinite():
-    stage = CondensationStage(
-        stage_number=1,
-        label="test",
-        temp_range_C=(500.0, 600.0),
-        target_species=["SiO"],
-    )
-
-    assert condensation._pressure_isolated_stage_efficiency(
-        stage, 1000.0, 1.0, 0.0
-    ) == 0.0
-    with pytest.raises(ValueError, match="must be finite"):
-        condensation._pressure_isolated_stage_efficiency(
-            stage, 1000.0, 1.0, float("nan")
-        )
 
 
-@pytest.mark.parametrize(
-    "temp_range_C",
-    [
-        (float("nan"), 600.0),
-        (500.0, float("inf")),
-        (600.0, 500.0),
-    ],
-)
-def test_pressure_isolated_efficiency_refuses_invalid_stage_temperature_bounds(
-    temp_range_C,
-):
-    stage = CondensationStage(
-        stage_number=1,
-        label="invalid stage",
-        temp_range_C=temp_range_C,
-        target_species=["SiO"],
-    )
-
-    with pytest.raises(ValueError, match="temperature|finite"):
-        condensation._pressure_isolated_stage_efficiency(
-            stage, 1000.0, 1.0, 1.0
-        )
 
 
 def test_sio_stage_band_flux_uses_cold_wall_gate(
@@ -449,24 +367,3 @@ def test_grounded_sio_wall_alpha_reaches_supply_ceiling(monkeypatch):
         assert wall + stage + remaining == pytest.approx(1.0, rel=0.0, abs=1e-12)
         assert authority["mass_closure_error_kg_hr"] == pytest.approx(0.0)
         assert refusal["upstream_authority_status"] == "missing"
-
-
-def test_capture_budget_regularizer_is_marked_numerical_uncertified():
-    data = _load_sticking_data()
-    floor = data["capture_budget_regularizer_floor"]
-    time_constant = data["capture_budget_regularizer_time_s"]
-
-    assert floor["value"] == pytest.approx(0.01)
-    assert floor["status"] == "UNCERTIFIED"
-    assert floor["source_class"] == "numerical_regularizer_not_literature_constant"
-    assert floor["output_status"] == "uncertainty_only"
-    assert time_constant["value"] == pytest.approx(1.0)
-    assert time_constant["status"] == "UNCERTIFIED"
-    assert time_constant["source_class"] == "numerical_regularizer_not_literature_constant"
-    assert time_constant["output_status"] == "uncertainty_only"
-    assert condensation.CAPTURE_BUDGET_REGULARIZER_NOTICE[
-        "citation_status"
-    ] == "UNCERTIFIED"
-    assert condensation.CAPTURE_BUDGET_REGULARIZER_NOTICE[
-        "time_constant_citation_status"
-    ] == "UNCERTIFIED"

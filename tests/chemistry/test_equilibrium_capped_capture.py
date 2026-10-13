@@ -64,6 +64,14 @@ def test_missing_inlet_pressure_is_unavailable():
         efficiency(model, None)
 
 
+@pytest.mark.parametrize("band", [(math.nan, 600.0), (500.0, math.inf), (600.0, 500.0)])
+def test_invalid_stage_temperature_band_remains_a_typed_refusal(band):
+    model = _configured_model()
+    model.train.stages[1].temp_range_C = band
+    with pytest.raises(condensation.DepositionInputRefusal, match="stage_temperature"):
+        efficiency(model, 27.18)
+
+
 def test_route_keeps_capture_at_its_stage_and_depletes_inlet_pressure(monkeypatch):
     model = _configured_model()
     model.pipe_segments = []

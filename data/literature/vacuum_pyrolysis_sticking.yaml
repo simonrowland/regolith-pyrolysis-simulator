@@ -3,7 +3,7 @@ surface: vacuum_pyrolysis_wall_and_condenser_capture
 usage:
   - simulator/condensation.py::_stage_alpha_s
   - simulator/condensation.py::_wall_alpha_s
-  - simulator/condensation.py::_pressure_isolated_capture_budget_kg
+  - simulator/condensation.py::_condensation_efficiency
   - engines/builtin/evaporation_flux.py::BuiltinEvaporationFluxProvider
 status_values:
   - CITED
@@ -179,25 +179,3 @@ unknown_species_default:
   envelope: [0.0, 1.0]
   uncertainty_flag: no_species_specific_sticking_coefficient
   output_status: status_bearing
-
-capture_budget_regularizer_floor:
-  value: 0.01
-  status: UNCERTIFIED
-  source_class: numerical_regularizer_not_literature_constant
-  source: "Legacy pressure-isolated capture-budget floor preventing zero normalized temperature driving-force in the provisional pre-pressure-coupling model; not a physical condensation/sticking constant."
-  source_url: null
-  temperature_range_K: not_applicable_numerical
-  usage: simulator/condensation.py::_pressure_isolated_stage_efficiency
-  uncertainty_flag: numerical_safeguard
-  output_status: uncertainty_only
-
-capture_budget_regularizer_time_s:
-  value: 1.0
-  status: UNCERTIFIED
-  source_class: numerical_regularizer_not_literature_constant
-  source: "Legacy one-second pressure-isolated capture-budget timescale made explicit so the provisional time constant has units; not a physical condensation/sticking constant."
-  source_url: null
-  temperature_range_K: not_applicable_numerical
-  usage: simulator/condensation.py::_pressure_isolated_stage_efficiency
-  uncertainty_flag: numerical_safeguard
-  output_status: uncertainty_only

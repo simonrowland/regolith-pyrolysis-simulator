@@ -414,33 +414,6 @@ def _load_sticking_data(path: Path = STICKING_DATA_PATH) -> dict[str, Any]:
         'unknown_species_default',
         raw.get('unknown_species_default'),
     )
-    floor = raw.get('capture_budget_regularizer_floor')
-    if not isinstance(floor, Mapping):
-        raise ValueError(f'{path}: missing capture_budget_regularizer_floor')
-    _validate_sticking_value(
-        path,
-        'capture_budget_regularizer_floor.value',
-        floor.get('value'),
-    )
-    if str(floor.get('status', '')).upper() not in STICKING_STATUSES:
-        raise ValueError(f'{path}: regularizer floor must be CITED or UNCERTIFIED')
-    if not floor.get('source') or not floor.get('source_class'):
-        raise ValueError(f'{path}: regularizer floor needs source/source_class')
-    time_constant = raw.get('capture_budget_regularizer_time_s')
-    if not isinstance(time_constant, Mapping):
-        raise ValueError(f'{path}: missing capture_budget_regularizer_time_s')
-    if isinstance(time_constant.get('value'), bool):
-        raise ValueError(f'{path}: regularizer time must be numeric, not boolean')
-    try:
-        time_s = float(time_constant.get('value'))
-    except (TypeError, ValueError) as exc:
-        raise ValueError(f'{path}: regularizer time must be numeric') from exc
-    if not math.isfinite(time_s) or time_s <= 0.0:
-        raise ValueError(f'{path}: regularizer time must be finite and > 0')
-    if str(time_constant.get('status', '')).upper() not in STICKING_STATUSES:
-        raise ValueError(f'{path}: regularizer time must be CITED or UNCERTIFIED')
-    if not time_constant.get('source') or not time_constant.get('source_class'):
-        raise ValueError(f'{path}: regularizer time needs source/source_class')
     return dict(raw)
 
 
@@ -1401,35 +1374,6 @@ STICKING_COEFF = {
     if isinstance(entry, Mapping)
 }
 
-CAPTURE_BUDGET_REGULARIZER_FLOOR = float(
-    STICKING_DATA['capture_budget_regularizer_floor']['value']
-)
-CAPTURE_BUDGET_REGULARIZER_TIME_S = float(
-    STICKING_DATA['capture_budget_regularizer_time_s']['value']
-)
-CAPTURE_BUDGET_REGULARIZER_NOTICE = {
-    'severity': 'warning',
-    'code': 'pressure_isolated_capture_budget_regularizer_uncertified',
-    'source_class': STICKING_DATA['capture_budget_regularizer_floor']['source_class'],
-    'floor': CAPTURE_BUDGET_REGULARIZER_FLOOR,
-    'time_constant_s': CAPTURE_BUDGET_REGULARIZER_TIME_S,
-    'source': STICKING_DATA['capture_budget_regularizer_floor']['source'],
-    'time_constant_source': STICKING_DATA['capture_budget_regularizer_time_s']['source'],
-    'citation_status': STICKING_DATA['capture_budget_regularizer_floor']['status'],
-    'time_constant_citation_status': (
-        STICKING_DATA['capture_budget_regularizer_time_s']['status']
-    ),
-    'uncertainty_flag': (
-        STICKING_DATA['capture_budget_regularizer_floor']['uncertainty_flag']
-    ),
-    'usage': '_pressure_isolated_stage_efficiency',
-    'output_status': 'uncertainty_only',
-    'message': (
-        'Pressure-isolated capture budget uses a documented numerical '
-        'regularizer floor; the value is surfaced as uncertainty-only and '
-        'must not be treated as a sourced condensation constant.'
-    ),
-}
 
 # ``MAX_STIR_FACTOR`` + ``clamp_stir_factor`` are canonical in
 # ``simulator/state.py`` (where ``MeltState.stir_factor`` lives). They
@@ -2147,7 +2091,6 @@ class CondensationModel:
         self.last_wall_deposition_rate_shadow_candidate: dict[
             str, dict[str, Any]
         ] = {}
-        self.last_wall_capture_fixed_point_iterations = 0
         self.wall_alkali_binding_diagnostic_state_by_account: dict[
             str, dict[str, Any]
         ] = {}
@@ -3005,7 +2948,6 @@ class CondensationModel:
         flowing_rates = dict(inlet_rates)
         wall_hkl_by_species: dict[str, dict[str, float]] = {}
         self.wall_species_partial_pressures_pa_by_segment = {}
-        self.last_wall_capture_fixed_point_iterations = 0
         # The train is causal: each entering wall and then its stage consume
         # one shared inlet mixture. Recompute Dalton partials only AFTER all
         # species at that location have been evaluated, preserving carrier flow.
@@ -3916,289 +3858,6 @@ class CondensationModel:
         finally:
             _reset_antoine_telemetry_context(token)
 
-    def _resolve_wall_deposit_candidates_by_species_segment_kg(
-        self,
-        *,
-        evap_flux: EvaporationFlux,
-        melt: MeltState,
-        stage_route_by_species: Mapping[str, Mapping[str, Any]],
-        antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
-        antoine_extrapolation_warnings: list[str] | None = None,
-    ) -> Dict[str, Dict[str, float]]:
-        self.last_wall_capture_fixed_point_iterations = 0
-        if not self.pipe_segments or not stage_route_by_species:
-            self.wall_species_partial_pressures_pa_by_segment = {}
-            return {}
-
-        inlet_rates = {
-            str(species): max(0.0, float(rate_kg_hr))
-            for species, rate_kg_hr in evap_flux.species_kg_hr.items()
-        }
-        segment_names = [segment.name for segment in self.pipe_segments]
-        total_pressure_pa = self.overhead_pressure_mbar * 100.0
-
-        def segment_rates_from_capture(
-            stage_capture_by_species: Mapping[str, Mapping[int, float]],
-            wall_capture_by_species: Mapping[str, Mapping[str, float]],
-        ) -> dict[str, dict[str, float]]:
-            by_segment: dict[str, dict[str, float]] = {}
-            prior_segments: list[str] = []
-            for segment in self.pipe_segments:
-                upstream_number = _segment_stage_number(segment.upstream_stage)
-                rates: dict[str, float] = {}
-                for species, inlet_rate in inlet_rates.items():
-                    stage_removed = (
-                        sum(
-                            float(value)
-                            for stage_number, value
-                            in stage_capture_by_species.get(species, {}).items()
-                            if (
-                                upstream_number is not None
-                                and int(stage_number) <= upstream_number
-                            )
-                        )
-                    )
-                    wall_removed = sum(
-                        float(
-                            wall_capture_by_species.get(species, {}).get(
-                                prior_segment,
-                                0.0,
-                            )
-                        )
-                        for prior_segment in prior_segments
-                    )
-                    remaining = inlet_rate - stage_removed - wall_removed
-                    tolerance = 1.0e-12 * max(1.0, inlet_rate)
-                    if remaining < -tolerance:
-                        raise ValueError(
-                            'resolved wall routing removes more '
-                            f'{species} than enters the train'
-                        )
-                    rates[species] = max(0.0, remaining)
-                by_segment[segment.name] = rates
-                prior_segments.append(segment.name)
-            return by_segment
-
-        def wall_candidates(
-            species_rates_by_segment: Mapping[str, Mapping[str, float]],
-            *,
-            record_telemetry: bool,
-        ) -> dict[str, dict[str, float]]:
-            candidates: dict[str, dict[str, float]] = {}
-            for species, stage_route in stage_route_by_species.items():
-                rate_kg_hr = inlet_rates.get(species, 0.0)
-                if rate_kg_hr <= 0.0:
-                    continue
-                species_candidates = self._wall_deposit_candidates_by_segment_kg(
-                    species=species,
-                    rate_kg_hr=rate_kg_hr,
-                    T_cond_C=float(stage_route['T_cond_C']),
-                    melt_temperature_C=float(
-                        getattr(melt, 'temperature_C', stage_route['T_cond_C'])
-                    ),
-                    supply_by_segment_kg={
-                        segment_name: float(
-                            species_rates_by_segment.get(
-                                segment_name,
-                                {},
-                            ).get(species, 0.0)
-                        )
-                        for segment_name in segment_names
-                    },
-                    antoine_extrapolations=(
-                        antoine_extrapolations if record_telemetry else None
-                    ),
-                    antoine_extrapolation_warnings=(
-                        antoine_extrapolation_warnings
-                        if record_telemetry else None
-                    ),
-                )
-                candidates[species] = species_candidates
-            return candidates
-
-        def resolved_capture(
-            candidates_by_species: Mapping[str, Mapping[str, float]],
-        ) -> tuple[
-            dict[str, dict[int, float]],
-            dict[str, dict[str, float]],
-        ]:
-            stage_capture: dict[str, dict[int, float]] = {}
-            wall_capture: dict[str, dict[str, float]] = {}
-            for species, stage_route in stage_route_by_species.items():
-                stages, walls = _regularized_capture_allocations(
-                    float(stage_route['capture_budget_kg']),
-                    stage_route['hkl_condensed_by_stage'],
-                    candidates_by_species.get(species, {}),
-                )
-                stage_capture[species] = {
-                    int(stage_number): float(value)
-                    for stage_number, value in stages.items()
-                }
-                wall_capture[species] = {
-                    str(segment_name): float(value)
-                    for segment_name, value in walls.items()
-                }
-            return stage_capture, wall_capture
-
-        def capture_delta(
-            previous_stage: Mapping[str, Mapping[int, float]],
-            previous_wall: Mapping[str, Mapping[str, float]],
-            current_stage: Mapping[str, Mapping[int, float]],
-            current_wall: Mapping[str, Mapping[str, float]],
-        ) -> float:
-            delta = 0.0
-            for species, inlet_rate in inlet_rates.items():
-                scale = max(1.0e-30, inlet_rate)
-                for stage_number in (
-                    set(previous_stage.get(species, {}))
-                    | set(current_stage.get(species, {}))
-                ):
-                    delta = max(
-                        delta,
-                        abs(
-                            float(
-                                previous_stage.get(species, {}).get(
-                                    stage_number,
-                                    0.0,
-                                )
-                            )
-                            - float(
-                                current_stage.get(species, {}).get(
-                                    stage_number,
-                                    0.0,
-                                )
-                            )
-                        )
-                        / scale,
-                    )
-                for segment_name in (
-                    set(previous_wall.get(species, {}))
-                    | set(current_wall.get(species, {}))
-                ):
-                    delta = max(
-                        delta,
-                        abs(
-                            float(
-                                previous_wall.get(species, {}).get(
-                                    segment_name,
-                                    0.0,
-                                )
-                            )
-                            - float(
-                                current_wall.get(species, {}).get(
-                                    segment_name,
-                                    0.0,
-                                )
-                            )
-                        )
-                        / scale,
-                    )
-            return delta
-
-        def relax_capture(
-            previous: Mapping[str, Mapping[Any, float]],
-            current: Mapping[str, Mapping[Any, float]],
-            factor: float,
-        ) -> dict[str, dict[Any, float]]:
-            relaxed: dict[str, dict[Any, float]] = {}
-            for species in set(previous) | set(current):
-                values: dict[Any, float] = {}
-                for location in (
-                    set(previous.get(species, {}))
-                    | set(current.get(species, {}))
-                ):
-                    old_value = float(
-                        previous.get(species, {}).get(location, 0.0)
-                    )
-                    new_value = float(
-                        current.get(species, {}).get(location, 0.0)
-                    )
-                    value = old_value + factor * (new_value - old_value)
-                    if value > 0.0:
-                        values[location] = value
-                relaxed[species] = values
-            return relaxed
-
-        stage_capture: dict[str, dict[int, float]] = {}
-        wall_capture: dict[str, dict[str, float]] = {}
-        converged = False
-        previous_delta: float | None = None
-        relaxation = 1.0
-        for iteration in range(1024):
-            species_rates_by_segment = segment_rates_from_capture(
-                stage_capture,
-                wall_capture,
-            )
-            self.wall_species_partial_pressures_pa_by_segment = (
-                _segment_species_partial_pressures_pa(
-                    self.wall_species_partial_pressures_pa,
-                    total_pressure_pa,
-                    inlet_rates,
-                    species_rates_by_segment,
-                )
-            )
-            self.last_wall_deposition_rate_shadow_candidate = {}
-            candidates_by_species = wall_candidates(
-                species_rates_by_segment,
-                record_telemetry=False,
-            )
-            next_stage_capture, next_wall_capture = resolved_capture(
-                candidates_by_species
-            )
-            delta = capture_delta(
-                stage_capture,
-                wall_capture,
-                next_stage_capture,
-                next_wall_capture,
-            )
-            if delta <= 1.0e-7:
-                stage_capture = next_stage_capture
-                wall_capture = next_wall_capture
-                self.last_wall_capture_fixed_point_iterations = iteration + 1
-                converged = True
-                break
-            if (
-                previous_delta is not None
-                and delta >= 0.95 * previous_delta
-            ):
-                relaxation = 0.8
-            stage_capture = relax_capture(
-                stage_capture,
-                next_stage_capture,
-                relaxation,
-            )
-            wall_capture = relax_capture(
-                wall_capture,
-                next_wall_capture,
-                relaxation,
-            )
-            previous_delta = delta
-        if not converged:
-            self.last_wall_capture_fixed_point_iterations = 1024
-            raise RuntimeError(
-                'wall/stage capture fixed-point did not converge in 1024 '
-                f'iterations (relative delta={delta:.12g})'
-            )
-        if (
-            antoine_extrapolations is not None
-            or antoine_extrapolation_warnings is not None
-        ):
-            for species in stage_route_by_species:
-                for segment in self._mixed_temperature_wall_candidate_segments(
-                    species
-                ):
-                    if segment.name in self.wall_temperature_input_refusals:
-                        continue
-                    _record_wall_surface_antoine_telemetry(
-                        species,
-                        segment.wall_temperature_C,
-                        vapor_pressure_data=self.vapor_pressure_data,
-                        antoine_extrapolations=antoine_extrapolations,
-                        antoine_extrapolation_warnings=(
-                            antoine_extrapolation_warnings
-                        ),
-                    )
-        return candidates_by_species
 
     def _mixed_temperature_wall_candidate_segments(
         self,
@@ -4260,35 +3919,6 @@ class CondensationModel:
         finally:
             _reset_antoine_telemetry_context(token)
 
-    def _segment_supply_by_name(
-        self,
-        rate_kg_hr: float,
-        remaining_after_stage: Mapping[int, float],
-    ) -> Dict[str, float]:
-        supply: Dict[str, float] = {}
-        for segment in self.pipe_segments:
-            upstream_number = _segment_stage_number(segment.upstream_stage)
-            if upstream_number is None:
-                supply[segment.name] = max(0.0, float(rate_kg_hr))
-            else:
-                prior_numbers = [
-                    stage_number
-                    for stage_number in remaining_after_stage
-                    if stage_number <= upstream_number
-                ]
-                default_supply = (
-                    remaining_after_stage[max(prior_numbers)]
-                    if prior_numbers else rate_kg_hr
-                )
-                supply[segment.name] = max(
-                    0.0,
-                    min(
-                        float(rate_kg_hr),
-                        float(remaining_after_stage.get(
-                            upstream_number, default_supply)),
-                    ),
-                )
-        return supply
 
     def _condensation_efficiency(
         self,
@@ -5533,11 +5163,6 @@ def _wall_alpha_record(
     return _sidecar_alpha_record(species, T_K=T_K)
 
 
-def _capture_budget_alpha_record(
-    species: str,
-    T_K: float | None = None,
-) -> dict[str, Any]:
-    return _sidecar_alpha_record(species, T_K=T_K)
 
 
 def _liner_material_config(
@@ -7295,94 +6920,6 @@ def _campaign_requires_viscous_flow(campaign_name: str | None) -> bool:
     }
 
 
-def _pressure_isolated_capture_budget_kg(
-    species: str,
-    rate_kg_hr: float,
-    stages: list[CondensationStage],
-    residence_time_s: Mapping[int, float],
-    *,
-    temps: Mapping[str, float] | None = None,
-    vapor_pressure_data: Mapping[str, Any] | None = None,
-    alpha_record_out: MutableMapping[str, Any] | None = None,
-) -> float:
-    """Hold total vapor removal fixed until Chunk C pressure coupling lands."""
-
-    remaining_kg = max(0.0, rate_kg_hr)
-    T_cond_C = _species_condensation_temperature_C(
-        species,
-        temps=temps,
-        vapor_pressure_data=vapor_pressure_data,
-    )
-    alpha_record = _capture_budget_alpha_record(
-        species,
-        T_K=max(T_cond_C + CELSIUS_TO_KELVIN_OFFSET, 1.0),
-    )
-    stage_alpha_evaluations: dict[str, Any] = {}
-    for stage in stages:
-        if remaining_kg <= 1e-15:
-            break
-        if _cr_stage_isolation_blocks(stage, species):
-            continue
-        T_stage_K = _stage_midpoint_temperature_K(stage)
-        alpha_context: dict[str, Any] = {
-            'coefficient_spec': _sticking_species_entry(species).get('value'),
-        }
-        stage_alpha_s = _condensation_alpha_s(species, T_stage_K, alpha_context)
-        stage_alpha_evaluations[str(stage.stage_number)] = dict(
-            alpha_context.get('alpha_s_evaluation', {})
-        )
-        eta = _pressure_isolated_stage_efficiency(
-            stage,
-            T_cond_C,
-            float(residence_time_s.get(stage.stage_number, 1.0)),
-            stage_alpha_s,
-        )
-        remaining_kg -= remaining_kg * eta
-    if stage_alpha_evaluations:
-        alpha_record['alpha_s_stage_evaluations'] = stage_alpha_evaluations
-        alpha_record['alpha_s_stage_extrapolated'] = any(
-            bool(record.get('alpha_s_extrapolated'))
-            for record in stage_alpha_evaluations.values()
-            if isinstance(record, Mapping)
-        )
-    if alpha_record_out is not None:
-        alpha_record_out.clear()
-        alpha_record_out.update(alpha_record)
-    return max(0.0, min(rate_kg_hr, rate_kg_hr - remaining_kg))
-
-
-def _pressure_isolated_stage_efficiency(
-    stage: CondensationStage,
-    T_cond_C: float,
-    residence_s: float,
-    alpha_s: float,
-) -> float:
-    lo_C, hi_C = stage.temp_range_C
-    values = (T_cond_C, residence_s, alpha_s, lo_C, hi_C)
-    if not all(math.isfinite(float(value)) for value in values):
-        raise ValueError('pressure-isolated capture inputs must be finite')
-    if residence_s < 0.0 or not 0.0 <= alpha_s <= 1.0:
-        raise ValueError('residence_s and alpha_s are outside physical bounds')
-    if float(lo_C) > float(hi_C):
-        raise ValueError('stage temperature bounds must be ordered low-to-high')
-    if residence_s == 0.0 or alpha_s == 0.0:
-        return 0.0
-    T_stage_C = (float(lo_C) + float(hi_C)) / 2.0
-    if T_stage_C >= T_cond_C:
-        return 0.0
-    delta_T = T_cond_C - T_stage_C
-    normalized_drive = max(
-        delta_T / max(T_cond_C, 1.0),
-        CAPTURE_BUDGET_REGULARIZER_FLOOR,
-    )
-    # Premise: alpha_s and normalized_drive are dimensionless. Algebra:
-    # tau_s = t_ref_s / (alpha_s * normalized_drive). Unit check:
-    # s / 1 = s, so residence_s / tau_s is dimensionless. Sanity:
-    # colder stages or higher sticking shorten tau; the explicit
-    # one-second t_ref_s is surfaced as an uncertified numerical regularizer.
-    tau_s = CAPTURE_BUDGET_REGULARIZER_TIME_S / (alpha_s * normalized_drive)
-    eta = 1.0 - math.exp(-residence_s / tau_s)
-    return max(0.0, min(1.0, eta))
 
 
 def _cr_stage_isolation_blocks(stage: CondensationStage, species: str) -> bool:
@@ -7420,27 +6957,6 @@ def _allocate_total_by_weights(
     return allocated
 
 
-def _regularized_capture_allocations(
-    capture_budget_kg: float,
-    stage_hkl_by_stage: Mapping[int, float],
-    wall_hkl_by_segment: Mapping[str, float],
-) -> tuple[Dict[str, float], Dict[str, float]]:
-    stage_hkl_kg = sum(
-        max(0.0, float(value)) for value in stage_hkl_by_stage.values()
-    )
-    wall_hkl_kg = sum(
-        max(0.0, float(value)) for value in wall_hkl_by_segment.values()
-    )
-    hkl_sink_kg = stage_hkl_kg + wall_hkl_kg
-    budget_kg = max(0.0, float(capture_budget_kg))
-    if budget_kg <= 0.0 or hkl_sink_kg <= 1.0e-15:
-        return {}, {}
-    wall_deposit_kg = budget_kg * wall_hkl_kg / hkl_sink_kg
-    stage_deposit_kg = max(0.0, budget_kg - wall_deposit_kg)
-    return (
-        _allocate_total_by_weights(stage_deposit_kg, stage_hkl_by_stage),
-        _allocate_total_by_weights(wall_deposit_kg, wall_hkl_by_segment),
-    )
 
 
 def _wall_segment_account_fractions(

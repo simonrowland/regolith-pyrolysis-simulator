@@ -240,7 +240,7 @@ def wall_sticking_alpha_provenance_notice(
         "usage": [
             "_stage_alpha_s",
             "_wall_alpha_s",
-            "_pressure_isolated_capture_budget_kg",
+            "_condensation_efficiency",
         ],
         "species": species,
         "alpha_s_by_species": {
@@ -248,11 +248,11 @@ def wall_sticking_alpha_provenance_notice(
             for item in species
         },
         # Reported numbers are the wall-path (_wall_alpha_s) values. The
-        # _pressure_isolated_capture_budget_kg path reads the same literature
-        # sidecar defaults, so material-specific wall overrides can still
-        # differ from the capture-budget alpha_s — do not equate the two.
+        # Stage capture reads the same literature sidecar defaults; material
+        # overrides can differ between stage and wall surfaces.
         "alpha_s_source": "_wall_alpha_s",
         "alpha_s_provenance_by_species": provenance,
+        # Historical report key retained for existing artifact readers.
         "capture_budget_alpha_s_source": WALL_STICKING_ALPHA_GROUNDING_TARGET,
         "authoritative_for_deposit_mass": not has_status_bearing,
         "deposit_output_status": (

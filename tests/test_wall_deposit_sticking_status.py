@@ -280,6 +280,7 @@ def _route_wall_deposit_authority(
     model.configure_operating_conditions(
         overhead_pressure_mbar=10.0,
         species_partial_pressures_mbar={species: 1.0},
+        stage_area_m2_by_stage={str(stage.stage_number): 1.0 for stage in model.train.stages},
         campaign_name="C0",
     )
     melt = MeltState()
@@ -570,55 +571,6 @@ def test_null_wall_liner_alpha_falls_back_to_grounded_sidecar() -> None:
     assert null_dep == pytest.approx(default_dep)
 
 
-def test_uncertified_capture_budget_alpha_driving_wall_deposit_fails_closed(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    original_sticking_alpha_s = condensation_module._sticking_alpha_s
-    original_capture_budget_alpha_record = (
-        condensation_module._capture_budget_alpha_record
-    )
-
-    def fake_sticking_alpha_s(species: str, T_K: float) -> float:
-        if species == "Fe":
-            return 1.0
-        return original_sticking_alpha_s(species, T_K)
-
-    def fake_capture_budget_alpha_record(
-        species: str,
-        T_K: float | None = None,
-    ) -> dict[str, object]:
-        if species != "Fe":
-            return original_capture_budget_alpha_record(species, T_K=T_K)
-        return {
-            "species": "Fe",
-            "alpha_s": 1.0,
-            "source": "test::capture_budget.Fe",
-            "source_class": "test_uncertified_capture_budget_alpha",
-            "status": "UNCERTIFIED",
-            "citation_status": "UNCERTIFIED",
-            "output_status": "status_bearing",
-        }
-
-    monkeypatch.setattr(
-        condensation_module,
-        "_sticking_alpha_s",
-        fake_sticking_alpha_s,
-    )
-    monkeypatch.setattr(
-        condensation_module,
-        "_capture_budget_alpha_record",
-        fake_capture_budget_alpha_record,
-    )
-
-    route, authority = _route_wall_deposit_authority("Fe")
-
-    assert route.wall_deposit_by_species["Fe"] > 0.0
-    assert authority["authoritative_for_deposit_mass"] is False
-    assert authority["code"] == "wall_deposit_sticking_alpha_uncertified"
-    provenance = authority["alpha_s_provenance_by_species"]["Fe"]
-    assert provenance["capture_budget"]["source_class"] == (
-        "test_uncertified_capture_budget_alpha"
-    )
 
 
 def test_grounded_but_out_of_domain_alpha_cannot_certify_wall_deposit() -> None:
@@ -641,7 +593,7 @@ def test_grounded_but_out_of_domain_alpha_cannot_certify_wall_deposit() -> None:
     assert authority["code"] == "wall_deposit_sticking_alpha_out_of_domain"
     provenance = authority["alpha_s_provenance_by_species"]["Fe"]
     assert provenance["stage_1"]["citation_status"] == "CITED"
-    assert provenance["capture_budget"]["citation_status"] == "CITED"
+    assert "capture_budget" not in provenance
 
 
 def test_out_of_domain_cited_fe_alpha_computes_but_marks_wall_non_authoritative(
@@ -828,6 +780,7 @@ def test_later_no_deposit_route_cannot_erase_prior_out_of_domain_authority(
         wall_temperature_C=900.0,
     )
     model.configure_operating_conditions(
+        stage_area_m2_by_stage={str(stage.stage_number): 1.0 for stage in model.train.stages},
         overhead_pressure_mbar=10.0,
         species_partial_pressures_mbar={"Fe": 1.0},
         campaign_name="C0",
@@ -841,6 +794,7 @@ def test_later_no_deposit_route_cannot_erase_prior_out_of_domain_authority(
     assert first.wall_deposit_by_species["Fe"] > 0.0
 
     model.configure_operating_conditions(
+        stage_area_m2_by_stage={str(stage.stage_number): 1.0 for stage in model.train.stages},
         wall_temperature_C=2000.0,
         overhead_pressure_mbar=10.0,
         species_partial_pressures_mbar={"Fe": 1.0},
@@ -876,6 +830,7 @@ def test_cumulative_carrier_authority_preserves_worst_status(
         wall_temperature_C=900.0,
     )
     model.configure_operating_conditions(
+        stage_area_m2_by_stage={str(stage.stage_number): 1.0 for stage in model.train.stages},
         overhead_pressure_mbar=10.0,
         species_partial_pressures_mbar={"Fe": 1.0},
         campaign_name="C0",
@@ -908,6 +863,7 @@ def test_returned_authority_notice_cannot_mutate_model_history() -> None:
         wall_temperature_C=900.0,
     )
     model.configure_operating_conditions(
+        stage_area_m2_by_stage={str(stage.stage_number): 1.0 for stage in model.train.stages},
         overhead_pressure_mbar=10.0,
         species_partial_pressures_mbar={"Fe": 1.0},
         campaign_name="C0",
@@ -946,6 +902,7 @@ def test_status_bearing_carrier_keeps_mass_but_cannot_certify_wall_deposit(
         wall_temperature_C=1476.85,
     )
     model.configure_operating_conditions(
+        stage_area_m2_by_stage={str(stage.stage_number): 1.0 for stage in model.train.stages},
         overhead_pressure_mbar=10.0,
         species_partial_pressures_mbar={"Fe": 1.0},
         campaign_name="C0",
@@ -1047,6 +1004,7 @@ def test_non_debiting_carrier_states_remain_distinct_and_mass_explicit(
         wall_temperature_C=1476.85,
     )
     model.configure_operating_conditions(
+        stage_area_m2_by_stage={str(stage.stage_number): 1.0 for stage in model.train.stages},
         overhead_pressure_mbar=10.0,
         species_partial_pressures_mbar={"Fe": 1.0},
         campaign_name="C0",
@@ -1239,6 +1197,7 @@ def test_wall_psat_refusal_survives_a_later_non_refusing_route() -> None:
     melt = MeltState()
     melt.temperature_C = 1700.0
     model.configure_operating_conditions(
+        stage_area_m2_by_stage={str(stage.stage_number): 1.0 for stage in model.train.stages},
         overhead_pressure_mbar=10.0,
         species_partial_pressures_mbar={"Mg": 1.0},
         campaign_name="C0",
@@ -1249,6 +1208,7 @@ def test_wall_psat_refusal_survives_a_later_non_refusing_route() -> None:
         melt,
     )
     model.configure_operating_conditions(
+        stage_area_m2_by_stage={str(stage.stage_number): 1.0 for stage in model.train.stages},
         overhead_pressure_mbar=10.0,
         species_partial_pressures_mbar={"Fe": 1.0},
         campaign_name="C0",
