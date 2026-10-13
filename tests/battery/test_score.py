@@ -1019,6 +1019,79 @@ def test_kems_band_prefers_printed_envelope_over_replicate_scatter() -> None:
     assert "source-printed pressure envelope" in band.rule
 
 
+def test_uncalibrated_kems_partial_pressure_is_excluded_from_band_population() -> None:
+    from simulator.battery.score import derive_kems_partial_pressure_band
+
+    uncalibrated = F.kems_experiment(kn=None, calibrated=False)
+    uncertainty = Uncertainty(
+        kind=UncertaintyKind.PRINTED,
+        verbatim="10% pressure error",
+    )
+    uncalibrated_rows = tuple(
+        replace(
+            _uncalibrated_kems_partial_row(
+                uncalibrated,
+                f"uncalibrated-kems-replicate-{index}",
+                Decimal(value),
+            ),
+            uncertainty=uncertainty,
+        )
+        for index, value in enumerate(("10", "100"))
+    )
+    calibrated = F.kems_experiment("calibrated-kems")
+    identity = replace(
+        _partial_identity(),
+        total_pressure_Pa=State.of(Decimal("1e-6")),
+    )
+    calibrated_rows = tuple(
+        F.observation(
+            f"calibrated-kems-replicate-{index}",
+            calibrated.experiment_id,
+            identity,
+            Decimal(value),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+        )
+        for index, value in enumerate(("10", "100"))
+    )
+    experiments = {
+        uncalibrated.experiment_id: uncalibrated,
+        calibrated.experiment_id: calibrated,
+    }
+    only_uncalibrated = {
+        row.observation_id: row for row in uncalibrated_rows
+    }
+    calibrated_band = derive_kems_partial_pressure_band(
+        {row.observation_id: row for row in calibrated_rows}, experiments
+    )
+    mixed_band = derive_kems_partial_pressure_band(
+        {
+            row.observation_id: row
+            for row in (*calibrated_rows, *uncalibrated_rows)
+        },
+        experiments,
+    )
+
+    assert derive_kems_partial_pressure_band(
+        only_uncalibrated, experiments
+    ) is None
+    assert calibrated_band is not None
+    assert mixed_band == calibrated_band
+    flagged_reference = uncalibrated_rows[0]
+    residual, _ = compile_residual(
+        flagged_reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(
+            F.work(), uncalibrated, flagged_reference, review="reviewed"
+        ),
+        prediction=_partial_prediction(
+            Engine.INTERNAL_ANALYTICAL, flagged_reference
+        ),
+    )
+    assert residual.status is ResidualStatus.NO_BAND
+    assert residual.numeric is not None
+    assert residual.numeric.decision_band is None
+
+
 def test_inferred_cell_replicates_do_not_move_fallback_band() -> None:
     from simulator.battery.enums import CellMaterial
     from simulator.battery.score import derive_kems_partial_pressure_band
