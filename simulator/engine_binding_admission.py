@@ -90,7 +90,6 @@ class GateCurveEvidence:
     eligible: bool
     identity: BindingIdentity | None = None
     provenance: Mapping[str, Any] | None = None
-    refusal_reason: str | None = None
 
 
 _SELECTED_PRODUCER_IDENTITIES = {
@@ -377,21 +376,6 @@ def _live_selected_binding_eligibility(
     return eligible
 
 
-def _live_with_selected_bindings(
-    sim: Any,
-    primary_eligible: bool,
-    *,
-    artifact: str,
-    provider_role: str | None,
-) -> bool:
-    selected_eligible = _live_selected_binding_eligibility(
-        sim,
-        artifact=artifact,
-        provider_role=provider_role,
-    )
-    return primary_eligible and selected_eligible
-
-
 def _authorize_selected_bindings(
     sim: Any,
     *,
@@ -448,7 +432,6 @@ def _unresolved_gate_curve_evidence(
     provider_role: str | None,
     *,
     eligible: bool,
-    refusal_reason: str | None = None,
 ) -> GateCurveEvidence:
     from simulator.melt_backend.base import InternalAnalyticalBackend
     from simulator.chemistry.kernel import ChemistryIntent
@@ -466,7 +449,7 @@ def _unresolved_gate_curve_evidence(
         )
         else "unproven"
     )
-    return GateCurveEvidence(state, eligible, refusal_reason=refusal_reason)
+    return GateCurveEvidence(state, eligible)
 
 
 def _live_binding_cache_evidence(
@@ -518,7 +501,6 @@ def _live_binding_cache_evidence(
                 "evidence-unavailable",
                 False,
                 identity,
-                refusal_reason="install provenance unverifiable",
             )
         primary_eligible = False
         if include_selected_bindings:
@@ -622,7 +604,6 @@ def _live_binding_cache_evidence(
                 "evidence-unavailable",
                 False,
                 identity,
-                refusal_reason="install provenance unverifiable",
             )
         initialized = bool(getattr(provider, "_backend_initialised", False))
         checker = getattr(live_backend, "is_available", None)
@@ -682,7 +663,6 @@ def _live_binding_cache_evidence(
             "evidence-unavailable",
             False,
             identity,
-            refusal_reason="install provenance unverifiable",
         )
     primary_eligible = (
         live_cache_eligibility(
@@ -778,7 +758,6 @@ def write_gate_curve_memo_record(
     curve: Mapping[str, Any],
     repair_notices: Sequence[Mapping[str, Any]] | None = None,
     *,
-    disposition: str = "live",
     evidence: GateCurveEvidence | None = None,
 ) -> dict[str, Any]:
     """Write one origin-bearing runtime record for production or a fixture."""
@@ -815,7 +794,7 @@ def write_gate_curve_memo_record(
         curve,
         origin,
         repair_notices,
-        disposition,
+        "live",
     )
 
 
