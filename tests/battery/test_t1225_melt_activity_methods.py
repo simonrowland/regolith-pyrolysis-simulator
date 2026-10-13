@@ -8,6 +8,7 @@ from simulator.battery.enums import (
     Engine,
     FO2Channel,
     MethodToken,
+    Phase,
     Rail,
     RefusalReason,
     ResidualStatus,
@@ -104,6 +105,42 @@ def test_printed_quench_equilibration_reaches_melt_activity_rows(
             own_row.refusal.detail["engine_reason"]
             == "internal_analytical_missing_oxygen_condition"
         )
+
+
+def test_missing_oxygen_precedes_solid_reference_mismatch(tmp_path: Path) -> None:
+    migrated = _migrate_real_extract(tmp_path, "kume-2000-cao-activities.yaml")
+    observation = next(
+        row
+        for row in migrated.observations.values()
+        if row.observation_id.endswith("::kume_2000_table2_sample_101")
+    )
+    experiment = migrated.experiments[observation.experiment_id]
+    oxygen = oxygen_condition(experiment, _bench(), observation)
+    assert oxygen.selected is None
+    assert oxygen.absence is not None
+    assert oxygen.absence.reason is GapReason.MISSING_EVIDENCE
+    reference_state = observation.identity.reference_state
+    assert reference_state is not None and reference_state.is_value
+    assert reference_state.value.endmember.phase.value is Phase.CR
+
+    context = ScoreContext(
+        works=migrated.works,
+        experiments=migrated.experiments,
+        observations=migrated.observations,
+        benches=migrated.benches,
+    )
+    residuals, _ = score_store(
+        context, rail=Rail.MELT_ACTIVITY, engines=(Engine.INTERNAL_ANALYTICAL,)
+    )
+    residual = next(
+        row for row in residuals if row.reference == observation.observation_id
+    )
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.ATTEMPTED_UNAVAILABLE
+    assert (
+        residual.refusal.detail["engine_reason"]
+        == "internal_analytical_missing_oxygen_condition"
+    )
 
 
 def test_rein_chipman_quote_keeps_unknown_method_refusal(tmp_path: Path) -> None:

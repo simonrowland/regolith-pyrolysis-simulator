@@ -536,6 +536,7 @@ def melt_activity_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]
         if engine == "internal-analytical" and inputs.activity_quantity != "activity":
             results.append(_not_applicable(provenance, engine))
             continue
+        readiness = ConsumerReadiness("melt_activity", status, gap_tuple, engine)
         reported_activity = _ENGINE_REPORTED_ACTIVITY[engine]
         single_cation = (
             inputs.activity_quantity == "activity_coefficient"
@@ -555,7 +556,22 @@ def melt_activity_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]
             engine_side = reported_activity.reported
         else:
             matches, engine_side = _reference_matches(state, reported_activity, engine)
-        if not matches:
+        # A missing internal-analytical oxygen input is terminal and precedes
+        # this known solid/liquid reference mismatch. Leave fO2 out of the
+        # payload so predict_with_engine's shared oxygen gate returns it.
+        internal_analytical_missing_oxygen = (
+            engine == "internal-analytical"
+            and inputs.waypoints["oxygen_condition"].selected is None
+            and not matches
+            and composition.selected is not None
+            and temperature.selected is not None
+            and all(gap.waypoint == "oxygen_condition" for gap in gap_tuple)
+            and state.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+            and phase_token(state.endmember) is Phase.CR
+            and state.component_basis == state.endmember.formula
+            and inputs.measured_species == state.endmember.formula
+        )
+        if not matches and not internal_analytical_missing_oxygen:
             # Henrian, 1 wt%, a pure solid, a gas endmember, an unadmitted
             # single-cation basis, or an endmember formula this engine does not report.
             # Name both sides. Do not convert.
@@ -565,11 +581,13 @@ def melt_activity_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]
                 (_reference_gap(state, engine_side),),
             ))
             continue
-        readiness = ConsumerReadiness("melt_activity", status, gap_tuple, engine)
-        if status is not ReadinessStatus.READY:
+        if status is not ReadinessStatus.READY and not internal_analytical_missing_oxygen:
             results.append(GeneratedInput(readiness, None, provenance))
             continue
-        if inputs.measured_species != state.endmember.formula:
+        if (
+            not internal_analytical_missing_oxygen
+            and inputs.measured_species != state.endmember.formula
+        ):
             gap = ReadinessGap(
                 "reference_state",
                 GapReason.REFERENCE_STATE_MISMATCH,

@@ -442,6 +442,7 @@ def test_measured_gallium_requires_oxygen_when_the_bulk_is_cmas():
 def test_mismatched_reference_state_is_refused(convention, phase, basis, formula):
     experiment, bench, observation = _case(
         composition=_composition(("Na2O", "0.4"), ("SiO2", "0.6")),
+        oxygen=Decimal("-9"),
     )
     state = StandardState(convention, Species(formula, phase), basis, Decimal("1"))
     observation = replace(
@@ -914,6 +915,7 @@ def test_na2sio3_endmember_is_not_ready_for_imcc(monkeypatch):
 def test_formula_basis_does_not_broaden_parent_oxide_recognition(formula, basis):
     experiment, bench, observation = _case(
         composition=_composition(("Na2O", "0.4"), ("SiO2", "0.6")),
+        oxygen=Decimal("-9"),
         formula=formula,
         basis=basis,
     )
@@ -932,6 +934,7 @@ def test_formula_basis_does_not_broaden_parent_oxide_recognition(formula, basis)
 def test_formula_basis_does_not_hide_tridymite_phase_mismatch():
     experiment, bench, observation = _case(
         composition=_composition(("SiO2", "0.6"), ("Na2O", "0.4")),
+        oxygen=Decimal("-9"),
         formula="SiO2",
         basis="SiO2",
         phase=Phase.CR,
