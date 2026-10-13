@@ -261,13 +261,38 @@ def test_species_catalog_loads_case_sensitive_species_ids():
 def test_no_direct_melt_regime_membership_comparisons_outside_helper():
     repo = Path(__file__).parent.parent
     violations = []
-    for root in (repo / "simulator", repo / "engines" / "builtin"):
+    for root in _melt_regime_guard_roots(repo):
         for path in root.rglob("*.py"):
             if path.relative_to(repo).as_posix() == "simulator/melt_regime.py":
                 continue
             violations.extend(_melt_regime_membership_ast_violations(path, repo))
 
     assert not violations, "\n".join(violations)
+
+
+def test_melt_regime_guard_roots_include_engine_and_script_layers():
+    repo = Path(__file__).parent.parent
+
+    assert {root.relative_to(repo).as_posix() for root in _melt_regime_guard_roots(repo)} == {
+        "simulator",
+        "engines",
+        "scripts",
+    }
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        "if liquid_fraction_value < 0.0: pass",
+        "if liquid_fraction_value > 1.0: pass",
+        "if liquid_fraction_at(temperature_C) > 0.0: pass",
+    ],
+)
+def test_melt_regime_ast_guard_detects_liquid_fraction_aliases(source):
+    assert _melt_regime_membership_ast_violations_from_source(
+        source,
+        "engines/fixture.py",
+    )
 
 
 def test_pressure_channel_consumers_declare_intent():
@@ -334,6 +359,10 @@ def _melt_regime_membership_ast_violations(
         path.read_text(),
         path.relative_to(repo).as_posix(),
     )
+
+
+def _melt_regime_guard_roots(repo: Path) -> tuple[Path, ...]:
+    return (repo / "simulator", repo / "engines", repo / "scripts")
 
 
 def _melt_regime_membership_ast_violations_from_source(
