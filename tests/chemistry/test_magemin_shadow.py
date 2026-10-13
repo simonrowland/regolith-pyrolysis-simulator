@@ -28,6 +28,7 @@ import os
 import signal
 import subprocess
 import sys
+import threading
 import textwrap
 from pathlib import Path
 
@@ -302,6 +303,101 @@ def _run_provider_finalizer_probe(scenario: str, *, consumer_callback=False):
     )
 
 
+def _run_provider_after_fork_probe():
+    """Probe automatic collection during the real threading fork hook."""
+    repo_root = Path(__file__).resolve().parents[2]
+    script = textwrap.dedent(
+        f'''
+        import gc
+        import os
+        import sys
+        import threading
+        import weakref
+
+        from engines.magemin import provider as provider_module
+        from simulator.melt_backend import magemin as magemin_module
+
+        gc.disable()
+        closed = threading.Event()
+
+        class Backend:
+            def initialize(self, _config):
+                return True
+
+            def close(self):
+                closed.set()
+
+        backend = Backend()
+        magemin_module.MAGEMinBackend = lambda: backend
+        provider = provider_module.MAGEMinShadowProvider()
+        assert provider._ensure_backend() is backend
+        provider.cycle = provider
+        provider_ref = weakref.ref(provider)
+        del provider
+
+        def arm_collection_inside_after_fork(frame, event, _arg):
+            if (
+                frame.f_code.co_name == '_after_fork'
+                and event == 'line'
+                and threading._active_limbo_lock._is_owned()
+            ):
+                sys.settrace(None)
+                gc.set_threshold(gc.get_count()[0], 1_000_000, 1_000_000)
+                gc.enable()
+            return arm_collection_inside_after_fork
+
+        sys.settrace(arm_collection_inside_after_fork)
+        child_pid = os.fork()
+        if child_pid:
+            sys.settrace(None)
+            _, child_status = os.waitpid(child_pid, 0)
+            gc.enable()
+            gc.collect()
+            if not closed.wait(2.0):
+                raise SystemExit('parent close did not drain')
+            raise SystemExit(os.waitstatus_to_exitcode(child_status))
+
+        sys.settrace(None)
+        provider_collected = provider_ref() is None
+        # In this child the finalizer ran before its first _ensure_backend.
+        # That call must start a fresh reaper and drain the inherited queue.
+        trigger = provider_module.MAGEMinShadowProvider()
+        trigger._ensure_backend()
+        queued_close_ran = closed.wait(2.0)
+        os.write(
+            1,
+            f'provider_collected={{provider_collected}} '
+            f'queued_close_ran={{queued_close_ran}}\\n'.encode(),
+        )
+        os._exit(0 if provider_collected and queued_close_ran else 1)
+        '''
+    )
+    process = subprocess.Popen(
+        [sys.executable, '-c', script],
+        cwd=repo_root,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        start_new_session=True,
+    )
+    try:
+        stdout, stderr = process.communicate(timeout=8.0)
+    except subprocess.TimeoutExpired:
+        os.killpg(process.pid, signal.SIGKILL)
+        stdout, stderr = process.communicate()
+        pytest.fail(
+            'provider after-fork probe exceeded 8 seconds\n'
+            f'stdout: {stdout}\nstderr: {stderr}'
+        )
+    assert process.returncode == 0, (
+        f'provider after-fork probe exited {process.returncode}\n'
+        f'stdout: {stdout}\nstderr: {stderr}'
+    )
+    assert 'provider_collected=True queued_close_ran=True' in stdout
+    assert 'KeyError' not in stderr
+    assert 'Exception ignored in thread' not in stderr
+
+
 class _RaisingMAGEMinBackend(_FakeMAGEMinBackend):
     def __init__(self):
         super().__init__(
@@ -542,6 +638,41 @@ def test_provider_finalizer_reaps_when_collection_runs_on_consumer_thread():
         ''',
         consumer_callback=True,
     )
+
+
+def test_provider_finalizer_queues_close_across_automatic_gc_during_fork():
+    _run_provider_after_fork_probe()
+
+
+def test_provider_close_reaper_continues_after_close_raises(monkeypatch, caplog):
+    from engines.magemin import provider as provider_module
+    from simulator.melt_backend import magemin as magemin_module
+
+    backend = _FakeMAGEMinBackend(equilibrium=_FakeEquilibriumResult())
+    backend.close = lambda: None
+    monkeypatch.setattr(magemin_module, 'MAGEMinBackend', lambda: backend)
+    caplog.set_level('ERROR', logger=provider_module.__name__)
+
+    provider = MAGEMinShadowProvider()
+    assert provider._ensure_backend() is backend
+
+    close_order = []
+    next_close_ran = threading.Event()
+
+    def raising_close():
+        close_order.append('raising')
+        raise RuntimeError('synthetic close failure')
+
+    def next_close():
+        close_order.append('next')
+        next_close_ran.set()
+
+    provider_module._CLOSE_QUEUE.put(raising_close)
+    provider_module._CLOSE_QUEUE.put(next_close)
+
+    assert next_close_ran.wait(timeout=2.0)
+    assert close_order == ['raising', 'next']
+    assert 'MAGEMin provider backend close failed' in caplog.text
 
 
 # ---------------------------------------------------------------------------

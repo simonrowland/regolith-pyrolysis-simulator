@@ -46,7 +46,9 @@ Parity tolerances (binding spec §4 MAGEMin):
 
 from __future__ import annotations
 
-import sys
+import logging
+import os
+import queue
 import threading
 import weakref
 from typing import Any, Mapping, Optional
@@ -88,17 +90,61 @@ _FALLBACK_INTENTS = frozenset({ChemistryIntent.GATE_LIQUID_FRACTION})
 # every other account before dispatch.
 _DECLARED_ACCOUNT = 'process.cleaned_melt'
 _SHADOW_BACKEND_CONFIG = {'python_bridge': 'subprocess'}
+_CLOSE_QUEUE = queue.SimpleQueue()
+_CLOSE_REAPER_PID: Optional[int] = None
+_CLOSE_REAPER_LOCK = threading.Lock()
+_LOGGER = logging.getLogger(__name__)
 
 
-def _defer_backend_close(close: Any) -> None:
-    """Run blocking backend cleanup away from the provider's GC thread."""
-    close_thread = threading.Thread(target=close, daemon=True)
-    try:
-        close_thread.start()
-    except RuntimeError:
-        if not sys.is_finalizing():
-            raise
-        close()
+def _reset_close_reaper_after_fork() -> None:
+    """Forget the parent reaper in a child without starting a thread."""
+    global _CLOSE_REAPER_LOCK, _CLOSE_REAPER_PID
+
+    _CLOSE_REAPER_PID = None
+    _CLOSE_REAPER_LOCK = threading.Lock()
+
+
+if hasattr(os, 'register_at_fork'):
+    os.register_at_fork(after_in_child=_reset_close_reaper_after_fork)
+
+
+def _reap_backend_closes() -> None:
+    """Close queued provider backends outside finalizer callbacks."""
+    while True:
+        close = _CLOSE_QUEUE.get()
+        try:
+            close()
+        except BaseException:
+            try:
+                _LOGGER.exception('MAGEMin provider backend close failed')
+            except BaseException:
+                pass
+
+
+def _ensure_close_reaper() -> None:
+    """Start the current process's sole backend-close reaper if needed."""
+    global _CLOSE_REAPER_PID
+
+    pid = os.getpid()
+    with _CLOSE_REAPER_LOCK:
+        if _CLOSE_REAPER_PID == pid:
+            return
+        reaper = threading.Thread(
+            target=_reap_backend_closes,
+            name='magemin-backend-close-reaper',
+            daemon=True,
+        )
+        try:
+            reaper.start()
+        except Exception:
+            _LOGGER.exception('Could not start MAGEMin backend close reaper')
+            return
+        _CLOSE_REAPER_PID = pid
+
+
+def _enqueue_backend_close(close: Any) -> None:
+    """Queue blocking cleanup without taking locks in the GC callback."""
+    _CLOSE_QUEUE.put(close)
 
 
 # Note attached to the ControlAudit for every dispatch. MAGEMin is
@@ -459,6 +505,7 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         when MAGEMin is unavailable -- the provider must fall through
         to ``status='unavailable'`` cleanly.
         """
+        _ensure_close_reaper()
         if self._backend is not None:
             if not self._backend_initialised:
                 try:
@@ -475,7 +522,7 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
             close = getattr(backend, 'close', None)
             if callable(close):
                 backend_finalizer = weakref.finalize(
-                    self, _defer_backend_close, close
+                    self, _enqueue_backend_close, close
                 )
             backend.initialize(dict(_SHADOW_BACKEND_CONFIG))
         except Exception:
