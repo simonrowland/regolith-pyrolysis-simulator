@@ -7,7 +7,9 @@ import pytest
 from simulator.battery.enums import Engine, FO2Channel, MethodToken, Rail, ResidualStatus
 from simulator.battery.records import SweepGas
 from simulator.battery.score import ScoreContext, score_store
+from simulator.battery.waypoints import GapReason, oxygen_condition
 from tests.battery.test_migrate import _migrate_real_extract
+from tests.battery.test_waypoints import _bench
 
 
 @pytest.mark.parametrize(
@@ -158,6 +160,21 @@ def test_kume_own_experiments_keep_published_deoxidized_argon_control(
         assert sweep.locator is not None
         assert sweep.locator.published_page == 555
         assert '"equilibrated under a deoxidized argon atmosphere"' in sweep.locator.note
+
+    own_experiment_ids = {experiment.experiment_id for experiment in experiments.values()
+                          if experiment.experiment_id.rsplit("::", 1)[-1] in own_experiments}
+    linked_observations = [
+        observation
+        for observation in migrated.observations.values()
+        if observation.experiment_id in own_experiment_ids
+    ]
+    assert linked_observations
+    for observation in linked_observations:
+        experiment = migrated.experiments[observation.experiment_id]
+        oxygen = oxygen_condition(experiment, _bench(), observation)
+        assert oxygen.selected is None
+        assert oxygen.absence is not None
+        assert oxygen.absence.reason is GapReason.MISSING_EVIDENCE
 
     excluded_experiments = (
         "kume-2000-table1-1823k",
