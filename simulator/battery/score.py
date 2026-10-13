@@ -1995,6 +1995,19 @@ def _printed_pressure_uncertainty_dex(observation: Observation) -> Decimal | Non
     return None
 
 
+def _is_source_wide_kems_pressure_envelope(
+    quantity: Quantity,
+    method: MethodToken | None,
+    observation: Observation | None,
+) -> bool:
+    return (
+        quantity is Quantity.P_PARTIAL
+        and method is MethodToken.KNUDSEN_EFFUSION
+        and observation is not None
+        and _printed_pressure_uncertainty_dex(observation) is not None
+    )
+
+
 def _observation_flagged_strata(
     observation: Observation,
     experiments: Mapping[str, Experiment],
@@ -2618,11 +2631,8 @@ def _printed_uncertainty_band(
         return _PrintedBandResolution()
     if not _uncertainty_scope_covers_cell(uncertainty, source_observation):
         return _PrintedBandResolution()
-    if (
-        quantity is Quantity.P_PARTIAL
-        and method is MethodToken.KNUDSEN_EFFUSION
-        and source_observation is not None
-        and _printed_pressure_uncertainty_dex(source_observation) is not None
+    if _is_source_wide_kems_pressure_envelope(
+        quantity, method, source_observation
     ):
         # This source-wide KEMS envelope is pooled by the registered resolver;
         # the generic per-cell parser would mistake its pressure label for a unit.
@@ -6002,7 +6012,21 @@ def compile_residual(
                     ),
                 ),
             )
-        if printed.band is None and printed.refusal is None and derived_band is not None and ratchet_missing:
+        method = (
+            experiment.method.value
+            if experiment is not None and experiment.method.is_value
+            else None
+        )
+        source_wide_kems_band = _is_source_wide_kems_pressure_envelope(
+            quantity, method, reference
+        )
+        if (
+            printed.band is None
+            and printed.refusal is None
+            and derived_band is not None
+            and ratchet_missing
+            and not source_wide_kems_band
+        ):
             notices = union_notices(
                 notices,
                 (
