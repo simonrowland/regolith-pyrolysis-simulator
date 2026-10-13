@@ -1861,20 +1861,40 @@ def test_ferguson_effusion_pressure_migrates_point_phase_reservoirs(
     )
     assert reservoirs == {Phase.CR: 18, Phase.L: 26, "unknown": 1}
 
-    known_rows = [row for row in rows if row.identity.reservoir.is_value]
-    assert len(known_rows) == 44
-    identity_unknown = [
-        (
-            row.observation_id,
-            identity_equal(row.identity, row.identity).fields,
-        )
-        for row in known_rows
-        if identity_equal(row.identity, row.identity).kind
-        is IdentityEqualKind.IDENTITY_UNKNOWN
+    liquid_rows = [
+        row
+        for row in rows
+        if row.identity.reservoir.is_value
+        and row.identity.reservoir.value.phase.value is Phase.L
     ]
-    assert not identity_unknown, identity_unknown[0] if identity_unknown else None
+    assert len(liquid_rows) == 26
+    assert all(
+        identity_equal(row.identity, row.identity).kind is IdentityEqualKind.EQUAL
+        for row in liquid_rows
+    )
+
+    crystalline_rows = [
+        row
+        for row in rows
+        if row.identity.reservoir.is_value
+        and row.identity.reservoir.value.phase.value is Phase.CR
+    ]
+    assert len(crystalline_rows) == 18
+    # "Fe(s)" establishes a crystalline reservoir but names no allotrope;
+    # t-1240 owns predicting and flagging its still-unknown polymorph.
+    for row in crystalline_rows:
+        assert row.identity.reservoir.value.polymorph.is_unknown
+        assert (
+            identity_equal(row.identity, row.identity).kind
+            is IdentityEqualKind.IDENTITY_UNKNOWN
+        )
+
     ambiguous = next(row for row in rows if row.identity.reservoir.is_unknown)
     assert "ambiguous" in (ambiguous.identity.reservoir.reason or "").casefold()
+    assert (
+        identity_equal(ambiguous.identity, ambiguous.identity).kind
+        is IdentityEqualKind.IDENTITY_UNKNOWN
+    )
     for index, row in enumerate(rows):
         assert row.identity.temperature_K.is_value
         assert row.identity.temperature_K.value == expected_temperatures[index]
@@ -1883,7 +1903,7 @@ def test_ferguson_effusion_pressure_migrates_point_phase_reservoirs(
         )
         assert starting_composition is not None
         assert starting_composition.state.is_value
-        assert starting_composition.state.value["categorical"] == (
+        assert starting_composition.state.value.categorical == (
             "99.97% purity iron"
         )
         assert starting_composition.locator is not None
