@@ -2013,6 +2013,100 @@ def test_ferguson_unknown_composition_never_builds_pure_engine_pot(
     )
 
 
+@pytest.mark.parametrize(
+    ("starting_composition", "expected_phase"),
+    (
+        (
+            {
+                "state": {
+                    "tag": "value",
+                    "value": {
+                        "kind": "categorical",
+                        "categorical": "Fe-Ni alloy",
+                    },
+                }
+            },
+            None,
+        ),
+        (
+            {"state": {"tag": "unknown", "reason": "purity not reported"}},
+            None,
+        ),
+        (_typed_point_composition((("Fe", "1"),)), Phase.L),
+        (None, Phase.L),
+    ),
+    ids=(
+        "categorical-overrides-parent",
+        "unknown-overrides-parent",
+        "typed-pure",
+        "absent-uses-parent",
+    ),
+)
+def test_point_composition_is_the_purity_decision(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    starting_composition,
+    expected_phase,
+) -> None:
+    from simulator.battery.enums import AmountBasis, CellMaterial
+    from simulator.battery.records import Composition
+    from tests.battery.test_silent_fills import _capture_cell, _cell_material_bench
+
+    experiment = F.kems_experiment(experiment_id="pure-parent")
+    experiment = replace(
+        experiment,
+        sample=replace(
+            experiment.sample,
+            initial_composition=F.located(
+                Composition(
+                    basis="mole_fraction",
+                    components=(("Fe", Decimal("1")),),
+                    amount_basis=AmountBasis.MOLE_FRACTION,
+                )
+            ),
+        ),
+    )
+    point = {
+        "T_C": 1600,
+        "P_Pa": 0.1,
+        "phase_as_published": "Fe(l)",
+        "locator": {"table": "1", "row": 1, "page": 3},
+    }
+    if starting_composition is not None:
+        point["point_conditions"] = {"starting_composition": starting_composition}
+    extract = _ferguson_effusion_extract([point])
+    extract["experiments"] = [to_plain(experiment)]
+    extract["species"]["Fe"]["observations"][0]["experiment"] = "pure-parent"
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+
+    if expected_phase is None:
+        assert observation.identity.reservoir.is_unknown
+    else:
+        assert observation.identity.reservoir.is_value
+        assert observation.identity.reservoir.value.phase.value is expected_phase
+
+    if (
+        starting_composition is not None
+        and starting_composition["state"].get("value", {}).get("kind")
+        == "categorical"
+    ):
+        seen = _capture_cell(monkeypatch)
+        prediction = predict_with_engine(
+            Engine.OPENIMCC,
+            observation,
+            experiment=result.experiments[observation.experiment_id],
+            bench=_cell_material_bench((CellMaterial.PT,)),
+            isolated=False,
+        )
+        assert seen.get("wt") != {"Fe": 100.0}
+        assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+        assert (
+            prediction.refusal_detail["reason"]
+            == "composition_not_stated_pure_reservoir"
+        )
+
+
 def test_h09_quantity_not_applicable_is_not_unknown() -> None:
     from dataclasses import replace
 

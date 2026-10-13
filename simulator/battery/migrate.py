@@ -11840,14 +11840,9 @@ class Migrator:
                     point_composition = _point_condition_from_plain(
                         starting_composition, key="starting_composition"
                     )
-                    if point_composition.state.is_unknown:
-                        pure_sample = False
-                    elif point_composition.state.is_value and isinstance(
-                        point_composition.state.value, Composition
-                    ):
-                        pure_sample = has_pure_component_composition(
-                            point_composition.state
-                        )
+                    pure_sample = has_pure_component_composition(
+                        point_composition.state
+                    )
 
                 raw_phase = point_values.get("phase_as_published")
                 phase_options = (
