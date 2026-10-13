@@ -1026,10 +1026,15 @@ def test_kems_band_prefers_printed_envelope_over_replicate_scatter() -> None:
     assert "source-printed pressure envelope" in band.rule
 
 
-def test_kems_inter_source_catalog_pins_two_calibrated_sources() -> None:
+def test_kems_inter_source_catalog_excludes_uncalibrated_pressures(
+    tmp_path: Path,
+) -> None:
     from simulator.battery.score import _source_band_catalog
 
     experiment = F.kems_experiment("calibrated-kems")
+    uncalibrated_experiment = F.kems_experiment(
+        "uncalibrated-kems", kn=None, calibrated=False
+    )
     identity = replace(
         _partial_identity(),
         total_pressure_Pa=State.of(Decimal("1e-6")),
@@ -1049,19 +1054,104 @@ def test_kems_inter_source_catalog_pins_two_calibrated_sources() -> None:
         for index, value in enumerate(("10", "100"))
     )
     work = F.work()
-    context = ScoreContext(
-        works={work.work_id: work},
-        experiments={experiment.experiment_id: experiment},
-        observations={row.observation_id: row for row in rows},
-        hostname="test",
+
+    def context_for(rows, experiments):
+        return ScoreContext(
+            works={work.work_id: work},
+            experiments=experiments,
+            observations={row.observation_id: row for row in rows},
+            extract_review={row.source_id: "reviewed" for row in rows},
+            hostname="test",
+            root=tmp_path,
+        )
+
+    calibrated_context = context_for(
+        rows, {experiment.experiment_id: experiment}
+    )
+    calibrated_bands, _records, _no_band_reasons = _source_band_catalog(
+        calibrated_context, {}
     )
 
-    bands, _records, _no_band_reasons = _source_band_catalog(context, {})
+    assert len(calibrated_bands) == 1
+    calibrated_band = next(iter(calibrated_bands.values()))
+    assert calibrated_band.unit == "dimensionless"
+    assert calibrated_band.value == Decimal("1.452923475835081740375596191")
 
-    assert len(bands) == 1
-    band = next(iter(bands.values()))
-    assert band.unit == "dimensionless"
-    assert band.value == Decimal("1.452923475835081740375596191")
+    uncalibrated_row = replace(
+        _uncalibrated_kems_partial_row(
+            uncalibrated_experiment, "uncalibrated-kems-pressure", Decimal("1000")
+        ),
+        identity=identity,
+        source_id="uncalibrated-source",
+    )
+    mixed_rows = (*rows, uncalibrated_row)
+    mixed_context = context_for(
+        mixed_rows,
+        {
+            experiment.experiment_id: experiment,
+            uncalibrated_experiment.experiment_id: uncalibrated_experiment,
+        },
+    )
+    mixed_bands, _records, _no_band_reasons = _source_band_catalog(
+        mixed_context, {}
+    )
+
+    clean_residuals, _ = score_store(
+        calibrated_context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        rail=Rail.VAPOUR,
+        predict=_partial_prediction,
+    )
+    mixed_residuals, _ = score_store(
+        mixed_context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        rail=Rail.VAPOUR,
+        predict=_partial_prediction,
+    )
+    clean_by_reference = {row.reference: row for row in clean_residuals}
+    mixed_by_reference = {row.reference: row for row in mixed_residuals}
+    assert clean_by_reference[rows[1].observation_id].status is ResidualStatus.MISMATCH
+    assert mixed_by_reference[rows[1].observation_id].status is ResidualStatus.MISMATCH
+    assert (
+        mixed_by_reference[rows[1].observation_id].numeric.decision_band
+        == calibrated_band
+    )
+    bad_residual = mixed_by_reference[uncalibrated_row.observation_id]
+    assert bad_residual.execution.state is ExecutionState.PRODUCED
+    assert bad_residual.status is ResidualStatus.NO_BAND
+    assert bad_residual.numeric is not None
+    assert bad_residual.numeric.decision_band is None
+    assert any(
+        notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+        and notice.reason.startswith("calibration_not_grounded:")
+        for notice in bad_residual.notices
+    )
+
+    assert mixed_bands == calibrated_bands
+    assert next(iter(mixed_bands.values())).value == Decimal(
+        "1.452923475835081740375596191"
+    )
+
+    uncalibrated_only = tuple(
+        replace(
+            _uncalibrated_kems_partial_row(
+                uncalibrated_experiment,
+                f"uncalibrated-source-{index}",
+                Decimal(value),
+            ),
+            identity=identity,
+            source_id=f"uncalibrated-source-{index}",
+        )
+        for index, value in enumerate(("10", "100", "1000"))
+    )
+    uncalibrated_context = context_for(
+        uncalibrated_only,
+        {uncalibrated_experiment.experiment_id: uncalibrated_experiment},
+    )
+    uncalibrated_bands, _records, _no_band_reasons = _source_band_catalog(
+        uncalibrated_context, {}
+    )
+    assert uncalibrated_bands == {}
 
 
 def test_uncalibrated_kems_partial_pressure_is_excluded_from_band_population() -> None:

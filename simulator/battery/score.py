@@ -3026,6 +3026,9 @@ def _source_band_catalog(
     )
 
     comparison_ids = {row.observation_id for row in comparison_candidates(context)}
+    point_observations_by_experiment = _partial_pressure_observations_by_experiment(
+        context.observations.values()
+    )
     sources: dict[str, dict[str, dict[str, object]]] = defaultdict(dict)
     identities: dict[str, Identity] = {}
     group_keys: dict[str, dict[str, object]] = {}
@@ -3041,6 +3044,27 @@ def _source_band_catalog(
         else:
             continue
         if not parent.source_id:
+            continue
+        identity = parent.identity
+        experiment = context.experiments.get(parent.experiment_id)
+        if (
+            not compilation
+            and parent.observation_id in comparison_ids
+            and isinstance(identity, Identity)
+            and quantity_token(identity) is Quantity.P_PARTIAL
+            and experiment is not None
+            and experiment.method.is_value
+            and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
+            and FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED
+            in _observation_flagged_strata(
+                parent,
+                context.experiments,
+                point_observations_by_experiment,
+                context.benches,
+            )
+        ):
+            # d-139: retain uncalibrated KEMS rows for scoring, but exclude
+            # their absolute pressures from the generic scatter population.
             continue
         for cell in _iter_compilation_series_cells(parent, origin):
             if not isinstance(cell.identity, Identity):
