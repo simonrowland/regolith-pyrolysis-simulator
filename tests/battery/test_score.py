@@ -940,6 +940,241 @@ def test_plante_kems_pressure_envelope_reports_unstated_confidence(
     assert '"published_page": 276' in printed.notice.band
 
 
+def test_pooled_log_pressure_sd_known_replicates() -> None:
+    from simulator.battery.score import pooled_log_pressure_sd
+
+    assert pooled_log_pressure_sd(((-1, 0, 1), (9, 10, 11))) == Decimal("1")
+
+
+def test_kems_band_derives_known_replicate_scatter() -> None:
+    from simulator.battery.score import derive_kems_partial_pressure_band
+
+    experiment = F.kems_experiment()
+    identity = replace(
+        _partial_identity(),
+        total_pressure_Pa=State.of(Decimal("1e-6")),
+    )
+    rows = tuple(
+        F.observation(
+            f"kems-replicate-{index}",
+            experiment.experiment_id,
+            identity,
+            Decimal(value),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+        )
+        for index, value in enumerate(("10", "100"))
+    )
+    band = derive_kems_partial_pressure_band(
+        {row.observation_id: row for row in rows},
+        {experiment.experiment_id: experiment},
+    )
+
+    assert band is not None
+    assert band.unit == "dimensionless"
+    assert band.value == Decimal("0.5").sqrt()
+    assert "replicate scatter" in band.rule
+
+
+def test_kems_band_prefers_printed_envelope_over_replicate_scatter() -> None:
+    from simulator.battery.score import derive_kems_partial_pressure_band
+
+    experiment = F.kems_experiment()
+    identity = _partial_identity()
+    printed = replace(
+        F.observation(
+            "kems-printed-with-replicates",
+            experiment.experiment_id,
+            identity,
+            Decimal("10"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="kems-042-plante-1979",
+        ),
+        uncertainty=Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim={
+                "temperature_quote": (
+                    "At 1500 K, the estimated 20 K error yields an error "
+                    "in K pressure of about 40 percent."
+                )
+            },
+        ),
+    )
+    replicates = tuple(
+        F.observation(
+            f"kems-replicate-{index}",
+            experiment.experiment_id,
+            identity,
+            Decimal(value),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+        )
+        for index, value in enumerate(("10", "100"))
+    )
+    band = derive_kems_partial_pressure_band(
+        {row.observation_id: row for row in (printed, *replicates)},
+        {experiment.experiment_id: experiment},
+    )
+
+    assert band is not None
+    assert band.value == Decimal("1.4").ln() / Decimal("10").ln()
+    assert "source-printed pressure envelope" in band.rule
+
+
+def test_inferred_cell_replicates_do_not_move_fallback_band() -> None:
+    from simulator.battery.enums import CellMaterial
+    from simulator.battery.score import derive_kems_partial_pressure_band
+
+    inference = Derivation(
+        relation="inferred from printed Mo oxide ions",
+        inputs=("Mo+;MoO+;MoO2+;MoO3+",),
+        parameters=(),
+        output_unit="cell material",
+    )
+    flagged, flagged_context, flagged_bench, _ = _cell_material_score_case(
+        CellMaterial.MO, inference
+    )
+    flagged_exp = flagged_context.experiments[flagged.experiment_id]
+    flagged_replica = replace(
+        flagged,
+        observation_id="inferred-replica",
+        value=Value.point_of(Decimal("1e-3")),
+    )
+    clean_exp = replace(flagged_exp, experiment_id="clean-kems", bench_id="clean-cell")
+    clean_rows = tuple(
+        replace(
+            flagged,
+            observation_id=observation_id,
+            experiment_id=clean_exp.experiment_id,
+            value=Value.point_of(Decimal(value)),
+        )
+        for observation_id, value in (("clean-row", "1e-6"), ("clean-replica", "2e-6"))
+    )
+    clean_bench = replace(
+        flagged_bench,
+        id="clean-cell",
+        cell_materials=(F.located(CellMaterial.PT),),
+    )
+    experiments = {
+        flagged_exp.experiment_id: flagged_exp,
+        clean_exp.experiment_id: clean_exp,
+    }
+    baseline = {row.observation_id: row for row in clean_rows}
+    mixed = {
+        row.observation_id: row
+        for row in (*clean_rows, flagged, flagged_replica)
+    }
+
+    clean_band = derive_kems_partial_pressure_band(
+        baseline, experiments, benches={clean_bench.id: clean_bench}
+    )
+    mixed_band = derive_kems_partial_pressure_band(
+        mixed,
+        experiments,
+        benches={clean_bench.id: clean_bench, flagged_bench.id: flagged_bench},
+    )
+    assert clean_band is not None
+    assert mixed_band == clean_band
+
+
+def test_kj_band_dimension_mismatch_is_refused_for_heat_capacity(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.battery import score as score_module
+    from simulator.battery.records import DecisionBand
+
+    band = DecisionBand(
+        Decimal("1"), "kJ_per_declared_mol_basis", "source-owned test band"
+    )
+    assert score_module.band_dimension_matches(Quantity.CP, band) is False
+    assert score_module.decision_band_for(
+        Quantity.CP, SourceRelation.INDEPENDENT, derived_band=band
+    ) is None
+    monkeypatch.setattr(
+        score_module, "decision_band_for", lambda *args, **kwargs: band
+    )
+    numeric, reason, detail = score_module.populate_numeric(
+        quantity=Quantity.CP,
+        candidate=Decimal("50"),
+        reference=Decimal("40"),
+        source_relation=SourceRelation.INDEPENDENT,
+    )
+    assert numeric is None
+    assert reason is RefusalReason.DECISION_RULE_MISSING
+    assert detail["reason"] == "band_dimension_mismatch:cp"
+
+
+def test_stolyarova_rows_do_not_move_any_kems_band_path(tmp_path: Path) -> None:
+    from simulator.battery.enums import BenchIdentityBasis, CellMaterial
+    from simulator.battery.records import Bench, BenchIdentity
+    from simulator.battery.score import derive_kems_partial_pressure_band
+
+    context = _migrated_stolyarova_cell_context(tmp_path)
+    flagged = next(
+        item
+        for item in context.observations.values()
+        if isinstance(item.identity, Identity)
+        and quantity_token(item.identity) is Quantity.P_PARTIAL
+        and item.evidence.class_.is_value
+        and item.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
+    )
+    flagged_experiment = context.experiments[flagged.experiment_id]
+    flagged_bench = context.benches[flagged_experiment.bench_id]
+    clean_experiment = F.kems_experiment(
+        "stolyarova-clean-kems", flagged_experiment.work_id or "work-1"
+    )
+    clean_bench = Bench(
+        id="stolyarova-clean-pt",
+        work_id=clean_experiment.work_id or "work-1",
+        identity=BenchIdentity(BenchIdentityBasis.DESCRIBED_IN_THIS_WORK),
+        cell_materials=(F.located(CellMaterial.PT),),
+    )
+    clean_experiment = replace(clean_experiment, bench_id=clean_bench.id)
+    clean_identity = replace(
+        flagged.identity,
+        species=replace(flagged.identity.species, phase=State.of(Phase.G)),
+        composition=_partial_identity().composition,
+    )
+    clean_rows = tuple(
+        replace(
+            flagged,
+            observation_id=f"stolyarova-clean-{index}",
+            experiment_id=clean_experiment.experiment_id,
+            source_id="stolyarova-clean-test",
+            identity=clean_identity,
+            value=Value.point_of(value),
+            notices=(),
+        )
+        for index, value in enumerate((Decimal("1e-4"), Decimal("2e-4")))
+    )
+    experiments = {
+        flagged_experiment.experiment_id: flagged_experiment,
+        clean_experiment.experiment_id: clean_experiment,
+    }
+    benches = {flagged_bench.id: flagged_bench, clean_bench.id: clean_bench}
+    baseline = {row.observation_id: row for row in clean_rows}
+    baseline_band = derive_kems_partial_pressure_band(
+        baseline, experiments, benches={clean_bench.id: clean_bench}
+    )
+    assert baseline_band is not None
+    assert "replicate scatter" in baseline_band.rule
+
+    flagged_rows = tuple(
+        replace(
+            flagged,
+            observation_id=f"stolyarova-flagged-{index}",
+            identity=clean_identity,
+            value=Value.point_of(value),
+        )
+        for index, value in enumerate((Decimal("1e-5"), Decimal("1e-2")))
+    )
+    mixed = {
+        row.observation_id: row for row in (*clean_rows, *flagged_rows)
+    }
+    mixed_band = derive_kems_partial_pressure_band(
+        mixed, experiments, benches=benches
+    )
+    assert mixed_band == baseline_band
+
+
 
 
 def test_zhang_alpha_gamma_bound_uses_implied_alpha_verdict() -> None:
