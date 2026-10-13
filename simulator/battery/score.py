@@ -276,6 +276,8 @@ DECISION_BAND_POLICY_VERSION = "q6-v1"
 DECISION_BAND_RATCHET_RELATIVE_PATH = Path("data/battery/decision-band-ratchet.yaml")
 # Minimum n for a descriptive residual bias/scatter ratio; it does not gate bands.
 MIN_RESIDUAL_SUMMARY_N = 10
+# Minimum derived-band sample size; smaller no-band groups retain their reason.
+MIN_DERIVED_BAND_N = 10
 _ALIGNMENT_AXES = (
     "subtype",
     "per",
@@ -7035,6 +7037,7 @@ def _compilation_decision_strata(
     )
 
     strata: dict[tuple[str, str, str, str], list[Residual]] = defaultdict(list)
+    derived_ns: dict[tuple[str, str, str], int] = defaultdict(int)
     for residual in residuals:
         if residual.numeric is None or residual.status is ResidualStatus.REFUSED or any(
             _is_flagged_stratum_notice(notice)
@@ -7056,6 +7059,8 @@ def _compilation_decision_strata(
         )
         engine = _engine_of(residual)
         key = (family, quantity.value, engine)
+        if residual.numeric.decision_band is None:
+            derived_ns[key] += 1
         strata[(*key, residual.source_relation.value)].append(residual)
 
     rendered = []
@@ -7071,7 +7076,11 @@ def _compilation_decision_strata(
             int(band.rule.rsplit("n_sources=", 1)[1].split(";", 1)[0])
             for band in bands if "n_sources=" in band.rule
         })
-        band_fields = _compilation_band_value_fields(widths, band_n)
+        band_fields = _compilation_band_value_fields(
+            widths,
+            band_n,
+            unbanded_count=derived_ns[(family, quantity, engine)],
+        )
         rendered.append({
             "family": family,
             "quantity": quantity,
@@ -7094,19 +7103,26 @@ def _compilation_decision_strata(
             "no_band_count": sum(1 for r in bucket if r.status is ResidualStatus.NO_BAND),
             "tail_in_count": None,
             "tail_out_count": None,
-            "no_band_reason": None,
         })
     return rendered
 
 
 def _compilation_band_value_fields(
-    widths: Sequence[str], derived_n: Sequence[int]
+    widths: Sequence[str], derived_n: Sequence[int], *, unbanded_count: int
 ) -> dict[str, object]:
     """Serialize compilation band values consistently across report paths."""
 
+    recorded_n = list(derived_n)
+    if not recorded_n and not widths and unbanded_count:
+        recorded_n = [unbanded_count]
     return {
-        "band_value": widths[0] if len(widths) == 1 else widths or None,
-        "band_derived_n": derived_n[0] if len(derived_n) == 1 else derived_n or None,
+        "band_value": widths[0] if len(widths) == 1 else widths,
+        "band_derived_n": recorded_n[0] if len(recorded_n) == 1 else recorded_n,
+        "no_band_reason": (
+            "derived_band_insufficient_n"
+            if not widths and 0 < unbanded_count < MIN_DERIVED_BAND_N
+            else None
+        ),
     }
 
 
@@ -9504,6 +9520,7 @@ def headline_payload_records(
         )
 
         payload_groups: dict[tuple[str, str, str, str, str], dict[str, object]] = {}
+        derived_ns: dict[tuple[str, str, str], int] = defaultdict(int)
         for row in compilation_rows:
             reference = str(row.get("reference") or "")
             observation = compilation_row_observation(reference, observations, origins)
@@ -9529,6 +9546,8 @@ def headline_payload_records(
             flagged = bool(_flagged_payload_strata(row))
             if flagged:
                 continue
+            if band is None:
+                derived_ns[key] += 1
             rail = str(row.get("rail") or "")
             group = payload_groups.setdefault(
                 (*key, relation, rail),
@@ -9588,7 +9607,11 @@ def headline_payload_records(
                 derived_n = sorted(group["band_derived_n"])
                 widths = sorted(group["widths"])
                 units = sorted(group["units"])
-                band_fields = _compilation_band_value_fields(widths, derived_n)
+                band_fields = _compilation_band_value_fields(
+                    widths,
+                    derived_n,
+                    unbanded_count=derived_ns[(family, quantity, engine)],
+                )
                 strata.append({
                     "family": family, "quantity": quantity, "engine": engine, "relation": relation,
                     "n": len(values),
@@ -9608,8 +9631,7 @@ def headline_payload_records(
                     "no_band_count": group["no_band_count"],
                     "tail_in_count": None,
                     "tail_out_count": None,
-                    "no_band_reason": None,
-                })
+        })
             record["decision_strata"] = strata
     return records
 
@@ -9689,6 +9711,7 @@ class _ScorePayloadAccumulator:
         self.compilation_groups: dict[
             tuple[str, str, str, str, str], dict[str, object]
         ] = {}
+        self.derived_ns: dict[tuple[str, str, str], int] = defaultdict(int)
         self.refusal_counts: dict[str, int] = defaultdict(int)
         self.admission_with = 0
         self.admission_alone = 0
@@ -9803,6 +9826,8 @@ class _ScorePayloadAccumulator:
         if flagged:
             return
         key = (family, quantity.value, engine)
+        if not isinstance(band_data, Mapping):
+            self.derived_ns[key] += 1
         relation = str(row.get("source_relation") or SourceRelation.UNKNOWN.value)
         rail = str(row.get("rail") or "")
         group_key = (*key, relation, rail)
@@ -10153,7 +10178,11 @@ class _ScorePayloadAccumulator:
                 derived_n = sorted(group["band_derived_n"])
                 widths = sorted(group["widths"])
                 units = sorted(group["units"])
-                band_fields = _compilation_band_value_fields(widths, derived_n)
+                band_fields = _compilation_band_value_fields(
+                    widths,
+                    derived_n,
+                    unbanded_count=self.derived_ns[(family, quantity, engine)],
+                )
                 strata.append(
                     {
                         "family": family,
@@ -10177,7 +10206,6 @@ class _ScorePayloadAccumulator:
                         "no_band_count": group["no_band_count"],
                         "tail_in_count": None,
                         "tail_out_count": None,
-                        "no_band_reason": None,
                     }
                 )
             record["decision_strata"] = strata

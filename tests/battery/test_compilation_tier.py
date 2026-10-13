@@ -1246,8 +1246,8 @@ def test_census_keeps_unknown_relation_decision_when_band_exists(monkeypatch) ->
         audit_compile_residual=False,
     )["rows"][0]["decision_strata"][0]
     assert no_band["band_kind"] == "no_band"
-    assert no_band["no_band_reason"] is None
-    assert no_band["band_derived_n"] is None
+    assert no_band["no_band_reason"] == "derived_band_insufficient_n"
+    assert no_band["band_derived_n"] == 1
     assert no_band["n"] == 1
     assert no_band["signed_median_residual"] == "1"
     assert no_band["mad"] == "0"
@@ -1371,9 +1371,9 @@ def test_census_strata_use_scorer_pool_for_refusals_and_observation_flags(monkey
     assert census_stratum["n"] == 10
     assert census_stratum["signed_median_residual"] == "4.5"
     assert census_stratum["bias_to_scatter_ratio"] == "1.8"
-    assert census_stratum["band_value"] is None
+    assert census_stratum["band_value"] == []
     assert census_stratum["band_kind"] == "no_band"
-    assert census_stratum["band_derived_n"] is None
+    assert census_stratum["band_derived_n"] == 10
     assert census_stratum["match_count"] == 0
     assert census_stratum["no_band_count"] == 10
 
