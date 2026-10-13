@@ -7616,70 +7616,72 @@ def test_melts_liquid_reference_gap_is_attached_to_fusion_shift(
         for item in converted.notices
     )
 
-def test_unestablished_engine_reference_keeps_solid_value_and_notices_residual() -> None:
-    from simulator.battery.score import fusion_comparison_reference
+def test_internal_analytical_kume_row_uses_janaf_liquid_reference(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from simulator.battery import score
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.battery.records import StandardState
+    from tests.battery.test_migrate import _migrate_real_extract
 
-    inference_notice = Notice(
-        kind=NoticeKind.DERIVATION_USES_COMPILATION,
-        affected_quantities=(Quantity.ACTIVITY,),
-        reason="relation=extract_inference; standard state source inference retained",
-        origin="synthetic-reference-state-inference",
+    monkeypatch.setattr(
+        battery, "_call_with_hard_timeout", lambda call, timeout: call()
     )
-    experiment = F.kems_experiment()
-    identity = F.activity_identity(
-        formula="CaO",
-        T_K=Decimal("1933"),
-        endmember_phase=Phase.CR,
-        component_basis="CaO",
+    migrated = _migrate_real_extract(tmp_path, "kume-2000-cao-activities.yaml")
+    observation = next(
+        row
+        for row in migrated.observations.values()
+        if row.observation_id.endswith("::kume_2000_table2_sample_101")
     )
-    reference = F.observation(
-        "cao-solid-activity-unestablished-engine",
-        experiment.experiment_id,
-        identity,
-        Decimal("1"),
-        evidence=EvidenceClass.MEASURED_DIRECT,
-        source_id="synthetic-unestablished-engine",
-        notices=(inference_notice,),
-    )
-
-    untouched = fusion_comparison_reference(
-        reference, engine=Engine.INTERNAL_ANALYTICAL
-    )
-    assert untouched.value.point == reference.value.point
-    assert untouched.identity.reference_state.value.endmember.phase.value is Phase.CR
-    assert any(
-        "engine reference is unestablished" in item.reason
-        for item in untouched.notices
-    )
-
-    prediction = EnginePrediction(
-        engine=Engine.INTERNAL_ANALYTICAL,
-        channel="internal-analytical",
-        execution=Execution(
-            state=ExecutionState.PRODUCED,
-            call_evidence="test:unestablished-activity-reference",
+    identity = observation.identity
+    assert isinstance(identity.reference_state, State)
+    standard_state = identity.reference_state.value
+    assert isinstance(standard_state, StandardState)
+    observation = replace(
+        observation,
+        identity=replace(
+            identity,
+            fO2_Pa=State.of(Decimal("0.00001")),
+            species=replace(identity.species, polymorph=State.of("lime")),
+            reference_state=State.of(
+                replace(
+                    standard_state,
+                    endmember=replace(
+                        standard_state.endmember, polymorph=State.of("lime")
+                    ),
+                )
+            ),
         ),
-        value=Decimal("0.5"),
-        unit="dimensionless",
-        authority=Authority.CERTIFIED,
-        coefficient_sources=("nasa-cea-thermo",),
-        lineage_complete=True,
-        identity=reference.identity,
     )
-    context = _context(F.work(), experiment, reference, review="reviewed")
-    residual, _candidate = compile_residual(
-        reference,
+    context = ScoreContext(
+        works=migrated.works,
+        experiments=migrated.experiments,
+        observations={observation.observation_id: observation},
+        benches=migrated.benches,
+    )
+
+    converted = score.fusion_comparison_reference(
+        observation, engine=Engine.INTERNAL_ANALYTICAL
+    )
+    expected = score.fusion_comparison_reference(observation)
+    assert converted.value.point == expected.value.point
+    assert converted.value.point != observation.value.point
+    assert converted.identity.reference_state.value.endmember.phase.value is Phase.L
+    assert any(
+        notice.reason.startswith("reference_converted_via_fusion;")
+        for notice in converted.notices
+    )
+
+    residual, _candidate = score.compile_residual(
+        observation,
         Engine.INTERNAL_ANALYTICAL,
         context=context,
-        prediction=prediction,
+        predict=lambda *args, **kwargs: score.predict_with_engine(
+            *args, **kwargs, isolated=False
+        ),
     )
     assert residual.numeric is not None
-    assert abs(residual.numeric.value - Decimal("0.5").log10()) < Decimal("0.000001")
-    assert inference_notice in residual.notices
-    assert any(
-        "engine reference is unestablished" in item.reason
-        for item in residual.notices
-    )
+    assert abs(residual.numeric.value - Decimal("1.281")) <= Decimal("0.001")
 
 
 def test_fusion_conversion_without_janaf_pair_returns_typed_notice() -> None:
