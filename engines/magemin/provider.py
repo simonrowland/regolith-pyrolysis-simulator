@@ -46,6 +46,7 @@ Parity tolerances (binding spec §4 MAGEMin):
 
 from __future__ import annotations
 
+import weakref
 from typing import Any, Mapping, Optional
 
 from engines.magemin.domain import MAGEMinDomainGate
@@ -127,6 +128,7 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         # constructs and initialises the adapter; if that fails the
         # dispatch returns ``status='unavailable'`` cleanly.
         self._backend: Optional[Any] = backend
+        self._backend_finalizer = None
         self._backend_initialised: bool = backend is not None
         self._parity_comparator: MAGEMinParityComparator = MAGEMinParityComparator()
 
@@ -451,14 +453,26 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
                     pass
                 self._backend_initialised = True
             return self._backend
+        backend = None
+        backend_finalizer = None
         try:
             from simulator.melt_backend.magemin import MAGEMinBackend
             backend = MAGEMinBackend()
+            close = getattr(backend, 'close', None)
+            if callable(close):
+                backend_finalizer = weakref.finalize(self, close)
             backend.initialize(dict(_SHADOW_BACKEND_CONFIG))
         except Exception:
+            if backend_finalizer is not None:
+                try:
+                    backend_finalizer()
+                except Exception:
+                    pass
             self._backend = None
+            self._backend_finalizer = None
             return None
         self._backend = backend
+        self._backend_finalizer = backend_finalizer
         self._backend_initialised = True
         return backend
 

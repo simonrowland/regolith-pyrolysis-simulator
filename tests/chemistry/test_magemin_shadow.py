@@ -292,10 +292,6 @@ def _make_request(
     )
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason='MAGEMin shadow provider leaves its warm backend pool open',
-)
 def test_provider_closes_warm_pool_when_provider_lifetime_ends(monkeypatch):
     from simulator.melt_backend import magemin as magemin_module
 
