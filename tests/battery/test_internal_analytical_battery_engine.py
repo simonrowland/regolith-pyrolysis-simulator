@@ -171,6 +171,34 @@ def test_internal_analytical_forwards_supplied_oxygen_without_redox(monkeypatch)
     assert prediction.refusal_reason is None
 
 
+def test_internal_analytical_uses_identity_oxygen_without_redox(monkeypatch) -> None:
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery._call_with_hard_timeout",
+        lambda call, _timeout: call(),
+    )
+    experiment, bench, observation = _case(
+        composition=_composition(("SiO2", "0.6"), ("Na2O", "0.4")),
+        formula="SiO2",
+    )
+    observation = replace(
+        observation,
+        identity=replace(
+            observation.identity, fO2_Pa=State.of(Decimal("0.00001")),
+        ),
+    )
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        observation,
+        experiment=experiment,
+        bench=bench,
+        handles={},
+        isolated=False,
+    )
+
+    assert prediction.value is not None, prediction.refusal_detail
+    assert prediction.refusal_reason is None
+
+
 def test_internal_analytical_without_oxygen_is_typed_refusal() -> None:
     experiment, bench, observation = _case(
         composition=_composition(("SiO2", "0.6"), ("Na2O", "0.4")),
