@@ -370,33 +370,33 @@ experiments:
           basis: printed_oxides
           amount_basis: mole_fraction
           components:
-          - [SiO2, '0.562871824962']
-          - [Fe2O3, '0.052782896090']
-          - [Al2O3, '0.031000156787']
-          - [B2O3, '0.068103589059']
-          - [Li2O, '0.111009946581']
-          - [Na2O, '0.106298194930']
-          - [MnO2, '0.024313151875']
-          - [NiO, '0.009142619817']
-          - [CaO, '0.018440391130']
-          - [MgO, '0.010972827160']
-          - [ZrO2, '0.003694601161']
-          - [SrO, '0.000564886100']
-          - [Cs2O, '0.000230781783']
-          - [RuO2, '0.000439872342']
-          - [Re2O7, '0.000134260223']
+          - [SiO2, '0.593892158300']
+          - [Fe2O3, '0.047758470182']
+          - [Al2O3, '0.030921702324']
+          - [B2O3, '0.061877011840']
+          - [Li2O, '0.087968881039']
+          - [Na2O, '0.091992362541']
+          - [MnO2, '0.027256386715']
+          - [NiO, '0.015995434101']
+          - [CaO, '0.011954641096']
+          - [MgO, '0.008892943842']
+          - [ZrO2, '0.020415071092']
+          - [SrO, '0.000320280537']
+          - [Cs2O, '0.000164870034']
+          - [RuO2, '0.000548679830']
+          - [Re2O7, '0.000041106527']
       locator:
         published_page: 3
         pdf_page_index: 9
         table: '1'
-        note: 'Nominal Weight % column selected because the source says it was used for thermodynamic estimates; normalized mole fractions derived from the printed oxide wt% values'
+        note: 'Analyzed Weight % column selected as the measured sample in Table 1; normalized mole fractions derived from all printed oxide wt% values'
       method_class: calculated
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - 'x_i = (w_i / M_i) / sum_j(w_j / M_j)'
         - 'original_unit=wt_pct'
-        - 'nominal column selected as printed for thermodynamic estimates'
+        - 'analytical column selected as printed measured sample assay; nominal is used for thermodynamic estimates'
         output_unit: mole_fraction
   apparatus:
     geometry:
@@ -503,7 +503,6 @@ species:
         published_page: 3
         pdf_page_index: 9
         note: SNW glass nominal vs analytical composition (Soper 1982)
-      T_range_K: [1123.15, 1423.15]
       phase: SNW_alkali_bearing_glass
       standard_state: condensed glass as analysed; nominal used for thermo estimates
       regime: kems_effusion
@@ -536,7 +535,7 @@ species:
           Cs2O: 0.10
           RuO2: 0.09
           Re2O7: 0.10
-        composition_analytical_wt_pct:
+        composition_wt_pct: &plante_analyzed_wt_pct
           SiO2: 53.76
           Fe2O3: 11.49
           Al2O3: 4.75
@@ -554,13 +553,15 @@ species:
           Re2O7: 0.03
         footnote_a: Soper 1982
         footnote_b: see text for selection; nominal used for thermodynamic estimates; analytical is the measured sample composition
+        composition_derivation: &plante_analyzed_composition_derivation >-
+          Normalized from the analytical weight-percent values printed in Table 1:
+          x_i=(w_i/M_i)/sum_j(w_j/M_j), using all 15 reported compounds.
         composition_role_note: >-
           Published page 2 (PDF page 8): analytical composition is the measured
-          sample; nominal composition is for thermodynamic estimates. Full 15-compound
-          maps retained under composition_nominal_wt_pct / composition_analytical_wt_pct
-          (not allow-list keys) because eight printed compounds (B2O3, Li2O, MnO2,
-          ZrO2, SrO, Cs2O, RuO2, Re2O7) are outside _OXIDE_COMPONENT_KEYS and would
-          be dropped+renormalised. Registry KMS/TMS samples already carry both complete maps.
+          sample; nominal composition is for thermodynamic estimates. Both full
+          15-compound Weight % columns are preserved under composition_nominal_wt_pct
+          and composition_wt_pct; the analyzed column is normalized across all
+          15 printed compounds for sample identity.
       uncertainty:
         note: unreported for the ICP/NAA analyses
     - observation_id: plante_hastie_1983_table3_mass_loss
@@ -571,7 +572,6 @@ species:
         published_page: 15
         pdf_page_index: 21
         note: landscape table; calculated oxide-equivalent loss from eq. 2.6, not timed gravimetry
-      T_range_K: [1073.15, 1423.15]
       phase: SNW_alkali_bearing_glass
       standard_state: evolving residue after KMS Series I/II
       regime: kems_effusion
@@ -579,6 +579,8 @@ species:
       values:
         quantity: calculated_oxide_equivalent_mass_loss
         method_class: measured_direct
+        composition_wt_pct: *plante_analyzed_wt_pct
+        composition_derivation: *plante_analyzed_composition_derivation
         series_I_initial_sample_mg: 263.1
         series_II_initial_sample_mg: 418.4
         B2O3_borate_loss_cells: true_absence_printed_dashes_not_zero
@@ -623,9 +625,10 @@ species:
           Printed least-squares coefficients in Fig. 19 caption (report p. 45).
           Plate is PDF p. 70 / report p. 64. TMS+KMS equal-weight ensemble.
           Scatter on plates 7/8 (caption 5 / Series II) is the input, not a
-          second independent fit.
+          second independent fit. The Fig. 19 caption pools KMS and TMS without
+          per-point sample labels; composition remains unknown.
       T_range_K: [1000.0, 1600.0]
-      phase: SNW_alkali_bearing_glass
+      phase: gas
       standard_state: >-
         P(NaBO2,g) over SNW borosilicate melt; not pure NaBO2. Authors compare
         to JANAF P°(NaBO2,l) for activity.
@@ -647,7 +650,6 @@ species:
         pO2_note: >-
           KMS O2 from Fe2O3 reduction is Fig. 5 plate (caption 7), figure-only.
           Combined metaborate LS does not carry a pO2 column.
-        composition_analytical_Na2O_wt_pct: 8.59
         tms_carrier: N2
         tms_total_pressure_atm: 0.3
         tms_flow_sccm: 6
@@ -746,6 +748,8 @@ species:
         quantity: activity_NaBO2
         oxide_formula_as_published: NaBO2
         method_class: measured_direct
+        composition_wt_pct: *plante_analyzed_wt_pct
+        composition_derivation: *plante_analyzed_composition_derivation
         activity: 0.01
         activity_qualifier: approximately
         temperature_dependence: slight
@@ -758,7 +762,6 @@ species:
         published_page: 44
         pdf_page_index: 50
         note: §8 figure captions and all numbered tables; no evaporation/condensation coefficient
-      T_range_K: [1073.15, 1600.0]
       phase: SNW_alkali_bearing_glass
       regime: mixed_kms_tms
       units: dimensionless
@@ -780,14 +783,15 @@ species:
         published_page: 18
         pdf_page_index: 24
         paragraph: Search for Ru, Re, and Sr-containing Species
-      T_range_K: [1073.15, 1773.15]
-      phase: SNW_alkali_bearing_glass
+      phase: gas
       standard_state: KMS vacuum detection limits, not a measured p_i
       regime: kems_effusion
       units: atm as published
       values:
         quantity: undetected_radionuclide_simulant_partial_pressure
         method_class: measured_direct
+        composition_wt_pct: *plante_analyzed_wt_pct
+        composition_derivation: *plante_analyzed_composition_derivation
         semantics: bound_not_point_ordering
         ions_sought:
           - Ru+
@@ -821,6 +825,7 @@ species:
         figure: '19'
       quote: log P(atm) {NaBO2} = (4.09 ± 0.2) - (1.190 ± 0.02) x 10^4/T
       units: log10 pressure in atm; slope coefficient as printed in 10^4/T
+      phase: gas
       values:
         quantity: partial_pressure_NaBO2_fit
         gas_species: NaBO2
@@ -835,6 +840,7 @@ species:
         note: Printed plus/minus terms; confidence level unstated.
     - observation_id: plante_hastie_1983_nabo2_activity_quoted
       supersedes: plante_hastie_1983_nabo2_activity_approx
+      experiment: kms-vacuum-glass-series
       type: activity_coefficient
       class_tag: derived
       locator:
@@ -847,6 +853,8 @@ species:
       values:
         quantity: activity_NaBO2
         method_class: model_derived
+        composition_wt_pct: *plante_analyzed_wt_pct
+        composition_derivation: *plante_analyzed_composition_derivation
         admission_status: model_output_not_measurement
         activity: 0.01
         qualifier: approximately
@@ -855,19 +863,24 @@ species:
         note: approximately; slight temperature dependence; no numeric uncertainty printed
     - observation_id: plante_hastie_1983_detection_limits_quoted
       supersedes: plante_hastie_1983_ru_re_sr_undetected
+      experiment: kms-vacuum-glass-series
       type: psat_series
       class_tag: measured
       locator:
         published_page: 35
         pdf_page_index: 41
         section: '4.1'
+        note: KMS ion-current detection limits for the Table 1 analyzed SNW glass sample
       quote: From the mass spectrometric detection limits, partial pressure limits for the other radionuclides
         at temperatures as high as 1500 °C are in the region of 10^-7 atm with an inert atmosphere and 10^-6
         atm with H2O or the reactive gas mixture present.
       units: atm
+      phase: gas
       values:
         quantity: undetected_radionuclide_partial_pressure_limit
         method_class: measured_direct
+        composition_wt_pct: *plante_analyzed_wt_pct
+        composition_derivation: *plante_analyzed_composition_derivation
         semantics: bound_not_point_ordering
         T_max_C_as_published: 1500
         P_upper_atm_inert: 1.0e-07
@@ -909,9 +922,12 @@ species:
         figure: '19'
         published_page: 45
         pdf_page_index: 51
-        note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+        note: >-
+          Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity;
+          coefficients are unscaled P. The caption pools KMS and TMS without
+          per-point sample labels; composition remains unknown.
       T_range_K: [1000.0, 1600.0]
-      phase: SNW_alkali_bearing_glass
+      phase: gas
       standard_state: P(LiBO2,g) over SNW melt; P° from JANAF 1971 LiBO2(l) used for activity
       regime: mixed_kms_tms
       units: atm as published (p_Pa = p_atm × 101325)
@@ -1007,6 +1023,8 @@ species:
       values:
         quantity: activity_LiBO2
         method_class: measured_direct
+        composition_wt_pct: *plante_analyzed_wt_pct
+        composition_derivation: *plante_analyzed_composition_derivation
         activity: 0.1
         activity_qualifier: about
         temperature_dependence: some
@@ -1023,6 +1041,7 @@ species:
         figure: '19'
       quote: log P(atm) {LiBO2} = (4.73 ± 0.2) - (1.292 ± 0.02) x 10^4/T
       units: log10 pressure in atm; slope coefficient as printed in 10^4/T
+      phase: gas
       values:
         quantity: partial_pressure_LiBO2_fit
         gas_species: LiBO2
@@ -1037,6 +1056,7 @@ species:
         note: Printed plus/minus terms; confidence level unstated.
     - observation_id: plante_hastie_1983_libo2_activity_quoted
       supersedes: plante_hastie_1983_libo2_activity_approx
+      experiment: kms-vacuum-glass-series
       type: activity_coefficient
       class_tag: derived
       locator:
@@ -1049,6 +1069,8 @@ species:
       values:
         quantity: activity_LiBO2
         method_class: model_derived
+        composition_wt_pct: *plante_analyzed_wt_pct
+        composition_derivation: *plante_analyzed_composition_derivation
         admission_status: model_output_not_measurement
         activity: 0.1
         qualifier: about
@@ -1066,8 +1088,10 @@ species:
         note: >-
           First five KMS and four TMS points selected as most representative.
           KMS CsBO2 from Series I multiplied by two (average of Series I and II).
+          The Fig. 19 caption pools KMS and TMS without per-point sample labels;
+          composition remains unknown.
       T_range_K: [1100.0, 1600.0]
-      phase: SNW_alkali_bearing_glass
+      phase: gas
       standard_state: P(CsBO2,g) over SNW melt; P° from Gurvich and Veits 1983
       regime: mixed_kms_tms
       units: atm as published (p_Pa = p_atm × 101325)
@@ -1154,6 +1178,8 @@ species:
       values:
         quantity: activity_CsBO2
         method_class: measured_direct
+        composition_wt_pct: *plante_analyzed_wt_pct
+        composition_derivation: *plante_analyzed_composition_derivation
         activity: 4.0e-6
         T_K: 1200.0
         P_obs_atm_order: 1.0e-8
@@ -1172,6 +1198,7 @@ species:
         figure: '19'
       quote: log P(atm) {CsBO2} = (3.45 ± 0.3) - (1.288 ± 0.04) x 10^4/T
       units: log10 pressure in atm; slope coefficient as printed in 10^4/T
+      phase: gas
       values:
         quantity: partial_pressure_CsBO2_fit
         gas_species: CsBO2
@@ -1186,6 +1213,7 @@ species:
         note: Printed plus/minus terms; confidence level unstated.
     - observation_id: plante_hastie_1983_csbo2_activity_quoted
       supersedes: plante_hastie_1983_csbo2_activity_1200K
+      experiment: kms-vacuum-glass-series
       type: activity_coefficient
       class_tag: derived
       locator:
@@ -1198,6 +1226,8 @@ species:
       values:
         quantity: activity_CsBO2
         method_class: model_derived
+        composition_wt_pct: *plante_analyzed_wt_pct
+        composition_derivation: *plante_analyzed_composition_derivation
         admission_status: model_output_not_measurement
         activity: 4.0e-06
         T_K: 1200
@@ -1235,21 +1265,22 @@ species:
           LS coefficients. Five lowest-T points rejected in the authors' LS.
           Comparison curve is JANAF Fe2O3(c)→Fe3O4(c), not a measurement.
       T_range_K: [1073.15, 1423.15]
-      phase: SNW_alkali_bearing_glass
+      phase: gas
       standard_state: P(O2) over SNW melt; attributed mainly to Fe2O3→Fe3O4 in solution
       regime: kems_effusion
       units: atm as published
       values:
         quantity: partial_pressure_O2
         gas_species: O2
-        method_class: measured_direct
+        method_class: figure_only
+        composition_wt_pct: *plante_analyzed_wt_pct
+        composition_derivation: *plante_analyzed_composition_derivation
+        evidence_class: figure_only
         admission_status: figure_only
-        status: typed_refusal
+        janaf_overlay: Fe2O3_c_to_Fe3O4_c
         reason: >-
           O2 P(T) exists only as Fig. 5 plate scatter plus an unpublished LS
           (five lowest-T points rejected). No numeric table or printed A,B.
-        semantics: bound_not_point_ordering
-        janaf_overlay: Fe2O3_c_to_Fe3O4_c
       uncertainty:
         note: not applicable to unpublished LS; scatter not digitised this hunt
     - observation_id: plante_hastie_1983_table4_offgas_cec_model
@@ -1300,8 +1331,10 @@ species:
         figure: '20'
         published_page: 45
         pdf_page_index: 71
-        note: Figs 20–21 thermodynamic estimates; a=x; pO2=0.02 atm. Not measurements.
-      T_range_K: [1073.15, 1373.15]
+        note: >-
+          Figs 20–21 thermodynamic estimates; a=x; pO2=0.02 atm. Not measurements.
+          The printed temperature axis is °C, with a secondary 10^4/T (K) axis.
+      T_range_C: [800, 1100]
       phase: SNW_alkali_bearing_glass
       standard_state: oxide mole-fraction activities; pO2=0.02 atm as assigned
       regime: thermodynamic_estimate
@@ -1321,6 +1354,7 @@ species:
         note: not applicable
     - observation_id: plante_hastie_1983_o2_figure_only_quoted
       supersedes: plante_hastie_1983_o2_kms_figure_only
+      experiment: kms-vacuum-glass-series
       type: psat_series
       class_tag: figure_only
       locator:
@@ -1330,11 +1364,15 @@ species:
       quote: Oxygen pressure vs 10^4/T(K) for SNW glass vapor, series I, run 1-5 data; the five lowest temperature
         points were rejected in the least squares analysis.
       units: atm
+      phase: gas
       values:
         quantity: partial_pressure_O2
+        gas_species: O2
+        method_class: figure_only
+        composition_wt_pct: *plante_analyzed_wt_pct
+        composition_derivation: *plante_analyzed_composition_derivation
+        evidence_class: figure_only
         admission_status: figure_only
-        semantics: bound_not_point_ordering
-        status: typed_refusal
         reason: Scatter not digitised; comparison JANAF curve is not measured. No invented temperature grid.
     - observation_id: plante_hastie_1983_offgas_model_quoted
       experiment: plante-1983-model-assay

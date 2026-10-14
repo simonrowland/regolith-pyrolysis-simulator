@@ -3060,6 +3060,13 @@ _COMPOSITION_COMPONENTS: dict[str, tuple[str, str, bool]] = {
     "SO3": ("SO3", "SO3", False),
     "S": ("S", "S", False),
     "B2O3": ("B2O3", "B2O3", False),
+    "Li2O": ("Li2O", "Li2O", False),
+    "MnO2": ("MnO2", "MnO2", False),
+    "ZrO2": ("ZrO2", "ZrO2", False),
+    "SrO": ("SrO", "SrO", False),
+    "Cs2O": ("Cs2O", "Cs2O", False),
+    "RuO2": ("RuO2", "RuO2", False),
+    "Re2O7": ("Re2O7", "Re2O7", False),
     # Total iron printed as FeO is converted with the FeO mass and key.
     "FeOT": ("FeO", "FeO", False),
 }

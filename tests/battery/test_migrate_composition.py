@@ -12,7 +12,14 @@ import yaml
 
 from simulator.battery import migrate as migrate_module
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
-from simulator.battery.enums import AmountBasis, NoticeKind
+from simulator.battery.enums import (
+    AdmissionStatus,
+    AmountBasis,
+    EvidenceClass,
+    NoticeKind,
+    Phase,
+    ValueKind,
+)
 from simulator.battery.migrate import (
     Migrator,
     REPO_ROOT,
@@ -223,6 +230,7 @@ def test_plante_hastie_fit_coefficients_are_not_composition_evidence() -> None:
     )
     assert values["A"] == 4.09
     assert values["B"] == 11900.0
+    assert "composition_analytical_Na2O_wt_pct" not in values
 
     refusal: list[str] = []
     assert _initial_oxide_map_from_values(values, refusal_reason=refusal) is None
@@ -236,26 +244,107 @@ def test_plante_hastie_fit_coefficients_are_not_composition_evidence() -> None:
     assert source_experiment.sample.initial_composition is None
 
 
+def _plante_analytical_composition(doc: dict) -> tuple[dict[str, Decimal], object]:
+    table1 = next(
+        item
+        for item in doc["experiments"]
+        if item["experiment_id"] == "kms-vacuum-glass-series"
+    )["sample"]["printed_composition"]["state"]["value"]
+    analytical_wt = {
+        name: as_decimal(value) for name, value in table1["analytical"].items()
+    }
+    return analytical_wt, wt_pct_to_mole_fraction(analytical_wt)
+
+
+def _assert_plante_samples_use_analyzed_composition(
+    result, expected_composition
+) -> None:
+    for experiment_id, bench in (
+        ("kms-vacuum-glass-series", "kms"),
+        ("tms-n2-glass-series", "tms"),
+    ):
+        migrated_id = next(
+            key
+            for key in result.experiments
+            if key.endswith(f"::experiment::{experiment_id}")
+        )
+        experiment = result.experiments[migrated_id]
+        assert experiment.bench_id.endswith(f"::bench::{bench}")
+        initial = experiment.sample.initial_composition
+        assert initial is not None and initial.state.is_value
+        assert initial.locator is not None
+        actual = dict(initial.state.value.components)
+        expected = dict(expected_composition.components)
+        assert set(actual) == set(expected) and len(actual) == 15
+        assert all(
+            abs(actual[name] - expected[name]) < Decimal("1e-11")
+            for name in expected
+        ), f"{experiment_id} sample composition differs from Table 1 analytical values"
+        assert "analy" in initial.locator.note.lower()
+
+
+def _assert_plante_observations_use_analyzed_composition(
+    result, expected_composition
+) -> None:
+    tied_rows = {
+        "plante_hastie_1983_table1_snw_glass_composition": "plante-1983-model-assay",
+        "plante_hastie_1983_table3_mass_loss": "kms-vacuum-glass-series",
+        "plante_hastie_1983_nabo2_activity_approx": "kms-vacuum-glass-series",
+        "plante_hastie_1983_nabo2_activity_quoted": "kms-vacuum-glass-series",
+        "plante_hastie_1983_libo2_activity_approx": "kms-vacuum-glass-series",
+        "plante_hastie_1983_libo2_activity_quoted": "kms-vacuum-glass-series",
+        "plante_hastie_1983_csbo2_activity_1200K": "kms-vacuum-glass-series",
+        "plante_hastie_1983_csbo2_activity_quoted": "kms-vacuum-glass-series",
+        "plante_hastie_1983_ru_re_sr_undetected": "kms-vacuum-glass-series",
+        "plante_hastie_1983_detection_limits_quoted": "kms-vacuum-glass-series",
+        "plante_hastie_1983_o2_kms_figure_only": "kms-vacuum-glass-series",
+        "plante_hastie_1983_o2_figure_only_quoted": "kms-vacuum-glass-series",
+    }
+    expected = dict(expected_composition.components)
+    for source_id, experiment_id in tied_rows.items():
+        observation = result.observations[
+            f"kems-027-plante-hastie-1983::{source_id}"
+        ]
+        assert observation.experiment_id.endswith(
+            f"::experiment::{experiment_id}"
+        ), f"{source_id} is not independently bound to its source experiment"
+        composition = observation.identity.composition
+        assert composition is not None and composition.is_value, source_id
+        actual = dict(composition.value.components)
+        assert len(actual) == 15 and set(actual) == set(expected), source_id
+        assert all(
+            abs(actual[name] - expected[name]) < Decimal("1e-11")
+            for name in expected
+        ), f"{source_id} composition differs from Table 1 analytical values"
+        if source_id in {
+            "plante_hastie_1983_ru_re_sr_undetected",
+            "plante_hastie_1983_detection_limits_quoted",
+        }:
+            phase = observation.identity.species.phase
+            assert phase.is_value and phase.value is Phase.G, source_id
+
+
 @pytest.mark.parametrize(
-    ("experiment_id", "selected_column"),
+    ("experiment_id", "bench"),
     (
-        ("kms-vacuum-glass-series", "analytical"),
-        ("tms-n2-glass-series", "nominal"),
+        ("kms-vacuum-glass-series", "kms"),
+        ("tms-n2-glass-series", "tms"),
     ),
 )
-def test_plante_glass_initials_refuse_selected_printed_map_by_name(
-    monkeypatch, experiment_id: str, selected_column: str
+def test_plante_glass_initials_use_analyzed_printed_map_by_name(
+    monkeypatch, experiment_id: str, bench: str
 ) -> None:
     path = REPO_ROOT / "data/literature/extracts/kems-027-plante-hastie-1983.yaml"
     doc = yaml.safe_load(path.read_text(encoding="utf-8"))
-    source = next(
-        item for item in doc["experiments"] if item["experiment_id"] == experiment_id
+    analytical_wt, expected = _plante_analytical_composition(doc)
+    table1 = next(
+        row
+        for species in doc["species"].values()
+        for row in species["observations"]
+        if row["observation_id"] == "plante_hastie_1983_table1_snw_glass_composition"
     )
-    expected = {
-        name: as_decimal(value)
-        for name, value in source["sample"]["printed_composition"]["state"][
-            "value"
-        ][selected_column].items()
+    assert table1["values"]["composition_wt_pct"] == {
+        name: float(value) for name, value in analytical_wt.items()
     }
 
     convert = migrate_module.wt_pct_to_mole_fraction
@@ -274,14 +363,94 @@ def test_plante_glass_initials_refuse_selected_printed_map_by_name(
         for key in migrator.result.experiments
         if key.endswith(f"::experiment::{experiment_id}")
     )
-    initial = migrator.result.experiments[migrated_id].sample.initial_composition
+    experiment = migrator.result.experiments[migrated_id]
 
-    assert expected in seen
-    assert initial is not None and initial.state.is_unknown
-    refusal_names = set(initial.state.reason.rsplit(": ", 1)[1].split(", "))
-    assert refusal_names == {"Cs2O", "Li2O", "MnO2", "Re2O7", "RuO2", "SrO", "ZrO2"}
-    assert initial.locator is not None
-    assert selected_column in initial.locator.note.lower()
+    assert experiment.bench_id.endswith(f"::bench::{bench}")
+    assert analytical_wt in seen
+    _assert_plante_samples_use_analyzed_composition(migrator.result, expected)
+    _assert_plante_observations_use_analyzed_composition(migrator.result, expected)
+
+
+def test_plante_fig19_points_keep_pooled_sample_unknown_and_gas_phase() -> None:
+    path = REPO_ROOT / "data/literature/extracts/kems-027-plante-hastie-1983.yaml"
+    doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+    migrator = Migrator()
+    migrator._migrate_extract(path)
+    source_points = {
+        row["observation_id"]: row["values"]["points"]
+        for species in doc["species"].values()
+        for row in species["observations"]
+        if row["observation_id"]
+        in {
+            "plante_hastie_1983_fig19_nabo2_logP_ls",
+            "plante_hastie_1983_fig19_libo2_logP_ls",
+            "plante_hastie_1983_fig19_csbo2_logP_ls",
+        }
+    }
+    fit_points = [
+        observation
+        for observation in migrator.result.observations.values()
+        if "::T=" in observation.observation_id
+        and any(
+            name in observation.observation_id
+            for name in (
+                "fig19_nabo2_logP_ls",
+                "fig19_libo2_logP_ls",
+                "fig19_csbo2_logP_ls",
+            )
+        )
+    ]
+
+    assert len(fit_points) == 25
+    for source_id, points in source_points.items():
+        migrated = [
+            observation
+            for observation in fit_points
+            if f"::{source_id}::T=" in observation.observation_id
+        ]
+        assert len(migrated) == len(points)
+        expected_temperatures = {as_decimal(point["T_K"]) for point in points}
+        assert all("T_C" not in point for point in points)
+        assert {
+            observation.identity.temperature_K.value
+            for observation in migrated
+            if observation.identity.temperature_K is not None
+            and observation.identity.temperature_K.is_value
+        } == expected_temperatures
+        for observation in migrated:
+            temperature = (observation.point_conditions or {}).get("temperature_K")
+            assert temperature is not None and temperature.state.is_value
+            assert temperature.state.value in expected_temperatures
+            assert temperature.locator is not None
+    assert all(
+        observation.identity.species.phase.is_value
+        and observation.identity.species.phase.value is Phase.G
+        for observation in fit_points
+    )
+    assert all(
+        observation.identity.composition is None
+        or observation.identity.composition.is_unknown
+        for observation in fit_points
+    )
+    assert all(
+        "without per-point sample labels" in observation.locator.note
+        for observation in fit_points
+    )
+    assert all(
+        not observation.experiment_id.endswith(
+            ("::experiment::kms-vacuum-glass-series", "::experiment::tms-n2-glass-series")
+        )
+        for observation in fit_points
+    )
+    o2_figure = migrator.result.observations[
+        "kems-027-plante-hastie-1983::plante_hastie_1983_o2_figure_only_quoted"
+    ]
+    assert o2_figure.value.kind is ValueKind.UNAVAILABLE
+    assert o2_figure.admission.status is AdmissionStatus.PENDING
+    assert o2_figure.evidence.class_.is_value
+    assert o2_figure.evidence.class_.value is EvidenceClass.FIGURE_ONLY
+    assert o2_figure.identity.species.phase.is_value
+    assert o2_figure.identity.species.phase.value is Phase.G
 
 
 def test_composition_mass_percent_keeps_feot_until_owner_conversion() -> None:
