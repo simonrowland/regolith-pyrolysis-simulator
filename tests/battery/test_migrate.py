@@ -11,6 +11,7 @@ import re
 import subprocess
 import sys
 import unicodedata
+from collections import Counter
 from copy import deepcopy
 from dataclasses import replace
 from decimal import Decimal
@@ -422,9 +423,14 @@ def _migrate_real_extract(
     *,
     write: bool = False,
     use_repository_index_row: bool = False,
+    extract_doc: dict | None = None,
 ):
     src = REPO_ROOT / "data" / "literature" / "extracts" / name
-    doc = yaml.safe_load(src.read_text(encoding="utf-8"))
+    doc = (
+        extract_doc
+        if extract_doc is not None
+        else yaml.safe_load(src.read_text(encoding="utf-8"))
+    )
     assert isinstance(doc, dict)
     root = tmp_path / "tree"
     extracts = root / "data" / "literature" / "extracts"
@@ -452,8 +458,158 @@ def _migrate_real_extract(
         yaml.safe_dump(index, sort_keys=False),
         encoding="utf-8",
     )
-    (extracts / name).write_text(src.read_text(encoding="utf-8"), encoding="utf-8")
+    extract_text = (
+        yaml.safe_dump(doc, sort_keys=False)
+        if extract_doc is not None
+        else src.read_text(encoding="utf-8")
+    )
+    (extracts / name).write_text(extract_text, encoding="utf-8")
     return migrate(root, write=write)
+
+
+def test_holzheid_1997_typed_wustite_reference_and_table2_compositions(
+    tmp_path: Path,
+) -> None:
+    name = "holzheid-1997-feo-nio-coo-activity-metal-saturated.yaml"
+    result = _migrate_real_extract(tmp_path / "baseline", name)
+    table2_ids = (
+        "holzheid_1997_table2_page23_feo",
+        "holzheid_1997_table2_page24_feo",
+        "holzheid_1997_table2_page25_feo",
+    )
+    table3_ids = (
+        "holzheid_1997_table3_pages27_bk_feo",
+        *(f"holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_{i}" for i in range(1, 8)),
+    )
+
+    def rows_for(ids: tuple[str, ...]):
+        return [
+            observation
+            for observation in result.observations.values()
+            if any(f"::{identifier}::" in observation.observation_id for identifier in ids)
+        ]
+
+    table2 = rows_for(table2_ids)
+    table3 = rows_for(table3_ids)
+    all_rows = [*table2, *table3]
+    assert (len(table2), len(table3), len(all_rows)) == (57, 15, 72)
+
+    source_path = REPO_ROOT / "data" / "literature" / "extracts" / name
+    source_doc = yaml.safe_load(source_path.read_text(encoding="utf-8"))
+    activity_sources = [
+        observation
+        for observation in source_doc["species"]["FeO"]["observations"]
+        if observation.get("type") == "activity_coefficient"
+    ]
+    assert len(activity_sources) == 11
+    for source_observation in activity_sources:
+        standard_state = source_observation["standard_state"]
+        assert standard_state["locator"] == {
+            "published_page": 31,
+            "section": "4.1 Activity coefficients",
+        }
+        assert (
+            'For FeO we have chosen an "FeO"-wüstite(l) standard state.'
+            in standard_state["note"]
+        )
+
+    for observation in all_rows:
+        standard_state = observation.identity.reference_state
+        assert standard_state.is_value
+        reference = standard_state.value
+        assert reference.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+        assert reference.endmember.formula == "Fe(1-x)O"
+        assert reference.endmember.phase.value is Phase.L
+        assert reference.component_basis == "Fe(1-x)O"
+        assert reference.reference_pressure_bar == Decimal("1.01325")
+        assert identity_equal(observation.identity, observation.identity).kind is (
+            IdentityEqualKind.IDENTITY_UNKNOWN
+        )
+
+    assert all(observation.identity.composition.is_value for observation in table2)
+    assert all(observation.identity.composition.is_unknown for observation in table3)
+    for observation in table2:
+        temperature = observation.point_conditions["temperature_K"]
+        composition = observation.point_conditions["composition"]
+        assert temperature.state.is_value and temperature.locator is not None
+        assert composition.state.is_value and composition.locator is not None
+        assert composition.state.value == observation.identity.composition.value
+        assert composition.inference is not None
+        assert len(composition.inference.inputs) == 3
+        assert "Table 1" in composition.inference.inputs[0]
+        assert "Table 2 run" in composition.inference.inputs[1]
+        assert "other oxide ratios assumed to persist" in composition.inference.inputs[2]
+        assert "not a renormalisation of a partial analysis (d-131)" in (
+            composition.inference.inputs[2]
+        )
+        assert abs(
+            sum(
+                (value for _, value in composition.state.value.components),
+                Decimal("0"),
+            )
+            - 1
+        ) < Decimal("1e-24")
+    assert Counter(issue.reason.value for issue in result.validation.hard_issues) == Counter(
+        {"conditional_field": 4}
+    )
+
+    expected = {
+        "::T=1677:row=ad-10:": {
+            "SiO2": "0.4735",
+            "CaO": "0.2482",
+            "MgO": "0.1442",
+            "Al2O3": "0.0757",
+            "FeO": "0.0556",
+            "NiO": "0.0003",
+            "CoO": "0.0025",
+        },
+        "::T=1672:row=bk-59-a:": {
+            "SiO2": "0.4686",
+            "CaO": "0.1963",
+            "MgO": "0.1508",
+            "Al2O3": "0.0793",
+            "FeO": "0.0437",
+            "NiO": "0.0000",
+            "CoO": "0.0612",
+        },
+        "::T=1672:row=bk-59-b:": {
+            "SiO2": "0.4990",
+            "CaO": "0.2091",
+            "MgO": "0.1606",
+            "Al2O3": "0.0844",
+            "FeO": "0.0407",
+            "NiO": "0.0062",
+            "CoO": "0.0000",
+        },
+    }
+    for key_fragment, expected_components in expected.items():
+        observation = next(row for row in table2 if key_fragment in row.observation_id)
+        composition = observation.identity.composition.value
+        assert {
+            name: f"{value:.4f}" for name, value in composition.components
+        } == expected_components
+        condition = observation.point_conditions["composition"]
+        assert condition.inference.relation == (
+            "calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios"
+        )
+
+    # Mutating a persisted run composition must fail the three-run expected-value pin.
+    mutated_doc = yaml.safe_load(source_path.read_text(encoding="utf-8"))
+    mutated_doc["species"]["FeO"]["observations"][0]["values"]["series"][0][
+        "composition_mol"
+    ]["SiO2"] = "0.9999"
+    mutated = _migrate_real_extract(
+        tmp_path / "mutation", name, extract_doc=mutated_doc
+    )
+    mutated_row = next(
+        observation
+        for observation in mutated.observations.values()
+        if "::holzheid_1997_table2_page23_feo::T=1677:row=ad-10:" in observation.observation_id
+    )
+    assert mutated_row.identity.composition.value.components[0][1] == Decimal("0.9999")
+    assert f"{mutated_row.identity.composition.value.components[0][1]:.4f}" != expected[
+        "::T=1677:row=ad-10:"
+    ]["SiO2"]
 
 
 def _extract_observations(name: str) -> list[dict]:
