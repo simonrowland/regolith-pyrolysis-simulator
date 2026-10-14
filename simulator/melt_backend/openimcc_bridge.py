@@ -118,10 +118,29 @@ def imported_openimcc_commit() -> str | None:
 
     # A PYTHONPATH source checkout may shadow a stale distribution. In that
     # case report the checkout's HEAD, never the unrelated dist-info commit.
+    if "site-packages" in imported_path.parts or any(
+        part in {".venv", "venv", "env"} for part in imported_path.parts
+    ):
+        return None
     for checkout in imported_path.parents:
         if not (checkout / ".git").exists():
             continue
         try:
+            relative_path = imported_path.relative_to(checkout)
+            subprocess.run(
+                [
+                    "git",
+                    "-C",
+                    str(checkout),
+                    "ls-files",
+                    "--error-unmatch",
+                    str(relative_path),
+                ],
+                check=True,
+                capture_output=True,
+                text=True,
+                timeout=5,
+            )
             result = subprocess.run(
                 ["git", "-C", str(checkout), "rev-parse", "HEAD"],
                 check=True,
@@ -130,7 +149,7 @@ def imported_openimcc_commit() -> str | None:
                 timeout=5,
             )
         except (OSError, subprocess.SubprocessError):
-            return None
+            continue
         commit_id = result.stdout.strip()
         return commit_id or None
     return None

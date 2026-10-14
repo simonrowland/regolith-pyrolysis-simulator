@@ -1038,14 +1038,44 @@ def test_imported_openimcc_commit_uses_source_checkout_without_dist_info(
     monkeypatch, tmp_path
 ) -> None:
     from importlib.metadata import PackageNotFoundError
+    import subprocess
 
     from simulator.melt_backend import openimcc_bridge
 
     module_file = tmp_path / "checkout/src/openimcc/__init__.py"
     module_file.parent.mkdir(parents=True)
     module_file.touch()
-    (tmp_path / "checkout/.git").mkdir()
-    commit = "b" * 40
+    checkout = tmp_path / "checkout"
+    subprocess.run(
+        ["git", "-C", str(checkout), "init"], check=True, capture_output=True
+    )
+    subprocess.run(
+        ["git", "-C", str(checkout), "add", "src/openimcc/__init__.py"],
+        check=True,
+        capture_output=True,
+    )
+    subprocess.run(
+        [
+            "git",
+            "-C",
+            str(checkout),
+            "-c",
+            "user.name=Test",
+            "-c",
+            "user.email=test@example.invalid",
+            "commit",
+            "-m",
+            "source checkout",
+        ],
+        check=True,
+        capture_output=True,
+    )
+    commit = subprocess.run(
+        ["git", "-C", str(checkout), "rev-parse", "HEAD"],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
 
     def no_distribution(_name):
         raise PackageNotFoundError("openimcc")
@@ -1054,12 +1084,6 @@ def test_imported_openimcc_commit_uses_source_checkout_without_dist_info(
         openimcc_bridge, "_openimcc", SimpleNamespace(__file__=str(module_file))
     )
     monkeypatch.setattr(openimcc_bridge.metadata, "distribution", no_distribution)
-    monkeypatch.setattr(
-        openimcc_bridge.subprocess,
-        "run",
-        lambda args, **_kwargs: SimpleNamespace(stdout=f"{commit}\n"),
-    )
-
     assert imported_openimcc_commit() == commit
 
 
@@ -1086,6 +1110,65 @@ def test_imported_openimcc_commit_is_unverified_without_distribution_or_git(
         "run",
         lambda *_args, **_kwargs: pytest.fail("no git checkout should be queried"),
     )
+
+    assert imported_openimcc_commit() is None
+
+
+def test_imported_openimcc_commit_requires_tracked_source_in_enclosing_repo(
+    monkeypatch, tmp_path
+) -> None:
+    from importlib.metadata import PackageNotFoundError
+    from subprocess import CalledProcessError
+
+    from simulator.melt_backend import openimcc_bridge
+
+    module_file = tmp_path / "project/vendor/openimcc/__init__.py"
+    module_file.parent.mkdir(parents=True)
+    module_file.touch()
+    (tmp_path / "project/.git").mkdir()
+
+    def no_distribution(_name):
+        raise PackageNotFoundError("openimcc")
+
+    def git(args, **_kwargs):
+        if args[3] == "ls-files":
+            raise CalledProcessError(1, args)
+        return SimpleNamespace(stdout="f" * 40 + "\n")
+
+    monkeypatch.setattr(
+        openimcc_bridge, "_openimcc", SimpleNamespace(__file__=str(module_file))
+    )
+    monkeypatch.setattr(openimcc_bridge.metadata, "distribution", no_distribution)
+    monkeypatch.setattr(openimcc_bridge.subprocess, "run", git)
+
+    assert imported_openimcc_commit() is None
+
+
+def test_imported_openimcc_commit_rejects_untracked_wheel_in_project_venv(
+    monkeypatch, tmp_path
+) -> None:
+    from importlib.metadata import PackageNotFoundError
+
+    from simulator.melt_backend import openimcc_bridge
+
+    module_file = (
+        tmp_path / "project/.venv/lib/python/site-packages/openimcc/__init__.py"
+    )
+    module_file.parent.mkdir(parents=True)
+    module_file.touch()
+    (tmp_path / "project/.git").mkdir()
+
+    def no_distribution(_name):
+        raise PackageNotFoundError("openimcc")
+
+    def git(args, **_kwargs):
+        return SimpleNamespace(stdout="f" * 40 + "\n")
+
+    monkeypatch.setattr(
+        openimcc_bridge, "_openimcc", SimpleNamespace(__file__=str(module_file))
+    )
+    monkeypatch.setattr(openimcc_bridge.metadata, "distribution", no_distribution)
+    monkeypatch.setattr(openimcc_bridge.subprocess, "run", git)
 
     assert imported_openimcc_commit() is None
 
