@@ -1450,37 +1450,40 @@ def fusion_comparison_reference(
         and observed_polymorph is not expected_polymorph
         and source_polymorph_is_unspecified
     ):
-        eligible_solid_tables = _janaf_eligible_pure_crystal_tables(
-            formula, temperature_K
-        )
-        if len(eligible_solid_tables) == 1:
-            unique_unknown_polymorph_table = eligible_solid_tables[0][0] == (
-                fusion.crystal_table
+        stability = None
+        try:
+            eligible_solid_tables = _janaf_eligible_pure_crystal_tables(
+                formula, temperature_K
             )
-        elif len(eligible_solid_tables) > 1:
-            try:
+            if len(eligible_solid_tables) > 1:
                 stability = _janaf_stable_crystal_set(
                     formula,
                     temperature_K,
                     eligible_solid_tables,
                 )
-            except JANAFFusionPolymorphUnavailable as exc:
-                notice = fusion_missing_input_notice(str(exc))
-                if notice is None:
-                    notice = Notice(
-                        kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
-                        affected_quantities=(Quantity.ACTIVITY,),
-                        reason=(
-                            f"fusion conversion missing input for {formula}: "
-                            f"incomplete JANAF stability candidate set: {exc}"
-                        ),
-                        origin=reference.observation_id,
-                        band=f"JANAF stability data for {formula}: {exc}",
-                    )
-                return replace(
-                    reference,
-                    notices=union_notices(reference.notices, (notice,)),
+        except JANAFFusionPolymorphUnavailable as exc:
+            notice = fusion_missing_input_notice(str(exc))
+            if notice is None:
+                notice = Notice(
+                    kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+                    affected_quantities=(Quantity.ACTIVITY,),
+                    reason=(
+                        f"fusion conversion missing input for {formula}: "
+                        f"incomplete JANAF stability candidate set: {exc}"
+                    ),
+                    origin=reference.observation_id,
+                    band=f"JANAF stability data for {formula}: {exc}",
                 )
+            return replace(
+                reference,
+                notices=union_notices(reference.notices, (notice,)),
+            )
+        if len(eligible_solid_tables) == 1:
+            unique_unknown_polymorph_table = eligible_solid_tables[0][0] == (
+                fusion.crystal_table
+            )
+        elif len(eligible_solid_tables) > 1:
+            assert stability is not None
             stable_table = stability.selected.table_id
             stable_polymorph = stability.selected.polymorph
             stable_gibbs_kJ_per_mol = stability.selected.gibbs_kJ_per_mol
