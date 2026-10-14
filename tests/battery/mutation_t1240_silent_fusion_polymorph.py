@@ -11,10 +11,10 @@ from simulator.battery import compilation_tier
 
 
 source = textwrap.dedent(inspect.getsource(compilation_tier.predict_thermo_attempt))
-needle = "if polymorph_unspecified:\n            alternatives = tuple("
+needle = 'if polymorph_unspecified:\n            other_references = ", ".join('
 assert source.count(needle) == 1
 mutated = source.replace(
-    needle, "if False:\n            alternatives = tuple(", 1
+    needle, 'if False:\n            other_references = ", ".join(', 1
 )
 namespace: dict[str, object] = {}
 exec(

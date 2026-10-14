@@ -41,6 +41,7 @@ from simulator.battery.enums import (
     NoticeKind,
     PerBasis,
     Phase,
+    Polymorph,
     Quantity,
     RefusalReason,
     MetricOperation,
@@ -164,6 +165,7 @@ class ThermoAttempt:
     refusal_reason: RefusalReason | None
     refusal_detail: dict[str, object]
     call_evidence: str
+    coefficient_sources: tuple[str, ...] = ()
 
 
 def _decimal_token(value: Decimal) -> str:
@@ -1238,11 +1240,78 @@ def predict_thermo_attempt(
                 quantity=quantity,
                 origin=origin,
             )
+        phase = _state_value(identity.species.phase)
+        if phase is None:
+            return _refuse(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                "fusion-solid-phase-unknown",
+                quantity=quantity,
+                origin=origin,
+            )
+        if phase is not Phase.CR:
+            return _refuse(
+                RefusalReason.IDENTITY_MISMATCH,
+                "fusion-solid-phase-must-be-crystal",
+                quantity=quantity,
+                origin=origin,
+                extra={"phase": str(getattr(phase, "value", phase))},
+            )
+        from simulator.battery.score import _source_polymorph_is_unspecified
+
+        source_polymorph = identity.species.polymorph
+        polymorph_unspecified = _source_polymorph_is_unspecified(source_polymorph)
+        polymorph = _state_value(source_polymorph)
+        alternatives: tuple[Polymorph, ...] = ()
+        if polymorph_unspecified:
+            from simulator.battery.generators.janaf import (
+                JANAFFusionPolymorphUnavailable,
+                _janaf_stable_fusion_polymorph,
+            )
+
+            try:
+                polymorph, alternatives = _janaf_stable_fusion_polymorph(
+                    identity.species.formula, temperature_K
+                )
+            except JANAFFusionPolymorphUnavailable as exc:
+                return _refuse(
+                    RefusalReason.IDENTITY_UNKNOWN,
+                    "fusion-solid-polymorph-unknown",
+                    quantity=quantity,
+                    origin=origin,
+                    extra={"detail": str(exc)},
+                )
+        if polymorph is None:
+            return _refuse(
+                RefusalReason.IDENTITY_UNKNOWN,
+                "fusion-solid-polymorph-unknown",
+                quantity=quantity,
+                origin=origin,
+            )
+        if not isinstance(polymorph, Polymorph):
+            return _refuse(
+                RefusalReason.IDENTITY_MISMATCH,
+                "fusion-solid-polymorph-not-closed",
+                quantity=quantity,
+                origin=origin,
+                extra={"polymorph": str(polymorph)},
+            )
         try:
-            from simulator.battery.generators.janaf import janaf_fusion_enthalpy
+            from simulator.battery.generators.janaf import (
+                JANAFFusionPolymorphUnavailable,
+                janaf_fusion_enthalpy,
+                janaf_fusion_entropy,
+            )
 
             enthalpy_J_mol, low, high, solid, liquid, hashes = janaf_fusion_enthalpy(
-                identity.species.formula, temperature_K
+                identity.species.formula, temperature_K, polymorph
+            )
+        except JANAFFusionPolymorphUnavailable as exc:
+            return _refuse(
+                RefusalReason.IDENTITY_MISMATCH,
+                "fusion-solid-polymorph-not-in-janaf",
+                quantity=quantity,
+                origin=origin,
+                extra={"detail": str(exc), "formula": identity.species.formula},
             )
         except (KeyError, ValueError) as exc:
             return _refuse(
@@ -1252,22 +1321,10 @@ def predict_thermo_attempt(
                 origin=origin,
                 extra={"detail": str(exc), "formula": identity.species.formula},
             )
-        notices: tuple[Notice, ...] = ()
         authority = Authority.BRIDGE
-        from simulator.battery.score import (
-            _fusion_solid_table_polymorph,
-            _janaf_pure_solid_table_index,
-            _janaf_pure_solid_table_temperature_range,
-            _source_polymorph_is_unspecified,
-        )
+        from simulator.battery.generators.janaf import _FUSION_TABLE_POLYMORPHS
 
-        solid_polymorph = _fusion_solid_table_polymorph(
-            identity.species.formula, solid
-        )
-        source_polymorph = identity.species.polymorph
-        polymorph_unspecified = _source_polymorph_is_unspecified(
-            source_polymorph
-        )
+        solid_polymorph = _FUSION_TABLE_POLYMORPHS.get(solid)
         observed_polymorph = polymorph_token(identity.species)
         if (
             not polymorph_unspecified
@@ -1290,44 +1347,32 @@ def predict_thermo_attempt(
                 },
             )
         if polymorph_unspecified:
-            alternatives = tuple(
-                f"{table_id} ({polymorph.value})"
-                for formula, table_id, polymorph in _janaf_pure_solid_table_index()
-                if formula == identity.species.formula
-                and polymorph is not None
-                and table_id != solid
-                and (
-                    table_range := _janaf_pure_solid_table_temperature_range(
-                        table_id
-                    )
-                ) is not None
-                and table_range[0] <= temperature_K <= table_range[1]
+            other_references = ", ".join(
+                alternative.value for alternative in alternatives
             )
-            ambiguity = (
-                "; other JANAF solid references available at T: "
-                + ", ".join(alternatives)
-                if alternatives
-                else ""
-            )
-            notices = (
+            notice_list = [
                 Notice(
                     kind=NoticeKind.DERIVATION_USES_COMPILATION,
                     affected_quantities=(quantity,),
                     reason=(
                         "fusion_solid_polymorph_unspecified: source does not state "
                         f"a solid polymorph; predictor used {solid} "
-                        f"({solid_polymorph.value if solid_polymorph is not None else 'unmapped polymorph'})"
-                        f"{ambiguity}"
+                        f"({polymorph.value}); alternatives: "
+                        f"{other_references or 'none defined at this temperature'}"
                     ),
                     origin=origin,
                     band=f"JANAF {solid}/{liquid} common range [{low}, {high}] K",
-                    authority=Authority.BRIDGE,
+                    authority=authority,
                     certification="NIST-JANAF solid/liquid fusion reference",
                 ),
-            )
+            ]
+        else:
+            notice_list = []
         if temperature_K < low or temperature_K > high:
             authority = Authority.EXTRAPOLATED
-            notices = notices + (
+            if polymorph_unspecified:
+                notice_list[0] = replace(notice_list[0], authority=authority)
+            notice_list.append(
                 Notice(
                     kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
                     affected_quantities=(quantity,),
@@ -1335,18 +1380,30 @@ def predict_thermo_attempt(
                     origin=origin,
                     band=f"[{low}, {high}] K",
                     authority=Authority.EXTRAPOLATED,
-                ),
+                )
             )
-        if polymorph_unspecified and notices:
-            notices = (replace(notices[0], authority=authority),) + notices[1:]
-        # JANAF formation enthalpies are kJ/mol; their endmember difference
-        # cancels the elemental reference. Convert to J/mol before deriving
-        # ΔS_fus = ΔH_fus/T_fus (J/mol/K); return the declared unit per kind.
-        predicted = (
-            enthalpy_J_mol / Decimal(1000)
-            if quantity is Quantity.ENTHALPY_OF_FUSION
-            else enthalpy_J_mol / temperature_K
-        )
+        if quantity is Quantity.ENTHALPY_OF_FUSION:
+            # JANAF formation enthalpies are kJ/mol; their endmember difference
+            # cancels the elemental reference. Convert to the declared unit.
+            predicted = enthalpy_J_mol / Decimal(1000)
+        else:
+            # At the JANAF crossing, ΔG=0 gives ΔS=ΔH/T_fus. Away from
+            # that crossing, ΔS_fus(T) is the two curves' entropy difference.
+            predicted, crossing_K = janaf_fusion_entropy(
+                identity.species.formula, temperature_K, polymorph
+            )
+            if temperature_K != crossing_K:
+                notice_list.append(
+                    Notice(
+                        kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                        affected_quantities=(quantity,),
+                        reason="janaf_fusion_transition_off_equilibrium",
+                        origin=origin,
+                        band=f"fusion crossing at {crossing_K} K",
+                        authority=authority,
+                    )
+                )
+        notices = tuple(notice_list)
         return ThermoAttempt(
             value=predicted,
             unit=QUANTITY_UNITS[quantity],
@@ -1358,6 +1415,7 @@ def predict_thermo_attempt(
                 f"janaf-fusion:{solid}/{liquid}:T={temperature_K}:"
                 f"source_sha256={hashes[0]}/{hashes[1]}"
             ),
+            coefficient_sources=(solid, liquid),
         )
     if engine is Engine.INTERNAL_ANALYTICAL:
         return _ellingham_attempt(identity, quantity, temperature_K, origin=origin)
