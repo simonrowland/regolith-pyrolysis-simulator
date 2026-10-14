@@ -520,6 +520,10 @@ def test_holzheid_1997_typed_wustite_reference_and_table2_compositions(
         assert reference.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
         assert reference.endmember.formula == "Fe(1-x)O"
         assert reference.endmember.phase.value is Phase.L
+        assert reference.endmember.charge.is_value
+        assert reference.endmember.charge.value == 0
+        assert observation.identity.species.phase.is_value
+        assert observation.identity.species.phase.value is Phase.L
         assert reference.component_basis == "Fe(1-x)O"
         assert reference.reference_pressure_bar == Decimal("1.01325")
         assert identity_equal(observation.identity, observation.identity).kind is (

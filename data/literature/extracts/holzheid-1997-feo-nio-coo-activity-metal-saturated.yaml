@@ -3395,7 +3395,7 @@ species:
         relation: authors' equilibrium-constant calculation from measured oxide mole fractions and log fO2
         inputs: [holzheid_1997_equilibrium_free_energy_fits]
         output_unit: dimensionless
-      phase: silicate_melt
+      phase: l
       standard_state:
         state:
           tag: value
@@ -3410,8 +3410,8 @@ species:
                 tag: not_applicable
                 reason: non-stoichiometric liquid wüstite has no crystalline polymorph
               charge:
-                tag: unknown
-                reason: non-stoichiometric Fe(1-x)O has no single fixed formal charge
+                tag: value
+                value: 0
             component_basis: Fe(1-x)O
             reference_pressure_bar: '1.01325'
         inferred: false
@@ -3419,7 +3419,7 @@ species:
           The paper states verbatim: "For FeO we have chosen an "FeO"-wüstite(l) standard state." The reference is
           non-stoichiometric liquid wüstite Fe(1-x)O at 1 atm for Fe(s) + 1/2 O2(g) = "FeO"(l). The typed schema has
           no explicit non-stoichiometric liquid-wüstite convention; it preserves Fe(1-x)O and liquid phase in the
-          closest Raoultian pure-endmember form and does not label the material stoichiometric FeO.
+          closest Raoultian pure-endmember form and does not label the material stoichiometric FeO. Fe has variable oxidation state within the Fe(1-x)O composition; the reference compound remains neutral.
         locator:
           published_page: 31
           section: 4.1 Activity coefficients
@@ -3441,6 +3441,7 @@ species:
           state: unknown
           reason: not_published; pages 22-25 and 29-30 searched, log fO2 scale and imposition/measurement not specified
         FeO_calculation_metal_standard: pure Fe reference metal in the section 3 equilibrium calculation, page 30
+        alloy_note: The source warns that alloy composition and alloy activity-coefficient uncertainty add uncertainty after recalculation to pure metals.
         series:
         - run: AD 10
           system: AD
@@ -5211,7 +5212,7 @@ species:
         relation: authors' equilibrium-constant calculation from measured oxide mole fractions and log fO2
         inputs: [holzheid_1997_equilibrium_free_energy_fits]
         output_unit: dimensionless
-      phase: silicate_melt
+      phase: l
       standard_state:
         state:
           tag: value
@@ -5226,8 +5227,8 @@ species:
                 tag: not_applicable
                 reason: non-stoichiometric liquid wüstite has no crystalline polymorph
               charge:
-                tag: unknown
-                reason: non-stoichiometric Fe(1-x)O has no single fixed formal charge
+                tag: value
+                value: 0
             component_basis: Fe(1-x)O
             reference_pressure_bar: '1.01325'
         inferred: false
@@ -5235,7 +5236,7 @@ species:
           The paper states verbatim: "For FeO we have chosen an "FeO"-wüstite(l) standard state." The reference is
           non-stoichiometric liquid wüstite Fe(1-x)O at 1 atm for Fe(s) + 1/2 O2(g) = "FeO"(l). The typed schema has
           no explicit non-stoichiometric liquid-wüstite convention; it preserves Fe(1-x)O and liquid phase in the
-          closest Raoultian pure-endmember form and does not label the material stoichiometric FeO.
+          closest Raoultian pure-endmember form and does not label the material stoichiometric FeO. Fe has variable oxidation state within the Fe(1-x)O composition; the reference compound remains neutral.
         locator:
           published_page: 31
           section: 4.1 Activity coefficients
@@ -5257,6 +5258,7 @@ species:
           state: unknown
           reason: not_published; pages 22-25 and 29-30 searched, log fO2 scale and imposition/measurement not specified
         FeO_calculation_metal_standard: pure Fe reference metal in the section 3 equilibrium calculation, page 30
+        alloy_note: The source warns that alloy composition and alloy activity-coefficient uncertainty add uncertainty after recalculation to pure metals.
         series:
         - run: BK 59 a
           system: BK
@@ -6978,7 +6980,7 @@ species:
         relation: authors' equilibrium-constant calculation from measured oxide mole fractions and log fO2
         inputs: [holzheid_1997_equilibrium_free_energy_fits]
         output_unit: dimensionless
-      phase: silicate_melt
+      phase: l
       standard_state:
         state:
           tag: value
@@ -6993,8 +6995,8 @@ species:
                 tag: not_applicable
                 reason: non-stoichiometric liquid wüstite has no crystalline polymorph
               charge:
-                tag: unknown
-                reason: non-stoichiometric Fe(1-x)O has no single fixed formal charge
+                tag: value
+                value: 0
             component_basis: Fe(1-x)O
             reference_pressure_bar: '1.01325'
         inferred: false
@@ -7002,7 +7004,7 @@ species:
           The paper states verbatim: "For FeO we have chosen an "FeO"-wüstite(l) standard state." The reference is
           non-stoichiometric liquid wüstite Fe(1-x)O at 1 atm for Fe(s) + 1/2 O2(g) = "FeO"(l). The typed schema has
           no explicit non-stoichiometric liquid-wüstite convention; it preserves Fe(1-x)O and liquid phase in the
-          closest Raoultian pure-endmember form and does not label the material stoichiometric FeO.
+          closest Raoultian pure-endmember form and does not label the material stoichiometric FeO. Fe has variable oxidation state within the Fe(1-x)O composition; the reference compound remains neutral.
         locator:
           published_page: 31
           section: 4.1 Activity coefficients
@@ -7432,7 +7434,7 @@ species:
         relation: authors' equilibrium-constant calculation from measured oxide concentrations and log fO2
         inputs: [holzheid_1997_equilibrium_free_energy_fits]
         output_unit: dimensionless
-      phase: komatiitic_basalt_silicate_melt
+      phase: l
       standard_state:
         state:
           tag: value
@@ -7447,8 +7449,8 @@ species:
                 tag: not_applicable
                 reason: non-stoichiometric liquid wüstite has no crystalline polymorph
               charge:
-                tag: unknown
-                reason: non-stoichiometric Fe(1-x)O has no single fixed formal charge
+                tag: value
+                value: 0
             component_basis: Fe(1-x)O
             reference_pressure_bar: '1.01325'
         inferred: false
@@ -7456,7 +7458,7 @@ species:
           The paper states verbatim: "For FeO we have chosen an "FeO"-wüstite(l) standard state." The reference is
           non-stoichiometric liquid wüstite Fe(1-x)O at 1 atm for Fe(s) + 1/2 O2(g) = "FeO"(l). The typed schema has
           no explicit non-stoichiometric liquid-wüstite convention; it preserves Fe(1-x)O and liquid phase in the
-          closest Raoultian pure-endmember form and does not label the material stoichiometric FeO.
+          closest Raoultian pure-endmember form and does not label the material stoichiometric FeO. Fe has variable oxidation state within the Fe(1-x)O composition; the reference compound remains neutral.
         locator:
           published_page: 31
           section: 4.1 Activity coefficients
@@ -7663,8 +7665,8 @@ species:
                 tag: not_applicable
                 reason: non-stoichiometric liquid wüstite has no crystalline polymorph
               charge:
-                tag: unknown
-                reason: non-stoichiometric Fe(1-x)O has no single fixed formal charge
+                tag: value
+                value: 0
             component_basis: Fe(1-x)O
             reference_pressure_bar: '1.01325'
         inferred: false
@@ -7672,7 +7674,7 @@ species:
           The paper states verbatim: "For FeO we have chosen an "FeO"-wüstite(l) standard state." The reference is
           non-stoichiometric liquid wüstite Fe(1-x)O at 1 atm for Fe(s) + 1/2 O2(g) = "FeO"(l). The typed schema has
           no explicit non-stoichiometric liquid-wüstite convention; it preserves Fe(1-x)O and liquid phase in the
-          closest Raoultian pure-endmember form and does not label the material stoichiometric FeO.
+          closest Raoultian pure-endmember form and does not label the material stoichiometric FeO. Fe has variable oxidation state within the Fe(1-x)O composition; the reference compound remains neutral.
         locator:
           published_page: 31
           section: 4.1 Activity coefficients
@@ -7755,8 +7757,8 @@ species:
                 tag: not_applicable
                 reason: non-stoichiometric liquid wüstite has no crystalline polymorph
               charge:
-                tag: unknown
-                reason: non-stoichiometric Fe(1-x)O has no single fixed formal charge
+                tag: value
+                value: 0
             component_basis: Fe(1-x)O
             reference_pressure_bar: '1.01325'
         inferred: false
@@ -7764,7 +7766,7 @@ species:
           The paper states verbatim: "For FeO we have chosen an "FeO"-wüstite(l) standard state." The reference is
           non-stoichiometric liquid wüstite Fe(1-x)O at 1 atm for Fe(s) + 1/2 O2(g) = "FeO"(l). The typed schema has
           no explicit non-stoichiometric liquid-wüstite convention; it preserves Fe(1-x)O and liquid phase in the
-          closest Raoultian pure-endmember form and does not label the material stoichiometric FeO.
+          closest Raoultian pure-endmember form and does not label the material stoichiometric FeO. Fe has variable oxidation state within the Fe(1-x)O composition; the reference compound remains neutral.
         locator:
           published_page: 31
           section: 4.1 Activity coefficients
@@ -7847,8 +7849,8 @@ species:
                 tag: not_applicable
                 reason: non-stoichiometric liquid wüstite has no crystalline polymorph
               charge:
-                tag: unknown
-                reason: non-stoichiometric Fe(1-x)O has no single fixed formal charge
+                tag: value
+                value: 0
             component_basis: Fe(1-x)O
             reference_pressure_bar: '1.01325'
         inferred: false
@@ -7856,7 +7858,7 @@ species:
           The paper states verbatim: "For FeO we have chosen an "FeO"-wüstite(l) standard state." The reference is
           non-stoichiometric liquid wüstite Fe(1-x)O at 1 atm for Fe(s) + 1/2 O2(g) = "FeO"(l). The typed schema has
           no explicit non-stoichiometric liquid-wüstite convention; it preserves Fe(1-x)O and liquid phase in the
-          closest Raoultian pure-endmember form and does not label the material stoichiometric FeO.
+          closest Raoultian pure-endmember form and does not label the material stoichiometric FeO. Fe has variable oxidation state within the Fe(1-x)O composition; the reference compound remains neutral.
         locator:
           published_page: 31
           section: 4.1 Activity coefficients
@@ -7939,8 +7941,8 @@ species:
                 tag: not_applicable
                 reason: non-stoichiometric liquid wüstite has no crystalline polymorph
               charge:
-                tag: unknown
-                reason: non-stoichiometric Fe(1-x)O has no single fixed formal charge
+                tag: value
+                value: 0
             component_basis: Fe(1-x)O
             reference_pressure_bar: '1.01325'
         inferred: false
@@ -7948,7 +7950,7 @@ species:
           The paper states verbatim: "For FeO we have chosen an "FeO"-wüstite(l) standard state." The reference is
           non-stoichiometric liquid wüstite Fe(1-x)O at 1 atm for Fe(s) + 1/2 O2(g) = "FeO"(l). The typed schema has
           no explicit non-stoichiometric liquid-wüstite convention; it preserves Fe(1-x)O and liquid phase in the
-          closest Raoultian pure-endmember form and does not label the material stoichiometric FeO.
+          closest Raoultian pure-endmember form and does not label the material stoichiometric FeO. Fe has variable oxidation state within the Fe(1-x)O composition; the reference compound remains neutral.
         locator:
           published_page: 31
           section: 4.1 Activity coefficients
@@ -8031,8 +8033,8 @@ species:
                 tag: not_applicable
                 reason: non-stoichiometric liquid wüstite has no crystalline polymorph
               charge:
-                tag: unknown
-                reason: non-stoichiometric Fe(1-x)O has no single fixed formal charge
+                tag: value
+                value: 0
             component_basis: Fe(1-x)O
             reference_pressure_bar: '1.01325'
         inferred: false
@@ -8040,7 +8042,7 @@ species:
           The paper states verbatim: "For FeO we have chosen an "FeO"-wüstite(l) standard state." The reference is
           non-stoichiometric liquid wüstite Fe(1-x)O at 1 atm for Fe(s) + 1/2 O2(g) = "FeO"(l). The typed schema has
           no explicit non-stoichiometric liquid-wüstite convention; it preserves Fe(1-x)O and liquid phase in the
-          closest Raoultian pure-endmember form and does not label the material stoichiometric FeO.
+          closest Raoultian pure-endmember form and does not label the material stoichiometric FeO. Fe has variable oxidation state within the Fe(1-x)O composition; the reference compound remains neutral.
         locator:
           published_page: 31
           section: 4.1 Activity coefficients
@@ -8123,8 +8125,8 @@ species:
                 tag: not_applicable
                 reason: non-stoichiometric liquid wüstite has no crystalline polymorph
               charge:
-                tag: unknown
-                reason: non-stoichiometric Fe(1-x)O has no single fixed formal charge
+                tag: value
+                value: 0
             component_basis: Fe(1-x)O
             reference_pressure_bar: '1.01325'
         inferred: false
@@ -8132,7 +8134,7 @@ species:
           The paper states verbatim: "For FeO we have chosen an "FeO"-wüstite(l) standard state." The reference is
           non-stoichiometric liquid wüstite Fe(1-x)O at 1 atm for Fe(s) + 1/2 O2(g) = "FeO"(l). The typed schema has
           no explicit non-stoichiometric liquid-wüstite convention; it preserves Fe(1-x)O and liquid phase in the
-          closest Raoultian pure-endmember form and does not label the material stoichiometric FeO.
+          closest Raoultian pure-endmember form and does not label the material stoichiometric FeO. Fe has variable oxidation state within the Fe(1-x)O composition; the reference compound remains neutral.
         locator:
           published_page: 31
           section: 4.1 Activity coefficients
@@ -8215,8 +8217,8 @@ species:
                 tag: not_applicable
                 reason: non-stoichiometric liquid wüstite has no crystalline polymorph
               charge:
-                tag: unknown
-                reason: non-stoichiometric Fe(1-x)O has no single fixed formal charge
+                tag: value
+                value: 0
             component_basis: Fe(1-x)O
             reference_pressure_bar: '1.01325'
         inferred: false
@@ -8224,7 +8226,7 @@ species:
           The paper states verbatim: "For FeO we have chosen an "FeO"-wüstite(l) standard state." The reference is
           non-stoichiometric liquid wüstite Fe(1-x)O at 1 atm for Fe(s) + 1/2 O2(g) = "FeO"(l). The typed schema has
           no explicit non-stoichiometric liquid-wüstite convention; it preserves Fe(1-x)O and liquid phase in the
-          closest Raoultian pure-endmember form and does not label the material stoichiometric FeO.
+          closest Raoultian pure-endmember form and does not label the material stoichiometric FeO. Fe has variable oxidation state within the Fe(1-x)O composition; the reference compound remains neutral.
         locator:
           published_page: 31
           section: 4.1 Activity coefficients
