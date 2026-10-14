@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Mapping, Sequence
 
 
 OPENIMCC_PROVENANCE_PREFIXES: tuple[str, ...] = (
@@ -23,17 +23,9 @@ _OPENIMCC_ENGINE_IDENTITY_FIELDS: tuple[tuple[str, str], ...] = (
 
 
 def _is_unknown_source_asset(asset_id: str) -> bool:
-    """The generated unknown asset is a read_from fallback, not source lineage."""
+    """Identify the generated fallback asset for an unmatched INDEX layer."""
 
     return asset_id.startswith("unknown:")
-
-
-def _registered_lineage_asset_ids(asset_ids: Iterable[str]) -> frozenset[str]:
-    """Exclude the generated read_from fallback from source asset lineage."""
-
-    return frozenset(
-        asset_id for asset_id in asset_ids if not _is_unknown_source_asset(asset_id)
-    )
 
 
 def openimcc_engine_identity_sources(

@@ -58,10 +58,7 @@ from simulator.battery.polymorph_dictionary import (
     resolve_formula_polymorph,
 )
 from simulator.battery.extract_context import iter_extract_context_containers
-from simulator.battery.source_lineage import (
-    _is_unknown_source_asset,
-    _registered_lineage_asset_ids,
-)
+from simulator.battery.source_lineage import _is_unknown_source_asset
 from simulator.battery.enums import (
     AdmissionStatus,
     AmountBasis,
@@ -13235,9 +13232,7 @@ class Migrator:
         regime = obs.get("regime") or values.get("regime")
         if method_class is None:
             measured.absent_classes += 1
-        source_asset_ids = _registered_lineage_asset_ids(
-            asset.asset_id for asset in work.source_files.files
-        )
+        source_asset_ids = {asset.asset_id for asset in work.source_files.files}
         try:
             derived_parents, derived_prose = lineage_parents_from_source(
                 obs,

@@ -1347,7 +1347,38 @@ def test_kor_sulfur_tables_are_typed_refusals_and_keep_24_hour_footnote() -> Non
     assert len(activities) == 2
     assert all(obs.admission.status is AdmissionStatus.ADMITTED for obs in activities)
     assert migrator.result.validation is not None
-    assert migrator.result.validation.hard_issues == ()
+    table_asset = "tables:kor-1967-thesis-sulphur-oxides-slags"
+    expected_issues = set()
+    for suffix in ("h=496a7a098edd", "h=b5bde09ebf68"):
+        observation_id = (
+            "kor-1967-thesis-sulphur-oxides-slags::"
+            "kor_1967_table_xxiv_cas_sat_lime_activities::T=1773:"
+            f"{suffix}"
+        )
+        path = f"observation[{observation_id}]"
+        expected_issues.update(
+            {
+                (
+                    f"{path}.derived_from",
+                    RefusalReason.CONDITIONAL_FIELD,
+                    "derived observation requires derived_from",
+                ),
+                (
+                    f"{path}.derived_from",
+                    RefusalReason.REFERENTIAL_INTEGRITY,
+                    f"derived_from {table_asset!r} does not resolve",
+                ),
+                (
+                    f"{path}.derivation.inputs",
+                    RefusalReason.REFERENTIAL_INTEGRITY,
+                    f"derivation input {table_asset!r} does not resolve",
+                ),
+            }
+        )
+    assert {
+        (issue.path, issue.reason, issue.detail)
+        for issue in migrator.result.validation.hard_issues
+    } == expected_issues
 
 
 def test_identity_complete_compilation_cells_are_admitted_at_source_level() -> None:
@@ -7925,7 +7956,7 @@ def test_unregistered_table_assets_are_referential_issues(
     observation_id = "kume_2000_table2_sample_101"
     unregistered_parent = "tables:fixture-source"
     unregistered_input = "tables:fixture-source/not-registered.csv"
-    unregistered_placeholder = "unknown:fixture-source"
+    unregistered_placeholder = "unknown:unregistered-fixture"
     row = next(
         row
         for block in extract["species"].values()
@@ -7958,6 +7989,10 @@ def test_unregistered_table_assets_are_referential_issues(
         for obs in result.observations.values()
         if obs.observation_id.endswith(f"::{observation_id}")
     )
+    work = result.works[result.experiments[observation.experiment_id].work_id]
+    registered_assets = {asset.asset_id for asset in work.source_files.files}
+    assert "unknown:fixture-source" in registered_assets
+    assert unregistered_placeholder not in registered_assets
     assert observation.derived_from == (unregistered_parent,)
     assert observation.derivation is not None
     assert observation.derivation.inputs == (
@@ -8027,6 +8062,37 @@ def test_registered_table_asset_resolves_as_lineage(tmp_path: Path) -> None:
     assert not any(
         issue.reason is RefusalReason.REFERENTIAL_INTEGRITY
         and table_asset in issue.detail
+        for issue in result.validation.hard_issues
+    )
+
+
+def test_registered_unknown_placeholder_resolves_as_lineage(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    placeholder_asset = "unknown:fixture-source"
+    row["values"]["method_class"] = "measured_reduced"
+    row["derived_from"] = [placeholder_asset]
+    row["derivation"] = {
+        "relation": "author_mass_balance_reduction",
+        "inputs": [placeholder_asset],
+        "output_unit": "Pa",
+    }
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    observation = next(iter(result.observations.values()))
+    work = result.works[result.experiments[observation.experiment_id].work_id]
+    assert placeholder_asset in {asset.asset_id for asset in work.source_files.files}
+    assert observation.derived_from == (placeholder_asset,)
+    assert observation.derivation is not None
+    assert observation.derivation.inputs == (placeholder_asset,)
+    lineage_paths = {
+        f"observation[{observation.observation_id}].derived_from",
+        f"observation[{observation.observation_id}].derivation.inputs",
+    }
+    assert not any(
+        issue.path in lineage_paths
+        and issue.reason
+        in {RefusalReason.CONDITIONAL_FIELD, RefusalReason.REFERENTIAL_INTEGRITY}
         for issue in result.validation.hard_issues
     )
 
