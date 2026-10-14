@@ -72,6 +72,7 @@ from simulator.reference_data.janaf import (
     formula_composition,
     is_nist_tail_signed_repair_cell,
     _is_nist_typed_absent_enthalpy_cell,
+    load_manifest,
     load_table_document,
     table_printed_temperatures,
 )
@@ -2574,16 +2575,21 @@ _FUSION_TABLES = {
     "SiO2": ("O-035", "O-038"),
 }
 
-# Closed fusion-resolver identity map; table names and assignments are from
-# NIST-JANAF 4th ed. Mg-008 is rock-salt/periclase at 1 bar through melting;
-# Ca-027 is lime (rock-salt) at 1 bar. Al-096 is alpha-alumina/corundum.
+_JANAF_POLYMORPH_BY_TABLE = {
+    table_id: JANAF_CRYSTAL_DICTIONARY[key]
+    for key, table_ids in JANAF_CRYSTAL_TABLE_IDS.items()
+    for table_id in table_ids
+}
+
+# Keep the fusion predictor's pre-existing candidate identity census intact
+# during the selector move; the follow-up behavior change uses the full table.
 _FUSION_TABLE_POLYMORPHS = {
-    "Ca-027": Polymorph.LIME,  # JANAF Calcium Oxide (cr).
-    "Al-096": Polymorph.CORUNDUM,  # JANAF Aluminium Oxide, Alpha.
-    "Mg-008": Polymorph.PERICLASE,  # JANAF Magnesium Oxide (cr).
-    "O-035": Polymorph.CRISTOBALITE_HIGH,  # JANAF Silicon Oxide, Cristobalite, High.
-    "O-036": Polymorph.CRISTOBALITE_LOW,  # JANAF Silicon Oxide, Cristobalite, Low.
-    "O-037": Polymorph.QUARTZ,  # JANAF Silicon Oxide, Quartz.
+    "Ca-027": Polymorph.LIME,
+    "Al-096": Polymorph.CORUNDUM,
+    "Mg-008": Polymorph.PERICLASE,
+    "O-035": Polymorph.CRISTOBALITE_HIGH,
+    "O-036": Polymorph.CRISTOBALITE_LOW,
+    "O-037": Polymorph.QUARTZ,
 }
 
 
@@ -2619,10 +2625,137 @@ def _fusion_table_pair(
     return solid_tables[0], liquid
 
 
+@dataclass(frozen=True)
+class JANAFCrystalGibbs:
+    table_id: str
+    polymorph: Polymorph
+    gibbs_kJ_per_mol: Decimal
+
+
+@dataclass(frozen=True)
+class JANAFCrystalStability:
+    selected: JANAFCrystalGibbs
+    alternatives: tuple[JANAFCrystalGibbs, ...]
+
+
+@lru_cache(maxsize=1)
+def _janaf_pure_solid_table_index() -> tuple[tuple[str, str, Polymorph | None], ...]:
+    """Return JANAF neutral crystal tables and their canonical polymorphs."""
+
+    entries = load_manifest().get("entries")
+    if not isinstance(entries, list):
+        return ()
+    return tuple(
+        (
+            str(entry["formula_normalised"]),
+            str(entry["table_id"]),
+            _JANAF_POLYMORPH_BY_TABLE.get(str(entry["table_id"])),
+        )
+        for entry in entries
+        if isinstance(entry, Mapping)
+        and entry.get("phase") == "cr"
+        and entry.get("charge") == 0
+        and isinstance(entry.get("formula_normalised"), str)
+        and isinstance(entry.get("table_id"), str)
+    )
+
+
+@lru_cache(maxsize=None)
+def _janaf_pure_solid_table_temperature_range(
+    table_id: str,
+) -> tuple[Decimal, Decimal] | None:
+    document = load_table_document(TABLES_DIR / f"{table_id}.yaml")
+    table = document.get("table")
+    values = table.get("values") if isinstance(table, Mapping) else None
+    if not isinstance(values, list):
+        return None
+    temperatures: list[Decimal] = []
+    for row in values:
+        if not isinstance(row, Mapping):
+            continue
+        temperature = row.get("temperature")
+        gibbs = row.get("formation_gibbs_energy")
+        if not isinstance(temperature, Mapping) or not isinstance(gibbs, Mapping):
+            continue
+        temperature_value = temperature.get("value")
+        gibbs_value = gibbs.get("value")
+        if temperature_value is None or gibbs_value is None:
+            continue
+        temperatures.append(Decimal(str(temperature_value)))
+    if len(set(temperatures)) < 2:
+        return None
+    return min(temperatures), max(temperatures)
+
+
+def _janaf_eligible_pure_crystal_tables(
+    oxide: str, temperature_K: Decimal
+) -> tuple[tuple[str, Polymorph | None], ...]:
+    return tuple(
+        (table_id, polymorph)
+        for formula, table_id, polymorph in _janaf_pure_solid_table_index()
+        if formula == oxide
+        and (
+            table_range := _janaf_pure_solid_table_temperature_range(table_id)
+        ) is not None
+        and table_range[0] <= temperature_K <= table_range[1]
+    )
+
+
+def _janaf_stable_crystal_set(
+    oxide: str,
+    temperature_K: Decimal,
+    eligible_tables: tuple[tuple[str, Polymorph | None], ...] | None = None,
+    *,
+    fail_on_error: bool = False,
+) -> JANAFCrystalStability:
+    """Order eligible crystal tables by their interpolated JANAF Gibbs energy."""
+    eligible = (
+        _janaf_eligible_pure_crystal_tables(oxide, temperature_K)
+        if eligible_tables is None
+        else eligible_tables
+    )
+    if not eligible:
+        raise JANAFFusionPolymorphUnavailable(
+            f"JANAF tables do not define a solid polymorph for {oxide} at "
+            f"{temperature_K} K"
+        )
+
+    candidates: list[JANAFCrystalGibbs] = []
+    if any(polymorph is None for _table_id, polymorph in eligible):
+        raise JANAFFusionPolymorphUnavailable(
+            f"JANAF crystal table has no canonical polymorph for {oxide}"
+        )
+    for table_id, polymorph in eligible:
+        assert polymorph is not None
+        try:
+            points, _digest = _fusion_table_points(table_id)
+            if not points[0][0] <= temperature_K <= points[-1][0]:
+                continue
+            gibbs = _interpolate_formation_gibbs(points, temperature_K)
+        except (KeyError, ValueError) as exc:
+            if not fail_on_error:
+                continue
+            raise JANAFFusionPolymorphUnavailable(
+                f"{table_id}: stability data unavailable for {oxide} at "
+                f"{temperature_K} K: {exc}"
+            ) from exc
+        candidates.append(JANAFCrystalGibbs(table_id, polymorph, gibbs))
+
+    if not candidates:
+        raise JANAFFusionPolymorphUnavailable(
+            f"JANAF tables do not define a solid polymorph for {oxide} at "
+            f"{temperature_K} K"
+        )
+    selected = min(candidates, key=lambda item: item.gibbs_kJ_per_mol)
+    return JANAFCrystalStability(
+        selected,
+        tuple(candidate for candidate in candidates if candidate is not selected),
+    )
+
+
 def _janaf_stable_fusion_polymorph(
     oxide: str, temperature_K: Decimal
 ) -> tuple[Polymorph, tuple[Polymorph, ...]]:
-    """Select the lowest-G JANAF crystal table available at this temperature."""
     try:
         default_solid, _liquid = _FUSION_TABLES[oxide]
     except KeyError as exc:
@@ -2636,38 +2769,44 @@ def _janaf_stable_fusion_polymorph(
         if formula == oxide
         for table_id in table_ids
     )
-    candidates: dict[Polymorph, tuple[str, Decimal]] = {}
-    for table_id in dict.fromkeys(tables):
-        polymorph = _FUSION_TABLE_POLYMORPHS.get(table_id)
-        if polymorph is None:
-            continue
-        try:
-            points, _digest = _fusion_table_points(table_id)
-            if not points[0][0] <= temperature_K <= points[-1][0]:
-                continue
-            gibbs = _interpolate_formation_gibbs(points, temperature_K)
-        except (KeyError, ValueError):
-            continue
-        prior = candidates.get(polymorph)
-        if prior is None or gibbs < prior[1]:
-            candidates[polymorph] = (table_id, gibbs)
-    if not candidates:
-        raise JANAFFusionPolymorphUnavailable(
-            f"JANAF tables do not define a solid polymorph for {oxide} at "
-            f"{temperature_K} K"
-        )
-    ordered = sorted(candidates.items(), key=lambda item: (item[1][1], item[0].value))
-    if len(ordered) > 1 and ordered[0][1][1] == ordered[1][1][1]:
+    eligible = tuple(
+        (table_id, _FUSION_TABLE_POLYMORPHS[table_id])
+        for table_id in dict.fromkeys(tables)
+        if table_id in _FUSION_TABLE_POLYMORPHS
+    )
+    eligible = tuple(
+        (table_id, polymorph)
+        for table_id, polymorph in eligible
+        if (
+            table_range := _janaf_pure_solid_table_temperature_range(table_id)
+        ) is not None
+        and table_range[0] <= temperature_K <= table_range[1]
+    )
+    stability = _janaf_stable_crystal_set(
+        oxide, temperature_K, eligible, fail_on_error=False
+    )
+    by_polymorph: dict[Polymorph, JANAFCrystalGibbs] = {}
+    for candidate in (stability.selected, *stability.alternatives):
+        prior = by_polymorph.get(candidate.polymorph)
+        if prior is None or candidate.gibbs_kJ_per_mol < prior.gibbs_kJ_per_mol:
+            by_polymorph[candidate.polymorph] = candidate
+    ordered = sorted(
+        by_polymorph.items(),
+        key=lambda item: (item[1].gibbs_kJ_per_mol, item[0].value),
+    )
+    if len(ordered) > 1 and (
+        ordered[0][1].gibbs_kJ_per_mol == ordered[1][1].gibbs_kJ_per_mol
+    ):
         tied = [
             polymorph.value
-            for polymorph, (_table_id, gibbs) in ordered
-            if gibbs == ordered[0][1][1]
+            for polymorph, candidate in ordered
+            if candidate.gibbs_kJ_per_mol == ordered[0][1].gibbs_kJ_per_mol
         ]
         raise JANAFFusionPolymorphUnavailable(
             f"JANAF solid polymorph is ambiguous for {oxide} at {temperature_K} K: "
             + ", ".join(tied)
         )
-    return ordered[0][0], tuple(poly for poly, _ in ordered[1:])
+    return ordered[0][0], tuple(polymorph for polymorph, _ in ordered[1:])
 
 
 # The source hashes identify the JANAF text; pin the extracted temperature-node

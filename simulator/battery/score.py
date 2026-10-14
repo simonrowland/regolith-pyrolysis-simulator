@@ -1212,68 +1212,6 @@ def _is_flagged_stratum_notice(notice: Notice) -> bool:
     return bool(flagged_strata((notice,)))
 
 
-@lru_cache(maxsize=1)
-def _janaf_pure_solid_table_index() -> tuple[tuple[str, str, Polymorph | None], ...]:
-    """Return JANAF neutral crystal tables and their canonical polymorphs."""
-
-    from simulator.reference_data.janaf import load_manifest
-    from simulator.battery.polymorph_dictionary import (
-        JANAF_CRYSTAL_DICTIONARY,
-        JANAF_CRYSTAL_TABLE_IDS,
-    )
-
-    entries = load_manifest().get("entries")
-    if not isinstance(entries, list):
-        return ()
-    table_polymorphs = {
-        table_id: JANAF_CRYSTAL_DICTIONARY[key]
-        for key, table_ids in JANAF_CRYSTAL_TABLE_IDS.items()
-        for table_id in table_ids
-    }
-    return tuple(
-        (
-            str(entry["formula_normalised"]),
-            str(entry["table_id"]),
-            table_polymorphs.get(str(entry["table_id"])),
-        )
-        for entry in entries
-        if isinstance(entry, Mapping)
-        and entry.get("phase") == "cr"
-        and entry.get("charge") == 0
-        and isinstance(entry.get("formula_normalised"), str)
-        and isinstance(entry.get("table_id"), str)
-    )
-
-
-@lru_cache(maxsize=None)
-def _janaf_pure_solid_table_temperature_range(
-    table_id: str,
-) -> tuple[Decimal, Decimal] | None:
-    from simulator.reference_data.janaf import TABLES_DIR, load_table_document
-
-    document = load_table_document(TABLES_DIR / f"{table_id}.yaml")
-    table = document.get("table")
-    values = table.get("values") if isinstance(table, Mapping) else None
-    if not isinstance(values, list):
-        return None
-    temperatures: list[Decimal] = []
-    for row in values:
-        if not isinstance(row, Mapping):
-            continue
-        temperature = row.get("temperature")
-        gibbs = row.get("formation_gibbs_energy")
-        if not isinstance(temperature, Mapping) or not isinstance(gibbs, Mapping):
-            continue
-        temperature_value = temperature.get("value")
-        gibbs_value = gibbs.get("value")
-        if temperature_value is None or gibbs_value is None:
-            continue
-        temperatures.append(Decimal(str(temperature_value)))
-    if len(set(temperatures)) < 2:
-        return None
-    return min(temperatures), max(temperatures)
-
-
 def _source_polymorph_is_unspecified(source_polymorph: State | None) -> bool:
     return source_polymorph is None or (
         source_polymorph.is_unknown
@@ -1440,7 +1378,10 @@ def fusion_comparison_reference(
     from simulator.battery.generators.janaf import (
         _FUSION_TABLE_POLYMORPHS,
         JANAF_R_J_PER_MOL_K,
+        JANAFFusionPolymorphUnavailable,
+        _janaf_eligible_pure_crystal_tables,
         _janaf_fusion_energy_for_pair,
+        _janaf_stable_crystal_set,
         janaf_fusion_energy,
     )
 
@@ -1458,6 +1399,7 @@ def fusion_comparison_reference(
                 "needed JANAF table node row missing or changed",
                 "JANAF cached table is incomplete",
                 "JANAF table values are missing",
+                "JANAF cache hash does not match source sidecar",
                 "JANAF table has fewer than two Gibbs points",
                 "spans missing grid node",
             )
@@ -1508,48 +1450,36 @@ def fusion_comparison_reference(
         and observed_polymorph is not expected_polymorph
         and source_polymorph_is_unspecified
     ):
-        eligible_solid_tables = tuple(
-            (table_id, table_polymorph)
-            for candidate_formula, table_id, table_polymorph
-            in _janaf_pure_solid_table_index()
-            if candidate_formula == formula
-            and (
-                table_range := _janaf_pure_solid_table_temperature_range(table_id)
-            ) is not None
-            and table_range[0] <= temperature_K <= table_range[1]
+        eligible_solid_tables = _janaf_eligible_pure_crystal_tables(
+            formula, temperature_K
         )
         if len(eligible_solid_tables) == 1:
             unique_unknown_polymorph_table = eligible_solid_tables[0][0] == (
                 fusion.crystal_table
             )
         elif len(eligible_solid_tables) > 1:
-            from simulator.battery.generators import janaf as janaf_tables
-
-            candidates: list[tuple[str, Polymorph, Decimal]] = []
-            for table_id, table_polymorph in eligible_solid_tables:
-                if table_polymorph is None:
-                    candidates = []
-                    break
-                try:
-                    points, _source_sha256 = janaf_tables._fusion_table_points(
-                        table_id
-                    )
-                    gibbs_kJ_per_mol = janaf_tables._interpolate_formation_gibbs(
-                        points, temperature_K
-                    )
-                except ValueError:
-                    continue
-                candidates.append((table_id, table_polymorph, gibbs_kJ_per_mol))
-
-            if len(candidates) == len(eligible_solid_tables) and candidates:
-                stable_table, stable_polymorph, stable_gibbs_kJ_per_mol = min(
-                    candidates, key=lambda item: item[2]
+            stability = None
+            try:
+                stability = _janaf_stable_crystal_set(
+                    formula,
+                    temperature_K,
+                    eligible_solid_tables,
+                    fail_on_error=True,
                 )
+            except JANAFFusionPolymorphUnavailable:
+                pass
+            if stability is not None:
+                stable_table = stability.selected.table_id
+                stable_polymorph = stability.selected.polymorph
+                stable_gibbs_kJ_per_mol = stability.selected.gibbs_kJ_per_mol
                 alternatives = tuple(
-                    item for item in candidates if item[0] != stable_table
+                    (item.table_id, item.polymorph, item.gibbs_kJ_per_mol)
+                    for item in stability.alternatives
                 )
-                if alternatives:
-                    # For equal chemical potential, changing the pure-solid
+            else:
+                alternatives = ()
+            if stability is not None and alternatives:
+                # For equal chemical potential, changing the pure-solid
                     # standard state shifts activity by exp(dG/RT). Therefore
                     # d log10(a) = dG / (R T ln 10); J/mol divided by
                     # (J/mol/K) K is dimensionless, and ln(10) converts ln to
