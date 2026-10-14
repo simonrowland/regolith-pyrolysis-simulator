@@ -911,6 +911,7 @@ def test_freeze_gate_cache_key_constant_across_isochemical_ramp(
         setpoints_data,
         enabled=True,
     )
+    sim.melt.p_total_mbar = 10.0
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
     sim.melt.oxygen_reservoir.reference_T_K = 1425.0 + 273.15
     sim._sync_oxygen_reservoir_mirror()
@@ -955,6 +956,7 @@ def test_freeze_gate_cache_rekeys_after_real_redox_source_term(
         setpoints_data,
         enabled=True,
     )
+    sim.melt.p_total_mbar = 10.0
     temperature_K = 1500.0 + 273.15
     sim.melt.temperature_C = 1500.0
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
@@ -2462,6 +2464,7 @@ def test_freeze_gate_enabled_quench_hysteresis_uses_last_liquid_reference(
         setpoints_data,
         enabled=True,
     )
+    sim.melt.p_total_mbar = 10.0
 
     def fail_dispatch(*_args, **_kwargs):
         raise AssertionError('quenched redox guard must not dispatch')
@@ -2487,7 +2490,12 @@ def test_freeze_gate_enabled_quench_hysteresis_uses_last_liquid_reference(
     sim._re_reference_melt_fO2_to_temperature(remelt_T_K)
     expected_hot = (
         original_fO2
-        + kress91_ln_fO2_temperature_delta(original_T_K, remelt_T_K)
+        + kress91_ln_fO2_temperature_delta(
+            original_T_K,
+            remelt_T_K,
+            reference_pressure_bar=sim.melt.p_total_mbar / 1000.0,
+            target_pressure_bar=sim.melt.p_total_mbar / 1000.0,
+        )
         / math.log(10.0)
     )
     assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(
