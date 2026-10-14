@@ -1,0 +1,370 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1134/s0016702912040088
+  citation: Volovetskii M.V., Lukanin O.A., Rusakov V.S., and Kargal'tsev A.A. (2012). Influence of Oxygen Fugacity and Temperature
+    on the Redox State of Iron in Natural Silicic Aluminosilicate Melts. Geochemistry International 50(4):330–343.
+  source_ids:
+  - volovetskii-2012-iron-redox
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+    files:
+    - asset_id: pdf:volovetskii-2012-iron-redox
+      role: pdf
+      path: raw/volovetskii-2012-iron-redox/volovetskii-2012-iron-redox.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:volovetskii-2012-iron-redox
+      role: pdftotext
+      path: text/volovetskii-2012-iron-redox
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:volovetskii-2012-iron-redox
+      role: table_csv
+      path: tables/volovetskii-2012-iron-redox
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: unknown:volovetskii-2012-iron-redox
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1134/s0016702912040088
+experiments:
+- experiment_id: 10.1134/s0016702912040088::experiment::volovetskii_2012_table1_runs
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 6
+        published_page: 335
+        pdf_page_index: 5
+        section: Experimental Procedure
+        note: Total pressure is stated as 1 atm; converted using 1 atm = 101325 Pa.
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 6
+              published_page: 335
+              pdf_page_index: 5
+              section: Experimental Procedure
+              note: Total pressure is stated as 1 atm; converted using 1 atm = 101325 Pa.
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 6
+              published_page: 335
+              pdf_page_index: 5
+              section: Experimental Procedure
+              note: Total pressure is stated as 1 atm; converted using 1 atm = 101325 Pa.
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        published_page: 335
+        pdf_page_index: 5
+        section: Experimental Procedure
+        note: The gas mixture is described but its proportions and flow are not tabulated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1134/s0016702912040088
+  locator:
+    page: 6
+    published_page: 335
+    pdf_page_index: 5
+    section: Experimental Procedure
+- experiment_id: 10.1134/s0016702912040088::experiment::volovetskii_2012_table2_runs
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 6
+        published_page: 335
+        pdf_page_index: 5
+        section: Experimental Procedure
+        note: Total pressure is stated as 1 atm; converted using 1 atm = 101325 Pa.
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 6
+              published_page: 335
+              pdf_page_index: 5
+              section: Experimental Procedure
+              note: Total pressure is stated as 1 atm; converted using 1 atm = 101325 Pa.
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 6
+              published_page: 335
+              pdf_page_index: 5
+              section: Experimental Procedure
+              note: Total pressure is stated as 1 atm; converted using 1 atm = 101325 Pa.
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        published_page: 335
+        pdf_page_index: 5
+        section: Experimental Procedure
+        note: The gas mixture is described but its proportions and flow are not tabulated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1134/s0016702912040088
+  locator:
+    page: 6
+    published_page: 335
+    pdf_page_index: 5
+    section: Experimental Procedure
+- experiment_id: 10.1134/s0016702912040088::volovetskii-2012-iron-redox
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: printed oxide wt% map has unsupported numeric component(s): Cl, ZrO2'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '7.39'
+          CaO: '0.34'
+          Cl: '0.81'
+          FeO: '7.82'
+          K2O: '4.17'
+          MgO: '0.07'
+          MnO: '0.31'
+          Na2O: '6.61'
+          SiO2: '68.28'
+          TiO2: '0.36'
+          ZrO2: '0.33'
+          total: '96.48'
+      locator:
+        page: 5
+        published_page: 334
+        pdf_page_index: 4
+        table: '2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1134/s0016702912040088
+  locator:
+    page: 5
+    published_page: 334
+    pdf_page_index: 4
+    table: '2'
+context:
+- observation_id: volo12_table3_regressions
+  type: recalculation_table
+  locator:
+    pdf_page_index: 10
+    page: 11
+    published_page: 340
+    table: '3'
+  units: as published
+  uncertainty: Parenthesized coefficient widths in the two experimental fit equations are identified as standard deviations
+    in the table note. The confidence level for h widths is not stated.
+  values:
+    attribution: Volovetskii et al. fits for P9 and I2 are derived from their experimental data; recalculations use published
+      data cited in the table.
+    inputs_as_published: Table 3 lists k, h, regression equations and R2; comparative rows are attributed to references [10],
+      [5], [7], and [14] as printed.
+    points:
+    - melt: P9
+      attribution_as_published: experiments
+      k: 0.22; 0.24
+      h: 8500 ± 3000
+      equations: y = 0.22 (2)x + 1.10 (14); y = 0.24(1)x + 0.94 (7)
+      R2: 0.9746; 0.9952
+      locator:
+        pdf_page_index: 10
+        page: 11
+        published_page: 340
+        table: '3'
+      method_class: model_derived
+      inputs_as_published: Experimental data in Tables 1 and 2
+    - melt: I2
+      attribution_as_published: experiments
+      k: 0.17; 0.21
+      h: 8500 ± 5500
+      equations: y = 0.17(1)x + 0.58 (7); y = 0.21(3)x + 0.53 (18)
+      R2: 0.9975; 0.9530
+      locator:
+        pdf_page_index: 10
+        page: 11
+        published_page: 340
+        table: '3'
+      method_class: model_derived
+      inputs_as_published: Experimental data in Tables 1 and 2
+    - melt: P9
+      attribution_as_published: calculated after [10]
+      k: 0.18; 0.21
+      h: 4150 ± 450
+      equations: y = 0.21x + 0.78; y = 0.18x + 0.30
+      locator:
+        pdf_page_index: 10
+        page: 11
+        published_page: 340
+        table: '3'
+      method_class: model_derived
+    - melt: I2
+      attribution_as_published: calculated after [10]
+      k: 0.14; 0.16
+      h: 1470 ± 500
+      equations: y = 0.16x + 0.22; y = 0.14x + 0.07
+      locator:
+        pdf_page_index: 10
+        page: 11
+        published_page: 340
+        table: '3'
+      method_class: model_derived
+    - melt: P9
+      attribution_as_published: calculated after [5]
+      k: '0.22'
+      h: 5509
+      equations: y = 0.22x + 0.00; y = 0.22x − 0.29
+      locator:
+        pdf_page_index: 10
+        page: 11
+        published_page: 340
+        table: '3'
+      method_class: model_derived
+    - melt: I2
+      attribution_as_published: calculated after [5]
+      k: '0.22'
+      h: 5509
+      equations: y = 0.22x − 0.16; y = 0.22x − 0.33
+      locator:
+        pdf_page_index: 10
+        page: 11
+        published_page: 340
+        table: '3'
+      method_class: model_derived
+    - melt: P9
+      attribution_as_published: calculated after [7]
+      k: '0.20'
+      h: 4997
+      equations: y = 0.20x − 0.13; y = 0.20x − 0.37
+      locator:
+        pdf_page_index: 10
+        page: 11
+        published_page: 340
+        table: '3'
+      method_class: model_derived
+    - melt: I2
+      attribution_as_published: calculated after [7]
+      k: '0.20'
+      h: 4997
+      equations: y = 0.20x − 0.17; y = 0.20x − 0.33
+      locator:
+        pdf_page_index: 10
+        page: 11
+        published_page: 340
+        table: '3'
+      method_class: model_derived
+    - melt: Rhyolite
+      attribution_as_published: experiments [14]
+      k: 0.21 ± 0.01
+      h: 2900 ± 900
+      inputs: three experiments at 1300 and 1450°C in air and at 1351°C and fO2 = 10−5 bar
+      locator:
+        pdf_page_index: 10
+        page: 11
+        published_page: 340
+        table: '3'
+      method_class: model_derived
+  context_id: volovetskii-2012-iron-redox::context::volo12_table3_regressions
+  work_id: 10.1134/s0016702912040088
+  source_id: volovetskii-2012-iron-redox
+  species: Fe

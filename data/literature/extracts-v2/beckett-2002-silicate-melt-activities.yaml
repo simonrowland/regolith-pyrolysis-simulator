@@ -1,0 +1,1210 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/beckett-2002-silicate-melt-activities.yaml
+observations:
+- observation_id: beckett-2002-silicate-melt-activities::beckett_2002_al2o3_fig5_figure_only
+  experiment_id: 10.1016/s0016-7037(01)00751-7::beckett-2002-silicate-melt-activities
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'CMAS_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: corundum (Al2O3 solid) at temperature and 1 atm, as printed on p. 94'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, admission_status,
+      caption, axes_as_printed, temperature_as_printed, note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: beckett-2002-silicate-melt-activities
+  locator:
+    page: 9
+    published_page: 101
+    pdf_page_index: 8
+    figure: '5'
+  read_from: pdf:beckett-2002-silicate-melt-activities
+- observation_id: beckett-2002-silicate-melt-activities::beckett_2002_al2o3_fig6_figure_only
+  experiment_id: 10.1016/s0016-7037(01)00751-7::beckett-2002-silicate-melt-activities
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'CMAS_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: corundum (Al2O3 solid) at temperature and 1 atm, as printed on p. 94'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, admission_status,
+      caption, axes_as_printed, temperature_as_printed, note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: beckett-2002-silicate-melt-activities
+  locator:
+    page: 10
+    published_page: 102
+    pdf_page_index: 9
+    figure: '6'
+  read_from: pdf:beckett-2002-silicate-melt-activities
+- observation_id: beckett-2002-silicate-melt-activities::beckett_2002_al2o3_fig7_figure_only
+  experiment_id: 10.1016/s0016-7037(01)00751-7::beckett-2002-silicate-melt-activities
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'CMAS_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: corundum (Al2O3 solid) at temperature and 1 atm, as printed on p. 94'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, admission_status,
+      caption, axes_as_printed, temperature_as_printed, note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: beckett-2002-silicate-melt-activities
+  locator:
+    page: 11
+    published_page: 103
+    pdf_page_index: 10
+    figure: '7'
+  read_from: pdf:beckett-2002-silicate-melt-activities
+- observation_id: beckett-2002-silicate-melt-activities::beckett_2002_cao_fig1_figure_only
+  experiment_id: 10.1016/s0016-7037(01)00751-7::beckett-2002-silicate-melt-activities
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CMAS_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: lime (CaO solid) at temperature and 1 atm, as printed on p. 94'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, admission_status,
+      caption, axes_as_printed, temperature_as_printed, note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: beckett-2002-silicate-melt-activities
+  locator:
+    page: 4
+    published_page: 96
+    pdf_page_index: 3
+    figure: '1'
+  read_from: pdf:beckett-2002-silicate-melt-activities
+- observation_id: beckett-2002-silicate-melt-activities::beckett_2002_cao_fig2_figure_only
+  experiment_id: 10.1016/s0016-7037(01)00751-7::beckett-2002-silicate-melt-activities
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CMAS_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: lime (CaO solid) at temperature and 1 atm, as printed on p. 94'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, caption,
+      axes_as_printed, temperature_as_printed, note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: beckett-2002-silicate-melt-activities
+  locator:
+    page: 6
+    published_page: 98
+    pdf_page_index: 5
+    figure: '2'
+  read_from: pdf:beckett-2002-silicate-melt-activities
+- observation_id: beckett-2002-silicate-melt-activities::beckett_2002_cao_fig3_figure_only
+  experiment_id: 10.1016/s0016-7037(01)00751-7::beckett-2002-silicate-melt-activities
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CMAS_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: lime (CaO solid) at temperature and 1 atm, as printed on p. 94'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, admission_status,
+      caption, axes_as_printed, temperature_as_printed, note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: beckett-2002-silicate-melt-activities
+  locator:
+    page: 7
+    published_page: 99
+    pdf_page_index: 6
+    figure: '3'
+  read_from: pdf:beckett-2002-silicate-melt-activities
+- observation_id: beckett-2002-silicate-melt-activities::beckett_2002_cao_fig5_figure_only
+  experiment_id: 10.1016/s0016-7037(01)00751-7::beckett-2002-silicate-melt-activities
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CMAS_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: lime (CaO solid) at temperature and 1 atm, as printed on p. 94'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, admission_status,
+      caption, axes_as_printed, temperature_as_printed, note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: beckett-2002-silicate-melt-activities
+  locator:
+    page: 9
+    published_page: 101
+    pdf_page_index: 8
+    figure: '5'
+  read_from: pdf:beckett-2002-silicate-melt-activities
+- observation_id: beckett-2002-silicate-melt-activities::beckett_2002_cao_fig7_figure_only
+  experiment_id: 10.1016/s0016-7037(01)00751-7::beckett-2002-silicate-melt-activities
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CMAS_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: lime (CaO solid) at temperature and 1 atm, as printed on p. 94'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, admission_status,
+      caption, axes_as_printed, temperature_as_printed, note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: beckett-2002-silicate-melt-activities
+  locator:
+    page: 11
+    published_page: 103
+    pdf_page_index: 10
+    figure: '7'
+  read_from: pdf:beckett-2002-silicate-melt-activities
+- observation_id: beckett-2002-silicate-melt-activities::beckett_2002_cao_fig8_figure_only
+  experiment_id: 10.1016/s0016-7037(01)00751-7::beckett-2002-silicate-melt-activities
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CMAS_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: lime (CaO solid) at temperature and 1 atm, as printed on p. 94'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, admission_status,
+      caption, axes_as_printed, temperature_as_printed, source_data_attribution_as_printed, note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: beckett-2002-silicate-melt-activities
+  locator:
+    page: 12
+    published_page: 104
+    pdf_page_index: 11
+    figure: '8'
+  read_from: pdf:beckett-2002-silicate-melt-activities
+- observation_id: beckett-2002-silicate-melt-activities::beckett_2002_mgo_fig3_figure_only
+  experiment_id: 10.1016/s0016-7037(01)00751-7::beckett-2002-silicate-melt-activities
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: MgO
+      phase:
+        tag: unknown
+        reason: phase string 'CMAS_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: periclase (MgO solid) at temperature and 1 atm, as printed on p. 94'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, admission_status,
+      caption, axes_as_printed, temperature_as_printed, note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: beckett-2002-silicate-melt-activities
+  locator:
+    page: 7
+    published_page: 99
+    pdf_page_index: 6
+    figure: '3'
+  read_from: pdf:beckett-2002-silicate-melt-activities
+- observation_id: beckett-2002-silicate-melt-activities::beckett_2002_mgo_fig6_figure_only
+  experiment_id: 10.1016/s0016-7037(01)00751-7::beckett-2002-silicate-melt-activities
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: MgO
+      phase:
+        tag: unknown
+        reason: phase string 'CMAS_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: periclase (MgO solid) at temperature and 1 atm, as printed on p. 94'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, admission_status,
+      caption, axes_as_printed, temperature_as_printed, note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: beckett-2002-silicate-melt-activities
+  locator:
+    page: 10
+    published_page: 102
+    pdf_page_index: 9
+    figure: '6'
+  read_from: pdf:beckett-2002-silicate-melt-activities
+- observation_id: beckett-2002-silicate-melt-activities::beckett_2002_mgo_fig7_figure_only
+  experiment_id: 10.1016/s0016-7037(01)00751-7::beckett-2002-silicate-melt-activities
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: MgO
+      phase:
+        tag: unknown
+        reason: phase string 'CMAS_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: periclase (MgO solid) at temperature and 1 atm, as printed on p. 94'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, admission_status,
+      caption, axes_as_printed, temperature_as_printed, note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: beckett-2002-silicate-melt-activities
+  locator:
+    page: 11
+    published_page: 103
+    pdf_page_index: 10
+    figure: '7'
+  read_from: pdf:beckett-2002-silicate-melt-activities
+- observation_id: beckett-2002-silicate-melt-activities::beckett_2002_sio2_fig3_figure_only
+  experiment_id: 10.1016/s0016-7037(01)00751-7::beckett-2002-silicate-melt-activities
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'CMAS_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: high cristobalite (SiO2 solid) at temperature and 1 atm, as printed on
+        p. 94'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, admission_status,
+      caption, axes_as_printed, temperature_as_printed, note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: beckett-2002-silicate-melt-activities
+  locator:
+    page: 7
+    published_page: 99
+    pdf_page_index: 6
+    figure: '3'
+  read_from: pdf:beckett-2002-silicate-melt-activities
+- observation_id: beckett-2002-silicate-melt-activities::beckett_2002_sio2_fig4_figure_only
+  experiment_id: 10.1016/s0016-7037(01)00751-7::beckett-2002-silicate-melt-activities
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'CMAS_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: high cristobalite (SiO2 solid) at temperature and 1 atm, as printed on
+        p. 94'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, caption,
+      axes_as_printed, temperature_as_printed, note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: beckett-2002-silicate-melt-activities
+  locator:
+    page: 8
+    published_page: 100
+    pdf_page_index: 7
+    figure: '4'
+  read_from: pdf:beckett-2002-silicate-melt-activities

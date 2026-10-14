@@ -1,0 +1,1078 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/sugawara-akaogi-2004-liquid-calorimetry.yaml
+observations:
+- observation_id: sugawara-akaogi-2004-liquid-calorimetry::suga04_eq11_acmite_endmember_enthalpy
+  experiment_id: 10.2138/am-2004-11-1202::sugawara-akaogi-2004-liquid-calorimetry
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: NaFeSi2O6
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1373'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '326.5'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '9.4'
+      units: kJ_per_mol
+      value_semantics: printed end-member fit width
+  evidence:
+    class:
+      tag: value
+      value: author_estimate
+    original_method_class: authors_estimate
+    model: authors_estimate
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - H_minus_H298
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sugawara-akaogi-2004-liquid-calorimetry::suga04_eq11_acmite_endmember_enthalpy
+  source_id: sugawara-akaogi-2004-liquid-calorimetry
+  locator:
+    page: 6
+    published_page: 1591
+    pdf_page_index: 5
+    equation: '11'
+  read_from: pdf:sugawara-akaogi-2004-liquid-calorimetry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373'
+      locator:
+        page: 6
+        published_page: 1591
+        pdf_page_index: 5
+        equation: '11'
+- observation_id: sugawara-akaogi-2004-liquid-calorimetry::suga04_eq4_na2sio3_endmember_enthalpy
+  experiment_id: 10.2138/am-2004-11-1202::sugawara-akaogi-2004-liquid-calorimetry
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Na2SiO3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1373'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '209.5'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '8.9'
+      units: kJ_per_mol
+      value_semantics: printed end-member fit width
+  evidence:
+    class:
+      tag: value
+      value: author_estimate
+    original_method_class: authors_estimate
+    model: authors_estimate
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - H_minus_H298
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sugawara-akaogi-2004-liquid-calorimetry::suga04_eq4_na2sio3_endmember_enthalpy
+  source_id: sugawara-akaogi-2004-liquid-calorimetry
+  locator:
+    page: 4
+    published_page: 1589
+    pdf_page_index: 3
+    equation: '4'
+  read_from: pdf:sugawara-akaogi-2004-liquid-calorimetry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373'
+      locator:
+        page: 4
+        published_page: 1589
+        pdf_page_index: 3
+        equation: '4'
+- observation_id: sugawara-akaogi-2004-liquid-calorimetry::suga04_eq4_quartz_endmember_enthalpy
+  experiment_id: 10.2138/am-2004-11-1202::sugawara-akaogi-2004-liquid-calorimetry
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1373'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '76.4'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '8.9'
+      units: kJ_per_mol
+      value_semantics: printed end-member fit width
+  evidence:
+    class:
+      tag: value
+      value: author_estimate
+    original_method_class: authors_estimate
+    model: authors_estimate
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - H_minus_H298
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sugawara-akaogi-2004-liquid-calorimetry::suga04_eq4_quartz_endmember_enthalpy
+  source_id: sugawara-akaogi-2004-liquid-calorimetry
+  locator:
+    page: 4
+    published_page: 1589
+    pdf_page_index: 3
+    equation: '4'
+  read_from: pdf:sugawara-akaogi-2004-liquid-calorimetry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373'
+      locator:
+        page: 4
+        published_page: 1589
+        pdf_page_index: 3
+        equation: '4'
+- observation_id: sugawara-akaogi-2004-liquid-calorimetry::suga04_eq8_hematite_endmember_enthalpy
+  experiment_id: 10.2138/am-2004-11-1202::sugawara-akaogi-2004-liquid-calorimetry
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Fe2O3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1373'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '235.5'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value: '8.3'
+      units: kJ_per_mol
+      value_semantics: printed end-member fit width
+  evidence:
+    class:
+      tag: value
+      value: author_estimate
+    original_method_class: authors_estimate
+    model: authors_estimate
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - H_minus_H298
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sugawara-akaogi-2004-liquid-calorimetry::suga04_eq8_hematite_endmember_enthalpy
+  source_id: sugawara-akaogi-2004-liquid-calorimetry
+  locator:
+    page: 5
+    published_page: 1590
+    pdf_page_index: 4
+    equation: '8'
+  read_from: pdf:sugawara-akaogi-2004-liquid-calorimetry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373'
+      locator:
+        page: 5
+        published_page: 1590
+        pdf_page_index: 4
+        equation: '8'
+- observation_id: sugawara-akaogi-2004-liquid-calorimetry::suga04_t1_acmite_solid_drop_enthalpy::T=1023:row=ac-2:h=1693ecd36c8d
+  experiment_id: 10.2138/am-2004-11-1202::sugawara-akaogi-2004-liquid-calorimetry
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: NaFeSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1023'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '168.8'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '8.4'
+      parent: sugawara-akaogi-2004-liquid-calorimetry::suga04_t1_acmite_solid_drop_enthalpy
+      confidence_level: two_sigma
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - H_minus_H298
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sugawara-akaogi-2004-liquid-calorimetry::suga04_t1_acmite_solid_drop_enthalpy::T=1023:row=ac-2:h=1693ecd36c8d
+  source_id: sugawara-akaogi-2004-liquid-calorimetry
+  locator:
+    page: 3
+    published_page: 1588
+    pdf_page_index: 2
+    table: '1'
+  read_from: pdf:sugawara-akaogi-2004-liquid-calorimetry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1023'
+      locator:
+        page: 3
+        published_page: 1588
+        pdf_page_index: 2
+        table: '1'
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - pdf:sugawara-akaogi-2004-liquid-calorimetry
+    parameters: []
+    output_unit: kJ_per_mol
+- observation_id: sugawara-akaogi-2004-liquid-calorimetry::suga04_t1_acmite_solid_drop_enthalpy::T=1123:row=ac-3:h=a522dea0b412
+  experiment_id: 10.2138/am-2004-11-1202::sugawara-akaogi-2004-liquid-calorimetry
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: NaFeSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1123'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '194.8'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '10.7'
+      parent: sugawara-akaogi-2004-liquid-calorimetry::suga04_t1_acmite_solid_drop_enthalpy
+      confidence_level: two_sigma
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - H_minus_H298
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sugawara-akaogi-2004-liquid-calorimetry::suga04_t1_acmite_solid_drop_enthalpy::T=1123:row=ac-3:h=a522dea0b412
+  source_id: sugawara-akaogi-2004-liquid-calorimetry
+  locator:
+    page: 3
+    published_page: 1588
+    pdf_page_index: 2
+    table: '1'
+  read_from: pdf:sugawara-akaogi-2004-liquid-calorimetry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1123'
+      locator:
+        page: 3
+        published_page: 1588
+        pdf_page_index: 2
+        table: '1'
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - pdf:sugawara-akaogi-2004-liquid-calorimetry
+    parameters: []
+    output_unit: kJ_per_mol
+- observation_id: sugawara-akaogi-2004-liquid-calorimetry::suga04_t1_acmite_solid_drop_enthalpy::T=1223:row=ac-4:h=8fad62e06483
+  experiment_id: 10.2138/am-2004-11-1202::sugawara-akaogi-2004-liquid-calorimetry
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: NaFeSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1223'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '216.2'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '12.8'
+      parent: sugawara-akaogi-2004-liquid-calorimetry::suga04_t1_acmite_solid_drop_enthalpy
+      confidence_level: two_sigma
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - H_minus_H298
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sugawara-akaogi-2004-liquid-calorimetry::suga04_t1_acmite_solid_drop_enthalpy::T=1223:row=ac-4:h=8fad62e06483
+  source_id: sugawara-akaogi-2004-liquid-calorimetry
+  locator:
+    page: 3
+    published_page: 1588
+    pdf_page_index: 2
+    table: '1'
+  read_from: pdf:sugawara-akaogi-2004-liquid-calorimetry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1223'
+      locator:
+        page: 3
+        published_page: 1588
+        pdf_page_index: 2
+        table: '1'
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - pdf:sugawara-akaogi-2004-liquid-calorimetry
+    parameters: []
+    output_unit: kJ_per_mol
+- observation_id: sugawara-akaogi-2004-liquid-calorimetry::suga04_t1_acmite_solid_drop_enthalpy::T=923:row=ac-1:h=36bdcb8e4d67
+  experiment_id: 10.2138/am-2004-11-1202::sugawara-akaogi-2004-liquid-calorimetry
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: NaFeSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '923'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '130.8'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '6.6'
+      parent: sugawara-akaogi-2004-liquid-calorimetry::suga04_t1_acmite_solid_drop_enthalpy
+      confidence_level: two_sigma
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - H_minus_H298
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sugawara-akaogi-2004-liquid-calorimetry::suga04_t1_acmite_solid_drop_enthalpy::T=923:row=ac-1:h=36bdcb8e4d67
+  source_id: sugawara-akaogi-2004-liquid-calorimetry
+  locator:
+    page: 3
+    published_page: 1588
+    pdf_page_index: 2
+    table: '1'
+  read_from: pdf:sugawara-akaogi-2004-liquid-calorimetry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '923'
+      locator:
+        page: 3
+        published_page: 1588
+        pdf_page_index: 2
+        table: '1'
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - pdf:sugawara-akaogi-2004-liquid-calorimetry
+    parameters: []
+    output_unit: kJ_per_mol
+- observation_id: sugawara-akaogi-2004-liquid-calorimetry::suga04_t1_hematite_drop_enthalpy::T=1373:row=hematite:h=0e7eb01386d7
+  experiment_id: 10.2138/am-2004-11-1202::sugawara-akaogi-2004-liquid-calorimetry
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Fe2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1373'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '152.2'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '6.4'
+      parent: sugawara-akaogi-2004-liquid-calorimetry::suga04_t1_hematite_drop_enthalpy
+      confidence_level: two_sigma
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - H_minus_H298
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sugawara-akaogi-2004-liquid-calorimetry::suga04_t1_hematite_drop_enthalpy::T=1373:row=hematite:h=0e7eb01386d7
+  source_id: sugawara-akaogi-2004-liquid-calorimetry
+  locator:
+    page: 3
+    published_page: 1588
+    pdf_page_index: 2
+    table: '1'
+  read_from: pdf:sugawara-akaogi-2004-liquid-calorimetry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373'
+      locator:
+        page: 3
+        published_page: 1588
+        pdf_page_index: 2
+        table: '1'
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - pdf:sugawara-akaogi-2004-liquid-calorimetry
+    parameters: []
+    output_unit: kJ_per_mol
+- observation_id: sugawara-akaogi-2004-liquid-calorimetry::suga04_t1_nf_drop_enthalpy::T=1373:row=nf-1:h=f921b2754642
+  experiment_id: 10.2138/am-2004-11-1202::sugawara-akaogi-2004-liquid-calorimetry
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: Na2SiO3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1373'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '210.6'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '7.9'
+      parent: sugawara-akaogi-2004-liquid-calorimetry::suga04_t1_nf_drop_enthalpy
+      confidence_level: two_sigma
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - H_minus_H298
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sugawara-akaogi-2004-liquid-calorimetry::suga04_t1_nf_drop_enthalpy::T=1373:row=nf-1:h=f921b2754642
+  source_id: sugawara-akaogi-2004-liquid-calorimetry
+  locator:
+    page: 3
+    published_page: 1588
+    pdf_page_index: 2
+    table: '1'
+  read_from: pdf:sugawara-akaogi-2004-liquid-calorimetry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373'
+      locator:
+        page: 3
+        published_page: 1588
+        pdf_page_index: 2
+        table: '1'
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - pdf:sugawara-akaogi-2004-liquid-calorimetry
+    parameters: []
+    output_unit: kJ_per_mol
