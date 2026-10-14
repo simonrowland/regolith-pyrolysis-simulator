@@ -82,6 +82,15 @@ def test_table_values_conditions_and_uncertainties_reach_migrated_records():
         assert row.value.point == value
         assert Decimal(str(row.uncertainty.verbatim["sigma"])) == sigma
         assert row.point_conditions["composition"].state.is_value
+        if quantity is Quantity.PARTIAL_MOLAR_ENTHALPY:
+            assert row.identity.composition.is_value
+            composition = row.identity.composition.value
+            assert composition.amount_basis is AmountBasis.MOLE_FRACTION
+            assert dict(composition.components) == {
+                "CaO": Decimal("0.25"),
+                "MgO": Decimal("0.25"),
+                "SiO2": Decimal("0.5"),
+            }
         assert row.identity.temperature_K.is_unknown
 
 
