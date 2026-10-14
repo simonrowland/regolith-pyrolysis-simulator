@@ -2023,8 +2023,8 @@ def test_lineage_parents_from_source_never_invents_pointer() -> None:
         "src",
         set(),
     )
-    assert parents == ("tables:src",)
-    assert prose == ("tables:src/t2.csv",)
+    assert parents == ("tables:src", "tables:src/t2.csv")
+    assert prose == ()
 
     parents, prose = lineage_parents_from_source(
         {"derived_from": ["tables:src/t2.csv"]},
@@ -7912,7 +7912,7 @@ def test_kume_tables3_and4_derivation_evidence_fresh_migration_and_mutations(
     ] == "derived observation requires derivation"
 
 
-def test_unregistered_table_derivation_input_is_not_retained(
+def test_unregistered_table_assets_are_referential_issues(
     tmp_path: Path,
 ) -> None:
     name = "kume-2000-cao-activities.yaml"
@@ -7923,30 +7923,111 @@ def test_unregistered_table_derivation_input_is_not_retained(
     )
     extract["source_id"] = "fixture-source"
     observation_id = "kume_2000_table2_sample_101"
-    unregistered = "tables:fixture-source/not-registered.csv"
+    unregistered_parent = "tables:fixture-source"
+    unregistered_input = "tables:fixture-source/not-registered.csv"
+    unregistered_placeholder = "unknown:fixture-source"
     row = next(
         row
         for block in extract["species"].values()
         for row in block["observations"]
         if row.get("observation_id") == observation_id
     )
-    row["derivation"]["inputs"] = [unregistered]
+    row["values"]["method_class"] = "calculated"
+    row["derived_from"] = [unregistered_parent]
+    row["derivation"]["inputs"] = [unregistered_input, unregistered_placeholder]
+    no_inputs_row = deepcopy(row)
+    no_inputs_row["observation_id"] = f"{observation_id}_without_inputs"
+    no_inputs_row["derivation"]["inputs"] = []
+    next(
+        block
+        for block in extract["species"].values()
+        if row in block["observations"]
+    )["observations"].append(no_inputs_row)
 
-    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    root = _write_min_tree(tmp_path, extract)
+    index_path = root / "data" / "literature" / "INDEX.yaml"
+    index = yaml.safe_load(index_path.read_text(encoding="utf-8"))
+    index["sources"][0]["corpus"]["tables"] = {
+        "exists": False,
+        "path": "tables/fixture-source",
+    }
+    index_path.write_text(yaml.safe_dump(index, sort_keys=False), encoding="utf-8")
+    result = migrate(root, write=False)
     observation = next(
         obs
         for obs in result.observations.values()
         if obs.observation_id.endswith(f"::{observation_id}")
     )
-    assert unregistered not in (observation.derived_from or ())
-    assert observation.derivation is None or unregistered not in observation.derivation.inputs
-
-    report = validate_corpus(
-        result.works, result.experiments, result.observations, residuals=None
+    assert observation.derived_from == (unregistered_parent,)
+    assert observation.derivation is not None
+    assert observation.derivation.inputs == (
+        unregistered_input,
+        unregistered_placeholder,
     )
+    assert observation.evidence.class_.is_unknown
+    issues = [
+        issue
+        for issue in result.validation.hard_issues
+        if issue.reason is RefusalReason.REFERENTIAL_INTEGRITY
+    ]
+    assert {
+        (issue.path.rsplit(".", 1)[-1], issue.detail)
+        for issue in issues
+    } >= {
+        ("derived_from", f"derived_from {unregistered_parent!r} does not resolve"),
+        (
+            "inputs",
+            f"derivation input {unregistered_input!r} does not resolve",
+        ),
+        (
+            "inputs",
+            f"derivation input {unregistered_placeholder!r} does not resolve",
+        ),
+    }
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and issue.path.endswith(f"::{observation_id}_without_inputs.derivation")
+        and issue.detail
+        == (
+            "invalid derivation annotation: Derivation.inputs is required unless "
+            "raw_inputs is located not_printed"
+        )
+        for issue in result.validation.hard_issues
+    )
+
+
+def test_registered_table_asset_resolves_as_lineage(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    table_asset = "tables:fixture-source"
+    row["values"]["method_class"] = "measured_reduced"
+    row["derived_from"] = [table_asset]
+    row["derivation"] = {
+        "relation": "author_mass_balance_reduction",
+        "inputs": [table_asset],
+        "output_unit": "Pa",
+    }
+    root = _write_min_tree(tmp_path, extract)
+    index_path = root / "data" / "literature" / "INDEX.yaml"
+    index = yaml.safe_load(index_path.read_text(encoding="utf-8"))
+    index["sources"][0]["corpus"]["tables"] = {
+        "exists": True,
+        "path": "tables/fixture-source",
+    }
+    index_path.write_text(yaml.safe_dump(index, sort_keys=False), encoding="utf-8")
+
+    result = migrate(root, write=False)
+
+    observation = next(iter(result.observations.values()))
+    work = result.works[result.experiments[observation.experiment_id].work_id]
+    assert table_asset in {asset.asset_id for asset in work.source_files.files}
+    assert observation.derived_from == (table_asset,)
+    assert observation.derivation is not None
+    assert observation.derivation.inputs == (table_asset,)
     assert not any(
         issue.reason is RefusalReason.REFERENTIAL_INTEGRITY
-        for issue in report.hard_issues
+        and table_asset in issue.detail
+        for issue in result.validation.hard_issues
     )
 
 
@@ -8004,7 +8085,15 @@ def test_kume_measured_reduced_activity_without_derivation_stays_queued(
             if row.get("observation_id") == observation_id:
                 row.pop("derivation")
 
-    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    root = _write_min_tree(tmp_path, extract)
+    index_path = root / "data" / "literature" / "INDEX.yaml"
+    index = yaml.safe_load(index_path.read_text(encoding="utf-8"))
+    index["sources"][0]["corpus"]["tables"] = {
+        "exists": True,
+        "path": "tables/fixture-source",
+    }
+    index_path.write_text(yaml.safe_dump(index, sort_keys=False), encoding="utf-8")
+    result = migrate(root, write=False)
     observation = next(
         obs
         for obs in result.observations.values()

@@ -92,7 +92,10 @@ from simulator.battery.records import (
 from simulator.battery.oxygen_balance import (
     has_own_engine_solved_oxygen_balance,
 )
-from simulator.battery.source_lineage import coefficient_lineage_sources
+from simulator.battery.source_lineage import (
+    _registered_lineage_asset_ids,
+    coefficient_lineage_sources,
+)
 from simulator.accounting.formulas import parse_formula
 from simulator.battery.validity import (
     _partial_pressure_observations_by_experiment,
@@ -1006,6 +1009,7 @@ def validate_observation(
                     f"source_id {observation.source_id!r} is not in Work.source_ids",
                 )
             )
+    lineage_asset_ids = _registered_lineage_asset_ids(asset_ids)
     identity = observation.identity
     if not isinstance(identity, Identity):
         issues.append(
@@ -1127,7 +1131,11 @@ def validate_observation(
                     "raw_inputs not_printed declaration contradicts derived_from",
                 )
             )
-        if not observation.derived_from and not (
+        has_resolved_lineage = any(
+            parent in observations or parent in lineage_asset_ids
+            for parent in observation.derived_from or ()
+        )
+        if not has_resolved_lineage and not (
             ev.value is EvidenceClass.MEASURED_REDUCED
             and derivation is not None
             and derivation.has_located_unprinted_raw_inputs
@@ -1149,7 +1157,7 @@ def validate_observation(
             )
     if observation.derived_from:
         for parent in observation.derived_from:
-            if parent not in observations and parent not in asset_ids:
+            if parent not in observations and parent not in lineage_asset_ids:
                 issues.append(
                     _issue(
                         f"{path}.derived_from",
@@ -1159,7 +1167,7 @@ def validate_observation(
                 )
     if observation.derivation is not None:
         for inp in observation.derivation.inputs:
-            if inp not in observations and inp not in asset_ids:
+            if inp not in observations and inp not in lineage_asset_ids:
                 issues.append(
                     _issue(
                         f"{path}.derivation.inputs",

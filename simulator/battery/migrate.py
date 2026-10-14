@@ -58,6 +58,10 @@ from simulator.battery.polymorph_dictionary import (
     resolve_formula_polymorph,
 )
 from simulator.battery.extract_context import iter_extract_context_containers
+from simulator.battery.source_lineage import (
+    _is_unknown_source_asset,
+    _registered_lineage_asset_ids,
+)
 from simulator.battery.enums import (
     AdmissionStatus,
     AmountBasis,
@@ -6158,13 +6162,11 @@ def lineage_parents_from_source(
     local_ids: set[str],
     asset_ids: set[str] | frozenset[str] = frozenset(),
 ) -> tuple[tuple[str, ...], tuple[str, ...]]:
-    """Source-stated lineage as (parents, prose). Never invents a pointer.
+    """Source-stated lineage as (parents, prose), without inventing pointers.
 
-    A stated parent resolves only against a local observation id or an
-    already-qualified ``source::id`` reference. Bare text that names no
-    resolvable id is prose about how the value was obtained; it is returned
-    in the second tuple so the caller can route it to the queue rather than
-    minting a ``source::prose`` pointer that cannot resolve by construction.
+    Unqualified prose is returned separately for queueing. Namespaced
+    references are kept for store validation, which checks them against the
+    observation's Work assets and observation ids.
     """
 
     raw = values.get("derived_from")
@@ -6189,15 +6191,10 @@ def lineage_parents_from_source(
         local = item[len(prefix):] if item.startswith(prefix) else item
         if local in local_ids:
             parents.append(f"{prefix}{local}")
-        elif item == f"tables:{source_id}":
-            # The source's root table asset is a stable lineage link. More
-            # specific table filenames resolve only when registered.
+        elif item in asset_ids:
             parents.append(item)
-        elif item.startswith("tables:") and item in asset_ids:
-            parents.append(item)
-        elif "::" in item:
-            # Source-stated qualified pointer; kept as written. If it
-            # dangles, the store validator flags the extract, not us.
+        elif "::" in item or (":" in item and not any(char.isspace() for char in item)):
+            # Keep source-stated qualified references for store validation.
             parents.append(item)
         else:
             prose.append(item)
@@ -11444,14 +11441,16 @@ def choose_read_from(work: Work, locator: Locator | None) -> str:
 
 def _unknown_asset_id(files: tuple[SourceFile, ...] | list[SourceFile]) -> str:
     for asset in files:
-        if asset.asset_id.startswith("unknown:"):
+        if _is_unknown_source_asset(asset.asset_id):
             return asset.asset_id
     return "unknown"
 
 
 def unmatched_read_from_reason(locator: Locator | None, read_from: str) -> str | None:
     loc_path = locator.source_path if locator is not None else None
-    if loc_path and (read_from == "unknown" or str(read_from).startswith("unknown:")):
+    if loc_path and (
+        read_from == "unknown" or _is_unknown_source_asset(str(read_from))
+    ):
         return f"locator source_path {loc_path!r} has no matching INDEX asset"
     return None
 
@@ -11471,7 +11470,7 @@ def source_files_for(
     raw = corpus.get("raw") or {}
     pdf_path = raw.get("path") or (index_row or {}).get("pdf_path")
     sha = raw.get("sha256") or (index_row or {}).get("pdf_sha256")
-    if pdf_path:
+    if pdf_path and raw.get("present") is not False:
         files.append(
             SourceFile(
                 asset_id=f"pdf:{source_id}",
@@ -11481,7 +11480,11 @@ def source_files_for(
             )
         )
     text = corpus.get("text") or {}
-    if text.get("exists") or text.get("path"):
+    if (
+        text.get("exists") is not False
+        and text.get("present") is not False
+        and (text.get("exists") or text.get("path"))
+    ):
         files.append(
             SourceFile(
                 asset_id=f"pdftotext:{source_id}",
@@ -11491,7 +11494,11 @@ def source_files_for(
             )
         )
     tables = corpus.get("tables") or {}
-    if tables.get("exists") or tables.get("path"):
+    if (
+        tables.get("exists") is not False
+        and tables.get("present") is not False
+        and (tables.get("exists") or tables.get("path"))
+    ):
         files.append(
             SourceFile(
                 asset_id=f"tables:{source_id}",
@@ -11501,7 +11508,12 @@ def source_files_for(
             )
         )
     ocr = corpus.get("ocr") or corpus.get("mineru") or corpus.get("vlm")
-    if isinstance(ocr, Mapping) and (ocr.get("exists") or ocr.get("path")):
+    if (
+        isinstance(ocr, Mapping)
+        and ocr.get("exists") is not False
+        and ocr.get("present") is not False
+        and (ocr.get("exists") or ocr.get("path"))
+    ):
         files.append(
             SourceFile(
                 asset_id=f"mineru_md:{source_id}",
@@ -13223,7 +13235,9 @@ class Migrator:
         regime = obs.get("regime") or values.get("regime")
         if method_class is None:
             measured.absent_classes += 1
-        source_asset_ids = {asset.asset_id for asset in work.source_files.files}
+        source_asset_ids = _registered_lineage_asset_ids(
+            asset.asset_id for asset in work.source_files.files
+        )
         try:
             derived_parents, derived_prose = lineage_parents_from_source(
                 obs,
@@ -13240,8 +13254,12 @@ class Migrator:
                 detail=str(exc),
             ))
         derived_from = derived_parents or None
+        has_resolved_lineage = any(
+            "::" in parent or parent in source_asset_ids
+            for parent in derived_parents
+        )
         source_derivation, invalid_derivations = source_derivation_from_source(
-            obs, values, has_resolved_lineage=bool(derived_parents)
+            obs, values, has_resolved_lineage=has_resolved_lineage
         )
         for field_path, detail in invalid_derivations:
             self.result.registry_issues.append(
