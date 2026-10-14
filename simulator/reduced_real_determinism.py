@@ -2505,8 +2505,27 @@ def record_binding_producer_ids(
 
 
 def replay_scope_dependency_vector(key: Mapping[str, Any]) -> dict[str, Any]:
-    vector = dependency_vector_from_replay_key(key)
-    return {} if vector is None else vector
+    sulfur_side = key.get("sulfur_side", {})
+    if not isinstance(sulfur_side, Mapping):
+        sulfur_side = {}
+    vector: dict[str, Any] = {
+        "namespace_id": key.get("namespace_id"),
+        "vapor_pressure_provider_selection": key.get(
+            "vapor_pressure_provider_selection"
+        ),
+        "model": _json_ready(key.get("model", {})),
+    }
+    sulfur_input_ppm = _sulfur_input_ppm_from_replay_key(key)
+    if sulfur_input_ppm and sulfur_input_ppm > 0.0:
+        vector["sulfsat"] = {
+            name: sulfur_side.get(name)
+            for name in (
+                "sulfsat_available",
+                "sulfsat_provider_selection",
+            )
+            if sulfur_side.get(name) is not None
+        }
+    return vector
 
 
 def dependency_vector_from_replay_key(
