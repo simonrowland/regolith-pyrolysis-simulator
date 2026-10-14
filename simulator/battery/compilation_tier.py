@@ -1254,9 +1254,80 @@ def predict_thermo_attempt(
             )
         notices: tuple[Notice, ...] = ()
         authority = Authority.BRIDGE
+        from simulator.battery.score import (
+            _fusion_solid_table_polymorph,
+            _janaf_pure_solid_table_index,
+            _janaf_pure_solid_table_temperature_range,
+            _source_polymorph_is_unspecified,
+        )
+
+        solid_polymorph = _fusion_solid_table_polymorph(
+            identity.species.formula, solid
+        )
+        source_polymorph = identity.species.polymorph
+        polymorph_unspecified = _source_polymorph_is_unspecified(
+            source_polymorph
+        )
+        observed_polymorph = polymorph_token(identity.species)
+        if (
+            not polymorph_unspecified
+            and solid_polymorph is not None
+            and observed_polymorph is not solid_polymorph
+        ):
+            return _refuse(
+                RefusalReason.IDENTITY_MISMATCH,
+                "fusion-solid-polymorph-mismatch",
+                quantity=quantity,
+                origin=origin,
+                extra={
+                    "engine_reference_table": solid,
+                    "engine_reference_polymorph": solid_polymorph.value,
+                    "observed_polymorph": (
+                        None
+                        if observed_polymorph is None
+                        else observed_polymorph.value
+                    ),
+                },
+            )
+        if polymorph_unspecified:
+            alternatives = tuple(
+                f"{table_id} ({polymorph.value})"
+                for formula, table_id, polymorph in _janaf_pure_solid_table_index()
+                if formula == identity.species.formula
+                and polymorph is not None
+                and table_id != solid
+                and (
+                    table_range := _janaf_pure_solid_table_temperature_range(
+                        table_id
+                    )
+                ) is not None
+                and table_range[0] <= temperature_K <= table_range[1]
+            )
+            ambiguity = (
+                "; other JANAF solid references available at T: "
+                + ", ".join(alternatives)
+                if alternatives
+                else ""
+            )
+            notices = (
+                Notice(
+                    kind=NoticeKind.DERIVATION_USES_COMPILATION,
+                    affected_quantities=(quantity,),
+                    reason=(
+                        "fusion_solid_polymorph_unspecified: source does not state "
+                        f"a solid polymorph; predictor used {solid} "
+                        f"({solid_polymorph.value if solid_polymorph is not None else 'unmapped polymorph'})"
+                        f"{ambiguity}"
+                    ),
+                    origin=origin,
+                    band=f"JANAF {solid}/{liquid} common range [{low}, {high}] K",
+                    authority=Authority.BRIDGE,
+                    certification="NIST-JANAF solid/liquid fusion reference",
+                ),
+            )
         if temperature_K < low or temperature_K > high:
             authority = Authority.EXTRAPOLATED
-            notices = (
+            notices = notices + (
                 Notice(
                     kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
                     affected_quantities=(quantity,),
@@ -1266,6 +1337,8 @@ def predict_thermo_attempt(
                     authority=Authority.EXTRAPOLATED,
                 ),
             )
+        if polymorph_unspecified and notices:
+            notices = (replace(notices[0], authority=authority),) + notices[1:]
         # JANAF formation enthalpies are kJ/mol; their endmember difference
         # cancels the elemental reference. Convert to J/mol before deriving
         # ΔS_fus = ΔH_fus/T_fus (J/mol/K); return the declared unit per kind.

@@ -1274,6 +1274,29 @@ def _janaf_pure_solid_table_temperature_range(
     return min(temperatures), max(temperatures)
 
 
+def _fusion_solid_table_polymorph(
+    formula: str, table_id: str
+) -> Polymorph | None:
+    """Return the solid reference used by the production JANAF fusion pair."""
+
+    fusion_pair_polymorphs = {
+        ("CaO", "Ca-027"): Polymorph.LIME,
+        ("Al2O3", "Al-096"): Polymorph.CORUNDUM,
+        ("MgO", "Mg-008"): Polymorph.PERICLASE,
+        ("SiO2", "O-035"): Polymorph.CRISTOBALITE_HIGH,
+    }
+    return fusion_pair_polymorphs.get((formula, table_id))
+
+
+def _source_polymorph_is_unspecified(source_polymorph: State | None) -> bool:
+    return source_polymorph is None or (
+        source_polymorph.is_unknown
+        and not (source_polymorph.reason or "").startswith(
+            "unrecognised polymorph "
+        )
+    )
+
+
 @lru_cache(maxsize=1)
 def _b1259_tridymite_cristobalite_offset_rows() -> tuple[
     tuple[Decimal, Decimal, Decimal], ...
@@ -1475,12 +1498,9 @@ def fusion_comparison_reference(
     # Thus ΔG_fus=+28.47061 kJ/mol and Δlog10(a)=ΔG_fus*1000/(R*T*ln(10))
     # = +0.793984 dex (R=8.31441 J mol^-1 K^-1). Their branches cross at
     # 3104.945598 K, where ΔG_fus and the reference shift go to zero.
-    expected_polymorph = {
-        "Ca-027": Polymorph.LIME,
-        "Al-096": Polymorph.CORUNDUM,
-        "Mg-008": Polymorph.PERICLASE,
-        "O-035": Polymorph.CRISTOBALITE_HIGH,
-    }.get(fusion.crystal_table)
+    expected_polymorph = _fusion_solid_table_polymorph(
+        formula, fusion.crystal_table
+    )
     observed_polymorph = polymorph_token(standard_state.endmember)
     tridymite_to_cristobalite = (
         formula == "SiO2"
@@ -1490,11 +1510,10 @@ def fusion_comparison_reference(
     source_polymorph = standard_state.endmember.polymorph
     source_polymorph_is_unknown = (
         source_polymorph is not None
-        and source_polymorph.is_unknown
-        and not (source_polymorph.reason or "").startswith("unrecognised polymorph ")
+        and _source_polymorph_is_unspecified(source_polymorph)
     )
-    source_polymorph_is_unspecified = (
-        source_polymorph is None or source_polymorph_is_unknown
+    source_polymorph_is_unspecified = _source_polymorph_is_unspecified(
+        source_polymorph
     )
     unique_unknown_polymorph_table = False
     inferred_reference_notice: Notice | None = None
@@ -3897,13 +3916,32 @@ def _comparison_identity(
     solved_oxygen_balance = has_own_engine_solved_oxygen_balance(
         prediction.engine, prediction.notices
     )
+    fusion_polymorph_flag = (
+        quantity_token(identity) in FUSION_QUANTITIES
+        and any(
+            notice.reason.startswith("fusion_solid_polymorph_unspecified:")
+            for notice in prediction.notices
+        )
+    )
     comparison_activity = (
         quantity_token(identity) in MELT_ACTIVITY_QUANTITIES
         and comparison_method_cell_constant_cancels(reference.provenance)
     )
     if not solved_oxygen_balance and not comparison_activity:
-        return identity
+        if not fusion_polymorph_flag:
+            return identity
     updates: dict[str, State] = {}
+    if fusion_polymorph_flag:
+        call_evidence = prediction.execution.call_evidence or ""
+        fusion_pair = call_evidence.partition("janaf-fusion:")[2].partition(":")[0]
+        solid_table = fusion_pair.partition("/")[0]
+        solid_polymorph = _fusion_solid_table_polymorph(
+            identity.species.formula, solid_table
+        )
+        if solid_polymorph is not None:
+            updates["species"] = replace(
+                identity.species, polymorph=State.of(solid_polymorph)
+            )
     if identity.composition is None or not identity.composition.is_value:
         point = _printed_point_composition(reference)
         if point is not None:
