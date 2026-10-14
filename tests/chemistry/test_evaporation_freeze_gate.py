@@ -4191,6 +4191,7 @@ def test_gate_curve_memo_producer_configuration_projects_sulfur_state(
 
 
 def test_gate_curve_memo_admission_registers_uninitialized_fallback_supplier(
+    tmp_path,
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
@@ -4211,6 +4212,17 @@ def test_gate_curve_memo_admission_registers_uninitialized_fallback_supplier(
         enabled=True,
     )
     producer._register_freeze_gate_liquid_fraction_providers()
+    fake_binary = tmp_path / 'MAGEMin'
+    fake_binary.write_text('#!/bin/sh\nexit 0\n')
+    fake_binary.chmod(0o755)
+    initialized_backend = MAGEMinBackend()
+    assert initialized_backend.initialize(
+        {
+            'binary_path': str(fake_binary),
+            'python_bridge': 'subprocess',
+            'warm_worker': False,
+        }
+    )
     curve = {
         'source': 'gate_liquid_fraction:fallback:magemin-shadow',
         'solidus_T_C': 900.0,
@@ -4221,7 +4233,7 @@ def test_gate_curve_memo_admission_registers_uninitialized_fallback_supplier(
         curve,
     )
     assert producer_configuration['model']['magemin_database'] == (
-        MAGEMinBackend()._database
+        initialized_backend._database
     )
     assert receiver._chem_registry.fallback_for(
         ChemistryIntent.GATE_LIQUID_FRACTION
@@ -4277,18 +4289,18 @@ def test_gate_curve_memo_evidence_is_stable_across_lazy_magemin_init(
     )
     assert isinstance(producer_provider, MAGEMinShadowProvider)
     producer_backend = MAGEMinBackend()
-    producer_backend.get_engine_version = lambda: 'MAGEMin pinned test build'
+    from simulator import engine_local_config
+
     producer_provider._backend = producer_backend
-    producer_provider._backend_initialised = True
     monkeypatch.setattr(
-        admission_module,
-        'install_provenance',
-        lambda _identity, **_kwargs: {
-            'runtime_artifacts': {
-                'magemin_selected_binary': {'sha256': 'a' * 64},
-            },
-        },
+        engine_local_config,
+        'cache_version_for',
+        lambda _engine: None,
     )
+    if not producer_backend.initialize(
+        {'python_bridge': 'subprocess', 'warm_worker': False}
+    ):
+        pytest.skip('requires an installed MAGEMin executable')
     curve = {
         'source': 'gate_liquid_fraction:fallback:magemin-shadow',
         'solidus_T_C': 900.0,
@@ -4307,8 +4319,153 @@ def test_gate_curve_memo_evidence_is_stable_across_lazy_magemin_init(
     )
 
     assert producer_evidence.identity == receiver_evidence.identity
+    assert producer_evidence.provenance['runtime_version'] == (
+        receiver_evidence.provenance['runtime_version']
+    )
     assert producer_evidence.producer_evidence == (
         receiver_evidence.producer_evidence
+    )
+
+
+def test_gate_curve_memo_origin_rejects_changed_magemin_runtime_version(
+    monkeypatch,
+    tmp_path,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    import hashlib
+    from pathlib import Path
+    import subprocess
+    import sys
+
+    from simulator import engine_local_config
+    from simulator.engine_local_config import configured_magemin_binary_path
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    worktree_root = Path(__file__).resolve().parents[2]
+    common_dir = subprocess.run(
+        ['git', 'rev-parse', '--git-common-dir'],
+        cwd=worktree_root,
+        capture_output=True,
+        check=True,
+        text=True,
+    ).stdout.strip()
+    common_dir_path = Path(common_dir)
+    if not common_dir_path.is_absolute():
+        common_dir_path = worktree_root / common_dir_path
+    main_repo_root = common_dir_path.resolve().parent
+    candidates = (
+        configured_magemin_binary_path(),
+        MAGEMinBackend._locate_binary(None),
+        main_repo_root / 'engines' / 'magemin' / 'bin' / 'MAGEMin',
+        main_repo_root / 'engines' / 'magemin' / 'MAGEMin',
+    )
+    runtime_binaries = []
+    seen_digests = set()
+    for candidate in candidates:
+        if candidate is None:
+            continue
+        binary = Path(candidate).expanduser().resolve()
+        if not binary.is_file() or not os.access(binary, os.X_OK):
+            continue
+        with binary.open('rb') as stream:
+            digest = hashlib.file_digest(stream, 'sha256').hexdigest()
+        if digest not in seen_digests:
+            runtime_binaries.append(binary)
+            seen_digests.add(digest)
+    if len(runtime_binaries) < 2:
+        pytest.skip('requires two installed MAGEMin runtime builds')
+
+    monkeypatch.setattr(
+        engine_local_config,
+        'cache_version_for',
+        lambda _engine: None,
+    )
+    target_file = tmp_path / 'delegated-magemin'
+    launcher = tmp_path / 'MAGEMin-launcher'
+    launcher.write_text(
+        f'#!{sys.executable}\n'
+        'from pathlib import Path\n'
+        'import hashlib\n'
+        'import subprocess\n'
+        'import sys\n'
+        'target = Path(__file__).with_name("delegated-magemin").read_text().strip()\n'
+        'result = subprocess.run([target, *sys.argv[1:]], capture_output=True, text=True)\n'
+        'if sys.argv[1:2] == ["--version"] and result.returncode == 0:\n'
+        '    output = result.stdout or result.stderr\n'
+        '    lines = output.strip().splitlines()\n'
+        '    if lines:\n'
+        '        with open(target, "rb") as stream:\n'
+        '            runtime_digest = hashlib.file_digest(stream, "sha256").hexdigest()\n'
+        '        print(f"{lines[0]} (runtime sha256={runtime_digest})")\n'
+        '    else:\n'
+        '        sys.stdout.write(result.stdout)\n'
+        '        sys.stderr.write(result.stderr)\n'
+        'else:\n'
+        '    sys.stdout.write(result.stdout)\n'
+        '    sys.stderr.write(result.stderr)\n'
+        'sys.exit(result.returncode)\n'
+    )
+    launcher.chmod(0o755)
+
+    curve = {
+        'source': 'gate_liquid_fraction:fallback:magemin-shadow',
+        'status': 'ok',
+        'solidus_T_C': 900.0,
+        'liquidus_T_C': 1300.0,
+    }
+
+    def build_sim(binary):
+        sim = _build_freeze_gate_sim(
+            vapor_pressure_data,
+            feedstocks_data,
+            setpoints_data,
+            enabled=True,
+        )
+        sim._register_freeze_gate_liquid_fraction_providers()
+        backend = MAGEMinBackend()
+        backend._binary_path = launcher
+        provider = sim._chem_registry.fallback_for(
+            ChemistryIntent.GATE_LIQUID_FRACTION
+        )
+        provider._backend = backend
+        target_file.write_text(f'{binary}\n')
+        return sim, backend
+
+    producer, producer_backend = build_sim(runtime_binaries[0])
+    producer_version = producer_backend.get_engine_version()
+    producer_evidence = engine_binding_admission.gate_curve_memo_evidence(
+        producer,
+        curve,
+        include_selected_bindings=False,
+    )
+    record = engine_binding_admission.write_gate_curve_memo_record(
+        producer,
+        curve,
+        evidence=producer_evidence,
+    )
+
+    receiver, receiver_backend = build_sim(runtime_binaries[1])
+    receiver_version = receiver_backend.get_engine_version()
+    receiver_evidence = engine_binding_admission.gate_curve_memo_evidence(
+        receiver,
+        curve,
+        include_selected_bindings=False,
+    )
+
+    assert producer_version != receiver_version
+    assert producer_evidence.provenance['runtime_artifacts'][
+        'magemin_selected_binary'
+    ]['sha256'] == receiver_evidence.provenance['runtime_artifacts'][
+        'magemin_selected_binary'
+    ]['sha256']
+    assert not engine_binding_admission.gate_curve_memo_origin_matches(
+        receiver,
+        curve,
+        record['origin'],
+        fresh_evidence=True,
+        evidence=receiver_evidence,
     )
 
 
