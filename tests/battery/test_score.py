@@ -5105,6 +5105,47 @@ def test_hashimoto_scoring_projects_by_experiment_and_carries_residue_flags(
         assert "injected_refusal" in refusal.refusal_detail["reason"]
 
 
+@pytest.mark.parametrize(
+    "reason",
+    (
+        "engine_timeout:openimcc:hashimoto_residue_cohort",
+        "engine_transport_error:openimcc",
+    ),
+)
+def test_hashimoto_worker_infrastructure_failures_are_not_cohort_cached(
+    monkeypatch: pytest.MonkeyPatch, reason: str
+) -> None:
+    from simulator.battery import residue, score
+
+    context = load_score_context(sources=("kems-015-hashimoto-1983",))
+    reference = next(
+        row
+        for row in context.observations.values()
+        if row.source_id == "kems-015-hashimoto-1983"
+        and "::hashimoto_1983_table3_residue_composition_series::"
+        in row.observation_id
+        and quantity_token(row.identity)
+        is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    )
+
+    def fail_cohort(*_args, **_kwargs):
+        raise residue.ResidueEngineNonconvergence(
+            "openimcc", "worker infrastructure failure", reason=reason
+        )
+
+    monkeypatch.setattr(residue, "_predict_hashimoto_residue_cohort", fail_cohort)
+    cache = {}
+    prediction = score._hashimoto_residue_prediction(
+        context, reference, Engine.OPENIMCC, cache
+    )
+
+    assert cache == {}
+    assert prediction.value is None
+    assert prediction.execution.state is ExecutionState.ATTEMPTED_UNAVAILABLE
+    assert prediction.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE
+    assert prediction.refusal_detail["reason"] == reason
+
+
 def test_residue_area_is_not_identity_but_per_area_rate_still_requires_it() -> None:
     context = load_score_context(sources=("kems-015-hashimoto-1983",))
     residue_identity = next(

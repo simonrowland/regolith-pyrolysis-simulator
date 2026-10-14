@@ -5293,6 +5293,11 @@ def candidate_observation(
 _HASHIMOTO_SOURCE_ID = "kems-015-hashimoto-1983"
 
 
+def _is_residue_worker_infrastructure_failure(reason: object) -> bool:
+    """A single slow cell is transient infrastructure, not a cohort refusal."""
+    return str(reason).startswith(("engine_timeout:", "engine_transport_error:"))
+
+
 def _hashimoto_residue_prediction(
     context: ScoreContext,
     reference: Observation,
@@ -5485,7 +5490,8 @@ def _hashimoto_residue_prediction(
         )
     except Exception as exc:  # the scorer records typed per-cell refusal and continues
         reason = getattr(exc, "reason", None) or str(exc) or type(exc).__name__
-        if cache_key not in cache:
+        infrastructure_failure = _is_residue_worker_infrastructure_failure(reason)
+        if cache_key not in cache and not infrastructure_failure:
             cache[cache_key] = {"__cohort_error__": str(reason)}
         detail: dict[str, object] = {
             "reason": str(reason),
@@ -5501,14 +5507,14 @@ def _hashimoto_residue_prediction(
             execution=Execution(
                 state=(
                     ExecutionState.ATTEMPTED_UNAVAILABLE
-                    if str(reason).startswith("engine_timeout:")
+                    if infrastructure_failure
                     else ExecutionState.NOT_PROBED
                 )
             ),
             coefficient_sources=sources,
             refusal_reason=(
                 RefusalReason.ATTEMPTED_UNAVAILABLE
-                if str(reason).startswith("engine_timeout:")
+                if infrastructure_failure
                 else RefusalReason.OPENIMCC_NOT_IMPORTABLE
                 if str(reason) == "openimcc_not_importable"
                 else RefusalReason.UNSUPPORTED
@@ -5734,9 +5740,10 @@ def _sossi_residue_prediction(
         )
     except Exception as exc:  # preserve a typed per-cell absence and keep scoring
         reason = getattr(exc, "reason", None) or str(exc) or type(exc).__name__
-        if cache_key not in cache:
+        infrastructure_failure = _is_residue_worker_infrastructure_failure(reason)
+        if cache_key not in cache and not infrastructure_failure:
             cache[cache_key] = {"__cohort_error__": str(reason)}
-        if str(reason).startswith("engine_timeout:"):
+        if infrastructure_failure:
             refusal = RefusalReason.ATTEMPTED_UNAVAILABLE
         elif reason == "oxygen_condition_missing":
             refusal = RefusalReason.IDENTITY_INCOMPLETE
@@ -5752,7 +5759,7 @@ def _sossi_residue_prediction(
             execution=Execution(
                 state=(
                     ExecutionState.ATTEMPTED_UNAVAILABLE
-                    if str(reason).startswith("engine_timeout:")
+                    if infrastructure_failure
                     else ExecutionState.NOT_PROBED
                 )
             ),

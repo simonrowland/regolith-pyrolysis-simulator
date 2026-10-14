@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import math
+from decimal import Decimal
 from pathlib import Path
+from types import MappingProxyType
 
 import pytest
 import yaml
@@ -22,10 +24,114 @@ PRIMARY_TABLE3_PREFIX = "::hashimoto_1983_table3_residue_composition_series::"
 OXIDES = ("FeO", "MgO", "SiO2", "CaO", "Al2O3")
 
 
+@pytest.fixture(autouse=True)
+def _close_openimcc_worker_between_tests():
+    from simulator.battery.residue import _close_openimcc_evaluation_worker
+
+    _close_openimcc_evaluation_worker()
+    yield
+    _close_openimcc_evaluation_worker()
+
+
 def _hanging_openimcc_engine(**_kwargs):
     import threading
 
     threading.Event().wait(30)
+
+
+def _fake_openimcc_bridge_result(**_kwargs):
+    from simulator.melt_backend.openimcc_bridge import OpenImccBridgeResult
+    from simulator.melt_backend.imcc_adapter_labels import ImccAdapterLabels
+
+    return OpenImccBridgeResult(
+        parent_oxide_activities={"SiO2": 0.75, "MgO": 0.25},
+        parent_oxides=("SiO2", "MgO"),
+        flags=("fixture-flag",),
+        notices=("fixture-notice",),
+        acid_sink_ratio=0.125,
+        pack_model_id="fixture-model",
+        pack_version="fixture-version",
+        pack_digest="fixture-digest",
+        openimcc_version="fixture-openimcc",
+        envelope_status="in_domain",
+        extrapolated=False,
+        labels=ImccAdapterLabels(
+            identity={"model_id": "fixture-model"},
+            coverage={"SiO2": "covered"},
+            trust="internal-analytical",
+            envelope_status="in_domain",
+            flags=("fixture-flag",),
+            notices=("fixture-notice",),
+            acid_sink_ratio=0.125,
+        ),
+        coverage={"SiO2": "covered"},
+        activity_coefficients={
+            "Si": {
+                "value": Decimal("1.25"),
+                "coefficient_basis": "single_cation",
+                "standard_state": {"convention": "raoultian_pure_endmember"},
+            }
+        },
+        parent_oxide_x_star_ratios={"SiO2": 0.875},
+    )
+
+
+def test_openimcc_bridge_result_round_trips_through_isolated_worker():
+    from simulator.battery.residue import _evaluate_openimcc_isolated
+
+    direct = _fake_openimcc_bridge_result()
+    isolated = _evaluate_openimcc_isolated(
+        _fake_openimcc_bridge_result, timeout_s=10.0
+    )
+
+    assert isolated == direct
+    assert set(isolated.to_transport()) == {
+        "parent_oxide_activities",
+        "parent_oxides",
+        "flags",
+        "notices",
+        "acid_sink_ratio",
+        "pack_model_id",
+        "pack_version",
+        "pack_digest",
+        "openimcc_version",
+        "envelope_status",
+        "extrapolated",
+        "labels",
+        "coverage",
+        "activity_coefficients",
+        "parent_oxide_x_star_ratios",
+    }
+    assert isinstance(isolated.parent_oxide_activities, MappingProxyType)
+    assert isinstance(isolated.coverage, MappingProxyType)
+    assert isinstance(isolated.activity_coefficients, MappingProxyType)
+    assert isinstance(isolated.parent_oxide_x_star_ratios, MappingProxyType)
+
+
+def test_real_openimcc_bridge_result_round_trips_when_available():
+    pytest.importorskip("openimcc")
+    from simulator.battery.residue import _evaluate_openimcc_isolated
+    from simulator.melt_backend import openimcc_bridge
+
+    kwargs = {
+        "composition_mol": {"SiO2": 1.0, "MgO": 1.0},
+        "temperature_K": 1800.0,
+        "allow_extrapolation": True,
+        "allow_out_of_envelope": True,
+    }
+    direct = openimcc_bridge.evaluate(**kwargs)
+    isolated = _evaluate_openimcc_isolated(
+        openimcc_bridge.evaluate, timeout_s=30.0, **kwargs
+    )
+
+    assert isolated == direct
+
+
+def test_isolated_openimcc_worker_still_times_out():
+    from simulator.battery.residue import _evaluate_openimcc_isolated
+
+    with pytest.raises(TimeoutError, match="timed out"):
+        _evaluate_openimcc_isolated(_hanging_openimcc_engine, timeout_s=0.05)
 
 
 def _source_data():

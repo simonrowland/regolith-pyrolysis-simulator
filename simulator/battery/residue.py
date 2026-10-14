@@ -92,13 +92,26 @@ class ResidueEngineNonconvergence(RuntimeError):
         }
 
 
+class ResidueEngineTransportError(ResidueEngineNonconvergence):
+    """Infrastructure failure moving an engine result across its worker pipe."""
+
+    def __init__(self, detail: str) -> None:
+        super().__init__("openimcc", detail, reason="engine_transport_error:openimcc")
+
+
 def _openimcc_evaluation_worker(connection, evaluate) -> None:
     while True:
         kwargs = connection.recv()
         if kwargs is None:
             break
         try:
-            connection.send((True, evaluate(**kwargs)))
+            result = evaluate(**kwargs)
+            from simulator.melt_backend.openimcc_bridge import OpenImccBridgeResult
+
+            if isinstance(result, OpenImccBridgeResult):
+                connection.send((True, "openimcc_bridge_result", result.to_transport()))
+            else:
+                connection.send((True, "value", result))
         except BaseException as exc:  # noqa: BLE001 - report worker failures to parent
             connection.send((False, type(exc).__name__, str(exc)))
     connection.close()
@@ -152,14 +165,32 @@ def _evaluate_openimcc_isolated(
         _OPENIMCC_EVALUATION_WORKER = worker
     process, parent = worker
     try:
-        parent.send(kwargs)
+        try:
+            parent.send(kwargs)
+        except (OSError, TypeError, ValueError) as exc:
+            raise ResidueEngineTransportError(str(exc)) from exc
         if not parent.poll(timeout_s):
             _close_openimcc_evaluation_worker()
             raise TimeoutError(f"OpenIMCC call timed out after {timeout_s:g}s")
-        response = parent.recv()
+        try:
+            response = parent.recv()
+        except (EOFError, OSError) as exc:
+            raise ResidueEngineTransportError(str(exc)) from exc
         if response[0]:
-            return response[1]
+            result_kind, payload = response[1:]
+            if result_kind == "openimcc_bridge_result":
+                from simulator.melt_backend.openimcc_bridge import OpenImccBridgeResult
+
+                try:
+                    return OpenImccBridgeResult.from_transport(payload)
+                except (KeyError, TypeError, ValueError) as exc:
+                    raise ResidueEngineTransportError(str(exc)) from exc
+            return payload
         error_name, detail = response[1:]
+        if error_name in {"PicklingError", "TypeError", "AttributeError"} and (
+            "pickl" in str(detail).lower() or "serializ" in str(detail).lower()
+        ):
+            raise ResidueEngineTransportError(str(detail))
         if error_name == "ImccNonconvergenceError":
             raise ResidueEngineNonconvergence("openimcc", str(detail))
         raise RuntimeError(f"isolated OpenIMCC {error_name}: {detail}")
