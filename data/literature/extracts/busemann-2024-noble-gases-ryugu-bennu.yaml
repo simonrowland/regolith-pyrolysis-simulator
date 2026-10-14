@@ -10,6 +10,12 @@ extraction:
   provenance_path: corpus/raw/busemann-2024-noble-gases-ryugu-bennu/
 review_status: draft
 corrections: []
+fidelity_samples:
+- path: species.noble_gases.observations[busemann_2024_preliminary_ryugu_exposure_ages].values.exposure_age_range_Ma
+  value: 5 to 8
+  locator:
+    page: 1
+    section: Results & Discussion
 absent_from_source:
 - oxide or elemental bulk composition
 - noble-gas concentrations or yields
@@ -149,9 +155,13 @@ species:
     observations:
     - observation_id: busemann_2024_preliminary_ryugu_exposure_ages
       type: rate_series
-      derived_from: cosmic-ray production rates given by reference [7]
+      derived_from:
+      - tables:busemann-2024-noble-gases-ryugu-bennu
       derivation:
-        relation: preliminary exposure-age calculation using the cosmic-ray production rates cited by the authors
+        relation: >-
+          The authors use cosmic-ray production rates from reference [7] to calculate preliminary exposure ages (p. 1, Results & Discussion).
+        inputs:
+        - tables:busemann-2024-noble-gases-ryugu-bennu
         input_source: Okazaki et al. 2023, reference [7]
         status: preliminary
       locator:
