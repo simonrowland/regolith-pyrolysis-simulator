@@ -39,6 +39,23 @@ def _hanging_openimcc_engine(**_kwargs):
     threading.Event().wait(30)
 
 
+def _first_openimcc_engine(**_kwargs):
+    return "first evaluator"
+
+
+def _second_openimcc_engine(**_kwargs):
+    return "second evaluator"
+
+
+def _slow_starting_openimcc_worker(connection, evaluate):
+    import time
+
+    time.sleep(0.2)
+    from simulator.battery.residue import _openimcc_evaluation_worker
+
+    _openimcc_evaluation_worker(connection, evaluate)
+
+
 def _fake_openimcc_bridge_result(**_kwargs):
     from simulator.melt_backend.openimcc_bridge import OpenImccBridgeResult
     from simulator.melt_backend.imcc_adapter_labels import ImccAdapterLabels
@@ -132,6 +149,37 @@ def test_isolated_openimcc_worker_still_times_out():
 
     with pytest.raises(TimeoutError, match="timed out"):
         _evaluate_openimcc_isolated(_hanging_openimcc_engine, timeout_s=0.05)
+
+
+def test_isolated_openimcc_worker_startup_is_outside_call_deadline(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import simulator.battery.residue as residue
+
+    monkeypatch.setattr(
+        residue, "_openimcc_evaluation_worker", _slow_starting_openimcc_worker
+    )
+    first = residue._evaluate_openimcc_isolated(
+        _first_openimcc_engine, timeout_s=0.05
+    )
+    process = residue._OPENIMCC_EVALUATION_WORKER[0]
+    second = residue._evaluate_openimcc_isolated(
+        _first_openimcc_engine, timeout_s=0.05
+    )
+
+    assert first == second == "first evaluator"
+    assert residue._OPENIMCC_EVALUATION_WORKER[0] is process
+
+
+def test_isolated_openimcc_worker_restarts_for_a_different_evaluator() -> None:
+    from simulator.battery.residue import _evaluate_openimcc_isolated
+
+    assert _evaluate_openimcc_isolated(
+        _first_openimcc_engine, timeout_s=5.0
+    ) == "first evaluator"
+    assert _evaluate_openimcc_isolated(
+        _second_openimcc_engine, timeout_s=5.0
+    ) == "second evaluator"
 
 
 def _source_data():

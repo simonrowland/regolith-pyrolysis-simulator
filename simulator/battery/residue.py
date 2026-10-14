@@ -99,15 +99,27 @@ class ResidueEngineTransportError(ResidueEngineNonconvergence):
         super().__init__("openimcc", detail, reason="engine_transport_error:openimcc")
 
 
+_OPENIMCC_EVALUATION_WORKER_STARTUP_TIMEOUT_S = 120.0
+
+
 def _openimcc_evaluation_worker(connection, evaluate) -> None:
+    try:
+        from simulator.melt_backend.openimcc_bridge import OpenImccBridgeResult
+
+        connection.send(("ready",))
+    except BaseException as exc:  # noqa: BLE001 - report startup failures to parent
+        try:
+            connection.send(("startup_error", type(exc).__name__, str(exc)))
+        except (BrokenPipeError, EOFError, OSError):
+            pass
+        connection.close()
+        return
     while True:
         kwargs = connection.recv()
         if kwargs is None:
             break
         try:
             result = evaluate(**kwargs)
-            from simulator.melt_backend.openimcc_bridge import OpenImccBridgeResult
-
             if isinstance(result, OpenImccBridgeResult):
                 connection.send((True, "openimcc_bridge_result", result.to_transport()))
             else:
@@ -126,7 +138,7 @@ def _close_openimcc_evaluation_worker() -> None:
     _OPENIMCC_EVALUATION_WORKER = None
     if worker is None:
         return
-    process, connection = worker
+    process, connection, _evaluate = worker
     if process.is_alive():
         try:
             connection.send(None)
@@ -148,7 +160,9 @@ def _evaluate_openimcc_isolated(
     """Run one residue-engine call in a killable process with a hard deadline."""
     global _OPENIMCC_EVALUATION_WORKER
     worker = _OPENIMCC_EVALUATION_WORKER
-    if worker is not None and not worker[0].is_alive():
+    if worker is not None and (
+        not worker[0].is_alive() or worker[2] is not evaluate
+    ):
         _close_openimcc_evaluation_worker()
         worker = None
     if worker is None:
@@ -161,9 +175,35 @@ def _evaluate_openimcc_isolated(
         )
         process.start()
         child.close()
-        worker = (process, parent)
+        worker = (process, parent, evaluate)
         _OPENIMCC_EVALUATION_WORKER = worker
-    process, parent = worker
+        if not parent.poll(_OPENIMCC_EVALUATION_WORKER_STARTUP_TIMEOUT_S):
+            _close_openimcc_evaluation_worker()
+            raise ResidueEngineTransportError(
+                "OpenIMCC worker readiness timed out after "
+                f"{_OPENIMCC_EVALUATION_WORKER_STARTUP_TIMEOUT_S:g}s"
+            )
+        try:
+            startup = parent.recv()
+        except (EOFError, OSError) as exc:
+            _close_openimcc_evaluation_worker()
+            raise ResidueEngineTransportError(
+                f"OpenIMCC worker exited before readiness: {exc}"
+            ) from exc
+        if startup != ("ready",):
+            _close_openimcc_evaluation_worker()
+            if (
+                isinstance(startup, tuple)
+                and len(startup) == 3
+                and startup[0] == "startup_error"
+            ):
+                raise ResidueEngineTransportError(
+                    f"OpenIMCC worker startup failed: {startup[1]}: {startup[2]}"
+                )
+            raise ResidueEngineTransportError(
+                f"unexpected OpenIMCC worker startup response: {startup!r}"
+            )
+    process, parent, _evaluate = worker
     try:
         try:
             parent.send(kwargs)
