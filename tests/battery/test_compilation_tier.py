@@ -19,6 +19,7 @@ from simulator.battery.compilation_tier import (
 )
 from simulator.battery.enums import (
     AdmissionStatus,
+    AssetRole,
     Authority,
     Engine,
     EvidenceClass,
@@ -38,7 +39,14 @@ from simulator.battery.identity import (
     log10K_from_delta_fG_kJ_mol,
     standard_pressure_delta_g_kJ_per_mol,
 )
-from simulator.battery.records import Species, State, Uncertainty, Value
+from simulator.battery.records import (
+    SourceFile,
+    SourceFiles,
+    Species,
+    State,
+    Uncertainty,
+    Value,
+)
 from simulator.battery.score import (
     EnginePrediction,
     ScoreContext,
@@ -107,13 +115,20 @@ def _pure_standard_identity(identity, quantity: Quantity):
     )
 
 
-def _fusion_identity(quantity: Quantity, temperature: Decimal):
+def _fusion_identity(
+    quantity: Quantity,
+    temperature: Decimal,
+    *,
+    formula: str = "MgO",
+    polymorph: Polymorph = Polymorph.PERICLASE,
+    phase: Phase = Phase.CR,
+):
     identity = F.oxide_identity(
-        "MgO",
-        Phase.CR,
+        formula,
+        phase,
         T_K=temperature,
         per=PerBasis.MOL_SPECIES,
-        polymorph=Polymorph.PERICLASE.value,
+        polymorph=polymorph.value,
     )
     return replace(
         identity,
@@ -124,6 +139,134 @@ def _fusion_identity(quantity: Quantity, temperature: Decimal):
         formation_elements=State.not_applicable("not a formation quantity"),
         subtype=State.of("solid_to_liquid"),
     )
+
+
+def test_fusion_predictor_selects_the_stated_silica_polymorph_table() -> None:
+    from simulator.battery.score import predict_with_engine
+
+    experiment = F.tabulation_experiment()
+    for polymorph, solid_table in (
+        (Polymorph.QUARTZ, "O-037"),
+        (Polymorph.CRISTOBALITE_HIGH, "O-035"),
+    ):
+        identity = _fusion_identity(
+            Quantity.ENTHALPY_OF_FUSION,
+            Decimal("1986"),
+            formula="SiO2",
+            polymorph=polymorph,
+        )
+        observation = F.observation(
+            f"silica-fusion-{polymorph.value}",
+            experiment.experiment_id,
+            identity,
+            Decimal("9.4"),
+        )
+        attempt = predict_thermo_attempt(Engine.INTERNAL_ANALYTICAL, observation)
+        assert attempt.value is not None
+        assert f"janaf-fusion:{solid_table}/O-038:" in attempt.call_evidence
+        prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, observation)
+        assert prediction.coefficient_sources == (solid_table, "O-038")
+
+
+def test_fusion_predictor_refuses_unavailable_stated_polymorph() -> None:
+    from simulator.battery.score import predict_with_engine
+
+    experiment = F.tabulation_experiment()
+    identity = _fusion_identity(
+        Quantity.ENTHALPY_OF_FUSION,
+        Decimal("1986"),
+        formula="SiO2",
+        polymorph=Polymorph.TRIDYMITE,
+    )
+    observation = F.observation(
+        "silica-fusion-tridymite",
+        experiment.experiment_id,
+        identity,
+        Decimal("9.4"),
+    )
+    attempt = predict_thermo_attempt(Engine.INTERNAL_ANALYTICAL, observation)
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, observation)
+    assert prediction.coefficient_sources == ()
+
+
+def test_fusion_predictor_refuses_a_stated_polymorph_on_an_unlisted_table(
+    monkeypatch,
+) -> None:
+    from simulator.battery.generators import janaf
+    from simulator.battery.score import predict_with_engine
+
+    key = ("SiO2", "Tridymite")
+    monkeypatch.setitem(janaf.JANAF_CRYSTAL_TABLE_IDS, key, ("O-999",))
+    monkeypatch.setitem(janaf.JANAF_CRYSTAL_DICTIONARY, key, Polymorph.TRIDYMITE)
+
+    experiment = F.tabulation_experiment()
+    identity = _fusion_identity(
+        Quantity.ENTHALPY_OF_FUSION,
+        Decimal("1986"),
+        formula="SiO2",
+        polymorph=Polymorph.TRIDYMITE,
+    )
+    observation = F.observation(
+        "silica-fusion-unlisted-table",
+        experiment.experiment_id,
+        identity,
+        Decimal("9.4"),
+    )
+    attempt = predict_thermo_attempt(Engine.INTERNAL_ANALYTICAL, observation)
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    assert predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL, observation
+    ).coefficient_sources == ()
+
+
+def test_fusion_predictor_flags_an_unstated_polymorph_from_stable_tables() -> None:
+    experiment = F.tabulation_experiment()
+    identity = _fusion_identity(
+        Quantity.ENTHALPY_OF_FUSION,
+        Decimal("1986"),
+        formula="SiO2",
+        polymorph=Polymorph.CRISTOBALITE_HIGH,
+    )
+    identity = replace(
+        identity,
+        species=replace(
+            identity.species,
+            polymorph=State.unknown("printed polymorph unknown"),
+        ),
+    )
+    observation = F.observation(
+        "silica-fusion-unstated",
+        experiment.experiment_id,
+        identity,
+        Decimal("9.4"),
+    )
+    attempt = predict_thermo_attempt(Engine.INTERNAL_ANALYTICAL, observation)
+    assert attempt.value is not None
+    assert attempt.refusal_reason is None
+    assert attempt.notices[0].kind is NoticeKind.DERIVATION_USES_COMPILATION
+    assert "predictor used O-035 (cristobalite_high)" in attempt.notices[0].reason
+    assert "alternatives: quartz" in attempt.notices[0].reason
+
+
+def test_fusion_predictor_refuses_a_noncrystalline_solid_identity() -> None:
+    experiment = F.tabulation_experiment()
+    identity = _fusion_identity(
+        Quantity.ENTHALPY_OF_FUSION,
+        Decimal("3000"),
+        phase=Phase.L,
+    )
+    observation = F.observation(
+        "fusion-liquid-identity",
+        experiment.experiment_id,
+        identity,
+        Decimal("77.028"),
+    )
+    attempt = predict_thermo_attempt(Engine.INTERNAL_ANALYTICAL, observation)
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
 
 
 def _gas_thermo(
@@ -2847,15 +2990,21 @@ def test_scorer_streams_series_cells_without_child_observations(monkeypatch) -> 
 def test_internal_predicts_janaf_fusion_enthalpy_and_entropy() -> None:
     # JANAF Mg-008/Mg-009 print ΔfH at 3000 K as −709.524/−632.496
     # kJ/mol, so ΔH_fus is 77.028 kJ/mol. At 3100 K the printed values
-    # are −707.689/−629.904 kJ/mol, giving ΔH=77.785 kJ/mol and
-    # ΔS=77,785 J/mol / 3100 K = 25.091935... J/(mol K).
+    # are −707.689/−629.904 kJ/mol. Printed entropies give ΔS=24.804 at
+    # 3000 K (167.293−142.489) and 25.052 J/(mol K) at 3100 K
+    # (169.488−144.436), independently of the enthalpy values.
     experiment = F.tabulation_experiment()
     expected = (
         (Quantity.ENTHALPY_OF_FUSION, Decimal("3000"), Decimal("77.028")),
         (
             Quantity.ENTROPY_OF_FUSION,
+            Decimal("3000"),
+            Decimal("24.804"),
+        ),
+        (
+            Quantity.ENTROPY_OF_FUSION,
             Decimal("3100"),
-            Decimal("77785") / Decimal("3100"),
+            Decimal("25.052"),
         ),
     )
     for quantity, temperature, value in expected:
@@ -2870,11 +3019,23 @@ def test_internal_predicts_janaf_fusion_enthalpy_and_entropy() -> None:
         attempt = predict_thermo_attempt(Engine.INTERNAL_ANALYTICAL, observation)
         assert attempt.value == value
         assert attempt.authority is Authority.BRIDGE
-        assert attempt.notices == ()
+        if quantity is Quantity.ENTHALPY_OF_FUSION:
+            assert attempt.notices == ()
+        else:
+            assert any(
+                notice.reason == "janaf_fusion_transition_off_equilibrium"
+                for notice in attempt.notices
+            )
         assert attempt.unit == {
             Quantity.ENTHALPY_OF_FUSION: "kJ_per_declared_mol_basis",
             Quantity.ENTROPY_OF_FUSION: "J_per_declared_mol_basis_per_K",
         }[quantity]
+        if quantity is Quantity.ENTROPY_OF_FUSION:
+            assert any(
+                notice.reason == "janaf_fusion_transition_off_equilibrium"
+                and "3104.968" in notice.band
+                for notice in attempt.notices
+            )
 
 
 def test_fusion_prediction_flags_an_unstated_solid_polymorph() -> None:
@@ -2905,7 +3066,8 @@ def test_fusion_prediction_flags_an_unstated_solid_polymorph() -> None:
     assert notice.kind is NoticeKind.DERIVATION_USES_COMPILATION
     assert notice.reason == (
         "fusion_solid_polymorph_unspecified: source does not state a solid "
-        "polymorph; predictor used Mg-008 (periclase)"
+        "polymorph; predictor used Mg-008 (periclase); alternatives: none "
+        "defined at this temperature"
     )
     assert notice.authority is Authority.BRIDGE
     assert notice.band == "JANAF Mg-008/Mg-009 common range [298.15, 4000.0] K"
@@ -2928,7 +3090,7 @@ def test_fusion_prediction_refuses_a_stated_polymorph_mismatch() -> None:
         Phase.CR,
         T_K=Decimal("1800"),
         per=PerBasis.MOL_SPECIES,
-        polymorph=Polymorph.QUARTZ.value,
+        polymorph=Polymorph.TRIDYMITE.value,
     )
     identity = replace(
         identity,
@@ -2951,9 +3113,8 @@ def test_fusion_prediction_refuses_a_stated_polymorph_mismatch() -> None:
 
     assert attempt.value is None
     assert attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
-    assert attempt.refusal_detail["reason"] == "fusion-solid-polymorph-mismatch"
-    assert attempt.refusal_detail["engine_reference_table"] == "O-035"
-    assert attempt.refusal_detail["engine_reference_polymorph"] == "cristobalite_high"
+    assert attempt.refusal_detail["reason"] == "fusion-solid-polymorph-not-in-janaf"
+    assert "tridymite" in attempt.refusal_detail["detail"]
 
 
 def test_fusion_notice_names_the_selected_silica_reference_among_alternatives() -> None:
@@ -2988,16 +3149,21 @@ def test_fusion_notice_names_the_selected_silica_reference_among_alternatives() 
     attempt = predict_thermo_attempt(Engine.INTERNAL_ANALYTICAL, observation)
 
     assert attempt.value is not None
-    assert attempt.notices[0].reason == (
+    assert attempt.notices[0].reason.startswith(
         "fusion_solid_polymorph_unspecified: source does not state a solid "
-        "polymorph; predictor used O-035 (cristobalite_high); other JANAF "
-        "solid references available at T: O-037 (quartz)"
+        "polymorph; predictor used O-035 (cristobalite_high); alternatives: "
     )
+    assert "quartz" in attempt.notices[0].reason
 
 
 def test_non_internal_engine_has_typed_fusion_refusal() -> None:
     experiment = F.tabulation_experiment()
-    identity = _fusion_identity(Quantity.ENTHALPY_OF_FUSION, Decimal("3000"))
+    identity = _fusion_identity(
+        Quantity.ENTHALPY_OF_FUSION,
+        Decimal("3000"),
+        formula="SiO2",
+        polymorph=Polymorph.QUARTZ,
+    )
     observation = F.observation(
         "unsupported-fusion",
         experiment.experiment_id,
@@ -3029,7 +3195,12 @@ def test_janaf_fusion_source_is_training_relation() -> None:
     from simulator.battery.score import compile_residual
 
     experiment = F.tabulation_experiment()
-    identity = _fusion_identity(Quantity.ENTHALPY_OF_FUSION, Decimal("3000"))
+    identity = _fusion_identity(
+        Quantity.ENTHALPY_OF_FUSION,
+        Decimal("3000"),
+        formula="SiO2",
+        polymorph=Polymorph.QUARTZ,
+    )
     observation = F.observation(
         "janaf-fusion-training",
         experiment.experiment_id,
@@ -3038,10 +3209,83 @@ def test_janaf_fusion_source_is_training_relation() -> None:
         evidence=EvidenceClass.COMPILATION_ASSESSED,
         source_id="nist-janaf-4th",
     )
+    observation = replace(observation, read_from="O-037")
+    experiment = F.tabulation_experiment(experiment_id="fusion-ref", work_id="ref-work")
+    observation = replace(observation, experiment_id=experiment.experiment_id)
+    works = {
+        "ref-work": _work_with_table_assets("ref-work", ("O-037",)),
+        "janaf-work": _work_with_table_assets("janaf-work", ("O-037", "O-038")),
+    }
     residual, _ = compile_residual(
         observation,
         Engine.INTERNAL_ANALYTICAL,
-        context=_context(observation),
+        context=ScoreContext(
+            works=works,
+            experiments={experiment.experiment_id: experiment},
+            observations={observation.observation_id: observation},
+            extract_review={observation.source_id or "": None},
+            hostname="test",
+        ),
     )
     assert residual.numeric is not None
     assert residual.source_relation is SourceRelation.TRAINING
+
+
+def _work_with_table_assets(work_id: str, asset_ids: tuple[str, ...]):
+    work = F.work(work_id)
+    files = tuple(
+        SourceFile(
+            asset_id=asset_id,
+            role=AssetRole.TABLE_CSV,
+            path=f"{asset_id}.csv",
+            sha256=State.of(f"sha-{asset_id}"),
+        )
+        for asset_id in asset_ids
+    )
+    return replace(
+        work,
+        source_ids=(work_id,),
+        source_files=SourceFiles(
+            corpus_repo="test",
+            corpus_commit=State.of("test"),
+            files=files,
+        ),
+    )
+
+
+def test_fusion_janaf_tables_do_not_make_other_works_training() -> None:
+    from simulator.battery.score import compile_residual
+
+    experiment = F.tabulation_experiment(experiment_id="independent-ref", work_id="other-work")
+    identity = _fusion_identity(
+        Quantity.ENTHALPY_OF_FUSION,
+        Decimal("3000"),
+        formula="SiO2",
+        polymorph=Polymorph.QUARTZ,
+    )
+    observation = F.observation(
+        "independent-fusion-row",
+        experiment.experiment_id,
+        identity,
+        Decimal("77.028"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="independent-work",
+    )
+    observation = replace(observation, read_from="independent-table")
+    works = {
+        "janaf-work": _work_with_table_assets("janaf-work", ("O-037", "O-038")),
+        "other-work": _work_with_table_assets("other-work", ("independent-table",)),
+    }
+    residual, _ = compile_residual(
+        observation,
+        Engine.INTERNAL_ANALYTICAL,
+        context=ScoreContext(
+            works=works,
+            experiments={experiment.experiment_id: experiment},
+            observations={observation.observation_id: observation},
+            extract_review={observation.source_id or "": None},
+            hostname="test",
+        ),
+    )
+    assert residual.numeric is not None
+    assert residual.source_relation is SourceRelation.INDEPENDENT

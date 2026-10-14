@@ -32,6 +32,8 @@ from simulator.yaml_cache import load_cached_safe_yaml
 from simulator.battery.identity import log10K_from_delta_fG_kJ_mol
 from simulator.battery.migrate import dump_yaml, fill_identity, make_species, to_plain
 from simulator.battery.polymorph_dictionary import (
+    JANAF_CRYSTAL_DICTIONARY,
+    JANAF_CRYSTAL_TABLE_IDS,
     JANAF_LABEL_POLYMORPHS,
     JANAF_TRANSITION_POLYMORPHS,
     canonicalize_janaf_transition,
@@ -2571,6 +2573,103 @@ _FUSION_TABLES = {
     # below the accepted SiO2 melting point; the quartz table is metastable.
     "SiO2": ("O-035", "O-038"),
 }
+
+# Closed fusion-resolver identity map; table names and assignments are from
+# NIST-JANAF 4th ed. Mg-008 is rock-salt/periclase at 1 bar through melting;
+# Ca-027 is lime (rock-salt) at 1 bar. Al-096 is alpha-alumina/corundum.
+_FUSION_TABLE_POLYMORPHS = {
+    "Ca-027": Polymorph.LIME,  # JANAF Calcium Oxide (cr).
+    "Al-096": Polymorph.CORUNDUM,  # JANAF Aluminium Oxide, Alpha.
+    "Mg-008": Polymorph.PERICLASE,  # JANAF Magnesium Oxide (cr).
+    "O-035": Polymorph.CRISTOBALITE_HIGH,  # JANAF Silicon Oxide, Cristobalite, High.
+    "O-036": Polymorph.CRISTOBALITE_LOW,  # JANAF Silicon Oxide, Cristobalite, Low.
+    "O-037": Polymorph.QUARTZ,  # JANAF Silicon Oxide, Quartz.
+}
+
+
+class JANAFFusionPolymorphUnavailable(ValueError):
+    """No unique JANAF solid table represents the stated fusion polymorph."""
+
+
+def _fusion_table_pair(
+    oxide: str, polymorph: Polymorph | None
+) -> tuple[str, str]:
+    try:
+        default_solid, liquid = _FUSION_TABLES[oxide]
+    except KeyError as exc:
+        raise ValueError(f"no JANAF fusion table pair for {oxide}") from exc
+    if polymorph is None:
+        return default_solid, liquid
+    candidates = [default_solid]
+    candidates.extend(
+        table_id
+        for key, table_ids in JANAF_CRYSTAL_TABLE_IDS.items()
+        if key[0] == oxide
+        for table_id in table_ids
+    )
+    solid_tables = tuple(
+        table_id
+        for table_id in dict.fromkeys(candidates)
+        if _FUSION_TABLE_POLYMORPHS.get(table_id) is polymorph
+    )
+    if len(solid_tables) != 1:
+        raise JANAFFusionPolymorphUnavailable(
+            f"no unique JANAF solid table for {oxide} polymorph {polymorph.value}"
+        )
+    return solid_tables[0], liquid
+
+
+def _janaf_stable_fusion_polymorph(
+    oxide: str, temperature_K: Decimal
+) -> tuple[Polymorph, tuple[Polymorph, ...]]:
+    """Select the lowest-G JANAF crystal table available at this temperature."""
+    try:
+        default_solid, _liquid = _FUSION_TABLES[oxide]
+    except KeyError as exc:
+        raise JANAFFusionPolymorphUnavailable(
+            f"no JANAF fusion table pair for {oxide}"
+        ) from exc
+    tables = [default_solid]
+    tables.extend(
+        table_id
+        for (formula, _qualifier), table_ids in JANAF_CRYSTAL_TABLE_IDS.items()
+        if formula == oxide
+        for table_id in table_ids
+    )
+    candidates: dict[Polymorph, tuple[str, Decimal]] = {}
+    for table_id in dict.fromkeys(tables):
+        polymorph = _FUSION_TABLE_POLYMORPHS.get(table_id)
+        if polymorph is None:
+            continue
+        try:
+            points, _digest = _fusion_table_points(table_id)
+            if not points[0][0] <= temperature_K <= points[-1][0]:
+                continue
+            gibbs = _interpolate_formation_gibbs(points, temperature_K)
+        except (KeyError, ValueError):
+            continue
+        prior = candidates.get(polymorph)
+        if prior is None or gibbs < prior[1]:
+            candidates[polymorph] = (table_id, gibbs)
+    if not candidates:
+        raise JANAFFusionPolymorphUnavailable(
+            f"JANAF tables do not define a solid polymorph for {oxide} at "
+            f"{temperature_K} K"
+        )
+    ordered = sorted(candidates.items(), key=lambda item: (item[1][1], item[0].value))
+    if len(ordered) > 1 and ordered[0][1][1] == ordered[1][1][1]:
+        tied = [
+            polymorph.value
+            for polymorph, (_table_id, gibbs) in ordered
+            if gibbs == ordered[0][1][1]
+        ]
+        raise JANAFFusionPolymorphUnavailable(
+            f"JANAF solid polymorph is ambiguous for {oxide} at {temperature_K} K: "
+            + ", ".join(tied)
+        )
+    return ordered[0][0], tuple(poly for poly, _ in ordered[1:])
+
+
 # The source hashes identify the JANAF text; pin the extracted temperature-node
 # sets too so a dropped compiled row cannot silently widen interpolation.
 _FUSION_NODE_SET_SHA256 = {
@@ -2632,6 +2731,12 @@ def _fusion_table_points(table_id: str) -> tuple[tuple[tuple[Decimal, Decimal], 
 def _fusion_enthalpy_points(
     table_id: str,
 ) -> tuple[tuple[tuple[Decimal, Decimal], ...], str, tuple[Decimal, ...]]:
+    return _fusion_property_points(table_id, "formation_enthalpy")
+
+
+def _fusion_property_points(
+    table_id: str, property_name: str
+) -> tuple[tuple[tuple[Decimal, Decimal], ...], str, tuple[Decimal, ...]]:
     rows, digest = _checked_fusion_table_rows(table_id)
     points = []
     missing = []
@@ -2639,17 +2744,26 @@ def _fusion_enthalpy_points(
         if not isinstance(row, Mapping):
             continue
         temperature = row.get("temperature")
-        enthalpy = row.get("formation_enthalpy")
+        value = row.get(property_name)
         t = temperature.get("value") if isinstance(temperature, Mapping) else None
-        h = enthalpy.get("value") if isinstance(enthalpy, Mapping) else None
-        if t is not None and h is not None:
-            points.append((Decimal(str(t)), Decimal(str(h))))
+        y = value.get("value") if isinstance(value, Mapping) else None
+        if t is not None and y is not None:
+            points.append((Decimal(str(t)), Decimal(str(y))))
         elif t is not None:
             missing.append(Decimal(str(t)))
     points.sort()
     if len(points) < 2:
-        raise ValueError(f"{table_id}: JANAF table has fewer than two formation enthalpy points")
+        raise ValueError(
+            f"{table_id}: JANAF table has fewer than two {property_name} points"
+        )
     return tuple(points), digest, tuple(sorted(missing))
+
+
+@lru_cache(maxsize=2 * len(_FUSION_TABLES))
+def _fusion_entropy_points(
+    table_id: str,
+) -> tuple[tuple[tuple[Decimal, Decimal], ...], str, tuple[Decimal, ...]]:
+    return _fusion_property_points(table_id, "entropy")
 
 
 def _checked_fusion_table_rows(table_id: str) -> tuple[list[Mapping], str]:
@@ -2669,13 +2783,10 @@ def _checked_fusion_table_rows(table_id: str) -> tuple[list[Mapping], str]:
 
 
 def janaf_fusion_enthalpy(
-    oxide: str, temperature_K: Decimal
+    oxide: str, temperature_K: Decimal, polymorph: Polymorph | None = None
 ) -> tuple[Decimal, Decimal, Decimal, str, str, tuple[str, str]]:
-    """Return dH_fus(T) from the production JANAF solid/liquid table pair."""
-    try:
-        solid_id, liquid_id = _FUSION_TABLES[oxide]
-    except KeyError as exc:
-        raise ValueError(f"no JANAF fusion table pair for {oxide}") from exc
+    """Return dH_fus(T) from the selected JANAF solid/liquid table pair."""
+    solid_id, liquid_id = _fusion_table_pair(oxide, polymorph)
     solid, solid_sha, solid_missing = _fusion_enthalpy_points(solid_id)
     liquid, liquid_sha, liquid_missing = _fusion_enthalpy_points(liquid_id)
     low = max(solid[0][0], liquid[0][0])
@@ -2703,6 +2814,36 @@ def janaf_fusion_enthalpy(
         liquid_id,
         (solid_sha, liquid_sha),
     )
+
+
+def janaf_fusion_entropy(
+    oxide: str, temperature_K: Decimal, polymorph: Polymorph | None = None
+) -> tuple[Decimal, Decimal]:
+    """Return ΔS_fus(T) and the selected pair's JANAF Gibbs crossing."""
+
+    solid_id, liquid_id = _fusion_table_pair(oxide, polymorph)
+    solid, _solid_sha, solid_missing = _fusion_entropy_points(solid_id)
+    liquid, _liquid_sha, liquid_missing = _fusion_entropy_points(liquid_id)
+    low = max(solid[0][0], liquid[0][0])
+    high = min(solid[-1][0], liquid[-1][0])
+    if low <= temperature_K <= high:
+        for points, missing in ((solid, solid_missing), (liquid, liquid_missing)):
+            missing_node = _missing_node_for_interpolation(
+                points, missing, temperature_K
+            )
+            if missing_node is not None:
+                raise ValueError(
+                    f"JANAF entropy interpolation spans missing grid node "
+                    f"{missing_node} K at {temperature_K} K"
+                )
+    delta_s = (
+        _interpolate_table_points(liquid, temperature_K, extrapolate=True)
+        - _interpolate_table_points(solid, temperature_K, extrapolate=True)
+    )
+    crossing = _janaf_fusion_energy_for_pair(
+        oxide, solid_id, liquid_id, temperature_K
+    ).melting_temperature_K
+    return delta_s, crossing
 
 
 @lru_cache(maxsize=2 * len(_FUSION_TABLES))

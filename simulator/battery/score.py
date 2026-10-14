@@ -1274,20 +1274,6 @@ def _janaf_pure_solid_table_temperature_range(
     return min(temperatures), max(temperatures)
 
 
-def _fusion_solid_table_polymorph(
-    formula: str, table_id: str
-) -> Polymorph | None:
-    """Return the solid reference used by the production JANAF fusion pair."""
-
-    fusion_pair_polymorphs = {
-        ("CaO", "Ca-027"): Polymorph.LIME,
-        ("Al2O3", "Al-096"): Polymorph.CORUNDUM,
-        ("MgO", "Mg-008"): Polymorph.PERICLASE,
-        ("SiO2", "O-035"): Polymorph.CRISTOBALITE_HIGH,
-    }
-    return fusion_pair_polymorphs.get((formula, table_id))
-
-
 def _source_polymorph_is_unspecified(source_polymorph: State | None) -> bool:
     return source_polymorph is None or (
         source_polymorph.is_unknown
@@ -1452,6 +1438,7 @@ def fusion_comparison_reference(
         return replace(reference, notices=union_notices(reference.notices, (notice,)))
 
     from simulator.battery.generators.janaf import (
+        _FUSION_TABLE_POLYMORPHS,
         JANAF_R_J_PER_MOL_K,
         _janaf_fusion_energy_for_pair,
         janaf_fusion_energy,
@@ -1498,9 +1485,7 @@ def fusion_comparison_reference(
     # Thus ΔG_fus=+28.47061 kJ/mol and Δlog10(a)=ΔG_fus*1000/(R*T*ln(10))
     # = +0.793984 dex (R=8.31441 J mol^-1 K^-1). Their branches cross at
     # 3104.945598 K, where ΔG_fus and the reference shift go to zero.
-    expected_polymorph = _fusion_solid_table_polymorph(
-        formula, fusion.crystal_table
-    )
+    expected_polymorph = _FUSION_TABLE_POLYMORPHS.get(fusion.crystal_table)
     observed_polymorph = polymorph_token(standard_state.endmember)
     tridymite_to_cristobalite = (
         formula == "SiO2"
@@ -3935,9 +3920,9 @@ def _comparison_identity(
         call_evidence = prediction.execution.call_evidence or ""
         fusion_pair = call_evidence.partition("janaf-fusion:")[2].partition(":")[0]
         solid_table = fusion_pair.partition("/")[0]
-        solid_polymorph = _fusion_solid_table_polymorph(
-            identity.species.formula, solid_table
-        )
+        from simulator.battery.generators.janaf import _FUSION_TABLE_POLYMORPHS
+
+        solid_polymorph = _FUSION_TABLE_POLYMORPHS.get(solid_table)
         if solid_polymorph is not None:
             updates["species"] = replace(
                 identity.species, polymorph=State.of(solid_polymorph)
@@ -4488,6 +4473,17 @@ def predict_with_engine(
         from simulator.battery.compilation_tier import predict_thermo_attempt
 
         attempt = predict_thermo_attempt(engine, observation)
+        coefficient_sources = (
+            attempt.coefficient_sources
+            if quantity in FUSION_QUANTITIES
+            and engine is Engine.INTERNAL_ANALYTICAL
+            else attempt.coefficient_sources or sources
+        )
+        lineage_complete = (
+            lineage_complete_for(coefficient_sources)
+            if attempt.value is not None
+            else False
+        )
         if attempt.value is not None:
             exec_state = ExecutionState.PRODUCED
         elif attempt.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE:
@@ -4509,8 +4505,8 @@ def predict_with_engine(
             unit=attempt.unit,
             authority=attempt.authority,
             notices=attempt.notices,
-            coefficient_sources=sources,
-            lineage_complete=lineage_complete_for(sources) if attempt.value is not None else False,
+            coefficient_sources=coefficient_sources,
+            lineage_complete=lineage_complete,
             refusal_reason=attempt.refusal_reason,
             refusal_detail=attempt.refusal_detail,
             identity=identity,
@@ -6150,6 +6146,7 @@ def compile_residual(
     if (
         quantity in FUSION_QUANTITIES
         and prediction.engine is Engine.INTERNAL_ANALYTICAL
+        and reference.read_from in prediction.coefficient_sources
         and source_relation is SourceRelation.SAME_INPUT
     ):
         source_relation = SourceRelation.TRAINING
