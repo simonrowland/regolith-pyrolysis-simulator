@@ -7002,7 +7002,14 @@ def test_stolyarova_1996_comparison_provenance_is_activity_only(
 def test_stolyarova_1996_printed_compositions_reach_migrated_observations(
     tmp_path: Path,
 ) -> None:
+    from collections import Counter
+
     from simulator.battery.identity import Identity
+    from simulator.battery.score import (
+        ScoreContext,
+        comparison_candidates,
+        rail_for_quantity,
+    )
 
     result = _migrate_real_extract(
         tmp_path, "stolyarova-1996-cao-alumina-silica-kems.yaml"
@@ -7059,15 +7066,52 @@ def test_stolyarova_1996_printed_compositions_reach_migrated_observations(
     ion_currents = [obs for obs in rows if "table1_" in obs.observation_id]
     assert len(ion_currents) == 6
     assert all(obs.identity.species.phase.value is Phase.G for obs in ion_currents)
+    assert all(quantity_token(obs.identity) is Quantity.ION_INTENSITY for obs in ion_currents)
     figure_rows = [obs for obs in rows if "figure_only" in obs.observation_id]
     assert len(figure_rows) == 6
-    assert all(obs.identity.quantity.is_unknown for obs in figure_rows)
+    assert all(obs.identity.quantity.is_value for obs in figure_rows)
+    assert all(obs.identity.quantity.value is Quantity.ACTIVITY for obs in figure_rows)
+    assert all(obs.value.kind is ValueKind.UNAVAILABLE for obs in figure_rows)
+    assert all(obs.value.unavailable_reason == "figure_not_digitized" for obs in figure_rows)
+    assert all(obs.admission.status is AdmissionStatus.REJECTED for obs in figure_rows)
+    assert all(obs.locator is not None and obs.locator.figure in {"1", "2"} for obs in figure_rows)
     assert all(
-        obs.identity.quantity.reason
-        == "source semantics bound_not_point_ordering is ordering/categorical, not activity"
+        "bound_not_point_ordering" in obs.locator.note
+        and "never a point value" in obs.locator.note
         for obs in figure_rows
     )
+    assert all(obs.value.kind is not ValueKind.POINT for obs in figure_rows)
     assert all(obs.identity.species.phase.value is Phase.L for obs in figure_rows)
+    candidates = comparison_candidates(
+        ScoreContext(
+            works=result.works,
+            experiments=result.experiments,
+            observations=result.observations,
+        )
+    )
+    assert {obs.observation_id for obs in figure_rows}.isdisjoint(
+        obs.observation_id for obs in candidates
+    )
+    candidates = [
+        obs
+        for obs in candidates
+        if obs.source_id == "stolyarova-1996-cao-alumina-silica-kems"
+    ]
+    candidate_rails = Counter(
+        str(
+            rail_for_quantity(
+                obs.identity.quantity.value if obs.identity.quantity.is_value else None,
+                species_formula=obs.identity.species.formula,
+            )
+        )
+        for obs in candidates
+    )
+    assert candidate_rails == {
+        "None": 6,
+        "SiO_evolution": 45,
+        "melt_activity": 137,
+        "vapour": 63,
+    }
 
 
 def test_comparison_provenance_is_not_inherited_by_unknown_quantity_points(
