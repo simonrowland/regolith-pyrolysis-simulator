@@ -2574,6 +2574,18 @@ _FUSION_TABLES = {
     "SiO2": ("O-035", "O-038"),
 }
 
+# Closed fusion-resolver identity map; table names and assignments are from
+# NIST-JANAF 4th ed. Mg-008 is rock-salt/periclase at 1 bar through melting;
+# Ca-027 is lime (rock-salt) at 1 bar. Al-096 is alpha-alumina/corundum.
+_FUSION_TABLE_POLYMORPHS = {
+    "Ca-027": Polymorph.LIME,  # JANAF Calcium Oxide (cr).
+    "Al-096": Polymorph.CORUNDUM,  # JANAF Aluminium Oxide, Alpha.
+    "Mg-008": Polymorph.PERICLASE,  # JANAF Magnesium Oxide (cr).
+    "O-035": Polymorph.CRISTOBALITE_HIGH,  # JANAF Silicon Oxide, Cristobalite, High.
+    "O-036": Polymorph.CRISTOBALITE_LOW,  # JANAF Silicon Oxide, Cristobalite, Low.
+    "O-037": Polymorph.QUARTZ,  # JANAF Silicon Oxide, Quartz.
+}
+
 
 class JANAFFusionPolymorphUnavailable(ValueError):
     """No unique JANAF solid table represents the stated fusion polymorph."""
@@ -2588,11 +2600,17 @@ def _fusion_table_pair(
         raise ValueError(f"no JANAF fusion table pair for {oxide}") from exc
     if polymorph is None:
         return default_solid, liquid
-    solid_tables = tuple(
+    candidates = [default_solid]
+    candidates.extend(
         table_id
         for key, table_ids in JANAF_CRYSTAL_TABLE_IDS.items()
-        if key[0] == oxide and JANAF_CRYSTAL_DICTIONARY.get(key) is polymorph
+        if key[0] == oxide
         for table_id in table_ids
+    )
+    solid_tables = tuple(
+        table_id
+        for table_id in dict.fromkeys(candidates)
+        if _FUSION_TABLE_POLYMORPHS.get(table_id) is polymorph
     )
     if len(solid_tables) != 1:
         raise JANAFFusionPolymorphUnavailable(

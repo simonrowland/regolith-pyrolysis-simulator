@@ -191,6 +191,37 @@ def test_fusion_predictor_refuses_unavailable_stated_polymorph() -> None:
     assert prediction.coefficient_sources == ()
 
 
+def test_fusion_predictor_refuses_a_stated_polymorph_on_an_unlisted_table(
+    monkeypatch,
+) -> None:
+    from simulator.battery.generators import janaf
+    from simulator.battery.score import predict_with_engine
+
+    key = ("SiO2", "Tridymite")
+    monkeypatch.setitem(janaf.JANAF_CRYSTAL_TABLE_IDS, key, ("O-999",))
+    monkeypatch.setitem(janaf.JANAF_CRYSTAL_DICTIONARY, key, Polymorph.TRIDYMITE)
+
+    experiment = F.tabulation_experiment()
+    identity = _fusion_identity(
+        Quantity.ENTHALPY_OF_FUSION,
+        Decimal("1986"),
+        formula="SiO2",
+        polymorph=Polymorph.TRIDYMITE,
+    )
+    observation = F.observation(
+        "silica-fusion-unlisted-table",
+        experiment.experiment_id,
+        identity,
+        Decimal("9.4"),
+    )
+    attempt = predict_thermo_attempt(Engine.INTERNAL_ANALYTICAL, observation)
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    assert predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL, observation
+    ).coefficient_sources == ()
+
+
 def test_fusion_predictor_does_not_choose_an_unstated_polymorph() -> None:
     experiment = F.tabulation_experiment()
     identity = _fusion_identity(

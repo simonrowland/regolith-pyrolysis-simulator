@@ -1429,6 +1429,7 @@ def fusion_comparison_reference(
         return replace(reference, notices=union_notices(reference.notices, (notice,)))
 
     from simulator.battery.generators.janaf import (
+        _FUSION_TABLE_POLYMORPHS,
         JANAF_R_J_PER_MOL_K,
         _janaf_fusion_energy_for_pair,
         janaf_fusion_energy,
@@ -1475,12 +1476,7 @@ def fusion_comparison_reference(
     # Thus ΔG_fus=+28.47061 kJ/mol and Δlog10(a)=ΔG_fus*1000/(R*T*ln(10))
     # = +0.793984 dex (R=8.31441 J mol^-1 K^-1). Their branches cross at
     # 3104.945598 K, where ΔG_fus and the reference shift go to zero.
-    expected_polymorph = {
-        "Ca-027": Polymorph.LIME,
-        "Al-096": Polymorph.CORUNDUM,
-        "Mg-008": Polymorph.PERICLASE,
-        "O-035": Polymorph.CRISTOBALITE_HIGH,
-    }.get(fusion.crystal_table)
+    expected_polymorph = _FUSION_TABLE_POLYMORPHS.get(fusion.crystal_table)
     observed_polymorph = polymorph_token(standard_state.endmember)
     tridymite_to_cristobalite = (
         formula == "SiO2"
