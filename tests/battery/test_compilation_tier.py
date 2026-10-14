@@ -2869,10 +2869,130 @@ def test_internal_predicts_janaf_fusion_enthalpy_and_entropy() -> None:
         )
         attempt = predict_thermo_attempt(Engine.INTERNAL_ANALYTICAL, observation)
         assert attempt.value == value
+        assert attempt.authority is Authority.BRIDGE
+        assert attempt.notices == ()
         assert attempt.unit == {
             Quantity.ENTHALPY_OF_FUSION: "kJ_per_declared_mol_basis",
             Quantity.ENTROPY_OF_FUSION: "J_per_declared_mol_basis_per_K",
         }[quantity]
+
+
+def test_fusion_prediction_flags_an_unstated_solid_polymorph() -> None:
+    experiment = F.tabulation_experiment()
+    identity = _fusion_identity(
+        Quantity.ENTHALPY_OF_FUSION, Decimal("3000")
+    )
+    identity = replace(
+        identity,
+        species=replace(
+            identity.species, polymorph=State.unknown("source omits polymorph")
+        ),
+    )
+    observation = F.observation(
+        "fusion-unknown-polymorph",
+        experiment.experiment_id,
+        identity,
+        Decimal("77.028"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+
+    attempt = predict_thermo_attempt(Engine.INTERNAL_ANALYTICAL, observation)
+
+    assert attempt.value == Decimal("77.028")
+    assert attempt.authority is Authority.BRIDGE
+    assert len(attempt.notices) == 1
+    notice = attempt.notices[0]
+    assert notice.kind is NoticeKind.DERIVATION_USES_COMPILATION
+    assert notice.reason == (
+        "fusion_solid_polymorph_unspecified: source does not state a solid "
+        "polymorph; predictor used Mg-008 (periclase)"
+    )
+    assert notice.authority is Authority.BRIDGE
+    assert notice.band == "JANAF Mg-008/Mg-009 common range [298.15, 4000.0] K"
+    residual, _candidate = compile_residual(
+        observation,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(observation),
+    )
+    assert residual.numeric is not None
+    assert residual.status is ResidualStatus.NO_BAND
+    assert any(
+        item.reason == notice.reason for item in residual.notices
+    )
+
+
+def test_fusion_prediction_refuses_a_stated_polymorph_mismatch() -> None:
+    experiment = F.tabulation_experiment()
+    identity = F.oxide_identity(
+        "SiO2",
+        Phase.CR,
+        T_K=Decimal("1800"),
+        per=PerBasis.MOL_SPECIES,
+        polymorph=Polymorph.QUARTZ.value,
+    )
+    identity = replace(
+        identity,
+        quantity=Quantity.ENTHALPY_OF_FUSION,
+        per=State.not_applicable("not a fusion basis"),
+        standard_pressure_Pa=State.not_applicable("not pressure dependent"),
+        reaction=State.not_applicable("not a formation quantity"),
+        formation_elements=State.not_applicable("not a formation quantity"),
+        subtype=State.of("solid_to_liquid"),
+    )
+    observation = F.observation(
+        "fusion-quartz-mismatches-engine-reference",
+        experiment.experiment_id,
+        identity,
+        Decimal("80"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+
+    attempt = predict_thermo_attempt(Engine.INTERNAL_ANALYTICAL, observation)
+
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    assert attempt.refusal_detail["reason"] == "fusion-solid-polymorph-mismatch"
+    assert attempt.refusal_detail["engine_reference_table"] == "O-035"
+    assert attempt.refusal_detail["engine_reference_polymorph"] == "cristobalite_high"
+
+
+def test_fusion_notice_names_the_selected_silica_reference_among_alternatives() -> None:
+    experiment = F.tabulation_experiment()
+    identity = F.oxide_identity(
+        "SiO2",
+        Phase.CR,
+        T_K=Decimal("1800"),
+        per=PerBasis.MOL_SPECIES,
+        polymorph=Polymorph.CRISTOBALITE_HIGH.value,
+    )
+    identity = replace(
+        identity,
+        quantity=Quantity.ENTHALPY_OF_FUSION,
+        per=State.not_applicable("not a fusion basis"),
+        standard_pressure_Pa=State.not_applicable("not pressure dependent"),
+        reaction=State.not_applicable("not a formation quantity"),
+        formation_elements=State.not_applicable("not a formation quantity"),
+        subtype=State.of("solid_to_liquid"),
+        species=replace(
+            identity.species, polymorph=State.unknown("source omits polymorph")
+        ),
+    )
+    observation = F.observation(
+        "fusion-unknown-silica-polymorph",
+        experiment.experiment_id,
+        identity,
+        Decimal("80"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+
+    attempt = predict_thermo_attempt(Engine.INTERNAL_ANALYTICAL, observation)
+
+    assert attempt.value is not None
+    assert attempt.notices[0].reason == (
+        "fusion_solid_polymorph_unspecified: source does not state a solid "
+        "polymorph; predictor used O-035 (cristobalite_high); other JANAF "
+        "solid references available at T: O-037 (quartz)"
+    )
 
 
 def test_non_internal_engine_has_typed_fusion_refusal() -> None:
