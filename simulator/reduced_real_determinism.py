@@ -2528,6 +2528,10 @@ def gate_curve_memo_producer_configuration(
     sim: Any,
     curve: Mapping[str, Any],
 ) -> dict[str, Any]:
+    # Match the provider selection used by gate dispatch before a cache read.
+    # Gate providers are otherwise registered lazily by the dispatch path,
+    # after an uninitialized receiver has already refused a shared memo.
+    _register_gate_providers_for_key(sim)
     provider_role = _gate_curve_provider_role(curve)
     if provider_role is None:
         provider_role = _gate_provider_role_for_key(sim)
